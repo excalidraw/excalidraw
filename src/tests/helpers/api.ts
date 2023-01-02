@@ -43,6 +43,10 @@ export class API {
 
   static addSubtype = (record: SubtypeRecord, subtypePrepFn: SubtypePrepFn) => {
     const prep = prepareSubtype(record, subtypePrepFn);
+    if (prep.actions) {
+      h.app.actionManager.registerAll(prep.actions);
+      h.app.actionManager.registerActionGuards();
+    }
     return prep;
   };
 

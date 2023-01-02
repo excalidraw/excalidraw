@@ -16,7 +16,7 @@ import { render } from "./test-utils";
 import { API } from "./helpers/api";
 import ExcalidrawApp from "../excalidraw-app";
 
-import { FontString, Theme } from "../element/types";
+import { ExcalidrawElement, FontString, Theme } from "../element/types";
 import { createIcon, iconFillColor } from "../components/icons";
 import { SubtypeButton } from "../components/SubtypeButton";
 import { registerAuxLangData } from "../i18n";
@@ -24,6 +24,7 @@ import { getFontString, getShortcutKey } from "../utils";
 import * as textElementUtils from "../element/textElement";
 import { isTextElement } from "../element";
 import { mutateElement, newElementWith } from "../element/mutateElement";
+import { Action } from "../actions/types";
 import { AppState } from "../types";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 
@@ -58,10 +59,26 @@ const testSubtypeIcon = ({ theme }: { theme: Theme }) =>
     { width: 40, height: 20, mirror: true },
   );
 
+const TEST_ACTION = "testAction";
+const TEST_DISABLE1 = "changeSloppiness";
+const TEST_DISABLE3 = "changeRoundness";
+
 const test1: SubtypeRecord = {
   subtype: "test",
   parents: ["line", "arrow", "rectangle", "diamond", "ellipse"],
-  disabledNames: ["changeSloppiness"],
+  disabledNames: [TEST_DISABLE1],
+  actionNames: [TEST_ACTION],
+};
+
+const testAction: Action = {
+  name: TEST_ACTION,
+  trackEvent: false,
+  perform: (elements, appState) => {
+    return {
+      elements,
+      commitToHistory: false,
+    };
+  },
 };
 
 const test1Button = SubtypeButton(
@@ -89,6 +106,7 @@ const test3: SubtypeRecord = {
     testShortcut: [getShortcutKey("Shift+T")],
   },
   alwaysEnabledNames: ["test3Always"],
+  disabledNames: [TEST_DISABLE3],
 };
 
 const test3Button = SubtypeButton(
@@ -129,7 +147,7 @@ const prepareTest1Subtype = function (
   addLangData(fallbackLangData, getLangData);
   registerAuxLangData(fallbackLangData, getLangData);
 
-  const actions = [test1Button];
+  const actions = [testAction, test1Button];
   actions.forEach((action) => addSubtypeAction(action));
 
   return { actions, methods };
@@ -207,6 +225,7 @@ const { h } = window;
 
 describe("subtype registration", () => {
   it("should check for invalid subtype or parents", async () => {
+    await render(<ExcalidrawApp />, {});
     // Define invalid subtype records
     const null1 = {} as SubtypeRecord;
     const null2 = { subtype: "" } as SubtypeRecord;
@@ -226,7 +245,7 @@ describe("subtype registration", () => {
   it("should return subtype actions and methods correctly", async () => {
     // Check initial registration works
     let prep1 = API.addSubtype(test1, prepareTest1Subtype);
-    expect(prep1.actions).toStrictEqual([test1Button]);
+    expect(prep1.actions).toStrictEqual([testAction, test1Button]);
     expect(prep1.methods).toStrictEqual({ clean: cleanTestElementUpdate });
     // Check repeat registration fails
     prep1 = API.addSubtype(test1, prepareNullSubtype);
@@ -313,46 +332,28 @@ describe("subtypes", () => {
     expect(subtypeCollides(test1.subtype, [test3.subtype])).toBe(true);
   });
   it("should apply to ExcalidrawElements", async () => {
-    await render(<ExcalidrawApp />, {
-      localStorageData: {
-        elements: [
-          API.createElement({ type: "line", id: "A", subtype: test1.subtype }),
-          API.createElement({ type: "arrow", id: "B", subtype: test1.subtype }),
-          API.createElement({
-            type: "rectangle",
-            id: "C",
-            subtype: test1.subtype,
-          }),
-          API.createElement({
-            type: "diamond",
-            id: "D",
-            subtype: test1.subtype,
-          }),
-          API.createElement({
-            type: "ellipse",
-            id: "E",
-            subtype: test1.subtype,
-          }),
-        ],
-      },
-    });
-    h.elements.forEach((el) => expect(el.subtype).toBe(test1.subtype));
+    const elements = [
+      API.createElement({ type: "line", id: "A", subtype: test1.subtype }),
+      API.createElement({ type: "arrow", id: "B", subtype: test1.subtype }),
+      API.createElement({ type: "rectangle", id: "C", subtype: test1.subtype }),
+      API.createElement({ type: "diamond", id: "D", subtype: test1.subtype }),
+      API.createElement({ type: "ellipse", id: "E", subtype: test1.subtype }),
+    ];
+    await render(<ExcalidrawApp />, { localStorageData: { elements } });
+    elements.forEach((el) => expect(el.subtype).toBe(test1.subtype));
   });
   it("should enforce prop value restrictions", async () => {
-    await render(<ExcalidrawApp />, {
-      localStorageData: {
-        elements: [
-          API.createElement({
-            type: "line",
-            id: "A",
-            subtype: test1.subtype,
-            roughness: 1,
-          }),
-          API.createElement({ type: "line", id: "B", roughness: 1 }),
-        ],
-      },
-    });
-    h.elements.forEach((el) => {
+    const elements = [
+      API.createElement({
+        type: "line",
+        id: "A",
+        subtype: test1.subtype,
+        roughness: 1,
+      }),
+      API.createElement({ type: "line", id: "B", roughness: 1 }),
+    ];
+    await render(<ExcalidrawApp />, { localStorageData: { elements } });
+    elements.forEach((el) => {
       if (el.subtype === test1.subtype) {
         expect(el.roughness).toBe(0);
       } else {
@@ -401,19 +402,16 @@ describe("subtypes", () => {
   });
   it("should call custom text methods", async () => {
     const testString = "A quick brown fox jumps over the lazy dog.";
-    await render(<ExcalidrawApp />, {
-      localStorageData: {
-        elements: [
-          API.createElement({
-            type: "text",
-            id: "A",
-            subtype: test2.subtype,
-            text: testString,
-            fontSize: FONTSIZE,
-          }),
-        ],
-      },
-    });
+    const elements = [
+      API.createElement({
+        type: "text",
+        id: "A",
+        subtype: test2.subtype,
+        text: testString,
+        fontSize: FONTSIZE,
+      }),
+    ];
+    await render(<ExcalidrawApp />, { localStorageData: { elements } });
     const mockMeasureText = (
       text: string,
       font: FontString,
@@ -441,7 +439,7 @@ describe("subtypes", () => {
       .spyOn(textElementUtils, "measureText")
       .mockImplementation(mockMeasureText);
 
-    h.elements.forEach((el) => {
+    elements.forEach((el) => {
       if (isTextElement(el)) {
         // First test with `ExcalidrawTextElement.text`
         const metrics = textElementUtils.measureTextElement(el);
@@ -594,5 +592,66 @@ describe("subtypes", () => {
     expect(subtypes.customData![test1.subtype]).toBe(true);
     expect(subtypes.customData![test2.subtype]).toBeUndefined();
     expect(subtypes.customData![test3.subtype]).toBeUndefined();
+  });
+});
+describe("subtype actions", () => {
+  let elements: ExcalidrawElement[];
+  beforeEach(async () => {
+    elements = [
+      API.createElement({ type: "line", id: "A", subtype: test1.subtype }),
+      API.createElement({ type: "line", id: "B" }),
+      API.createElement({ type: "line", id: "C", subtype: test3.subtype }),
+      API.createElement({ type: "text", id: "D", subtype: test3.subtype }),
+    ];
+    await render(<ExcalidrawApp />, { localStorageData: { elements } });
+  });
+  it("should apply to elements with their subtype", async () => {
+    h.setState({ selectedElementIds: { A: true } });
+    const am = h.app.actionManager;
+    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(true);
+    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(false);
+  });
+  it("should apply to elements without a subtype", async () => {
+    h.setState({ selectedElementIds: { B: true } });
+    const am = h.app.actionManager;
+    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(false);
+    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(true);
+  });
+  it("should apply to elements with and without their subtype", async () => {
+    h.setState({ selectedElementIds: { A: true, B: true } });
+    const am = h.app.actionManager;
+    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(true);
+    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(true);
+  });
+  it("should apply to elements with a different subtype", async () => {
+    h.setState({ selectedElementIds: { C: true, D: true } });
+    const am = h.app.actionManager;
+    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(false);
+    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(true);
+  });
+  it("should apply to like types with varying subtypes", async () => {
+    h.setState({ selectedElementIds: { A: true, C: true } });
+    const am = h.app.actionManager;
+    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(true);
+    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(true);
+  });
+  it("should apply to non-like types with varying subtypes", async () => {
+    h.setState({ selectedElementIds: { A: true, D: true } });
+    const am = h.app.actionManager;
+    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(true);
+    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(false);
+  });
+  it("should apply to like/non-like types with varying subtypes", async () => {
+    h.setState({ selectedElementIds: { A: true, B: true, D: true } });
+    const am = h.app.actionManager;
+    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(true);
+    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(true);
+  });
+  it("should apply to the correct parent type", async () => {
+    const am = h.app.actionManager;
+    h.setState({ selectedElementIds: { A: true, C: true } });
+    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE3)).toBe(true);
+    h.setState({ selectedElementIds: { A: true, D: true } });
+    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE3)).toBe(true);
   });
 });

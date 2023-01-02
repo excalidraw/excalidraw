@@ -158,17 +158,35 @@ const isActionEnabled: EnableFn = function (elements, appState, actionName) {
             }
             return !isForSubtype(subtype, actionName, false);
           }))) ||
-      // Or is there an ExcalidrawElement without a subtype which would
-      // disable this action if it had a subtype?
+      // Or can we find an ExcalidrawElement without a valid subtype
+      // which would disable this action if it had a valid subtype?
       chosen.some((el) => {
         const e = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
         return parentTypeMap.some(
           (value) =>
             value.parentType === e.type &&
-            e.subtype === undefined &&
-            disabledActionMap
-              .find((val) => val.subtype === value.subtype)!
-              .actions.includes(actionName),
+            !isValidSubtype(e.subtype, e.type) &&
+            isForSubtype(value.subtype, actionName, false),
+        );
+      }) ||
+      chosen.some((el) => {
+        const e = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
+        return (
+          // Would the subtype of e by inself disable this action?
+          isForSubtype(e.subtype, actionName, false) &&
+          // Can we find an ExcalidrawElement which could have the same subtype
+          // as e but whose subtype does not disable this action?
+          chosen.some((el) => {
+            const e2 = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
+            return (
+              // Does e have a valid subtype whose parent types include the
+              // type of e2, and does the subtype of e2 not disable this action?
+              parentTypeMap
+                .filter((val) => val.subtype === e.subtype)
+                .some((val) => val.parentType === e2.type) &&
+              !isForSubtype(e2.subtype, actionName, false)
+            );
+          })
         );
       })
     );
