@@ -146,7 +146,8 @@
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
     </script>
-    <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
+    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true' &&
+    process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=%REACT_APP_GOOGLE_ANALYTICS_ID%"
