@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Prilepi",
+    "pasteAsPlaintext": "Prilepi kot navadno besedilo",
     "pasteCharts": "Prilepi grafikone",
     "selectAll": "Izberi vse",
     "multiSelect": "Dodaj element v izbor",
@@ -71,7 +72,7 @@
     "layers": "Plasti",
     "actions": "Dejanja",
     "language": "Jezik",
-    "liveCollaboration": "Sodelovanje v živo",
+    "liveCollaboration": "Sodelovanje v živo...",
     "duplicateSelection": "Podvoji",
     "untitled": "Neimenovana",
     "name": "Ime",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Ponastavi platno",
     "exportJSON": "Izvozi v datoteko",
-    "exportImage": "Shrani kot sliko",
-    "export": "Izvoz",
+    "exportImage": "Izvozi sliko...",
+    "export": "Shrani v...",
     "exportToPng": "Izvozi v PNG",
     "exportToSvg": "Izvozi v SVG",
     "copyToClipboard": "Kopiraj v odložišče",
@@ -144,7 +145,7 @@
     "scale": "Povečava",
     "save": "Shrani v trenutno datoteko",
     "saveAs": "Shrani kot",
-    "load": "Naloži",
+    "load": "Odpri",
     "getShareableLink": "Pridobi povezavo za deljenje",
     "close": "Zapri",
     "selectLanguage": "Izberi jezik",
@@ -214,7 +215,7 @@
     "text": "Besedilo",
     "library": "Knjižnica",
     "lock": "Ohrani izbrano orodje aktivno po risanju",
-    "penMode": "Prepreči povečavo s prsti in dovoli samo risanje s peresom",
+    "penMode": "Način peresa - prepreči dotik",
     "link": "Dodaj/posodobi povezavo za izbrano obliko",
     "eraser": "Radirka"
   },
@@ -235,7 +236,7 @@
     "resize": "Razmerja lahko omejite tako, da držite tipko Shift med spreminjanjem velikosti. Držite tipko Alt, da spremenite velikost od središča",
     "resizeImage": "Velikost lahko prosto spreminjate tako, da držite tipko Shift. Držite tipko Alt, da spremenite velikost od središča",
     "rotate": "Kote lahko omejite tako, da med vrtenjem držite tipko Shift",
-    "lineEditor_info": "Dvokliknite ali pritisnite tipko Enter, da uredite točke",
+    "lineEditor_info": "Držite CtrlOrCmd in dvokliknite ali pritisnite CtrlOrCmd + Enter za urejanje točk",
     "lineEditor_pointSelected": "Pritisnite tipko Delete, da odstranite točko(e), CtrlOrCmd+D za podvojitev ali povlecite za premikanje",
     "lineEditor_nothingSelected": "Izberite točko za urejanje (pridržite tipko Shift za izbiro več točk), ali držite tipko Alt in kliknite za dodajanje novih točk",
     "placeImage": "Kliknite, da postavite sliko, ali kliknite in povlecite, da ročno nastavite njeno velikost",
@@ -310,7 +311,9 @@
     "view": "Pogled",
     "zoomToFit": "Približaj na vse elemente",
     "zoomToSelection": "Približaj na izbor",
-    "toggleElementLock": "Zakleni/odkleni izbor"
+    "toggleElementLock": "Zakleni/odkleni izbor",
+    "movePageUpDown": "Premakni stran gor/dol",
+    "movePageLeftRight": "Premakni stran levo/desno"
   },
   "clearCanvasDialog": {
     "title": "Počisti platno"
@@ -391,7 +394,8 @@
     "fileSaved": "Datoteka shranjena.",
     "fileSavedToFilename": "Shranjeno v {filename}",
     "canvas": "platno",
-    "selection": "izbor"
+    "selection": "izbor",
+    "pasteAsSingleElement": "Uporabite {{shortcut}}, da prilepite kot en element,\n ali prilepite v obstoječ urejevalnik besedil"
   },
   "colors": {
     "ffffff": "Bela",
@@ -439,5 +443,12 @@
     "5c940d": "Limeta 9",
     "e67700": "Rumena 9",
     "d9480f": "Oranžna 9"
+  },
+  "welcomeScreen": {
+    "data": "Vsi vaši podatki so shranjeni lokalno v vašem brskalniku.",
+    "switchToPlusApp": "Ste namesto tega želeli odpreti Excalidraw+?",
+    "menuHints": "Izvoz, nastavitve, jeziki, ...",
+    "toolbarHints": "Izberi orodje in začni z risanjem!",
+    "helpHints": "Bljižnice in pomoč"
   }
 }

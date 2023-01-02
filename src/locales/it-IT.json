@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Incolla",
+    "pasteAsPlaintext": "Incolla come testo normale",
     "pasteCharts": "Incolla grafici",
     "selectAll": "Seleziona tutto",
     "multiSelect": "Aggiungi elemento alla selezione",
@@ -71,7 +72,7 @@
     "layers": "Livelli",
     "actions": "Azioni",
     "language": "Lingua",
-    "liveCollaboration": "Collaborazione live",
+    "liveCollaboration": "Collaborazione dal vivo...",
     "duplicateSelection": "Duplica",
     "untitled": "Senza titolo",
     "name": "Nome",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Svuota la tela",
     "exportJSON": "Esporta su file",
-    "exportImage": "Salva come immagine",
-    "export": "Esporta",
+    "exportImage": "Esporta immagine...",
+    "export": "Salva in...",
     "exportToPng": "Esporta come PNG",
     "exportToSvg": "Esporta come SVG",
     "copyToClipboard": "Copia negli appunti",
@@ -144,7 +145,7 @@
     "scale": "Scala",
     "save": "Salva sul file corrente",
     "saveAs": "Salva con nome",
-    "load": "Carica",
+    "load": "Apri",
     "getShareableLink": "Ottieni link condivisibile",
     "close": "Chiudi",
     "selectLanguage": "Seleziona lingua",
@@ -214,7 +215,7 @@
     "text": "Testo",
     "library": "Libreria",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato",
-    "penMode": "Impedisci il pinch-zoom e accetta l'input di disegno libero solo dalla penna",
+    "penMode": "Modalità penna - previene il tocco",
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
     "eraser": "Gomma"
   },
@@ -235,7 +236,7 @@
     "resize": "Per vincolare le proporzioni, tieni premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tieni premuto ALT",
     "resizeImage": "Puoi ridimensionare liberamente tenendo premuto SHIFT,\ntieni premuto ALT per ridimensionare dal centro",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
-    "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
+    "lineEditor_info": "Tieni premuto Ctrl o Cmd e doppio clic oppure premi Ctrl o Cmd + Invio per modificare i punti",
     "lineEditor_pointSelected": "Premi Elimina per rimuovere il punto(i),\nCtrlOCmd+D per duplicare o trascinare per spostare",
     "lineEditor_nothingSelected": "Seleziona un punto da modificare (tieni premuto MAIUSC per selezionare più punti),\noppure tieni premuto Alt e fai clic per aggiungere nuovi punti",
     "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente",
@@ -310,7 +311,9 @@
     "view": "Vista",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
     "zoomToSelection": "Zoom alla selezione",
-    "toggleElementLock": "Blocca/sblocca selezione"
+    "toggleElementLock": "Blocca/sblocca selezione",
+    "movePageUpDown": "Sposta la pagina su/giù",
+    "movePageLeftRight": "Sposta la pagina a sinistra/destra"
   },
   "clearCanvasDialog": {
     "title": "Svuota la tela"
@@ -391,7 +394,8 @@
     "fileSaved": "File salvato.",
     "fileSavedToFilename": "Salvato in {filename}",
     "canvas": "tela",
-    "selection": "selezione"
+    "selection": "selezione",
+    "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente"
   },
   "colors": {
     "ffffff": "Bianco",
@@ -439,5 +443,12 @@
     "5c940d": "Lime 9",
     "e67700": "Giallo 9",
     "d9480f": "Arancio 9"
+  },
+  "welcomeScreen": {
+    "data": "Tutti i tuoi dati sono salvati localmente nel browser.",
+    "switchToPlusApp": "Volevi invece andare su Excalidraw+?",
+    "menuHints": "Esporta, preferenze, lingue, ...",
+    "toolbarHints": "Scegli uno strumento & Inizia a disegnare!",
+    "helpHints": "Scorciatoie & aiuto"
   }
 }
