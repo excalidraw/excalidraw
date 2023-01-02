@@ -701,10 +701,11 @@ export const ReactChildrenToObject = <
     if (
       React.isValidElement(child) &&
       typeof child.type !== "string" &&
-      child?.type.name
+      //@ts-ignore
+      child?.type.displayName
     ) {
       // @ts-ignore
-      acc[child.type.name] = child;
+      acc[child.type.displayName] = child;
     }
     return acc;
   }, {} as Partial<T>);

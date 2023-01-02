@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lim inn",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Lim inn diagram",
     "selectAll": "Vel alt",
     "multiSelect": "Legg til element i utval",
@@ -71,7 +72,7 @@
     "layers": "Lag",
     "actions": "Handlingar",
     "language": "Språk",
-    "liveCollaboration": "Sanntids-samarbeid",
+    "liveCollaboration": "",
     "duplicateSelection": "Dupliser",
     "untitled": "Utan namn",
     "name": "Namn",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
     "exportJSON": "Eksporter til fil",
-    "exportImage": "Lagre som bilete",
-    "export": "Eksporter",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Eksporter til PNG",
     "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavla",
@@ -144,7 +145,7 @@
     "scale": "Skaler",
     "save": "Lagre til noverande fil",
     "saveAs": "Lagre som",
-    "load": "Opne",
+    "load": "",
     "getShareableLink": "Hent delingslenke",
     "close": "Lukk",
     "selectLanguage": "Vel språk",
@@ -214,7 +215,7 @@
     "text": "Tekst",
     "library": "Bibliotek",
     "lock": "Hald fram med valt verktøy",
-    "penMode": "Forhindre zoom ved kniping og godta frihandsteikning kun frå penn",
+    "penMode": "",
     "link": "Legg til/ oppdater lenke til valt figur",
     "eraser": "Viskelêr"
   },
@@ -235,7 +236,7 @@
     "resize": "Du kan halde fram med forholdet ved å trykke SHIFT medan du endrar storleik,\ntrykk ALT for å endre storleiken frå midten",
     "resizeImage": "Du kan endre storleiken fritt ved å halde inne SHIFT,\nhald ALT for å endre storleik frå sentrum",
     "rotate": "Du kan låse vinklane ved å halde SHIFT medan du roterer",
-    "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkt",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Trykk på Slett for å fjerne punkt(a),\nCtrl / Cmd+D for å duplisere, eller drag for å flytte",
     "lineEditor_nothingSelected": "Vel eit punkt å redigere (hald inne SHIFT for å velje fleire),\neller hald inne Alt og klikk for å legge til nye punkt",
     "placeImage": "Klikk for å plassere biletet, eller klikk og drag for å velje storleik manuelt",
@@ -310,7 +311,9 @@
     "view": "Vising",
     "zoomToFit": "Zoom for å sjå alle elementa",
     "zoomToSelection": "Zoom til utval",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Tøm lerretet"
@@ -391,7 +394,8 @@
     "fileSaved": "Fila er lagra.",
     "fileSavedToFilename": "Lagra som {filename}",
     "canvas": "lerret",
-    "selection": "val"
+    "selection": "val",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Kvit",
@@ -439,5 +443,12 @@
     "5c940d": "Limegrøn 9",
     "e67700": "Gul 9",
     "d9480f": "Oransj 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }

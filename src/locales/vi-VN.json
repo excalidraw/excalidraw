@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Dán",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Dán biểu đồ",
     "selectAll": "Chọn tất cả",
     "multiSelect": "Thêm mới vào Select",
@@ -44,7 +45,7 @@
     "exportEmbedScene": "",
     "exportEmbedScene_details": "",
     "addWatermark": "Làm với Excalidraw\"",
-    "handDrawn": "",
+    "handDrawn": "Vẽ tay",
     "normal": "Bình thường",
     "code": "Mã",
     "small": "Nhỏ",
@@ -52,34 +53,34 @@
     "large": "Lớn",
     "veryLarge": "Rất lớn",
     "solid": "Đặc",
-    "hachure": "",
-    "crossHatch": "",
+    "hachure": "Nét gạch gạch",
+    "crossHatch": "Nét gạch chéo",
     "thin": "Mỏng",
     "bold": "In đậm",
     "left": "Trái",
     "center": "Giữa",
     "right": "Phải",
     "extraBold": "",
-    "architect": "",
-    "artist": "",
-    "cartoonist": "",
+    "architect": "Kiến trúc sư",
+    "artist": "Nghệ sỹ",
+    "cartoonist": "Hoạt hình",
     "fileTitle": "",
-    "colorPicker": "",
+    "colorPicker": "Chọn màu",
     "canvasColors": "",
     "canvasBackground": "",
     "drawingCanvas": "",
-    "layers": "",
-    "actions": "",
-    "language": "",
+    "layers": "Lớp",
+    "actions": "Chức năng",
+    "language": "Ngôn ngữ",
     "liveCollaboration": "",
-    "duplicateSelection": "",
-    "untitled": "",
-    "name": "",
-    "yourName": "",
+    "duplicateSelection": "Tạo bản sao",
+    "untitled": "Không có tiêu đề",
+    "name": "Tên",
+    "yourName": "Tên của bạn",
     "madeWithExcalidraw": "Làm với Excalidraw",
     "group": "",
     "ungroup": "",
-    "collaborators": "",
+    "collaborators": "Cộng tác viên",
     "showGrid": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
@@ -310,7 +311,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": "",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -391,7 +394,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
@@ -439,5 +443,12 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
