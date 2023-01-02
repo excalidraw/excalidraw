@@ -201,7 +201,9 @@
     "svgImageInsertError": "Kon geen SVG-afbeelding invoegen. De SVG-opmaak ziet er niet geldig uit.",
     "invalidSVGString": "Ongeldige SVG.",
     "cannotResolveCollabServer": "Kan geen verbinding maken met de collab server. Herlaad de pagina en probeer het opnieuw.",
-    "importLibraryError": "Kon bibliotheek niet laden"
+    "importLibraryError": "Kon bibliotheek niet laden",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Selectie",
