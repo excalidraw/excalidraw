@@ -82,6 +82,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
             }
           }
           if (!didChangePoints) {
+            key in oldUpdates && (increment = true);
             continue;
           }
         }
