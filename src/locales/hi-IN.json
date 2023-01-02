@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "चिपकाएँ",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "सादे पाठ के रूप में चिपकाएं",
     "pasteCharts": "चार्ट चिपकाएँ",
     "selectAll": "सभी चुनें",
     "multiSelect": "आकार को चयन में जोड़ें",
@@ -236,7 +236,7 @@
     "resize": "आकार बदलते समय आप SHIFT को पकड़ कर अनुपात में कमी कर सकते हैं,\nकेंद्र से आकार बदलने के लिए ALT दबाए रखें",
     "resizeImage": "",
     "rotate": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को विवश कर सकते हैं",
-    "lineEditor_info": "",
+    "lineEditor_info": "बिंदुओं को सम्पादित करने के लिए CtrlOrCmd को दबायें रखते हुये डबल क्लिक करे, अथवा CtrlOrCmd + Enter साथ दबाये",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
