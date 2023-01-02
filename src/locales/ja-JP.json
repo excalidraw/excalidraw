@@ -201,7 +201,9 @@
     "svgImageInsertError": "SVGイメージを挿入できませんでした。SVGマークアップは無効に見えます。",
     "invalidSVGString": "無効なSVGです。",
     "cannotResolveCollabServer": "コラボレーションサーバに接続できませんでした。ページを再読み込みして、もう一度お試しください。",
-    "importLibraryError": "ライブラリを読み込めませんでした。"
+    "importLibraryError": "ライブラリを読み込めませんでした。",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "選択",
