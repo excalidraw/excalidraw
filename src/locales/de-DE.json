@@ -201,7 +201,9 @@
     "svgImageInsertError": "SVG-Bild konnte nicht eingefügt werden. Das SVG-Markup sieht ungültig aus.",
     "invalidSVGString": "Ungültige SVG.",
     "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut.",
-    "importLibraryError": "Bibliothek konnte nicht geladen werden"
+    "importLibraryError": "Bibliothek konnte nicht geladen werden",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Auswahl",
