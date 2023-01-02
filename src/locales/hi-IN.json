@@ -395,7 +395,7 @@
     "fileSavedToFilename": "",
     "canvas": "",
     "selection": "",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "एक अवयव के रूप में चिपकाने के लिए {{shortcut}} का उपयोग करें,\nया किसी मौजूदा पाठ संपादक में चिपकायें"
   },
   "colors": {
     "ffffff": "सफेद",
