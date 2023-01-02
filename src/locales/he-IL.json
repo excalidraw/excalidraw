@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "הדבק",
+    "pasteAsPlaintext": "",
     "pasteCharts": "הדבק גרפים",
     "selectAll": "בחר הכל",
     "multiSelect": "הוסף אובייקט לבחירה",
@@ -71,7 +72,7 @@
     "layers": "שכבות",
     "actions": "פעולות",
     "language": "שפה",
-    "liveCollaboration": "התחל שיתוף חי",
+    "liveCollaboration": "",
     "duplicateSelection": "שכפל",
     "untitled": "ללא כותרת",
     "name": "שם",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "אפס את הלוח",
     "exportJSON": "ייצא לקובץ",
-    "exportImage": "שמירה כתמונה",
-    "export": "ייצא",
+    "exportImage": "ייצוא התמונה...",
+    "export": "שמור ל...",
     "exportToPng": "יצא ל PNG",
     "exportToSvg": "יצא ל SVG",
     "copyToClipboard": "העתק ללוח",
@@ -144,7 +145,7 @@
     "scale": "קנה מידה",
     "save": "שמירת קובץ נוכחי",
     "saveAs": "שמירה בשם",
-    "load": "טען",
+    "load": "פתח",
     "getShareableLink": "קבל קישור לשיתוף",
     "close": "סגור",
     "selectLanguage": "בחר שפה",
@@ -235,7 +236,7 @@
     "resize": "ניתן להגביל פרופורציות על ידי לחיצה על SHIFT תוך כדי שינוי גודל,\nהחזק ALT בשביל לשנות גודל ביחס למרכז",
     "resizeImage": "",
     "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב",
-    "lineEditor_info": "לחץ לחיצה כפולה או אנטר לעריכת הנקודות",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -310,7 +311,9 @@
     "view": "תצוגה",
     "zoomToFit": "גלילה להצגת כל האלמנטים במסך",
     "zoomToSelection": "התמקד בבחירה",
-    "toggleElementLock": "נעילה/ביטול הנעילה של הרכיבים הנבחרים"
+    "toggleElementLock": "נעילה/ביטול הנעילה של הרכיבים הנבחרים",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "ניקוי הקנבס"
@@ -391,7 +394,8 @@
     "fileSaved": "קובץ נשמר.",
     "fileSavedToFilename": "נשמר לקובץ {filename}",
     "canvas": "משטח ציור",
-    "selection": "בחירה"
+    "selection": "בחירה",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "לבן",
@@ -439,5 +443,12 @@
     "5c940d": "ליים 9",
     "e67700": "ירוק 9",
     "d9480f": "כתום 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }

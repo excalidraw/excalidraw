@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Colar",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Colar gráficos",
     "selectAll": "Selecionar tudo",
     "multiSelect": "Adicionar elemento à seleção",
@@ -71,7 +72,7 @@
     "layers": "Camadas",
     "actions": "Ações",
     "language": "Idioma",
-    "liveCollaboration": "Colaboração ao vivo",
+    "liveCollaboration": "Colaboração ao vivo...",
     "duplicateSelection": "Duplicar",
     "untitled": "Sem título",
     "name": "Nome",
@@ -115,8 +116,8 @@
       "label": "Ligação"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Editar linha",
+      "exit": "Sair do editor de linha"
     },
     "elementLock": {
       "lock": "Bloquear",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Limpar a área de desenho e redefinir a cor de fundo",
     "exportJSON": "Exportar para ficheiro",
-    "exportImage": "Guardar como imagem",
-    "export": "Exportar",
+    "exportImage": "Exportar imagem...",
+    "export": "Guardar para...",
     "exportToPng": "Exportar em PNG",
     "exportToSvg": "Exportar em SVG",
     "copyToClipboard": "Copiar para o clipboard",
@@ -144,7 +145,7 @@
     "scale": "Escala",
     "save": "Guardar no ficheiro atual",
     "saveAs": "Guardar como",
-    "load": "Carregar",
+    "load": "Abrir",
     "getShareableLink": "Obter um link de partilha",
     "close": "Fechar",
     "selectLanguage": "Selecionar idioma",
@@ -214,7 +215,7 @@
     "text": "Texto",
     "library": "Biblioteca",
     "lock": "Manter a ferramenta selecionada ativa após desenhar",
-    "penMode": "Impedir o <em>pinch-zoom</em> e aceitar desenho livre apenas da caneta",
+    "penMode": "Modo caneta - impedir toque",
     "link": "Acrescentar/ Adicionar ligação para uma forma seleccionada",
     "eraser": "Borracha"
   },
@@ -235,7 +236,7 @@
     "resize": "Pode restringir as proporções mantendo a tecla SHIFT premida enquanto redimensiona,\nmantenha a tecla ALT premida para redimensionar a partir do centro",
     "resizeImage": "Pode redimensionar livremente mantendo pressionada a tecla SHIFT,\nmantenha pressionada a tecla ALT para redimensionar do centro",
     "rotate": "Pode restringir os ângulos mantendo a tecla SHIFT premida enquanto roda",
-    "lineEditor_info": "Clique duas vezes ou pressione a tecla Enter para editar os pontos",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Carregue na tecla Delete para remover o(s) ponto(s), CtrlOuCmd+D para duplicar, ou arraste para mover",
     "lineEditor_nothingSelected": "Seleccione um ponto para editar (carregue em SHIFT para seleccionar vários),\nou carregue em Alt e clique para acrescentar novos pontos",
     "placeImage": "Clique para colocar a imagem ou clique e arraste para definir o seu tamanho manualmente",
@@ -310,7 +311,9 @@
     "view": "Visualizar",
     "zoomToFit": "Ajustar para todos os elementos caberem",
     "zoomToSelection": "Ampliar a seleção",
-    "toggleElementLock": "Trancar/destrancar selecção"
+    "toggleElementLock": "Trancar/destrancar selecção",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Apagar tela"
@@ -391,7 +394,8 @@
     "fileSaved": "Ficheiro guardado.",
     "fileSavedToFilename": "Guardado como {filename}",
     "canvas": "área de desenho",
-    "selection": "seleção"
+    "selection": "seleção",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Branco",
@@ -439,5 +443,12 @@
     "5c940d": "Lima 9",
     "e67700": "Amarelo 9",
     "d9480f": "Laranja 9"
+  },
+  "welcomeScreen": {
+    "data": "Todos os dados estão guardados no seu navegador local.",
+    "switchToPlusApp": "Queria antes ir para o Excalidraw+?",
+    "menuHints": "Exportar, preferências, idiomas...",
+    "toolbarHints": "Escolha uma ferramenta e comece a desenhar!",
+    "helpHints": "Atalhos e ajuda"
   }
 }

@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Indsæt",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Indsæt diagrammer",
     "selectAll": "Marker alle",
     "multiSelect": "Tilføj element til markering",
@@ -69,12 +70,12 @@
     "canvasBackground": "Lærredsbaggrund",
     "drawingCanvas": "Tegnelærred",
     "layers": "Lag",
-    "actions": "",
+    "actions": "Handlinger",
     "language": "Sprog",
-    "liveCollaboration": "Direkte samarbejde",
+    "liveCollaboration": "",
     "duplicateSelection": "",
-    "untitled": "",
-    "name": "",
+    "untitled": "Unavngivet",
+    "name": "Navn",
     "yourName": "Dit navn",
     "madeWithExcalidraw": "Fremstillet med Excalidraw",
     "group": "",
@@ -144,7 +145,7 @@
     "scale": "",
     "save": "",
     "saveAs": "Gem som",
-    "load": "Indlæs",
+    "load": "",
     "getShareableLink": "Lav et delbart link",
     "close": "Luk",
     "selectLanguage": "Vælg sprog",
@@ -310,7 +311,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": "",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -391,7 +394,8 @@
     "fileSaved": "Fil gemt.",
     "fileSavedToFilename": "Gemt som {filename}",
     "canvas": "canvas",
-    "selection": "markering"
+    "selection": "markering",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
@@ -439,5 +443,12 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }

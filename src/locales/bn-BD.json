@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "পেস্ট করুন",
+    "pasteAsPlaintext": "",
     "pasteCharts": "চার্ট পেস্ট করুন",
     "selectAll": "সবটা সিলেক্ট করুন",
     "multiSelect": "একাধিক সিলেক্ট করুন",
@@ -71,7 +72,7 @@
     "layers": "মাত্রা",
     "actions": "ক্রিয়া",
     "language": "ভাষা",
-    "liveCollaboration": "যুগ্ম কার্য",
+    "liveCollaboration": "",
     "duplicateSelection": "সদৃশ সিলেক্ট",
     "untitled": "অনামী",
     "name": "নাম",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "ক্যানভাস সাফ করুন",
     "exportJSON": "জেসন নিবদ্ধ করুন",
-    "exportImage": "চিত্র নিবদ্ধ করুন",
-    "export": "নিবদ্ধ",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "পীএনজী ছবির মতন নিবদ্ধ করুন",
     "exportToSvg": "এসভীজী ছবির মতন নিবদ্ধ করুন",
     "copyToClipboard": "ক্লিপবোর্ডে কপি করুন",
@@ -144,7 +145,7 @@
     "scale": "মাপ",
     "save": "জমা করুন",
     "saveAs": "অন্যভাবে জমা করুন",
-    "load": "লোড করুন",
+    "load": "",
     "getShareableLink": "ভাগযোগ্য লিঙ্ক পান",
     "close": "বন্ধ করুন",
     "selectLanguage": "ভাষা চিহ্নিত করুন",
@@ -214,7 +215,7 @@
     "text": "লেখা",
     "library": "সংগ্রহ",
     "lock": "আঁকার পরে নির্বাচিত টুল সক্রিয় রাখুন",
-    "penMode": "পিঞ্চ-জুম প্রতিরোধ করুন এবং শুধুমাত্র কলম থেকে ইনপুট গ্রহণ করুন",
+    "penMode": "",
     "link": "একটি নির্বাচিত আকৃতির জন্য লিঙ্ক যোগ বা আপডেট করুন",
     "eraser": "ঝাড়ন"
   },
@@ -235,7 +236,7 @@
     "resize": "আপনি আকার পরিবর্তন করার সময় শিফ্ট ধরে রেখে অনুপাতকে সীমাবদ্ধ করতে পারেন,\nকেন্দ্র থেকে আকার পরিবর্তন করতে অল্ট ধরে রাখুন",
     "resizeImage": "আপনি শিফ্ট ধরে রেখে অবাধে আকার পরিবর্তন করতে পারেন, কেন্দ্র থেকে আকার পরিবর্তন করতে অল্ট ধরুন",
     "rotate": "আপনি ঘোরানোর সময় শিফ্ট ধরে রেখে কোণগুলিকে সীমাবদ্ধ করতে পারেন",
-    "lineEditor_info": "পয়েন্ট সম্পাদনা করতে ডাবল-ক্লিক করুন বা এন্টার টিপুন",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "বিন্দু(গুলি) মুছতে ডিলিট টিপুন, কন্ট্রোল/কম্যান্ড যোগে ডি টিপুন নকল করতে অথবা সরানোর জন্য টানুন",
     "lineEditor_nothingSelected": "সম্পাদনা করার জন্য একটি বিন্দু নির্বাচন করুন (একাধিক নির্বাচন করতে শিফ্ট ধরে রাখুন),\nঅথবা অল্ট ধরে রাখুন এবং নতুন বিন্দু যোগ করতে ক্লিক করুন",
     "placeImage": "ছবিটি স্থাপন করতে ক্লিক করুন, অথবা নিজে আকার সেট করতে ক্লিক করুন এবং টেনে আনুন",
@@ -310,7 +311,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": "",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -391,7 +394,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": "বাছাই"
+    "selection": "বাছাই",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "সাদা",
@@ -439,5 +443,12 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }
