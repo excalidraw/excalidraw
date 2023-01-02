@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "貼上",
+    "pasteAsPlaintext": "以純文字貼上",
     "pasteCharts": "貼上圖表",
     "selectAll": "全選",
     "multiSelect": "將物件加入選取範圍",
@@ -71,7 +72,7 @@
     "layers": "圖層",
     "actions": "動作",
     "language": "語言",
-    "liveCollaboration": "即時協作",
+    "liveCollaboration": "即時協作...",
     "duplicateSelection": "複製",
     "untitled": "無標題",
     "name": "名稱",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "重置 canvas",
     "exportJSON": "匯出至檔案",
-    "exportImage": "另存為圖片",
-    "export": "輸出",
+    "exportImage": "匯出圖片",
+    "export": "儲存至...",
     "exportToPng": "輸出成 PNG",
     "exportToSvg": "輸出成 SVG",
     "copyToClipboard": "複製至剪貼簿",
@@ -144,7 +145,7 @@
     "scale": "縮放比例",
     "save": "儲存目前檔案",
     "saveAs": "儲存為",
-    "load": "載入",
+    "load": "開啟",
     "getShareableLink": "取得共享連結",
     "close": "關閉",
     "selectLanguage": "選擇語言",
@@ -214,7 +215,7 @@
     "text": "文字",
     "library": "資料庫",
     "lock": "可連續使用選取的工具",
-    "penMode": "停止使用手勢縮放並接受以繪圖筆繪圖輸入",
+    "penMode": "筆模式 - 避免觸摸",
     "link": "為所選的形狀增加\b/更新連結",
     "eraser": "橡皮擦"
   },
@@ -235,7 +236,7 @@
     "resize": "縮放時按住 Shift 可保持原比例縮放；\\n按住 Alt 可由中心點進行縮放",
     "resizeImage": "按住 SHIFT 可任意縮放，按住 ALT 可由中央縮放。",
     "rotate": "旋轉時按住 Shift 可限制旋轉角度",
-    "lineEditor_info": "雙擊滑鼠左鍵或按 Enter 來編輯控制點",
+    "lineEditor_info": "按住 Ctrl 或 Cmd 並雙擊或按住 Ctrl 或 Cmd + Enter 來編輯控制點",
     "lineEditor_pointSelected": "按下 Delete 可移除錨點；Ctrl 或 Cmd + D 可複製；或可拖曳來移動",
     "lineEditor_nothingSelected": "選擇要編輯的錨點（按住 SHIFT 可多選），\n或按住 Alt 並點擊以增加新錨點。",
     "placeImage": "點擊以放置圖片，或點擊並拖曳以手動調整其尺寸。",
@@ -310,7 +311,9 @@
     "view": "檢視",
     "zoomToFit": "放大至填滿畫面",
     "zoomToSelection": "縮放至選取區",
-    "toggleElementLock": "鎖定/解鎖已選的項目"
+    "toggleElementLock": "鎖定/解鎖已選的項目",
+    "movePageUpDown": "向上/下移動頁面",
+    "movePageLeftRight": "向左/右移動頁面"
   },
   "clearCanvasDialog": {
     "title": "清除畫布"
@@ -391,7 +394,8 @@
     "fileSaved": "已儲存檔案。",
     "fileSavedToFilename": "儲存為 {filename}",
     "canvas": "畫布",
-    "selection": "已選項目"
+    "selection": "已選項目",
+    "pasteAsSingleElement": "使用 {{shortcut}} 以做為單一物件貼上，\n或貼上至現有的文字編輯器"
   },
   "colors": {
     "ffffff": "白",
@@ -439,5 +443,12 @@
     "5c940d": "黃綠 9",
     "e67700": "黃 9",
     "d9480f": "橘 9"
+  },
+  "welcomeScreen": {
+    "data": "您的所有資料都儲存在本機瀏覽器。",
+    "switchToPlusApp": "您是否是要前往 Excalidraw+ ？",
+    "menuHints": "輸出、偏好設定、語言...",
+    "toolbarHints": "選個工具開始畫圖吧！",
+    "helpHints": "快速鍵與說明"
   }
 }

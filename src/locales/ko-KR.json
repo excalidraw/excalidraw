@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "붙여넣기",
+    "pasteAsPlaintext": "",
     "pasteCharts": "차트 붙여넣기",
     "selectAll": "전체 선택",
     "multiSelect": "선택 영역에 추가하기",
@@ -71,7 +72,7 @@
     "layers": "레이어",
     "actions": "동작",
     "language": "언어",
-    "liveCollaboration": "실시간 협업",
+    "liveCollaboration": "",
     "duplicateSelection": "복제",
     "untitled": "제목 없음",
     "name": "이름",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "캔버스 초기화",
     "exportJSON": "파일로 내보내기",
-    "exportImage": "이미지로 저장",
-    "export": "내보내기",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "PNG로 내보내기",
     "exportToSvg": "SVG로 내보내기",
     "copyToClipboard": "클립보드로 복사",
@@ -144,7 +145,7 @@
     "scale": "크기",
     "save": "현재 파일에 저장",
     "saveAs": "다른 이름으로 저장",
-    "load": "불러오기",
+    "load": "",
     "getShareableLink": "공유 가능한 링크 생성",
     "close": "닫기",
     "selectLanguage": "언어 선택",
@@ -214,7 +215,7 @@
     "text": "텍스트",
     "library": "라이브러리",
     "lock": "선택된 도구 유지하기",
-    "penMode": "핀치 줌을 하지 않도록 하고 펜을 통해서 자유롭게 그리기",
+    "penMode": "",
     "link": "선택한 도형에 대해서 링크를 추가/업데이트",
     "eraser": "지우개"
   },
@@ -235,7 +236,7 @@
     "resize": "SHIFT 키를 누르면서 조정하면 크기의 비율이 제한됩니다.\nALT를 누르면서 조정하면 중앙을 기준으로 크기를 조정합니다.",
     "resizeImage": "SHIFT를 눌러서 자유롭게 크기를 변경하거나,\nALT를 눌러서 중앙을 고정하고 크기를 변경하기",
     "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
-    "lineEditor_info": "지점을 수정하려면 두 번 클릭하거나 Enter 키를 누르세요.",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Delete 키로 꼭짓점을 제거하거나,\nCtrlOrCmd+D 로 복제하거나, 드래그 해서 이동시키기",
     "lineEditor_nothingSelected": "꼭짓점을 선택해서 수정하거나 (SHIFT를 눌러서 여러개 선택),\nAlt를 누르고 클릭해서 새로운 꼭짓점 추가하기",
     "placeImage": "클릭해서 이미지를 배치하거나, 클릭하고 드래그해서 사이즈를 조정하기",
@@ -310,7 +311,9 @@
     "view": "보기",
     "zoomToFit": "모든 요소가 보이도록 확대/축소",
     "zoomToSelection": "선택 영역으로 확대/축소",
-    "toggleElementLock": "선택한 항목을 잠금/잠금 해제"
+    "toggleElementLock": "선택한 항목을 잠금/잠금 해제",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "캔버스 지우기"
@@ -391,7 +394,8 @@
     "fileSaved": "파일이 저장되었습니다.",
     "fileSavedToFilename": "{filename} 로 저장되었습니다",
     "canvas": "캔버스",
-    "selection": "선택한 요소"
+    "selection": "선택한 요소",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "화이트",
@@ -439,5 +443,12 @@
     "5c940d": "라임 9",
     "e67700": "노란색 9",
     "d9480f": "주황색 9"
+  },
+  "welcomeScreen": {
+    "data": "",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }

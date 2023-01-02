@@ -312,7 +312,9 @@
     "view": "View",
     "zoomToFit": "Zoom to fit all elements",
     "zoomToSelection": "Zoom to selection",
-    "toggleElementLock": "Lock/unlock selection"
+    "toggleElementLock": "Lock/unlock selection",
+    "movePageUpDown": "Move page up/down",
+    "movePageLeftRight": "Move page left/right"
   },
   "clearCanvasDialog": {
     "title": "Clear canvas"

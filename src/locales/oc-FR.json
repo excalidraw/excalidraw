@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Pegar",
+    "pasteAsPlaintext": "Pegar en tèxt brut",
     "pasteCharts": "Pegar los grafics",
     "selectAll": "Tot seleccionar",
     "multiSelect": "Apondre un element a la seleccion",
@@ -71,7 +72,7 @@
     "layers": "Calques",
     "actions": "Accions",
     "language": "Lenga",
-    "liveCollaboration": "Collaboracion en dirèct",
+    "liveCollaboration": "Collaboracion en dirèct...",
     "duplicateSelection": "Duplicar",
     "untitled": "Sens títol",
     "name": "Nom",
@@ -129,14 +130,14 @@
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Seleccionatz un element d’apondre aquí, o installatz una bibliotèca del depaus public, çai-jos.",
+    "hint_emptyPrivateLibrary": "Seleccionatz un element d’apondre aquí pel canabàs."
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
     "exportJSON": "Exportar en fichièr",
-    "exportImage": "Salvar coma imatge",
-    "export": "Exportar",
+    "exportImage": "Exportar imatges...",
+    "export": "Enregistrar dins...",
     "exportToPng": "Exportar en PNG",
     "exportToSvg": "Exportar en SVG",
     "copyToClipboard": "Copiar al quichapapièrs",
@@ -144,7 +145,7 @@
     "scale": "Escala",
     "save": "Salvar al fichièr actual",
     "saveAs": "Enregistrar jos",
-    "load": "Cargar",
+    "load": "Dobrir",
     "getShareableLink": "Obténer lo ligam de partatge",
     "close": "Tampar",
     "selectLanguage": "Causir una lenga",
@@ -214,7 +215,7 @@
     "text": "Tèxt",
     "library": "Bibliotèca",
     "lock": "Mantenir activa l’aisina aprèp dessenhar",
-    "penMode": "Empachar l’agradiment tactil e acceptar la picada liura solament amb un estilò",
+    "penMode": "Mòde estilo - empachar lo contact",
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
     "eraser": "Goma"
   },
@@ -235,7 +236,7 @@
     "resize": "Podètz servar las proporcions en mantenent la tòca MAJ pendent lo redimensionament,\nmantenètz la tòca ALT per redimensionar a partir del centre",
     "resizeImage": "Podètz retalhar liurament en quichant CTRL,\nquichatz ALT per retalhar a partir del centre",
     "rotate": "Podètz restrénger los angles en mantenent MAJ pendent la rotacion",
-    "lineEditor_info": "Doble-clicatz o quichatz Entrada per modificar los punts",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Quichar Suprimir per tirar lo(s) punt(s),\nCtrlOCmd+D per duplicar, o lisatz per desplaçar",
     "lineEditor_nothingSelected": "Seleccionar un punt d’editar (manténer Maj. per ne seleccionar mantun),\no manténer Alt e clicar per n’apondre de novèls",
     "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament",
@@ -310,7 +311,9 @@
     "view": "Vista",
     "zoomToFit": "Zoomar per veire totes los elements",
     "zoomToSelection": "Zoomar la seleccion",
-    "toggleElementLock": "Verrolhar/Desverrolhar la seleccion"
+    "toggleElementLock": "Verrolhar/Desverrolhar la seleccion",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Escafar canabàs"
@@ -353,7 +356,7 @@
     },
     "noteItems": "Cada element de bibliotèca deu aver un nom pròpri per èsser filtrable. Los elements de bibliotèca seguentas seràn incluses :",
     "atleastOneLibItem": "Volgatz seleccionar almens un element de bibliotèca per començar",
-    "republishWarning": ""
+    "republishWarning": "Nòta : d’unes elements seleccionats son marcats ja coma publicats/enviats. Deuriatz sonque tornar enviar los elements pendent l’actualizacion d’una bibliotèca existenta o un mandadís."
   },
   "publishSuccessDialog": {
     "title": "Bibliotèca somesa",
@@ -391,7 +394,8 @@
     "fileSaved": "Fichièr enregistrat.",
     "fileSavedToFilename": "Enregistrat jos {filename}",
     "canvas": "canabàs",
-    "selection": "seleccion"
+    "selection": "seleccion",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Blanc",
@@ -439,5 +443,12 @@
     "5c940d": "Verd citron 9",
     "e67700": "Jaune 9",
     "d9480f": "Irange 9"
+  },
+  "welcomeScreen": {
+    "data": "Totas las donadas son enregistradas dins vòstre navegador.",
+    "switchToPlusApp": "Volètz puslèu utilizar Excalidraw+ ?",
+    "menuHints": "Exportar, preferéncias, lengas, ...",
+    "toolbarHints": "Prenètz un esplech e començatz de dessenhar !",
+    "helpHints": "Acorchis e ajuda"
   }
 }
