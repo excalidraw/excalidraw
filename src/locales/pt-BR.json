@@ -201,7 +201,9 @@
     "svgImageInsertError": "Não foi possível inserir a imagem SVG. A marcação SVG parece inválida.",
     "invalidSVGString": "SVG Inválido.",
     "cannotResolveCollabServer": "Não foi possível conectar-se ao servidor colaborativo. Por favor, recarregue a página e tente novamente.",
-    "importLibraryError": "Não foi possível carregar a biblioteca"
+    "importLibraryError": "Não foi possível carregar a biblioteca",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Seleção",
