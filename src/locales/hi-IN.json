@@ -201,7 +201,9 @@
     "svgImageInsertError": "एसवीजी छवि सम्मिलित नहीं कर सके, एसवीजी रचना अनुचित हैं",
     "invalidSVGString": "अनुचित SVG",
     "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे.",
-    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका"
+    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "चयन",
