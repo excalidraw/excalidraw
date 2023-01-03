@@ -407,8 +407,7 @@ const App = () => {
 
 #### MainMenu
 
-By default Excalidraw will render the `MainMenu` with default options, you can visit [example](https://excalidraw-package-example-git-release-excalidraw.vercel.app/) to see the default menu.
-If you want to customise the `MainMenu`, you can pass the `MainMenu` component with the list options.
+By default Excalidraw will render the `MainMenu` with default options, you can visit [example](https://excalidraw-package-example-git-release-excalidraw.vercel.app/) to see the default menu. If you want to customise the `MainMenu`, you can pass the `MainMenu` component with the list options.
 
 **Usage**
 
@@ -434,11 +433,11 @@ To render an item, its recommended to use `MainMenu.Item`
 | --- | --- | --- | --- |
 | `icon` | `JSX.Element` | `undefined` | The icon used in the menu item |
 | `shortcut` | `string` | `undefined` | The shortcut to be shown for the menu item |
-| `children` |  `React.ReactNode` | `undefined` | The content of the menu item |
-| `onClick` | `Function` | `undefined` | The click handler will be triggered when clicked on menu item. If passed the item is rendered as a button. | 
+| `children` | `React.ReactNode` | `undefined` | The content of the menu item |
+| `onClick` | `Function` | `undefined` | The click handler will be triggered when clicked on menu item. If passed the item is rendered as a button. |
 | `className` | `string` | "" | The class names to be added to the menu item |
-| `link` | `string` | `undefined` | If `link` is passed the item is rendered as an anchor element.
-|`style` | `React.CSSProperties` | `undefined` | The inline styles to be added to the menu item |
+| `link` | `string` | `undefined` | If `link` is passed the item is rendered as an anchor element. |
+| `style` | `React.CSSProperties` | `undefined` | The inline styles to be added to the menu item |
 
 **MainMenu.DefaultItems**
 
@@ -455,6 +454,7 @@ const App = () => {
   </MainMenu>
 }
 ```
+
 Here is a [complete list](https://github.com/excalidraw/excalidraw/blob/master/src/components/mainMenu/DefaultItems.tsx) of the default items.
 
 **MainMenu.Group**
@@ -482,8 +482,7 @@ const App = () => {
 | `title` | `string` | `undefined` | The `title` for the grouped items |
 | `className` | `string` | "" | The `classname` to be added to the group |
 | `style` | `React.CSsSProperties` | `undefined` | The inline `styles` to be added to the group |
-| `children `| `React.ReactNode`  | `undefined` | The content of the `Menu Group` |
-
+| `children ` | `React.ReactNode` | `undefined` | The content of the `Menu Group` |
 
 ### Props
 
