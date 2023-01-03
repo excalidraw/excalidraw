@@ -166,7 +166,7 @@ export const MobileMenu = ({
     <>
       {renderSidebars()}
       {!appState.viewModeEnabled && renderToolbar()}
-      {!isMenuOpen && appState.showStats && (
+      {!appState.openMenu && appState.showStats && (
         <Stats
           appState={appState}
           setAppState={setAppState}
