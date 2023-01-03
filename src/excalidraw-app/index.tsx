@@ -25,7 +25,7 @@ import {
   Excalidraw,
   defaultLang,
   Footer,
-  Menu,
+  HamburgerMenu,
 } from "../packages/excalidraw/index";
 import {
   AppState,
@@ -85,7 +85,7 @@ import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 import { EncryptedIcon } from "./components/EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
 import { LanguageList } from "./components/LanguageList";
-import { PlusPromoIcon, UsersIcon } from "../components/icons";
+import { PlusPromoIcon } from "../components/icons";
 
 polyfill();
 
@@ -603,37 +603,36 @@ const ExcalidrawWrapper = () => {
 
   const renderMenu = () => {
     return (
-      <Menu>
-        <Menu.Trigger />
-        <Menu.DefaultItems.LoadScene />
-        <Menu.DefaultItems.SaveToActiveFile />
-        <Menu.DefaultItems.Export />
-        <Menu.DefaultItems.SaveAsImage />
-        <Menu.DefaultItems.LiveCollaboration
+      <HamburgerMenu>
+        <HamburgerMenu.DefaultItems.LoadScene />
+        <HamburgerMenu.DefaultItems.SaveToActiveFile />
+        <HamburgerMenu.DefaultItems.Export />
+        <HamburgerMenu.DefaultItems.SaveAsImage />
+        <HamburgerMenu.DefaultItems.LiveCollaboration
           isCollaborating={isCollaborating}
           onClick={() => setCollabDialogShown(true)}
         />
 
-        <Menu.DefaultItems.Help />
-        <Menu.DefaultItems.ClearCanvas />
-        <Menu.Separator />
-        <Menu.Item
+        <HamburgerMenu.DefaultItems.Help />
+        <HamburgerMenu.DefaultItems.ClearCanvas />
+        <HamburgerMenu.Separator />
+        <HamburgerMenu.Item
           icon={PlusPromoIcon}
           link="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger"
           className="ExcalidrawPlus"
         >
           Excalidraw+
-        </Menu.Item>
-        <Menu.DefaultItems.Socials />
-        <Menu.Separator />
-        <Menu.Group className="menu-footer">
-          <Menu.DefaultItems.ToggleTheme />
-          <Menu.Item className="language">
+        </HamburgerMenu.Item>
+        <HamburgerMenu.DefaultItems.Socials />
+        <HamburgerMenu.Separator />
+        <HamburgerMenu.Group className="HamburgerMenu-footer">
+          <HamburgerMenu.DefaultItems.ToggleTheme />
+          <HamburgerMenu.Item className="language">
             <LanguageList style={{ width: "100%" }} />
-          </Menu.Item>
-          <Menu.DefaultItems.ChangeCanvasBackground />
-        </Menu.Group>
-      </Menu>
+          </HamburgerMenu.Item>
+          <HamburgerMenu.DefaultItems.ChangeCanvasBackground />
+        </HamburgerMenu.Group>
+      </HamburgerMenu>
     );
   };
 

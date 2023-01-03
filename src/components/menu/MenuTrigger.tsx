@@ -1,18 +1,16 @@
 import clsx from "clsx";
-import { useAtom } from "jotai";
 import { useDevice, useExcalidrawAppState } from "../App";
-import { HamburgerMenuIcon } from "../icons";
-import { isMenuOpenAtom } from "./Menu";
 
 const MenuTrigger = ({
   className = "",
-  children = HamburgerMenuIcon,
+  children,
+  onClick,
 }: {
   className?: string;
-  children?: React.ReactNode;
+  children: React.ReactNode;
+  onClick: () => void;
 }) => {
   const appState = useExcalidrawAppState();
-  const [isMenuOpen, setIsMenuOpen] = useAtom(isMenuOpenAtom);
   const device = useDevice();
   const classNames = clsx(`menu-button ${className}`, "zen-mode-transition", {
     "transition-left": appState.zenModeEnabled,
@@ -22,7 +20,7 @@ const MenuTrigger = ({
     <button
       data-prevent-outside-click
       className={classNames}
-      onClick={() => setIsMenuOpen(!isMenuOpen)}
+      onClick={onClick}
       type="button"
       data-testid="menu-button"
     >

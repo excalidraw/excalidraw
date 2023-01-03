@@ -3,9 +3,9 @@ import { Dialog, DialogProps } from "./Dialog";
 
 import "./ConfirmDialog.scss";
 import DialogActionButton from "./DialogActionButton";
-import { isDropdownOpenAtom } from "./App";
 import { useSetAtom } from "jotai";
 import { isMenuOpenAtom } from "./menu/Menu";
+import { isLibraryMenuOpenAtom } from "./LibraryMenuHeaderContent";
 
 interface Props extends Omit<DialogProps, "onCloseRequest"> {
   onConfirm: () => void;
@@ -25,7 +25,7 @@ const ConfirmDialog = (props: Props) => {
   } = props;
 
   const setIsMenuOpen = useSetAtom(isMenuOpenAtom);
-  const setIsDropdownOpen = useSetAtom(isDropdownOpenAtom);
+  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
 
   return (
     <Dialog
@@ -40,7 +40,7 @@ const ConfirmDialog = (props: Props) => {
           label={cancelText}
           onClick={() => {
             setIsMenuOpen(false);
-            setIsDropdownOpen(false);
+            setIsLibraryMenuOpen(false);
             onCancel();
           }}
         />
@@ -48,7 +48,7 @@ const ConfirmDialog = (props: Props) => {
           label={confirmText}
           onClick={() => {
             setIsMenuOpen(false);
-            setIsDropdownOpen(false);
+            setIsLibraryMenuOpen(false);
             onConfirm();
           }}
           actionType="danger"

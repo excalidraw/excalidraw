@@ -1,5 +1,5 @@
 import React from "react";
-import * as MenuComponents from "./MenuDefaultItems";
+import * as MenuComponents from "../hamburgerMenu/MenuDefaultItems";
 
 export const getValidMenuChildren = (
   children: React.ReactNode,
@@ -39,6 +39,23 @@ export const getMenuTriggerComponent = (children: React.ReactNode) => {
       child?.type.displayName &&
       //@ts-ignore
       child.type.displayName === "MenuTrigger",
+  );
+  if (!comp) {
+    return null;
+  }
+  //@ts-ignore
+  return comp;
+};
+
+export const getMenuContentComponent = (children: React.ReactNode) => {
+  const comp = React.Children.toArray(children).find(
+    (child) =>
+      React.isValidElement(child) &&
+      typeof child.type !== "string" &&
+      //@ts-ignore
+      child?.type.displayName &&
+      //@ts-ignore
+      child.type.displayName === "MenuContent",
   );
   if (!comp) {
     return null;

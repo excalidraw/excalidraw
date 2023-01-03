@@ -272,11 +272,8 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
-import { atom } from "jotai";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
-
-export const isDropdownOpenAtom = atom(false);
 
 const deviceContextInitialValue = {
   isSmScreen: false,
