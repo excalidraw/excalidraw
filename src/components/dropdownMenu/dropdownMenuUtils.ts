@@ -1,34 +1,4 @@
 import React from "react";
-import * as MenuComponents from "../mainMenu/DefaultItems";
-
-export const getValidMenuChildren = (
-  children: React.ReactNode,
-  exclude?: Array<string>,
-) => {
-  const validMenuChildren = [
-    ...Object.keys(MenuComponents),
-    "DropdownMenuSeparator",
-    "DropdownMenuSocials",
-    "DropdownMenuItem",
-    "DropdownMenuGroup",
-    "Collaborators",
-  ].filter((item) => !exclude?.includes(item));
-  const childrenComponents: React.ReactNode[] = [];
-  React.Children.toArray(children).forEach((child) => {
-    if (
-      React.isValidElement(child) &&
-      typeof child.type !== "string" &&
-      //@ts-ignore
-      child?.type.displayName &&
-      //@ts-ignore
-      validMenuChildren.includes(child.type.displayName)
-    ) {
-      childrenComponents.push(child);
-    }
-  });
-
-  return childrenComponents;
-};
 
 export const getMenuTriggerComponent = (children: React.ReactNode) => {
   const comp = React.Children.toArray(children).find(

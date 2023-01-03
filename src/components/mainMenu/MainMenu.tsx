@@ -42,12 +42,10 @@ const MainMenu = ({ children }: { children?: React.ReactNode }) => {
       <DropdownMenu.Content onClickOutside={onClickOutside}>
         {children}
         {device.isMobile && appState.collaborators.size > 0 && (
-          <DropdownMenu.Item style={{ height: "auto", padding: 0 }}>
-            <fieldset className="UserList-Wrapper">
-              <legend>{t("labels.collaborators")}</legend>
-              <UserList mobile={true} collaborators={appState.collaborators} />
-            </fieldset>
-          </DropdownMenu.Item>
+          <fieldset className="UserList-Wrapper">
+            <legend>{t("labels.collaborators")}</legend>
+            <UserList mobile={true} collaborators={appState.collaborators} />
+          </fieldset>
         )}
       </DropdownMenu.Content>
     </DropdownMenu>
