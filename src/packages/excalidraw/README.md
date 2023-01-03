@@ -405,6 +405,86 @@ const App = () => {
 };
 ```
 
+#### MainMenu
+
+By default Excalidraw will render the `MainMenu` with default options, you can visit [example](https://excalidraw-package-example-git-release-excalidraw.vercel.app/) to see the default menu.
+If you want to customise the `MainMenu`, you can pass the `MainMenu` component with the list options.
+
+**Usage**
+
+```js
+import { MainMenu } from "@excalidraw/excalidraw";
+const App = () => {
+  <MainMenu>
+    <MainMenu.Item> Item1 </MainMenu.Item>
+    <MainMenu.Item> Item 2 </>
+  </MainMenu>
+}
+```
+
+**MainMenu**
+
+This is the `MainMenu` component which you need to import to render the menu with custom options.
+
+**MainMenu.Item**
+
+To render an item, its recommended to use `MainMenu.Item`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` | `JSX.Element` | `undefined` | The icon used in the menu item |
+| `shortcut` | `string` | `undefined` | The shortcut to be shown for the menu item |
+| `children` |  `React.ReactNode` | `undefined` | The content of the menu item |
+| `onClick` | `Function` | `undefined` | The click handler will be triggered when clicked on menu item. If passed the item is rendered as a button. | 
+| `className` | `string` | "" | The class names to be added to the menu item |
+| `link` | `string` | `undefined` | If `link` is passed the item is rendered as an anchor element.
+|`style` | `React.CSSProperties` | `undefined` | The inline styles to be added to the menu item |
+
+**MainMenu.DefaultItems**
+
+For the items which are shown in the menu in [excalidraw.com](https://excalidraw.com), you can use `MainMenu.DefaultItems`
+
+```js
+import { MainMenu } from "@excalidraw/excalidraw";
+const App = () => {
+  <MainMenu>
+    <MainMenu.DefaultItems.Socials/>
+    <MainMenu.DefaultItems.Export/>
+    <MainMenu.Item> Item1 </MainMenu.Item>
+    <MainMenu.Item> Item 2 </>
+  </MainMenu>
+}
+```
+Here is a [complete list](https://github.com/excalidraw/excalidraw/blob/master/src/components/mainMenu/DefaultItems.tsx) of the default items.
+
+**MainMenu.Group**
+
+To Group item in the main menu, you can use `MainMenu.Group`
+
+```js
+import { MainMenu } from "@excalidraw/excalidraw";
+const App = () => {
+  <MainMenu>
+    <MainMenu.Group title="Excalidraw items">
+      <MainMenu.DefaultItems.Socials/>
+      <MainMenu.DefaultItems.Export/>
+    </MainMenu.Group>
+    <MainMenu.Group title="custom items">
+      <MainMenu.Item> Item1 </MainMenu.Item>
+      <MainMenu.Item> Item 2 </>
+    </MainMenu.Group>
+  </MainMenu>
+}
+```
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | `undefined` | The `title` for the grouped items |
+| `className` | `string` | "" | The `classname` to be added to the group |
+| `style` | `React.CSsSProperties` | `undefined` | The inline `styles` to be added to the group |
+| `children `| `React.ReactNode`  | `undefined` | The content of the `Menu Group` |
+
+
 ### Props
 
 | Name | Type | Default | Description |
