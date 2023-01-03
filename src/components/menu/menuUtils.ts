@@ -1,5 +1,5 @@
 import React from "react";
-import * as MenuComponents from "../hamburgerMenu/MenuDefaultItems";
+import * as MenuComponents from "../hamburgerMenu/DefaultItems";
 
 export const getValidMenuChildren = (
   children: React.ReactNode,

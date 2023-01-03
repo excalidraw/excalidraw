@@ -7,7 +7,7 @@ import {
 } from "../App";
 import Menu from "../menu/Menu";
 
-import * as DefaultItems from "./MenuDefaultItems";
+import * as DefaultItems from "./DefaultItems";
 
 import { UserList } from "../UserList";
 import { t } from "../../i18n";
