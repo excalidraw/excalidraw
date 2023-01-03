@@ -360,7 +360,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
       style="height: 1px; margin: .5rem 0px;"
     />
     <div
-      class="menu-group HamburgerMenu-footer"
+      class="menu-group menu-footer"
     >
       <button
         aria-label="Dark mode"
