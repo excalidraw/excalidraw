@@ -203,7 +203,7 @@ const LayerUI = ({
           </HamburgerMenu.Group>
           <HamburgerMenu.Separator />
 
-          <HamburgerMenu.Group className="HamburgerMenu-footer">
+          <HamburgerMenu.Group className="menu-footer">
             <HamburgerMenu.DefaultItems.ToggleTheme />
             <HamburgerMenu.DefaultItems.ChangeCanvasBackground />
           </HamburgerMenu.Group>

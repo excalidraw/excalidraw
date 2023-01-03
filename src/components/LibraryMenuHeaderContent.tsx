@@ -185,7 +185,10 @@ export const LibraryMenuHeader: React.FC<{
         >
           {DotsIcon}
         </Menu.Trigger>
-        <Menu.Content onClickOutside={() => setIsLibraryMenuOpen(false)}>
+        <Menu.Content
+          onClickOutside={() => setIsLibraryMenuOpen(false)}
+          className="library-menu"
+        >
           {!itemsSelected && (
             <Menu.Item
               onClick={onLibraryImport}

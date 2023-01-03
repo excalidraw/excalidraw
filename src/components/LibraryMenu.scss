@@ -131,7 +131,11 @@
   }
 
   .layer-ui__sidebar__header .menu {
+    &.menu--mobile {
+      top: 100%;
+    }
     .menu-container {
+      --gap: 0;
       z-index: 1;
       position: absolute;
       top: 100%;

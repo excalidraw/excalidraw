@@ -9,9 +9,13 @@ import Stack from "../Stack";
 const MenuContent = ({
   children,
   onClickOutside,
+  className = "",
+  style,
 }: {
   children?: React.ReactNode;
   onClickOutside?: () => void;
+  className?: string;
+  style?: React.CSSProperties;
 }) => {
   const device = useDevice();
   const menuRef = useOutsideClickHook(() => {
@@ -19,20 +23,15 @@ const MenuContent = ({
   });
 
   const menuChildren = getValidMenuChildren(children);
+  const classNames = clsx(`menu ${className}`, {
+    "menu--mobile": device.isMobile,
+  }).trim();
   return (
-    <div
-      ref={menuRef}
-      className={clsx("menu", {
-        "menu--mobile": device.isMobile,
-      })}
-      data-testid="menu"
-    >
+    <div ref={menuRef} className={classNames} style={style} data-testid="menu">
       {/* the zIndex ensures this menu has higher stacking order,
     see https://github.com/excalidraw/excalidraw/pull/1445 */}
       {device.isMobile ? (
-        <Stack.Col className="menu-container" gap={2}>
-          {menuChildren}
-        </Stack.Col>
+        <Stack.Col className="menu-container">{menuChildren}</Stack.Col>
       ) : (
         <Island className="menu-container" padding={2} style={{ zIndex: 1 }}>
           {menuChildren}

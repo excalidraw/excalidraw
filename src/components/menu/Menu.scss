@@ -34,6 +34,7 @@
       background-color: #fff !important;
       max-height: calc(100vh - 150px);
       overflow-y: auto;
+      --gap: 2;
     }
 
     .menu-item {
@@ -85,21 +86,6 @@
       text-align: left;
       margin: 10px 0;
       font-weight: 500;
-    }
-
-    .UserList-Wrapper {
-      margin: 0;
-      padding: 0;
-      border: none;
-      text-align: left;
-
-      legend {
-        display: block;
-        font-size: 0.75rem;
-        font-weight: 400;
-        margin: 0 0 0.25rem;
-        padding: 0;
-      }
     }
   }
   &.theme--dark {

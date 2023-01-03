@@ -625,7 +625,7 @@ const ExcalidrawWrapper = () => {
         </HamburgerMenu.Item>
         <HamburgerMenu.DefaultItems.Socials />
         <HamburgerMenu.Separator />
-        <HamburgerMenu.Group className="HamburgerMenu-footer">
+        <HamburgerMenu.Group className="menu-footer">
           <HamburgerMenu.DefaultItems.ToggleTheme />
           <HamburgerMenu.Item className="language">
             <LanguageList style={{ width: "100%" }} />
