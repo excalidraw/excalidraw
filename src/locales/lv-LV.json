@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Ielīmēt",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Ielīmēt kā vienkāršu tekstu",
     "pasteCharts": "Ielīmēt grafikus",
     "selectAll": "Atlasīt visu",
     "multiSelect": "Pievienot elementu atlasei",
@@ -202,8 +202,8 @@
     "invalidSVGString": "Nederīgs SVG.",
     "cannotResolveCollabServer": "Nevarēja savienoties ar sadarbošanās serveri. Lūdzu, pārlādējiet lapu un mēģiniet vēlreiz.",
     "importLibraryError": "Nevarēja ielādēt bibliotēku",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed": "Darbs nav saglabāts datubāzē. Ja problēma turpinās, saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu.",
+    "collabSaveFailed_sizeExceeded": "Darbs nav saglabāts datubāzē, šķiet, ka tāfele ir pārāk liela. Saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu."
   },
   "toolBar": {
     "selection": "Atlase",
@@ -314,8 +314,8 @@
     "zoomToFit": "Iestatīt mērogu, kas iekļauj visus elementus",
     "zoomToSelection": "Iestatīt mērogu, lai rādītu atlasi",
     "toggleElementLock": "Fiksēt/atbrīvot atlasīto",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Pārvietot lapu augšup/lejup",
+    "movePageLeftRight": "Pārvietot lapu pa labi/kreisi"
   },
   "clearCanvasDialog": {
     "title": "Notīrīt tāfeli"
