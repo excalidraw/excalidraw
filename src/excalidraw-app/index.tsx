@@ -25,7 +25,7 @@ import {
   Excalidraw,
   defaultLang,
   Footer,
-  HamburgerMenu,
+  MainMenu,
 } from "../packages/excalidraw/index";
 import {
   AppState,
@@ -603,36 +603,36 @@ const ExcalidrawWrapper = () => {
 
   const renderMenu = () => {
     return (
-      <HamburgerMenu>
-        <HamburgerMenu.DefaultItems.LoadScene />
-        <HamburgerMenu.DefaultItems.SaveToActiveFile />
-        <HamburgerMenu.DefaultItems.Export />
-        <HamburgerMenu.DefaultItems.SaveAsImage />
-        <HamburgerMenu.DefaultItems.LiveCollaboration
+      <MainMenu>
+        <MainMenu.DefaultItems.LoadScene />
+        <MainMenu.DefaultItems.SaveToActiveFile />
+        <MainMenu.DefaultItems.Export />
+        <MainMenu.DefaultItems.SaveAsImage />
+        <MainMenu.DefaultItems.LiveCollaboration
           isCollaborating={isCollaborating}
           onClick={() => setCollabDialogShown(true)}
         />
 
-        <HamburgerMenu.DefaultItems.Help />
-        <HamburgerMenu.DefaultItems.ClearCanvas />
-        <HamburgerMenu.Separator />
-        <HamburgerMenu.Item
+        <MainMenu.DefaultItems.Help />
+        <MainMenu.DefaultItems.ClearCanvas />
+        <MainMenu.Separator />
+        <MainMenu.Item
           icon={PlusPromoIcon}
           link="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger"
           className="ExcalidrawPlus"
         >
           Excalidraw+
-        </HamburgerMenu.Item>
-        <HamburgerMenu.DefaultItems.Socials />
-        <HamburgerMenu.Separator />
-        <HamburgerMenu.Group className="menu-footer">
-          <HamburgerMenu.DefaultItems.ToggleTheme />
-          <HamburgerMenu.Item className="language">
+        </MainMenu.Item>
+        <MainMenu.DefaultItems.Socials />
+        <MainMenu.Separator />
+        <MainMenu.Group className="menu-footer">
+          <MainMenu.DefaultItems.ToggleTheme />
+          <MainMenu.Item className="language">
             <LanguageList style={{ width: "100%" }} />
-          </HamburgerMenu.Item>
-          <HamburgerMenu.DefaultItems.ChangeCanvasBackground />
-        </HamburgerMenu.Group>
-      </HamburgerMenu>
+          </MainMenu.Item>
+          <MainMenu.DefaultItems.ChangeCanvasBackground />
+        </MainMenu.Group>
+      </MainMenu>
     );
   };
 

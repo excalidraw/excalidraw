@@ -14,7 +14,7 @@ import { t } from "../../i18n";
 import { HamburgerMenuIcon } from "../icons";
 export const isMenuOpenAtom = atom(false);
 
-const HamburgerMenu = ({ children }: { children?: React.ReactNode }) => {
+const MainMenu = ({ children }: { children?: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useAtom(isMenuOpenAtom);
   const device = useDevice();
   const appState = useExcalidrawAppState();
@@ -52,12 +52,12 @@ const HamburgerMenu = ({ children }: { children?: React.ReactNode }) => {
   );
 };
 
-HamburgerMenu.Trigger = Menu.Trigger;
-HamburgerMenu.Item = Menu.Item;
-HamburgerMenu.Group = Menu.Group;
-HamburgerMenu.Separator = Menu.Separator;
-HamburgerMenu.DefaultItems = DefaultItems;
+MainMenu.Trigger = Menu.Trigger;
+MainMenu.Item = Menu.Item;
+MainMenu.Group = Menu.Group;
+MainMenu.Separator = Menu.Separator;
+MainMenu.DefaultItems = DefaultItems;
 
-export default HamburgerMenu;
+export default MainMenu;
 
-HamburgerMenu.displayName = "Menu";
+MainMenu.displayName = "Menu";

@@ -51,7 +51,7 @@ import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import WelcomeScreenDecor from "./WelcomeScreenDecor";
-import HamburgerMenu from "./hamburgerMenu/HamburgerMenu";
+import MainMenu from "./mainMenu/MainMenu";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -180,34 +180,32 @@ const LayerUI = ({
   const renderMenu = () => {
     return (
       childrenComponents.Menu || (
-        <HamburgerMenu>
-          <HamburgerMenu.DefaultItems.LoadScene />
-          <HamburgerMenu.DefaultItems.SaveToActiveFile />
-          {UIOptions.canvasActions.export && (
-            <HamburgerMenu.DefaultItems.Export />
-          )}
+        <MainMenu>
+          <MainMenu.DefaultItems.LoadScene />
+          <MainMenu.DefaultItems.SaveToActiveFile />
+          {UIOptions.canvasActions.export && <MainMenu.DefaultItems.Export />}
           {UIOptions.canvasActions.saveAsImage && (
-            <HamburgerMenu.DefaultItems.SaveAsImage />
+            <MainMenu.DefaultItems.SaveAsImage />
           )}
           {onCollabButtonClick && (
-            <HamburgerMenu.DefaultItems.LiveCollaboration
+            <MainMenu.DefaultItems.LiveCollaboration
               onClick={onCollabButtonClick}
               isCollaborating={isCollaborating}
             />
           )}
-          <HamburgerMenu.DefaultItems.Help />
-          <HamburgerMenu.DefaultItems.ClearCanvas />
-          <HamburgerMenu.Separator />
-          <HamburgerMenu.Group title="Excalidraw links">
-            <HamburgerMenu.DefaultItems.Socials />
-          </HamburgerMenu.Group>
-          <HamburgerMenu.Separator />
+          <MainMenu.DefaultItems.Help />
+          <MainMenu.DefaultItems.ClearCanvas />
+          <MainMenu.Separator />
+          <MainMenu.Group title="Excalidraw links">
+            <MainMenu.DefaultItems.Socials />
+          </MainMenu.Group>
+          <MainMenu.Separator />
 
-          <HamburgerMenu.Group className="menu-footer">
-            <HamburgerMenu.DefaultItems.ToggleTheme />
-            <HamburgerMenu.DefaultItems.ChangeCanvasBackground />
-          </HamburgerMenu.Group>
-        </HamburgerMenu>
+          <MainMenu.Group className="menu-footer">
+            <MainMenu.DefaultItems.ToggleTheme />
+            <MainMenu.DefaultItems.ChangeCanvasBackground />
+          </MainMenu.Group>
+        </MainMenu>
       )
     );
   };
