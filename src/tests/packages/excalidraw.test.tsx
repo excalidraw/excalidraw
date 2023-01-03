@@ -8,7 +8,7 @@ const { h } = window;
 
 describe("<Excalidraw/>", () => {
   afterEach(() => {
-    const menu = document.querySelector(".menu");
+    const menu = document.querySelector(".dropdown-menu");
     if (menu) {
       toggleMenu(document.querySelector(".excalidraw")!);
     }
@@ -62,9 +62,7 @@ describe("<Excalidraw/>", () => {
         <div>This is a custom footer</div>
       </Excalidraw>,
     );
-    expect(
-      container.querySelector(".layer-ui__wrapper__footer-center"),
-    ).toBeEmptyDOMElement();
+    expect(container.querySelector(".footer-center")).toBeEmptyDOMElement();
 
     // Footer passed hence it will render the footer
     ({ container } = await render(
@@ -75,9 +73,9 @@ describe("<Excalidraw/>", () => {
       </Excalidraw>,
     ));
     expect(
-      container.querySelector(".layer-ui__wrapper__footer-center")?.innerHTML,
+      container.querySelector(".footer-center")?.innerHTML,
     ).toMatchInlineSnapshot(
-      `"<div class=\\"layer-ui__wrapper__footer-center zen-mode-transition\\"><div>This is a custom footer</div></div>"`,
+      `"<div class=\\"footer-center zen-mode-transition\\"><div>This is a custom footer</div></div>"`,
     );
   });
 

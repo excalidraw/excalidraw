@@ -3,7 +3,7 @@ import { t } from "../i18n";
 import { TrashIcon } from "./icons";
 
 import ConfirmDialog from "./ConfirmDialog";
-import MenuItem from "./menu/MenuItem";
+import MenuItem from "./dropdownMenu/DropdownMenuItem";
 
 const ClearCanvas = ({ onConfirm }: { onConfirm: () => void }) => {
   const [showDialog, setShowDialog] = useState(false);

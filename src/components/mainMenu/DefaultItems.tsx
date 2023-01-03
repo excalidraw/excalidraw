@@ -9,7 +9,7 @@ import {
 } from "../App";
 import { ExportIcon, ExportImageIcon, UsersIcon } from "../icons";
 import { GithubIcon, DiscordIcon, TwitterIcon } from "../icons";
-import MenuItem from "../menu/MenuItem";
+import MenuItem from "../dropdownMenu/DropdownMenuItem";
 
 export const LoadScene = () => {
   const appState = useExcalidrawAppState();

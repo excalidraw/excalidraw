@@ -25,8 +25,8 @@
     }
   }
 
-  .menu-container {
-    .menu-item {
+  .dropdown-menu-container {
+    .dropdown-menu-item {
       &.active-collab {
         background-color: #ecfdf5;
         color: #064e3c;
@@ -38,7 +38,7 @@
         padding: 0 0.625rem;
       }
     }
-    .menu-group.menu-footer {
+    .dropdown-menu-group.main-menu-footer {
       display: flex;
       flex-direction: column;
       row-gap: 0.5rem;
@@ -46,7 +46,7 @@
   }
 
   &.theme--dark {
-    .menu-item {
+    .dropdown-menu-item {
       &.active-collab {
         background-color: #064e3c;
         color: #ecfdf5;

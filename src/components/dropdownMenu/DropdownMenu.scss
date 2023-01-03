@@ -1,7 +1,7 @@
 @import "../../css/variables.module";
 
 .excalidraw {
-  .menu {
+  .dropdown-menu {
     position: absolute;
     top: 100%;
     margin-top: 0.25rem;
@@ -15,7 +15,7 @@
       flex-direction: column;
       row-gap: 0.75rem;
 
-      .menu-container {
+      .dropdown-menu-container {
         padding: 8px 8px;
         box-sizing: border-box;
         background-color: var(--island-bg-color);
@@ -30,14 +30,14 @@
       }
     }
 
-    .menu-container {
+    .dropdown-menu-container {
       background-color: #fff !important;
       max-height: calc(100vh - 150px);
       overflow-y: auto;
       --gap: 2;
     }
 
-    .menu-item {
+    .dropdown-menu-item {
       display: flex;
       background-color: transparent;
       border: 0;
@@ -81,7 +81,7 @@
       }
     }
 
-    .menu-group-title {
+    .dropdown-menu-group-title {
       font-size: 14px;
       text-align: left;
       margin: 10px 0;
@@ -89,16 +89,16 @@
     }
   }
   &.theme--dark {
-    .menu-item {
+    .dropdown-menu-item {
       color: var(--color-gray-40);
     }
 
-    .menu-container {
+    .dropdown-menu-container {
       background-color: var(--color-gray-90) !important;
     }
   }
 
-  .menu-button {
+  .dropdown-menu-button {
     @include outlineButtonStyles;
     background-color: var(--island-bg-color);
     width: var(--lg-button-size);

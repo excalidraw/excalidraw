@@ -6,7 +6,7 @@ import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { KEYS } from "../keys";
 import { HelpButton } from "../components/HelpButton";
-import MenuItem from "../components/menu/MenuItem";
+import MenuItem from "../components/dropdownMenu/DropdownMenuItem";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",

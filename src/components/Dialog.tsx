@@ -11,7 +11,7 @@ import { Modal } from "./Modal";
 import { AppState } from "../types";
 import { queryFocusableElements } from "../utils";
 import { useSetAtom } from "jotai";
-import { isMenuOpenAtom } from "./menu/Menu";
+import { isMenuOpenAtom } from "./dropdownMenu/DropdownMenu";
 import { isLibraryMenuOpenAtom } from "./LibraryMenuHeaderContent";
 
 export interface DialogProps {

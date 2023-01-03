@@ -5,7 +5,7 @@ import { save } from "../components/icons";
 import { t } from "../i18n";
 
 import "./ActiveFile.scss";
-import MenuItem from "./menu/MenuItem";
+import MenuItem from "./dropdownMenu/DropdownMenuItem";
 
 type ActiveFileProps = {
   fileName?: string;

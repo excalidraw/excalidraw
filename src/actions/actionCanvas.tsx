@@ -23,7 +23,7 @@ import { newElementWith } from "../element/mutateElement";
 import { getDefaultAppState, isEraserActive } from "../appState";
 import ClearCanvas from "../components/ClearCanvas";
 import clsx from "clsx";
-import MenuItem from "../components/menu/MenuItem";
+import MenuItem from "../components/dropdownMenu/DropdownMenuItem";
 import { getShortcutFromShortcutName } from "./shortcuts";
 
 export const actionChangeViewBackgroundColor = register({

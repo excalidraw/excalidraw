@@ -201,7 +201,7 @@ const LayerUI = ({
           </MainMenu.Group>
           <MainMenu.Separator />
 
-          <MainMenu.Group className="menu-footer">
+          <MainMenu.Group className="main-menu-footer">
             <MainMenu.DefaultItems.ToggleTheme />
             <MainMenu.DefaultItems.ChangeCanvasBackground />
           </MainMenu.Group>

@@ -625,7 +625,7 @@ const ExcalidrawWrapper = () => {
         </MainMenu.Item>
         <MainMenu.DefaultItems.Socials />
         <MainMenu.Separator />
-        <MainMenu.Group className="menu-footer">
+        <MainMenu.Group className="main-menu-footer">
           <MainMenu.DefaultItems.ToggleTheme />
           <MainMenu.Item className="language">
             <LanguageList style={{ width: "100%" }} />

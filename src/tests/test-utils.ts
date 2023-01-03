@@ -188,5 +188,5 @@ export const assertSelectedElements = (
 
 export const toggleMenu = (container: HTMLElement) => {
   // open menu
-  fireEvent.click(container.querySelector(".menu-button")!);
+  fireEvent.click(container.querySelector(".dropdown-menu-button")!);
 };

@@ -12,10 +12,10 @@ const MenuItemContent = ({
   const device = useDevice();
   return (
     <>
-      <div className="menu-item__icon">{icon}</div>
-      <div className="menu-item__text">{label}</div>
+      <div className="dropdown-menu-item__icon">{icon}</div>
+      <div className="dropdown-menu-item__text">{label}</div>
       {shortcut && !device.isMobile && (
-        <div className="menu-item__shortcut">{shortcut}</div>
+        <div className="dropdown-menu-item__shortcut">{shortcut}</div>
       )}
     </>
   );
@@ -40,7 +40,7 @@ const MenuItem = ({
   link?: string;
   style?: React.CSSProperties;
 }) => {
-  const classNames = `menu-item ${className}`.trim();
+  const classNames = `dropdown-menu-item ${className}`.trim();
 
   if (typeof children === "string") {
     const label = children;
@@ -79,4 +79,4 @@ const MenuItem = ({
 };
 
 export default MenuItem;
-MenuItem.displayName = "MenuItem";
+MenuItem.displayName = "DropdownMenuItem";

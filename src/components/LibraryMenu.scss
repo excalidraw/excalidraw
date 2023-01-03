@@ -130,11 +130,11 @@
     }
   }
 
-  .layer-ui__sidebar__header .menu {
-    &.menu--mobile {
+  .layer-ui__sidebar__header .dropdown-menu {
+    &.dropdown-menu--mobile {
       top: 100%;
     }
-    .menu-container {
+    .dropdown-menu-container {
       --gap: 0;
       z-index: 1;
       position: absolute;

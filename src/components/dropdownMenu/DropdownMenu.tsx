@@ -1,13 +1,17 @@
 import React from "react";
 import { atom } from "jotai";
-import MenuTrigger from "./MenuTrigger";
-import MenuItem from "./MenuItem";
-import MenuSeparator from "./MenuSeparator";
-import MenuGroup from "./MenuGroup";
-import MenuContent from "./MenuContent";
-import { getMenuContentComponent, getMenuTriggerComponent } from "./menuUtils";
+import MenuTrigger from "./DropdownMenuTrigger";
+import MenuItem from "./DropdownMenuItem";
+import MenuSeparator from "./DropdownMenuSeparator";
+import MenuGroup from "./DropdownMenuGroup";
+import MenuContent from "./DropdownMenuContent";
+import {
+  getMenuContentComponent,
+  getMenuTriggerComponent,
+} from "./dropdownMenuUtils";
 
-import "./Menu.scss";
+import "./DropdownMenu.scss";
+
 export const isMenuOpenAtom = atom(false);
 
 const Menu = ({
@@ -35,4 +39,4 @@ Menu.Separator = MenuSeparator;
 
 export default Menu;
 
-Menu.displayName = "Menu";
+Menu.displayName = "DropdownMenu";

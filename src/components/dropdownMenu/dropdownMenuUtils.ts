@@ -7,10 +7,10 @@ export const getValidMenuChildren = (
 ) => {
   const validMenuChildren = [
     ...Object.keys(MenuComponents),
-    "MenuSeparator",
-    "MenuSocials",
-    "MenuItem",
-    "MenuGroup",
+    "DropdownMenuSeparator",
+    "DropdownMenuSocials",
+    "DropdownMenuItem",
+    "DropdownMenuGroup",
     "Collaborators",
   ].filter((item) => !exclude?.includes(item));
   const childrenComponents: React.ReactNode[] = [];
@@ -38,7 +38,7 @@ export const getMenuTriggerComponent = (children: React.ReactNode) => {
       //@ts-ignore
       child?.type.displayName &&
       //@ts-ignore
-      child.type.displayName === "MenuTrigger",
+      child.type.displayName === "DropdownMenuTrigger",
   );
   if (!comp) {
     return null;
@@ -55,7 +55,7 @@ export const getMenuContentComponent = (children: React.ReactNode) => {
       //@ts-ignore
       child?.type.displayName &&
       //@ts-ignore
-      child.type.displayName === "MenuContent",
+      child.type.displayName === "DropdownMenuContent",
   );
   if (!comp) {
     return null;

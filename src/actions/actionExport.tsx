@@ -19,7 +19,7 @@ import { ActiveFile } from "../components/ActiveFile";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
-import MenuItem from "../components/menu/MenuItem";
+import MenuItem from "../components/dropdownMenu/DropdownMenuItem";
 import { getShortcutFromShortcutName } from "./shortcuts";
 
 export const actionChangeProjectName = register({

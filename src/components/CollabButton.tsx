@@ -2,7 +2,7 @@ import { t } from "../i18n";
 import { UsersIcon } from "./icons";
 
 import "./CollabButton.scss";
-import MenuItem from "./menu/MenuItem";
+import MenuItem from "./dropdownMenu/DropdownMenuItem";
 import clsx from "clsx";
 
 const CollabButton = ({

@@ -2,22 +2,22 @@
 
 exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu with default items when "UIOPtions" is "undefined" 1`] = `
 <div
-  class="menu"
+  class="dropdown-menu"
   data-testid="menu"
 >
   <div
-    class="Island menu-container"
+    class="Island dropdown-menu-container"
     style="--padding: 2; z-index: 1;"
   >
     <button
       aria-label="Open"
-      class="menu-item"
+      class="dropdown-menu-item"
       data-testid="load-button"
       title="Open"
       type="button"
     >
       <div
-        class="menu-item__icon"
+        class="dropdown-menu-item__icon"
       >
         <svg
           aria-hidden="true"
@@ -37,25 +37,25 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         </svg>
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
         Open
       </div>
       <div
-        class="menu-item__shortcut"
+        class="dropdown-menu-item__shortcut"
       >
         Ctrl+O
       </div>
     </button>
     <button
       aria-label="Save to..."
-      class="menu-item"
+      class="dropdown-menu-item"
       data-testid="json-export-button"
       title="Save to..."
       type="button"
     >
       <div
-        class="menu-item__icon"
+        class="dropdown-menu-item__icon"
       >
         <svg
           aria-hidden="true"
@@ -75,20 +75,20 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         </svg>
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
         Save to...
       </div>
     </button>
     <button
       aria-label="Export image..."
-      class="menu-item"
+      class="dropdown-menu-item"
       data-testid="image-export-button"
       title="Export image..."
       type="button"
     >
       <div
-        class="menu-item__icon"
+        class="dropdown-menu-item__icon"
       >
         <svg
           aria-hidden="true"
@@ -132,25 +132,25 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         </svg>
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
         Export image...
       </div>
       <div
-        class="menu-item__shortcut"
+        class="dropdown-menu-item__shortcut"
       >
         Ctrl+Shift+E
       </div>
     </button>
     <button
       aria-label="Help"
-      class="menu-item"
+      class="dropdown-menu-item"
       data-testid="help-menu-item"
       title="Help"
       type="button"
     >
       <div
-        class="menu-item__icon"
+        class="dropdown-menu-item__icon"
       >
         <svg
           aria-hidden="true"
@@ -190,25 +190,25 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         </svg>
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
         Help
       </div>
       <div
-        class="menu-item__shortcut"
+        class="dropdown-menu-item__shortcut"
       >
         ?
       </div>
     </button>
     <button
       aria-label="Reset the canvas"
-      class="menu-item"
+      class="dropdown-menu-item"
       data-testid="clear-canvas-button"
       title="Reset the canvas"
       type="button"
     >
       <div
-        class="menu-item__icon"
+        class="dropdown-menu-item__icon"
       >
         <svg
           aria-hidden="true"
@@ -228,7 +228,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         </svg>
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
         Reset the canvas
       </div>
@@ -237,21 +237,21 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
       style="height: 1px; margin: .5rem 0px;"
     />
     <div
-      class="menu-group "
+      class="dropdown-menu-group "
     >
       <p
-        class="menu-group-title"
+        class="dropdown-menu-group-title"
       >
         Excalidraw links
       </p>
       <a
-        class="menu-item"
+        class="dropdown-menu-item"
         href="https://github.com/excalidraw/excalidraw"
         rel="noreferrer"
         target="_blank"
       >
         <div
-          class="menu-item__icon"
+          class="dropdown-menu-item__icon"
         >
           <svg
             aria-hidden="true"
@@ -271,19 +271,19 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
           </svg>
         </div>
         <div
-          class="menu-item__text"
+          class="dropdown-menu-item__text"
         >
           GitHub
         </div>
       </a>
       <a
-        class="menu-item"
+        class="dropdown-menu-item"
         href="https://discord.gg/UexuTaE"
         rel="noreferrer"
         target="_blank"
       >
         <div
-          class="menu-item__icon"
+          class="dropdown-menu-item__icon"
         >
           <svg
             aria-hidden="true"
@@ -309,19 +309,19 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
           </svg>
         </div>
         <div
-          class="menu-item__text"
+          class="dropdown-menu-item__text"
         >
           Discord
         </div>
       </a>
       <a
-        class="menu-item"
+        class="dropdown-menu-item"
         href="https://twitter.com/excalidraw"
         rel="noreferrer"
         target="_blank"
       >
         <div
-          class="menu-item__icon"
+          class="dropdown-menu-item__icon"
         >
           <svg
             aria-hidden="true"
@@ -350,7 +350,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
           </svg>
         </div>
         <div
-          class="menu-item__text"
+          class="dropdown-menu-item__text"
         >
           Twitter
         </div>
@@ -360,17 +360,17 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
       style="height: 1px; margin: .5rem 0px;"
     />
     <div
-      class="menu-group menu-footer"
+      class="dropdown-menu-group main-menu-footer"
     >
       <button
         aria-label="Dark mode"
-        class="menu-item"
+        class="dropdown-menu-item"
         data-testid="toggle-dark-mode"
         title="Dark mode"
         type="button"
       >
         <div
-          class="menu-item__icon"
+          class="dropdown-menu-item__icon"
         >
           <svg
             aria-hidden="true"
@@ -391,12 +391,12 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
           </svg>
         </div>
         <div
-          class="menu-item__text"
+          class="dropdown-menu-item__text"
         >
           Dark mode
         </div>
         <div
-          class="menu-item__shortcut"
+          class="dropdown-menu-item__shortcut"
         >
           Shift+Alt+D
         </div>

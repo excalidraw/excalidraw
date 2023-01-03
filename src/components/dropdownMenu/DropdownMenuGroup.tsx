@@ -12,12 +12,12 @@ const MenuGroup = ({
   title?: string;
 }) => {
   return (
-    <div className={`menu-group ${className}`} style={style}>
-      {title && <p className="menu-group-title">{title}</p>}
+    <div className={`dropdown-menu-group ${className}`} style={style}>
+      {title && <p className="dropdown-menu-group-title">{title}</p>}
       {children}
     </div>
   );
 };
 
 export default MenuGroup;
-MenuGroup.displayName = "MenuGroup";
+MenuGroup.displayName = "DropdownMenuGroup";

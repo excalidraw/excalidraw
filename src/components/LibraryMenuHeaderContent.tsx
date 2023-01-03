@@ -19,7 +19,7 @@ import ConfirmDialog from "./ConfirmDialog";
 import PublishLibrary from "./PublishLibrary";
 import { Dialog } from "./Dialog";
 
-import Menu from "./menu/Menu";
+import DropdownMenu from "./dropdownMenu/DropdownMenu";
 
 export const isLibraryMenuOpenAtom = atom(false);
 
@@ -178,54 +178,54 @@ export const LibraryMenuHeader: React.FC<{
 
   const renderLibraryMenu = () => {
     return (
-      <Menu open={isLibraryMenuOpen}>
-        <Menu.Trigger
+      <DropdownMenu open={isLibraryMenuOpen}>
+        <DropdownMenu.Trigger
           className="Sidebar__dropdown-btn"
-          onClick={() => setIsLibraryMenuOpen(!isLibraryMenuOpen)}
+          onToggle={() => setIsLibraryMenuOpen(!isLibraryMenuOpen)}
         >
           {DotsIcon}
-        </Menu.Trigger>
-        <Menu.Content
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
           onClickOutside={() => setIsLibraryMenuOpen(false)}
           className="library-menu"
         >
           {!itemsSelected && (
-            <Menu.Item
+            <DropdownMenu.Item
               onClick={onLibraryImport}
               icon={LoadIcon}
               dataTestId="lib-dropdown--load"
             >
               {t("buttons.load")}
-            </Menu.Item>
+            </DropdownMenu.Item>
           )}
           {!!items.length && (
-            <Menu.Item
+            <DropdownMenu.Item
               onClick={onLibraryExport}
               icon={ExportIcon}
               dataTestId="lib-dropdown--export"
             >
               {t("buttons.export")}
-            </Menu.Item>
+            </DropdownMenu.Item>
           )}
           {!!items.length && (
-            <Menu.Item
+            <DropdownMenu.Item
               onClick={() => setShowRemoveLibAlert(true)}
               icon={TrashIcon}
             >
               {resetLabel}
-            </Menu.Item>
+            </DropdownMenu.Item>
           )}
           {itemsSelected && (
-            <Menu.Item
+            <DropdownMenu.Item
               icon={publishIcon}
               onClick={() => setShowPublishLibraryDialog(true)}
               dataTestId="lib-dropdown--remove"
             >
               {t("buttons.publishLibrary")}
-            </Menu.Item>
+            </DropdownMenu.Item>
           )}
-        </Menu.Content>
-      </Menu>
+        </DropdownMenu.Content>
+      </DropdownMenu>
     );
   };
   return (

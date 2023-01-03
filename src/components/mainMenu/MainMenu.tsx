@@ -5,7 +5,7 @@ import {
   useExcalidrawAppState,
   useExcalidrawSetAppState,
 } from "../App";
-import Menu from "../menu/Menu";
+import DropdownMenu from "../dropdownMenu/DropdownMenu";
 
 import * as DefaultItems from "./DefaultItems";
 
@@ -23,9 +23,11 @@ const MainMenu = ({ children }: { children?: React.ReactNode }) => {
     ? undefined
     : () => setIsMenuOpen(false);
   return (
-    <Menu open={device.isMobile ? appState.openMenu === "canvas" : isMenuOpen}>
-      <Menu.Trigger
-        onClick={() => {
+    <DropdownMenu
+      open={device.isMobile ? appState.openMenu === "canvas" : isMenuOpen}
+    >
+      <DropdownMenu.Trigger
+        onToggle={() => {
           if (device.isMobile) {
             setAppState({
               openMenu: appState.openMenu === "canvas" ? null : "canvas",
@@ -36,26 +38,26 @@ const MainMenu = ({ children }: { children?: React.ReactNode }) => {
         }}
       >
         {HamburgerMenuIcon}
-      </Menu.Trigger>
-      <Menu.Content onClickOutside={onClickOutside}>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content onClickOutside={onClickOutside}>
         {children}
         {device.isMobile && appState.collaborators.size > 0 && (
-          <Menu.Item style={{ height: "auto", padding: 0 }}>
+          <DropdownMenu.Item style={{ height: "auto", padding: 0 }}>
             <fieldset className="UserList-Wrapper">
               <legend>{t("labels.collaborators")}</legend>
               <UserList mobile={true} collaborators={appState.collaborators} />
             </fieldset>
-          </Menu.Item>
+          </DropdownMenu.Item>
         )}
-      </Menu.Content>
-    </Menu>
+      </DropdownMenu.Content>
+    </DropdownMenu>
   );
 };
 
-MainMenu.Trigger = Menu.Trigger;
-MainMenu.Item = Menu.Item;
-MainMenu.Group = Menu.Group;
-MainMenu.Separator = Menu.Separator;
+MainMenu.Trigger = DropdownMenu.Trigger;
+MainMenu.Item = DropdownMenu.Item;
+MainMenu.Group = DropdownMenu.Group;
+MainMenu.Separator = DropdownMenu.Separator;
 MainMenu.DefaultItems = DefaultItems;
 
 export default MainMenu;
