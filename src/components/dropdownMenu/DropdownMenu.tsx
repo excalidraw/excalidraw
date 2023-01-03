@@ -1,5 +1,4 @@
 import React from "react";
-import { atom } from "jotai";
 import MenuTrigger from "./DropdownMenuTrigger";
 import MenuItem from "./DropdownMenuItem";
 import MenuSeparator from "./DropdownMenuSeparator";
@@ -11,8 +10,6 @@ import {
 } from "./dropdownMenuUtils";
 
 import "./DropdownMenu.scss";
-
-export const isMenuOpenAtom = atom(false);
 
 const Menu = ({
   children,
