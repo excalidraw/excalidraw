@@ -6,7 +6,7 @@ import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { KEYS } from "../keys";
 import { HelpButton } from "../components/HelpButton";
-import MenuItem from "../components/dropdownMenu/DropdownMenuItem";
+import DropdownMenuItem from "../components/dropdownMenu/DropdownMenuItem";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -90,14 +90,14 @@ export const actionShortcuts = register({
   },
   PanelComponent: ({ updateData, isInHamburgerMenu }) =>
     isInHamburgerMenu ? (
-      <MenuItem
+      <DropdownMenuItem
         dataTestId="help-menu-item"
         icon={HelpIcon}
         onClick={updateData}
         shortcut="?"
       >
         {t("helpDialog.title")}
-      </MenuItem>
+      </DropdownMenuItem>
     ) : (
       <HelpButton title={t("helpDialog.title")} onClick={updateData} />
     ),

@@ -9,7 +9,7 @@ import {
 } from "../App";
 import { ExportIcon, ExportImageIcon, UsersIcon } from "../icons";
 import { GithubIcon, DiscordIcon, TwitterIcon } from "../icons";
-import MenuItem from "../dropdownMenu/DropdownMenuItem";
+import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
 
 export const LoadScene = () => {
   const appState = useExcalidrawAppState();
@@ -34,14 +34,14 @@ SaveToActiveFile.displayName = "SaveToActiveFile";
 export const SaveAsImage = () => {
   const setAppState = useExcalidrawSetAppState();
   return (
-    <MenuItem
+    <DropdownMenuItem
       icon={ExportImageIcon}
       dataTestId="image-export-button"
       onClick={() => setAppState({ openDialog: "imageExport" })}
       shortcut={getShortcutFromShortcutName("imageExport")}
     >
       {t("buttons.exportImage")}
-    </MenuItem>
+    </DropdownMenuItem>
   );
 };
 SaveAsImage.displayName = "SaveAsImage";
@@ -92,7 +92,7 @@ ChangeCanvasBackground.displayName = "ChangeCanvasBackground";
 export const Export = () => {
   const setAppState = useExcalidrawSetAppState();
   return (
-    <MenuItem
+    <DropdownMenuItem
       icon={ExportIcon}
       onClick={() => {
         setAppState({ openDialog: "jsonExport" });
@@ -100,22 +100,25 @@ export const Export = () => {
       dataTestId="json-export-button"
     >
       {t("buttons.export")}
-    </MenuItem>
+    </DropdownMenuItem>
   );
 };
 Export.displayName = "Export";
 
 export const Socials = () => (
   <>
-    <MenuItem icon={GithubIcon} link="https://github.com/excalidraw/excalidraw">
+    <DropdownMenuItem
+      icon={GithubIcon}
+      link="https://github.com/excalidraw/excalidraw"
+    >
       GitHub
-    </MenuItem>
-    <MenuItem icon={DiscordIcon} link="https://discord.gg/UexuTaE">
+    </DropdownMenuItem>
+    <DropdownMenuItem icon={DiscordIcon} link="https://discord.gg/UexuTaE">
       Discord
-    </MenuItem>
-    <MenuItem icon={TwitterIcon} link="https://twitter.com/excalidraw">
+    </DropdownMenuItem>
+    <DropdownMenuItem icon={TwitterIcon} link="https://twitter.com/excalidraw">
       Twitter
-    </MenuItem>
+    </DropdownMenuItem>
   </>
 );
 
@@ -129,7 +132,7 @@ export const LiveCollaboration = ({
   isCollaborating: ExcalidrawProps["isCollaborating"];
 }) => {
   return (
-    <MenuItem
+    <DropdownMenuItem
       dataTestId="collab-button"
       icon={UsersIcon}
       className={clsx({
@@ -138,7 +141,7 @@ export const LiveCollaboration = ({
       onClick={onClick}
     >
       {t("labels.liveCollaboration")}
-    </MenuItem>
+    </DropdownMenuItem>
   );
 };
 

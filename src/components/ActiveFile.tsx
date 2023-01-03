@@ -5,7 +5,7 @@ import { save } from "../components/icons";
 import { t } from "../i18n";
 
 import "./ActiveFile.scss";
-import MenuItem from "./dropdownMenu/DropdownMenuItem";
+import DropdownMenuItem from "./dropdownMenu/DropdownMenuItem";
 
 type ActiveFileProps = {
   fileName?: string;
@@ -13,10 +13,10 @@ type ActiveFileProps = {
 };
 
 export const ActiveFile = ({ fileName, onSave }: ActiveFileProps) => (
-  <MenuItem
+  <DropdownMenuItem
     shortcut={getShortcutFromShortcutName("saveScene")}
     dataTestId="save-button"
     onClick={onSave}
     icon={save}
-  >{`${t("buttons.save")}`}</MenuItem>
+  >{`${t("buttons.save")}`}</DropdownMenuItem>
 );

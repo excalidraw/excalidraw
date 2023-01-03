@@ -23,7 +23,7 @@ import { newElementWith } from "../element/mutateElement";
 import { getDefaultAppState, isEraserActive } from "../appState";
 import ClearCanvas from "../components/ClearCanvas";
 import clsx from "clsx";
-import MenuItem from "../components/dropdownMenu/DropdownMenuItem";
+import DropdownMenuItem from "../components/dropdownMenu/DropdownMenuItem";
 import { getShortcutFromShortcutName } from "./shortcuts";
 
 export const actionChangeViewBackgroundColor = register({
@@ -299,7 +299,7 @@ export const actionToggleTheme = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <MenuItem
+    <DropdownMenuItem
       onClick={() => {
         updateData(appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT);
       }}
@@ -310,7 +310,7 @@ export const actionToggleTheme = register({
       {appState.theme === "dark"
         ? t("buttons.lightMode")
         : t("buttons.darkMode")}
-    </MenuItem>
+    </DropdownMenuItem>
   ),
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
 });

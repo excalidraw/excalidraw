@@ -1,6 +1,6 @@
 import React from "react";
 import MenuTrigger from "./DropdownMenuTrigger";
-import MenuItem from "./DropdownMenuItem";
+import DropdownMenuItem from "./DropdownMenuItem";
 import MenuSeparator from "./DropdownMenuSeparator";
 import MenuGroup from "./DropdownMenuGroup";
 import MenuContent from "./DropdownMenuContent";
@@ -30,7 +30,7 @@ const Menu = ({
 
 Menu.Trigger = MenuTrigger;
 Menu.Content = MenuContent;
-Menu.Item = MenuItem;
+Menu.Item = DropdownMenuItem;
 Menu.Group = MenuGroup;
 Menu.Separator = MenuSeparator;
 

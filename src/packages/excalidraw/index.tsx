@@ -241,3 +241,4 @@ export {
 export { Sidebar } from "../../components/Sidebar/Sidebar";
 export { Footer };
 export { MainMenu };
+export { useDevice } from "../../components/App";

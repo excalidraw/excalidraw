@@ -2,7 +2,7 @@ import { t } from "../i18n";
 import { UsersIcon } from "./icons";
 
 import "./CollabButton.scss";
-import MenuItem from "./dropdownMenu/DropdownMenuItem";
+import DropdownMenuItem from "./dropdownMenu/DropdownMenuItem";
 import clsx from "clsx";
 
 const CollabButton = ({
@@ -19,9 +19,13 @@ const CollabButton = ({
   return (
     <>
       {isInHamburgerMenu ? (
-        <MenuItem dataTestId="collab-button" icon={UsersIcon} onClick={onClick}>
+        <DropdownMenuItem
+          dataTestId="collab-button"
+          icon={UsersIcon}
+          onClick={onClick}
+        >
           {t("labels.liveCollaboration")}
-        </MenuItem>
+        </DropdownMenuItem>
       ) : (
         <button
           className={clsx("collab-button", { active: isCollaborating })}

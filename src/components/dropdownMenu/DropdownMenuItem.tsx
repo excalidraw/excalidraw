@@ -21,7 +21,7 @@ const MenuItemContent = ({
   );
 };
 
-const MenuItem = ({
+const DropdownMenuItem = ({
   icon,
   onClick,
   children,
@@ -78,5 +78,5 @@ const MenuItem = ({
   );
 };
 
-export default MenuItem;
-MenuItem.displayName = "DropdownMenuItem";
+export default DropdownMenuItem;
+DropdownMenuItem.displayName = "DropdownMenuItem";

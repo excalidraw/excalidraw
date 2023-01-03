@@ -405,19 +405,61 @@ const App = () => {
 };
 ```
 
+This will only for `Desktop` devices.
+
+For `mobile` you will need to render it inside the [MainMenu](#mainmenu). You can use the [`useDevice`](#useDevice) hook to check the type of device, this will be available only inside the `children` of `Excalidraw` component.
+
+```js
+import { useDevice, Footer } from "@excalidraw/excalidraw";
+
+const MobileFooter = ({
+}) => {
+  const device = useDevice();
+  if (device.isMobile) {
+    return (
+      <Footer>
+       <button
+        className="custom-footer"
+        onClick={() => alert("This is custom footer in mobile menu")}
+      >
+        {" "}
+        custom footer{" "}
+      </button>
+      </Footer>
+    );
+  }
+  return null;
+
+};
+const App = () => {
+  <Excalidraw>
+    <MainMenu>
+      <MainMenu.Item> Item1 </MainMenu.Item>
+      <MainMenu.Item> Item 2 </>
+      <MobileFooter/>
+    </MainMenu>
+  </Excalidraw>
+}
+
+```
+
+You can visit the[ example](https://ehlz3.csb.app/) for working demo.
+
 #### MainMenu
 
-By default Excalidraw will render the `MainMenu` with default options, you can visit [example](https://excalidraw-package-example-git-release-excalidraw.vercel.app/) to see the default menu. If you want to customise the `MainMenu`, you can pass the `MainMenu` component with the list options.
+By default Excalidraw will render the `MainMenu` with default options. If you want to customise the `MainMenu`, you can pass the `MainMenu` component with the list options. You can visit [codesandbox example](https://ehlz3.csb.app/) for a working demo.
 
 **Usage**
 
 ```js
 import { MainMenu } from "@excalidraw/excalidraw";
 const App = () => {
-  <MainMenu>
-    <MainMenu.Item> Item1 </MainMenu.Item>
-    <MainMenu.Item> Item 2 </>
-  </MainMenu>
+  <Excalidraw>
+    <MainMenu>
+      <MainMenu.Item> Item1 </MainMenu.Item>
+      <MainMenu.Item> Item 2 </>
+    </MainMenu>
+  </Excalidraw>
 }
 ```
 
@@ -446,12 +488,14 @@ For the items which are shown in the menu in [excalidraw.com](https://excalidraw
 ```js
 import { MainMenu } from "@excalidraw/excalidraw";
 const App = () => {
-  <MainMenu>
-    <MainMenu.DefaultItems.Socials/>
-    <MainMenu.DefaultItems.Export/>
-    <MainMenu.Item> Item1 </MainMenu.Item>
-    <MainMenu.Item> Item 2 </>
-  </MainMenu>
+  <Excalidraw>
+    <MainMenu>
+      <MainMenu.DefaultItems.Socials/>
+      <MainMenu.DefaultItems.Export/>
+      <MainMenu.Item> Item1 </MainMenu.Item>
+      <MainMenu.Item> Item 2 </>
+    </MainMenu>
+  </Excalidraw>
 }
 ```
 
@@ -464,16 +508,18 @@ To Group item in the main menu, you can use `MainMenu.Group`
 ```js
 import { MainMenu } from "@excalidraw/excalidraw";
 const App = () => {
-  <MainMenu>
-    <MainMenu.Group title="Excalidraw items">
-      <MainMenu.DefaultItems.Socials/>
-      <MainMenu.DefaultItems.Export/>
-    </MainMenu.Group>
-    <MainMenu.Group title="custom items">
-      <MainMenu.Item> Item1 </MainMenu.Item>
-      <MainMenu.Item> Item 2 </>
-    </MainMenu.Group>
-  </MainMenu>
+  <Excalidraw>
+    <MainMenu>
+      <MainMenu.Group title="Excalidraw items">
+        <MainMenu.DefaultItems.Socials/>
+        <MainMenu.DefaultItems.Export/>
+      </MainMenu.Group>
+      <MainMenu.Group title="custom items">
+        <MainMenu.Item> Item1 </MainMenu.Item>
+        <MainMenu.Item> Item 2 </>
+      </MainMenu.Group>
+    </MainMenu>
+  </Excalidraw>
 }
 ```
 
@@ -1447,6 +1493,53 @@ viewportCoordsToSceneCoords({clientX: number, clientY: number}, appState: <a hre
 </pre>
 
 This function returns equivalent scene coords for the provided viewport coords in params.
+
+#### useDevice
+
+This hook can be used to check the type of device which is being used. It can only be used inside the `children` of `Excalidraw` component
+
+```js
+import { useDevice, Footer } from "@excalidraw/excalidraw";
+
+const MobileFooter = ({
+}) => {
+  const device = useDevice();
+  if (device.isMobile) {
+    return (
+      <Footer>
+       <button
+        className="custom-footer"
+        onClick={() => alert("This is custom footer in mobile menu")}
+      >
+        {" "}
+        custom footer{" "}
+      </button>
+      </Footer>
+    );
+  }
+  return null;
+
+};
+const App = () => {
+  <Excalidraw>
+    <MainMenu>
+      <MainMenu.Item> Item1 </MainMenu.Item>
+      <MainMenu.Item> Item 2 </>
+      <MobileFooter/>
+    </MainMenu>
+  </Excalidraw>
+}
+
+```
+
+The `device` has the following `attributes`
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `isSmScreen` | `boolean` | Set to `true` when the device small screen is small (Width < `640px` ) |
+| `isMobile` | `boolean` | Set to `true` when the device is `mobile` |
+| `isTouchScreen` | `boolean` | Set to `true` for `touch` devices |
+| `canDeviceFitSidebar` | `boolean` | Implies whether there is enough space to fit the `sidebar` |
 
 ### Exported constants
 

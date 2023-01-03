@@ -465,7 +465,7 @@ const LayerUI = ({
               actionManager={actionManager}
               showExitZenModeBtn={showExitZenModeBtn}
             >
-              {childrenComponents.FooterCenter}
+              {childrenComponents.FooterCenter?.props.children}
             </Footer>
 
             {appState.showStats && (
