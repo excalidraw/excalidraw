@@ -33,6 +33,9 @@ SaveToActiveFile.displayName = "SaveToActiveFile";
 
 export const SaveAsImage = () => {
   const setAppState = useExcalidrawSetAppState();
+  // Hack until we tie "t" to lang state
+  // eslint-disable-next-line
+  const appState = useExcalidrawAppState();
   return (
     <DropdownMenuItem
       icon={ExportImageIcon}
@@ -47,6 +50,10 @@ export const SaveAsImage = () => {
 SaveAsImage.displayName = "SaveAsImage";
 
 export const Help = () => {
+  // Hack until we tie "t" to lang state
+  // eslint-disable-next-line
+  const appState = useExcalidrawAppState();
+
   const actionManager = useExcalidrawActionManager();
   return actionManager.renderAction("toggleShortcuts", undefined, true);
 };
@@ -64,6 +71,9 @@ export const ClearCanvas = () => {
 ClearCanvas.displayName = "ClearCanvas";
 
 export const ToggleTheme = () => {
+  // Hack until we tie "t" to lang state
+  // eslint-disable-next-line
+  const appState = useExcalidrawAppState();
   const actionManager = useExcalidrawActionManager();
   return actionManager.renderAction("toggleTheme");
 };
@@ -90,6 +100,9 @@ export const ChangeCanvasBackground = () => {
 ChangeCanvasBackground.displayName = "ChangeCanvasBackground";
 
 export const Export = () => {
+  // Hack until we tie "t" to lang state
+  // eslint-disable-next-line
+  const appState = useExcalidrawAppState();
   const setAppState = useExcalidrawSetAppState();
   return (
     <DropdownMenuItem
@@ -131,6 +144,9 @@ export const LiveCollaboration = ({
   onClick: ExcalidrawProps["onCollabButtonClick"];
   isCollaborating: ExcalidrawProps["isCollaborating"];
 }) => {
+  // Hack until we tie "t" to lang state
+  // eslint-disable-next-line
+  const appState = useExcalidrawAppState();
   return (
     <DropdownMenuItem
       dataTestId="collab-button"
