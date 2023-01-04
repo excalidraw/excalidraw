@@ -25,7 +25,12 @@ const MenuContent = ({
     "dropdown-menu--mobile": device.isMobile,
   }).trim();
   return (
-    <div ref={menuRef} className={classNames} style={style} data-testid="menu">
+    <div
+      ref={menuRef}
+      className={classNames}
+      style={style}
+      data-testid="dropdown-menu"
+    >
       {/* the zIndex ensures this menu has higher stacking order,
     see https://github.com/excalidraw/excalidraw/pull/1445 */}
       {device.isMobile ? (

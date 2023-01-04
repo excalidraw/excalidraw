@@ -499,7 +499,14 @@ export default function App() {
           <MainMenu.DefaultItems.Socials />
         </MainMenu.Group>
         <MainMenu.Separator />
-
+        <MainMenu.Item>
+          <button
+            style={{ height: "2rem" }}
+            onClick={() => window.alert("custom menu item")}
+          >
+            custom item
+          </button>
+        </MainMenu.Item>
         <MainMenu.DefaultItems.Help />
         {excalidrawAPI && <MobileFooter excalidrawAPI={excalidrawAPI} />}
       </MainMenu>

@@ -1,5 +1,5 @@
 import { fireEvent, GlobalTestState, toggleMenu, render } from "../test-utils";
-import { Excalidraw, Footer } from "../../packages/excalidraw/index";
+import { Excalidraw, Footer, MainMenu } from "../../packages/excalidraw/index";
 import { queryByText, queryByTestId } from "@testing-library/react";
 import { GRID_SIZE, THEME } from "../../constants";
 import { t } from "../../i18n";
@@ -121,6 +121,28 @@ describe("<Excalidraw/>", () => {
     });
   });
 
+  it("should render main menu with custom items if passed from host", async () => {
+    const { container } = await render(
+      <Excalidraw UIOptions={undefined}>
+        <MainMenu>
+          <MainMenu.Item>
+            <button
+              style={{ height: "2rem" }}
+              onClick={() => window.alert("custom menu item")}
+            >
+              {" "}
+              custom item
+            </button>
+          </MainMenu.Item>
+          <MainMenu.DefaultItems.Help />
+        </MainMenu>
+      </Excalidraw>,
+    );
+    //open menu
+    toggleMenu(container);
+    expect(queryByTestId(container, "dropdown-menu")).toMatchSnapshot();
+  });
+
   describe("Test UIOptions prop", () => {
     describe("Test canvasActions", () => {
       it('should render menu with default items when "UIOPtions" is "undefined"', async () => {
@@ -129,7 +151,7 @@ describe("<Excalidraw/>", () => {
         );
         //open menu
         toggleMenu(container);
-        expect(queryByTestId(container, "menu")).toMatchSnapshot();
+        expect(queryByTestId(container, "dropdown-menu")).toMatchSnapshot();
       });
 
       it("should hide clear canvas button when clearCanvas is false", async () => {
@@ -208,83 +230,106 @@ describe("<Excalidraw/>", () => {
         toggleMenu(container);
         expect(queryByTestId(container, "toggle-dark-mode")).toBeNull();
       });
-    });
 
-    describe("Test theme prop", () => {
-      it("should show the theme toggle by default", async () => {
-        const { container } = await render(<Excalidraw />);
-        expect(h.state.theme).toBe(THEME.LIGHT);
-        //open menu
-        toggleMenu(container);
-        const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
-        expect(darkModeToggle).toBeTruthy();
-      });
-
-      it("should not show theme toggle when the theme prop is defined", async () => {
-        const { container } = await render(<Excalidraw theme={THEME.DARK} />);
-
-        expect(h.state.theme).toBe(THEME.DARK);
-        //open menu
-        toggleMenu(container);
-        expect(queryByTestId(container, "toggle-dark-mode")).toBe(null);
-      });
-
-      it("should show theme mode toggle when `UIOptions.canvasActions.toggleTheme` is true", async () => {
+      it("should not render default items in custom menu even if passed if the prop in `canvasActions` is set to false", async () => {
         const { container } = await render(
-          <Excalidraw
-            theme={THEME.DARK}
-            UIOptions={{ canvasActions: { toggleTheme: true } }}
-          />,
+          <Excalidraw UIOptions={{ canvasActions: { loadScene: false } }}>
+            <MainMenu>
+              <MainMenu.Item>
+                <button
+                  style={{ height: "2rem" }}
+                  onClick={() => window.alert("custom menu item")}
+                >
+                  {" "}
+                  custom item
+                </button>
+              </MainMenu.Item>
+              <MainMenu.DefaultItems.LoadScene />
+            </MainMenu>
+          </Excalidraw>,
         );
-        expect(h.state.theme).toBe(THEME.DARK);
         //open menu
         toggleMenu(container);
-        const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
-        expect(darkModeToggle).toBeTruthy();
-      });
-
-      it("should not show theme toggle when `UIOptions.canvasActions.toggleTheme` is false", async () => {
-        const { container } = await render(
-          <Excalidraw
-            UIOptions={{ canvasActions: { toggleTheme: false } }}
-            theme={THEME.DARK}
-          />,
-        );
-        expect(h.state.theme).toBe(THEME.DARK);
-        //open menu
-        toggleMenu(container);
-        const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
-        expect(darkModeToggle).toBeFalsy();
-      });
-    });
-    describe("Test name prop", () => {
-      it('should allow editing name when the name prop is "undefined"', async () => {
-        const { container } = await render(<Excalidraw />);
-        //open menu
-        toggleMenu(container);
-        fireEvent.click(queryByTestId(container, "image-export-button")!);
-        const textInput: HTMLInputElement | null = document.querySelector(
-          ".ExportDialog .ProjectName .TextInput",
-        );
-        expect(textInput?.value).toContain(`${t("labels.untitled")}`);
-        expect(textInput?.nodeName).toBe("INPUT");
-      });
-
-      it('should set the name and not allow editing when the name prop is present"', async () => {
-        const name = "test";
-        const { container } = await render(<Excalidraw name={name} />);
-        //open menu
-        toggleMenu(container);
-        await fireEvent.click(queryByTestId(container, "image-export-button")!);
-        const textInput = document.querySelector(
-          ".ExportDialog .ProjectName .TextInput--readonly",
-        );
-        expect(textInput?.textContent).toEqual(name);
-        expect(textInput?.nodeName).toBe("SPAN");
+        // load button shouldn't be rendered since `UIActions.canvasActions.loadScene` is `false`
+        expect(queryByTestId(container, "load-button")).toBeNull();
       });
     });
   });
 
+  describe("Test theme prop", () => {
+    it("should show the theme toggle by default", async () => {
+      const { container } = await render(<Excalidraw />);
+      expect(h.state.theme).toBe(THEME.LIGHT);
+      //open menu
+      toggleMenu(container);
+      const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
+      expect(darkModeToggle).toBeTruthy();
+    });
+
+    it("should not show theme toggle when the theme prop is defined", async () => {
+      const { container } = await render(<Excalidraw theme={THEME.DARK} />);
+
+      expect(h.state.theme).toBe(THEME.DARK);
+      //open menu
+      toggleMenu(container);
+      expect(queryByTestId(container, "toggle-dark-mode")).toBe(null);
+    });
+
+    it("should show theme mode toggle when `UIOptions.canvasActions.toggleTheme` is true", async () => {
+      const { container } = await render(
+        <Excalidraw
+          theme={THEME.DARK}
+          UIOptions={{ canvasActions: { toggleTheme: true } }}
+        />,
+      );
+      expect(h.state.theme).toBe(THEME.DARK);
+      //open menu
+      toggleMenu(container);
+      const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
+      expect(darkModeToggle).toBeTruthy();
+    });
+
+    it("should not show theme toggle when `UIOptions.canvasActions.toggleTheme` is false", async () => {
+      const { container } = await render(
+        <Excalidraw
+          UIOptions={{ canvasActions: { toggleTheme: false } }}
+          theme={THEME.DARK}
+        />,
+      );
+      expect(h.state.theme).toBe(THEME.DARK);
+      //open menu
+      toggleMenu(container);
+      const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
+      expect(darkModeToggle).toBeFalsy();
+    });
+  });
+
+  describe("Test name prop", () => {
+    it('should allow editing name when the name prop is "undefined"', async () => {
+      const { container } = await render(<Excalidraw />);
+      //open menu
+      toggleMenu(container);
+      fireEvent.click(queryByTestId(container, "image-export-button")!);
+      const textInput: HTMLInputElement | null = document.querySelector(
+        ".ExportDialog .ProjectName .TextInput",
+      );
+      expect(textInput?.value).toContain(`${t("labels.untitled")}`);
+      expect(textInput?.nodeName).toBe("INPUT");
+    });
+
+    it('should set the name and not allow editing when the name prop is present"', async () => {
+      const name = "test";
+      const { container } = await render(<Excalidraw name={name} />);
+      //open menu
+      toggleMenu(container);
+      await fireEvent.click(queryByTestId(container, "image-export-button")!);
+      const textInput = document.querySelector(
+        ".ExportDialog .ProjectName .TextInput--readonly",
+      );
+      expect(textInput?.textContent).toEqual(name);
+      expect(textInput?.nodeName).toBe("SPAN");
+    });
+  });
   describe("Test autoFocus prop", () => {
     it("should not focus when autoFocus is false", async () => {
       const { container } = await render(<Excalidraw />);
