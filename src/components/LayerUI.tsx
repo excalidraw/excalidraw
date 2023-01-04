@@ -200,11 +200,8 @@ const LayerUI = ({
             <MainMenu.DefaultItems.Socials />
           </MainMenu.Group>
           <MainMenu.Separator />
-
-          <MainMenu.Group className="main-menu-footer">
-            <MainMenu.DefaultItems.ToggleTheme />
-            <MainMenu.DefaultItems.ChangeCanvasBackground />
-          </MainMenu.Group>
+          <MainMenu.DefaultItems.ToggleTheme />
+          <MainMenu.DefaultItems.ChangeCanvasBackground />
         </MainMenu>
       )
     );

@@ -11,7 +11,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
   >
     <button
       aria-label="Open"
-      class="dropdown-menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="load-button"
       title="Open"
       type="button"
@@ -49,7 +49,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
     </button>
     <button
       aria-label="Save to..."
-      class="dropdown-menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="json-export-button"
       title="Save to..."
       type="button"
@@ -82,7 +82,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
     </button>
     <button
       aria-label="Export image..."
-      class="dropdown-menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="image-export-button"
       title="Export image..."
       type="button"
@@ -144,7 +144,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
     </button>
     <button
       aria-label="Help"
-      class="dropdown-menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="help-menu-item"
       title="Help"
       type="button"
@@ -202,7 +202,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
     </button>
     <button
       aria-label="Reset the canvas"
-      class="dropdown-menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="clear-canvas-button"
       title="Reset the canvas"
       type="button"
@@ -245,7 +245,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         Excalidraw links
       </p>
       <a
-        class="dropdown-menu-item"
+        class="dropdown-menu-item dropdown-menu-item-base"
         href="https://github.com/excalidraw/excalidraw"
         rel="noreferrer"
         target="_blank"
@@ -277,7 +277,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         </div>
       </a>
       <a
-        class="dropdown-menu-item"
+        class="dropdown-menu-item dropdown-menu-item-base"
         href="https://discord.gg/UexuTaE"
         rel="noreferrer"
         target="_blank"
@@ -315,7 +315,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         </div>
       </a>
       <a
-        class="dropdown-menu-item"
+        class="dropdown-menu-item dropdown-menu-item-base"
         href="https://twitter.com/excalidraw"
         rel="noreferrer"
         target="_blank"
@@ -359,89 +359,87 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
     <div
       style="height: 1px; margin: .5rem 0px;"
     />
-    <div
-      class="dropdown-menu-group main-menu-footer"
+    <button
+      aria-label="Dark mode"
+      class="dropdown-menu-item dropdown-menu-item-base"
+      data-testid="toggle-dark-mode"
+      title="Dark mode"
+      type="button"
     >
-      <button
-        aria-label="Dark mode"
-        class="dropdown-menu-item"
-        data-testid="toggle-dark-mode"
-        title="Dark mode"
-        type="button"
+      <div
+        class="dropdown-menu-item__icon"
+      >
+        <svg
+          aria-hidden="true"
+          class=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <path
+            clip-rule="evenodd"
+            d="M10 2.5h.328a6.25 6.25 0 0 0 6.6 10.372A7.5 7.5 0 1 1 10 2.493V2.5Z"
+            stroke="currentColor"
+          />
+        </svg>
+      </div>
+      <div
+        class="dropdown-menu-item__text"
+      >
+        Dark mode
+      </div>
+      <div
+        class="dropdown-menu-item__shortcut"
+      >
+        Shift+Alt+D
+      </div>
+    </button>
+    <div
+      style="margin: 0.625rem 0px;"
+    >
+      <div
+        style="font-size: .75rem; margin-bottom: .5rem;"
+      >
+        Canvas background
+      </div>
+      <div
+        style="padding: 0px 0.625rem;"
       >
         <div
-          class="dropdown-menu-item__icon"
+          style="position: relative;"
         >
-          <svg
-            aria-hidden="true"
-            class=""
-            fill="none"
-            focusable="false"
-            role="img"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            viewBox="0 0 20 20"
-          >
-            <path
-              clip-rule="evenodd"
-              d="M10 2.5h.328a6.25 6.25 0 0 0 6.6 10.372A7.5 7.5 0 1 1 10 2.493V2.5Z"
-              stroke="currentColor"
-            />
-          </svg>
-        </div>
-        <div
-          class="dropdown-menu-item__text"
-        >
-          Dark mode
-        </div>
-        <div
-          class="dropdown-menu-item__shortcut"
-        >
-          Shift+Alt+D
-        </div>
-      </button>
-      <div>
-        <div
-          style="font-size: .75rem; margin-bottom: .5rem;"
-        >
-          Canvas background
-        </div>
-        <div
-          style="padding: 0px 0.625rem;"
-        >
-          <div
-            style="position: relative;"
-          >
-            <div>
+          <div>
+            <div
+              class="color-picker-control-container"
+            >
               <div
-                class="color-picker-control-container"
+                class="color-picker-label-swatch-container"
+              >
+                <button
+                  aria-label="Canvas background"
+                  class="color-picker-label-swatch"
+                  style="--swatch-color: #ffffff;"
+                />
+              </div>
+              <label
+                class="color-input-container"
               >
                 <div
-                  class="color-picker-label-swatch-container"
+                  class="color-picker-hash"
                 >
-                  <button
-                    aria-label="Canvas background"
-                    class="color-picker-label-swatch"
-                    style="--swatch-color: #ffffff;"
-                  />
+                  #
                 </div>
-                <label
-                  class="color-input-container"
-                >
-                  <div
-                    class="color-picker-hash"
-                  >
-                    #
-                  </div>
-                  <input
-                    aria-label="Canvas background"
-                    class="color-picker-input"
-                    spellcheck="false"
-                    value="ffffff"
-                  />
-                </label>
-              </div>
+                <input
+                  aria-label="Canvas background"
+                  class="color-picker-input"
+                  spellcheck="false"
+                  value="ffffff"
+                />
+              </label>
             </div>
           </div>
         </div>
@@ -461,7 +459,7 @@ exports[`<Excalidraw/> should render main menu with custom items if passed from 
     style="--padding: 2; z-index: 1;"
   >
     <div
-      class="dropdown-menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
     >
       <button
         style="height: 2rem;"
@@ -472,7 +470,7 @@ exports[`<Excalidraw/> should render main menu with custom items if passed from 
     </div>
     <button
       aria-label="Help"
-      class="dropdown-menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="help-menu-item"
       title="Help"
       type="button"

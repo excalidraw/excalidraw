@@ -37,22 +37,25 @@
       --gap: 2;
     }
 
+    .dropdown-menu-item-base {
+      padding: 0 0.625rem;
+      column-gap: 0.625rem;
+      font-size: 0.875rem;
+      color: var(--color-gray-100);
+      width: 100%;
+      box-sizing: border-box;
+      font-weight: normal;
+      font-family: inherit;
+    }
+
     .dropdown-menu-item {
       display: flex;
       background-color: transparent;
       border: 0;
       align-items: center;
-      padding: 0 0.625rem;
       height: 2rem;
-      column-gap: 0.625rem;
-      font-size: 0.875rem;
-      color: var(--color-gray-100);
       cursor: pointer;
       border-radius: var(--border-radius-md);
-      width: 100%;
-      box-sizing: border-box;
-      font-weight: normal;
-      font-family: inherit;
 
       @media screen and (min-width: 1921px) {
         height: 2.25rem;

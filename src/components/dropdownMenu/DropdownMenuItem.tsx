@@ -40,7 +40,8 @@ const DropdownMenuItem = ({
   link?: string;
   style?: React.CSSProperties;
 }) => {
-  const classNames = `dropdown-menu-item ${className}`.trim();
+  const classNames =
+    `dropdown-menu-item dropdown-menu-item-base ${className}`.trim();
 
   if (typeof children === "string") {
     const label = children;
