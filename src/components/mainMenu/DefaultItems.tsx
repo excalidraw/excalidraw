@@ -87,7 +87,7 @@ export const ChangeCanvasBackground = () => {
     return null;
   }
   return (
-    <div style={{ marginTop: "0.5rem 0" }}>
+    <div style={{ marginTop: "0.5rem" }}>
       <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
         {t("labels.canvasBackground")}
       </div>
