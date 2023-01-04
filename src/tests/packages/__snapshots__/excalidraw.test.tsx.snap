@@ -399,7 +399,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
       </div>
     </button>
     <div
-      style="margin: 0.625rem 0px;"
+      style="margin-top: 0.5rem;"
     >
       <div
         style="font-size: .75rem; margin-bottom: .5rem;"
