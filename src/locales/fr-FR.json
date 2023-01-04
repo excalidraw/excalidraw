@@ -397,7 +397,7 @@
     "fileSavedToFilename": "Enregistré sous {filename}",
     "canvas": "canevas",
     "selection": "sélection",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Utiliser {{shortcut}} pour coller comme un seul élément,\nou coller dans un éditeur de texte existant"
   },
   "colors": {
     "ffffff": "Blanc",
