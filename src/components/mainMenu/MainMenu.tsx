@@ -1,5 +1,4 @@
 import React from "react";
-import { atom, useAtom } from "jotai";
 import {
   useDevice,
   useExcalidrawAppState,
@@ -12,29 +11,21 @@ import * as DefaultItems from "./DefaultItems";
 import { UserList } from "../UserList";
 import { t } from "../../i18n";
 import { HamburgerMenuIcon } from "../icons";
-export const isMenuOpenAtom = atom(false);
 
 const MainMenu = ({ children }: { children?: React.ReactNode }) => {
-  const [isMenuOpen, setIsMenuOpen] = useAtom(isMenuOpenAtom);
   const device = useDevice();
   const appState = useExcalidrawAppState();
   const setAppState = useExcalidrawSetAppState();
   const onClickOutside = device.isMobile
     ? undefined
-    : () => setIsMenuOpen(false);
+    : () => setAppState({ openMenu: null });
   return (
-    <DropdownMenu
-      open={device.isMobile ? appState.openMenu === "canvas" : isMenuOpen}
-    >
+    <DropdownMenu open={appState.openMenu === "canvas"}>
       <DropdownMenu.Trigger
         onToggle={() => {
-          if (device.isMobile) {
-            setAppState({
-              openMenu: appState.openMenu === "canvas" ? null : "canvas",
-            });
-          } else {
-            setIsMenuOpen(!isMenuOpen);
-          }
+          setAppState({
+            openMenu: appState.openMenu === "canvas" ? null : "canvas",
+          });
         }}
       >
         {HamburgerMenuIcon}

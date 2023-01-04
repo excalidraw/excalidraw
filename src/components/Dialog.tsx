@@ -2,7 +2,11 @@ import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import { useExcalidrawContainer, useDevice } from "../components/App";
+import {
+  useExcalidrawContainer,
+  useDevice,
+  useExcalidrawSetAppState,
+} from "../components/App";
 import { KEYS } from "../keys";
 import "./Dialog.scss";
 import { back, CloseIcon } from "./icons";
@@ -11,7 +15,6 @@ import { Modal } from "./Modal";
 import { AppState } from "../types";
 import { queryFocusableElements } from "../utils";
 import { useSetAtom } from "jotai";
-import { isMenuOpenAtom } from "./mainMenu/MainMenu";
 import { isLibraryMenuOpenAtom } from "./LibraryMenuHeaderContent";
 
 export interface DialogProps {
@@ -68,11 +71,11 @@ export const Dialog = (props: DialogProps) => {
     return () => islandNode.removeEventListener("keydown", handleKeyDown);
   }, [islandNode, props.autofocus]);
 
-  const setIsMenuOpen = useSetAtom(isMenuOpenAtom);
+  const setAppState = useExcalidrawSetAppState();
   const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
 
   const onClose = () => {
-    setIsMenuOpen(false);
+    setAppState({ openMenu: null });
     setIsLibraryMenuOpen(false);
     (lastActiveElement as HTMLElement).focus();
     props.onCloseRequest();

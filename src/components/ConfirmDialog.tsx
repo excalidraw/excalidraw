@@ -4,8 +4,8 @@ import { Dialog, DialogProps } from "./Dialog";
 import "./ConfirmDialog.scss";
 import DialogActionButton from "./DialogActionButton";
 import { useSetAtom } from "jotai";
-import { isMenuOpenAtom } from "./mainMenu/MainMenu";
 import { isLibraryMenuOpenAtom } from "./LibraryMenuHeaderContent";
+import { useExcalidrawSetAppState } from "./App";
 
 interface Props extends Omit<DialogProps, "onCloseRequest"> {
   onConfirm: () => void;
@@ -23,8 +23,7 @@ const ConfirmDialog = (props: Props) => {
     className = "",
     ...rest
   } = props;
-
-  const setIsMenuOpen = useSetAtom(isMenuOpenAtom);
+  const setAppState = useExcalidrawSetAppState();
   const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
 
   return (
@@ -39,7 +38,7 @@ const ConfirmDialog = (props: Props) => {
         <DialogActionButton
           label={cancelText}
           onClick={() => {
-            setIsMenuOpen(false);
+            setAppState({ openMenu: null });
             setIsLibraryMenuOpen(false);
             onCancel();
           }}
@@ -47,7 +46,7 @@ const ConfirmDialog = (props: Props) => {
         <DialogActionButton
           label={confirmText}
           onClick={() => {
-            setIsMenuOpen(false);
+            setAppState({ openMenu: null });
             setIsLibraryMenuOpen(false);
             onConfirm();
           }}
