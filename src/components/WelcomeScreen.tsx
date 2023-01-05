@@ -59,7 +59,19 @@ const WelcomeScreenMenuItem = ({
 
 const Center = ({ children }: { children?: React.ReactNode }) => {
   const childrenComponents =
-    ReactChildrenToObject<UIWelcomeScreenCenterComponents>(children);
+    ReactChildrenToObject<UIWelcomeScreenCenterComponents>(
+      children ||
+        (
+          <>
+            <Logo />
+            <Heading>{t("welcomeScreen.defaults.center_heading")}</Heading>
+            <Menu>
+              <MenuItemLoadScene />
+              <MenuItemHelp />
+            </Menu>
+          </>
+        ).props.children,
+    );
 
   return (
     <div className="WelcomeScreen-container">
