@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { t } from "../../i18n";
-import { ExcalidrawProps } from "../../types";
 import {
   useExcalidrawAppState,
   useExcalidrawSetAppState,

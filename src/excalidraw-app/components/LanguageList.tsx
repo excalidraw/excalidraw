@@ -1,6 +1,7 @@
 import { useAtom } from "jotai";
 import React from "react";
 import { langCodeAtom } from "..";
+import DropdownMenuItemCustom from "../../components/dropdownMenu/DropdownMenuItemCustom";
 import * as i18n from "../../i18n";
 import { languages } from "../../i18n";
 
@@ -8,7 +9,7 @@ export const LanguageList = ({ style }: { style?: React.CSSProperties }) => {
   const [langCode, setLangCode] = useAtom(langCodeAtom);
 
   return (
-    <React.Fragment>
+    <DropdownMenuItemCustom style={{ paddingLeft: "0", paddingRight: "0" }}>
       <select
         className="dropdown-select dropdown-select__language"
         onChange={({ target }) => setLangCode(target.value)}
@@ -25,6 +26,6 @@ export const LanguageList = ({ style }: { style?: React.CSSProperties }) => {
           </option>
         ))}
       </select>
-    </React.Fragment>
+    </DropdownMenuItemCustom>
   );
 };

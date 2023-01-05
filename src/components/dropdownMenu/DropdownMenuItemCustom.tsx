@@ -1,6 +1,6 @@
 const DropdownMenuItemCustom = ({
   children,
-  className,
+  className = "",
   style,
   dataTestId,
 }: {
