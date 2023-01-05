@@ -46,7 +46,6 @@ const MainMenu = ({ children }: { children?: React.ReactNode }) => {
 MainMenu.Trigger = DropdownMenu.Trigger;
 MainMenu.Item = DropdownMenu.Item;
 MainMenu.ItemLink = DropdownMenu.ItemLink;
-MainMenu.ItemLink = DropdownMenu.ItemCustom;
 MainMenu.ItemCustom = DropdownMenu.ItemCustom;
 MainMenu.Group = DropdownMenu.Group;
 MainMenu.Separator = DropdownMenu.Separator;
