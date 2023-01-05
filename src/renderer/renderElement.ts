@@ -1364,9 +1364,7 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
   if (element.customData?.strokeOptions?.options) {
     options.simulatePressure =
       options.simulatePressure ?? element.simulatePressure;
-    options.size = options.size
-      ? (options.size * element.strokeWidth) / 4
-      : element.strokeWidth * 4.25;
+    options.size = element.strokeWidth * 4.25; //override size with stroke width
     options.last = !!element.lastCommittedPoint;
   }
 
