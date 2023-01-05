@@ -477,11 +477,21 @@ exports[`<Excalidraw/> should render main menu with host menu items if passed fr
         Click me
       </div>
     </button>
-    <div
-      class="dropdown-menu-item-base undefined"
+    <a
+      class="dropdown-menu-item dropdown-menu-item-base"
+      href="blog.excalidaw.com"
+      rel="noreferrer"
+      target="_blank"
     >
-      Excalidraw blog
-    </div>
+      <div
+        class="dropdown-menu-item__icon"
+      />
+      <div
+        class="dropdown-menu-item__text"
+      >
+        Excalidraw blog
+      </div>
+    </a>
     <div
       class="dropdown-menu-item-base undefined"
     >
