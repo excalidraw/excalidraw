@@ -38,6 +38,7 @@
     }
 
     .dropdown-menu-item-base {
+      display: flex;
       padding: 0 0.625rem;
       column-gap: 0.625rem;
       font-size: 0.875rem;
@@ -49,7 +50,6 @@
     }
 
     .dropdown-menu-item {
-      display: flex;
       background-color: transparent;
       border: 0;
       align-items: center;
