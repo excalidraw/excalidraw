@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { ActionManager } from "../../actions/manager";
 import { t } from "../../i18n";
-import { AppState } from "../../types";
+import { AppState, UIChildrenComponents } from "../../types";
 import {
   ExitZenModeAction,
   FinalizeAction,
@@ -13,20 +13,19 @@ import { WelcomeScreenHelpArrow } from "../icons";
 import { Section } from "../Section";
 import Stack from "../Stack";
 import WelcomeScreenDecor from "../WelcomeScreenDecor";
-import FooterCenter from "./FooterCenter";
 
 const Footer = ({
   appState,
   actionManager,
   showExitZenModeBtn,
   renderWelcomeScreen,
-  children,
+  footerCenter,
 }: {
   appState: AppState;
   actionManager: ActionManager;
   showExitZenModeBtn: boolean;
   renderWelcomeScreen: boolean;
-  children?: React.ReactNode;
+  footerCenter: UIChildrenComponents["FooterCenter"];
 }) => {
   const device = useDevice();
   const showFinalize =
@@ -71,7 +70,7 @@ const Footer = ({
           </Section>
         </Stack.Col>
       </div>
-      <FooterCenter>{children}</FooterCenter>
+      {footerCenter}
       <div
         className={clsx("layer-ui__wrapper__footer-right zen-mode-transition", {
           "transition-right disable-pointerEvents": appState.zenModeEnabled,

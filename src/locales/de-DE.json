@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Einfügen",
+    "pasteAsPlaintext": "Als reinen Text einfügen",
     "pasteCharts": "Diagramme einfügen",
     "selectAll": "Alle auswählen",
     "multiSelect": "Element zur Auswahl hinzufügen",
@@ -71,7 +72,7 @@
     "layers": "Ebenen",
     "actions": "Aktionen",
     "language": "Sprache",
-    "liveCollaboration": "Live-Zusammenarbeit",
+    "liveCollaboration": "Live-Zusammenarbeit...",
     "duplicateSelection": "Duplizieren",
     "untitled": "Unbenannt",
     "name": "Name",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
     "exportJSON": "In Datei exportieren",
-    "exportImage": "Als Bild speichern",
-    "export": "Exportieren",
+    "exportImage": "Exportiere Bild...",
+    "export": "Speichern als...",
     "exportToPng": "Als PNG exportieren",
     "exportToSvg": "Als SVG exportieren",
     "copyToClipboard": "In Zwischenablage kopieren",
@@ -144,7 +145,7 @@
     "scale": "Skalierung",
     "save": "In aktueller Datei speichern",
     "saveAs": "Speichern unter",
-    "load": "Laden",
+    "load": "Öffnen",
     "getShareableLink": "Teilbaren Link erhalten",
     "close": "Schließen",
     "selectLanguage": "Sprache auswählen",
@@ -214,7 +215,7 @@
     "text": "Text",
     "library": "Bibliothek",
     "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen",
-    "penMode": "Verhindere Pinch-Zoom und akzeptiere Eingabe nur vom Stift",
+    "penMode": "Stift-Modus - Berührung verhindern",
     "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
     "eraser": "Radierer"
   },
@@ -235,7 +236,7 @@
     "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
     "resizeImage": "Du kannst die Größe frei ändern, indem du SHIFT gedrückt hältst; halte ALT, um die Größe vom Zentrum aus zu ändern",
     "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst",
-    "lineEditor_info": "Doppelklicken oder Eingabetaste drücken, um Punkte zu bearbeiten",
+    "lineEditor_info": "CtrlOrCmd halten und Doppelklick oder CtrlOrCmd + Eingabe drücken, um Punkte zu bearbeiten",
     "lineEditor_pointSelected": "Drücke Löschen, um Punkt(e) zu entfernen, CtrlOrCmd+D zum Duplizieren oder ziehe zum Verschieben",
     "lineEditor_nothingSelected": "Wähle einen zu bearbeitenden Punkt (halte SHIFT gedrückt um mehrere Punkte auszuwählen),\noder halte Alt gedrückt und klicke um neue Punkte hinzuzufügen",
     "placeImage": "Klicken, um das Bild zu platzieren oder klicken und ziehen um seine Größe manuell zu setzen",
@@ -310,7 +311,9 @@
     "view": "Ansicht",
     "zoomToFit": "Zoomen um alle Elemente einzupassen",
     "zoomToSelection": "Auf Auswahl zoomen",
-    "toggleElementLock": "Auswahl sperren/entsperren"
+    "toggleElementLock": "Auswahl sperren/entsperren",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Zeichenfläche löschen"
@@ -391,7 +394,8 @@
     "fileSaved": "Datei gespeichert.",
     "fileSavedToFilename": "Als {filename} gespeichert",
     "canvas": "Zeichenfläche",
-    "selection": "Auswahl"
+    "selection": "Auswahl",
+    "pasteAsSingleElement": "Verwende {{shortcut}} , um als einzelnes Element\neinzufügen oder in einen existierenden Texteditor einzufügen"
   },
   "colors": {
     "ffffff": "Weiß",
@@ -439,5 +443,12 @@
     "5c940d": "Hellgrün 9",
     "e67700": "Gelb 9",
     "d9480f": "Orange 9"
+  },
+  "welcomeScreen": {
+    "data": "Alle Daten werden lokal in Deinem Browser gespeichert.",
+    "switchToPlusApp": "Möchtest du stattdessen zu Excalidraw+ gehen?",
+    "menuHints": "Exportieren, Einstellungen, Sprachen, ...",
+    "toolbarHints": "Wähle ein Werkzeug & beginne zu zeichnen!",
+    "helpHints": "Kurzbefehle & Hilfe"
   }
 }

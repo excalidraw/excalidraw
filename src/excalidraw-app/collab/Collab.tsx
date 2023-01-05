@@ -242,6 +242,12 @@ class Collab extends PureComponent<Props, CollabState> {
         );
       }
     } catch (error: any) {
+      this.setState({
+        // firestore doesn't return a specific error code when size exceeded
+        errorMessage: /is longer than.*?bytes/.test(error.message)
+          ? t("errors.collabSaveFailed_sizeExceeded")
+          : t("errors.collabSaveFailed"),
+      });
       console.error(error);
     }
   };

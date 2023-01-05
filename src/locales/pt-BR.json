@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Colar",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Colar gráficos",
     "selectAll": "Selecionar tudo",
     "multiSelect": "Adicionar elemento à seleção",
@@ -71,7 +72,7 @@
     "layers": "Camadas",
     "actions": "Ações",
     "language": "Idioma",
-    "liveCollaboration": "Colaboração ao vivo",
+    "liveCollaboration": "Colaboração ao vivo...",
     "duplicateSelection": "Duplicar",
     "untitled": "Sem título",
     "name": "Nome",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
     "exportJSON": "Exportar arquivo",
-    "exportImage": "Salvar como imagem",
-    "export": "Exportar",
+    "exportImage": "Exportar imagem...",
+    "export": "Salvar como...",
     "exportToPng": "Exportar em PNG",
     "exportToSvg": "Exportar em SVG",
     "copyToClipboard": "Copiar para o clipboard",
@@ -144,7 +145,7 @@
     "scale": "Escala",
     "save": "Salvar para o arquivo atual",
     "saveAs": "Salvar como",
-    "load": "Carregar",
+    "load": "Abrir",
     "getShareableLink": "Obter um link de compartilhamento",
     "close": "Fechar",
     "selectLanguage": "Selecionar idioma",
@@ -214,7 +215,7 @@
     "text": "Texto",
     "library": "Biblioteca",
     "lock": "Manter ativa a ferramenta selecionada após desenhar",
-    "penMode": "Prevenir a ação de tocar-ampliar e permitir apenas interações da caneta",
+    "penMode": "",
     "link": "Adicionar/Atualizar link para uma forma selecionada",
     "eraser": "Borracha"
   },
@@ -235,7 +236,7 @@
     "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
     "resizeImage": "Você pode redimensionar livremente segurando SHIFT,\nsegure ALT para redimensionar a partir do centro",
     "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira",
-    "lineEditor_info": "Clique duas vezes ou pressione Enter para editar os pontos",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Pressione Delete para remover o(s) ponto(s),\nCtrl/Cmd+D para duplicar ou arraste para mover",
     "lineEditor_nothingSelected": "Selecione um ponto para editar (segure SHIFT para selecionar vários) ou segure Alt e clique para adicionar novos pontos",
     "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho",
@@ -310,7 +311,9 @@
     "view": "Visualizar",
     "zoomToFit": "Ampliar para encaixar todos os elementos",
     "zoomToSelection": "Ampliar a seleção",
-    "toggleElementLock": "Bloquear/desbloquear seleção"
+    "toggleElementLock": "Bloquear/desbloquear seleção",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Limpar a tela"
@@ -391,7 +394,8 @@
     "fileSaved": "Arquivo salvo.",
     "fileSavedToFilename": "Salvo em {filename}",
     "canvas": "tela",
-    "selection": "seleção"
+    "selection": "seleção",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Braco",
@@ -439,5 +443,12 @@
     "5c940d": "Lima 9",
     "e67700": "Amarelo 9",
     "d9480f": "Laranja 9"
+  },
+  "welcomeScreen": {
+    "data": "Todos os dados são salvos localmente no seu navegador.",
+    "switchToPlusApp": "",
+    "menuHints": "",
+    "toolbarHints": "",
+    "helpHints": ""
   }
 }

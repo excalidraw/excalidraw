@@ -569,6 +569,20 @@
       display: none;
     }
   }
+  .UserList-Wrapper {
+    margin: 0;
+    padding: 0;
+    border: none;
+    text-align: left;
+
+    legend {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 400;
+      margin: 0 0 0.25rem;
+      padding: 0;
+    }
+  }
 }
 
 .ErrorSplash.excalidraw {
