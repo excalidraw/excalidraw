@@ -474,7 +474,7 @@ To render an item, its recommended to use `MainMenu.Item`.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `icon` | `JSX.Element` | `undefined` | The icon used in the menu item |
-| `onClick` | `Function` | `undefined` | The click handler will be triggered when clicked on menu item. |
+| `onSelect` | `Function` | `undefined` | The handler is triggered when the item is selected. |
 | `children` | `React.ReactNode` | `undefined` | The content of the menu item |
 | `shortcut` | `string` | `undefined` | The shortcut to be shown for the menu item |
 | `className` | `string` | "" | The class names to be added to the menu item |

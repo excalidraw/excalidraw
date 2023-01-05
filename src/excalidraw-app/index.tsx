@@ -610,7 +610,7 @@ const ExcalidrawWrapper = () => {
         <MainMenu.DefaultItems.SaveAsImage />
         <MainMenu.DefaultItems.LiveCollaboration
           isCollaborating={isCollaborating}
-          onClick={() => setCollabDialogShown(true)}
+          onSelect={() => setCollabDialogShown(true)}
         />
 
         <MainMenu.DefaultItems.Help />

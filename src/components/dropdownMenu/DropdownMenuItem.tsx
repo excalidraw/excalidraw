@@ -7,7 +7,7 @@ export const getDrodownMenuItemClassName = (className = "") => {
 
 const DropdownMenuItem = ({
   icon,
-  onClick,
+  onSelect,
   children,
   dataTestId,
   shortcut,
@@ -16,7 +16,7 @@ const DropdownMenuItem = ({
   ariaLabel,
 }: {
   icon?: JSX.Element;
-  onClick: () => void;
+  onSelect: () => void;
   children: React.ReactNode;
   dataTestId?: string;
   shortcut?: string;
@@ -27,7 +27,7 @@ const DropdownMenuItem = ({
   return (
     <button
       aria-label={ariaLabel}
-      onClick={onClick}
+      onClick={onSelect}
       data-testid={dataTestId}
       title={ariaLabel}
       type="button"

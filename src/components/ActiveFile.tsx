@@ -16,7 +16,7 @@ export const ActiveFile = ({ fileName, onSave }: ActiveFileProps) => (
   <DropdownMenuItem
     shortcut={getShortcutFromShortcutName("saveScene")}
     dataTestId="save-button"
-    onClick={onSave}
+    onSelect={onSave}
     icon={save}
     ariaLabel={`${t("buttons.save")}`}
   >{`${t("buttons.save")}`}</DropdownMenuItem>

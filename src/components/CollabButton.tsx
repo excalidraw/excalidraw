@@ -22,7 +22,7 @@ const CollabButton = ({
         <DropdownMenuItem
           dataTestId="collab-button"
           icon={UsersIcon}
-          onClick={onClick}
+          onSelect={onClick}
           ariaLabel={t("labels.liveCollaboration")}
         >
           {t("labels.liveCollaboration")}

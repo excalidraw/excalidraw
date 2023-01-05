@@ -300,7 +300,7 @@ export const actionToggleTheme = register({
   },
   PanelComponent: ({ appState, updateData }) => (
     <DropdownMenuItem
-      onClick={() => {
+      onSelect={() => {
         updateData(appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT);
       }}
       icon={appState.theme === "dark" ? SunIcon : MoonIcon}

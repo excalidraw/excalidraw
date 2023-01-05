@@ -478,12 +478,12 @@ exports[`<Excalidraw/> should render main menu with host menu items if passed fr
       </div>
     </button>
     <div
-      class="dropdown-menu-item dropdown-menu-item-base undefined"
+      class="dropdown-menu-item-base undefined"
     >
       Excalidraw blog
     </div>
     <div
-      class="dropdown-menu-item dropdown-menu-item-base undefined"
+      class="dropdown-menu-item-base undefined"
     >
       <button
         style="height: 2rem;"

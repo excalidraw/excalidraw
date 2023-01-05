@@ -491,7 +491,7 @@ export default function App() {
         <MainMenu.Separator />
         {isCollaborating && (
           <MainMenu.DefaultItems.LiveCollaboration
-            onClick={() => window.alert("You clicked on collab button")}
+            onSelect={() => window.alert("You clicked on collab button")}
             isCollaborating={isCollaborating}
           />
         )}

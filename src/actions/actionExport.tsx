@@ -251,7 +251,7 @@ export const actionLoadScene = register({
     return (
       <DropdownMenuItem
         icon={LoadIcon}
-        onClick={updateData}
+        onSelect={updateData}
         dataTestId="load-button"
         shortcut={getShortcutFromShortcutName("loadScene")}
         ariaLabel={t("buttons.load")}

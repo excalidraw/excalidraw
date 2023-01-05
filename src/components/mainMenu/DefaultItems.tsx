@@ -41,7 +41,7 @@ export const SaveAsImage = () => {
     <DropdownMenuItem
       icon={ExportImageIcon}
       dataTestId="image-export-button"
-      onClick={() => setAppState({ openDialog: "imageExport" })}
+      onSelect={() => setAppState({ openDialog: "imageExport" })}
       shortcut={getShortcutFromShortcutName("imageExport")}
       ariaLabel={t("buttons.exportImage")}
     >
@@ -109,7 +109,7 @@ export const Export = () => {
   return (
     <DropdownMenuItem
       icon={ExportIcon}
-      onClick={() => {
+      onSelect={() => {
         setAppState({ openDialog: "jsonExport" });
       }}
       dataTestId="json-export-button"
@@ -149,10 +149,10 @@ export const Socials = () => (
 Socials.displayName = "Socials";
 
 export const LiveCollaboration = ({
-  onClick,
+  onSelect,
   isCollaborating,
 }: {
-  onClick: () => void;
+  onSelect: () => void;
   isCollaborating: boolean;
 }) => {
   // Hack until we tie "t" to lang state
@@ -165,7 +165,7 @@ export const LiveCollaboration = ({
       className={clsx({
         "active-collab": isCollaborating,
       })}
-      onClick={onClick}
+      onSelect={onSelect}
     >
       {t("labels.liveCollaboration")}
     </DropdownMenuItem>

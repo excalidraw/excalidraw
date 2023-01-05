@@ -125,7 +125,7 @@ describe("<Excalidraw/>", () => {
     const { container } = await render(
       <Excalidraw UIOptions={undefined}>
         <MainMenu>
-          <MainMenu.Item onClick={() => window.alert("Clicked")}>
+          <MainMenu.Item onSelect={() => window.alert("Clicked")}>
             Click me
           </MainMenu.Item>
           <MainMenu.ItemLink href="blog.excalidaw.com">

@@ -189,7 +189,7 @@ const LayerUI = ({
           )}
           {onCollabButtonClick && (
             <MainMenu.DefaultItems.LiveCollaboration
-              onClick={onCollabButtonClick}
+              onSelect={onCollabButtonClick}
               isCollaborating={isCollaborating}
             />
           )}

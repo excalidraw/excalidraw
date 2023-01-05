@@ -15,7 +15,7 @@ const ClearCanvas = ({ onConfirm }: { onConfirm: () => void }) => {
     <>
       <DropdownMenuItem
         icon={TrashIcon}
-        onClick={toggleDialog}
+        onSelect={toggleDialog}
         dataTestId="clear-canvas-button"
         ariaLabel={t("buttons.clearReset")}
       >
