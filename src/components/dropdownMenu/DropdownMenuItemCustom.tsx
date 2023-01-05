@@ -11,7 +11,7 @@ const DropdownMenuItemCustom = ({
 }) => {
   return (
     <div
-      className={`dropdown-menu-item-base ${className}`.trim()}
+      className={`dropdown-menu-item-base dropdown-menu-item-custom ${className}`.trim()}
       style={style}
       data-testid={dataTestId}
     >

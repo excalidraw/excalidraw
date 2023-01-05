@@ -493,7 +493,7 @@ exports[`<Excalidraw/> should render main menu with host menu items if passed fr
       </div>
     </a>
     <div
-      class="dropdown-menu-item-base"
+      class="dropdown-menu-item-base dropdown-menu-item-custom"
     >
       <button
         style="height: 2rem;"
