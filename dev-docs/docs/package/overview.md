@@ -155,6 +155,7 @@ export default function App() {
   );
 }
 ```
+
 To view the full example visit :point_down:
 
 [![Edit excalidraw](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-ehlz3?fontsize=14&hidenavigation=1&theme=dark)
@@ -534,7 +535,6 @@ const App = () => {
 | `style` | `React.CSsSProperties` | `undefined` | The inline `styles` to be added to the group |
 | `children ` | `React.ReactNode` | `undefined` | The content of the `Menu Group` |
 
-
 ### Props
 
 | Name | Type | Default | Description |
@@ -561,7 +561,7 @@ const App = () => {
 | [`handleKeyboardGlobally`](#handleKeyboardGlobally) | boolean | false | Indicates whether to bind the keyboard events to document. |
 | [`onLibraryChange`](#onLibraryChange) | <code>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </code> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
-| [`generateIdForFile`](#generateIdForFile) | ```tsx(file: File) => string \| Promise<string>``` | | Allows you to override `id` generation for files added on canvas |
+| [`generateIdForFile`](#generateIdForFile) | `tsx(file: File) => string \| Promise<string>` |  | Allows you to override `id` generation for files added on canvas |
 | [`onPointerDown`](#onPointerDown) | <code>(activeTool: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L93"> AppState["activeTool"]</a>, pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L365">PointerDownState</a>) => void</code> |  | This prop if passed gets triggered on pointer down evenets |
 | [`onScrollChange`](#onScrollChange) | <code>(scrollX: number, scrollY: number)</code> |  | This prop if passed gets triggered when scrolling the canvas. |
 
@@ -666,7 +666,15 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 #### `readyPromise`
 
 ```tsx
-const excalidrawRef = { current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a>}}
+const excalidrawRef = {
+  current: {
+    readyPromise: (
+      <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">
+        resolvablePromise
+      </a>
+    ),
+  },
+};
 ```
 
 Since plain object is passed as a `ref`, the `readyPromise` is resolved as soon as the component is mounted. Most of the time you will not need this unless you have a specific use case where you can't pass the `ref` in the react way and want to do some action on the host when this promise resolves. You can check the [example](https://codesandbox.io/s/eexcalidraw-resolvable-promise-d0qg3?file=/src/App.js) for the usage.
@@ -683,7 +691,7 @@ You can use this function to update the scene with the sceneData. It accepts the
 | --- | --- | --- |
 | `elements` | [`ImportedDataState["elements"]`](https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L17) | The `elements` to be updated in the scene |
 | `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L18) | The `appState` to be updated in the scene. |
-| `collaborators` | ```tsx Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L35">Collaborator></a>``` | The list of collaborators to be updated in the scene. |
+| `collaborators` | `tsx Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L35">Collaborator></a>` | The list of collaborators to be updated in the scene. |
 | `commitToHistory` | `boolean` | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
 | `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise<[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)> &#124; ((currentItems: [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)>) => [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise<[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)>) | The `libraryItems` to be update in the scene. |
 
@@ -712,7 +720,7 @@ You can use this function to update the library. It accepts the below attributes
 ### `addFiles`
 
 ```tsx
-(files: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts">BinaryFileData</a>) => void 
+(files: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts">BinaryFileData</a>) => void
 ```
 
 Adds supplied files data to the `appState.files` cache on top of existing files present in the cache.
@@ -775,7 +783,7 @@ A function that can be used to render custom stats (returns JSX) in the nerd sta
 #### `renderSidebar`
 
 ```tsx
-() => JSX | null
+() => JSX | null;
 ```
 
 Optional function that can render custom sidebar. This sidebar is the same that the library menu sidebar is using, and can be used for any purposes your app needs. The render function should return a `<Sidebar>` instance — a component that is exported from the Excalidraw package. It accepts `children` which can be any content you like to render inside.
@@ -785,9 +793,9 @@ The `<Sidebar>` component takes these props (all are optional except `children`)
 | name | type | description |
 | --- | --- | --- |
 | className | string |
-| children | ```tsxReact.ReactNode``` | Content you want to render inside the sidebar. |
-| onClose | ```tsx() => void``` | Invoked when the component is closed (by user, or the editor). No need to act on this event, as the editor manages the sidebar open state on its own. |
-| onDock | ```tsx(isDocked: boolean) => void``` | Invoked when the user toggles the dock button. |
+| children | `tsxReact.ReactNode` | Content you want to render inside the sidebar. |
+| onClose | `tsx() => void` | Invoked when the component is closed (by user, or the editor). No need to act on this event, as the editor manages the sidebar open state on its own. |
+| onDock | `tsx(isDocked: boolean) => void` | Invoked when the user toggles the dock button. |
 | docked | boolean | Indicates whether the sidebar is docked. By default, the sidebar is undocked. If passed, the docking becomes controlled, and you are responsible for updating the `docked` state by listening on `onDock` callback. See [here](#dockedSidebarBreakpoint) for more info docking. |
 | dockable | boolean | Indicates whether the sidebar can be docked by user (=the dock button is shown). If `false`, you can still dock programmatically by passing `docked=true` |
 
@@ -800,7 +808,7 @@ The `<Sidebar.Header>` component takes these props children (all are optional):
 | name | type | description |
 | --- | --- | --- |
 | className | string |
-| children | ```tsx React.ReactNode``` | Content you want to render inside the sidebar header, sibling of the header buttons. |
+| children | `tsx React.ReactNode` | Content you want to render inside the sidebar header, sibling of the header buttons. |
 
 For example code, see the example [`App.tsx`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/example/App.tsx#L524) file.
 
@@ -844,7 +852,7 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | --- | --- | --- | --- |
 | `changeViewBackgroundColor` | boolean | true | Implies whether to show `Background color picker` |
 | `clearCanvas` | boolean | true | Implies whether to show `Clear canvas button` |
-| `export` | false &#124; [exportOpts](#exportOpts) | ```tsx{ saveFileToDisk: true }``` | This prop allows to customize the UI inside the export dialog. By default it shows the "saveFileToDisk". If this prop is `false` the export button will not be rendered. For more details visit [`exportOpts`](#exportOpts). |
+| `export` | false &#124; [exportOpts](#exportOpts) | `tsx{ saveFileToDisk: true }` | This prop allows to customize the UI inside the export dialog. By default it shows the "saveFileToDisk". If this prop is `false` the export button will not be rendered. For more details visit [`exportOpts`](#exportOpts). |
 | `loadScene` | boolean | true | Implies whether to show `Load button` |
 | `saveToActiveFile` | boolean | true | Implies whether to show `Save button` to save to current file |
 | `toggleTheme` | boolean &#124; null | null | Implies whether to show `Theme toggle`. When defined as `boolean`, takes precedence over [`props.theme`](#theme) to show `Theme toggle` |
@@ -863,8 +871,8 @@ The below attributes can be set in `UIOptions.canvasActions.export` to customize
 | Attribute | Type | Default | Description |
 | --- | --- | --- | --- |
 | `saveFileToDisk` | boolean | true | Implies if save file to disk button should be shown |
-| `onExportToBackend` | ```tsx (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void ``` |  | This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed. |
-| `renderCustomUI` | ```tsx (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void ``` |  | This callback should be supplied if you want to render custom UI in the export dialog. |
+| `onExportToBackend` | `tsx (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void ` |  | This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed. |
+| `renderCustomUI` | `tsx (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void ` |  | This callback should be supplied if you want to render custom UI in the export dialog. |
 
 #### `onPaste`
 
@@ -941,7 +949,7 @@ This API can be used to customise the mouse cursor on the canvas and has the bel
 #### `toggleMenu`
 
 ```tsx
-(type: "library" | "customSidebar", force?: boolean) => boolean
+(type: "library" | "customSidebar", force?: boolean) => boolean;
 ```
 
 This API can be used to toggle a specific menu (currently only the sidebars), and returns whether the menu was toggled on or off. If the `force` flag passed, it will force the menu to be toggled either on/off based on the boolean passed.
@@ -1188,12 +1196,24 @@ Returns a promise which resolves with a [blob](https://developer.mozilla.org/en-
 
 ```tsx
 exportToSvg({
-  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>,
-  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>,
-  exportPadding?: number,
-  metadata?: string,
-  files?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64">BinaryFiles</a>
-})
+  elements: (
+    <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">
+      ExcalidrawElement[]
+    </a>
+  ),
+  appState: (
+    <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">
+      AppState
+    </a>
+  ),
+  exportPadding: number,
+  metadata: string,
+  files: (
+    <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64">
+      BinaryFiles
+    </a>
+  ),
+});
 ```
 
 | Name | Type | Default | Description |
