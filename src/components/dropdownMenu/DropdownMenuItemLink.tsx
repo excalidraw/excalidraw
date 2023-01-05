@@ -1,6 +1,6 @@
 import MenuItemContent from "./DropdownMenuItemContent";
 import React from "react";
-import { getItemClassName } from "./DropdownMenuItem";
+import { getDrodownMenuItemClassName } from "./DropdownMenuItem";
 const DropdownMenuItemLink = ({
   icon,
   dataTestId,
@@ -25,7 +25,7 @@ const DropdownMenuItemLink = ({
       href={href}
       target="_blank"
       rel="noreferrer"
-      className={getItemClassName(className)}
+      className={getDrodownMenuItemClassName(className)}
       style={style}
       data-testid={dataTestId}
       title={ariaLabel}

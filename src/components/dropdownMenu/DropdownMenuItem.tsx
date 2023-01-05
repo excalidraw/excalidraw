@@ -1,16 +1,17 @@
 import React from "react";
 import MenuItemContent from "./DropdownMenuItemContent";
 
-export const getItemClassName = (className?: string) => {
+export const getDrodownMenuItemClassName = (className = "") => {
   return `dropdown-menu-item dropdown-menu-item-base ${className}`.trim();
 };
+
 const DropdownMenuItem = ({
   icon,
   onClick,
   children,
   dataTestId,
   shortcut,
-  className = "",
+  className,
   style,
   ariaLabel,
 }: {
@@ -30,7 +31,7 @@ const DropdownMenuItem = ({
       data-testid={dataTestId}
       title={ariaLabel}
       type="button"
-      className={getItemClassName(className)}
+      className={getDrodownMenuItemClassName(className)}
       style={style}
     >
       <MenuItemContent icon={icon} shortcut={shortcut}>

@@ -1,4 +1,4 @@
-import { getItemClassName } from "./DropdownMenuItem";
+import { getDrodownMenuItemClassName } from "./DropdownMenuItem";
 
 const DropdownMenuItemCustom = ({
   children,
@@ -13,7 +13,7 @@ const DropdownMenuItemCustom = ({
 }) => {
   return (
     <div
-      className={getItemClassName(className)}
+      className={getDrodownMenuItemClassName(className)}
       style={style}
       data-testid={dataTestId}
     >
