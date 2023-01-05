@@ -226,15 +226,15 @@ export const updateStaleImageStatuses = (params: {
   }
   params.excalidrawAPI.updateScene({
     elements: params.elements.map((element) => {
-        if (
-          isInitializedImageElement(element) &&
-          params.erroredFiles.has(element.fileId)
-        ) {
-          return newElementWith(element, {
-            status: "error",
-          });
-        }
-        return element;
-      }),
+      if (
+        isInitializedImageElement(element) &&
+        params.erroredFiles.has(element.fileId)
+      ) {
+        return newElementWith(element, {
+          status: "error",
+        });
+      }
+      return element;
+    }),
   });
 };
