@@ -616,13 +616,13 @@ const ExcalidrawWrapper = () => {
         <MainMenu.DefaultItems.Help />
         <MainMenu.DefaultItems.ClearCanvas />
         <MainMenu.Separator />
-        <MainMenu.Item
+        <MainMenu.ItemLink
           icon={PlusPromoIcon}
-          link="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger"
+          href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger"
           className="ExcalidrawPlus"
         >
           Excalidraw+
-        </MainMenu.Item>
+        </MainMenu.ItemLink>
         <MainMenu.DefaultItems.Socials />
         <MainMenu.Separator />
         <MainMenu.DefaultItems.ToggleTheme />

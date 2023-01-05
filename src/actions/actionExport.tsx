@@ -254,6 +254,7 @@ export const actionLoadScene = register({
         onClick={updateData}
         dataTestId="load-button"
         shortcut={getShortcutFromShortcutName("loadScene")}
+        ariaLabel={t("buttons.load")}
       >
         {t("buttons.load")}
       </DropdownMenuItem>

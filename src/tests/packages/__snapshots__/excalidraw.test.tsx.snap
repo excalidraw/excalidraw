@@ -245,10 +245,12 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         Excalidraw links
       </p>
       <a
+        aria-label="GitHub"
         class="dropdown-menu-item dropdown-menu-item-base"
         href="https://github.com/excalidraw/excalidraw"
         rel="noreferrer"
         target="_blank"
+        title="GitHub"
       >
         <div
           class="dropdown-menu-item__icon"
@@ -277,10 +279,12 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         </div>
       </a>
       <a
+        aria-label="Discord"
         class="dropdown-menu-item dropdown-menu-item-base"
         href="https://discord.gg/UexuTaE"
         rel="noreferrer"
         target="_blank"
+        title="Discord"
       >
         <div
           class="dropdown-menu-item__icon"
@@ -315,10 +319,12 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         </div>
       </a>
       <a
+        aria-label="Twitter"
         class="dropdown-menu-item dropdown-menu-item-base"
         href="https://twitter.com/excalidraw"
         rel="noreferrer"
         target="_blank"
+        title="Twitter"
       >
         <div
           class="dropdown-menu-item__icon"
@@ -449,7 +455,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
 </div>
 `;
 
-exports[`<Excalidraw/> should render main menu with custom items if passed from host 1`] = `
+exports[`<Excalidraw/> should render main menu with host menu items if passed from host 1`] = `
 <div
   class="dropdown-menu"
   data-testid="dropdown-menu"
@@ -458,14 +464,32 @@ exports[`<Excalidraw/> should render main menu with custom items if passed from 
     class="Island dropdown-menu-container"
     style="--padding: 2; z-index: 1;"
   >
-    <div
+    <button
       class="dropdown-menu-item dropdown-menu-item-base"
+      type="button"
+    >
+      <div
+        class="dropdown-menu-item__icon"
+      />
+      <div
+        class="dropdown-menu-item__text"
+      >
+        Click me
+      </div>
+    </button>
+    <div
+      class="dropdown-menu-item dropdown-menu-item-base undefined"
+    >
+      Excalidraw blog
+    </div>
+    <div
+      class="dropdown-menu-item dropdown-menu-item-base undefined"
     >
       <button
         style="height: 2rem;"
       >
          
-        custom item
+        custom menu item
       </button>
     </div>
     <button

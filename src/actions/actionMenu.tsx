@@ -95,6 +95,7 @@ export const actionShortcuts = register({
         icon={HelpIcon}
         onClick={updateData}
         shortcut="?"
+        ariaLabel={t("helpDialog.title")}
       >
         {t("helpDialog.title")}
       </DropdownMenuItem>

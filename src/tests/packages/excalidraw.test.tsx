@@ -121,19 +121,25 @@ describe("<Excalidraw/>", () => {
     });
   });
 
-  it("should render main menu with custom items if passed from host", async () => {
+  it("should render main menu with host menu items if passed from host", async () => {
     const { container } = await render(
       <Excalidraw UIOptions={undefined}>
         <MainMenu>
-          <MainMenu.Item>
+          <MainMenu.Item onClick={() => window.alert("Clicked")}>
+            Click me
+          </MainMenu.Item>
+          <MainMenu.ItemLink href="blog.excalidaw.com">
+            Excalidraw blog
+          </MainMenu.ItemLink>
+          <MainMenu.ItemCustom>
             <button
               style={{ height: "2rem" }}
               onClick={() => window.alert("custom menu item")}
             >
               {" "}
-              custom item
+              custom menu item
             </button>
-          </MainMenu.Item>
+          </MainMenu.ItemCustom>
           <MainMenu.DefaultItems.Help />
         </MainMenu>
       </Excalidraw>,
@@ -235,7 +241,7 @@ describe("<Excalidraw/>", () => {
         const { container } = await render(
           <Excalidraw UIOptions={{ canvasActions: { loadScene: false } }}>
             <MainMenu>
-              <MainMenu.Item>
+              <MainMenu.ItemCustom>
                 <button
                   style={{ height: "2rem" }}
                   onClick={() => window.alert("custom menu item")}
@@ -243,7 +249,7 @@ describe("<Excalidraw/>", () => {
                   {" "}
                   custom item
                 </button>
-              </MainMenu.Item>
+              </MainMenu.ItemCustom>
               <MainMenu.DefaultItems.LoadScene />
             </MainMenu>
           </Excalidraw>,

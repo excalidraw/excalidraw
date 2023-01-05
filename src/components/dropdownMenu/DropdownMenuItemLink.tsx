@@ -1,44 +1,42 @@
-import React from "react";
 import MenuItemContent from "./DropdownMenuItemContent";
-
-export const getItemClassName = (className?: string) => {
-  return `dropdown-menu-item dropdown-menu-item-base ${className}`.trim();
-};
-const DropdownMenuItem = ({
+import React from "react";
+import { getItemClassName } from "./DropdownMenuItem";
+const DropdownMenuItemLink = ({
   icon,
-  onClick,
-  children,
   dataTestId,
   shortcut,
+  href,
+  children,
   className = "",
   style,
   ariaLabel,
 }: {
   icon?: JSX.Element;
-  onClick: () => void;
   children: React.ReactNode;
   dataTestId?: string;
   shortcut?: string;
   className?: string;
+  href: string;
   style?: React.CSSProperties;
   ariaLabel?: string;
 }) => {
   return (
-    <button
-      aria-label={ariaLabel}
-      onClick={onClick}
-      data-testid={dataTestId}
-      title={ariaLabel}
-      type="button"
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
       className={getItemClassName(className)}
       style={style}
+      data-testid={dataTestId}
+      title={ariaLabel}
+      aria-label={ariaLabel}
     >
       <MenuItemContent icon={icon} shortcut={shortcut}>
         {children}
       </MenuItemContent>
-    </button>
+    </a>
   );
 };
 
-export default DropdownMenuItem;
-DropdownMenuItem.displayName = "DropdownMenuItem";
+export default DropdownMenuItemLink;
+DropdownMenuItemLink.displayName = "DropdownMenuItemLink";

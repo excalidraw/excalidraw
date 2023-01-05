@@ -306,6 +306,11 @@ export const actionToggleTheme = register({
       icon={appState.theme === "dark" ? SunIcon : MoonIcon}
       dataTestId="toggle-dark-mode"
       shortcut={getShortcutFromShortcutName("toggleTheme")}
+      ariaLabel={
+        appState.theme === "dark"
+          ? t("buttons.lightMode")
+          : t("buttons.darkMode")
+      }
     >
       {appState.theme === "dark"
         ? t("buttons.lightMode")

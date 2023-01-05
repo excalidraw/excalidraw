@@ -1,9 +1,11 @@
 import React from "react";
-import MenuTrigger from "./DropdownMenuTrigger";
+import DropdownMenuTrigger from "./DropdownMenuTrigger";
 import DropdownMenuItem from "./DropdownMenuItem";
 import MenuSeparator from "./DropdownMenuSeparator";
-import MenuGroup from "./DropdownMenuGroup";
-import MenuContent from "./DropdownMenuContent";
+import DropdownMenuGroup from "./DropdownMenuGroup";
+import DropdownMenuContent from "./DropdownMenuContent";
+import DropdownMenuItemLink from "./DropdownMenuItemLink";
+import DropdownMenuItemCustom from "./DropdownMenuItemCustom";
 import {
   getMenuContentComponent,
   getMenuTriggerComponent,
@@ -11,7 +13,7 @@ import {
 
 import "./DropdownMenu.scss";
 
-const Menu = ({
+const DropdownMenu = ({
   children,
   open,
 }: {
@@ -28,12 +30,14 @@ const Menu = ({
   );
 };
 
-Menu.Trigger = MenuTrigger;
-Menu.Content = MenuContent;
-Menu.Item = DropdownMenuItem;
-Menu.Group = MenuGroup;
-Menu.Separator = MenuSeparator;
+DropdownMenu.Trigger = DropdownMenuTrigger;
+DropdownMenu.Content = DropdownMenuContent;
+DropdownMenu.Item = DropdownMenuItem;
+DropdownMenu.ItemLink = DropdownMenuItemLink;
+DropdownMenu.ItemCustom = DropdownMenuItemCustom;
+DropdownMenu.Group = DropdownMenuGroup;
+DropdownMenu.Separator = MenuSeparator;
 
-export default Menu;
+export default DropdownMenu;
 
-Menu.displayName = "DropdownMenu";
+DropdownMenu.displayName = "DropdownMenu";

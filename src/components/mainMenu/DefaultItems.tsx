@@ -10,6 +10,7 @@ import {
 import { ExportIcon, ExportImageIcon, UsersIcon } from "../icons";
 import { GithubIcon, DiscordIcon, TwitterIcon } from "../icons";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
+import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
 
 export const LoadScene = () => {
   const appState = useExcalidrawAppState();
@@ -42,6 +43,7 @@ export const SaveAsImage = () => {
       dataTestId="image-export-button"
       onClick={() => setAppState({ openDialog: "imageExport" })}
       shortcut={getShortcutFromShortcutName("imageExport")}
+      ariaLabel={t("buttons.exportImage")}
     >
       {t("buttons.exportImage")}
     </DropdownMenuItem>
@@ -111,6 +113,7 @@ export const Export = () => {
         setAppState({ openDialog: "jsonExport" });
       }}
       dataTestId="json-export-button"
+      ariaLabel={t("buttons.export")}
     >
       {t("buttons.export")}
     </DropdownMenuItem>
@@ -120,18 +123,27 @@ Export.displayName = "Export";
 
 export const Socials = () => (
   <>
-    <DropdownMenuItem
+    <DropdownMenuItemLink
       icon={GithubIcon}
-      link="https://github.com/excalidraw/excalidraw"
+      href="https://github.com/excalidraw/excalidraw"
+      ariaLabel="GitHub"
     >
       GitHub
-    </DropdownMenuItem>
-    <DropdownMenuItem icon={DiscordIcon} link="https://discord.gg/UexuTaE">
+    </DropdownMenuItemLink>
+    <DropdownMenuItemLink
+      icon={DiscordIcon}
+      href="https://discord.gg/UexuTaE"
+      ariaLabel="Discord"
+    >
       Discord
-    </DropdownMenuItem>
-    <DropdownMenuItem icon={TwitterIcon} link="https://twitter.com/excalidraw">
+    </DropdownMenuItemLink>
+    <DropdownMenuItemLink
+      icon={TwitterIcon}
+      href="https://twitter.com/excalidraw"
+      ariaLabel="Twitter"
+    >
       Twitter
-    </DropdownMenuItem>
+    </DropdownMenuItemLink>
   </>
 );
 Socials.displayName = "Socials";
@@ -140,8 +152,8 @@ export const LiveCollaboration = ({
   onClick,
   isCollaborating,
 }: {
-  onClick: ExcalidrawProps["onCollabButtonClick"];
-  isCollaborating: ExcalidrawProps["isCollaborating"];
+  onClick: () => void;
+  isCollaborating: boolean;
 }) => {
   // Hack until we tie "t" to lang state
   // eslint-disable-next-line

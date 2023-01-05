@@ -18,5 +18,6 @@ export const ActiveFile = ({ fileName, onSave }: ActiveFileProps) => (
     dataTestId="save-button"
     onClick={onSave}
     icon={save}
+    ariaLabel={`${t("buttons.save")}`}
   >{`${t("buttons.save")}`}</DropdownMenuItem>
 );
