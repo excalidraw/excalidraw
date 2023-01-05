@@ -172,7 +172,7 @@ export type AppState = {
     | "strokeColorPicker"
     | null;
   openSidebar: "library" | "customSidebar" | null;
-  openDialog: "imageExport" | "help" | null;
+  openDialog: "imageExport" | "help" | "jsonExport" | null;
   isSidebarDocked: boolean;
 
   lastPointerDownWith: PointerType;
@@ -533,7 +533,7 @@ export type Device = Readonly<{
 }>;
 
 export type UIChildrenComponents = {
-  [k in "FooterCenter"]?:
+  [k in "FooterCenter" | "Menu"]?:
     | React.ReactPortal
     | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>;
 };
