@@ -239,8 +239,8 @@ const drawElementOnCanvas = (
 
       if (!fillShape && element.customData?.strokeOptions?.hasOutline) {
         context.lineWidth =
-          (element.strokeWidth / 5) *
-            element.customData.strokeOptions.outlineWidth ?? 1;
+          element.strokeWidth *
+          (element.customData.strokeOptions.outlineWidth ?? 1);
         context.strokeStyle = element.strokeColor;
         context.stroke(path);
         context.fillStyle = element.backgroundColor;
