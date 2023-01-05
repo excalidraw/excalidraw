@@ -626,9 +626,9 @@ const ExcalidrawWrapper = () => {
         <MainMenu.DefaultItems.Socials />
         <MainMenu.Separator />
         <MainMenu.DefaultItems.ToggleTheme />
-        <div className="dropdown-menu-item-base" style={{ margin: "0.5rem 0" }}>
+        <MainMenu.ItemCustom style={{ marginTop: "0.5rem" }}>
           <LanguageList style={{ width: "100%" }} />
-        </div>
+        </MainMenu.ItemCustom>
         <MainMenu.DefaultItems.ChangeCanvasBackground />
       </MainMenu>
     );
