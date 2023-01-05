@@ -124,9 +124,7 @@ export type PanelComponentProps = {
 
 export interface Action {
   name: ActionName;
-  PanelComponent?: React.FC<
-    PanelComponentProps & { isInHamburgerMenu: boolean }
-  >;
+  PanelComponent?: React.FC<PanelComponentProps>;
   perform: ActionFn;
   keyPriority?: number;
   keyTest?: (

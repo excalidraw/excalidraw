@@ -1,7 +1,6 @@
-import { LoadIcon, questionCircle, saveAs } from "../components/icons";
+import { questionCircle, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
-import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
@@ -15,12 +14,11 @@ import { getExportSize } from "../scene/export";
 import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
-import { ActiveFile } from "../components/ActiveFile";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
-import DropdownMenuItem from "../components/dropdownMenu/DropdownMenuItem";
-import { getShortcutFromShortcutName } from "./shortcuts";
+
+import "../components/ToolIcon.scss";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -169,12 +167,6 @@ export const actionSaveToActiveFile = register({
   },
   keyTest: (event) =>
     event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
-  PanelComponent: ({ updateData, appState }) => (
-    <ActiveFile
-      onSave={() => updateData(null)}
-      fileName={appState.fileHandle?.name}
-    />
-  ),
 });
 
 export const actionSaveFileToDisk = register({
@@ -247,19 +239,6 @@ export const actionLoadScene = register({
     }
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
-  PanelComponent: ({ updateData }) => {
-    return (
-      <DropdownMenuItem
-        icon={LoadIcon}
-        onSelect={updateData}
-        dataTestId="load-button"
-        shortcut={getShortcutFromShortcutName("loadScene")}
-        ariaLabel={t("buttons.load")}
-      >
-        {t("buttons.load")}
-      </DropdownMenuItem>
-    );
-  },
 });
 
 export const actionExportWithDarkMode = register({
