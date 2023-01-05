@@ -238,7 +238,7 @@ const drawElementOnCanvas = (
         rc.draw(fillShape);
       }
 
-      if (!fillShape && element.customData?.strokeOptions?.hasOutline) {
+      if (element.customData?.strokeOptions?.hasOutline) {
         context.lineWidth =
           element.strokeWidth *
           (element.customData.strokeOptions.outlineWidth ?? 1);
@@ -1195,16 +1195,20 @@ export const renderElementToSvg = (
       );
       node.setAttribute("stroke", "none");
       const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
-      if (!shape && element.customData?.strokeOptions?.hasOutline) {
-        path.setAttribute("fill", element.backgroundColor);
-        path.setAttribute("stroke", element.strokeColor);
-        path.setAttribute(
+      if (element.customData?.strokeOptions?.hasOutline) {
+        node.setAttribute(
           "stroke-width",
           `${
-            (element.strokeWidth / 5) *
-              element.customData.strokeOptions.outlineWidth ?? 1
+            element.strokeWidth *
+            (element.customData.strokeOptions.outlineWidth ?? 1)
           }`,
         );
+        const outline = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
+        outline.setAttribute("fill", "none");
+        outline.setAttribute("stroke", element.strokeColor);
+        outline.setAttribute("d", getFreeDrawSvgPath(element));
+        node.appendChild(outline);
+        path.setAttribute("fill", element.backgroundColor);
       } else {
         path.setAttribute("fill", element.strokeColor);
       }
