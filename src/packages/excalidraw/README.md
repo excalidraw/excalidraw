@@ -434,8 +434,8 @@ const MobileFooter = ({
 const App = () => {
   <Excalidraw>
     <MainMenu>
-      <MainMenu.Item> Item1 </MainMenu.Item>
-      <MainMenu.Item> Item 2 </>
+      <MainMenu.Item onSelect={() => window.alert("Item1")}> Item1 </MainMenu.Item>
+      <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
       <MobileFooter/>
     </MainMenu>
   </Excalidraw>
@@ -456,8 +456,8 @@ import { MainMenu } from "@excalidraw/excalidraw";
 const App = () => {
   <Excalidraw>
     <MainMenu>
-      <MainMenu.Item onClick={() => window.alert("Item1")}> Item1 </MainMenu.Item>
-      <MainMenu.Item onClick={() => window.alert("Item2")}> Item 2 </>
+      <MainMenu.Item onSelect={() => window.alert("Item1")}> Item1 </MainMenu.Item>
+      <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
     </MainMenu>
   </Excalidraw>
 }
@@ -556,8 +556,8 @@ const App = () => {
     <MainMenu>
       <MainMenu.DefaultItems.Socials/>
       <MainMenu.DefaultItems.Export/>
-      <MainMenu.Item> Item1 </MainMenu.Item>
-      <MainMenu.Item> Item 2 </>
+      <MainMenu.Item onSelect={() => window.alert("Item1")}> Item1 </MainMenu.Item>
+      <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
     </MainMenu>
   </Excalidraw>
 }
@@ -579,8 +579,8 @@ const App = () => {
         <MainMenu.DefaultItems.Export/>
       </MainMenu.Group>
       <MainMenu.Group title="custom items">
-        <MainMenu.Item> Item1 </MainMenu.Item>
-        <MainMenu.Item> Item 2 </>
+        <MainMenu.Item onSelect={() => window.alert("Item1")}> Item1 </MainMenu.Item>
+        <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
       </MainMenu.Group>
     </MainMenu>
   </Excalidraw>
