@@ -237,7 +237,17 @@ const drawElementOnCanvas = (
         rc.draw(fillShape);
       }
 
-      context.fillStyle = element.strokeColor;
+      //zsviczian
+      if (!fillShape && element.customData?.strokeOptions?.hasOutline) {
+        context.lineWidth =
+          element.strokeWidth *
+          (element.customData.strokeOptions.outlineWidth ?? 1);
+        context.strokeStyle = element.strokeColor;
+        context.stroke(path);
+        context.fillStyle = element.backgroundColor;
+      } else {
+        context.fillStyle = element.strokeColor;
+      }
       context.fill(path);
 
       context.restore();
@@ -1185,7 +1195,20 @@ export const renderElementToSvg = (
       );
       node.setAttribute("stroke", "none");
       const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
-      path.setAttribute("fill", element.strokeColor);
+      //zsviczian
+      if (!shape && element.customData?.strokeOptions?.hasOutline) {
+        path.setAttribute("fill", element.backgroundColor);
+        path.setAttribute("stroke", element.strokeColor);
+        path.setAttribute(
+          "stroke-width",
+          `${
+            (element.strokeWidth / 5) *
+              element.customData.strokeOptions.outlineWidth ?? 1
+          }`,
+        );
+      } else {
+        path.setAttribute("fill", element.strokeColor);
+      }
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
       root.appendChild(node);
@@ -1328,15 +1351,25 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     : [[0, 0, 0.5]];
 
   // Consider changing the options for simulated pressure vs real pressure
-  const options: StrokeOptions = {
-    simulatePressure: element.simulatePressure,
-    size: element.strokeWidth * 4.25,
-    thinning: 0.6,
-    smoothing: 0.5,
-    streamline: 0.5,
-    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
-  };
+  const options: StrokeOptions = element.customData?.strokeOptions?.options //zsviczian
+    ? { ...element.customData?.strokeOptions?.options }
+    : {
+        simulatePressure: element.simulatePressure,
+        size: element.strokeWidth * 4.25,
+        thinning: 0.6,
+        smoothing: 0.5,
+        streamline: 0.5,
+        easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
+        last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
+      };
+
+  //zsviczian
+  if (element.customData?.strokeOptions?.options) {
+    options.simulatePressure =
+      options.simulatePressure ?? element.simulatePressure;
+    options.size = element.strokeWidth * 4.25; //override size with stroke width
+    options.last = !!element.lastCommittedPoint;
+  }
 
   return getSvgPathFromStroke(getStroke(inputPoints as number[][], options));
 }

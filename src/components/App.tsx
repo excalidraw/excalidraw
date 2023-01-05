@@ -4305,6 +4305,8 @@ class App extends React.Component<AppProps, AppState> {
       null,
     );
 
+    //@ts-ignore //zsviczian
+    const strokeOptions = this.state.currentStrokeOptions;
     const element = newFreeDrawElement({
       type: elementType,
       x: gridX,
@@ -4319,6 +4321,9 @@ class App extends React.Component<AppProps, AppState> {
       roundness: null,
       simulatePressure: event.pressure === 0.5,
       locked: false,
+      ...(strokeOptions //zsviczian
+        ? { customData: { strokeOptions } }
+        : {}),
     });
 
     this.setState((prevState) => ({
