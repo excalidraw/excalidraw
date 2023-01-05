@@ -19,7 +19,7 @@ import { ActiveFile } from "../components/ActiveFile";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
-import MenuItem from "../components/MenuItem";
+import DropdownMenuItem from "../components/dropdownMenu/DropdownMenuItem";
 import { getShortcutFromShortcutName } from "./shortcuts";
 
 export const actionChangeProjectName = register({
@@ -247,15 +247,19 @@ export const actionLoadScene = register({
     }
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
-  PanelComponent: ({ updateData }) => (
-    <MenuItem
-      label={t("buttons.load")}
-      icon={LoadIcon}
-      onClick={updateData}
-      dataTestId="load-button"
-      shortcut={getShortcutFromShortcutName("loadScene")}
-    />
-  ),
+  PanelComponent: ({ updateData }) => {
+    return (
+      <DropdownMenuItem
+        icon={LoadIcon}
+        onSelect={updateData}
+        dataTestId="load-button"
+        shortcut={getShortcutFromShortcutName("loadScene")}
+        ariaLabel={t("buttons.load")}
+      >
+        {t("buttons.load")}
+      </DropdownMenuItem>
+    );
+  },
 });
 
 export const actionExportWithDarkMode = register({

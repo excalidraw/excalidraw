@@ -23,7 +23,7 @@ import { newElementWith } from "../element/mutateElement";
 import { getDefaultAppState, isEraserActive } from "../appState";
 import ClearCanvas from "../components/ClearCanvas";
 import clsx from "clsx";
-import MenuItem from "../components/MenuItem";
+import DropdownMenuItem from "../components/dropdownMenu/DropdownMenuItem";
 import { getShortcutFromShortcutName } from "./shortcuts";
 
 export const actionChangeViewBackgroundColor = register({
@@ -299,19 +299,23 @@ export const actionToggleTheme = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <MenuItem
-      label={
-        appState.theme === "dark"
-          ? t("buttons.lightMode")
-          : t("buttons.darkMode")
-      }
-      onClick={() => {
+    <DropdownMenuItem
+      onSelect={() => {
         updateData(appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT);
       }}
       icon={appState.theme === "dark" ? SunIcon : MoonIcon}
       dataTestId="toggle-dark-mode"
       shortcut={getShortcutFromShortcutName("toggleTheme")}
-    />
+      ariaLabel={
+        appState.theme === "dark"
+          ? t("buttons.lightMode")
+          : t("buttons.darkMode")
+      }
+    >
+      {appState.theme === "dark"
+        ? t("buttons.lightMode")
+        : t("buttons.darkMode")}
+    </DropdownMenuItem>
   ),
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
 });

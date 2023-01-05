@@ -3,9 +3,9 @@ import { Dialog, DialogProps } from "./Dialog";
 
 import "./ConfirmDialog.scss";
 import DialogActionButton from "./DialogActionButton";
-import { isMenuOpenAtom } from "./App";
-import { isDropdownOpenAtom } from "./App";
 import { useSetAtom } from "jotai";
+import { isLibraryMenuOpenAtom } from "./LibraryMenuHeaderContent";
+import { useExcalidrawSetAppState } from "./App";
 
 interface Props extends Omit<DialogProps, "onCloseRequest"> {
   onConfirm: () => void;
@@ -23,9 +23,8 @@ const ConfirmDialog = (props: Props) => {
     className = "",
     ...rest
   } = props;
-
-  const setIsMenuOpen = useSetAtom(isMenuOpenAtom);
-  const setIsDropdownOpen = useSetAtom(isDropdownOpenAtom);
+  const setAppState = useExcalidrawSetAppState();
+  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
 
   return (
     <Dialog
@@ -39,16 +38,16 @@ const ConfirmDialog = (props: Props) => {
         <DialogActionButton
           label={cancelText}
           onClick={() => {
-            setIsMenuOpen(false);
-            setIsDropdownOpen(false);
+            setAppState({ openMenu: null });
+            setIsLibraryMenuOpen(false);
             onCancel();
           }}
         />
         <DialogActionButton
           label={confirmText}
           onClick={() => {
-            setIsMenuOpen(false);
-            setIsDropdownOpen(false);
+            setAppState({ openMenu: null });
+            setIsLibraryMenuOpen(false);
             onConfirm();
           }}
           actionType="danger"

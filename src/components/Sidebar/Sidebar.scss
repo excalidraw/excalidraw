@@ -3,24 +3,6 @@
 
 .excalidraw {
   .Sidebar {
-    &__dropdown-content {
-      z-index: 1;
-      position: absolute;
-      top: 100%;
-      left: 0;
-
-      :root[dir="rtl"] & {
-        right: 0;
-        left: auto;
-      }
-
-      margin-top: 0.25rem;
-      width: 180px;
-      box-shadow: var(--library-dropdown-shadow);
-      border-radius: var(--border-radius-lg);
-      padding: 0.25rem 0.5rem;
-    }
-
     &__close-btn,
     &__pin-btn,
     &__dropdown-btn {

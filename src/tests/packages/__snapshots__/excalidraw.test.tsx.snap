@@ -1,28 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide any UI element when canvasActions is "undefined" 1`] = `
-<section
-  aria-labelledby="test-id-canvasActions-title"
+exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu with default items when "UIOPtions" is "undefined" 1`] = `
+<div
+  class="dropdown-menu"
+  data-testid="dropdown-menu"
 >
-  <h2
-    class="visually-hidden"
-    id="test-id-canvasActions-title"
-  >
-    Canvas actions
-  </h2>
   <div
-    class="Island menu-container"
+    class="Island dropdown-menu-container"
     style="--padding: 2; z-index: 1;"
   >
     <button
       aria-label="Open"
-      class="menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="load-button"
       title="Open"
       type="button"
     >
       <div
-        class="menu-item__icon"
+        class="dropdown-menu-item__icon"
       >
         <svg
           aria-hidden="true"
@@ -42,25 +37,25 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
         </svg>
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
         Open
       </div>
       <div
-        class="menu-item__shortcut"
+        class="dropdown-menu-item__shortcut"
       >
         Ctrl+O
       </div>
     </button>
     <button
       aria-label="Save to..."
-      class="menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="json-export-button"
       title="Save to..."
       type="button"
     >
       <div
-        class="menu-item__icon"
+        class="dropdown-menu-item__icon"
       >
         <svg
           aria-hidden="true"
@@ -80,20 +75,20 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
         </svg>
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
         Save to...
       </div>
     </button>
     <button
       aria-label="Export image..."
-      class="menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="image-export-button"
       title="Export image..."
       type="button"
     >
       <div
-        class="menu-item__icon"
+        class="dropdown-menu-item__icon"
       >
         <svg
           aria-hidden="true"
@@ -137,25 +132,25 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
         </svg>
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
         Export image...
       </div>
       <div
-        class="menu-item__shortcut"
+        class="dropdown-menu-item__shortcut"
       >
         Ctrl+Shift+E
       </div>
     </button>
     <button
       aria-label="Help"
-      class="menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="help-menu-item"
       title="Help"
       type="button"
     >
       <div
-        class="menu-item__icon"
+        class="dropdown-menu-item__icon"
       >
         <svg
           aria-hidden="true"
@@ -195,25 +190,25 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
         </svg>
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
         Help
       </div>
       <div
-        class="menu-item__shortcut"
+        class="dropdown-menu-item__shortcut"
       >
         ?
       </div>
     </button>
     <button
       aria-label="Reset the canvas"
-      class="menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="clear-canvas-button"
       title="Reset the canvas"
       type="button"
     >
       <div
-        class="menu-item__icon"
+        class="dropdown-menu-item__icon"
       >
         <svg
           aria-hidden="true"
@@ -233,7 +228,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
         </svg>
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
         Reset the canvas
       </div>
@@ -241,71 +236,144 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
     <div
       style="height: 1px; margin: .5rem 0px;"
     />
-    <a
-      class="menu-item"
-      href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger"
-      rel="noreferrer"
-      target="_blank"
+    <div
+      class="dropdown-menu-group "
     >
-      <div
-        class="menu-item__icon"
+      <p
+        class="dropdown-menu-group-title"
       >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
+        Excalidraw links
+      </p>
+      <a
+        aria-label="GitHub"
+        class="dropdown-menu-item dropdown-menu-item-base"
+        href="https://github.com/excalidraw/excalidraw"
+        rel="noreferrer"
+        target="_blank"
+        title="GitHub"
+      >
+        <div
+          class="dropdown-menu-item__icon"
         >
-          <g
-            stroke-width="1.5"
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="none"
+            focusable="false"
+            role="img"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            viewBox="0 0 20 20"
           >
             <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
+              d="M7.5 15.833c-3.583 1.167-3.583-2.083-5-2.5m10 4.167v-2.917c0-.833.083-1.166-.417-1.666 2.334-.25 4.584-1.167 4.584-5a3.833 3.833 0 0 0-1.084-2.667 3.5 3.5 0 0 0-.083-2.667s-.917-.25-2.917 1.084a10.25 10.25 0 0 0-5.166 0C5.417 2.333 4.5 2.583 4.5 2.583a3.5 3.5 0 0 0-.083 2.667 3.833 3.833 0 0 0-1.084 2.667c0 3.833 2.25 4.75 4.584 5-.5.5-.5 1-.417 1.666V17.5"
+              stroke-width="1.25"
             />
-            <rect
-              height="4"
-              rx="1"
-              width="18"
-              x="3"
-              y="8"
-            />
-            <line
-              x1="12"
-              x2="12"
-              y1="8"
-              y2="21"
-            />
-            <path
-              d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7"
-            />
-            <path
-              d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5"
-            />
-          </g>
-        </svg>
-      </div>
-      <div
-        class="menu-item__text"
+          </svg>
+        </div>
+        <div
+          class="dropdown-menu-item__text"
+        >
+          GitHub
+        </div>
+      </a>
+      <a
+        aria-label="Discord"
+        class="dropdown-menu-item dropdown-menu-item-base"
+        href="https://discord.gg/UexuTaE"
+        rel="noreferrer"
+        target="_blank"
+        title="Discord"
       >
-        Excalidraw+
-      </div>
-    </a>
-    <a
-      class="menu-item"
-      href="https://github.com/excalidraw/excalidraw"
-      rel="noopener noreferrer"
-      target="_blank"
+        <div
+          class="dropdown-menu-item__icon"
+        >
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="none"
+            focusable="false"
+            role="img"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            viewBox="0 0 20 20"
+          >
+            <g
+              stroke-width="1.25"
+            >
+              <path
+                d="M7.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM12.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM6.25 6.25c2.917-.833 4.583-.833 7.5 0M5.833 13.75c2.917.833 5.417.833 8.334 0"
+              />
+              <path
+                d="M12.917 14.167c0 .833 1.25 2.5 1.666 2.5 1.25 0 2.361-1.39 2.917-2.5.556-1.39.417-4.861-1.25-9.584-1.214-.846-2.5-1.116-3.75-1.25l-.833 2.084M7.083 14.167c0 .833-1.13 2.5-1.526 2.5-1.191 0-2.249-1.39-2.778-2.5-.529-1.39-.397-4.861 1.19-9.584 1.157-.846 2.318-1.116 3.531-1.25l.833 2.084"
+              />
+            </g>
+          </svg>
+        </div>
+        <div
+          class="dropdown-menu-item__text"
+        >
+          Discord
+        </div>
+      </a>
+      <a
+        aria-label="Twitter"
+        class="dropdown-menu-item dropdown-menu-item-base"
+        href="https://twitter.com/excalidraw"
+        rel="noreferrer"
+        target="_blank"
+        title="Twitter"
+      >
+        <div
+          class="dropdown-menu-item__icon"
+        >
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="none"
+            focusable="false"
+            role="img"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <g
+              stroke-width="1.25"
+            >
+              <path
+                d="M0 0h24v24H0z"
+                fill="none"
+                stroke="none"
+              />
+              <path
+                d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"
+              />
+            </g>
+          </svg>
+        </div>
+        <div
+          class="dropdown-menu-item__text"
+        >
+          Twitter
+        </div>
+      </a>
+    </div>
+    <div
+      style="height: 1px; margin: .5rem 0px;"
+    />
+    <button
+      aria-label="Dark mode"
+      class="dropdown-menu-item dropdown-menu-item-base"
+      data-testid="toggle-dark-mode"
+      title="Dark mode"
+      type="button"
     >
       <div
-        class="menu-item__icon"
+        class="dropdown-menu-item__icon"
       >
         <svg
           aria-hidden="true"
@@ -319,549 +387,130 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
           viewBox="0 0 20 20"
         >
           <path
-            d="M7.5 15.833c-3.583 1.167-3.583-2.083-5-2.5m10 4.167v-2.917c0-.833.083-1.166-.417-1.666 2.334-.25 4.584-1.167 4.584-5a3.833 3.833 0 0 0-1.084-2.667 3.5 3.5 0 0 0-.083-2.667s-.917-.25-2.917 1.084a10.25 10.25 0 0 0-5.166 0C5.417 2.333 4.5 2.583 4.5 2.583a3.5 3.5 0 0 0-.083 2.667 3.833 3.833 0 0 0-1.084 2.667c0 3.833 2.25 4.75 4.584 5-.5.5-.5 1-.417 1.666V17.5"
-            stroke-width="1.25"
+            clip-rule="evenodd"
+            d="M10 2.5h.328a6.25 6.25 0 0 0 6.6 10.372A7.5 7.5 0 1 1 10 2.493V2.5Z"
+            stroke="currentColor"
           />
         </svg>
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
-        GitHub
-      </div>
-    </a>
-    <a
-      class="menu-item"
-      href="https://discord.gg/UexuTaE"
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      <div
-        class="menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          viewBox="0 0 20 20"
-        >
-          <g
-            stroke-width="1.25"
-          >
-            <path
-              d="M7.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM12.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM6.25 6.25c2.917-.833 4.583-.833 7.5 0M5.833 13.75c2.917.833 5.417.833 8.334 0"
-            />
-            <path
-              d="M12.917 14.167c0 .833 1.25 2.5 1.666 2.5 1.25 0 2.361-1.39 2.917-2.5.556-1.39.417-4.861-1.25-9.584-1.214-.846-2.5-1.116-3.75-1.25l-.833 2.084M7.083 14.167c0 .833-1.13 2.5-1.526 2.5-1.191 0-2.249-1.39-2.778-2.5-.529-1.39-.397-4.861 1.19-9.584 1.157-.846 2.318-1.116 3.531-1.25l.833 2.084"
-            />
-          </g>
-        </svg>
+        Dark mode
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__shortcut"
       >
-        Discord
+        Shift+Alt+D
       </div>
-    </a>
-    <a
-      class="menu-item"
-      href="https://twitter.com/excalidraw"
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      <div
-        class="menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <g
-            stroke-width="1.25"
-          >
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"
-            />
-          </g>
-        </svg>
-      </div>
-      <div
-        class="menu-item__text"
-      >
-        Twitter
-      </div>
-    </a>
+    </button>
     <div
-      style="height: 1px; margin: .5rem 0px;"
-    />
-    <div
-      style="display: flex; flex-direction: column; row-gap: .5rem;"
+      style="margin-top: 0.5rem;"
     >
-      <div>
-        <button
-          aria-label="Dark mode"
-          class="menu-item"
-          data-testid="toggle-dark-mode"
-          title="Dark mode"
-          type="button"
-        >
-          <div
-            class="menu-item__icon"
-          >
-            <svg
-              aria-hidden="true"
-              class=""
-              fill="none"
-              focusable="false"
-              role="img"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              viewBox="0 0 20 20"
-            >
-              <path
-                clip-rule="evenodd"
-                d="M10 2.5h.328a6.25 6.25 0 0 0 6.6 10.372A7.5 7.5 0 1 1 10 2.493V2.5Z"
-                stroke="currentColor"
-              />
-            </svg>
-          </div>
-          <div
-            class="menu-item__text"
-          >
-            Dark mode
-          </div>
-          <div
-            class="menu-item__shortcut"
-          >
-            Shift+Alt+D
-          </div>
-        </button>
+      <div
+        style="font-size: .75rem; margin-bottom: .5rem;"
+      >
+        Canvas background
       </div>
       <div
         style="padding: 0px 0.625rem;"
       >
-        <select
-          aria-label="Select language"
-          class="dropdown-select dropdown-select__language"
-          style="width: 100%;"
-        >
-          <option
-            value="en"
-          >
-            English
-          </option>
-          <option
-            value="id-ID"
-          >
-            Bahasa Indonesia
-          </option>
-          <option
-            value="ca-ES"
-          >
-            Català
-          </option>
-          <option
-            value="de-DE"
-          >
-            Deutsch
-          </option>
-          <option
-            value="en"
-          >
-            English
-          </option>
-          <option
-            value="es-ES"
-          >
-            Español
-          </option>
-          <option
-            value="eu-ES"
-          >
-            Euskara
-          </option>
-          <option
-            value="fr-FR"
-          >
-            Français
-          </option>
-          <option
-            value="gl-ES"
-          >
-            Galego
-          </option>
-          <option
-            value="it-IT"
-          >
-            Italiano
-          </option>
-          <option
-            value="ku-TR"
-          >
-            Kurdî
-          </option>
-          <option
-            value="lv-LV"
-          >
-            Latviešu
-          </option>
-          <option
-            value="hu-HU"
-          >
-            Magyar
-          </option>
-          <option
-            value="nl-NL"
-          >
-            Nederlands
-          </option>
-          <option
-            value="nb-NO"
-          >
-            Norsk bokmål
-          </option>
-          <option
-            value="nn-NO"
-          >
-            Norsk nynorsk
-          </option>
-          <option
-            value="oc-FR"
-          >
-            Occitan
-          </option>
-          <option
-            value="pl-PL"
-          >
-            Polski
-          </option>
-          <option
-            value="pt-PT"
-          >
-            Português
-          </option>
-          <option
-            value="pt-BR"
-          >
-            Português Brasileiro
-          </option>
-          <option
-            value="ro-RO"
-          >
-            Română
-          </option>
-          <option
-            value="sk-SK"
-          >
-            Slovenčina
-          </option>
-          <option
-            value="sl-SI"
-          >
-            Slovenščina
-          </option>
-          <option
-            value="fi-FI"
-          >
-            Suomi
-          </option>
-          <option
-            value="sv-SE"
-          >
-            Svenska
-          </option>
-          <option
-            value="kab-KAB"
-          >
-            Taqbaylit
-          </option>
-          <option
-            value="tr-TR"
-          >
-            Türkçe
-          </option>
-          <option
-            value="el-GR"
-          >
-            Ελληνικά
-          </option>
-          <option
-            value="ru-RU"
-          >
-            Русский
-          </option>
-          <option
-            value="uk-UA"
-          >
-            Українська
-          </option>
-          <option
-            value="he-IL"
-          >
-            עברית
-          </option>
-          <option
-            value="ar-SA"
-          >
-            العربية
-          </option>
-          <option
-            value="fa-IR"
-          >
-            فارسی
-          </option>
-          <option
-            value="mr-IN"
-          >
-            मराठी
-          </option>
-          <option
-            value="ja-JP"
-          >
-            日本語
-          </option>
-          <option
-            value="zh-CN"
-          >
-            简体中文
-          </option>
-          <option
-            value="zh-TW"
-          >
-            繁體中文
-          </option>
-          <option
-            value="ko-KR"
-          >
-            한국어
-          </option>
-        </select>
-      </div>
-      <div>
         <div
-          style="font-size: .75rem; margin-bottom: .5rem;"
+          style="position: relative;"
         >
-          Canvas background
-        </div>
-        <div
-          style="padding: 0px 0.625rem;"
-        >
-          <div
-            style="position: relative;"
-          >
-            <div>
+          <div>
+            <div
+              class="color-picker-control-container"
+            >
               <div
-                class="color-picker-control-container"
+                class="color-picker-label-swatch-container"
+              >
+                <button
+                  aria-label="Canvas background"
+                  class="color-picker-label-swatch"
+                  style="--swatch-color: #ffffff;"
+                />
+              </div>
+              <label
+                class="color-input-container"
               >
                 <div
-                  class="color-picker-label-swatch-container"
+                  class="color-picker-hash"
                 >
-                  <button
-                    aria-label="Canvas background"
-                    class="color-picker-label-swatch"
-                    style="--swatch-color: #ffffff;"
-                  />
+                  #
                 </div>
-                <label
-                  class="color-input-container"
-                >
-                  <div
-                    class="color-picker-hash"
-                  >
-                    #
-                  </div>
-                  <input
-                    aria-label="Canvas background"
-                    class="color-picker-input"
-                    spellcheck="false"
-                    value="ffffff"
-                  />
-                </label>
-              </div>
+                <input
+                  aria-label="Canvas background"
+                  class="color-picker-input"
+                  spellcheck="false"
+                  value="ffffff"
+                />
+              </label>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</section>
+</div>
 `;
 
-exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when the UIOptions prop is "undefined" 1`] = `
-<section
-  aria-labelledby="test-id-canvasActions-title"
+exports[`<Excalidraw/> should render main menu with host menu items if passed from host 1`] = `
+<div
+  class="dropdown-menu"
+  data-testid="dropdown-menu"
 >
-  <h2
-    class="visually-hidden"
-    id="test-id-canvasActions-title"
-  >
-    Canvas actions
-  </h2>
   <div
-    class="Island menu-container"
+    class="Island dropdown-menu-container"
     style="--padding: 2; z-index: 1;"
   >
     <button
-      aria-label="Open"
-      class="menu-item"
-      data-testid="load-button"
-      title="Open"
+      class="dropdown-menu-item dropdown-menu-item-base"
       type="button"
     >
       <div
-        class="menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          viewBox="0 0 20 20"
-        >
-          <path
-            d="m9.257 6.351.183.183H15.819c.34 0 .727.182 1.051.506.323.323.505.708.505 1.05v5.819c0 .316-.183.7-.52 1.035-.337.338-.723.522-1.037.522H4.182c-.352 0-.74-.181-1.058-.5-.318-.318-.499-.705-.499-1.057V5.182c0-.351.181-.736.5-1.054.32-.321.71-.503 1.057-.503H6.53l2.726 2.726Z"
-            stroke-width="1.25"
-          />
-        </svg>
-      </div>
+        class="dropdown-menu-item__icon"
+      />
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
-        Open
-      </div>
-      <div
-        class="menu-item__shortcut"
-      >
-        Ctrl+O
+        Click me
       </div>
     </button>
-    <button
-      aria-label="Save to..."
-      class="menu-item"
-      data-testid="json-export-button"
-      title="Save to..."
-      type="button"
+    <a
+      class="dropdown-menu-item dropdown-menu-item-base"
+      href="blog.excalidaw.com"
+      rel="noreferrer"
+      target="_blank"
     >
       <div
-        class="menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          viewBox="0 0 20 20"
-        >
-          <path
-            d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 9.167 10 13.333l4.167-4.166M10 3.333v10"
-            stroke-width="1.25"
-          />
-        </svg>
-      </div>
+        class="dropdown-menu-item__icon"
+      />
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
-        Save to...
+        Excalidraw blog
       </div>
-    </button>
-    <button
-      aria-label="Export image..."
-      class="menu-item"
-      data-testid="image-export-button"
-      title="Export image..."
-      type="button"
+    </a>
+    <div
+      class="dropdown-menu-item-base dropdown-menu-item-custom"
     >
-      <div
-        class="menu-item__icon"
+      <button
+        style="height: 2rem;"
       >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <g
-            stroke-width="1.25"
-          >
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M15 8h.01"
-            />
-            <path
-              d="M12 20h-5a3 3 0 0 1 -3 -3v-10a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v5"
-            />
-            <path
-              d="M4 15l4 -4c.928 -.893 2.072 -.893 3 0l4 4"
-            />
-            <path
-              d="M14 14l1 -1c.617 -.593 1.328 -.793 2.009 -.598"
-            />
-            <path
-              d="M19 16v6"
-            />
-            <path
-              d="M22 19l-3 3l-3 -3"
-            />
-          </g>
-        </svg>
-      </div>
-      <div
-        class="menu-item__text"
-      >
-        Export image...
-      </div>
-      <div
-        class="menu-item__shortcut"
-      >
-        Ctrl+Shift+E
-      </div>
-    </button>
+         
+        custom menu item
+      </button>
+    </div>
     <button
       aria-label="Help"
-      class="menu-item"
+      class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="help-menu-item"
       title="Help"
       type="button"
     >
       <div
-        class="menu-item__icon"
+        class="dropdown-menu-item__icon"
       >
         <svg
           aria-hidden="true"
@@ -901,513 +550,16 @@ exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when t
         </svg>
       </div>
       <div
-        class="menu-item__text"
+        class="dropdown-menu-item__text"
       >
         Help
       </div>
       <div
-        class="menu-item__shortcut"
+        class="dropdown-menu-item__shortcut"
       >
         ?
       </div>
     </button>
-    <button
-      aria-label="Reset the canvas"
-      class="menu-item"
-      data-testid="clear-canvas-button"
-      title="Reset the canvas"
-      type="button"
-    >
-      <div
-        class="menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          viewBox="0 0 20 20"
-        >
-          <path
-            d="M3.333 5.833h13.334M8.333 9.167v5M11.667 9.167v5M4.167 5.833l.833 10c0 .92.746 1.667 1.667 1.667h6.666c.92 0 1.667-.746 1.667-1.667l.833-10M7.5 5.833v-2.5c0-.46.373-.833.833-.833h3.334c.46 0 .833.373.833.833v2.5"
-            stroke-width="1.25"
-          />
-        </svg>
-      </div>
-      <div
-        class="menu-item__text"
-      >
-        Reset the canvas
-      </div>
-    </button>
-    <div
-      style="height: 1px; margin: .5rem 0px;"
-    />
-    <a
-      class="menu-item"
-      href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger"
-      rel="noreferrer"
-      target="_blank"
-    >
-      <div
-        class="menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <g
-            stroke-width="1.5"
-          >
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <rect
-              height="4"
-              rx="1"
-              width="18"
-              x="3"
-              y="8"
-            />
-            <line
-              x1="12"
-              x2="12"
-              y1="8"
-              y2="21"
-            />
-            <path
-              d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7"
-            />
-            <path
-              d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5"
-            />
-          </g>
-        </svg>
-      </div>
-      <div
-        class="menu-item__text"
-      >
-        Excalidraw+
-      </div>
-    </a>
-    <a
-      class="menu-item"
-      href="https://github.com/excalidraw/excalidraw"
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      <div
-        class="menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          viewBox="0 0 20 20"
-        >
-          <path
-            d="M7.5 15.833c-3.583 1.167-3.583-2.083-5-2.5m10 4.167v-2.917c0-.833.083-1.166-.417-1.666 2.334-.25 4.584-1.167 4.584-5a3.833 3.833 0 0 0-1.084-2.667 3.5 3.5 0 0 0-.083-2.667s-.917-.25-2.917 1.084a10.25 10.25 0 0 0-5.166 0C5.417 2.333 4.5 2.583 4.5 2.583a3.5 3.5 0 0 0-.083 2.667 3.833 3.833 0 0 0-1.084 2.667c0 3.833 2.25 4.75 4.584 5-.5.5-.5 1-.417 1.666V17.5"
-            stroke-width="1.25"
-          />
-        </svg>
-      </div>
-      <div
-        class="menu-item__text"
-      >
-        GitHub
-      </div>
-    </a>
-    <a
-      class="menu-item"
-      href="https://discord.gg/UexuTaE"
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      <div
-        class="menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          viewBox="0 0 20 20"
-        >
-          <g
-            stroke-width="1.25"
-          >
-            <path
-              d="M7.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM12.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM6.25 6.25c2.917-.833 4.583-.833 7.5 0M5.833 13.75c2.917.833 5.417.833 8.334 0"
-            />
-            <path
-              d="M12.917 14.167c0 .833 1.25 2.5 1.666 2.5 1.25 0 2.361-1.39 2.917-2.5.556-1.39.417-4.861-1.25-9.584-1.214-.846-2.5-1.116-3.75-1.25l-.833 2.084M7.083 14.167c0 .833-1.13 2.5-1.526 2.5-1.191 0-2.249-1.39-2.778-2.5-.529-1.39-.397-4.861 1.19-9.584 1.157-.846 2.318-1.116 3.531-1.25l.833 2.084"
-            />
-          </g>
-        </svg>
-      </div>
-      <div
-        class="menu-item__text"
-      >
-        Discord
-      </div>
-    </a>
-    <a
-      class="menu-item"
-      href="https://twitter.com/excalidraw"
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      <div
-        class="menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <g
-            stroke-width="1.25"
-          >
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"
-            />
-          </g>
-        </svg>
-      </div>
-      <div
-        class="menu-item__text"
-      >
-        Twitter
-      </div>
-    </a>
-    <div
-      style="height: 1px; margin: .5rem 0px;"
-    />
-    <div
-      style="display: flex; flex-direction: column; row-gap: .5rem;"
-    >
-      <div>
-        <button
-          aria-label="Dark mode"
-          class="menu-item"
-          data-testid="toggle-dark-mode"
-          title="Dark mode"
-          type="button"
-        >
-          <div
-            class="menu-item__icon"
-          >
-            <svg
-              aria-hidden="true"
-              class=""
-              fill="none"
-              focusable="false"
-              role="img"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              viewBox="0 0 20 20"
-            >
-              <path
-                clip-rule="evenodd"
-                d="M10 2.5h.328a6.25 6.25 0 0 0 6.6 10.372A7.5 7.5 0 1 1 10 2.493V2.5Z"
-                stroke="currentColor"
-              />
-            </svg>
-          </div>
-          <div
-            class="menu-item__text"
-          >
-            Dark mode
-          </div>
-          <div
-            class="menu-item__shortcut"
-          >
-            Shift+Alt+D
-          </div>
-        </button>
-      </div>
-      <div
-        style="padding: 0px 0.625rem;"
-      >
-        <select
-          aria-label="Select language"
-          class="dropdown-select dropdown-select__language"
-          style="width: 100%;"
-        >
-          <option
-            value="en"
-          >
-            English
-          </option>
-          <option
-            value="id-ID"
-          >
-            Bahasa Indonesia
-          </option>
-          <option
-            value="ca-ES"
-          >
-            Català
-          </option>
-          <option
-            value="de-DE"
-          >
-            Deutsch
-          </option>
-          <option
-            value="en"
-          >
-            English
-          </option>
-          <option
-            value="es-ES"
-          >
-            Español
-          </option>
-          <option
-            value="eu-ES"
-          >
-            Euskara
-          </option>
-          <option
-            value="fr-FR"
-          >
-            Français
-          </option>
-          <option
-            value="gl-ES"
-          >
-            Galego
-          </option>
-          <option
-            value="it-IT"
-          >
-            Italiano
-          </option>
-          <option
-            value="ku-TR"
-          >
-            Kurdî
-          </option>
-          <option
-            value="lv-LV"
-          >
-            Latviešu
-          </option>
-          <option
-            value="hu-HU"
-          >
-            Magyar
-          </option>
-          <option
-            value="nl-NL"
-          >
-            Nederlands
-          </option>
-          <option
-            value="nb-NO"
-          >
-            Norsk bokmål
-          </option>
-          <option
-            value="nn-NO"
-          >
-            Norsk nynorsk
-          </option>
-          <option
-            value="oc-FR"
-          >
-            Occitan
-          </option>
-          <option
-            value="pl-PL"
-          >
-            Polski
-          </option>
-          <option
-            value="pt-PT"
-          >
-            Português
-          </option>
-          <option
-            value="pt-BR"
-          >
-            Português Brasileiro
-          </option>
-          <option
-            value="ro-RO"
-          >
-            Română
-          </option>
-          <option
-            value="sk-SK"
-          >
-            Slovenčina
-          </option>
-          <option
-            value="sl-SI"
-          >
-            Slovenščina
-          </option>
-          <option
-            value="fi-FI"
-          >
-            Suomi
-          </option>
-          <option
-            value="sv-SE"
-          >
-            Svenska
-          </option>
-          <option
-            value="kab-KAB"
-          >
-            Taqbaylit
-          </option>
-          <option
-            value="tr-TR"
-          >
-            Türkçe
-          </option>
-          <option
-            value="el-GR"
-          >
-            Ελληνικά
-          </option>
-          <option
-            value="ru-RU"
-          >
-            Русский
-          </option>
-          <option
-            value="uk-UA"
-          >
-            Українська
-          </option>
-          <option
-            value="he-IL"
-          >
-            עברית
-          </option>
-          <option
-            value="ar-SA"
-          >
-            العربية
-          </option>
-          <option
-            value="fa-IR"
-          >
-            فارسی
-          </option>
-          <option
-            value="mr-IN"
-          >
-            मराठी
-          </option>
-          <option
-            value="ja-JP"
-          >
-            日本語
-          </option>
-          <option
-            value="zh-CN"
-          >
-            简体中文
-          </option>
-          <option
-            value="zh-TW"
-          >
-            繁體中文
-          </option>
-          <option
-            value="ko-KR"
-          >
-            한국어
-          </option>
-        </select>
-      </div>
-      <div>
-        <div
-          style="font-size: .75rem; margin-bottom: .5rem;"
-        >
-          Canvas background
-        </div>
-        <div
-          style="padding: 0px 0.625rem;"
-        >
-          <div
-            style="position: relative;"
-          >
-            <div>
-              <div
-                class="color-picker-control-container"
-              >
-                <div
-                  class="color-picker-label-swatch-container"
-                >
-                  <button
-                    aria-label="Canvas background"
-                    class="color-picker-label-swatch"
-                    style="--swatch-color: #ffffff;"
-                  />
-                </div>
-                <label
-                  class="color-input-container"
-                >
-                  <div
-                    class="color-picker-hash"
-                  >
-                    #
-                  </div>
-                  <input
-                    aria-label="Canvas background"
-                    class="color-picker-input"
-                    spellcheck="false"
-                    value="ffffff"
-                  />
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
-</section>
+</div>
 `;

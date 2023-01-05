@@ -11,6 +11,7 @@ import { DEFAULT_UI_OPTIONS } from "../../constants";
 import { Provider } from "jotai";
 import { jotaiScope, jotaiStore } from "../../jotai";
 import Footer from "../../components/footer/FooterCenter";
+import MainMenu from "../../components/mainMenu/MainMenu";
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
@@ -239,3 +240,5 @@ export {
 
 export { Sidebar } from "../../components/Sidebar/Sidebar";
 export { Footer };
+export { MainMenu };
+export { useDevice } from "../../components/App";

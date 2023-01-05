@@ -1,18 +1,10 @@
-import { useAtom } from "jotai";
 import { actionLoadScene, actionShortcuts } from "../actions";
 import { ActionManager } from "../actions/manager";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { isExcalidrawPlusSignedUser } from "../constants";
-import { collabDialogShownAtom } from "../excalidraw-app/collab/Collab";
 import { t } from "../i18n";
 import { AppState } from "../types";
-import {
-  ExcalLogo,
-  HelpIcon,
-  LoadIcon,
-  PlusPromoIcon,
-  UsersIcon,
-} from "./icons";
+import { ExcalLogo, HelpIcon, LoadIcon, PlusPromoIcon } from "./icons";
 import "./WelcomeScreen.scss";
 
 const WelcomeScreenItem = ({
@@ -64,8 +56,6 @@ const WelcomeScreen = ({
   appState: AppState;
   actionManager: ActionManager;
 }) => {
-  const [, setCollabDialogShown] = useAtom(collabDialogShownAtom);
-
   let subheadingJSX;
 
   if (isExcalidrawPlusSignedUser) {
@@ -109,12 +99,6 @@ const WelcomeScreen = ({
             icon={LoadIcon}
           />
         )}
-        <WelcomeScreenItem
-          label={t("labels.liveCollaboration")}
-          shortcut={null}
-          onClick={() => setCollabDialogShown(true)}
-          icon={UsersIcon}
-        />
         <WelcomeScreenItem
           onClick={() => actionManager.executeAction(actionShortcuts)}
           label={t("helpDialog.title")}
