@@ -480,7 +480,7 @@ To render an item, its recommended to use `MainMenu.Item`.
 | `className` | `string` | "" | The class names to be added to the menu item |
 | `style` | `React.CSSProperties` | `undefined` | The inline styles to be added to the menu item |
 | `ariaLabel` | `string` | `undefined` | The `aria-label` to be added to the item for accessibility |
-| `dataTestId` | `string` | `undefined` | The `data-testid` to be added to the item.
+| `dataTestId` | `string` | `undefined` | The `data-testid` to be added to the item. |
 
 **MainMenu.ItemLink**
 
@@ -495,7 +495,7 @@ To render an item as a link, its recommended to use `MainMenu.ItemLink`.
 | `className` | `string` | "" | The class names to be added to the menu item |
 | `style` | `React.CSSProperties` | `undefined` | The inline styles to be added to the menu item |
 | `ariaLabel` | `string` | `undefined` | The `aria-label` to be added to the item for accessibility |
-| `dataTestId` | `string` | `undefined` | The `data-testid` to be added to the item.
+| `dataTestId` | `string` | `undefined` | The `data-testid` to be added to the item. |
 
 **MainMenu.Custom**
 
@@ -506,7 +506,7 @@ To render a custom item, you can use `MainMenu.Custom`.
 | `children` | `React.ReactNode` | `undefined` | The content of the menu item |
 | `className` | `string` | "" | The class names to be added to the menu item |
 | `style` | `React.CSSProperties` | `undefined` | The inline styles to be added to the menu item |
-| `dataTestId` | `string` | `undefined` | The `data-testid` to be added to the item.
+| `dataTestId` | `string` | `undefined` | The `data-testid` to be added to the item. |
 
 **MainMenu.DefaultItems**
 
