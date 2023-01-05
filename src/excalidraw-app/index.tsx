@@ -21,7 +21,12 @@ import {
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import { Excalidraw, defaultLang, Footer } from "../packages/excalidraw/index";
+import {
+  Excalidraw,
+  defaultLang,
+  Footer,
+  MainMenu,
+} from "../packages/excalidraw/index";
 import {
   AppState,
   LibraryItems,
@@ -79,8 +84,11 @@ import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 import { EncryptedIcon } from "./components/EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
+import { LanguageList } from "./components/LanguageList";
+import { PlusPromoIcon } from "../components/icons";
 
 polyfill();
+
 window.EXCALIDRAW_THROTTLE_RENDER = true;
 
 const languageDetector = new LanguageDetector();
@@ -229,7 +237,6 @@ export const langCodeAtom = atom(
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [langCode, setLangCode] = useAtom(langCodeAtom);
-
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -594,6 +601,39 @@ const ExcalidrawWrapper = () => {
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
   };
 
+  const renderMenu = () => {
+    return (
+      <MainMenu>
+        <MainMenu.DefaultItems.LoadScene />
+        <MainMenu.DefaultItems.SaveToActiveFile />
+        <MainMenu.DefaultItems.Export />
+        <MainMenu.DefaultItems.SaveAsImage />
+        <MainMenu.DefaultItems.LiveCollaboration
+          isCollaborating={isCollaborating}
+          onSelect={() => setCollabDialogShown(true)}
+        />
+
+        <MainMenu.DefaultItems.Help />
+        <MainMenu.DefaultItems.ClearCanvas />
+        <MainMenu.Separator />
+        <MainMenu.ItemLink
+          icon={PlusPromoIcon}
+          href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger"
+          className="ExcalidrawPlus"
+        >
+          Excalidraw+
+        </MainMenu.ItemLink>
+        <MainMenu.DefaultItems.Socials />
+        <MainMenu.Separator />
+        <MainMenu.DefaultItems.ToggleTheme />
+        <MainMenu.ItemCustom>
+          <LanguageList style={{ width: "100%" }} />
+        </MainMenu.ItemCustom>
+        <MainMenu.DefaultItems.ChangeCanvasBackground />
+      </MainMenu>
+    );
+  };
+
   return (
     <div
       style={{ height: "100%" }}
@@ -640,6 +680,7 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
         theme={theme}
       >
+        {renderMenu()}
         <Footer>
           <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
             <ExcalidrawPlusAppLink />
