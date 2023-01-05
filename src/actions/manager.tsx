@@ -172,4 +172,14 @@ export class ActionManager {
 
     return null;
   };
+
+  isActionEnabled = (action: Action) => {
+    const elements = this.getElementsIncludingDeleted();
+    const appState = this.getAppState();
+
+    return (
+      !action.predicate ||
+      action.predicate(elements, appState, this.app.props, this.app)
+    );
+  };
 }

@@ -138,7 +138,7 @@ export interface Action {
         elements: readonly ExcalidrawElement[],
         appState: Readonly<AppState>,
       ) => string);
-  contextItemPredicate?: (
+  predicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     appProps: ExcalidrawProps,

@@ -33,10 +33,12 @@ import { useState } from "react";
 import ConfirmDialog from "../ConfirmDialog";
 
 export const LoadScene = () => {
+  // FIXME Hack until we tie "t" to lang state
+  // eslint-disable-next-line
   const appState = useExcalidrawAppState();
   const actionManager = useExcalidrawActionManager();
 
-  if (appState.viewModeEnabled) {
+  if (!actionManager.isActionEnabled(actionLoadScene)) {
     return null;
   }
 
@@ -55,9 +57,12 @@ export const LoadScene = () => {
 LoadScene.displayName = "LoadScene";
 
 export const SaveToActiveFile = () => {
+  // FIXME Hack until we tie "t" to lang state
+  // eslint-disable-next-line
   const appState = useExcalidrawAppState();
   const actionManager = useExcalidrawActionManager();
-  if (!appState.fileHandle) {
+
+  if (!actionManager.isActionEnabled(actionSaveToActiveFile)) {
     return null;
   }
 
@@ -75,7 +80,7 @@ SaveToActiveFile.displayName = "SaveToActiveFile";
 
 export const SaveAsImage = () => {
   const setAppState = useExcalidrawSetAppState();
-  // Hack until we tie "t" to lang state
+  // FIXME Hack until we tie "t" to lang state
   // eslint-disable-next-line
   const appState = useExcalidrawAppState();
   return (
@@ -93,7 +98,7 @@ export const SaveAsImage = () => {
 SaveAsImage.displayName = "SaveAsImage";
 
 export const Help = () => {
-  // Hack until we tie "t" to lang state
+  // FIXME Hack until we tie "t" to lang state
   // eslint-disable-next-line
   const appState = useExcalidrawAppState();
 
@@ -114,13 +119,15 @@ export const Help = () => {
 Help.displayName = "Help";
 
 export const ClearCanvas = () => {
+  // FIXME Hack until we tie "t" to lang state
+  // eslint-disable-next-line
   const appState = useExcalidrawAppState();
   const actionManager = useExcalidrawActionManager();
 
   const [showDialog, setShowDialog] = useState(false);
   const toggleDialog = () => setShowDialog(!showDialog);
 
-  if (appState.viewModeEnabled) {
+  if (!actionManager.isActionEnabled(actionClearCanvas)) {
     return null;
   }
 
@@ -157,6 +164,11 @@ ClearCanvas.displayName = "ClearCanvas";
 export const ToggleTheme = () => {
   const appState = useExcalidrawAppState();
   const actionManager = useExcalidrawActionManager();
+
+  if (!actionManager.isActionEnabled(actionToggleTheme)) {
+    return null;
+  }
+
   return (
     <DropdownMenuItem
       onSelect={() => {
@@ -200,7 +212,7 @@ export const ChangeCanvasBackground = () => {
 ChangeCanvasBackground.displayName = "ChangeCanvasBackground";
 
 export const Export = () => {
-  // Hack until we tie "t" to lang state
+  // FIXME Hack until we tie "t" to lang state
   // eslint-disable-next-line
   const appState = useExcalidrawAppState();
   const setAppState = useExcalidrawSetAppState();
@@ -253,7 +265,7 @@ export const LiveCollaboration = ({
   onSelect: () => void;
   isCollaborating: boolean;
 }) => {
-  // Hack until we tie "t" to lang state
+  // FIXME Hack until we tie "t" to lang state
   // eslint-disable-next-line
   const appState = useExcalidrawAppState();
   return (

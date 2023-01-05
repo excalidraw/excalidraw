@@ -50,7 +50,7 @@ export const actionFlipHorizontal = register({
   },
   keyTest: (event) => event.shiftKey && event.code === "KeyH",
   contextItemLabel: "labels.flipHorizontal",
-  contextItemPredicate: (elements, appState) =>
+  predicate: (elements, appState) =>
     enableActionFlipHorizontal(elements, appState),
 });
 
@@ -67,7 +67,7 @@ export const actionFlipVertical = register({
   keyTest: (event) =>
     event.shiftKey && event.code === "KeyV" && !event[KEYS.CTRL_OR_CMD],
   contextItemLabel: "labels.flipVertical",
-  contextItemPredicate: (elements, appState) =>
+  predicate: (elements, appState) =>
     enableActionFlipVertical(elements, appState),
 });
 

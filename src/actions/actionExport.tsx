@@ -131,6 +131,13 @@ export const actionChangeExportEmbedScene = register({
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
   trackEvent: { category: "export" },
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.saveToActiveFile &&
+      !!appState.fileHandle &&
+      !appState.viewModeEnabled
+    );
+  },
   perform: async (elements, appState, value, app) => {
     const fileHandleExists = !!appState.fileHandle;
 
@@ -212,6 +219,11 @@ export const actionSaveFileToDisk = register({
 export const actionLoadScene = register({
   name: "loadScene",
   trackEvent: { category: "export" },
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.loadScene && !appState.viewModeEnabled
+    );
+  },
   perform: async (elements, appState, _, app) => {
     try {
       const {

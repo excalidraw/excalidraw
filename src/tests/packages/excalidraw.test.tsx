@@ -306,7 +306,7 @@ describe("<Excalidraw/>", () => {
       //open menu
       toggleMenu(container);
       const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
-      expect(darkModeToggle).toBeFalsy();
+      expect(darkModeToggle).toBe(null);
     });
   });
 

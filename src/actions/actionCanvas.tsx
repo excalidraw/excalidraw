@@ -20,6 +20,12 @@ import clsx from "clsx";
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   trackEvent: false,
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.changeViewBackgroundColor &&
+      !appState.viewModeEnabled
+    );
+  },
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
@@ -27,6 +33,7 @@ export const actionChangeViewBackgroundColor = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
+    // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
       <div style={{ position: "relative" }}>
         <ColorPicker
@@ -50,6 +57,12 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   trackEvent: { category: "canvas" },
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.clearCanvas &&
+      !appState.viewModeEnabled
+    );
+  },
   perform: (elements, appState, _, app) => {
     app.imageCache.clear();
     return {
@@ -288,6 +301,9 @@ export const actionToggleTheme = register({
     };
   },
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
+  predicate: (elements, appState, props, app) => {
+    return !!app.props.UIOptions.canvasActions.toggleTheme;
+  },
 });
 
 export const actionErase = register({
