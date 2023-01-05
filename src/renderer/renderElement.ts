@@ -46,6 +46,7 @@ import {
   getContainerElement,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import easingsFunctions from "./easingFunctions";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -1351,25 +1352,43 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     : [[0, 0, 0.5]];
 
   // Consider changing the options for simulated pressure vs real pressure
-  const options: StrokeOptions = element.customData?.strokeOptions?.options //zsviczian
-    ? { ...element.customData?.strokeOptions?.options }
+  const customOptions = element.customData?.strokeOptions?.options; //zsviczian
+  const options: StrokeOptions = customOptions //zsviczian
+    ? {
+        ...customOptions,
+        simulatePressure:
+          customOptions.simulatePressure ?? element.simulatePressure,
+        size: element.strokeWidth * 4.25, //override size with stroke width
+        last: !!element.lastCommittedPoint,
+        easing: easingsFunctions[customOptions.easing] ?? ((t) => t),
+        ...(customOptions.start?.easing
+          ? {
+              start: {
+                ...customOptions.start,
+                easing:
+                  easingsFunctions[customOptions.start.easing] ?? ((t) => t),
+              },
+            }
+          : { start: customOptions.start }),
+        ...(customOptions.end?.easing
+          ? {
+              end: {
+                ...customOptions.end,
+                easing:
+                  easingsFunctions[customOptions.end.easing] ?? ((t) => t),
+              },
+            }
+          : { end: customOptions.end }),
+      }
     : {
         simulatePressure: element.simulatePressure,
         size: element.strokeWidth * 4.25,
         thinning: 0.6,
         smoothing: 0.5,
         streamline: 0.5,
-        easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
+        easing: easingsFunctions.easeOutSine, //zsviczian
         last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
       };
-
-  //zsviczian
-  if (element.customData?.strokeOptions?.options) {
-    options.simulatePressure =
-      options.simulatePressure ?? element.simulatePressure;
-    options.size = element.strokeWidth * 4.25; //override size with stroke width
-    options.last = !!element.lastCommittedPoint;
-  }
 
   return getSvgPathFromStroke(getStroke(inputPoints as number[][], options));
 }
