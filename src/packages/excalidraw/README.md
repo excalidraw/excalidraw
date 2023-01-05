@@ -456,8 +456,8 @@ import { MainMenu } from "@excalidraw/excalidraw";
 const App = () => {
   <Excalidraw>
     <MainMenu>
-      <MainMenu.Item> Item1 </MainMenu.Item>
-      <MainMenu.Item> Item 2 </>
+      <MainMenu.Item onClick={() => window.alert("Item1")}> Item1 </MainMenu.Item>
+      <MainMenu.Item onClick={() => window.alert("Item2")}> Item 2 </>
     </MainMenu>
   </Excalidraw>
 }
@@ -471,42 +471,79 @@ This is the `MainMenu` component which you need to import to render the menu wit
 
 To render an item, its recommended to use `MainMenu.Item`.
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `icon` | `JSX.Element` | `undefined` | The icon used in the menu item |
-| `onSelect` | `Function` | `undefined` | The handler is triggered when the item is selected. |
-| `children` | `React.ReactNode` | `undefined` | The content of the menu item |
-| `shortcut` | `string` | `undefined` | The shortcut to be shown for the menu item |
-| `className` | `string` | "" | The class names to be added to the menu item |
-| `style` | `React.CSSProperties` | `undefined` | The inline styles to be added to the menu item |
-| `ariaLabel` | `string` | `undefined` | The `aria-label` to be added to the item for accessibility |
-| `dataTestId` | `string` | `undefined` | The `data-testid` to be added to the item. |
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `onSelect` | `Function` | Yes | `undefined` | The handler is triggered when the item is selected. |
+| `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
+| `icon` | `JSX.Element` | No | `undefined` | The icon used in the menu item |
+| `shortcut` | `string` | No | `undefined` | The shortcut to be shown for the menu item |
+| `className` | `string` | No | "" | The class names to be added to the menu item |
+| `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
+| `ariaLabel` | `string` | `undefined` | No | The `aria-label` to be added to the item for accessibility |
+| `dataTestId` | `string` | `undefined` | No | The `data-testid` to be added to the item. |
 
 **MainMenu.ItemLink**
 
 To render an item as a link, its recommended to use `MainMenu.ItemLink`.
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `icon` | `JSX.Element` | `undefined` | The icon used in the menu item |
-| `href` | `string` | `undefined` | The `href` attribute to be added to the `anchor` element. |
-| `children` | `React.ReactNode` | `undefined` | The content of the menu item |
-| `shortcut` | `string` | `undefined` | The shortcut to be shown for the menu item |
-| `className` | `string` | "" | The class names to be added to the menu item |
-| `style` | `React.CSSProperties` | `undefined` | The inline styles to be added to the menu item |
-| `ariaLabel` | `string` | `undefined` | The `aria-label` to be added to the item for accessibility |
-| `dataTestId` | `string` | `undefined` | The `data-testid` to be added to the item. |
+**Usage**
 
-**MainMenu.Custom**
+```js
+import { MainMenu } from "@excalidraw/excalidraw";
+const App = () => {
+  <Excalidraw>
+    <MainMenu>
+      <MainMenu.ItemLink href="https://google.com">Google</MainMenu.ItemLink>
+      <MainMenu.ItemLink href="https://excalidraw.com">
+        Excalidraw
+      </MainMenu.ItemLink>
+    </MainMenu>
+  </Excalidraw>;
+};
+```
 
-To render a custom item, you can use `MainMenu.Custom`.
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `href` | `string` | Yes | `undefined` | The `href` attribute to be added to the `anchor` element. |
+| `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
+| `icon` | `JSX.Element` | No | `undefined` | The icon used in the menu item |
+| `shortcut` | `string` | No | `undefined` | The shortcut to be shown for the menu item |
+| `className` | `string` | No | "" | The class names to be added to the menu item |
+| `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
+| `ariaLabel` | `string` | No | `undefined` | The `aria-label` to be added to the item for accessibility |
+| `dataTestId` | `string` | No | `undefined` | The `data-testid` to be added to the item. |
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `React.ReactNode` | `undefined` | The content of the menu item |
-| `className` | `string` | "" | The class names to be added to the menu item |
-| `style` | `React.CSSProperties` | `undefined` | The inline styles to be added to the menu item |
-| `dataTestId` | `string` | `undefined` | The `data-testid` to be added to the item. |
+**MainMenu.ItemCustom**
+
+To render a custom item, you can use `MainMenu.ItemCustom`.
+
+**Usage**
+
+```js
+import { MainMenu } from "@excalidraw/excalidraw";
+const App = () => {
+  <Excalidraw>
+    <MainMenu>
+      <MainMenu.ItemCustom>
+        <button
+          style={{ height: "2rem" }}
+          onClick={() => window.alert("custom menu item")}
+        >
+          {" "}
+          custom item
+        </button>
+      </MainMenu.ItemCustom>
+    </MainMenu>
+  </Excalidraw>;
+};
+```
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
+| `className` | `string` | No | "" | The class names to be added to the menu item |
+| `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
+| `dataTestId` | `string` | No | `undefined` | The `data-testid` to be added to the item. |
 
 **MainMenu.DefaultItems**
 
@@ -550,12 +587,12 @@ const App = () => {
 }
 ```
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `title` | `string` | `undefined` | The `title` for the grouped items |
-| `className` | `string` | "" | The `classname` to be added to the group |
-| `style` | `React.CSsSProperties` | `undefined` | The inline `styles` to be added to the group |
-| `children ` | `React.ReactNode` | `undefined` | The content of the `Menu Group` |
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children ` | `React.ReactNode` | Yes | `undefined` | The content of the `Menu Group` |
+| `title` | `string` | No | `undefined` | The `title` for the grouped items |
+| `className` | `string` | No | "" | The `classname` to be added to the group |
+| `style` | `React.CSsSProperties` | No | `undefined` | The inline `styles` to be added to the group |
 
 ### Props
 
