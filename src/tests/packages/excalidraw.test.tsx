@@ -62,7 +62,7 @@ describe("<Excalidraw/>", () => {
         <div>This is a custom footer</div>
       </Excalidraw>,
     );
-    expect(container.querySelector(".footer-center")).toBeEmptyDOMElement();
+    expect(container.querySelector(".footer-center")).toBe(null);
 
     // Footer passed hence it will render the footer
     ({ container } = await render(
