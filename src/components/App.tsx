@@ -312,9 +312,9 @@ const ExcalidrawSetAppStateContext = React.createContext<
 >(() => {});
 ExcalidrawSetAppStateContext.displayName = "ExcalidrawSetAppStateContext";
 
-const ExcalidrawActionManagerContext = React.createContext<
-  ActionManager | { renderAction: ActionManager["renderAction"] }
->({ renderAction: () => null });
+const ExcalidrawActionManagerContext = React.createContext<ActionManager>(
+  null!,
+);
 ExcalidrawActionManagerContext.displayName = "ExcalidrawActionManagerContext";
 
 export const useExcalidrawElements = () =>
