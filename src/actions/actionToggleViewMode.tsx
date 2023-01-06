@@ -18,7 +18,7 @@ export const actionToggleViewMode = register({
     };
   },
   checked: (appState) => appState.viewModeEnabled,
-  contextItemPredicate: (elements, appState, appProps) => {
+  predicate: (elements, appState, appProps) => {
     return typeof appProps.viewModeEnabled === "undefined";
   },
   contextItemLabel: "labels.viewMode",

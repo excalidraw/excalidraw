@@ -129,8 +129,7 @@ export const actionGroup = register({
     };
   },
   contextItemLabel: "labels.group",
-  contextItemPredicate: (elements, appState) =>
-    enableActionGroup(elements, appState),
+  predicate: (elements, appState) => enableActionGroup(elements, appState),
   keyTest: (event) =>
     !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G,
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -193,8 +192,7 @@ export const actionUngroup = register({
     event[KEYS.CTRL_OR_CMD] &&
     event.key === KEYS.G.toUpperCase(),
   contextItemLabel: "labels.ungroup",
-  contextItemPredicate: (elements, appState) =>
-    getSelectedGroupIds(appState).length > 0,
+  predicate: (elements, appState) => getSelectedGroupIds(appState).length > 0,
 
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton

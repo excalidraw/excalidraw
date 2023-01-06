@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { actionShortcuts } from "../../actions";
 import { ActionManager } from "../../actions/manager";
 import { t } from "../../i18n";
 import { AppState, UIChildrenComponents } from "../../types";
@@ -9,6 +10,7 @@ import {
   ZoomActions,
 } from "../Actions";
 import { useDevice } from "../App";
+import { HelpButton } from "../HelpButton";
 import { WelcomeScreenHelpArrow } from "../icons";
 import { Section } from "../Section";
 import Stack from "../Stack";
@@ -86,7 +88,10 @@ const Footer = ({
             </div>
           </WelcomeScreenDecor>
 
-          {actionManager.renderAction("toggleShortcuts")}
+          <HelpButton
+            title={t("helpDialog.title")}
+            onClick={() => actionManager.executeAction(actionShortcuts)}
+          />
         </div>
       </div>
       <ExitZenModeAction

@@ -124,9 +124,7 @@ export type PanelComponentProps = {
 
 export interface Action {
   name: ActionName;
-  PanelComponent?: React.FC<
-    PanelComponentProps & { isInHamburgerMenu: boolean }
-  >;
+  PanelComponent?: React.FC<PanelComponentProps>;
   perform: ActionFn;
   keyPriority?: number;
   keyTest?: (
@@ -140,7 +138,7 @@ export interface Action {
         elements: readonly ExcalidrawElement[],
         appState: Readonly<AppState>,
       ) => string);
-  contextItemPredicate?: (
+  predicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     appProps: ExcalidrawProps,

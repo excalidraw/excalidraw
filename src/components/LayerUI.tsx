@@ -183,7 +183,9 @@ const LayerUI = ({
         <MainMenu>
           <MainMenu.DefaultItems.LoadScene />
           <MainMenu.DefaultItems.SaveToActiveFile />
+          {/* FIXME we should to test for this inside the item itself */}
           {UIOptions.canvasActions.export && <MainMenu.DefaultItems.Export />}
+          {/* FIXME we should to test for this inside the item itself */}
           {UIOptions.canvasActions.saveAsImage && (
             <MainMenu.DefaultItems.SaveAsImage />
           )}
@@ -350,7 +352,6 @@ const LayerUI = ({
             <UserList collaborators={appState.collaborators} />
             {onCollabButtonClick && (
               <CollabButton
-                isInHamburgerMenu={false}
                 isCollaborating={isCollaborating}
                 collaboratorCount={appState.collaborators.size}
                 onClick={onCollabButtonClick}

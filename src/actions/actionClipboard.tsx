@@ -24,7 +24,7 @@ export const actionCopy = register({
       commitToHistory: false,
     };
   },
-  contextItemPredicate: (elements, appState, appProps, app) => {
+  predicate: (elements, appState, appProps, app) => {
     return app.device.isMobile && !!navigator.clipboard;
   },
   contextItemLabel: "labels.copy",
@@ -41,7 +41,7 @@ export const actionPaste = register({
       commitToHistory: false,
     };
   },
-  contextItemPredicate: (elements, appState, appProps, app) => {
+  predicate: (elements, appState, appProps, app) => {
     return app.device.isMobile && !!navigator.clipboard;
   },
   contextItemLabel: "labels.paste",
@@ -56,7 +56,7 @@ export const actionCut = register({
     actionCopy.perform(elements, appState, data, app);
     return actionDeleteSelected.perform(elements, appState);
   },
-  contextItemPredicate: (elements, appState, appProps, app) => {
+  predicate: (elements, appState, appProps, app) => {
     return app.device.isMobile && !!navigator.clipboard;
   },
   contextItemLabel: "labels.cut",
@@ -101,7 +101,7 @@ export const actionCopyAsSvg = register({
       };
     }
   },
-  contextItemPredicate: (elements) => {
+  predicate: (elements) => {
     return probablySupportsClipboardWriteText && elements.length > 0;
   },
   contextItemLabel: "labels.copyAsSvg",
@@ -158,7 +158,7 @@ export const actionCopyAsPng = register({
       };
     }
   },
-  contextItemPredicate: (elements) => {
+  predicate: (elements) => {
     return probablySupportsClipboardBlob && elements.length > 0;
   },
   contextItemLabel: "labels.copyAsPng",
@@ -188,7 +188,7 @@ export const copyText = register({
       commitToHistory: false,
     };
   },
-  contextItemPredicate: (elements, appState) => {
+  predicate: (elements, appState) => {
     return (
       probablySupportsClipboardWriteText &&
       getSelectedElements(elements, appState, true).some(isTextElement)
