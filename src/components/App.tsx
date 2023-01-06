@@ -4307,6 +4307,9 @@ class App extends React.Component<AppProps, AppState> {
 
     //@ts-ignore //zsviczian
     const strokeOptions = this.state.currentStrokeOptions;
+    const simulatePressure = strokeOptions?.constantPressure
+      ? false
+      : event.pressure === 0.5;
     const element = newFreeDrawElement({
       type: elementType,
       x: gridX,
@@ -4319,7 +4322,7 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       roundness: null,
-      simulatePressure: event.pressure === 0.5,
+      simulatePressure, //zsviczian
       locked: false,
       ...(strokeOptions //zsviczian
         ? { customData: { strokeOptions } }
@@ -4335,7 +4338,11 @@ class App extends React.Component<AppProps, AppState> {
 
     const pressures = element.simulatePressure
       ? element.pressures
-      : [...element.pressures, event.pressure];
+      : [
+          //zsviczian
+          ...element.pressures,
+          strokeOptions?.constantPressure ? 1 : event.pressure,
+        ];
 
     mutateElement(element, {
       points: [[0, 0]],
@@ -4866,9 +4873,15 @@ class App extends React.Component<AppProps, AppState> {
           lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
 
         if (!discardPoint) {
+          //@ts-ignore //zsviczian
+          const strokeOptions = this.state.currentStrokeOptions;
           const pressures = draggingElement.simulatePressure
             ? draggingElement.pressures
-            : [...draggingElement.pressures, event.pressure];
+            : [
+                //zsviczian
+                ...draggingElement.pressures,
+                strokeOptions?.constantPressure ? 1 : event.pressure,
+              ];
 
           mutateElement(draggingElement, {
             points: [...points, [dx, dy]],
