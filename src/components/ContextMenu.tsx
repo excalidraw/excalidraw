@@ -39,8 +39,8 @@ export const ContextMenu = React.memo(
       if (
         item &&
         (item === CONTEXT_MENU_SEPARATOR ||
-          !item.contextItemPredicate ||
-          item.contextItemPredicate(
+          !item.predicate ||
+          item.predicate(
             elements,
             appState,
             actionManager.app.props,
