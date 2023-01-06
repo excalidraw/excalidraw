@@ -1,3 +1,6 @@
+---
+title: Export Utilities
+---
 ### `exportToCanvas`
 
 **_Signature_**

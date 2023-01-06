@@ -1,3 +1,6 @@
+---
+sidebar_position: 2
+---
 ### Using Web Bundler
 
 If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below

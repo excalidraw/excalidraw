@@ -1,3 +1,6 @@
+---
+title: Restore Utilities
+---
 ### `restoreAppState`
 
 **_Signature_**
