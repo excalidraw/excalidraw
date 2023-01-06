@@ -332,7 +332,7 @@ describe("<Excalidraw/>", () => {
   describe("<MainMenu/>", () => {
     it("should render main menu with host menu items if passed from host", async () => {
       const { container } = await render(
-        <Excalidraw UIOptions={undefined}>
+        <Excalidraw>
           <MainMenu>
             <MainMenu.Item onSelect={() => window.alert("Clicked")}>
               Click me
