@@ -26,6 +26,7 @@ type ToolButtonBaseProps = {
   selected?: boolean;
   className?: string;
   isLoading?: boolean;
+  onContextMenu?(event: React.MouseEvent, source: string): void;
 };
 
 type ToolButtonProps =
@@ -156,6 +157,11 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         requestAnimationFrame(() => {
           lastPointerTypeRef.current = null;
         });
+      }}
+      onContextMenu={(event) => {
+        if (props.onContextMenu !== undefined) {
+          props.onContextMenu(event, props.name ?? "");
+        }
       }}
     >
       <input

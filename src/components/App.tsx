@@ -38,7 +38,7 @@ import {
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
-import { actions } from "../actions/register";
+import { getActions } from "../actions/register";
 import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState, isEraserActive } from "../appState";
@@ -418,6 +418,12 @@ class App extends React.Component<AppProps, AppState> {
     this.id = nanoid();
 
     this.library = new Library(this);
+    this.actionManager = new ActionManager(
+      this.syncActionResult,
+      () => this.state,
+      () => this.scene.getElementsIncludingDeleted(),
+      this,
+    );
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -438,6 +444,7 @@ class App extends React.Component<AppProps, AppState> {
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
+        actionManager: this.actionManager,
         refresh: this.refresh,
         setToast: this.setToast,
         id: this.id,
@@ -465,13 +472,8 @@ class App extends React.Component<AppProps, AppState> {
       onSceneUpdated: this.onSceneUpdated,
     });
     this.history = new History();
-    this.actionManager = new ActionManager(
-      this.syncActionResult,
-      () => this.state,
-      () => this.scene.getElementsIncludingDeleted(),
-      this,
-    );
-    this.actionManager.registerAll(actions);
+    this.actionManager.registerAll(getActions());
+    this.actionManager.registerActionGuards();
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
@@ -587,6 +589,7 @@ class App extends React.Component<AppProps, AppState> {
                       renderTopRightUI={renderTopRightUI}
                       renderCustomStats={renderCustomStats}
                       renderCustomSidebar={this.props.renderSidebar}
+                      onContextMenu={this.handleCustomContextMenu}
                       showExitZenModeBtn={
                         typeof this.props?.zenModeEnabled === "undefined" &&
                         this.state.zenModeEnabled
@@ -5968,6 +5971,28 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private handleCustomContextMenu = (
+    event: React.MouseEvent,
+    source: string,
+  ) => {
+    event.preventDefault();
+
+    const container = this.excalidrawContainerRef.current!;
+    const { top: offsetTop, left: offsetLeft } =
+      container.getBoundingClientRect();
+    const left = event.clientX - offsetLeft;
+    const top = event.clientY - offsetTop;
+    this.setState({}, () => {
+      this.setState({
+        contextMenu: {
+          top,
+          left,
+          items: this.getContextMenuItems("custom", source),
+        },
+      });
+    });
+  };
+
   private handleCanvasContextMenu = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
@@ -6139,9 +6164,39 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private getContextMenuItems = (
-    type: "canvas" | "element",
+    type: "canvas" | "element" | "custom",
+    source?: string,
   ): ContextMenuItems => {
     const options: ContextMenuItems = [];
+    const allElements = this.actionManager.getElementsIncludingDeleted();
+    const appState = this.actionManager.getAppState();
+    let addedCustom = false;
+    this.actionManager.getCustomActions().forEach((action) => {
+      const predicate =
+        type === "custom"
+          ? action.customPredicate
+          : action.contextItemPredicate;
+      if (
+        predicate &&
+        predicate(
+          allElements,
+          appState,
+          this.actionManager.app.props,
+          this.actionManager.app,
+          type === "custom" ? { source } : undefined,
+        ) &&
+        this.actionManager.isActionEnabled(allElements, appState, action.name)
+      ) {
+        addedCustom = true;
+        options.push(action);
+      }
+    });
+    if (type === "custom") {
+      return options;
+    }
+    if (addedCustom) {
+      options.push(CONTEXT_MENU_SEPARATOR);
+    }
 
     options.push(actionCopyAsPng, actionCopyAsSvg);
 

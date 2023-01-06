@@ -30,6 +30,20 @@ import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
+import { Action, EnableFn } from "../../../actions/types";
+
+const exampleAction: Action = {
+  name: "example",
+  trackEvent: false,
+  perform: (elements, appState) => {
+    return { elements, appState, commitToHistory: false };
+  },
+  customPredicate: (elements, appState, appProps, app, data) =>
+    data !== undefined && data.source === "editor-current-shape",
+  contextItemLabel: "labels.untitled",
+};
+const exampleEnableFn: EnableFn = (elements, appState, actionName) =>
+  actionName === "example";
 
 declare global {
   interface Window {
@@ -123,6 +137,8 @@ export default function App() {
     if (!excalidrawAPI) {
       return;
     }
+    excalidrawAPI.actionManager.registerAction(exampleAction);
+    excalidrawAPI.actionManager.registerEnableFn("example", exampleEnableFn);
     const fetchData = async () => {
       const res = await fetch("/rocket.jpeg");
       const imageData = await res.blob();

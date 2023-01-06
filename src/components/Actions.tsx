@@ -36,10 +36,12 @@ export const SelectedShapeActions = ({
   appState,
   elements,
   renderAction,
+  getCustomActions,
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
+  getCustomActions: ActionManager["getCustomActions"];
 }) => {
   const targetElements = getTargetElements(
     getNonDeletedElements(elements),
@@ -92,6 +94,15 @@ export const SelectedShapeActions = ({
       {showChangeBackgroundIcons && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
+      {getCustomActions().map((action) => {
+        if (
+          action.panelComponentPredicate &&
+          action.panelComponentPredicate(targetElements, appState)
+        ) {
+          return renderAction(action.name);
+        }
+        return null;
+      })}
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||
@@ -209,12 +220,14 @@ export const ShapesSwitcher = ({
   setAppState,
   onImageAction,
   appState,
+  onContextMenu,
 }: {
   canvas: HTMLCanvasElement | null;
   activeTool: AppState["activeTool"];
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: AppState;
+  onContextMenu?: (event: React.MouseEvent, source: string) => void;
 }) => (
   <>
     {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
@@ -263,6 +276,9 @@ export const ShapesSwitcher = ({
             if (value === "image") {
               onImageAction({ pointerType });
             }
+          }}
+          onContextMenu={(event, source) => {
+            onContextMenu && onContextMenu(event, source);
           }}
         />
       );

@@ -78,6 +78,7 @@ interface LayerUIProps {
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
+  onContextMenu?: (event: React.MouseEvent, source: string) => void;
 }
 
 const LayerUI = ({
@@ -104,6 +105,7 @@ const LayerUI = ({
   onImageAction,
   renderWelcomeScreen,
   children,
+  onContextMenu,
 }: LayerUIProps) => {
   const device = useDevice();
 
@@ -240,6 +242,7 @@ const LayerUI = ({
           appState={appState}
           elements={elements}
           renderAction={actionManager.renderAction}
+          getCustomActions={actionManager.getCustomActions}
         />
       </Island>
     </Section>
@@ -327,6 +330,7 @@ const LayerUI = ({
                                 insertOnCanvasDirectly: pointerType !== "mouse",
                               });
                             }}
+                            onContextMenu={onContextMenu}
                           />
                           {/* {actionManager.renderAction("eraser", {
                           // size: "small",
@@ -433,6 +437,7 @@ const LayerUI = ({
           renderSidebars={renderSidebars}
           device={device}
           renderMenu={renderMenu}
+          onContextMenu={onContextMenu}
         />
       )}
 

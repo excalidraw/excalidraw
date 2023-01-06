@@ -5,6 +5,7 @@ import { t } from "../i18n";
 import "./ContextMenu.scss";
 import {
   getShortcutFromShortcutName,
+  CustomShortcutName,
   ShortcutName,
 } from "../actions/shortcuts";
 import { Action } from "../actions/types";
@@ -110,7 +111,9 @@ export const ContextMenu = React.memo(
                   <div className="context-menu-item__label">{label}</div>
                   <kbd className="context-menu-item__shortcut">
                     {actionName
-                      ? getShortcutFromShortcutName(actionName as ShortcutName)
+                      ? getShortcutFromShortcutName(
+                          actionName as ShortcutName | CustomShortcutName,
+                        )
                       : ""}
                   </kbd>
                 </button>

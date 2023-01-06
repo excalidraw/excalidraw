@@ -31,88 +31,110 @@ type ActionFn = (
   app: AppClassProperties,
 ) => ActionResult | Promise<ActionResult>;
 
+// Return `true` to indicate the standard Action with name `actionName`
+// should be disabled given `elements` and `appState`.
+export type DisableFn = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  actionName: ActionName,
+) => boolean;
+
+// Return `true` to indicate the custom Action with name `actionName`
+// should be enabled given `elements` and `appState`.
+export type EnableFn = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  actionName: Action["name"],
+) => boolean;
+
 export type UpdaterFn = (res: ActionResult) => void;
 export type ActionFilterFn = (action: Action) => void;
 
-export type ActionName =
-  | "copy"
-  | "cut"
-  | "paste"
-  | "copyAsPng"
-  | "copyAsSvg"
-  | "copyText"
-  | "sendBackward"
-  | "bringForward"
-  | "sendToBack"
-  | "bringToFront"
-  | "copyStyles"
-  | "selectAll"
-  | "pasteStyles"
-  | "gridMode"
-  | "zenMode"
-  | "stats"
-  | "changeStrokeColor"
-  | "changeBackgroundColor"
-  | "changeFillStyle"
-  | "changeStrokeWidth"
-  | "changeStrokeShape"
-  | "changeSloppiness"
-  | "changeStrokeStyle"
-  | "changeArrowhead"
-  | "changeOpacity"
-  | "changeFontSize"
-  | "toggleCanvasMenu"
-  | "toggleEditMenu"
-  | "undo"
-  | "redo"
-  | "finalize"
-  | "changeProjectName"
-  | "changeExportBackground"
-  | "changeExportEmbedScene"
-  | "changeExportScale"
-  | "saveToActiveFile"
-  | "saveFileToDisk"
-  | "loadScene"
-  | "duplicateSelection"
-  | "deleteSelectedElements"
-  | "changeViewBackgroundColor"
-  | "clearCanvas"
-  | "zoomIn"
-  | "zoomOut"
-  | "resetZoom"
-  | "zoomToFit"
-  | "zoomToSelection"
-  | "changeFontFamily"
-  | "changeTextAlign"
-  | "changeVerticalAlign"
-  | "toggleFullScreen"
-  | "toggleShortcuts"
-  | "group"
-  | "ungroup"
-  | "goToCollaborator"
-  | "addToLibrary"
-  | "changeRoundness"
-  | "alignTop"
-  | "alignBottom"
-  | "alignLeft"
-  | "alignRight"
-  | "alignVerticallyCentered"
-  | "alignHorizontallyCentered"
-  | "distributeHorizontally"
-  | "distributeVertically"
-  | "flipHorizontal"
-  | "flipVertical"
-  | "viewMode"
-  | "exportWithDarkMode"
-  | "toggleTheme"
-  | "increaseFontSize"
-  | "decreaseFontSize"
-  | "unbindText"
-  | "hyperlink"
-  | "eraser"
-  | "bindText"
-  | "toggleLock"
-  | "toggleLinearEditor";
+const actionNames = [
+  "copy",
+  "cut",
+  "paste",
+  "copyAsPng",
+  "copyAsSvg",
+  "copyText",
+  "sendBackward",
+  "bringForward",
+  "sendToBack",
+  "bringToFront",
+  "copyStyles",
+  "selectAll",
+  "pasteStyles",
+  "gridMode",
+  "zenMode",
+  "stats",
+  "changeStrokeColor",
+  "changeBackgroundColor",
+  "changeFillStyle",
+  "changeStrokeWidth",
+  "changeStrokeShape",
+  "changeSloppiness",
+  "changeStrokeStyle",
+  "changeArrowhead",
+  "changeOpacity",
+  "changeFontSize",
+  "toggleCanvasMenu",
+  "toggleEditMenu",
+  "undo",
+  "redo",
+  "finalize",
+  "changeProjectName",
+  "changeExportBackground",
+  "changeExportEmbedScene",
+  "changeExportScale",
+  "saveToActiveFile",
+  "saveFileToDisk",
+  "loadScene",
+  "duplicateSelection",
+  "deleteSelectedElements",
+  "changeViewBackgroundColor",
+  "clearCanvas",
+  "zoomIn",
+  "zoomOut",
+  "resetZoom",
+  "zoomToFit",
+  "zoomToSelection",
+  "changeFontFamily",
+  "changeTextAlign",
+  "changeVerticalAlign",
+  "toggleFullScreen",
+  "toggleShortcuts",
+  "group",
+  "ungroup",
+  "goToCollaborator",
+  "addToLibrary",
+  "changeRoundness",
+  "alignTop",
+  "alignBottom",
+  "alignLeft",
+  "alignRight",
+  "alignVerticallyCentered",
+  "alignHorizontallyCentered",
+  "distributeHorizontally",
+  "distributeVertically",
+  "flipHorizontal",
+  "flipVertical",
+  "viewMode",
+  "exportWithDarkMode",
+  "toggleTheme",
+  "increaseFontSize",
+  "decreaseFontSize",
+  "unbindText",
+  "hyperlink",
+  "eraser",
+  "bindText",
+  "toggleLock",
+  "toggleLinearEditor",
+] as const;
+
+// So we can have the `isActionName` type guard
+export type ActionName = typeof actionNames[number];
+export const isActionName = (n: any): n is ActionName =>
+  actionNames.includes(n);
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -123,16 +145,27 @@ export type PanelComponentProps = {
 };
 
 export interface Action {
-  name: ActionName;
+  name: string;
   PanelComponent?: React.FC<
     PanelComponentProps & { isInHamburgerMenu: boolean }
   >;
+  panelComponentPredicate?: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => boolean;
   perform: ActionFn;
   keyPriority?: number;
   keyTest?: (
     event: React.KeyboardEvent | KeyboardEvent,
     appState: AppState,
     elements: readonly ExcalidrawElement[],
+  ) => boolean;
+  customPredicate?: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    appProps: ExcalidrawProps,
+    app: AppClassProperties,
+    data?: Record<string, any>,
   ) => boolean;
   contextItemLabel?:
     | string
@@ -145,6 +178,7 @@ export interface Action {
     appState: AppState,
     appProps: ExcalidrawProps,
     app: AppClassProperties,
+    data?: Record<string, any>,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
   trackEvent:

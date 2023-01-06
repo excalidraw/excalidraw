@@ -42,6 +42,7 @@ type MobileMenuProps = {
   device: Device;
   renderWelcomeScreen?: boolean;
   renderMenu: () => React.ReactNode;
+  onContextMenu?: (event: React.MouseEvent, source: string) => void;
 };
 
 export const MobileMenu = ({
@@ -60,6 +61,7 @@ export const MobileMenu = ({
   device,
   renderWelcomeScreen,
   renderMenu,
+  onContextMenu,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -98,6 +100,7 @@ export const MobileMenu = ({
                           insertOnCanvasDirectly: pointerType !== "mouse",
                         });
                       }}
+                      onContextMenu={onContextMenu}
                     />
                   </Stack.Row>
                 </Island>
@@ -190,6 +193,7 @@ export const MobileMenu = ({
                 appState={appState}
                 elements={elements}
                 renderAction={actionManager.renderAction}
+                getCustomActions={actionManager.getCustomActions}
               />
             </Section>
           ) : null}
