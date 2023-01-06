@@ -499,14 +499,19 @@ const LayerUI = ({
   );
 };
 
+const stripIrrelevantAppStateProps = (
+  appState: AppState,
+): Partial<AppState> => {
+  const { suggestedBindings, startBoundElement, cursorButton, ...ret } =
+    appState;
+  return ret;
+};
+
 const areEqual = (prevProps: LayerUIProps, nextProps: LayerUIProps) => {
-  const stripIrrelevantAppStateProps = (
-    appState: AppState,
-  ): Partial<AppState> => {
-    const { suggestedBindings, startBoundElement, cursorButton, ...ret } =
-      appState;
-    return ret;
-  };
+  // short-circuit early
+  if (prevProps.children !== nextProps.children) {
+    return false;
+  }
 
   const {
     canvas: _prevCanvas,

@@ -129,6 +129,11 @@ const areEqual = (
   prevProps: PublicExcalidrawProps,
   nextProps: PublicExcalidrawProps,
 ) => {
+  // short-circuit early
+  if (prevProps.children !== nextProps.children) {
+    return false;
+  }
+
   const {
     initialData: prevInitialData,
     UIOptions: prevUIOptions = {},
