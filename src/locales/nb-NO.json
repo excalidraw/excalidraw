@@ -201,7 +201,9 @@
     "svgImageInsertError": "Kunne ikke sette inn SVG-bilde. SVG-koden ser ugyldig ut.",
     "invalidSVGString": "Ugyldig SVG.",
     "cannotResolveCollabServer": "Kunne ikke koble til samarbeidsserveren. Vennligst oppdater siden og prøv på nytt.",
-    "importLibraryError": "Kunne ikke laste bibliotek"
+    "importLibraryError": "Kunne ikke laste bibliotek",
+    "collabSaveFailed": "Kan ikke lagre i backend-databasen. Hvis problemer vedvarer, bør du lagre filen lokalt for å sikre at du ikke mister arbeidet.",
+    "collabSaveFailed_sizeExceeded": "Kunne ikke lagre til backend-databasen, lerretet ser ut til å være for stort. Du bør lagre filen lokalt for å sikre at du ikke mister arbeidet ditt."
   },
   "toolBar": {
     "selection": "Velg",

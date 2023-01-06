@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Pegar",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Pegar coma texto sen formato",
     "pasteCharts": "Pegar gráficos",
     "selectAll": "Seleccionar todo",
     "multiSelect": "Engadir elemento á selección",
@@ -201,7 +201,9 @@
     "svgImageInsertError": "Non se puido inserir como imaxe SVG. O marcado SVG semella inválido.",
     "invalidSVGString": "SVG inválido.",
     "cannotResolveCollabServer": "Non se puido conectar ao servidor de colaboración. Por favor recargue a páxina e probe de novo.",
-    "importLibraryError": "Non se puido cargar a biblioteca"
+    "importLibraryError": "Non se puido cargar a biblioteca",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Selección",
@@ -236,7 +238,7 @@
     "resize": "Pode reducir as proporcións mantendo SHIFT mentres axusta o tamaño,\nmanteña ALT para axustalo dende o centro",
     "resizeImage": "Pode axustar o tamaño libremente mantendo SHIFT,\nmanteña ALT para axustalo dende o centro",
     "rotate": "Podes reducir os ángulos mantendo SHIFT mentres os rotas",
-    "lineEditor_info": "",
+    "lineEditor_info": "Manteña pulsado CtrlOrCmd e faga dobre clic ou prema CtrlOrCmd + Enter para editar puntos",
     "lineEditor_pointSelected": "Prema Suprimir para eliminar o(s) punto(s)\nCtrlOrCmd+D para duplicalos, ou arrastre para movelos",
     "lineEditor_nothingSelected": "Seleccione un punto para editar (manteña pulsado SHIFT para selección múltiple),\nou manteña pulsado Alt e faga clic para engadir novos puntos",
     "placeImage": "Faga clic para colocar a imaxe, ou faga clic e arrastre para establecer o seu tamaño manualmente",
@@ -312,8 +314,8 @@
     "zoomToFit": "Zoom que se axuste a todos os elementos",
     "zoomToSelection": "Zoom á selección",
     "toggleElementLock": "Bloquear/desbloquear selección",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Mover páxina cara enriba/abaixo",
+    "movePageLeftRight": "Mover páxina cara a esquerda/dereita"
   },
   "clearCanvasDialog": {
     "title": "Limpar lenzo"
@@ -395,7 +397,7 @@
     "fileSavedToFilename": "Gardado en {filename}",
     "canvas": "lenzo",
     "selection": "selección",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Usa {{shortcut}} para pegar como un único elemento\nou pega nun editor de texto existente"
   },
   "colors": {
     "ffffff": "Branco",

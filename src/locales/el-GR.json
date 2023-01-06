@@ -201,7 +201,9 @@
     "svgImageInsertError": "Αδυναμία εισαγωγής εικόνας SVG. Η σήμανση της SVG δεν φαίνεται έγκυρη.",
     "invalidSVGString": "Μη έγκυρο SVG.",
     "cannotResolveCollabServer": "Αδυναμία σύνδεσης με τον διακομιστή συνεργασίας. Παρακαλώ ανανεώστε τη σελίδα και προσπαθήστε ξανά.",
-    "importLibraryError": "Αδυναμία φόρτωσης βιβλιοθήκης"
+    "importLibraryError": "Αδυναμία φόρτωσης βιβλιοθήκης",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Επιλογή",

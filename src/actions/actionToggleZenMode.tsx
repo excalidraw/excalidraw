@@ -18,7 +18,7 @@ export const actionToggleZenMode = register({
     };
   },
   checked: (appState) => appState.zenModeEnabled,
-  contextItemPredicate: (elements, appState, appProps) => {
+  predicate: (elements, appState, appProps) => {
     return typeof appProps.zenModeEnabled === "undefined";
   },
   contextItemLabel: "buttons.zenMode",

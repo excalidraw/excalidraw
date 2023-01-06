@@ -201,7 +201,9 @@
     "svgImageInsertError": "Nepavyko įtraukti SVG paveiksliuko. Panašu, jog SVG yra nevalidus.",
     "invalidSVGString": "Nevalidus SVG.",
     "cannotResolveCollabServer": "Nepavyko prisijungti prie serverio bendradarbiavimui. Perkrauk puslapį ir pabandyk prisijungti dar kartą.",
-    "importLibraryError": "Nepavyko įkelti bibliotekos"
+    "importLibraryError": "Nepavyko įkelti bibliotekos",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Žymėjimas",

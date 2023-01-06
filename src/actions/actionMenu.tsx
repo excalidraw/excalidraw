@@ -1,12 +1,10 @@
-import { HamburgerMenuIcon, HelpIcon, palette } from "../components/icons";
+import { HamburgerMenuIcon, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
 import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { KEYS } from "../keys";
-import { HelpButton } from "../components/HelpButton";
-import DropdownMenuItem from "../components/dropdownMenu/DropdownMenuItem";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -88,19 +86,5 @@ export const actionShortcuts = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData, isInHamburgerMenu }) =>
-    isInHamburgerMenu ? (
-      <DropdownMenuItem
-        dataTestId="help-menu-item"
-        icon={HelpIcon}
-        onSelect={updateData}
-        shortcut="?"
-        ariaLabel={t("helpDialog.title")}
-      >
-        {t("helpDialog.title")}
-      </DropdownMenuItem>
-    ) : (
-      <HelpButton title={t("helpDialog.title")} onClick={updateData} />
-    ),
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,
 });

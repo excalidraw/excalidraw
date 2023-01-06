@@ -94,15 +94,9 @@ export const SelectedShapeActions = ({
       {showChangeBackgroundIcons && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
-      {getCustomActions().map((action) => {
-        if (
-          action.panelComponentPredicate &&
-          action.panelComponentPredicate(targetElements, appState)
-        ) {
-          return renderAction(action.name);
-        }
-        return null;
-      })}
+      {getCustomActions({ elements: targetElements }).map((action) =>
+        renderAction(action.name),
+      )}
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||

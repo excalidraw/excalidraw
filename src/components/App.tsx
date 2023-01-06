@@ -312,9 +312,9 @@ const ExcalidrawSetAppStateContext = React.createContext<
 >(() => {});
 ExcalidrawSetAppStateContext.displayName = "ExcalidrawSetAppStateContext";
 
-const ExcalidrawActionManagerContext = React.createContext<
-  ActionManager | { renderAction: ActionManager["renderAction"] }
->({ renderAction: () => null });
+const ExcalidrawActionManagerContext = React.createContext<ActionManager>(
+  null!,
+);
 ExcalidrawActionManagerContext.displayName = "ExcalidrawActionManagerContext";
 
 export const useExcalidrawElements = () =>
@@ -6168,25 +6168,9 @@ class App extends React.Component<AppProps, AppState> {
     source?: string,
   ): ContextMenuItems => {
     const options: ContextMenuItems = [];
-    const allElements = this.actionManager.getElementsIncludingDeleted();
-    const appState = this.actionManager.getAppState();
     let addedCustom = false;
     this.actionManager.getCustomActions().forEach((action) => {
-      const predicate =
-        type === "custom"
-          ? action.customPredicate
-          : action.contextItemPredicate;
-      if (
-        predicate &&
-        predicate(
-          allElements,
-          appState,
-          this.actionManager.app.props,
-          this.actionManager.app,
-          type === "custom" ? { source } : undefined,
-        ) &&
-        this.actionManager.isActionEnabled(allElements, appState, action.name)
-      ) {
+      if (this.actionManager.isActionEnabled(action, { data: { source } })) {
         addedCustom = true;
         options.push(action);
       }
