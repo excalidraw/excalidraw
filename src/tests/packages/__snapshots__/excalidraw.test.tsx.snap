@@ -1,5 +1,114 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`<Excalidraw/> <MainMenu/> should render main menu with host menu items if passed from host 1`] = `
+<div
+  class="dropdown-menu"
+  data-testid="dropdown-menu"
+>
+  <div
+    class="Island dropdown-menu-container"
+    style="--padding: 2; z-index: 1;"
+  >
+    <button
+      class="dropdown-menu-item dropdown-menu-item-base"
+      type="button"
+    >
+      <div
+        class="dropdown-menu-item__icon"
+      />
+      <div
+        class="dropdown-menu-item__text"
+      >
+        Click me
+      </div>
+    </button>
+    <a
+      class="dropdown-menu-item dropdown-menu-item-base"
+      href="blog.excalidaw.com"
+      rel="noreferrer"
+      target="_blank"
+    >
+      <div
+        class="dropdown-menu-item__icon"
+      />
+      <div
+        class="dropdown-menu-item__text"
+      >
+        Excalidraw blog
+      </div>
+    </a>
+    <div
+      class="dropdown-menu-item-base dropdown-menu-item-custom"
+    >
+      <button
+        style="height: 2rem;"
+      >
+         
+        custom menu item
+      </button>
+    </div>
+    <button
+      aria-label="Help"
+      class="dropdown-menu-item dropdown-menu-item-base"
+      data-testid="help-menu-item"
+      title="Help"
+      type="button"
+    >
+      <div
+        class="dropdown-menu-item__icon"
+      >
+        <svg
+          aria-hidden="true"
+          class=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <g
+            stroke-width="1.5"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <circle
+              cx="12"
+              cy="12"
+              r="9"
+            />
+            <line
+              x1="12"
+              x2="12"
+              y1="17"
+              y2="17.01"
+            />
+            <path
+              d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"
+            />
+          </g>
+        </svg>
+      </div>
+      <div
+        class="dropdown-menu-item__text"
+      >
+        Help
+      </div>
+      <div
+        class="dropdown-menu-item__shortcut"
+      >
+        ?
+      </div>
+    </button>
+  </div>
+</div>
+`;
+
 exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu with default items when "UIOPtions" is "undefined" 1`] = `
 <div
   class="dropdown-menu"
@@ -451,115 +560,6 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         </div>
       </div>
     </div>
-  </div>
-</div>
-`;
-
-exports[`<Excalidraw/> should render main menu with host menu items if passed from host 1`] = `
-<div
-  class="dropdown-menu"
-  data-testid="dropdown-menu"
->
-  <div
-    class="Island dropdown-menu-container"
-    style="--padding: 2; z-index: 1;"
-  >
-    <button
-      class="dropdown-menu-item dropdown-menu-item-base"
-      type="button"
-    >
-      <div
-        class="dropdown-menu-item__icon"
-      />
-      <div
-        class="dropdown-menu-item__text"
-      >
-        Click me
-      </div>
-    </button>
-    <a
-      class="dropdown-menu-item dropdown-menu-item-base"
-      href="blog.excalidaw.com"
-      rel="noreferrer"
-      target="_blank"
-    >
-      <div
-        class="dropdown-menu-item__icon"
-      />
-      <div
-        class="dropdown-menu-item__text"
-      >
-        Excalidraw blog
-      </div>
-    </a>
-    <div
-      class="dropdown-menu-item-base dropdown-menu-item-custom"
-    >
-      <button
-        style="height: 2rem;"
-      >
-         
-        custom menu item
-      </button>
-    </div>
-    <button
-      aria-label="Help"
-      class="dropdown-menu-item dropdown-menu-item-base"
-      data-testid="help-menu-item"
-      title="Help"
-      type="button"
-    >
-      <div
-        class="dropdown-menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <g
-            stroke-width="1.5"
-          >
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <circle
-              cx="12"
-              cy="12"
-              r="9"
-            />
-            <line
-              x1="12"
-              x2="12"
-              y1="17"
-              y2="17.01"
-            />
-            <path
-              d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"
-            />
-          </g>
-        </svg>
-      </div>
-      <div
-        class="dropdown-menu-item__text"
-      >
-        Help
-      </div>
-      <div
-        class="dropdown-menu-item__shortcut"
-      >
-        ?
-      </div>
-    </button>
   </div>
 </div>
 `;
