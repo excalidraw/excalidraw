@@ -201,7 +201,9 @@
     "svgImageInsertError": "نەیتوانی وێنەی SVG داخڵ بکات. نیشانەی ئێس ڤی جی نادروست دیارە.",
     "invalidSVGString": "ئێس ڤی جی نادروستە.",
     "cannotResolveCollabServer": "ناتوانێت پەیوەندی بکات بە سێرڤەری کۆلاب. تکایە لاپەڕەکە دووبارە باربکەوە و دووبارە هەوڵ بدەوە.",
-    "importLibraryError": "نەیتوانی کتێبخانە بار بکات"
+    "importLibraryError": "نەیتوانی کتێبخانە بار بکات",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "دەستنیشانکردن",

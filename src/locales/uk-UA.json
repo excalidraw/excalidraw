@@ -201,7 +201,9 @@
     "svgImageInsertError": "Не вдалося вставити SVG-зображення. Помилка розмітки SVG.",
     "invalidSVGString": "Недійсний SVG.",
     "cannotResolveCollabServer": "Не вдалося приєднатися до сервера. Перезавантажте сторінку та повторіть спробу.",
-    "importLibraryError": "Не вдалося завантажити бібліотеку"
+    "importLibraryError": "Не вдалося завантажити бібліотеку",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Виділення",

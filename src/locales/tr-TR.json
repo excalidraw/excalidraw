@@ -201,7 +201,9 @@
     "svgImageInsertError": "SVG resmi eklenemedi. SVG işaretlemesi geçersiz görünüyor.",
     "invalidSVGString": "Geçersiz SVG.",
     "cannotResolveCollabServer": "İş birliği sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin.",
-    "importLibraryError": "Kütüphane yüklenemedi"
+    "importLibraryError": "Kütüphane yüklenemedi",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Seçme",

@@ -201,7 +201,9 @@
     "svgImageInsertError": "تصویر SVG وارد نشد. نشانه گذاری SVG نامعتبر به نظر می رسد.",
     "invalidSVGString": "SVG نادرست.",
     "cannotResolveCollabServer": "به سرور collab متصل نشد. لطفا صفحه را مجددا بارگذاری کنید و دوباره تلاش کنید.",
-    "importLibraryError": "داده‌ها بارگذاری نشدند"
+    "importLibraryError": "داده‌ها بارگذاری نشدند",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "گزینش",

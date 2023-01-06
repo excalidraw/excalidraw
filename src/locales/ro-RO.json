@@ -201,7 +201,9 @@
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
     "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou.",
-    "importLibraryError": "Biblioteca nu a putut fi încărcată"
+    "importLibraryError": "Biblioteca nu a putut fi încărcată",
+    "collabSaveFailed": "Nu s-a putut salva în baza de date la nivel de server. Dacă problemele persistă, ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
+    "collabSaveFailed_sizeExceeded": "Nu s-a putut salva în baza de date la nivel de server, întrucât se pare că pânza este prea mare. Ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca."
   },
   "toolBar": {
     "selection": "Selecție",

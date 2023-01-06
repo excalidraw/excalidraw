@@ -201,7 +201,9 @@
     "svgImageInsertError": "Nem sikerült beszúrni az SVG-képet. Az SVG szintaktika érvénytelennek tűnik.",
     "invalidSVGString": "Érvénytelen SVG.",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Kijelölés",

@@ -201,7 +201,9 @@
     "svgImageInsertError": "এসভীজী ছবি সন্নিবেশ করা যায়নি। এসভীজী মার্কআপটি অবৈধ মনে হচ্ছে৷",
     "invalidSVGString": "এসভীজী মার্কআপটি অবৈধ মনে হচ্ছে৷",
     "cannotResolveCollabServer": "কোল্যাব সার্ভারের সাথে সংযোগ করা যায়নি। পৃষ্ঠাটি পুনরায় লোড করে আবার চেষ্টা করুন।",
-    "importLibraryError": "সংগ্রহ লোড করা যায়নি"
+    "importLibraryError": "সংগ্রহ লোড করা যায়নি",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "বাছাই",

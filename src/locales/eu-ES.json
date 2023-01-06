@@ -201,7 +201,9 @@
     "svgImageInsertError": "Ezin izan da SVG irudia txertatu. SVG markak baliogabea dirudi.",
     "invalidSVGString": "SVG baliogabea.",
     "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro.",
-    "importLibraryError": "Ezin izan da liburutegia kargatu"
+    "importLibraryError": "Ezin izan da liburutegia kargatu",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Hautapena",

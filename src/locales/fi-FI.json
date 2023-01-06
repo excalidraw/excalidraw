@@ -201,7 +201,9 @@
     "svgImageInsertError": "SVG- kuvaa ei voitu lisätä. Tiedoston SVG-sisältö näyttää virheelliseltä.",
     "invalidSVGString": "Virheellinen SVG.",
     "cannotResolveCollabServer": "Yhteyden muodostaminen collab-palvelimeen epäonnistui. Virkistä sivu ja yritä uudelleen.",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Valinta",

@@ -201,7 +201,9 @@
     "svgImageInsertError": "無法插入 SVG 圖片。此 SVG 檔案有問題。",
     "invalidSVGString": "無效的 SVG。",
     "cannotResolveCollabServer": "無法連結至 collab 伺服器。請重新整理後再試一次。",
-    "importLibraryError": "無法載入資料庫"
+    "importLibraryError": "無法載入資料庫",
+    "collabSaveFailed": "無法儲存至後端資料庫。若此問題持續發生，請將檔案儲存於本機以確保資料不會遺失。",
+    "collabSaveFailed_sizeExceeded": "無法儲存至後端資料庫，可能的原因為畫布尺寸過大。請將檔案儲存於本機以確保資料不會遺失。"
   },
   "toolBar": {
     "selection": "選取",

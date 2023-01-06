@@ -201,7 +201,9 @@
     "svgImageInsertError": "",
     "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
