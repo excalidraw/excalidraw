@@ -461,8 +461,8 @@ import { MainMenu } from "@excalidraw/excalidraw";
 const App = () => {
   <Excalidraw>
     <MainMenu>
-      <MainMenu.Item> Item1 </MainMenu.Item>
-      <MainMenu.Item> Item 2 </>
+      <MainMenu.Item onSelect={() => window.alert("Item1")}> Item1 </MainMenu.Item>
+      <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
     </MainMenu>
   </Excalidraw>
 }
@@ -474,17 +474,81 @@ This is the `MainMenu` component which you need to import to render the menu wit
 
 **MainMenu.Item**
 
-To render an item, its recommended to use `MainMenu.Item`
+To render an item, its recommended to use `MainMenu.Item`.
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `icon` | `JSX.Element` | `undefined` | The icon used in the menu item |
-| `shortcut` | `string` | `undefined` | The shortcut to be shown for the menu item |
-| `children` | `React.ReactNode` | `undefined` | The content of the menu item |
-| `onClick` | `Function` | `undefined` | The click handler will be triggered when clicked on menu item. If passed the item is rendered as a button. |
-| `className` | `string` | "" | The class names to be added to the menu item |
-| `link` | `string` | `undefined` | If `link` is passed the item is rendered as an anchor element. |
-| `style` | `React.CSSProperties` | `undefined` | The inline styles to be added to the menu item |
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `onSelect` | `Function` | Yes | `undefined` | The handler is triggered when the item is selected. |
+| `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
+| `icon` | `JSX.Element` | No | `undefined` | The icon used in the menu item |
+| `shortcut` | `string` | No | `undefined` | The shortcut to be shown for the menu item |
+| `className` | `string` | No | "" | The class names to be added to the menu item |
+| `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
+| `ariaLabel` | `string` | `undefined` | No | The `aria-label` to be added to the item for accessibility |
+| `dataTestId` | `string` | `undefined` | No | The `data-testid` to be added to the item. |
+
+**MainMenu.ItemLink**
+
+To render an item as a link, its recommended to use `MainMenu.ItemLink`.
+
+**Usage**
+
+```js
+import { MainMenu } from "@excalidraw/excalidraw";
+const App = () => {
+  <Excalidraw>
+    <MainMenu>
+      <MainMenu.ItemLink href="https://google.com">Google</MainMenu.ItemLink>
+      <MainMenu.ItemLink href="https://excalidraw.com">
+        Excalidraw
+      </MainMenu.ItemLink>
+    </MainMenu>
+  </Excalidraw>;
+};
+```
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `href` | `string` | Yes | `undefined` | The `href` attribute to be added to the `anchor` element. |
+| `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
+| `icon` | `JSX.Element` | No | `undefined` | The icon used in the menu item |
+| `shortcut` | `string` | No | `undefined` | The shortcut to be shown for the menu item |
+| `className` | `string` | No | "" | The class names to be added to the menu item |
+| `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
+| `ariaLabel` | `string` | No | `undefined` | The `aria-label` to be added to the item for accessibility |
+| `dataTestId` | `string` | No | `undefined` | The `data-testid` to be added to the item. |
+
+**MainMenu.ItemCustom**
+
+To render a custom item, you can use `MainMenu.ItemCustom`.
+
+**Usage**
+
+```js
+import { MainMenu } from "@excalidraw/excalidraw";
+const App = () => {
+  <Excalidraw>
+    <MainMenu>
+      <MainMenu.ItemCustom>
+        <button
+          style={{ height: "2rem" }}
+          onClick={() => window.alert("custom menu item")}
+        >
+          {" "}
+          custom item
+        </button>
+      </MainMenu.ItemCustom>
+    </MainMenu>
+  </Excalidraw>;
+};
+```
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
+| `className` | `string` | No | "" | The class names to be added to the menu item |
+| `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
+| `dataTestId` | `string` | No | `undefined` | The `data-testid` to be added to the item. |
 
 **MainMenu.DefaultItems**
 
@@ -497,8 +561,8 @@ const App = () => {
     <MainMenu>
       <MainMenu.DefaultItems.Socials/>
       <MainMenu.DefaultItems.Export/>
-      <MainMenu.Item> Item1 </MainMenu.Item>
-      <MainMenu.Item> Item 2 </>
+      <MainMenu.Item onSelect={() => window.alert("Item1")}> Item1 </MainMenu.Item>
+      <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
     </MainMenu>
   </Excalidraw>
 }
@@ -520,20 +584,20 @@ const App = () => {
         <MainMenu.DefaultItems.Export/>
       </MainMenu.Group>
       <MainMenu.Group title="custom items">
-        <MainMenu.Item> Item1 </MainMenu.Item>
-        <MainMenu.Item> Item 2 </>
+        <MainMenu.Item onSelect={() => window.alert("Item1")}> Item1 </MainMenu.Item>
+        <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
       </MainMenu.Group>
     </MainMenu>
   </Excalidraw>
 }
 ```
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `title` | `string` | `undefined` | The `title` for the grouped items |
-| `className` | `string` | "" | The `classname` to be added to the group |
-| `style` | `React.CSsSProperties` | `undefined` | The inline `styles` to be added to the group |
-| `children ` | `React.ReactNode` | `undefined` | The content of the `Menu Group` |
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children ` | `React.ReactNode` | Yes | `undefined` | The content of the `Menu Group` |
+| `title` | `string` | No | `undefined` | The `title` for the grouped items |
+| `className` | `string` | No | "" | The `classname` to be added to the group |
+| `style` | `React.CSsSProperties` | No | `undefined` | The inline `styles` to be added to the group |
 
 ### Props
 
@@ -594,7 +658,7 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 | `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106) | The elements with which Excalidraw should be mounted. |
 | `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79) | The App state with which Excalidraw should be mounted. |
 | `scrollToContent` | boolean | This attribute implies whether to scroll to the nearest element to center once Excalidraw is mounted. By default, it will not scroll the nearest element to the center. Make sure you pass `initialData.appState.scrollX` and `initialData.appState.scrollY` when `scrollToContent` is false so that scroll positions are retained |
-| `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise<[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)> | This library items with which Excalidraw should be mounted. |
+| `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise&lt;[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)&gt; | This library items with which Excalidraw should be mounted. |
 | `files` | [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) | The files added to the scene. |
 
 ```json
@@ -693,19 +757,19 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L18) | The `appState` to be updated in the scene. |
 | `collaborators` | `tsx Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L35">Collaborator></a>` | The list of collaborators to be updated in the scene. |
 | `commitToHistory` | `boolean` | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
-| `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise<[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)> &#124; ((currentItems: [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)>) => [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise<[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)>) | The `libraryItems` to be update in the scene. |
+| `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise&lt;[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)&gt; &#124; ((currentItems: [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)>) => [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise&lt;[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)&gt;) | The `libraryItems` to be update in the scene. |
 
 ### `updateLibrary`
 
-```tsx
-(opts: {
+<pre>
+(opts: &#123;
   libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L224">LibraryItemsSource</a>;
   merge?: boolean;
   prompt?: boolean;
   openLibraryMenu?: boolean;
   defaultStatus?: "unpublished" | "published";
-}) => Promise<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>>
-```
+&#125;) => Promise&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>&gt;
+</pre>
 
 You can use this function to update the library. It accepts the below attributes.
 
@@ -840,7 +904,7 @@ This prop sets the name of the drawing which will be used when exporting the dra
 
 #### `UIOptions`
 
-This prop can be used to customise UI of Excalidraw. Currently we support customising [`canvasActions`](#canvasActions) and [`dockedSidebarBreakpoint`](dockedSidebarBreakpoint). It accepts the below parameters
+This prop can be used to customise UI of Excalidraw. Currently we support customising [`canvasActions`](#canvasActions) and [`dockedSidebarBreakpoint`](#dockedSidebarBreakpoint). It accepts the below parameters
 
 ```tsx
 { canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }
@@ -974,9 +1038,9 @@ Enable this if you want Excalidraw to handle keyboard even if the component isn'
 
 This callback if supplied will get triggered when the library is updated and has the below signature.
 
-```tsx
-(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void | Promise<any>
-```
+<pre>
+(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void | Promise&lt;any&gt;
+</pre>
 
 It is invoked with empty items when user clears the library. You can use this callback when you want to do something additional when library is updated for example persisting it to local storage.
 
@@ -1115,9 +1179,9 @@ This function makes sure elements and state is set to appropriate values and set
 
 **_Signature_**
 
-```tsx
+<pre>
 restoreLibraryItems(libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L22">ImportedDataState["libraryItems"]</a>, defaultStatus: "published" | "unpublished")
-```
+</pre>
 
 **_How to use_**
 
@@ -1135,15 +1199,15 @@ This function normalizes library items elements, adding missing values when need
 
 **_Signature_**
 
-```tsx
-exportToCanvas({
+<pre>
+exportToCanvas(&#123;
   elements,
   appState
   getDimensions,
   files,
   exportPadding?: number;
-}: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L12">ExportOpts</a>
-```
+&#125;: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L12">ExportOpts</a>
+</pre>
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1151,7 +1215,7 @@ exportToCanvas({
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L12) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/src/appState.ts#L11) | The app state of the scene |
 | getDimensions | `(width: number, height: number) => { width: number, height: number, scale?: number }` | undefined | A function which returns the `width`, `height`, and optionally `scale` (defaults `1`), with which canvas is to be exported. |
 | maxWidthOrHeight | `number` | undefined | The maximum width or height of the exported image. If provided, `getDimensions` is ignored. |
-| files | [BinaryFiles](The [`BinaryFiles`](<[BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64)>) | undefined | The files added to the scene. |
+| files | [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) | undefined | The files added to the scene. |
 | exportPadding | number | 10 | The padding to be added on canvas |
 
 **How to use**
@@ -1194,8 +1258,8 @@ Returns a promise which resolves with a [blob](https://developer.mozilla.org/en-
 
 **_Signature_**
 
-```tsx
-exportToSvg({
+<pre>
+exportToSvg(&#123;
   elements: (
     <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">
       ExcalidrawElement[]
@@ -1213,15 +1277,15 @@ exportToSvg({
       BinaryFiles
     </a>
   ),
-});
-```
+&#125;);
+</pre>
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | elements | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106) |  | The elements to exported as svg |
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/src/appState.ts#L11) | The app state of the scene |
 | exportPadding | number | 10 | The padding to be added on canvas |
-| files | [BinaryFiles](The [`BinaryFiles`](<[BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64)>) | undefined | The files added to the scene. |
+| files | [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) | undefined | The files added to the scene. |
 
 This function returns a promise which resolves to svg of the exported drawing.
 
@@ -1283,10 +1347,10 @@ If you want to overwrite the source field in the JSON string, you can set `windo
 
 **_Signature_**
 
-```tsx
-serializeLibraryAsJSON({
-  libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems[]</a>,
-```
+<pre>
+serializeLibraryAsJSON(
+  libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems[]</a>)
+</pre>
 
 Takes the library items and returns a JSON string.
 

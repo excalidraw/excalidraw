@@ -11,7 +11,7 @@ const config = {
     "For Excalidraw contributors or those integrating the Excalidraw editor",
   url: "https://docs.excalidraw.com.com",
   baseUrl: "/",
-  onBrokenLinks: "log",
+  onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
   organizationName: "Excalidraw", // Usually your GitHub org/user name.
