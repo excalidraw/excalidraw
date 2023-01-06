@@ -154,13 +154,6 @@ export interface Action {
     appState: AppState,
     elements: readonly ExcalidrawElement[],
   ) => boolean;
-  customPredicate?: (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    appProps: ExcalidrawProps,
-    app: AppClassProperties,
-    data?: Record<string, any>,
-  ) => boolean;
   contextItemLabel?:
     | string
     | ((

@@ -38,8 +38,8 @@ const exampleAction: Action = {
   perform: (elements, appState) => {
     return { elements, appState, commitToHistory: false };
   },
-  customPredicate: (elements, appState, appProps, app, data) =>
-    data !== undefined && data.source === "editor-current-shape",
+  predicate: (elements, appState, appProps, app, data) =>
+    data === undefined || data.source === "editor-current-shape",
   contextItemLabel: "labels.untitled",
 };
 const exampleEnableFn: EnableFn = (elements, appState, actionName) =>

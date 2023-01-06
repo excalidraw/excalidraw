@@ -6169,11 +6169,9 @@ class App extends React.Component<AppProps, AppState> {
   ): ContextMenuItems => {
     const options: ContextMenuItems = [];
     let addedCustom = false;
-    this.actionManager.getCustomActions().forEach((action) => {
-      if (this.actionManager.isActionEnabled(action, { data: { source } })) {
-        addedCustom = true;
-        options.push(action);
-      }
+    this.actionManager.getCustomActions({ data: { source } }).forEach((action) => {
+      addedCustom = true;
+      options.push(action);
     });
     if (type === "custom") {
       return options;
