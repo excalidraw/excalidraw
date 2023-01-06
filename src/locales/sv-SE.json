@@ -201,7 +201,9 @@
     "svgImageInsertError": "Kunde inte infoga SVG-bild. SVG-koden ser ogiltig ut.",
     "invalidSVGString": "Ogiltig SVG.",
     "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen.",
-    "importLibraryError": "Kunde inte ladda bibliotek"
+    "importLibraryError": "Kunde inte ladda bibliotek",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Markering",

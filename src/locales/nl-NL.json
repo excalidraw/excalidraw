@@ -201,7 +201,9 @@
     "svgImageInsertError": "Kon geen SVG-afbeelding invoegen. De SVG-opmaak ziet er niet geldig uit.",
     "invalidSVGString": "Ongeldige SVG.",
     "cannotResolveCollabServer": "Kan geen verbinding maken met de collab server. Herlaad de pagina en probeer het opnieuw.",
-    "importLibraryError": "Kon bibliotheek niet laden"
+    "importLibraryError": "Kon bibliotheek niet laden",
+    "collabSaveFailed": "Kan niet opslaan in de backend database. Als de problemen blijven bestaan, moet u het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
+    "collabSaveFailed_sizeExceeded": "Kan de backend database niet opslaan, het canvas lijkt te groot te zijn. U moet het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest."
   },
   "toolBar": {
     "selection": "Selectie",
@@ -236,7 +238,7 @@
     "resize": "Houd tijdens het vergroten SHIFT ingedrukt om verhoudingen te behouden,\ngebruik ALT om vanuit het midden te vergroten/verkleinen",
     "resizeImage": "",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait",
-    "lineEditor_info": "",
+    "lineEditor_info": "Houd CtrlOrCmd en Dubbelklik of druk op CtrlOrCmd + Enter om punten te bewerken",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -395,7 +397,7 @@
     "fileSavedToFilename": "Opgeslagen als {filename}",
     "canvas": "canvas",
     "selection": "selectie",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Gebruik {{shortcut}} om te plakken als een enkel element,\nof plak in een bestaande teksteditor"
   },
   "colors": {
     "ffffff": "Wit",

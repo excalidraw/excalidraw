@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "粘贴",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "粘贴为纯文本",
     "pasteCharts": "粘贴图表",
     "selectAll": "全部选中",
     "multiSelect": "添加元素到选区",
@@ -201,7 +201,9 @@
     "svgImageInsertError": "无法插入 SVG 图像。该 SVG 标记似乎是无效的。",
     "invalidSVGString": "无效的 SVG。",
     "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。",
-    "importLibraryError": "无法加载素材库"
+    "importLibraryError": "无法加载素材库",
+    "collabSaveFailed": "无法保存到后端数据库。如果问题持续存在，您应该保存文件到本地，以确保您的工作不会丢失。",
+    "collabSaveFailed_sizeExceeded": "无法保存到后端数据库，画布似乎过大。您应该保存文件到本地，以确保您的工作不会丢失。"
   },
   "toolBar": {
     "selection": "选择",
@@ -236,7 +238,7 @@
     "resize": "您可以按住SHIFT来限制比例大小，\n按住ALT来调整中心大小",
     "resizeImage": "按住SHIFT可以自由缩放，\n按住ALT可以从中间缩放",
     "rotate": "旋转时可以按住 Shift 来约束角度",
-    "lineEditor_info": "",
+    "lineEditor_info": "按住 CtrlOrCmd 并双击或按 CtrlOrmd + Enter 来编辑点",
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，拖动以移动",
     "lineEditor_nothingSelected": "选择要编辑的点 (按住 SHIFT 选择多个)，\n或按住 Alt 并点击以添加新点",
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
@@ -312,8 +314,8 @@
     "zoomToFit": "缩放以适应所有元素",
     "zoomToSelection": "缩放到选区",
     "toggleElementLock": "锁定/解锁",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "上下移动页面",
+    "movePageLeftRight": "左右移动页面"
   },
   "clearCanvasDialog": {
     "title": "清除画布"
@@ -394,8 +396,8 @@
     "fileSaved": "文件已保存。",
     "fileSavedToFilename": "保存到 {filename}",
     "canvas": "画布",
-    "selection": "选择项",
-    "pasteAsSingleElement": ""
+    "selection": "所选项",
+    "pasteAsSingleElement": "使用 {{shortcut}} 粘贴为单个元素，\n或粘贴到现有的文本编辑器里"
   },
   "colors": {
     "ffffff": "白",

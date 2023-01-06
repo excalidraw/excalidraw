@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Colar",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Colar como texto sem formatação",
     "pasteCharts": "Colar gráficos",
     "selectAll": "Selecionar tudo",
     "multiSelect": "Adicionar elemento à seleção",
@@ -201,7 +201,9 @@
     "svgImageInsertError": "Não foi possível inserir a imagem SVG. A marcação SVG parece inválida.",
     "invalidSVGString": "SVG Inválido.",
     "cannotResolveCollabServer": "Não foi possível conectar-se ao servidor colaborativo. Por favor, recarregue a página e tente novamente.",
-    "importLibraryError": "Não foi possível carregar a biblioteca"
+    "importLibraryError": "Não foi possível carregar a biblioteca",
+    "collabSaveFailed": "Não foi possível salvar no banco de dados do servidor. Se os problemas persistirem, salve o arquivo localmente para garantir que não perca o seu trabalho.",
+    "collabSaveFailed_sizeExceeded": "Não foi possível salvar no banco de dados do servidor, a tela parece ser muito grande. Se os problemas persistirem, salve o arquivo localmente para garantir que não perca o seu trabalho."
   },
   "toolBar": {
     "selection": "Seleção",
@@ -215,7 +217,7 @@
     "text": "Texto",
     "library": "Biblioteca",
     "lock": "Manter ativa a ferramenta selecionada após desenhar",
-    "penMode": "",
+    "penMode": "Modo caneta — impede o toque",
     "link": "Adicionar/Atualizar link para uma forma selecionada",
     "eraser": "Borracha"
   },
@@ -236,7 +238,7 @@
     "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
     "resizeImage": "Você pode redimensionar livremente segurando SHIFT,\nsegure ALT para redimensionar a partir do centro",
     "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira",
-    "lineEditor_info": "",
+    "lineEditor_info": "Pressione CtrlOuCmd e duplo-clique ou pressione CtrlOuCmd + Enter para editar pontos",
     "lineEditor_pointSelected": "Pressione Delete para remover o(s) ponto(s),\nCtrl/Cmd+D para duplicar ou arraste para mover",
     "lineEditor_nothingSelected": "Selecione um ponto para editar (segure SHIFT para selecionar vários) ou segure Alt e clique para adicionar novos pontos",
     "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho",
@@ -312,8 +314,8 @@
     "zoomToFit": "Ampliar para encaixar todos os elementos",
     "zoomToSelection": "Ampliar a seleção",
     "toggleElementLock": "Bloquear/desbloquear seleção",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Mover a página para cima/baixo",
+    "movePageLeftRight": "Mover a página para esquerda/direita"
   },
   "clearCanvasDialog": {
     "title": "Limpar a tela"
@@ -395,7 +397,7 @@
     "fileSavedToFilename": "Salvo em {filename}",
     "canvas": "tela",
     "selection": "seleção",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Use {{shortcut}} para colar como um único elemento,\nou cole em um editor de texto já existente"
   },
   "colors": {
     "ffffff": "Braco",
@@ -446,9 +448,9 @@
   },
   "welcomeScreen": {
     "data": "Todos os dados são salvos localmente no seu navegador.",
-    "switchToPlusApp": "",
-    "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "switchToPlusApp": "Você queria ir para o Excalidraw+ em vez disso?",
+    "menuHints": "Exportar, preferências, idiomas, ...",
+    "toolbarHints": "Escolha uma ferramenta & Comece a desenhar!",
+    "helpHints": "Atalhos & ajuda"
   }
 }

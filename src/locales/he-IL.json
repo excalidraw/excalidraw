@@ -201,7 +201,9 @@
     "svgImageInsertError": "לא ניתן היה להטמיע את תמונת ה-SVG. קידוד ה-SVG אינו תקני.",
     "invalidSVGString": "SVG בלתי תקני.",
     "cannotResolveCollabServer": "",
-    "importLibraryError": "לא ניתן היה לטעון את הספריה"
+    "importLibraryError": "לא ניתן היה לטעון את הספריה",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "בחירה",
