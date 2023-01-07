@@ -1301,7 +1301,7 @@ const createMathActions = () => {
   const mathActions: Action[] = [];
   const actionUseTexTrue: Action = {
     name: "useTexTrue",
-    perform: (elements, appState, useTex: boolean | null) => {
+    perform: (elements, appState) => {
       const mathOnly = getMathProps.getMathOnly(appState);
       const customData = appState.customData ?? {};
       customData[`${mathSubtype}`] = { useTex: true, mathOnly };
@@ -1315,13 +1315,12 @@ const createMathActions = () => {
       getMathProps.getUseTex(appState)
         ? "labels.useTexTrueActive"
         : "labels.useTexTrueInactive",
-    shapeConfigPredicate: (elements, appState, data) =>
-      data?.source === mathSubtype,
+    predicate: (...rest) => rest.length < 5 || rest[4]?.source === mathSubtype,
     trackEvent: false,
   };
   const actionUseTexFalse: Action = {
-    name: "useTexTrue",
-    perform: (elements, appState, useTex: boolean | null) => {
+    name: "useTexFalse",
+    perform: (elements, appState) => {
       const mathOnly = getMathProps.getMathOnly(appState);
       const customData = appState.customData ?? {};
       customData[`${mathSubtype}`] = { useTex: false, mathOnly };
@@ -1335,8 +1334,7 @@ const createMathActions = () => {
       !getMathProps.getUseTex(appState)
         ? "labels.useTexFalseActive"
         : "labels.useTexFalseInactive",
-    shapeConfigPredicate: (elements, appState, data) =>
-      data?.source === mathSubtype,
+    predicate: (...rest) => rest.length < 5 || rest[4]?.source === mathSubtype,
     trackEvent: false,
   };
   const actionResetUseTex: Action = {
@@ -1464,8 +1462,9 @@ const createMathActions = () => {
         />
       </fieldset>
     ),
-    panelComponentPredicate: (elements, appState) =>
-      enableActionChangeMathProps(elements, appState),
+    predicate: (...rest) =>
+      rest[4]?.source === undefined &&
+      enableActionChangeMathProps(rest[0], rest[1]),
     trackEvent: false,
   };
   const actionMath = SubtypeButton(mathSubtype, "text", mathSubtypeIcon, "M");

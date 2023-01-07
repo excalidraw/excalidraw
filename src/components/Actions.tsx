@@ -3,7 +3,7 @@ import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
-import { useDevice } from "../components/App";
+import { useDevice, useExcalidrawActionManager } from "../components/App";
 import {
   canChangeRoundness,
   canHaveArrowheads,
@@ -28,7 +28,6 @@ import { trackEvent } from "../analytics";
 import { hasBoundTextElement } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
-import { getCustomActions } from "../actions/register";
 import "./Actions.scss";
 import { Tooltip } from "./Tooltip";
 import { shouldAllowVerticalAlign } from "../element/textElement";
@@ -93,15 +92,9 @@ export const SelectedShapeActions = ({
       {showChangeBackgroundIcons && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
-      {getCustomActions().map((action) => {
-        if (
-          action.panelComponentPredicate &&
-          action.panelComponentPredicate(targetElements, appState)
-        ) {
-          return renderAction(action.name);
-        }
-        return null;
-      })}
+      {useExcalidrawActionManager()
+        .getCustomActions({ elements: targetElements })
+        .map((action) => renderAction(action.name))}
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||

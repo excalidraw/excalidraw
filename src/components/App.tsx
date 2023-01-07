@@ -38,7 +38,7 @@ import {
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
-import { getActions, getCustomActions } from "../actions/register";
+import { getActions } from "../actions/register";
 import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState, isEraserActive } from "../appState";
@@ -430,19 +430,12 @@ class App extends React.Component<AppProps, AppState> {
     this.id = nanoid();
 
     this.library = new Library(this);
-    this.scene = new Scene();
-    this.fonts = new Fonts({
-      scene: this.scene,
-      onSceneUpdated: this.onSceneUpdated,
-    });
-
     this.actionManager = new ActionManager(
       this.syncActionResult,
       () => this.state,
       () => this.scene.getElementsIncludingDeleted(),
       this,
     );
-
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -486,6 +479,11 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
+    this.scene = new Scene();
+    this.fonts = new Fonts({
+      scene: this.scene,
+      onSceneUpdated: this.onSceneUpdated,
+    });
     this.history = new History();
     this.actionManager.registerAll(getActions());
 
@@ -621,7 +619,7 @@ class App extends React.Component<AppProps, AppState> {
                         this.actionManager.renderAction(
                           subtype,
                           hasAlwaysEnabledActions(subtype)
-                            ? { onContextMenu: this.handleShapeContextMenu }
+                            ? { onContextMenu: this.handleCustomContextMenu }
                             : {},
                         ),
                       )}
@@ -1368,6 +1366,7 @@ class App extends React.Component<AppProps, AppState> {
       );
       cursorButton[socketId] = user.button;
     });
+
     const refresh = () => {
       // If a scene refresh is cued, restart the countdown.
       // This way we are not calling this.setState({}) once per
@@ -6046,7 +6045,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private handleShapeContextMenu = (
+  private handleCustomContextMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
     source: string,
   ) => {
@@ -6062,7 +6061,7 @@ class App extends React.Component<AppProps, AppState> {
         contextMenu: {
           top,
           left,
-          items: this.getContextMenuItems("shape", source),
+          items: this.getContextMenuItems("custom", source),
         },
       });
     });
@@ -6239,40 +6238,17 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private getContextMenuItems = (
-    type: "canvas" | "element" | "shape",
+    type: "canvas" | "element" | "custom",
     source?: string,
   ): ContextMenuItems => {
     const options: ContextMenuItems = [];
-    const allElements = this.actionManager.getElementsIncludingDeleted();
-    const appState = this.actionManager.getAppState();
-    let addedCustom = false;
-    getCustomActions().forEach((action) => {
-      if (action.predicate && type !== "shape") {
-        if (
-          action.predicate!(
-            allElements,
-            appState,
-            this.actionManager.app.props,
-            this.actionManager.app,
-          ) &&
-          this.actionManager.isActionEnabled(action)
-        ) {
-          addedCustom = true;
-          options.push(action);
-        }
-      } else if (action.shapeConfigPredicate && type === "shape") {
-        if (
-          action.shapeConfigPredicate!(allElements, appState, { source }) &&
-          this.actionManager.isActionEnabled(action)
-        ) {
-          options.push(action);
-        }
-      }
-    });
-    if (type === "shape") {
+    this.actionManager
+      .getCustomActions({ data: { source: source ?? "" } })
+      .forEach((action) => options.push(action));
+    if (type === "custom") {
       return options;
     }
-    if (addedCustom) {
+    if (options.length > 0) {
       options.push(CONTEXT_MENU_SEPARATOR);
     }
 

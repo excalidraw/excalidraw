@@ -75,7 +75,7 @@ export class ActionManager {
     this.app = app;
   }
 
-  public registerActionGuards() {
+  registerActionGuards() {
     const disablers = getActionDisablers();
     for (const d in disablers) {
       const dName = d as ActionName;
@@ -90,7 +90,7 @@ export class ActionManager {
     }
   }
 
-  private registerDisableFn(name: ActionName, disabler: DisableFn) {
+  registerDisableFn(name: ActionName, disabler: DisableFn) {
     if (!(name in this.disablers)) {
       this.disablers[name] = [] as DisableFn[];
     }
@@ -99,13 +99,32 @@ export class ActionManager {
     }
   }
 
-  private registerEnableFn(name: Action["name"], enabler: EnableFn) {
+  registerEnableFn(name: Action["name"], enabler: EnableFn) {
     if (!(name in this.enablers)) {
       this.enablers[name] = [] as EnableFn[];
     }
     if (!this.enablers[name].includes(enabler)) {
       this.enablers[name].push(enabler);
     }
+  }
+
+  getCustomActions(opts?: {
+    elements?: readonly ExcalidrawElement[];
+    data?: Record<string, any>;
+    guardsOnly?: boolean;
+  }): Action[] {
+    // For testing
+    if (this === undefined) {
+      return [];
+    }
+    const customActions: Action[] = [];
+    for (const key in this.actions) {
+      const action = this.actions[key];
+      if (!isActionName(action.name) && this.isActionEnabled(action, opts)) {
+        customActions.push(action);
+      }
+    }
+    return customActions;
   }
 
   registerAction(action: Action) {

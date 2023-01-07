@@ -18,6 +18,7 @@ export const SubtypeButton = (
   const subtypeAction: Action = {
     name: subtype,
     trackEvent: false,
+    predicate: (...rest) => rest[4]?.source === subtype,
     perform: (elements, appState) => {
       const inactive = !appState.activeSubtypes?.includes(subtype) ?? true;
       const activeSubtypes: Subtype[] = [];
