@@ -323,9 +323,9 @@ const ExcalidrawSetAppStateContext = React.createContext<
 >(() => {});
 ExcalidrawSetAppStateContext.displayName = "ExcalidrawSetAppStateContext";
 
-const ExcalidrawActionManagerContext = React.createContext<
-  ActionManager | { renderAction: ActionManager["renderAction"] }
->({ renderAction: () => null });
+const ExcalidrawActionManagerContext = React.createContext<ActionManager>(
+  null!,
+);
 ExcalidrawActionManagerContext.displayName = "ExcalidrawActionManagerContext";
 
 export const useExcalidrawElements = () =>
@@ -6247,15 +6247,15 @@ class App extends React.Component<AppProps, AppState> {
     const appState = this.actionManager.getAppState();
     let addedCustom = false;
     getCustomActions().forEach((action) => {
-      if (action.contextItemPredicate && type !== "shape") {
+      if (action.predicate && type !== "shape") {
         if (
-          action.contextItemPredicate!(
+          action.predicate!(
             allElements,
             appState,
             this.actionManager.app.props,
             this.actionManager.app,
           ) &&
-          this.actionManager.isActionEnabled(allElements, appState, action.name)
+          this.actionManager.isActionEnabled(action)
         ) {
           addedCustom = true;
           options.push(action);
@@ -6263,7 +6263,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (action.shapeConfigPredicate && type === "shape") {
         if (
           action.shapeConfigPredicate!(allElements, appState, { source }) &&
-          this.actionManager.isActionEnabled(allElements, appState, action.name)
+          this.actionManager.isActionEnabled(action)
         ) {
           options.push(action);
         }

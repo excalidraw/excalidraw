@@ -1,11 +1,5 @@
 import { ColorPicker } from "../components/ColorPicker";
-import {
-  eraser,
-  MoonIcon,
-  SunIcon,
-  ZoomInIcon,
-  ZoomOutIcon,
-} from "../components/icons";
+import { eraser, ZoomInIcon, ZoomOutIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
@@ -21,14 +15,17 @@ import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
 import { getDefaultAppState, isEraserActive } from "../appState";
-import ClearCanvas from "../components/ClearCanvas";
 import clsx from "clsx";
-import DropdownMenuItem from "../components/dropdownMenu/DropdownMenuItem";
-import { getShortcutFromShortcutName } from "./shortcuts";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   trackEvent: false,
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.changeViewBackgroundColor &&
+      !appState.viewModeEnabled
+    );
+  },
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
@@ -36,6 +33,7 @@ export const actionChangeViewBackgroundColor = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
+    // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
       <div style={{ position: "relative" }}>
         <ColorPicker
@@ -59,6 +57,12 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   trackEvent: { category: "canvas" },
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.clearCanvas &&
+      !appState.viewModeEnabled
+    );
+  },
   perform: (elements, appState, _, app) => {
     app.imageCache.clear();
     return {
@@ -84,8 +88,6 @@ export const actionClearCanvas = register({
       commitToHistory: true,
     };
   },
-
-  PanelComponent: ({ updateData }) => <ClearCanvas onConfirm={updateData} />,
 });
 
 export const actionZoomIn = register({
@@ -298,26 +300,10 @@ export const actionToggleTheme = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ appState, updateData }) => (
-    <DropdownMenuItem
-      onSelect={() => {
-        updateData(appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT);
-      }}
-      icon={appState.theme === "dark" ? SunIcon : MoonIcon}
-      dataTestId="toggle-dark-mode"
-      shortcut={getShortcutFromShortcutName("toggleTheme")}
-      ariaLabel={
-        appState.theme === "dark"
-          ? t("buttons.lightMode")
-          : t("buttons.darkMode")
-      }
-    >
-      {appState.theme === "dark"
-        ? t("buttons.lightMode")
-        : t("buttons.darkMode")}
-    </DropdownMenuItem>
-  ),
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
+  predicate: (elements, appState, props, app) => {
+    return !!app.props.UIOptions.canvasActions.toggleTheme;
+  },
 });
 
 export const actionErase = register({

@@ -201,7 +201,9 @@
     "svgImageInsertError": "SVG-Bild konnte nicht eingefügt werden. Das SVG-Markup sieht ungültig aus.",
     "invalidSVGString": "Ungültige SVG.",
     "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut.",
-    "importLibraryError": "Bibliothek konnte nicht geladen werden"
+    "importLibraryError": "Bibliothek konnte nicht geladen werden",
+    "collabSaveFailed": "Keine Speicherung in der Backend-Datenbank möglich. Wenn die Probleme weiterhin bestehen, solltest Du Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
+    "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst."
   },
   "toolBar": {
     "selection": "Auswahl",
@@ -312,8 +314,8 @@
     "zoomToFit": "Zoomen um alle Elemente einzupassen",
     "zoomToSelection": "Auf Auswahl zoomen",
     "toggleElementLock": "Auswahl sperren/entsperren",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Seite nach oben/unten verschieben",
+    "movePageLeftRight": "Seite nach links/rechts verschieben"
   },
   "clearCanvasDialog": {
     "title": "Zeichenfläche löschen"

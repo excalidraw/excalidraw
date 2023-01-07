@@ -146,9 +146,7 @@ export type PanelComponentProps = {
 
 export interface Action {
   name: string;
-  PanelComponent?: React.FC<
-    PanelComponentProps & { isInHamburgerMenu: boolean }
-  >;
+  PanelComponent?: React.FC<PanelComponentProps>;
   panelComponentPredicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -171,11 +169,12 @@ export interface Action {
         elements: readonly ExcalidrawElement[],
         appState: Readonly<AppState>,
       ) => string);
-  contextItemPredicate?: (
+  predicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     appProps: ExcalidrawProps,
     app: AppClassProperties,
+    data?: Record<string, any>,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
   trackEvent:

@@ -608,50 +608,50 @@ describe("subtype actions", () => {
   it("should apply to elements with their subtype", async () => {
     h.setState({ selectedElementIds: { A: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(true);
-    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(false);
+    expect(am.isActionEnabled(testAction, { elements })).toBe(true);
+    expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(false);
   });
   it("should apply to elements without a subtype", async () => {
     h.setState({ selectedElementIds: { B: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(false);
-    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(true);
+    expect(am.isActionEnabled(testAction, { elements })).toBe(false);
+    expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(true);
   });
   it("should apply to elements with and without their subtype", async () => {
     h.setState({ selectedElementIds: { A: true, B: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(true);
-    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(true);
+    expect(am.isActionEnabled(testAction, { elements })).toBe(true);
+    expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(true);
   });
   it("should apply to elements with a different subtype", async () => {
     h.setState({ selectedElementIds: { C: true, D: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(false);
-    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(true);
+    expect(am.isActionEnabled(testAction, { elements })).toBe(false);
+    expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(true);
   });
   it("should apply to like types with varying subtypes", async () => {
     h.setState({ selectedElementIds: { A: true, C: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(true);
-    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(true);
+    expect(am.isActionEnabled(testAction, { elements })).toBe(true);
+    expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(true);
   });
   it("should apply to non-like types with varying subtypes", async () => {
     h.setState({ selectedElementIds: { A: true, D: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(true);
-    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(false);
+    expect(am.isActionEnabled(testAction, { elements })).toBe(true);
+    expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(false);
   });
   it("should apply to like/non-like types with varying subtypes", async () => {
     h.setState({ selectedElementIds: { A: true, B: true, D: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(elements, h.state, TEST_ACTION)).toBe(true);
-    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE1)).toBe(true);
+    expect(am.isActionEnabled(testAction, { elements })).toBe(true);
+    expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(true);
   });
   it("should apply to the correct parent type", async () => {
     const am = h.app.actionManager;
     h.setState({ selectedElementIds: { A: true, C: true } });
-    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE3)).toBe(true);
+    expect(am.isActionEnabled(TEST_DISABLE3, { elements })).toBe(true);
     h.setState({ selectedElementIds: { A: true, D: true } });
-    expect(am.isActionEnabled(elements, h.state, TEST_DISABLE3)).toBe(true);
+    expect(am.isActionEnabled(TEST_DISABLE3, { elements })).toBe(true);
   });
 });

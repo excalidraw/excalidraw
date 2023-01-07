@@ -108,25 +108,6 @@ export class ActionManager {
     }
   }
 
-  public isActionEnabled(
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    actionName: Action["name"],
-  ): boolean {
-    if (isActionName(actionName)) {
-      return !(
-        actionName in this.disablers &&
-        this.disablers[actionName].some((fn) =>
-          fn(elements, appState, actionName),
-        )
-      );
-    }
-    return (
-      actionName in this.enablers &&
-      this.enablers[actionName].some((fn) => fn(elements, appState, actionName))
-    );
-  }
-
   registerAction(action: Action) {
     this.actions[action.name] = action;
   }
@@ -143,11 +124,7 @@ export class ActionManager {
         (action) =>
           (action.name in canvasActions
             ? canvasActions[action.name as keyof typeof canvasActions]
-            : this.isActionEnabled(
-                this.getElementsIncludingDeleted(),
-                this.getAppState(),
-                action.name,
-              )) &&
+            : this.isActionEnabled(action, { guardsOnly: true })) &&
           action.keyTest &&
           action.keyTest(
             event,
@@ -197,7 +174,6 @@ export class ActionManager {
   renderAction = (
     name: ActionName | Action["name"],
     data?: PanelComponentProps["data"],
-    isInHamburgerMenu = false,
   ) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
@@ -206,11 +182,7 @@ export class ActionManager {
       "PanelComponent" in this.actions[name] &&
       (name in canvasActions
         ? canvasActions[name as keyof typeof canvasActions]
-        : this.isActionEnabled(
-            this.getElementsIncludingDeleted(),
-            this.getAppState(),
-            name,
-          ))
+        : this.isActionEnabled(this.actions[name], { guardsOnly: true }))
     ) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
@@ -238,11 +210,48 @@ export class ActionManager {
           updateData={updateData}
           appProps={this.app.props}
           data={data}
-          isInHamburgerMenu={isInHamburgerMenu}
         />
       );
     }
 
     return null;
+  };
+
+  isActionEnabled = (
+    action: Action | ActionName,
+    opts?: {
+      elements?: readonly ExcalidrawElement[];
+      data?: Record<string, any>;
+      guardsOnly?: boolean;
+    },
+  ): boolean => {
+    const elements = opts?.elements ?? this.getElementsIncludingDeleted();
+    const appState = this.getAppState();
+    const data = opts?.data;
+
+    const _action = isActionName(action) ? this.actions[action] : action;
+
+    if (
+      !opts?.guardsOnly &&
+      _action.predicate &&
+      !_action.predicate(elements, appState, this.app.props, this.app, data)
+    ) {
+      return false;
+    }
+
+    if (isActionName(_action.name)) {
+      return !(
+        _action.name in this.disablers &&
+        this.disablers[_action.name].some((fn) =>
+          fn(elements, appState, _action.name as ActionName),
+        )
+      );
+    }
+    return (
+      _action.name in this.enablers &&
+      this.enablers[_action.name].some((fn) =>
+        fn(elements, appState, _action.name),
+      )
+    );
   };
 }

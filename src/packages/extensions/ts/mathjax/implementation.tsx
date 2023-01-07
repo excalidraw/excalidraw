@@ -1377,7 +1377,7 @@ const createMathActions = () => {
     },
     keyTest: (event) => event.shiftKey && event.code === "KeyR",
     contextItemLabel: "labels.resetUseTex",
-    contextItemPredicate: (elements, appState) => {
+    predicate: (elements, appState) => {
       const useTex = getMathProps.getUseTex(appState);
       const mathElements = getSelectedMathElements(elements, appState);
       return mathElements.some((el) => {

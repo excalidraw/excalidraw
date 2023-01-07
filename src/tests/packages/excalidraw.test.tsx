@@ -3,6 +3,7 @@ import { Excalidraw, Footer, MainMenu } from "../../packages/excalidraw/index";
 import { queryByText, queryByTestId } from "@testing-library/react";
 import { GRID_SIZE, THEME } from "../../constants";
 import { t } from "../../i18n";
+import { useMemo } from "react";
 
 const { h } = window;
 
@@ -13,6 +14,7 @@ describe("<Excalidraw/>", () => {
       toggleMenu(document.querySelector(".excalidraw")!);
     }
   });
+
   describe("Test zenModeEnabled prop", () => {
     it('should show exit zen mode button when zen mode is set and zen mode option in context menu when zenModeEnabled is "undefined"', async () => {
       const { container } = await render(<Excalidraw />);
@@ -119,34 +121,6 @@ describe("<Excalidraw/>", () => {
       expect(queryByText(contextMenu as HTMLElement, "Show grid")).toBe(null);
       expect(h.state.gridSize).toBe(null);
     });
-  });
-
-  it("should render main menu with host menu items if passed from host", async () => {
-    const { container } = await render(
-      <Excalidraw UIOptions={undefined}>
-        <MainMenu>
-          <MainMenu.Item onSelect={() => window.alert("Clicked")}>
-            Click me
-          </MainMenu.Item>
-          <MainMenu.ItemLink href="blog.excalidaw.com">
-            Excalidraw blog
-          </MainMenu.ItemLink>
-          <MainMenu.ItemCustom>
-            <button
-              style={{ height: "2rem" }}
-              onClick={() => window.alert("custom menu item")}
-            >
-              {" "}
-              custom menu item
-            </button>
-          </MainMenu.ItemCustom>
-          <MainMenu.DefaultItems.Help />
-        </MainMenu>
-      </Excalidraw>,
-    );
-    //open menu
-    toggleMenu(container);
-    expect(queryByTestId(container, "dropdown-menu")).toMatchSnapshot();
   });
 
   describe("Test UIOptions prop", () => {
@@ -306,7 +280,7 @@ describe("<Excalidraw/>", () => {
       //open menu
       toggleMenu(container);
       const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
-      expect(darkModeToggle).toBeFalsy();
+      expect(darkModeToggle).toBe(null);
     });
   });
 
@@ -336,6 +310,7 @@ describe("<Excalidraw/>", () => {
       expect(textInput?.nodeName).toBe("SPAN");
     });
   });
+
   describe("Test autoFocus prop", () => {
     it("should not focus when autoFocus is false", async () => {
       const { container } = await render(<Excalidraw />);
@@ -351,6 +326,66 @@ describe("<Excalidraw/>", () => {
       expect(
         container.querySelector(".excalidraw") === document.activeElement,
       ).toBe(true);
+    });
+  });
+
+  describe("<MainMenu/>", () => {
+    it("should render main menu with host menu items if passed from host", async () => {
+      const { container } = await render(
+        <Excalidraw>
+          <MainMenu>
+            <MainMenu.Item onSelect={() => window.alert("Clicked")}>
+              Click me
+            </MainMenu.Item>
+            <MainMenu.ItemLink href="blog.excalidaw.com">
+              Excalidraw blog
+            </MainMenu.ItemLink>
+            <MainMenu.ItemCustom>
+              <button
+                style={{ height: "2rem" }}
+                onClick={() => window.alert("custom menu item")}
+              >
+                {" "}
+                custom menu item
+              </button>
+            </MainMenu.ItemCustom>
+            <MainMenu.DefaultItems.Help />
+          </MainMenu>
+        </Excalidraw>,
+      );
+      //open menu
+      toggleMenu(container);
+      expect(queryByTestId(container, "dropdown-menu")).toMatchSnapshot();
+    });
+
+    it("should update themeToggle text even if MainMenu memoized", async () => {
+      const CustomExcalidraw = () => {
+        const customMenu = useMemo(() => {
+          return (
+            <MainMenu>
+              <MainMenu.DefaultItems.ToggleTheme />
+            </MainMenu>
+          );
+        }, []);
+
+        return <Excalidraw>{customMenu}</Excalidraw>;
+      };
+
+      const { container } = await render(<CustomExcalidraw />);
+      //open menu
+      toggleMenu(container);
+
+      expect(h.state.theme).toBe(THEME.LIGHT);
+
+      expect(
+        queryByTestId(container, "toggle-dark-mode")?.textContent,
+      ).toContain(t("buttons.darkMode"));
+
+      fireEvent.click(queryByTestId(container, "toggle-dark-mode")!);
+
+      expect(
+        queryByTestId(container, "toggle-dark-mode")?.textContent,
+      ).toContain(t("buttons.lightMode"));
     });
   });
 });
