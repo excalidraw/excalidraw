@@ -6241,6 +6241,19 @@ class App extends React.Component<AppProps, AppState> {
     type: "canvas" | "element" | "custom",
     source?: string,
   ): ContextMenuItems => {
+    const options = this._getContextMenuItems(type, source);
+    return options.filter(
+      (item) =>
+        !item ||
+        item === CONTEXT_MENU_SEPARATOR ||
+        this.actionManager.isActionEnabled(item, { guardsOnly: true }),
+    );
+  };
+
+  private _getContextMenuItems = (
+    type: "canvas" | "element" | "custom",
+    source?: string,
+  ): ContextMenuItems => {
     const options: ContextMenuItems = [];
     this.actionManager
       .getCustomActions({ data: { source: source ?? "" } })
