@@ -13,6 +13,7 @@ import { newLinearElement } from "../element";
 import ExcalidrawApp from "../excalidraw-app";
 import { mutateElement } from "../element/mutateElement";
 import { NormalizedZoomValue } from "../types";
+import { ROUNDNESS } from "../constants";
 
 const { h } = window;
 
@@ -127,7 +128,7 @@ const createLinearElementWithCurveInsideMinMaxPoints = (
     roughness: 1,
     opacity: 100,
     groupIds: [],
-    strokeSharpness: "round",
+    roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
     boundElements: null,
     link: null,
     locked: false,
@@ -160,7 +161,7 @@ const createLinearElementsWithCurveOutsideMinMaxPoints = (
     roughness: 1,
     opacity: 100,
     groupIds: [],
-    strokeSharpness: "round",
+    roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
     boundElements: null,
     link: null,
     locked: false,
