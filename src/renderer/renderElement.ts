@@ -788,20 +788,23 @@ const drawElementFromCanvas = (
       tempCanvas.height / zoom,
     );
   } else {
-    let scaleXFactor = 1;
-    let scaleYFactor = 1;
+    // we translate context to element center so that rotation and scale
+    // originates from the element center
+    context.translate(cx, cy);
+
+    context.rotate(element.angle);
 
     if (
       "scale" in elementWithCanvas.element &&
       !isPendingImageElement(element, renderConfig)
     ) {
-      scaleXFactor = elementWithCanvas.element.scale[0];
-      scaleYFactor = elementWithCanvas.element.scale[1];
+      context.scale(
+        elementWithCanvas.element.scale[0],
+        elementWithCanvas.element.scale[1],
+      );
     }
 
-    context.translate(cx, cy);
-    context.rotate(element.angle);
-    context.scale(scaleXFactor, scaleYFactor);
+    // revert afterwards we don't have account for it during drawing
     context.translate(-cx, -cy);
 
     context.drawImage(
