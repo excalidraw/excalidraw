@@ -13,7 +13,11 @@ import {
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
 import { getBoundTextElement } from "../element/textElement";
-import { hasBoundTextElement } from "../element/typeChecks";
+import {
+  hasBoundTextElement,
+  canApplyRoundnessTypeToElement,
+  getDefaultRoundnessTypeForElement,
+} from "../element/typeChecks";
 import { getSelectedElements } from "../scene";
 
 // `copiedStyles` is exported only for tests.
@@ -77,6 +81,14 @@ export const actionPasteStyles = register({
             fillStyle: elementStylesToCopyFrom?.fillStyle,
             opacity: elementStylesToCopyFrom?.opacity,
             roughness: elementStylesToCopyFrom?.roughness,
+            roundness: elementStylesToCopyFrom.roundness
+              ? canApplyRoundnessTypeToElement(
+                  elementStylesToCopyFrom.roundness.type,
+                  element,
+                )
+                ? elementStylesToCopyFrom.roundness
+                : getDefaultRoundnessTypeForElement(element)
+              : null,
           });
 
           if (isTextElement(newElement)) {

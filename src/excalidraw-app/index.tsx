@@ -7,7 +7,6 @@ import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import {
   APP_NAME,
-  COOKIES,
   EVENT,
   THEME,
   TITLE_TIMEOUT,
@@ -22,7 +21,12 @@ import {
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import { Excalidraw, defaultLang } from "../packages/excalidraw/index";
+import {
+  Excalidraw,
+  defaultLang,
+  Footer,
+  MainMenu,
+} from "../packages/excalidraw/index";
 import {
   AppState,
   LibraryItems,
@@ -50,7 +54,6 @@ import Collab, {
   collabDialogShownAtom,
   isCollaboratingAtom,
 } from "./collab/Collab";
-import { LanguageList } from "./components/LanguageList";
 import {
   exportToBackend,
   getCollaborationLinkData,
@@ -79,14 +82,14 @@ import { atom, Provider, useAtom } from "jotai";
 import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
-import EncryptedIcon from "../components/EncryptedIcon";
+import { EncryptedIcon } from "./components/EncryptedIcon";
+import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
+import { LanguageList } from "./components/LanguageList";
+import { PlusPromoIcon } from "../components/icons";
 
 polyfill();
-window.EXCALIDRAW_THROTTLE_RENDER = true;
 
-const isExcalidrawPlusSignedUser = document.cookie.includes(
-  COOKIES.AUTH_STATE_COOKIE,
-);
+window.EXCALIDRAW_THROTTLE_RENDER = true;
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -234,7 +237,6 @@ export const langCodeAtom = atom(
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [langCode, setLangCode] = useAtom(langCodeAtom);
-
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -577,41 +579,6 @@ const ExcalidrawWrapper = () => {
     }
   };
 
-  const renderFooter = (isMobile: boolean) => {
-    const renderLanguageList = () => <LanguageList />;
-    if (isMobile) {
-      return (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <div style={{ marginBottom: ".5rem", fontSize: "0.75rem" }}>
-            {t("labels.language")}
-          </div>
-          <div style={{ padding: "0 0.625rem" }}>{renderLanguageList()}</div>
-        </div>
-      );
-    }
-
-    return (
-      <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
-        {isExcalidrawPlusSignedUser && (
-          <a
-            href={`${process.env.REACT_APP_PLUS_APP}?utm_source=excalidraw&utm_medium=app&utm_content=signedInUserRedirectButton#excalidraw-redirect`}
-            target="_blank"
-            rel="noreferrer"
-            className="plus-button"
-          >
-            Go to Excalidraw+
-          </a>
-        )}
-        <EncryptedIcon />
-      </div>
-    );
-  };
-
   const renderCustomStats = (
     elements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
@@ -632,6 +599,39 @@ const ExcalidrawWrapper = () => {
     }
     const serializedItems = JSON.stringify(items);
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
+  };
+
+  const renderMenu = () => {
+    return (
+      <MainMenu>
+        <MainMenu.DefaultItems.LoadScene />
+        <MainMenu.DefaultItems.SaveToActiveFile />
+        <MainMenu.DefaultItems.Export />
+        <MainMenu.DefaultItems.SaveAsImage />
+        <MainMenu.DefaultItems.LiveCollaboration
+          isCollaborating={isCollaborating}
+          onSelect={() => setCollabDialogShown(true)}
+        />
+
+        <MainMenu.DefaultItems.Help />
+        <MainMenu.DefaultItems.ClearCanvas />
+        <MainMenu.Separator />
+        <MainMenu.ItemLink
+          icon={PlusPromoIcon}
+          href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger"
+          className="ExcalidrawPlus"
+        >
+          Excalidraw+
+        </MainMenu.ItemLink>
+        <MainMenu.DefaultItems.Socials />
+        <MainMenu.Separator />
+        <MainMenu.DefaultItems.ToggleTheme />
+        <MainMenu.ItemCustom>
+          <LanguageList style={{ width: "100%" }} />
+        </MainMenu.ItemCustom>
+        <MainMenu.DefaultItems.ChangeCanvasBackground />
+      </MainMenu>
+    );
   };
 
   return (
@@ -672,7 +672,6 @@ const ExcalidrawWrapper = () => {
             },
           },
         }}
-        renderFooter={renderFooter}
         langCode={langCode}
         renderCustomStats={renderCustomStats}
         detectScroll={false}
@@ -680,7 +679,15 @@ const ExcalidrawWrapper = () => {
         onLibraryChange={onLibraryChange}
         autoFocus={true}
         theme={theme}
-      />
+      >
+        {renderMenu()}
+        <Footer>
+          <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
+            <ExcalidrawPlusAppLink />
+            <EncryptedIcon />
+          </div>
+        </Footer>
+      </Excalidraw>
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
         <ErrorDialog

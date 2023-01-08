@@ -24,7 +24,7 @@ const allLanguages: Language[] = [
   { code: "fa-IR", label: "فارسی", rtl: true },
   { code: "fi-FI", label: "Suomi" },
   { code: "fr-FR", label: "Français" },
-  { code: "gl-ES	", label: "Galego" },
+  { code: "gl-ES", label: "Galego" },
   { code: "he-IL", label: "עברית", rtl: true },
   { code: "hi-IN", label: "हिन्दी" },
   { code: "hu-HU", label: "Magyar" },
@@ -90,9 +90,14 @@ export const setLanguage = async (lang: Language) => {
   if (lang.code.startsWith(TEST_LANG_CODE)) {
     currentLangData = {};
   } else {
-    currentLangData = await import(
-      /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
-    );
+    try {
+      currentLangData = await import(
+        /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
+      );
+    } catch (error: any) {
+      console.error(`Failed to load language ${lang.code}:`, error.message);
+      currentLangData = fallbackLangData;
+    }
   }
 };
 

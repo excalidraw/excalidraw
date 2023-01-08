@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Paste",
+    "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
@@ -201,7 +202,9 @@
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
     "invalidSVGString": "Invalid SVG.",
     "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
-    "importLibraryError": "Couldn't load library"
+    "importLibraryError": "Couldn't load library",
+    "collabSaveFailed": "Couldn't save to the backend database. If problems persist, you should save your file locally to ensure you don't lose your work.",
+    "collabSaveFailed_sizeExceeded": "Couldn't save to the backend database, the canvas seems to be too big. You should save the file locally to ensure you don't lose your work."
   },
   "toolBar": {
     "selection": "Selection",
@@ -236,7 +239,7 @@
     "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
     "resizeImage": "You can resize freely by holding SHIFT,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating",
-    "lineEditor_info": "Double-click or press Enter to edit points",
+    "lineEditor_info": "Hold CtrlOrCmd and Double-click or press CtrlOrCmd + Enter to edit points",
     "lineEditor_pointSelected": "Press Delete to remove point(s),\nCtrlOrCmd+D to duplicate, or drag to move",
     "lineEditor_nothingSelected": "Select a point to edit (hold SHIFT to select multiple),\nor hold Alt and click to add new points",
     "placeImage": "Click to place the image, or click and drag to set its size manually",
@@ -311,7 +314,9 @@
     "view": "View",
     "zoomToFit": "Zoom to fit all elements",
     "zoomToSelection": "Zoom to selection",
-    "toggleElementLock": "Lock/unlock selection"
+    "toggleElementLock": "Lock/unlock selection",
+    "movePageUpDown": "Move page up/down",
+    "movePageLeftRight": "Move page left/right"
   },
   "clearCanvasDialog": {
     "title": "Clear canvas"
@@ -392,7 +397,8 @@
     "fileSaved": "File saved.",
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
-    "selection": "selection"
+    "selection": "selection",
+    "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor"
   },
   "colors": {
     "ffffff": "White",

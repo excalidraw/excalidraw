@@ -140,11 +140,11 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             />
             <Shortcut
               label={t("toolBar.line")}
-              shortcuts={[KEYS.P, KEYS["6"]]}
+              shortcuts={[KEYS.L, KEYS["6"]]}
             />
             <Shortcut
               label={t("toolBar.freedraw")}
-              shortcuts={["Shift + P", KEYS["7"]]}
+              shortcuts={[KEYS.P, KEYS["7"]]}
             />
             <Shortcut
               label={t("toolBar.text")}
@@ -157,7 +157,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             />
             <Shortcut
               label={t("helpDialog.editSelectedShape")}
-              shortcuts={[getShortcutKey("Enter"), t("helpDialog.doubleClick")]}
+              shortcuts={[
+                getShortcutKey("CtrlOrCmd+Enter"),
+                getShortcutKey(`CtrlOrCmd + ${t("helpDialog.doubleClick")}`),
+              ]}
             />
             <Shortcut
               label={t("helpDialog.textNewLine")}
@@ -227,6 +230,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("helpDialog.zoomToSelection")}
               shortcuts={["Shift+2"]}
             />
+            <Shortcut
+              label={t("helpDialog.movePageUpDown")}
+              shortcuts={["PgUp/PgDn"]}
+            />
+            <Shortcut
+              label={t("helpDialog.movePageLeftRight")}
+              shortcuts={["Shift+PgUp/PgDn"]}
+            />
             <Shortcut label={t("buttons.fullScreen")} shortcuts={["F"]} />
             <Shortcut
               label={t("buttons.zenMode")}
@@ -290,6 +301,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("CtrlOrCmd+V")]}
             />
             <Shortcut
+              label={t("labels.pasteAsPlaintext")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V")]}
+            />
+            <Shortcut
               label={t("labels.copyAsPng")}
               shortcuts={[getShortcutKey("Shift+Alt+C")]}
             />
@@ -303,7 +318,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             />
             <Shortcut
               label={t("labels.delete")}
-              shortcuts={[getShortcutKey("Del")]}
+              shortcuts={[getShortcutKey("Delete")]}
             />
             <Shortcut
               label={t("labels.sendToBack")}

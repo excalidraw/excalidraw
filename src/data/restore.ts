@@ -1,7 +1,9 @@
 import {
   ExcalidrawElement,
   ExcalidrawSelectionElement,
+  ExcalidrawTextElement,
   FontFamilyValues,
+  StrokeRoundness,
 } from "../element/types";
 import {
   AppState,
@@ -16,7 +18,7 @@ import {
   isInvisiblySmallElement,
   refreshTextDimensions,
 } from "../element";
-import { isLinearElementType } from "../element/typeChecks";
+import { isTextElement, isUsingAdaptiveRadius } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
   DEFAULT_FONT_FAMILY,
@@ -24,12 +26,14 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   PRECEDING_ELEMENT_KEY,
   FONT_FAMILY,
+  ROUNDNESS,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
+import oc from "open-color";
 
 type RestoredAppState = Omit<
   AppState,
@@ -73,6 +77,8 @@ const restoreElementWithProperties = <
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
+    /** @deprecated */
+    strokeSharpness?: StrokeRoundness;
     /** metadata that may be present in elements during collaboration */
     [PRECEDING_ELEMENT_KEY]?: string;
   },
@@ -105,15 +111,23 @@ const restoreElementWithProperties = <
     angle: element.angle || 0,
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
-    strokeColor: element.strokeColor,
-    backgroundColor: element.backgroundColor,
+    strokeColor: element.strokeColor || oc.black,
+    backgroundColor: element.backgroundColor || "transparent",
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
-    strokeSharpness:
-      element.strokeSharpness ??
-      (isLinearElementType(element.type) ? "round" : "sharp"),
+    roundness: element.roundness
+      ? element.roundness
+      : element.strokeSharpness === "round"
+      ? {
+          // for old elements that would now use adaptive radius algo,
+          // use legacy algo instead
+          type: isUsingAdaptiveRadius(element.type)
+            ? ROUNDNESS.LEGACY
+            : ROUNDNESS.PROPORTIONAL_RADIUS,
+        }
+      : null,
     boundElements: element.boundElementIds
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
@@ -235,6 +249,91 @@ const restoreElement = (
   }
 };
 
+/**
+ * Repairs contaienr element's boundElements array by removing duplicates and
+ * fixing containerId of bound elements if not present. Also removes any
+ * bound elements that do not exist in the elements array.
+ *
+ * NOTE mutates elements.
+ */
+const repairContainerElement = (
+  container: Mutable<ExcalidrawElement>,
+  elementsMap: Map<string, Mutable<ExcalidrawElement>>,
+) => {
+  if (container.boundElements) {
+    // copy because we're not cloning on restore, and we don't want to mutate upstream
+    const boundElements = container.boundElements.slice();
+
+    // dedupe bindings & fix boundElement.containerId if not set already
+    const boundIds = new Set<ExcalidrawElement["id"]>();
+    container.boundElements = boundElements.reduce(
+      (
+        acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
+        binding,
+      ) => {
+        const boundElement = elementsMap.get(binding.id);
+        if (boundElement && !boundIds.has(binding.id)) {
+          boundIds.add(binding.id);
+
+          if (boundElement.isDeleted) {
+            return acc;
+          }
+
+          acc.push(binding);
+
+          if (
+            isTextElement(boundElement) &&
+            // being slightly conservative here, preserving existing containerId
+            // if defined, lest boundElements is stale
+            !boundElement.containerId
+          ) {
+            (boundElement as Mutable<ExcalidrawTextElement>).containerId =
+              container.id;
+          }
+        }
+        return acc;
+      },
+      [],
+    );
+  }
+};
+
+/**
+ * Repairs target bound element's container's boundElements array,
+ * or removes contaienrId if container does not exist.
+ *
+ * NOTE mutates elements.
+ */
+const repairBoundElement = (
+  boundElement: Mutable<ExcalidrawTextElement>,
+  elementsMap: Map<string, Mutable<ExcalidrawElement>>,
+) => {
+  const container = boundElement.containerId
+    ? elementsMap.get(boundElement.containerId)
+    : null;
+
+  if (!container) {
+    boundElement.containerId = null;
+    return;
+  }
+
+  if (boundElement.isDeleted) {
+    return;
+  }
+
+  if (
+    container.boundElements &&
+    !container.boundElements.find((binding) => binding.id === boundElement.id)
+  ) {
+    // copy because we're not cloning on restore, and we don't want to mutate upstream
+    const boundElements = (
+      container.boundElements || (container.boundElements = [])
+    ).slice();
+    boundElements.push({ type: "text", id: boundElement.id });
+    container.boundElements = boundElements;
+  }
+};
+
 export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
@@ -242,7 +341,7 @@ export const restoreElements = (
   refreshDimensions = false,
 ): ExcalidrawElement[] => {
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
-  return (elements || []).reduce((elements, element) => {
+  const restoredElements = (elements || []).reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
     // and causing issues if retained
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
@@ -260,6 +359,18 @@ export const restoreElements = (
     }
     return elements;
   }, [] as ExcalidrawElement[]);
+
+  // repair binding. Mutates elements.
+  const restoredElementsMap = arrayToMap(restoredElements);
+  for (const element of restoredElements) {
+    if (isTextElement(element) && element.containerId) {
+      repairBoundElement(element, restoredElementsMap);
+    } else if (element.boundElements) {
+      repairContainerElement(element, restoredElementsMap);
+    }
+  }
+
+  return restoredElements;
 };
 
 const coalesceAppStateValue = <
