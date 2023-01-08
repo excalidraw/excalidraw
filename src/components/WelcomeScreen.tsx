@@ -1,8 +1,6 @@
 import { actionLoadScene, actionShortcuts } from "../actions";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { t } from "../i18n";
-import { UIWelcomeScreenCenterComponents } from "../types";
-import { ReactChildrenToObject } from "../utils";
 import { useExcalidrawActionManager, useExcalidrawAppState } from "./App";
 import {
   ExcalLogo,
