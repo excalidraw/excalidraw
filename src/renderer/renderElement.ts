@@ -713,22 +713,8 @@ const drawElementFromCanvas = (
   const cx = ((x1 + x2) / 2 + renderConfig.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + renderConfig.scrollY) * window.devicePixelRatio;
 
-  const _isPendingImageElement = isPendingImageElement(element, renderConfig);
-
-  const scaleXFactor =
-    "scale" in elementWithCanvas.element && !_isPendingImageElement
-      ? elementWithCanvas.element.scale[0]
-      : 1;
-  const scaleYFactor =
-    "scale" in elementWithCanvas.element && !_isPendingImageElement
-      ? elementWithCanvas.element.scale[1]
-      : 1;
-
   context.save();
-  context.scale(
-    (1 / window.devicePixelRatio) * scaleXFactor,
-    (1 / window.devicePixelRatio) * scaleYFactor,
-  );
+  context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   const boundTextElement = getBoundTextElement(element);
 
   if (isArrowElement(element) && boundTextElement) {
@@ -793,7 +779,7 @@ const drawElementFromCanvas = (
         zoom,
     );
 
-    context.translate(cx * scaleXFactor, cy * scaleYFactor);
+    context.translate(cx, cy);
     context.drawImage(
       tempCanvas,
       (-(x2 - x1) / 2) * window.devicePixelRatio - offsetX / zoom - padding,
@@ -802,15 +788,30 @@ const drawElementFromCanvas = (
       tempCanvas.height / zoom,
     );
   } else {
-    context.translate(cx * scaleXFactor, cy * scaleYFactor);
+    // we translate context to element center so that rotation and scale
+    // originates from the element center
+    context.translate(cx, cy);
 
-    context.rotate(element.angle * scaleXFactor * scaleYFactor);
+    context.rotate(element.angle);
+
+    if (
+      "scale" in elementWithCanvas.element &&
+      !isPendingImageElement(element, renderConfig)
+    ) {
+      context.scale(
+        elementWithCanvas.element.scale[0],
+        elementWithCanvas.element.scale[1],
+      );
+    }
+
+    // revert afterwards we don't have account for it during drawing
+    context.translate(-cx, -cy);
 
     context.drawImage(
       elementWithCanvas.canvas!,
-      (-(x2 - x1) / 2) * window.devicePixelRatio -
+      (x1 + renderConfig.scrollX) * window.devicePixelRatio -
         (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
-      (-(y2 - y1) / 2) * window.devicePixelRatio -
+      (y1 + renderConfig.scrollY) * window.devicePixelRatio -
         (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
       elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
       elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
@@ -905,9 +906,6 @@ export const renderElement = (
         }
         context.save();
         context.translate(cx, cy);
-        if (element.type === "image") {
-          context.scale(element.scale[0], element.scale[1]);
-        }
 
         if (shouldResetImageFilter(element, renderConfig)) {
           context.filter = "none";
@@ -973,6 +971,12 @@ export const renderElement = (
           );
         } else {
           context.rotate(element.angle);
+
+          if (element.type === "image") {
+            // note: scale must be applied *after* rotating
+            context.scale(element.scale[0], element.scale[1]);
+          }
+
           context.translate(-shiftX, -shiftY);
           drawElementOnCanvas(element, rc, context, renderConfig);
         }
