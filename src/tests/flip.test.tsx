@@ -6,6 +6,7 @@ import { actionFlipHorizontal, actionFlipVertical } from "../actions";
 import { getElementAbsoluteCoords } from "../element";
 import {
   ExcalidrawElement,
+  ExcalidrawImageElement,
   ExcalidrawLinearElement,
   FileId,
 } from "../element/types";
@@ -268,6 +269,16 @@ const checkRotatedVerticalFlip = async (
 const checkVerticalFlip = async (toleranceInPx: number = 0.00001) => {
   const originalElement = JSON.parse(JSON.stringify(h.elements[0]));
 
+  h.app.actionManager.executeAction(actionFlipVertical);
+
+  const newElement = h.elements[0];
+  await checkElementsBoundingBox(originalElement, newElement, toleranceInPx);
+};
+
+const checkVerticalHorizontalFlip = async (toleranceInPx: number = 0.00001) => {
+  const originalElement = JSON.parse(JSON.stringify(h.elements[0]));
+
+  h.app.actionManager.executeAction(actionFlipHorizontal);
   h.app.actionManager.executeAction(actionFlipVertical);
 
   const newElement = h.elements[0];
@@ -691,25 +702,31 @@ describe("image", () => {
   it("flips an unrotated image horizontally correctly", async () => {
     //paste image
     await createImage();
+
     await waitFor(() => {
+      expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, 1]);
       expect(API.getSelectedElements().length).toBeGreaterThan(0);
       expect(API.getSelectedElements()[0].type).toEqual("image");
       expect(h.app.files.fileId).toBeDefined();
     });
-
     await checkHorizontalFlip();
+    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([-1, 1]);
+    expect(h.elements[0].angle).toBeCloseTo(0);
   });
 
   it("flips an unrotated image vertically correctly", async () => {
     //paste image
     await createImage();
     await waitFor(() => {
+      expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, 1]);
       expect(API.getSelectedElements().length).toBeGreaterThan(0);
       expect(API.getSelectedElements()[0].type).toEqual("image");
       expect(h.app.files.fileId).toBeDefined();
     });
 
     await checkVerticalFlip();
+    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([-1, 1]);
+    expect(h.elements[0].angle).toBeCloseTo(Math.PI);
   });
 
   it("flips an rotated image horizontally correctly", async () => {
@@ -718,6 +735,7 @@ describe("image", () => {
     //paste image
     await createImage();
     await waitFor(() => {
+      expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, 1]);
       expect(API.getSelectedElements().length).toBeGreaterThan(0);
       expect(API.getSelectedElements()[0].type).toEqual("image");
       expect(h.app.files.fileId).toBeDefined();
@@ -726,6 +744,7 @@ describe("image", () => {
       angle: originalAngle,
     });
     await checkRotatedHorizontalFlip(expectedAngle);
+    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([-1, 1]);
   });
 
   it("flips an rotated image vertically correctly", async () => {
@@ -734,6 +753,8 @@ describe("image", () => {
     //paste image
     await createImage();
     await waitFor(() => {
+      expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, 1]);
+      expect(h.elements[0].angle).toEqual(0);
       expect(API.getSelectedElements().length).toBeGreaterThan(0);
       expect(API.getSelectedElements()[0].type).toEqual("image");
       expect(h.app.files.fileId).toBeDefined();
@@ -743,5 +764,22 @@ describe("image", () => {
     });
 
     await checkRotatedVerticalFlip(expectedAngle);
+    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([-1, 1]);
+    expect(h.elements[0].angle).toBeCloseTo(expectedAngle);
+  });
+
+  it("flips an image both vertically & horizontally", async () => {
+    //paste image
+    await createImage();
+    await waitFor(() => {
+      expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, 1]);
+      expect(API.getSelectedElements().length).toBeGreaterThan(0);
+      expect(API.getSelectedElements()[0].type).toEqual("image");
+      expect(h.app.files.fileId).toBeDefined();
+    });
+
+    await checkVerticalHorizontalFlip();
+    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, 1]);
+    expect(h.elements[0].angle).toBeCloseTo(Math.PI);
   });
 });
