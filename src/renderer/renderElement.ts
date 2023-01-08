@@ -905,9 +905,6 @@ export const renderElement = (
         }
         context.save();
         context.translate(cx, cy);
-        if (element.type === "image") {
-          context.scale(element.scale[0], element.scale[1]);
-        }
 
         if (shouldResetImageFilter(element, renderConfig)) {
           context.filter = "none";
@@ -973,6 +970,12 @@ export const renderElement = (
           );
         } else {
           context.rotate(element.angle);
+
+          if (element.type === "image") {
+            // note: scale must be applied *after* rotating
+            context.scale(element.scale[0], element.scale[1]);
+          }
+
           context.translate(-shiftX, -shiftY);
           drawElementOnCanvas(element, rc, context, renderConfig);
         }
