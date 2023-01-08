@@ -114,7 +114,7 @@ export const getSystemClipboard = async (
 ): Promise<string> => {
   try {
     const text = event
-      ? event.clipboardData?.getData("text/plain").trim()
+      ? event.clipboardData?.getData("text/plain")
       : probablySupportsClipboardReadText &&
         (await navigator.clipboard.readText());
 
