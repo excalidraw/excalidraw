@@ -65,7 +65,7 @@ See [`restoreAppState()`](https://github.com/excalidraw/excalidraw/blob/master/s
 import { restore } from "@excalidraw/excalidraw";
 ```
 
-This function makes sure elements and state is set to appropriate values and set to default value if not present. It is a combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState).
+This function makes sure elements and state is set to appropriate values and set to default value if not present. It is a combination of [restoreElements](#restoreelements) and [restoreAppState](#restoreappstate).
 
 ### `restoreLibraryItems`
 

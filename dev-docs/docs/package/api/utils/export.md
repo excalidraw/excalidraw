@@ -49,7 +49,7 @@ exportToBlob(
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| opts |  |  | This param is passed to `exportToCanvas`. You can refer to [`exportToCanvas`](#exportToCanvas) |
+| opts |  |  | This param is passed to `exportToCanvas`. You can refer to [`exportToCanvas`](#exporttocanvas) |
 | mimeType | string | "image/png" | Indicates the image format |
 | quality | number | 0.92 | A value between 0 and 1 indicating the [image quality](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#parameters). Applies only to `image/jpeg`/`image/webp` MIME types. |
 | exportPadding | number | 10 | The padding to be added on canvas |
@@ -112,7 +112,7 @@ exportToClipboard(
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- | --- | --- |
-| opts |  |  | This param is same as the params passed to `exportToCanvas`. You can refer to [`exportToCanvas`](#exportToCanvas). |
+| opts |  |  | This param is same as the params passed to `exportToCanvas`. You can refer to [`exportToCanvas`](#exporttocanvas). |
 | mimeType | string | "image/png" | Indicates the image format, this will be used when exporting as `png`. |
 | quality | number | 0.92 | A value between 0 and 1 indicating the [image quality](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#parameters). Applies only to `image/jpeg`/`image/webp` MIME types. This will be used when exporting as `png`. |
 | type | 'png' | 'svg' | 'json' |  | This determines the format to which the scene data should be exported. |
