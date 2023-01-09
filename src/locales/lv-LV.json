@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Ielīmēt",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Ielīmēt kā vienkāršu tekstu",
     "pasteCharts": "Ielīmēt grafikus",
     "selectAll": "Atlasīt visu",
     "multiSelect": "Pievienot elementu atlasei",
@@ -201,7 +201,9 @@
     "svgImageInsertError": "Nevarēja ievietot SVG attēlu. Šķiet, ka SVG marķējums nav derīgs.",
     "invalidSVGString": "Nederīgs SVG.",
     "cannotResolveCollabServer": "Nevarēja savienoties ar sadarbošanās serveri. Lūdzu, pārlādējiet lapu un mēģiniet vēlreiz.",
-    "importLibraryError": "Nevarēja ielādēt bibliotēku"
+    "importLibraryError": "Nevarēja ielādēt bibliotēku",
+    "collabSaveFailed": "Darbs nav saglabāts datubāzē. Ja problēma turpinās, saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu.",
+    "collabSaveFailed_sizeExceeded": "Darbs nav saglabāts datubāzē, šķiet, ka tāfele ir pārāk liela. Saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu."
   },
   "toolBar": {
     "selection": "Atlase",
@@ -236,7 +238,7 @@
     "resize": "Kad maināt izmēru, varat ierobežot proporcijas, turot nospiestu SHIFT,\nvai arī ALT, lai mainītu izmēru ap centru",
     "resizeImage": "Varat brīvi mainīt izmēru, turot nospiestu SHIFT;\nturiet nospiestu ALT, lai mainītu izmēru ap centru",
     "rotate": "Rotējot varat ierobežot leņķi, turot nospiestu SHIFT",
-    "lineEditor_info": "",
+    "lineEditor_info": "Turiet CtrlOrCmd un dubultklikšķiniet, vai spiediet CtrlOrCmd + Enter, lai rediģētu punktus",
     "lineEditor_pointSelected": "Spiediet dzēšanas taustiņu, lai noņemtu punktus, – CtrlOrCmd+D, lai to kopētu, vai velciet, lai pārvietotu",
     "lineEditor_nothingSelected": "Atlasiet punktu, lai labotu (turiet nospiestu SHIFT, lai atlasītu vairākus),\nvai turiet Alt un clikšķiniet, lai pievienotu jaunus punktus",
     "placeImage": "Klikšķiniet, lai novietotu attēlu, vai spiediet un velciet, lai iestatītu tā izmēru",
@@ -312,8 +314,8 @@
     "zoomToFit": "Iestatīt mērogu, kas iekļauj visus elementus",
     "zoomToSelection": "Iestatīt mērogu, lai rādītu atlasi",
     "toggleElementLock": "Fiksēt/atbrīvot atlasīto",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Pārvietot lapu augšup/lejup",
+    "movePageLeftRight": "Pārvietot lapu pa labi/kreisi"
   },
   "clearCanvasDialog": {
     "title": "Notīrīt tāfeli"
@@ -395,7 +397,7 @@
     "fileSavedToFilename": "Saglabāts kā {filename}",
     "canvas": "tāfeli",
     "selection": "atlasi",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Izmantojiet {{shortcut}}, lai ielīmētu kā jaunu elementu, vai ielīmētu esošā teksta lauciņā"
   },
   "colors": {
     "ffffff": "Balts",

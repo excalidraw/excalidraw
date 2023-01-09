@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Dán",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Dán kiểu văn bản thuần",
     "pasteCharts": "Dán biểu đồ",
     "selectAll": "Chọn tất cả",
     "multiSelect": "Thêm mới vào Select",
@@ -201,7 +201,9 @@
     "svgImageInsertError": "",
     "invalidSVGString": "",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "",

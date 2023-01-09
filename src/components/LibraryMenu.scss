@@ -129,4 +129,27 @@
       padding-right: 0;
     }
   }
+
+  .layer-ui__sidebar__header .dropdown-menu {
+    &.dropdown-menu--mobile {
+      top: 100%;
+    }
+    .dropdown-menu-container {
+      --gap: 0;
+      z-index: 1;
+      position: absolute;
+      top: 100%;
+      left: 0;
+
+      :root[dir="rtl"] & {
+        right: 0;
+        left: auto;
+      }
+
+      width: 196px;
+      box-shadow: var(--library-dropdown-shadow);
+      border-radius: var(--border-radius-lg);
+      padding: 0.25rem 0.5rem;
+    }
+  }
 }
