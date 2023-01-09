@@ -15,7 +15,11 @@ import {
   BinaryFiles,
   UIChildrenComponents,
 } from "../types";
-import { muteFSAbortError, ReactChildrenToObject } from "../utils";
+import {
+  isShallowEqual,
+  muteFSAbortError,
+  ReactChildrenToObject,
+} from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
@@ -41,26 +45,17 @@ import "./LayerUI.scss";
 import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
-import { isMenuOpenAtom, useDevice } from "../components/App";
+import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
-import {
-  ExportImageIcon,
-  HamburgerMenuIcon,
-  WelcomeScreenMenuArrow,
-  WelcomeScreenTopToolbarArrow,
-} from "./icons";
-import { MenuLinks, Separator } from "./MenuUtils";
-import { useOutsideClickHook } from "../hooks/useOutsideClick";
+import { WelcomeScreenMenuArrow, WelcomeScreenTopToolbarArrow } from "./icons";
 import WelcomeScreen from "./WelcomeScreen";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
-import { LanguageList } from "../excalidraw-app/components/LanguageList";
 import WelcomeScreenDecor from "./WelcomeScreenDecor";
-import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import MenuItem from "./MenuItem";
+import MainMenu from "./mainMenu/MainMenu";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -103,7 +98,6 @@ const LayerUI = ({
   showExitZenModeBtn,
   isCollaborating,
   renderTopRightUI,
-
   renderCustomStats,
   renderCustomSidebar,
   libraryReturnUrl,
@@ -133,6 +127,7 @@ const LayerUI = ({
         actionManager={actionManager}
         exportOpts={UIOptions.canvasActions.export}
         canvas={canvas}
+        setAppState={setAppState}
       />
     );
   };
@@ -186,9 +181,37 @@ const LayerUI = ({
     );
   };
 
-  const [isMenuOpen, setIsMenuOpen] = useAtom(isMenuOpenAtom);
-  const menuRef = useOutsideClickHook(() => setIsMenuOpen(false));
-
+  const renderMenu = () => {
+    return (
+      childrenComponents.Menu || (
+        <MainMenu>
+          <MainMenu.DefaultItems.LoadScene />
+          <MainMenu.DefaultItems.SaveToActiveFile />
+          {/* FIXME we should to test for this inside the item itself */}
+          {UIOptions.canvasActions.export && <MainMenu.DefaultItems.Export />}
+          {/* FIXME we should to test for this inside the item itself */}
+          {UIOptions.canvasActions.saveAsImage && (
+            <MainMenu.DefaultItems.SaveAsImage />
+          )}
+          {onCollabButtonClick && (
+            <MainMenu.DefaultItems.LiveCollaboration
+              onSelect={onCollabButtonClick}
+              isCollaborating={isCollaborating}
+            />
+          )}
+          <MainMenu.DefaultItems.Help />
+          <MainMenu.DefaultItems.ClearCanvas />
+          <MainMenu.Separator />
+          <MainMenu.Group title="Excalidraw links">
+            <MainMenu.DefaultItems.Socials />
+          </MainMenu.Group>
+          <MainMenu.Separator />
+          <MainMenu.DefaultItems.ToggleTheme />
+          <MainMenu.DefaultItems.ChangeCanvasBackground />
+        </MainMenu>
+      )
+    );
+  };
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
       <WelcomeScreenDecor
@@ -199,87 +222,7 @@ const LayerUI = ({
           <div>{t("welcomeScreen.menuHints")}</div>
         </div>
       </WelcomeScreenDecor>
-
-      <button
-        data-prevent-outside-click
-        className={clsx("menu-button", "zen-mode-transition", {
-          "transition-left": appState.zenModeEnabled,
-        })}
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        type="button"
-        data-testid="menu-button"
-      >
-        {HamburgerMenuIcon}
-      </button>
-
-      {isMenuOpen && (
-        <div
-          ref={menuRef}
-          style={{ position: "absolute", top: "100%", marginTop: ".25rem" }}
-        >
-          <Section heading="canvasActions">
-            {/* the zIndex ensures this menu has higher stacking order,
-         see https://github.com/excalidraw/excalidraw/pull/1445 */}
-            <Island
-              className="menu-container"
-              padding={2}
-              style={{ zIndex: 1 }}
-            >
-              {!appState.viewModeEnabled &&
-                actionManager.renderAction("loadScene")}
-              {/* // TODO barnabasmolnar/editor-redesign  */}
-              {/* is this fine here? */}
-              {appState.fileHandle &&
-                actionManager.renderAction("saveToActiveFile")}
-              {renderJSONExportDialog()}
-              {UIOptions.canvasActions.saveAsImage && (
-                <MenuItem
-                  label={t("buttons.exportImage")}
-                  icon={ExportImageIcon}
-                  dataTestId="image-export-button"
-                  onClick={() => setAppState({ openDialog: "imageExport" })}
-                  shortcut={getShortcutFromShortcutName("imageExport")}
-                />
-              )}
-              {onCollabButtonClick && (
-                <CollabButton
-                  isCollaborating={isCollaborating}
-                  collaboratorCount={appState.collaborators.size}
-                  onClick={onCollabButtonClick}
-                />
-              )}
-              {actionManager.renderAction("toggleShortcuts", undefined, true)}
-              {!appState.viewModeEnabled &&
-                actionManager.renderAction("clearCanvas")}
-              <Separator />
-              <MenuLinks />
-              <Separator />
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  rowGap: ".5rem",
-                }}
-              >
-                <div>{actionManager.renderAction("toggleTheme")}</div>
-                <div style={{ padding: "0 0.625rem" }}>
-                  <LanguageList style={{ width: "100%" }} />
-                </div>
-                {!appState.viewModeEnabled && (
-                  <div>
-                    <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
-                      {t("labels.canvasBackground")}
-                    </div>
-                    <div style={{ padding: "0 0.625rem" }}>
-                      {actionManager.renderAction("changeViewBackgroundColor")}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Island>
-          </Section>
-        </div>
-      )}
+      {renderMenu()}
     </div>
   );
 
@@ -410,13 +353,9 @@ const LayerUI = ({
               },
             )}
           >
-            <UserList
-              collaborators={appState.collaborators}
-              actionManager={actionManager}
-            />
+            <UserList collaborators={appState.collaborators} />
             {onCollabButtonClick && (
               <CollabButton
-                isInHamburgerMenu={false}
                 isCollaborating={isCollaborating}
                 collaboratorCount={appState.collaborators.size}
                 onClick={onCollabButtonClick}
@@ -466,6 +405,7 @@ const LayerUI = ({
         />
       )}
       {renderImageExportDialog()}
+      {renderJSONExportDialog()}
       {appState.pasteDialog.shown && (
         <PasteChartDialog
           setAppState={setAppState}
@@ -497,6 +437,7 @@ const LayerUI = ({
           renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
           device={device}
+          renderMenu={renderMenu}
         />
       )}
 
@@ -525,9 +466,8 @@ const LayerUI = ({
               appState={appState}
               actionManager={actionManager}
               showExitZenModeBtn={showExitZenModeBtn}
-            >
-              {childrenComponents.FooterCenter}
-            </Footer>
+              footerCenter={childrenComponents.FooterCenter}
+            />
 
             {appState.showStats && (
               <Stats
@@ -560,28 +500,39 @@ const LayerUI = ({
   );
 };
 
-const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
-  const getNecessaryObj = (appState: AppState): Partial<AppState> => {
-    const {
-      suggestedBindings,
-      startBoundElement: boundElement,
-      ...ret
-    } = appState;
-    return ret;
-  };
-  const prevAppState = getNecessaryObj(prev.appState);
-  const nextAppState = getNecessaryObj(next.appState);
+const stripIrrelevantAppStateProps = (
+  appState: AppState,
+): Partial<AppState> => {
+  const { suggestedBindings, startBoundElement, cursorButton, ...ret } =
+    appState;
+  return ret;
+};
 
-  const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
+const areEqual = (prevProps: LayerUIProps, nextProps: LayerUIProps) => {
+  // short-circuit early
+  if (prevProps.children !== nextProps.children) {
+    return false;
+  }
+
+  const {
+    canvas: _prevCanvas,
+    // not stable, but shouldn't matter in our case
+    onInsertElements: _prevOnInsertElements,
+    appState: prevAppState,
+    ...prev
+  } = prevProps;
+  const {
+    canvas: _nextCanvas,
+    onInsertElements: _nextOnInsertElements,
+    appState: nextAppState,
+    ...next
+  } = nextProps;
 
   return (
-    prev.renderTopRightUI === next.renderTopRightUI &&
-    prev.renderCustomStats === next.renderCustomStats &&
-    prev.renderCustomSidebar === next.renderCustomSidebar &&
-    prev.langCode === next.langCode &&
-    prev.elements === next.elements &&
-    prev.files === next.files &&
-    keys.every((key) => prevAppState[key] === nextAppState[key])
+    isShallowEqual(
+      stripIrrelevantAppStateProps(prevAppState),
+      stripIrrelevantAppStateProps(nextAppState),
+    ) && isShallowEqual(prev, next)
   );
 };
 

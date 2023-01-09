@@ -14613,7 +14613,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openDialog": null,
-  "openMenu": null,
+  "openMenu": "canvas",
   "openPopup": null,
   "openSidebar": null,
   "pasteDialog": Object {
@@ -14672,7 +14672,7 @@ Object {
 
 exports[`regression tests rerenders UI on language change: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `10`;
+exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] appState 1`] = `
 Object {

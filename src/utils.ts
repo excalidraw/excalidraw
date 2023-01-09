@@ -352,9 +352,8 @@ export const viewportCoordsToSceneCoords = (
     scrollY: number;
   },
 ) => {
-  const invScale = 1 / zoom.value;
-  const x = (clientX - offsetLeft) * invScale - scrollX;
-  const y = (clientY - offsetTop) * invScale - scrollY;
+  const x = (clientX - offsetLeft) / zoom.value - scrollX;
+  const y = (clientY - offsetTop) / zoom.value - scrollY;
 
   return { x, y };
 };
@@ -709,4 +708,16 @@ export const ReactChildrenToObject = <
     }
     return acc;
   }, {} as Partial<T>);
+};
+
+export const isShallowEqual = <T extends Record<string, any>>(
+  objA: T,
+  objB: T,
+) => {
+  const aKeys = Object.keys(objA);
+  const bKeys = Object.keys(objA);
+  if (aKeys.length !== bKeys.length) {
+    return false;
+  }
+  return aKeys.every((key) => objA[key] === objB[key]);
 };

@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "चिपकाएँ",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "सादे पाठ के रूप में चिपकाएं",
     "pasteCharts": "चार्ट चिपकाएँ",
     "selectAll": "सभी चुनें",
     "multiSelect": "आकार को चयन में जोड़ें",
@@ -201,7 +201,9 @@
     "svgImageInsertError": "एसवीजी छवि सम्मिलित नहीं कर सके, एसवीजी रचना अनुचित हैं",
     "invalidSVGString": "अनुचित SVG",
     "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे.",
-    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका"
+    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका",
+    "collabSaveFailed": "किसी कारण वश अंदरूनी डेटाबेस में सहेजा नहीं जा सका। यदि समस्या बनी रहती है, तो किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।",
+    "collabSaveFailed_sizeExceeded": "लगता है कि पृष्ठ तल काफ़ी बड़ा है, इस्कारण अंदरूनी डेटाबेस में सहेजा नहीं जा सका। किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।"
   },
   "toolBar": {
     "selection": "चयन",
@@ -236,7 +238,7 @@
     "resize": "आकार बदलते समय आप SHIFT को पकड़ कर अनुपात में कमी कर सकते हैं,\nकेंद्र से आकार बदलने के लिए ALT दबाए रखें",
     "resizeImage": "",
     "rotate": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को विवश कर सकते हैं",
-    "lineEditor_info": "",
+    "lineEditor_info": "बिंदुओं को सम्पादित करने के लिए CtrlOrCmd को दबायें रखते हुये डबल क्लिक करे, अथवा CtrlOrCmd + Enter साथ दबाये",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -395,7 +397,7 @@
     "fileSavedToFilename": "",
     "canvas": "",
     "selection": "",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "एक अवयव के रूप में चिपकाने के लिए {{shortcut}} का उपयोग करें,\nया किसी मौजूदा पाठ संपादक में चिपकायें"
   },
   "colors": {
     "ffffff": "सफेद",
