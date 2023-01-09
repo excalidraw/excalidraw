@@ -1,6 +1,7 @@
 ---
 pagination_prev: package/installation
 ---
+
 # Development
 
 #### Install the dependencies
@@ -21,8 +22,7 @@ The example is same as the [codesandbox example](https://ehlz3.csb.app/)
 
 #### Create a test release
 
-You can create a test release by posting the below comment in your pull 
-request
+You can create a test release by posting the below comment in your pull request
 
 ```
 @excalibot trigger release
