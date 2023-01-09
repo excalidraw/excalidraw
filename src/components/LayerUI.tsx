@@ -15,7 +15,11 @@ import {
   BinaryFiles,
   UIChildrenComponents,
 } from "../types";
-import { muteFSAbortError, ReactChildrenToObject } from "../utils";
+import {
+  isShallowEqual,
+  muteFSAbortError,
+  ReactChildrenToObject,
+} from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
@@ -496,28 +500,39 @@ const LayerUI = ({
   );
 };
 
-const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
-  const getNecessaryObj = (appState: AppState): Partial<AppState> => {
-    const {
-      suggestedBindings,
-      startBoundElement: boundElement,
-      ...ret
-    } = appState;
-    return ret;
-  };
-  const prevAppState = getNecessaryObj(prev.appState);
-  const nextAppState = getNecessaryObj(next.appState);
+const stripIrrelevantAppStateProps = (
+  appState: AppState,
+): Partial<AppState> => {
+  const { suggestedBindings, startBoundElement, cursorButton, ...ret } =
+    appState;
+  return ret;
+};
 
-  const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
+const areEqual = (prevProps: LayerUIProps, nextProps: LayerUIProps) => {
+  // short-circuit early
+  if (prevProps.children !== nextProps.children) {
+    return false;
+  }
+
+  const {
+    canvas: _prevCanvas,
+    // not stable, but shouldn't matter in our case
+    onInsertElements: _prevOnInsertElements,
+    appState: prevAppState,
+    ...prev
+  } = prevProps;
+  const {
+    canvas: _nextCanvas,
+    onInsertElements: _nextOnInsertElements,
+    appState: nextAppState,
+    ...next
+  } = nextProps;
 
   return (
-    prev.renderTopRightUI === next.renderTopRightUI &&
-    prev.renderCustomStats === next.renderCustomStats &&
-    prev.renderCustomSidebar === next.renderCustomSidebar &&
-    prev.langCode === next.langCode &&
-    prev.elements === next.elements &&
-    prev.files === next.files &&
-    keys.every((key) => prevAppState[key] === nextAppState[key])
+    isShallowEqual(
+      stripIrrelevantAppStateProps(prevAppState),
+      stripIrrelevantAppStateProps(nextAppState),
+    ) && isShallowEqual(prev, next)
   );
 };
 

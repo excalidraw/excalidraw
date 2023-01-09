@@ -1,6 +1,7 @@
 import React, { useEffect, forwardRef } from "react";
 import { InitializeApp } from "../../components/InitializeApp";
 import App from "../../components/App";
+import { isShallowEqual } from "../../utils";
 
 import "../../css/app.scss";
 import "../../css/styles.scss";
@@ -128,6 +129,11 @@ const areEqual = (
   prevProps: PublicExcalidrawProps,
   nextProps: PublicExcalidrawProps,
 ) => {
+  // short-circuit early
+  if (prevProps.children !== nextProps.children) {
+    return false;
+  }
+
   const {
     initialData: prevInitialData,
     UIOptions: prevUIOptions = {},
@@ -176,13 +182,7 @@ const areEqual = (
     return true;
   });
 
-  const prevKeys = Object.keys(prevProps) as (keyof typeof prev)[];
-  const nextKeys = Object.keys(nextProps) as (keyof typeof next)[];
-  return (
-    isUIOptionsSame &&
-    prevKeys.length === nextKeys.length &&
-    prevKeys.every((key) => prev[key] === next[key])
-  );
+  return isUIOptionsSame && isShallowEqual(prev, next);
 };
 
 const forwardedRefComp = forwardRef<
