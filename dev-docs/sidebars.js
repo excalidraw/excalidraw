@@ -29,44 +29,40 @@ const sidebars = {
       label: "Package",
 
       items: [
-        "package/Installation",
-        "package/Usage",
-        "package/CustomizingStyles",
-        "package/Collaboration",
+        "package/installation",
+        "package/integration",
+        "package/customizing-styles",
         {
           type: "category",
           label: "API",
           link: {
             type: "doc",
-            id: "package/API/Introduction",
+            id: "package/api/api-intro",
           },
           items: [
-            "package/API/Props",
+            "package/api/props",
             {
               type: "category",
               label: "Components",
               link: {
                 type: "doc",
-                id: "package/API/Components/ComponentsIntro",
+                id: "package/api/components/components-intro",
               },
               items: [
-                "package/API/Components/Footer",
-                "package/API/Components/MainMenu",
-                {
-                  type: "category",
-                  label: "Utils",
-                  link: { type: "doc", id: "package/API/Utils/UtilsIntro" },
-                  items: [
-                    "package/API/Utils/ExportUtilities",
-                    "package/API/Utils/RestoreUtilities",
-                    "package/API/Utils/Misc",
-                  ],
-                },
+                "package/api/components/footer",
+                "package/api/components/main-menu",
               ],
+            },
+            {
+              type: "category",
+              label: "Utils",
+              link: { type: "doc", id: "package/api/utils/utils-intro" },
+              items: ["package/api/utils/export", "package/api/utils/restore"],
             },
           ],
         },
-        "package/Development",
+        "package/faq",
+        "package/development",
       ],
     },
   ],

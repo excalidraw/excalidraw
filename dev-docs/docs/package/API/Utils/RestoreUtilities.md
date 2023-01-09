@@ -1,5 +1,6 @@
 ---
 title: Restore Utilities
+id: 'restore'
 ---
 
 ### `restoreAppState`

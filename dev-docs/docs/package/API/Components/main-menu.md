@@ -1,3 +1,5 @@
+# MainMenu
+
 By default Excalidraw will render the `MainMenu` with default options. If you want to customise the `MainMenu`, you can pass the `MainMenu` component with the list options. You can visit [codesandbox example](https://ehlz3.csb.app/) for a working demo.
 
 **Usage**
@@ -13,8 +15,6 @@ const App = () => {
   </Excalidraw>
 }
 ```
-
-### MainMenu
 
 This is the `MainMenu` component which you need to import to render the menu with custom options.
 

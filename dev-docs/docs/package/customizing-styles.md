@@ -1,6 +1,4 @@
----
-title: Customizing Styles
----
+# Customizing Styles
 
 Excalidraw is using CSS variables to style certain components. To override them, you should set your own on the `.excalidraw` and `.excalidraw.theme--dark` (for dark mode variables) selectors.
 

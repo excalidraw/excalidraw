@@ -1,7 +1,6 @@
----
----
+# Integration
 
-### Using Web Bundler
+### Web Bundler
 
 If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
 

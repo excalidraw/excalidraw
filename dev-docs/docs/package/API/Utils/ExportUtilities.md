@@ -1,5 +1,6 @@
 ---
 title: Export Utilities
+id: 'export'
 ---
 
 ### `exportToCanvas`

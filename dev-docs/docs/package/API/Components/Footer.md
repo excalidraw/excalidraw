@@ -1,3 +1,5 @@
+
+# Footer
 Earlier we were using `renderFooter` prop to render custom footer which was removed in [#5970](https://github.com/excalidraw/excalidraw/pull/5970). Now you can pass a `Footer` component instead to render the custom UI for footer.
 
 You will need to import the `Footer` component from the package and wrap your component with the Footer component. The `Footer` should a valid React Node.
