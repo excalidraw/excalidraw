@@ -117,10 +117,16 @@ export class ActionManager {
     if (this === undefined) {
       return [];
     }
+    const filter =
+      opts !== undefined &&
+      ("elements" in opts || "data" in opts || "guardsOnly" in opts);
     const customActions: Action[] = [];
     for (const key in this.actions) {
       const action = this.actions[key];
-      if (!isActionName(action.name) && this.isActionEnabled(action, opts)) {
+      if (
+        !isActionName(action.name) &&
+        (!filter || this.isActionEnabled(action, opts))
+      ) {
         customActions.push(action);
       }
     }
