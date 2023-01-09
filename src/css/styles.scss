@@ -238,7 +238,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px;
+    padding: 6px; //zsviczian
   }
 
   .App-mobile-menu {
@@ -385,12 +385,12 @@
 
   .disable-zen-mode {
     border-radius: var(--border-radius-lg);
-    background-color: var(--color-gray-20);
+    background-color: var(--island-bg-color); //zsviczian
     border: 1px solid var(--color-gray-30);
     padding: 10px 20px;
 
     &:hover {
-      background-color: var(--color-gray-30);
+      background-color: var(--color-primary-light); //zsviczian
     }
   }
 

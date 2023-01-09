@@ -257,6 +257,9 @@ const LayerUI = ({
       elements,
     );
 
+    if (appState.viewModeEnabled) {
+      return null;
+    } //zsviczian
     return (
       <FixedSideContainer side="top">
         {renderWelcomeScreen && !appState.isLoading && (

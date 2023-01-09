@@ -3,12 +3,12 @@ import { AppState, Device, ExcalidrawProps } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
-import { showSelectedShapeActions } from "../element";
+import { getNonDeletedElements, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
-import { calculateScrollCenter } from "../scene";
+import { calculateScrollCenter, isSomeElementSelected } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { Section } from "./Section";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
@@ -145,16 +145,38 @@ export const MobileMenu = ({
       return <div className="App-toolbar-content">{renderMenu()}</div>;
     }
 
+    //zsviczian fix mobile menu button positions
+    const showEditMenu = showSelectedShapeActions(
+      appState,
+      getNonDeletedElements(elements),
+    );
+    const showElAction = isSomeElementSelected(
+      getNonDeletedElements(elements),
+      appState,
+    );
+
     return (
       <div className="App-toolbar-content">
         {renderMenu()}
-        {actionManager.renderAction("toggleEditMenu")}
+        {showEditMenu ? ( //zsviczian
+          actionManager.renderAction("toggleEditMenu")
+        ) : (
+          <div className="ToolIcon__icon" aria-hidden="true" />
+        )}
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
-        {actionManager.renderAction(
-          appState.multiElement ? "finalize" : "duplicateSelection",
+        {showElAction || appState.multiElement ? ( //zsviczian
+          actionManager.renderAction(
+            appState.multiElement ? "finalize" : "duplicateSelection",
+          )
+        ) : (
+          <div className="ToolIcon__icon" aria-hidden="true" />
         )}
-        {actionManager.renderAction("deleteSelectedElements")}
+        {showElAction ? ( //zsviczian
+          actionManager.renderAction("deleteSelectedElements")
+        ) : (
+          <div className="ToolIcon__icon" aria-hidden="true" />
+        )}
       </div>
     );
   };

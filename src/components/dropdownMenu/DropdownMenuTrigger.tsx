@@ -17,7 +17,8 @@ const MenuTrigger = ({
     "zen-mode-transition",
     {
       "transition-left": appState.zenModeEnabled,
-      "dropdown-menu-button--mobile": device.isMobile,
+      "dropdown-menu-button--mobile":
+        device.isMobile || appState.trayModeEnabled, //zsviczian
     },
   ).trim();
   return (

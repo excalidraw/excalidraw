@@ -30,7 +30,12 @@ const MainMenu = ({ children }: { children?: React.ReactNode }) => {
       >
         {HamburgerMenuIcon}
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content onClickOutside={onClickOutside}>
+      <DropdownMenu.Content //zsvicizan
+        onClickOutside={onClickOutside}
+        className={
+          appState.trayModeEnabled ? "dropdown-menu--mobile" : undefined
+        }
+      >
         {children}
         {device.isMobile && appState.collaborators.size > 0 && (
           <fieldset className="UserList-Wrapper">
