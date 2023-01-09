@@ -13,30 +13,30 @@ Object {
     "items": Array [
       Object {
         "contextItemLabel": "labels.cut",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copy",
-        "contextItemPredicate": [Function],
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.paste",
-        "contextItemPredicate": [Function],
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -44,28 +44,28 @@ Object {
       "separator",
       Object {
         "contextItemLabel": "labels.copyAsPng",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "copyAsPng",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copyAsSvg",
-        "contextItemPredicate": [Function],
         "name": "copyAsSvg",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copyText",
-        "contextItemPredicate": [Function],
         "name": "copyText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -93,28 +93,28 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.group",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "group",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.unbindText",
-        "contextItemPredicate": [Function],
         "name": "unbindText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.bindText",
-        "contextItemPredicate": [Function],
         "name": "bindText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -122,10 +122,10 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "ungroup",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -185,20 +185,20 @@ Object {
       "separator",
       Object {
         "contextItemLabel": "labels.flipHorizontal",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.flipVertical",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -206,9 +206,9 @@ Object {
       "separator",
       Object {
         "contextItemLabel": [Function],
-        "contextItemPredicate": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -216,10 +216,10 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": [Function],
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "hyperlink",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "action": "click",
           "category": "hyperlink",
@@ -4401,30 +4401,30 @@ Object {
     "items": Array [
       Object {
         "contextItemLabel": "labels.cut",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copy",
-        "contextItemPredicate": [Function],
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.paste",
-        "contextItemPredicate": [Function],
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -4432,28 +4432,28 @@ Object {
       "separator",
       Object {
         "contextItemLabel": "labels.copyAsPng",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "copyAsPng",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copyAsSvg",
-        "contextItemPredicate": [Function],
         "name": "copyAsSvg",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copyText",
-        "contextItemPredicate": [Function],
         "name": "copyText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -4481,28 +4481,28 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.group",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "group",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.unbindText",
-        "contextItemPredicate": [Function],
         "name": "unbindText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.bindText",
-        "contextItemPredicate": [Function],
         "name": "bindText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -4510,10 +4510,10 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "ungroup",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -4573,20 +4573,20 @@ Object {
       "separator",
       Object {
         "contextItemLabel": "labels.flipHorizontal",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.flipVertical",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -4594,9 +4594,9 @@ Object {
       "separator",
       Object {
         "contextItemLabel": [Function],
-        "contextItemPredicate": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -4604,10 +4604,10 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": [Function],
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "hyperlink",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "action": "click",
           "category": "hyperlink",
@@ -4942,30 +4942,30 @@ Object {
     "items": Array [
       Object {
         "contextItemLabel": "labels.cut",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copy",
-        "contextItemPredicate": [Function],
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.paste",
-        "contextItemPredicate": [Function],
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -4973,28 +4973,28 @@ Object {
       "separator",
       Object {
         "contextItemLabel": "labels.copyAsPng",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "copyAsPng",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copyAsSvg",
-        "contextItemPredicate": [Function],
         "name": "copyAsSvg",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copyText",
-        "contextItemPredicate": [Function],
         "name": "copyText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5022,28 +5022,28 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.group",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "group",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.unbindText",
-        "contextItemPredicate": [Function],
         "name": "unbindText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.bindText",
-        "contextItemPredicate": [Function],
         "name": "bindText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5051,10 +5051,10 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "ungroup",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5114,20 +5114,20 @@ Object {
       "separator",
       Object {
         "contextItemLabel": "labels.flipHorizontal",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.flipVertical",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5135,9 +5135,9 @@ Object {
       "separator",
       Object {
         "contextItemLabel": [Function],
-        "contextItemPredicate": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5145,10 +5145,10 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": [Function],
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "hyperlink",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "action": "click",
           "category": "hyperlink",
@@ -5568,10 +5568,10 @@ Object {
     "items": Array [
       Object {
         "contextItemLabel": "labels.paste",
-        "contextItemPredicate": [Function],
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5579,28 +5579,28 @@ Object {
       "separator",
       Object {
         "contextItemLabel": "labels.copyAsPng",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "copyAsPng",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copyAsSvg",
-        "contextItemPredicate": [Function],
         "name": "copyAsSvg",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copyText",
-        "contextItemPredicate": [Function],
         "name": "copyText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5619,10 +5619,10 @@ Object {
       Object {
         "checked": [Function],
         "contextItemLabel": "labels.showGrid",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "gridMode",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "canvas",
           "predicate": [Function],
@@ -5632,10 +5632,10 @@ Object {
       Object {
         "checked": [Function],
         "contextItemLabel": "buttons.zenMode",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "zenMode",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "canvas",
           "predicate": [Function],
@@ -5645,10 +5645,10 @@ Object {
       Object {
         "checked": [Function],
         "contextItemLabel": "labels.viewMode",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "viewMode",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "canvas",
           "predicate": [Function],
@@ -5782,30 +5782,30 @@ Object {
     "items": Array [
       Object {
         "contextItemLabel": "labels.cut",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copy",
-        "contextItemPredicate": [Function],
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.paste",
-        "contextItemPredicate": [Function],
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5813,28 +5813,28 @@ Object {
       "separator",
       Object {
         "contextItemLabel": "labels.copyAsPng",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "copyAsPng",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copyAsSvg",
-        "contextItemPredicate": [Function],
         "name": "copyAsSvg",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copyText",
-        "contextItemPredicate": [Function],
         "name": "copyText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5862,28 +5862,28 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.group",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "group",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.unbindText",
-        "contextItemPredicate": [Function],
         "name": "unbindText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.bindText",
-        "contextItemPredicate": [Function],
         "name": "bindText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5891,10 +5891,10 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "ungroup",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5954,20 +5954,20 @@ Object {
       "separator",
       Object {
         "contextItemLabel": "labels.flipHorizontal",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.flipVertical",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5975,9 +5975,9 @@ Object {
       "separator",
       Object {
         "contextItemLabel": [Function],
-        "contextItemPredicate": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5985,10 +5985,10 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": [Function],
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "hyperlink",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "action": "click",
           "category": "hyperlink",
@@ -6119,30 +6119,30 @@ Object {
     "items": Array [
       Object {
         "contextItemLabel": "labels.cut",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copy",
-        "contextItemPredicate": [Function],
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.paste",
-        "contextItemPredicate": [Function],
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -6150,28 +6150,28 @@ Object {
       "separator",
       Object {
         "contextItemLabel": "labels.copyAsPng",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "copyAsPng",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copyAsSvg",
-        "contextItemPredicate": [Function],
         "name": "copyAsSvg",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.copyText",
-        "contextItemPredicate": [Function],
         "name": "copyText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -6199,28 +6199,28 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.group",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "group",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.unbindText",
-        "contextItemPredicate": [Function],
         "name": "unbindText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.bindText",
-        "contextItemPredicate": [Function],
         "name": "bindText",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -6228,10 +6228,10 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "ungroup",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -6291,20 +6291,20 @@ Object {
       "separator",
       Object {
         "contextItemLabel": "labels.flipHorizontal",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
       },
       Object {
         "contextItemLabel": "labels.flipVertical",
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -6312,9 +6312,9 @@ Object {
       "separator",
       Object {
         "contextItemLabel": [Function],
-        "contextItemPredicate": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -6322,10 +6322,10 @@ Object {
       Object {
         "PanelComponent": [Function],
         "contextItemLabel": [Function],
-        "contextItemPredicate": [Function],
         "keyTest": [Function],
         "name": "hyperlink",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "action": "click",
           "category": "hyperlink",

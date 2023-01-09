@@ -1,7 +1,8 @@
 import clsx from "clsx";
+import { actionShortcuts } from "../../actions";
 import { ActionManager } from "../../actions/manager";
 import { t } from "../../i18n";
-import { AppState } from "../../types";
+import { AppState, UIChildrenComponents } from "../../types";
 import {
   ExitZenModeAction,
   FinalizeAction,
@@ -9,24 +10,24 @@ import {
   ZoomActions,
 } from "../Actions";
 import { useDevice } from "../App";
+import { HelpButton } from "../HelpButton";
 import { WelcomeScreenHelpArrow } from "../icons";
 import { Section } from "../Section";
 import Stack from "../Stack";
 import WelcomeScreenDecor from "../WelcomeScreenDecor";
-import FooterCenter from "./FooterCenter";
 
 const Footer = ({
   appState,
   actionManager,
   showExitZenModeBtn,
   renderWelcomeScreen,
-  children,
+  footerCenter,
 }: {
   appState: AppState;
   actionManager: ActionManager;
   showExitZenModeBtn: boolean;
   renderWelcomeScreen: boolean;
-  children?: React.ReactNode;
+  footerCenter: UIChildrenComponents["FooterCenter"];
 }) => {
   const device = useDevice();
   const showFinalize =
@@ -71,7 +72,7 @@ const Footer = ({
           </Section>
         </Stack.Col>
       </div>
-      <FooterCenter>{children}</FooterCenter>
+      {footerCenter}
       <div
         className={clsx("layer-ui__wrapper__footer-right zen-mode-transition", {
           "transition-right disable-pointerEvents": appState.zenModeEnabled,
@@ -87,7 +88,10 @@ const Footer = ({
             </div>
           </WelcomeScreenDecor>
 
-          {actionManager.renderAction("toggleShortcuts")}
+          <HelpButton
+            title={t("helpDialog.title")}
+            onClick={() => actionManager.executeAction(actionShortcuts)}
+          />
         </div>
       </div>
       <ExitZenModeAction

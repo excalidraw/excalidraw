@@ -41,25 +41,17 @@ import "./LayerUI.scss";
 import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
-import { isMenuOpenAtom, useDevice } from "../components/App";
+import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
-import {
-  ExportImageIcon,
-  HamburgerMenuIcon,
-  WelcomeScreenMenuArrow,
-  WelcomeScreenTopToolbarArrow,
-} from "./icons";
-import { Separator } from "./MenuUtils";
-import { useOutsideClickHook } from "../hooks/useOutsideClick";
+import { WelcomeScreenMenuArrow, WelcomeScreenTopToolbarArrow } from "./icons";
 import WelcomeScreen from "./WelcomeScreen";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import WelcomeScreenDecor from "./WelcomeScreenDecor";
-import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import MenuItem from "./MenuItem";
+import MainMenu from "./mainMenu/MainMenu";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -102,7 +94,6 @@ const LayerUI = ({
   showExitZenModeBtn,
   isCollaborating,
   renderTopRightUI,
-
   renderCustomStats,
   renderCustomSidebar,
   libraryReturnUrl,
@@ -132,6 +123,7 @@ const LayerUI = ({
         actionManager={actionManager}
         exportOpts={UIOptions.canvasActions.export}
         canvas={canvas}
+        setAppState={setAppState}
       />
     );
   };
@@ -185,9 +177,37 @@ const LayerUI = ({
     );
   };
 
-  const [isMenuOpen, setIsMenuOpen] = useAtom(isMenuOpenAtom);
-  const menuRef = useOutsideClickHook(() => setIsMenuOpen(false));
-
+  const renderMenu = () => {
+    return (
+      childrenComponents.Menu || (
+        <MainMenu>
+          <MainMenu.DefaultItems.LoadScene />
+          <MainMenu.DefaultItems.SaveToActiveFile />
+          {/* FIXME we should to test for this inside the item itself */}
+          {UIOptions.canvasActions.export && <MainMenu.DefaultItems.Export />}
+          {/* FIXME we should to test for this inside the item itself */}
+          {UIOptions.canvasActions.saveAsImage && (
+            <MainMenu.DefaultItems.SaveAsImage />
+          )}
+          {onCollabButtonClick && (
+            <MainMenu.DefaultItems.LiveCollaboration
+              onSelect={onCollabButtonClick}
+              isCollaborating={isCollaborating}
+            />
+          )}
+          <MainMenu.DefaultItems.Help />
+          <MainMenu.DefaultItems.ClearCanvas />
+          <MainMenu.Separator />
+          <MainMenu.Group title="Excalidraw links">
+            <MainMenu.DefaultItems.Socials />
+          </MainMenu.Group>
+          <MainMenu.Separator />
+          <MainMenu.DefaultItems.ToggleTheme />
+          <MainMenu.DefaultItems.ChangeCanvasBackground />
+        </MainMenu>
+      )
+    );
+  };
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
       <WelcomeScreenDecor
@@ -198,90 +218,7 @@ const LayerUI = ({
           <div>{t("welcomeScreen.menuHints")}</div>
         </div>
       </WelcomeScreenDecor>
-
-      {!appState.viewModeEnabled && (
-        <button //zsviczian hide menu in viewMode
-          data-prevent-outside-click
-          className={clsx("menu-button", "zen-mode-transition", {
-            "transition-left": appState.zenModeEnabled,
-          })}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          type="button"
-          data-testid="menu-button"
-        >
-          {HamburgerMenuIcon}
-        </button>
-      )}
-
-      {isMenuOpen && (
-        <div
-          ref={menuRef}
-          style={{ position: "absolute", top: "100%", marginTop: ".25rem" }}
-        >
-          <Section heading="canvasActions">
-            {/* the zIndex ensures this menu has higher stacking order,
-         see https://github.com/excalidraw/excalidraw/pull/1445 */}
-            <Island
-              className="menu-container"
-              padding={2}
-              style={{ zIndex: 1 }}
-            >
-              {!appState.viewModeEnabled &&
-                actionManager.renderAction("loadScene")}
-              {/* // TODO barnabasmolnar/editor-redesign  */}
-              {/* is this fine here? */}
-              {UIOptions.canvasActions.saveToActiveFile && //zsviczian
-                appState.fileHandle &&
-                actionManager.renderAction("saveToActiveFile")}
-              {renderJSONExportDialog()}
-              {UIOptions.canvasActions.saveAsImage && (
-                <MenuItem
-                  label={t("buttons.exportImage")}
-                  icon={ExportImageIcon}
-                  dataTestId="image-export-button"
-                  onClick={() => setAppState({ openDialog: "imageExport" })}
-                  shortcut={getShortcutFromShortcutName("imageExport")}
-                />
-              )}
-              {onCollabButtonClick && (
-                <CollabButton
-                  isCollaborating={isCollaborating}
-                  collaboratorCount={appState.collaborators.size}
-                  onClick={onCollabButtonClick}
-                />
-              )}
-              {actionManager.renderAction("toggleShortcuts", undefined, true)}
-              {!appState.viewModeEnabled &&
-                actionManager.renderAction("clearCanvas")}
-              {/*<Separator /> //zsviczian editor-ui-changes
-              <MenuLinks />*/}
-              <Separator />
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  rowGap: ".5rem",
-                }}
-              >
-                <div>{actionManager.renderAction("toggleTheme")}</div>
-                {/*<div style={{ padding: "0 0.625rem" }}> //zsviczian editor-ui-changes
-                  <LanguageList style={{ width: "100%" }} />
-                </div>*/}
-                {!appState.viewModeEnabled && (
-                  <div>
-                    <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
-                      {t("labels.canvasBackground")}
-                    </div>
-                    <div style={{ padding: "0 0.625rem" }}>
-                      {actionManager.renderAction("changeViewBackgroundColor")}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Island>
-          </Section>
-        </div>
-      )}
+      {renderMenu()}
     </div>
   );
 
@@ -419,13 +356,9 @@ const LayerUI = ({
               },
             )}
           >
-            <UserList
-              collaborators={appState.collaborators}
-              actionManager={actionManager}
-            />
+            <UserList collaborators={appState.collaborators} />
             {onCollabButtonClick && (
               <CollabButton
-                isInHamburgerMenu={false}
                 isCollaborating={isCollaborating}
                 collaboratorCount={appState.collaborators.size}
                 onClick={onCollabButtonClick}
@@ -480,6 +413,7 @@ const LayerUI = ({
         />
       )}
       {renderImageExportDialog()}
+      {renderJSONExportDialog()}
       {appState.pasteDialog.shown && (
         <PasteChartDialog
           setAppState={setAppState}
@@ -511,6 +445,7 @@ const LayerUI = ({
           renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
           device={device}
+          renderMenu={renderMenu}
         />
       )}
 
@@ -539,9 +474,8 @@ const LayerUI = ({
               appState={appState}
               actionManager={actionManager}
               showExitZenModeBtn={showExitZenModeBtn}
-            >
-              {childrenComponents.FooterCenter}
-            </Footer>
+              footerCenter={childrenComponents.FooterCenter}
+            />
 
             {appState.showStats && (
               <Stats

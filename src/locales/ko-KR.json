@@ -201,7 +201,9 @@
     "svgImageInsertError": "SVG 이미지를 삽입하지 못했습니다. SVG 문법이 유효하지 않은 것 같습니다.",
     "invalidSVGString": "유효하지 않은 SVG입니다.",
     "cannotResolveCollabServer": "협업 서버에 접속하는데 실패했습니다. 페이지를 새로고침하고 다시 시도해보세요.",
-    "importLibraryError": "라이브러리를 불러오지 못했습니다."
+    "importLibraryError": "라이브러리를 불러오지 못했습니다.",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "선택",
