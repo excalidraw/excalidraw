@@ -306,7 +306,9 @@ ExcalidrawAppStateContext.displayName = "ExcalidrawAppStateContext";
 
 const ExcalidrawSetAppStateContext = React.createContext<
   React.Component<any, AppState>["setState"]
->(null!);
+>(() => {
+  console.warn("unitialized ExcalidrawSetAppStateContext context!");
+});
 ExcalidrawSetAppStateContext.displayName = "ExcalidrawSetAppStateContext";
 
 const ExcalidrawActionManagerContext = React.createContext<ActionManager>(
