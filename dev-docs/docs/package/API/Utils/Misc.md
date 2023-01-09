@@ -1,4 +1,5 @@
 # Extra APIs
+
 ### `serializeAsJSON`
 
 **_Signature_**
@@ -352,4 +353,3 @@ import { MIME_TYPES } from "@excalidraw/excalidraw";
 ## Need help?
 
 Check out the existing [Q&A](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw). If you have any queries or need help, ask us [here](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw).
-

@@ -503,4 +503,3 @@ This prop if passed will be triggered when canvas is scrolled and has the below 
 ```
 
 ### Restore utilities
-

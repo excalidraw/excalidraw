@@ -1,5 +1,6 @@
 ---
 ---
+
 ### Using Web Bundler
 
 If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
@@ -143,8 +144,8 @@ For development use :point_down:
 ```js
 <script
   type="text/javascript"
-  src="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.development.js">
-</script>
+  src="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.development.js"
+></script>
 ```
 
 For production use :point_down:
@@ -152,8 +153,8 @@ For production use :point_down:
 ```js
 <script
   type="text/javascript"
-  src="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.production.min.js">
-</script>
+  src="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.production.min.js"
+></script>
 ```
 
 You will need to make sure `react`, `react-dom` is available as shown in the below example. For prod please use the production versions of `react`, `react-dom`.

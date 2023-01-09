@@ -35,7 +35,3 @@ Excalidraw takes `100%` of `width` and `height` of the containing block so make 
 ### Demo
 
 [Try here](https://codesandbox.io/s/excalidraw-ehlz3).
-
-
-
-

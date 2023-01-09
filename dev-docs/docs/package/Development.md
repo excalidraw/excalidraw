@@ -1,11 +1,13 @@
 ---
 pagination_prev: get-started
 ---
+
 #### Install the dependencies
 
 ```bash
 yarn
 ```
+
 #### Start the server
 
 ```bash
