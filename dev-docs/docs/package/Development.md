@@ -1,3 +1,6 @@
+---
+pagination_prev: get-started
+---
 #### Install the dependencies
 
 ```bash

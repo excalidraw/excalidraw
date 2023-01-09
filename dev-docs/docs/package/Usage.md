@@ -1,5 +1,4 @@
 ---
-sidebar_position: 2
 ---
 ### Using Web Bundler
 
