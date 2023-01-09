@@ -1,5 +1,5 @@
 ---
-pagination_prev: get-started
+pagination_prev: package/Installation
 ---
 
 #### Install the dependencies
