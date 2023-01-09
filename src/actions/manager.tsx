@@ -75,7 +75,7 @@ export class ActionManager {
     this.app = app;
   }
 
-  public registerActionGuards() {
+  registerActionGuards() {
     const disablers = getActionDisablers();
     for (const d in disablers) {
       const dName = d as ActionName;
@@ -90,7 +90,7 @@ export class ActionManager {
     }
   }
 
-  public registerDisableFn(name: ActionName, disabler: DisableFn) {
+  registerDisableFn(name: ActionName, disabler: DisableFn) {
     if (!(name in this.disablers)) {
       this.disablers[name] = [] as DisableFn[];
     }
@@ -99,7 +99,7 @@ export class ActionManager {
     }
   }
 
-  public registerEnableFn(name: Action["name"], enabler: EnableFn) {
+  registerEnableFn(name: Action["name"], enabler: EnableFn) {
     if (!(name in this.enablers)) {
       this.enablers[name] = [] as EnableFn[];
     }
@@ -108,18 +108,25 @@ export class ActionManager {
     }
   }
 
-  public getCustomActions(opts?: {
+  getCustomActions(opts?: {
     elements?: readonly ExcalidrawElement[];
     data?: Record<string, any>;
+    guardsOnly?: boolean;
   }): Action[] {
     // For testing
     if (this === undefined) {
       return [];
     }
+    const filter =
+      opts !== undefined &&
+      ("elements" in opts || "data" in opts || "guardsOnly" in opts);
     const customActions: Action[] = [];
     for (const key in this.actions) {
       const action = this.actions[key];
-      if (!isActionName(action.name) && this.isActionEnabled(action, opts)) {
+      if (
+        !isActionName(action.name) &&
+        (!filter || this.isActionEnabled(action, opts))
+      ) {
         customActions.push(action);
       }
     }
@@ -142,7 +149,7 @@ export class ActionManager {
         (action) =>
           (action.name in canvasActions
             ? canvasActions[action.name as keyof typeof canvasActions]
-            : this.isActionEnabled(action)) &&
+            : this.isActionEnabled(action, { guardsOnly: true })) &&
           action.keyTest &&
           action.keyTest(
             event,
@@ -200,7 +207,7 @@ export class ActionManager {
       "PanelComponent" in this.actions[name] &&
       (name in canvasActions
         ? canvasActions[name as keyof typeof canvasActions]
-        : this.isActionEnabled(this.actions[name]))
+        : this.isActionEnabled(this.actions[name], { guardsOnly: true }))
     ) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
@@ -236,35 +243,39 @@ export class ActionManager {
   };
 
   isActionEnabled = (
-    action: Action,
+    action: Action | ActionName,
     opts?: {
       elements?: readonly ExcalidrawElement[];
       data?: Record<string, any>;
+      guardsOnly?: boolean;
     },
   ): boolean => {
     const elements = opts?.elements ?? this.getElementsIncludingDeleted();
     const appState = this.getAppState();
     const data = opts?.data;
 
+    const _action = isActionName(action) ? this.actions[action] : action;
+
     if (
-      action.predicate &&
-      !action.predicate(elements, appState, this.app.props, this.app, data)
+      !opts?.guardsOnly &&
+      _action.predicate &&
+      !_action.predicate(elements, appState, this.app.props, this.app, data)
     ) {
       return false;
     }
 
-    if (isActionName(action.name)) {
+    if (isActionName(_action.name)) {
       return !(
-        action.name in this.disablers &&
-        this.disablers[action.name].some((fn) =>
-          fn(elements, appState, action.name as ActionName),
+        _action.name in this.disablers &&
+        this.disablers[_action.name].some((fn) =>
+          fn(elements, appState, _action.name as ActionName),
         )
       );
     }
     return (
-      action.name in this.enablers &&
-      this.enablers[action.name].some((fn) =>
-        fn(elements, appState, action.name),
+      _action.name in this.enablers &&
+      this.enablers[_action.name].some((fn) =>
+        fn(elements, appState, _action.name),
       )
     );
   };

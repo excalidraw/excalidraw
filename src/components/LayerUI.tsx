@@ -244,7 +244,6 @@ const LayerUI = ({
           appState={appState}
           elements={elements}
           renderAction={actionManager.renderAction}
-          getCustomActions={actionManager.getCustomActions}
         />
       </Island>
     </Section>

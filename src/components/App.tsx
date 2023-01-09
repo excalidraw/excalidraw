@@ -6167,20 +6167,29 @@ class App extends React.Component<AppProps, AppState> {
     type: "canvas" | "element" | "custom",
     source?: string,
   ): ContextMenuItems => {
-    const options: ContextMenuItems = [];
-    let addedCustom = false;
+    const custom: ContextMenuItems = [];
     this.actionManager
-      .getCustomActions({ data: { source } })
-      .forEach((action) => {
-        addedCustom = true;
-        options.push(action);
-      });
+      .getCustomActions({ data: { source: source ?? "" } })
+      .forEach((action) => custom.push(action));
     if (type === "custom") {
-      return options;
+      return custom;
     }
-    if (addedCustom) {
-      options.push(CONTEXT_MENU_SEPARATOR);
+    if (custom.length > 0) {
+      custom.push(CONTEXT_MENU_SEPARATOR);
     }
+    const standard: ContextMenuItems = this._getContextMenuItems(type).filter(
+      (item) =>
+        !item ||
+        item === CONTEXT_MENU_SEPARATOR ||
+        this.actionManager.isActionEnabled(item, { guardsOnly: true }),
+    );
+    return [...custom, ...standard];
+  };
+
+  private _getContextMenuItems = (
+    type: "canvas" | "element",
+  ): ContextMenuItems => {
+    const options: ContextMenuItems = [];
 
     options.push(actionCopyAsPng, actionCopyAsSvg);
 
