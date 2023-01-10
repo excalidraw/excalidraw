@@ -30,7 +30,11 @@ const sidebars = {
         type: "doc",
         id: "codebase/codebase-intro",
       },
-      items: [],
+      items: [
+        "codebase/development",
+        "codebase/contributing",
+        "codebase/tools",
+      ],
     },
     {
       type: "category",
