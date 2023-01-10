@@ -24,12 +24,8 @@ function HomepageHeader() {
 }
 
 export default function Home() {
-  const { siteConfig } = useDocusaurusContext();
   return (
-    <Layout
-      title={siteConfig.title}
-      description="For Excalidraw contributors or those integrating the Excalidraw editor"
-    >
+    <Layout description="For Excalidraw contributors or those integrating the Excalidraw editor">
       <HomepageHeader />
       <main>
         <HomepageFeatures />
