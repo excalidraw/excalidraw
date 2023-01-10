@@ -687,7 +687,7 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
     : [];
 };
 
-export const ReactChildrenToObject = <
+export const partitionKnownChildren = <
   T extends {
     [k in string]?:
       | React.ReactPortal
@@ -696,18 +696,25 @@ export const ReactChildrenToObject = <
 >(
   children: React.ReactNode,
 ) => {
-  return React.Children.toArray(children).reduce((acc, child) => {
-    if (
-      React.isValidElement(child) &&
-      typeof child.type !== "string" &&
-      //@ts-ignore
-      child?.type.displayName
-    ) {
-      // @ts-ignore
-      acc[child.type.displayName] = child;
-    }
-    return acc;
-  }, {} as Partial<T>);
+  const restChildren: React.ReactNode[] = [];
+  const knownChildren = React.Children.toArray(children).reduce(
+    (acc, child) => {
+      if (
+        React.isValidElement(child) &&
+        typeof child.type !== "string" &&
+        //@ts-ignore
+        child?.type.displayName
+      ) {
+        // @ts-ignore
+        acc[child.type.displayName] = child;
+      } else {
+        restChildren.push(child);
+      }
+      return acc;
+    },
+    {} as Partial<T>,
+  );
+  return [knownChildren, restChildren] as const;
 };
 
 export const isShallowEqual = <T extends Record<string, any>>(
