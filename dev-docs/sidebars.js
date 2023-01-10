@@ -28,7 +28,7 @@ const sidebars = {
       label: "Codebase",
       link: {
         type: "doc",
-        id: "codebase/overview",
+        id: "codebase/codebase-intro",
       },
       items: [],
     },
