@@ -9,8 +9,8 @@ import { ExternalLinkIcon } from "./icons";
 const Header = () => (
   <div className="HelpDialog__header">
     <a
-      className="HelpDialog__btn"
-      href="https://github.com/excalidraw/excalidraw#documentation"
+      className="HelpDialog__btn" //zsviczian
+      href="https://github.com/zsviczian/obsidian-excalidraw-plugin/#readme"
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -27,8 +27,8 @@ const Header = () => (
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
     </a>
     <a
-      className="HelpDialog__btn"
-      href="https://github.com/excalidraw/excalidraw/issues"
+      className="HelpDialog__btn" //zsviczian
+      href="https://github.com/zsviczian/obsidian-excalidraw-plugin/issues"
       target="_blank"
       rel="noopener noreferrer"
     >
