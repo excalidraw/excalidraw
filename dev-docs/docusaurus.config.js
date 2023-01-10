@@ -114,6 +114,7 @@ const config = {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
       },
+      image: "https://excalidraw.com/og-fb-v1.png",
     }),
 };
 
