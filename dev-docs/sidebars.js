@@ -14,7 +14,15 @@
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   docs: [
-    "get-started",
+    {
+      type: "category",
+      label: "Introduction",
+      link: {
+        type: "doc",
+        id: "get-started",
+      },
+      items: [],
+    },
     {
       type: "category",
       label: "Codebase",

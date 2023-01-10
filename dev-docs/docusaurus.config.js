@@ -46,17 +46,16 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: "Excalidraw Docs",
+        title: "Excalidraw",
         logo: {
           alt: "Excalidraw Logo",
           src: "img/logo.svg",
         },
         items: [
           {
-            type: "doc",
-            docId: "get-started",
+            to: "/docs",
             position: "left",
-            label: "Get started",
+            label: "Docs",
           },
           {
             to: "https://blog.excalidraw.com",
@@ -78,7 +77,7 @@ const config = {
             items: [
               {
                 label: "Get Started",
-                to: "/docs/get-started",
+                to: "/docs",
               },
             ],
           },
