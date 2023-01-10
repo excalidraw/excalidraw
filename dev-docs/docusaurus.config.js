@@ -111,8 +111,7 @@ const config = {
         copyright: `Made with ❤️ Built with Docusaurus`,
       },
       prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
+        theme: require("prism-react-renderer/themes/dracula"),
       },
       image: "https://excalidraw.com/og-fb-v1.png",
     }),
