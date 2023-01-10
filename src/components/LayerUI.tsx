@@ -18,7 +18,7 @@ import {
 import {
   isShallowEqual,
   muteFSAbortError,
-  partitionKnownChildren,
+  partitionReactChildren,
 } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import CollabButton from "./CollabButton";
@@ -112,7 +112,10 @@ const LayerUI = ({
   const device = useDevice();
 
   const [childrenComponents, restChildren] =
-    partitionKnownChildren<UIChildrenComponents>(children);
+    partitionReactChildren<UIChildrenComponents>(children, {
+      Menu: true,
+      FooterCenter: true,
+    });
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
