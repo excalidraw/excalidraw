@@ -1,7 +1,5 @@
 ---
-title: Introduction
-pagination_next: null
-slug: .
+slug: ../
 ---
 # 
 export const Header = () => (

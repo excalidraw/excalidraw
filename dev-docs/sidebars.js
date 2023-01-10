@@ -19,23 +19,15 @@ const sidebars = {
       label: "Introduction",
       link: {
         type: "doc",
-        id: "get-started",
-      },
-      items: [],
-    },
-    {
-      type: "category",
-      label: "Codebase",
-      link: {
-        type: "doc",
-        id: "codebase/codebase-intro",
+        id: "introduction/get-started",
       },
       items: [
-        "codebase/development",
-        "codebase/contributing",
-        "codebase/tools",
+        "introduction/development",
+        "introduction/contributing",
+        "introduction/tools",
       ],
     },
+
     {
       type: "category",
       label: "Package",
