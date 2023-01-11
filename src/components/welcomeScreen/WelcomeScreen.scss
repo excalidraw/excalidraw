@@ -18,20 +18,24 @@
     }
   }
 
-  @media (max-width: 1024px) {
-    .welcomeScreen-decor {
-      &--helpHint,
-      &--menuHint {
-        display: none;
-      }
-    }
-  }
-
   // WelcomeScreen.Hints
   // ---------------------------------------------------------------------------
 
-  .welcomeScreen-decor {
-    &--helpHint {
+  .welcomeScreen-decor-hint {
+    @media (max-height: 599px) {
+      display: none !important;
+    }
+
+    @media (max-width: 1024px), (max-width: 800px) {
+      .welcomeScreen-decor {
+        &--help,
+        &--menu {
+          display: none;
+        }
+      }
+    }
+
+    &--help {
       display: flex;
       position: absolute;
       right: 0;
@@ -55,7 +59,7 @@
       }
     }
 
-    &--toolbarHint {
+    &--toolbar {
       position: absolute;
       top: 100%;
       left: 50%;
@@ -64,7 +68,7 @@
       display: flex;
       align-items: baseline;
 
-      &__label {
+      .welcomeScreen-decor-hint__label {
         width: 120px;
         position: relative;
         top: -0.5rem;
@@ -80,7 +84,7 @@
       }
     }
 
-    &--menuHint {
+    &--menu {
       position: absolute;
       width: 320px;
       font-size: 1rem;
@@ -99,6 +103,12 @@
 
         :root[dir="rtl"] & {
           transform: scaleX(-1);
+        }
+      }
+
+      @media (max-width: 860px) {
+        .welcomeScreen-decor-hint__label {
+          max-width: 160px;
         }
       }
     }
@@ -257,7 +267,7 @@
       margin-top: 8rem;
     }
   }
-  @media (max-height: 500px) {
+  @media (max-height: 500px), (max-width: 320px) {
     .welcomeScreen__center {
       display: none;
     }
