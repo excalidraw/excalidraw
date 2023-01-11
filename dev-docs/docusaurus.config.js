@@ -33,7 +33,10 @@ const config = {
           editUrl: "https://github.com/excalidraw/docs/tree/master/",
         },
         theme: {
-          customCss: require.resolve("./src/css/custom.css"),
+          customCss: [
+            require.resolve("./src/css/custom.css"),
+            require.resolve("../src/packages/excalidraw/example/App.scss"),
+          ],
         },
       }),
     ],
@@ -117,6 +120,8 @@ const config = {
         },
       },
     }),
+  themes: ["@docusaurus/theme-live-codeblock"],
+  plugins: ["docusaurus-plugin-sass"],
 };
 
 module.exports = config;

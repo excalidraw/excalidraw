@@ -66,11 +66,14 @@
   button.custom-element {
     width: 2rem;
     height: 2rem;
-    margin: 0 8px;
   }
 
   .custom-footer,
   .custom-element {
     padding: 0.1rem;
+    margin: 0 8px;
+  }
+  .layer-ui__wrapper__footer.App-menu_bottom {
+    align-items: stretch;
   }
 }
