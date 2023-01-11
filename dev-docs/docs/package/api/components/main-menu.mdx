@@ -1,18 +1,26 @@
 # MainMenu
 
-By default Excalidraw will render the `MainMenu` with default options. If you want to customise the `MainMenu`, you can pass the `MainMenu` component with the list options. You can visit [codesandbox example](https://ehlz3.csb.app/) for a working demo.
+By default Excalidraw will render the `MainMenu` with default options. If you want to customise the `MainMenu`, you can pass the `MainMenu` component with the list options.
 
 **Usage**
 
-```js
-import { MainMenu } from "@excalidraw/excalidraw";
-const App = () => {
-  <Excalidraw>
-    <MainMenu>
-      <MainMenu.Item onSelect={() => window.alert("Item1")}> Item1 </MainMenu.Item>
-      <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
-    </MainMenu>
-  </Excalidraw>
+```jsx live
+function ExcalidrawWithCustomMainMenu() {
+  return (
+    <div style={{ height: "500px" }}>
+      <Excalidraw>
+        <MainMenu>
+          <MainMenu.Item onSelect={() => window.alert("Item1")}>
+            Item1
+          </MainMenu.Item>
+          <MainMenu.Item onSelect={() => window.alert("Item2")}>
+            {" "}
+            Item 2{" "}
+          </MainMenu.Item>
+        </MainMenu>
+      </Excalidraw>
+    </div>
+  );
 }
 ```
 
@@ -39,18 +47,23 @@ To render an item as a link, its recommended to use `MainMenu.ItemLink`.
 
 **Usage**
 
-```js
-import { MainMenu } from "@excalidraw/excalidraw";
-const App = () => {
-  <Excalidraw>
-    <MainMenu>
-      <MainMenu.ItemLink href="https://google.com">Google</MainMenu.ItemLink>
-      <MainMenu.ItemLink href="https://excalidraw.com">
-        Excalidraw
-      </MainMenu.ItemLink>
-    </MainMenu>
-  </Excalidraw>;
-};
+```jsx live
+function ExcalidrawWithCustomMainMenu() {
+  return (
+    <div style={{ height: "500px" }}>
+      <Excalidraw>
+        <MainMenu>
+          <MainMenu.ItemLink href="https://google.com">
+            Google
+          </MainMenu.ItemLink>
+          <MainMenu.ItemLink href="https://excalidraw.com">
+            Excalidraw
+          </MainMenu.ItemLink>
+        </MainMenu>
+      </Excalidraw>
+    </div>
+  );
+}
 ```
 
 | Prop | Type | Required | Default | Description |
@@ -70,23 +83,26 @@ To render a custom item, you can use `MainMenu.ItemCustom`.
 
 **Usage**
 
-```js
-import { MainMenu } from "@excalidraw/excalidraw";
-const App = () => {
-  <Excalidraw>
-    <MainMenu>
-      <MainMenu.ItemCustom>
-        <button
-          style={{ height: "2rem" }}
-          onClick={() => window.alert("custom menu item")}
-        >
-          {" "}
-          custom item
-        </button>
-      </MainMenu.ItemCustom>
-    </MainMenu>
-  </Excalidraw>;
-};
+```jsx live
+function ExcalidrawWithCustomMainMenu() {
+  return (
+    <div style={{ height: "500px" }}>
+      <Excalidraw>
+        <MainMenu>
+          <MainMenu.ItemCustom>
+            <button
+              style={{ height: "2rem" }}
+              onClick={() => window.alert("custom menu item")}
+            >
+              {" "}
+              custom item
+            </button>
+          </MainMenu.ItemCustom>
+        </MainMenu>
+      </Excalidraw>
+    </div>
+  );
+}
 ```
 
 | Prop | Type | Required | Default | Description |
@@ -100,17 +116,24 @@ const App = () => {
 
 For the items which are shown in the menu in [excalidraw.com](https://excalidraw.com), you can use `MainMenu.DefaultItems`
 
-```js
-import { MainMenu } from "@excalidraw/excalidraw";
-const App = () => {
-  <Excalidraw>
-    <MainMenu>
-      <MainMenu.DefaultItems.Socials/>
-      <MainMenu.DefaultItems.Export/>
-      <MainMenu.Item onSelect={() => window.alert("Item1")}> Item1 </MainMenu.Item>
-      <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
-    </MainMenu>
-  </Excalidraw>
+```jsx live
+function ExcalidrawWithCustomMainMenu() {
+  return (
+    <div style={{ height: "500px" }}>
+      <Excalidraw>
+        <MainMenu>
+          <MainMenu.DefaultItems.Socials />
+          <MainMenu.DefaultItems.Export />
+          <MainMenu.Item onSelect={() => window.alert("Item1")}>
+            Item1
+          </MainMenu.Item>
+          <MainMenu.Item onSelect={() => window.alert("Item2")}>
+            Item 2
+          </MainMenu.Item>
+        </MainMenu>
+      </Excalidraw>
+    </div>
+  );
 }
 ```
 
@@ -120,21 +143,28 @@ Here is a [complete list](https://github.com/excalidraw/excalidraw/blob/master/s
 
 To Group item in the main menu, you can use `MainMenu.Group`
 
-```js
-import { MainMenu } from "@excalidraw/excalidraw";
-const App = () => {
-  <Excalidraw>
-    <MainMenu>
-      <MainMenu.Group title="Excalidraw items">
-        <MainMenu.DefaultItems.Socials/>
-        <MainMenu.DefaultItems.Export/>
-      </MainMenu.Group>
-      <MainMenu.Group title="custom items">
-        <MainMenu.Item onSelect={() => window.alert("Item1")}> Item1 </MainMenu.Item>
-        <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
-      </MainMenu.Group>
-    </MainMenu>
-  </Excalidraw>
+```jsx live
+function ExcalidrawWithMainMenuGroup() {
+  return (
+    <div style={{ height: "500px" }}>
+      <Excalidraw>
+        <MainMenu>
+          <MainMenu.Group title="Excalidraw items">
+            <MainMenu.DefaultItems.Socials />
+            <MainMenu.DefaultItems.Export />
+          </MainMenu.Group>
+          <MainMenu.Group title="custom items">
+            <MainMenu.Item onSelect={() => window.alert("Item1")}>
+              Item1
+            </MainMenu.Item>
+            <MainMenu.Item onSelect={() => window.alert("Item2")}>
+              Item 2
+            </MainMenu.Item>
+          </MainMenu.Group>
+        </MainMenu>
+      </Excalidraw>
+    </div>
+  );
 }
 ```
 
