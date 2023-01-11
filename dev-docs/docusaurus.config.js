@@ -1,9 +1,6 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require("prism-react-renderer/themes/github");
-const darkCodeTheme = require("prism-react-renderer/themes/dracula");
-
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Excalidraw developer docs",
@@ -114,6 +111,11 @@ const config = {
         theme: require("prism-react-renderer/themes/dracula"),
       },
       image: "https://excalidraw.com/og-fb-v1.png",
+      docs: {
+        sidebar: {
+          hideable: true,
+        },
+      },
     }),
 };
 
