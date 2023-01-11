@@ -28,6 +28,21 @@
       "source": "/webex/:match*",
       "destination": "https://for-webex.excalidraw.com"
     },
+    { "handle": "filesystem" },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "hash",
+          "key": "json"
+        },
+        {
+          "type": "hash",
+          "key": "room"
+        }
+      ],
+      "destination": "https://excalidraw.com/:hash*"
+    },
     {
       "source": "/:path*",
       "has": [
@@ -37,6 +52,10 @@
         }
       ],
       "destination": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor"
+    },
+    {
+      "source": "/:path*",
+      "destination": "https://excalidraw.com"
     }
   ]
 }
