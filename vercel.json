@@ -28,7 +28,6 @@
       "source": "/webex/:match*",
       "destination": "https://for-webex.excalidraw.com"
     },
-    { "handle": "filesystem" },
     {
       "source": "/:path*",
       "has": [
