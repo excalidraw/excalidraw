@@ -1,17 +1,8 @@
-import { actionLoadScene, actionShortcuts } from "../actions";
-import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import { t } from "../i18n";
-import { useExcalidrawActionManager, useExcalidrawAppState } from "./App";
-import {
-  ExcalLogo,
-  HelpIcon,
-  LoadIcon,
-  WelcomeScreenHelpArrow,
-  WelcomeScreenMenuArrow,
-  WelcomeScreenTopToolbarArrow,
-} from "./icons";
-
-import "./WelcomeScreen.scss";
+import { actionLoadScene, actionShortcuts } from "../../actions";
+import { getShortcutFromShortcutName } from "../../actions/shortcuts";
+import { t } from "../../i18n";
+import { useExcalidrawActionManager, useExcalidrawAppState } from "../App";
+import { ExcalLogo, HelpIcon, LoadIcon } from "../icons";
 
 const WelcomeScreenMenuItem = ({
   label,
@@ -129,50 +120,7 @@ const MenuItemLoadScene = () => {
 };
 MenuItemLoadScene.displayName = "MenuItemLoadScene";
 
-const HelpHint = () => {
-  return (
-    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--help-pointer">
-      <div>{t("welcomeScreen.defaults.helpHint")}</div>
-      {WelcomeScreenHelpArrow}
-    </div>
-  );
-};
-HelpHint.displayName = "HelpHint";
-
-const MenuHint = ({ children }: { children?: React.ReactNode }) => {
-  return (
-    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--menu-pointer">
-      {WelcomeScreenMenuArrow}
-      <div>{children || t("welcomeScreen.defaults.menuHint")}</div>
-    </div>
-  );
-};
-MenuHint.displayName = "MenuHint";
-
-const ToolbarHint = () => {
-  return (
-    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--top-toolbar-pointer">
-      <div className="WelcomeScreen-decor--top-toolbar-pointer__label">
-        {t("welcomeScreen.defaults.toolbarHint")}
-      </div>
-      {WelcomeScreenTopToolbarArrow}
-    </div>
-  );
-};
-ToolbarHint.displayName = "ToolbarHint";
-
-const WelcomeScreen = (props: { children: React.ReactNode }) => {
-  // NOTE this component is used as a dummy wrapper to retrieve child props
-  // from, and will never be rendered to DOM directly. As such, we can't
-  // do anything here (use hooks and such)
-  return null;
-};
-WelcomeScreen.displayName = "WelcomeScreen";
-
-WelcomeScreen.HelpHint = HelpHint;
-WelcomeScreen.MenuHint = MenuHint;
-WelcomeScreen.ToolbarHint = ToolbarHint;
-WelcomeScreen.Center = Center;
+// -----------------------------------------------------------------------------
 
 Center.Logo = Logo;
 Center.Heading = Heading;
@@ -181,4 +129,4 @@ Center.MenuItem = WelcomeScreenMenuItem;
 Center.MenuItemHelp = MenuItemHelp;
 Center.MenuItemLoadScene = MenuItemLoadScene;
 
-export default WelcomeScreen;
+export { Center };

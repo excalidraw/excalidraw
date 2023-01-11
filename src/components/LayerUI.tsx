@@ -50,7 +50,7 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
-import WelcomeScreen from "./WelcomeScreen";
+import WelcomeScreen from "./welcomeScreen/WelcomeScreen";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
@@ -119,9 +119,9 @@ const LayerUI = ({
           childrenComponents?.WelcomeScreen ?? (
             <WelcomeScreen>
               <WelcomeScreen.Center />
-              <WelcomeScreen.MenuHint />
-              <WelcomeScreen.ToolbarHint />
-              <WelcomeScreen.HelpHint />
+              <WelcomeScreen.Hints.MenuHint />
+              <WelcomeScreen.Hints.ToolbarHint />
+              <WelcomeScreen.Hints.HelpHint />
             </WelcomeScreen>
           )
         )?.props?.children,

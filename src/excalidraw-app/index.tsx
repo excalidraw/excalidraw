@@ -662,11 +662,11 @@ const ExcalidrawWrapper = () => {
 
     return (
       <WelcomeScreen>
-        <WelcomeScreen.MenuHint>
+        <WelcomeScreen.Hints.MenuHint>
           {t("welcomeScreen.app.menuHint")}
-        </WelcomeScreen.MenuHint>
-        <WelcomeScreen.ToolbarHint />
-        <WelcomeScreen.HelpHint />
+        </WelcomeScreen.Hints.MenuHint>
+        <WelcomeScreen.Hints.ToolbarHint />
+        <WelcomeScreen.Hints.HelpHint />
         <WelcomeScreen.Center>
           <WelcomeScreen.Center.Logo />
           <WelcomeScreen.Center.Heading>
