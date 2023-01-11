@@ -17,11 +17,11 @@ const MenuHint = ({ children }: { children?: React.ReactNode }) => {
 };
 MenuHint.displayName = "MenuHint";
 
-const ToolbarHint = () => {
+const ToolbarHint = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className="virgil welcomeScreen-decor welcomeScreen-decor-hint welcomeScreen-decor-hint--toolbar">
       <div className="welcomeScreen-decor-hint__label">
-        {t("welcomeScreen.defaults.toolbarHint")}
+        {children || t("welcomeScreen.defaults.toolbarHint")}
       </div>
       {WelcomeScreenTopToolbarArrow}
     </div>
@@ -29,10 +29,10 @@ const ToolbarHint = () => {
 };
 ToolbarHint.displayName = "ToolbarHint";
 
-const HelpHint = () => {
+const HelpHint = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className="virgil welcomeScreen-decor welcomeScreen-decor-hint welcomeScreen-decor-hint--help">
-      <div>{t("welcomeScreen.defaults.helpHint")}</div>
+      <div>{children || t("welcomeScreen.defaults.helpHint")}</div>
       {WelcomeScreenHelpArrow}
     </div>
   );
