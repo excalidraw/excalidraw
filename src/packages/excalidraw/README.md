@@ -594,6 +594,139 @@ const App = () => {
 | `className` | `string` | No | "" | The `classname` to be added to the group |
 | `style` | `React.CSsSProperties` | No | `undefined` | The inline `styles` to be added to the group |
 
+### WelcomeScreen
+
+When the canvas is empty, Excalidraw shows a welcome "splash" screen with a logo, a few quick action items, and hints explaining what some of the UI buttons do. You can customize the welcome screen by rendering the `WelcomeScreen` component inside your Excalidraw instance.
+
+You can also disable the welcome screen altogether by setting `UIOptions.welcomeScreen` to `false`.
+
+**Usage**
+
+```jsx
+import { WelcomScreen } from "@excalidraw/excalidraw";
+const App = () => (
+  <Excalidraw>
+    <WelcomeScreen>
+      <WelcomeScreen.Center>
+        <WelcomeScreen.Center.Heading>
+          Your data are autosaved to the cloud.
+        </WelcomeScreen.Center.Heading>
+        <WelcomeScreen.Center.Menu>
+          <WelcomeScreen.Center.MenuItem
+            onClick={() => console.log("clicked!")}
+          >
+            Click me!
+          </WelcomeScreen.Center.MenuItem>
+          <WelcomeScreen.Center.MenuItemLink href="https://github.com/excalidraw/excalidraw">
+            Excalidraw GitHub
+          </WelcomeScreen.Center.MenuItemLink>
+          <WelcomeScreen.Center.MenuItemHelp />
+        </WelcomeScreen.Center.Menu>
+      </WelcomeScreen.Center>
+    </WelcomeScreen>
+  </Excalidraw>
+);
+```
+
+To disable the WelcomeScreen:
+
+```jsx
+import { WelcomScreen } from "@excalidraw/excalidraw";
+const App = () => <Excalidraw UIOptions={{ welcomeScreen: false }} />;
+```
+
+**WelcomeScreen**
+
+If you render the `<WelcomeScreen>` component, you are responsible for rendering the content.
+
+There are 2 main parts: 1) welcome screen center component, and 2) welcome screen hints.
+
+![WelcomeScreen overview](./welcome-screen-overview.png)
+
+**WelcomeScreen.Center**
+
+This is the center piece of the welcome screen, containing the logo, heading, and menu. All three sub-components are optional, and you can render whatever you wish into the center component.
+
+**WelcomeScreen.Center.Logo**
+
+By default renders the Excalidraw logo and name. Supply `children` to customize.
+
+**WelcomeScreen.Center.Heading**
+
+Supply `children` to change the default message.
+
+**WelcomeScreen.Center.Menu**
+
+Wrapper component for the menu items. You can build your menu using the `<WelcomeScreen.Center.MenuItem>` and `<WelcomeScreen.Center.MenuItemLink>` components, render your own, or render one of the default menu items.
+
+The default menu items are:
+
+- `<WelcomeScreen.Center.MenuItemHelp/>` - opens the help dialog.
+- `<WelcomeScreen.Center.MenuItemLoadScene/>` - open the load file dialog.
+
+**Usage**
+
+```jsx
+import { WelcomScreen } from "@excalidraw/excalidraw";
+const App = () => (
+  <Excalidraw>
+    <WelcomeScreen>
+      <WelcomeScreen.Center>
+        <WelcomeScreen.Center.Menu>
+          <WelcomeScreen.Center.MenuItem
+            onClick={() => console.log("clicked!")}
+          >
+            Click me!
+          </WelcomeScreen.Center.MenuItem>
+          <WelcomeScreen.Center.MenuItemLink href="https://github.com/excalidraw/excalidraw">
+            Excalidraw GitHub
+          </WelcomeScreen.Center.MenuItemLink>
+          <WelcomeScreen.Center.MenuItemHelp />
+        </WelcomeScreen.Center.Menu>
+      </WelcomeScreen.Center>
+    </WelcomeScreen>
+  </Excalidraw>
+);
+```
+
+**WelcomeScreen.Center.MenuItem**
+
+Use this component to render a menu item.
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `onSelect` | `Function` | Yes |  | The handler is triggered when the item is selected. |
+| `children` | `React.ReactNode` | Yes |  | The content of the menu item |
+| `icon` | `JSX.Element` | No |  | The icon used in the menu item |
+| `shortcut` | `string` | No |  | The keyboard shortcut (label-only, does not affect behavior) |
+
+**WelcomeScreen.Center.MenuItemLink**
+
+To render an external link in a menu item, you can use this component.
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `href` | `string` | Yes |  | The `href` attribute to be added to the `anchor` element. |
+| `children` | `React.ReactNode` | Yes |  | The content of the menu item |
+| `icon` | `JSX.Element` | No |  | The icon used in the menu item |
+| `shortcut` | `string` | No |  | The keyboard shortcut (label-only, does not affect behavior) |
+
+**WelcomeScreen.Hints**
+
+These subcomponents render the UI hints. Text of each hint can be customized by supplying `children`.
+
+**WelcomeScreen.Hints.Menu**
+
+Hint for the main menu. Supply `children` to customize the hint text.
+
+**WelcomeScreen.Hints.Toolbar**
+
+Hint for the toolbar. Supply `children` to customize the hint text.
+
+**WelcomeScreen.Hints.Help**
+
+Hint for the help dialog. Supply `children` to customize the hint text.
+
 ### Props
 
 | Name | Type | Default | Description |

@@ -15,13 +15,15 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- Expose component API for the Excalidraw main menu [#6034](https://github.com/excalidraw/excalidraw/pull/6034), You can read more about its usage [here](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#MainMenu)
+- Support customization for the editor [welcome screen](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#WelcomeScreen) [#6048](https://github.com/excalidraw/excalidraw/pull/6048).
 
-- Render Footer as a component instead of render prop [#5970](https://github.com/excalidraw/excalidraw/pull/5970). You can read more about its usage [here](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Footer)
+- Support customization for the Excalidraw [main menu](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#MainMenu) [#6034](https://github.com/excalidraw/excalidraw/pull/6034).
+
+- [Footer](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Footer) is now rendered as child component instead of passed as a render prop [#5970](https://github.com/excalidraw/excalidraw/pull/5970).
 
 #### BREAKING CHANGE
 
-- With this change, the prop `renderFooter` is now removed.
+- The prop `renderFooter` is now removed in favor of rendering as a child component.
 
 ### Excalidraw schema
 
