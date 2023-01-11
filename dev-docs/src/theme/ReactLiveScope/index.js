@@ -1,19 +1,17 @@
 import React from "react";
-import {
-  Excalidraw,
-  Footer,
-  useDevice,
-  MainMenu,
-} from "@excalidraw/excalidraw";
-
+import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
+let ExcalidrawComp = {};
+if (ExecutionEnvironment.canUseDOM) {
+  ExcalidrawComp = require("@excalidraw/excalidraw");
+}
 // Add react-live imports you need here
 const ExcalidrawScope = {
   React,
   ...React,
-  Excalidraw,
-  Footer,
-  useDevice,
-  MainMenu,
+  Excalidraw: ExcalidrawComp.Excalidraw,
+  Footer: ExcalidrawComp.Footer,
+  useDevice: ExcalidrawComp.useDevice,
+  MainMenu: ExcalidrawComp.MainMenu,
 };
 
 export default ExcalidrawScope;
