@@ -36,9 +36,9 @@ Every time component updates, this callback if passed will get triggered and has
 (excalidrawElements, appState, files) => void;
 ```
 
-1.`excalidrawElements`: Array of [excalidrawElements](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106) in the scene.
+1. `excalidrawElements`: Array of [excalidrawElements](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106) in the scene.
 
-2.`appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79) of the scene.
+2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79) of the scene.
 
 3. `files`: The [`BinaryFiles`]([BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) which are added to the scene.
 
@@ -503,5 +503,3 @@ This prop if passed will be triggered when canvas is scrolled and has the below 
 ```ts
 (scrollX: number, scrollY: number) => void
 ```
-
-### Restore utilities
