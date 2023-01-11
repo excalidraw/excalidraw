@@ -164,8 +164,10 @@
     color: var(--color-gray-50);
     font-size: 0.875rem;
 
+    width: 100%;
     min-width: 300px;
-    display: flex;
+    max-width: 400px;
+    display: grid;
     align-items: center;
     justify-content: space-between;
 
@@ -176,18 +178,23 @@
 
     border-radius: var(--border-radius-md);
 
-    &__label {
+    grid-template-columns: calc(var(--default-icon-size) + 0.5rem) 1fr 3rem;
+
+    &__text {
       display: flex;
       align-items: center;
+      margin-right: auto;
+      text-align: left;
       column-gap: 0.5rem;
+    }
 
-      svg {
-        width: var(--default-icon-size);
-        height: var(--default-icon-size);
-      }
+    &__icon {
+      width: var(--default-icon-size);
+      height: var(--default-icon-size);
     }
 
     &__shortcut {
+      margin-left: auto;
       color: var(--color-gray-40);
       font-size: 0.75rem;
     }
@@ -201,7 +208,7 @@
       color: var(--color-gray-50);
     }
 
-    .welcomeScreen__menuItem__label {
+    .welcomeScreen__menuItem__text {
       color: var(--color-gray-100);
     }
   }
@@ -213,7 +220,7 @@
       color: var(--color-gray-50);
     }
 
-    .welcomeScreen__menuItem__label {
+    .welcomeScreen__menuItem__text {
       color: var(--color-gray-100);
     }
 
@@ -221,7 +228,7 @@
       color: var(--color-promo) !important;
 
       &:hover {
-        .welcomeScreen__menuItem__label {
+        .welcomeScreen__menuItem__text {
           color: var(--color-promo) !important;
         }
       }
@@ -244,14 +251,14 @@
         color: var(--color-gray-50);
       }
 
-      .welcomeScreen__menuItem__label {
+      .welcomeScreen__menuItem__text {
         color: var(--color-gray-10);
       }
     }
 
     .welcomeScreen__menuItem:active {
       background-color: var(--color-gray-90);
-      .welcomeScreen__menuItem__label {
+      .welcomeScreen__menuItem__text {
         color: var(--color-gray-10);
       }
     }

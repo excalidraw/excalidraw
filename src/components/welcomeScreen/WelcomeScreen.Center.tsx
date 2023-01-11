@@ -1,50 +1,91 @@
 import { actionLoadScene, actionShortcuts } from "../../actions";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { t } from "../../i18n";
-import { useExcalidrawActionManager, useExcalidrawAppState } from "../App";
+import {
+  useDevice,
+  useExcalidrawActionManager,
+  useExcalidrawAppState,
+} from "../App";
 import { ExcalLogo, HelpIcon, LoadIcon } from "../icons";
 
-const WelcomeScreenMenuItem = ({
-  label,
-  shortcut,
-  onClick,
+const WelcomeScreenMenuItemContent = ({
   icon,
-  link,
+  shortcut,
+  children,
 }: {
-  label: string;
-  shortcut: string | null;
-  onClick?: () => void;
-  icon: JSX.Element;
-  link?: string;
+  icon?: JSX.Element;
+  shortcut?: string | null;
+  children: React.ReactNode;
 }) => {
-  if (link) {
-    return (
-      <a
-        className="welcomeScreen__menuItem"
-        href={link}
-        target="_blank"
-        rel="noreferrer"
-      >
-        <div className="welcomeScreen__menuItem__label">
-          {icon}
-          {label}
-        </div>
-      </a>
-    );
-  }
-
+  const device = useDevice();
   return (
-    <button className="welcomeScreen__menuItem" type="button" onClick={onClick}>
-      <div className="welcomeScreen__menuItem__label">
-        {icon}
-        {label}
-      </div>
-      {shortcut && (
+    <>
+      <div className="welcomeScreen__menuItem__icon">{icon}</div>
+      <div className="welcomeScreen__menuItem__text">{children}</div>
+      {shortcut && !device.isMobile && (
         <div className="welcomeScreen__menuItem__shortcut">{shortcut}</div>
       )}
+    </>
+  );
+};
+WelcomeScreenMenuItemContent.displayName = "WelcomeScreenMenuItemContent";
+
+const WelcomeScreenMenuItem = ({
+  onSelect,
+  children,
+  icon,
+  shortcut,
+  className = "",
+  ...props
+}: {
+  onSelect: () => void;
+  children: React.ReactNode;
+  icon?: JSX.Element;
+  shortcut?: string | null;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+  return (
+    <button
+      type="button"
+      className={`welcomeScreen__menuItem ${className}`}
+      onClick={onSelect}
+      {...props}
+    >
+      <WelcomeScreenMenuItemContent icon={icon} shortcut={shortcut}>
+        {children}
+      </WelcomeScreenMenuItemContent>
     </button>
   );
 };
+WelcomeScreenMenuItem.displayName = "WelcomeScreenMenuItem";
+
+const WelcomeScreenMenuItemLink = ({
+  children,
+  href,
+  icon,
+  shortcut,
+  className = "",
+  ...props
+}: {
+  children: React.ReactNode;
+  href: string;
+  icon?: JSX.Element;
+  shortcut?: string | null;
+} & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+  return (
+    <a
+      className={`welcomeScreen__menuItem ${className}`}
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      {...props}
+    >
+      <WelcomeScreenMenuItemContent icon={icon} shortcut={shortcut}>
+        {children}
+      </WelcomeScreenMenuItemContent>
+    </a>
+  );
+};
+WelcomeScreenMenuItemLink.displayName = "WelcomeScreenMenuItemLink";
 
 const Center = ({ children }: { children?: React.ReactNode }) => {
   return (
@@ -92,11 +133,12 @@ const MenuItemHelp = () => {
 
   return (
     <WelcomeScreenMenuItem
-      onClick={() => actionManager.executeAction(actionShortcuts)}
-      label={t("helpDialog.title")}
+      onSelect={() => actionManager.executeAction(actionShortcuts)}
       shortcut="?"
       icon={HelpIcon}
-    />
+    >
+      {t("helpDialog.title")}
+    </WelcomeScreenMenuItem>
   );
 };
 MenuItemHelp.displayName = "MenuItemHelp";
@@ -111,11 +153,12 @@ const MenuItemLoadScene = () => {
 
   return (
     <WelcomeScreenMenuItem
-      label={t("buttons.load")}
-      onClick={() => actionManager.executeAction(actionLoadScene)}
+      onSelect={() => actionManager.executeAction(actionLoadScene)}
       shortcut={getShortcutFromShortcutName("loadScene")}
       icon={LoadIcon}
-    />
+    >
+      {t("buttons.load")}
+    </WelcomeScreenMenuItem>
   );
 };
 MenuItemLoadScene.displayName = "MenuItemLoadScene";
@@ -126,6 +169,7 @@ Center.Logo = Logo;
 Center.Heading = Heading;
 Center.Menu = Menu;
 Center.MenuItem = WelcomeScreenMenuItem;
+Center.MenuItemLink = WelcomeScreenMenuItemLink;
 Center.MenuItemHelp = MenuItemHelp;
 Center.MenuItemLoadScene = MenuItemLoadScene;
 

@@ -677,19 +677,21 @@ const ExcalidrawWrapper = () => {
             <WelcomeScreen.Center.MenuItemHelp />
 
             <WelcomeScreen.Center.MenuItem
-              label={t("labels.liveCollaboration")}
               shortcut={null}
-              onClick={() => setCollabDialogShown(true)}
+              onSelect={() => setCollabDialogShown(true)}
               icon={UsersIcon}
-            />
+            >
+              {t("labels.liveCollaboration")}
+            </WelcomeScreen.Center.MenuItem>
 
             {!isExcalidrawPlusSignedUser && (
-              <WelcomeScreen.Center.MenuItem
-                link="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"
-                label="Try Excalidraw Plus!"
+              <WelcomeScreen.Center.MenuItemLink
+                href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"
                 shortcut={null}
                 icon={PlusPromoIcon}
-              />
+              >
+                Try Excalidraw Plus!
+              </WelcomeScreen.Center.MenuItemLink>
             )}
           </WelcomeScreen.Center.Menu>
         </WelcomeScreen.Center>
