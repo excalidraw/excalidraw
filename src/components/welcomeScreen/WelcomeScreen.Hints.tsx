@@ -7,7 +7,7 @@ import {
 
 const MenuHint = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--menu-pointer">
+    <div className="virgil welcomeScreen-decor welcomeScreen-decor--menuHint">
       {WelcomeScreenMenuArrow}
       <div>{children || t("welcomeScreen.defaults.menuHint")}</div>
     </div>
@@ -17,8 +17,8 @@ MenuHint.displayName = "MenuHint";
 
 const ToolbarHint = () => {
   return (
-    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--top-toolbar-pointer">
-      <div className="WelcomeScreen-decor--top-toolbar-pointer__label">
+    <div className="virgil welcomeScreen-decor welcomeScreen-decor--toolbarHint">
+      <div className="welcomeScreen-decor--toolbarHint__label">
         {t("welcomeScreen.defaults.toolbarHint")}
       </div>
       {WelcomeScreenTopToolbarArrow}
@@ -29,7 +29,7 @@ ToolbarHint.displayName = "ToolbarHint";
 
 const HelpHint = () => {
   return (
-    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--help-pointer">
+    <div className="virgil welcomeScreen-decor welcomeScreen-decor--helpHint">
       <div>{t("welcomeScreen.defaults.helpHint")}</div>
       {WelcomeScreenHelpArrow}
     </div>

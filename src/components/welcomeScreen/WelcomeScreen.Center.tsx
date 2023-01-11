@@ -20,12 +20,12 @@ const WelcomeScreenMenuItem = ({
   if (link) {
     return (
       <a
-        className="WelcomeScreen-item"
+        className="welcomeScreen__menuItem"
         href={link}
         target="_blank"
         rel="noreferrer"
       >
-        <div className="WelcomeScreen-item__label">
+        <div className="welcomeScreen__menuItem__label">
           {icon}
           {label}
         </div>
@@ -34,13 +34,13 @@ const WelcomeScreenMenuItem = ({
   }
 
   return (
-    <button className="WelcomeScreen-item" type="button" onClick={onClick}>
-      <div className="WelcomeScreen-item__label">
+    <button className="welcomeScreen__menuItem" type="button" onClick={onClick}>
+      <div className="welcomeScreen__menuItem__label">
         {icon}
         {label}
       </div>
       {shortcut && (
-        <div className="WelcomeScreen-item__shortcut">{shortcut}</div>
+        <div className="welcomeScreen__menuItem__shortcut">{shortcut}</div>
       )}
     </button>
   );
@@ -48,7 +48,7 @@ const WelcomeScreenMenuItem = ({
 
 const Center = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <div className="WelcomeScreen-container">
+    <div className="welcomeScreen__center">
       {children || (
         <>
           <Logo />
@@ -66,7 +66,7 @@ Center.displayName = "Center";
 
 const Logo = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <div className="WelcomeScreen-logo virgil WelcomeScreen-decor">
+    <div className="welcomeScreen__center__logo virgil welcomeScreen-decor">
       {children || <>{ExcalLogo} Excalidraw</>}
     </div>
   );
@@ -75,7 +75,7 @@ Logo.displayName = "Logo";
 
 const Heading = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--subheading">
+    <div className="welcomeScreen__center__heading welcomeScreen-decor virgil">
       {children}
     </div>
   );
@@ -83,7 +83,7 @@ const Heading = ({ children }: { children: React.ReactNode }) => {
 Heading.displayName = "Heading";
 
 const Menu = ({ children }: { children?: React.ReactNode }) => {
-  return <div className="WelcomeScreen-items">{children}</div>;
+  return <div className="welcomeScreen__menu">{children}</div>;
 };
 Menu.displayName = "Menu";
 
