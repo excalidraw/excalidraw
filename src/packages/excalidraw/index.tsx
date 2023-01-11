@@ -163,7 +163,7 @@ const areEqual = (
       const canvasOptionKeys = Object.keys(
         prevUIOptions.canvasActions!,
       ) as (keyof Partial<typeof DEFAULT_UI_OPTIONS.canvasActions>)[];
-      canvasOptionKeys.every((key) => {
+      return canvasOptionKeys.every((key) => {
         if (
           key === "export" &&
           prevUIOptions?.canvasActions?.export &&
@@ -180,7 +180,7 @@ const areEqual = (
         );
       });
     }
-    return true;
+    return prevUIOptions[key] === nextUIOptions[key];
   });
 
   return isUIOptionsSame && isShallowEqual(prev, next);
