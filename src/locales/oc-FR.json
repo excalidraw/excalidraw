@@ -447,10 +447,16 @@
     "d9480f": "Irange 9"
   },
   "welcomeScreen": {
-    "data": "Totas las donadas son enregistradas dins vòstre navegador.",
-    "switchToPlusApp": "Volètz puslèu utilizar Excalidraw+ ?",
-    "menuHints": "Exportar, preferéncias, lengas, ...",
-    "toolbarHints": "Prenètz un esplech e començatz de dessenhar !",
-    "helpHints": "Acorchis e ajuda"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }
