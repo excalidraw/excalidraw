@@ -9,30 +9,23 @@ const DropdownMenuItem = ({
   icon,
   onSelect,
   children,
-  dataTestId,
   shortcut,
   className,
-  style,
-  ariaLabel,
+  ...rest
 }: {
   icon?: JSX.Element;
   onSelect: () => void;
   children: React.ReactNode;
-  dataTestId?: string;
   shortcut?: string;
   className?: string;
-  style?: React.CSSProperties;
-  ariaLabel?: string;
-}) => {
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   return (
     <button
-      aria-label={ariaLabel}
+      {...rest}
       onClick={onSelect}
-      data-testid={dataTestId}
-      title={ariaLabel}
       type="button"
       className={getDrodownMenuItemClassName(className)}
-      style={style}
+      title={rest.title ?? rest["aria-label"]}
     >
       <MenuItemContent icon={icon} shortcut={shortcut}>
         {children}

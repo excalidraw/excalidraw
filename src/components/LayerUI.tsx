@@ -50,7 +50,7 @@ import WelcomeScreen from "./welcome-screen/WelcomeScreen";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
-import MainMenu from "./mainMenu/MainMenu";
+import MainMenu from "./main-menu/MainMenu";
 
 interface LayerUIProps {
   actionManager: ActionManager;
