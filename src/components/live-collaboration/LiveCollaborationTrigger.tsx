@@ -10,14 +10,16 @@ import "./LiveCollaborationTrigger.scss";
 const LiveCollaborationTrigger = ({
   isCollaborating,
   onSelect,
+  ...rest
 }: {
   isCollaborating: boolean;
   onSelect: () => void;
-}) => {
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   const appState = useExcalidrawAppState();
 
   return (
     <Button
+      {...rest}
       className={clsx("collab-button", { active: isCollaborating })}
       type="button"
       onSelect={onSelect}
