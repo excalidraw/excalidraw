@@ -1,0 +1,18 @@
+@import "../css/variables.module";
+@import "../css/theme";
+
+.excalidraw {
+  .excalidraw-button {
+    @include outlineButtonStyles;
+    background-color: var(--island-bg-color);
+    width: var(--lg-button-size);
+    height: var(--lg-button-size);
+
+    svg {
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
+    }
+
+    overflow: hidden;
+  }
+}

@@ -1,3 +1,5 @@
+import "./Button.scss";
+
 interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   type?: "button" | "submit" | "reset";
   onSelect: () => any;
