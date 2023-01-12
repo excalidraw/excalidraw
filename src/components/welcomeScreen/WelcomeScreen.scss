@@ -6,14 +6,14 @@
   // WelcomeSreen common
   // ---------------------------------------------------------------------------
 
-  .welcomeScreen-decor {
+  .welcome-screen-decor {
     pointer-events: none;
 
     color: var(--color-gray-40);
   }
 
   &.theme--dark {
-    .welcomeScreen-decor {
+    .welcome-screen-decor {
       color: var(--color-gray-60);
     }
   }
@@ -21,13 +21,13 @@
   // WelcomeScreen.Hints
   // ---------------------------------------------------------------------------
 
-  .welcomeScreen-decor-hint {
+  .welcome-screen-decor-hint {
     @media (max-height: 599px) {
       display: none !important;
     }
 
     @media (max-width: 1024px), (max-width: 800px) {
-      .welcomeScreen-decor {
+      .welcome-screen-decor {
         &--help,
         &--menu {
           display: none;
@@ -68,7 +68,7 @@
       display: flex;
       align-items: baseline;
 
-      .welcomeScreen-decor-hint__label {
+      .welcome-screen-decor-hint__label {
         width: 120px;
         position: relative;
         top: -0.5rem;
@@ -107,7 +107,7 @@
       }
 
       @media (max-width: 860px) {
-        .welcomeScreen-decor-hint__label {
+        .welcome-screen-decor-hint__label {
           max-width: 160px;
         }
       }
@@ -117,7 +117,7 @@
   // WelcomeSreen.Center
   // ---------------------------------------------------------------------------
 
-  .welcomeScreen__center {
+  .welcome-screen-center {
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -131,7 +131,7 @@
     bottom: 1rem;
   }
 
-  .welcomeScreen__center__logo {
+  .welcome-screen-center__logo {
     display: flex;
     align-items: center;
     column-gap: 0.75rem;
@@ -143,12 +143,12 @@
     }
   }
 
-  .welcomeScreen__center__heading {
+  .welcome-screen-center__heading {
     font-size: 1.125rem;
     text-align: center;
   }
 
-  .welcomeScreen__menu {
+  .welcome-screen-menu {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -156,7 +156,7 @@
     align-items: center;
   }
 
-  .welcomeScreen__menuItem {
+  .welcome-screen-menu-item {
     box-sizing: border-box;
 
     pointer-events: all;
@@ -200,27 +200,27 @@
     }
   }
 
-  &:not(:active) .welcomeScreen__menuItem:hover {
+  &:not(:active) .welcome-screen-menu-item:hover {
     text-decoration: none;
     background: var(--color-gray-10);
 
-    .welcomeScreen__menuItem__shortcut {
+    .welcome-screen-menu-item__shortcut {
       color: var(--color-gray-50);
     }
 
-    .welcomeScreen__menuItem__text {
+    .welcome-screen-menu-item__text {
       color: var(--color-gray-100);
     }
   }
 
-  .welcomeScreen__menuItem:active {
+  .welcome-screen-menu-item:active {
     background: var(--color-gray-20);
 
-    .welcomeScreen__menuItem__shortcut {
+    .welcome-screen-menu-item__shortcut {
       color: var(--color-gray-50);
     }
 
-    .welcomeScreen__menuItem__text {
+    .welcome-screen-menu-item__text {
       color: var(--color-gray-100);
     }
 
@@ -228,7 +228,7 @@
       color: var(--color-promo) !important;
 
       &:hover {
-        .welcomeScreen__menuItem__text {
+        .welcome-screen-menu-item__text {
           color: var(--color-promo) !important;
         }
       }
@@ -236,7 +236,7 @@
   }
 
   &.theme--dark {
-    .welcomeScreen__menuItem {
+    .welcome-screen-menu-item {
       color: var(--color-gray-60);
 
       &__shortcut {
@@ -244,38 +244,38 @@
       }
     }
 
-    &:not(:active) .welcomeScreen__menuItem:hover {
+    &:not(:active) .welcome-screen-menu-item:hover {
       background: var(--color-gray-85);
 
-      .welcomeScreen__menuItem__shortcut {
+      .welcome-screen-menu-item__shortcut {
         color: var(--color-gray-50);
       }
 
-      .welcomeScreen__menuItem__text {
+      .welcome-screen-menu-item__text {
         color: var(--color-gray-10);
       }
     }
 
-    .welcomeScreen__menuItem:active {
+    .welcome-screen-menu-item:active {
       background-color: var(--color-gray-90);
-      .welcomeScreen__menuItem__text {
+      .welcome-screen-menu-item__text {
         color: var(--color-gray-10);
       }
     }
   }
 
   @media (max-height: 599px) {
-    .welcomeScreen__center {
+    .welcome-screen-center {
       margin-top: 4rem;
     }
   }
   @media (min-height: 600px) and (max-height: 900px) {
-    .welcomeScreen__center {
+    .welcome-screen-center {
       margin-top: 8rem;
     }
   }
   @media (max-height: 500px), (max-width: 320px) {
-    .welcomeScreen__center {
+    .welcome-screen-center {
       display: none;
     }
   }

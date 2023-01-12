@@ -20,10 +20,10 @@ const WelcomeScreenMenuItemContent = ({
   const device = useDevice();
   return (
     <>
-      <div className="welcomeScreen__menuItem__icon">{icon}</div>
-      <div className="welcomeScreen__menuItem__text">{children}</div>
+      <div className="welcome-screen-menu-item__icon">{icon}</div>
+      <div className="welcome-screen-menu-item__text">{children}</div>
       {shortcut && !device.isMobile && (
-        <div className="welcomeScreen__menuItem__shortcut">{shortcut}</div>
+        <div className="welcome-screen-menu-item__shortcut">{shortcut}</div>
       )}
     </>
   );
@@ -46,7 +46,7 @@ const WelcomeScreenMenuItem = ({
   return (
     <button
       type="button"
-      className={`welcomeScreen__menuItem ${className}`}
+      className={`welcome-screen-menu-item ${className}`}
       onClick={onSelect}
       {...props}
     >
@@ -73,7 +73,7 @@ const WelcomeScreenMenuItemLink = ({
 } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   return (
     <a
-      className={`welcomeScreen__menuItem ${className}`}
+      className={`welcome-screen-menu-item ${className}`}
       href={href}
       target="_blank"
       rel="noreferrer"
@@ -89,7 +89,7 @@ WelcomeScreenMenuItemLink.displayName = "WelcomeScreenMenuItemLink";
 
 const Center = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <div className="welcomeScreen__center">
+    <div className="welcome-screen-center">
       {children || (
         <>
           <Logo />
@@ -107,7 +107,7 @@ Center.displayName = "Center";
 
 const Logo = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <div className="welcomeScreen__center__logo virgil welcomeScreen-decor">
+    <div className="welcome-screen-center__logo virgil welcome-screen-decor">
       {children || <>{ExcalLogo} Excalidraw</>}
     </div>
   );
@@ -116,7 +116,7 @@ Logo.displayName = "Logo";
 
 const Heading = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="welcomeScreen__center__heading welcomeScreen-decor virgil">
+    <div className="welcome-screen-center__heading welcome-screen-decor virgil">
       {children}
     </div>
   );
@@ -124,7 +124,7 @@ const Heading = ({ children }: { children: React.ReactNode }) => {
 Heading.displayName = "Heading";
 
 const Menu = ({ children }: { children?: React.ReactNode }) => {
-  return <div className="welcomeScreen__menu">{children}</div>;
+  return <div className="welcome-screen-menu">{children}</div>;
 };
 Menu.displayName = "Menu";
 
