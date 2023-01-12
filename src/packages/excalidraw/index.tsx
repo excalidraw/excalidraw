@@ -14,13 +14,13 @@ import { jotaiScope, jotaiStore } from "../../jotai";
 import Footer from "../../components/footer/FooterCenter";
 import MainMenu from "../../components/main-menu/MainMenu";
 import WelcomeScreen from "../../components/welcome-screen/WelcomeScreen";
+import LiveCollaborationTrigger from "../../components/live-collaboration/LiveCollaborationTrigger";
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
     onChange,
     initialData,
     excalidrawRef,
-    onCollabButtonClick,
     isCollaborating = false,
     onPointerUpdate,
     renderTopRightUI,
@@ -94,7 +94,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onChange={onChange}
           initialData={initialData}
           excalidrawRef={excalidrawRef}
-          onCollabButtonClick={onCollabButtonClick}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
           renderTopRightUI={renderTopRightUI}
@@ -246,3 +245,4 @@ export { Footer };
 export { MainMenu };
 export { useDevice } from "../../components/App";
 export { WelcomeScreen };
+export { LiveCollaborationTrigger };
