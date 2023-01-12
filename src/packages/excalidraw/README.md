@@ -479,14 +479,10 @@ Use this component to render a menu item.
 
 | Prop | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `onSelect` | `Function` | Yes |  | The handler is triggered when the item is selected. |
-| `children` | `React.ReactNode` | Yes |  | The content of the menu item |
-| `icon` | `JSX.Element` | No |  | The icon used in the menu item |
+| `onSelect` | `Function` | Yes | `undefined` | The handler is triggered when the item is selected. |
+| `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
+| `icon` | `JSX.Element` | No | `undefined` | The icon used in the menu item |
 | `shortcut` | `string` | No |  | The keyboard shortcut (label-only, does not affect behavior) |
-| `className` | `string` | No |  | The class names to be added to the menu item |
-| `style` | `React.CSSProperties` | No |  | The inline styles to be added to the menu item |
-| `ariaLabel` | `string` |  | No | The `aria-label` to be added to the item for accessibility |
-| `dataTestId` | `string` |  | No | The `data-testid` to be added to the item. |
 
 **MainMenu.ItemLink**
 
@@ -510,14 +506,10 @@ const App = () => (
 
 | Prop | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `href` | `string` | Yes |  | The `href` attribute to be added to the `anchor` element. |
-| `children` | `React.ReactNode` | Yes |  | The content of the menu item |
-| `icon` | `JSX.Element` | No |  | The icon used in the menu item |
+| `href` | `string` | Yes | `undefined` | The `href` attribute to be added to the `anchor` element. |
+| `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
+| `icon` | `JSX.Element` | No | `undefined` | The icon used in the menu item |
 | `shortcut` | `string` | No |  | The keyboard shortcut (label-only, does not affect behavior) |
-| `className` | `string` | No | "" | The class names to be added to the menu item |
-| `style` | `React.CSSProperties` | No |  | The inline styles to be added to the menu item |
-| `ariaLabel` | `string` | No |  | The `aria-label` to be added to the item for accessibility |
-| `dataTestId` | `string` | No |  | The `data-testid` to be added to the item. |
 
 **MainMenu.ItemCustom**
 
@@ -547,9 +539,6 @@ const App = () => (
 | Prop | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
-| `className` | `string` | No | "" | The class names to be added to the menu item |
-| `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
-| `dataTestId` | `string` | No | `undefined` | The `data-testid` to be added to the item. |
 
 **MainMenu.DefaultItems**
 
@@ -595,10 +584,7 @@ const App = () => (
 
 | Prop | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `children ` | `React.ReactNode` | Yes | `undefined` | The content of the `MenuItem Group` |
-| `title` | `string` | No | `undefined` | The `title` for the grouped items |
-| `className` | `string` | No | "" | The `classname` to be added to the group |
-| `style` | `React.CSsSProperties` | No | `undefined` | The inline `styles` to be added to the group |
+| `children ` | `React.ReactNode` | Yes | `undefined` | The content of the `MainMenu.Group` |
 
 ### WelcomeScreen
 
