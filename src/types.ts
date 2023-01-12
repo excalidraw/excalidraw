@@ -521,11 +521,7 @@ export type Device = Readonly<{
 }>;
 
 export type UIChildrenComponents = {
-  [k in
-    | "FooterCenter"
-    | "Menu"
-    | "WelcomeScreen"
-    | "LiveCollaboration"]?: React.ReactElement<
+  [k in "FooterCenter" | "Menu" | "WelcomeScreen"]?: React.ReactElement<
     { children?: React.ReactNode },
     React.JSXElementConstructor<any>
   >;

@@ -107,7 +107,6 @@ const LayerUI = ({
     getReactChildren<UIChildrenComponents>(children, {
       Menu: true,
       FooterCenter: true,
-      LiveCollaboration: true,
       WelcomeScreen: true,
     });
 
@@ -343,7 +342,6 @@ const LayerUI = ({
             )}
           >
             <UserList collaborators={appState.collaborators} />
-            {childrenComponents.LiveCollaboration}
             {renderTopRightUI?.(device.isMobile, appState)}
             {!appState.viewModeEnabled && (
               <LibraryButton appState={appState} setAppState={setAppState} />
