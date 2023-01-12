@@ -447,10 +447,16 @@
     "d9480f": "Turuncu 9"
   },
   "welcomeScreen": {
-    "data": "Tüm veri internet gezgininize yerel olarak kaydedildi.",
-    "switchToPlusApp": "Excalidraw+ kullanmak ister miydiniz?",
-    "menuHints": "Dışa aktar, seçenkeler, diller, ...",
-    "toolbarHints": "Bir araç seçin & Çizime başlayın!",
-    "helpHints": "Kısayollar & yardım"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }
