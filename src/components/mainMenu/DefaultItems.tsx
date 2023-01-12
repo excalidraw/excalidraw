@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { t } from "../../i18n";
 import {
@@ -15,7 +14,6 @@ import {
   save,
   SunIcon,
   TrashIcon,
-  UsersIcon,
 } from "../icons";
 import { GithubIcon, DiscordIcon, TwitterIcon } from "../icons";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
@@ -257,29 +255,3 @@ export const Socials = () => (
   </>
 );
 Socials.displayName = "Socials";
-
-export const LiveCollaboration = ({
-  onSelect,
-  isCollaborating,
-}: {
-  onSelect: () => void;
-  isCollaborating: boolean;
-}) => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
-  return (
-    <DropdownMenuItem
-      dataTestId="collab-button"
-      icon={UsersIcon}
-      className={clsx({
-        "active-collab": isCollaborating,
-      })}
-      onSelect={onSelect}
-    >
-      {t("labels.liveCollaboration")}
-    </DropdownMenuItem>
-  );
-};
-
-LiveCollaboration.displayName = "LiveCollaboration";

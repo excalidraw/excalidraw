@@ -26,6 +26,8 @@ import {
   defaultLang,
   Footer,
   MainMenu,
+  LiveCollaboration,
+  UsersIcon,
 } from "../packages/excalidraw/index";
 import {
   AppState,
@@ -608,10 +610,16 @@ const ExcalidrawWrapper = () => {
         <MainMenu.DefaultItems.SaveToActiveFile />
         <MainMenu.DefaultItems.Export />
         <MainMenu.DefaultItems.SaveAsImage />
-        <MainMenu.DefaultItems.LiveCollaboration
-          isCollaborating={isCollaborating}
+        <MainMenu.Item
+          dataTestId="collab-button"
+          icon={UsersIcon}
+          className={clsx({
+            "active-collab": isCollaborating,
+          })}
           onSelect={() => setCollabDialogShown(true)}
-        />
+        >
+          {t("labels.liveCollaboration")}
+        </MainMenu.Item>
 
         <MainMenu.DefaultItems.Help />
         <MainMenu.DefaultItems.ClearCanvas />
@@ -645,7 +653,6 @@ const ExcalidrawWrapper = () => {
         ref={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
-        onCollabButtonClick={() => setCollabDialogShown(true)}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{
@@ -681,6 +688,10 @@ const ExcalidrawWrapper = () => {
         theme={theme}
       >
         {renderMenu()}
+        <LiveCollaboration
+          isCollaborating={isCollaborating}
+          onSelect={() => setCollabDialogShown(true)}
+        />
         <Footer>
           <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
             <ExcalidrawPlusAppLink />

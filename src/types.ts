@@ -287,7 +287,6 @@ export interface ExcalidrawProps {
     | null
     | Promise<ExcalidrawInitialDataState | null>;
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
-  onCollabButtonClick?: () => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
     pointer: { x: number; y: number };
@@ -517,7 +516,7 @@ export type Device = Readonly<{
 }>;
 
 export type UIChildrenComponents = {
-  [k in "FooterCenter" | "Menu"]?:
+  [k in "FooterCenter" | "Menu" | "LiveCollaboration"]?:
     | React.ReactPortal
     | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>;
 };

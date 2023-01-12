@@ -30,6 +30,7 @@ import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
+import clsx from "clsx";
 
 declare global {
   interface Window {
@@ -72,6 +73,8 @@ const {
   Sidebar,
   Footer,
   MainMenu,
+  UsersIcon,
+  LiveCollaboration,
 } = window.ExcalidrawLib;
 
 const COMMENT_ICON_DIMENSION = 32;
@@ -489,12 +492,16 @@ export default function App() {
         <MainMenu.DefaultItems.SaveAsImage />
         <MainMenu.DefaultItems.Export />
         <MainMenu.Separator />
-        {isCollaborating && (
-          <MainMenu.DefaultItems.LiveCollaboration
-            onSelect={() => window.alert("You clicked on collab button")}
-            isCollaborating={isCollaborating}
-          />
-        )}
+        <MainMenu.Item
+          dataTestId="collab-button"
+          icon={UsersIcon}
+          className={clsx({
+            "active-collab": isCollaborating,
+          })}
+          onSelect={() => setIsCollaborating(true)}
+        >
+          Live Collaboration
+        </MainMenu.Item>
         <MainMenu.Group title="Excalidraw links">
           <MainMenu.DefaultItems.Socials />
         </MainMenu.Group>
@@ -508,6 +515,7 @@ export default function App() {
           </button>
         </MainMenu.ItemCustom>
         <MainMenu.DefaultItems.Help />
+
         {excalidrawAPI && <MobileFooter excalidrawAPI={excalidrawAPI} />}
       </MainMenu>
     );
@@ -677,9 +685,6 @@ export default function App() {
               button: "down" | "up";
               pointersMap: Gesture["pointers"];
             }) => setPointerData(payload)}
-            onCollabButtonClick={() =>
-              window.alert("You clicked on collab button")
-            }
             viewModeEnabled={viewModeEnabled}
             zenModeEnabled={zenModeEnabled}
             gridModeEnabled={gridModeEnabled}
@@ -698,6 +703,12 @@ export default function App() {
               </Footer>
             )}
             {renderMenu()}
+            <LiveCollaboration
+              isCollaborating={isCollaborating}
+              onSelect={() => {
+                window.alert("Collab dialog clicked");
+              }}
+            />
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}

@@ -537,8 +537,7 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.getNonDeletedElements(),
       this.state,
     );
-    const { onCollabButtonClick, renderTopRightUI, renderCustomStats } =
-      this.props;
+    const { renderTopRightUI, renderCustomStats } = this.props;
 
     return (
       <div
@@ -572,7 +571,6 @@ class App extends React.Component<AppProps, AppState> {
                       setAppState={this.setAppState}
                       actionManager={this.actionManager}
                       elements={this.scene.getNonDeletedElements()}
-                      onCollabButtonClick={onCollabButtonClick}
                       onLockToggle={this.toggleLock}
                       onPenModeToggle={this.togglePenMode}
                       onInsertElements={(elements) =>

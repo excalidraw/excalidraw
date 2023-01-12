@@ -26,7 +26,6 @@ type MobileMenuProps = {
   renderImageExportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;

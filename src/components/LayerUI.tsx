@@ -21,7 +21,6 @@ import {
   ReactChildrenToObject,
 } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
-import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
@@ -64,7 +63,6 @@ interface LayerUIProps {
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   onPenModeToggle: () => void;
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
@@ -91,7 +89,6 @@ const LayerUI = ({
   setAppState,
   elements,
   canvas,
-  onCollabButtonClick,
   onLockToggle,
   onPenModeToggle,
   onInsertElements,
@@ -192,12 +189,6 @@ const LayerUI = ({
           {/* FIXME we should to test for this inside the item itself */}
           {UIOptions.canvasActions.saveAsImage && (
             <MainMenu.DefaultItems.SaveAsImage />
-          )}
-          {onCollabButtonClick && (
-            <MainMenu.DefaultItems.LiveCollaboration
-              onSelect={onCollabButtonClick}
-              isCollaborating={isCollaborating}
-            />
           )}
           <MainMenu.DefaultItems.Help />
           <MainMenu.DefaultItems.ClearCanvas />
@@ -354,13 +345,7 @@ const LayerUI = ({
             )}
           >
             <UserList collaborators={appState.collaborators} />
-            {onCollabButtonClick && (
-              <CollabButton
-                isCollaborating={isCollaborating}
-                collaboratorCount={appState.collaborators.size}
-                onClick={onCollabButtonClick}
-              />
-            )}
+            {childrenComponents.LiveCollaboration}
             {renderTopRightUI?.(device.isMobile, appState)}
             {!appState.viewModeEnabled && (
               <LibraryButton appState={appState} setAppState={setAppState} />
@@ -427,7 +412,6 @@ const LayerUI = ({
           renderJSONExportDialog={renderJSONExportDialog}
           renderImageExportDialog={renderImageExportDialog}
           setAppState={setAppState}
-          onCollabButtonClick={onCollabButtonClick}
           onLockToggle={() => onLockToggle()}
           onPenModeToggle={onPenModeToggle}
           canvas={canvas}
