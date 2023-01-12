@@ -241,6 +241,7 @@ export {
 } from "../../utils";
 
 export { Sidebar } from "../../components/Sidebar/Sidebar";
+export { Button } from "../../components/Button";
 export { Footer };
 export { MainMenu };
 export { useDevice } from "../../components/App";
