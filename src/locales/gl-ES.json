@@ -447,10 +447,16 @@
     "d9480f": "Laranxa 9"
   },
   "welcomeScreen": {
-    "data": "Toda a información é gardada de maneira local no seu navegador.",
-    "switchToPlusApp": "Queres ir a Excalidraw+ no seu lugar?",
-    "menuHints": "Exportar, preferencias, idiomas, ...",
-    "toolbarHints": "Escolle unha ferramenta & Comeza a debuxar!",
-    "helpHints": "Atallos & axuda"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }
