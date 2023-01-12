@@ -150,6 +150,7 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     toggleTheme: null,
     saveAsImage: true,
   },
+  welcomeScreen: true,
 };
 
 // breakpoints

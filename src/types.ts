@@ -390,7 +390,7 @@ export type AppProps = Merge<
   ExcalidrawProps,
   {
     UIOptions: Merge<
-      UIOptions,
+      MarkRequired<UIOptions, "welcomeScreen">,
       {
         canvasActions: Required<CanvasActions> & { export: ExportOpts };
       }

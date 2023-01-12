@@ -601,7 +601,7 @@ class App extends React.Component<AppProps, AppState> {
                       onImageAction={this.onImageAction}
                       renderWelcomeScreen={
                         !this.state.isLoading &&
-                        this.props.UIOptions.welcomeScreen !== false &&
+                        this.props.UIOptions.welcomeScreen &&
                         this.state.showWelcomeScreen &&
                         this.state.activeTool.type === "selection" &&
                         !this.scene.getElementsIncludingDeleted().length
