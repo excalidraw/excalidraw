@@ -29,12 +29,9 @@ Please add the latest change on the top under the correct section.
 
 #### BREAKING CHANGES
 
-<<<<<<< HEAD
 - `props.onCollabButtonClick` is now removed. You need to render the main menu item yourself, and optionally also render the `<LiveCollaboration>` component if you want to retain the canvas button at top-right.
 - With this change, the prop `renderFooter` is now removed.
-=======
 - The prop `renderFooter` is now removed in favor of rendering as a child component.
->>>>>>> origin/master
 
 ### Excalidraw schema
 
