@@ -15,11 +15,7 @@ import {
   BinaryFiles,
   UIChildrenComponents,
 } from "../types";
-import {
-  isShallowEqual,
-  muteFSAbortError,
-  ReactChildrenToObject,
-} from "../utils";
+import { isShallowEqual, muteFSAbortError, getReactChildren } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
@@ -108,8 +104,12 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const device = useDevice();
 
-  const childrenComponents =
-    ReactChildrenToObject<UIChildrenComponents>(children);
+  const [childrenComponents, restChildren] =
+    getReactChildren<UIChildrenComponents>(children, {
+      Menu: true,
+      FooterCenter: true,
+      LiveCollaboration: true,
+    });
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -375,6 +375,7 @@ const LayerUI = ({
 
   return (
     <>
+      {restChildren}
       {appState.isLoading && <LoadingMessage delay={250} />}
       {appState.errorMessage && (
         <ErrorDialog
