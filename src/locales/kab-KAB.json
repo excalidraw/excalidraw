@@ -447,10 +447,16 @@
     "d9480f": "Aččinawi 9"
   },
   "welcomeScreen": {
-    "data": "Akk isefka-inek•inem ttwakelsen s wudem adigan deg yiminig-inek•inem.",
-    "switchToPlusApp": "Tebɣiḍ ad tedduḍ ɣer Excalidraw+ deg umḍiq?",
-    "menuHints": "Asifeḍ, ismenyifen, tutlayin, ...",
-    "toolbarHints": "Fren afecku tebduḍ asuneɣ!",
-    "helpHints": "Inegzumen akked tallelt"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }
