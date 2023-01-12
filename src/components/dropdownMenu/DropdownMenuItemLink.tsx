@@ -7,7 +7,6 @@ const DropdownMenuItemLink = ({
   href,
   children,
   className = "",
-  "aria-label": ariaLabel,
   ...rest
 }: {
   icon?: JSX.Element;
@@ -15,7 +14,6 @@ const DropdownMenuItemLink = ({
   shortcut?: string;
   className?: string;
   href: string;
-  "aria-label"?: string;
 } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   return (
     <a
@@ -24,8 +22,7 @@ const DropdownMenuItemLink = ({
       target="_blank"
       rel="noreferrer"
       className={getDrodownMenuItemClassName(className)}
-      aria-label={ariaLabel}
-      title={rest.title ?? ariaLabel}
+      title={rest.title ?? rest["aria-label"]}
     >
       <MenuItemContent icon={icon} shortcut={shortcut}>
         {children}
