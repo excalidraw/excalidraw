@@ -1,5 +1,6 @@
 import { t } from "../../i18n";
 import { UsersIcon } from "../icons";
+import { Button } from "../Button";
 
 import clsx from "clsx";
 import { useExcalidrawAppState } from "../App";
@@ -16,10 +17,10 @@ const LiveCollaboration = ({
   const appState = useExcalidrawAppState();
 
   return (
-    <button
+    <Button
       className={clsx("collab-button", { active: isCollaborating })}
       type="button"
-      onClick={onSelect}
+      onSelect={onSelect}
       style={{ position: "relative" }}
       title={t("labels.liveCollaboration")}
     >
@@ -29,7 +30,7 @@ const LiveCollaboration = ({
           {appState.collaborators.size}
         </div>
       )}
-    </button>
+    </Button>
   );
 };
 
