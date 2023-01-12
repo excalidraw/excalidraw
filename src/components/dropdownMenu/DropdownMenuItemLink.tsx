@@ -25,7 +25,7 @@ const DropdownMenuItemLink = ({
       rel="noreferrer"
       className={getDrodownMenuItemClassName(className)}
       aria-label={ariaLabel}
-      title={ariaLabel}
+      title={rest.title ?? ariaLabel}
     >
       <MenuItemContent icon={icon} shortcut={shortcut}>
         {children}

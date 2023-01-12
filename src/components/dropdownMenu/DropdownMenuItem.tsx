@@ -12,7 +12,6 @@ const DropdownMenuItem = ({
   shortcut,
   className,
   "aria-label": ariaLabel,
-
   ...rest
 }: {
   icon?: JSX.Element;
@@ -29,7 +28,7 @@ const DropdownMenuItem = ({
       type="button"
       className={getDrodownMenuItemClassName(className)}
       aria-label={ariaLabel}
-      title={ariaLabel}
+      title={rest.title ?? ariaLabel}
     >
       <MenuItemContent icon={icon} shortcut={shortcut}>
         {children}
