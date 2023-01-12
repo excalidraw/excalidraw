@@ -8,8 +8,7 @@ const DropdownMenuItemLink = ({
   children,
   className = "",
   style,
-  "aria-label": ariaLabel,
-  "data-testid": dataTestId,
+  ...rest
 }: {
   icon?: JSX.Element;
   children: React.ReactNode;
@@ -18,19 +17,18 @@ const DropdownMenuItemLink = ({
   className?: string;
   href: string;
   style?: React.CSSProperties;
-  "aria-label"?: string;
-  "data-testid"?: string;
 }) => {
+  const title =
+    "aria-label" in rest ? (rest["aria-label"] as string) : undefined;
   return (
     <a
+      {...rest}
       href={href}
       target="_blank"
       rel="noreferrer"
       className={getDrodownMenuItemClassName(className)}
       style={style}
-      data-testid={dataTestId}
-      title={ariaLabel}
-      aria-label={ariaLabel}
+      title={title}
     >
       <MenuItemContent icon={icon} shortcut={shortcut}>
         {children}

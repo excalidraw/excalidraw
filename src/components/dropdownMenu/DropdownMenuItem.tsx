@@ -12,8 +12,7 @@ const DropdownMenuItem = ({
   shortcut,
   className,
   style,
-  "aria-label": ariaLabel,
-  "data-testid": dataTestId,
+  ...rest
 }: {
   icon?: JSX.Element;
   onSelect: () => void;
@@ -21,18 +20,17 @@ const DropdownMenuItem = ({
   shortcut?: string;
   className?: string;
   style?: React.CSSProperties;
-  "aria-label"?: string;
-  "data-testid"?: string;
 }) => {
+  const title =
+    "aria-label" in rest ? (rest["aria-label"] as string) : undefined;
   return (
     <button
-      aria-label={ariaLabel}
+      {...rest}
       onClick={onSelect}
-      data-testid={dataTestId}
-      title={ariaLabel}
       type="button"
       className={getDrodownMenuItemClassName(className)}
       style={style}
+      title={title}
     >
       <MenuItemContent icon={icon} shortcut={shortcut}>
         {children}
