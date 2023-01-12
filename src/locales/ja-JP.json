@@ -447,10 +447,16 @@
     "d9480f": "オレンジ 9"
   },
   "welcomeScreen": {
-    "data": "すべてのデータはブラウザにローカル保存されます。",
-    "switchToPlusApp": "代わりにExcalidraw+を開きますか？",
-    "menuHints": "エクスポート, 設定, 言語, ...",
-    "toolbarHints": "ツールを選んで描き始めよう！",
-    "helpHints": "ショートカットとヘルプ"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }
