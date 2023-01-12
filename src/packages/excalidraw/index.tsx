@@ -15,7 +15,6 @@ import Footer from "../../components/footer/FooterCenter";
 import MainMenu from "../../components/main-menu/MainMenu";
 import WelcomeScreen from "../../components/welcome-screen/WelcomeScreen";
 import LiveCollaborationTrigger from "../../components/live-collaboration/LiveCollaborationTrigger";
-import { usersIcon } from "../../components/icons";
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
