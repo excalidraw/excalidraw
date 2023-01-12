@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { t } from "../../i18n";
 import {
@@ -15,7 +14,7 @@ import {
   save,
   SunIcon,
   TrashIcon,
-  UsersIcon,
+  usersIcon,
 } from "../icons";
 import { GithubIcon, DiscordIcon, TwitterIcon } from "../icons";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
@@ -31,6 +30,7 @@ import {
 import "./DefaultItems.scss";
 import { useState } from "react";
 import ConfirmDialog from "../ConfirmDialog";
+import clsx from "clsx";
 
 export const LoadScene = () => {
   // FIXME Hack until we tie "t" to lang state
@@ -258,7 +258,7 @@ export const Socials = () => (
 );
 Socials.displayName = "Socials";
 
-export const LiveCollaboration = ({
+export const LiveCollaborationTrigger = ({
   onSelect,
   isCollaborating,
 }: {
@@ -271,7 +271,7 @@ export const LiveCollaboration = ({
   return (
     <DropdownMenuItem
       data-testid="collab-button"
-      icon={UsersIcon}
+      icon={usersIcon}
       className={clsx({
         "active-collab": isCollaborating,
       })}
@@ -282,4 +282,4 @@ export const LiveCollaboration = ({
   );
 };
 
-LiveCollaboration.displayName = "LiveCollaboration";
+LiveCollaborationTrigger.displayName = "LiveCollaborationTrigger";

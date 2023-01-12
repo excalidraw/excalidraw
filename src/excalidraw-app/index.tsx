@@ -26,6 +26,7 @@ import {
   defaultLang,
   Footer,
   MainMenu,
+  LiveCollaborationTrigger,
   WelcomeScreen,
 } from "../packages/excalidraw/index";
 import {
@@ -87,7 +88,7 @@ import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 import { EncryptedIcon } from "./components/EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
 import { LanguageList } from "./components/LanguageList";
-import { PlusPromoIcon, UsersIcon } from "../components/icons";
+import { PlusPromoIcon } from "../components/icons";
 
 polyfill();
 
@@ -610,7 +611,7 @@ const ExcalidrawWrapper = () => {
         <MainMenu.DefaultItems.SaveToActiveFile />
         <MainMenu.DefaultItems.Export />
         <MainMenu.DefaultItems.SaveAsImage />
-        <MainMenu.DefaultItems.LiveCollaboration
+        <MainMenu.DefaultItems.LiveCollaborationTrigger
           isCollaborating={isCollaborating}
           onSelect={() => setCollabDialogShown(true)}
         />
@@ -675,15 +676,9 @@ const ExcalidrawWrapper = () => {
           <WelcomeScreen.Center.Menu>
             <WelcomeScreen.Center.MenuItemLoadScene />
             <WelcomeScreen.Center.MenuItemHelp />
-
-            <WelcomeScreen.Center.MenuItem
-              shortcut={null}
+            <WelcomeScreen.Center.MenuItemLiveCollaborationTrigger
               onSelect={() => setCollabDialogShown(true)}
-              icon={UsersIcon}
-            >
-              {t("labels.liveCollaboration")}
-            </WelcomeScreen.Center.MenuItem>
-
+            />
             {!isExcalidrawPlusSignedUser && (
               <WelcomeScreen.Center.MenuItemLink
                 href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"
@@ -710,7 +705,6 @@ const ExcalidrawWrapper = () => {
         ref={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
-        onCollabButtonClick={() => setCollabDialogShown(true)}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{
@@ -744,8 +738,20 @@ const ExcalidrawWrapper = () => {
         onLibraryChange={onLibraryChange}
         autoFocus={true}
         theme={theme}
+        renderTopRightUI={(isMobile) => {
+          if (isMobile) {
+            return null;
+          }
+          return (
+            <LiveCollaborationTrigger
+              isCollaborating={isCollaborating}
+              onSelect={() => setCollabDialogShown(true)}
+            />
+          );
+        }}
       >
         {renderMenu()}
+
         <Footer>
           <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
             <ExcalidrawPlusAppLink />
