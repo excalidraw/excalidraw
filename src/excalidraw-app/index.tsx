@@ -88,7 +88,7 @@ import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 import { EncryptedIcon } from "./components/EncryptedIcon";
 import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
 import { LanguageList } from "./components/LanguageList";
-import { PlusPromoIcon, usersIcon } from "../components/icons";
+import { PlusPromoIcon } from "../components/icons";
 
 polyfill();
 
