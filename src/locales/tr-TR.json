@@ -202,8 +202,8 @@
     "invalidSVGString": "Geçersiz SVG.",
     "cannotResolveCollabServer": "İş birliği sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin.",
     "importLibraryError": "Kütüphane yüklenemedi",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed": "Backend veritabanına kaydedilemedi. Eğer problem devam ederse, çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
+    "collabSaveFailed_sizeExceeded": "Backend veritabanına kaydedilemedi. Eğer problem devam ederse, çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz. Çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz."
   },
   "toolBar": {
     "selection": "Seçme",
@@ -314,8 +314,8 @@
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
     "zoomToSelection": "Seçime yakınlaş",
     "toggleElementLock": "Seçimi Kilitle/çöz",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Sayfayı kaydır yukarı/aşağı",
+    "movePageLeftRight": "Sayfayı kaydır sol/sağ"
   },
   "clearCanvasDialog": {
     "title": "Tuvali temizle"
@@ -397,7 +397,7 @@
     "fileSavedToFilename": "{filename} kaydedildi",
     "canvas": "tuval",
     "selection": "seçim",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Tekil obje olarak yapıştırmak için veya var olan bir metin editörüne yapıştırmak için {{shortcut}} kullanın"
   },
   "colors": {
     "ffffff": "Beyaz",
