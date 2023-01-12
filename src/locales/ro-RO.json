@@ -448,15 +448,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Toate datele tale sunt salvate local în navigatorul tău.",
+      "center_heading_plus": "Ai vrut să mergi în schimb la Excalidraw+?",
+      "menuHint": "Exportare, preferințe, limbi, ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Exportare, preferințe și mai multe...",
+      "center_heading": "Diagrame. Făcute. Simple.",
+      "toolbarHint": "Alege un instrument și începe să desenezi!",
+      "helpHint": "Comenzi rapide și ajutor"
     }
   }
 }
