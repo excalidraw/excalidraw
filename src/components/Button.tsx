@@ -1,7 +1,8 @@
 interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+  type?: "button" | "submit" | "reset";
+  onSelect: () => any;
   children: React.ReactNode;
   className?: string;
-  type?: "button" | "submit" | "reset";
 }
 
 /**
@@ -10,13 +11,22 @@ interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
  * Accepts all props that a regular `button` element accepts.
  */
 export const Button = ({
-  children,
-  className,
   type = "button",
+  onSelect,
+  children,
+  className = "",
   ...rest
 }: ButtonProps) => {
   return (
-    <button type={type} className={`excalidraw-button ${className}`} {...rest}>
+    <button
+      onClick={(event) => {
+        onSelect();
+        rest.onClick?.(event);
+      }}
+      type={type}
+      className={`excalidraw-button ${className}`}
+      {...rest}
+    >
       {children}
     </button>
   );

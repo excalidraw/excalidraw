@@ -26,7 +26,7 @@ const CustomFooter = ({
   return (
     <>
       <Button
-        onClick={() => alert("General Kenobi!")}
+        onSelect={() => alert("General Kenobi!")}
         className="you are a bold one"
         style={{ marginLeft: "1rem" }}
         title="Hello there!"
