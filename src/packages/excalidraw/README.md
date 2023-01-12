@@ -477,10 +477,6 @@ To render an item, its recommended to use `MainMenu.Item`.
 | `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
 | `icon` | `JSX.Element` | No | `undefined` | The icon used in the menu item |
 | `shortcut` | `string` | No | `undefined` | The shortcut to be shown for the menu item |
-| `className` | `string` | No | "" | The class names to be added to the menu item |
-| `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
-| `aria-label` | `string` | `undefined` | No | The `aria-label` to be added to the item for accessibility |
-| `data-testid` | `string` | `undefined` | No | The `data-testid` to be added to the item. |
 
 **MainMenu.ItemLink**
 
@@ -508,10 +504,6 @@ const App = () => {
 | `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
 | `icon` | `JSX.Element` | No | `undefined` | The icon used in the menu item |
 | `shortcut` | `string` | No | `undefined` | The shortcut to be shown for the menu item |
-| `className` | `string` | No | "" | The class names to be added to the menu item |
-| `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
-| `aria-label` | `string` | No | `undefined` | The `aria-label` to be added to the item for accessibility |
-| `data-testid` | `string` | No | `undefined` | The `data-testid` to be added to the item. |
 
 **MainMenu.ItemCustom**
 
@@ -541,9 +533,7 @@ const App = () => {
 | Prop | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
-| `className` | `string` | No | "" | The class names to be added to the menu item |
-| `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
-| `data-testid` | `string` | No | `undefined` | The `data-testid` to be added to the item. |
+
 
 **MainMenu.DefaultItems**
 
@@ -590,9 +580,6 @@ const App = () => {
 | Prop | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `children ` | `React.ReactNode` | Yes | `undefined` | The content of the `Menu Group` |
-| `title` | `string` | No | `undefined` | The `title` for the grouped items |
-| `className` | `string` | No | "" | The `classname` to be added to the group |
-| `style` | `React.CSsSProperties` | No | `undefined` | The inline `styles` to be added to the group |
 
 ### Props
 
