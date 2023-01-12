@@ -1,3 +1,5 @@
+import React from "react";
+
 const DropdownMenuItemCustom = ({
   children,
   className = "",
@@ -5,7 +7,7 @@ const DropdownMenuItemCustom = ({
 }: {
   children: React.ReactNode;
   className?: string;
-}) => {
+} & React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
       {...rest}
