@@ -699,7 +699,7 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
  * To guard against this (provided you care about the rest children at all),
  * supply a second parameter with an object with keys of the expected children.
  */
-export const partitionReactChildren = <
+export const getReactChildren = <
   KnownChildren extends {
     [k in string]?: React.ReactNode;
   },

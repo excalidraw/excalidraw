@@ -15,11 +15,7 @@ import {
   BinaryFiles,
   UIChildrenComponents,
 } from "../types";
-import {
-  isShallowEqual,
-  muteFSAbortError,
-  partitionReactChildren,
-} from "../utils";
+import { isShallowEqual, muteFSAbortError, getReactChildren } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
@@ -112,7 +108,7 @@ const LayerUI = ({
   const device = useDevice();
 
   const [childrenComponents, restChildren] =
-    partitionReactChildren<UIChildrenComponents>(children, {
+    getReactChildren<UIChildrenComponents>(children, {
       Menu: true,
       FooterCenter: true,
     });
