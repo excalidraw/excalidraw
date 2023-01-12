@@ -687,27 +687,46 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
     : [];
 };
 
-export const ReactChildrenToObject = <
-  T extends {
-    [k in string]?:
-      | React.ReactPortal
-      | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>;
+/**
+ * Partitions React children into named components and the rest of children.
+ *
+ * Returns known children as a dictionary of react children keyed by their
+ * displayName, and the rest children as an array.
+ *
+ * NOTE all named react components are included in the dictionary, irrespective
+ * of the supplied type parameter. This means you may be throwing away
+ * children that you aren't expecting, but should nonetheless be rendered.
+ * To guard against this (provided you care about the rest children at all),
+ * supply a second parameter with an object with keys of the expected children.
+ */
+export const getReactChildren = <
+  KnownChildren extends {
+    [k in string]?: React.ReactNode;
   },
 >(
   children: React.ReactNode,
+  expectedComponents?: Record<keyof KnownChildren, any>,
 ) => {
-  return React.Children.toArray(children).reduce((acc, child) => {
-    if (
-      React.isValidElement(child) &&
-      typeof child.type !== "string" &&
-      //@ts-ignore
-      child?.type.displayName
-    ) {
-      // @ts-ignore
-      acc[child.type.displayName] = child;
-    }
-    return acc;
-  }, {} as Partial<T>);
+  const restChildren: React.ReactNode[] = [];
+
+  const knownChildren = React.Children.toArray(children).reduce(
+    (acc, child) => {
+      if (
+        React.isValidElement(child) &&
+        (!expectedComponents ||
+          ((child.type as any).displayName as string) in expectedComponents)
+      ) {
+        // @ts-ignore
+        acc[child.type.displayName] = child;
+      } else {
+        restChildren.push(child);
+      }
+      return acc;
+    },
+    {} as Partial<KnownChildren>,
+  );
+
+  return [knownChildren, restChildren] as const;
 };
 
 export const isShallowEqual = <T extends Record<string, any>>(
