@@ -542,7 +542,7 @@
   .mobile-misc-tools-container {
     position: absolute;
     top: 4rem;
-    right: -1rem;
+    right: -#{$editor-container-padding};
     display: flex;
     flex-direction: column;
     border: 1px solid var(--sidebar-border-color);
