@@ -715,9 +715,9 @@ Hint for the toolbar. Supply `children` to customize the hint text.
 
 Hint for the help dialog. Supply `children` to customize the hint text.
 
-### LiveCollaboration
+### LiveCollaborationTrigger
 
-If you implement live collaboration support and want to expose the same UI button as on excalidraw.com, you can render the `<LiveCollaboration>` component. You'll need to supply `onSelect()` to handle opening of your collaboration dialog, but the button will display current `appState.collaborators` count for you.
+If you implement live collaboration support and want to expose the same UI button as on excalidraw.com, you can render the `<LiveCollaborationTrigger>` component. You'll need to supply `onSelect()` to handle opening of your collaboration dialog, but the button will display current `appState.collaborators` count for you.
 
 | Prop | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
