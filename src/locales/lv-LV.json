@@ -447,10 +447,16 @@
     "d9480f": "Oranžs 9"
   },
   "welcomeScreen": {
-    "data": "Visi jūsu dati tiek glabāti uz vietas jūsu pārlūkā.",
-    "switchToPlusApp": "",
-    "menuHints": "Eksportēšana, iestatījumi, valodas...",
-    "toolbarHints": "Izvēlieties rīku un sāciet zīmēt!",
-    "helpHints": "Saīsnes un palīdzība"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }
