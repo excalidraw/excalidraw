@@ -493,7 +493,7 @@ export default function App() {
         <MainMenu.DefaultItems.Export />
         <MainMenu.Separator />
         <MainMenu.Item
-          dataTestId="collab-button"
+          data-testid="collab-button"
           icon={icons.usersIcon}
           className={clsx({
             "active-collab": isCollaborating,

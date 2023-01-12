@@ -44,9 +44,9 @@ export const LoadScene = () => {
     <DropdownMenuItem
       icon={LoadIcon}
       onSelect={() => actionManager.executeAction(actionLoadScene)}
-      dataTestId="load-button"
+      data-testid="load-button"
       shortcut={getShortcutFromShortcutName("loadScene")}
-      ariaLabel={t("buttons.load")}
+      aria-label={t("buttons.load")}
     >
       {t("buttons.load")}
     </DropdownMenuItem>
@@ -67,10 +67,10 @@ export const SaveToActiveFile = () => {
   return (
     <DropdownMenuItem
       shortcut={getShortcutFromShortcutName("saveScene")}
-      dataTestId="save-button"
+      data-testid="save-button"
       onSelect={() => actionManager.executeAction(actionSaveToActiveFile)}
       icon={save}
-      ariaLabel={`${t("buttons.save")}`}
+      aria-label={`${t("buttons.save")}`}
     >{`${t("buttons.save")}`}</DropdownMenuItem>
   );
 };
@@ -84,10 +84,10 @@ export const SaveAsImage = () => {
   return (
     <DropdownMenuItem
       icon={ExportImageIcon}
-      dataTestId="image-export-button"
+      data-testid="image-export-button"
       onSelect={() => setAppState({ openDialog: "imageExport" })}
       shortcut={getShortcutFromShortcutName("imageExport")}
-      ariaLabel={t("buttons.exportImage")}
+      aria-label={t("buttons.exportImage")}
     >
       {t("buttons.exportImage")}
     </DropdownMenuItem>
@@ -104,11 +104,11 @@ export const Help = () => {
 
   return (
     <DropdownMenuItem
-      dataTestId="help-menu-item"
+      data-testid="help-menu-item"
       icon={HelpIcon}
       onSelect={() => actionManager.executeAction(actionShortcuts)}
       shortcut="?"
-      ariaLabel={t("helpDialog.title")}
+      aria-label={t("helpDialog.title")}
     >
       {t("helpDialog.title")}
     </DropdownMenuItem>
@@ -134,8 +134,8 @@ export const ClearCanvas = () => {
       <DropdownMenuItem
         icon={TrashIcon}
         onSelect={toggleDialog}
-        dataTestId="clear-canvas-button"
-        ariaLabel={t("buttons.clearReset")}
+        data-testid="clear-canvas-button"
+        aria-label={t("buttons.clearReset")}
       >
         {t("buttons.clearReset")}
       </DropdownMenuItem>
@@ -173,9 +173,9 @@ export const ToggleTheme = () => {
         return actionManager.executeAction(actionToggleTheme);
       }}
       icon={appState.theme === "dark" ? SunIcon : MoonIcon}
-      dataTestId="toggle-dark-mode"
+      data-testid="toggle-dark-mode"
       shortcut={getShortcutFromShortcutName("toggleTheme")}
-      ariaLabel={
+      aria-label={
         appState.theme === "dark"
           ? t("buttons.lightMode")
           : t("buttons.darkMode")
@@ -220,8 +220,8 @@ export const Export = () => {
       onSelect={() => {
         setAppState({ openDialog: "jsonExport" });
       }}
-      dataTestId="json-export-button"
-      ariaLabel={t("buttons.export")}
+      data-testid="json-export-button"
+      aria-label={t("buttons.export")}
     >
       {t("buttons.export")}
     </DropdownMenuItem>
@@ -234,21 +234,21 @@ export const Socials = () => (
     <DropdownMenuItemLink
       icon={GithubIcon}
       href="https://github.com/excalidraw/excalidraw"
-      ariaLabel="GitHub"
+      aria-label="GitHub"
     >
       GitHub
     </DropdownMenuItemLink>
     <DropdownMenuItemLink
       icon={DiscordIcon}
       href="https://discord.gg/UexuTaE"
-      ariaLabel="Discord"
+      aria-label="Discord"
     >
       Discord
     </DropdownMenuItemLink>
     <DropdownMenuItemLink
       icon={TwitterIcon}
       href="https://twitter.com/excalidraw"
-      ariaLabel="Twitter"
+      aria-label="Twitter"
     >
       Twitter
     </DropdownMenuItemLink>
