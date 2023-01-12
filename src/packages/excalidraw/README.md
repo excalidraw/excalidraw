@@ -138,9 +138,6 @@ export default function App() {
             console.log("Elements :", elements, "State : ", state)
           }
           onPointerUpdate={(payload) => console.log(payload)}
-          onCollabButtonClick={() =>
-            window.alert("You clicked on collab button")
-          }
           viewModeEnabled={viewModeEnabled}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
@@ -331,7 +328,6 @@ const App = () => {
         onChange: (elements, state) =>
           console.log("Elements :", elements, "State : ", state),
         onPointerUpdate: (payload) => console.log(payload),
-        onCollabButtonClick: () => window.alert("You clicked on collab button"),
         viewModeEnabled: viewModeEnabled,
         zenModeEnabled: zenModeEnabled,
         gridModeEnabled: gridModeEnabled,
@@ -594,6 +590,15 @@ const App = () => {
 | `className` | `string` | No | "" | The `classname` to be added to the group |
 | `style` | `React.CSsSProperties` | No | `undefined` | The inline `styles` to be added to the group |
 
+### LiveCollaboration
+
+If you implement live collaboration support and want to expose the same UI button as on excalidraw.com, you can render the `<LiveCollaboration>` component. You'll need to supply `onSelect()` to handle opening of your collaboration dialog, but the button will display current `appState.collaborators` count for you.
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `onSelect` | `() => any` | Yes |  | Handler called when the user click on the button |
+| `isCollaborating` | `boolean` | Yes | false | Whether live collaboration session is in effect. Modifies button style. |
+
 ### Props
 
 | Name | Type | Default | Description |
@@ -601,7 +606,6 @@ const App = () => {
 | [`onChange`](#onChange) | Function |  | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
 | [`initialData`](#initialData) | <code>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState<a> } </code> | null | The initial data with which app loads. |
 | [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) &#124; [`useRef`](https://reactjs.org/docs/hooks-reference.html#useref) &#124; [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) &#124; <code>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</code> |  | Ref to be passed to Excalidraw |
-| [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
 | [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
 | [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
 | [`langCode`](#langCode) | string | `en` | Language code string |
@@ -774,10 +778,6 @@ You can use this function to update the library. It accepts the below attributes
 <pre>(files: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts">BinaryFileData</a>) => void </pre>
 
 Adds supplied files data to the `appState.files` cache on top of existing files present in the cache.
-
-#### `onCollabButtonClick`
-
-This callback is triggered when clicked on the collab button in excalidraw. If not supplied, the collab dialog button is not rendered.
 
 #### `isCollaborating`
 
