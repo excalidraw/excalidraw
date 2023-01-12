@@ -447,10 +447,16 @@
     "d9480f": "Naranja 9"
   },
   "welcomeScreen": {
-    "data": "Toda su información es guardada localmente en su navegador.",
-    "switchToPlusApp": "¿Quieres ir a Excalidraw+ en su lugar?",
-    "menuHints": "Exportar, preferencias, idiomas, ...",
-    "toolbarHints": "¡Escoge una herramienta & Empiece a dibujar!",
-    "helpHints": "Atajos & ayuda"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }
