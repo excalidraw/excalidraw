@@ -13,6 +13,7 @@ import { Provider } from "jotai";
 import { jotaiScope, jotaiStore } from "../../jotai";
 import Footer from "../../components/footer/FooterCenter";
 import MainMenu from "../../components/mainMenu/MainMenu";
+import WelcomeScreen from "../../components/welcome-screen/WelcomeScreen";
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
@@ -52,6 +53,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
       ...DEFAULT_UI_OPTIONS.canvasActions,
       ...canvasActions,
     },
+    welcomeScreen: props.UIOptions?.welcomeScreen ?? true,
   };
 
   if (canvasActions?.export) {
@@ -162,7 +164,7 @@ const areEqual = (
       const canvasOptionKeys = Object.keys(
         prevUIOptions.canvasActions!,
       ) as (keyof Partial<typeof DEFAULT_UI_OPTIONS.canvasActions>)[];
-      canvasOptionKeys.every((key) => {
+      return canvasOptionKeys.every((key) => {
         if (
           key === "export" &&
           prevUIOptions?.canvasActions?.export &&
@@ -179,7 +181,7 @@ const areEqual = (
         );
       });
     }
-    return true;
+    return prevUIOptions[key] === nextUIOptions[key];
   });
 
   return isUIOptionsSame && isShallowEqual(prev, next);
@@ -243,3 +245,4 @@ export { Button } from "../../components/Button";
 export { Footer };
 export { MainMenu };
 export { useDevice } from "../../components/App";
+export { WelcomeScreen };

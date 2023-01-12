@@ -150,6 +150,7 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     toggleTheme: null,
     saveAsImage: true,
   },
+  welcomeScreen: true,
 };
 
 // breakpoints
@@ -236,14 +237,6 @@ export const ROUNDNESS = {
   ADAPTIVE_RADIUS: 3,
 } as const;
 
-export const COOKIES = {
-  AUTH_STATE_COOKIE: "excplus-auth",
-} as const;
-
 /** key containt id of precedeing elemnt id we use in reconciliation during
  * collaboration */
 export const PRECEDING_ELEMENT_KEY = "__precedingElement__";
-
-export const isExcalidrawPlusSignedUser = document.cookie.includes(
-  COOKIES.AUTH_STATE_COOKIE,
-);

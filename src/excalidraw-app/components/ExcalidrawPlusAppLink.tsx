@@ -1,4 +1,4 @@
-import { isExcalidrawPlusSignedUser } from "../../constants";
+import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 export const ExcalidrawPlusAppLink = () => {
   if (!isExcalidrawPlusSignedUser) {

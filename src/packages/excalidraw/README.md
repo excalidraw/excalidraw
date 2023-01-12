@@ -376,7 +376,7 @@ Most notably, you can customize the primary colors, by overriding these variable
 
 For a complete list of variables, check [theme.scss](https://github.com/excalidraw/excalidraw/blob/master/src/css/theme.scss), though most of them will not make sense to override.
 
-### Does this package support collaboration ?
+### Does this package support collaboration?
 
 No, Excalidraw package doesn't come with collaboration built in, since the implementation is specific to each host app. We expose APIs which you can use to communicate with Excalidraw which you can use to implement it. You can check our own implementation [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
 
@@ -405,45 +405,47 @@ const App = () => {
 };
 ```
 
-This will only for `Desktop` devices.
+Footer is only rendered in the desktop view.
 
-For `mobile` you will need to render it inside the [MainMenu](#mainmenu). You can use the [`useDevice`](#useDevice) hook to check the type of device, this will be available only inside the `children` of `Excalidraw` component.
+In the mobile view you can render it inside the [MainMenu](#mainmenu) (later we will expose other ways to customize the UI). You can use the [`useDevice`](#useDevice) hook to check the type of device, this will be available only inside the `children` of `Excalidraw` component.
 
 ```js
 import { useDevice, Footer } from "@excalidraw/excalidraw";
 
-const MobileFooter = ({
-}) => {
+const MobileFooter = () => {
   const device = useDevice();
   if (device.isMobile) {
     return (
       <Footer>
-       <button
-        className="custom-footer"
-        onClick={() => alert("This is custom footer in mobile menu")}
-      >
-        {" "}
-        custom footer{" "}
-      </button>
+        <button
+          className="custom-footer"
+          onClick={() => alert("This is custom footer in mobile menu")}
+        >
+          {" "}
+          custom footer{" "}
+        </button>
       </Footer>
     );
   }
   return null;
-
 };
+
 const App = () => {
   <Excalidraw>
     <MainMenu>
-      <MainMenu.Item onSelect={() => window.alert("Item1")}> Item1 </MainMenu.Item>
-      <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
-      <MobileFooter/>
+      <MainMenu.Item onSelect={() => window.alert("Item1")}>
+        Item1
+      </MainMenu.Item>
+      <MainMenu.Item onSelect={() => window.alert("Item2")}>
+        Item2
+      </MainMenu.Item>
+      <MobileFooter />
     </MainMenu>
-  </Excalidraw>
-}
-
+  </Excalidraw>;
+};
 ```
 
-You can visit the[ example](https://ehlz3.csb.app/) for working demo.
+You can visit the [example](https://ehlz3.csb.app/) for working demo.
 
 #### MainMenu
 
@@ -456,11 +458,15 @@ import { MainMenu } from "@excalidraw/excalidraw";
 const App = () => {
   <Excalidraw>
     <MainMenu>
-      <MainMenu.Item onSelect={() => window.alert("Item1")}> Item1 </MainMenu.Item>
-      <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
+      <MainMenu.Item onSelect={() => window.alert("Item1")}>
+        Item1
+      </MainMenu.Item>
+      <MainMenu.Item onSelect={() => window.alert("Item2")}>
+        Item2
+      </MainMenu.Item>
     </MainMenu>
-  </Excalidraw>
-}
+  </Excalidraw>;
+};
 ```
 
 **MainMenu**
@@ -469,28 +475,28 @@ This is the `MainMenu` component which you need to import to render the menu wit
 
 **MainMenu.Item**
 
-To render an item, its recommended to use `MainMenu.Item`.
+Use this component to render a menu item.
 
 | Prop | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `onSelect` | `Function` | Yes | `undefined` | The handler is triggered when the item is selected. |
-| `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
-| `icon` | `JSX.Element` | No | `undefined` | The icon used in the menu item |
-| `shortcut` | `string` | No | `undefined` | The shortcut to be shown for the menu item |
-| `className` | `string` | No | "" | The class names to be added to the menu item |
-| `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
-| `ariaLabel` | `string` | `undefined` | No | The `aria-label` to be added to the item for accessibility |
-| `dataTestId` | `string` | `undefined` | No | The `data-testid` to be added to the item. |
+| `onSelect` | `Function` | Yes |  | The handler is triggered when the item is selected. |
+| `children` | `React.ReactNode` | Yes |  | The content of the menu item |
+| `icon` | `JSX.Element` | No |  | The icon used in the menu item |
+| `shortcut` | `string` | No |  | The keyboard shortcut (label-only, does not affect behavior) |
+| `className` | `string` | No |  | The class names to be added to the menu item |
+| `style` | `React.CSSProperties` | No |  | The inline styles to be added to the menu item |
+| `ariaLabel` | `string` |  | No | The `aria-label` to be added to the item for accessibility |
+| `dataTestId` | `string` |  | No | The `data-testid` to be added to the item. |
 
 **MainMenu.ItemLink**
 
-To render an item as a link, its recommended to use `MainMenu.ItemLink`.
+To render an external link in a menu item, you can use this component.
 
 **Usage**
 
 ```js
 import { MainMenu } from "@excalidraw/excalidraw";
-const App = () => {
+const App = () => (
   <Excalidraw>
     <MainMenu>
       <MainMenu.ItemLink href="https://google.com">Google</MainMenu.ItemLink>
@@ -499,19 +505,19 @@ const App = () => {
       </MainMenu.ItemLink>
     </MainMenu>
   </Excalidraw>;
-};
+);
 ```
 
 | Prop | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `href` | `string` | Yes | `undefined` | The `href` attribute to be added to the `anchor` element. |
-| `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
-| `icon` | `JSX.Element` | No | `undefined` | The icon used in the menu item |
-| `shortcut` | `string` | No | `undefined` | The shortcut to be shown for the menu item |
+| `href` | `string` | Yes |  | The `href` attribute to be added to the `anchor` element. |
+| `children` | `React.ReactNode` | Yes |  | The content of the menu item |
+| `icon` | `JSX.Element` | No |  | The icon used in the menu item |
+| `shortcut` | `string` | No |  | The keyboard shortcut (label-only, does not affect behavior) |
 | `className` | `string` | No | "" | The class names to be added to the menu item |
-| `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
-| `ariaLabel` | `string` | No | `undefined` | The `aria-label` to be added to the item for accessibility |
-| `dataTestId` | `string` | No | `undefined` | The `data-testid` to be added to the item. |
+| `style` | `React.CSSProperties` | No |  | The inline styles to be added to the menu item |
+| `ariaLabel` | `string` | No |  | The `aria-label` to be added to the item for accessibility |
+| `dataTestId` | `string` | No |  | The `data-testid` to be added to the item. |
 
 **MainMenu.ItemCustom**
 
@@ -521,7 +527,7 @@ To render a custom item, you can use `MainMenu.ItemCustom`.
 
 ```js
 import { MainMenu } from "@excalidraw/excalidraw";
-const App = () => {
+const App = () => (
   <Excalidraw>
     <MainMenu>
       <MainMenu.ItemCustom>
@@ -535,7 +541,7 @@ const App = () => {
       </MainMenu.ItemCustom>
     </MainMenu>
   </Excalidraw>;
-};
+);
 ```
 
 | Prop | Type | Required | Default | Description |
@@ -551,7 +557,7 @@ For the items which are shown in the menu in [excalidraw.com](https://excalidraw
 
 ```js
 import { MainMenu } from "@excalidraw/excalidraw";
-const App = () => {
+const App = () => (
   <Excalidraw>
     <MainMenu>
       <MainMenu.DefaultItems.Socials/>
@@ -560,7 +566,7 @@ const App = () => {
       <MainMenu.Item onSelect={() => window.alert("Item2")}> Item 2 </>
     </MainMenu>
   </Excalidraw>
-}
+)
 ```
 
 Here is a [complete list](https://github.com/excalidraw/excalidraw/blob/master/src/components/mainMenu/DefaultItems.tsx) of the default items.
@@ -571,7 +577,7 @@ To Group item in the main menu, you can use `MainMenu.Group`
 
 ```js
 import { MainMenu } from "@excalidraw/excalidraw";
-const App = () => {
+const App = () => (
   <Excalidraw>
     <MainMenu>
       <MainMenu.Group title="Excalidraw items">
@@ -584,15 +590,148 @@ const App = () => {
       </MainMenu.Group>
     </MainMenu>
   </Excalidraw>
-}
+)
 ```
 
 | Prop | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `children ` | `React.ReactNode` | Yes | `undefined` | The content of the `Menu Group` |
+| `children ` | `React.ReactNode` | Yes | `undefined` | The content of the `MenuItem Group` |
 | `title` | `string` | No | `undefined` | The `title` for the grouped items |
 | `className` | `string` | No | "" | The `classname` to be added to the group |
 | `style` | `React.CSsSProperties` | No | `undefined` | The inline `styles` to be added to the group |
+
+### WelcomeScreen
+
+When the canvas is empty, Excalidraw shows a welcome "splash" screen with a logo, a few quick action items, and hints explaining what some of the UI buttons do. You can customize the welcome screen by rendering the `WelcomeScreen` component inside your Excalidraw instance.
+
+You can also disable the welcome screen altogether by setting `UIOptions.welcomeScreen` to `false`.
+
+**Usage**
+
+```jsx
+import { WelcomScreen } from "@excalidraw/excalidraw";
+const App = () => (
+  <Excalidraw>
+    <WelcomeScreen>
+      <WelcomeScreen.Center>
+        <WelcomeScreen.Center.Heading>
+          Your data are autosaved to the cloud.
+        </WelcomeScreen.Center.Heading>
+        <WelcomeScreen.Center.Menu>
+          <WelcomeScreen.Center.MenuItem
+            onClick={() => console.log("clicked!")}
+          >
+            Click me!
+          </WelcomeScreen.Center.MenuItem>
+          <WelcomeScreen.Center.MenuItemLink href="https://github.com/excalidraw/excalidraw">
+            Excalidraw GitHub
+          </WelcomeScreen.Center.MenuItemLink>
+          <WelcomeScreen.Center.MenuItemHelp />
+        </WelcomeScreen.Center.Menu>
+      </WelcomeScreen.Center>
+    </WelcomeScreen>
+  </Excalidraw>
+);
+```
+
+To disable the WelcomeScreen:
+
+```jsx
+import { WelcomScreen } from "@excalidraw/excalidraw";
+const App = () => <Excalidraw UIOptions={{ welcomeScreen: false }} />;
+```
+
+**WelcomeScreen**
+
+If you render the `<WelcomeScreen>` component, you are responsible for rendering the content.
+
+There are 2 main parts: 1) welcome screen center component, and 2) welcome screen hints.
+
+![WelcomeScreen overview](./welcome-screen-overview.png)
+
+**WelcomeScreen.Center**
+
+This is the center piece of the welcome screen, containing the logo, heading, and menu. All three sub-components are optional, and you can render whatever you wish into the center component.
+
+**WelcomeScreen.Center.Logo**
+
+By default renders the Excalidraw logo and name. Supply `children` to customize.
+
+**WelcomeScreen.Center.Heading**
+
+Supply `children` to change the default message.
+
+**WelcomeScreen.Center.Menu**
+
+Wrapper component for the menu items. You can build your menu using the `<WelcomeScreen.Center.MenuItem>` and `<WelcomeScreen.Center.MenuItemLink>` components, render your own, or render one of the default menu items.
+
+The default menu items are:
+
+- `<WelcomeScreen.Center.MenuItemHelp/>` - opens the help dialog.
+- `<WelcomeScreen.Center.MenuItemLoadScene/>` - open the load file dialog.
+
+**Usage**
+
+```jsx
+import { WelcomScreen } from "@excalidraw/excalidraw";
+const App = () => (
+  <Excalidraw>
+    <WelcomeScreen>
+      <WelcomeScreen.Center>
+        <WelcomeScreen.Center.Menu>
+          <WelcomeScreen.Center.MenuItem
+            onClick={() => console.log("clicked!")}
+          >
+            Click me!
+          </WelcomeScreen.Center.MenuItem>
+          <WelcomeScreen.Center.MenuItemLink href="https://github.com/excalidraw/excalidraw">
+            Excalidraw GitHub
+          </WelcomeScreen.Center.MenuItemLink>
+          <WelcomeScreen.Center.MenuItemHelp />
+        </WelcomeScreen.Center.Menu>
+      </WelcomeScreen.Center>
+    </WelcomeScreen>
+  </Excalidraw>
+);
+```
+
+**WelcomeScreen.Center.MenuItem**
+
+Use this component to render a menu item.
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `onSelect` | `Function` | Yes |  | The handler is triggered when the item is selected. |
+| `children` | `React.ReactNode` | Yes |  | The content of the menu item |
+| `icon` | `JSX.Element` | No |  | The icon used in the menu item |
+| `shortcut` | `string` | No |  | The keyboard shortcut (label-only, does not affect behavior) |
+
+**WelcomeScreen.Center.MenuItemLink**
+
+To render an external link in a menu item, you can use this component.
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `href` | `string` | Yes |  | The `href` attribute to be added to the `anchor` element. |
+| `children` | `React.ReactNode` | Yes |  | The content of the menu item |
+| `icon` | `JSX.Element` | No |  | The icon used in the menu item |
+| `shortcut` | `string` | No |  | The keyboard shortcut (label-only, does not affect behavior) |
+
+**WelcomeScreen.Hints**
+
+These subcomponents render the UI hints. Text of each hint can be customized by supplying `children`.
+
+**WelcomeScreen.Hints.Menu**
+
+Hint for the main menu. Supply `children` to customize the hint text.
+
+**WelcomeScreen.Hints.Toolbar**
+
+Hint for the toolbar. Supply `children` to customize the hint text.
+
+**WelcomeScreen.Hints.Help**
+
+Hint for the help dialog. Supply `children` to customize the hint text.
 
 ### Props
 
@@ -1565,8 +1704,7 @@ This hook can be used to check the type of device which is being used. It can on
 ```js
 import { useDevice, Footer } from "@excalidraw/excalidraw";
 
-const MobileFooter = ({
-}) => {
+const MobileFooter = () => {
   const device = useDevice();
   if (device.isMobile) {
     return (
