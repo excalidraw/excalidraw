@@ -45,10 +45,10 @@ const WelcomeScreenMenuItem = ({
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   return (
     <button
+      {...props}
       type="button"
       className={`welcome-screen-menu-item ${className}`}
       onClick={onSelect}
-      {...props}
     >
       <WelcomeScreenMenuItemContent icon={icon} shortcut={shortcut}>
         {children}
@@ -73,11 +73,11 @@ const WelcomeScreenMenuItemLink = ({
 } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   return (
     <a
+      {...props}
       className={`welcome-screen-menu-item ${className}`}
       href={href}
       target="_blank"
       rel="noreferrer"
-      {...props}
     >
       <WelcomeScreenMenuItemContent icon={icon} shortcut={shortcut}>
         {children}
