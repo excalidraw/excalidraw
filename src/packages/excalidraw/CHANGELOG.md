@@ -15,6 +15,8 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Any top-level children passed to the `<Excalidraw/>` component that do not belong to one of the officially supported Excalidraw children components are now rendered directly inside the Excalidraw container (previously, they weren't rendered at all) [#6096](https://github.com/excalidraw/excalidraw/pull/6096).
+
 - Expose component API for the Excalidraw main menu [#6034](https://github.com/excalidraw/excalidraw/pull/6034), You can read more about its usage [here](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#MainMenu)
 
 - Render Footer as a component instead of render prop [#5970](https://github.com/excalidraw/excalidraw/pull/5970). You can read more about its usage [here](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Footer)
