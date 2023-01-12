@@ -717,12 +717,33 @@ Hint for the help dialog. Supply `children` to customize the hint text.
 
 ### LiveCollaborationTrigger
 
-If you implement live collaboration support and want to expose the same UI button as on excalidraw.com, you can render the `<LiveCollaborationTrigger>` component. You'll need to supply `onSelect()` to handle opening of your collaboration dialog, but the button will display current `appState.collaborators` count for you.
+If you implement live collaboration support and want to expose the same UI button as on excalidraw.com, you can render the `<LiveCollaborationTrigger>` component using the [renderTopRightUI](#rendertoprightui) prop. You'll need to supply `onSelect()` to handle opening of your collaboration dialog, but the button will display current `appState.collaborators` count for you.
 
 | Prop | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `onSelect` | `() => any` | Yes |  | Handler called when the user click on the button |
 | `isCollaborating` | `boolean` | Yes | false | Whether live collaboration session is in effect. Modifies button style. |
+
+**Usage**
+
+```jsx
+import { LiveCollaborationTrigger } from "@excalidraw/excalidraw";
+const App = () => (
+  <Excalidraw
+    renderTopRightUI={(isMobile) => {
+      if (isMobile) {
+        return null;
+      }
+      return (
+        <LiveCollaborationTrigger
+          isCollaborating={isCollaborating}
+          onSelect={() => setCollabDialogShown(true)}
+        />
+      );
+    }}
+  />
+);
+```
 
 ### Props
 
