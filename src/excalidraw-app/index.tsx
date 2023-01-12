@@ -676,15 +676,9 @@ const ExcalidrawWrapper = () => {
           <WelcomeScreen.Center.Menu>
             <WelcomeScreen.Center.MenuItemLoadScene />
             <WelcomeScreen.Center.MenuItemHelp />
-
-            <WelcomeScreen.Center.MenuItem
-              shortcut={null}
+            <WelcomeScreen.Center.MenuItemLiveCollaborationTrigger
               onSelect={() => setCollabDialogShown(true)}
-              icon={usersIcon}
-            >
-              {t("labels.liveCollaboration")}
-            </WelcomeScreen.Center.MenuItem>
-
+            />
             {!isExcalidrawPlusSignedUser && (
               <WelcomeScreen.Center.MenuItemLink
                 href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"

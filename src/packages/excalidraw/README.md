@@ -651,6 +651,7 @@ The default menu items are:
 
 - `<WelcomeScreen.Center.MenuItemHelp/>` - opens the help dialog.
 - `<WelcomeScreen.Center.MenuItemLoadScene/>` - open the load file dialog.
+- `<WelcomeScreen.Center.MenuItemLiveCollaborationTrigger/>` - intended to open the live collaboration dialog. Works similarly to [`<LiveCollaborationTrigger>`](#LiveCollaborationTrigger) and you must supply `onSelect()` handler to integrate with your collaboration implementation.
 
 **Usage**
 
