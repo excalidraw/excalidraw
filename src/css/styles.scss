@@ -541,7 +541,7 @@
 
   .mobile-misc-tools-container {
     position: absolute;
-    top: calc(4 - var(--editor-container-padding));
+    top: calc(5rem - var(--editor-container-padding));
     right: calc(var(--editor-container-padding) * -1);
     display: flex;
     flex-direction: column;
