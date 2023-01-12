@@ -479,8 +479,8 @@ To render an item, its recommended to use `MainMenu.Item`.
 | `shortcut` | `string` | No | `undefined` | The shortcut to be shown for the menu item |
 | `className` | `string` | No | "" | The class names to be added to the menu item |
 | `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
-| `ariaLabel` | `string` | `undefined` | No | The `aria-label` to be added to the item for accessibility |
-| `dataTestId` | `string` | `undefined` | No | The `data-testid` to be added to the item. |
+| `aria-label` | `string` | `undefined` | No | The `aria-label` to be added to the item for accessibility |
+| `data-testid` | `string` | `undefined` | No | The `data-testid` to be added to the item. |
 
 **MainMenu.ItemLink**
 
@@ -510,8 +510,8 @@ const App = () => {
 | `shortcut` | `string` | No | `undefined` | The shortcut to be shown for the menu item |
 | `className` | `string` | No | "" | The class names to be added to the menu item |
 | `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
-| `ariaLabel` | `string` | No | `undefined` | The `aria-label` to be added to the item for accessibility |
-| `dataTestId` | `string` | No | `undefined` | The `data-testid` to be added to the item. |
+| `aria-label` | `string` | No | `undefined` | The `aria-label` to be added to the item for accessibility |
+| `data-testid` | `string` | No | `undefined` | The `data-testid` to be added to the item. |
 
 **MainMenu.ItemCustom**
 
@@ -543,7 +543,7 @@ const App = () => {
 | `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
 | `className` | `string` | No | "" | The class names to be added to the menu item |
 | `style` | `React.CSSProperties` | No | `undefined` | The inline styles to be added to the menu item |
-| `dataTestId` | `string` | No | `undefined` | The `data-testid` to be added to the item. |
+| `data-testid` | `string` | No | `undefined` | The `data-testid` to be added to the item. |
 
 **MainMenu.DefaultItems**
 

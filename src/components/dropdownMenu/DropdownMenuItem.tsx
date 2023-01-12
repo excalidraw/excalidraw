@@ -9,20 +9,20 @@ const DropdownMenuItem = ({
   icon,
   onSelect,
   children,
-  dataTestId,
   shortcut,
   className,
   style,
-  ariaLabel,
+  "aria-label": ariaLabel,
+  "data-testid": dataTestId,
 }: {
   icon?: JSX.Element;
   onSelect: () => void;
   children: React.ReactNode;
-  dataTestId?: string;
   shortcut?: string;
   className?: string;
   style?: React.CSSProperties;
-  ariaLabel?: string;
+  "aria-label"?: string;
+  "data-testid"?: string;
 }) => {
   return (
     <button

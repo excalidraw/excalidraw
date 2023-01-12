@@ -2,12 +2,12 @@ const DropdownMenuItemCustom = ({
   children,
   className = "",
   style,
-  dataTestId,
+  "data-testid": dataTestId,
 }: {
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
-  dataTestId?: string;
+  "data-testid"?: string;
 }) => {
   return (
     <div

@@ -3,13 +3,13 @@ import React from "react";
 import { getDrodownMenuItemClassName } from "./DropdownMenuItem";
 const DropdownMenuItemLink = ({
   icon,
-  dataTestId,
   shortcut,
   href,
   children,
   className = "",
   style,
-  ariaLabel,
+  "aria-label": ariaLabel,
+  "data-testid": dataTestId,
 }: {
   icon?: JSX.Element;
   children: React.ReactNode;
@@ -18,7 +18,8 @@ const DropdownMenuItemLink = ({
   className?: string;
   href: string;
   style?: React.CSSProperties;
-  ariaLabel?: string;
+  "aria-label"?: string;
+  "data-testid"?: string;
 }) => {
   return (
     <a
