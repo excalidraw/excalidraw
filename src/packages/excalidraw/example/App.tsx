@@ -72,23 +72,12 @@ const {
   Sidebar,
   Footer,
   MainMenu,
+  LiveCollaborationTrigger,
 } = window.ExcalidrawLib;
 
 const COMMENT_ICON_DIMENSION = 32;
 const COMMENT_INPUT_HEIGHT = 50;
 const COMMENT_INPUT_WIDTH = 150;
-
-const renderTopRightUI = () => {
-  return (
-    <button
-      onClick={() => alert("This is dummy top right UI")}
-      style={{ height: "2.5rem" }}
-    >
-      {" "}
-      Click me{" "}
-    </button>
-  );
-};
 
 export default function App() {
   const appRef = useRef<any>(null);
@@ -147,6 +136,28 @@ export default function App() {
     };
     fetchData();
   }, [excalidrawAPI]);
+
+  const renderTopRightUI = (isMobile: boolean) => {
+    return (
+      <>
+        {!isMobile && (
+          <LiveCollaborationTrigger
+            isCollaborating={isCollaborating}
+            onSelect={() => {
+              window.alert("Collab dialog clicked");
+            }}
+          />
+        )}
+        <button
+          onClick={() => alert("This is dummy top right UI")}
+          style={{ height: "2.5rem" }}
+        >
+          {" "}
+          Click me{" "}
+        </button>
+      </>
+    );
+  };
 
   const loadSceneOrLibrary = async () => {
     const file = await fileOpen({ description: "Excalidraw or library file" });
@@ -489,12 +500,10 @@ export default function App() {
         <MainMenu.DefaultItems.SaveAsImage />
         <MainMenu.DefaultItems.Export />
         <MainMenu.Separator />
-        {isCollaborating && (
-          <MainMenu.DefaultItems.LiveCollaboration
-            onSelect={() => window.alert("You clicked on collab button")}
-            isCollaborating={isCollaborating}
-          />
-        )}
+        <MainMenu.DefaultItems.LiveCollaborationTrigger
+          isCollaborating={isCollaborating}
+          onSelect={() => window.alert("You clicked on collab button")}
+        />
         <MainMenu.Group title="Excalidraw links">
           <MainMenu.DefaultItems.Socials />
         </MainMenu.Group>
@@ -508,6 +517,7 @@ export default function App() {
           </button>
         </MainMenu.ItemCustom>
         <MainMenu.DefaultItems.Help />
+
         {excalidrawAPI && <MobileFooter excalidrawAPI={excalidrawAPI} />}
       </MainMenu>
     );
@@ -677,9 +687,6 @@ export default function App() {
               button: "down" | "up";
               pointersMap: Gesture["pointers"];
             }) => setPointerData(payload)}
-            onCollabButtonClick={() =>
-              window.alert("You clicked on collab button")
-            }
             viewModeEnabled={viewModeEnabled}
             zenModeEnabled={zenModeEnabled}
             gridModeEnabled={gridModeEnabled}
