@@ -11,10 +11,10 @@
   }
 
   .FixedSideContainer_side_top {
-    left: #{$editor-container-padding};
-    top: #{$editor-container-padding};
-    right: #{$editor-container-padding};
-    bottom: #{$editor-container-padding};
+    left: var(--editor-container-padding);
+    top: var(--editor-container-padding);
+    right: var(--editor-container-padding);
+    bottom: var(--editor-container-padding);
     z-index: 2;
   }
 

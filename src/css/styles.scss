@@ -541,8 +541,8 @@
 
   .mobile-misc-tools-container {
     position: absolute;
-    top: 4rem;
-    right: -#{$editor-container-padding};
+    top: calc(4 - var(--editor-container-padding));
+    right: calc(var(--editor-container-padding) * -1);
     display: flex;
     flex-direction: column;
     border: 1px solid var(--sidebar-border-color);
