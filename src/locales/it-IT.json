@@ -447,10 +447,16 @@
     "d9480f": "Arancio 9"
   },
   "welcomeScreen": {
-    "data": "Tutti i tuoi dati sono salvati localmente nel browser.",
-    "switchToPlusApp": "Volevi invece andare su Excalidraw+?",
-    "menuHints": "Esporta, preferenze, lingue, ...",
-    "toolbarHints": "Scegli uno strumento & Inizia a disegnare!",
-    "helpHints": "Scorciatoie & aiuto"
+    "app": {
+      "center_heading": "Tutti i tuoi dati sono salvati localmente nel browser.",
+      "center_heading_plus": "Volevi invece andare su Excalidraw+?",
+      "menuHint": "Esporta, preferenze, lingue, ..."
+    },
+    "defaults": {
+      "menuHint": "Esporta, preferenze, e altro...",
+      "center_heading": "Diagrammi. Fatto. Semplice.",
+      "toolbarHint": "Scegli uno strumento & Inizia a disegnare!",
+      "helpHint": "Scorciatoie & aiuto"
+    }
   }
 }
