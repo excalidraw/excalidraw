@@ -37,6 +37,10 @@
         }
       ],
       "destination": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor"
+    },
+    {
+      "source": "/:path(.*)/:match*",
+      "destination": "https://excalidraw.com/:match*"
     }
   ]
 }
