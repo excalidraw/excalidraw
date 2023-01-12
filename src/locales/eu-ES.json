@@ -447,10 +447,16 @@
     "d9480f": "Laranja 9"
   },
   "welcomeScreen": {
-    "data": "Zure datu guztiak modu lokalean gordetzen dira zure nabigatzailean.",
-    "switchToPlusApp": "Horren ordez Excalidraw+-ra joan nahi al zenuen?",
-    "menuHints": "Esportatu, hobespenak, hizkuntzak,...",
-    "toolbarHints": "Aukeratu tresna bat eta hasi marrazten!",
-    "helpHints": "Lasterbideak eta laguntza"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }
