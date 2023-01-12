@@ -13,7 +13,7 @@ import { Provider } from "jotai";
 import { jotaiScope, jotaiStore } from "../../jotai";
 import Footer from "../../components/footer/FooterCenter";
 import MainMenu from "../../components/mainMenu/MainMenu";
-import WelcomeScreen from "../../components/welcomeScreen/WelcomeScreen";
+import WelcomeScreen from "../../components/welcome-screen/WelcomeScreen";
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
