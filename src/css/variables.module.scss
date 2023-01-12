@@ -39,11 +39,11 @@
 
   .ToolIcon__icon {
     &:hover {
-      background: var(--button-hover);
+      background: var(--button-hover-bg);
     }
 
     &:active {
-      background: var(--button-hover);
+      background: var(--button-hover-bg);
       border: 1px solid var(--color-primary-darkest);
     }
   }
@@ -54,24 +54,25 @@
   justify-content: center;
   align-items: center;
   padding: 0.625rem;
-  width: var(--default-button-size);
-  height: var(--default-button-size);
+  width: var(--button-width, var(--default-button-size));
+  height: var(--button-height, var(--default-button-size));
   box-sizing: border-box;
   border-width: 1px;
   border-style: solid;
-  border-color: var(--default-border-color);
+  border-color: var(--button-border, var(--default-border-color));
   border-radius: var(--border-radius-lg);
   cursor: pointer;
-  background-color: transparent;
-  color: var(--text-primary-color);
+  background-color: var(--button-bg, var(--island-bg-color));
+  color: var(--button-color, var(--text-primary-color));
 
   &:hover {
-    background-color: var(--button-hover);
+    background-color: var(--button-hover-bg);
+    border-color: var(--button-hover-border, var(--default-border-color));
   }
 
   &:active {
-    background-color: var(--button-hover);
-    border-color: var(--color-primary-darkest);
+    background-color: var(--button-active-bg);
+    border-color: var(--button-active-border, var(--color-primary-darkest));
   }
 
   &.active {
@@ -83,7 +84,10 @@
     }
 
     svg {
-      color: var(--color-primary-darker);
+      color: var(--button-color, var(--color-primary-darker));
+
+      width: var(--button-width, var(--lg-icon-size));
+      height: var(--button-height, var(--lg-icon-size));
     }
   }
 }
