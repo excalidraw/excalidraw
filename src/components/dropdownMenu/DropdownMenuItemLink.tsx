@@ -16,7 +16,7 @@ const DropdownMenuItemLink = ({
   className?: string;
   href: string;
   "aria-label"?: string;
-}) => {
+} & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   return (
     <a
       {...rest}

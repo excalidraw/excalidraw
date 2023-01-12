@@ -21,7 +21,7 @@ const DropdownMenuItem = ({
   shortcut?: string;
   className?: string;
   "aria-label"?: string;
-}) => {
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   return (
     <button
       {...rest}
