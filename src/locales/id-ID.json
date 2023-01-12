@@ -447,10 +447,16 @@
     "d9480f": "Jingga 9"
   },
   "welcomeScreen": {
-    "data": "Semua data Anda tersimpan secara lokal di browser.",
-    "switchToPlusApp": "Apa Anda ingin berpindah ke Excalidraw+?",
-    "menuHints": "Ekspor, preferensi, bahasa, ...",
-    "toolbarHints": "Ambil alat & mulai menggambar!",
-    "helpHints": "Pintasan & bantuan"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }
