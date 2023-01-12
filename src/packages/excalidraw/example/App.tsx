@@ -73,7 +73,7 @@ const {
   Sidebar,
   Footer,
   MainMenu,
-  UsersIcon,
+  icons,
   LiveCollaboration,
 } = window.ExcalidrawLib;
 
@@ -494,7 +494,7 @@ export default function App() {
         <MainMenu.Separator />
         <MainMenu.Item
           dataTestId="collab-button"
-          icon={UsersIcon}
+          icon={icons.usersIcon}
           className={clsx({
             "active-collab": isCollaborating,
           })}

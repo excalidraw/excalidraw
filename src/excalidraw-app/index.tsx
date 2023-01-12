@@ -27,7 +27,7 @@ import {
   Footer,
   MainMenu,
   LiveCollaboration,
-  UsersIcon,
+  icons,
 } from "../packages/excalidraw/index";
 import {
   AppState,
@@ -612,7 +612,7 @@ const ExcalidrawWrapper = () => {
         <MainMenu.DefaultItems.SaveAsImage />
         <MainMenu.Item
           dataTestId="collab-button"
-          icon={UsersIcon}
+          icon={icons.usersIcon}
           className={clsx({
             "active-collab": isCollaborating,
           })}

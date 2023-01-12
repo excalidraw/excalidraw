@@ -1,5 +1,5 @@
 import { t } from "../../i18n";
-import { UsersIcon } from "../icons";
+import { usersIcon } from "../icons";
 import { Button } from "../Button";
 
 import clsx from "clsx";
@@ -24,7 +24,7 @@ const LiveCollaboration = ({
       style={{ position: "relative" }}
       title={t("labels.liveCollaboration")}
     >
-      {UsersIcon}
+      {usersIcon}
       {appState.collaborators.size > 0 && (
         <div className="CollabButton-collaborators">
           {appState.collaborators.size}

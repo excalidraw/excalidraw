@@ -14,6 +14,7 @@ import { jotaiScope, jotaiStore } from "../../jotai";
 import Footer from "../../components/footer/FooterCenter";
 import MainMenu from "../../components/mainMenu/MainMenu";
 import LiveCollaboration from "../../components/live-collaboration/LiveCollaboration";
+import { usersIcon } from "../../components/icons";
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
@@ -243,4 +244,5 @@ export { Footer };
 export { MainMenu };
 export { useDevice } from "../../components/App";
 export { LiveCollaboration };
-export { UsersIcon } from "../../components/icons";
+
+export const icons = { usersIcon };
