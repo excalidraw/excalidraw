@@ -14,6 +14,7 @@ import {
   save,
   SunIcon,
   TrashIcon,
+  usersIcon,
 } from "../icons";
 import { GithubIcon, DiscordIcon, TwitterIcon } from "../icons";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
@@ -29,6 +30,7 @@ import {
 import "./DefaultItems.scss";
 import { useState } from "react";
 import ConfirmDialog from "../ConfirmDialog";
+import clsx from "clsx";
 
 export const LoadScene = () => {
   // FIXME Hack until we tie "t" to lang state
@@ -255,3 +257,29 @@ export const Socials = () => (
   </>
 );
 Socials.displayName = "Socials";
+
+export const LiveCollaborationTrigger = ({
+  onSelect,
+  isCollaborating,
+}: {
+  onSelect: () => void;
+  isCollaborating: boolean;
+}) => {
+  // FIXME Hack until we tie "t" to lang state
+  // eslint-disable-next-line
+  const appState = useExcalidrawAppState();
+  return (
+    <DropdownMenuItem
+      data-testid="collab-button"
+      icon={usersIcon}
+      className={clsx({
+        "active-collab": isCollaborating,
+      })}
+      onSelect={onSelect}
+    >
+      {t("labels.liveCollaboration")}
+    </DropdownMenuItem>
+  );
+};
+
+LiveCollaborationTrigger.displayName = "LiveCollaborationTrigger";

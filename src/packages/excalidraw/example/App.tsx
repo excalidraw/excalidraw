@@ -30,7 +30,7 @@ import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
-import clsx from "clsx";
+import Main from "../main";
 
 declare global {
   interface Window {
@@ -73,25 +73,12 @@ const {
   Sidebar,
   Footer,
   MainMenu,
-  icons,
-  LiveCollaboration,
+  LiveCollaborationTrigger,
 } = window.ExcalidrawLib;
 
 const COMMENT_ICON_DIMENSION = 32;
 const COMMENT_INPUT_HEIGHT = 50;
 const COMMENT_INPUT_WIDTH = 150;
-
-const renderTopRightUI = () => {
-  return (
-    <button
-      onClick={() => alert("This is dummy top right UI")}
-      style={{ height: "2.5rem" }}
-    >
-      {" "}
-      Click me{" "}
-    </button>
-  );
-};
 
 export default function App() {
   const appRef = useRef<any>(null);
@@ -150,6 +137,28 @@ export default function App() {
     };
     fetchData();
   }, [excalidrawAPI]);
+
+  const renderTopRightUI = (isMobile: boolean) => {
+    return (
+      <>
+        {!isMobile && (
+          <LiveCollaborationTrigger
+            isCollaborating={isCollaborating}
+            onSelect={() => {
+              window.alert("Collab dialog clicked");
+            }}
+          />
+        )}
+        <button
+          onClick={() => alert("This is dummy top right UI")}
+          style={{ height: "2.5rem" }}
+        >
+          {" "}
+          Click me{" "}
+        </button>
+      </>
+    );
+  };
 
   const loadSceneOrLibrary = async () => {
     const file = await fileOpen({ description: "Excalidraw or library file" });
@@ -492,16 +501,10 @@ export default function App() {
         <MainMenu.DefaultItems.SaveAsImage />
         <MainMenu.DefaultItems.Export />
         <MainMenu.Separator />
-        <MainMenu.Item
-          data-testid="collab-button"
-          icon={icons.usersIcon}
-          className={clsx({
-            "active-collab": isCollaborating,
-          })}
-          onSelect={() => setIsCollaborating(true)}
-        >
-          Live Collaboration
-        </MainMenu.Item>
+        <MainMenu.DefaultItems.LiveCollaborationTrigger
+          isCollaborating={isCollaborating}
+          onSelect={() => window.alert("You clicked on collab button")}
+        />
         <MainMenu.Group title="Excalidraw links">
           <MainMenu.DefaultItems.Socials />
         </MainMenu.Group>
@@ -703,12 +706,6 @@ export default function App() {
               </Footer>
             )}
             {renderMenu()}
-            <LiveCollaboration
-              isCollaborating={isCollaborating}
-              onSelect={() => {
-                window.alert("Collab dialog clicked");
-              }}
-            />
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}

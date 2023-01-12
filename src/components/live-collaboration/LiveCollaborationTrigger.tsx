@@ -5,9 +5,9 @@ import { Button } from "../Button";
 import clsx from "clsx";
 import { useExcalidrawAppState } from "../App";
 
-import "./LiveCollaboration.scss";
+import "./LiveCollaborationTrigger.scss";
 
-const LiveCollaboration = ({
+const LiveCollaborationTrigger = ({
   isCollaborating,
   onSelect,
 }: {
@@ -34,5 +34,5 @@ const LiveCollaboration = ({
   );
 };
 
-export default LiveCollaboration;
-LiveCollaboration.displayName = "LiveCollaboration";
+export default LiveCollaborationTrigger;
+LiveCollaborationTrigger.displayName = "LiveCollaborationTrigger";

@@ -26,8 +26,7 @@ import {
   defaultLang,
   Footer,
   MainMenu,
-  LiveCollaboration,
-  icons,
+  LiveCollaborationTrigger,
   WelcomeScreen,
 } from "../packages/excalidraw/index";
 import {
@@ -612,16 +611,10 @@ const ExcalidrawWrapper = () => {
         <MainMenu.DefaultItems.SaveToActiveFile />
         <MainMenu.DefaultItems.Export />
         <MainMenu.DefaultItems.SaveAsImage />
-        <MainMenu.Item
-          data-testid="collab-button"
-          icon={icons.usersIcon}
-          className={clsx({
-            "active-collab": isCollaborating,
-          })}
+        <MainMenu.DefaultItems.LiveCollaborationTrigger
+          isCollaborating={isCollaborating}
           onSelect={() => setCollabDialogShown(true)}
-        >
-          {t("labels.liveCollaboration")}
-        </MainMenu.Item>
+        />
 
         <MainMenu.DefaultItems.Help />
         <MainMenu.DefaultItems.ClearCanvas />
@@ -751,12 +744,20 @@ const ExcalidrawWrapper = () => {
         onLibraryChange={onLibraryChange}
         autoFocus={true}
         theme={theme}
+        renderTopRightUI={(isMobile) => {
+          if (isMobile) {
+            return null;
+          }
+          return (
+            <LiveCollaborationTrigger
+              isCollaborating={isCollaborating}
+              onSelect={() => setCollabDialogShown(true)}
+            />
+          );
+        }}
       >
         {renderMenu()}
-        <LiveCollaboration
-          isCollaborating={isCollaborating}
-          onSelect={() => setCollabDialogShown(true)}
-        />
+
         <Footer>
           <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
             <ExcalidrawPlusAppLink />
