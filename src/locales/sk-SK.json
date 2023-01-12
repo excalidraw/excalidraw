@@ -447,10 +447,16 @@
     "d9480f": "Oranžová 9"
   },
   "welcomeScreen": {
-    "data": "Všetky vaše dáta sú uložené lokálne vo vašom prehliadači.",
-    "switchToPlusApp": "Chceli ste namiesto toho prejsť do Excalidraw+?",
-    "menuHints": "Exportovanie, nastavenia, jazyky, ...",
-    "toolbarHints": "Zvoľte nástroj a začnite kresliť!",
-    "helpHints": "Klávesové skratky a pomocník"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }
