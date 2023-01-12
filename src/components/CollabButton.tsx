@@ -3,6 +3,7 @@ import { UsersIcon } from "./icons";
 
 import "./CollabButton.scss";
 import clsx from "clsx";
+import { Button } from "./Button";
 
 const CollabButton = ({
   isCollaborating,
@@ -14,10 +15,10 @@ const CollabButton = ({
   onClick: () => void;
 }) => {
   return (
-    <button
+    <Button
       className={clsx("collab-button", { active: isCollaborating })}
       type="button"
-      onClick={onClick}
+      onSelect={onClick}
       style={{ position: "relative" }}
       title={t("labels.liveCollaboration")}
     >
@@ -25,7 +26,7 @@ const CollabButton = ({
       {collaboratorCount > 0 && (
         <div className="CollabButton-collaborators">{collaboratorCount}</div>
       )}
-    </button>
+    </Button>
   );
 };
 
