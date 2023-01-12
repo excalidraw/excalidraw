@@ -448,10 +448,16 @@
     "d9480f": "Orange 9"
   },
   "welcomeScreen": {
-    "data": "All your data is saved locally in your browser.",
-    "switchToPlusApp": "Did you want to go to the Excalidraw+ instead?",
-    "menuHints": "Export, preferences, languages, ...",
-    "toolbarHints": "Pick a tool & Start drawing!",
-    "helpHints": "Shortcuts & help"
+    "app": {
+      "center_heading": "All your data is saved locally in your browser.",
+      "center_heading_plus": "Did you want to go to the Excalidraw+ instead?",
+      "menuHint": "Export, preferences, languages, ..."
+    },
+    "defaults": {
+      "menuHint": "Export, preferences, and more...",
+      "center_heading": "Diagrams. Made. Simple.",
+      "toolbarHint": "Pick a tool & Start drawing!",
+      "helpHint": "Shortcuts & help"
+    }
   }
 }

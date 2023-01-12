@@ -14,12 +14,9 @@ import {
   ExcalidrawProps,
   BinaryFiles,
   UIChildrenComponents,
+  UIWelcomeScreenComponents,
 } from "../types";
-import {
-  isShallowEqual,
-  muteFSAbortError,
-  ReactChildrenToObject,
-} from "../utils";
+import { isShallowEqual, muteFSAbortError, getReactChildren } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
@@ -49,12 +46,10 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
-import { WelcomeScreenMenuArrow, WelcomeScreenTopToolbarArrow } from "./icons";
-import WelcomeScreen from "./WelcomeScreen";
+import WelcomeScreen from "./welcome-screen/WelcomeScreen";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
-import WelcomeScreenDecor from "./WelcomeScreenDecor";
 import MainMenu from "./main-menu/MainMenu";
 
 interface LayerUIProps {
@@ -111,8 +106,27 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const device = useDevice();
 
-  const childrenComponents =
-    ReactChildrenToObject<UIChildrenComponents>(children);
+  const [childrenComponents, restChildren] =
+    getReactChildren<UIChildrenComponents>(children, {
+      Menu: true,
+      FooterCenter: true,
+      WelcomeScreen: true,
+    });
+
+  const [WelcomeScreenComponents] = getReactChildren<UIWelcomeScreenComponents>(
+    renderWelcomeScreen
+      ? (
+          childrenComponents?.WelcomeScreen ?? (
+            <WelcomeScreen>
+              <WelcomeScreen.Center />
+              <WelcomeScreen.Hints.MenuHint />
+              <WelcomeScreen.Hints.ToolbarHint />
+              <WelcomeScreen.Hints.HelpHint />
+            </WelcomeScreen>
+          )
+        )?.props?.children
+      : null,
+  );
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -214,15 +228,10 @@ const LayerUI = ({
   };
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
-      <WelcomeScreenDecor
-        shouldRender={renderWelcomeScreen && !appState.isLoading}
-      >
-        <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--menu-pointer">
-          {WelcomeScreenMenuArrow}
-          <div>{t("welcomeScreen.menuHints")}</div>
-        </div>
-      </WelcomeScreenDecor>
-      {renderMenu()}
+      {WelcomeScreenComponents.MenuHint}
+      {/* wrapping to Fragment stops React from occasionally complaining
+                about identical Keys */}
+      <>{renderMenu()}</>
     </div>
   );
 
@@ -259,9 +268,7 @@ const LayerUI = ({
 
     return (
       <FixedSideContainer side="top">
-        {renderWelcomeScreen && !appState.isLoading && (
-          <WelcomeScreen appState={appState} actionManager={actionManager} />
-        )}
+        {WelcomeScreenComponents.Center}
         <div className="App-menu App-menu_top">
           <Stack.Col
             gap={6}
@@ -276,17 +283,7 @@ const LayerUI = ({
             <Section heading="shapes" className="shapes-section">
               {(heading: React.ReactNode) => (
                 <div style={{ position: "relative" }}>
-                  <WelcomeScreenDecor
-                    shouldRender={renderWelcomeScreen && !appState.isLoading}
-                  >
-                    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--top-toolbar-pointer">
-                      <div className="WelcomeScreen-decor--top-toolbar-pointer__label">
-                        {t("welcomeScreen.toolbarHints")}
-                      </div>
-                      {WelcomeScreenTopToolbarArrow}
-                    </div>
-                  </WelcomeScreenDecor>
-
+                  {WelcomeScreenComponents.ToolbarHint}
                   <Stack.Col gap={4} align="start">
                     <Stack.Row
                       gap={1}
@@ -390,6 +387,7 @@ const LayerUI = ({
 
   return (
     <>
+      {restChildren}
       {appState.isLoading && <LoadingMessage delay={250} />}
       {appState.errorMessage && (
         <ErrorDialog
@@ -420,24 +418,22 @@ const LayerUI = ({
       )}
       {device.isMobile && (
         <MobileMenu
-          renderWelcomeScreen={renderWelcomeScreen}
           appState={appState}
           elements={elements}
           actionManager={actionManager}
           renderJSONExportDialog={renderJSONExportDialog}
           renderImageExportDialog={renderImageExportDialog}
           setAppState={setAppState}
-          onCollabButtonClick={onCollabButtonClick}
           onLockToggle={() => onLockToggle()}
           onPenModeToggle={onPenModeToggle}
           canvas={canvas}
-          isCollaborating={isCollaborating}
           onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
           device={device}
           renderMenu={renderMenu}
+          welcomeScreenCenter={WelcomeScreenComponents.Center}
         />
       )}
 
@@ -462,13 +458,12 @@ const LayerUI = ({
           >
             {renderFixedSideContainer()}
             <Footer
-              renderWelcomeScreen={renderWelcomeScreen}
               appState={appState}
               actionManager={actionManager}
               showExitZenModeBtn={showExitZenModeBtn}
               footerCenter={childrenComponents.FooterCenter}
+              welcomeScreenHelp={WelcomeScreenComponents.HelpHint}
             />
-
             {appState.showStats && (
               <Stats
                 appState={appState}

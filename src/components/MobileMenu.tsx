@@ -1,5 +1,10 @@
 import React from "react";
-import { AppState, Device, ExcalidrawProps } from "../types";
+import {
+  AppState,
+  Device,
+  ExcalidrawProps,
+  UIWelcomeScreenComponents,
+} from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -17,7 +22,6 @@ import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
-import WelcomeScreen from "./WelcomeScreen";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -26,11 +30,9 @@ type MobileMenuProps = {
   renderImageExportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
-  isCollaborating: boolean;
 
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
@@ -40,8 +42,8 @@ type MobileMenuProps = {
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderSidebars: () => JSX.Element | null;
   device: Device;
-  renderWelcomeScreen?: boolean;
   renderMenu: () => React.ReactNode;
+  welcomeScreenCenter: UIWelcomeScreenComponents["Center"];
 };
 
 export const MobileMenu = ({
@@ -52,21 +54,18 @@ export const MobileMenu = ({
   onLockToggle,
   onPenModeToggle,
   canvas,
-  isCollaborating,
   onImageAction,
   renderTopRightUI,
   renderCustomStats,
   renderSidebars,
   device,
-  renderWelcomeScreen,
   renderMenu,
+  welcomeScreenCenter,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
-        {renderWelcomeScreen && !appState.isLoading && (
-          <WelcomeScreen appState={appState} actionManager={actionManager} />
-        )}
+        {welcomeScreenCenter}
         <Section heading="shapes">
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
@@ -74,20 +73,6 @@ export const MobileMenu = ({
                 <Island padding={1} className="App-toolbar App-toolbar--mobile">
                   {heading}
                   <Stack.Row gap={1}>
-                    {/* <PenModeButton
-                      checked={appState.penMode}
-                      onChange={onPenModeToggle}
-                      title={t("toolBar.penMode")}
-                      isMobile
-                      penDetected={appState.penDetected}
-                    />
-                    <LockButton
-                      checked={appState.activeTool.locked}
-                      onChange={onLockToggle}
-                      title={t("toolBar.lock")}
-                      isMobile
-                    />
-                    <div className="App-toolbar__divider"></div> */}
                     <ShapesSwitcher
                       appState={appState}
                       canvas={canvas}
@@ -109,7 +94,6 @@ export const MobileMenu = ({
                     title={t("toolBar.penMode")}
                     isMobile
                     penDetected={appState.penDetected}
-                    // penDetected={true}
                   />
                   <LockButton
                     checked={appState.activeTool.locked}
