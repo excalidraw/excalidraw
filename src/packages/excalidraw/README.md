@@ -584,7 +584,7 @@ const App = () => (
 
 | Prop | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `children ` | `React.ReactNode` | Yes | `undefined` | The content of the `MenuItem Group` |
+| `children ` | `React.ReactNode` | Yes | `undefined` | The content of the `MainMenu.Group` |
 
 ### WelcomeScreen
 
