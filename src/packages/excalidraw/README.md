@@ -534,7 +534,6 @@ const App = () => {
 | --- | --- | --- | --- | --- |
 | `children` | `React.ReactNode` | Yes | `undefined` | The content of the menu item |
 
-
 **MainMenu.DefaultItems**
 
 For the items which are shown in the menu in [excalidraw.com](https://excalidraw.com), you can use `MainMenu.DefaultItems`
