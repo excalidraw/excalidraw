@@ -448,15 +448,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Alle Daten werden lokal in Deinem Browser gespeichert.",
+      "center_heading_plus": "Möchtest du stattdessen zu Excalidraw+ gehen?",
+      "menuHint": "Exportieren, Einstellungen, Sprachen, ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Exportieren, Einstellungen und mehr...",
+      "center_heading": "Diagramme. Einfach. Gemacht.",
+      "toolbarHint": "Wähle ein Werkzeug & beginne zu zeichnen!",
+      "helpHint": "Kurzbefehle & Hilfe"
     }
   }
 }
