@@ -203,7 +203,7 @@
     "cannotResolveCollabServer": "İş birliği sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin.",
     "importLibraryError": "Kütüphane yüklenemedi",
     "collabSaveFailed": "Backend veritabanına kaydedilemedi. Eğer problem devam ederse, çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
-    "collabSaveFailed_sizeExceeded": "Backend veritabanına kaydedilemedi. Eğer problem devam ederse, çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz. Çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz."
+    "collabSaveFailed_sizeExceeded": "Backend veritabanına kaydedilemedi; tuval çok büyük. Çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz."
   },
   "toolBar": {
     "selection": "Seçme",
@@ -314,8 +314,8 @@
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
     "zoomToSelection": "Seçime yakınlaş",
     "toggleElementLock": "Seçimi Kilitle/çöz",
-    "movePageUpDown": "Sayfayı kaydır yukarı/aşağı",
-    "movePageLeftRight": "Sayfayı kaydır sol/sağ"
+    "movePageUpDown": "Sayfayı yukarı/aşağı kaydır",
+    "movePageLeftRight": "Sayfayı sola/sağa kaydır"
   },
   "clearCanvasDialog": {
     "title": "Tuvali temizle"
