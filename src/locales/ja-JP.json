@@ -448,12 +448,12 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "すべてのデータはブラウザにローカル保存されます。",
+      "center_heading_plus": "代わりにExcalidraw+を開きますか？",
+      "menuHint": "エクスポート、設定、言語..."
     },
     "defaults": {
-      "menuHint": "",
+      "menuHint": "エクスポート、設定、その他...",
       "center_heading": "",
       "toolbarHint": "",
       "helpHint": ""
