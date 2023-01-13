@@ -126,7 +126,7 @@ export const MobileMenu = ({
 
   const renderAppToolbar = () => {
     if (appState.viewModeEnabled) {
-      return <div className="App-toolbar-content">{renderMenu()}</div>;
+      return; //zsviczian
     }
 
     //zsviczian fix mobile menu button positions
