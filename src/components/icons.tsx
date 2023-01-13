@@ -883,7 +883,7 @@ export const CenterHorizontallyIcon = createIcon(
   modifiedTablerIconProps,
 );
 
-export const UsersIcon = createIcon(
+export const usersIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="9" cy="7" r="4"></circle>
