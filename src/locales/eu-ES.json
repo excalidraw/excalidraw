@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Itsatsi",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Itsatsi testu arrunt gisa",
     "pasteCharts": "Itsatsi grafikoak",
     "selectAll": "Hautatu dena",
     "multiSelect": "Gehitu elementua hautapenera",
@@ -202,7 +202,7 @@
     "invalidSVGString": "SVG baliogabea.",
     "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro.",
     "importLibraryError": "Ezin izan da liburutegia kargatu",
-    "collabSaveFailed": "",
+    "collabSaveFailed": "Ezin izan da backend datu-basean gorde. Arazoak jarraitzen badu, zure fitxategia lokalean gorde beharko zenuke zure lana ez duzula galtzen ziurtatzeko.",
     "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
