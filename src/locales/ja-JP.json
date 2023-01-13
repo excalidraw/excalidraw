@@ -455,8 +455,8 @@
     "defaults": {
       "menuHint": "エクスポート、設定、その他...",
       "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "toolbarHint": "ツールを選んで描き始めよう！",
+      "helpHint": "ショートカットとヘルプ"
     }
   }
 }
