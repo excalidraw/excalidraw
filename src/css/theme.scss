@@ -35,13 +35,14 @@
   --shadow-island: 0px 7px 14px rgba(0, 0, 0, 0.05),
     0px 0px 3.12708px rgba(0, 0, 0, 0.0798),
     0px 0px 0.931014px rgba(0, 0, 0, 0.1702);
-  --button-hover: var(--color-gray-10);
+  --button-hover-bg: var(--color-gray-10);
   --default-border-color: var(--color-gray-30);
 
   --default-button-size: 2rem;
   --default-icon-size: 1rem;
   --lg-button-size: 2.25rem;
   --lg-icon-size: 1rem;
+  --editor-container-padding: 1rem;
 
   @media screen and (min-device-width: 1921px) {
     --lg-button-size: 2.5rem;
@@ -135,7 +136,7 @@
     --popup-text-inverted-color: #2c2c2c;
     --select-highlight-color: #{$oc-blue-4};
     --text-primary-color: var(--color-gray-40);
-    --button-hover: var(--color-gray-80);
+    --button-hover-bg: var(--color-gray-80);
     --default-border-color: var(--color-gray-80);
     --shadow-island: 0px 13px 33px rgba(0, 0, 0, 0.07),
       0px 4.13px 9.94853px rgba(0, 0, 0, 0.0456112),
