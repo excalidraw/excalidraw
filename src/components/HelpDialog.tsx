@@ -19,11 +19,11 @@ const Header = () => (
     </a>
     <a
       className="HelpDialog__btn"
-      href="https://blog.excalidraw.com"
+      href="https://www.youtube.com/@VisualPKM" //zsviczian
       target="_blank"
       rel="noopener noreferrer"
     >
-      {t("helpDialog.blog")}
+      {"Visual PKM YouTube"}
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
     </a>
     <a
