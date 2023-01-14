@@ -6,6 +6,10 @@ export const withInternalFallback = <P,>(
   Component: React.FC<P>,
 ) => {
   const counterAtom = atom(0);
+  // flag set on initial render to tell the fallback component to skip the
+  // render until mount counter are initialized. This is because the counter
+  // is initialized in an effect, and thus we could end rendering both
+  // components at the same time until counter is initialized.
   let preferHost = false;
 
   const WrapperComponent: React.FC<
@@ -26,8 +30,12 @@ export const withInternalFallback = <P,>(
       preferHost = true;
     }
 
+    // ensure we don't render fallback and host components at the same time
     if (
+      // either before the counters are initialized
       (!counter && props.__fallback && preferHost) ||
+      // or after the counters are initialized, and both are rendered
+      // (this is the default when host renders as well)
       (counter > 1 && props.__fallback)
     ) {
       return null;
