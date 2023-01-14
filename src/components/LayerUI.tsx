@@ -71,9 +71,9 @@ interface LayerUIProps {
 }
 
 export const mainMenuTunnel = tunnel();
-export const welcomeScreenMenuHint = tunnel();
-export const welcomeScreenToolbarHint = tunnel();
-export const welcomeScreenHelpHint = tunnel();
+export const welcomeScreenMenuHintTunnel = tunnel();
+export const welcomeScreenToolbarHintTunnel = tunnel();
+export const welcomeScreenHelpHintTunnel = tunnel();
 export const welcomeScreenCenterTunnel = tunnel();
 export const footerCenterTunnel = tunnel();
 
@@ -211,7 +211,7 @@ const LayerUI = ({
       {/* wrapping to Fragment stops React from occasionally complaining
                 about identical Keys */}
       <mainMenuTunnel.Out />
-      <welcomeScreenMenuHint.Out />
+      <welcomeScreenMenuHintTunnel.Out />
     </div>
   );
 
@@ -262,7 +262,7 @@ const LayerUI = ({
             <Section heading="shapes" className="shapes-section">
               {(heading: React.ReactNode) => (
                 <div style={{ position: "relative" }}>
-                  <welcomeScreenToolbarHint.Out />
+                  <welcomeScreenToolbarHintTunnel.Out />
                   <Stack.Col gap={4} align="start">
                     <Stack.Row
                       gap={1}

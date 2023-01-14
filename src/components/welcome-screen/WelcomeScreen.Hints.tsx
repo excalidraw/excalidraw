@@ -5,47 +5,47 @@ import {
   WelcomeScreenTopToolbarArrow,
 } from "../icons";
 import {
-  welcomeScreenMenuHint,
-  welcomeScreenToolbarHint,
-  welcomeScreenHelpHint,
+  welcomeScreenMenuHintTunnel,
+  welcomeScreenToolbarHintTunnel,
+  welcomeScreenHelpHintTunnel,
 } from "../LayerUI";
 
 const MenuHint = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <welcomeScreenMenuHint.In>
+    <welcomeScreenMenuHintTunnel.In>
       <div className="virgil welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--menu">
         {WelcomeScreenMenuArrow}
         <div className="welcome-screen-decor-hint__label">
           {children || t("welcomeScreen.defaults.menuHint")}
         </div>
       </div>
-    </welcomeScreenMenuHint.In>
+    </welcomeScreenMenuHintTunnel.In>
   );
 };
 MenuHint.displayName = "MenuHint";
 
 const ToolbarHint = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <welcomeScreenToolbarHint.In>
+    <welcomeScreenToolbarHintTunnel.In>
       <div className="virgil welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--toolbar">
         <div className="welcome-screen-decor-hint__label">
           {children || t("welcomeScreen.defaults.toolbarHint")}
         </div>
         {WelcomeScreenTopToolbarArrow}
       </div>
-    </welcomeScreenToolbarHint.In>
+    </welcomeScreenToolbarHintTunnel.In>
   );
 };
 ToolbarHint.displayName = "ToolbarHint";
 
 const HelpHint = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <welcomeScreenHelpHint.In>
+    <welcomeScreenHelpHintTunnel.In>
       <div className="virgil welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--help">
         <div>{children || t("welcomeScreen.defaults.helpHint")}</div>
         {WelcomeScreenHelpArrow}
       </div>
-    </welcomeScreenHelpHint.In>
+    </welcomeScreenHelpHintTunnel.In>
   );
 };
 HelpHint.displayName = "HelpHint";

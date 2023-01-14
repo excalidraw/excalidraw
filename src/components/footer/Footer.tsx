@@ -10,7 +10,7 @@ import {
 } from "../Actions";
 import { useDevice } from "../App";
 import { HelpButton } from "../HelpButton";
-import { footerCenterTunnel, welcomeScreenHelpHint } from "../LayerUI";
+import { footerCenterTunnel, welcomeScreenHelpHintTunnel } from "../LayerUI";
 import { Section } from "../Section";
 import Stack from "../Stack";
 
@@ -73,7 +73,7 @@ const Footer = ({
         })}
       >
         <div style={{ position: "relative" }}>
-          <welcomeScreenHelpHint.Out />
+          <welcomeScreenHelpHintTunnel.Out />
           <HelpButton
             onClick={() => actionManager.executeAction(actionShortcuts)}
           />
