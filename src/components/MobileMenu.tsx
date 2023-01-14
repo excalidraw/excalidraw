@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  AppState,
-  Device,
-  ExcalidrawProps,
-  UIWelcomeScreenComponents,
-} from "../types";
+import { AppState, Device, ExcalidrawProps } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -22,6 +17,7 @@ import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
+import { mainMenuTunnel, welcomeScreenCenterTunnel } from "./LayerUI";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -42,8 +38,6 @@ type MobileMenuProps = {
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderSidebars: () => JSX.Element | null;
   device: Device;
-  renderMenu: () => React.ReactNode;
-  welcomeScreenCenter: UIWelcomeScreenComponents["Center"];
 };
 
 export const MobileMenu = ({
@@ -59,13 +53,11 @@ export const MobileMenu = ({
   renderCustomStats,
   renderSidebars,
   device,
-  renderMenu,
-  welcomeScreenCenter,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
-        {welcomeScreenCenter}
+        <welcomeScreenCenterTunnel.Out />
         <Section heading="shapes">
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
@@ -125,12 +117,16 @@ export const MobileMenu = ({
 
   const renderAppToolbar = () => {
     if (appState.viewModeEnabled) {
-      return <div className="App-toolbar-content">{renderMenu()}</div>;
+      return (
+        <div className="App-toolbar-content">
+          <mainMenuTunnel.Out />
+        </div>
+      );
     }
 
     return (
       <div className="App-toolbar-content">
-        {renderMenu()}
+        <mainMenuTunnel.Out />
         {actionManager.renderAction("toggleEditMenu")}
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}

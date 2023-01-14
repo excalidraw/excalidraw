@@ -1,11 +1,7 @@
 import clsx from "clsx";
 import { actionShortcuts } from "../../actions";
 import { ActionManager } from "../../actions/manager";
-import {
-  AppState,
-  UIChildrenComponents,
-  UIWelcomeScreenComponents,
-} from "../../types";
+import { AppState } from "../../types";
 import {
   ExitZenModeAction,
   FinalizeAction,
@@ -14,6 +10,7 @@ import {
 } from "../Actions";
 import { useDevice } from "../App";
 import { HelpButton } from "../HelpButton";
+import { footerCenterTunnel, welcomeScreenHelpHint } from "../LayerUI";
 import { Section } from "../Section";
 import Stack from "../Stack";
 
@@ -21,14 +18,10 @@ const Footer = ({
   appState,
   actionManager,
   showExitZenModeBtn,
-  footerCenter,
-  welcomeScreenHelp,
 }: {
   appState: AppState;
   actionManager: ActionManager;
   showExitZenModeBtn: boolean;
-  footerCenter: UIChildrenComponents["FooterCenter"];
-  welcomeScreenHelp: UIWelcomeScreenComponents["HelpHint"];
 }) => {
   const device = useDevice();
   const showFinalize =
@@ -73,14 +66,14 @@ const Footer = ({
           </Section>
         </Stack.Col>
       </div>
-      {footerCenter}
+      <footerCenterTunnel.Out />
       <div
         className={clsx("layer-ui__wrapper__footer-right zen-mode-transition", {
           "transition-right disable-pointerEvents": appState.zenModeEnabled,
         })}
       >
         <div style={{ position: "relative" }}>
-          {welcomeScreenHelp}
+          <welcomeScreenHelpHint.Out />
           <HelpButton
             onClick={() => actionManager.executeAction(actionShortcuts)}
           />

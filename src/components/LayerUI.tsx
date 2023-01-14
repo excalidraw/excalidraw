@@ -8,15 +8,8 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { ExportType } from "../scene/types";
-import {
-  AppProps,
-  AppState,
-  ExcalidrawProps,
-  BinaryFiles,
-  UIChildrenComponents,
-  UIWelcomeScreenComponents,
-} from "../types";
-import { isShallowEqual, muteFSAbortError, getReactChildren } from "../utils";
+import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
+import { isShallowEqual, muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
@@ -50,6 +43,7 @@ import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
+import tunnel from "tunnel-rat";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -63,7 +57,6 @@ interface LayerUIProps {
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
-  isCollaborating: boolean;
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
@@ -77,6 +70,13 @@ interface LayerUIProps {
   children?: React.ReactNode;
 }
 
+export const mainMenuTunnel = tunnel();
+export const welcomeScreenMenuHint = tunnel();
+export const welcomeScreenToolbarHint = tunnel();
+export const welcomeScreenHelpHint = tunnel();
+export const welcomeScreenCenterTunnel = tunnel();
+export const footerCenterTunnel = tunnel();
+
 const LayerUI = ({
   actionManager,
   appState,
@@ -88,7 +88,6 @@ const LayerUI = ({
   onPenModeToggle,
   onInsertElements,
   showExitZenModeBtn,
-  isCollaborating,
   renderTopRightUI,
   renderCustomStats,
   renderCustomSidebar,
@@ -102,28 +101,6 @@ const LayerUI = ({
   children,
 }: LayerUIProps) => {
   const device = useDevice();
-
-  const [childrenComponents, restChildren] =
-    getReactChildren<UIChildrenComponents>(children, {
-      Menu: true,
-      FooterCenter: true,
-      WelcomeScreen: true,
-    });
-
-  const [WelcomeScreenComponents] = getReactChildren<UIWelcomeScreenComponents>(
-    renderWelcomeScreen
-      ? (
-          childrenComponents?.WelcomeScreen ?? (
-            <WelcomeScreen>
-              <WelcomeScreen.Center />
-              <WelcomeScreen.Hints.MenuHint />
-              <WelcomeScreen.Hints.ToolbarHint />
-              <WelcomeScreen.Hints.HelpHint />
-            </WelcomeScreen>
-          )
-        )?.props?.children
-      : null,
-  );
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -192,37 +169,47 @@ const LayerUI = ({
     );
   };
 
-  const renderMenu = () => {
+  const renderDefaultMainMenu = () => {
     return (
-      childrenComponents.Menu || (
-        <MainMenu>
-          <MainMenu.DefaultItems.LoadScene />
-          <MainMenu.DefaultItems.SaveToActiveFile />
-          {/* FIXME we should to test for this inside the item itself */}
-          {UIOptions.canvasActions.export && <MainMenu.DefaultItems.Export />}
-          {/* FIXME we should to test for this inside the item itself */}
-          {UIOptions.canvasActions.saveAsImage && (
-            <MainMenu.DefaultItems.SaveAsImage />
-          )}
-          <MainMenu.DefaultItems.Help />
-          <MainMenu.DefaultItems.ClearCanvas />
-          <MainMenu.Separator />
-          <MainMenu.Group title="Excalidraw links">
-            <MainMenu.DefaultItems.Socials />
-          </MainMenu.Group>
-          <MainMenu.Separator />
-          <MainMenu.DefaultItems.ToggleTheme />
-          <MainMenu.DefaultItems.ChangeCanvasBackground />
-        </MainMenu>
-      )
+      <MainMenu __fallback>
+        <MainMenu.DefaultItems.LoadScene />
+        <MainMenu.DefaultItems.SaveToActiveFile />
+        {/* FIXME we should to test for this inside the item itself */}
+        {UIOptions.canvasActions.export && <MainMenu.DefaultItems.Export />}
+        {/* FIXME we should to test for this inside the item itself */}
+        {UIOptions.canvasActions.saveAsImage && (
+          <MainMenu.DefaultItems.SaveAsImage />
+        )}
+        <MainMenu.DefaultItems.Help />
+        <MainMenu.DefaultItems.ClearCanvas />
+        <MainMenu.Separator />
+        <MainMenu.Group title="Excalidraw links">
+          <MainMenu.DefaultItems.Socials />
+        </MainMenu.Group>
+        <MainMenu.Separator />
+        <MainMenu.DefaultItems.ToggleTheme />
+        <MainMenu.DefaultItems.ChangeCanvasBackground />
+      </MainMenu>
     );
   };
+
+  const renderDefaultWelcomeScreen = () => {
+    return (
+      <WelcomeScreen __fallback>
+        <WelcomeScreen.Center />
+        <WelcomeScreen.Hints.MenuHint />
+        <WelcomeScreen.Hints.ToolbarHint />
+        <WelcomeScreen.Hints.HelpHint />
+      </WelcomeScreen>
+    );
+  };
+
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
-      {WelcomeScreenComponents.MenuHint}
       {/* wrapping to Fragment stops React from occasionally complaining
                 about identical Keys */}
-      <>{renderMenu()}</>
+      <mainMenuTunnel.Out />
+      <welcomeScreenMenuHint.Out />
     </div>
   );
 
@@ -259,7 +246,6 @@ const LayerUI = ({
 
     return (
       <FixedSideContainer side="top">
-        {WelcomeScreenComponents.Center}
         <div className="App-menu App-menu_top">
           <Stack.Col
             gap={6}
@@ -274,7 +260,7 @@ const LayerUI = ({
             <Section heading="shapes" className="shapes-section">
               {(heading: React.ReactNode) => (
                 <div style={{ position: "relative" }}>
-                  {WelcomeScreenComponents.ToolbarHint}
+                  <welcomeScreenToolbarHint.Out />
                   <Stack.Col gap={4} align="start">
                     <Stack.Row
                       gap={1}
@@ -371,7 +357,17 @@ const LayerUI = ({
 
   return (
     <>
-      {restChildren}
+      {/* ------------------------- tunneled UI ---------------------------- */}
+      {/* make sure we render host app components first so that we can detect
+          them first on initial render to optimize layout shift */}
+      {children}
+      {/* render component fallbacks. Can be rendered anywhere as they'll be
+          tunneled away. We only render tunneled components that actually
+          have defaults when host do not render anything. */}
+      {renderDefaultWelcomeScreen()}
+      {renderDefaultMainMenu()}
+      {/* ------------------------------------------------------------------ */}
+
       {appState.isLoading && <LoadingMessage delay={250} />}
       {appState.errorMessage && (
         <ErrorDialog
@@ -416,8 +412,6 @@ const LayerUI = ({
           renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
           device={device}
-          renderMenu={renderMenu}
-          welcomeScreenCenter={WelcomeScreenComponents.Center}
         />
       )}
 
@@ -440,13 +434,12 @@ const LayerUI = ({
                 : {}
             }
           >
+            <welcomeScreenCenterTunnel.Out />
             {renderFixedSideContainer()}
             <Footer
               appState={appState}
               actionManager={actionManager}
               showExitZenModeBtn={showExitZenModeBtn}
-              footerCenter={childrenComponents.FooterCenter}
-              welcomeScreenHelp={WelcomeScreenComponents.HelpHint}
             />
             {appState.showStats && (
               <Stats

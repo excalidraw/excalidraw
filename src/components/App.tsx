@@ -583,7 +583,6 @@ class App extends React.Component<AppProps, AppState> {
                         })
                       }
                       langCode={getLanguage().code}
-                      isCollaborating={this.props.isCollaborating}
                       renderTopRightUI={renderTopRightUI}
                       renderCustomStats={renderCustomStats}
                       renderCustomSidebar={this.props.renderSidebar}

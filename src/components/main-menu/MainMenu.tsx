@@ -11,46 +11,58 @@ import * as DefaultItems from "./DefaultItems";
 import { UserList } from "../UserList";
 import { t } from "../../i18n";
 import { HamburgerMenuIcon } from "../icons";
+import { mainMenuTunnel } from "../LayerUI";
+import { withInternalFallback } from "../hoc/withInternalFallback";
 
-const MainMenu = ({ children }: { children?: React.ReactNode }) => {
-  const device = useDevice();
-  const appState = useExcalidrawAppState();
-  const setAppState = useExcalidrawSetAppState();
-  const onClickOutside = device.isMobile
-    ? undefined
-    : () => setAppState({ openMenu: null });
-  return (
-    <DropdownMenu open={appState.openMenu === "canvas"}>
-      <DropdownMenu.Trigger
-        onToggle={() => {
-          setAppState({
-            openMenu: appState.openMenu === "canvas" ? null : "canvas",
-          });
-        }}
-      >
-        {HamburgerMenuIcon}
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content onClickOutside={onClickOutside}>
-        {children}
-        {device.isMobile && appState.collaborators.size > 0 && (
-          <fieldset className="UserList-Wrapper">
-            <legend>{t("labels.collaborators")}</legend>
-            <UserList mobile={true} collaborators={appState.collaborators} />
-          </fieldset>
-        )}
-      </DropdownMenu.Content>
-    </DropdownMenu>
-  );
-};
+const MainMenu = Object.assign(
+  withInternalFallback(
+    "MainMenu",
+    ({ children }: { children?: React.ReactNode }) => {
+      const device = useDevice();
+      const appState = useExcalidrawAppState();
+      const setAppState = useExcalidrawSetAppState();
+      const onClickOutside = device.isMobile
+        ? undefined
+        : () => setAppState({ openMenu: null });
 
-MainMenu.Trigger = DropdownMenu.Trigger;
-MainMenu.Item = DropdownMenu.Item;
-MainMenu.ItemLink = DropdownMenu.ItemLink;
-MainMenu.ItemCustom = DropdownMenu.ItemCustom;
-MainMenu.Group = DropdownMenu.Group;
-MainMenu.Separator = DropdownMenu.Separator;
-MainMenu.DefaultItems = DefaultItems;
+      return (
+        <mainMenuTunnel.In>
+          <DropdownMenu open={appState.openMenu === "canvas"}>
+            <DropdownMenu.Trigger
+              onToggle={() => {
+                setAppState({
+                  openMenu: appState.openMenu === "canvas" ? null : "canvas",
+                });
+              }}
+            >
+              {HamburgerMenuIcon}
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content onClickOutside={onClickOutside}>
+              {children}
+              {device.isMobile && appState.collaborators.size > 0 && (
+                <fieldset className="UserList-Wrapper">
+                  <legend>{t("labels.collaborators")}</legend>
+                  <UserList
+                    mobile={true}
+                    collaborators={appState.collaborators}
+                  />
+                </fieldset>
+              )}
+            </DropdownMenu.Content>
+          </DropdownMenu>
+        </mainMenuTunnel.In>
+      );
+    },
+  ),
+  {
+    Trigger: DropdownMenu.Trigger,
+    Item: DropdownMenu.Item,
+    ItemLink: DropdownMenu.ItemLink,
+    ItemCustom: DropdownMenu.ItemCustom,
+    Group: DropdownMenu.Group,
+    Separator: DropdownMenu.Separator,
+    DefaultItems,
+  },
+);
 
 export default MainMenu;
-
-MainMenu.displayName = "Menu";
