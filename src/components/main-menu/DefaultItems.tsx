@@ -137,6 +137,7 @@ export const ClearCanvas = () => {
         icon={TrashIcon}
         onSelect={toggleDialog}
         data-testid="clear-canvas-button"
+        shortcut={getShortcutFromShortcutName("clearCanvas")}
         aria-label={t("buttons.clearReset")}
       >
         {t("buttons.clearReset")}

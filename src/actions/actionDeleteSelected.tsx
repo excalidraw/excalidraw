@@ -1,4 +1,4 @@
-import { isSomeElementSelected } from "../scene";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { KEYS } from "../keys";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
@@ -154,7 +154,9 @@ export const actionDeleteSelected = register({
     };
   },
   contextItemLabel: "labels.delete",
-  keyTest: (event) => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE,
+  keyTest: (event, appState, elements) => 
+    (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
+    (getSelectedElements(elements, appState, false).length > 0),
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"
