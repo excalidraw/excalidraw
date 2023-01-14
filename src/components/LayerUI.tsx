@@ -77,6 +77,43 @@ export const welcomeScreenHelpHint = tunnel();
 export const welcomeScreenCenterTunnel = tunnel();
 export const footerCenterTunnel = tunnel();
 
+const DefaultMainMenu: React.FC<{
+  UIOptions: AppProps["UIOptions"];
+}> = ({ UIOptions }) => {
+  return (
+    <MainMenu __fallback>
+      <MainMenu.DefaultItems.LoadScene />
+      <MainMenu.DefaultItems.SaveToActiveFile />
+      {/* FIXME we should to test for this inside the item itself */}
+      {UIOptions.canvasActions.export && <MainMenu.DefaultItems.Export />}
+      {/* FIXME we should to test for this inside the item itself */}
+      {UIOptions.canvasActions.saveAsImage && (
+        <MainMenu.DefaultItems.SaveAsImage />
+      )}
+      <MainMenu.DefaultItems.Help />
+      <MainMenu.DefaultItems.ClearCanvas />
+      <MainMenu.Separator />
+      <MainMenu.Group title="Excalidraw links">
+        <MainMenu.DefaultItems.Socials />
+      </MainMenu.Group>
+      <MainMenu.Separator />
+      <MainMenu.DefaultItems.ToggleTheme />
+      <MainMenu.DefaultItems.ChangeCanvasBackground />
+    </MainMenu>
+  );
+};
+
+const DefaultWelcomeScreen = () => {
+  return (
+    <WelcomeScreen __fallback>
+      <WelcomeScreen.Center />
+      <WelcomeScreen.Hints.MenuHint />
+      <WelcomeScreen.Hints.ToolbarHint />
+      <WelcomeScreen.Hints.HelpHint />
+    </WelcomeScreen>
+  );
+};
+
 const LayerUI = ({
   actionManager,
   appState,
@@ -166,41 +203,6 @@ const LayerUI = ({
         onExportToSvg={createExporter("svg")}
         onExportToClipboard={createExporter("clipboard")}
       />
-    );
-  };
-
-  const renderDefaultMainMenu = () => {
-    return (
-      <MainMenu __fallback>
-        <MainMenu.DefaultItems.LoadScene />
-        <MainMenu.DefaultItems.SaveToActiveFile />
-        {/* FIXME we should to test for this inside the item itself */}
-        {UIOptions.canvasActions.export && <MainMenu.DefaultItems.Export />}
-        {/* FIXME we should to test for this inside the item itself */}
-        {UIOptions.canvasActions.saveAsImage && (
-          <MainMenu.DefaultItems.SaveAsImage />
-        )}
-        <MainMenu.DefaultItems.Help />
-        <MainMenu.DefaultItems.ClearCanvas />
-        <MainMenu.Separator />
-        <MainMenu.Group title="Excalidraw links">
-          <MainMenu.DefaultItems.Socials />
-        </MainMenu.Group>
-        <MainMenu.Separator />
-        <MainMenu.DefaultItems.ToggleTheme />
-        <MainMenu.DefaultItems.ChangeCanvasBackground />
-      </MainMenu>
-    );
-  };
-
-  const renderDefaultWelcomeScreen = () => {
-    return (
-      <WelcomeScreen __fallback>
-        <WelcomeScreen.Center />
-        <WelcomeScreen.Hints.MenuHint />
-        <WelcomeScreen.Hints.ToolbarHint />
-        <WelcomeScreen.Hints.HelpHint />
-      </WelcomeScreen>
     );
   };
 
@@ -364,8 +366,8 @@ const LayerUI = ({
       {/* render component fallbacks. Can be rendered anywhere as they'll be
           tunneled away. We only render tunneled components that actually
           have defaults when host do not render anything. */}
-      {renderDefaultWelcomeScreen()}
-      {renderDefaultMainMenu()}
+      <DefaultMainMenu UIOptions={UIOptions} />
+      <DefaultWelcomeScreen />
       {/* ------------------------------------------------------------------ */}
 
       {appState.isLoading && <LoadingMessage delay={250} />}
