@@ -178,7 +178,7 @@
 
     border-radius: var(--border-radius-md);
 
-    grid-template-columns: calc(var(--default-icon-size) + 0.5rem) 1fr 3rem;
+    grid-template-columns: calc(var(--default-icon-size) + 0.5rem) 1fr; //zsviczian
 
     &__text {
       display: flex;
