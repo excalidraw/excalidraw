@@ -448,15 +448,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Toutes vos données sont sauvegardées en local dans votre navigateur.",
+      "center_heading_plus": "Vouliez-vous plutôt aller à Excalidraw+ à la place ?",
+      "menuHint": "Exportation, préférences, langues, ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Exportation, préférences et plus...",
+      "center_heading": "Diagrammes. Rendus. Simples.",
+      "toolbarHint": "Choisissez un outil et commencez à dessiner !",
+      "helpHint": "Raccourcis et aide"
     }
   }
 }
