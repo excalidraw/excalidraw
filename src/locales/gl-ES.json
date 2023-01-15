@@ -448,15 +448,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Toda a información é gardada de maneira local no seu navegador.",
+      "center_heading_plus": "Queres ir a Excalidraw+ no seu lugar?",
+      "menuHint": "Exportar, preferencias, idiomas, ..."
     },
     "defaults": {
-      "menuHint": "",
+      "menuHint": "Exportar, preferencias, e máis...",
       "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "toolbarHint": "Escolle unha ferramenta & Comeza a debuxar!",
+      "helpHint": "Atallos & axuda"
     }
   }
 }
