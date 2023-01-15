@@ -24,7 +24,6 @@ import { t } from "../i18n";
 import {
   Excalidraw,
   defaultLang,
-  Footer,
   LiveCollaborationTrigger,
 } from "../packages/excalidraw/index";
 import {
@@ -82,10 +81,9 @@ import { atom, Provider, useAtom } from "jotai";
 import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
-import { EncryptedIcon } from "./components/EncryptedIcon";
-import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
+import { AppFooter } from "./components/AppFooter";
 
 polyfill();
 
@@ -661,15 +659,8 @@ const ExcalidrawWrapper = () => {
           setCollabDialogShown={setCollabDialogShown}
           isCollaborating={isCollaborating}
         />
-
         <AppWelcomeScreen setCollabDialogShown={setCollabDialogShown} />
-
-        <Footer>
-          <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
-            <ExcalidrawPlusAppLink />
-            <EncryptedIcon />
-          </div>
-        </Footer>
+        <AppFooter />
       </Excalidraw>
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (

@@ -1,3 +1,4 @@
+import React from "react";
 import { PlusPromoIcon } from "../../components/icons";
 import { MainMenu } from "../../packages/excalidraw/index";
 import { LanguageList } from "./LanguageList";
@@ -5,7 +6,7 @@ import { LanguageList } from "./LanguageList";
 export const AppMainMenu: React.FC<{
   setCollabDialogShown: (toggle: boolean) => any;
   isCollaborating: boolean;
-}> = (props) => {
+}> = React.memo((props) => {
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
@@ -36,4 +37,4 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>
   );
-};
+});
