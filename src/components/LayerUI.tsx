@@ -211,7 +211,7 @@ const LayerUI = ({
       {/* wrapping to Fragment stops React from occasionally complaining
                 about identical Keys */}
       <mainMenuTunnel.Out />
-      <welcomeScreenMenuHintTunnel.Out />
+      {renderWelcomeScreen && <welcomeScreenMenuHintTunnel.Out />}
     </div>
   );
 
@@ -262,7 +262,9 @@ const LayerUI = ({
             <Section heading="shapes" className="shapes-section">
               {(heading: React.ReactNode) => (
                 <div style={{ position: "relative" }}>
-                  <welcomeScreenToolbarHintTunnel.Out />
+                  {renderWelcomeScreen && (
+                    <welcomeScreenToolbarHintTunnel.Out />
+                  )}
                   <Stack.Col gap={4} align="start">
                     <Stack.Row
                       gap={1}
@@ -436,12 +438,13 @@ const LayerUI = ({
                 : {}
             }
           >
-            <welcomeScreenCenterTunnel.Out />
+            {renderWelcomeScreen && <welcomeScreenCenterTunnel.Out />}
             {renderFixedSideContainer()}
             <Footer
               appState={appState}
               actionManager={actionManager}
               showExitZenModeBtn={showExitZenModeBtn}
+              renderWelcomeScreen={renderWelcomeScreen}
             />
             {appState.showStats && (
               <Stats

@@ -18,10 +18,12 @@ const Footer = ({
   appState,
   actionManager,
   showExitZenModeBtn,
+  renderWelcomeScreen,
 }: {
   appState: AppState;
   actionManager: ActionManager;
   showExitZenModeBtn: boolean;
+  renderWelcomeScreen: boolean;
 }) => {
   const device = useDevice();
   const showFinalize =
@@ -73,7 +75,7 @@ const Footer = ({
         })}
       >
         <div style={{ position: "relative" }}>
-          <welcomeScreenHelpHintTunnel.Out />
+          {renderWelcomeScreen && <welcomeScreenHelpHintTunnel.Out />}
           <HelpButton
             onClick={() => actionManager.executeAction(actionShortcuts)}
           />
