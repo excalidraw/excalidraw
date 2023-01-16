@@ -97,6 +97,7 @@ export const exportCanvas = async (
       const blob = canvasToBlob(tempCanvas);
       await copyBlobToClipboardAsPng(blob);
     } catch (error: any) {
+      console.warn(error);
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;
       }
