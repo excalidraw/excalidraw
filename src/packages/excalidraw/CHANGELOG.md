@@ -11,6 +11,12 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## 0.14.1 (2023-01-16)
+
+### Fixes
+
+- remove overflow hidden from button [#6110](https://github.com/excalidraw/excalidraw/pull/6110). This fixes the collaborator count css in the [LiveCollaborationTrigger](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#LiveCollaborationTrigger) component.
+
 ## 0.14.0 (2023-01-13)
 
 ### Features
@@ -71,8 +77,6 @@ Please add the latest change on the top under the correct section.
 - Editor redesign 🔥 [#5780](https://github.com/excalidraw/excalidraw/pull/5780)
 
 ### Fixes
-
-- remove overflow hidden from button [#6110](https://github.com/excalidraw/excalidraw/pull/6110)
 
 - Mobile tools positioning [#6107](https://github.com/excalidraw/excalidraw/pull/6107)
 
