@@ -306,8 +306,8 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("labels.pasteAsPlaintext")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V")]}
             />
-            {/* firefox supports clipboard.write under flag, so we'll
-                show users what they co do in the error message */}
+            {/* firefox supports clipboard API under a flag, so we'll
+                show users what they can do in the error message */}
             {(probablySupportsClipboardBlob || isFirefox) && (
               <Shortcut
                 label={t("labels.copyAsPng")}
