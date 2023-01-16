@@ -101,11 +101,9 @@ export const exportCanvas = async (
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;
       }
-      if (
-        isFirefox &&
-        (error.message.includes("window.ClipboardItem is not a constructor") ||
-          error.message.includes("clipboard.write is not a function"))
-      ) {
+      // TypeError *probably* suggests ClipboardItem not defined, which
+      // people on Firefox can enable through a flag, so let's tell them.
+      if (isFirefox && error.name === "TypeError") {
         throw new Error(
           `${t("alerts.couldNotCopyToClipboard")}\n\n${t(
             "hints.firefox_clipboard_write",
