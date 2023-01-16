@@ -57,6 +57,7 @@ import {
   EVENT,
   GRID_SIZE,
   IMAGE_RENDER_TIMEOUT,
+  isAndroid,
   LINE_CONFIRM_THRESHOLD,
   MAX_ALLOWED_FILE_BYTES,
   MIME_TYPES,
@@ -166,7 +167,6 @@ import {
   shouldRotateWithDiscreteAngle,
   isArrowKey,
   KEYS,
-  isAndroid,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer/renderScene";

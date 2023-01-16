@@ -2,7 +2,7 @@ import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
 } from "../clipboard";
-import { DEFAULT_EXPORT_PADDING, MIME_TYPES } from "../constants";
+import { DEFAULT_EXPORT_PADDING, isFirefox, MIME_TYPES } from "../constants";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { exportToCanvas, exportToSvg } from "../scene/export";
@@ -101,7 +101,19 @@ export const exportCanvas = async (
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;
       }
-      throw new Error(t("alerts.couldNotCopyToClipboard"));
+      if (
+        isFirefox &&
+        (error.message.includes("window.ClipboardItem is not a constructor") ||
+          error.message.includes("clipboard.write is not a function"))
+      ) {
+        throw new Error(
+          `${t("alerts.couldNotCopyToClipboard")}\n\n${t(
+            "hints.firefox_clipboard_write",
+          )}`,
+        );
+      } else {
+        throw new Error(t("alerts.couldNotCopyToClipboard"));
+      }
     } finally {
       tempCanvas.remove();
     }

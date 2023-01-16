@@ -1,11 +1,12 @@
 import React from "react";
 import { t } from "../i18n";
-import { isDarwin, isWindows, KEYS } from "../keys";
+import { KEYS } from "../keys";
 import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
 import "./HelpDialog.scss";
 import { ExternalLinkIcon } from "./icons";
 import { probablySupportsClipboardBlob } from "../clipboard";
+import { isDarwin, isFirefox, isWindows } from "../constants";
 
 const Header = () => (
   <div className="HelpDialog__header">
@@ -305,7 +306,9 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("labels.pasteAsPlaintext")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V")]}
             />
-            {probablySupportsClipboardBlob && (
+            {/* firefox supports clipboard.write under flag, so we'll
+                show users what they co do in the error message */}
+            {(probablySupportsClipboardBlob || isFirefox) && (
               <Shortcut
                 label={t("labels.copyAsPng")}
                 shortcuts={[getShortcutKey("Shift+Alt+C")]}

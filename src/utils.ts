@@ -6,6 +6,7 @@ import {
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
+  isDarwin,
   MIME_TYPES,
   THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
@@ -13,7 +14,6 @@ import {
 import { FontFamilyValues, FontString } from "./element/types";
 import { AppState, DataURL, LastActiveToolBeforeEraser, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
-import { isDarwin } from "./keys";
 import { SHAPES } from "./shapes";
 import React from "react";
 
