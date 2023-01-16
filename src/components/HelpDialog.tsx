@@ -5,6 +5,7 @@ import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
 import "./HelpDialog.scss";
 import { ExternalLinkIcon } from "./icons";
+import { probablySupportsClipboardBlob } from "../clipboard";
 
 const Header = () => (
   <div className="HelpDialog__header">
@@ -304,10 +305,12 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("labels.pasteAsPlaintext")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V")]}
             />
-            <Shortcut
-              label={t("labels.copyAsPng")}
-              shortcuts={[getShortcutKey("Shift+Alt+C")]}
-            />
+            {probablySupportsClipboardBlob && (
+              <Shortcut
+                label={t("labels.copyAsPng")}
+                shortcuts={[getShortcutKey("Shift+Alt+C")]}
+              />
+            )}
             <Shortcut
               label={t("labels.copyStyles")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Alt+C")]}
