@@ -12,6 +12,7 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawTextContainer,
+  ExcalidrawFrameElement,
 } from "../element/types";
 import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -39,6 +40,7 @@ type ElementConstructorOpts = MarkOptional<
   | "height"
   | "angle"
   | "groupIds"
+  | "frameId"
   | "boundElements"
   | "seed"
   | "version"
@@ -62,6 +64,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     height = 0,
     angle = 0,
     groupIds = [],
+    frameId = null,
     roundness = null,
     boundElements = null,
     link = null,
@@ -86,6 +89,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     roughness,
     opacity,
     groupIds,
+    frameId,
     roundness,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
@@ -105,6 +109,20 @@ export const newElement = (
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
+
+export const newFrameElement = (
+  opts: {} & ElementConstructorOpts,
+): NonDeleted<ExcalidrawFrameElement> => {
+  const frameElement = newElementWith(
+    {
+      ..._newElementBase<ExcalidrawFrameElement>("frame", opts),
+      type: "frame",
+    },
+    {},
+  );
+
+  return frameElement;
+};
 
 /** computes element x/y offset based on textAlign/verticalAlign */
 const getTextElementPositionOffsets = (
@@ -136,6 +154,7 @@ export const newTextElement = (
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
     containerId?: ExcalidrawTextContainer["id"];
+    isFrameName?: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const text = normalizeText(opts.text);
@@ -156,6 +175,7 @@ export const newTextElement = (
       baseline: metrics.baseline,
       containerId: opts.containerId || null,
       originalText: text,
+      isFrameName: opts.isFrameName || false,
     },
     {},
   );

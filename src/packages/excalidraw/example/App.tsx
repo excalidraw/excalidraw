@@ -240,6 +240,7 @@ export default function App() {
             height: 141.9765625,
             seed: 1968410350,
             groupIds: [],
+            frameId: null,
             boundElements: null,
             locked: false,
             link: null,

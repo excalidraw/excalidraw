@@ -52,6 +52,7 @@ type _ExcalidrawElementBase = Readonly<{
   /** List of groups the element belongs to.
       Ordered from deepest to shallowest. */
   groupIds: readonly GroupId[];
+  frameId: string | null;
   /** other elements that are bound to this element */
   boundElements:
     | readonly Readonly<{
@@ -97,6 +98,10 @@ export type InitializedExcalidrawImageElement = MarkNonNullable<
   "fileId"
 >;
 
+export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
+  type: "frame";
+};
+
 /**
  * These are elements that don't have any additional properties.
  */
@@ -116,7 +121,8 @@ export type ExcalidrawElement =
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
   | ExcalidrawFreeDrawElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawFrameElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: boolean;
@@ -135,6 +141,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
+    isFrameName?: boolean;
   }>;
 
 export type ExcalidrawBindableElement =
@@ -142,7 +149,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawFrameElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement

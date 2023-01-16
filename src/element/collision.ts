@@ -26,6 +26,7 @@ import {
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
   StrokeRoundness,
+  ExcalidrawFrameElement,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -207,6 +208,8 @@ const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
         "This should not happen, we need to investigate why it does.",
       );
       return false;
+    case "frame":
+      return false;
   }
 };
 
@@ -218,6 +221,7 @@ export const distanceToBindableElement = (
     case "rectangle":
     case "image":
     case "text":
+    case "frame":
       return distanceToRectangle(element, point);
     case "diamond":
       return distanceToDiamond(element, point);
@@ -247,7 +251,8 @@ const distanceToRectangle = (
     | ExcalidrawRectangleElement
     | ExcalidrawTextElement
     | ExcalidrawFreeDrawElement
-    | ExcalidrawImageElement,
+    | ExcalidrawImageElement
+    | ExcalidrawFrameElement,
   point: Point,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(element, point);
@@ -530,6 +535,7 @@ export const determineFocusDistance = (
     case "rectangle":
     case "image":
     case "text":
+    case "frame":
       return c / (hwidth * (nabs + q * mabs));
     case "diamond":
       return mabs < nabs ? c / (nabs * hwidth) : c / (mabs * hheight);
@@ -562,6 +568,7 @@ export const determineFocusPoint = (
     case "image":
     case "text":
     case "diamond":
+    case "frame":
       point = findFocusPointForRectangulars(element, focus, adjecentPointRel);
       break;
     case "ellipse":
@@ -612,6 +619,7 @@ const getSortedElementLineIntersections = (
     case "image":
     case "text":
     case "diamond":
+    case "frame":
       const corners = getCorners(element);
       intersections = corners
         .flatMap((point, i) => {
@@ -645,7 +653,8 @@ const getCorners = (
     | ExcalidrawRectangleElement
     | ExcalidrawImageElement
     | ExcalidrawDiamondElement
-    | ExcalidrawTextElement,
+    | ExcalidrawTextElement
+    | ExcalidrawFrameElement,
   scale: number = 1,
 ): GA.Point[] => {
   const hx = (scale * element.width) / 2;
@@ -654,6 +663,7 @@ const getCorners = (
     case "rectangle":
     case "image":
     case "text":
+    case "frame":
       return [
         GA.point(hx, hy),
         GA.point(hx, -hy),
@@ -796,7 +806,8 @@ export const findFocusPointForRectangulars = (
     | ExcalidrawRectangleElement
     | ExcalidrawImageElement
     | ExcalidrawDiamondElement
-    | ExcalidrawTextElement,
+    | ExcalidrawTextElement
+    | ExcalidrawFrameElement,
   // Between -1 and 1 for how far away should the focus point be relative
   // to the size of the element. Sign determines orientation.
   relativeDistance: number,

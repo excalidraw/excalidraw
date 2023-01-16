@@ -6,6 +6,7 @@ import { NonDeletedExcalidrawElement } from "./types";
 import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
+import Scene from "../scene/Scene";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -16,10 +17,28 @@ export const dragSelectedElements = (
   distanceX: number = 0,
   distanceY: number = 0,
   appState: AppState,
+  scene: Scene,
 ) => {
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
-  selectedElements.forEach((element) => {
+
+  let elementsToUpdate: NonDeletedExcalidrawElement[];
+  const frames = selectedElements
+    .filter((e) => e.type === "frame")
+    .map((f) => f.id);
+
+  if (frames.length > 0) {
+    const elementsInFrames = scene
+      .getNonDeletedElements()
+      .filter((e) => e.frameId !== null)
+      .filter((e) => frames.includes(e.frameId!));
+
+    elementsToUpdate = [...selectedElements, ...elementsInFrames];
+  } else {
+    elementsToUpdate = selectedElements;
+  }
+
+  elementsToUpdate.forEach((element) => {
     updateElementCoords(
       lockDirection,
       distanceX,
@@ -50,7 +69,7 @@ export const dragSelectedElements = (
       }
     }
     updateBoundElements(element, {
-      simultaneouslyUpdated: selectedElements,
+      simultaneouslyUpdated: elementsToUpdate,
     });
   });
 };

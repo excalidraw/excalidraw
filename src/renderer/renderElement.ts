@@ -209,7 +209,8 @@ const drawElementOnCanvas = (
   switch (element.type) {
     case "rectangle":
     case "diamond":
-    case "ellipse": {
+    case "ellipse":
+    case "frame": {
       context.lineJoin = "round";
       context.lineCap = "round";
       rc.draw(getShapeForElement(element)!);
@@ -376,7 +377,8 @@ export const generateRoughOptions = (
   switch (element.type) {
     case "rectangle":
     case "diamond":
-    case "ellipse": {
+    case "ellipse":
+    case "frame": {
       options.fillStyle = element.fillStyle;
       options.fill =
         element.backgroundColor === "transparent"
@@ -424,6 +426,7 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
+      case "frame":
         if (element.roundness) {
           const w = element.width;
           const h = element.height;
@@ -883,6 +886,7 @@ export const renderElement = (
     case "line":
     case "arrow":
     case "image":
+    case "frame":
     case "text": {
       generateElementShape(element, generator);
       if (renderConfig.isExporting) {

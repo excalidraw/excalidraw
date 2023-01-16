@@ -137,6 +137,7 @@ export class API {
       | "versionNonce"
       | "isDeleted"
       | "groupIds"
+      | "frameId"
       | "link"
       | "updated"
     > = {

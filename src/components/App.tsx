@@ -124,7 +124,11 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
+import {
+  deepCopyElement,
+  newFrameElement,
+  newFreeDrawElement,
+} from "../element/newElement";
 import {
   hasBoundTextElement,
   isArrowElement,
@@ -3135,7 +3139,11 @@ class App extends React.Component<AppProps, AppState> {
             )) &&
           !hitElement?.locked
         ) {
-          setCursor(this.canvas, CURSOR_TYPE.MOVE);
+          if (hitElement?.type === "text" && hitElement.isFrameName) {
+            setCursor(this.canvas, CURSOR_TYPE.AUTO);
+          } else {
+            setCursor(this.canvas, CURSOR_TYPE.MOVE);
+          }
         }
       } else {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
@@ -3457,6 +3465,8 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (this.state.activeTool.type === "custom") {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
+    } else if (this.state.activeTool.type === "frame") {
+      this.createFrameElementOnPointerDown(pointerDownState);
     } else if (this.state.activeTool.type !== "eraser") {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
@@ -3884,6 +3894,18 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.y,
           );
 
+        // alter hitElement when working with a frame text to control frame box
+        if (
+          pointerDownState.hit.element &&
+          pointerDownState.hit.element.type === "text" &&
+          pointerDownState.hit.element.isFrameName &&
+          pointerDownState.hit.element.frameId
+        ) {
+          pointerDownState.hit.element = this.scene.getElement(
+            pointerDownState.hit.element.frameId,
+          );
+        }
+
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
           const hitLinkElement = this.getElementLinkAtPosition(
@@ -4305,6 +4327,69 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private createFrameElementOnPointerDown = (
+    pointerDownState: PointerDownState,
+  ): void => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      this.state.gridSize,
+    );
+
+    const frame = newFrameElement({
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      roundness:
+        this.state.currentItemRoundness === "round"
+          ? {
+              type: ROUNDNESS.ADAPTIVE_RADIUS,
+            }
+          : null,
+      locked: false,
+    });
+
+    // TODO: frame, extract settings
+    const text = newTextElement({
+      x: gridX,
+      y: gridY - 25,
+      strokeColor: "#495057",
+      backgroundColor: "",
+      fillStyle: "solid",
+      strokeWidth: 1,
+      strokeStyle: "solid",
+      roundness: null,
+      roughness: this.state.currentItemRoughness,
+      opacity: 100,
+      text: "Frame",
+      fontSize: 14,
+      fontFamily: 1,
+      textAlign: "left",
+      verticalAlign: DEFAULT_VERTICAL_ALIGN,
+      locked: false,
+      isFrameName: true,
+      frameId: frame.id,
+    });
+
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      text,
+      frame,
+    ]);
+
+    this.setState({
+      multiElement: null,
+      draggingElement: frame,
+      editingElement: frame,
+    });
+  };
+
   private onKeyDownFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: KeyboardEvent) => void {
@@ -4538,6 +4623,7 @@ class App extends React.Component<AppProps, AppState> {
             dragDistanceX,
             dragDistanceY,
             this.state,
+            this.scene,
           );
           this.maybeSuggestBindingForAll(selectedElements);
 

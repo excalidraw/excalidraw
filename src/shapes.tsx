@@ -83,6 +83,14 @@ export const SHAPES = [
     numericKey: KEYS["0"],
     fillable: false,
   },
+  // TODO: frame, create icon and set up numeric key
+  {
+    icon: RectangleIcon,
+    value: "frame",
+    key: KEYS.G,
+    numericKey: "10",
+    fillable: false,
+  },
 ] as const;
 
 export const findShapeByKey = (key: string) => {
