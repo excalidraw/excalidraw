@@ -12,6 +12,7 @@ const ExcalidrawScope = {
   Footer: ExcalidrawComp.Footer,
   useDevice: ExcalidrawComp.useDevice,
   MainMenu: ExcalidrawComp.MainMenu,
+  WelcomeScreen: ExcalidrawComp.WelcomeScreen,
 };
 
 export default ExcalidrawScope;

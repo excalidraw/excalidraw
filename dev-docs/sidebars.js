@@ -55,6 +55,7 @@ const sidebars = {
               items: [
                 "package/api/components/footer",
                 "package/api/components/main-menu",
+                "package/api/components/welcome-screen",
               ],
             },
             {
