@@ -1,30 +1,23 @@
-@import "../css/variables.module";
+@import "../../css/variables.module";
 
 .excalidraw {
   .collab-button {
-    @include outlineButtonStyles;
-    width: var(--lg-button-size);
-    height: var(--lg-button-size);
+    --button-bg: var(--color-primary);
+    --button-color: white;
+    --button-border: var(--color-primary);
 
-    svg {
-      width: var(--lg-icon-size);
-      height: var(--lg-icon-size);
-    }
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-    color: white;
+    --button-width: var(--lg-button-size);
+    --button-height: var(--lg-button-size);
+
+    --button-hover-bg: var(--color-primary-darker);
+    --button-hover-border: var(--color-primary-darker);
+
+    --button-active-bg: var(--color-primary-darker);
+
     flex-shrink: 0;
 
-    &:hover {
-      background-color: var(--color-primary-darker);
-      border-color: var(--color-primary-darker);
-    }
-
-    &:active {
-      background-color: var(--color-primary-darker);
-    }
-
-    &.active {
+    // double .active to force specificity
+    &.active.active {
       background-color: #0fb884;
       border-color: #0fb884;
 
