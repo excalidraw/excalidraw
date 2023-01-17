@@ -11,7 +11,7 @@
 | [`langCode`](#langcode) | string | `en` | Language code string |
 | [`renderTopRightUI`](#rendertoprightui) | Function |  | Function that renders custom UI in top right corner |
 | [`renderCustomStats`](#rendercustomstats) | Function |  | Function that can be used to render custom stats on the stats dialog. |
-| [`renderSIdebar`](#rendersidebar) | Function |  | Render function that renders custom sidebar. |
+| [`renderSidebar`](#rendersidebar) | Function |  | Render function that renders custom sidebar. |
 | [`viewModeEnabled`](#viewmodeenabled) | boolean |  | This implies if the app is in view mode. |
 | [`zenModeEnabled`](#zenmodeenabled) | boolean |  | This implies if the zen mode is enabled |
 | [`gridModeEnabled`](#gridmodeenabled) | boolean |  | This implies if the grid mode is enabled |
@@ -40,7 +40,7 @@ Every time component updates, this callback if passed will get triggered and has
 
 2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79) of the scene.
 
-3. `files`: The [`BinaryFiles`]([BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) which are added to the scene.
+3. `files`: The [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) which are added to the scene.
 
 Here you can try saving the data to your backend or local storage for example.
 
@@ -56,36 +56,46 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 | `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise&lt;[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)&gt; | This library items with which Excalidraw should be mounted. |
 | `files` | [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) | The files added to the scene. |
 
-```json
-{
-  "elements": [
-    {
-      "type": "rectangle",
-      "version": 141,
-      "versionNonce": 361174001,
-      "isDeleted": false,
-      "id": "oDVXy8D6rom3H1-LLH2-f",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 100.50390625,
-      "y": 93.67578125,
-      "strokeColor": "#000000",
-      "backgroundColor": "transparent",
-      "width": 186.47265625,
-      "height": 141.9765625,
-      "seed": 1968410350,
-      "groupIds": []
-    }
-  ],
-  "appState": { "zenModeEnabled": true, "viewBackgroundColor": "#AFEEEE" }
+You might want to use this when you want to load excalidraw with some initial elements and app state.
+
+
+```jsx live
+function ExcalidrawWithInitialData() {
+  return (
+    <div style={{ height: "500px" }}>
+      <Excalidraw
+        initialData={{
+          elements: [
+            {
+              type: "rectangle",
+              version: 141,
+              versionNonce: 361174001,
+              isDeleted: false,
+              id: "oDVXy8D6rom3H1-LLH2-f",
+              fillStyle: "hachure",
+              strokeWidth: 1,
+              strokeStyle: "solid",
+              roughness: 1,
+              opacity: 100,
+              angle: 0,
+              x: 100.50390625,
+              y: 93.67578125,
+              strokeColor: "#000000",
+              backgroundColor: "transparent",
+              width: 186.47265625,
+              height: 141.9765625,
+              seed: 1968410350,
+              groupIds: [],
+            },
+          ],
+          appState: { zenModeEnabled: true, viewBackgroundColor: "#a5d8ff" },
+        }}
+      />
+    </div>
+  );
 }
 ```
 
-You might want to use this when you want to load excalidraw with some initial elements and app state.
 
 ### Storing custom data on Excalidraw elements
 
@@ -95,6 +105,13 @@ You can use this to add any extra information you need to keep track of.
 
 You can add `customData` to elements when passing them as `initialData`, or using [`updateScene`](#updatescene)/[`updateLibrary`](#updatelibrary) afterwards.
 
+```js showLineNumbers
+{
+  type: "rectangle",
+  id: "oDVXy8D6rom3H1-LLH2-f",
+  customData: {customId: '162'},
+}
+```
 ### ref
 
 You can pass a `ref` when you want to access some excalidraw APIs. We expose the below APIs:
@@ -157,13 +174,16 @@ You can use this function to update the scene with the sceneData. It accepts the
 ### updateLibrary
 
 <pre>
-(opts: &#123;
-  libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L224">LibraryItemsSource</a>;
-  merge?: boolean;
-  prompt?: boolean;
-  openLibraryMenu?: boolean;
-  defaultStatus?: "unpublished" | "published";
-&#125;) => Promise&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>&gt;
+  (opts: &#123; libraryItems:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L224">
+    LibraryItemsSource
+  </a>
+  ; merge?: boolean; prompt?: boolean; openLibraryMenu?: boolean; defaultStatus?:
+  "unpublished" | "published"; &#125;) => Promise&lt;
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">
+    LibraryItems
+  </a>
+  &gt;
 </pre>
 
 You can use this function to update the library. It accepts the below attributes.
