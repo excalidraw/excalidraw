@@ -454,9 +454,9 @@
     },
     "defaults": {
       "menuHint": "导出、首选项……",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "center_heading": "图，化繁为简。",
+      "toolbarHint": "选择工具并开始绘图！",
+      "helpHint": "快捷键和帮助"
     }
   }
 }
