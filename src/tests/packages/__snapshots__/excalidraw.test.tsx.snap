@@ -341,6 +341,11 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
       >
         Reset the canvas
       </div>
+      <div
+        class="dropdown-menu-item__shortcut"
+      >
+        Shift+Delete
+      </div>
     </button>
     <div
       style="height: 1px; margin: .5rem 0px;"
