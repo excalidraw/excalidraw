@@ -154,9 +154,9 @@ export const actionDeleteSelected = register({
     };
   },
   contextItemLabel: "labels.delete",
-  keyTest: (event, appState, elements) => 
+  keyTest: (event, appState, elements) =>
     (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
-    (getSelectedElements(elements, appState, false).length > 0),
+    getSelectedElements(elements, appState, false).length > 0,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"

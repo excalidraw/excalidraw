@@ -88,8 +88,8 @@ export const actionClearCanvas = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event, appState, elements) => 
-    event.key === KEYS.DELETE && 
+  keyTest: (event, appState, elements) =>
+    event.key === KEYS.DELETE &&
     event.shiftKey &&
     getSelectedElements(elements, appState, false).length === 0,
 });
