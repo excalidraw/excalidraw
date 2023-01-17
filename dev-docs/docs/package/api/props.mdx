@@ -58,7 +58,6 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 
 You might want to use this when you want to load excalidraw with some initial elements and app state.
 
-
 ```jsx live
 function ExcalidrawWithInitialData() {
   return (
@@ -96,7 +95,6 @@ function ExcalidrawWithInitialData() {
 }
 ```
 
-
 ### Storing custom data on Excalidraw elements
 
 Beyond attributes that Excalidraw elements already support, you can store custom data on each element in a `customData` object. The type of the attribute is [`Record<string, any>`](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L59) and is optional.
@@ -112,6 +110,7 @@ You can add `customData` to elements when passing them as `initialData`, or usin
   customData: {customId: '162'},
 }
 ```
+
 ### ref
 
 You can pass a `ref` when you want to access some excalidraw APIs. We expose the below APIs:
@@ -141,25 +140,61 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 
 ### readyPromise
 
-```tsx
-const excalidrawRef = {
-  current: {
-    readyPromise: (
-      <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">
-        resolvablePromise
-      </a>
-    ),
-  },
-};
-```
+<pre>
+  const excalidrawRef = &#123; current:&#123; readyPromise:
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L460">
+    &nbsp;resolvablePromise
+  </a>
+  &nbsp;&#125; &#125;
+</pre>
 
-Since plain object is passed as a `ref`, the `readyPromise` is resolved as soon as the component is mounted. Most of the time you will not need this unless you have a specific use case where you can't pass the `ref` in the react way and want to do some action on the host when this promise resolves. You can check the [example](https://codesandbox.io/s/eexcalidraw-resolvable-promise-d0qg3?file=/src/App.js) for the usage.
+Since plain object is passed as a `ref`, the `readyPromise` is resolved as soon as the component is mounted. Most of the time you will not need this unless you have a specific use case where you can't pass the `ref` in the react way and want to do some action on the host when this promise resolves.
+
+```jsx showLineNumbers
+const resolvablePromise = () => {
+  let resolve;
+  let reject;
+  const promise = new Promise((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  promise.resolve = resolve;
+  promise.reject = reject;
+  return promise;
+};
+
+const App = () => {
+  const excalidrawRef = useMemo(
+    () => ({
+      current: {
+        readyPromise: resolvablePromise(),
+      },
+    }),
+    [],
+  );
+
+  useEffect(() => {
+    excalidrawRef.current.readyPromise.then((api) => {
+      console.log("loaded", api);
+    });
+  }, [excalidrawRef]);
+  return (
+    <div style={{ height: "500px" }}>
+      <Excalidraw ref={excalidrawRef} />
+    </div>
+  );
+}
+```
 
 ### updateScene
 
-```tsx
-(scene: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>) => void
-```
+<pre>
+  (scene:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">
+    sceneData
+  </a>
+  ) => void
+</pre>
 
 You can use this function to update the scene with the sceneData. It accepts the below attributes.
 
@@ -170,6 +205,62 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `collaborators` | `tsx Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L35">Collaborator></a>` | The list of collaborators to be updated in the scene. |
 | `commitToHistory` | `boolean` | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
 | `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise&lt;[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)&gt; &#124; ((currentItems: [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)>) => [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise&lt;[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)&gt;) | The `libraryItems` to be update in the scene. |
+
+```jsx live
+function ExcalidrawWithUpdateScene () {
+  const updateScene = () => {
+    const sceneData = {
+      elements: 
+        [
+          {
+            type: "rectangle",
+            version: 141,
+            versionNonce: 361174001,
+            isDeleted: false,
+            id: "oDVXy8D6rom3H1-LLH2-f",
+            fillStyle: "hachure",
+            strokeWidth: 1,
+            strokeStyle: "solid",
+            roughness: 1,
+            opacity: 100,
+            angle: 0,
+            x: 100.50390625,
+            y: 93.67578125,
+            strokeColor: "#c92a2a",
+            backgroundColor: "transparent",
+            width: 186.47265625,
+            height: 141.9765625,
+            seed: 1968410350,
+            groupIds: [],
+            boundElements: null,
+            locked: false,
+            link: null,
+            updated: 1,
+            roundness: {
+              type: 3,
+              value: 32,
+            },
+          },
+        ],
+      appState: {
+        viewBackgroundColor: "#edf2ff",
+      },
+    };
+    excalidrawAPI.updateScene(sceneData);
+  };
+  const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+  return (
+    <div style={{ height: "500px" }}>
+     <p style={{ fontSize: "16px" }}> Click to update the scene</p>
+    <button onClick={updateScene}>
+      Update Scene
+    </button>
+      <Excalidraw ref={(api) => setExcalidrawAPI(api)}/>
+    </div>
+  )
+
+}
+```
 
 ### updateLibrary
 
@@ -454,7 +545,11 @@ Enable this if you want Excalidraw to handle keyboard even if the component isn'
 This callback if supplied will get triggered when the library is updated and has the below signature.
 
 <pre>
-(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void | Promise&lt;any&gt;
+  (items:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">
+    LibraryItems
+  </a>
+  ) => void | Promise&lt;any&gt;
 </pre>
 
 It is invoked with empty items when user clears the library. You can use this callback when you want to do something additional when library is updated for example persisting it to local storage.
