@@ -231,7 +231,6 @@ import {
   setEraserCursor,
   updateActiveTool,
   getShortcutKey,
-  findLastIndex,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -2823,6 +2822,20 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private getTopLayerFrameAtSceneCoords = (sceneCoords: {
+    x: number;
+    y: number;
+  }) => {
+    const frames = this.scene
+      .getNonDeletedElements()
+      .filter((el) => el.type === "frame")
+      .filter((frame) =>
+        isCursorInFrame(sceneCoords, frame as ExcalidrawFrameElement),
+      );
+
+    return frames.length ? frames[frames.length - 1] : null;
+  };
+
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
@@ -3515,18 +3528,9 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.getNonDeletedElements(),
       this.state,
     ).filter((el) => el.type !== "frame");
-    const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
 
-    const framesContainingCursor = this.scene
-      .getNonDeletedElements()
-      .filter((el) => el.type === "frame")
-      .filter((frame) =>
-        isCursorInFrame(pointerCoords, frame as ExcalidrawFrameElement),
-      );
-    const topLayerFrame =
-      framesContainingCursor[
-        findLastIndex(framesContainingCursor, (el) => el.type === "frame")
-      ];
+    const sceneCoords = viewportCoordsToSceneCoords(event, this.state);
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
     if (topLayerFrame) {
       addElementsToFrame(nonFrameSelectedElements, topLayerFrame.id);
@@ -4318,6 +4322,12 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin.y,
       this.state.gridSize,
     );
+
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: gridX,
+      y: gridY,
+    });
+
     const element = newElement({
       type: elementType,
       x: gridX,
@@ -4338,6 +4348,7 @@ class App extends React.Component<AppProps, AppState> {
             }
           : null,
       locked: false,
+      frameId: topLayerFrame ? topLayerFrame.id : null,
     });
 
     if (element.type === "selection") {
