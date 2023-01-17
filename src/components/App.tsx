@@ -154,6 +154,7 @@ import {
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
+  ExcalidrawFrameElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -230,6 +231,7 @@ import {
   setEraserCursor,
   updateActiveTool,
   getShortcutKey,
+  findLastIndex,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -278,6 +280,11 @@ import {
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { atom } from "jotai";
 import { Fonts } from "../scene/Fonts";
+import {
+  addElementsToFrame,
+  isCursorInFrame,
+  removeElementsFromFrame,
+} from "../frame";
 
 export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
@@ -3503,6 +3510,30 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
+
+    const nonFrameSelectedElements = getSelectedElements(
+      this.scene.getNonDeletedElements(),
+      this.state,
+    ).filter((el) => el.type !== "frame");
+    const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
+
+    const framesContainingCursor = this.scene
+      .getNonDeletedElements()
+      .filter((el) => el.type === "frame")
+      .filter((frame) =>
+        isCursorInFrame(pointerCoords, frame as ExcalidrawFrameElement),
+      );
+    const topLayerFrame =
+      framesContainingCursor[
+        findLastIndex(framesContainingCursor, (el) => el.type === "frame")
+      ];
+
+    if (topLayerFrame) {
+      addElementsToFrame(nonFrameSelectedElements, topLayerFrame.id);
+    } else {
+      removeElementsFromFrame(nonFrameSelectedElements);
+    }
+
     if (this.device.isTouchScreen) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
