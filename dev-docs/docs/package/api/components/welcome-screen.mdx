@@ -10,7 +10,7 @@ You can customize the welcome screen by rendering the `WelcomeScreen` component 
 />
 
 ```jsx live
-function ExcalidrawWithMainMenuGroup() {
+function ExcalidrawWithWelcomeScreen() {
   return (
     <div style={{ height: "500px" }}>
       <Excalidraw>
@@ -54,7 +54,7 @@ There are 2 main parts:
 This is the center piece of the welcome screen, containing the `logo`, `heading`, and `menu`. All three sub-components are optional, and you can render whatever you wish into the center component.
 
 ```jsx live
-function ExcalidrawWithMainMenuGroup() {
+function ExcalidrawWithWelcomeScreenCenter() {
   return (
     <div style={{ height: "500px" }}>
       <Excalidraw>
@@ -126,7 +126,7 @@ To render an external link in a menu item, you can use this component.
 These subcomponents render the `UI hints`. Text of each hint can be customized by supplying `children`.
 
 ```jsx live
-function ExcalidrawWithMainMenuGroup() {
+function ExcalidrawWithWelcomeScreenHints() {
   return (
     <div style={{ height: "500px" }}>
       <Excalidraw>

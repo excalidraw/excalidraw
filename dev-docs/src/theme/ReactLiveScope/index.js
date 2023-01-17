@@ -13,6 +13,7 @@ const ExcalidrawScope = {
   useDevice: ExcalidrawComp.useDevice,
   MainMenu: ExcalidrawComp.MainMenu,
   WelcomeScreen: ExcalidrawComp.WelcomeScreen,
+  LiveCollaborationTrigger: ExcalidrawComp.LiveCollaborationTrigger,
 };
 
 export default ExcalidrawScope;

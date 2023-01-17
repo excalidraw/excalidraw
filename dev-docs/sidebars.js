@@ -56,6 +56,7 @@ const sidebars = {
                 "package/api/components/footer",
                 "package/api/components/main-menu",
                 "package/api/components/welcome-screen",
+                "package/api/components/live-collaboration-trigger",
               ],
             },
             {
