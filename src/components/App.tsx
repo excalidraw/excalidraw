@@ -1695,11 +1695,17 @@ class App extends React.Component<AppProps, AppState> {
         const text = line.trim();
 
         if (text.length) {
+          const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+            x,
+            y: currentY,
+          });
+
           const element = newTextElement({
             ...textElementProps,
             x,
             y: currentY,
             text,
+            frameId: topLayerFrame ? topLayerFrame.id : null,
           });
           acc.push(element);
           currentY += element.height + LINE_GAP;
@@ -2570,6 +2576,12 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
     }
+
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: sceneX,
+      y: sceneY,
+    });
+
     const element = existingTextElement
       ? existingTextElement
       : newTextElement({
@@ -2599,6 +2611,7 @@ class App extends React.Component<AppProps, AppState> {
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
           locked: false,
+          frameId: topLayerFrame ? topLayerFrame.id : null,
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {
