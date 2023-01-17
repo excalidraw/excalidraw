@@ -12,14 +12,15 @@ import { DEFAULT_UI_OPTIONS } from "../../constants";
 import { Provider } from "jotai";
 import { jotaiScope, jotaiStore } from "../../jotai";
 import Footer from "../../components/footer/FooterCenter";
-import MainMenu from "../../components/mainMenu/MainMenu";
+import MainMenu from "../../components/main-menu/MainMenu";
+import WelcomeScreen from "../../components/welcome-screen/WelcomeScreen";
+import LiveCollaborationTrigger from "../../components/live-collaboration/LiveCollaborationTrigger";
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
     onChange,
     initialData,
     excalidrawRef,
-    onCollabButtonClick,
     isCollaborating = false,
     onPointerUpdate,
     renderTopRightUI,
@@ -52,6 +53,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
       ...DEFAULT_UI_OPTIONS.canvasActions,
       ...canvasActions,
     },
+    welcomeScreen: props.UIOptions?.welcomeScreen ?? true,
   };
 
   if (canvasActions?.export) {
@@ -92,7 +94,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onChange={onChange}
           initialData={initialData}
           excalidrawRef={excalidrawRef}
-          onCollabButtonClick={onCollabButtonClick}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
           renderTopRightUI={renderTopRightUI}
@@ -162,7 +163,7 @@ const areEqual = (
       const canvasOptionKeys = Object.keys(
         prevUIOptions.canvasActions!,
       ) as (keyof Partial<typeof DEFAULT_UI_OPTIONS.canvasActions>)[];
-      canvasOptionKeys.every((key) => {
+      return canvasOptionKeys.every((key) => {
         if (
           key === "export" &&
           prevUIOptions?.canvasActions?.export &&
@@ -179,7 +180,7 @@ const areEqual = (
         );
       });
     }
-    return true;
+    return prevUIOptions[key] === nextUIOptions[key];
   });
 
   return isUIOptionsSame && isShallowEqual(prev, next);
@@ -239,6 +240,9 @@ export {
 } from "../../utils";
 
 export { Sidebar } from "../../components/Sidebar/Sidebar";
+export { Button } from "../../components/Button";
 export { Footer };
 export { MainMenu };
 export { useDevice } from "../../components/App";
+export { WelcomeScreen };
+export { LiveCollaborationTrigger };

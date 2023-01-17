@@ -287,7 +287,6 @@ export interface ExcalidrawProps {
     | null
     | Promise<ExcalidrawInitialDataState | null>;
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
-  onCollabButtonClick?: () => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
     pointer: { x: number; y: number };
@@ -313,10 +312,7 @@ export interface ExcalidrawProps {
     elements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
   ) => JSX.Element;
-  UIOptions?: {
-    dockedSidebarBreakpoint?: number;
-    canvasActions?: CanvasActions;
-  };
+  UIOptions?: Partial<UIOptions>;
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
@@ -373,23 +369,31 @@ export type ExportOpts = {
 // truthiness value will determine whether the action is rendered or not
 // (see manager renderAction). We also override canvasAction values in
 // excalidraw package index.tsx.
-type CanvasActions = {
-  changeViewBackgroundColor?: boolean;
-  clearCanvas?: boolean;
-  export?: false | ExportOpts;
-  loadScene?: boolean;
-  saveToActiveFile?: boolean;
-  toggleTheme?: boolean | null;
-  saveAsImage?: boolean;
-};
+type CanvasActions = Partial<{
+  changeViewBackgroundColor: boolean;
+  clearCanvas: boolean;
+  export: false | ExportOpts;
+  loadScene: boolean;
+  saveToActiveFile: boolean;
+  toggleTheme: boolean | null;
+  saveAsImage: boolean;
+}>;
+
+type UIOptions = Partial<{
+  dockedSidebarBreakpoint: number;
+  welcomeScreen: boolean;
+  canvasActions: CanvasActions;
+}>;
 
 export type AppProps = Merge<
   ExcalidrawProps,
   {
-    UIOptions: {
-      canvasActions: Required<CanvasActions> & { export: ExportOpts };
-      dockedSidebarBreakpoint?: number;
-    };
+    UIOptions: Merge<
+      MarkRequired<UIOptions, "welcomeScreen">,
+      {
+        canvasActions: Required<CanvasActions> & { export: ExportOpts };
+      }
+    >;
     detectScroll: boolean;
     handleKeyboardGlobally: boolean;
     isCollaborating: boolean;
@@ -517,7 +521,31 @@ export type Device = Readonly<{
 }>;
 
 export type UIChildrenComponents = {
-  [k in "FooterCenter" | "Menu"]?:
-    | React.ReactPortal
-    | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>;
+  [k in "FooterCenter" | "Menu" | "WelcomeScreen"]?: React.ReactElement<
+    { children?: React.ReactNode },
+    React.JSXElementConstructor<any>
+  >;
+};
+
+export type UIWelcomeScreenComponents = {
+  [k in
+    | "Center"
+    | "MenuHint"
+    | "ToolbarHint"
+    | "HelpHint"]?: React.ReactElement<
+    { children?: React.ReactNode },
+    React.JSXElementConstructor<any>
+  >;
+};
+
+export type UIWelcomeScreenCenterComponents = {
+  [k in
+    | "Logo"
+    | "Heading"
+    | "Menu"
+    | "MenuItemLoadScene"
+    | "MenuItemHelp"]?: React.ReactElement<
+    { children?: React.ReactNode },
+    React.JSXElementConstructor<any>
+  >;
 };

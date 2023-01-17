@@ -408,7 +408,7 @@
     pointer-events: all;
 
     &:hover {
-      background-color: var(--button-hover);
+      background-color: var(--button-hover-bg);
     }
 
     &:active {
@@ -540,9 +540,9 @@
   }
 
   .mobile-misc-tools-container {
-    position: fixed;
-    top: 5rem;
-    right: 0;
+    position: absolute;
+    top: calc(5rem - var(--editor-container-padding));
+    right: calc(var(--editor-container-padding) * -1);
     display: flex;
     flex-direction: column;
     border: 1px solid var(--sidebar-border-color);
