@@ -4182,6 +4182,11 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
 
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: gridX,
+      y: gridY,
+    });
+
     const element = newImageElement({
       type: "image",
       x: gridX,
@@ -4195,6 +4200,7 @@ class App extends React.Component<AppProps, AppState> {
       roundness: null,
       opacity: this.state.currentItemOpacity,
       locked: false,
+      frameId: topLayerFrame ? topLayerFrame.id : null,
     });
 
     return element;
