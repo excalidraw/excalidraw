@@ -4276,6 +4276,13 @@ class App extends React.Component<AppProps, AppState> {
         this.state.gridSize,
       );
 
+      // TODO: frame, linear elements takes extra care, what we have here
+      // is an extremely simplification
+      const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+        x: gridX,
+        y: gridY,
+      });
+
       /* If arrow is pre-arrowheads, it will have undefined for both start and end arrowheads.
       If so, we want it to be null for start and "arrow" for end. If the linear item is not
       an arrow, we want it to be null for both. Otherwise, we want it to use the
@@ -4305,6 +4312,7 @@ class App extends React.Component<AppProps, AppState> {
         startArrowhead,
         endArrowhead,
         locked: false,
+        frameId: topLayerFrame ? topLayerFrame.id : null,
       });
       this.setState((prevState) => ({
         selectedElementIds: {
