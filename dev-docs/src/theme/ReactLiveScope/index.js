@@ -1,5 +1,6 @@
 import React from "react";
 import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
+
 let ExcalidrawComp = {};
 if (ExecutionEnvironment.canUseDOM) {
   ExcalidrawComp = require("@excalidraw/excalidraw");
