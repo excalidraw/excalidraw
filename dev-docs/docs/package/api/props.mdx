@@ -5,7 +5,6 @@
 | [`onChange`](#onchange) | Function |  | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
 | [`initialData`](#initialdata) | <code>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a> } </code> | null | The initial data with which app loads. |
 | [`ref`](#ref) | [`createref`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) &#124; [`useRef`](https://reactjs.org/docs/hooks-reference.html#useref) &#124; [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) &#124; <code>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</code> |  | Ref to be passed to Excalidraw |
-| [`onCollabButtonClick`](#oncollabbuttonclick) | Function |  | Callback to be triggered when the collab button is clicked |
 | [`isCollaborating`](#iscollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
 | [`onPointerUpdate`](#onpointerupdate) | Function |  | Callback triggered when mouse pointer is updated. |
 | [`langCode`](#langcode) | string | `en` | Language code string |
@@ -294,10 +293,6 @@ You can use this function to update the library. It accepts the below attributes
 ```
 
 Adds supplied files data to the `appState.files` cache on top of existing files present in the cache.
-
-### onCollabButtonClick
-
-This callback is triggered when clicked on the collab button in excalidraw. If not supplied, the collab dialog button is not rendered.
 
 ### isCollaborating
 
