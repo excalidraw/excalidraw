@@ -13,7 +13,7 @@ These are pure Javascript functions exported from the package [`@excalidraw/exca
 ```tsx
 serializeAsJSON({
   elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>,
-  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>,
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>,
 }): string
 ```
 
@@ -91,7 +91,7 @@ excalidrawAPI.updateScene(scene);
 ```tsx
 loadFromBlob(
   blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,
-  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a> | null,
+  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a> | null,
   localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null,
   fileHandle?: FileSystemHandle | null
 ) => Promise<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L53">RestoredDataState</a>>
@@ -119,7 +119,7 @@ if (contents.type === MIME_TYPES.excalidraw) {
 ```tsx
 loadSceneOrLibraryFromBlob(
   blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,
-  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a> | null,
+  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a> | null,
   localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null,
   fileHandle?: FileSystemHandle | null
 ) => Promise<{ type: string, data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L53">RestoredDataState</a> | <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L33">ImportedLibraryState</a>}>
@@ -243,7 +243,7 @@ import { sceneCoordsToViewportCoords } from "@excalidraw/excalidraw";
 **_Signature_**
 
 ```tsx
-sceneCoordsToViewportCoords({sceneX: number, sceneY: number}, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>): {x: number, y: number}
+sceneCoordsToViewportCoords({sceneX: number, sceneY: number}, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>): {x: number, y: number}
 ```
 
 This function returns equivalent viewport coords for the provided scene coords in params.
@@ -257,7 +257,7 @@ import { viewportCoordsToSceneCoords } from "@excalidraw/excalidraw";
 **_Signature_**
 
 ```tsx
-viewportCoordsToSceneCoords({clientX: number, clientY: number}, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>): {x: number, y: number}
+viewportCoordsToSceneCoords({clientX: number, clientY: number}, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>): {x: number, y: number}
 ```
 
 This function returns equivalent scene coords for the provided viewport coords in params.
