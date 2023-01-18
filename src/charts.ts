@@ -138,7 +138,7 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
     .map((line) => line.trim().split("\t"));
 
   // Check for comma separated files
-  if (lines.length && lines[0].includes(",")) {
+  if (lines.length && lines[0][0].includes(",")) {
     lines = text
       .trim()
       .split("\n")
@@ -507,7 +507,6 @@ const table = (
     Math.max(...spreadsheet.cells!.flat().map((element) => element.length)) *
     cellHeight;
 
-  // fix csv
   const columns = new Array(numberOfColumns).fill(true).map((_, i) =>
     newLinearElement({
       backgroundColor,
