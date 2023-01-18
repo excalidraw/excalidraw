@@ -45,3 +45,14 @@
 pre a {
   color: #5dccff;
 }
+
+.custom-button {
+  height: 40px;
+  max-width: 200px;
+  margin: 10px 0;
+  padding: 5px;
+  background: #70b1ec;
+  color: white;
+  font-weight: bold;
+  border: none;
+}

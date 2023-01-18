@@ -136,7 +136,7 @@ function ExcalidrawWithUpdateScene() {
   return (
     <div style={{ height: "500px" }}>
       <p style={{ fontSize: "16px" }}> Click to update the scene</p>
-      <button onClick={updateScene}>Update Scene</button>
+      <button className="custom-button" onClick={updateScene}>Update Scene</button>
       <Excalidraw ref={(api) => setExcalidrawAPI(api)} />
     </div>
   );
@@ -184,7 +184,7 @@ function ExcalidrawWithUpdateLibrary() {
   return (
     <div style={{ height: "500px" }}>
       <p style={{ fontSize: "16px" }}> Click to update the library items</p>
-      <button
+      <button className="custom-button"
         onClick={() => {
           const libraryItems = [
             {
