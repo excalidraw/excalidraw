@@ -50,7 +50,7 @@ const isNumericColumn = (lines: string[][], columnIndex: number) =>
 export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const numCols = cells[0].length;
 
-  if (numCols > 2) {
+  if (numCols > 2 && cells.length > 1) {
     return {
       type: VALID_SPREADSHEET,
       spreadsheet: {
