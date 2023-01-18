@@ -44,7 +44,15 @@ const sidebars = {
             id: "package/api/api-intro",
           },
           items: [
-            "package/api/props",
+            {
+              type: "category",
+              label: "Props",
+              link: {
+                type: "doc",
+                id: "package/api/props/props",
+              },
+              items: ["package/api/props/ref"],
+            },
             {
               type: "category",
               label: "Components",

@@ -12,7 +12,7 @@ These are pure Javascript functions exported from the package [`@excalidraw/exca
 
 ```tsx
 serializeAsJSON({
-  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>,
+  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>,
   appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a>,
 }): string
 ```
@@ -40,7 +40,7 @@ If you want to overwrite the source field in the JSON string, you can set `windo
 
 ```tsx
 import { getSceneVersion } from "@excalidraw/excalidraw";
-getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a>)
+getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>)
 ```
 
 This function returns the current scene version.
@@ -50,7 +50,7 @@ This function returns the current scene version.
 **_Signature_**
 
 ```tsx
-isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement</a>): boolean
+isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement</a>): boolean
 ```
 
 **How to use**
@@ -92,7 +92,7 @@ excalidrawAPI.updateScene(scene);
 loadFromBlob(
   blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,
   localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a> | null,
-  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a> | null,
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null,
   fileHandle?: FileSystemHandle | null
 ) => Promise<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L53">RestoredDataState</a>>
 ```
@@ -120,7 +120,7 @@ if (contents.type === MIME_TYPES.excalidraw) {
 loadSceneOrLibraryFromBlob(
   blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,
   localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L79">AppState</a> | null,
-  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L106">ExcalidrawElement[]</a> | null,
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null,
   fileHandle?: FileSystemHandle | null
 ) => Promise<{ type: string, data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L53">RestoredDataState</a> | <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L33">ImportedLibraryState</a>}>
 ```

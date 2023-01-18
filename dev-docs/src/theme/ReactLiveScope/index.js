@@ -1,5 +1,6 @@
 import React from "react";
 import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
+import initialData from "@site/src/initialData";
 
 let ExcalidrawComp = {};
 if (ExecutionEnvironment.canUseDOM) {
@@ -15,6 +16,7 @@ const ExcalidrawScope = {
   MainMenu: ExcalidrawComp.MainMenu,
   WelcomeScreen: ExcalidrawComp.WelcomeScreen,
   LiveCollaborationTrigger: ExcalidrawComp.LiveCollaborationTrigger,
+  initialData,
 };
 
 export default ExcalidrawScope;
