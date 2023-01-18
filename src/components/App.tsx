@@ -539,6 +539,44 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  private renderFrameNames = () => {
+    return this.getFrames().map((f) => {
+      const { x, y } = sceneCoordsToViewportCoords(
+        { sceneX: f.x, sceneY: f.y },
+        this.state,
+      );
+
+      const FRAME_NAME_GAP = 20;
+
+      return (
+        <div
+          id={f.id}
+          key={f.id}
+          style={{
+            top: `${y - FRAME_NAME_GAP - this.state.offsetTop}px`,
+            left: `${x - this.state.offsetLeft}px`,
+            position: "absolute",
+            zIndex: 9999999999999999,
+            fontFamily: "virgil",
+            fontSize: "14px",
+          }}
+          className="frame-title"
+          onPointerDown={(event) => {
+            event.preventDefault();
+
+            this.setState({
+              selectedElementIds: {
+                [f.id]: true,
+              },
+            });
+          }}
+        >
+          {f.name}
+        </div>
+      );
+    });
+  };
+
   public render() {
     const selectedElement = getSelectedElements(
       this.scene.getNonDeletedElements(),
@@ -637,6 +675,7 @@ class App extends React.Component<AppProps, AppState> {
             </ExcalidrawSetAppStateContext.Provider>
           </DeviceContext.Provider>
         </ExcalidrawContainerContext.Provider>
+        {this.renderFrameNames()}
       </div>
     );
   }
@@ -2839,12 +2878,9 @@ class App extends React.Component<AppProps, AppState> {
     x: number;
     y: number;
   }) => {
-    const frames = this.scene
-      .getNonDeletedElements()
-      .filter((el) => el.type === "frame")
-      .filter((frame) =>
-        isCursorInFrame(sceneCoords, frame as ExcalidrawFrameElement),
-      );
+    const frames = this.getFrames().filter((frame) =>
+      isCursorInFrame(sceneCoords, frame as ExcalidrawFrameElement),
+    );
 
     return frames.length ? frames[frames.length - 1] : null;
   };
@@ -3172,11 +3208,7 @@ class App extends React.Component<AppProps, AppState> {
             )) &&
           !hitElement?.locked
         ) {
-          if (hitElement?.type === "text" && hitElement.isFrameName) {
-            setCursor(this.canvas, CURSOR_TYPE.AUTO);
-          } else {
-            setCursor(this.canvas, CURSOR_TYPE.MOVE);
-          }
+          setCursor(this.canvas, CURSOR_TYPE.MOVE);
         }
       } else {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
@@ -3732,7 +3764,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private initialPointerDownState(
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event:
+      | React.PointerEvent<HTMLCanvasElement>
+      | React.PointerEvent<HTMLDivElement>,
   ): PointerDownState {
     const origin = viewportCoordsToSceneCoords(event, this.state);
     const selectedElements = getSelectedElements(
@@ -3943,16 +3977,16 @@ class App extends React.Component<AppProps, AppState> {
           );
 
         // alter hitElement when working with a frame text to control frame box
-        if (
-          pointerDownState.hit.element &&
-          pointerDownState.hit.element.type === "text" &&
-          pointerDownState.hit.element.isFrameName &&
-          pointerDownState.hit.element.frameId
-        ) {
-          pointerDownState.hit.element = this.scene.getElement(
-            pointerDownState.hit.element.frameId,
-          );
-        }
+        // if (
+        //   pointerDownState.hit.element &&
+        //   pointerDownState.hit.element.type === "text" &&
+        //   pointerDownState.hit.element.isFrameName &&
+        //   pointerDownState.hit.element.frameId
+        // ) {
+        //   pointerDownState.hit.element = this.scene.getElement(
+        //     pointerDownState.hit.element.frameId,
+        //   );
+        // }
 
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
@@ -4396,6 +4430,14 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private getFrames = () => {
+    return this.scene
+      .getNonDeletedElements()
+      .filter(
+        (e) => e.type === "frame",
+      ) as NonDeleted<ExcalidrawFrameElement>[];
+  };
+
   private createFrameElementOnPointerDown = (
     pointerDownState: PointerDownState,
   ): void => {
@@ -4404,6 +4446,8 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin.y,
       this.state.gridSize,
     );
+
+    const frames = this.getFrames();
 
     const frame = newFrameElement({
       x: gridX,
@@ -4422,33 +4466,11 @@ class App extends React.Component<AppProps, AppState> {
             }
           : null,
       locked: false,
-    });
-
-    // TODO: frame, extract settings
-    const text = newTextElement({
-      x: gridX,
-      y: gridY - 25,
-      strokeColor: "#495057",
-      backgroundColor: "",
-      fillStyle: "solid",
-      strokeWidth: 1,
-      strokeStyle: "solid",
-      roundness: null,
-      roughness: this.state.currentItemRoughness,
-      opacity: 100,
-      text: "Frame",
-      fontSize: 14,
-      fontFamily: 1,
-      textAlign: "left",
-      verticalAlign: DEFAULT_VERTICAL_ALIGN,
-      locked: false,
-      isFrameName: true,
-      frameId: frame.id,
+      name: `Frame ${frames.length + 1}`,
     });
 
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
-      text,
       frame,
     ]);
 

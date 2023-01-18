@@ -176,7 +176,6 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || element.text,
-        isFrameName: element.isFrameName || false,
       });
 
       if (refreshDimensions) {
@@ -245,7 +244,9 @@ const restoreElement = (
     case "diamond":
       return restoreElementWithProperties(element, {});
     case "frame":
-      return restoreElementWithProperties(element, {});
+      return restoreElementWithProperties(element, {
+        name: element.name ?? "Frame",
+      });
 
     // Don't use default case so as to catch a missing an element type case.
     // We also don't want to throw, but instead return void so we filter

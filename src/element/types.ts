@@ -100,6 +100,7 @@ export type InitializedExcalidrawImageElement = MarkNonNullable<
 
 export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
   type: "frame";
+  name: string;
 };
 
 /**
@@ -141,7 +142,6 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
-    isFrameName?: boolean;
   }>;
 
 export type ExcalidrawBindableElement =
