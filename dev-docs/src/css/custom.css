@@ -41,3 +41,7 @@
 [data-theme="dark"] .navbar__logo {
   filter: invert(93%) hue-rotate(180deg);
 }
+
+pre a {
+    color: #5dccff;
+}
