@@ -82,6 +82,7 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
         title: hasHeader ? cells[0][0] : null,
         labels: null,
         values: values as number[],
+        cells,
       },
     };
   }
@@ -109,6 +110,7 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
       title: hasHeader ? cells[0][valueColumnIndex] : null,
       labels: rows.map((row) => row[labelColumnIndex]),
       values: rows.map((row) => tryParseNumber(row[valueColumnIndex])!),
+      cells,
     },
   };
 };
