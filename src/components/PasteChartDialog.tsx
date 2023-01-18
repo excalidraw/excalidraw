@@ -112,16 +112,26 @@ export const PasteChartDialog = ({
       autofocus={false}
     >
       <div className={"container"}>
+        {appState.pasteDialog.data?.values && (
+          <>
+            <ChartPreviewBtn
+              chartType="bar"
+              spreadsheet={appState.pasteDialog.data}
+              selected={appState.currentChartType === "bar"}
+              onClick={handleChartClick}
+            />
+            <ChartPreviewBtn
+              chartType="line"
+              spreadsheet={appState.pasteDialog.data}
+              selected={appState.currentChartType === "line"}
+              onClick={handleChartClick}
+            />
+          </>
+        )}
         <ChartPreviewBtn
-          chartType="bar"
+          chartType="table"
           spreadsheet={appState.pasteDialog.data}
-          selected={appState.currentChartType === "bar"}
-          onClick={handleChartClick}
-        />
-        <ChartPreviewBtn
-          chartType="line"
-          spreadsheet={appState.pasteDialog.data}
-          selected={appState.currentChartType === "line"}
+          selected={appState.currentChartType === "table"}
           onClick={handleChartClick}
         />
       </div>
