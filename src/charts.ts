@@ -504,6 +504,8 @@ const table = (
   const cellWidth =
     Math.max(...spreadsheet.cells!.flat().map((element) => element.length)) *
     cellHeight;
+
+  //can't scale, fix it.
   const columns = new Array(numberOfColumns).fill(true).map((_, i) =>
     newLinearElement({
       backgroundColor,
@@ -540,20 +542,25 @@ const table = (
     }),
   );
 
-  // to do
-  //can't scale, fix it.
-  const text = newTextElement({
-    ...commonProps,
-    text: "test",
-    x: 0,
-    y: 0,
-    roundness: null,
-    strokeStyle: "solid",
-    textAlign: "center",
-    backgroundColor: "red",
-  });
+  const cellsContent = spreadsheet
+    .cells!.map((rows, i) =>
+      rows.map((content, j) =>
+        newTextElement({
+          ...commonProps,
+          groupIds: [groupId],
+          text: content,
+          x: x + j * cellWidth + cellWidth / 2,
+          y: y + i * cellHeight + cellHeight / 2,
+          roundness: null,
+          strokeStyle: "solid",
+          textAlign: "center",
+          backgroundColor,
+        }),
+      ),
+    )
+    .flat();
 
-  return [...(text ? [text] : []), ...columns, ...rows];
+  return [...columns, ...rows, ...cellsContent];
 };
 
 export const renderSpreadsheet = (
