@@ -507,7 +507,7 @@ const table = (
     Math.max(...spreadsheet.cells!.flat().map((element) => element.length)) *
     cellHeight;
 
-  //can't scale, fix it.
+  // fix csv
   const columns = new Array(numberOfColumns).fill(true).map((_, i) =>
     newLinearElement({
       backgroundColor,
@@ -519,9 +519,10 @@ const table = (
       startArrowhead: null,
       endArrowhead: null,
       strokeWidth: 2,
+      height: cellHeight * (numberOfRows - 1),
       points: [
         [0, 0],
-        [0, cellWidth],
+        [0, cellHeight * (numberOfRows - 1)],
       ],
     }),
   );
@@ -537,9 +538,10 @@ const table = (
       startArrowhead: null,
       endArrowhead: null,
       strokeWidth: 2,
+      width: cellWidth * (numberOfColumns - 1),
       points: [
-        [cellWidth * (numberOfColumns - 1), 0],
         [0, 0],
+        [cellWidth * (numberOfColumns - 1), 0],
       ],
     }),
   );
