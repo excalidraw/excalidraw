@@ -454,7 +454,7 @@
     },
     "defaults": {
       "menuHint": "エクスポート、設定、その他...",
-      "center_heading": "",
+      "center_heading": "ダイアグラムを簡単に。",
       "toolbarHint": "ツールを選んで描き始めよう！",
       "helpHint": "ショートカットとヘルプ"
     }
