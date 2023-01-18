@@ -505,7 +505,7 @@ const table = (
   const cellHeight = commonProps.fontSize * 2;
   const cellWidth =
     Math.max(...spreadsheet.cells!.flat().map((element) => element.length)) *
-    cellHeight;
+    commonProps.fontSize;
 
   const columns = new Array(numberOfColumns).fill(true).map((_, i) =>
     newLinearElement({
