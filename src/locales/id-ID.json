@@ -202,8 +202,8 @@
     "invalidSVGString": "SVG tidak valid.",
     "cannotResolveCollabServer": "Tidak dapat terhubung ke server kolab. Muat ulang laman dan coba lagi.",
     "importLibraryError": "Tidak dapat memuat pustaka",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed": "Tidak dapat menyimpan ke dalam basis data server. Jika masih berlanjut, Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
+    "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang."
   },
   "toolBar": {
     "selection": "Pilihan",
@@ -448,15 +448,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Semua data Anda disimpan secara lokal di peramban Anda.",
+      "center_heading_plus": "Apa Anda ingin berpindah ke Excalidraw+?",
+      "menuHint": "Ekspor, preferensi, bahasa, ..."
     },
     "defaults": {
-      "menuHint": "",
+      "menuHint": "Ekspor, preferensi, dan selebihnya...",
       "center_heading": "",
       "toolbarHint": "",
-      "helpHint": ""
+      "helpHint": "Pintasan & bantuan"
     }
   }
 }
