@@ -3,6 +3,24 @@
 exports[`tryParseSpreadsheet works for numbers with comma in them 1`] = `
 Object {
   "spreadsheet": Object {
+    "cells": Array [
+      Array [
+        "Week Index",
+        "Users",
+      ],
+      Array [
+        "Week 1",
+        "814",
+      ],
+      Array [
+        "Week 2",
+        "10,301",
+      ],
+      Array [
+        "Week 3",
+        "4,264",
+      ],
+    ],
     "labels": Array [
       "Week 1",
       "Week 2",
