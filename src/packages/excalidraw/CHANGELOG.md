@@ -15,6 +15,8 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Adding option to paste tabular data as a rough table [issue] (https://github.com/excalidraw/excalidraw/issues/3762) [#6133](https://github.com/excalidraw/excalidraw/pull/6133)
+
 - Support customization for the editor [welcome screen](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#WelcomeScreen) [#6048](https://github.com/excalidraw/excalidraw/pull/6048).
 
 - Expose component API for the Excalidraw main menu [#6034](https://github.com/excalidraw/excalidraw/pull/6034), You can read more about its usage [here](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#MainMenu)
