@@ -70,3 +70,26 @@ pre a {
   --color-primary-darkest: #e86e99;
   --color-primary-light: #dcbec9;
 }
+
+/* The global css conflicts with Excal css hence overriding */
+
+.excalidraw .context-menu-item__shortcut {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+.excalidraw .Stats table td,
+.excalidraw .Stats table th,
+.excalidraw .Stats table tr {
+  border: none;
+  background: none;
+  padding: 0;
+}
+.excalidraw .Stats .close {
+  padding: 0;
+}
+
+.excalidraw .Stats table {
+  display: table;
+}

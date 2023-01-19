@@ -8,9 +8,9 @@
 | [`isCollaborating`](#iscollaborating) | `boolean` | _ | This indicates if the app is in collaboration mode |
 | [`onPointerUpdate`](#onpointerupdate) | `function` | _ | Callback triggered when mouse pointer is updated. |
 | [`langCode`](#langcode) | `string` | `en` | Language code string |
-| [`renderTopRightUI`](#rendertoprightui) | `function` | _ | Function that renders custom UI in top right corner |
-| [`renderCustomStats`](#rendercustomstats) | `function` | _ | Function that can be used to render custom stats on the stats dialog. |
-| [`renderSidebar`](#rendersidebar) | `function` | _ | Render function that renders custom sidebar. |
+| [`renderTopRightUI`](/docs/package/api/props/render-props#rendertoprightui) | `function` | _ | Function that renders custom UI in top right corner |
+| [`renderCustomStats`](/docs/package/api/props/render-props#rendercustomstats) | `function` | _ | Function that can be used to render custom stats on the stats dialog. |
+| [`renderSidebar`](/docs/package/api/props/render-props#rendersidebar) | `function` | _ | Render function that renders custom sidebar. |
 | [`viewModeEnabled`](#viewmodeenabled) | `boolean` | _ | This indicates if the app is in view mode. |
 | [`zenModeEnabled`](#zenmodeenabled) | `boolean` | _ | This indicates if the zen mode is enabled |
 | [`gridModeEnabled`](#gridmodeenabled) | `boolean` | _ | This indicates if the grid mode is enabled |
@@ -97,50 +97,6 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 | --- | --- |
 | `defaultLang` | `string` |
 | `languages` | [`Language[]`](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L15) |
-
-### renderTopRightUI
-
-<pre>
-(isMobile: boolean, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>) => JSX | null
-</pre>
-
-A function returning JSX to render custom UI in the top right corner of the app.
-
-### renderCustomStats
-
-A function that can be used to render custom stats (returns JSX) in the nerd stats dialog. For example you can use this prop to render the size of the elements in the storage.
-
-### renderSidebar
-
-```tsx
-() => JSX | null;
-```
-
-Optional function that can render custom sidebar. This sidebar is the same that the library menu sidebar is using, and can be used for any purposes your app needs. The render function should return a `<Sidebar>` instance — a component that is exported from the Excalidraw package. It accepts `children` which can be any content you like to render inside.
-
-The `<Sidebar>` component takes these props (all are optional except `children`):
-
-| name | type | description |
-| --- | --- | --- |
-| className | string |
-| children | `tsxReact.ReactNode` | Content you want to render inside the sidebar. |
-| onClose | `tsx() => void` | Invoked when the component is closed (by user, or the editor). No need to act on this event, as the editor manages the sidebar open state on its own. |
-| onDock | `tsx(isDocked: boolean) => void` | Invoked when the user toggles the dock button. |
-| docked | boolean | Indicates whether the sidebar is docked. By default, the sidebar is undocked. If passed, the docking becomes controlled, and you are responsible for updating the `docked` state by listening on `onDock` callback. See [here](#dockedsidebarbreakpoint) for more info docking. |
-| dockable | boolean | Indicates whether the sidebar can be docked by user (=the dock button is shown). If `false`, you can still dock programmatically by passing `docked=true` |
-
-The sidebar will always include a header with close/dock buttons (when applicable).
-
-You can also add custom content to the header, by rendering `<Sidebar.Header>` as a child of the `<Sidebar>` component. Note that the custom header will still include the default buttons.
-
-The `<Sidebar.Header>` component takes these props children (all are optional):
-
-| name | type | description |
-| --- | --- | --- |
-| className | string |
-| children | `tsx React.ReactNode` | Content you want to render inside the sidebar header, sibling of the header buttons. |
-
-For example code, see the example [`App.tsx`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/example/App.tsx#L524) file.
 
 ### viewModeEnabled
 
