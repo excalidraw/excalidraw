@@ -454,8 +454,8 @@
     },
     "defaults": {
       "menuHint": "Ekspor, preferensi, dan selebihnya...",
-      "center_heading": "",
-      "toolbarHint": "",
+      "center_heading": "Diagram. Menjadi. Mudah.",
+      "toolbarHint": "Pilih alat & mulai menggambar!",
       "helpHint": "Pintasan & bantuan"
     }
   }
