@@ -51,7 +51,11 @@ const sidebars = {
                 type: "doc",
                 id: "package/api/props/props",
               },
-              items: ["package/api/props/ref", "package/api/props/ui-options"],
+              items: [
+                "package/api/props/ref",
+                "package/api/props/ui-options",
+                "package/api/props/initialdata",
+              ],
             },
             {
               type: "category",

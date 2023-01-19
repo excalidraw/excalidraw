@@ -3,17 +3,17 @@
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | [`onChange`](#onchange) | `function` | _ | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
-| [`initialData`](#initialdata) |  `function` | `null` | The initial data with which app loads. |
+| [`initialData`](/docs/package/api/props/initialdata) |  `object` &#124; `null` &#124; <code>Promise<object &#124; null></code> | `null` | The initial data with which app loads. |
 | [`ref`](/docs/package/api/props/ref) | `object` | _ | Ref to be passed to Excalidraw |
-| [`isCollaborating`](#iscollaborating) | `boolean` | _ | This implies if the app is in collaboration mode |
+| [`isCollaborating`](#iscollaborating) | `boolean` | _ | This indicates if the app is in collaboration mode |
 | [`onPointerUpdate`](#onpointerupdate) | `function` | _ | Callback triggered when mouse pointer is updated. |
 | [`langCode`](#langcode) | `string` | `en` | Language code string |
 | [`renderTopRightUI`](#rendertoprightui) | `function` | _ | Function that renders custom UI in top right corner |
 | [`renderCustomStats`](#rendercustomstats) | `function` | _ | Function that can be used to render custom stats on the stats dialog. |
 | [`renderSidebar`](#rendersidebar) | `function` | _ | Render function that renders custom sidebar. |
-| [`viewModeEnabled`](#viewmodeenabled) | `boolean` | _ | This implies if the app is in view mode. |
-| [`zenModeEnabled`](#zenmodeenabled) | `boolean` | _ | This implies if the zen mode is enabled |
-| [`gridModeEnabled`](#gridmodeenabled) | `boolean` | _ | This implies if the grid mode is enabled |
+| [`viewModeEnabled`](#viewmodeenabled) | `boolean` | _ | This indicates if the app is in view mode. |
+| [`zenModeEnabled`](#zenmodeenabled) | `boolean` | _ | This indicates if the zen mode is enabled |
+| [`gridModeEnabled`](#gridmodeenabled) | `boolean` | _ | This indicates if the grid mode is enabled |
 | [`libraryReturnUrl`](#libraryreturnurl) | `string` | _ | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | `"light"` &#124; `"dark"` | `"light"` | The theme of the Excalidraw component |
 | [`name`](#name) | `string` |  | Name of the drawing |
@@ -22,10 +22,26 @@
 | [`detectScroll`](#detectscroll) | `boolean` | `true` | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
 | [`onLibraryChange`](#onlibrarychange) | `object` | _ | The callback if supplied is triggered when the library is updated and receives the library items. |
-| [`autoFocus`](#autofocus) | `boolean` | `false` | Implies whether to focus the Excalidraw component on page load |
+| [`autoFocus`](#autofocus) | `boolean` | `false` | indicates whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateidforfile) | `function` | _ | Allows you to override `id` generation for files added on canvas |
 | [`onPointerDown`](#onpointerdown) | `function` | _ | This prop if passed gets triggered on pointer down evenets |
 | [`onScrollChange`](#onscrollchange) | `function` | _ | This prop if passed gets triggered when scrolling the canvas. |
+
+### Storing custom data on Excalidraw elements
+
+Beyond attributes that Excalidraw elements already support, you can store `custom` data on each `element` in a `customData` object. The type of the attribute is [`Record<string, any>`](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L59) and is optional.
+
+You can use this to add any extra information you need to keep track of.
+
+You can add `customData` to elements when passing them as [`initialData`](/docs/package/api/props/initialdata), or using [`updateScene`](/docs/package/api/props/ref#updatescene) / [`updateLibrary`](/docs/package/api/props/ref#updatelibrary) afterwards.
+
+```js showLineNumbers
+{
+  type: "rectangle",
+  id: "oDVXy8D6rom3H1-LLH2-f",
+  customData: {customId: '162'},
+}
+```
 
 ### onChange
 
@@ -43,83 +59,9 @@ Every time component updates, this callback if passed will get triggered and has
 
 Here you can try saving the data to your backend or local storage for example.
 
-### initialData
-
-<pre>
-&#123; elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a> &#125;
-</pre>
-
-This helps to load Excalidraw with `initialData`. It must be an object or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to an object containing the below optional fields.
-
-| Name | Type | Description |
-| --- | --- | --- |
-| `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114) | The elements with which Excalidraw should be mounted. |
-| `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95) | The App state with which Excalidraw should be mounted. |
-| `scrollToContent` | boolean | This attribute implies whether to scroll to the nearest element to center once Excalidraw is mounted. By default, it will not scroll the nearest element to the center. Make sure you pass `initialData.appState.scrollX` and `initialData.appState.scrollY` when `scrollToContent` is false so that scroll positions are retained |
-| `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200) &#124; Promise&lt;[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)&gt; | This library items with which Excalidraw should be mounted. |
-| `files` | [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) | The files added to the scene. |
-
-You might want to use this when you want to load excalidraw with some initial elements and app state.
-
-```jsx live
-function ExcalidrawWithInitialData() {
-  return (
-    <div style={{ height: "500px" }}>
-      <Excalidraw
-        initialData={{
-          elements: [
-            {
-              type: "rectangle",
-              version: 141,
-              versionNonce: 361174001,
-              isDeleted: false,
-              id: "oDVXy8D6rom3H1-LLH2-f",
-              fillStyle: "hachure",
-              strokeWidth: 1,
-              strokeStyle: "solid",
-              roughness: 1,
-              opacity: 100,
-              angle: 0,
-              x: 100.50390625,
-              y: 93.67578125,
-              strokeColor: "#000000",
-              backgroundColor: "transparent",
-              width: 186.47265625,
-              height: 141.9765625,
-              seed: 1968410350,
-              groupIds: [],
-            },
-          ],
-          appState: { zenModeEnabled: true, viewBackgroundColor: "#a5d8ff" },
-        }}
-      />
-    </div>
-  );
-}
-```
-
-### Storing custom data on Excalidraw elements
-
-Beyond attributes that Excalidraw elements already support, you can store custom data on each element in a `customData` object. The type of the attribute is [`Record<string, any>`](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L59) and is optional.
-
-You can use this to add any extra information you need to keep track of.
-
-You can add `customData` to elements when passing them as `initialData`, or using [`updateScene`](#updatescene)/[`updateLibrary`](#updatelibrary) afterwards.
-
-```js showLineNumbers
-{
-  type: "rectangle",
-  id: "oDVXy8D6rom3H1-LLH2-f",
-  customData: {customId: '162'},
-}
-```
-
-
-
-
 ### isCollaborating
 
-This prop indicates if the app is in collaboration mode.
+This prop indicates if the app is in `collaboration` mode.
 
 ### onPointerUpdate
 
@@ -133,7 +75,7 @@ This callback is triggered when mouse pointer is updated.
 
 2.`button`: The position of the button. This will be one of `["down", "up"]`
 
-3.`pointersMap`: [`pointers map`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L131) of the scene
+3.`pointersMap`: [`pointers`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L131) map of the scene
 
 ```js
 (exportedElements, appState, canvas) => void
@@ -153,8 +95,8 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 
 | name | type |
 | --- | --- |
-| defaultLang | string |
-| languages | [Language[]](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L8) |
+| `defaultLang` | `string` |
+| `languages` | [`Language[]`](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L15) |
 
 ### renderTopRightUI
 
@@ -267,7 +209,7 @@ It is invoked with empty items when user clears the library. You can use this ca
 
 ### autoFocus
 
-This prop implies whether to focus the Excalidraw component on page load. Defaults to false.
+This prop indicates whether to focus the Excalidraw component on page load. Defaults to false.
 
 ### generateIdForFile
 
