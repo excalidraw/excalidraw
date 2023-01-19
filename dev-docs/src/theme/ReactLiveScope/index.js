@@ -16,6 +16,7 @@ const ExcalidrawScope = {
   MainMenu: ExcalidrawComp.MainMenu,
   WelcomeScreen: ExcalidrawComp.WelcomeScreen,
   LiveCollaborationTrigger: ExcalidrawComp.LiveCollaborationTrigger,
+  Sidebar: ExcalidrawComp.Sidebar,
   initialData,
 };
 
