@@ -5,7 +5,8 @@ export const hasBackground = (type: string) =>
   type === "ellipse" ||
   type === "diamond" ||
   type === "line" ||
-  type === "freedraw";
+  type === "freedraw" ||
+  type === "frame";
 
 export const hasStrokeColor = (type: string) => type !== "image";
 
@@ -15,14 +16,16 @@ export const hasStrokeWidth = (type: string) =>
   type === "diamond" ||
   type === "freedraw" ||
   type === "arrow" ||
-  type === "line";
+  type === "line" ||
+  type === "frame";
 
 export const hasStrokeStyle = (type: string) =>
   type === "rectangle" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "arrow" ||
-  type === "line";
+  type === "line" ||
+  type === "frame";
 
 export const canChangeRoundness = (type: string) =>
   type === "rectangle" ||
