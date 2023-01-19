@@ -135,6 +135,7 @@ import {
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
+  isFrameElement,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -4433,9 +4434,7 @@ class App extends React.Component<AppProps, AppState> {
   private getFrames = () => {
     return this.scene
       .getNonDeletedElements()
-      .filter(
-        (e) => e.type === "frame",
-      ) as NonDeleted<ExcalidrawFrameElement>[];
+      .filter((e) => isFrameElement(e)) as NonDeleted<ExcalidrawFrameElement>[];
   };
 
   private createFrameElementOnPointerDown = (
@@ -4688,8 +4687,8 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        const selectedElementsHasAFrame = selectedElements.find(
-          (e) => e.type === "frame",
+        const selectedElementsHasAFrame = selectedElements.find((e) =>
+          isFrameElement(e),
         );
         const topLayerFrame = this.getTopLayerFrameAtSceneCoords(pointerCoords);
         this.setState({

@@ -7,6 +7,7 @@ import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
 import Scene from "../scene/Scene";
+import { isFrameElement } from "./typeChecks";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -24,7 +25,7 @@ export const dragSelectedElements = (
 
   let elementsToUpdate: NonDeletedExcalidrawElement[];
   const frames = selectedElements
-    .filter((e) => e.type === "frame")
+    .filter((e) => isFrameElement(e))
     .map((f) => f.id);
 
   if (frames.length > 0) {
