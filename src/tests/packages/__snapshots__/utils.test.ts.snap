@@ -35,6 +35,7 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameToHighlight": null,
   "gridSize": null,
   "isBindingEnabled": true,
   "isLoading": false,
