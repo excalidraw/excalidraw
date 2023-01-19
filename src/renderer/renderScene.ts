@@ -10,6 +10,7 @@ import {
   NonDeleted,
   GroupId,
   ExcalidrawBindableElement,
+  ExcalidrawFrameElement,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -457,6 +458,10 @@ export const _renderScene = ({
         .forEach((suggestedBinding) => {
           renderBindingHighlight(context, renderConfig, suggestedBinding!);
         });
+    }
+
+    if (appState.frameToHighlight) {
+      renderFrameHighlight(context, renderConfig, appState.frameToHighlight);
     }
     const locallySelectedElements = getSelectedElements(elements, appState);
 
@@ -971,6 +976,7 @@ const renderBindingHighlightForBindableElement = (
     case "rectangle":
     case "text":
     case "image":
+    case "frame":
       strokeRectWithRotation(
         context,
         x1 - padding,
@@ -1006,6 +1012,37 @@ const renderBindingHighlightForBindableElement = (
       );
       break;
   }
+};
+
+const renderFrameHighlight = (
+  context: CanvasRenderingContext2D,
+  renderConfig: RenderConfig,
+  frame: NonDeleted<ExcalidrawFrameElement>,
+) => {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame);
+  const width = x2 - x1;
+  const height = y2 - y1;
+  const threshold = maxBindingGap(frame, width, height);
+
+  // So that we don't overlap the element itself
+  const strokeOffset = 4;
+  context.strokeStyle = "rgba(0,0,0,.05)";
+  context.lineWidth = threshold - strokeOffset;
+  const padding = strokeOffset / 2 + threshold / 2;
+
+  context.save();
+  context.translate(renderConfig.scrollX, renderConfig.scrollY);
+  strokeRectWithRotation(
+    context,
+    x1 - padding,
+    y1 - padding,
+    width + padding * 2,
+    height + padding * 2,
+    x1 + width / 2,
+    y1 + height / 2,
+    frame.angle,
+  );
+  context.restore();
 };
 
 const renderBindingHighlightForSuggestedPointBinding = (

@@ -41,7 +41,7 @@ export const removeElementsFromFrame = (
   elements.forEach((el) => removeElementFromFrame(el));
 };
 
-// TODO: include rotation
+// TODO: include rotation when rotation is enabled
 export const isCursorInFrame = (
   cursorCoords: {
     x: number;

@@ -556,7 +556,7 @@ class App extends React.Component<AppProps, AppState> {
             top: `${y - FRAME_NAME_GAP - this.state.offsetTop}px`,
             left: `${x - this.state.offsetLeft}px`,
             position: "absolute",
-            zIndex: 9999999999999999,
+            zIndex: 2,
             fontFamily: "virgil",
             fontSize: "14px",
           }}
@@ -4683,9 +4683,20 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
           this.state,
         );
+
         if (selectedElements.every((element) => element.locked)) {
           return;
         }
+
+        const selectedElementsHasAFrame = selectedElements.find(
+          (e) => e.type === "frame",
+        );
+        const topLayerFrame = this.getTopLayerFrameAtSceneCoords(pointerCoords);
+        this.setState({
+          frameToHighlight:
+            topLayerFrame && !selectedElementsHasAFrame ? topLayerFrame : null,
+        });
+
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
         pointerDownState.drag.hasOccurred = true;
@@ -4981,6 +4992,7 @@ class App extends React.Component<AppProps, AppState> {
         isRotating: false,
         resizingElement: null,
         selectionElement: null,
+        frameToHighlight: null,
         cursorButton: "up",
         // text elements are reset on finalize, and resetting on pointerup
         // may cause issues with double taps
