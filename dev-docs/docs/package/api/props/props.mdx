@@ -17,7 +17,7 @@
 | [`libraryReturnUrl`](#libraryreturnurl) | `string` | _ | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | `"light"` &#124; `"dark"` | `"light"` | The theme of the Excalidraw component |
 | [`name`](#name) | `string` |  | Name of the drawing |
-| [`UIOptions`](#uioptions) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L143) | To customise UI options. Currently we support customising [`canvas actions`](#canvasactions) |
+| [`UIOptions`](/docs/package/api/props/ui-options) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L143) | To customise UI options. Currently we support customising [`canvas actions`](#canvasactions) |
 | [`onPaste`](#onpaste) | `function` | _ | Callback to be triggered if passed when the something is pasted in to the scene |
 | [`detectScroll`](#detectscroll) | `boolean` | `true` | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
@@ -164,11 +164,11 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 
 A function returning JSX to render custom UI in the top right corner of the app.
 
-#### renderCustomStats
+### renderCustomStats
 
 A function that can be used to render custom stats (returns JSX) in the nerd stats dialog. For example you can use this prop to render the size of the elements in the storage.
 
-#### renderSidebar
+### renderSidebar
 
 ```tsx
 () => JSX | null;
@@ -225,42 +225,6 @@ You can use [`THEME`](/docs/package/api/utils#theme) to specify the theme.
 ### name
 
 This prop sets the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
-
-### UIOptions
-
-This prop can be used to customise UI of Excalidraw. Currently we support customising [`canvasActions`](#canvasactions) and [`dockedSidebarBreakpoint`](#dockedsidebarbreakpoint). It accepts the below parameters
-
-<pre>
-&#123; canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L372">CanvasActions</a> }
-</pre>
-
-##### canvasActions
-
-| Attribute | Type | Default | Description |
-| --- | --- | --- | --- |
-| `changeViewBackgroundColor` | boolean | true | Implies whether to show `Background color picker` |
-| `clearCanvas` | boolean | true | Implies whether to show `Clear canvas button` |
-| `export` | false &#124; [exportOpts](#exportopts) | `tsx{ saveFileToDisk: true }` | This prop allows to customize the UI inside the export dialog. By default it shows the "saveFileToDisk". If this prop is `false` the export button will not be rendered. For more details visit [`exportOpts`](#exportopts). |
-| `loadScene` | boolean | true | Implies whether to show `Load button` |
-| `saveToActiveFile` | boolean | true | Implies whether to show `Save button` to save to current file |
-| `toggleTheme` | boolean &#124; null | `null` | Implies whether to show `Theme toggle`. When defined as `boolean`, takes precedence over [`props.theme`](#theme) to show `Theme toggle` |
-| `saveAsImage` | boolean | true | Implies whether to show `Save as image button` |
-
-##### dockedSidebarBreakpoint
-
-This prop indicates at what point should we break to a docked, permanent sidebar. If not passed it defaults to [`MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L167). If the `width` of the `excalidraw` container exceeds `dockedSidebarBreakpoint`, the sidebar will be dockable. If user choses to dock the sidebar, it will push the right part of the UI towards the left, making space for the sidebar as shown below.
-
-![image](https://user-images.githubusercontent.com/11256141/174664866-c698c3fa-197b-43ff-956c-d79852c7b326.png)
-
-### exportOpts
-
-The below attributes can be set in `UIOptions.canvasActions.export` to customize the export dialog. If `UIOptions.canvasActions.export` is `false` the export button will not be rendered.
-
-| Attribute | Type | Default | Description |
-| --- | --- | --- | --- |
-| `saveFileToDisk` | boolean | true | Implies if save file to disk button should be shown |
-| `onExportToBackend` | `tsx (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void ` |  | This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed. |
-| `renderCustomUI` | `tsx (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void ` |  | This callback should be supplied if you want to render custom UI in the export dialog. |
 
 ### onPaste
 
