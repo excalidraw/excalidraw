@@ -15,12 +15,12 @@
 | [`zenModeEnabled`](#zenmodeenabled) | `boolean` | _ | This implies if the zen mode is enabled |
 | [`gridModeEnabled`](#gridmodeenabled) | `boolean` | _ | This implies if the grid mode is enabled |
 | [`libraryReturnUrl`](#libraryreturnurl) | `string` | _ | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
-| [`theme`](#theme) | [THEME.LIGHT](/docs/package/api/utils#theme) &#124; [THEME.DARK](/docs/package/api/utils#theme) | [THEME.LIGHT](/docs/package/api/utils#theme) | The theme of the Excalidraw component |
+| [`theme`](#theme) | `"light"` &#124; `"dark"` | `"light"` | The theme of the Excalidraw component |
 | [`name`](#name) | `string` |  | Name of the drawing |
-| [`UIOptions`](#uioptions) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasactions) |
+| [`UIOptions`](#uioptions) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L143) | To customise UI options. Currently we support customising [`canvas actions`](#canvasactions) |
 | [`onPaste`](#onpaste) | `function` | _ | Callback to be triggered if passed when the something is pasted in to the scene |
-| [`detectScroll`](#detectscroll) | `boolean` | true | Indicates whether to update the offsets when nearest ancestor is scrolled. |
-| [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | false | Indicates whether to bind the keyboard events to document. |
+| [`detectScroll`](#detectscroll) | `boolean` | `true` | Indicates whether to update the offsets when nearest ancestor is scrolled. |
+| [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
 | [`onLibraryChange`](#onlibrarychange) | `object` | _ | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autofocus) | `boolean` | `false` | Implies whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateidforfile) | `function` | _ | Allows you to override `id` generation for files added on canvas |
