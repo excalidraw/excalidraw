@@ -52,6 +52,7 @@ import { useAtom } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
 
 interface LayerUIProps {
+  test: JSX.Element;
   actionManager: ActionManager;
   appState: AppState;
   files: BinaryFiles;

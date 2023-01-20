@@ -567,6 +567,7 @@ class App extends React.Component<AppProps, AppState> {
                     value={this.actionManager}
                   >
                     <LayerUI
+                      test={<div />}
                       canvas={this.canvas}
                       appState={this.state}
                       files={this.files}
