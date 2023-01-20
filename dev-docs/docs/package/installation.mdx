@@ -1,20 +1,16 @@
 # Installation
 
-#### Note
-
-⚠️ ⚠️ ⚠️ You are viewing the docs for the **next** release, in case you want to check the docs for the stable release, you can view it [here](https://www.npmjs.com/package/@excalidraw/excalidraw).
-
 **Excalidraw** is exported as a component to directly embed in your projects.
 
-You can use npm
+You can use `npm`
 
-```
+```bash
 npm install react react-dom @excalidraw/excalidraw
 ```
 
-or via yarn
+or via `yarn`
 
-```
+```bash
 yarn add react react-dom @excalidraw/excalidraw
 ```
 
@@ -22,17 +18,18 @@ After installation you will see a folder `excalidraw-assets` and `excalidraw-ass
 
 Move the folder `excalidraw-assets` and `excalidraw-assets-dev` to the path where your assets are served.
 
-By default it will try to load the files from `https://unpkg.com/@excalidraw/excalidraw/dist/`
+By default it will try to load the files from [`https://unpkg.com/@excalidraw/excalidraw/dist/`](https://unpkg.com/@excalidraw/excalidraw/dist)
 
 If you want to load assets from a different path you can set a variable `window.EXCALIDRAW_ASSET_PATH` depending on environment (for example if you have different URL's for dev and prod) to the url from where you want to load the assets.
 
-#### Note
+:::tip
 
 **If you don't want to wait for the next stable release and try out the unreleased changes you can use `@excalidraw/excalidraw@next`.**
 
+:::
 ### Dimensions of Excalidraw
 
-Excalidraw takes `100%` of `width` and `height` of the containing block so make sure the container in which you render Excalidraw has non zero dimensions.
+Excalidraw takes *100%* of `width` and `height` of the containing block so make sure the container in which you render Excalidraw has non zero dimensions.
 
 ### Demo
 

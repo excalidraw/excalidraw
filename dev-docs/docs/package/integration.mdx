@@ -1,8 +1,12 @@
 # Integration
 
-### Web Bundler
+## Web Bundler
 
 If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
+
+```js
+import { Excalidraw } from '@excalidraw/excalidraw'
+```
 
 ```jsx live
 function App() {
@@ -16,8 +20,12 @@ function App() {
   );
 }
 ```
+### Rendering Excalidraw only on client
 
-Since Excalidraw doesn't support server side rendering yet, you should render the component once the host is mounted.
+Since *Excalidraw* doesn't support server side rendering, you should render the component once the host is 
+
+
+<Highlight color="#25c2a0">Docusaurus green</Highlight>
 
 ```jsx showLineNumbers
 import { useState, useEffect } from "react";
@@ -32,7 +40,7 @@ export default function IndexPage() {
 
 The `types` are available at `@excalidraw/excalidraw/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
 
-### Browser
+## Browser
 
 To use it in a browser directly:
 
