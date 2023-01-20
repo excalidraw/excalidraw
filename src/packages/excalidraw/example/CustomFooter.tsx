@@ -1,5 +1,7 @@
 import { ExcalidrawImperativeAPI } from "../../../types";
 import { MIME_TYPES } from "../entry";
+import { Button } from "../../../components/Button";
+
 const COMMENT_SVG = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -23,6 +25,14 @@ const CustomFooter = ({
 }) => {
   return (
     <>
+      <Button
+        onSelect={() => alert("General Kenobi!")}
+        className="you are a bold one"
+        style={{ marginLeft: "1rem" }}
+        title="Hello there!"
+      >
+        {COMMENT_SVG}
+      </Button>
       <button
         className="custom-element"
         onClick={() => {

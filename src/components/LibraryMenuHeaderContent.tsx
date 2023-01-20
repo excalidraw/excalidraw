@@ -193,7 +193,7 @@ export const LibraryMenuHeader: React.FC<{
             <DropdownMenu.Item
               onSelect={onLibraryImport}
               icon={LoadIcon}
-              dataTestId="lib-dropdown--load"
+              data-testid="lib-dropdown--load"
             >
               {t("buttons.load")}
             </DropdownMenu.Item>
@@ -202,7 +202,7 @@ export const LibraryMenuHeader: React.FC<{
             <DropdownMenu.Item
               onSelect={onLibraryExport}
               icon={ExportIcon}
-              dataTestId="lib-dropdown--export"
+              data-testid="lib-dropdown--export"
             >
               {t("buttons.export")}
             </DropdownMenu.Item>
@@ -219,7 +219,7 @@ export const LibraryMenuHeader: React.FC<{
             <DropdownMenu.Item
               icon={publishIcon}
               onSelect={() => setShowPublishLibraryDialog(true)}
-              dataTestId="lib-dropdown--remove"
+              data-testid="lib-dropdown--remove"
             >
               {t("buttons.publishLibrary")}
             </DropdownMenu.Item>

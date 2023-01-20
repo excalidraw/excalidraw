@@ -1,19 +1,17 @@
+import React from "react";
+
 const DropdownMenuItemCustom = ({
   children,
   className = "",
-  style,
-  dataTestId,
+  ...rest
 }: {
   children: React.ReactNode;
   className?: string;
-  style?: React.CSSProperties;
-  dataTestId?: string;
-}) => {
+} & React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
+      {...rest}
       className={`dropdown-menu-item-base dropdown-menu-item-custom ${className}`.trim()}
-      style={style}
-      data-testid={dataTestId}
     >
       {children}
     </div>
