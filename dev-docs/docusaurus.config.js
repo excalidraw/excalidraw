@@ -6,7 +6,7 @@ const config = {
   title: "Excalidraw developer docs",
   tagline:
     "For Excalidraw contributors or those integrating the Excalidraw editor",
-  url: "https://docs.excalidraw.com.com",
+  url: "https://docs-git-aakansha-docs-excalidraw.vercel.app",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
