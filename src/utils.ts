@@ -728,15 +728,3 @@ export const getReactChildren = <
 
   return [knownChildren, restChildren] as const;
 };
-
-export const isShallowEqual = <T extends Record<string, any>>(
-  objA: T,
-  objB: T,
-) => {
-  const aKeys = Object.keys(objA);
-  const bKeys = Object.keys(objA);
-  if (aKeys.length !== bKeys.length) {
-    return false;
-  }
-  return aKeys.every((key) => objA[key] === objB[key]);
-};

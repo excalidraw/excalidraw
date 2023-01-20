@@ -16,7 +16,7 @@ import {
   UIChildrenComponents,
   UIWelcomeScreenComponents,
 } from "../types";
-import { isShallowEqual, muteFSAbortError, getReactChildren } from "../utils";
+import { muteFSAbortError, getReactChildren } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
@@ -480,39 +480,28 @@ const LayerUI = ({
   );
 };
 
-const stripIrrelevantAppStateProps = (
-  appState: AppState,
-): Partial<AppState> => {
-  const { suggestedBindings, startBoundElement, cursorButton, ...ret } =
-    appState;
-  return ret;
-};
+const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
+  const getNecessaryObj = (appState: AppState): Partial<AppState> => {
+    const {
+      suggestedBindings,
+      startBoundElement: boundElement,
+      ...ret
+    } = appState;
+    return ret;
+  };
+  const prevAppState = getNecessaryObj(prev.appState);
+  const nextAppState = getNecessaryObj(next.appState);
 
-const areEqual = (prevProps: LayerUIProps, nextProps: LayerUIProps) => {
-  // short-circuit early
-  if (prevProps.children !== nextProps.children) {
-    return false;
-  }
-
-  const {
-    canvas: _prevCanvas,
-    // not stable, but shouldn't matter in our case
-    onInsertElements: _prevOnInsertElements,
-    appState: prevAppState,
-    ...prev
-  } = prevProps;
-  const {
-    canvas: _nextCanvas,
-    onInsertElements: _nextOnInsertElements,
-    appState: nextAppState,
-    ...next
-  } = nextProps;
+  const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
 
   return (
-    isShallowEqual(
-      stripIrrelevantAppStateProps(prevAppState),
-      stripIrrelevantAppStateProps(nextAppState),
-    ) && isShallowEqual(prev, next)
+    prev.renderTopRightUI === next.renderTopRightUI &&
+    prev.renderCustomStats === next.renderCustomStats &&
+    prev.renderCustomSidebar === next.renderCustomSidebar &&
+    prev.langCode === next.langCode &&
+    prev.elements === next.elements &&
+    prev.files === next.files &&
+    keys.every((key) => prevAppState[key] === nextAppState[key])
   );
 };
 
