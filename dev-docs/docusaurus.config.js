@@ -6,7 +6,7 @@ const config = {
   title: "Excalidraw developer docs",
   tagline:
     "For Excalidraw contributors or those integrating the Excalidraw editor",
-  url: "https://docs-git-aakansha-docs-excalidraw.vercel.app",
+  url: "https://docs.excalidraw.com",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -113,7 +113,7 @@ const config = {
       prism: {
         theme: require("prism-react-renderer/themes/dracula"),
       },
-      image: "img/docs-og.png",
+      image: "img/og-image.png",
       docs: {
         sidebar: {
           hideable: true,
