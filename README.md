@@ -1,4 +1,4 @@
-<div align="center" style={{ display:'flex',flexDirection:'column' }}>
+<div align="center" style="display:flex;flex-direction:column;"}>
   <a href="https://excalidraw.com">
     <img width="540" src="./public/og-image-sm.png" alt="Excalidraw logo: Sketch handrawn like diagrams."/>
   </a>
