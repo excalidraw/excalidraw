@@ -37,4 +37,5 @@ Last but not least, we're thankful to these companies for offering their service
 [Google Cloud](https://googlecloudcheatsheet.withgoogle.com/architecture) • [Meta](https://meta.com/) • [CodeSandbox](https://codesandbox.io/) • [Obsidian Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) • [Replit](https://replit.com/) • [Slite](https://slite.com/) • [Notion](https://notion.so/) • [HackerRank](https://www.hackerrank.com/) •
 
 ## Documentation
+
 Visit [https://docs.excalidraw.com](https://docs.excalidraw.com)
