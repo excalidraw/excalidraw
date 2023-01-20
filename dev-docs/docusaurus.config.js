@@ -113,7 +113,7 @@ const config = {
       prism: {
         theme: require("prism-react-renderer/themes/dracula"),
       },
-      image: "https://excalidraw.com/og-fb-v1.png",
+      image: "img/docs-og.png",
       docs: {
         sidebar: {
           hideable: true,
