@@ -1,7 +1,7 @@
 import { ColorPicker } from "../components/ColorPicker";
-import { eraser, ZoomInIcon, ZoomOutIcon } from "../components/icons";
+import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
+import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
@@ -10,12 +10,15 @@ import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
-import { getShortcutKey, updateActiveTool } from "../utils";
+import { getShortcutKey, setCursor, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
-import { getDefaultAppState, isEraserActive } from "../appState";
-import clsx from "clsx";
+import {
+  getDefaultAppState,
+  isEraserActive,
+  isPanningToolActive,
+} from "../appState";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -337,17 +340,30 @@ export const actionErase = register({
     };
   },
   keyTest: (event) => event.key === KEYS.E,
-  PanelComponent: ({ elements, appState, updateData, data }) => (
-    <ToolButton
-      type="button"
-      icon={eraser}
-      className={clsx("eraser", { active: isEraserActive(appState) })}
-      title={`${t("toolBar.eraser")}-${getShortcutKey("E")}`}
-      aria-label={t("toolBar.eraser")}
-      onClick={() => {
-        updateData(null);
-      }}
-      size={data?.size || "medium"}
-    ></ToolButton>
-  ),
+});
+
+export const actionPanningTool = register({
+  name: "panningTool",
+  trackEvent: { category: "toolbar" },
+  perform: (elements, appState, _, app) => {
+    let activeTool: AppState["activeTool"];
+
+    if (isPanningToolActive(appState)) {
+      activeTool = updateActiveTool(appState, { type: "selection" });
+    } else {
+      activeTool = updateActiveTool(appState, { type: "panning" });
+      setCursor(app.canvas, CURSOR_TYPE.GRAB);
+    }
+
+    return {
+      appState: {
+        ...appState,
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        activeTool,
+      },
+      commitToHistory: true,
+    };
+  },
+  keyTest: (event) => event.key === KEYS.H,
 });

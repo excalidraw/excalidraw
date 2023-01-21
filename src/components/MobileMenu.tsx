@@ -22,6 +22,8 @@ import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
+import { PanningButton } from "./PanningButton";
+import { isPanningToolActive } from "../appState";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -31,6 +33,7 @@ type MobileMenuProps = {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
+  onPanningToolToggle: () => void;
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
 
@@ -52,6 +55,7 @@ export const MobileMenu = ({
   actionManager,
   setAppState,
   onLockToggle,
+  onPanningToolToggle,
   onPenModeToggle,
   canvas,
   onImageAction,
@@ -88,6 +92,13 @@ export const MobileMenu = ({
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
                 <div className="mobile-misc-tools-container">
+                  {!appState.viewModeEnabled && (
+                    <LibraryButton
+                      appState={appState}
+                      setAppState={setAppState}
+                      isMobile
+                    />
+                  )}
                   <PenModeButton
                     checked={appState.penMode}
                     onChange={onPenModeToggle}
@@ -101,13 +112,12 @@ export const MobileMenu = ({
                     title={t("toolBar.lock")}
                     isMobile
                   />
-                  {!appState.viewModeEnabled && (
-                    <LibraryButton
-                      appState={appState}
-                      setAppState={setAppState}
-                      isMobile
-                    />
-                  )}
+                  <PanningButton
+                    checked={isPanningToolActive(appState)}
+                    onChange={() => onPanningToolToggle()}
+                    title={t("toolBar.panning")}
+                    isMobile
+                  />
                 </div>
               </Stack.Row>
             </Stack.Col>

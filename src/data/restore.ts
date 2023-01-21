@@ -55,6 +55,7 @@ export const AllowedExcalidrawActiveTools: Record<
   freedraw: true,
   eraser: false,
   custom: true,
+  panning: true,
 };
 
 export type RestoredDataState = {

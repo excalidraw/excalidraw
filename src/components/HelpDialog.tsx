@@ -67,6 +67,10 @@ function* intersperse(as: JSX.Element[][], delim: string | null) {
   }
 }
 
+const upperCaseSingleChars = (str: string) => {
+  return str.replace(/\b[a-z]\b/, (c) => c.toUpperCase());
+};
+
 const Shortcut = ({
   label,
   shortcuts,
@@ -81,7 +85,9 @@ const Shortcut = ({
       ? [...shortcut.slice(0, -2).split("+"), "+"]
       : shortcut.split("+");
 
-    return keys.map((key) => <ShortcutKey key={key}>{key}</ShortcutKey>);
+    return keys.map((key) => (
+      <ShortcutKey key={key}>{upperCaseSingleChars(key)}</ShortcutKey>
+    ));
   });
 
   return (
@@ -118,6 +124,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             className="HelpDialog__island--tools"
             caption={t("helpDialog.tools")}
           >
+            <Shortcut label={t("toolBar.panning")} shortcuts={[KEYS.H]} />
             <Shortcut
               label={t("toolBar.selection")}
               shortcuts={[KEYS.V, KEYS["1"]]}

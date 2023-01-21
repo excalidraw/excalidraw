@@ -50,6 +50,8 @@ import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
+import { PanningButton } from "./PanningButton";
+import { isPanningToolActive } from "../appState";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -59,6 +61,7 @@ interface LayerUIProps {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
+  onPanningToolToggle: () => void;
   onPenModeToggle: () => void;
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   showExitZenModeBtn: boolean;
@@ -85,6 +88,7 @@ const LayerUI = ({
   elements,
   canvas,
   onLockToggle,
+  onPanningToolToggle,
   onPenModeToggle,
   onInsertElements,
   showExitZenModeBtn,
@@ -304,10 +308,14 @@ const LayerUI = ({
                             penDetected={appState.penDetected}
                           />
                           <LockButton
-                            zenModeEnabled={appState.zenModeEnabled}
                             checked={appState.activeTool.locked}
-                            onChange={() => onLockToggle()}
+                            onChange={onLockToggle}
                             title={t("toolBar.lock")}
+                          />
+                          <PanningButton
+                            checked={isPanningToolActive(appState)}
+                            onChange={onPanningToolToggle}
+                            title={t("toolBar.panning")}
                           />
                           <div className="App-toolbar__divider"></div>
 
@@ -322,9 +330,6 @@ const LayerUI = ({
                               });
                             }}
                           />
-                          {/* {actionManager.renderAction("eraser", {
-                          // size: "small",
-                        })} */}
                         </Stack.Row>
                       </Island>
                     </Stack.Row>
@@ -408,7 +413,8 @@ const LayerUI = ({
           renderJSONExportDialog={renderJSONExportDialog}
           renderImageExportDialog={renderImageExportDialog}
           setAppState={setAppState}
-          onLockToggle={() => onLockToggle()}
+          onLockToggle={onLockToggle}
+          onPanningToolToggle={onPanningToolToggle}
           onPenModeToggle={onPenModeToggle}
           canvas={canvas}
           onImageAction={onImageAction}
