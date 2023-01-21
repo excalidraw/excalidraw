@@ -12,6 +12,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
@@ -22,4 +28,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: excalidraw/excalidraw:latest
+          tags: |
+            excalidraw/excalidraw:latest
+            ghcr.io/${{ github.repository_owner }}/excalidraw:latest
+
