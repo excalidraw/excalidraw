@@ -312,12 +312,14 @@ const LayerUI = ({
                             onChange={onLockToggle}
                             title={t("toolBar.lock")}
                           />
+
+                          <div className="App-toolbar__divider"></div>
+
                           <PanningButton
                             checked={isPanningToolActive(appState)}
                             onChange={onPanningToolToggle}
                             title={t("toolBar.panning")}
                           />
-                          <div className="App-toolbar__divider"></div>
 
                           <ShapesSwitcher
                             appState={appState}
