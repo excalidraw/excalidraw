@@ -448,15 +448,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Všetky vaše dáta sú uložené lokálne vo vašom prehliadači.",
+      "center_heading_plus": "Chceli ste namiesto toho prejsť do Excalidraw+?",
+      "menuHint": "Exportovanie, nastavenia, jazyky, ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Exportovanie, nastavenia a ďalšie...",
+      "center_heading": "Diagramy. Jednoducho.",
+      "toolbarHint": "Zvoľte nástroj a začnite kresliť!",
+      "helpHint": "Klávesové skratky a pomocník"
     }
   }
 }
