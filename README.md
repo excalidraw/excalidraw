@@ -41,14 +41,22 @@ Last but not least, we're thankful to these companies for offering their service
 ### Shortcuts
 
 You can almost do anything with shortcuts. Click on the help icon on the bottom right corner to see them all.
+<img height="500" width="500" src="./public/screenshots/shortcuts_help.png" alt="shortcut demo for help button" /><img height="500" width="500" src="./public/screenshots/shortcuts.PNG" alt="shortcut demo for shortcuts menu" />
 
 ### Curved lines and arrows
 
 Choose line or arrow and click click click instead of drag.
+<div>
+  <img height="400" width="700" src="./public/screenshots/lines_arrows-1.png" alt="lines and arrows demo" />
+</div>
 
 ### Charts
 
 You can easily create charts by copy pasting data from Excel or just plain comma separated text.
+
+Click on the link below to see a full demonstration on how to implement charts on your own Excalidraw session.
+
+<a href="https://blog.excalidraw.com/tell-your-story-with-charts/">Charts Demonstration</a>
 
 ### Translating
 
@@ -190,6 +198,8 @@ We are working towards providing a full-fledged solution for self-hosting your o
 ## Contributing
 
 Pull requests are welcome. For major changes, please [open an issue](https://github.com/excalidraw/excalidraw/issues/new) first to discuss what you would like to change.
+
+For more information check out our [guidelines](https://github.com/excalidraw/excalidraw/blob/master/CONTRIBUTING.md) on how to contribute.
 
 ## Notable used tools
 
