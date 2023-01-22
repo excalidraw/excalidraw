@@ -246,7 +246,7 @@
     "bindTextToElement": "Нажмите Enter для добавления текста",
     "deepBoxSelect": "Удерживайте Ctrl или Cmd для глубокого выделения, чтобы предотвратить перетаскивание",
     "eraserRevert": "Удерживайте Alt, чтобы вернуть элементы, отмеченные для удаления",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага \"dom.events.asyncClipboard.clipboardItem\" на \"true\". Чтобы изменить флаги браузера в Firefox, посетите страницу \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Не удается отобразить предпросмотр",
@@ -449,15 +449,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Все ваши данные сохраняются локально в вашем браузере.",
+      "center_heading_plus": "Хотите перейти на Excalidraw+?",
+      "menuHint": "Экспорт, настройки, языки, ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Экспорт, настройки и другое...",
+      "center_heading": "Диаграммы. Просто.",
+      "toolbarHint": "Выберите инструмент и начните рисовать!",
+      "helpHint": "Сочетания клавиш и помощь"
     }
   }
 }
