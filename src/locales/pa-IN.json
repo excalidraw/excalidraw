@@ -245,7 +245,8 @@
     "publishLibrary": "ਆਪਣੀ ਲਾਇਬ੍ਰੇਰੀ ਪ੍ਰਕਾਸ਼ਿਤ ਕਰੋ",
     "bindTextToElement": "ਪਾਠ ਜੋੜਨ ਲਈ ਐੰਟਰ ਦਬਾਓ",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "ਝਲਕ ਨਹੀਂ ਦਿਖਾ ਸਕਦੇ",
