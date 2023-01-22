@@ -447,10 +447,16 @@
     "d9480f": "Оранжевый 9"
   },
   "welcomeScreen": {
-    "data": "Все ваши данные сохраняются локально в вашем браузере.",
-    "switchToPlusApp": "Хотите перейти на Excalidraw+?",
-    "menuHints": "Экспорт, настройки, языки, ...",
-    "toolbarHints": "Выберите инструмент и начните рисовать!",
-    "helpHints": "Сочетания клавиш и помощь"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }
