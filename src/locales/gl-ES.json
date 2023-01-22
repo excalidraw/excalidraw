@@ -202,8 +202,8 @@
     "invalidSVGString": "SVG inválido.",
     "cannotResolveCollabServer": "Non se puido conectar ao servidor de colaboración. Por favor recargue a páxina e probe de novo.",
     "importLibraryError": "Non se puido cargar a biblioteca",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed": "Non se puido gardar na base de datos. Se o problema persiste, deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
+    "collabSaveFailed_sizeExceeded": "Non se puido gardar na base de datos, o lenzo semella demasiado grande. Deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo."
   },
   "toolBar": {
     "selection": "Selección",
@@ -447,10 +447,16 @@
     "d9480f": "Laranxa 9"
   },
   "welcomeScreen": {
-    "data": "Toda a información é gardada de maneira local no seu navegador.",
-    "switchToPlusApp": "Queres ir a Excalidraw+ no seu lugar?",
-    "menuHints": "Exportar, preferencias, idiomas, ...",
-    "toolbarHints": "Escolle unha ferramenta & Comeza a debuxar!",
-    "helpHints": "Atallos & axuda"
+    "app": {
+      "center_heading": "Toda a información é gardada de maneira local no seu navegador.",
+      "center_heading_plus": "Queres ir a Excalidraw+ no seu lugar?",
+      "menuHint": "Exportar, preferencias, idiomas, ..."
+    },
+    "defaults": {
+      "menuHint": "Exportar, preferencias, e máis...",
+      "center_heading": "Diagramas. Feito. Sinxelo.",
+      "toolbarHint": "Escolle unha ferramenta & Comeza a debuxar!",
+      "helpHint": "Atallos & axuda"
+    }
   }
 }

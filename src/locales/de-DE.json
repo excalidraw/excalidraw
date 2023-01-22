@@ -99,14 +99,14 @@
     "flipHorizontal": "Horizontal spiegeln",
     "flipVertical": "Vertikal spiegeln",
     "viewMode": "Ansichtsmodus",
-    "toggleExportColorScheme": "Exportfarbschema umschalten",
+    "toggleExportColorScheme": "Farbschema für Export umschalten",
     "share": "Teilen",
     "showStroke": "Auswahl für Strichfarbe anzeigen",
     "showBackground": "Hintergrundfarbe auswählen",
-    "toggleTheme": "Thema umschalten",
+    "toggleTheme": "Design umschalten",
     "personalLib": "Persönliche Bibliothek",
-    "excalidrawLib": "Excalidraw-Bibliothek",
-    "decreaseFontSize": "Schrift verkleinern",
+    "excalidrawLib": "Excalidraw Bibliothek",
+    "decreaseFontSize": "Schriftgröße verkleinern",
     "increaseFontSize": "Schrift vergrößern",
     "unbindText": "Text lösen",
     "bindText": "Text an Container binden",
@@ -161,8 +161,8 @@
     "resetLibrary": "Bibliothek zurücksetzen",
     "createNewRoom": "Neuen Raum erstellen",
     "fullScreen": "Vollbildanzeige",
-    "darkMode": "Dunkler Modus",
-    "lightMode": "Heller Modus",
+    "darkMode": "Dunkles Design",
+    "lightMode": "Helles Design",
     "zenMode": "Zen-Modus",
     "exitZenMode": "Zen-Modus verlassen",
     "cancel": "Abbrechen",
@@ -447,10 +447,16 @@
     "d9480f": "Orange 9"
   },
   "welcomeScreen": {
-    "data": "Alle Daten werden lokal in Deinem Browser gespeichert.",
-    "switchToPlusApp": "Möchtest du stattdessen zu Excalidraw+ gehen?",
-    "menuHints": "Exportieren, Einstellungen, Sprachen, ...",
-    "toolbarHints": "Wähle ein Werkzeug & beginne zu zeichnen!",
-    "helpHints": "Kurzbefehle & Hilfe"
+    "app": {
+      "center_heading": "Alle Daten werden lokal in Deinem Browser gespeichert.",
+      "center_heading_plus": "Möchtest du stattdessen zu Excalidraw+ gehen?",
+      "menuHint": "Exportieren, Einstellungen, Sprachen, ..."
+    },
+    "defaults": {
+      "menuHint": "Exportieren, Einstellungen und mehr...",
+      "center_heading": "Diagramme. Einfach. Gemacht.",
+      "toolbarHint": "Wähle ein Werkzeug & beginne zu zeichnen!",
+      "helpHint": "Kurzbefehle & Hilfe"
+    }
   }
 }

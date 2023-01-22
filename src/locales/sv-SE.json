@@ -447,10 +447,16 @@
     "d9480f": "Orange 9"
   },
   "welcomeScreen": {
-    "data": "All din data sparas lokalt i din webbläsare.",
-    "switchToPlusApp": "Ville du gå till Excalidraw+ istället?",
-    "menuHints": "Export, inställningar, språk, ...",
-    "toolbarHints": "Välj ett verktyg och börja rita!",
-    "helpHints": "Genvägar och hjälp"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

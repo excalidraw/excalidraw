@@ -447,10 +447,16 @@
     "d9480f": "Oranžinė 9"
   },
   "welcomeScreen": {
-    "data": "Visi tavo duomenys išsaugoti lokaliai naršyklėje.",
-    "switchToPlusApp": "Ar vietoj to norėjai patekti į Excalidraw+?",
-    "menuHints": "Eksportavimas, parinktys, kalbos, ...",
-    "toolbarHints": "Pasirink įrankį ir Pradėk piešti!",
-    "helpHints": "Spartieji klavišai ir pagalba"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

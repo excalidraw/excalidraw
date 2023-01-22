@@ -447,10 +447,16 @@
     "d9480f": "Portocaliu 9"
   },
   "welcomeScreen": {
-    "data": "Toate datele tale sunt salvate local în navigatorul tău.",
-    "switchToPlusApp": "Ai vrut să mergi în schimb la Excalidraw+?",
-    "menuHints": "Exportare, preferințe, limbi, ...",
-    "toolbarHints": "Alege un instrument și începe să desenezi!",
-    "helpHints": "Comenzi rapide și ajutor"
+    "app": {
+      "center_heading": "Toate datele tale sunt salvate local în navigatorul tău.",
+      "center_heading_plus": "Ai vrut să mergi în schimb la Excalidraw+?",
+      "menuHint": "Exportare, preferințe, limbi, ..."
+    },
+    "defaults": {
+      "menuHint": "Exportare, preferințe și mai multe...",
+      "center_heading": "Diagrame. Făcute. Simple.",
+      "toolbarHint": "Alege un instrument și începe să desenezi!",
+      "helpHint": "Comenzi rapide și ajutor"
+    }
   }
 }

@@ -447,10 +447,16 @@
     "d9480f": "Naranja 9"
   },
   "welcomeScreen": {
-    "data": "Toda su información es guardada localmente en su navegador.",
-    "switchToPlusApp": "¿Quieres ir a Excalidraw+ en su lugar?",
-    "menuHints": "Exportar, preferencias, idiomas, ...",
-    "toolbarHints": "¡Escoge una herramienta & Empiece a dibujar!",
-    "helpHints": "Atajos & ayuda"
+    "app": {
+      "center_heading": "Toda su información es guardada localmente en su navegador.",
+      "center_heading_plus": "¿Quieres ir a Excalidraw+?",
+      "menuHint": "Exportar, preferencias, idiomas, ..."
+    },
+    "defaults": {
+      "menuHint": "Exportar, preferencias y más...",
+      "center_heading": "Diagramas. Hecho. Simplemente.",
+      "toolbarHint": "¡Elige una herramienta y empieza a dibujar!",
+      "helpHint": "Atajos & ayuda"
+    }
   }
 }

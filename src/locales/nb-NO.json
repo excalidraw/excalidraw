@@ -447,10 +447,16 @@
     "d9480f": "Oransje 9"
   },
   "welcomeScreen": {
-    "data": "Alle dine data lagres lokalt i din nettleser.",
-    "switchToPlusApp": "Ønsker du å gå til Excalidraw+ i stedet?",
-    "menuHints": "Eksporter, innstillinger, språk, ...",
-    "toolbarHints": "Velg et verktøy og start å tegne!",
-    "helpHints": "Snarveier & hjelp"
+    "app": {
+      "center_heading": "Alle dine data lagres lokalt i din nettleser.",
+      "center_heading_plus": "Ønsker du å gå til Excalidraw+ i stedet?",
+      "menuHint": "Eksporter, innstillinger, språk, ..."
+    },
+    "defaults": {
+      "menuHint": "Eksporter, innstillinger og mer...",
+      "center_heading": "Diagrammer. Gjort. Enkelt.",
+      "toolbarHint": "Velg et verktøy og start å tegne!",
+      "helpHint": "Snarveier & hjelp"
+    }
   }
 }

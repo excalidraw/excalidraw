@@ -202,8 +202,8 @@
     "invalidSVGString": "Nevalidné SVG.",
     "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu.",
     "importLibraryError": "Nepodarilo sa načítať knižnicu",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed": "Uloženie do databázy sa nepodarilo. Ak tento problém pretrváva uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
+    "collabSaveFailed_sizeExceeded": "Uloženie do databázy sa nepodarilo, pretože veľkosť plátna je príliš veľká. Uložte si váš súbor lokálne aby ste nestratili vašu prácu."
   },
   "toolBar": {
     "selection": "Výber",
@@ -447,10 +447,16 @@
     "d9480f": "Oranžová 9"
   },
   "welcomeScreen": {
-    "data": "Všetky vaše dáta sú uložené lokálne vo vašom prehliadači.",
-    "switchToPlusApp": "Chceli ste namiesto toho prejsť do Excalidraw+?",
-    "menuHints": "Exportovanie, nastavenia, jazyky, ...",
-    "toolbarHints": "Zvoľte nástroj a začnite kresliť!",
-    "helpHints": "Klávesové skratky a pomocník"
+    "app": {
+      "center_heading": "Všetky vaše dáta sú uložené lokálne vo vašom prehliadači.",
+      "center_heading_plus": "Chceli ste namiesto toho prejsť do Excalidraw+?",
+      "menuHint": "Exportovanie, nastavenia, jazyky, ..."
+    },
+    "defaults": {
+      "menuHint": "Exportovanie, nastavenia a ďalšie...",
+      "center_heading": "Diagramy. Jednoducho.",
+      "toolbarHint": "Zvoľte nástroj a začnite kresliť!",
+      "helpHint": "Klávesové skratky a pomocník"
+    }
   }
 }

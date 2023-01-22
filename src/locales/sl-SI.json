@@ -447,10 +447,16 @@
     "d9480f": "Oranžna 9"
   },
   "welcomeScreen": {
-    "data": "Vsi vaši podatki so shranjeni lokalno v vašem brskalniku.",
-    "switchToPlusApp": "Ste namesto tega želeli odpreti Excalidraw+?",
-    "menuHints": "Izvoz, nastavitve, jeziki, ...",
-    "toolbarHints": "Izberi orodje in začni z risanjem!",
-    "helpHints": "Bljižnice in pomoč"
+    "app": {
+      "center_heading": "Vsi vaši podatki so shranjeni lokalno v vašem brskalniku.",
+      "center_heading_plus": "Ste namesto tega želeli odpreti Excalidraw+?",
+      "menuHint": "Izvoz, nastavitve, jeziki, ..."
+    },
+    "defaults": {
+      "menuHint": "Izvoz, nastavitve in več ...",
+      "center_heading": "Diagrami. Enostavno.",
+      "toolbarHint": "Izberi orodje in začni z risanjem!",
+      "helpHint": "Bližnjice in pomoč"
+    }
   }
 }

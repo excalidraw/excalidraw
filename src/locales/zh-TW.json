@@ -447,10 +447,16 @@
     "d9480f": "橘 9"
   },
   "welcomeScreen": {
-    "data": "您的所有資料都儲存在本機瀏覽器。",
-    "switchToPlusApp": "您是否是要前往 Excalidraw+ ？",
-    "menuHints": "輸出、偏好設定、語言...",
-    "toolbarHints": "選個工具開始畫圖吧！",
-    "helpHints": "快速鍵與說明"
+    "app": {
+      "center_heading": "所有資料皆已在瀏覽器中儲存於本機",
+      "center_heading_plus": "您是否是要前往 Excalidraw+ ？",
+      "menuHint": "輸出、偏好設定、語言..."
+    },
+    "defaults": {
+      "menuHint": "輸出、偏好設定及其他...",
+      "center_heading": "圖表。製作。超簡單。",
+      "toolbarHint": "選個工具開始畫圖吧！",
+      "helpHint": "快速鍵與說明"
+    }
   }
 }

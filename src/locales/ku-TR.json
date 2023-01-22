@@ -447,10 +447,16 @@
     "d9480f": "پرتەقاڵی 9"
   },
   "welcomeScreen": {
-    "data": "هەموو داتاکانت لە ناو بڕاوزەرەکەتدا پاشەکەوت کراوە.",
-    "switchToPlusApp": "دەتویست بچیت بۆ Excalidraw+؟",
-    "menuHints": "هەناردەکردن، پەسندکردنەکان، زمانەکان، ...",
-    "toolbarHints": "ئامرازێک هەڵبژێرە و دەستبکە بە وێنەکێشان!",
-    "helpHints": "قەدبڕەکان و یارمەتی"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

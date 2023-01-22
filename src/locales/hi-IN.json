@@ -447,10 +447,16 @@
     "d9480f": "नारंगी"
   },
   "welcomeScreen": {
-    "data": "आपका सर्व डेटा ब्राउज़र के भीतर स्थानिक जगह पे सुरक्षित किया गया.",
-    "switchToPlusApp": "बजाय आपको Excalidraw+ जगह जाना है?",
-    "menuHints": "निर्यात, पसंद, भाषायें, ...",
-    "toolbarHints": "औजार चुने और चित्रकारी प्रारंभ करे!",
-    "helpHints": "शॉर्ट्कट & सहाय्य"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

@@ -202,8 +202,8 @@
     "invalidSVGString": "SVG non valido.",
     "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova.",
     "importLibraryError": "Impossibile caricare la libreria",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed": "Impossibile salvare nel database di backend. Se i problemi persistono, dovresti salvare il tuo file localmente per assicurarti di non perdere il tuo lavoro.",
+    "collabSaveFailed_sizeExceeded": "Impossibile salvare nel database di backend, la tela sembra essere troppo grande. Dovresti salvare il file localmente per assicurarti di non perdere il tuo lavoro."
   },
   "toolBar": {
     "selection": "Selezione",
@@ -447,10 +447,16 @@
     "d9480f": "Arancio 9"
   },
   "welcomeScreen": {
-    "data": "Tutti i tuoi dati sono salvati localmente nel browser.",
-    "switchToPlusApp": "Volevi invece andare su Excalidraw+?",
-    "menuHints": "Esporta, preferenze, lingue, ...",
-    "toolbarHints": "Scegli uno strumento & Inizia a disegnare!",
-    "helpHints": "Scorciatoie & aiuto"
+    "app": {
+      "center_heading": "Tutti i tuoi dati sono salvati localmente nel browser.",
+      "center_heading_plus": "Volevi invece andare su Excalidraw+?",
+      "menuHint": "Esporta, preferenze, lingue, ..."
+    },
+    "defaults": {
+      "menuHint": "Esporta, preferenze, e altro...",
+      "center_heading": "Diagrammi. Fatto. Semplice.",
+      "toolbarHint": "Scegli uno strumento & Inizia a disegnare!",
+      "helpHint": "Scorciatoie & aiuto"
+    }
   }
 }
