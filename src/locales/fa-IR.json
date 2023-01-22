@@ -245,7 +245,8 @@
     "publishLibrary": "کتابخانه خود را منتشر کنید",
     "bindTextToElement": "برای افزودن اینتر را بزنید",
     "deepBoxSelect": "CtrlOrCmd را برای انتخاب عمیق و جلوگیری از کشیدن نگه دارید",
-    "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند"
+    "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
