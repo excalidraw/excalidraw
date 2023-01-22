@@ -245,7 +245,8 @@
     "publishLibrary": "Publier votre propre bibliothèque",
     "bindTextToElement": "Appuyer sur Entrée pour ajouter du texte",
     "deepBoxSelect": "Maintenir Ctrl ou Cmd pour sélectionner dans les groupes et empêcher le déplacement",
-    "eraserRevert": "Maintenez Alt enfoncé pour annuler les éléments marqués pour suppression"
+    "eraserRevert": "Maintenez Alt enfoncé pour annuler les éléments marqués pour suppression",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
