@@ -152,7 +152,9 @@ export const ToggleTheme = () => {
 
   return (
     <DropdownMenuItem
-      onSelect={() => {
+      onSelect={(event) => {
+        // do not close the menu when changing theme
+        event.preventDefault();
         return actionManager.executeAction(actionToggleTheme);
       }}
       icon={appState.theme === "dark" ? SunIcon : MoonIcon}
