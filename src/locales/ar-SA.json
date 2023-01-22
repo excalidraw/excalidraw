@@ -245,7 +245,8 @@
     "publishLibrary": "نشر مكتبتك",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",
