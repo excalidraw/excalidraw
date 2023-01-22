@@ -246,7 +246,7 @@
     "bindTextToElement": "Premi invio per aggiungere il testo",
     "deepBoxSelect": "Tieni premuto CtrlOCmd per selezionare in profondità e per impedire il trascinamento",
     "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Questa funzione può essere abilitata impostando il flag \"dom.events.asyncClipboard.clipboardItem\" su \"true\". Per modificare i flag del browser in Firefox, visitare la pagina \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
