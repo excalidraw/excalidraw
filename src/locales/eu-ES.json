@@ -245,7 +245,8 @@
     "publishLibrary": "Argitaratu zure liburutegia",
     "bindTextToElement": "Sakatu Sartu testua gehitzeko",
     "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko",
-    "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko"
+    "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Ezin da oihala aurreikusi",
