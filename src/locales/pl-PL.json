@@ -245,7 +245,8 @@
     "publishLibrary": "Opublikuj własną bibliotekę",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
