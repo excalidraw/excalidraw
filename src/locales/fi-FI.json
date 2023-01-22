@@ -245,7 +245,8 @@
     "publishLibrary": "Julkaise oma kirjasto",
     "bindTextToElement": "Lisää tekstiä painamalla enter",
     "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus painamalla CtrlOrCmd",
-    "eraserRevert": "Pidä Alt alaspainettuna, kumotaksesi merkittyjen elementtien poistamisen"
+    "eraserRevert": "Pidä Alt alaspainettuna, kumotaksesi merkittyjen elementtien poistamisen",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
