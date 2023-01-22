@@ -245,7 +245,8 @@
     "publishLibrary": "Publiqueu la vostra pròpia llibreria",
     "bindTextToElement": "Premeu enter per a afegir-hi text",
     "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament",
-    "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar"
+    "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
