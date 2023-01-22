@@ -245,7 +245,8 @@
     "publishLibrary": "פירסום ספריה אישית",
     "bindTextToElement": "יש להקיש Enter כדי להוסיף טקסט",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "לא הצלחנו להציג את התצוגה המקדימה",
