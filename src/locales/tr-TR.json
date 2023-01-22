@@ -245,7 +245,8 @@
     "publishLibrary": "Kendi kitaplığınızı yayınlayın",
     "bindTextToElement": "Enter tuşuna basarak metin ekleyin",
     "deepBoxSelect": "Ctrl/Cmd tuşuna basılı tutarak derin seçim yapın ya da sürüklemeyi engelleyin",
-    "eraserRevert": "Alt tuşuna basılı tutarak silinme için işaretlenmiş ögeleri tersine çevirin"
+    "eraserRevert": "Alt tuşuna basılı tutarak silinme için işaretlenmiş ögeleri tersine çevirin",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
