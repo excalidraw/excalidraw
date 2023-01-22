@@ -245,7 +245,8 @@
     "publishLibrary": "Publiceer je eigen bibliotheek",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan voorbeeld niet tonen",
