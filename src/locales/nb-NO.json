@@ -245,7 +245,8 @@
     "publishLibrary": "Publiser ditt eget bibliotek",
     "bindTextToElement": "Trykk Enter for å legge til tekst",
     "deepBoxSelect": "Hold CTRL/CMD for å markere dypt og forhindre flytting",
-    "eraserRevert": "Hold Alt for å reversere elementene merket for sletting"
+    "eraserRevert": "Hold Alt for å reversere elementene merket for sletting",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",
