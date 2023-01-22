@@ -245,7 +245,8 @@
     "publishLibrary": "",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए"
+    "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
