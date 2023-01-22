@@ -245,7 +245,8 @@
     "publishLibrary": "당신만의 라이브러리를 게시하기",
     "bindTextToElement": "Enter 키를 눌러서 텍스트 추가하기",
     "deepBoxSelect": "CtrlOrCmd 키를 눌러서 깊게 선택하고, 드래그하지 않도록 하기",
-    "eraserRevert": "Alt를 눌러서 삭제하도록 지정된 요소를 되돌리기"
+    "eraserRevert": "Alt를 눌러서 삭제하도록 지정된 요소를 되돌리기",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "미리보기를 볼 수 없습니다",
