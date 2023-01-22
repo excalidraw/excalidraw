@@ -12,7 +12,7 @@ import Stack from "./Stack";
 import "./ExportDialog.scss";
 import OpenColor from "open-color";
 import { CheckboxItem } from "./CheckboxItem";
-import { DEFAULT_EXPORT_PADDING } from "../constants";
+import { DEFAULT_EXPORT_PADDING, isFirefox } from "../constants";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { ActionManager } from "../actions/manager";
 
@@ -190,7 +190,9 @@ const ImageExportModal = ({
         >
           SVG
         </ExportButton>
-        {probablySupportsClipboardBlob && (
+        {/* firefox supports clipboard API under a flag,
+            so let's throw and tell people what they can do */}
+        {(probablySupportsClipboardBlob || isFirefox) && (
           <ExportButton
             title={t("buttons.copyPngToClipboard")}
             onClick={() => onExportToClipboard(exportedElements)}
