@@ -245,7 +245,8 @@
     "publishLibrary": "Pubblica la tua libreria",
     "bindTextToElement": "Premi invio per aggiungere il testo",
     "deepBoxSelect": "Tieni premuto CtrlOCmd per selezionare in profondità e per impedire il trascinamento",
-    "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione"
+    "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
