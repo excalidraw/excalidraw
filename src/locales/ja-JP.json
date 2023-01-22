@@ -245,7 +245,8 @@
     "publishLibrary": "自分のライブラリを公開",
     "bindTextToElement": "Enterを押してテキストを追加",
     "deepBoxSelect": "CtrlOrCmd を押し続けることでドラッグを抑止し、深い選択を行います",
-    "eraserRevert": "Alt を押し続けることで削除マークされた要素を元に戻す"
+    "eraserRevert": "Alt を押し続けることで削除マークされた要素を元に戻す",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
