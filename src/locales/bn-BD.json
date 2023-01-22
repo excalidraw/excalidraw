@@ -245,7 +245,8 @@
     "publishLibrary": "আপনার নিজস্ব সংগ্রহ প্রকাশ করুন",
     "bindTextToElement": "লেখা যোগ করতে এন্টার টিপুন",
     "deepBoxSelect": "",
-    "eraserRevert": "মুছে ফেলার জন্য চিহ্নিত উপাদানগুলিকে ফিরিয়ে আনতে অল্ট ধরে রাখুন"
+    "eraserRevert": "মুছে ফেলার জন্য চিহ্নিত উপাদানগুলিকে ফিরিয়ে আনতে অল্ট ধরে রাখুন",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "প্রিভিউ দেখাতে অপারগ",
