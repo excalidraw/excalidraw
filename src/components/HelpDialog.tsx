@@ -1,10 +1,12 @@
 import React from "react";
 import { t } from "../i18n";
-import { isDarwin, isWindows, KEYS } from "../keys";
+import { KEYS } from "../keys";
 import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
 import "./HelpDialog.scss";
 import { ExternalLinkIcon } from "./icons";
+import { probablySupportsClipboardBlob } from "../clipboard";
+import { isDarwin, isFirefox, isWindows } from "../constants";
 
 const Header = () => (
   <div className="HelpDialog__header">
@@ -304,10 +306,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("labels.pasteAsPlaintext")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V")]}
             />
-            <Shortcut
-              label={t("labels.copyAsPng")}
-              shortcuts={[getShortcutKey("Shift+Alt+C")]}
-            />
+            {/* firefox supports clipboard API under a flag, so we'll
+                show users what they can do in the error message */}
+            {(probablySupportsClipboardBlob || isFirefox) && (
+              <Shortcut
+                label={t("labels.copyAsPng")}
+                shortcuts={[getShortcutKey("Shift+Alt+C")]}
+              />
+            )}
             <Shortcut
               label={t("labels.copyStyles")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Alt+C")]}
