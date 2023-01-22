@@ -180,16 +180,16 @@ export const parseClipboard = async (
 };
 
 export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
-  let promise;
   try {
     // in Safari so far we need to construct the ClipboardItem synchronously
     // (i.e. in the same tick) otherwise browser will complain for lack of
     // user intent. Using a Promise ClipboardItem constructor solves this.
     // https://bugs.webkit.org/show_bug.cgi?id=222262
     //
-    // not await so that we can detect whether the thrown error likely relates
-    // to a lack of support for the Promise ClipboardItem constructor
-    promise = navigator.clipboard.write([
+    // Note that Firefox (and potentially others) seems to support Promise
+    // ClipboardItem constructor, but throws on an unrelated MIME type error.
+    // So we need to await this and fallback to awaiting the blob if applicable.
+    await navigator.clipboard.write([
       new window.ClipboardItem({
         [MIME_TYPES.png]: blob,
       }),
@@ -207,7 +207,6 @@ export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
       throw error;
     }
   }
-  await promise;
 };
 
 export const copyTextToSystemClipboard = async (text: string | null) => {
