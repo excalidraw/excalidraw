@@ -245,7 +245,8 @@
     "publishLibrary": "Tedd közzé saját könyvtáradat",
     "bindTextToElement": "Nyomd meg az Entert szöveg hozzáadáshoz",
     "deepBoxSelect": "Tartsd lenyomva a Ctrl/Cmd billentyűt a mély kijelöléshez és a húzás megakadályozásához",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Előnézet nem jeleníthető meg",
