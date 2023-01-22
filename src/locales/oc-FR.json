@@ -245,7 +245,8 @@
     "publishLibrary": "Publicar vòstra pròpria bibliotèca",
     "bindTextToElement": "Quichatz Entrada per apondre de tèxte",
     "deepBoxSelect": "Gardar CtrlOCmd per una seleccion gropada e empachar lo desplaçament",
-    "eraserRevert": "Tenètz quichat Alt per anullar los elements marcats per supression"
+    "eraserRevert": "Tenètz quichat Alt per anullar los elements marcats per supression",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
