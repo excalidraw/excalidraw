@@ -245,7 +245,8 @@
     "publishLibrary": "Publique a sua própria biblioteca",
     "bindTextToElement": "Carregue Enter para acrescentar texto",
     "deepBoxSelect": "Mantenha a tecla CtrlOrCmd carregada para selecção profunda, impedindo o arrastamento",
-    "eraserRevert": "Carregue também em Alt para reverter os elementos marcados para serem apagados"
+    "eraserRevert": "Carregue também em Alt para reverter os elementos marcados para serem apagados",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar uma pré-visualização",
