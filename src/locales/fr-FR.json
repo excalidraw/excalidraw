@@ -246,7 +246,7 @@
     "bindTextToElement": "Appuyer sur Entrée pour ajouter du texte",
     "deepBoxSelect": "Maintenir Ctrl ou Cmd pour sélectionner dans les groupes et empêcher le déplacement",
     "eraserRevert": "Maintenez Alt enfoncé pour annuler les éléments marqués pour suppression",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Cette fonctionnalité devrait pouvoir être activée en définissant l'option \"dom.events.asyncClipboard.clipboard.clipboardItem\" à \"true\". Pour modifier les paramètres du navigateur dans Firefox, visitez la page \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
