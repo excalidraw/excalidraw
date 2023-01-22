@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Itsatsi",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Itsatsi testu arrunt gisa",
     "pasteCharts": "Itsatsi grafikoak",
     "selectAll": "Hautatu dena",
     "multiSelect": "Gehitu elementua hautapenera",
@@ -202,8 +202,8 @@
     "invalidSVGString": "SVG baliogabea.",
     "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro.",
     "importLibraryError": "Ezin izan da liburutegia kargatu",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed": "Ezin izan da backend datu-basean gorde. Arazoak jarraitzen badu, zure fitxategia lokalean gorde beharko zenuke zure lana ez duzula galtzen ziurtatzeko.",
+    "collabSaveFailed_sizeExceeded": "Ezin izan da backend datu-basean gorde, ohiala handiegia dela dirudi. Fitxategia lokalean gorde beharko zenuke zure lana galtzen ez duzula ziurtatzeko."
   },
   "toolBar": {
     "selection": "Hautapena",
@@ -238,7 +238,7 @@
     "resize": "Proportzioak mantendu ditzakezu SHIFT sakatuta tamaina aldatzen duzun bitartean.\nsakatu ALT erditik tamaina aldatzeko",
     "resizeImage": "Tamaina libreki alda dezakezu SHIFT sakatuta,\nsakatu ALT erditik tamaina aldatzeko",
     "rotate": "Angeluak mantendu ditzakezu SHIFT sakatuta biratzen duzun bitartean",
-    "lineEditor_info": "",
+    "lineEditor_info": "Eutsi sakatuta Ctrl edo Cmd eta egin klik bikoitza edo sakatu Ctrl edo Cmd + Sartu puntuak editatzeko",
     "lineEditor_pointSelected": "Sakatu Ezabatu puntuak kentzeko,\nKtrl+D bikoizteko, edo arrastatu mugitzeko",
     "lineEditor_nothingSelected": "Hautatu editatzeko puntu bat (SHIFT sakatuta anitz hautatzeko),\nedo eduki Alt sakatuta eta egin klik puntu berriak gehitzeko",
     "placeImage": "Egin klik irudia kokatzeko, edo egin klik eta arrastatu bere tamaina eskuz ezartzeko",
@@ -314,8 +314,8 @@
     "zoomToFit": "Egin zoom elementu guztiak ikusteko",
     "zoomToSelection": "Zooma hautapenera",
     "toggleElementLock": "Blokeatu/desbloketatu hautapena",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Mugitu orria gora/behera",
+    "movePageLeftRight": "Mugitu orria ezker/eskuin"
   },
   "clearCanvasDialog": {
     "title": "Garbitu oihala"
@@ -397,7 +397,7 @@
     "fileSavedToFilename": "{filename}-n gorde da",
     "canvas": "oihala",
     "selection": "hautapena",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Erabili {{shortcut}} elementu bakar gisa itsasteko,\nedo itsatsi lehendik dagoen testu-editore batean"
   },
   "colors": {
     "ffffff": "Zuria",
@@ -447,10 +447,16 @@
     "d9480f": "Laranja 9"
   },
   "welcomeScreen": {
-    "data": "Zure datu guztiak modu lokalean gordetzen dira zure nabigatzailean.",
-    "switchToPlusApp": "Horren ordez Excalidraw+-ra joan nahi al zenuen?",
-    "menuHints": "Esportatu, hobespenak, hizkuntzak,...",
-    "toolbarHints": "Aukeratu tresna bat eta hasi marrazten!",
-    "helpHints": "Lasterbideak eta laguntza"
+    "app": {
+      "center_heading": "Zure datu guztiak lokalean gordetzen dira zure nabigatzailean.",
+      "center_heading_plus": "Horren ordez Excalidraw+-era joan nahi al zenuen?",
+      "menuHint": "Esportatu, hobespenak, hizkuntzak..."
+    },
+    "defaults": {
+      "menuHint": "Esportatu, hobespenak eta gehiago...",
+      "center_heading": "Diagramak. Egina. Sinplea.",
+      "toolbarHint": "Aukeratu tresna bat eta hasi marrazten!",
+      "helpHint": "Lasterbideak eta laguntza"
+    }
   }
 }
