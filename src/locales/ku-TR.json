@@ -245,7 +245,8 @@
     "publishLibrary": "کتێبخانەی تایبەت بە خۆت بڵاوبکەرەوە",
     "bindTextToElement": "بۆ زیادکردنی دەق enter بکە",
     "deepBoxSelect": "CtrlOrCmd ڕابگرە بۆ هەڵبژاردنی قووڵ، و بۆ ڕێگریکردن لە ڕاکێشان",
-    "eraserRevert": "بۆ گەڕاندنەوەی ئەو توخمانەی کە بۆ سڕینەوە نیشانە کراون، Alt ڕابگرە"
+    "eraserRevert": "بۆ گەڕاندنەوەی ئەو توخمانەی کە بۆ سڕینەوە نیشانە کراون، Alt ڕابگرە",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "ناتوانرێ پێشبینین پیشان بدرێت",
