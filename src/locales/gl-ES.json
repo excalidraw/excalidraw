@@ -245,7 +245,8 @@
     "publishLibrary": "Publica a túa propia biblioteca",
     "bindTextToElement": "Prema a tecla enter para engadir texto",
     "deepBoxSelect": "Manteña pulsado CtrlOrCmd para seleccionar en profundidade e evitar o arrastre",
-    "eraserRevert": "Manteña pulsado Alt para reverter os elementos marcados para a súa eliminación"
+    "eraserRevert": "Manteña pulsado Alt para reverter os elementos marcados para a súa eliminación",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Non se pode mostrar a vista previa",
