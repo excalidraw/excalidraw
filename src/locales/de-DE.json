@@ -219,7 +219,8 @@
     "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen",
     "penMode": "Stift-Modus - Berührung verhindern",
     "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
-    "eraser": "Radierer"
+    "eraser": "Radierer",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
@@ -227,7 +228,7 @@
     "shapes": "Formen"
   },
   "hints": {
-    "canvasPanning": "Um die Zeichenfläche zu verschieben, halte das Mausrad oder die Leertaste während des Ziehens",
+    "canvasPanning": "",
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
