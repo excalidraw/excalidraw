@@ -23,10 +23,8 @@ export const useHandleDropdownMenuItemClick = (
       bubbles: true,
       cancelable: true,
     });
-    if (!event.defaultPrevented) {
-      onSelect?.(itemSelectEvent);
-    }
-    if (!event.defaultPrevented) {
+    onSelect?.(itemSelectEvent);
+    if (!itemSelectEvent.defaultPrevented) {
       DropdownMenuContentProps.onSelect?.(itemSelectEvent);
     }
   });
