@@ -9,7 +9,6 @@ type LockIconProps = {
   name?: string;
   checked: boolean;
   onChange?(): void;
-  zenModeEnabled?: boolean;
   isMobile?: boolean;
 };
 
