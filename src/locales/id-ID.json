@@ -219,7 +219,8 @@
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar",
     "penMode": "Mode pena - mencegah sentuhan",
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
-    "eraser": "Penghapus"
+    "eraser": "Penghapus",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -227,7 +228,7 @@
     "shapes": "Bentuk"
   },
   "hints": {
-    "canvasPanning": "Untuk memindahkan kanvas, tekan roda mouse atau spasi ketika menarik",
+    "canvasPanning": "",
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
