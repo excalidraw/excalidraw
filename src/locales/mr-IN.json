@@ -246,7 +246,7 @@
     "bindTextToElement": "मजकूर जोडण्यासाठी एंटर की दाबा",
     "deepBoxSelect": "खोल निवड ह्या साठी कंट्रोल किव्हा कमांड दाबून ठेवा, आणि बाहेर खेचणे वाचवण्या साठी पण",
     "eraserRevert": "खोडण्या साठी घेतलेल्या वस्तु ना घेण्या साठी Alt दाबून ठेवावे",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "हे वैशिष्ट्य \"dom.events.asyncClipboard.clipboardItem\" फ्लॅग \"सत्य\" वर सेट करून शक्यतो सक्षम केले जाऊ शकते. Firefox मध्ये ब्राउझर फ्लॅग बदलण्यासाठी, \"about:config\" पृष्ठावर जा."
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन दाखवू शकत नाही",
