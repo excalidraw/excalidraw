@@ -219,7 +219,8 @@
     "lock": "Garder l'outil sélectionné actif après le dessin",
     "penMode": "Mode stylo - évite le toucher",
     "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
-    "eraser": "Gomme"
+    "eraser": "Gomme",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Actions du canevas",
@@ -227,7 +228,7 @@
     "shapes": "Formes"
   },
   "hints": {
-    "canvasPanning": "Pour déplacer la zone de dessin, maintenez la molette de la souris enfoncée ou la barre d'espace tout en faisant glisser",
+    "canvasPanning": "",
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
