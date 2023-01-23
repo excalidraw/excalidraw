@@ -50,6 +50,7 @@ import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
+import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
 
@@ -394,6 +395,7 @@ const LayerUI = ({
           }}
         />
       )}
+      <ActiveConfirmDialog />
       {renderImageExportDialog()}
       {renderJSONExportDialog()}
       {appState.pasteDialog.shown && (
