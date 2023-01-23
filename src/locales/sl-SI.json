@@ -219,7 +219,8 @@
     "lock": "Ohrani izbrano orodje aktivno po risanju",
     "penMode": "Način peresa - prepreči dotik",
     "link": "Dodaj/posodobi povezavo za izbrano obliko",
-    "eraser": "Radirka"
+    "eraser": "Radirka",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Dejanja za platno",
@@ -227,7 +228,7 @@
     "shapes": "Oblike"
   },
   "hints": {
-    "canvasPanning": "Za premik platna med vlečenjem držite kolesce miške ali preslednico",
+    "canvasPanning": "",
     "linearElement": "Kliknite za začetek več točk, povlecite za posamezno črto",
     "freeDraw": "Kliknite in povlecite, spustite, ko končate",
     "text": "Namig: besedilo lahko dodate tudi z dvoklikom kjer koli z orodjem za izbiro",
