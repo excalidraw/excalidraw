@@ -113,7 +113,7 @@ export type ActionName =
   | "bindText"
   | "toggleLock"
   | "toggleLinearEditor"
-  | "panningTool";
+  | "hand";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

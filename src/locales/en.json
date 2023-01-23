@@ -221,7 +221,7 @@
     "penMode": "Pen mode - prevent touch",
     "link": "Add/ Update link for a selected shape",
     "eraser": "Eraser",
-    "panning": "Hand (panning tool)"
+    "hand": "Hand (panning tool)"
   },
   "headings": {
     "canvasActions": "Canvas actions",

@@ -17,7 +17,7 @@ import { newElementWith } from "../element/mutateElement";
 import {
   getDefaultAppState,
   isEraserActive,
-  isPanningToolActive,
+  isHandToolActive,
 } from "../appState";
 
 export const actionChangeViewBackgroundColor = register({
@@ -342,16 +342,16 @@ export const actionErase = register({
   keyTest: (event) => event.key === KEYS.E,
 });
 
-export const actionPanningTool = register({
-  name: "panningTool",
+export const actionToggleHandTool = register({
+  name: "hand",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
 
-    if (isPanningToolActive(appState)) {
+    if (isHandToolActive(appState)) {
       activeTool = updateActiveTool(appState, { type: "selection" });
     } else {
-      activeTool = updateActiveTool(appState, { type: "panning" });
+      activeTool = updateActiveTool(appState, { type: "hand" });
       setCursor(app.canvas, CURSOR_TYPE.GRAB);
     }
 

@@ -50,8 +50,8 @@ import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
-import { PanningButton } from "./PanningButton";
-import { isPanningToolActive } from "../appState";
+import { HandButton } from "./PanningButton";
+import { isHandToolActive } from "../appState";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -61,7 +61,7 @@ interface LayerUIProps {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
-  onPanningToolToggle: () => void;
+  onHandToolToggle: () => void;
   onPenModeToggle: () => void;
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   showExitZenModeBtn: boolean;
@@ -88,7 +88,7 @@ const LayerUI = ({
   elements,
   canvas,
   onLockToggle,
-  onPanningToolToggle,
+  onHandToolToggle,
   onPenModeToggle,
   onInsertElements,
   showExitZenModeBtn,
@@ -315,10 +315,10 @@ const LayerUI = ({
 
                           <div className="App-toolbar__divider"></div>
 
-                          <PanningButton
-                            checked={isPanningToolActive(appState)}
-                            onChange={onPanningToolToggle}
-                            title={t("toolBar.panning")}
+                          <HandButton
+                            checked={isHandToolActive(appState)}
+                            onChange={onHandToolToggle}
+                            title={t("toolBar.hand")}
                           />
 
                           <ShapesSwitcher
@@ -416,7 +416,7 @@ const LayerUI = ({
           renderImageExportDialog={renderImageExportDialog}
           setAppState={setAppState}
           onLockToggle={onLockToggle}
-          onPanningToolToggle={onPanningToolToggle}
+          onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
           canvas={canvas}
           onImageAction={onImageAction}

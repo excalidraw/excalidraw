@@ -22,8 +22,8 @@ import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
-import { PanningButton } from "./PanningButton";
-import { isPanningToolActive } from "../appState";
+import { HandButton } from "./PanningButton";
+import { isHandToolActive } from "../appState";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -33,7 +33,7 @@ type MobileMenuProps = {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
-  onPanningToolToggle: () => void;
+  onHandToolToggle: () => void;
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
 
@@ -55,7 +55,7 @@ export const MobileMenu = ({
   actionManager,
   setAppState,
   onLockToggle,
-  onPanningToolToggle,
+  onHandToolToggle,
   onPenModeToggle,
   canvas,
   onImageAction,
@@ -112,10 +112,10 @@ export const MobileMenu = ({
                     title={t("toolBar.lock")}
                     isMobile
                   />
-                  <PanningButton
-                    checked={isPanningToolActive(appState)}
-                    onChange={() => onPanningToolToggle()}
-                    title={t("toolBar.panning")}
+                  <HandButton
+                    checked={isHandToolActive(appState)}
+                    onChange={() => onHandToolToggle()}
+                    title={t("toolBar.hand")}
                     isMobile
                   />
                 </div>

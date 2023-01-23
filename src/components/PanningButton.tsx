@@ -13,7 +13,7 @@ type LockIconProps = {
   isMobile?: boolean;
 };
 
-export const PanningButton = (props: LockIconProps) => {
+export const HandButton = (props: LockIconProps) => {
   return (
     <ToolButton
       className={clsx("Shape", { fillable: false })}
@@ -25,7 +25,7 @@ export const PanningButton = (props: LockIconProps) => {
       keyBindingLabel={!props.isMobile ? KEYS.H.toLocaleUpperCase() : undefined}
       aria-label={`${props.title} — H`}
       aria-keyshortcuts={KEYS.H}
-      data-testid={`toolbar-panning`}
+      data-testid={`toolbar-hand`}
       onChange={() => props.onChange?.()}
     />
   );

@@ -229,10 +229,10 @@ export const isEraserActive = ({
   activeTool: AppState["activeTool"];
 }) => activeTool.type === "eraser";
 
-export const isPanningToolActive = ({
+export const isHandToolActive = ({
   activeTool,
 }: {
   activeTool: AppState["activeTool"];
 }) => {
-  return activeTool.type === "panning";
+  return activeTool.type === "hand";
 };

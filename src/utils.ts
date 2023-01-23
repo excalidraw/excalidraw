@@ -16,7 +16,7 @@ import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 import { SHAPES } from "./shapes";
 import React from "react";
-import { isEraserActive, isPanningToolActive } from "./appState";
+import { isEraserActive, isHandToolActive } from "./appState";
 
 let mockDateTime: string | null = null;
 
@@ -220,7 +220,7 @@ export const distance = (x: number, y: number) => Math.abs(x - y);
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: (
-    | { type: typeof SHAPES[number]["value"] | "eraser" | "panning" }
+    | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" }
     | { type: "custom"; customType: string }
   ) & { lastActiveToolBeforeEraser?: LastActiveToolBeforeEraser },
 ): AppState["activeTool"] => {
@@ -306,7 +306,7 @@ export const setCursorForShape = (
   }
   if (appState.activeTool.type === "selection") {
     resetCursor(canvas);
-  } else if (isPanningToolActive(appState)) {
+  } else if (isHandToolActive(appState)) {
     canvas.style.cursor = CURSOR_TYPE.GRAB;
   } else if (isEraserActive(appState)) {
     setEraserCursor(canvas, appState.theme);
