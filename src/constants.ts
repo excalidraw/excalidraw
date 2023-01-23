@@ -62,6 +62,7 @@ export enum EVENT {
   SCROLL = "scroll",
   // custom events
   EXCALIDRAW_LINK = "excalidraw-link",
+  MENU_ITEM_SELECT = "menu.itemSelect",
 }
 
 export const ENV = {

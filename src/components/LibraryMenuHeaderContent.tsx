@@ -187,6 +187,7 @@ export const LibraryMenuHeader: React.FC<{
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => setIsLibraryMenuOpen(false)}
+          onSelect={() => setIsLibraryMenuOpen(false)}
           className="library-menu"
         >
           {!itemsSelected && (

@@ -743,3 +743,22 @@ export const isShallowEqual = <T extends Record<string, any>>(
   }
   return aKeys.every((key) => objA[key] === objB[key]);
 };
+
+// taken from Radix UI
+// https://github.com/radix-ui/primitives/blob/main/packages/core/primitive/src/primitive.tsx
+export const composeEventHandlers = <E>(
+  originalEventHandler?: (event: E) => void,
+  ourEventHandler?: (event: E) => void,
+  { checkForDefaultPrevented = true } = {},
+) => {
+  return function handleEvent(event: E) {
+    originalEventHandler?.(event);
+
+    if (
+      !checkForDefaultPrevented ||
+      !(event as unknown as Event).defaultPrevented
+    ) {
+      return ourEventHandler?.(event);
+    }
+  };
+};
