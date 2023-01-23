@@ -220,7 +220,7 @@
     "penMode": "Modalità penna - previene il tocco",
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
     "eraser": "Gomma",
-    "hand": ""
+    "hand": "Mano (strumento di panoramica)"
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
@@ -228,7 +228,7 @@
     "shapes": "Forme"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Per spostare la tela, tieni premuta la rotellina del mouse o la barra spaziatrice mentre trascini oppure usa lo strumento mano",
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
