@@ -219,7 +219,8 @@
     "lock": "Eǧǧ afecku n tefrayt yermed mbaɛd asuneɣ",
     "penMode": "",
     "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen",
-    "eraser": "Sfeḍ"
+    "eraser": "Sfeḍ",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Tigawin n teɣzut n usuneɣ",
@@ -227,7 +228,7 @@
     "shapes": "Talɣiwin"
   },
   "hints": {
-    "canvasPanning": "Akken ad tesmuttiḍ taɣzut n usuneɣ, ṭṭef ṛṛuda n umumed, neɣ afeggag n tallunt mi ara tzuɣreḍ",
+    "canvasPanning": "",
     "linearElement": "Ssit akken ad tebduḍ aṭas n tenqiḍin, zuɣer i yiwen n yizirig",
     "freeDraw": "Ssit yerna zuɣer, serreḥ ticki tfukeḍ",
     "text": "Tixidest: tzemreḍ daɣen ad ternuḍ aḍris s usiti snat n tikkal anida tebɣiḍ s ufecku n tefrayt",
