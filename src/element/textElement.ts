@@ -389,10 +389,6 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
             push(currentLine);
             currentLine = currentChar;
             currentLineWidthTillNow = width;
-            if (currentLineWidthTillNow === maxWidth) {
-              currentLine = "";
-              currentLineWidthTillNow = 0;
-            }
           } else {
             currentLine += currentChar;
           }
