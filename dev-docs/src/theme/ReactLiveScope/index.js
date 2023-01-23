@@ -17,6 +17,7 @@ const ExcalidrawScope = {
   WelcomeScreen: ExcalidrawComp.WelcomeScreen,
   LiveCollaborationTrigger: ExcalidrawComp.LiveCollaborationTrigger,
   Sidebar: ExcalidrawComp.Sidebar,
+  exportToCanvas: ExcalidrawComp.exportToCanvas,
   initialData,
 };
 
