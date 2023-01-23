@@ -22,7 +22,7 @@ import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
-import { HandButton } from "./PanningButton";
+import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
 
 type MobileMenuProps = {

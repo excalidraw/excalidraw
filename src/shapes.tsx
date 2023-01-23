@@ -4,7 +4,6 @@ import {
   EllipseIcon,
   EraserIcon,
   FreedrawIcon,
-  handIcon,
   ImageIcon,
   LineIcon,
   RectangleIcon,
@@ -14,13 +13,6 @@ import {
 import { KEYS } from "./keys";
 
 export const SHAPES = [
-  {
-    icon: handIcon,
-    value: "hand",
-    key: KEYS.H,
-    numericKey: null,
-    fillable: false,
-  },
   {
     icon: SelectionIcon,
     value: "selection",

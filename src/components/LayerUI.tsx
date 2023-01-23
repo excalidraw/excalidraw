@@ -50,6 +50,8 @@ import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
+import { HandButton } from "./HandButton";
+import { isHandToolActive } from "../appState";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -312,6 +314,13 @@ const LayerUI = ({
                           />
 
                           <div className="App-toolbar__divider"></div>
+
+                          <HandButton
+                            checked={isHandToolActive(appState)}
+                            onChange={() => onHandToolToggle()}
+                            title={t("toolBar.hand")}
+                            isMobile
+                          />
 
                           <ShapesSwitcher
                             appState={appState}
