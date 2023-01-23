@@ -220,7 +220,7 @@
     "penMode": "Pennläge - förhindra touch",
     "link": "Lägg till / Uppdatera länk för en vald form",
     "eraser": "Radergummi",
-    "hand": ""
+    "hand": "Hand (panoreringsverktyg)"
   },
   "headings": {
     "canvasActions": "Canvas-åtgärder",
@@ -228,7 +228,7 @@
     "shapes": "Former"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "För att flytta whiteboarden, håll mushjulet eller mellanslagstangenten medan du drar eller använd handverktyget",
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
