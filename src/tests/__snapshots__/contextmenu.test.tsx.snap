@@ -4,7 +4,7 @@ exports[`contextMenu element right-clicking on a group should select whole group
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -434,7 +434,7 @@ exports[`contextMenu element selecting 'Add to library' in context menu adds ele
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -620,7 +620,7 @@ exports[`contextMenu element selecting 'Bring forward' in context menu brings el
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -975,7 +975,7 @@ exports[`contextMenu element selecting 'Bring to front' in context menu brings e
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -1330,7 +1330,7 @@ exports[`contextMenu element selecting 'Copy styles' in context menu copies styl
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -1516,7 +1516,7 @@ exports[`contextMenu element selecting 'Delete' in context menu deletes element:
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -1738,7 +1738,7 @@ exports[`contextMenu element selecting 'Duplicate' in context menu duplicates el
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -2023,7 +2023,7 @@ exports[`contextMenu element selecting 'Group selection' in context menu groups 
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -2396,7 +2396,7 @@ exports[`contextMenu element selecting 'Paste styles' in context menu pastes sty
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -3243,7 +3243,7 @@ exports[`contextMenu element selecting 'Send backward' in context menu sends ele
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -3598,7 +3598,7 @@ exports[`contextMenu element selecting 'Send to back' in context menu sends elem
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -3953,7 +3953,7 @@ exports[`contextMenu element selecting 'Ungroup selection' in context menu ungro
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -4392,7 +4392,7 @@ exports[`contextMenu element shows 'Group selection' in context menu for multipl
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -4933,7 +4933,7 @@ exports[`contextMenu element shows 'Ungroup selection' in context menu for group
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -5559,7 +5559,7 @@ exports[`contextMenu element shows context menu for canvas: [end of test] appSta
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -5773,7 +5773,7 @@ exports[`contextMenu element shows context menu for element: [end of test] appSt
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
@@ -6110,7 +6110,7 @@ exports[`contextMenu element shows context menu for element: [end of test] appSt
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },

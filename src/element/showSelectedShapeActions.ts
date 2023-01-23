@@ -11,6 +11,7 @@ export const showSelectedShapeActions = (
       appState.activeTool.type !== "custom" &&
       (appState.editingElement ||
         (appState.activeTool.type !== "selection" &&
-          appState.activeTool.type !== "eraser"))) ||
+          appState.activeTool.type !== "eraser" &&
+          appState.activeTool.type !== "hand"))) ||
       getSelectedElements(elements, appState).length,
   );

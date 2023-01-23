@@ -41,7 +41,11 @@ import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
-import { getDefaultAppState, isEraserActive } from "../appState";
+import {
+  getDefaultAppState,
+  isEraserActive,
+  isHandToolActive,
+} from "../appState";
 import { parseClipboard } from "../clipboard";
 import {
   APP_NAME,
@@ -274,6 +278,7 @@ import {
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
+import { actionToggleHandTool } from "../actions/actionCanvas";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -575,6 +580,7 @@ class App extends React.Component<AppProps, AppState> {
                       elements={this.scene.getNonDeletedElements()}
                       onLockToggle={this.toggleLock}
                       onPenModeToggle={this.togglePenMode}
+                      onHandToolToggle={this.onHandToolToggle}
                       onInsertElements={(elements) =>
                         this.addElementsFromPasteOrLibrary({
                           elements,
@@ -1812,6 +1818,10 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  onHandToolToggle = () => {
+    this.actionManager.executeAction(actionToggleHandTool);
+  };
+
   scrollToContent = (
     target:
       | ExcalidrawElement
@@ -2229,11 +2239,13 @@ class App extends React.Component<AppProps, AppState> {
 
   private setActiveTool = (
     tool:
-      | { type: typeof SHAPES[number]["value"] | "eraser" }
+      | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" }
       | { type: "custom"; customType: string },
   ) => {
     const nextActiveTool = updateActiveTool(this.state, tool);
-    if (!isHoldingSpace) {
+    if (nextActiveTool.type === "hand") {
+      setCursor(this.canvas, CURSOR_TYPE.GRAB);
+    } else if (!isHoldingSpace) {
       setCursorForShape(this.canvas, this.state);
     }
     if (isToolIcon(document.activeElement)) {
@@ -2904,7 +2916,12 @@ class App extends React.Component<AppProps, AppState> {
           null;
     }
 
-    if (isHoldingSpace || isPanning || isDraggingScrollBar) {
+    if (
+      isHoldingSpace ||
+      isPanning ||
+      isDraggingScrollBar ||
+      isHandToolActive(this.state)
+    ) {
       return;
     }
 
@@ -3496,7 +3513,10 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (this.state.activeTool.type === "custom") {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
-    } else if (this.state.activeTool.type !== "eraser") {
+    } else if (
+      this.state.activeTool.type !== "eraser" &&
+      this.state.activeTool.type !== "hand"
+    ) {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
         pointerDownState,
@@ -3607,6 +3627,7 @@ class App extends React.Component<AppProps, AppState> {
         gesture.pointers.size <= 1 &&
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
+          isHandToolActive(this.state) ||
           this.state.viewModeEnabled)
       ) ||
       isTextElement(this.state.editingElement)
