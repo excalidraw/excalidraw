@@ -246,7 +246,7 @@
     "bindTextToElement": "Tekan enter untuk tambahkan teks",
     "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran",
     "eraserRevert": "Tahan Alt untuk mengembalikan elemen yang ditandai untuk dihapus",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Fitur ini dapat diaktifkan melalui pengaturan flag \"dom.events.asyncClipboard.clipboardItem\" ke \"true\". Untuk mengganti flag di Firefox, pergi ke laman \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
