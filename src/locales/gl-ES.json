@@ -219,7 +219,8 @@
     "lock": "Manter a ferramenta seleccionada activa despois de debuxar",
     "penMode": "Modo lapis - evitar o contacto",
     "link": "Engadir/ Actualizar ligazón para a forma seleccionada",
-    "eraser": "Goma de borrar"
+    "eraser": "Goma de borrar",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Accións do lenzo",
@@ -227,7 +228,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Para mover o lenzo, manteña a roda do rato ou a barra de espazo mentres arrastra",
+    "canvasPanning": "",
     "linearElement": "Faga clic para iniciar varios puntos, arrastre para unha sola liña",
     "freeDraw": "Fai clic e arrastra, solta cando acabes",
     "text": "Consello: tamén podes engadir texto facendo dobre-clic en calquera lugar coa ferramenta de selección",
