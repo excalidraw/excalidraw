@@ -65,13 +65,18 @@
   background-color: var(--button-bg, var(--island-bg-color));
   color: var(--button-color, var(--text-primary-color));
 
+  svg {
+    width: var(--button-width, var(--lg-icon-size));
+    height: var(--button-height, var(--lg-icon-size));
+  }
+
   &:hover {
-    background-color: var(--button-hover-bg);
+    background-color: var(--button-hover-bg, var(--island-bg-color));
     border-color: var(--button-hover-border, var(--default-border-color));
   }
 
   &:active {
-    background-color: var(--button-active-bg);
+    background-color: var(--button-active-bg, var(--island-bg-color));
     border-color: var(--button-active-border, var(--color-primary-darkest));
   }
 
@@ -85,9 +90,6 @@
 
     svg {
       color: var(--button-color, var(--color-primary-darker));
-
-      width: var(--button-width, var(--lg-icon-size));
-      height: var(--button-height, var(--lg-icon-size));
     }
   }
 }
