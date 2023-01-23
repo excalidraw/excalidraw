@@ -219,7 +219,8 @@
     "lock": "Mantenir activa l’aisina aprèp dessenhar",
     "penMode": "Mòde estilo - empachar lo contact",
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
-    "eraser": "Goma"
+    "eraser": "Goma",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -227,7 +228,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Per desplaçar los canabasses, tenètz la rodeta de la mirga o la barra d’espaci pendent lo desplaçament",
+    "canvasPanning": "",
     "linearElement": "Clicatz per començar mantun punt, lisatz per una sola linha",
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
