@@ -219,7 +219,8 @@
     "lock": "Mantener la herramienta seleccionada activa después de dibujar",
     "penMode": "Modo Lápiz - previene toque",
     "link": "Añadir/Actualizar enlace para una forma seleccionada",
-    "eraser": "Borrar"
+    "eraser": "Borrar",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
@@ -227,7 +228,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Para mover el lienzo, mantenga la rueda del ratón o la barra de espacio mientras arrastra",
+    "canvasPanning": "",
     "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
