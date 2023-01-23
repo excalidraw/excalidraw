@@ -449,15 +449,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "आपका सर्व डेटा ब्राउज़र के भीतर स्थानिक जगह पे सुरक्षित किया गया.",
+      "center_heading_plus": "बजाय आपको Excalidraw+ पर जाना है?",
+      "menuHint": "निर्यात, पसंद, भाषायें, ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "निर्यात, पसंद, और भी...",
+      "center_heading": "चित्रांकन। बनाया गया। सरल।",
+      "toolbarHint": "एक औजार चुने और चित्रकारी प्रारंभ करे!",
+      "helpHint": "शॉर्ट्कट और सहाय्य"
     }
   }
 }
