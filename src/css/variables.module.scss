@@ -66,12 +66,12 @@
   color: var(--button-color, var(--text-primary-color));
 
   &:hover {
-    background-color: var(--button-hover-bg);
+    background-color: var(--button-hover-bg, var(--island-bg-color));
     border-color: var(--button-hover-border, var(--default-border-color));
   }
 
   &:active {
-    background-color: var(--button-active-bg);
+    background-color: var(--button-active-bg, var(--island-bg-color));
     border-color: var(--button-active-border, var(--color-primary-darkest));
   }
 
