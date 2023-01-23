@@ -219,7 +219,8 @@
     "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia",
     "penMode": "Režim pera – zabrániť dotyku",
     "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
-    "eraser": "Guma"
+    "eraser": "Guma",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Akcie plátna",
@@ -227,7 +228,7 @@
     "shapes": "Tvary"
   },
   "hints": {
-    "canvasPanning": "Pre pohyb plátna podržte koliesko myši alebo medzerník počas ťahania",
+    "canvasPanning": "",
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
