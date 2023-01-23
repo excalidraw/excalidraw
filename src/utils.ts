@@ -11,7 +11,7 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { AppState, DataURL, LastActiveToolBeforeEraser, Zoom } from "./types";
+import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 import { SHAPES } from "./shapes";
@@ -222,7 +222,7 @@ export const updateActiveTool = (
   data: (
     | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" }
     | { type: "custom"; customType: string }
-  ) & { lastActiveToolBeforeEraser?: LastActiveToolBeforeEraser },
+  ) & { lastActiveToolBeforeEraser?: LastActiveTool },
 ): AppState["activeTool"] => {
   if (data.type === "custom") {
     return {
@@ -234,9 +234,9 @@ export const updateActiveTool = (
 
   return {
     ...appState.activeTool,
-    lastActiveToolBeforeEraser:
+    lastActiveTool:
       data.lastActiveToolBeforeEraser === undefined
-        ? appState.activeTool.lastActiveToolBeforeEraser
+        ? appState.activeTool.lastActiveTool
         : data.lastActiveToolBeforeEraser,
     type: data.type,
     customType: null,

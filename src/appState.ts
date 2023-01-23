@@ -45,7 +45,7 @@ export const getDefaultAppState = (): Omit<
       type: "selection",
       customType: null,
       locked: false,
-      lastActiveToolBeforeEraser: null,
+      lastActiveTool: null,
     },
     penMode: false,
     penDetected: false,

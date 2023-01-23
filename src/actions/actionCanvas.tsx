@@ -309,15 +309,15 @@ export const actionToggleTheme = register({
   },
 });
 
-export const actionErase = register({
-  name: "eraser",
+export const actionToggleEraserTool = register({
+  name: "toggleEraserTool",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
     let activeTool: AppState["activeTool"];
 
     if (isEraserActive(appState)) {
       activeTool = updateActiveTool(appState, {
-        ...(appState.activeTool.lastActiveToolBeforeEraser || {
+        ...(appState.activeTool.lastActiveTool || {
           type: "selection",
         }),
         lastActiveToolBeforeEraser: null,
@@ -343,15 +343,23 @@ export const actionErase = register({
 });
 
 export const actionToggleHandTool = register({
-  name: "hand",
+  name: "toggleHandTool",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
 
     if (isHandToolActive(appState)) {
-      activeTool = updateActiveTool(appState, { type: "selection" });
+      activeTool = updateActiveTool(appState, {
+        ...(appState.activeTool.lastActiveTool || {
+          type: "selection",
+        }),
+        lastActiveToolBeforeEraser: null,
+      });
     } else {
-      activeTool = updateActiveTool(appState, { type: "hand" });
+      activeTool = updateActiveTool(appState, {
+        type: "hand",
+        lastActiveToolBeforeEraser: appState.activeTool,
+      });
       setCursor(app.canvas, CURSOR_TYPE.GRAB);
     }
 
