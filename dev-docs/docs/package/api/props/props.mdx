@@ -24,7 +24,7 @@ All `props` are *optional*.
 | [`libraryReturnUrl`](#libraryreturnurl) | `string` | _ | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | `"light"` &#124; `"dark"` | `"light"` | The theme of the Excalidraw component |
 | [`name`](#name) | `string` |  | Name of the drawing |
-| [`UIOptions`](/docs/package/api/props/ui-options) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L143) | To customise UI options. Currently we support customising [`canvas actions`](#canvasactions) |
+| [`UIOptions`](/docs/package/api/props/ui-options) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L151) | To customise UI options. Currently we support customising [`canvas actions`](#canvasactions) |
 | [`detectScroll`](#detectscroll) | `boolean` | `true` | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
 | [`autoFocus`](#autofocus) | `boolean` | `false` | indicates whether to focus the Excalidraw component on page load |
@@ -104,6 +104,18 @@ This prop if passed will be triggered when canvas is scrolled and has the below 
 (scrollX: number, scrollY: number) => void
 ```
 
+### onPaste
+
+This callback is triggered if passed when something is pasted into the scene. You can use this callback in case you want to do something additional when the paste event occurs.
+
+<pre>
+(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L18">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean
+</pre>
+
+This callback must return a `boolean` value or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to a boolean value.
+
+In case you want to prevent the excalidraw paste action you must return `false`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene).
+
 ### onLibraryChange
 
 This callback if supplied will get triggered when the library is updated and has the below signature.
@@ -120,16 +132,16 @@ It is invoked with empty items when user clears the library. You can use this ca
 
 ### onLinkOpen
 
-This prop if passed will be triggered when clicked on link. To handle the redirect yourself (such as when using your own router for internal links), you must call `event.preventDefault()`.
+This prop if passed will be triggered when clicked on `link`. To handle the redirect yourself (such as when using your own router for internal links), you must call `event.preventDefault()`.
 
-```tsx
-(element: ExcalidrawElement, 
- event: CustomEvent<{ nativeEvent: MouseEvent }>) => void
-```
+<pre>
+(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement</a>, 
+ event: CustomEvent&lt;&#123; nativeEvent: MouseEvent }&gt;) => void
+</pre>
 
 Example:
 
-```ts
+```js showLineNumbers
 const history = useHistory();
 
 // open internal links using the app's router, but opens external links in
@@ -154,7 +166,7 @@ const onLinkOpen: ExcalidrawProps["onLinkOpen"] = useCallback(
 
 ### langCode
 
-Determines the language of the UI. It should be one of the [available language codes](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L14). Defaults to `en` (English). We also export default language and supported languages which you can import as shown below.
+Determines the `language` of the UI. It should be one of the [available language codes](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L14). Defaults to `en` (English). We also export default language and supported languages which you can import as shown below.
 
 ```js
 import { defaultLang, languages } from "@excalidraw/excalidraw";
@@ -167,41 +179,30 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 
 ### viewModeEnabled
 
-This prop indicates whether the app is in `view mode`. When supplied, the value takes precedence over `intialData.appState.viewModeEnabled`, the `view mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+This prop indicates whether the app is in `view mode`. When supplied, the value takes precedence over *intialData.appState.viewModeEnabled*, the `view mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
 
 ### zenModeEnabled
 
-This prop indicates whether the app is in `zen mode`. When supplied, the value takes precedence over `intialData.appState.zenModeEnabled`, the `zen mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+This prop indicates whether the app is in `zen mode`. When supplied, the value takes precedence over *intialData.appState.zenModeEnabled*, the `zen mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
 
 ### gridModeEnabled
 
-This prop indicates whether the shows the grid. When supplied, the value takes precedence over `intialData.appState.gridModeEnabled`, the grid will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+This prop indicates whether the shows the grid. When supplied, the value takes precedence over *intialData.appState.gridModeEnabled*, the grid will be fully controlled by the host app, and users won't be able to toggle it from within the app.
 
 ### libraryReturnUrl
 
-If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com). Defaults to `window.location.origin + window.location.pathname`. To install the libraries in the same tab from which it was opened, you need to set `window.name` (to any alphanumeric string) — if it's not set it will open in a new tab.
+If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com).  
+Defaults to *window.location.origin + window.location.pathname*. To install the libraries in the same tab from which it was opened, you need to set <highlight>window.name</highlight> (to any alphanumeric string) — if it's not set it will open in a new tab.
 
 ### theme
 
-This prop controls Excalidraw's theme. When supplied, the value takes precedence over `intialData.appState.theme`, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app unless `UIOptions.canvasActions.toggleTheme` is set to `true`, in which case the `theme` prop will control Excalidraw's default theme with ability to allow theme switching (you must take care of updating the `theme` prop when you detect a change to `appState.theme` from the [onChange](#onchange) callback).
+This prop controls Excalidraw's theme. When supplied, the value takes precedence over *intialData.appState.theme*, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app unless *UIOptions.canvasActions.toggleTheme* is set to `true`, in which case the `theme` prop will control Excalidraw's default theme with ability to allow theme switching (you must take care of updating the `theme` prop when you detect a change to `appState.theme` from the [onChange](#onchange) callback).
 
 You can use [`THEME`](/docs/package/api/utils#theme) to specify the theme.
 
 ### name
 
-This prop sets the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
-
-### onPaste
-
-This callback is triggered if passed when something is pasted into the scene. You can use this callback in case you want to do something additional when the paste event occurs.
-
-<pre>
-(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L18">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean
-</pre>
-
-This callback must return a `boolean` value or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to a boolean value.
-
-In case you want to prevent the excalidraw paste action you must return `false`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene).
+This prop sets the `name` of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over *intialData.appState.name*, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
 
 
 ### detectScroll
@@ -217,13 +218,13 @@ Enable this if you want Excalidraw to handle keyboard even if the component isn'
 
 ### autoFocus
 
-This prop indicates whether to focus the Excalidraw component on page load. Defaults to false.
+This prop indicates whether to `focus` the Excalidraw component on page load. Defaults to false.
 
 ### generateIdForFile
 
 Allows you to override `id` generation for files added on canvas (images). By default, an SHA-1 digest of the file is used.
 
-```
+```tsx
 (file: File) => string | Promise<string>
 ```
 

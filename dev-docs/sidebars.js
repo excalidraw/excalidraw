@@ -52,10 +52,10 @@ const sidebars = {
                 id: "package/api/props/props",
               },
               items: [
-                "package/api/props/ref",
-                "package/api/props/ui-options",
                 "package/api/props/initialdata",
+                "package/api/props/ref",
                 "package/api/props/render-props",
+                "package/api/props/ui-options",
               ],
             },
             {
