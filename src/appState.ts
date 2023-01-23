@@ -57,6 +57,7 @@ export const getDefaultAppState = (): Omit<
     exportWithDarkMode: false,
     fileHandle: null,
     gridSize: null,
+    previousGridSize: null, //zsviczian
     isBindingEnabled: true,
     isSidebarDocked: false,
     isLoading: false,
@@ -95,6 +96,8 @@ export const getDefaultAppState = (): Omit<
     linkOpacity: 1, //zsviczian
     trayModeEnabled: false, //zsviczian
     colorPalette: {}, //zsviczian
+    allowPinchZoom: false, //zsviczian
+    allowWheelZoom: false, //zsviczian
     selectedLinearElement: null,
   };
 };
@@ -151,6 +154,7 @@ const APP_STATE_STORAGE_CONF = (<
   exportWithDarkMode: { browser: true, export: false, server: false },
   fileHandle: { browser: false, export: false, server: false },
   gridSize: { browser: true, export: true, server: true },
+  previousGridSize: { browser: false, export: false, server: false }, //zsviczian
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: false, export: false, server: false },
   isSidebarDocked: { browser: true, export: false, server: false },
@@ -191,6 +195,8 @@ const APP_STATE_STORAGE_CONF = (<
   linkOpacity: { browser: false, export: false, server: false }, //zsviczian
   trayModeEnabled: { browser: false, export: false, server: false }, //zsviczian
   colorPalette: { browser: false, export: false, server: false }, //zsviczian
+  allowPinchZoom: { browser: false, export: false, server: false }, //zsviczian
+  allowWheelZoom: { browser: false, export: false, server: false }, //zsviczian
   selectedLinearElement: { browser: true, export: false, server: false },
 });
 

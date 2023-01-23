@@ -173,6 +173,7 @@ export type AppState = {
   zenModeEnabled: boolean;
   theme: Theme;
   gridSize: number | null;
+  previousGridSize: number | null; //zsviczian
   viewModeEnabled: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
@@ -208,6 +209,8 @@ export type AppState = {
     elementBackground?: string[];
     elementStroke?: string[];
   }; //zsviczian
+  allowWheelZoom?: boolean; //zsviczian
+  allowPinchZoom?: boolean; //zsviczian
   selectedLinearElement: LinearElementEditor | null;
 };
 

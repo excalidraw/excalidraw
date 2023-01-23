@@ -3072,7 +3072,9 @@ class App extends React.Component<AppProps, AppState> {
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
       const scaleFactor =
-        this.state.activeTool.type === "freedraw" && this.state.penMode
+        !this.state.allowPinchZoom && //zsviczian
+        this.state.activeTool.type === "freedraw" &&
+        this.state.penMode
           ? 1
           : distance / gesture.initialDistance;
 
@@ -6461,7 +6463,11 @@ class App extends React.Component<AppProps, AppState> {
 
     const { deltaX, deltaY } = event;
     // note that event.ctrlKey is necessary to handle pinch zooming
-    if (event.metaKey || event.ctrlKey) {
+    if (
+      //zsviczian
+      ((event.metaKey || event.ctrlKey) && !this.state.allowWheelZoom) ||
+      (!(event.metaKey || event.ctrlKey) && this.state.allowWheelZoom)
+    ) {
       const sign = Math.sign(deltaY);
       const MAX_STEP = ZOOM_STEP * 100;
       const absDelta = Math.abs(deltaY);
