@@ -58,7 +58,13 @@ export const dragSelectedElements = (
       (appState.editingGroupId && !isSelectedViaGroup(appState, element))
     ) {
       const textElement = getBoundTextElement(element);
-      if (textElement) {
+      if (
+        textElement &&
+        // when container is added to a frame, so will its bound text
+        // so the text is already in `elementsToUpdate` and we should avoid
+        // updating its coords again
+        (!textElement.frameId || !frames.includes(textElement.frameId))
+      ) {
         updateElementCoords(
           lockDirection,
           distanceX,

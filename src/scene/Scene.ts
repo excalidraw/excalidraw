@@ -2,9 +2,17 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
+  ExcalidrawFrameElement,
 } from "../element/types";
-import { getNonDeletedElements, isNonDeletedElement } from "../element";
+import {
+  getNonDeletedElements,
+  getNonDeletedFrames,
+  isNonDeletedElement,
+} from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { isFrameElement } from "../element/typeChecks";
+import { mutateElement } from "../element/mutateElement";
+import { findIndex, findLastIndex, moveLeftIndexToRightIndex } from "../utils";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -55,6 +63,8 @@ class Scene {
 
   private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
   private elements: readonly ExcalidrawElement[] = [];
+  private nonDeletedFrames: readonly NonDeleted<ExcalidrawFrameElement>[] = [];
+  private frames: readonly ExcalidrawFrameElement[] = [];
   private elementsMap = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
 
   getElementsIncludingDeleted() {
@@ -63,6 +73,65 @@ class Scene {
 
   getNonDeletedElements(): readonly NonDeletedExcalidrawElement[] {
     return this.nonDeletedElements;
+  }
+
+  getFramesIncludingDeleted() {
+    return this.frames;
+  }
+
+  getNonDeletedFrames(): readonly NonDeleted<ExcalidrawFrameElement>[] {
+    return this.nonDeletedFrames;
+  }
+
+  /**
+   * Add the given elements to the given frame, which consists of the following tasks:
+   * 1. update elements' frameId
+   * 2. update elements' z-indexes
+   *    - elements are all above the frame
+   *    - elements are all above the current elements in the frame
+   *    - elements' z-index to each other remain unchanged
+   *
+   * Note that, the given elements have to be ordered according to their z-indexes
+   * which they will be if they are first returned from `getSelectedElements` are subsequent
+   * operations do not alter z-indexes
+   */
+  addElementsToFrame(
+    elementsToAdd: NonDeletedExcalidrawElement[],
+    frame: NonDeleted<ExcalidrawFrameElement>,
+  ) {
+    // this is ok but not so efficient
+    let indexTo = findLastIndex(
+      this.elements,
+      (element) => element.frameId === frame.id,
+    );
+
+    if (indexTo === -1) {
+      indexTo = this.getElementIndex(frame.id);
+    }
+
+    let nextElements = [...this.elements];
+
+    elementsToAdd.forEach((element) => {
+      mutateElement(element, {
+        frameId: frame.id,
+      });
+      const indexFrom = findIndex(nextElements, (e) => e.id === element.id);
+      nextElements = moveLeftIndexToRightIndex(
+        nextElements,
+        indexFrom,
+        indexTo,
+      );
+    });
+
+    this.replaceAllElements(nextElements);
+  }
+
+  removeElementsFromFrame(elementsToRemove: NonDeletedExcalidrawElement[]) {
+    elementsToRemove.forEach((element) => {
+      mutateElement(element, {
+        frameId: null,
+      });
+    });
   }
 
   getElement<T extends ExcalidrawElement>(id: T["id"]): T | null {
@@ -110,12 +179,19 @@ class Scene {
 
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {
     this.elements = nextElements;
+    const nextFrames: ExcalidrawFrameElement[] = [];
     this.elementsMap.clear();
     nextElements.forEach((element) => {
+      if (isFrameElement(element)) {
+        nextFrames.push(element);
+      }
       this.elementsMap.set(element.id, element);
       Scene.mapElementToScene(element, this);
     });
     this.nonDeletedElements = getNonDeletedElements(this.elements);
+    this.frames = nextFrames;
+    this.nonDeletedFrames = getNonDeletedFrames(this.frames);
+
     this.informMutation();
   }
 

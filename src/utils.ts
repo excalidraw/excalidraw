@@ -447,6 +447,25 @@ export const findLastIndex = <T>(
   return -1;
 };
 
+export const moveLeftIndexToRightIndex = <T>(
+  array: T[],
+  left: number,
+  right: number,
+) => {
+  if (left < 0 || right >= array.length) {
+    return array;
+  }
+
+  return left < right
+    ? [
+        ...array.slice(0, left),
+        ...array.slice(left + 1, right + 1),
+        array[left],
+        ...array.slice(right + 1),
+      ]
+    : array;
+};
+
 export const isTransparent = (color: string) => {
   const isRGBTransparent = color.length === 5 && color.substr(4, 1) === "0";
   const isRRGGBBTransparent = color.length === 9 && color.substr(7, 2) === "00";

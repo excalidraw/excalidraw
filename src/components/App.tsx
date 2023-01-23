@@ -280,11 +280,7 @@ import {
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { atom } from "jotai";
 import { Fonts } from "../scene/Fonts";
-import {
-  addElementsToFrame,
-  isCursorInFrame,
-  removeElementsFromFrame,
-} from "../frame";
+import { getElementsToUpdateForFrame, isCursorInFrame } from "../frame";
 
 export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
@@ -541,7 +537,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private renderFrameNames = () => {
-    return this.getFrames().map((f) => {
+    return this.scene.getNonDeletedFrames().map((f) => {
       const { x, y } = sceneCoordsToViewportCoords(
         { sceneX: f.x, sceneY: f.y },
         this.state,
@@ -2879,9 +2875,11 @@ class App extends React.Component<AppProps, AppState> {
     x: number;
     y: number;
   }) => {
-    const frames = this.getFrames().filter((frame) =>
-      isCursorInFrame(sceneCoords, frame as ExcalidrawFrameElement),
-    );
+    const frames = this.scene
+      .getNonDeletedFrames()
+      .filter((frame) =>
+        isCursorInFrame(sceneCoords, frame as ExcalidrawFrameElement),
+      );
 
     return frames.length ? frames[frames.length - 1] : null;
   };
@@ -3570,18 +3568,29 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.lastPointerUp = event;
 
-    const nonFrameSelectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    ).filter((el) => el.type !== "frame");
-
     const sceneCoords = viewportCoordsToSceneCoords(event, this.state);
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
+    const selectedElements = getSelectedElements(
+      this.scene.getNonDeletedElements(),
+      this.state,
+    );
+
     if (topLayerFrame) {
-      addElementsToFrame(nonFrameSelectedElements, topLayerFrame.id);
+      const elementsToAddToFrame = getElementsToUpdateForFrame(
+        selectedElements,
+        (element) =>
+          !isFrameElement(element) && element.frameId !== topLayerFrame.id,
+      );
+
+      this.scene.addElementsToFrame(elementsToAddToFrame, topLayerFrame);
     } else {
-      removeElementsFromFrame(nonFrameSelectedElements);
+      const elementsToRemoveFromFrame = getElementsToUpdateForFrame(
+        selectedElements,
+        (element) => !isFrameElement(element),
+      );
+
+      this.scene.removeElementsFromFrame(elementsToRemoveFromFrame);
     }
 
     if (this.device.isTouchScreen) {
@@ -4431,12 +4440,6 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private getFrames = () => {
-    return this.scene
-      .getNonDeletedElements()
-      .filter((e) => isFrameElement(e)) as NonDeleted<ExcalidrawFrameElement>[];
-  };
-
   private createFrameElementOnPointerDown = (
     pointerDownState: PointerDownState,
   ): void => {
@@ -4446,7 +4449,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state.gridSize,
     );
 
-    const frames = this.getFrames();
+    const frames = this.scene.getNonDeletedFrames();
 
     const frame = newFrameElement({
       x: gridX,

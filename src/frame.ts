@@ -7,39 +7,12 @@ import {
   NonDeletedExcalidrawElement,
 } from "./element/types";
 import { isPointWithinBounds } from "./math";
+import { getBoundTextElement } from "./element/textElement";
 
 export const getElementsInFrame = (
   elements: readonly ExcalidrawElement[],
   frameId: string,
 ) => elements.filter((element) => element.frameId === frameId);
-
-const addElementToFrame = (
-  element: NonDeletedExcalidrawElement,
-  frameId: string,
-) => {
-  mutateElement(element, {
-    frameId,
-  });
-};
-
-const removeElementFromFrame = (element: NonDeletedExcalidrawElement) => {
-  mutateElement(element, {
-    frameId: null,
-  });
-};
-
-export const addElementsToFrame = (
-  elements: NonDeletedExcalidrawElement[],
-  frameId: string,
-) => {
-  elements.forEach((el) => addElementToFrame(el, frameId));
-};
-
-export const removeElementsFromFrame = (
-  elements: NonDeletedExcalidrawElement[],
-) => {
-  elements.forEach((el) => removeElementFromFrame(el));
-};
 
 // TODO: include rotation when rotation is enabled
 export const isCursorInFrame = (
@@ -56,4 +29,26 @@ export const isCursorInFrame = (
     [cursorCoords.x, cursorCoords.y],
     [fx2, fy2],
   );
+};
+
+export const getElementsToUpdateForFrame = (
+  selectedElements: NonDeletedExcalidrawElement[],
+  predicate: (element: NonDeletedExcalidrawElement) => boolean,
+): NonDeletedExcalidrawElement[] => {
+  const elementsToUpdate: NonDeletedExcalidrawElement[] = [];
+
+  selectedElements.forEach((element) => {
+    if (predicate(element)) {
+      elementsToUpdate.push(element);
+      // since adding elements to a frame will alter the z-indexes
+      // we have to add bound text element to the update array as well
+      // to keep the text right next to its container
+      const textElement = getBoundTextElement(element);
+      if (textElement) {
+        elementsToUpdate.push(textElement);
+      }
+    }
+  });
+
+  return elementsToUpdate;
 };
