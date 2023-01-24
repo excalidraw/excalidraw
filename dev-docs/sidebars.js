@@ -78,6 +78,12 @@ const sidebars = {
               link: { type: "doc", id: "package/api/utils/utils-intro" },
               items: ["package/api/utils/export", "package/api/utils/restore"],
             },
+            {
+              type: "category",
+              label: "Constants",
+              link: { type: "doc", id: "package/api/constants" },
+              items: [],
+            },
           ],
         },
         "package/faq",
