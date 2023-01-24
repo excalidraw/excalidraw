@@ -109,10 +109,11 @@ export type ActionName =
   | "decreaseFontSize"
   | "unbindText"
   | "hyperlink"
-  | "eraser"
   | "bindText"
   | "toggleLock"
-  | "toggleLinearEditor";
+  | "toggleLinearEditor"
+  | "toggleEraserTool"
+  | "toggleHandTool";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

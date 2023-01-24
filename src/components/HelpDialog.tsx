@@ -1,10 +1,12 @@
 import React from "react";
 import { t } from "../i18n";
-import { isDarwin, isWindows, KEYS } from "../keys";
+import { KEYS } from "../keys";
 import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
 import "./HelpDialog.scss";
 import { ExternalLinkIcon } from "./icons";
+import { probablySupportsClipboardBlob } from "../clipboard";
+import { isDarwin, isFirefox, isWindows } from "../constants";
 
 const Header = () => (
   <div className="HelpDialog__header">
@@ -67,6 +69,10 @@ function* intersperse(as: JSX.Element[][], delim: string | null) {
   }
 }
 
+const upperCaseSingleChars = (str: string) => {
+  return str.replace(/\b[a-z]\b/, (c) => c.toUpperCase());
+};
+
 const Shortcut = ({
   label,
   shortcuts,
@@ -81,7 +87,9 @@ const Shortcut = ({
       ? [...shortcut.slice(0, -2).split("+"), "+"]
       : shortcut.split("+");
 
-    return keys.map((key) => <ShortcutKey key={key}>{key}</ShortcutKey>);
+    return keys.map((key) => (
+      <ShortcutKey key={key}>{upperCaseSingleChars(key)}</ShortcutKey>
+    ));
   });
 
   return (
@@ -118,6 +126,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             className="HelpDialog__island--tools"
             caption={t("helpDialog.tools")}
           >
+            <Shortcut label={t("toolBar.hand")} shortcuts={[KEYS.H]} />
             <Shortcut
               label={t("toolBar.selection")}
               shortcuts={[KEYS.V, KEYS["1"]]}
@@ -304,10 +313,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("labels.pasteAsPlaintext")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V")]}
             />
-            <Shortcut
-              label={t("labels.copyAsPng")}
-              shortcuts={[getShortcutKey("Shift+Alt+C")]}
-            />
+            {/* firefox supports clipboard API under a flag, so we'll
+                show users what they can do in the error message */}
+            {(probablySupportsClipboardBlob || isFirefox) && (
+              <Shortcut
+                label={t("labels.copyAsPng")}
+                shortcuts={[getShortcutKey("Shift+Alt+C")]}
+              />
+            )}
             <Shortcut
               label={t("labels.copyStyles")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Alt+C")]}

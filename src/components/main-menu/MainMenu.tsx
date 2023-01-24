@@ -11,14 +11,25 @@ import * as DefaultItems from "./DefaultItems";
 import { UserList } from "../UserList";
 import { t } from "../../i18n";
 import { HamburgerMenuIcon } from "../icons";
+import { composeEventHandlers } from "../../utils";
 
-const MainMenu = ({ children }: { children?: React.ReactNode }) => {
+const MainMenu = ({
+  children,
+  onSelect,
+}: {
+  children?: React.ReactNode;
+  /**
+   * Called when any menu item is selected (clicked on).
+   */
+  onSelect?: (event: Event) => void;
+}) => {
   const device = useDevice();
   const appState = useExcalidrawAppState();
   const setAppState = useExcalidrawSetAppState();
   const onClickOutside = device.isMobile
     ? undefined
     : () => setAppState({ openMenu: null });
+
   return (
     <DropdownMenu open={appState.openMenu === "canvas"}>
       <DropdownMenu.Trigger
@@ -35,6 +46,9 @@ const MainMenu = ({ children }: { children?: React.ReactNode }) => {
         className={
           appState.trayModeEnabled ? "dropdown-menu--mobile" : undefined
         }
+        onSelect={composeEventHandlers(onSelect, () => {
+          setAppState({ openMenu: null });
+        })}
       >
         {children}
         {device.isMobile && appState.collaborators.size > 0 && (
