@@ -50,7 +50,7 @@ import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
-import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
+import { ActiveConfirmDialog, activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
 
@@ -79,6 +79,8 @@ interface LayerUIProps {
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
+  confirmDialogTrigger: boolean;
+  onConfirmDialogClose: () => void;
 }
 
 const LayerUI = ({
@@ -105,8 +107,18 @@ const LayerUI = ({
   onImageAction,
   renderWelcomeScreen,
   children,
+  confirmDialogTrigger,
+  onConfirmDialogClose,
 }: LayerUIProps) => {
   const device = useDevice();
+
+  const setActiveConfirmDialog = useAtom(activeConfirmDialogAtom)[1];
+  React.useEffect(() => {
+    if(confirmDialogTrigger) {
+      onConfirmDialogClose();
+      setActiveConfirmDialog("clearCanvas");
+    }
+  }, [confirmDialogTrigger]);
 
   const [childrenComponents, restChildren] =
     getReactChildren<UIChildrenComponents>(children, {
