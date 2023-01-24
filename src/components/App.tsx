@@ -2243,7 +2243,7 @@ class App extends React.Component<AppProps, AppState> {
         : unbindLinearElements(selectedElements);
       this.setState({ suggestedBindings: [] });
     }
-    if (event.ctrlKey && event.key === KEYS.DELETE && getSelectedElements(this.scene.getNonDeletedElements(), this.state, false).length === 0) {
+    if (event.ctrlKey && event.key === KEYS.DELETE) {
       this.setState({ confirmDialogTrigger: true });
     }
   });
