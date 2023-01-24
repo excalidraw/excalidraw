@@ -23,6 +23,7 @@ import {
 } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
+import { SubtypeToggles } from "./SubtypeButton";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import { hasBoundTextElement } from "../element/typeChecks";
@@ -270,6 +271,7 @@ export const ShapesSwitcher = ({
         />
       );
     })}
+    <SubtypeToggles />
   </>
 );
 

@@ -235,8 +235,6 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
   SubtypeRecord,
   SubtypePrepFn,
-  getSubtypeNames,
-  hasAlwaysEnabledActions,
   prepareSubtype,
   selectSubtype,
 } from "../subtypes";
@@ -616,14 +614,6 @@ class App extends React.Component<AppProps, AppState> {
                     value={this.actionManager}
                   >
                     <LayerUI
-                      renderShapeToggles={getSubtypeNames().map((subtype) =>
-                        this.actionManager.renderAction(
-                          subtype,
-                          hasAlwaysEnabledActions(subtype)
-                            ? { onContextMenu: this.handleCustomContextMenu }
-                            : {},
-                        ),
-                      )}
                       canvas={this.canvas}
                       appState={this.state}
                       files={this.files}
@@ -6045,28 +6035,6 @@ class App extends React.Component<AppProps, AppState> {
     } catch (error: any) {
       this.setState({ isLoading: false, errorMessage: error.message });
     }
-  };
-
-  private handleCustomContextMenu = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    source: string,
-  ) => {
-    event.preventDefault();
-
-    const container = this.excalidrawContainerRef.current!;
-    const { top: offsetTop, left: offsetLeft } =
-      container.getBoundingClientRect();
-    const left = event.clientX - offsetLeft;
-    const top = event.clientY - offsetTop;
-    this.setState({}, () => {
-      this.setState({
-        contextMenu: {
-          top,
-          left,
-          items: this.getContextMenuItems("custom", source),
-        },
-      });
-    });
   };
 
   private handleCanvasContextMenu = (

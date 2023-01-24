@@ -64,7 +64,6 @@ interface LayerUIProps {
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
   isCollaborating: boolean;
-  renderShapeToggles?: (JSX.Element | null)[];
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
@@ -90,7 +89,6 @@ const LayerUI = ({
   onInsertElements,
   showExitZenModeBtn,
   isCollaborating,
-  renderShapeToggles,
   renderTopRightUI,
   renderCustomStats,
   renderCustomSidebar,
@@ -327,7 +325,6 @@ const LayerUI = ({
                           {/* {actionManager.renderAction("eraser", {
                           // size: "small",
                         })} */}
-                          {renderShapeToggles}
                         </Stack.Row>
                       </Island>
                     </Stack.Row>
@@ -414,7 +411,6 @@ const LayerUI = ({
           onLockToggle={() => onLockToggle()}
           onPenModeToggle={onPenModeToggle}
           canvas={canvas}
-          renderShapeToggles={renderShapeToggles}
           onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}

@@ -33,7 +33,6 @@ type MobileMenuProps = {
   onLockToggle: () => void;
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
-  renderShapeToggles?: (JSX.Element | null)[];
 
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
@@ -55,7 +54,6 @@ export const MobileMenu = ({
   onLockToggle,
   onPenModeToggle,
   canvas,
-  renderShapeToggles,
   onImageAction,
   renderTopRightUI,
   renderCustomStats,
@@ -86,7 +84,6 @@ export const MobileMenu = ({
                         });
                       }}
                     />
-                    {renderShapeToggles}
                   </Stack.Row>
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}

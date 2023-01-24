@@ -3,8 +3,20 @@ import { t } from "../i18n";
 import { Action } from "../actions/types";
 import { ToolButton } from "./ToolButton";
 import clsx from "clsx";
-import { Subtype, isValidSubtype, subtypeCollides } from "../subtypes";
+import {
+  Subtype,
+  getSubtypeNames,
+  hasAlwaysEnabledActions,
+  isValidSubtype,
+  subtypeCollides,
+} from "../subtypes";
 import { ExcalidrawElement, Theme } from "../element/types";
+import {
+  useExcalidrawActionManager,
+  useExcalidrawContainer,
+  useExcalidrawSetAppState,
+} from "./App";
+import { ContextMenuItems } from "./ContextMenu";
 
 export const SubtypeButton = (
   subtype: Subtype,
@@ -101,3 +113,44 @@ export const SubtypeButton = (
   }
   return subtypeAction;
 };
+
+export const SubtypeToggles = () => {
+  const am = useExcalidrawActionManager();
+  const { container } = useExcalidrawContainer();
+  const setAppState = useExcalidrawSetAppState();
+
+  const onContextMenu = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    source: string,
+  ) => {
+    event.preventDefault();
+
+    const { top: offsetTop, left: offsetLeft } =
+      container!.getBoundingClientRect();
+    const left = event.clientX - offsetLeft;
+    const top = event.clientY - offsetTop;
+
+    const items: ContextMenuItems = [];
+    am.getCustomActions({ data: { source } }).forEach((action) =>
+      items.push(action),
+    );
+    setAppState({}, () => {
+      setAppState({
+        contextMenu: { top, left, items },
+      });
+    });
+  };
+
+  return (
+    <>
+      {getSubtypeNames().map((subtype) =>
+        am.renderAction(
+          subtype,
+          hasAlwaysEnabledActions(subtype) ? { onContextMenu } : {},
+        ),
+      )}
+    </>
+  );
+};
+
+SubtypeToggles.displayName = "SubtypeToggles";
