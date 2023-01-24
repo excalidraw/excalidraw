@@ -9,6 +9,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": Object {
     "items": Array [
       Object {
@@ -439,6 +440,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -625,6 +627,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -980,6 +983,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -1335,6 +1339,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -1521,6 +1526,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -1743,6 +1749,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -2028,6 +2035,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -2401,6 +2409,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "#e64980",
@@ -3248,6 +3257,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -3603,6 +3613,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -3958,6 +3969,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -4397,6 +4409,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": Object {
     "items": Array [
       Object {
@@ -4938,6 +4951,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": Object {
     "items": Array [
       Object {
@@ -5564,6 +5578,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": Object {
     "items": Array [
       Object {
@@ -5778,6 +5793,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": Object {
     "items": Array [
       Object {
@@ -6115,6 +6131,7 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
+  "confirmDialogTrigger": false,
   "contextMenu": Object {
     "items": Array [
       Object {
