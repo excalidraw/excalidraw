@@ -396,6 +396,10 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   lastScenePointer: { x: number; y: number } | null = null;
 
+  onConfirmDialogClose = () => {
+    this.setState({ confirmDialogTrigger: false });
+  };
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -610,6 +614,11 @@ class App extends React.Component<AppProps, AppState> {
                         this.state.activeTool.type === "selection" &&
                         !this.scene.getElementsIncludingDeleted().length
                       }
+                      confirmDialogTrigger={this.state.confirmDialogTrigger}
+                      // onConfirmDialogClose={this.onConfirmDialogClose}
+                      onConfirmDialogClose={() => {
+                        this.setState({ confirmDialogTrigger: false })
+                      }}
                     >
                       {this.props.children}
                     </LayerUI>
@@ -1954,7 +1963,6 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   // Input handling
-
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
       // normalize `event.key` when CapsLock is pressed #2372
@@ -2234,6 +2242,9 @@ class App extends React.Component<AppProps, AppState> {
         ? bindOrUnbindSelectedElements(selectedElements)
         : unbindLinearElements(selectedElements);
       this.setState({ suggestedBindings: [] });
+    }
+    if (event.ctrlKey && event.key === KEYS.DELETE && getSelectedElements(this.scene.getNonDeletedElements(), this.state, false).length === 0) {
+      this.setState({ confirmDialogTrigger: true });
     }
   });
 
