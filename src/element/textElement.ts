@@ -376,7 +376,9 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
         currentLine = "";
         currentLineWidthTillNow = 0;
         while (words[index].length > 0) {
-          const currentChar = String.fromCodePoint(words[index].codePointAt(0));
+          const currentChar = String.fromCodePoint(
+            words[index].codePointAt(0)!,
+          );
           const width = charWidth.calculate(currentChar, font);
           currentLineWidthTillNow += width;
           words[index] = words[index].slice(currentChar.length);
