@@ -28,9 +28,9 @@ import {
 } from "../../actions";
 
 import "./DefaultItems.scss";
-import { useState } from "react";
-import ConfirmDialog from "../ConfirmDialog";
 import clsx from "clsx";
+import { useSetAtom } from "jotai";
+import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 
 export const LoadScene = () => {
   // FIXME Hack until we tie "t" to lang state
@@ -122,41 +122,22 @@ export const ClearCanvas = () => {
   // FIXME Hack until we tie "t" to lang state
   // eslint-disable-next-line
   const appState = useExcalidrawAppState();
+  const setActiveConfirmDialog = useSetAtom(activeConfirmDialogAtom);
   const actionManager = useExcalidrawActionManager();
-
-  const [showDialog, setShowDialog] = useState(false);
-  const toggleDialog = () => setShowDialog(!showDialog);
 
   if (!actionManager.isActionEnabled(actionClearCanvas)) {
     return null;
   }
 
   return (
-    <>
-      <DropdownMenuItem
-        icon={TrashIcon}
-        onSelect={toggleDialog}
-        data-testid="clear-canvas-button"
-        aria-label={t("buttons.clearReset")}
-      >
-        {t("buttons.clearReset")}
-      </DropdownMenuItem>
-
-      {/* FIXME this should live outside MainMenu so it stays open
-          if menu is closed */}
-      {showDialog && (
-        <ConfirmDialog
-          onConfirm={() => {
-            actionManager.executeAction(actionClearCanvas);
-            toggleDialog();
-          }}
-          onCancel={toggleDialog}
-          title={t("clearCanvasDialog.title")}
-        >
-          <p className="clear-canvas__content"> {t("alerts.clearReset")}</p>
-        </ConfirmDialog>
-      )}
-    </>
+    <DropdownMenuItem
+      icon={TrashIcon}
+      onSelect={() => setActiveConfirmDialog("clearCanvas")}
+      data-testid="clear-canvas-button"
+      aria-label={t("buttons.clearReset")}
+    >
+      {t("buttons.clearReset")}
+    </DropdownMenuItem>
   );
 };
 ClearCanvas.displayName = "ClearCanvas";
@@ -171,7 +152,9 @@ export const ToggleTheme = () => {
 
   return (
     <DropdownMenuItem
-      onSelect={() => {
+      onSelect={(event) => {
+        // do not close the menu when changing theme
+        event.preventDefault();
         return actionManager.executeAction(actionToggleTheme);
       }}
       icon={appState.theme === "dark" ? SunIcon : MoonIcon}

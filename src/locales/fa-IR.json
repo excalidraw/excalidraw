@@ -447,10 +447,16 @@
     "d9480f": "نارنجی 9"
   },
   "welcomeScreen": {
-    "data": "همه ی داده های شما به صورت محلی در مرورگر ذخیره میشود.",
-    "switchToPlusApp": "آیا ترجیح میدهید به Excalidraw+ بروید؟",
-    "menuHints": "خروجی گرفتن، تنظیمات، زبانها، ...",
-    "toolbarHints": "یک ابزار را انتخاب کنید و ترسیم را شروع کنید!",
-    "helpHints": "میانبرها و کمک"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }
