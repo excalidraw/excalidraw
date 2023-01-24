@@ -6,22 +6,32 @@ slug: /package/api/utils
 
 These are pure Javascript functions exported from the package [`@excalidraw/excalidraw`](https://npmjs.com/@excalidraw/excalidraw). If you want to export your drawings in different formats eg `png`, `svg` and more you can check out [Export Utilities](/docs/package/API/utils/export). If you want to restore your drawings you can check out [Restore Utilities](/docs/package/API/utils/restore).
 
-### `serializeAsJSON`
+### serializeAsJSON
+
+Takes the scene elements and state and returns a JSON string. `Deleted` elements as well as most properties from `AppState` are removed from the resulting JSON. (see [`serializeAsJSON()`](https://github.com/excalidraw/excalidraw/blob/master/src/data/json.ts#L42) source for details).
+
+If you want to overwrite the `source` field in the `JSON` string, you can set <highlight>window.EXCALIDRAW_EXPORT_SOURCE</highlight> to the desired value.
 
 **_Signature_**
 
-```tsx
-serializeAsJSON({
-  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>,
-  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>,
+<pre>
+serializeAsJSON(&#123;<br/>&nbsp;
+  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>,<br/>&nbsp;
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>,<br/>
 }): string
+</pre>
+
+**How to use**
+
+```js
+import { serializeAsJSON } from "@excalidraw/excalidraw";
 ```
 
-Takes the scene elements and state and returns a JSON string. Deleted `elements`as well as most properties from `AppState` are removed from the resulting JSON. (see [`serializeAsJSON()`](https://github.com/excalidraw/excalidraw/blob/master/src/data/json.ts#L16) source for details).
+### serializeLibraryAsJSON
 
-If you want to overwrite the source field in the JSON string, you can set `window.EXCALIDRAW_EXPORT_SOURCE` to the desired value.
+Takes the `library` items and returns a `JSON` string.
 
-### `serializeLibraryAsJSON`
+If you want to overwrite the source field in the JSON string, you can set <highlight>window.EXCALIDRAW_EXPORT_SOURCE</highlight> to the desired value.
 
 **_Signature_**
 
@@ -30,28 +40,21 @@ serializeLibraryAsJSON(
   libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems[]</a>)
 </pre>
 
-Takes the library items and returns a JSON string.
-
-If you want to overwrite the source field in the JSON string, you can set `window.EXCALIDRAW_EXPORT_SOURCE` to the desired value.
-
-### `getSceneVersion`
-
 **How to use**
 
-```tsx
-import { getSceneVersion } from "@excalidraw/excalidraw";
-getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>)
+```js
+import { serializeLibraryAsJSON } from "@excalidraw/excalidraw";
 ```
 
-This function returns the current scene version.
+#### isInvisiblySmallElement
 
-#### `isInvisiblySmallElement`
+Returns `true` if element is invisibly small (e.g. width & height are zero).
 
 **_Signature_**
 
-```tsx
+<pre>
 isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement</a>): boolean
-```
+</pre>
 
 **How to use**
 
@@ -59,23 +62,9 @@ isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalid
 import { isInvisiblySmallElement } from "@excalidraw/excalidraw";
 ```
 
-Returns `true` if element is invisibly small (e.g. width & height are zero).
+### loadFromBlob
 
-### `loadLibraryFromBlob`
-
-```js
-import { loadLibraryFromBlob } from "@excalidraw/excalidraw";
-```
-
-**_Signature_**
-
-```tsx
-loadLibraryFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>, defaultStatus: "published" | "unpublished")
-```
-
-This function loads the library from the blob. Additonally takes `defaultStatus` param which sets the default status for library item if not present, defaults to `unpublished`.
-
-### `loadFromBlob`
+This function loads the scene data from the blob (or file). If you pass `localAppState`, `localAppState` value will be preferred over the `appState` derived from `blob`. Throws if blob doesn't contain valid scene data.
 
 **How to use**
 
@@ -88,22 +77,44 @@ excalidrawAPI.updateScene(scene);
 
 **Signature**
 
-```tsx
-loadFromBlob(
-  blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,
-  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a> | null,
-  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null,
-  fileHandle?: FileSystemHandle | null
-) => Promise<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L53">RestoredDataState</a>>
+<pre>
+loadFromBlob(<br/>&nbsp;
+  blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,<br/>&nbsp;
+  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a> | null,<br/>&nbsp;
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null,<br/>&nbsp;
+  fileHandle?: FileSystemHandle | null <br/>
+) => Promise&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L61">RestoredDataState</a>>
+</pre>
+
+### loadLibraryFromBlob
+
+This function loads the library from the blob. Additonally takes `defaultStatus` param which sets the default status for library item if not present, defaults to `unpublished`.
+
+**How to use **
+
+```js
+import { loadLibraryFromBlob } from "@excalidraw/excalidraw";
 ```
 
-This function loads the scene data from the blob (or file). If you pass `localAppState`, `localAppState` value will be preferred over the `appState` derived from `blob`. Throws if blob doesn't contain valid scene data.
+**_Signature_**
 
-### `loadSceneOrLibraryFromBlob`
+<pre>
+loadLibraryFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>, defaultStatus: "published" | "unpublished")
+</pre>
+
+### loadSceneOrLibraryFromBlob
+
+This function loads either scene or library data from the supplied blob. If the blob contains scene data, and you pass `localAppState`, `localAppState` value will be preferred over the `appState` derived from `blob`.
+
+:::
+
+caution Throws if blob doesn't contain valid `scene` data or `library` data.
+
+:::
 
 **How to use**
 
-```js
+```js showLineNumbers
 import { loadSceneOrLibraryFromBlob, MIME_TYPES } from "@excalidraw/excalidraw";
 
 const contents = await loadSceneOrLibraryFromBlob(file, null, null);
@@ -114,20 +125,20 @@ if (contents.type === MIME_TYPES.excalidraw) {
 }
 ```
 
-**Signature**
+**_Signature_**
 
-```tsx
-loadSceneOrLibraryFromBlob(
+<pre>
+loadSceneOrLibraryFromBlob(<br/>&nbsp;
   blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,
-  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a> | null,
-  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null,
-  fileHandle?: FileSystemHandle | null
-) => Promise<{ type: string, data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L53">RestoredDataState</a> | <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L33">ImportedLibraryState</a>}>
-```
+  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a> | null,<br/>&nbsp;
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null,<br/>&nbsp;
+  fileHandle?: FileSystemHandle | null<br/>
+) => Promise&lt;&#123; type: string, data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L53">RestoredDataState</a> | <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L33">ImportedLibraryState</a>}>
+</pre>
 
-This function loads either scene or library data from the supplied blob. If the blob contains scene data, and you pass `localAppState`, `localAppState` value will be preferred over the `appState` derived from `blob`. Throws if blob doesn't contain neither valid scene data or library data.
+### getFreeDrawSvgPath
 
-### `getFreeDrawSvgPath`
+This function returns the `free draw` svg path for the element.
 
 **How to use**
 
@@ -137,13 +148,13 @@ import { getFreeDrawSvgPath } from "@excalidraw/excalidraw";
 
 **Signature**
 
-```tsx
-getFreeDrawSvgPath(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L127">ExcalidrawFreeDrawElement</a>
-```
+<pre>
+getFreeDrawSvgPath(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L182">ExcalidrawFreeDrawElement</a>)
+</pre>
 
-This function returns the free draw svg path for the element.
+### isLinearElement
 
-### `isLinearElement`
+This function returns true if the element is `linear` type (`arrow` |`line`) else returns `false`.
 
 **How to use**
 
@@ -157,9 +168,9 @@ import { isLinearElement } from "@excalidraw/excalidraw";
 isLinearElement(elementType?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L80">ExcalidrawElement</a>): boolean
 ```
 
-This function returns true if the element is linear type (`arrow` |`line`) else returns false.
+### getNonDeletedElements
 
-### `getNonDeletedElements`
+This function returns an array of `deleted` elements.
 
 **How to use**
 
@@ -169,13 +180,13 @@ import { getNonDeletedElements } from "@excalidraw/excalidraw";
 
 **Signature**
 
-```tsx
-getNonDeletedElements(elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L80"> readonly ExcalidrawElement[]</a>): as readonly <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L90">NonDeletedExcalidrawElement[]</a>
-```
+<pre>
+getNonDeletedElements(elements:<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114"> readonly ExcalidrawElement[]</a>): as readonly <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L125">NonDeletedExcalidrawElement[]</a>
+</pre>
 
-This function returns an array of deleted elements.
+### mergeLibraryItems
 
-### `mergeLibraryItems`
+This function merges two `LibraryItems` arrays, where unique items from `otherItems` are sorted first in the returned array.
 
 ```js
 import { mergeLibraryItems } from "@excalidraw/excalidraw";
@@ -183,13 +194,14 @@ import { mergeLibraryItems } from "@excalidraw/excalidraw";
 
 **_Signature_**
 
-```tsx
-mergeLibraryItems(localItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>, otherItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>
-```
+<pre>
+mergeLibraryItems(localItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L250">LibraryItems</a>,<br/>&nbsp;
+ otherItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L250">LibraryItems</a>
+</pre>
 
-This function merges two `LibraryItems` arrays, where unique items from `otherItems` are sorted first in the returned array.
+### parseLibraryTokensFromUrl
 
-### `parseLibraryTokensFromUrl`
+Parses library parameters from URL if present (expects the `#addLibrary` hash key), and returns an object with the `libraryUrl` and `idToken`. Returns `null` if `#addLibrary` hash key not found.
 
 **How to use**
 
@@ -206,9 +218,9 @@ parseLibraryTokensFromUrl(): {
 } | null
 ```
 
-Parses library parameters from URL if present (expects the `#addLibrary` hash key), and returns an object with the `libraryUrl` and `idToken`. Returns `null` if `#addLibrary` hash key not found.
+### useHandleLibrary
 
-### `useHandleLibrary`
+A hook that automatically imports library from url if `#addLibrary` hash key exists on initial load, or when it changes during the editing session (e.g. when a user installs a new library), and handles initial library load if `getInitialLibraryItems` getter is supplied.
 
 **How to use**
 
@@ -223,18 +235,34 @@ export const App = () => {
 
 **Signature**
 
-```tsx
-useHandleLibrary(opts: {
-  excalidrawAPI: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L432">ExcalidrawAPI</a>,
-  getInitialLibraryItems?: () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L224">LibraryItemsSource</a>
+<pre>
+useHandleLibrary(opts: &#123;<br/>&nbsp;
+  excalidrawAPI: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L494">ExcalidrawAPI</a>,<br/>&nbsp;
+  getInitialLibraryItems?: () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L253">LibraryItemsSource</a><br/>
 });
+</pre>
+
+In the future, we will be adding support for handling `library` persistence to `browser storage` (or elsewhere).
+
+### getSceneVersion
+
+This function returns the current `scene` version.
+
+**_Signature_**
+
+<pre>
+getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>)
+</pre>
+
+**How to use**
+
+```js
+import { getSceneVersion } from "@excalidraw/excalidraw";
 ```
 
-A hook that automatically imports library from url if `#addLibrary` hash key exists on initial load, or when it changes during the editing session (e.g. when a user installs a new library), and handles initial library load if `getInitialLibraryItems` getter is supplied.
+### sceneCoordsToViewportCoords
 
-In the future, we will be adding support for handling library persistence to browser storage (or elsewhere).
-
-### `sceneCoordsToViewportCoords`
+This function returns equivalent `viewport` coords for the provided `scene` coords in params.
 
 ```js
 import { sceneCoordsToViewportCoords } from "@excalidraw/excalidraw";
@@ -242,13 +270,14 @@ import { sceneCoordsToViewportCoords } from "@excalidraw/excalidraw";
 
 **_Signature_**
 
-```tsx
-sceneCoordsToViewportCoords({sceneX: number, sceneY: number}, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>): {x: number, y: number}
-```
+<pre>
+sceneCoordsToViewportCoords(&#123; sceneX: number, sceneY: number },<br/>&nbsp;
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a><br/>): &#123; x: number, y: number }
+</pre>
 
-This function returns equivalent viewport coords for the provided scene coords in params.
+### viewportCoordsToSceneCoords
 
-### `viewportCoordsToSceneCoords`
+This function returns equivalent `scene` coords for the provided `viewport` coords in params.
 
 ```js
 import { viewportCoordsToSceneCoords } from "@excalidraw/excalidraw";
@@ -256,48 +285,48 @@ import { viewportCoordsToSceneCoords } from "@excalidraw/excalidraw";
 
 **_Signature_**
 
-```tsx
-viewportCoordsToSceneCoords({clientX: number, clientY: number}, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>): {x: number, y: number}
-```
-
-This function returns equivalent scene coords for the provided viewport coords in params.
+<pre>
+viewportCoordsToSceneCoords(&#123; clientX: number, clientY: number },<br/>&nbsp;
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a><br/>): &#123;x: number, y: number}
+</pre>
 
 ### useDevice
 
-This hook can be used to check the type of device which is being used. It can only be used inside the `children` of `Excalidraw` component
+This hook can be used to check the type of device which is being used. It can only be used inside the `children` of `Excalidraw` component.
 
-```js
-import { useDevice, Footer } from "@excalidraw/excalidraw";
-
-const MobileFooter = ({
-}) => {
+```jsx live noInline
+const MobileFooter = ({}) => {
   const device = useDevice();
   if (device.isMobile) {
     return (
       <Footer>
-       <button
-        className="custom-footer"
-        onClick={() => alert("This is custom footer in mobile menu")}
-      >
-        {" "}
-        custom footer{" "}
-      </button>
+        <button
+          className="custom-footer"
+          style={{ marginLeft: "20px", height: "2rem" }}
+          onClick={() => alert("This is custom footer in mobile menu")}
+        >
+          custom footer
+        </button>
       </Footer>
     );
   }
   return null;
-
 };
-const App = () => {
-  <Excalidraw>
-    <MainMenu>
-      <MainMenu.Item> Item1 </MainMenu.Item>
-      <MainMenu.Item> Item 2 </>
-      <MobileFooter/>
-    </MainMenu>
-  </Excalidraw>
-}
+const App = () => (
+  <div style={{ height: "400px" }}>
+    <Excalidraw>
+      <MainMenu>
+        <MainMenu.Item> Item1 </MainMenu.Item>
+        <MainMenu.Item> Item 2 </MainMenu.Item>
+        <MobileFooter />
+      </MainMenu>
+    </Excalidraw>
+  </div>
+);
 
+// Need to render when code is span across multiple components
+// in Live Code blocks editor
+render(<App />);
 ```
 
 The `device` has the following `attributes`
@@ -311,7 +340,7 @@ The `device` has the following `attributes`
 
 ## Exported constants
 
-### `FONT_FAMILY`
+### FONT_FAMILY
 
 **How to use**
 
@@ -321,15 +350,15 @@ import { FONT_FAMILY } from "@excalidraw/excalidraw";
 
 `FONT_FAMILY` contains all the font families used in `Excalidraw` as explained below
 
-| Font Family | Description          |
-| ----------- | -------------------- |
-| Virgil      | The handwritten font |
-| Helvetica   | The Normal Font      |
-| Cascadia    | The Code Font        |
+| Font Family | Description            |
+| ----------- | ---------------------- |
+| `Virgil`    | The `handwritten` font |
+| `Helvetica` | The `Normal` Font      |
+| `Cascadia`  | The `Code` Font        |
 
 Defaults to `FONT_FAMILY.Virgil` unless passed in `initialData.appState.currentItemFontFamily`.
 
-### `THEME`
+### THEME
 
 **How to use**
 
@@ -339,19 +368,19 @@ import { THEME } from "@excalidraw/excalidraw";
 
 `THEME` contains all the themes supported by `Excalidraw` as explained below
 
-| Theme | Description     |
-| ----- | --------------- |
-| LIGHT | The light theme |
-| DARK  | The Dark theme  |
+| Theme   | Description       |
+| ------- | ----------------- |
+| `LIGHT` | The `light` theme |
+| `DARK`  | The `Dark` theme  |
 
 Defaults to `THEME.LIGHT` unless passed in `initialData.appState.theme`
 
-### `MIME_TYPES`
+### MIME_TYPES
+
+[`MIME_TYPES`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L101) contains all the mime types supported by `Excalidraw`.
 
 **How to use **
 
 ```js
 import { MIME_TYPES } from "@excalidraw/excalidraw";
 ```
-
-[`MIME_TYPES`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L92) contains all the mime types supported by `Excalidraw`.
