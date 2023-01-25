@@ -5,7 +5,7 @@ import {
   moveAllLeft,
   moveAllRight,
 } from "../zindex";
-import { KEYS, isDarwin, CODES } from "../keys";
+import { KEYS, CODES } from "../keys";
 import { t } from "../i18n";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
@@ -15,6 +15,7 @@ import {
   SendBackwardIcon,
   SendToBackIcon,
 } from "../components/icons";
+import { isDarwin } from "../constants";
 
 export const actionSendBackward = register({
   name: "sendBackward",

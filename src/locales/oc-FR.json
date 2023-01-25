@@ -447,10 +447,16 @@
     "d9480f": "Irange 9"
   },
   "welcomeScreen": {
-    "data": "Totas las donadas son enregistradas dins vòstre navegador.",
-    "switchToPlusApp": "Volètz puslèu utilizar Excalidraw+ ?",
-    "menuHints": "Exportar, preferéncias, lengas, ...",
-    "toolbarHints": "Prenètz un esplech e començatz de dessenhar !",
-    "helpHints": "Acorchis e ajuda"
+    "app": {
+      "center_heading": "Totas las donadas son enregistradas dins vòstre navegador.",
+      "center_heading_plus": "Voliatz puslèu utilizar Excalidraw+ a la plaça ?",
+      "menuHint": "Exportar, preferéncias, lengas, ..."
+    },
+    "defaults": {
+      "menuHint": "Exportar, preferéncias, e mai...",
+      "center_heading": "Diagram. Tot. Simplament.",
+      "toolbarHint": "Prenètz un esplech e començatz de dessenhar !",
+      "helpHint": "Acorchis e ajuda"
+    }
   }
 }

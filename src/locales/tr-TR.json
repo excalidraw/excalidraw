@@ -202,8 +202,8 @@
     "invalidSVGString": "Geçersiz SVG.",
     "cannotResolveCollabServer": "İş birliği sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin.",
     "importLibraryError": "Kütüphane yüklenemedi",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed": "Backend veritabanına kaydedilemedi. Eğer problem devam ederse, çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
+    "collabSaveFailed_sizeExceeded": "Backend veritabanına kaydedilemedi; tuval çok büyük. Çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz."
   },
   "toolBar": {
     "selection": "Seçme",
@@ -314,8 +314,8 @@
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
     "zoomToSelection": "Seçime yakınlaş",
     "toggleElementLock": "Seçimi Kilitle/çöz",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Sayfayı yukarı/aşağı kaydır",
+    "movePageLeftRight": "Sayfayı sola/sağa kaydır"
   },
   "clearCanvasDialog": {
     "title": "Tuvali temizle"
@@ -397,7 +397,7 @@
     "fileSavedToFilename": "{filename} kaydedildi",
     "canvas": "tuval",
     "selection": "seçim",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Tekil obje olarak yapıştırmak için veya var olan bir metin editörüne yapıştırmak için {{shortcut}} kullanın"
   },
   "colors": {
     "ffffff": "Beyaz",
@@ -447,10 +447,16 @@
     "d9480f": "Turuncu 9"
   },
   "welcomeScreen": {
-    "data": "Tüm veri internet gezgininize yerel olarak kaydedildi.",
-    "switchToPlusApp": "Excalidraw+ kullanmak ister miydiniz?",
-    "menuHints": "Dışa aktar, seçenkeler, diller, ...",
-    "toolbarHints": "Bir araç seçin & Çizime başlayın!",
-    "helpHints": "Kısayollar & yardım"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

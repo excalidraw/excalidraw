@@ -45,7 +45,7 @@ export const getDefaultAppState = (): Omit<
       type: "selection",
       customType: null,
       locked: false,
-      lastActiveToolBeforeEraser: null,
+      lastActiveTool: null,
     },
     penMode: false,
     penDetected: false,
@@ -230,3 +230,11 @@ export const isEraserActive = ({
 }: {
   activeTool: AppState["activeTool"];
 }) => activeTool.type === "eraser";
+
+export const isHandToolActive = ({
+  activeTool,
+}: {
+  activeTool: AppState["activeTool"];
+}) => {
+  return activeTool.type === "hand";
+};
