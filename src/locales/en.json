@@ -220,7 +220,8 @@
     "lock": "Keep selected tool active after drawing",
     "penMode": "Pen mode - prevent touch",
     "link": "Add/ Update link for a selected shape",
-    "eraser": "Eraser"
+    "eraser": "Eraser",
+    "hand": "Hand (panning tool)"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -228,7 +229,7 @@
     "shapes": "Shapes"
   },
   "hints": {
-    "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging",
+    "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging, or use the hand tool",
     "linearElement": "Click to start multiple points, drag for single line",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
@@ -246,7 +247,8 @@
     "publishLibrary": "Publish your own library",
     "bindTextToElement": "Press enter to add text",
     "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
-    "eraserRevert": "Hold Alt to revert the elements marked for deletion"
+    "eraserRevert": "Hold Alt to revert the elements marked for deletion",
+    "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page."
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",

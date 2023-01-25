@@ -447,10 +447,16 @@
     "d9480f": "橙 9"
   },
   "welcomeScreen": {
-    "data": "您的所有数据都储存在浏览器本地。",
-    "switchToPlusApp": "是否前往 Excalidraw+ ？",
-    "menuHints": "导出、首选项、语言...",
-    "toolbarHints": "选择工具并开始绘图！",
-    "helpHints": "快捷键和帮助"
+    "app": {
+      "center_heading": "您的所有数据都储存在浏览器本地。",
+      "center_heading_plus": "是否前往 Excalidraw+ ？",
+      "menuHint": "导出、首选项、语言……"
+    },
+    "defaults": {
+      "menuHint": "导出、首选项……",
+      "center_heading": "图，化繁为简。",
+      "toolbarHint": "选择工具并开始绘图！",
+      "helpHint": "快捷键和帮助"
+    }
   }
 }

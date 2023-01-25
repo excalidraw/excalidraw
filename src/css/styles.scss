@@ -8,6 +8,10 @@
 }
 
 .excalidraw {
+  --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
+    Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--ui-font);
+
   position: relative;
   overflow: hidden;
   color: var(--text-primary-color);
@@ -549,6 +553,7 @@
     border-top-left-radius: var(--border-radius-lg);
     border-bottom-left-radius: var(--border-radius-lg);
     border-right: 0;
+    overflow: hidden;
 
     background-color: var(--island-bg-color);
 

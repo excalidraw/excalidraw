@@ -447,10 +447,16 @@
     "d9480f": "Orange 9"
   },
   "welcomeScreen": {
-    "data": "Toutes vos données sont sauvegardées en local dans votre navigateur.",
-    "switchToPlusApp": "Vous vouliez plutôt aller à Excalidraw+ ?",
-    "menuHints": "Exportation, préférences, langues, ...",
-    "toolbarHints": "Choisissez un outil et commencez à dessiner !",
-    "helpHints": "Raccourcis et aide"
+    "app": {
+      "center_heading": "Toutes vos données sont sauvegardées en local dans votre navigateur.",
+      "center_heading_plus": "Vouliez-vous plutôt aller à Excalidraw+ à la place ?",
+      "menuHint": "Exportation, préférences, langues, ..."
+    },
+    "defaults": {
+      "menuHint": "Exportation, préférences et plus...",
+      "center_heading": "Diagrammes. Rendus. Simples.",
+      "toolbarHint": "Choisissez un outil et commencez à dessiner !",
+      "helpHint": "Raccourcis et aide"
+    }
   }
 }
