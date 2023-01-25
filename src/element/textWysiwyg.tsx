@@ -170,7 +170,7 @@ export const textWysiwyg = ({
       const width = eMetrics.width;
       // Set to element height by default since that's
       // what is going to be used for unbounded text
-      let textElementHeight = updatedTextElement.height;
+      let textElementHeight = Math.max(updatedTextElement.height, maxHeight);
       if (container && updatedTextElement.containerId) {
         if (isArrowElement(container)) {
           const boundTextCoords =

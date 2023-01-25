@@ -83,6 +83,14 @@ export const redrawTextBoundingBox = (
   const metrics = { width, height, baseline };
   let coordY = textElement.y;
   let coordX = textElement.x;
+  // Maintain coordX for non left-aligned text in case the width has changed
+  if (!container) {
+    if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
+      coordX += textElement.width - metrics.width;
+    } else if (textElement.textAlign === TEXT_ALIGN.CENTER) {
+      coordX += textElement.width / 2 - metrics.width / 2;
+    }
+  }
   // Resize container and vertically center align the text
   if (container) {
     if (!isArrowElement(container)) {

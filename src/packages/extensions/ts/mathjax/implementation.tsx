@@ -356,6 +356,9 @@ const consumeMathNewlines = (
   mathProps: MathProps,
   isMathJaxLoaded: boolean,
 ) => {
+  if (!isMathJaxLoaded) {
+    return text;
+  }
   const tempText = splitMath(text.replace(/\r\n?/g, "\n"), mathProps);
   if (mathProps.useTex || !mathProps.mathOnly) {
     for (let i = 0; i < tempText.length; i++) {
@@ -472,7 +475,7 @@ const markupText = (
   isMathJaxLoaded: boolean,
 ) => {
   const lines = consumeMathNewlines(text, mathProps, isMathJaxLoaded).split(
-    getMathNewline(mathProps),
+    isMathJaxLoaded ? getMathNewline(mathProps) : "\n",
   );
   const markup = [] as Array<string>[];
   const aria = [] as Array<string>[];
@@ -709,7 +712,7 @@ const renderMath = (
   parentWidth?: number,
 ): string => {
   const mathLines = consumeMathNewlines(text, mathProps, isMathJaxLoaded).split(
-    getMathNewline(mathProps),
+    isMathJaxLoaded ? getMathNewline(mathProps) : "\n",
   );
   const { markup, aria } = markupText(text, mathProps, isMathJaxLoaded);
   const metrics = getMetrics(markup, fontSize, mathProps, isMathJaxLoaded);
@@ -1150,7 +1153,7 @@ const wrapMathElement = function (element, containerWidth, next) {
   const metrics = getMetrics(markup, fontSize, mathProps, isMathJaxLoaded);
 
   const lines = consumeMathNewlines(text, mathProps, isMathJaxLoaded).split(
-    "\n",
+    isMathJaxLoaded ? getMathNewline(mathProps) : "\n",
   );
   const wrappedLines: string[] = [];
   const spaceWidth = getTextWidth(" ", font);
