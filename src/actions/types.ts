@@ -34,86 +34,92 @@ type ActionFn = (
 export type UpdaterFn = (res: ActionResult) => void;
 export type ActionFilterFn = (action: Action) => void;
 
-export type ActionName =
-  | "copy"
-  | "cut"
-  | "paste"
-  | "copyAsPng"
-  | "copyAsSvg"
-  | "copyText"
-  | "sendBackward"
-  | "bringForward"
-  | "sendToBack"
-  | "bringToFront"
-  | "copyStyles"
-  | "selectAll"
-  | "pasteStyles"
-  | "gridMode"
-  | "zenMode"
-  | "stats"
-  | "changeStrokeColor"
-  | "changeBackgroundColor"
-  | "changeFillStyle"
-  | "changeStrokeWidth"
-  | "changeStrokeShape"
-  | "changeSloppiness"
-  | "changeStrokeStyle"
-  | "changeArrowhead"
-  | "changeOpacity"
-  | "changeFontSize"
-  | "toggleCanvasMenu"
-  | "toggleEditMenu"
-  | "undo"
-  | "redo"
-  | "finalize"
-  | "changeProjectName"
-  | "changeExportBackground"
-  | "changeExportEmbedScene"
-  | "changeExportScale"
-  | "saveToActiveFile"
-  | "saveFileToDisk"
-  | "loadScene"
-  | "duplicateSelection"
-  | "deleteSelectedElements"
-  | "changeViewBackgroundColor"
-  | "clearCanvas"
-  | "zoomIn"
-  | "zoomOut"
-  | "resetZoom"
-  | "zoomToFit"
-  | "zoomToSelection"
-  | "changeFontFamily"
-  | "changeTextAlign"
-  | "changeVerticalAlign"
-  | "toggleFullScreen"
-  | "toggleShortcuts"
-  | "group"
-  | "ungroup"
-  | "goToCollaborator"
-  | "addToLibrary"
-  | "changeRoundness"
-  | "alignTop"
-  | "alignBottom"
-  | "alignLeft"
-  | "alignRight"
-  | "alignVerticallyCentered"
-  | "alignHorizontallyCentered"
-  | "distributeHorizontally"
-  | "distributeVertically"
-  | "flipHorizontal"
-  | "flipVertical"
-  | "viewMode"
-  | "exportWithDarkMode"
-  | "toggleTheme"
-  | "increaseFontSize"
-  | "decreaseFontSize"
-  | "unbindText"
-  | "hyperlink"
-  | "bindText"
-  | "toggleLock"
-  | "toggleLinearEditor"
-  | "toggleEraserTool"
-  | "toggleHandTool";
+const actionNames = [
+  "copy",
+  "cut",
+  "paste",
+  "copyAsPng",
+  "copyAsSvg",
+  "copyText",
+  "sendBackward",
+  "bringForward",
+  "sendToBack",
+  "bringToFront",
+  "copyStyles",
+  "selectAll",
+  "pasteStyles",
+  "gridMode",
+  "zenMode",
+  "stats",
+  "changeStrokeColor",
+  "changeBackgroundColor",
+  "changeFillStyle",
+  "changeStrokeWidth",
+  "changeStrokeShape",
+  "changeSloppiness",
+  "changeStrokeStyle",
+  "changeArrowhead",
+  "changeOpacity",
+  "changeFontSize",
+  "toggleCanvasMenu",
+  "toggleEditMenu",
+  "undo",
+  "redo",
+  "finalize",
+  "changeProjectName",
+  "changeExportBackground",
+  "changeExportEmbedScene",
+  "changeExportScale",
+  "saveToActiveFile",
+  "saveFileToDisk",
+  "loadScene",
+  "duplicateSelection",
+  "deleteSelectedElements",
+  "changeViewBackgroundColor",
+  "clearCanvas",
+  "zoomIn",
+  "zoomOut",
+  "resetZoom",
+  "zoomToFit",
+  "zoomToSelection",
+  "changeFontFamily",
+  "changeTextAlign",
+  "changeVerticalAlign",
+  "toggleFullScreen",
+  "toggleShortcuts",
+  "group",
+  "ungroup",
+  "goToCollaborator",
+  "addToLibrary",
+  "changeRoundness",
+  "alignTop",
+  "alignBottom",
+  "alignLeft",
+  "alignRight",
+  "alignVerticallyCentered",
+  "alignHorizontallyCentered",
+  "distributeHorizontally",
+  "distributeVertically",
+  "flipHorizontal",
+  "flipVertical",
+  "viewMode",
+  "exportWithDarkMode",
+  "toggleTheme",
+  "increaseFontSize",
+  "decreaseFontSize",
+  "unbindText",
+  "hyperlink",
+  "bindText",
+  "toggleLock",
+  "toggleLinearEditor",
+  "toggleEraserTool",
+  "toggleHandTool",
+] as const;
+
+// So we can have the `isActionName` type guard
+export type ActionName = typeof actionNames[number];
+export const isActionName = (n: any): n is ActionName =>
+  actionNames.includes(n);
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
