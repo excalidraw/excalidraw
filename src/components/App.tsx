@@ -615,7 +615,6 @@ class App extends React.Component<AppProps, AppState> {
                         !this.scene.getElementsIncludingDeleted().length
                       }
                       confirmDialogTrigger={this.state.confirmDialogTrigger}
-                      // onConfirmDialogClose={this.onConfirmDialogClose}
                       onConfirmDialogClose={() => {
                         this.setState({ confirmDialogTrigger: false })
                       }}

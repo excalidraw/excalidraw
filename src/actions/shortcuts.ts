@@ -42,7 +42,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   toggleTheme: [getShortcutKey("Shift+Alt+D")],
   saveScene: [getShortcutKey("CtrlOrCmd+S")],
   loadScene: [getShortcutKey("CtrlOrCmd+O")],
-  clearCanvas: [getShortcutKey("Shift+Delete")],
+  clearCanvas: [getShortcutKey("Ctrl+Delete")],
   imageExport: [getShortcutKey("CtrlOrCmd+Shift+E")],
   cut: [getShortcutKey("CtrlOrCmd+X")],
   copy: [getShortcutKey("CtrlOrCmd+C")],
