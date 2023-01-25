@@ -92,6 +92,10 @@ const config = {
                 label: "Twitter",
                 href: "https://twitter.com/excalidraw",
               },
+              {
+                label: "Linkedin",
+                href: "https://www.linkedin.com/company/excalidraw",
+              },
             ],
           },
           {
