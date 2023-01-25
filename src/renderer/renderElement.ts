@@ -44,6 +44,7 @@ import {
   getBoundTextElement,
   getBoundTextElementOffset,
   getContainerElement,
+  getLineWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -284,7 +285,7 @@ const drawElementOnCanvas = (
         if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
           verticalOffset = getBoundTextElementOffset(element);
         }
-
+        const spaceWidth = getLineWidth(" ", getFontString(element));
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
@@ -292,9 +293,11 @@ const drawElementOnCanvas = (
             ? element.width
             : 0;
         for (let index = 0; index < lines.length; index++) {
+          const trailingSpaces =
+            lines[index].length - lines[index].trimEnd().length;
           context.fillText(
-            lines[index],
-            horizontalOffset,
+            lines[index].trimEnd(),
+            Math.max(horizontalOffset - trailingSpaces * spaceWidth, getBoundTextElementOffset(element)), // ,
             (index + 1) * lineHeight - verticalOffset,
           );
         }
