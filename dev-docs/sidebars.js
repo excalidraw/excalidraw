@@ -30,18 +30,18 @@ const sidebars = {
 
     {
       type: "category",
-      label: "Package",
+      label: "@excalidraw/excalidraw",
 
       items: [
-        "package/installation",
-        "package/integration",
-        "package/customizing-styles",
+        "@excalidraw/excalidraw/installation",
+        "@excalidraw/excalidraw/integration",
+        "@excalidraw/excalidraw/customizing-styles",
         {
           type: "category",
           label: "API",
           link: {
             type: "doc",
-            id: "package/api/api-intro",
+            id: "@excalidraw/excalidraw/api/api-intro",
           },
           items: [
             {
@@ -49,13 +49,13 @@ const sidebars = {
               label: "Props",
               link: {
                 type: "doc",
-                id: "package/api/props/props",
+                id: "@excalidraw/excalidraw/api/props/props",
               },
               items: [
-                "package/api/props/initialdata",
-                "package/api/props/ref",
-                "package/api/props/render-props",
-                "package/api/props/ui-options",
+                "@excalidraw/excalidraw/api/props/initialdata",
+                "@excalidraw/excalidraw/api/props/ref",
+                "@excalidraw/excalidraw/api/props/render-props",
+                "@excalidraw/excalidraw/api/props/ui-options",
               ],
             },
             {
@@ -63,31 +63,37 @@ const sidebars = {
               label: "Components",
               link: {
                 type: "doc",
-                id: "package/api/components/components-intro",
+                id: "@excalidraw/excalidraw/api/components/components-intro",
               },
               items: [
-                "package/api/components/footer",
-                "package/api/components/main-menu",
-                "package/api/components/welcome-screen",
-                "package/api/components/live-collaboration-trigger",
+                "@excalidraw/excalidraw/api/components/footer",
+                "@excalidraw/excalidraw/api/components/main-menu",
+                "@excalidraw/excalidraw/api/components/welcome-screen",
+                "@excalidraw/excalidraw/api/components/live-collaboration-trigger",
               ],
             },
             {
               type: "category",
               label: "Utils",
-              link: { type: "doc", id: "package/api/utils/utils-intro" },
-              items: ["package/api/utils/export", "package/api/utils/restore"],
+              link: {
+                type: "doc",
+                id: "@excalidraw/excalidraw/api/utils/utils-intro",
+              },
+              items: [
+                "@excalidraw/excalidraw/api/utils/export",
+                "@excalidraw/excalidraw/api/utils/restore",
+              ],
             },
             {
               type: "category",
               label: "Constants",
-              link: { type: "doc", id: "package/api/constants" },
+              link: { type: "doc", id: "@excalidraw/excalidraw/api/constants" },
               items: [],
             },
           ],
         },
-        "package/faq",
-        "package/development",
+        "@excalidraw/excalidraw/faq",
+        "@excalidraw/excalidraw/development",
       ],
     },
   ],

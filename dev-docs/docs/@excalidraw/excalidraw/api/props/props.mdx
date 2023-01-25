@@ -4,8 +4,8 @@ All `props` are *optional*.
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| [`initialData`](/docs/package/api/props/initialdata) |  `object` &#124; `null` &#124; <code>Promise<object &#124; null></code> | `null` | The initial data with which app loads. |
-| [`ref`](/docs/package/api/props/ref) | `object` | _ | `Ref` to be passed to Excalidraw |
+| [`initialData`](/docs/@excalidraw/excalidraw/api/props/initialdata) |  `object` &#124; `null` &#124; <code>Promise<object &#124; null></code> | `null` | The initial data with which app loads. |
+| [`ref`](/docs/@excalidraw/excalidraw/api/props/ref) | `object` | _ | `Ref` to be passed to Excalidraw |
 | [`isCollaborating`](#iscollaborating) | `boolean` | _ | This indicates if the app is in `collaboration` mode |
 | [`onChange`](#onchange) | `function` | _ | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw `elements` and the current `app state`. |
 | [`onPointerUpdate`](#onpointerupdate) | `function` | _ | Callback triggered when mouse pointer is updated. |
@@ -15,16 +15,16 @@ All `props` are *optional*.
 | [`onLibraryChange`](#onlibrarychange) | `function` | _ | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`onLinkOpen`](#onlinkopen) | `function` | _ | The callback if supplied is triggered when any link is opened. |
 | [`langCode`](#langcode) | `string` | `en` | Language code string to be used in Excalidraw |
-| [`renderTopRightUI`](/docs/package/api/props/render-props#rendertoprightui) | `function` | _ | Render function that renders custom UI in top right corner |
-| [`renderCustomStats`](/docs/package/api/props/render-props#rendercustomstats) | `function` | _ | Render function that can be used to render custom stats on the stats dialog. |
-| [`renderSidebar`](/docs/package/api/props/render-props#rendersidebar) | `function` | _ | Render function that renders custom sidebar. |
+| [`renderTopRightUI`](/docs/@excalidraw/excalidraw/api/props/render-props#rendertoprightui) | `function` | _ | Render function that renders custom UI in top right corner |
+| [`renderCustomStats`](/docs/@excalidraw/excalidraw/api/props/render-props#rendercustomstats) | `function` | _ | Render function that can be used to render custom stats on the stats dialog. |
+| [`renderSidebar`](/docs/@excalidraw/excalidraw/api/props/render-props#rendersidebar) | `function` | _ | Render function that renders custom sidebar. |
 | [`viewModeEnabled`](#viewmodeenabled) | `boolean` | _ | This indicates if the app is in `view` mode. |
 | [`zenModeEnabled`](#zenmodeenabled) | `boolean` | _ | This indicates if the `zen` mode is enabled |
 | [`gridModeEnabled`](#gridmodeenabled) | `boolean` | _ | This indicates if the `grid` mode is enabled |
 | [`libraryReturnUrl`](#libraryreturnurl) | `string` | _ | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | `"light"` &#124; `"dark"` | `"light"` | The theme of the Excalidraw component |
 | [`name`](#name) | `string` |  | Name of the drawing |
-| [`UIOptions`](/docs/package/api/props/ui-options) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L151) | To customise UI options. Currently we support customising [`canvas actions`](#canvasactions) |
+| [`UIOptions`](/docs/@excalidraw/excalidraw/api/props/ui-options) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L151) | To customise UI options. Currently we support customising [`canvas actions`](#canvasactions) |
 | [`detectScroll`](#detectscroll) | `boolean` | `true` | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
 | [`autoFocus`](#autofocus) | `boolean` | `false` | indicates whether to focus the Excalidraw component on page load |
@@ -36,7 +36,7 @@ Beyond attributes that Excalidraw elements already support, you can store `custo
 
 You can use this to add any extra information you need to keep track of.
 
-You can add `customData` to elements when passing them as [`initialData`](/docs/package/api/props/initialdata), or using [`updateScene`](/docs/package/api/props/ref#updatescene) / [`updateLibrary`](/docs/package/api/props/ref#updatelibrary) afterwards.
+You can add `customData` to elements when passing them as [`initialData`](/docs/@excalidraw/excalidraw/api/props/initialdata), or using [`updateScene`](/docs/@excalidraw/excalidraw/api/props/ref#updatescene) / [`updateLibrary`](/docs/@excalidraw/excalidraw/api/props/ref#updatelibrary) afterwards.
 
 ```js showLineNumbers
 {
@@ -198,7 +198,7 @@ Defaults to *window.location.origin + window.location.pathname*. To install the 
 
 This prop controls Excalidraw's theme. When supplied, the value takes precedence over *intialData.appState.theme*, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app unless *UIOptions.canvasActions.toggleTheme* is set to `true`, in which case the `theme` prop will control Excalidraw's default theme with ability to allow theme switching (you must take care of updating the `theme` prop when you detect a change to `appState.theme` from the [onChange](#onchange) callback).
 
-You can use [`THEME`](/docs/package/api/utils#theme) to specify the theme.
+You can use [`THEME`](/docs/@excalidraw/excalidraw/api/utils#theme) to specify the theme.
 
 ### name
 
