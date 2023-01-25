@@ -123,6 +123,15 @@ const config = {
           hideable: true,
         },
       },
+      algolia: {
+        // The application ID provided by Algolia
+        appId: "YOUR_APP_ID",
+
+        // Public API key: it is safe to commit it
+        apiKey: "YOUR_SEARCH_API_KEY",
+
+        indexName: "YOUR_INDEX_NAME",
+      },
     }),
   themes: ["@docusaurus/theme-live-codeblock"],
   plugins: ["docusaurus-plugin-sass"],
