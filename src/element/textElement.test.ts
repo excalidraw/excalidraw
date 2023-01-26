@@ -12,6 +12,20 @@ describe("Test wrapText", () => {
     expect(res).toBe("Hello whats up    ");
   });
 
+  it("should work with emojis", () => {
+    const text = "😀";
+    const maxWidth = 1;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("😀");
+  });
+
+  it("should show the text correctly when min width reached", () => {
+    const text = "Hello😀";
+    const maxWidth = 10;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("H\ne\nl\nl\no\n😀");
+  });
+
   describe("When text doesn't contain new lines", () => {
     const text = "Hello whats up";
     [
