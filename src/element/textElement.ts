@@ -358,7 +358,6 @@ export const getTextWidth = (text: string, font: FontString) => {
   return width;
 };
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
-  console.log(maxWidth);
   return text
     .split("\n")
     .flatMap((line) => {
@@ -391,7 +390,7 @@ const breakLine = (line: string, font: FontString, maxWidth: number) => {
       return getLineWidth(word.trim(), font) <= maxWidth ||
         Array.from(word.trim()).length === 1
         ? word
-        : [...breakWord(word, font, maxWidth), " "];
+        : breakWord(word, font, maxWidth);
     });
   const lines: Array<string> = [];
   let lastLineWidth = 0;
