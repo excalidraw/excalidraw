@@ -47,6 +47,7 @@ import {
   getLineWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { getMaxContainerWidth } from "../element/newElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -286,6 +287,7 @@ const drawElementOnCanvas = (
           verticalOffset = getBoundTextElementOffset(element);
         }
         const spaceWidth = getLineWidth(" ", getFontString(element));
+        const maxWidth = getMaxContainerWidth(element);
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
@@ -293,11 +295,26 @@ const drawElementOnCanvas = (
             ? element.width
             : 0;
         for (let index = 0; index < lines.length; index++) {
-          const trailingSpaces =
-            lines[index].length - lines[index].trimEnd().length;
+          let marginToAdd = 0;
+
+          if (element.textAlign === "center" || element.textAlign === "right") {
+            const trimmedLineWidth = getLineWidth(
+              lines[index].trimEnd(),
+              getFontString(element),
+            );
+            const aviableWidth = maxWidth - trimmedLineWidth;
+            const trailingSpacesWidth =
+              (lines[index].length - lines[index].trimEnd().length) *
+              spaceWidth;
+            marginToAdd = -Math.min(aviableWidth, trailingSpacesWidth);
+            if (element.textAlign === "center") {
+              marginToAdd /= 2;
+            }
+          }
+
           context.fillText(
             lines[index].trimEnd(),
-            Math.max(horizontalOffset - trailingSpaces * spaceWidth, getBoundTextElementOffset(element)), // ,
+            horizontalOffset + marginToAdd,
             (index + 1) * lineHeight - verticalOffset,
           );
         }
