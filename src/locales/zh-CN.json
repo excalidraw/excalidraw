@@ -220,7 +220,7 @@
     "penMode": "笔模式 – 避免误触",
     "link": "为选中的形状添加/更新链接",
     "eraser": "橡皮",
-    "hand": ""
+    "hand": "抓手（平移工具）"
   },
   "headings": {
     "canvasActions": "画布动作",
@@ -228,7 +228,7 @@
     "shapes": "形状"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "要移动画布，请按住鼠标滚轮或空格键同时拖拽鼠标，或使用抓手工具。",
     "linearElement": "点击创建多个点 拖动创建直线",
     "freeDraw": "点击并拖动，完成时松开",
     "text": "提示：您也可以使用选择工具双击任意位置来添加文字",
