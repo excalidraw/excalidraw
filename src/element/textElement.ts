@@ -39,6 +39,19 @@ export const normalizeText = (text: string) => {
   );
 };
 
+export const getMaxTextElementWidth = (textElement: ExcalidrawTextElement) => {
+  if (!textElement.containerId) {
+    return textElement.width; // TODO: CHECK THIS CASE
+  }
+  const container = Scene.getScene(textElement)?.getElement<ExcalidrawElement>(
+    textElement.containerId,
+  );
+  if (!container) {
+    return textElement.width; // TODO: CHECK THIS CASE
+  }
+  return getMaxContainerWidth(container);
+};
+
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
@@ -345,6 +358,7 @@ export const getTextWidth = (text: string, font: FontString) => {
   return width;
 };
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
+  console.log(maxWidth);
   return text
     .split("\n")
     .flatMap((line) => {
@@ -360,6 +374,10 @@ const breakLine = (line: string, font: FontString, maxWidth: number) => {
   const words = line
     .split(" ")
     .reduce((words: Array<string>, word: string) => {
+      if (words.length === 0 && word.length === 0) {
+        words.push(" "); // line start with spaces
+        return words;
+      }
       if (words.length > 0) {
         words[words.length - 1] += " ";
       }

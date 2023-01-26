@@ -45,6 +45,7 @@ import {
   getBoundTextElementOffset,
   getContainerElement,
   getLineWidth,
+  getMaxTextElementWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { getMaxContainerWidth } from "../element/newElement";
@@ -278,6 +279,7 @@ const drawElementOnCanvas = (
         context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
+        const margin = getBoundTextElementOffset(element);
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.containerId
           ? getApproxLineHeight(getFontString(element))
@@ -287,13 +289,13 @@ const drawElementOnCanvas = (
           verticalOffset = getBoundTextElementOffset(element);
         }
         const spaceWidth = getLineWidth(" ", getFontString(element));
-        const maxWidth = getMaxContainerWidth(element);
+        const maxWidth = getMaxTextElementWidth(element);
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
             : element.textAlign === "right"
-            ? element.width
-            : 0;
+            ? element.width - margin
+            : margin;
         for (let index = 0; index < lines.length; index++) {
           let marginToAdd = 0;
 
