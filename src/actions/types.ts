@@ -125,10 +125,11 @@ const actionNames = [
   "decreaseFontSize",
   "unbindText",
   "hyperlink",
-  "eraser",
   "bindText",
   "toggleLock",
   "toggleLinearEditor",
+  "toggleEraserTool",
+  "toggleHandTool",
 ] as const;
 
 // So we can have the `isActionName` type guard

@@ -72,7 +72,7 @@
     "layers": "Tissiyin",
     "actions": "Tigawin",
     "language": "Tutlayt",
-    "liveCollaboration": "",
+    "liveCollaboration": "Amɛiwen s srid...",
     "duplicateSelection": "Sisleg",
     "untitled": "War azwel",
     "name": "Isem",
@@ -314,8 +314,8 @@
     "zoomToFit": "Simɣur akken ad twliḍ akk iferdisen",
     "zoomToSelection": "Simɣur ɣer tefrayt",
     "toggleElementLock": "Sekkeṛ/kkes asekker i tefrayt",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Smutti asebter d asawen/akessar",
+    "movePageLeftRight": "Smutti asebter s azelmaḍ/ayfus"
   },
   "clearCanvasDialog": {
     "title": "Sfeḍ taɣzut n usuneɣ"
@@ -447,10 +447,16 @@
     "d9480f": "Aččinawi 9"
   },
   "welcomeScreen": {
-    "data": "Akk isefka-inek•inem ttwakelsen s wudem adigan deg yiminig-inek•inem.",
-    "switchToPlusApp": "Tebɣiḍ ad tedduḍ ɣer Excalidraw+ deg umḍiq?",
-    "menuHints": "Asifeḍ, ismenyifen, tutlayin, ...",
-    "toolbarHints": "Fren afecku tebduḍ asuneɣ!",
-    "helpHints": "Inegzumen akked tallelt"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

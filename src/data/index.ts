@@ -2,7 +2,7 @@ import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
 } from "../clipboard";
-import { DEFAULT_EXPORT_PADDING, MIME_TYPES } from "../constants";
+import { DEFAULT_EXPORT_PADDING, isFirefox, MIME_TYPES } from "../constants";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { exportToCanvas, exportToSvg } from "../scene/export";
@@ -97,10 +97,21 @@ export const exportCanvas = async (
       const blob = canvasToBlob(tempCanvas);
       await copyBlobToClipboardAsPng(blob);
     } catch (error: any) {
+      console.warn(error);
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;
       }
-      throw new Error(t("alerts.couldNotCopyToClipboard"));
+      // TypeError *probably* suggests ClipboardItem not defined, which
+      // people on Firefox can enable through a flag, so let's tell them.
+      if (isFirefox && error.name === "TypeError") {
+        throw new Error(
+          `${t("alerts.couldNotCopyToClipboard")}\n\n${t(
+            "hints.firefox_clipboard_write",
+          )}`,
+        );
+      } else {
+        throw new Error(t("alerts.couldNotCopyToClipboard"));
+      }
     } finally {
       tempCanvas.remove();
     }

@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "붙여넣기",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "일반 텍스트로 붙여넣기",
     "pasteCharts": "차트 붙여넣기",
     "selectAll": "전체 선택",
     "multiSelect": "선택 영역에 추가하기",
@@ -72,7 +72,7 @@
     "layers": "레이어",
     "actions": "동작",
     "language": "언어",
-    "liveCollaboration": "",
+    "liveCollaboration": "실시간 협업...",
     "duplicateSelection": "복제",
     "untitled": "제목 없음",
     "name": "이름",
@@ -136,8 +136,8 @@
   "buttons": {
     "clearReset": "캔버스 초기화",
     "exportJSON": "파일로 내보내기",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "이미지 내보내기",
+    "export": "다른 이름으로 저장...",
     "exportToPng": "PNG로 내보내기",
     "exportToSvg": "SVG로 내보내기",
     "copyToClipboard": "클립보드로 복사",
@@ -145,7 +145,7 @@
     "scale": "크기",
     "save": "현재 파일에 저장",
     "saveAs": "다른 이름으로 저장",
-    "load": "",
+    "load": "열기",
     "getShareableLink": "공유 가능한 링크 생성",
     "close": "닫기",
     "selectLanguage": "언어 선택",
@@ -202,8 +202,8 @@
     "invalidSVGString": "유효하지 않은 SVG입니다.",
     "cannotResolveCollabServer": "협업 서버에 접속하는데 실패했습니다. 페이지를 새로고침하고 다시 시도해보세요.",
     "importLibraryError": "라이브러리를 불러오지 못했습니다.",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed": "데이터베이스에 저장하지 못했습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
+    "collabSaveFailed_sizeExceeded": "데이터베이스에 저장하지 못했습니다. 캔버스가 너무 큰 거 같습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요."
   },
   "toolBar": {
     "selection": "선택",
@@ -217,7 +217,7 @@
     "text": "텍스트",
     "library": "라이브러리",
     "lock": "선택된 도구 유지하기",
-    "penMode": "",
+    "penMode": "펜 모드 - 터치 방지",
     "link": "선택한 도형에 대해서 링크를 추가/업데이트",
     "eraser": "지우개"
   },
@@ -238,7 +238,7 @@
     "resize": "SHIFT 키를 누르면서 조정하면 크기의 비율이 제한됩니다.\nALT를 누르면서 조정하면 중앙을 기준으로 크기를 조정합니다.",
     "resizeImage": "SHIFT를 눌러서 자유롭게 크기를 변경하거나,\nALT를 눌러서 중앙을 고정하고 크기를 변경하기",
     "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
-    "lineEditor_info": "",
+    "lineEditor_info": "포인트를 편집하려면 Ctrl/Cmd을 누르고 더블 클릭을 하거나 Ctrl/Cmd + Enter를 누르세요",
     "lineEditor_pointSelected": "Delete 키로 꼭짓점을 제거하거나,\nCtrlOrCmd+D 로 복제하거나, 드래그 해서 이동시키기",
     "lineEditor_nothingSelected": "꼭짓점을 선택해서 수정하거나 (SHIFT를 눌러서 여러개 선택),\nAlt를 누르고 클릭해서 새로운 꼭짓점 추가하기",
     "placeImage": "클릭해서 이미지를 배치하거나, 클릭하고 드래그해서 사이즈를 조정하기",
@@ -314,8 +314,8 @@
     "zoomToFit": "모든 요소가 보이도록 확대/축소",
     "zoomToSelection": "선택 영역으로 확대/축소",
     "toggleElementLock": "선택한 항목을 잠금/잠금 해제",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "페이지 움직이기 위/아래",
+    "movePageLeftRight": "페이지 움직이기 좌/우"
   },
   "clearCanvasDialog": {
     "title": "캔버스 지우기"
@@ -397,7 +397,7 @@
     "fileSavedToFilename": "{filename} 로 저장되었습니다",
     "canvas": "캔버스",
     "selection": "선택한 요소",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "단일 요소로 붙여넣거나, 기존 텍스트 에디터에 붙여넣으려면 {{shortcut}} 을 사용하세요."
   },
   "colors": {
     "ffffff": "화이트",
@@ -447,10 +447,16 @@
     "d9480f": "주황색 9"
   },
   "welcomeScreen": {
-    "data": "",
-    "switchToPlusApp": "",
-    "menuHints": "",
-    "toolbarHints": "",
-    "helpHints": ""
+    "app": {
+      "center_heading": "당신의 모든 데이터는 브라우저에 저장되었습니다.",
+      "center_heading_plus": "대신 Excalidraw+로 이동하시겠습니까?",
+      "menuHint": "내보내기, 설정, 언어, ..."
+    },
+    "defaults": {
+      "menuHint": "내보내기, 설정, 더 보기...",
+      "center_heading": "",
+      "toolbarHint": "도구 선택 & 그리기 시작",
+      "helpHint": "단축키 & 도움말"
+    }
   }
 }

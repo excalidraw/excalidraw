@@ -81,9 +81,9 @@ export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
-export type LastActiveToolBeforeEraser =
+export type LastActiveTool =
   | {
-      type: typeof SHAPES[number]["value"] | "eraser";
+      type: typeof SHAPES[number]["value"] | "eraser" | "hand";
       customType: null;
     }
   | {
@@ -112,19 +112,23 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
-  activeTool:
+  activeTool: {
+    /**
+     * indicates a previous tool we should revert back to if we deselect the
+     * currently active tool. At the moment applies to `eraser` and `hand` tool.
+     */
+    lastActiveTool: LastActiveTool;
+    locked: boolean;
+  } & (
     | {
-        type: typeof SHAPES[number]["value"] | "eraser";
-        lastActiveToolBeforeEraser: LastActiveToolBeforeEraser;
-        locked: boolean;
+        type: typeof SHAPES[number]["value"] | "eraser" | "hand";
         customType: null;
       }
     | {
         type: "custom";
         customType: string;
-        lastActiveToolBeforeEraser: LastActiveToolBeforeEraser;
-        locked: boolean;
-      };
+      }
+  );
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
