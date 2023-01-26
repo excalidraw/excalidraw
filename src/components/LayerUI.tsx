@@ -50,6 +50,9 @@ import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
+import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
+import { HandButton } from "./HandButton";
+import { isHandToolActive } from "../appState";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -59,6 +62,7 @@ interface LayerUIProps {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
+  onHandToolToggle: () => void;
   onPenModeToggle: () => void;
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   showExitZenModeBtn: boolean;
@@ -85,6 +89,7 @@ const LayerUI = ({
   elements,
   canvas,
   onLockToggle,
+  onHandToolToggle,
   onPenModeToggle,
   onInsertElements,
   showExitZenModeBtn,
@@ -304,12 +309,19 @@ const LayerUI = ({
                             penDetected={appState.penDetected}
                           />
                           <LockButton
-                            zenModeEnabled={appState.zenModeEnabled}
                             checked={appState.activeTool.locked}
-                            onChange={() => onLockToggle()}
+                            onChange={onLockToggle}
                             title={t("toolBar.lock")}
                           />
+
                           <div className="App-toolbar__divider"></div>
+
+                          <HandButton
+                            checked={isHandToolActive(appState)}
+                            onChange={() => onHandToolToggle()}
+                            title={t("toolBar.hand")}
+                            isMobile
+                          />
 
                           <ShapesSwitcher
                             appState={appState}
@@ -322,9 +334,6 @@ const LayerUI = ({
                               });
                             }}
                           />
-                          {/* {actionManager.renderAction("eraser", {
-                          // size: "small",
-                        })} */}
                         </Stack.Row>
                       </Island>
                     </Stack.Row>
@@ -386,6 +395,7 @@ const LayerUI = ({
           }}
         />
       )}
+      <ActiveConfirmDialog />
       {renderImageExportDialog()}
       {renderJSONExportDialog()}
       {appState.pasteDialog.shown && (
@@ -408,7 +418,8 @@ const LayerUI = ({
           renderJSONExportDialog={renderJSONExportDialog}
           renderImageExportDialog={renderImageExportDialog}
           setAppState={setAppState}
-          onLockToggle={() => onLockToggle()}
+          onLockToggle={onLockToggle}
+          onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
           canvas={canvas}
           onImageAction={onImageAction}
