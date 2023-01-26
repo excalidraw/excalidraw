@@ -29,7 +29,6 @@ import {
   getContainerElement,
   getTextElementAngle,
   getTextWidth,
-  measureText,
   normalizeText,
   wrapText,
 } from "./textElement";
