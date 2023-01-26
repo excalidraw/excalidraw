@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 
 import { AppState, ExportOpts, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
-import { ExportIcon, exportToFileIcon, LinkIcon } from "./icons";
+import { exportToFileIcon, LinkIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
 import { actionSaveFileToDisk } from "../actions/actionExport";
 import { Card } from "./Card";
@@ -14,7 +14,6 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { trackEvent } from "../analytics";
 import { ActionManager } from "../actions/manager";
 import { getFrame } from "../utils";
-import MenuItem from "./MenuItem";
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -94,6 +93,7 @@ export const JSONExportDialog = ({
   actionManager,
   exportOpts,
   canvas,
+  setAppState,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
@@ -101,24 +101,15 @@ export const JSONExportDialog = ({
   actionManager: ActionManager;
   exportOpts: ExportOpts;
   canvas: HTMLCanvasElement | null;
+  setAppState: React.Component<any, AppState>["setState"];
 }) => {
-  const [modalIsShown, setModalIsShown] = useState(false);
-
   const handleClose = React.useCallback(() => {
-    setModalIsShown(false);
-  }, []);
+    setAppState({ openDialog: null });
+  }, [setAppState]);
 
   return (
     <>
-      <MenuItem
-        icon={ExportIcon}
-        label={t("buttons.export")}
-        onClick={() => {
-          setModalIsShown(true);
-        }}
-        dataTestId="json-export-button"
-      />
-      {modalIsShown && (
+      {appState.openDialog === "jsonExport" && (
         <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
           <JSONExportModal
             elements={elements}

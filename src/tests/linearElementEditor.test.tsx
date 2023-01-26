@@ -829,6 +829,15 @@ describe("Test Linear Elements", () => {
       });
     });
 
+    it("should match styles for text editor", () => {
+      createTwoPointerLinearElement("arrow");
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      expect(editor).toMatchSnapshot();
+    });
+
     it("should bind text to arrow when double clicked", async () => {
       createTwoPointerLinearElement("arrow");
       const arrow = h.elements[0] as ExcalidrawLinearElement;
@@ -1027,7 +1036,7 @@ describe("Test Linear Elements", () => {
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
         Object {
-          "x": 386.5,
+          "x": 387,
           "y": 70,
         }
       `);
@@ -1086,7 +1095,7 @@ describe("Test Linear Elements", () => {
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
         Object {
-          "x": 189.5,
+          "x": 190,
           "y": 20,
         }
       `);

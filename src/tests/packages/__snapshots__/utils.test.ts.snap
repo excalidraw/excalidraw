@@ -4,11 +4,12 @@ exports[`exportToSvg with default arguments 1`] = `
 Object {
   "activeTool": Object {
     "customType": null,
-    "lastActiveToolBeforeEraser": null,
+    "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
+  "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",

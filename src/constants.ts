@@ -2,6 +2,14 @@ import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
 import { FontFamilyValues } from "./element/types";
 
+export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+export const isWindows = /^Win/.test(navigator.platform);
+export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
+export const isFirefox =
+  "netscape" in window &&
+  navigator.userAgent.indexOf("rv:") > 1 &&
+  navigator.userAgent.indexOf("Gecko") > 1;
+
 export const APP_NAME = "Excalidraw";
 
 export const DRAGGING_THRESHOLD = 10; // px
@@ -54,6 +62,7 @@ export enum EVENT {
   SCROLL = "scroll",
   // custom events
   EXCALIDRAW_LINK = "excalidraw-link",
+  MENU_ITEM_SELECT = "menu.itemSelect",
 }
 
 export const ENV = {
@@ -150,6 +159,7 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     toggleTheme: null,
     saveAsImage: true,
   },
+  welcomeScreen: true,
 };
 
 // breakpoints
@@ -234,10 +244,6 @@ export const ROUNDNESS = {
   // NOTE right now we don't allow configuration and use a constant radius
   // (see DEFAULT_ADAPTIVE_RADIUS constant)
   ADAPTIVE_RADIUS: 3,
-} as const;
-
-export const COOKIES = {
-  AUTH_STATE_COOKIE: "excplus-auth",
 } as const;
 
 /** key containt id of precedeing elemnt id we use in reconciliation during

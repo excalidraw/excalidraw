@@ -30,6 +30,7 @@ import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
+import { ContextMenuItems } from "./components/ContextMenu";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -80,9 +81,9 @@ export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
-export type LastActiveToolBeforeEraser =
+export type LastActiveTool =
   | {
-      type: typeof SHAPES[number]["value"] | "eraser";
+      type: typeof SHAPES[number]["value"] | "eraser" | "hand";
       customType: null;
     }
   | {
@@ -92,6 +93,11 @@ export type LastActiveToolBeforeEraser =
   | null;
 
 export type AppState = {
+  contextMenu: {
+    items: ContextMenuItems;
+    top: number;
+    left: number;
+  } | null;
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: string | null;
@@ -106,19 +112,23 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
-  activeTool:
+  activeTool: {
+    /**
+     * indicates a previous tool we should revert back to if we deselect the
+     * currently active tool. At the moment applies to `eraser` and `hand` tool.
+     */
+    lastActiveTool: LastActiveTool;
+    locked: boolean;
+  } & (
     | {
-        type: typeof SHAPES[number]["value"] | "eraser";
-        lastActiveToolBeforeEraser: LastActiveToolBeforeEraser;
-        locked: boolean;
+        type: typeof SHAPES[number]["value"] | "eraser" | "hand";
         customType: null;
       }
     | {
         type: "custom";
         customType: string;
-        lastActiveToolBeforeEraser: LastActiveToolBeforeEraser;
-        locked: boolean;
-      };
+      }
+  );
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
@@ -147,6 +157,7 @@ export type AppState = {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
+  // mobile-only
   openMenu: "canvas" | "shape" | null;
   openPopup:
     | "canvasColorPicker"
@@ -154,7 +165,7 @@ export type AppState = {
     | "strokeColorPicker"
     | null;
   openSidebar: "library" | "customSidebar" | null;
-  openDialog: "imageExport" | "help" | null;
+  openDialog: "imageExport" | "help" | "jsonExport" | null;
   isSidebarDocked: boolean;
 
   lastPointerDownWith: PointerType;
@@ -280,7 +291,6 @@ export interface ExcalidrawProps {
     | null
     | Promise<ExcalidrawInitialDataState | null>;
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
-  onCollabButtonClick?: () => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
     pointer: { x: number; y: number };
@@ -295,7 +305,6 @@ export interface ExcalidrawProps {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  renderFooter?: (isMobile: boolean, appState: AppState) => JSX.Element | null;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
@@ -307,10 +316,7 @@ export interface ExcalidrawProps {
     elements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
   ) => JSX.Element;
-  UIOptions?: {
-    dockedSidebarBreakpoint?: number;
-    canvasActions?: CanvasActions;
-  };
+  UIOptions?: Partial<UIOptions>;
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
@@ -331,6 +337,7 @@ export interface ExcalidrawProps {
    * Render function that renders custom <Sidebar /> component.
    */
   renderSidebar?: () => JSX.Element | null;
+  children?: React.ReactNode;
 }
 
 export type SceneData = {
@@ -366,23 +373,31 @@ export type ExportOpts = {
 // truthiness value will determine whether the action is rendered or not
 // (see manager renderAction). We also override canvasAction values in
 // excalidraw package index.tsx.
-type CanvasActions = {
-  changeViewBackgroundColor?: boolean;
-  clearCanvas?: boolean;
-  export?: false | ExportOpts;
-  loadScene?: boolean;
-  saveToActiveFile?: boolean;
-  toggleTheme?: boolean | null;
-  saveAsImage?: boolean;
-};
+type CanvasActions = Partial<{
+  changeViewBackgroundColor: boolean;
+  clearCanvas: boolean;
+  export: false | ExportOpts;
+  loadScene: boolean;
+  saveToActiveFile: boolean;
+  toggleTheme: boolean | null;
+  saveAsImage: boolean;
+}>;
+
+type UIOptions = Partial<{
+  dockedSidebarBreakpoint: number;
+  welcomeScreen: boolean;
+  canvasActions: CanvasActions;
+}>;
 
 export type AppProps = Merge<
   ExcalidrawProps,
   {
-    UIOptions: {
-      canvasActions: Required<CanvasActions> & { export: ExportOpts };
-      dockedSidebarBreakpoint?: number;
-    };
+    UIOptions: Merge<
+      MarkRequired<UIOptions, "welcomeScreen">,
+      {
+        canvasActions: Required<CanvasActions> & { export: ExportOpts };
+      }
+    >;
     detectScroll: boolean;
     handleKeyboardGlobally: boolean;
     isCollaborating: boolean;
@@ -407,6 +422,7 @@ export type AppClassProperties = {
   files: BinaryFiles;
   device: App["device"];
   scene: App["scene"];
+  pasteFromClipboard: App["pasteFromClipboard"];
 };
 
 export type PointerDownState = Readonly<{
@@ -507,3 +523,33 @@ export type Device = Readonly<{
   isTouchScreen: boolean;
   canDeviceFitSidebar: boolean;
 }>;
+
+export type UIChildrenComponents = {
+  [k in "FooterCenter" | "Menu" | "WelcomeScreen"]?: React.ReactElement<
+    { children?: React.ReactNode },
+    React.JSXElementConstructor<any>
+  >;
+};
+
+export type UIWelcomeScreenComponents = {
+  [k in
+    | "Center"
+    | "MenuHint"
+    | "ToolbarHint"
+    | "HelpHint"]?: React.ReactElement<
+    { children?: React.ReactNode },
+    React.JSXElementConstructor<any>
+  >;
+};
+
+export type UIWelcomeScreenCenterComponents = {
+  [k in
+    | "Logo"
+    | "Heading"
+    | "Menu"
+    | "MenuItemLoadScene"
+    | "MenuItemHelp"]?: React.ReactElement<
+    { children?: React.ReactNode },
+    React.JSXElementConstructor<any>
+  >;
+};
