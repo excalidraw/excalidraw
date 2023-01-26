@@ -414,16 +414,26 @@ const breakWord = (word: string, font: FontString, maxWidth: number) => {
   const trimmedWord = word.trim();
   const symbols = Array.from(trimmedWord);
   const wordSections: Array<string> = [];
-  let lastSectionWidth = 0;
   symbols.forEach((symbol) => {
-    const symbolWidth = getLineWidth(symbol, font);
+    if (wordSections.length === 0) {
+      wordSections.push(symbol);
+      return;
+    }
+    const widthWithLastLine = getLineWidth(
+      wordSections[wordSections.length - 1] + symbol.trimEnd(),
+      font,
+    );
+
     // fits in wordSection above
-    if (wordSections.length > 0 && lastSectionWidth + symbolWidth <= maxWidth) {
-      lastSectionWidth += symbolWidth;
+    if (
+      wordSections.length > 0 &&
+      (widthWithLastLine <= maxWidth ||
+        widthWithLastLine <=
+          getLineWidth(wordSections[wordSections.length - 1], font))
+    ) {
       wordSections[wordSections.length - 1] += symbol;
       return; // next word
     }
-    lastSectionWidth = symbolWidth;
     wordSections.push(symbol);
   });
   wordSections[wordSections.length - 1] += " ".repeat(

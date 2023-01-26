@@ -48,7 +48,6 @@ import {
   getMaxTextElementWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { getMaxContainerWidth } from "../element/newElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
