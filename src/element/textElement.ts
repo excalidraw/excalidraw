@@ -272,7 +272,6 @@ export const measureText = (
   container.style.font = font;
   container.style.minHeight = "1em";
   const textWidth = getTextWidth(text, font);
-
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
     container.style.width = `${String(Math.min(textWidth, maxWidth) + 1)}px`;
@@ -333,7 +332,10 @@ const getLineWidth = (text: string, font: FontString) => {
     return metrics.width * 10;
   }
 
-  return metrics.width;
+  return Math.max(
+    metrics.width,
+    metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight,
+  );
 };
 
 export const getTextWidth = (text: string, font: FontString) => {
