@@ -247,7 +247,7 @@
     "bindTextToElement": "Enterを押してテキストを追加",
     "deepBoxSelect": "CtrlOrCmd を押し続けることでドラッグを抑止し、深い選択を行います",
     "eraserRevert": "Alt を押し続けることで削除マークされた要素を元に戻す",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "この機能は、\"dom.events.asyncClipboard.clipboardItem\" フラグを \"true\" に設定することで有効になる可能性があります。Firefox でブラウザーの設定を変更するには、\"about:config\" ページを参照してください。"
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
