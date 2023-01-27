@@ -212,14 +212,12 @@ export const ShapesSwitcher = ({
   setAppState,
   onImageAction,
   appState,
-  onContextMenu,
 }: {
   canvas: HTMLCanvasElement | null;
   activeTool: AppState["activeTool"];
   setAppState: React.Component<any, AppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: AppState;
-  onContextMenu?: (event: React.MouseEvent, source: string) => void;
 }) => (
   <>
     {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
@@ -269,9 +267,6 @@ export const ShapesSwitcher = ({
             if (value === "image") {
               onImageAction({ pointerType });
             }
-          }}
-          onContextMenu={(event, source) => {
-            onContextMenu && onContextMenu(event, source);
           }}
         />
       );

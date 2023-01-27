@@ -38,7 +38,7 @@ import {
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
-import { getActions } from "../actions/register";
+import { actions } from "../actions/register";
 import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import {
@@ -479,7 +479,7 @@ class App extends React.Component<AppProps, AppState> {
       onSceneUpdated: this.onSceneUpdated,
     });
     this.history = new History();
-    this.actionManager.registerAll(getActions());
+    this.actionManager.registerAll(actions);
     this.actionManager.registerActionGuards();
 
     this.actionManager.registerAction(createUndoAction(this.history));
@@ -595,7 +595,6 @@ class App extends React.Component<AppProps, AppState> {
                       renderTopRightUI={renderTopRightUI}
                       renderCustomStats={renderCustomStats}
                       renderCustomSidebar={this.props.renderSidebar}
-                      onContextMenu={this.handleCustomContextMenu}
                       showExitZenModeBtn={
                         typeof this.props?.zenModeEnabled === "undefined" &&
                         this.state.zenModeEnabled
@@ -5992,28 +5991,6 @@ class App extends React.Component<AppProps, AppState> {
     } catch (error: any) {
       this.setState({ isLoading: false, errorMessage: error.message });
     }
-  };
-
-  private handleCustomContextMenu = (
-    event: React.MouseEvent,
-    source: string,
-  ) => {
-    event.preventDefault();
-
-    const container = this.excalidrawContainerRef.current!;
-    const { top: offsetTop, left: offsetLeft } =
-      container.getBoundingClientRect();
-    const left = event.clientX - offsetLeft;
-    const top = event.clientY - offsetTop;
-    this.setState({}, () => {
-      this.setState({
-        contextMenu: {
-          top,
-          left,
-          items: this.getContextMenuItems("custom", source),
-        },
-      });
-    });
   };
 
   private handleCanvasContextMenu = (

@@ -31,6 +31,7 @@ import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
 import { Action, EnableFn } from "../../../actions/types";
+import { ContextMenuItems } from "../../../components/ContextMenu";
 
 const exampleAction: Action = {
   name: "example",
@@ -39,7 +40,7 @@ const exampleAction: Action = {
     return { elements, appState, commitToHistory: false };
   },
   predicate: (elements, appState, appProps, app, data) =>
-    data === undefined || data.source === "editor-current-shape",
+    data === undefined || data.source === "custom",
   contextItemLabel: "labels.untitled",
 };
 const exampleEnableFn: EnableFn = (elements, appState, actionName) =>
@@ -164,6 +165,28 @@ export default function App() {
             }}
           />
         )}
+        <button
+          onContextMenu={(event: React.MouseEvent<HTMLButtonElement>) => {
+            event.preventDefault();
+            const offsetLeft = excalidrawAPI?.getAppState().offsetLeft ?? 0;
+            const offsetTop = excalidrawAPI?.getAppState().offsetTop ?? 0;
+            const left = event.clientX - offsetLeft;
+            const top = event.clientY - offsetTop;
+
+            const items: ContextMenuItems = [];
+            excalidrawAPI?.actionManager
+              .getCustomActions({ data: { source: "custom" } })
+              .forEach((action) => items.push(action));
+            excalidrawAPI?.updateScene({
+              appState: {
+                contextMenu: { top, left, items },
+              },
+            });
+          }}
+        >
+          {" "}
+          Context Menu{" "}
+        </button>
         <button
           onClick={() => alert("This is dummy top right UI")}
           style={{ height: "2.5rem" }}

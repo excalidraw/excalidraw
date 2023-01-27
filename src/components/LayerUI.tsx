@@ -79,7 +79,6 @@ interface LayerUIProps {
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
-  onContextMenu?: (event: React.MouseEvent, source: string) => void;
 }
 
 const LayerUI = ({
@@ -106,7 +105,6 @@ const LayerUI = ({
   onImageAction,
   renderWelcomeScreen,
   children,
-  onContextMenu,
 }: LayerUIProps) => {
   const device = useDevice();
 
@@ -335,7 +333,6 @@ const LayerUI = ({
                                 insertOnCanvasDirectly: pointerType !== "mouse",
                               });
                             }}
-                            onContextMenu={onContextMenu}
                           />
                         </Stack.Row>
                       </Island>
@@ -431,7 +428,6 @@ const LayerUI = ({
           renderSidebars={renderSidebars}
           device={device}
           renderMenu={renderMenu}
-          onContextMenu={onContextMenu}
           welcomeScreenCenter={WelcomeScreenComponents.Center}
         />
       )}
