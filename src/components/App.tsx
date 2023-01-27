@@ -4335,9 +4335,7 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin.y,
       null,
     );
-
-    //@ts-ignore //zsviczian
-    const strokeOptions = this.state.currentStrokeOptions;
+    const strokeOptions = this.state.currentStrokeOptions; //zsviczian
     const simulatePressure = strokeOptions?.constantPressure
       ? false
       : event.pressure === 0.5;
@@ -4384,10 +4382,17 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin,
       this.scene,
     );
-    this.scene.replaceAllElements([
-      ...this.scene.getElementsIncludingDeleted(),
-      element,
-    ]);
+    if(strokeOptions?.highlighter) { //zsviczian
+      this.scene.replaceAllElements([
+        element,
+        ...this.scene.getElementsIncludingDeleted(),
+      ]);
+    } else {
+      this.scene.replaceAllElements([
+        ...this.scene.getElementsIncludingDeleted(),
+        element,
+      ]);
+    }
     this.setState({
       draggingElement: element,
       editingElement: element,
@@ -4904,8 +4909,7 @@ class App extends React.Component<AppProps, AppState> {
           lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
 
         if (!discardPoint) {
-          //@ts-ignore //zsviczian
-          const strokeOptions = this.state.currentStrokeOptions;
+          const strokeOptions = this.state.currentStrokeOptions; //zsviczian
           const pressures = draggingElement.simulatePressure
             ? draggingElement.pressures
             : [

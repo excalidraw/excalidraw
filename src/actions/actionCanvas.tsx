@@ -91,6 +91,8 @@ export const actionClearCanvas = register({
         trayModeEnabled: appState.trayModeEnabled, //zsviczian
         allowPinchZoom: appState.allowPinchZoom, //zsviczian
         allowWheelZoom: appState.allowWheelZoom, //zsviczian
+        pinnedScripts: appState.pinnedScripts, //zsviczian
+        customPens: appState.customPens, //zsviczian
       },
       commitToHistory: true,
     };

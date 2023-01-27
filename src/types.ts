@@ -215,6 +215,10 @@ export type AppState = {
   }; //zsviczian
   allowWheelZoom?: boolean; //zsviczian
   allowPinchZoom?: boolean; //zsviczian
+  pinnedScripts?: string[]; //zsviczian
+  customPens?: any[]; //zsviczian
+  currentStrokeOptions?: any; //zsviczian
+  resetCustomPen?: any //zsviczian
   selectedLinearElement: LinearElementEditor | null;
 };
 

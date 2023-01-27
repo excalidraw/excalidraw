@@ -98,6 +98,10 @@ export const getDefaultAppState = (): Omit<
     colorPalette: {}, //zsviczian
     allowPinchZoom: false, //zsviczian
     allowWheelZoom: false, //zsviczian
+    pinnedScripts: [], //zsviczian
+    customPens: [], //zsviczian
+    currentStrokeOptions: null, //zsviczian
+    resetCustomPen: null, //zsviczian
     selectedLinearElement: null,
   };
 };
@@ -197,6 +201,10 @@ const APP_STATE_STORAGE_CONF = (<
   colorPalette: { browser: false, export: false, server: false }, //zsviczian
   allowPinchZoom: { browser: false, export: false, server: false }, //zsviczian
   allowWheelZoom: { browser: false, export: false, server: false }, //zsviczian
+  pinnedScripts: { browser: false, export: false, server: false }, //zsviczian
+  customPens: { browser: false, export: false, server: false }, //zsviczian
+  currentStrokeOptions: { browser: false, export: false, server: false }, //zsviczian
+  resetCustomPen: { browser: false, export: false, server: false }, //zsviczian
   selectedLinearElement: { browser: true, export: false, server: false },
 });
 
