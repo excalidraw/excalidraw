@@ -274,7 +274,8 @@ export const measureText = (
 
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
-    container.style.maxWidth = `${maxWidth}px`;
+    // since we are adding a span of width 1px later
+    container.style.maxWidth = `${maxWidth + 1}px`;
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
     container.style.lineHeight = `${String(lineHeight)}px`;
@@ -291,8 +292,7 @@ export const measureText = (
   container.appendChild(span);
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
-  // Since span adds 1px extra width to the container
-  const width = container.offsetWidth + 1;
+  const width = container.offsetWidth;
   const height = container.offsetHeight;
   document.body.removeChild(container);
   if (isTestEnv()) {
