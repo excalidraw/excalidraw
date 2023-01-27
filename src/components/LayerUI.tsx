@@ -53,6 +53,7 @@ import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
+import { isOnlineAtom } from "../excalidraw-app/collab/Collab";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -107,6 +108,8 @@ const LayerUI = ({
   children,
 }: LayerUIProps) => {
   const device = useDevice();
+
+  const [isOnline] = useAtom(isOnlineAtom);
 
   const [childrenComponents, restChildren] =
     getReactChildren<UIChildrenComponents>(children, {
@@ -394,6 +397,11 @@ const LayerUI = ({
             setAppState({ openDialog: null });
           }}
         />
+      )}
+      {isCollaborating && !isOnline && (
+        <div className="DisconnectPopup">
+          {t("errors.disconnectedWhileCollaborating")}
+        </div>
       )}
       <ActiveConfirmDialog />
       {renderImageExportDialog()}
