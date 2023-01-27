@@ -30,7 +30,7 @@ import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
-import { Action, EnableFn } from "../../../actions/types";
+import { Action, ActionPredicateFn } from "../../../actions/types";
 import { ContextMenuItems } from "../../../components/ContextMenu";
 
 const exampleAction: Action = {
@@ -43,8 +43,9 @@ const exampleAction: Action = {
     data === undefined || data.source === "custom",
   contextItemLabel: "labels.untitled",
 };
-const exampleEnableFn: EnableFn = (elements, appState, actionName) =>
-  actionName === "example";
+const examplePredicateFn: ActionPredicateFn = (action, elements) =>
+  action.name !== "example" ||
+  !elements.some((el) => el.type === "text" && !el.isDeleted);
 
 declare global {
   interface Window {
@@ -128,7 +129,7 @@ export default function App() {
       return;
     }
     excalidrawAPI.actionManager.registerAction(exampleAction);
-    excalidrawAPI.actionManager.registerEnableFn("example", exampleEnableFn);
+    excalidrawAPI.actionManager.registerActionPredicate(examplePredicateFn);
     const fetchData = async () => {
       const res = await fetch("/rocket.jpeg");
       const imageData = await res.blob();
@@ -177,11 +178,12 @@ export default function App() {
             excalidrawAPI?.actionManager
               .getCustomActions({ data: { source: "custom" } })
               .forEach((action) => items.push(action));
-            excalidrawAPI?.updateScene({
-              appState: {
-                contextMenu: { top, left, items },
-              },
-            });
+            items.length > 0 &&
+              excalidrawAPI?.updateScene({
+                appState: {
+                  contextMenu: { top, left, items },
+                },
+              });
           }}
         >
           {" "}

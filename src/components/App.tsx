@@ -480,7 +480,6 @@ class App extends React.Component<AppProps, AppState> {
     });
     this.history = new History();
     this.actionManager.registerAll(actions);
-    this.actionManager.registerActionGuards();
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));

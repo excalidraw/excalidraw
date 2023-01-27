@@ -2,15 +2,12 @@ import React from "react";
 import {
   Action,
   UpdaterFn,
-  ActionName,
   ActionResult,
   PanelComponentProps,
   ActionSource,
-  DisableFn,
-  EnableFn,
+  ActionPredicateFn,
   isActionName,
 } from "./types";
-import { getActionDisablers, getActionEnablers } from "./guards";
 import { ExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 import { trackEvent } from "../analytics";
@@ -44,10 +41,8 @@ const trackAction = (
 };
 
 export class ActionManager {
-  actions = {} as Record<ActionName | Action["name"], Action>;
-
-  disablers = {} as Record<ActionName, DisableFn[]>;
-  enablers = {} as Record<Action["name"], EnableFn[]>;
+  actions = {} as Record<Action["name"], Action>;
+  actionPredicates = [] as ActionPredicateFn[];
 
   updater: (actionResult: ActionResult | Promise<ActionResult>) => void;
 
@@ -75,36 +70,9 @@ export class ActionManager {
     this.app = app;
   }
 
-  registerActionGuards() {
-    const disablers = getActionDisablers();
-    for (const d in disablers) {
-      const dName = d as ActionName;
-      disablers[dName].forEach((disabler) =>
-        this.registerDisableFn(dName, disabler),
-      );
-    }
-    const enablers = getActionEnablers();
-    for (const e in enablers) {
-      const eName = e as Action["name"];
-      enablers[e].forEach((enabler) => this.registerEnableFn(eName, enabler));
-    }
-  }
-
-  registerDisableFn(name: ActionName, disabler: DisableFn) {
-    if (!(name in this.disablers)) {
-      this.disablers[name] = [] as DisableFn[];
-    }
-    if (!this.disablers[name].includes(disabler)) {
-      this.disablers[name].push(disabler);
-    }
-  }
-
-  registerEnableFn(name: Action["name"], enabler: EnableFn) {
-    if (!(name in this.enablers)) {
-      this.enablers[name] = [] as EnableFn[];
-    }
-    if (!this.enablers[name].includes(enabler)) {
-      this.enablers[name].push(enabler);
+  registerActionPredicate(predicate: ActionPredicateFn) {
+    if (!this.actionPredicates.includes(predicate)) {
+      this.actionPredicates.push(predicate);
     }
   }
 
@@ -196,10 +164,7 @@ export class ActionManager {
   /**
    * @param data additional data sent to the PanelComponent
    */
-  renderAction = (
-    name: ActionName | Action["name"],
-    data?: PanelComponentProps["data"],
-  ) => {
+  renderAction = (name: Action["name"], data?: PanelComponentProps["data"]) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
     if (
@@ -243,7 +208,7 @@ export class ActionManager {
   };
 
   isActionEnabled = (
-    action: Action | ActionName,
+    action: Action,
     opts?: {
       elements?: readonly ExcalidrawElement[];
       data?: Record<string, any>;
@@ -254,29 +219,19 @@ export class ActionManager {
     const appState = this.getAppState();
     const data = opts?.data;
 
-    const _action = isActionName(action) ? this.actions[action] : action;
-
     if (
       !opts?.guardsOnly &&
-      _action.predicate &&
-      !_action.predicate(elements, appState, this.app.props, this.app, data)
+      action.predicate &&
+      !action.predicate(elements, appState, this.app.props, this.app, data)
     ) {
       return false;
     }
-
-    if (isActionName(_action.name)) {
-      return !(
-        _action.name in this.disablers &&
-        this.disablers[_action.name].some((fn) =>
-          fn(elements, appState, _action.name as ActionName),
-        )
-      );
-    }
-    return (
-      _action.name in this.enablers &&
-      this.enablers[_action.name].some((fn) =>
-        fn(elements, appState, _action.name),
-      )
-    );
+    let enabled = true;
+    this.actionPredicates.forEach((fn) => {
+      if (!fn(action, elements, appState, data)) {
+        enabled = false;
+      }
+    });
+    return enabled;
   };
 }
