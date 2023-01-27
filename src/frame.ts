@@ -1,5 +1,4 @@
 import { getElementAbsoluteCoords } from "./element";
-import { mutateElement } from "./element/mutateElement";
 import {
   ExcalidrawElement,
   ExcalidrawFrameElement,

@@ -3986,18 +3986,6 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.y,
           );
 
-        // alter hitElement when working with a frame text to control frame box
-        // if (
-        //   pointerDownState.hit.element &&
-        //   pointerDownState.hit.element.type === "text" &&
-        //   pointerDownState.hit.element.isFrameName &&
-        //   pointerDownState.hit.element.frameId
-        // ) {
-        //   pointerDownState.hit.element = this.scene.getElement(
-        //     pointerDownState.hit.element.frameId,
-        //   );
-        // }
-
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
           const hitLinkElement = this.getElementLinkAtPosition(
