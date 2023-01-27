@@ -331,11 +331,10 @@ const getLineWidth = (text: string, font: FontString) => {
   if (isTestEnv()) {
     return metrics.width * 10;
   }
-
-  return Math.max(
-    metrics.width,
-    metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight,
-  );
+  // Since measureText behaves differently in different browsers
+  // OS so considering a adjustment factor of 0.2
+  const adjustmentFactor = 0.2;
+  return metrics.width + adjustmentFactor;
 };
 
 export const getTextWidth = (text: string, font: FontString) => {
