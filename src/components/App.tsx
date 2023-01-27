@@ -38,7 +38,7 @@ import {
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
-import { getActions } from "../actions/register";
+import { actions } from "../actions/register";
 import { ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import {
@@ -241,6 +241,7 @@ import {
   SubtypePrepFn,
   prepareSubtype,
   selectSubtype,
+  subtypeActionPredicate,
 } from "../subtypes";
 import {
   dataURLToFile,
@@ -490,12 +491,12 @@ class App extends React.Component<AppProps, AppState> {
       onSceneUpdated: this.onSceneUpdated,
     });
     this.history = new History();
-    this.actionManager.registerAll(getActions());
+    this.actionManager.registerAll(actions);
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
     // Call `this.addSubtype()` here for `@excalidraw/excalidraw`-specific subtypes
-    this.actionManager.registerActionGuards();
+    this.actionManager.registerActionPredicate(subtypeActionPredicate);
   }
 
   private addSubtype(record: SubtypeRecord, subtypePrepFn: SubtypePrepFn) {
@@ -527,7 +528,6 @@ class App extends React.Component<AppProps, AppState> {
     if (prep.actions) {
       this.actionManager.registerAll(prep.actions);
     }
-    this.actionManager.registerActionGuards();
     return prep;
   }
 

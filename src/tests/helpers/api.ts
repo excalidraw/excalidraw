@@ -20,6 +20,7 @@ import {
   SubtypeRecord,
   prepareSubtype,
   selectSubtype,
+  subtypeActionPredicate,
 } from "../../subtypes";
 import {
   maybeGetSubtypeProps,
@@ -36,6 +37,7 @@ const { h } = window;
 
 export class API {
   constructor() {
+    h.app.actionManager.registerActionPredicate(subtypeActionPredicate);
     if (true) {
       // Call `prepareSubtype()` here for `@excalidraw/excalidraw`-specific subtypes
     }
@@ -45,7 +47,6 @@ export class API {
     const prep = prepareSubtype(record, subtypePrepFn);
     if (prep.actions) {
       h.app.actionManager.registerAll(prep.actions);
-      h.app.actionManager.registerActionGuards();
     }
     return prep;
   };

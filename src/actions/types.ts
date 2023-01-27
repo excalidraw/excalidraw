@@ -31,20 +31,13 @@ type ActionFn = (
   app: AppClassProperties,
 ) => ActionResult | Promise<ActionResult>;
 
-// Return `true` to indicate the standard Action with name `actionName`
-// should be disabled given `elements` and `appState`.
-export type DisableFn = (
+// Return `true` *unless* `Action` should be disabled
+// given `elements`, `appState`, and optionally `data`.
+export type ActionPredicateFn = (
+  action: Action,
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-  actionName: ActionName,
-) => boolean;
-
-// Return `true` to indicate the custom Action with name `actionName`
-// should be enabled given `elements` and `appState`.
-export type EnableFn = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  actionName: Action["name"],
+  data?: Record<string, any>,
 ) => boolean;
 
 export type UpdaterFn = (res: ActionResult) => void;

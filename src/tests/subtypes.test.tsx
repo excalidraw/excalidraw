@@ -24,9 +24,11 @@ import { getFontString, getShortcutKey } from "../utils";
 import * as textElementUtils from "../element/textElement";
 import { isTextElement } from "../element";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { Action } from "../actions/types";
+import { Action, ActionName } from "../actions/types";
 import { AppState } from "../types";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { actionChangeSloppiness } from "../actions";
+import { actionChangeRoundness } from "../actions/actionProperties";
 
 const MW = 200;
 const TWIDTH = 200;
@@ -60,13 +62,13 @@ const testSubtypeIcon = ({ theme }: { theme: Theme }) =>
   );
 
 const TEST_ACTION = "testAction";
-const TEST_DISABLE1 = "changeSloppiness";
-const TEST_DISABLE3 = "changeRoundness";
+const TEST_DISABLE1 = actionChangeSloppiness;
+const TEST_DISABLE3 = actionChangeRoundness;
 
 const test1: SubtypeRecord = {
   subtype: "test",
   parents: ["line", "arrow", "rectangle", "diamond", "ellipse"],
-  disabledNames: [TEST_DISABLE1],
+  disabledNames: [TEST_DISABLE1.name as ActionName],
   actionNames: [TEST_ACTION],
 };
 
@@ -106,7 +108,7 @@ const test3: SubtypeRecord = {
     testShortcut: [getShortcutKey("Shift+T")],
   },
   alwaysEnabledNames: ["test3Always"],
-  disabledNames: [TEST_DISABLE3],
+  disabledNames: [TEST_DISABLE3.name as ActionName],
 };
 
 const test3Button = SubtypeButton(

@@ -8,13 +8,12 @@ import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
 import { registerAuxLangData } from "./i18n";
 
-import { Action, ActionName, DisableFn, EnableFn } from "./actions/types";
+import { Action, ActionName, ActionPredicateFn } from "./actions/types";
 import {
   CustomShortcutName,
   registerCustomShortcuts,
 } from "./actions/shortcuts";
 import { register } from "./actions/register";
-import { registerDisableFn, registerEnableFn } from "./actions/guards";
 import { hasBoundTextElement } from "./element/typeChecks";
 import { getBoundTextElement } from "./element/textElement";
 
@@ -100,16 +99,16 @@ const isForSubtype = (
   return false;
 };
 
-const isActionDisabled: DisableFn = function (elements, appState, actionName) {
-  return !isActionEnabled(elements, appState, actionName);
-};
-
-const isActionEnabled: EnableFn = function (elements, appState, actionName) {
+export const subtypeActionPredicate: ActionPredicateFn = function (
+  action,
+  elements,
+  appState,
+) {
   // We always enable subtype actions.  Also let through standard actions
   // which no subtypes might have disabled.
   if (
-    isSubtypeName(actionName) ||
-    (!isSubtypeActionName(actionName) && !isDisabledActionName(actionName))
+    isSubtypeName(action.name) ||
+    (!isSubtypeActionName(action.name) && !isDisabledActionName(action.name))
   ) {
     return true;
   }
@@ -121,13 +120,13 @@ const isActionEnabled: EnableFn = function (elements, appState, actionName) {
     ? [appState.editingElement, ...selectedElements]
     : selectedElements;
   // Now handle actions added by subtypes
-  if (isSubtypeActionName(actionName)) {
+  if (isSubtypeActionName(action.name)) {
     // Has any ExcalidrawElement enabled this actionName through having
     // its subtype?
     return (
       chosen.some((el) => {
         const e = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
-        return isForSubtype(e.subtype, actionName, true);
+        return isForSubtype(e.subtype, action.name, true);
       }) ||
       // Or has any active subtype enabled this actionName?
       (appState.activeSubtypes !== undefined &&
@@ -135,20 +134,20 @@ const isActionEnabled: EnableFn = function (elements, appState, actionName) {
           if (!isValidSubtype(subtype, appState.activeTool.type)) {
             return false;
           }
-          return isForSubtype(subtype, actionName, true);
+          return isForSubtype(subtype, action.name, true);
         })) ||
       alwaysEnabledMap.some((value) => {
-        return value.actions.includes(actionName);
+        return value.actions.includes(action.name);
       })
     );
   }
   // Now handle standard actions disabled by subtypes
-  if (isDisabledActionName(actionName)) {
+  if (isDisabledActionName(action.name)) {
     return (
       // Has every ExcalidrawElement not disabled this actionName?
       (chosen.every((el) => {
         const e = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
-        return !isForSubtype(e.subtype, actionName, false);
+        return !isForSubtype(e.subtype, action.name, false);
       }) &&
         // And has every active subtype not disabled this actionName?
         (appState.activeSubtypes === undefined ||
@@ -156,7 +155,7 @@ const isActionEnabled: EnableFn = function (elements, appState, actionName) {
             if (!isValidSubtype(subtype, appState.activeTool.type)) {
               return true;
             }
-            return !isForSubtype(subtype, actionName, false);
+            return !isForSubtype(subtype, action.name, false);
           }))) ||
       // Or can we find an ExcalidrawElement without a valid subtype
       // which would disable this action if it had a valid subtype?
@@ -166,14 +165,14 @@ const isActionEnabled: EnableFn = function (elements, appState, actionName) {
           (value) =>
             value.parentType === e.type &&
             !isValidSubtype(e.subtype, e.type) &&
-            isForSubtype(value.subtype, actionName, false),
+            isForSubtype(value.subtype, action.name, false),
         );
       }) ||
       chosen.some((el) => {
         const e = hasBoundTextElement(el) ? getBoundTextElement(el)! : el;
         return (
           // Would the subtype of e by inself disable this action?
-          isForSubtype(e.subtype, actionName, false) &&
+          isForSubtype(e.subtype, action.name, false) &&
           // Can we find an ExcalidrawElement which could have the same subtype
           // as e but whose subtype does not disable this action?
           chosen.some((el) => {
@@ -184,7 +183,7 @@ const isActionEnabled: EnableFn = function (elements, appState, actionName) {
               parentTypeMap
                 .filter((val) => val.subtype === e.subtype)
                 .some((val) => val.parentType === e2.type) &&
-              !isForSubtype(e2.subtype, actionName, false)
+              !isForSubtype(e2.subtype, action.name, false)
             );
           })
         );
@@ -381,13 +380,6 @@ export const prepareSubtype = (
     onSubtypeLoaded,
   );
 
-  record.disabledNames?.forEach((name) => {
-    registerDisableFn(name, isActionDisabled);
-  });
-  record.actionNames?.forEach((name) => {
-    registerEnableFn(name, isActionEnabled);
-  });
-  registerEnableFn(record.subtype, isActionEnabled);
   // Register the subtype's methods
   addSubtypeMethods(record.subtype, methods);
   return { actions, methods };
