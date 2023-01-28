@@ -220,7 +220,7 @@
     "penMode": "Režim pera – zabrániť dotyku",
     "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
     "eraser": "Guma",
-    "hand": ""
+    "hand": "Ruka (nástroj pre pohyb plátna)"
   },
   "headings": {
     "canvasActions": "Akcie plátna",
@@ -228,7 +228,7 @@
     "shapes": "Tvary"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Pre pohyb plátna podržte koliesko myši alebo medzerník počas ťahania, alebo použite nástroj ruka",
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
@@ -247,7 +247,7 @@
     "bindTextToElement": "Stlačte enter na pridanie textu",
     "deepBoxSelect": "Podržte CtrlOrCmd na výber v skupine alebo zamedzeniu poťiahnutia",
     "eraserRevert": "Podržte Alt pre prehodenie položiek určených na vymazanie",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Táto sa funkcionalita sa dá zapnúť nastavením \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Pre zmenu nastavení vo Firefox-e otvorte stránku \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
