@@ -9,6 +9,7 @@ import { isWritableElement } from "../utils";
 import colors from "../colors";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
+import { COLOR_NAMES } from "../constants";
 
 const MAX_CUSTOM_COLORS = 5;
 const MAX_DEFAULT_COLORS = 15;
@@ -339,6 +340,30 @@ const ColorInput = React.forwardRef(
       [onChange],
     );
 
+    //zsviczian
+    let opacity: string = "";
+    const hexColor = (color:string):string => {
+      if(Object.keys(COLOR_NAMES).includes(color)) {
+        return COLOR_NAMES[color];
+      }
+      const style = new Option().style;
+      style.color = color;
+      if(!!style.color) {
+        const digits = style.color.match(/^[^\d]*(\d*)[^\d]*(\d*)[^\d]*(\d*)[^\d]*([\d\.]*)?/);
+        if(!digits) {
+          return "#000000"
+        }
+        opacity = digits[4]
+          ? (Math.round(parseFloat(digits[4])*255)<<0).toString(16).padStart(2,"0")
+          : "";
+        return `#${
+          (parseInt(digits[1])<<0).toString(16).padStart(2,"0")}${
+          (parseInt(digits[2])<<0).toString(16).padStart(2,"0")}${
+          (parseInt(digits[3])<<0).toString(16).padStart(2,"0")}`
+      }
+      return "#000000"
+    }
+
     return (
       <label className="color-input-container">
         <div className="color-picker-hash">#</div>
@@ -351,6 +376,17 @@ const ColorInput = React.forwardRef(
           onBlur={() => setInnerValue(color)}
           ref={inputRef}
         />
+      <input //zsviczian
+        type="color"
+        onChange={(event) => changeColor(event.target.value+opacity)}
+        value={hexColor(innerValue || "")}
+        onBlur={() => setInnerValue(color)}
+        style={{
+          marginTop: "auto",
+          marginLeft: "5px",
+          marginBottom: "auto",
+        }}
+      />
       </label>
     );
   },
