@@ -19,10 +19,11 @@ import { newElementWith } from "../../element/mutateElement";
 import { BroadcastedExcalidrawElement } from "./reconciliation";
 import { encryptData } from "../../data/encryption";
 import { PRECEDING_ELEMENT_KEY } from "../../constants";
+import { Socket } from "socket.io-client";
 
 class Portal {
   collab: TCollabClass;
-  socket: SocketIOClient.Socket | null = null;
+  socket: Socket | null = null;
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initialized
   roomId: string | null = null;
   roomKey: string | null = null;
@@ -32,7 +33,7 @@ class Portal {
     this.collab = collab;
   }
 
-  open(socket: SocketIOClient.Socket, id: string, key: string) {
+  open(socket: Socket, id: string, key: string) {
     this.socket = socket;
     this.roomId = id;
     this.roomKey = key;
@@ -63,6 +64,7 @@ class Portal {
       return;
     }
     this.queueFileUpload.flush();
+    this.socket.off();
     this.socket.close();
     this.socket = null;
     this.roomId = null;
@@ -142,7 +144,12 @@ class Portal {
     // periodically we'll resync the whole thing to make sure no one diverges
     // due to a dropped message (server goes down etc).
     const syncableElements = allElements.reduce(
-      (acc, element: BroadcastedExcalidrawElement, idx, elements) => {
+      (
+        acc: BroadcastedExcalidrawElement[],
+        element: BroadcastedExcalidrawElement,
+        idx,
+        elements,
+      ) => {
         if (
           (syncAll ||
             !this.broadcastedElementVersions.has(element.id) ||
@@ -158,7 +165,7 @@ class Portal {
         }
         return acc;
       },
-      [] as BroadcastedExcalidrawElement[],
+      [],
     );
 
     const data: SocketUpdateDataSource[typeof updateType] = {

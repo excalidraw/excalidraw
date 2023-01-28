@@ -14,6 +14,7 @@ import { encryptData, decryptData } from "../../data/encryption";
 import { MIME_TYPES } from "../../constants";
 import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
+import { Socket } from "socket.io-client";
 
 // private
 // -----------------------------------------------------------------------------
@@ -129,12 +130,12 @@ const decryptElements = async (
 };
 
 class FirebaseSceneVersionCache {
-  private static cache = new WeakMap<SocketIOClient.Socket, number>();
-  static get = (socket: SocketIOClient.Socket) => {
+  private static cache = new WeakMap<Socket, number>();
+  static get = (socket: Socket) => {
     return FirebaseSceneVersionCache.cache.get(socket);
   };
   static set = (
-    socket: SocketIOClient.Socket,
+    socket: Socket,
     elements: readonly SyncableExcalidrawElement[],
   ) => {
     FirebaseSceneVersionCache.cache.set(socket, getSceneVersion(elements));
@@ -276,7 +277,7 @@ export const saveToFirebase = async (
 export const loadFromFirebase = async (
   roomId: string,
   roomKey: string,
-  socket: SocketIOClient.Socket | null,
+  socket: Socket | null,
 ): Promise<readonly ExcalidrawElement[] | null> => {
   const firebase = await loadFirestore();
   const db = firebase.firestore();
