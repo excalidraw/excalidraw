@@ -171,7 +171,7 @@ describe("Test measureText", () => {
 
     expect(res.container).toMatchInlineSnapshot(`
       <div
-        style="position: absolute; white-space: pre-wrap; font: Emoji 20px 20px; min-height: 1em; width: 111px; overflow: hidden; word-break: break-word; line-height: 0px;"
+        style="position: absolute; white-space: pre-wrap; font: Emoji 20px 20px; min-height: 1em; max-width: 191px; overflow: hidden; word-break: break-word; line-height: 0px;"
       >
         <span
           style="display: inline-block; overflow: hidden; width: 1px; height: 1px;"
