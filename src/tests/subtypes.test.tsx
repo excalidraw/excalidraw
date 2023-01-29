@@ -18,7 +18,7 @@ import ExcalidrawApp from "../excalidraw-app";
 
 import { ExcalidrawElement, FontString, Theme } from "../element/types";
 import { createIcon, iconFillColor } from "../components/icons";
-import { SubtypeButton } from "../components/SubtypeButton";
+import { SubtypeButton } from "../components/Subtypes";
 import { registerAuxLangData } from "../i18n";
 import { getFontString, getShortcutKey } from "../utils";
 import * as textElementUtils from "../element/textElement";

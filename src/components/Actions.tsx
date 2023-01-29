@@ -3,7 +3,7 @@ import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
-import { useDevice, useExcalidrawActionManager } from "../components/App";
+import { useDevice } from "../components/App";
 import {
   canChangeRoundness,
   canHaveArrowheads,
@@ -23,7 +23,7 @@ import {
 } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
-import { SubtypeToggles } from "./SubtypeButton";
+import { SubtypeShapeActions, SubtypeToggles } from "./Subtypes";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import { hasBoundTextElement } from "../element/typeChecks";
@@ -93,9 +93,7 @@ export const SelectedShapeActions = ({
       {showChangeBackgroundIcons && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
-      {useExcalidrawActionManager()
-        .getCustomActions({ elements: targetElements })
-        .map((action) => renderAction(action.name))}
+      <SubtypeShapeActions elements={targetElements} />
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||

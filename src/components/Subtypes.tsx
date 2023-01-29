@@ -7,6 +7,7 @@ import {
   Subtype,
   getSubtypeNames,
   hasAlwaysEnabledActions,
+  isSubtypeAction,
   isValidSubtype,
   subtypeCollides,
 } from "../subtypes";
@@ -30,7 +31,7 @@ export const SubtypeButton = (
   const subtypeAction: Action = {
     name: subtype,
     trackEvent: false,
-    predicate: (...rest) => rest[4]?.source === subtype,
+    predicate: (...rest) => rest[4]?.subtype === subtype,
     perform: (elements, appState) => {
       const inactive = !appState.activeSubtypes?.includes(subtype) ?? true;
       const activeSubtypes: Subtype[] = [];
@@ -121,7 +122,7 @@ export const SubtypeToggles = () => {
 
   const onContextMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
-    source: string,
+    subtype: string,
   ) => {
     event.preventDefault();
 
@@ -131,8 +132,9 @@ export const SubtypeToggles = () => {
     const top = event.clientY - offsetTop;
 
     const items: ContextMenuItems = [];
-    am.getCustomActions({ data: { source } }).forEach((action) =>
-      items.push(action),
+    am.filterActions(isSubtypeAction).forEach(
+      (action) =>
+        am.isActionEnabled(action, { data: { subtype } }) && items.push(action),
     );
     setAppState({}, () => {
       setAppState({
@@ -154,3 +156,18 @@ export const SubtypeToggles = () => {
 };
 
 SubtypeToggles.displayName = "SubtypeToggles";
+
+export const SubtypeShapeActions = (props: {
+  elements: readonly ExcalidrawElement[];
+}) => {
+  const am = useExcalidrawActionManager();
+  return (
+    <>
+      {am
+        .filterActions(isSubtypeAction, { elements: props.elements })
+        .map((action) => am.renderAction(action.name))}
+    </>
+  );
+};
+
+SubtypeShapeActions.displayName = "SubtypeShapeActions";

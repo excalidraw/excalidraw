@@ -242,6 +242,7 @@ import {
   prepareSubtype,
   selectSubtype,
   subtypeActionPredicate,
+  isSubtypeAction,
 } from "../subtypes";
 import {
   dataURLToFile,
@@ -6229,26 +6230,26 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private getContextMenuItems = (
-    type: "canvas" | "element" | "custom",
-    source?: string,
+    type: "canvas" | "element",
   ): ContextMenuItems => {
-    const custom: ContextMenuItems = [];
+    const subtype: ContextMenuItems = [];
     this.actionManager
-      .getCustomActions({ data: { source: source ?? "" } })
-      .forEach((action) => custom.push(action));
-    if (type === "custom") {
-      return custom;
-    }
-    if (custom.length > 0) {
-      custom.push(CONTEXT_MENU_SEPARATOR);
+      .filterActions(isSubtypeAction)
+      .forEach(
+        (action) =>
+          this.actionManager.isActionEnabled(action, { data: {} }) &&
+          subtype.push(action),
+      );
+    if (subtype.length > 0) {
+      subtype.push(CONTEXT_MENU_SEPARATOR);
     }
     const standard: ContextMenuItems = this._getContextMenuItems(type).filter(
       (item) =>
         !item ||
         item === CONTEXT_MENU_SEPARATOR ||
-        this.actionManager.isActionEnabled(item, { guardsOnly: true }),
+        this.actionManager.isActionEnabled(item, { noPredicates: true }),
     );
-    return [...custom, ...standard];
+    return [...subtype, ...standard];
   };
 
   private _getContextMenuItems = (

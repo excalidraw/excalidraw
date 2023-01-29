@@ -45,7 +45,7 @@ import {
 } from "../../../../subtypes";
 import { mathSubtypeIcon } from "./icon";
 import { getMathSubtypeRecord } from "./types";
-import { SubtypeButton } from "../../../../components/SubtypeButton";
+import { SubtypeButton } from "../../../../components/Subtypes";
 import { getMaxContainerWidth } from "../../../../element/newElement";
 
 const mathSubtype = getMathSubtypeRecord().subtype;
@@ -1318,7 +1318,7 @@ const createMathActions = () => {
       getMathProps.getUseTex(appState)
         ? "labels.useTexTrueActive"
         : "labels.useTexTrueInactive",
-    predicate: (...rest) => rest.length < 5 || rest[4]?.source === mathSubtype,
+    predicate: (...rest) => rest.length < 5 || rest[4]?.subtype === mathSubtype,
     trackEvent: false,
   };
   const actionUseTexFalse: Action = {
@@ -1337,7 +1337,7 @@ const createMathActions = () => {
       !getMathProps.getUseTex(appState)
         ? "labels.useTexFalseActive"
         : "labels.useTexFalseInactive",
-    predicate: (...rest) => rest.length < 5 || rest[4]?.source === mathSubtype,
+    predicate: (...rest) => rest.length < 5 || rest[4]?.subtype === mathSubtype,
     trackEvent: false,
   };
   const actionResetUseTex: Action = {
@@ -1466,8 +1466,7 @@ const createMathActions = () => {
       </fieldset>
     ),
     predicate: (...rest) =>
-      rest[4]?.source === undefined &&
-      enableActionChangeMathProps(rest[0], rest[1]),
+      rest[4] === undefined && enableActionChangeMathProps(rest[0], rest[1]),
     trackEvent: false,
   };
   const actionMath = SubtypeButton(mathSubtype, "text", mathSubtypeIcon, "M");

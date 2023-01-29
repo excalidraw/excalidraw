@@ -99,6 +99,10 @@ const isForSubtype = (
   return false;
 };
 
+export const isSubtypeAction: ActionPredicateFn = function (action) {
+  return isSubtypeActionName(action.name) && !isSubtypeName(action.name);
+};
+
 export const subtypeActionPredicate: ActionPredicateFn = function (
   action,
   elements,

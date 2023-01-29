@@ -6,7 +6,6 @@ import {
   PanelComponentProps,
   ActionSource,
   ActionPredicateFn,
-  isActionName,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
@@ -76,29 +75,29 @@ export class ActionManager {
     }
   }
 
-  getCustomActions(opts?: {
-    elements?: readonly ExcalidrawElement[];
-    data?: Record<string, any>;
-    guardsOnly?: boolean;
-  }): Action[] {
+  filterActions(
+    filter: ActionPredicateFn,
+    opts?: {
+      elements?: readonly ExcalidrawElement[];
+      data?: Record<string, any>;
+    },
+  ): Action[] {
     // For testing
     if (this === undefined) {
       return [];
     }
-    const filter =
-      opts !== undefined &&
-      ("elements" in opts || "data" in opts || "guardsOnly" in opts);
-    const customActions: Action[] = [];
+    const elements = opts?.elements ?? this.getElementsIncludingDeleted();
+    const appState = this.getAppState();
+    const data = opts?.data;
+
+    const actions: Action[] = [];
     for (const key in this.actions) {
       const action = this.actions[key];
-      if (
-        !isActionName(action.name) &&
-        (!filter || this.isActionEnabled(action, opts))
-      ) {
-        customActions.push(action);
+      if (filter(action, elements, appState, data)) {
+        actions.push(action);
       }
     }
-    return customActions;
+    return actions;
   }
 
   registerAction(action: Action) {
@@ -117,7 +116,7 @@ export class ActionManager {
         (action) =>
           (action.name in canvasActions
             ? canvasActions[action.name as keyof typeof canvasActions]
-            : this.isActionEnabled(action, { guardsOnly: true })) &&
+            : this.isActionEnabled(action, { noPredicates: true })) &&
           action.keyTest &&
           action.keyTest(
             event,
@@ -172,7 +171,7 @@ export class ActionManager {
       "PanelComponent" in this.actions[name] &&
       (name in canvasActions
         ? canvasActions[name as keyof typeof canvasActions]
-        : this.isActionEnabled(this.actions[name], { guardsOnly: true }))
+        : this.isActionEnabled(this.actions[name], { noPredicates: true }))
     ) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
@@ -212,7 +211,7 @@ export class ActionManager {
     opts?: {
       elements?: readonly ExcalidrawElement[];
       data?: Record<string, any>;
-      guardsOnly?: boolean;
+      noPredicates?: boolean;
     },
   ): boolean => {
     const elements = opts?.elements ?? this.getElementsIncludingDeleted();
@@ -220,7 +219,7 @@ export class ActionManager {
     const data = opts?.data;
 
     if (
-      !opts?.guardsOnly &&
+      !opts?.noPredicates &&
       action.predicate &&
       !action.predicate(elements, appState, this.app.props, this.app, data)
     ) {
