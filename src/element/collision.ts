@@ -29,7 +29,12 @@ import {
   ExcalidrawFrameElement,
 } from "./types";
 
-import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
+import {
+  getElementAbsoluteCoords,
+  getCurvePathOps,
+  Bounds,
+  getDivElementAbsoluteCoords,
+} from "./bounds";
 import { Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
@@ -117,7 +122,13 @@ export const isHittingElementNotConsideringBoundingBox = (
     : isElementDraggableFromInside(element)
     ? isInsideCheck
     : isNearCheck;
-  return hitTestPointAgainstElement({ element, point, threshold, check });
+  return hitTestPointAgainstElement({
+    element,
+    point,
+    threshold,
+    check,
+    appState,
+  });
 };
 
 const isElementSelected = (
@@ -177,6 +188,7 @@ type HitTestArgs = {
   point: Point;
   threshold: number;
   check: (distance: number, threshold: number) => boolean;
+  appState?: AppState;
 };
 
 const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
@@ -209,6 +221,20 @@ const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
       );
       return false;
     case "frame":
+      // check top distance
+      const labelDiv = document.getElementById(
+        args.element.id,
+      ) as HTMLDivElement;
+      if (labelDiv && args.appState) {
+        const distance = distanceToLabel(
+          labelDiv,
+          args.element,
+          args.point,
+          args.appState,
+        );
+        return args.check(distance, args.threshold);
+      }
+
       return false;
   }
 };
@@ -256,6 +282,24 @@ const distanceToRectangle = (
   point: Point,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(element, point);
+  return Math.max(
+    GAPoint.distanceToLine(pointRel, GALine.equation(0, 1, -hheight)),
+    GAPoint.distanceToLine(pointRel, GALine.equation(1, 0, -hwidth)),
+  );
+};
+
+const distanceToLabel = (
+  label: HTMLDivElement,
+  element: ExcalidrawElement,
+  point: Point,
+  appState: AppState,
+): number => {
+  const [, pointRel, hwidth, hheight] = pointRelativeToDivElement(
+    label,
+    element,
+    point,
+    appState,
+  );
   return Math.max(
     GAPoint.distanceToLine(pointRel, GALine.equation(0, 1, -hheight)),
     GAPoint.distanceToLine(pointRel, GALine.equation(1, 0, -hwidth)),
@@ -464,6 +508,28 @@ const pointRelativeToElement = (
   const elementCoords = getElementAbsoluteCoords(element);
   const center = coordsCenter([x1, y1, x2, y2]);
   // GA has angle orientation opposite to `rotate`
+  const rotate = GATransform.rotation(center, element.angle);
+  const pointRotated = GATransform.apply(rotate, point);
+  const pointRelToCenter = GA.sub(pointRotated, GADirection.from(center));
+  const pointRelToCenterAbs = GAPoint.abs(pointRelToCenter);
+  const elementPos = GA.offset(element.x, element.y);
+  const pointRelToPos = GA.sub(pointRotated, elementPos);
+  const [ax, ay, bx, by] = elementCoords;
+  const halfWidth = (bx - ax) / 2;
+  const halfHeight = (by - ay) / 2;
+  return [pointRelToPos, pointRelToCenterAbs, halfWidth, halfHeight];
+};
+
+const pointRelativeToDivElement = (
+  div: HTMLDivElement,
+  element: ExcalidrawElement,
+  pointTuple: Point,
+  appState: AppState,
+): [GA.Point, GA.Point, number, number] => {
+  const point = GAPoint.from(pointTuple);
+  const [x1, y1, x2, y2] = getDivElementAbsoluteCoords(div, element, appState);
+  const elementCoords = getDivElementAbsoluteCoords(div, element, appState);
+  const center = coordsCenter([x1, y1, x2, y2]);
   const rotate = GATransform.rotation(center, element.angle);
   const pointRotated = GATransform.apply(rotate, point);
   const pointRelToCenter = GA.sub(pointRotated, GADirection.from(center));

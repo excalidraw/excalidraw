@@ -9,7 +9,7 @@ import {
 import { distance2d, rotate } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
-import { Point } from "../types";
+import { AppState, Point } from "../types";
 import {
   getShapeForElement,
   generateRoughOptions,
@@ -23,6 +23,7 @@ import {
 import { rescalePoints } from "../points";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
+import { viewportCoordsToSceneCoords } from "../utils";
 
 // x and y position of top left corner, x and y position of bottom right corner
 export type Bounds = readonly [number, number, number, number];
@@ -65,6 +66,37 @@ export const getElementAbsoluteCoords = (
     element.y + element.height,
     element.x + element.width / 2,
     element.y + element.height / 2,
+  ];
+};
+
+export const getDivElementAbsoluteCoords = (
+  div: HTMLDivElement,
+  element: ExcalidrawElement,
+  appState: AppState,
+) => {
+  // TODO: translate boundingbox size to scene sizes
+  const boundingBox = div.getBoundingClientRect();
+
+  const { x: topX, y: topY } = viewportCoordsToSceneCoords(
+    { clientX: boundingBox.left, clientY: boundingBox.top - 20 },
+    appState,
+  );
+
+  const { x: bottomX, y: bottomY } = viewportCoordsToSceneCoords(
+    { clientX: boundingBox.right, clientY: boundingBox.bottom - 20 },
+    appState,
+  );
+
+  const width = Math.abs(bottomX - topX);
+  const height = Math.abs(bottomY - topY);
+
+  return [
+    element.x,
+    element.y - height,
+    element.x + width,
+    element.y,
+    element.x + width / 2,
+    element.y - height / 2,
   ];
 };
 

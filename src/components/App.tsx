@@ -557,14 +557,17 @@ class App extends React.Component<AppProps, AppState> {
             fontFamily: "virgil",
             fontSize: "14px",
           }}
-          className="frame-title"
           onPointerDown={(event) => {
-            event.preventDefault();
-
+            this.handleCanvasPointerDown(event as any);
+          }}
+          onPointerOver={(event) => {
             this.setState({
-              selectedElementIds: {
-                [f.id]: true,
-              },
+              frameToHighlight: this.scene.getElement(event.currentTarget.id),
+            });
+          }}
+          onPointerLeave={() => {
+            this.setState({
+              frameToHighlight: null,
             });
           }}
         >
