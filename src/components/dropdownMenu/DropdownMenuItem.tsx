@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  getDrodownMenuItemClassName,
+  getDropdownMenuItemClassName,
   useHandleDropdownMenuItemClick,
 } from "./common";
 import MenuItemContent from "./DropdownMenuItemContent";
@@ -26,7 +26,7 @@ const DropdownMenuItem = ({
       {...rest}
       onClick={handleClick}
       type="button"
-      className={getDrodownMenuItemClassName(className)}
+      className={getDropdownMenuItemClassName(className)}
       title={rest.title ?? rest["aria-label"]}
     >
       <MenuItemContent icon={icon} shortcut={shortcut}>

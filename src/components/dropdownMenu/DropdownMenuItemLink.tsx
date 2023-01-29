@@ -1,7 +1,7 @@
 import MenuItemContent from "./DropdownMenuItemContent";
 import React from "react";
 import {
-  getDrodownMenuItemClassName,
+  getDropdownMenuItemClassName,
   useHandleDropdownMenuItemClick,
 } from "./common";
 
@@ -29,7 +29,7 @@ const DropdownMenuItemLink = ({
       href={href}
       target="_blank"
       rel="noreferrer"
-      className={getDrodownMenuItemClassName(className)}
+      className={getDropdownMenuItemClassName(className)}
       title={rest.title ?? rest["aria-label"]}
       onClick={handleClick}
     >
