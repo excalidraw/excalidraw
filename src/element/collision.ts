@@ -820,37 +820,89 @@ export const findFocusPointForRectangulars = (
   return tangentPoint!;
 };
 
-const pointInBezierEquation = (
+const parametricBezierEquation = (
   p0: Point,
   p1: Point,
   p2: Point,
   p3: Point,
-  [mx, my]: Point,
-  lineThreshold: number,
 ) => {
   // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
-  const equation = (t: number, idx: number) =>
+  return (t: number, idx: number) =>
     Math.pow(1 - t, 3) * p3[idx] +
     3 * t * Math.pow(1 - t, 2) * p2[idx] +
     3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
     p0[idx] * Math.pow(t, 3);
+};
 
-  // go through t in increments of 0.01
-  let t = 0;
-  while (t <= 1.0) {
-    const tx = equation(t, 0);
-    const ty = equation(t, 1);
+const calculateTInsideWindow = (
+  t: number,
+  index: number,
+  resolution: number,
+): number => {
+  return t + (index - WINDOW_SIZE / 2) * resolution;
+};
 
-    const diff = Math.sqrt(Math.pow(tx - mx, 2) + Math.pow(ty - my, 2));
+const WINDOW_SIZE = 10;
+const INITIAL_CENTER_T = 0.5;
+const INITIAL_RES = 1.0 / WINDOW_SIZE;
+const RES_INC_MULTIPLIER = 10;
+const RES_INC_LEVELS = 4;
+const MAX_RES = INITIAL_RES / Math.pow(RES_INC_MULTIPLIER, RES_INC_LEVELS);
+const pointInBezierEquation = (
+  parametricBezierEquation: (t: number, idx: number) => number,
+  [mx, my]: Point,
+  lineThreshold: number,
+) => {
+  const distances: number[] = [];
+  return pointInBezierEquationWindow(
+    parametricBezierEquation,
+    INITIAL_CENTER_T,
+    INITIAL_RES,
+    [mx, my],
+    lineThreshold,
+    distances,
+  );
+};
 
-    if (diff < lineThreshold) {
+const pointInBezierEquationWindow = (
+  parametricBezierEquation: (t: number, idx: number) => number,
+  centerT: number,
+  resolution: number,
+  [mx, my]: Point,
+  lineThreshold: number,
+  distances: number[],
+): Boolean => {
+  for (let i = 0; i <= WINDOW_SIZE; i++) {
+    const windowT = calculateTInsideWindow(centerT, i, resolution);
+    if (windowT < 0 || windowT > 1.0) {
+      distances[i] = Infinity;
+      continue;
+    }
+
+    const pointX = parametricBezierEquation(windowT, 0);
+    const pointY = parametricBezierEquation(windowT, 1);
+    const distance = distance2d(mx, my, pointX, pointY);
+    if (distance < lineThreshold) {
       return true;
     }
 
-    t += 0.01;
+    distances[i] = distance;
   }
 
-  return false;
+  if (resolution < MAX_RES) {
+    return false;
+  }
+
+  const minIndex = distances.indexOf(Math.min(...distances));
+  const minT = calculateTInsideWindow(centerT, minIndex, resolution);
+  return pointInBezierEquationWindow(
+    parametricBezierEquation,
+    minT,
+    resolution / RES_INC_MULTIPLIER,
+    [mx, my],
+    lineThreshold,
+    distances,
+  );
 };
 
 const hitTestCurveInside = (
@@ -925,11 +977,9 @@ const hitTestRoughShape = (
       // check if points are on the curve
       // cubic bezier curves require four parameters
       // the first parameter is the last stored position (p0)
+      const curveEquation = parametricBezierEquation(p0, p1, p2, p3);
       const retVal = pointInBezierEquation(
-        p0,
-        p1,
-        p2,
-        p3,
+        curveEquation,
         [x, y],
         lineThreshold,
       );
