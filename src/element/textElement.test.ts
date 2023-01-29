@@ -6,10 +6,10 @@ describe("Test wrapText", () => {
   const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
 
   it("shouldn't add new lines for trailing spaces", () => {
-    const text = "Hello whats up     ";
+    const text = "Hello whats up      ";
     const maxWidth = 200 - BOUND_TEXT_PADDING * 2;
     const res = wrapText(text, font, maxWidth);
-    expect(res).toBe("Hello whats up    ");
+    expect(res).toBe("Hello whats up      ");
   });
 
   it("should work with emojis", () => {
@@ -27,11 +27,11 @@ describe("Test wrapText", () => {
   });
 
   describe("When text doesn't contain new lines", () => {
-    const text = "Hello whats up";
+    const text = "Hello whats up"; // 14
     [
       {
         desc: "break all words when width of each word is less than container width",
-        width: 90,
+        width: 80,
         res: `Hello 
 whats 
 up`,
@@ -43,19 +43,19 @@ up`,
 e
 l
 l
-o
+o 
 w
 h
 a
 t
-s
+s 
 u
 p`,
       },
       {
         desc: "break words as per the width",
 
-        width: 150,
+        width: 140,
         res: `Hello whats 
 up`,
       },
@@ -78,7 +78,7 @@ whats up`;
     [
       {
         desc: "break all words when width of each word is less than container width",
-        width: 90,
+        width: 80,
         res: `Hello
 whats 
 up`,
@@ -95,7 +95,7 @@ w
 h
 a
 t
-s
+s 
 u
 p`,
       },
@@ -125,7 +125,7 @@ whats up`,
     [
       {
         desc: "fit characters of long string as per container width",
-        width: 170,
+        width: 160,
         res: `hellolongtextth
 isiswhatsupwith
 youIamtypingggg
@@ -136,19 +136,19 @@ break it now`,
       {
         desc: "fit characters of long string as per container width and break words as per the width",
 
-        width: 130,
+        width: 120,
         res: `hellolongte
 xtthisiswha
 tsupwithyou
 Iamtypinggg
 ggandtyping
-gg break it
+gg break it 
 now`,
       },
       {
         desc: "fit the long text when container width is greater than text length and move the rest to next line",
 
-        width: 600,
+        width: 580,
         res: `hellolongtextthisiswhatsupwithyouIamtypingggggandtypinggg 
 break it now`,
       },
