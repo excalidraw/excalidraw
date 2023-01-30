@@ -132,6 +132,9 @@ const config = {
 
         indexName: "YOUR_INDEX_NAME",
       },
+      tableOfContents: {
+        maxHeadingLevel: 4,
+      },
     }),
   themes: ["@docusaurus/theme-live-codeblock"],
   plugins: ["docusaurus-plugin-sass"],
