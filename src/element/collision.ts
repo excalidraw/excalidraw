@@ -77,6 +77,17 @@ export const hitTest = (
     isElementSelected(appState, element) &&
     shouldShowBoundingBox([element], appState)
   ) {
+    // frames needs be checked differently so as to be able to drag it
+    // by its frame, whether it has been selected or not
+    // this logic here is not ideal
+    // TODO: refactor it later...
+    if (element.type === "frame") {
+      return isHittingElementNotConsideringBoundingBox(
+        element,
+        appState,
+        point,
+      );
+    }
     return isPointHittingElementBoundingBox(element, point, threshold);
   }
 
@@ -220,22 +231,21 @@ const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
         "This should not happen, we need to investigate why it does.",
       );
       return false;
-    case "frame":
+    case "frame": {
       // check top distance
       const labelDiv = document.getElementById(
         args.element.id,
       ) as HTMLDivElement;
-      if (labelDiv && args.appState) {
-        const distance = distanceToLabel(
-          labelDiv,
-          args.element,
-          args.point,
-          args.appState,
-        );
-        return args.check(distance, args.threshold);
-      }
-
-      return false;
+      const disToElement = distanceToBindableElement(args.element, args.point);
+      const disToLabel =
+        labelDiv && args.appState
+          ? distanceToLabel(labelDiv, args.element, args.point, args.appState)
+          : Infinity;
+      return (
+        args.check(disToLabel, args.threshold) ||
+        args.check(disToElement, args.threshold)
+      );
+    }
   }
 };
 
