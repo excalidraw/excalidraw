@@ -85,7 +85,8 @@ export const SelectedShapeActions = ({
       <div>
         {((hasStrokeColor(appState.activeTool.type) &&
           appState.activeTool.type !== "image" &&
-          commonSelectedType !== "image") ||
+          commonSelectedType !== "image" &&
+          commonSelectedType !== "frame") ||
           targetElements.some((element) => hasStrokeColor(element.type))) &&
           renderAction("changeStrokeColor")}
       </div>
