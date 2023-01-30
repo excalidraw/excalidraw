@@ -554,7 +554,6 @@ class App extends React.Component<AppProps, AppState> {
             left: `${x - this.state.offsetLeft}px`,
             position: "absolute",
             zIndex: 2,
-            fontFamily: "virgil",
             fontSize: "14px",
           }}
           onPointerDown={(event) => {
