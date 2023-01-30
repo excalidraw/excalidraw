@@ -60,15 +60,15 @@ const sidebars = {
             },
             {
               type: "category",
-              label: "Components",
+              label: "Children components",
               link: {
                 type: "doc",
                 id: "@excalidraw/excalidraw/api/components/components-intro",
               },
               items: [
-                "@excalidraw/excalidraw/api/components/footer",
                 "@excalidraw/excalidraw/api/components/main-menu",
                 "@excalidraw/excalidraw/api/components/welcome-screen",
+                "@excalidraw/excalidraw/api/components/footer",
                 "@excalidraw/excalidraw/api/components/live-collaboration-trigger",
               ],
             },
