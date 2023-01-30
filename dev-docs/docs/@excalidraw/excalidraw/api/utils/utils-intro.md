@@ -106,9 +106,9 @@ loadLibraryFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/
 
 This function loads either scene or library data from the supplied blob. If the blob contains scene data, and you pass `localAppState`, `localAppState` value will be preferred over the `appState` derived from `blob`.
 
-:::
+:::caution
 
-caution Throws if blob doesn't contain valid `scene` data or `library` data.
+Throws if blob doesn't contain valid `scene` data or `library` data.
 
 :::
 
