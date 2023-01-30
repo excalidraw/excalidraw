@@ -1,13 +1,7 @@
 import { ExcalidrawElement } from "../element/types";
-import { getShortcutKey } from "../utils";
 import { API } from "./helpers/api";
 import { render } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
-import {
-  CustomShortcutName,
-  getShortcutFromShortcutName,
-  registerCustomShortcuts,
-} from "../actions/shortcuts";
 import { Action, ActionPredicateFn, ActionResult } from "../actions/types";
 import {
   actionChangeFontFamily,
@@ -18,14 +12,6 @@ import { isTextElement } from "../element";
 const { h } = window;
 
 describe("regression tests", () => {
-  it("should retrieve custom shortcuts", () => {
-    const shortcuts: Record<CustomShortcutName, string[]> = {
-      test: [getShortcutKey("CtrlOrCmd+1"), getShortcutKey("CtrlOrCmd+2")],
-    };
-    registerCustomShortcuts(shortcuts);
-    expect(getShortcutFromShortcutName("test")).toBe("Ctrl+1");
-  });
-
   it("should apply universal action predicates", async () => {
     await render(<ExcalidrawApp />);
     // Create the test elements

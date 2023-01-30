@@ -30,22 +30,6 @@ import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
-import { Action, ActionPredicateFn } from "../../../actions/types";
-import { ContextMenuItems } from "../../../components/ContextMenu";
-
-const exampleAction: Action = {
-  name: "example",
-  trackEvent: false,
-  perform: (elements, appState) => {
-    return { elements, appState, commitToHistory: false };
-  },
-  predicate: (elements, appState, appProps, app, data) =>
-    data === undefined || data.source === "custom",
-  contextItemLabel: "labels.untitled",
-};
-const examplePredicateFn: ActionPredicateFn = (action, elements) =>
-  action.name !== "example" ||
-  !elements.some((el) => el.type === "text" && !el.isDeleted);
 
 declare global {
   interface Window {
@@ -128,8 +112,6 @@ export default function App() {
     if (!excalidrawAPI) {
       return;
     }
-    excalidrawAPI.actionManager.registerAction(exampleAction);
-    excalidrawAPI.actionManager.registerActionPredicate(examplePredicateFn);
     const fetchData = async () => {
       const res = await fetch("/rocket.jpeg");
       const imageData = await res.blob();
@@ -166,29 +148,6 @@ export default function App() {
             }}
           />
         )}
-        <button
-          onContextMenu={(event: React.MouseEvent<HTMLButtonElement>) => {
-            event.preventDefault();
-            const offsetLeft = excalidrawAPI?.getAppState().offsetLeft ?? 0;
-            const offsetTop = excalidrawAPI?.getAppState().offsetTop ?? 0;
-            const left = event.clientX - offsetLeft;
-            const top = event.clientY - offsetTop;
-
-            const items: ContextMenuItems = [];
-            excalidrawAPI?.actionManager
-              .getCustomActions({ data: { source: "custom" } })
-              .forEach((action) => items.push(action));
-            items.length > 0 &&
-              excalidrawAPI?.updateScene({
-                appState: {
-                  contextMenu: { top, left, items },
-                },
-              });
-          }}
-        >
-          {" "}
-          Context Menu{" "}
-        </button>
         <button
           onClick={() => alert("This is dummy top right UI")}
           style={{ height: "2.5rem" }}

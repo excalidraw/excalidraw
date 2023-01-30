@@ -3,7 +3,7 @@ import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
-import { useDevice, useExcalidrawActionManager } from "../components/App";
+import { useDevice } from "../components/App";
 import {
   canChangeRoundness,
   canHaveArrowheads,
@@ -92,9 +92,6 @@ export const SelectedShapeActions = ({
       {showChangeBackgroundIcons && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
-      {useExcalidrawActionManager()
-        .getCustomActions({ elements: targetElements })
-        .map((action) => renderAction(action.name))}
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||

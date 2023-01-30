@@ -6163,29 +6163,6 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private getContextMenuItems = (
-    type: "canvas" | "element" | "custom",
-    source?: string,
-  ): ContextMenuItems => {
-    const custom: ContextMenuItems = [];
-    this.actionManager
-      .getCustomActions({ data: { source: source ?? "" } })
-      .forEach((action) => custom.push(action));
-    if (type === "custom") {
-      return custom;
-    }
-    if (custom.length > 0) {
-      custom.push(CONTEXT_MENU_SEPARATOR);
-    }
-    const standard: ContextMenuItems = this._getContextMenuItems(type).filter(
-      (item) =>
-        !item ||
-        item === CONTEXT_MENU_SEPARATOR ||
-        this.actionManager.isActionEnabled(item, { guardsOnly: true }),
-    );
-    return [...custom, ...standard];
-  };
-
-  private _getContextMenuItems = (
     type: "canvas" | "element",
   ): ContextMenuItems => {
     const options: ContextMenuItems = [];
