@@ -1,160 +1,137 @@
-import { BOUND_TEXT_PADDING } from "../constants";
-import { measureText, wrapText } from "./textElement";
+import { CHARACTER_WIDTH_IN_TEST, measureText, wrapText } from "./textElement";
 import { FontString } from "./types";
+import { faker } from "@faker-js/faker";
 
 describe("Test wrapText", () => {
   const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
 
   it("shouldn't add new lines for trailing spaces", () => {
-    const text = "Hello whats up      ";
-    const maxWidth = 200 - BOUND_TEXT_PADDING * 2;
-    const res = wrapText(text, font, maxWidth);
-    expect(res).toBe("Hello whats up      ");
+    const text = faker.lorem.paragraph();
+    const maxWidth = text.length * CHARACTER_WIDTH_IN_TEST;
+    const spaces = " ".repeat(faker.datatype.number({ min: 1, max: 10 }));
+    const res = wrapText(text + spaces, font, maxWidth);
+    expect(res).toBe(text + spaces);
   });
 
   it("should work with emojis", () => {
     const text = "😀";
-    const maxWidth = 1;
+    const maxWidth = CHARACTER_WIDTH_IN_TEST / 2;
     const res = wrapText(text, font, maxWidth);
     expect(res).toBe("😀");
   });
 
   it("should show the text correctly when min width reached", () => {
-    const text = "Hello😀";
-    const maxWidth = 10;
+    const text = `${faker.random.word()}😀`;
+    const maxWidth = CHARACTER_WIDTH_IN_TEST;
     const res = wrapText(text, font, maxWidth);
-    expect(res).toBe("H\ne\nl\nl\no\n😀");
+    expect(res).toBe(Array.from(text).join("\n"));
   });
 
   describe("When text doesn't contain new lines", () => {
-    const text = "Hello whats up"; // 14
+    const words = [
+      faker.lorem.word(5),
+      faker.lorem.word(3),
+      faker.lorem.word(2),
+    ];
+    const text = words.join(" ");
     [
       {
         desc: "break all words when width of each word is less than container width",
-        width: 80,
-        res: `Hello 
-whats 
-up`,
+        width: words[0].length * CHARACTER_WIDTH_IN_TEST,
+        res: words.join(" \n"),
       },
       {
         desc: "break all characters when width of each character is less than container width",
-        width: 25,
-        res: `H
-e
-l
-l
-o 
-w
-h
-a
-t
-s 
-u
-p`,
+        width: CHARACTER_WIDTH_IN_TEST * 1.5,
+        res: words.map((word) => word.split("").join("\n")).join(" \n"),
       },
       {
         desc: "break words as per the width",
-
-        width: 140,
-        res: `Hello whats 
-up`,
+        width: `${words[0]} ${words[1]}`.length * CHARACTER_WIDTH_IN_TEST,
+        res: `${words[0]} ${words[1]} \n${words[2]}`,
       },
       {
         desc: "fit the container",
-
-        width: 250,
-        res: "Hello whats up",
+        width: text.length * CHARACTER_WIDTH_IN_TEST,
+        res: text,
       },
     ].forEach((data) => {
       it(`should ${data.desc}`, () => {
-        const res = wrapText(text, font, data.width - BOUND_TEXT_PADDING * 2);
+        const res = wrapText(text, font, data.width);
         expect(res).toEqual(data.res);
       });
     });
   });
   describe("When text contain new lines", () => {
-    const text = `Hello
-whats up`;
+    const words = [
+      faker.lorem.word(5),
+      faker.lorem.word(3),
+      faker.lorem.word(2),
+    ];
+    const text = `${words[0]}\n${words[1]} ${words[2]}`;
     [
       {
         desc: "break all words when width of each word is less than container width",
-        width: 80,
-        res: `Hello
-whats 
-up`,
+        width: words[0].length * CHARACTER_WIDTH_IN_TEST,
+        res: `${words[0]}\n${words[1]} \n${words[2]}`,
       },
       {
         desc: "break all characters when width of each character is less than container width",
-        width: 25,
-        res: `H
-e
-l
-l
-o
-w
-h
-a
-t
-s 
-u
-p`,
+        width: CHARACTER_WIDTH_IN_TEST * 1.5,
+        res: `${words[0].split("").join("\n")}\n${words[1]
+          .split("")
+          .join("\n")} \n${words[2].split("").join("\n")}`,
       },
       {
         desc: "break words as per the width",
-
-        width: 150,
-        res: `Hello
-whats up`,
+        width: `${words[1]} ${words[2]}`.length * CHARACTER_WIDTH_IN_TEST,
+        res: text,
       },
       {
         desc: "fit the container",
-
-        width: 250,
-        res: `Hello
-whats up`,
+        width: text.length * CHARACTER_WIDTH_IN_TEST,
+        res: text,
       },
     ].forEach((data) => {
       it(`should respect new lines and ${data.desc}`, () => {
-        const res = wrapText(text, font, data.width - BOUND_TEXT_PADDING * 2);
+        const res = wrapText(text, font, data.width);
         expect(res).toEqual(data.res);
       });
     });
   });
   describe("When text is long", () => {
-    const text = `hellolongtextthisiswhatsupwithyouIamtypingggggandtypinggg break it now`;
+    const words = [
+      faker.lorem.word(10),
+      faker.lorem.word(5),
+      faker.lorem.word(3),
+      faker.lorem.word(2),
+    ];
+    const text = `${words[0].repeat(10)} ${words[1]} ${words[2]} ${words[3]}`; // 100 5 3 2
     [
       {
         desc: "fit characters of long string as per container width",
-        width: 160,
-        res: `hellolongtextth
-isiswhatsupwith
-youIamtypingggg
-gandtypinggg 
-break it now`,
+        width: words[0].length * CHARACTER_WIDTH_IN_TEST,
+        res: `${Array(10).fill(words[0]).join("\n")} \n${words[1]} ${
+          words[2]
+        } \n${words[3]}`,
       },
 
       {
         desc: "fit characters of long string as per container width and break words as per the width",
-
-        width: 120,
-        res: `hellolongte
-xtthisiswha
-tsupwithyou
-Iamtypinggg
-ggandtyping
-gg break it 
-now`,
+        width: words[0].repeat(3).length * CHARACTER_WIDTH_IN_TEST,
+        res: `${Array(3).fill(words[0].repeat(3)).join("\n")}\n${words[0]} ${
+          words[1]
+        } ${words[2]} ${words[3]}`,
       },
       {
         desc: "fit the long text when container width is greater than text length and move the rest to next line",
 
-        width: 580,
-        res: `hellolongtextthisiswhatsupwithyouIamtypingggggandtypinggg 
-break it now`,
+        width: words[0].repeat(10).length * CHARACTER_WIDTH_IN_TEST,
+        res: `${words[0].repeat(10)} \n${words[1]} ${words[2]} ${words[3]}`,
       },
     ].forEach((data) => {
       it(`should ${data.desc}`, () => {
-        const res = wrapText(text, font, data.width - BOUND_TEXT_PADDING * 2);
+        const res = wrapText(text, font, data.width);
         expect(res).toEqual(data.res);
       });
     });
@@ -163,15 +140,17 @@ break it now`,
 
 describe("Test measureText", () => {
   const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
-  const text = "Hello World";
+  const text = faker.lorem.paragraph(1);
 
   it("should add correct attributes when maxWidth is passed", () => {
-    const maxWidth = 200 - BOUND_TEXT_PADDING * 2;
+    const maxWidth = text.length * CHARACTER_WIDTH_IN_TEST;
     const res = measureText(text, font, maxWidth);
 
     expect(res.container).toMatchInlineSnapshot(`
       <div
-        style="position: absolute; white-space: pre-wrap; font: Emoji 20px 20px; min-height: 1em; width: 111px; overflow: hidden; word-break: break-word; line-height: 0px;"
+        style="position: absolute; white-space: pre-wrap; font: Emoji 20px 20px; min-height: 1em; width: ${
+          maxWidth + 1
+        }px; overflow: hidden; word-break: break-word; line-height: 0px;"
       >
         <span
           style="display: inline-block; overflow: hidden; width: 1px; height: 1px;"

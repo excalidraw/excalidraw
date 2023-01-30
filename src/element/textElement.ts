@@ -319,6 +319,8 @@ export const measureText = (
   return { width, height, baseline };
 };
 
+export const CHARACTER_WIDTH_IN_TEST = 10;
+
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
 const cacheApproxLineHeight: { [key: FontString]: number } = {};
 
@@ -343,7 +345,7 @@ export const getLineWidth = (text: string, font: FontString) => {
   // doesn't measure text and instead just returns number of
   // characters hence we assume that each letteris 10px
   if (isTestEnv()) {
-    return metrics.width * 10;
+    return metrics.width * CHARACTER_WIDTH_IN_TEST;
   }
 
   return metrics.width;
