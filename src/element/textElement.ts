@@ -77,7 +77,10 @@ export const redrawTextBoundingBox = (
       } else {
         coordY = container.y + containerDims.height / 2 - metrics.height / 2;
         if (metrics.height > getMaxContainerHeight(container)) {
-          nextHeight = metrics.height + boundTextElementPadding * 2;
+          nextHeight = computeContainerHeightForBoundText(
+            container,
+            metrics.height,
+          );
           coordY = container.y + nextHeight / 2 - metrics.height / 2;
         }
       }
