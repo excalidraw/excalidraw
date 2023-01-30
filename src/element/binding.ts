@@ -26,7 +26,11 @@ import Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
 import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import {
+  getBoundTextElement,
+  handleBindTextResize,
+  isValidTextContainer,
+} from "./textElement";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>

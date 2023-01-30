@@ -12,7 +12,11 @@ import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
-import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
+import {
+  computeContainerHeightForBoundText,
+  getMaxContainerHeight,
+  getMaxContainerWidth,
+} from "./newElement";
 import {
   isBoundToContainer,
   isImageElement,
@@ -192,7 +196,11 @@ export const handleBindTextResize = (
     }
     // increase height in case text element height exceeds
     if (nextHeight > maxHeight) {
-      containerHeight = nextHeight + getBoundTextElementOffset(textElement) * 2;
+      containerHeight = computeContainerHeightForBoundText(
+        container,
+        nextHeight,
+      );
+
       const diff = containerHeight - containerDims.height;
       // fix the y coord when resizing from ne/nw/n
       const updatedY =
@@ -615,6 +623,21 @@ export const getContainerCenter = (
   return { x: midSegmentMidpoint[0], y: midSegmentMidpoint[1] };
 };
 
+export const getTextContainerCoords = (container: ExcalidrawTextContainer) => {
+  if (container.type === "ellipse") {
+    const offsetX = (container.width / 2) * (1 - Math.sqrt(2) / 2);
+    const offsetY = (container.height / 2) * (1 - Math.sqrt(2) / 2);
+    return {
+      x: container.x + offsetX,
+      y: container.y + offsetY,
+    };
+  }
+  return {
+    x: container.x,
+    y: container.y,
+  };
+};
+
 export const getTextElementAngle = (textElement: ExcalidrawTextElement) => {
   const container = getContainerElement(textElement);
   if (!container || isArrowElement(container)) {
@@ -627,12 +650,13 @@ export const getBoundTextElementOffset = (
   boundTextElement: ExcalidrawTextElement | null,
 ) => {
   const container = getContainerElement(boundTextElement);
-  if (!container) {
+  if (!container || !boundTextElement) {
     return 0;
   }
   if (isArrowElement(container)) {
     return BOUND_TEXT_PADDING * 8;
   }
+
   return BOUND_TEXT_PADDING;
 };
 

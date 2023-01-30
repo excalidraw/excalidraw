@@ -12,6 +12,8 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawTextContainer,
+  ExcalidrawTextElementWithContainer,
+  NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -22,6 +24,7 @@ import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
+  getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementOffset,
   getContainerDims,
@@ -290,6 +293,8 @@ export const getMaxContainerWidth = (container: ExcalidrawElement) => {
       return BOUND_TEXT_PADDING * 8 * 2;
     }
     return containerWidth;
+  } else if (container.type === "ellipse") {
+    return Math.round((width / 2) * Math.sqrt(2));
   }
   return width - BOUND_TEXT_PADDING * 2;
 };
@@ -306,8 +311,23 @@ export const getMaxContainerHeight = (container: ExcalidrawElement) => {
       return BOUND_TEXT_PADDING * 8 * 2;
     }
     return height;
+  } else if (container.type === "ellipse") {
+    return Math.round((height / 2) * Math.sqrt(2));
   }
   return height - BOUND_TEXT_PADDING * 2;
+};
+
+export const computeContainerHeightForBoundText = (
+  container: NonDeletedExcalidrawElement,
+  boundTextElementHeight: number,
+) => {
+  if (container.type === "ellipse") {
+    return Math.round((boundTextElementHeight / Math.sqrt(2)) * 2);
+  }
+  if (isArrowElement(container)) {
+    return boundTextElementHeight + BOUND_TEXT_PADDING * 8 * 2;
+  }
+  return boundTextElementHeight + BOUND_TEXT_PADDING * 2;
 };
 
 export const updateTextElement = (
