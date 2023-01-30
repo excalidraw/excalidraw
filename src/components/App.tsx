@@ -1773,10 +1773,19 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    this.scene.replaceAllElements([
-      ...this.scene.getElementsIncludingDeleted(),
-      ...textElements,
-    ]);
+    const frameId = textElements[0].frameId;
+
+    if (frameId) {
+      this.scene.insertElementsAtIndex(
+        textElements,
+        this.scene.getElementIndex(frameId),
+      );
+    } else {
+      this.scene.replaceAllElements([
+        ...this.scene.getElementsIncludingDeleted(),
+        ...textElements,
+      ]);
+    }
 
     this.setState({
       selectedElementIds: Object.fromEntries(
@@ -2668,10 +2677,7 @@ class App extends React.Component<AppProps, AppState> {
         const containerIndex = this.scene.getElementIndex(container.id);
         this.scene.insertElementAtIndex(element, containerIndex + 1);
       } else {
-        this.scene.replaceAllElements([
-          ...this.scene.getElementsIncludingDeleted(),
-          element,
-        ]);
+        this.scene.addNewElement(element);
       }
 
       // case: creating new text not centered to parent element → offset Y
@@ -4173,6 +4179,11 @@ class App extends React.Component<AppProps, AppState> {
       null,
     );
 
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: gridX,
+      y: gridY,
+    });
+
     const element = newFreeDrawElement({
       type: elementType,
       x: gridX,
@@ -4187,6 +4198,7 @@ class App extends React.Component<AppProps, AppState> {
       roundness: null,
       simulatePressure: event.pressure === 0.5,
       locked: false,
+      frameId: topLayerFrame ? topLayerFrame.id : null,
     });
 
     this.setState((prevState) => ({
@@ -4213,6 +4225,7 @@ class App extends React.Component<AppProps, AppState> {
       ...this.scene.getElementsIncludingDeleted(),
       element,
     ]);
+    this.scene.addNewElement(element);
     this.setState({
       draggingElement: element,
       editingElement: element,
@@ -4362,10 +4375,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.origin,
         this.scene,
       );
-      this.scene.replaceAllElements([
-        ...this.scene.getElementsIncludingDeleted(),
-        element,
-      ]);
+
+      this.scene.addNewElement(element);
       this.setState({
         draggingElement: element,
         editingElement: element,
@@ -4419,10 +4430,7 @@ class App extends React.Component<AppProps, AppState> {
         draggingElement: element,
       });
     } else {
-      this.scene.replaceAllElements([
-        ...this.scene.getElementsIncludingDeleted(),
-        element,
-      ]);
+      this.scene.addNewElement(element);
       this.setState({
         multiElement: null,
         draggingElement: element,
@@ -5640,10 +5648,7 @@ class App extends React.Component<AppProps, AppState> {
     imageFile: File,
     showCursorImagePreview?: boolean,
   ) => {
-    this.scene.replaceAllElements([
-      ...this.scene.getElementsIncludingDeleted(),
-      imageElement,
-    ]);
+    this.scene.addNewElement(imageElement);
 
     try {
       await this.initializeImage({

@@ -246,6 +246,29 @@ class Scene {
     this.replaceAllElements(nextElements);
   }
 
+  insertElementsAtIndex(elements: ExcalidrawElement[], index: number) {
+    if (!Number.isFinite(index) || index < 0) {
+      throw new Error(
+        "insertElementAtIndex can only be called with index >= 0",
+      );
+    }
+    const nextElements = [
+      ...this.elements.slice(0, index),
+      ...elements,
+      ...this.elements.slice(index),
+    ];
+
+    this.replaceAllElements(nextElements);
+  }
+
+  addNewElement = (element: ExcalidrawElement) => {
+    if (element.frameId) {
+      this.insertElementAtIndex(element, this.getElementIndex(element.frameId));
+    } else {
+      this.replaceAllElements([...this.elements, element]);
+    }
+  };
+
   getElementIndex(elementId: string) {
     return this.elements.findIndex((element) => element.id === elementId);
   }
