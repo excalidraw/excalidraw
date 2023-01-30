@@ -62,21 +62,24 @@ export const redrawTextBoundingBox = (
   let coordX = textElement.x;
   // Resize container and vertically center align the text
   if (container) {
+    const containerCoords = getContainerCoords(container);
     if (!isArrowElement(container)) {
       const containerDims = getContainerDims(container);
+      const maxContainerHeight = getMaxContainerHeight(container);
+      const maxContainerWidth = getMaxContainerWidth(container);
       let nextHeight = containerDims.height;
       const boundTextElementPadding = getBoundTextElementOffset(textElement);
       if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-        coordY = container.y + boundTextElementPadding;
+        coordY = containerCoords.y + boundTextElementPadding;
       } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
         coordY =
-          container.y +
-          containerDims.height -
+          containerCoords.y +
+          maxContainerHeight -
           metrics.height -
           boundTextElementPadding;
       } else {
         coordY = container.y + containerDims.height / 2 - metrics.height / 2;
-        if (metrics.height > getMaxContainerHeight(container)) {
+        if (metrics.height > maxContainerHeight) {
           nextHeight = computeContainerHeightForBoundText(
             container,
             metrics.height,
@@ -85,11 +88,11 @@ export const redrawTextBoundingBox = (
         }
       }
       if (textElement.textAlign === TEXT_ALIGN.LEFT) {
-        coordX = container.x + boundTextElementPadding;
+        coordX = containerCoords.x + boundTextElementPadding;
       } else if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
         coordX =
-          container.x +
-          containerDims.width -
+          containerCoords.x +
+          maxContainerWidth -
           metrics.width -
           boundTextElementPadding;
       } else {
@@ -626,7 +629,7 @@ export const getContainerCenter = (
   return { x: midSegmentMidpoint[0], y: midSegmentMidpoint[1] };
 };
 
-export const getTextContainerCoords = (container: ExcalidrawTextContainer) => {
+export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
   if (container.type === "ellipse") {
     const offsetX = (container.width / 2) * (1 - Math.sqrt(2) / 2);
     const offsetY = (container.height / 2) * (1 - Math.sqrt(2) / 2);
