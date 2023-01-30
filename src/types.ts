@@ -385,7 +385,6 @@ type CanvasActions = Partial<{
 
 type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
-  welcomeScreen: boolean;
   canvasActions: CanvasActions;
 }>;
 
@@ -393,7 +392,7 @@ export type AppProps = Merge<
   ExcalidrawProps,
   {
     UIOptions: Merge<
-      MarkRequired<UIOptions, "welcomeScreen">,
+      UIOptions,
       {
         canvasActions: Required<CanvasActions> & { export: ExportOpts };
       }

@@ -38,7 +38,6 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
-import WelcomeScreen from "./welcome-screen/WelcomeScreen";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
@@ -104,17 +103,6 @@ const DefaultMainMenu: React.FC<{
       <MainMenu.DefaultItems.ToggleTheme />
       <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>
-  );
-};
-
-const DefaultWelcomeScreen = () => {
-  return (
-    <WelcomeScreen __fallback>
-      <WelcomeScreen.Center />
-      <WelcomeScreen.Hints.MenuHint />
-      <WelcomeScreen.Hints.ToolbarHint />
-      <WelcomeScreen.Hints.HelpHint />
-    </WelcomeScreen>
   );
 };
 
@@ -378,7 +366,6 @@ const LayerUI = ({
           tunneled away. We only render tunneled components that actually
           have defaults when host do not render anything. */}
       <DefaultMainMenu UIOptions={UIOptions} />
-      <DefaultWelcomeScreen />
       {/* ------------------------------------------------------------------ */}
 
       {appState.isLoading && <LoadingMessage delay={250} />}
