@@ -292,7 +292,8 @@ export const measureText = (
   container.appendChild(span);
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
-  const width = container.offsetWidth;
+  // since we are adding a span of width 1px
+  const width = container.offsetWidth + 1;
   const height = container.offsetHeight;
   document.body.removeChild(container);
   if (isTestEnv()) {
