@@ -12,7 +12,7 @@ import {
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { isFrameElement } from "../element/typeChecks";
 import { mutateElement } from "../element/mutateElement";
-import { findIndex, findLastIndex, moveLeftIndexToRightIndex } from "../utils";
+import { findIndex } from "../utils";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -87,40 +87,45 @@ class Scene {
    * Add the given elements to the given frame, which consists of the following tasks:
    * 1. update elements' frameId
    * 2. update elements' z-indexes
-   *    - elements are all above the frame
+   *    - elements are all below the frame
    *    - elements are all above the current elements in the frame
    *    - elements' z-index to each other remain unchanged
-   *
-   * Note that, the given elements have to be ordered according to their z-indexes
-   * which they will be if they are first returned from `getSelectedElements` are subsequent
-   * operations do not alter z-indexes
+   *    - frame's elements are kept contiguously
    */
   addElementsToFrame(
     elementsToAdd: NonDeletedExcalidrawElement[],
     frame: NonDeleted<ExcalidrawFrameElement>,
   ) {
-    // this is ok but not so efficient
-    let indexTo = findLastIndex(
-      this.elements,
-      (element) => element.frameId === frame.id,
-    );
-
-    if (indexTo === -1) {
-      indexTo = this.getElementIndex(frame.id);
-    }
-
     let nextElements = [...this.elements];
 
     elementsToAdd.forEach((element) => {
-      mutateElement(element, {
-        frameId: frame.id,
-      });
-      const indexFrom = findIndex(nextElements, (e) => e.id === element.id);
-      nextElements = moveLeftIndexToRightIndex(
-        nextElements,
-        indexFrom,
-        indexTo,
-      );
+      // only necessary if the element is not already in the frame
+      if (element.frameId !== frame.id) {
+        mutateElement(element, {
+          frameId: frame.id,
+        });
+        const frameIndex = findIndex(nextElements, (e) => e.id === frame.id);
+        const elementIndex = findIndex(
+          nextElements,
+          (e) => e.id === element.id,
+        );
+
+        if (elementIndex < frameIndex) {
+          nextElements = [
+            ...nextElements.slice(0, elementIndex),
+            ...nextElements.slice(elementIndex + 1, frameIndex),
+            element,
+            ...nextElements.slice(frameIndex),
+          ];
+        } else {
+          nextElements = [
+            ...nextElements.slice(0, frameIndex),
+            element,
+            ...nextElements.slice(frameIndex, elementIndex),
+            ...nextElements.slice(elementIndex + 1),
+          ];
+        }
+      }
     });
 
     this.replaceAllElements(nextElements);
