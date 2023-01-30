@@ -18,6 +18,8 @@ import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import { mainMenuTunnel, welcomeScreenCenterTunnel } from "./LayerUI";
+import { HandButton } from "./HandButton";
+import { isHandToolActive } from "../appState";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -27,6 +29,7 @@ type MobileMenuProps = {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
+  onHandToolToggle: () => void;
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
 
@@ -46,6 +49,7 @@ export const MobileMenu = ({
   actionManager,
   setAppState,
   onLockToggle,
+  onHandToolToggle,
   onPenModeToggle,
   canvas,
   onImageAction,
@@ -80,6 +84,13 @@ export const MobileMenu = ({
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
                 <div className="mobile-misc-tools-container">
+                  {!appState.viewModeEnabled && (
+                    <LibraryButton
+                      appState={appState}
+                      setAppState={setAppState}
+                      isMobile
+                    />
+                  )}
                   <PenModeButton
                     checked={appState.penMode}
                     onChange={onPenModeToggle}
@@ -93,13 +104,12 @@ export const MobileMenu = ({
                     title={t("toolBar.lock")}
                     isMobile
                   />
-                  {!appState.viewModeEnabled && (
-                    <LibraryButton
-                      appState={appState}
-                      setAppState={setAppState}
-                      isMobile
-                    />
-                  )}
+                  <HandButton
+                    checked={isHandToolActive(appState)}
+                    onChange={() => onHandToolToggle()}
+                    title={t("toolBar.hand")}
+                    isMobile
+                  />
                 </div>
               </Stack.Row>
             </Stack.Col>

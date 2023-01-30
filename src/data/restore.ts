@@ -55,6 +55,7 @@ export const AllowedExcalidrawActiveTools: Record<
   freedraw: true,
   eraser: false,
   custom: true,
+  hand: true,
 };
 
 export type RestoredDataState = {
@@ -465,7 +466,7 @@ export const restoreAppState = (
           ? nextAppState.activeTool
           : { type: "selection" },
       ),
-      lastActiveToolBeforeEraser: null,
+      lastActiveTool: null,
       locked: nextAppState.activeTool.locked ?? false,
     },
     // Migrates from previous version where appState.zoom was a number

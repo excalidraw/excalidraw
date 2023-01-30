@@ -1,9 +1,9 @@
 import React from "react";
+import {
+  getDropdownMenuItemClassName,
+  useHandleDropdownMenuItemClick,
+} from "./common";
 import MenuItemContent from "./DropdownMenuItemContent";
-
-export const getDrodownMenuItemClassName = (className = "") => {
-  return `dropdown-menu-item dropdown-menu-item-base ${className}`.trim();
-};
 
 const DropdownMenuItem = ({
   icon,
@@ -14,17 +14,19 @@ const DropdownMenuItem = ({
   ...rest
 }: {
   icon?: JSX.Element;
-  onSelect: () => void;
+  onSelect: (event: Event) => void;
   children: React.ReactNode;
   shortcut?: string;
   className?: string;
-} & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+} & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">) => {
+  const handleClick = useHandleDropdownMenuItemClick(rest.onClick, onSelect);
+
   return (
     <button
       {...rest}
-      onClick={onSelect}
+      onClick={handleClick}
       type="button"
-      className={getDrodownMenuItemClassName(className)}
+      className={getDropdownMenuItemClassName(className)}
       title={rest.title ?? rest["aria-label"]}
     >
       <MenuItemContent icon={icon} shortcut={shortcut}>

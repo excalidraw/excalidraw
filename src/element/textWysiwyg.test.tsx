@@ -862,7 +862,7 @@ describe("textWysiwyg", () => {
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
-          110,
+          109.5,
           17,
         ]
       `);
@@ -910,7 +910,7 @@ describe("textWysiwyg", () => {
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
-          425,
+          424,
           -539,
         ]
       `);
@@ -1026,7 +1026,7 @@ describe("textWysiwyg", () => {
       mouse.up(rectangle.x + 100, rectangle.y + 50);
       expect(rectangle.x).toBe(80);
       expect(rectangle.y).toBe(85);
-      expect(text.x).toBe(90);
+      expect(text.x).toBe(89.5);
       expect(text.y).toBe(90);
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {

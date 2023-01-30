@@ -145,7 +145,7 @@ export const actionFinalize = register({
     let activeTool: AppState["activeTool"];
     if (appState.activeTool.type === "eraser") {
       activeTool = updateActiveTool(appState, {
-        ...(appState.activeTool.lastActiveToolBeforeEraser || {
+        ...(appState.activeTool.lastActiveTool || {
           type: "selection",
         }),
         lastActiveToolBeforeEraser: null,

@@ -271,12 +271,11 @@ export const measureText = (
   container.style.whiteSpace = "pre";
   container.style.font = font;
   container.style.minHeight = "1em";
-  const textWidth = getTextWidth(text, font);
 
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
-    container.style.width = `${String(Math.min(textWidth, maxWidth) + 1)}px`;
-
+    // since we are adding a span of width 1px later
+    container.style.maxWidth = `${maxWidth + 1}px`;
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
     container.style.lineHeight = `${String(lineHeight)}px`;
@@ -293,11 +292,8 @@ export const measureText = (
   container.appendChild(span);
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
-  // Since span adds 1px extra width to the container
-  let width = container.offsetWidth;
-  if (maxWidth && textWidth > maxWidth) {
-    width = width - 1;
-  }
+  // since we are adding a span of width 1px
+  const width = container.offsetWidth + 1;
   const height = container.offsetHeight;
   document.body.removeChild(container);
   if (isTestEnv()) {
@@ -332,8 +328,11 @@ const getLineWidth = (text: string, font: FontString) => {
   if (isTestEnv()) {
     return metrics.width * 10;
   }
+  // Since measureText behaves differently in different browsers
+  // OS so considering a adjustment factor of 0.2
+  const adjustmentFactor = 0.2;
 
-  return metrics.width;
+  return metrics.width + adjustmentFactor;
 };
 
 export const getTextWidth = (text: string, font: FontString) => {
@@ -359,95 +358,93 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     // This means its newline so push it
     if (words.length === 1 && words[0] === "") {
       lines.push(words[0]);
-    } else {
-      let currentLine = "";
-      let currentLineWidthTillNow = 0;
+      return; // continue
+    }
+    let currentLine = "";
+    let currentLineWidthTillNow = 0;
 
-      let index = 0;
-      while (index < words.length) {
-        const currentWordWidth = getLineWidth(words[index], font);
+    let index = 0;
+    while (index < words.length) {
+      const currentWordWidth = getLineWidth(words[index], font);
 
-        // Start breaking longer words exceeding max width
-        if (currentWordWidth >= maxWidth) {
-          // push current line since the current word exceeds the max width
-          // so will be appended in next line
+      // Start breaking longer words exceeding max width
+      if (currentWordWidth >= maxWidth) {
+        // push current line since the current word exceeds the max width
+        // so will be appended in next line
+        push(currentLine);
+        currentLine = "";
+        currentLineWidthTillNow = 0;
+        while (words[index].length > 0) {
+          const currentChar = String.fromCodePoint(
+            words[index].codePointAt(0)!,
+          );
+          const width = charWidth.calculate(currentChar, font);
+          currentLineWidthTillNow += width;
+          words[index] = words[index].slice(currentChar.length);
+
+          if (currentLineWidthTillNow >= maxWidth) {
+            // only remove last trailing space which we have added when joining words
+            if (currentLine.slice(-1) === " ") {
+              currentLine = currentLine.slice(0, -1);
+            }
+            push(currentLine);
+            currentLine = currentChar;
+            currentLineWidthTillNow = width;
+          } else {
+            currentLine += currentChar;
+          }
+        }
+        // push current line if appending space exceeds max width
+        if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
           push(currentLine);
           currentLine = "";
           currentLineWidthTillNow = 0;
-          while (words[index].length > 0) {
-            const currentChar = words[index][0];
-            const width = charWidth.calculate(currentChar, font);
-            currentLineWidthTillNow += width;
-            words[index] = words[index].slice(1);
-
-            if (currentLineWidthTillNow >= maxWidth) {
-              // only remove last trailing space which we have added when joining words
-              if (currentLine.slice(-1) === " ") {
-                currentLine = currentLine.slice(0, -1);
-              }
-              push(currentLine);
-              currentLine = currentChar;
-              currentLineWidthTillNow = width;
-              if (currentLineWidthTillNow === maxWidth) {
-                currentLine = "";
-                currentLineWidthTillNow = 0;
-              }
-            } else {
-              currentLine += currentChar;
-            }
-          }
-          // push current line if appending space exceeds max width
-          if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
-            push(currentLine);
-            currentLine = "";
-            currentLineWidthTillNow = 0;
-          } else {
-            // space needs to be appended before next word
-            // as currentLine contains chars which couldn't be appended
-            // to previous line
-            currentLine += " ";
-            currentLineWidthTillNow += spaceWidth;
-          }
-
-          index++;
         } else {
-          // Start appending words in a line till max width reached
-          while (currentLineWidthTillNow < maxWidth && index < words.length) {
-            const word = words[index];
-            currentLineWidthTillNow = getLineWidth(currentLine + word, font);
+          // space needs to be appended before next word
+          // as currentLine contains chars which couldn't be appended
+          // to previous line
+          currentLine += " ";
+          currentLineWidthTillNow += spaceWidth;
+        }
 
-            if (currentLineWidthTillNow >= maxWidth) {
-              push(currentLine);
-              currentLineWidthTillNow = 0;
-              currentLine = "";
+        index++;
+      } else {
+        // Start appending words in a line till max width reached
+        while (currentLineWidthTillNow < maxWidth && index < words.length) {
+          const word = words[index];
+          currentLineWidthTillNow = getLineWidth(currentLine + word, font);
 
-              break;
-            }
-            index++;
-            currentLine += `${word} `;
+          if (currentLineWidthTillNow >= maxWidth) {
+            push(currentLine);
+            currentLineWidthTillNow = 0;
+            currentLine = "";
 
-            // Push the word if appending space exceeds max width
-            if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
-              const word = currentLine.slice(0, -1);
-              push(word);
-              currentLine = "";
-              currentLineWidthTillNow = 0;
-              break;
-            }
+            break;
           }
-          if (currentLineWidthTillNow === maxWidth) {
+          index++;
+          currentLine += `${word} `;
+
+          // Push the word if appending space exceeds max width
+          if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
+            const word = currentLine.slice(0, -1);
+            push(word);
             currentLine = "";
             currentLineWidthTillNow = 0;
+            break;
           }
         }
-      }
-      if (currentLine) {
-        // only remove last trailing space which we have added when joining words
-        if (currentLine.slice(-1) === " ") {
-          currentLine = currentLine.slice(0, -1);
+        if (currentLineWidthTillNow === maxWidth) {
+          currentLine = "";
+          currentLineWidthTillNow = 0;
         }
-        push(currentLine);
       }
+    }
+    if (currentLine) {
+      // only remove last trailing space which we have added when joining words
+      if (currentLine.slice(-1) === " ") {
+        currentLine = currentLine.slice(0, -1);
+      }
+      push(currentLine);
     }
   });
   return lines.join("\n");

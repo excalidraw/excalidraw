@@ -13,11 +13,21 @@ import { t } from "../../i18n";
 import { HamburgerMenuIcon } from "../icons";
 import { mainMenuTunnel } from "../LayerUI";
 import { withInternalFallback } from "../hoc/withInternalFallback";
+import { composeEventHandlers } from "../../utils";
 
 const MainMenu = Object.assign(
   withInternalFallback(
     "MainMenu",
-    ({ children }: { children?: React.ReactNode }) => {
+    ({
+      children,
+      onSelect,
+    }: {
+      children?: React.ReactNode;
+      /**
+       * Called when any menu item is selected (clicked on).
+       */
+      onSelect?: (event: Event) => void;
+    }) => {
       const device = useDevice();
       const appState = useExcalidrawAppState();
       const setAppState = useExcalidrawSetAppState();
@@ -37,7 +47,12 @@ const MainMenu = Object.assign(
             >
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>
-            <DropdownMenu.Content onClickOutside={onClickOutside}>
+            <DropdownMenu.Content
+              onClickOutside={onClickOutside}
+              onSelect={composeEventHandlers(onSelect, () => {
+                setAppState({ openMenu: null });
+              })}
+            >
               {children}
               {device.isMobile && appState.collaborators.size > 0 && (
                 <fieldset className="UserList-Wrapper">
