@@ -2,11 +2,19 @@
 slug: /@excalidraw/excalidraw/api/components
 ---
 
-# Components
+# `<Excalidraw/>` children
 
-We are slowly migrating to `Component` API so that host can customize the UI using React Components. Below are components supported currently 👇
+We expose several components you can render as children of the `<Excalidraw/>` component to customize the UI.
 
-- [Footer](/docs/@excalidraw/excalidraw/api/components/footer)
+:::info
+
+We have only recently started migrating to this type of component API. Some UI components are still using render props, and some UI customization isn't supported yet (such as the toolbar or the element properties panel). Stay tuned for more updates!
+
+:::
+
+Below are the currently supported components:
+
 - [MainMenu](/docs/@excalidraw/excalidraw/api/components/main-menu)
 - [WelcomeScreen](/docs/@excalidraw/excalidraw/api/components/welcome-screen)
+- [Footer](/docs/@excalidraw/excalidraw/api/components/footer)
 - [LiveCollaborationTrigger](/docs/@excalidraw/excalidraw/api/components/live-collaboration-trigger)
