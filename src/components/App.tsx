@@ -4446,18 +4446,13 @@ class App extends React.Component<AppProps, AppState> {
       x: gridX,
       y: gridY,
       strokeColor: this.state.currentItemStrokeColor,
-      backgroundColor: this.state.currentItemBackgroundColor,
+      backgroundColor: "transparent",
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.state.currentItemStrokeWidth,
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
-      roundness:
-        this.state.currentItemRoundness === "round"
-          ? {
-              type: ROUNDNESS.ADAPTIVE_RADIUS,
-            }
-          : null,
+      roundness: null,
       locked: false,
       name: `Frame ${frames.length + 1}`,
     });

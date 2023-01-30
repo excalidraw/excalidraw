@@ -13,7 +13,7 @@ import {
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
 import { getBoundTextElement } from "../element/textElement";
-import { hasBoundTextElement } from "../element/typeChecks";
+import { hasBoundTextElement, isFrameElement } from "../element/typeChecks";
 import { getSelectedElements } from "../scene";
 
 // `copiedStyles` is exported only for tests.
@@ -104,6 +104,13 @@ export const actionPasteStyles = register({
             newElement = newElementWith(newElement, {
               startArrowhead: elementStylesToCopyFrom.startArrowhead,
               endArrowhead: elementStylesToCopyFrom.endArrowhead,
+            });
+          }
+
+          if (isFrameElement(element)) {
+            newElement = newElementWith(newElement, {
+              roundness: null,
+              backgroundColor: "transparent",
             });
           }
 

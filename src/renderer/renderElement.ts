@@ -381,7 +381,9 @@ export const generateRoughOptions = (
     case "frame": {
       options.fillStyle = element.fillStyle;
       options.fill =
-        element.backgroundColor === "transparent"
+        element.type === "frame"
+          ? undefined
+          : element.backgroundColor === "transparent"
           ? undefined
           : element.backgroundColor;
       if (element.type === "ellipse") {

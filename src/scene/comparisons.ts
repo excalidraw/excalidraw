@@ -5,8 +5,7 @@ export const hasBackground = (type: string) =>
   type === "ellipse" ||
   type === "diamond" ||
   type === "line" ||
-  type === "freedraw" ||
-  type === "frame";
+  type === "freedraw";
 
 export const hasStrokeColor = (type: string) => type !== "image";
 
