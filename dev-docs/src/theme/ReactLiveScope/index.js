@@ -1,17 +1,23 @@
 import React from "react";
 import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
 import initialData from "@site/src/initialData";
+import { useColorMode } from "@docusaurus/theme-common";
 
 let ExcalidrawComp = {};
 if (ExecutionEnvironment.canUseDOM) {
   ExcalidrawComp = require("@excalidraw/excalidraw");
 }
-console.log(ExcalidrawComp);
+
+const Excalidraw = (props) => {
+  const { colorMode } = useColorMode();
+  return <ExcalidrawComp.Excalidraw theme={colorMode} {...props} />;
+};
+
 // Add react-live imports you need here
 const ExcalidrawScope = {
   React,
   ...React,
-  Excalidraw: ExcalidrawComp.Excalidraw,
+  Excalidraw,
   Footer: ExcalidrawComp.Footer,
   useDevice: ExcalidrawComp.useDevice,
   MainMenu: ExcalidrawComp.MainMenu,

@@ -8,11 +8,19 @@ If you are using a module bundler (for instance, Webpack), you can import it as 
 import { Excalidraw } from "@excalidraw/excalidraw";
 ```
 
+:::info
+
+Throughout the documentation we use live, editable Excalidraw examples like the one shown below.
+
+While we aim for the examples to closely reflect what you'd get if you rendered it yourself, we actually initialize it with some props behind the scenes. For example, we're passing a `theme` prop to it based on the current color theme of the docs you're just reading.
+
+:::
+
 ```jsx live
 function App() {
   return (
     <>
-      <h1 style={{ textAlign: "center" }}> Excalidraw Example</h1>
+      <h1 style={{ textAlign: "center" }}>Excalidraw Example</h1>
       <div style={{ height: "500px" }}>
         <Excalidraw />
       </div>
