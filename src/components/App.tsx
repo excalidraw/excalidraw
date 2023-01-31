@@ -281,8 +281,11 @@ import {
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { atom } from "jotai";
 import { Fonts } from "../scene/Fonts";
-import { getElementsToUpdateForFrame, isCursorInFrame } from "../frame";
-import { excludeElementsInFramesFromSelection } from "../scene/selection";
+import {
+  getElementsInFrame,
+  getElementsToUpdateForFrame,
+  isCursorInFrame,
+} from "../frame";
 
 export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
@@ -4046,33 +4049,37 @@ class App extends React.Component<AppProps, AppState> {
             // Add hit element to selection. At this point if we're not holding
             // SHIFT the previously selected element(s) were deselected above
             // (make sure you use setState updater to use latest state)
+            // With shift-selection, we want to make sure that frames and their containing
+            // elements are not selected at the same time.
             if (
               !someHitElementIsSelected &&
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
               this.setState((prevState) => {
-                let nextSelectedElementIds = {
+                const nextSelectedElementIds = {
                   ...prevState.selectedElementIds,
                   [hitElement.id]: true,
                 };
 
-                let nextSelectedElements: ExcalidrawElement[] = [];
+                const previouslySelectedElements: ExcalidrawElement[] = [];
 
-                Object.keys(nextSelectedElementIds).forEach((id) => {
+                Object.keys(prevState.selectedElementIds).forEach((id) => {
                   const element = this.scene.getElement(id);
-                  element && nextSelectedElements.push(element);
+                  element && previouslySelectedElements.push(element);
                 });
 
-                nextSelectedElements =
-                  excludeElementsInFramesFromSelection(nextSelectedElements);
-
-                nextSelectedElementIds = nextSelectedElements.reduce(
-                  (map: Record<ExcalidrawElement["id"], true>, element) => {
-                    map[element.id] = true;
-                    return map;
-                  },
-                  {},
-                );
+                // if hitElement is frame, deselect all of its elements if they are selected
+                if (hitElement.type === "frame") {
+                  getElementsInFrame(
+                    previouslySelectedElements,
+                    hitElement.id,
+                  ).forEach((element) => {
+                    nextSelectedElementIds[element.id] = false;
+                  });
+                } else if (hitElement.frameId) {
+                  // if hitElements is a normal element, deselect its frame
+                  nextSelectedElementIds[hitElement.frameId] = false;
+                }
 
                 return selectGroupsForSelectedElements(
                   {
