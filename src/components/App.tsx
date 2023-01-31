@@ -3577,31 +3577,6 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.lastPointerUp = event;
 
-    const sceneCoords = viewportCoordsToSceneCoords(event, this.state);
-    const topLayerFrame = this.getTopLayerFrameAtSceneCoords(sceneCoords);
-
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
-
-    if (topLayerFrame) {
-      const elementsToAddToFrame = getElementsToUpdateForFrame(
-        selectedElements,
-        (element) =>
-          !isFrameElement(element) && element.frameId !== topLayerFrame.id,
-      );
-
-      this.scene.addElementsToFrame(elementsToAddToFrame, topLayerFrame);
-    } else {
-      const elementsToRemoveFromFrame = getElementsToUpdateForFrame(
-        selectedElements,
-        (element) => !isFrameElement(element),
-      );
-
-      this.scene.removeElementsFromFrame(elementsToRemoveFromFrame);
-    }
-
     if (this.device.isTouchScreen) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
@@ -5219,6 +5194,37 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (draggingElement) {
+        if (pointerDownState.drag.hasOccurred) {
+          const sceneCoords = viewportCoordsToSceneCoords(
+            childEvent,
+            this.state,
+          );
+          const topLayerFrame = this.getTopLayerFrameAtSceneCoords(sceneCoords);
+
+          const selectedElements = getSelectedElements(
+            this.scene.getNonDeletedElements(),
+            this.state,
+          );
+
+          if (topLayerFrame) {
+            const elementsToAddToFrame = getElementsToUpdateForFrame(
+              selectedElements,
+              (element) =>
+                !isFrameElement(element) &&
+                element.frameId !== topLayerFrame.id,
+            );
+
+            this.scene.addElementsToFrame(elementsToAddToFrame, topLayerFrame);
+          } else {
+            const elementsToRemoveFromFrame = getElementsToUpdateForFrame(
+              selectedElements,
+              (element) => !isFrameElement(element),
+            );
+
+            this.scene.removeElementsFromFrame(elementsToRemoveFromFrame);
+          }
+        }
+
         mutateElement(
           draggingElement,
           getNormalizedDimensions(draggingElement),
