@@ -15,7 +15,6 @@ import { FontFamilyValues, FontString } from "./element/types";
 import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
-import React from "react";
 import { isEraserActive, isHandToolActive } from "./appState";
 
 let mockDateTime: string | null = null;
@@ -688,48 +687,6 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
           element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
       )
     : [];
-};
-
-/**
- * Partitions React children into named components and the rest of children.
- *
- * Returns known children as a dictionary of react children keyed by their
- * displayName, and the rest children as an array.
- *
- * NOTE all named react components are included in the dictionary, irrespective
- * of the supplied type parameter. This means you may be throwing away
- * children that you aren't expecting, but should nonetheless be rendered.
- * To guard against this (provided you care about the rest children at all),
- * supply a second parameter with an object with keys of the expected children.
- */
-export const getReactChildren = <
-  KnownChildren extends {
-    [k in string]?: React.ReactNode;
-  },
->(
-  children: React.ReactNode,
-  expectedComponents?: Record<keyof KnownChildren, any>,
-) => {
-  const restChildren: React.ReactNode[] = [];
-
-  const knownChildren = React.Children.toArray(children).reduce(
-    (acc, child) => {
-      if (
-        React.isValidElement(child) &&
-        (!expectedComponents ||
-          ((child.type as any).displayName as string) in expectedComponents)
-      ) {
-        // @ts-ignore
-        acc[child.type.displayName] = child;
-      } else {
-        restChildren.push(child);
-      }
-      return acc;
-    },
-    {} as Partial<KnownChildren>,
-  );
-
-  return [knownChildren, restChildren] as const;
 };
 
 export const isShallowEqual = <T extends Record<string, any>>(
