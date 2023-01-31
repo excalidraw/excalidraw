@@ -42,10 +42,15 @@ import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { useAtom } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
-import tunnel from "tunnel-rat";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
+import {
+  mainMenuTunnel,
+  welcomeScreenMenuHintTunnel,
+  welcomeScreenToolbarHintTunnel,
+  welcomeScreenCenterTunnel,
+} from "./tunnels";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -72,13 +77,6 @@ interface LayerUIProps {
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
 }
-
-export const mainMenuTunnel = tunnel();
-export const welcomeScreenMenuHintTunnel = tunnel();
-export const welcomeScreenToolbarHintTunnel = tunnel();
-export const welcomeScreenHelpHintTunnel = tunnel();
-export const welcomeScreenCenterTunnel = tunnel();
-export const footerCenterTunnel = tunnel();
 
 const DefaultMainMenu: React.FC<{
   UIOptions: AppProps["UIOptions"];

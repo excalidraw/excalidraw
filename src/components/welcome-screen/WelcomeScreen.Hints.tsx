@@ -8,7 +8,7 @@ import {
   welcomeScreenMenuHintTunnel,
   welcomeScreenToolbarHintTunnel,
   welcomeScreenHelpHintTunnel,
-} from "../LayerUI";
+} from "../tunnels";
 
 const MenuHint = ({ children }: { children?: React.ReactNode }) => {
   return (

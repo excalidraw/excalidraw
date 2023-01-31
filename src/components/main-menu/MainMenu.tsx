@@ -11,9 +11,9 @@ import * as DefaultItems from "./DefaultItems";
 import { UserList } from "../UserList";
 import { t } from "../../i18n";
 import { HamburgerMenuIcon } from "../icons";
-import { mainMenuTunnel } from "../LayerUI";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { composeEventHandlers } from "../../utils";
+import { mainMenuTunnel } from "../tunnels";
 
 const MainMenu = Object.assign(
   withInternalFallback(

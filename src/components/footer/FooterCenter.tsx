@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useExcalidrawAppState } from "../App";
-import { footerCenterTunnel } from "../LayerUI";
+import { footerCenterTunnel } from "../tunnels";
 import "./FooterCenter.scss";
 
 const FooterCenter = ({ children }: { children?: React.ReactNode }) => {

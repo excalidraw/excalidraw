@@ -7,7 +7,7 @@ import {
   useExcalidrawAppState,
 } from "../App";
 import { ExcalLogo, HelpIcon, LoadIcon, usersIcon } from "../icons";
-import { welcomeScreenCenterTunnel } from "../LayerUI";
+import { welcomeScreenCenterTunnel } from "../tunnels";
 
 const WelcomeScreenMenuItemContent = ({
   icon,

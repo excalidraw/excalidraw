@@ -10,9 +10,9 @@ import {
 } from "../Actions";
 import { useDevice } from "../App";
 import { HelpButton } from "../HelpButton";
-import { footerCenterTunnel, welcomeScreenHelpHintTunnel } from "../LayerUI";
 import { Section } from "../Section";
 import Stack from "../Stack";
+import { footerCenterTunnel, welcomeScreenHelpHintTunnel } from "../tunnels";
 
 const Footer = ({
   appState,
