@@ -282,6 +282,7 @@ import { shouldShowBoundingBox } from "../element/transformHandles";
 import { atom } from "jotai";
 import { Fonts } from "../scene/Fonts";
 import { getElementsToUpdateForFrame, isCursorInFrame } from "../frame";
+import { excludeElementsInFramesFromSelection } from "../scene/selection";
 
 export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
@@ -4050,13 +4051,33 @@ class App extends React.Component<AppProps, AppState> {
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
               this.setState((prevState) => {
+                let nextSelectedElementIds = {
+                  ...prevState.selectedElementIds,
+                  [hitElement.id]: true,
+                };
+
+                let nextSelectedElements: ExcalidrawElement[] = [];
+
+                Object.keys(nextSelectedElementIds).forEach((id) => {
+                  const element = this.scene.getElement(id);
+                  element && nextSelectedElements.push(element);
+                });
+
+                nextSelectedElements =
+                  excludeElementsInFramesFromSelection(nextSelectedElements);
+
+                nextSelectedElementIds = nextSelectedElements.reduce(
+                  (map: Record<ExcalidrawElement["id"], true>, element) => {
+                    map[element.id] = true;
+                    return map;
+                  },
+                  {},
+                );
+
                 return selectGroupsForSelectedElements(
                   {
                     ...prevState,
-                    selectedElementIds: {
-                      ...prevState.selectedElementIds,
-                      [hitElement.id]: true,
-                    },
+                    selectedElementIds: nextSelectedElementIds,
                     showHyperlinkPopup: hitElement.link ? "info" : false,
                   },
                   this.scene.getNonDeletedElements(),
