@@ -21,11 +21,7 @@ const sidebars = {
         type: "doc",
         id: "introduction/get-started",
       },
-      items: [
-        "introduction/development",
-        "introduction/contributing",
-        "introduction/tools",
-      ],
+      items: ["introduction/development", "introduction/contributing"],
     },
 
     {
