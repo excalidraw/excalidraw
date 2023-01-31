@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { AppState, Device, ExcalidrawProps } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
@@ -19,7 +19,7 @@ import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
-import { mainMenuTunnel, welcomeScreenCenterTunnel } from "./tunnels";
+import { TunnelsContext } from "./LayerUI";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -58,6 +58,8 @@ export const MobileMenu = ({
   renderSidebars,
   device,
 }: MobileMenuProps) => {
+  const { welcomeScreenCenterTunnel, mainMenuTunnel } =
+    useContext(TunnelsContext);
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">

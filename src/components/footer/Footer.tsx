@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useContext } from "react";
 import { actionShortcuts } from "../../actions";
 import { ActionManager } from "../../actions/manager";
 import { AppState } from "../../types";
@@ -10,9 +11,9 @@ import {
 } from "../Actions";
 import { useDevice } from "../App";
 import { HelpButton } from "../HelpButton";
+import { TunnelsContext } from "../LayerUI";
 import { Section } from "../Section";
 import Stack from "../Stack";
-import { footerCenterTunnel, welcomeScreenHelpHintTunnel } from "../tunnels";
 
 const Footer = ({
   appState,
@@ -25,6 +26,9 @@ const Footer = ({
   showExitZenModeBtn: boolean;
   renderWelcomeScreen: boolean;
 }) => {
+  const { footerCenterTunnel, welcomeScreenHelpHintTunnel } =
+    useContext(TunnelsContext);
+
   const device = useDevice();
   const showFinalize =
     !appState.viewModeEnabled && appState.multiElement && device.isTouchScreen;
