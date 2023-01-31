@@ -63,13 +63,13 @@ const sidebars = {
               label: "Children Components",
               link: {
                 type: "doc",
-                id: "@excalidraw/excalidraw/api/components/components-intro",
+                id: "@excalidraw/excalidraw/api/children-components/children-components-intro",
               },
               items: [
-                "@excalidraw/excalidraw/api/components/main-menu",
-                "@excalidraw/excalidraw/api/components/welcome-screen",
-                "@excalidraw/excalidraw/api/components/footer",
-                "@excalidraw/excalidraw/api/components/live-collaboration-trigger",
+                "@excalidraw/excalidraw/api/children-components/main-menu",
+                "@excalidraw/excalidraw/api/children-components/welcome-screen",
+                "@excalidraw/excalidraw/api/children-components/footer",
+                "@excalidraw/excalidraw/api/children-components/live-collaboration-trigger",
               ],
             },
             {
