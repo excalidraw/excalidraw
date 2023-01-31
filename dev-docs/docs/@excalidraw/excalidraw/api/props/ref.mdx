@@ -95,7 +95,7 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `commitToHistory` | `boolean` | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
 
 ```jsx live
-function ExcalidrawWithUpdateScene() {
+function App() {
   const updateScene = () => {
     const sceneData = {
       elements: [
@@ -173,7 +173,7 @@ You can use this function to update the library. It accepts the below attributes
 | `defaultStatus` | <code>"unpublished" &#124; "published"</code> | `"unpublished"` | Default library item's `status` if not present. |
 
 ```tsx live
-function ExcalidrawWithUpdateLibrary() {
+function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
 
   useEffect(() => {

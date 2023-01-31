@@ -26,7 +26,7 @@ This `prop` controls the visibility of the canvas actions inside the `menu`.
 | `saveAsImage` | `boolean` | `true` | Indicates whether to show `Save as image` button. |
 
 ```tsx live
-function ExcalidrawWithUIOptions() {
+function App() {
   const UIOptions = {
     canvasActions: {
       changeViewBackgroundColor: false,
@@ -62,7 +62,7 @@ If user choses to `dock` the sidebar, it will push the right part of the UI towa
 ![image](https://user-images.githubusercontent.com/11256141/174664866-c698c3fa-197b-43ff-956c-d79852c7b326.png)
 
 ```tsx live
-function ExcalidrawWithDockedSidebar() {
+function App() {
   return (
     <div style={{ height: "500px" }}>
       <Excalidraw UIOptions={{dockedSidebarBreakpoint: 200}}/>

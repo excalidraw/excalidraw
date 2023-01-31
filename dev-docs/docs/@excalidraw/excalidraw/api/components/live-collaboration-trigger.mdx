@@ -9,14 +9,15 @@ You'll need to supply `onSelect()` to handle opening of your collaboration dialo
 | `onSelect` | `function` | Yes |  | Handler called when the user clicks on the button |
 | `isCollaborating` | `boolean` | Yes | false | Whether live collaboration session is in effect. Modifies button style. |
 
-
 ```tsx live
-function ExcalidrawWithLiveCollaborationTrigger() {
+function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
   const [isCollaborating, setIsCollaborating] = useState(false);
   return (
     <div style={{ height: "500px" }}>
-    <p style={{ fontSize: "16px" }}>Selecting the checkbox to see the collaborator count</p>
+      <p style={{ fontSize: "16px" }}>
+        Selecting the checkbox to see the collaborator count
+      </p>
       <label style={{ fontSize: "16px", fontWeight: "bold" }}>
         <input
           type="checkbox"

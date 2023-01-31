@@ -5,7 +5,7 @@ When the canvas is empty, Excalidraw can show a welcome *splash* screen with a l
 You can enable this behavior by rendering a `WelcomeScreen` component like this:
 
 ```jsx live
-function ExcalidrawWithMainMenuGroup() {
+function App() {
   return (
     <div style={{ height: "500px" }}>
       <Excalidraw>
@@ -39,7 +39,7 @@ The welcome screen consists of two main groups of subcomponents:
 `<WelcomeScreen.Center/>` subcomponent is the center piece of the welcome screen, containing the `logo`, `heading`, and `menu`. All three subcomponents are optional, and you can render whatever you wish into the center component.
 
 ```jsx live
-function ExcalidrawWithWelcomeScreenCenter() {
+function App() {
   return (
     <div style={{ height: "500px" }}>
       <Excalidraw>
@@ -111,7 +111,7 @@ To render an external link in a menu item, you can use this component.
 These `<WelcomeScreen.Hints.*>` subcomponents render the UI hints. Text of each hint can be customized by supplying `children`.
 
 ```jsx live
-function ExcalidrawWithWelcomeScreenHints() {
+function App() {
   return (
     <div style={{ height: "500px" }}>
       <Excalidraw>

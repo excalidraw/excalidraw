@@ -27,7 +27,7 @@ Since *Excalidraw* doesn't support server side rendering, you should render the 
 
 ```jsx showLineNumbers
 import { useState, useEffect } from "react";
-export default function IndexPage() {
+export default function App() {
   const [Comp, setComp] = useState(null);
   useEffect(() => {
     import("@excalidraw/excalidraw").then((comp) => setComp(comp.default));

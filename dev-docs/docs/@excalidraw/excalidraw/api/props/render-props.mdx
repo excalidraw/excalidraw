@@ -13,7 +13,7 @@
 A function returning `JSX` to render `custom` UI in the top right corner of the app.
 
 ```jsx live
-function ExcalidrawWithRenderTopRightUI() {
+function App() {
   return (
     <div style={{ height: "500px" }}>
       <Excalidraw
@@ -49,7 +49,7 @@ A function that can be used to render custom stats (returns JSX) in the `nerd st
 For example you can use this prop to render the size of the elements in the storage as do in [excalidraw.com](https://excalidraw.com).
 
 ```jsx live
-function ExcalidrawWithRenderCustomStats() {
+function App() {
   return (
     <div style={{ height: "500px" }}>
       <Excalidraw
@@ -99,7 +99,7 @@ You can also add custom content to the header, by rendering `<Sidebar.Header>` a
 To control the visibility of the sidebar you can use [`toggleMenu("customSidebar")`](/docs/@excalidraw/excalidraw/api/props/ref#togglemenu) api available via `ref`.
 
 ```tsx live
-function ExcalidrawWithCustomSidebar() {
+function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
 
   return (
