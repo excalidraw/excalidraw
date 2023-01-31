@@ -6,13 +6,41 @@ import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 
+/**
+ * Frames and their containing elements are not to be selected at the same time.
+ * Given an array of selected elements, if there are frames and their containing elements
+ * we only keep the frames.
+ * @param selectedElements
+ */
+export const excludeElementsInFramesFromSelection = <
+  T extends ExcalidrawElement,
+>(
+  selectedElements: readonly T[],
+) => {
+  const framesInSelection = new Set<T["id"]>();
+
+  selectedElements.forEach((element) => {
+    if (element.type === "frame") {
+      framesInSelection.add(element.id);
+    }
+  });
+
+  return selectedElements.filter((element) => {
+    if (element.frameId && framesInSelection.has(element.frameId)) {
+      return false;
+    }
+    return true;
+  });
+};
+
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
 ) => {
   const [selectionX1, selectionY1, selectionX2, selectionY2] =
     getElementAbsoluteCoords(selection);
-  return elements.filter((element) => {
+
+  const elementsInSelection = elements.filter((element) => {
     const [elementX1, elementY1, elementX2, elementY2] =
       getElementBounds(element);
 
@@ -26,6 +54,8 @@ export const getElementsWithinSelection = (
       selectionY2 >= elementY2
     );
   });
+
+  return excludeElementsInFramesFromSelection(elementsInSelection);
 };
 
 export const isSomeElementSelected = (
