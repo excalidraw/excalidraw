@@ -59,6 +59,7 @@ import {
   ELEMENT_TRANSLATE_AMOUNT,
   ENV,
   EVENT,
+  FRAME_STYLE,
   GRID_SIZE,
   IMAGE_RENDER_TIMEOUT,
   LINE_CONFIRM_THRESHOLD,
@@ -4452,16 +4453,10 @@ class App extends React.Component<AppProps, AppState> {
     const frame = newFrameElement({
       x: gridX,
       y: gridY,
-      strokeColor: this.state.currentItemStrokeColor,
-      backgroundColor: "transparent",
-      fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
-      strokeStyle: this.state.currentItemStrokeStyle,
-      roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
-      roundness: null,
       locked: false,
       name: `Frame ${frames.length + 1}`,
+      ...FRAME_STYLE,
     });
 
     this.scene.replaceAllElements([

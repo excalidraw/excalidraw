@@ -55,7 +55,7 @@ import {
   throttleRAF,
 } from "../utils";
 import { UserIdleState } from "../types";
-import { THEME_FILTER } from "../constants";
+import { FRAME_STYLE, THEME_FILTER } from "../constants";
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
@@ -1024,7 +1024,7 @@ const renderFrameHighlight = (
   const height = y2 - y1;
 
   context.strokeStyle = "rgb(0,118,255)";
-  context.lineWidth = 4;
+  context.lineWidth = FRAME_STYLE.strokeWidth * 2;
 
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);

@@ -33,6 +33,7 @@ import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
+  FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
@@ -377,18 +378,24 @@ export const generateRoughOptions = (
   switch (element.type) {
     case "rectangle":
     case "diamond":
-    case "ellipse":
-    case "frame": {
+    case "ellipse": {
       options.fillStyle = element.fillStyle;
       options.fill =
-        element.type === "frame"
-          ? undefined
-          : element.backgroundColor === "transparent"
+        element.backgroundColor === "transparent"
           ? undefined
           : element.backgroundColor;
       if (element.type === "ellipse") {
         options.curveFitting = 1;
       }
+      return options;
+    }
+    case "frame": {
+      options.fill = "transparent";
+      options.fillStyle = FRAME_STYLE.fillStyle;
+      options.strokeWidth = FRAME_STYLE.strokeWidth;
+      options.stroke = FRAME_STYLE.strokeColor;
+      options.roughness = FRAME_STYLE.roughness;
+
       return options;
     }
     case "line":

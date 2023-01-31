@@ -1,6 +1,6 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
-import { FontFamilyValues } from "./element/types";
+import { ExcalidrawElement, FontFamilyValues } from "./element/types";
 
 export const APP_NAME = "Excalidraw";
 
@@ -75,6 +75,16 @@ export const FONT_FAMILY = {
 export const THEME = {
   LIGHT: "light",
   DARK: "dark",
+};
+
+export const FRAME_STYLE = {
+  strokeColor: "#3D3D45" as ExcalidrawElement["strokeColor"],
+  strokeWidth: 1 as ExcalidrawElement["strokeWidth"],
+  strokeStyle: "solid" as ExcalidrawElement["strokeStyle"],
+  fillStyle: "solid" as ExcalidrawElement["fillStyle"],
+  roughness: 0 as ExcalidrawElement["roughness"],
+  roundness: null as ExcalidrawElement["roundness"],
+  backgroundColor: "transparent" as ExcalidrawElement["backgroundColor"],
 };
 
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
