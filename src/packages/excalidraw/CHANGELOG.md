@@ -21,6 +21,7 @@ Please add the latest change on the top under the correct section.
 ### Fixes
 
 - declare css variable for font in excalidraw so its available in host [#6160](https://github.com/excalidraw/excalidraw/pull/6160)
+
 ## 0.14.1 (2023-01-16)
 
 ### Fixes
