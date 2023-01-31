@@ -1,5 +1,5 @@
 import React from "react";
-import tunnel from "tunnel-rat";
+import tunnel from "@dwelle/tunnel-rat";
 
 type Tunnel = ReturnType<typeof tunnel>;
 
