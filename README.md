@@ -4,21 +4,22 @@
   </a>
   <h3>Virtual whiteboard for sketching hand-drawn like diagrams.<br/>Collaborative and end-to-end encrypted.</h3>
   <p>
-    <a href="https://twitter.com/Excalidraw">
-      <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+excalidraw&style=social&logo=twitter"/>
+    <a href="https://twitter.com/excalidraw">
+      <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+@excalidraw&style=social&logo=twitter"/>
     </a>
-    <a target="_blank" href="https://crowdin.com/project/excalidraw">
-      <img src="https://badges.crowdin.net/excalidraw/localized.svg"/>
+    <a href="https://discord.gg/UexuTaE">
+      <img alt="Chat with us on Discord" src="https://img.shields.io/discord/723672430744174682?color=738ad6&label=Chat%20on%20Discord&logo=discord&logoColor=ffffff&widge=false"/>
     </a>
   </p>
-  <p>Ask questions or hang out on our <a target="_blank" href="https://discord.gg/UexuTaE">discord.gg/UexuTaE</a>.</p>
 </div>
 
-## Try it now
+## Try now
 
-Go to [excalidraw.com](https://excalidraw.com) to start sketching.
+Visit [excalidraw.com](https://excalidraw.com) to start sketching.
 
-Read the latest news and updates on our [blog](https://blog.excalidraw.com). A good start is to see all the updates of [One Year of Excalidraw](https://blog.excalidraw.com/one-year-of-excalidraw/).
+## Community
+
+For latest updates, follow us on [twitter](https://twitter.com/excalidraw). If you need help or want to chat, join us on [Discord](https://discord.gg/UexuTaE). For releases and deep dives, check out our [blog](https://blog.excalidraw.com). Report bugs on [GitHub](https://github.com/excalidraw/excalidraw/issues).
 
 ## Supporting Excalidraw
 
@@ -32,10 +33,12 @@ Last but not least, we're thankful to these companies for offering their service
 
 [![Vercel](./.github/assets/vercel.svg)](https://vercel.com) [![Sentry](./.github/assets/sentry.svg)](https://sentry.io) [![Crowdin](./.github/assets/crowdin.svg)](https://crowdin.com)
 
+## Developers
+
+You can integrate Excalidraw into your app by installing our [npm component](https://npmjs.com/package/@excalidraw/excalidraw).
+
+Visit our documentation on [https://docs.excalidraw.com](https://docs.excalidraw.com).
+
 ## Who's integrating Excalidraw
 
-[Google Cloud](https://googlecloudcheatsheet.withgoogle.com/architecture) • [Meta](https://meta.com/) • [CodeSandbox](https://codesandbox.io/) • [Obsidian Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) • [Replit](https://replit.com/) • [Slite](https://slite.com/) • [Notion](https://notion.so/) • [HackerRank](https://www.hackerrank.com/) •
-
-## Documentation
-
-Visit [https://docs.excalidraw.com](https://docs.excalidraw.com)
+[Google Cloud](https://googlecloudcheatsheet.withgoogle.com/architecture) • [Meta](https://meta.com/) • [CodeSandbox](https://codesandbox.io/) • [Obsidian Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) • [Replit](https://replit.com/) • [Slite](https://slite.com/) • [Notion](https://notion.so/) • [HackerRank](https://www.hackerrank.com/)
