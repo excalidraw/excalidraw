@@ -372,34 +372,21 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
 };
 
 const breakLine = (line: string, font: FontString, maxWidth: number) => {
-  const words = line
-    .split(" ")
-    .reduce((words: Array<string>, word: string) => {
-      if (words.length === 0 && word.length === 0) {
-        words.push(" "); // line start with spaces
-        return words;
-      }
-      if (words.length > 0) {
-        words[words.length - 1] += " ";
-      }
-      if (word.length > 0) {
-        words.push(word);
-      }
-      return words;
-    }, []) // add all trailing spaces
-    .flatMap((word) => {
-      // break big words
-      return getLineWidth(word.trim(), font) <= maxWidth ||
-        Array.from(word.trim()).length === 1
-        ? word
-        : breakWord(word, font, maxWidth);
-    });
+  const words = line.match(/(\S+ *)| +/g)!.flatMap((word) => {
+    // break big words
+    return getLineWidth(word.trim(), font) <= maxWidth ||
+      Array.from(word.trim()).length === 1
+      ? word
+      : breakWord(word, font, maxWidth);
+  });
   const lines: Array<string> = [];
   let lastLineWidth = 0;
+  const spaceWidth = getLineWidth(" ", font);
   // create lines
   words.forEach((word) => {
     const wordWidth = getLineWidth(word, font);
-    const trimmedWordWidth = getLineWidth(word.trim(), font);
+    const trimmedWordWidth =
+      wordWidth - (word.length - word.trim().length) * spaceWidth;
     // fits in line above
     if (lines.length > 0 && lastLineWidth + trimmedWordWidth <= maxWidth) {
       lastLineWidth += wordWidth;
@@ -413,7 +400,7 @@ const breakLine = (line: string, font: FontString, maxWidth: number) => {
 };
 
 const breakWord = (word: string, font: FontString, maxWidth: number) => {
-  const trimmedWord = word.trim();
+  const trimmedWord = word.trimEnd();
   const symbols = Array.from(trimmedWord);
   const wordSections: Array<string> = [];
   symbols.forEach((symbol) => {
@@ -428,10 +415,9 @@ const breakWord = (word: string, font: FontString, maxWidth: number) => {
 
     // fits in wordSection above
     if (
-      wordSections.length > 0 &&
-      (widthWithLastLine <= maxWidth ||
-        widthWithLastLine <=
-          getLineWidth(wordSections[wordSections.length - 1], font))
+      widthWithLastLine <= maxWidth ||
+      widthWithLastLine <=
+        getLineWidth(wordSections[wordSections.length - 1], font)
     ) {
       wordSections[wordSections.length - 1] += symbol;
       return; // next word
