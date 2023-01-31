@@ -24,18 +24,24 @@ function App() {
 }
 ```
 
-This is the `MainMenu` component which you need to import to render the menu with custom options.
+### `<MainMenu>`
+
+This is the `MainMenu` component. If you render it, you will need to populate the menu with your own items as we will not render any ourselves at that point.
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | :-: | :-: | --- |
+| `onSelect` | `(event: Event) => void` | No | - | Triggered when any item is selected (via mouse). Calling `event.preventDefault()` will stop menu from closing. |
 
 ### MainMenu.Item
 
 To render an item, its recommended to use `MainMenu.Item`.
 
 | Prop | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `onSelect` | `Function` | Yes | _ | The handler is triggered when the item is selected. |
-| `children` | `React.ReactNode` | Yes | _ | The content of the menu item |
-| `icon` | `JSX.Element` | No | _ | The icon used in the menu item |
-| `shortcut` | `string` | No | _ | The shortcut to be shown for the menu item |
+| --- | --- | :-: | :-: | --- |
+| `onSelect` | `(event: Event) => void` | Yes | - | Triggered when selected (via mouse). Calling `event.preventDefault()` will stop menu from closing. |
+| `children` | `React.ReactNode` | Yes | - | The content of the menu item |
+| `icon` | `JSX.Element` | No | - | The icon used in the menu item |
+| `shortcut` | `string` | No | - | The shortcut to be shown for the menu item |
 
 ### MainMenu.ItemLink
 
@@ -63,11 +69,12 @@ function App() {
 ```
 
 | Prop | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `href` | `string` | Yes | _ | The `href` attribute to be added to the `anchor` element. |
-| `children` | `React.ReactNode` | Yes | _ | The content of the menu item |
-| `icon` | `JSX.Element` | No | _ | The icon used in the menu item |
-| `shortcut` | `string` | No | _ | The shortcut to be shown for the menu item |
+| --- | --- | :-: | :-: | --- |
+| `onSelect` | `(event: Event) => void` | No | - | Triggered when selected (via mouse). Calling `event.preventDefault()` will stop menu from closing. |
+| `href` | `string` | Yes | - | The `href` attribute to be added to the `anchor` element. |
+| `children` | `React.ReactNode` | Yes | - | The content of the menu item |
+| `icon` | `JSX.Element` | No | - | The icon used in the menu item |
+| `shortcut` | `string` | No | - | The shortcut to be shown for the menu item |
 
 ### MainMenu.ItemCustom
 
@@ -98,8 +105,8 @@ function App() {
 ```
 
 | Prop | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `children` | `React.ReactNode` | Yes | _ | The content of the menu item |
+| --- | --- | :-: | :-: | --- |
+| `children` | `React.ReactNode` | Yes | - | The content of the menu item |
 
 ### MainMenu.DefaultItems
 
@@ -158,5 +165,5 @@ function App() {
 ```
 
 | Prop | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `children ` | `React.ReactNode` | Yes | _ | The content of the `Menu Group` |
+| --- | --- | :-: | :-: | --- |
+| `children ` | `React.ReactNode` | Yes | - | The content of the `Menu Group` |
