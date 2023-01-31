@@ -1,11 +1,10 @@
 import clsx from "clsx";
-import { useContext } from "react";
 import { useExcalidrawAppState } from "../App";
-import { TunnelsContext } from "../LayerUI";
+import { useTunnels } from "../context/tunnels";
 import "./FooterCenter.scss";
 
 const FooterCenter = ({ children }: { children?: React.ReactNode }) => {
-  const { footerCenterTunnel } = useContext(TunnelsContext);
+  const { footerCenterTunnel } = useTunnels();
   const appState = useExcalidrawAppState();
   return (
     <footerCenterTunnel.In>

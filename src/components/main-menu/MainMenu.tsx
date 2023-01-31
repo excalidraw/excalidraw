@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   useDevice,
   useExcalidrawAppState,
@@ -13,7 +13,7 @@ import { t } from "../../i18n";
 import { HamburgerMenuIcon } from "../icons";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { composeEventHandlers } from "../../utils";
-import { TunnelsContext } from "../LayerUI";
+import { useTunnels } from "../context/tunnels";
 
 const MainMenu = Object.assign(
   withInternalFallback(
@@ -28,7 +28,7 @@ const MainMenu = Object.assign(
        */
       onSelect?: (event: Event) => void;
     }) => {
-      const { mainMenuTunnel } = useContext(TunnelsContext);
+      const { mainMenuTunnel } = useTunnels();
       const device = useDevice();
       const appState = useExcalidrawAppState();
       const setAppState = useExcalidrawSetAppState();

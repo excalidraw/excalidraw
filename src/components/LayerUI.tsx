@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { useMemo } from "react";
+import React from "react";
 import { ActionManager } from "../actions/manager";
 import { CLASSES, LIBRARY_SIDEBAR_WIDTH } from "../constants";
 import { exportCanvas } from "../data";
@@ -45,7 +45,7 @@ import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
-import tunnel from "tunnel-rat";
+import { TunnelsContext, useInitializeTunnels } from "./context/tunnels";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -99,17 +99,6 @@ const DefaultMainMenu: React.FC<{
   );
 };
 
-type Tunnel = ReturnType<typeof tunnel>;
-export const TunnelsContext = React.createContext<{
-  mainMenuTunnel: Tunnel;
-  welcomeScreenMenuHintTunnel: Tunnel;
-  welcomeScreenToolbarHintTunnel: Tunnel;
-  welcomeScreenHelpHintTunnel: Tunnel;
-  welcomeScreenCenterTunnel: Tunnel;
-  footerCenterTunnel: Tunnel;
-  jotaiScope: symbol;
-}>(null!);
-
 const LayerUI = ({
   actionManager,
   appState,
@@ -136,17 +125,7 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const device = useDevice();
 
-  const tunnels = useMemo(() => {
-    return {
-      mainMenuTunnel: tunnel(),
-      welcomeScreenMenuHintTunnel: tunnel(),
-      welcomeScreenToolbarHintTunnel: tunnel(),
-      welcomeScreenHelpHintTunnel: tunnel(),
-      welcomeScreenCenterTunnel: tunnel(),
-      footerCenterTunnel: tunnel(),
-      jotaiScope: Symbol(),
-    };
-  }, []);
+  const tunnels = useInitializeTunnels();
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
