@@ -306,6 +306,7 @@ export const textWysiwyg = ({
           : textAlign === "center"
           ? offWidth / 2
           : 0;
+      const { width: w, height: h } = updatedTextElement;
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
@@ -318,8 +319,7 @@ export const textWysiwyg = ({
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
-        transformOrigin: `${updatedTextElement.width / 2}px
-          ${updatedTextElement.height / 2}px`,
+        transformOrigin: `${w / 2}px ${h / 2}px`,
         transform: getTransform(
           offsetX,
           updatedTextElement.width,
