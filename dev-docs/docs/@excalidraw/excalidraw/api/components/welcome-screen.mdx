@@ -1,6 +1,6 @@
 # WelcomeScreen
 
-When the canvas is empty, Excalidraw can show a welcome "splash" screen with a logo, a few quick action items, and hints explaining what some of the UI buttons do. Once the user picks a tool, or has created an element on the canvas, the welcome screen will disappear.
+When the canvas is empty, Excalidraw can show a welcome *splash* screen with a logo, a few quick action items, and hints explaining what some of the UI buttons do. Once the user picks a tool, or has created an element on the canvas, the welcome screen will disappear.
 
 You can enable this behavior by rendering a `WelcomeScreen` component like this:
 
@@ -18,7 +18,7 @@ function ExcalidrawWithMainMenuGroup() {
 
 You can also customize the welcome screen by passing children to the `WelcomeScreen` component. See below.
 
-## `<WelcomeScreen/>`
+## <WelcomeScreen/>
 
 This is the main component. If you render it without any children, we will render the default welcome screen.
 
@@ -34,7 +34,7 @@ The welcome screen consists of two main groups of subcomponents:
   alt="Excalidraw logo: Sketch handrawn like diagrams."
 />
 
-### `Center`
+### Center
 
 `<WelcomeScreen.Center/>` subcomponent is the center piece of the welcome screen, containing the `logo`, `heading`, and `menu`. All three subcomponents are optional, and you can render whatever you wish into the center component.
 
@@ -64,15 +64,15 @@ function ExcalidrawWithWelcomeScreenCenter() {
 }
 ```
 
-#### `Logo`
+#### Logo
 
 Use the `<WelcomeScreen.Center.Logo/>` to render a logo. By default it renders the Excalidraw logo and name. Supply `children` to customize.
 
-#### `Heading`
+#### Heading
 
 Use the `<WelcomeScreen.Center.Heading/>` to render a heading below the logo. Supply `children` to change the default message.
 
-#### `Menu`
+#### Menu
 
 `<WelcomeScreen.Center.Menu/>` is a wrapper component for the menu items. You can build your menu using the `<WelcomeScreen.Center.MenuItem>` and `<WelcomeScreen.Center.MenuItemLink>` components, render your own, or render one of the default menu items.
 
@@ -84,7 +84,7 @@ The default menu items are:
 
 - `<WelcomeScreen.Center.MenuItemLiveCollaborationTrigger/>` - intended to open the live collaboration dialog. Works similarly to [`<LiveCollaborationTrigger>`](/docs/@excalidraw/excalidraw/api/components/live-collaboration-trigger) and you must supply `onSelect()` handler to integrate with your collaboration implementation.
 
-#### `MenuItem`
+#### MenuItem
 
 The `<WelcomeScreen.Center.MenuItem/>` component can be used to render a menu item.
 
@@ -106,7 +106,7 @@ To render an external link in a menu item, you can use this component.
 | `icon` | `JSX.Element` | No |  | The icon used in the menu item |
 | `shortcut` | `string` | No |  | The keyboard shortcut (label-only, does not affect behavior) |
 
-### `Hints`
+### Hints
 
 These `<WelcomeScreen.Hints.*>` subcomponents render the UI hints. Text of each hint can be customized by supplying `children`.
 
@@ -128,14 +128,14 @@ function ExcalidrawWithWelcomeScreenHints() {
 }
 ```
 
-#### `MenuHint`
+#### MenuHint
 
 `<WelcomeScreen.Hints.MenuHint>` hint subcomponent for the main menu. Supply `children` to customize the hint text.
 
-#### `ToolbarHint`
+#### ToolbarHint
 
 `<WelcomeScreen.Hints.ToolbarHint>` hint subcomponent for the toolbar. Supply `children` to customize the hint text.
 
-#### `Help`
+#### Help
 
 `<WelcomeScreen.Hints.Help>` hint subcomponent for the help dialog. Supply `children` to customize the hint text.
