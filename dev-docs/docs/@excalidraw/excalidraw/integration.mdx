@@ -5,7 +5,7 @@
 If you are using a module bundler (for instance, Webpack), you can import it as an ES6 module as shown below
 
 ```js
-import { Excalidraw } from '@excalidraw/excalidraw'
+import { Excalidraw } from "@excalidraw/excalidraw";
 ```
 
 ```jsx live
@@ -23,7 +23,7 @@ function App() {
 
 ### Rendering Excalidraw only on client
 
-Since *Excalidraw* doesn't support server side rendering, you should render the component once the host is <highlight>mounted</highlight>
+Since _Excalidraw_ doesn't support server side rendering, you should render the component once the host is `mounted`.
 
 ```jsx showLineNumbers
 import { useState, useEffect } from "react";
@@ -91,7 +91,6 @@ import TabItem from "@theme/TabItem";
     <script type="text/javascript" src="src/index.js"></script>
   </body>
 </html>
-
 ```
 
 </TabItem>
@@ -105,17 +104,17 @@ const App = () => {
     React.createElement(
       "div",
       {
-        style: { height: "500px" }
+        style: { height: "500px" },
       },
-      React.createElement(ExcalidrawLib.Excalidraw)
-    )
+      React.createElement(ExcalidrawLib.Excalidraw),
+    ),
   );
 };
 
 const excalidrawWrapper = document.getElementById("app");
 const root = ReactDOM.createRoot(excalidrawWrapper);
 root.render(React.createElement(App));
-
 ```
+
 </TabItem>
 </Tabs>
