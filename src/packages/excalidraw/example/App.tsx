@@ -71,6 +71,7 @@ const {
   restoreElements,
   Sidebar,
   Footer,
+  WelcomeScreen,
   MainMenu,
   LiveCollaborationTrigger,
 } = window.ExcalidrawLib;
@@ -678,7 +679,6 @@ export default function App() {
           </div>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
-            initialData={initialStatePromiseRef.current.promise}
             onChange={(elements, state) => {
               console.info("Elements :", elements, "State : ", state);
             }}
@@ -704,6 +704,7 @@ export default function App() {
                 <CustomFooter excalidrawAPI={excalidrawAPI} />
               </Footer>
             )}
+            <WelcomeScreen />
             {renderMenu()}
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}

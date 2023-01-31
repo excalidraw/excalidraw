@@ -4,7 +4,11 @@ import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import { APP_NAME } from "../constants";
 import { loadFromBlob } from "../data/blob";
 import { t } from "../i18n";
-import { Excalidraw, defaultLang } from "../packages/excalidraw/index";
+import {
+  Excalidraw,
+  defaultLang,
+  WelcomeScreen,
+} from "../packages/excalidraw/index";
 import { ExcalidrawImperativeAPI, ExcalidrawInitialDataState } from "../types";
 import {
   FIREBASE_STORAGE_PREFIXES,
@@ -417,57 +421,9 @@ const ExcalidrawWrapper = () => {
       style={{ width: "926px", height: "500px" }}
       className={clsx("excalidraw-app", {})}
     >
-      <Excalidraw
-        ref={(api) => {
-          console.log(api);
-        }}
-        // onChange={onChange}
-        // initialData={initialStatePromiseRef.current.promise}
-        // isCollaborating={isCollaborating}
-        // onPointerUpdate={collabAPI?.onPointerUpdate}
-        // UIOptions={{
-        //   canvasActions: {
-        //     toggleTheme: true,
-        //     export: {
-        //       onExportToBackend,
-        //       renderCustomUI: (elements, appState, files) => {
-        //         return (
-        //           <ExportToExcalidrawPlus
-        //             elements={elements}
-        //             appState={appState}
-        //             files={files}
-        //             onError={(error) => {
-        //               excalidrawAPI?.updateScene({
-        //                 appState: {
-        //                   errorMessage: error.message,
-        //                 },
-        //               });
-        //             }}
-        //           />
-        //         );
-        //       },
-        //     },
-        //   },
-        // }}
-        // langCode={langCode}
-        // renderCustomStats={renderCustomStats}
-        // detectScroll={false}
-        // handleKeyboardGlobally={true}
-        // onLibraryChange={onLibraryChange}
-        // autoFocus={true}
-        // theme={theme}
-        // renderTopRightUI={(isMobile) => {
-        //   if (isMobile) {
-        //     return null;
-        //   }
-        //   return (
-        //     <LiveCollaborationTrigger
-        //       isCollaborating={isCollaborating}
-        //       onSelect={() => setCollabDialogShown(true)}
-        //     />
-        //   );
-        // }}
-      ></Excalidraw>
+      <Excalidraw>
+        <WelcomeScreen />
+      </Excalidraw>
     </div>
   );
 };

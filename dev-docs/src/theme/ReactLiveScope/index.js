@@ -6,6 +6,7 @@ let ExcalidrawComp = {};
 if (ExecutionEnvironment.canUseDOM) {
   ExcalidrawComp = require("@excalidraw/excalidraw");
 }
+console.log(ExcalidrawComp);
 // Add react-live imports you need here
 const ExcalidrawScope = {
   React,
