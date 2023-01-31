@@ -1,6 +1,6 @@
 import polyfill from "../polyfill";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
@@ -24,10 +24,7 @@ import { t } from "../i18n";
 import {
   Excalidraw,
   defaultLang,
-  Footer,
-  MainMenu,
   LiveCollaborationTrigger,
-  WelcomeScreen,
 } from "../packages/excalidraw/index";
 import {
   AppState,
@@ -47,7 +44,6 @@ import {
 } from "../utils";
 import {
   FIREBASE_STORAGE_PREFIXES,
-  isExcalidrawPlusSignedUser,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
@@ -85,10 +81,9 @@ import { atom, Provider, useAtom } from "jotai";
 import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
-import { EncryptedIcon } from "./components/EncryptedIcon";
-import { ExcalidrawPlusAppLink } from "./components/ExcalidrawPlusAppLink";
-import { LanguageList } from "./components/LanguageList";
-import { PlusPromoIcon } from "../components/icons";
+import { AppMainMenu } from "./components/AppMainMenu";
+import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
+import { AppFooter } from "./components/AppFooter";
 
 polyfill();
 
@@ -604,96 +599,6 @@ const ExcalidrawWrapper = () => {
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
   };
 
-  const renderMenu = () => {
-    return (
-      <MainMenu>
-        <MainMenu.DefaultItems.LoadScene />
-        <MainMenu.DefaultItems.SaveToActiveFile />
-        <MainMenu.DefaultItems.Export />
-        <MainMenu.DefaultItems.SaveAsImage />
-        <MainMenu.DefaultItems.LiveCollaborationTrigger
-          isCollaborating={isCollaborating}
-          onSelect={() => setCollabDialogShown(true)}
-        />
-
-        <MainMenu.DefaultItems.Help />
-        <MainMenu.DefaultItems.ClearCanvas />
-        <MainMenu.Separator />
-        <MainMenu.ItemLink
-          icon={PlusPromoIcon}
-          href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger"
-          className="ExcalidrawPlus"
-        >
-          Excalidraw+
-        </MainMenu.ItemLink>
-        <MainMenu.DefaultItems.Socials />
-        <MainMenu.Separator />
-        <MainMenu.DefaultItems.ToggleTheme />
-        <MainMenu.ItemCustom>
-          <LanguageList style={{ width: "100%" }} />
-        </MainMenu.ItemCustom>
-        <MainMenu.DefaultItems.ChangeCanvasBackground />
-      </MainMenu>
-    );
-  };
-
-  const welcomeScreenJSX = useMemo(() => {
-    let headingContent;
-
-    if (isExcalidrawPlusSignedUser) {
-      headingContent = t("welcomeScreen.app.center_heading_plus")
-        .split(/(Excalidraw\+)/)
-        .map((bit, idx) => {
-          if (bit === "Excalidraw+") {
-            return (
-              <a
-                style={{ pointerEvents: "all" }}
-                href={`${process.env.REACT_APP_PLUS_APP}?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenSignedInUser`}
-                key={idx}
-              >
-                Excalidraw+
-              </a>
-            );
-          }
-          return bit;
-        });
-    } else {
-      headingContent = t("welcomeScreen.app.center_heading");
-    }
-
-    return (
-      <WelcomeScreen>
-        <WelcomeScreen.Hints.MenuHint>
-          {t("welcomeScreen.app.menuHint")}
-        </WelcomeScreen.Hints.MenuHint>
-        <WelcomeScreen.Hints.ToolbarHint />
-        <WelcomeScreen.Hints.HelpHint />
-        <WelcomeScreen.Center>
-          <WelcomeScreen.Center.Logo />
-          <WelcomeScreen.Center.Heading>
-            {headingContent}
-          </WelcomeScreen.Center.Heading>
-          <WelcomeScreen.Center.Menu>
-            <WelcomeScreen.Center.MenuItemLoadScene />
-            <WelcomeScreen.Center.MenuItemHelp />
-            <WelcomeScreen.Center.MenuItemLiveCollaborationTrigger
-              onSelect={() => setCollabDialogShown(true)}
-            />
-            {!isExcalidrawPlusSignedUser && (
-              <WelcomeScreen.Center.MenuItemLink
-                href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"
-                shortcut={null}
-                icon={PlusPromoIcon}
-              >
-                Try Excalidraw Plus!
-              </WelcomeScreen.Center.MenuItemLink>
-            )}
-          </WelcomeScreen.Center.Menu>
-        </WelcomeScreen.Center>
-      </WelcomeScreen>
-    );
-  }, [setCollabDialogShown]);
-
   return (
     <div
       style={{ height: "100%" }}
@@ -750,15 +655,12 @@ const ExcalidrawWrapper = () => {
           );
         }}
       >
-        {renderMenu()}
-
-        <Footer>
-          <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
-            <ExcalidrawPlusAppLink />
-            <EncryptedIcon />
-          </div>
-        </Footer>
-        {welcomeScreenJSX}
+        <AppMainMenu
+          setCollabDialogShown={setCollabDialogShown}
+          isCollaborating={isCollaborating}
+        />
+        <AppWelcomeScreen setCollabDialogShown={setCollabDialogShown} />
+        <AppFooter />
       </Excalidraw>
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
