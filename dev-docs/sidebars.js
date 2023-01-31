@@ -60,7 +60,7 @@ const sidebars = {
             },
             {
               type: "category",
-              label: "Children components",
+              label: "Children Components",
               link: {
                 type: "doc",
                 id: "@excalidraw/excalidraw/api/components/components-intro",
