@@ -5,6 +5,7 @@ import { getNonDeletedElements, isTextElement } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { excludeElementsInFramesFromSelection } from "../scene/selection";
 
 export const actionSelectAll = register({
   name: "selectAll",
@@ -13,19 +14,18 @@ export const actionSelectAll = register({
     if (appState.editingLinearElement) {
       return false;
     }
-    const selectedElementIds = elements.reduce(
-      (map: Record<ExcalidrawElement["id"], true>, element) => {
-        if (
+
+    const selectedElementIds = excludeElementsInFramesFromSelection(
+      elements.filter(
+        (element) =>
           !element.isDeleted &&
           !(isTextElement(element) && element.containerId) &&
-          !element.locked
-        ) {
-          map[element.id] = true;
-        }
-        return map;
-      },
-      {},
-    );
+          !element.locked,
+      ),
+    ).reduce((map: Record<ExcalidrawElement["id"], true>, element) => {
+      map[element.id] = true;
+      return map;
+    }, {});
 
     return {
       appState: selectGroupsForSelectedElements(
