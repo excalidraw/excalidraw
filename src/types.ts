@@ -386,6 +386,8 @@ type CanvasActions = Partial<{
 type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
   canvasActions: CanvasActions;
+  /** @deprecated does nothing. Will be removed in 0.15 */
+  welcomeScreen?: boolean;
 }>;
 
 export type AppProps = Merge<
