@@ -19,7 +19,7 @@ import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
-import { mainMenuTunnel, welcomeScreenCenterTunnel } from "./tunnels";
+import { useTunnels } from "./context/tunnels";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -58,6 +58,7 @@ export const MobileMenu = ({
   renderSidebars,
   device,
 }: MobileMenuProps) => {
+  const { welcomeScreenCenterTunnel, mainMenuTunnel } = useTunnels();
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">

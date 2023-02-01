@@ -1,5 +1,6 @@
 import { atom, useAtom } from "jotai";
 import React, { useLayoutEffect } from "react";
+import { useTunnels } from "../context/tunnels";
 
 export const withInternalFallback = <P,>(
   componentName: string,
@@ -17,7 +18,8 @@ export const withInternalFallback = <P,>(
       __fallback?: boolean;
     }
   > = (props) => {
-    const [counter, setCounter] = useAtom(counterAtom);
+    const { jotaiScope } = useTunnels();
+    const [counter, setCounter] = useAtom(counterAtom, jotaiScope);
 
     useLayoutEffect(() => {
       setCounter((counter) => counter + 1);
