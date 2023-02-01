@@ -40,17 +40,12 @@ import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
-import { useAtom } from "jotai";
+import { Provider, useAtom } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
-import {
-  mainMenuTunnel,
-  welcomeScreenMenuHintTunnel,
-  welcomeScreenToolbarHintTunnel,
-  welcomeScreenCenterTunnel,
-} from "./tunnels";
+import { TunnelsContext, useInitializeTunnels } from "./context/tunnels";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -130,6 +125,8 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const device = useDevice();
 
+  const tunnels = useInitializeTunnels();
+
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
       return null;
@@ -201,8 +198,8 @@ const LayerUI = ({
     <div style={{ position: "relative" }}>
       {/* wrapping to Fragment stops React from occasionally complaining
                 about identical Keys */}
-      <mainMenuTunnel.Out />
-      {renderWelcomeScreen && <welcomeScreenMenuHintTunnel.Out />}
+      <tunnels.mainMenuTunnel.Out />
+      {renderWelcomeScreen && <tunnels.welcomeScreenMenuHintTunnel.Out />}
     </div>
   );
 
@@ -254,7 +251,7 @@ const LayerUI = ({
               {(heading: React.ReactNode) => (
                 <div style={{ position: "relative" }}>
                   {renderWelcomeScreen && (
-                    <welcomeScreenToolbarHintTunnel.Out />
+                    <tunnels.welcomeScreenToolbarHintTunnel.Out />
                   )}
                   <Stack.Col gap={4} align="start">
                     <Stack.Row
@@ -354,7 +351,7 @@ const LayerUI = ({
 
   const [hostSidebarCounters] = useAtom(hostSidebarCountersAtom, jotaiScope);
 
-  return (
+  const layerUIJSX = (
     <>
       {/* ------------------------- tunneled UI ---------------------------- */}
       {/* make sure we render host app components first so that we can detect
@@ -434,7 +431,7 @@ const LayerUI = ({
                 : {}
             }
           >
-            {renderWelcomeScreen && <welcomeScreenCenterTunnel.Out />}
+            {renderWelcomeScreen && <tunnels.welcomeScreenCenterTunnel.Out />}
             {renderFixedSideContainer()}
             <Footer
               appState={appState}
@@ -470,6 +467,14 @@ const LayerUI = ({
         </>
       )}
     </>
+  );
+
+  return (
+    <Provider scope={tunnels.jotaiScope}>
+      <TunnelsContext.Provider value={tunnels}>
+        {layerUIJSX}
+      </TunnelsContext.Provider>
+    </Provider>
   );
 };
 
