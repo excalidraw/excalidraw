@@ -32,6 +32,8 @@ const config = {
           // Please change this to your repo.
           editUrl:
             "https://github.com/excalidraw/excalidraw/tree/master/dev-docs/",
+          showLastUpdateAuthor: true,
+          showLastUpdateTime: true,
         },
         theme: {
           customCss: [
