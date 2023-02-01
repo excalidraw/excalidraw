@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "粘贴",
+    "pasteAsPlaintext": "粘贴为纯文本",
     "pasteCharts": "粘贴图表",
     "selectAll": "全部选中",
     "multiSelect": "添加元素到选区",
@@ -45,12 +46,12 @@
     "exportEmbedScene_details": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
     "handDrawn": "手写",
-    "normal": "正常",
+    "normal": "普通",
     "code": "代码",
-    "small": "小号",
-    "medium": "中等",
-    "large": "大号",
-    "veryLarge": "极大",
+    "small": "小",
+    "medium": "中",
+    "large": "大",
+    "veryLarge": "加大",
     "solid": "实心",
     "hachure": "线条",
     "crossHatch": "交叉线条",
@@ -64,14 +65,14 @@
     "artist": "艺术",
     "cartoonist": "漫画家",
     "fileTitle": "文件名",
-    "colorPicker": "调色盘",
+    "colorPicker": "取色器",
     "canvasColors": "画布上的",
     "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
     "layers": "图层",
     "actions": "操作",
     "language": "语言",
-    "liveCollaboration": "实时协作",
+    "liveCollaboration": "实时协作...",
     "duplicateSelection": "复制",
     "untitled": "无标题",
     "name": "名字",
@@ -114,18 +115,29 @@
       "create": "新建链接",
       "label": "链接"
     },
+    "lineEditor": {
+      "edit": "编辑线条",
+      "exit": "退出线条编辑"
+    },
     "elementLock": {
       "lock": "锁定",
-      "unlock": "解锁​​​​",
+      "unlock": "解除锁定",
       "lockAll": "全部锁定",
       "unlockAll": "全部解锁"
-    }
+    },
+    "statusPublished": "已发布",
+    "sidebarLock": "侧边栏常驻"
+  },
+  "library": {
+    "noItems": "尚未添加任何项目……",
+    "hint_emptyLibrary": "选中画布上的项目添加到此处，或从下方的公共素材库中导入。",
+    "hint_emptyPrivateLibrary": "选中画布上的项目添加到此处。"
   },
   "buttons": {
     "clearReset": "重置画布",
     "exportJSON": "导出为文件",
-    "exportImage": "保存为图像",
-    "export": "导出",
+    "exportImage": "导出图片...",
+    "export": "保存到...",
     "exportToPng": "导出为 PNG",
     "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
@@ -133,7 +145,7 @@
     "scale": "缩放",
     "save": "保存至当前文件",
     "saveAs": "保存为",
-    "load": "载入文件",
+    "load": "打开",
     "getShareableLink": "获取共享链接",
     "close": "关闭",
     "selectLanguage": "选择语言",
@@ -172,7 +184,6 @@
     "uploadedSecurly": "上传已被端到端加密保护，这意味着 Excalidraw 的服务器和第三方都无法读取内容。",
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
     "collabStopOverridePrompt": "停止会话将覆盖您先前本地存储的绘图。 您确定吗？\n\n(如果您想保持本地绘图，只需关闭浏览器选项卡。)",
-    "errorLoadingLibrary": "加载第三方素材库时出错。",
     "errorAddingToLibrary": "无法将项目添加到素材库中",
     "errorRemovingFromLibrary": "无法从素材库中移除项目",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的素材库中。您确定吗？",
@@ -189,7 +200,10 @@
     "fileTooBig": "文件过大。最大允许的大小为 {{maxSize}}。",
     "svgImageInsertError": "无法插入 SVG 图像。该 SVG 标记似乎是无效的。",
     "invalidSVGString": "无效的 SVG。",
-    "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。"
+    "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。",
+    "importLibraryError": "无法加载素材库",
+    "collabSaveFailed": "无法保存到后端数据库。如果问题持续存在，您应该保存文件到本地，以确保您的工作不会丢失。",
+    "collabSaveFailed_sizeExceeded": "无法保存到后端数据库，画布似乎过大。您应该保存文件到本地，以确保您的工作不会丢失。"
   },
   "toolBar": {
     "selection": "选择",
@@ -203,7 +217,7 @@
     "text": "文字",
     "library": "素材库",
     "lock": "绘制后保持所选的工具栏状态",
-    "penMode": "禁用手势缩放并只接收来自触控笔的输入",
+    "penMode": "笔模式 – 避免误触",
     "link": "为选中的形状添加/更新链接",
     "eraser": "橡皮"
   },
@@ -224,7 +238,7 @@
     "resize": "您可以按住SHIFT来限制比例大小，\n按住ALT来调整中心大小",
     "resizeImage": "按住SHIFT可以自由缩放，\n按住ALT可以从中间缩放",
     "rotate": "旋转时可以按住 Shift 来约束角度",
-    "lineEditor_info": "双击或按回车键编辑",
+    "lineEditor_info": "按住 CtrlOrCmd 并双击或按 CtrlOrmd + Enter 来编辑点",
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，拖动以移动",
     "lineEditor_nothingSelected": "选择要编辑的点 (按住 SHIFT 选择多个)，\n或按住 Alt 并点击以添加新点",
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
@@ -299,7 +313,9 @@
     "view": "视图",
     "zoomToFit": "缩放以适应所有元素",
     "zoomToSelection": "缩放到选区",
-    "toggleElementLock": "锁定/解锁"
+    "toggleElementLock": "锁定/解锁",
+    "movePageUpDown": "上下移动页面",
+    "movePageLeftRight": "左右移动页面"
   },
   "clearCanvasDialog": {
     "title": "清除画布"
@@ -341,7 +357,8 @@
       "post": "简而言之，任何人都可以不受限制地使用它们。"
     },
     "noteItems": "素材库中每个项目都有各自的名称以供筛选。以下项目将被包含：",
-    "atleastOneLibItem": "请选择至少一个素材库以开始"
+    "atleastOneLibItem": "请选择至少一个素材库以开始",
+    "republishWarning": "注意：部分选中的项目已经发布或提交。请仅在更新已有或已提交的素材库时重复提交项目。"
   },
   "publishSuccessDialog": {
     "title": "素材库已提交",
@@ -379,7 +396,8 @@
     "fileSaved": "文件已保存。",
     "fileSavedToFilename": "保存到 {filename}",
     "canvas": "画布",
-    "selection": "选择项"
+    "selection": "所选项",
+    "pasteAsSingleElement": "使用 {{shortcut}} 粘贴为单个元素，\n或粘贴到现有的文本编辑器里"
   },
   "colors": {
     "ffffff": "白",
@@ -427,5 +445,18 @@
     "5c940d": "柠檬绿 9",
     "e67700": "黄 9",
     "d9480f": "橙 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "您的所有数据都储存在浏览器本地。",
+      "center_heading_plus": "是否前往 Excalidraw+ ？",
+      "menuHint": "导出、首选项、语言……"
+    },
+    "defaults": {
+      "menuHint": "导出、首选项……",
+      "center_heading": "图，化繁为简。",
+      "toolbarHint": "选择工具并开始绘图！",
+      "helpHint": "快捷键和帮助"
+    }
   }
 }

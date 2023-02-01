@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "ထား",
+    "pasteAsPlaintext": "",
     "pasteCharts": "",
     "selectAll": "အကုန်ရွေး",
     "multiSelect": "ရွေးထားသည့်ထဲပုံထည့်",
@@ -114,18 +115,29 @@
       "create": "",
       "label": ""
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
     "exportJSON": "",
     "exportImage": "",
-    "export": "ထုတ်",
+    "export": "",
     "exportToPng": "PNG ထုတ်",
     "exportToSvg": "SVG ထုတ်",
     "copyToClipboard": "ကူးယူ",
@@ -133,7 +145,7 @@
     "scale": "စကေး",
     "save": "",
     "saveAs": "ပြောင်းသိမ်း",
-    "load": "တင်သွင်း",
+    "load": "",
     "getShareableLink": "မျှဝေရန် လင့်ခ်ရယူ",
     "close": "ပိတ်",
     "selectLanguage": "ဘာသာစကားရွေးပါ",
@@ -172,7 +184,6 @@
     "uploadedSecurly": "တင်သွင်းအချက်အလက်များအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်စနစ်အသုံးပြု၍လုံခြုံစွာထိန်းသိမ်းထားပါသဖြင့် Excalidraw ဆာဗာနှင့်ဆက်စပ်အဖွဲ့အစည်းများပင်လျှင်မဖတ်ရှုနိုင်ပါ။",
     "loadSceneOverridePrompt": "လက်ရှိရေးဆွဲထားသမျှအား ပြင်ပမှတင်သွင်းသောပုံနှင့်အစားထိုးပါမည်။ ဆက်လက်ဆောင်ရွက်လိုပါသလား။",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "ပြင်ပမှမှတ်တမ်းအားတင်သွင်းရာတွင်အမှားအယွင်းရှိနေသည်။",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "{{numShapes}} ခုသောပုံသဏ္ဌာန်အားမှတ်တမ်းတင်ပါမည်။ အတည်ပြုပါ။",
@@ -189,7 +200,10 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": "",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
@@ -224,7 +238,7 @@
     "resize": "အချိုးအစားကန့်သတ်ရန် Shift နှင့် ဗဟိုမှချိန်ညှိရန် Alt တို့ကိုနှိပ်ထားနိုင်သည်",
     "resizeImage": "",
     "rotate": "Shift ကိုနှိပ်ထားခြင်းဖြင့် ထောင့်အလိုက်လှည့်နိုင်သည်",
-    "lineEditor_info": "အမှတ်များပြင်ဆင်သတ်မှတ်ရင် ကလစ်နှစ်ချက် (သို့) Enter ကိုနှိပ်ပါ",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -299,7 +313,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": "",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -341,7 +357,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
@@ -379,7 +396,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
@@ -427,5 +445,18 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Vložiť",
+    "pasteAsPlaintext": "Vložiť ako obyčajný text",
     "pasteCharts": "Vložiť grafy",
     "selectAll": "Vybrať všetko",
     "multiSelect": "Pridať prvok do výberu",
@@ -71,7 +72,7 @@
     "layers": "Vrstvy",
     "actions": "Akcie",
     "language": "Jazyk",
-    "liveCollaboration": "Živá spolupráca",
+    "liveCollaboration": "Živá spolupráca...",
     "duplicateSelection": "Duplikovať",
     "untitled": "Bez názvu",
     "name": "Meno",
@@ -114,18 +115,29 @@
       "create": "Vytvoriť odkaz",
       "label": "Odkaz"
     },
+    "lineEditor": {
+      "edit": "Upraviť čiaru",
+      "exit": "Ukončiť editovanie čiary"
+    },
     "elementLock": {
       "lock": "Zamknúť",
       "unlock": "Odomknúť",
       "lockAll": "Zamknúť všetko",
       "unlockAll": "Odomknúť všetko"
-    }
+    },
+    "statusPublished": "Zverejnené",
+    "sidebarLock": "Nechať bočný panel otvorený"
+  },
+  "library": {
+    "noItems": "Zatiaľ neboli pridané žiadne položky...",
+    "hint_emptyLibrary": "Vyberte položku z plátna pre jej pridanie do knižnice alebo použite knižnicu z verejného zoznamu knižníc nižšie.",
+    "hint_emptyPrivateLibrary": "Vyberte položku z plátna pre jej pridanie do knižnice."
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
     "exportJSON": "Exportovať do súboru",
-    "exportImage": "Uložiť ako obrázok",
-    "export": "Exportovať",
+    "exportImage": "Exportovať obrázok...",
+    "export": "Uložiť do...",
     "exportToPng": "Exportovať do PNG",
     "exportToSvg": "Exportovať do SVG",
     "copyToClipboard": "Kopírovať do schránky",
@@ -133,7 +145,7 @@
     "scale": "Mierka",
     "save": "Uložiť do aktuálneho súboru",
     "saveAs": "Uložiť ako",
-    "load": "Nahrať",
+    "load": "Otvoriť",
     "getShareableLink": "Získať odkaz na zdieľanie",
     "close": "Zavrieť",
     "selectLanguage": "Zvoliť jazyk",
@@ -172,7 +184,6 @@
     "uploadedSecurly": "Nahratie je zabezpečené end-to-end šifrovaním, takže Excalidraw server a tretie strany nedokážu prečítať jeho obsah.",
     "loadSceneOverridePrompt": "Nahratie externej kresby nahradí existujúci obsah. Prajete si pokračovať?",
     "collabStopOverridePrompt": "Ukončenie schôdze nahradí vašu predchádzajúcu lokálne uloženú scénu. Ste si istý?\n\n(Ak si chcete ponechať lokálnu scénu, jednoducho iba zavrite kartu prehliadača.)",
-    "errorLoadingLibrary": "Nepodarilo sa načítať externú knižnicu.",
     "errorAddingToLibrary": "Nepodarilo sa pridať položku do knižnice",
     "errorRemovingFromLibrary": "Nepodarilo sa odstrániť položku z knižnice",
     "confirmAddLibrary": "Týmto sa pridá {{numShapes}} tvar(ov) do vašej knižnice. Ste si istí?",
@@ -189,7 +200,10 @@
     "fileTooBig": "Súbor je príliš veľký. Maximálna povolená veľkosť je {{maxSize}}.",
     "svgImageInsertError": "Nepodarilo sa vložiť SVG obrázok. SVG formát je pravdepodobne nevalidný.",
     "invalidSVGString": "Nevalidné SVG.",
-    "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu."
+    "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu.",
+    "importLibraryError": "Nepodarilo sa načítať knižnicu",
+    "collabSaveFailed": "Uloženie do databázy sa nepodarilo. Ak tento problém pretrváva uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
+    "collabSaveFailed_sizeExceeded": "Uloženie do databázy sa nepodarilo, pretože veľkosť plátna je príliš veľká. Uložte si váš súbor lokálne aby ste nestratili vašu prácu."
   },
   "toolBar": {
     "selection": "Výber",
@@ -203,7 +217,7 @@
     "text": "Text",
     "library": "Knižnica",
     "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia",
-    "penMode": "Zabrániť priblíženiu potiahnutím a povoliť vstup voľnou rokou iba z pera",
+    "penMode": "Režim pera – zabrániť dotyku",
     "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
     "eraser": "Guma"
   },
@@ -224,7 +238,7 @@
     "resize": "Počas zmeny veľkosti zachováte proporcie podržaním SHIFT,\\npodržaním ALT meníte veľkosť so zachovaním stredu",
     "resizeImage": "Podržte SHIFT pre voľnú zmenu veľkosti, podržte ALT pre zmenu veľkosti od stredu",
     "rotate": "Počas rotácie obmedzíte uhol podržaním SHIFT",
-    "lineEditor_info": "Použite dvojklik alebo stlačte Enter na editáciu bodov",
+    "lineEditor_info": "Podržte CtrlOrCmd a kliknite dva krát alebo stlačte CtrlOrCmd + Enter pre editáciu bodov",
     "lineEditor_pointSelected": "Stačte Delete na vymazanie bodu (bodov), CtrlOrCmd+D na duplikovanie, alebo potiahnite na presunutie",
     "lineEditor_nothingSelected": "Zvoľte bod na upravovanie (podržte SHIFT pre zvolenie viacerých bodov) alebo podržte Alt a kliknite na pridanie nového bodu",
     "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti",
@@ -299,7 +313,9 @@
     "view": "Zobrazenie",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
     "zoomToSelection": "Priblížiť na výber",
-    "toggleElementLock": "Zamknúť/odomknúť vybrané"
+    "toggleElementLock": "Zamknúť/odomknúť vybrané",
+    "movePageUpDown": "Posunúť stranu hore/dole",
+    "movePageLeftRight": "Posunúť stranu doľava/doprava"
   },
   "clearCanvasDialog": {
     "title": "Vyčistiť plátno"
@@ -341,7 +357,8 @@
       "post": "čo v skratke znamená, že ju môže použiť hocikto bez obmedzení."
     },
     "noteItems": "Každá položka v knižnici musí mať svoje vlastné meno, aby sa dala vyhľadať. Súčasťou knižnice budú nasledujúce položky:",
-    "atleastOneLibItem": "Začnite prosím zvolením aspoň jednej položky z knižnice"
+    "atleastOneLibItem": "Začnite prosím zvolením aspoň jednej položky z knižnice",
+    "republishWarning": "Poznámka: Niektoré z vybraných položiek sú už označené ako zverejnené. Ich znovu uverejnenie by ste mali vykovať iba vtedy ak aktualizujete už existujúcu knižnicu alebo požiadavku na uverejnenie."
   },
   "publishSuccessDialog": {
     "title": "Knižnica uverejnená",
@@ -379,7 +396,8 @@
     "fileSaved": "Súbor uložený.",
     "fileSavedToFilename": "Uložený ako {filename}",
     "canvas": "plátna",
-    "selection": "výberu"
+    "selection": "výberu",
+    "pasteAsSingleElement": "Použitím {{shortcut}} vložte ako samostatný prvok alebo vložte do existujúceho editovaného textu"
   },
   "colors": {
     "ffffff": "Biela",
@@ -427,5 +445,18 @@
     "5c940d": "Limetková 9",
     "e67700": "Žltá 9",
     "d9480f": "Oranžová 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "Všetky vaše dáta sú uložené lokálne vo vašom prehliadači.",
+      "center_heading_plus": "Chceli ste namiesto toho prejsť do Excalidraw+?",
+      "menuHint": "Exportovanie, nastavenia, jazyky, ..."
+    },
+    "defaults": {
+      "menuHint": "Exportovanie, nastavenia a ďalšie...",
+      "center_heading": "Diagramy. Jednoducho.",
+      "toolbarHint": "Zvoľte nástroj a začnite kresliť!",
+      "helpHint": "Klávesové skratky a pomocník"
+    }
   }
 }

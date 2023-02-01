@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Қою",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Диаграммаларды қою",
     "selectAll": "Бәрін таңдау",
     "multiSelect": "",
@@ -114,18 +115,29 @@
       "create": "",
       "label": ""
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "",
     "exportJSON": "",
     "exportImage": "",
-    "export": "Экспорт",
+    "export": "",
     "exportToPng": "",
     "exportToSvg": "",
     "copyToClipboard": "",
@@ -172,7 +184,6 @@
     "uploadedSecurly": "",
     "loadSceneOverridePrompt": "",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "",
@@ -189,7 +200,10 @@
     "fileTooBig": "Файл өте үлкен. Максималды рұқсат етілген көлем {{maxSize}}.",
     "svgImageInsertError": "",
     "invalidSVGString": "",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "",
@@ -299,7 +313,9 @@
     "view": "Көру",
     "zoomToFit": "Барлық элементтердің көлеміне сәйкес үлкейту",
     "zoomToSelection": "Таңдалғанды үлкейту",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -341,7 +357,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
@@ -379,7 +396,8 @@
     "fileSaved": "Файл сақталды.",
     "fileSavedToFilename": "{filename} сақталды",
     "canvas": "",
-    "selection": "таңдау"
+    "selection": "таңдау",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
@@ -427,5 +445,18 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

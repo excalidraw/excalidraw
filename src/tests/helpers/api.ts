@@ -4,18 +4,21 @@ import {
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawImageElement,
+  FileId,
 } from "../../element/types";
 import { newElement, newTextElement, newLinearElement } from "../../element";
-import { DEFAULT_VERTICAL_ALIGN } from "../../constants";
+import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
 import { getDefaultAppState } from "../../appState";
 import { GlobalTestState, createEvent, fireEvent } from "../test-utils";
 import fs from "fs";
 import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
-import { newFreeDrawElement } from "../../element/newElement";
+import { newFreeDrawElement, newImageElement } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
+import { isLinearElementType } from "../../element/typeChecks";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -59,9 +62,10 @@ export class API {
   };
 
   static createElement = <
-    T extends Exclude<ExcalidrawElement["type"], "selection">,
+    T extends Exclude<ExcalidrawElement["type"], "selection"> = "rectangle",
   >({
-    type,
+    // @ts-ignore
+    type = "rectangle",
     id,
     x = 0,
     y = x,
@@ -71,11 +75,12 @@ export class API {
     groupIds = [],
     ...rest
   }: {
-    type: T;
+    type?: T;
     x?: number;
     y?: number;
     height?: number;
     width?: number;
+    angle?: number;
     id?: string;
     isDeleted?: boolean;
     groupIds?: string[];
@@ -85,7 +90,7 @@ export class API {
     fillStyle?: ExcalidrawGenericElement["fillStyle"];
     strokeWidth?: ExcalidrawGenericElement["strokeWidth"];
     strokeStyle?: ExcalidrawGenericElement["strokeStyle"];
-    strokeSharpness?: ExcalidrawGenericElement["strokeSharpness"];
+    roundness?: ExcalidrawGenericElement["roundness"];
     roughness?: ExcalidrawGenericElement["roughness"];
     opacity?: ExcalidrawGenericElement["opacity"];
     // text props
@@ -102,28 +107,59 @@ export class API {
       : never;
     points?: T extends "arrow" | "line" ? readonly Point[] : never;
     locked?: boolean;
+    fileId?: T extends "image" ? string : never;
+    scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
+    status?: T extends "image" ? ExcalidrawImageElement["status"] : never;
+    endBinding?: T extends "arrow"
+      ? ExcalidrawLinearElement["endBinding"]
+      : never;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
     ? ExcalidrawFreeDrawElement
     : T extends "text"
     ? ExcalidrawTextElement
+    : T extends "image"
+    ? ExcalidrawImageElement
     : ExcalidrawGenericElement => {
     let element: Mutable<ExcalidrawElement> = null!;
 
     const appState = h?.state || getDefaultAppState();
 
-    const base = {
+    const base: Omit<
+      ExcalidrawGenericElement,
+      | "id"
+      | "width"
+      | "height"
+      | "type"
+      | "seed"
+      | "version"
+      | "versionNonce"
+      | "isDeleted"
+      | "groupIds"
+      | "link"
+      | "updated"
+    > = {
       x,
       y,
+      angle: rest.angle ?? 0,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:
         rest.backgroundColor ?? appState.currentItemBackgroundColor,
       fillStyle: rest.fillStyle ?? appState.currentItemFillStyle,
       strokeWidth: rest.strokeWidth ?? appState.currentItemStrokeWidth,
       strokeStyle: rest.strokeStyle ?? appState.currentItemStrokeStyle,
-      strokeSharpness:
-        rest.strokeSharpness ?? appState.currentItemStrokeSharpness,
+      roundness: (
+        rest.roundness === undefined
+          ? appState.currentItemRoundness === "round"
+          : rest.roundness
+      )
+        ? {
+            type: isLinearElementType(type)
+              ? ROUNDNESS.PROPORTIONAL_RADIUS
+              : ROUNDNESS.ADAPTIVE_RADIUS,
+          }
+        : null,
       roughness: rest.roughness ?? appState.currentItemRoughness,
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,
@@ -166,10 +202,21 @@ export class API {
           ...base,
           width,
           height,
-          type: type as "arrow" | "line",
+          type,
           startArrowhead: null,
           endArrowhead: null,
           points: rest.points ?? [],
+        });
+        break;
+      case "image":
+        element = newImageElement({
+          ...base,
+          width,
+          height,
+          type,
+          fileId: (rest.fileId as string as FileId) ?? null,
+          status: rest.status || "saved",
+          scale: rest.scale || [1, 1],
         });
         break;
     }

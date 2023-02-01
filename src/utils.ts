@@ -6,14 +6,16 @@ import {
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
+  isDarwin,
   MIME_TYPES,
   THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { AppState, DataURL, Zoom } from "./types";
+import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
-import { isDarwin } from "./keys";
+import { SHAPES } from "./shapes";
+import { isEraserActive, isHandToolActive } from "./appState";
 
 let mockDateTime: string | null = null;
 
@@ -125,47 +127,54 @@ export const debounce = <T extends any[]>(
 };
 
 // throttle callback to execute once per animation frame
-export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
-  let handle: number | null = null;
+export const throttleRAF = <T extends any[]>(
+  fn: (...args: T) => void,
+  opts?: { trailing?: boolean },
+) => {
+  let timerId: number | null = null;
   let lastArgs: T | null = null;
-  let callback: ((...args: T) => void) | null = null;
+  let lastArgsTrailing: T | null = null;
+
+  const scheduleFunc = (args: T) => {
+    timerId = window.requestAnimationFrame(() => {
+      timerId = null;
+      fn(...args);
+      lastArgs = null;
+      if (lastArgsTrailing) {
+        lastArgs = lastArgsTrailing;
+        lastArgsTrailing = null;
+        scheduleFunc(lastArgs);
+      }
+    });
+  };
+
   const ret = (...args: T) => {
     if (process.env.NODE_ENV === "test") {
       fn(...args);
       return;
     }
     lastArgs = args;
-    callback = fn;
-    if (handle === null) {
-      handle = window.requestAnimationFrame(() => {
-        handle = null;
-        lastArgs = null;
-        callback = null;
-        fn(...args);
-      });
+    if (timerId === null) {
+      scheduleFunc(lastArgs);
+    } else if (opts?.trailing) {
+      lastArgsTrailing = args;
     }
   };
   ret.flush = () => {
-    if (handle !== null) {
-      cancelAnimationFrame(handle);
-      handle = null;
+    if (timerId !== null) {
+      cancelAnimationFrame(timerId);
+      timerId = null;
     }
     if (lastArgs) {
-      const _lastArgs = lastArgs;
-      const _callback = callback;
-      lastArgs = null;
-      callback = null;
-      if (_callback !== null) {
-        _callback(..._lastArgs);
-      }
+      fn(...(lastArgsTrailing || lastArgs));
+      lastArgs = lastArgsTrailing = null;
     }
   };
   ret.cancel = () => {
-    lastArgs = null;
-    callback = null;
-    if (handle !== null) {
-      cancelAnimationFrame(handle);
-      handle = null;
+    lastArgs = lastArgsTrailing = null;
+    if (timerId !== null) {
+      cancelAnimationFrame(timerId);
+      timerId = null;
     }
   };
   return ret;
@@ -206,6 +215,32 @@ export const removeSelection = () => {
 };
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
+
+export const updateActiveTool = (
+  appState: Pick<AppState, "activeTool">,
+  data: (
+    | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" }
+    | { type: "custom"; customType: string }
+  ) & { lastActiveToolBeforeEraser?: LastActiveTool },
+): AppState["activeTool"] => {
+  if (data.type === "custom") {
+    return {
+      ...appState.activeTool,
+      type: "custom",
+      customType: data.customType,
+    };
+  }
+
+  return {
+    ...appState.activeTool,
+    lastActiveTool:
+      data.lastActiveToolBeforeEraser === undefined
+        ? appState.activeTool.lastActiveTool
+        : data.lastActiveToolBeforeEraser,
+    type: data.type,
+    customType: null,
+  };
+};
 
 export const resetCursor = (canvas: HTMLCanvasElement | null) => {
   if (canvas) {
@@ -270,11 +305,14 @@ export const setCursorForShape = (
   }
   if (appState.activeTool.type === "selection") {
     resetCursor(canvas);
-  } else if (appState.activeTool.type === "eraser") {
+  } else if (isHandToolActive(appState)) {
+    canvas.style.cursor = CURSOR_TYPE.GRAB;
+  } else if (isEraserActive(appState)) {
     setEraserCursor(canvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
-  } else if (appState.activeTool.type !== "image") {
+    // Ignore custom type as well and let host decide
+  } else if (!["image", "custom"].includes(appState.activeTool.type)) {
     canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
@@ -291,15 +329,13 @@ export const getShortcutKey = (shortcut: string): string => {
   shortcut = shortcut
     .replace(/\bAlt\b/i, "Alt")
     .replace(/\bShift\b/i, "Shift")
-    .replace(/\b(Enter|Return)\b/i, "Enter")
-    .replace(/\bDel\b/i, "Delete");
-
+    .replace(/\b(Enter|Return)\b/i, "Enter");
   if (isDarwin) {
     return shortcut
-      .replace(/\bCtrlOrCmd\b/i, "Cmd")
+      .replace(/\bCtrlOrCmd\b/gi, "Cmd")
       .replace(/\bAlt\b/i, "Option");
   }
-  return shortcut.replace(/\bCtrlOrCmd\b/i, "Ctrl");
+  return shortcut.replace(/\bCtrlOrCmd\b/gi, "Ctrl");
 };
 
 export const viewportCoordsToSceneCoords = (
@@ -318,9 +354,8 @@ export const viewportCoordsToSceneCoords = (
     scrollY: number;
   },
 ) => {
-  const invScale = 1 / zoom.value;
-  const x = (clientX - offsetLeft) * invScale - scrollX;
-  const y = (clientY - offsetTop) * invScale - scrollY;
+  const x = (clientX - offsetLeft) / zoom.value - scrollX;
+  const y = (clientY - offsetTop) / zoom.value - scrollY;
 
   return { x, y };
 };
@@ -647,4 +682,48 @@ export const isPromiseLike = (
     "catch" in value &&
     "finally" in value
   );
+};
+
+export const queryFocusableElements = (container: HTMLElement | null) => {
+  const focusableElements = container?.querySelectorAll<HTMLElement>(
+    "button, a, input, select, textarea, div[tabindex], label[tabindex]",
+  );
+
+  return focusableElements
+    ? Array.from(focusableElements).filter(
+        (element) =>
+          element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
+      )
+    : [];
+};
+
+export const isShallowEqual = <T extends Record<string, any>>(
+  objA: T,
+  objB: T,
+) => {
+  const aKeys = Object.keys(objA);
+  const bKeys = Object.keys(objA);
+  if (aKeys.length !== bKeys.length) {
+    return false;
+  }
+  return aKeys.every((key) => objA[key] === objB[key]);
+};
+
+// taken from Radix UI
+// https://github.com/radix-ui/primitives/blob/main/packages/core/primitive/src/primitive.tsx
+export const composeEventHandlers = <E>(
+  originalEventHandler?: (event: E) => void,
+  ourEventHandler?: (event: E) => void,
+  { checkForDefaultPrevented = true } = {},
+) => {
+  return function handleEvent(event: E) {
+    originalEventHandler?.(event);
+
+    if (
+      !checkForDefaultPrevented ||
+      !(event as unknown as Event).defaultPrevented
+    ) {
+      return ourEventHandler?.(event);
+    }
+  };
 };

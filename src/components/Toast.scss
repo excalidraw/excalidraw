@@ -2,6 +2,9 @@
 
 .excalidraw {
   .Toast {
+    $closeButtonSize: 1.2rem;
+    $closeButtonPadding: 0.4rem;
+
     animation: fade-in 0.5s;
     background-color: var(--button-gray-1);
     border-radius: 4px;
@@ -15,11 +18,24 @@
     text-align: center;
     width: 300px;
     z-index: 999999;
-  }
 
-  .Toast__message {
-    color: var(--popup-text-color);
-    white-space: pre-wrap;
+    .Toast__message {
+      padding: 0 $closeButtonSize + ($closeButtonPadding);
+      color: var(--popup-text-color);
+      white-space: pre-wrap;
+    }
+
+    .close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: $closeButtonPadding;
+
+      .ToolIcon__icon {
+        width: $closeButtonSize;
+        height: $closeButtonSize;
+      }
+    }
   }
 
   @keyframes fade-in {

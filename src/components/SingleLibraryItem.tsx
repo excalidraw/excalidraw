@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { t } from "../i18n";
 import { exportToSvg } from "../packages/utils";
 import { AppState, LibraryItem } from "../types";
-import { close } from "./icons";
+import { CloseIcon } from "./icons";
 
 import "./SingleLibraryItem.scss";
 import { ToolButton } from "./ToolButton";
@@ -45,11 +45,16 @@ const SingleLibraryItem = ({
 
   return (
     <div className="single-library-item">
+      {libItem.status === "published" && (
+        <span className="single-library-item-status">
+          {t("labels.statusPublished")}
+        </span>
+      )}
       <div ref={svgRef} className="single-library-item__svg" />
       <ToolButton
         aria-label={t("buttons.remove")}
         type="button"
-        icon={close}
+        icon={CloseIcon}
         className="single-library-item--remove"
         onClick={onRemove.bind(null, libItem.id)}
         title={t("buttons.remove")}
@@ -57,7 +62,7 @@ const SingleLibraryItem = ({
       <div
         style={{
           display: "flex",
-          margin: "0.8rem 0.3rem",
+          margin: "0.8rem 0",
           width: "100%",
           fontSize: "14px",
           fontWeight: 500,

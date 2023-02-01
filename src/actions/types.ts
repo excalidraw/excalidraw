@@ -6,7 +6,6 @@ import {
   ExcalidrawProps,
   BinaryFiles,
 } from "../types";
-import { ToolButtonSize } from "../components/ToolButton";
 
 export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
 
@@ -92,7 +91,7 @@ export type ActionName =
   | "ungroup"
   | "goToCollaborator"
   | "addToLibrary"
-  | "changeSharpness"
+  | "changeRoundness"
   | "alignTop"
   | "alignBottom"
   | "alignLeft"
@@ -110,16 +109,18 @@ export type ActionName =
   | "decreaseFontSize"
   | "unbindText"
   | "hyperlink"
-  | "eraser"
   | "bindText"
-  | "toggleLock";
+  | "toggleLock"
+  | "toggleLinearEditor"
+  | "toggleEraserTool"
+  | "toggleHandTool";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
   appState: AppState;
   updateData: (formData?: any) => void;
   appProps: ExcalidrawProps;
-  data?: Partial<{ id: string; size: ToolButtonSize }>;
+  data?: Record<string, any>;
 };
 
 export interface Action {
@@ -138,9 +139,11 @@ export interface Action {
         elements: readonly ExcalidrawElement[],
         appState: Readonly<AppState>,
       ) => string);
-  contextItemPredicate?: (
+  predicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
+    appProps: ExcalidrawProps,
+    app: AppClassProperties,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
   trackEvent:
@@ -162,4 +165,7 @@ export interface Action {
           value: any,
         ) => boolean;
       };
+  /** if set to `true`, allow action to be performed in viewMode.
+   *  Defaults to `false` */
+  viewMode?: boolean;
 }

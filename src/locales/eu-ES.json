@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Itsatsi",
+    "pasteAsPlaintext": "Itsatsi testu arrunt gisa",
     "pasteCharts": "Itsatsi grafikoak",
     "selectAll": "Hautatu dena",
     "multiSelect": "Gehitu elementua hautapenera",
@@ -71,7 +72,7 @@
     "layers": "Geruzak",
     "actions": "Ekintzak",
     "language": "Hizkuntza",
-    "liveCollaboration": "Zuzeneko elkarlana",
+    "liveCollaboration": "Zuzeneko elkarlana...",
     "duplicateSelection": "Bikoiztu",
     "untitled": "Izengabea",
     "name": "Izena",
@@ -114,18 +115,29 @@
       "create": "Sortu esteka",
       "label": "Esteka"
     },
+    "lineEditor": {
+      "edit": "Editatu lerroa",
+      "exit": "Irten lerro-editoretik"
+    },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
-    }
+      "lock": "Blokeatu",
+      "unlock": "Desblokeatu",
+      "lockAll": "Blokeatu guztiak",
+      "unlockAll": "Desblokeatu guztiak"
+    },
+    "statusPublished": "Argitaratua",
+    "sidebarLock": "Mantendu alboko barra irekita"
+  },
+  "library": {
+    "noItems": "Oraindik ez da elementurik gehitu...",
+    "hint_emptyLibrary": "Hautatu oihaleko elementu bat hemen gehitzeko, edo instalatu liburutegi bat beheko biltegi publikotik.",
+    "hint_emptyPrivateLibrary": "Hautatu oihaleko elementu bat hemen gehitzeko."
   },
   "buttons": {
     "clearReset": "Garbitu oihala",
     "exportJSON": "Esportatu fitxategira",
-    "exportImage": "Gorde irudi gisa",
-    "export": "Esportatu",
+    "exportImage": "Esportatu irudia...",
+    "export": "Gorde hemen...",
     "exportToPng": "Esportatu PNG gisa",
     "exportToSvg": "Esportatu SVG gisa",
     "copyToClipboard": "Kopiatu arbelera",
@@ -133,7 +145,7 @@
     "scale": "Eskala",
     "save": "Gorde uneko fitxategian",
     "saveAs": "Gorde honela",
-    "load": "Kargatu",
+    "load": "Ireki",
     "getShareableLink": "Lortu partekatzeko esteka",
     "close": "Itxi",
     "selectLanguage": "Hautatu hizkuntza",
@@ -172,7 +184,6 @@
     "uploadedSecurly": "Kargatzea muturretik muturrerako zifratze bidez ziurtatu da, hau da, Excalidraw zerbitzariak eta hirugarrenek ezin dutela edukia irakurri.",
     "loadSceneOverridePrompt": "Kanpoko marrazkia kargatzeak lehendik duzun edukia ordezkatuko du. Jarraitu nahi duzu?",
     "collabStopOverridePrompt": "Saioa gelditzeak lokalean gordetako zure aurreko marrazkia gainidatziko du. Ziur zaude?\n\n(Zure marrazki lokala mantendu nahi baduzu, itxi arakatzailearen fitxa.)",
-    "errorLoadingLibrary": "Errore bat gertatu da hirugarrenen liburutegia kargatzean.",
     "errorAddingToLibrary": "Ezin izan da elementua liburutegian gehitu",
     "errorRemovingFromLibrary": "Ezin izan da elementua liburutegitik kendu",
     "confirmAddLibrary": "Honek {{numShapes}} forma gehituko ditu zure liburutegian. Ziur zaude?",
@@ -189,7 +200,10 @@
     "fileTooBig": "Fitxategia handiegia da. Onartutako gehienezko tamaina {{maxSize}} da.",
     "svgImageInsertError": "Ezin izan da SVG irudia txertatu. SVG markak baliogabea dirudi.",
     "invalidSVGString": "SVG baliogabea.",
-    "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro."
+    "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro.",
+    "importLibraryError": "Ezin izan da liburutegia kargatu",
+    "collabSaveFailed": "Ezin izan da backend datu-basean gorde. Arazoak jarraitzen badu, zure fitxategia lokalean gorde beharko zenuke zure lana ez duzula galtzen ziurtatzeko.",
+    "collabSaveFailed_sizeExceeded": "Ezin izan da backend datu-basean gorde, ohiala handiegia dela dirudi. Fitxategia lokalean gorde beharko zenuke zure lana galtzen ez duzula ziurtatzeko."
   },
   "toolBar": {
     "selection": "Hautapena",
@@ -203,7 +217,7 @@
     "text": "Testua",
     "library": "Liburutegia",
     "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
-    "penMode": "Saihestu txikiagotzea eta onartu marrazte libreko idazketa solik arkatza bidez",
+    "penMode": "Luma modua - ukipena saihestu",
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma"
   },
@@ -224,7 +238,7 @@
     "resize": "Proportzioak mantendu ditzakezu SHIFT sakatuta tamaina aldatzen duzun bitartean.\nsakatu ALT erditik tamaina aldatzeko",
     "resizeImage": "Tamaina libreki alda dezakezu SHIFT sakatuta,\nsakatu ALT erditik tamaina aldatzeko",
     "rotate": "Angeluak mantendu ditzakezu SHIFT sakatuta biratzen duzun bitartean",
-    "lineEditor_info": "Egin klik bikoitza edo sakatu Sartu puntuak editatzeko",
+    "lineEditor_info": "Eutsi sakatuta Ctrl edo Cmd eta egin klik bikoitza edo sakatu Ctrl edo Cmd + Sartu puntuak editatzeko",
     "lineEditor_pointSelected": "Sakatu Ezabatu puntuak kentzeko,\nKtrl+D bikoizteko, edo arrastatu mugitzeko",
     "lineEditor_nothingSelected": "Hautatu editatzeko puntu bat (SHIFT sakatuta anitz hautatzeko),\nedo eduki Alt sakatuta eta egin klik puntu berriak gehitzeko",
     "placeImage": "Egin klik irudia kokatzeko, edo egin klik eta arrastatu bere tamaina eskuz ezartzeko",
@@ -299,7 +313,9 @@
     "view": "Bistaratu",
     "zoomToFit": "Egin zoom elementu guztiak ikusteko",
     "zoomToSelection": "Zooma hautapenera",
-    "toggleElementLock": ""
+    "toggleElementLock": "Blokeatu/desbloketatu hautapena",
+    "movePageUpDown": "Mugitu orria gora/behera",
+    "movePageLeftRight": "Mugitu orria ezker/eskuin"
   },
   "clearCanvasDialog": {
     "title": "Garbitu oihala"
@@ -341,7 +357,8 @@
       "post": "zeinak, laburbilduz, esan nahi du edozeinek erabiltzen ahal duela murrizketarik gabe."
     },
     "noteItems": "Liburutegiko elementu bakoitzak bere izena eduki behar du iragazi ahal izateko. Liburutegiko hurrengo elementuak barne daude:",
-    "atleastOneLibItem": "Hautatu gutxienez liburutegiko elementu bat gutxienez hasi ahal izateko"
+    "atleastOneLibItem": "Hautatu gutxienez liburutegiko elementu bat gutxienez hasi ahal izateko",
+    "republishWarning": "Oharra: hautatutako elementu batzuk dagoeneko argitaratuta/bidalita bezala markatuta daude. Elementuak berriro bidali behar dituzu lehendik dagoen liburutegi edo bidalketa eguneratzen duzunean."
   },
   "publishSuccessDialog": {
     "title": "Liburutegia bidali da",
@@ -379,7 +396,8 @@
     "fileSaved": "Fitxategia gorde da.",
     "fileSavedToFilename": "{filename}-n gorde da",
     "canvas": "oihala",
-    "selection": "hautapena"
+    "selection": "hautapena",
+    "pasteAsSingleElement": "Erabili {{shortcut}} elementu bakar gisa itsasteko,\nedo itsatsi lehendik dagoen testu-editore batean"
   },
   "colors": {
     "ffffff": "Zuria",
@@ -427,5 +445,18 @@
     "5c940d": "Lima 9",
     "e67700": "Horia 9",
     "d9480f": "Laranja 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "Zure datu guztiak lokalean gordetzen dira zure nabigatzailean.",
+      "center_heading_plus": "Horren ordez Excalidraw+-era joan nahi al zenuen?",
+      "menuHint": "Esportatu, hobespenak, hizkuntzak..."
+    },
+    "defaults": {
+      "menuHint": "Esportatu, hobespenak eta gehiago...",
+      "center_heading": "Diagramak. Egina. Sinplea.",
+      "toolbarHint": "Aukeratu tresna bat eta hasi marrazten!",
+      "helpHint": "Lasterbideak eta laguntza"
+    }
   }
 }

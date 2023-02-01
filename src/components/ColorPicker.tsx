@@ -66,10 +66,13 @@ const getColor = (color: string): string | null => {
     return color;
   }
 
-  return isValidColor(color)
-    ? color
-    : isValidColor(`#${color}`)
+  // testing for `#` first fixes a bug on Electron (more specfically, an
+  // Obsidian popout window), where a hex color without `#` is (incorrectly)
+  // considered valid
+  return isValidColor(`#${color}`)
     ? `#${color}`
+    : isValidColor(color)
+    ? color
     : null;
 };
 
@@ -128,45 +131,33 @@ const Picker = ({
   }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === KEYS.TAB) {
-      const { activeElement } = document;
-      if (event.shiftKey) {
-        if (activeElement === firstItem.current) {
-          colorInput.current?.focus();
-          event.preventDefault();
-        }
-      } else if (activeElement === colorInput.current) {
-        firstItem.current?.focus();
-        event.preventDefault();
-      }
-    } else if (isArrowKey(event.key)) {
+    let handled = false;
+    if (isArrowKey(event.key)) {
+      handled = true;
       const { activeElement } = document;
       const isRTL = getLanguage().rtl;
       let isCustom = false;
       let index = Array.prototype.indexOf.call(
-        gallery!.current!.querySelector(".color-picker-content--default")!
-          .children,
+        gallery.current!.querySelector(".color-picker-content--default")
+          ?.children,
         activeElement,
       );
       if (index === -1) {
         index = Array.prototype.indexOf.call(
-          gallery!.current!.querySelector(
-            ".color-picker-content--canvas-colors",
-          )!.children,
+          gallery.current!.querySelector(".color-picker-content--canvas-colors")
+            ?.children,
           activeElement,
         );
         if (index !== -1) {
           isCustom = true;
         }
       }
-      const parentSelector = isCustom
-        ? gallery!.current!.querySelector(
-            ".color-picker-content--canvas-colors",
-          )!
-        : gallery!.current!.querySelector(".color-picker-content--default")!;
+      const parentElement = isCustom
+        ? gallery.current?.querySelector(".color-picker-content--canvas-colors")
+        : gallery.current?.querySelector(".color-picker-content--default");
 
-      if (index !== -1) {
-        const length = parentSelector!.children.length - (showInput ? 1 : 0);
+      if (parentElement && index !== -1) {
+        const length = parentElement.children.length - (showInput ? 1 : 0);
         const nextIndex =
           event.key === (isRTL ? KEYS.ARROW_LEFT : KEYS.ARROW_RIGHT)
             ? (index + 1) % length
@@ -177,30 +168,38 @@ const Picker = ({
             : !isCustom && event.key === KEYS.ARROW_UP
             ? (length + index - 5) % length
             : index;
-        (parentSelector!.children![nextIndex] as HTMLElement)?.focus();
+        (parentElement.children[nextIndex] as HTMLElement | undefined)?.focus();
       }
       event.preventDefault();
     } else if (
       keyBindings.includes(event.key.toLowerCase()) &&
+      !event[KEYS.CTRL_OR_CMD] &&
+      !event.altKey &&
       !isWritableElement(event.target)
     ) {
+      handled = true;
       const index = keyBindings.indexOf(event.key.toLowerCase());
       const isCustom = index >= MAX_DEFAULT_COLORS;
-      const parentSelector = isCustom
-        ? gallery!.current!.querySelector(
+      const parentElement = isCustom
+        ? gallery?.current?.querySelector(
             ".color-picker-content--canvas-colors",
-          )!
-        : gallery!.current!.querySelector(".color-picker-content--default")!;
+          )
+        : gallery?.current?.querySelector(".color-picker-content--default");
       const actualIndex = isCustom ? index - MAX_DEFAULT_COLORS : index;
-      (parentSelector!.children![actualIndex] as HTMLElement)?.focus();
+      (
+        parentElement?.children[actualIndex] as HTMLElement | undefined
+      )?.focus();
 
       event.preventDefault();
     } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
+      handled = true;
       event.preventDefault();
       onClose();
     }
-    event.nativeEvent.stopImmediatePropagation();
-    event.stopPropagation();
+    if (handled) {
+      event.nativeEvent.stopImmediatePropagation();
+      event.stopPropagation();
+    }
   };
 
   const renderColors = (colors: Array<string>, custom: boolean = false) => {
@@ -264,7 +263,8 @@ const Picker = ({
             gallery.current = el;
           }
         }}
-        tabIndex={0}
+        // to allow focusing by clicking but not by tabbing
+        tabIndex={-1}
       >
         <div className="color-picker-content--default">
           {renderColors(colors)}
@@ -346,6 +346,8 @@ const ColorInput = React.forwardRef(
   },
 );
 
+ColorInput.displayName = "ColorInput";
+
 export const ColorPicker = ({
   type,
   color,
@@ -366,17 +368,20 @@ export const ColorPicker = ({
   appState: AppState;
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
+  const coords = pickerButton.current?.getBoundingClientRect();
 
   return (
     <div>
       <div className="color-picker-control-container">
-        <button
-          className="color-picker-label-swatch"
-          aria-label={label}
-          style={color ? { "--swatch-color": color } : undefined}
-          onClick={() => setActive(!isActive)}
-          ref={pickerButton}
-        />
+        <div className="color-picker-label-swatch-container">
+          <button
+            className="color-picker-label-swatch"
+            aria-label={label}
+            style={color ? { "--swatch-color": color } : undefined}
+            onClick={() => setActive(!isActive)}
+            ref={pickerButton}
+          />
+        </div>
         <ColorInput
           color={color}
           label={label}
@@ -387,27 +392,37 @@ export const ColorPicker = ({
       </div>
       <React.Suspense fallback="">
         {isActive ? (
-          <Popover
-            onCloseRequest={(event) =>
-              event.target !== pickerButton.current && setActive(false)
-            }
+          <div
+            className="color-picker-popover-container"
+            style={{
+              position: "fixed",
+              top: coords?.top,
+              left: coords?.right,
+              zIndex: 1,
+            }}
           >
-            <Picker
-              colors={colors[type]}
-              color={color || null}
-              onChange={(changedColor) => {
-                onChange(changedColor);
-              }}
-              onClose={() => {
-                setActive(false);
-                pickerButton.current?.focus();
-              }}
-              label={label}
-              showInput={false}
-              type={type}
-              elements={elements}
-            />
-          </Popover>
+            <Popover
+              onCloseRequest={(event) =>
+                event.target !== pickerButton.current && setActive(false)
+              }
+            >
+              <Picker
+                colors={colors[type]}
+                color={color || null}
+                onChange={(changedColor) => {
+                  onChange(changedColor);
+                }}
+                onClose={() => {
+                  setActive(false);
+                  pickerButton.current?.focus();
+                }}
+                label={label}
+                showInput={false}
+                type={type}
+                elements={elements}
+              />
+            </Popover>
+          </div>
         ) : null}
       </React.Suspense>
     </div>

@@ -1,14 +1,15 @@
 import { Action, ActionResult } from "./types";
-import { undo, redo } from "../components/icons";
+import { UndoIcon, RedoIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import History, { HistoryEntry } from "../history";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { isWindows, KEYS } from "../keys";
+import { KEYS } from "../keys";
 import { newElementWith } from "../element/mutateElement";
 import { fixBindingsAfterDeletion } from "../element/binding";
 import { arrayToMap } from "../utils";
+import { isWindows } from "../constants";
 
 const writeData = (
   prevElements: readonly ExcalidrawElement[],
@@ -72,7 +73,7 @@ export const createUndoAction: ActionCreator = (history) => ({
   PanelComponent: ({ updateData, data }) => (
     <ToolButton
       type="button"
-      icon={undo}
+      icon={UndoIcon}
       aria-label={t("buttons.undo")}
       onClick={updateData}
       size={data?.size || "medium"}
@@ -94,7 +95,7 @@ export const createRedoAction: ActionCreator = (history) => ({
   PanelComponent: ({ updateData, data }) => (
     <ToolButton
       type="button"
-      icon={redo}
+      icon={RedoIcon}
       aria-label={t("buttons.redo")}
       onClick={updateData}
       size={data?.size || "medium"}

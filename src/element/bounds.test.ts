@@ -1,3 +1,4 @@
+import { ROUNDNESS } from "../constants";
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 
@@ -22,7 +23,8 @@ const _ce = ({
     backgroundColor: "#000",
     fillStyle: "solid",
     strokeWidth: 1,
-    roughness: 1,
+    roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+    roughness: 0,
     opacity: 1,
     x,
     y,
@@ -106,7 +108,7 @@ describe("getElementBounds", () => {
     } as ExcalidrawLinearElement);
     expect(x1).toEqual(360.3176068760539);
     expect(y1).toEqual(185.90654264413516);
-    expect(x2).toEqual(473.8171188951176);
-    expect(y2).toEqual(320.391865303557);
+    expect(x2).toEqual(480.87005902729743);
+    expect(y2).toEqual(320.4751269334226);
   });
 });

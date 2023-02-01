@@ -19,6 +19,7 @@ export const getDefaultAppState = (): Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 > => {
   return {
+    showWelcomeScreen: false,
     theme: THEME.LIGHT,
     collaborators: new Map(),
     currentChartType: "bar",
@@ -27,12 +28,11 @@ export const getDefaultAppState = (): Omit<
     currentItemFillStyle: "hachure",
     currentItemFontFamily: DEFAULT_FONT_FAMILY,
     currentItemFontSize: DEFAULT_FONT_SIZE,
-    currentItemLinearStrokeSharpness: "round",
     currentItemOpacity: 100,
     currentItemRoughness: 1,
     currentItemStartArrowhead: null,
     currentItemStrokeColor: oc.black,
-    currentItemStrokeSharpness: "sharp",
+    currentItemRoundness: "round",
     currentItemStrokeStyle: "solid",
     currentItemStrokeWidth: 1,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
@@ -43,8 +43,9 @@ export const getDefaultAppState = (): Omit<
     editingLinearElement: null,
     activeTool: {
       type: "selection",
+      customType: null,
       locked: false,
-      lastActiveToolBeforeEraser: null,
+      lastActiveTool: null,
     },
     penMode: false,
     penDetected: false,
@@ -56,15 +57,18 @@ export const getDefaultAppState = (): Omit<
     fileHandle: null,
     gridSize: null,
     isBindingEnabled: true,
-    isLibraryOpen: false,
+    isSidebarDocked: false,
     isLoading: false,
     isResizing: false,
     isRotating: false,
     lastPointerDownWith: "mouse",
     multiElement: null,
     name: `${t("labels.untitled")}-${getDateTime()}`,
+    contextMenu: null,
     openMenu: null,
     openPopup: null,
+    openSidebar: null,
+    openDialog: null,
     pasteDialog: { shown: false, data: null },
     previousSelectedElementIds: {},
     resizingElement: null,
@@ -75,19 +79,19 @@ export const getDefaultAppState = (): Omit<
     selectedGroupIds: {},
     selectionElement: null,
     shouldCacheIgnoreZoom: false,
-    showHelpDialog: false,
     showStats: false,
     startBoundElement: null,
     suggestedBindings: [],
-    toastMessage: null,
+    toast: null,
     viewBackgroundColor: oc.white,
     zenModeEnabled: false,
     zoom: {
       value: 1 as NormalizedZoomValue,
     },
     viewModeEnabled: false,
-    pendingImageElement: null,
+    pendingImageElementId: null,
     showHyperlinkPopup: false,
+    selectedLinearElement: null,
   };
 };
 
@@ -107,6 +111,7 @@ const APP_STATE_STORAGE_CONF = (<
   T extends Record<keyof AppState, Values>,
 >(config: { [K in keyof T]: K extends keyof AppState ? T[K] : never }) =>
   config)({
+  showWelcomeScreen: { browser: true, export: false, server: false },
   theme: { browser: true, export: false, server: false },
   collaborators: { browser: false, export: false, server: false },
   currentChartType: { browser: true, export: false, server: false },
@@ -115,7 +120,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemFillStyle: { browser: true, export: false, server: false },
   currentItemFontFamily: { browser: true, export: false, server: false },
   currentItemFontSize: { browser: true, export: false, server: false },
-  currentItemLinearStrokeSharpness: {
+  currentItemRoundness: {
     browser: true,
     export: false,
     server: false,
@@ -124,7 +129,6 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemRoughness: { browser: true, export: false, server: false },
   currentItemStartArrowhead: { browser: true, export: false, server: false },
   currentItemStrokeColor: { browser: true, export: false, server: false },
-  currentItemStrokeSharpness: { browser: true, export: false, server: false },
   currentItemStrokeStyle: { browser: true, export: false, server: false },
   currentItemStrokeWidth: { browser: true, export: false, server: false },
   currentItemTextAlign: { browser: true, export: false, server: false },
@@ -145,7 +149,7 @@ const APP_STATE_STORAGE_CONF = (<
   gridSize: { browser: true, export: true, server: true },
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: false, export: false, server: false },
-  isLibraryOpen: { browser: false, export: false, server: false },
+  isSidebarDocked: { browser: true, export: false, server: false },
   isLoading: { browser: false, export: false, server: false },
   isResizing: { browser: false, export: false, server: false },
   isRotating: { browser: false, export: false, server: false },
@@ -154,8 +158,11 @@ const APP_STATE_STORAGE_CONF = (<
   name: { browser: true, export: false, server: false },
   offsetLeft: { browser: false, export: false, server: false },
   offsetTop: { browser: false, export: false, server: false },
+  contextMenu: { browser: false, export: false, server: false },
   openMenu: { browser: true, export: false, server: false },
   openPopup: { browser: false, export: false, server: false },
+  openSidebar: { browser: true, export: false, server: false },
+  openDialog: { browser: false, export: false, server: false },
   pasteDialog: { browser: false, export: false, server: false },
   previousSelectedElementIds: { browser: true, export: false, server: false },
   resizingElement: { browser: false, export: false, server: false },
@@ -166,18 +173,18 @@ const APP_STATE_STORAGE_CONF = (<
   selectedGroupIds: { browser: true, export: false, server: false },
   selectionElement: { browser: false, export: false, server: false },
   shouldCacheIgnoreZoom: { browser: true, export: false, server: false },
-  showHelpDialog: { browser: false, export: false, server: false },
   showStats: { browser: true, export: false, server: false },
   startBoundElement: { browser: false, export: false, server: false },
   suggestedBindings: { browser: false, export: false, server: false },
-  toastMessage: { browser: false, export: false, server: false },
+  toast: { browser: false, export: false, server: false },
   viewBackgroundColor: { browser: true, export: true, server: true },
   width: { browser: false, export: false, server: false },
   zenModeEnabled: { browser: true, export: false, server: false },
   zoom: { browser: true, export: false, server: false },
   viewModeEnabled: { browser: false, export: false, server: false },
-  pendingImageElement: { browser: false, export: false, server: false },
+  pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
+  selectedLinearElement: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <
@@ -221,3 +228,11 @@ export const isEraserActive = ({
 }: {
   activeTool: AppState["activeTool"];
 }) => activeTool.type === "eraser";
+
+export const isHandToolActive = ({
+  activeTool,
+}: {
+  activeTool: AppState["activeTool"];
+}) => {
+  return activeTool.type === "hand";
+};

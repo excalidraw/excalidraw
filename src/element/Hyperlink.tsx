@@ -10,7 +10,7 @@ import { NonDeletedExcalidrawElement } from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
-import { editIcon, link, trash } from "../components/icons";
+import { FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
 import { t } from "../i18n";
 import {
   useCallback,
@@ -32,6 +32,7 @@ import { getElementAbsoluteCoords } from "./";
 
 import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
+import { useExcalidrawAppState } from "../components/App";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -48,15 +49,15 @@ let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
 
 export const Hyperlink = ({
   element,
-  appState,
   setAppState,
   onLinkOpen,
 }: {
   element: NonDeletedExcalidrawElement;
-  appState: AppState;
   setAppState: React.Component<any, AppState>["setState"];
   onLinkOpen: ExcalidrawProps["onLinkOpen"];
 }) => {
+  const appState = useExcalidrawAppState();
+
   const linkVal = element.link || "";
 
   const [inputVal, setInputVal] = useState(linkVal);
@@ -196,7 +197,7 @@ export const Hyperlink = ({
             label={t("buttons.edit")}
             onClick={onEdit}
             className="excalidraw-hyperlinkContainer--edit"
-            icon={editIcon}
+            icon={FreedrawIcon}
           />
         )}
 
@@ -208,7 +209,7 @@ export const Hyperlink = ({
             label={t("buttons.remove")}
             onClick={handleRemove}
             className="excalidraw-hyperlinkContainer--remove"
-            icon={trash}
+            icon={TrashIcon}
           />
         )}
       </div>
@@ -266,7 +267,7 @@ export const actionLink = register({
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
   contextItemLabel: (elements, appState) =>
     getContextMenuLabel(elements, appState),
-  contextItemPredicate: (elements, appState) => {
+  predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
     return selectedElements.length === 1;
   },
@@ -276,7 +277,7 @@ export const actionLink = register({
     return (
       <ToolButton
         type="button"
-        icon={link}
+        icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
         title={`${t("labels.link.label")} - ${getShortcutKey("CtrlOrCmd+K")}`}
         onClick={() => updateData(null)}

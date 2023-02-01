@@ -91,9 +91,15 @@
   }
 
   button.ExportDialog-imageExportButton {
+    border: 0;
+
     width: 5rem;
     height: 5rem;
     margin: 0 0.2em;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     border-radius: 1rem;
     background-color: var(--button-color);

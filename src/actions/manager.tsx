@@ -9,7 +9,6 @@ import {
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
-import { MODES } from "../constants";
 import { trackEvent } from "../analytics";
 
 const trackAction = (
@@ -30,7 +29,7 @@ const trackAction = (
           trackEvent(
             action.trackEvent.category,
             action.trackEvent.action || action.name,
-            `${source} (${app.deviceType.isMobile ? "mobile" : "desktop"})`,
+            `${source} (${app.device.isMobile ? "mobile" : "desktop"})`,
           );
         }
       }
@@ -103,11 +102,8 @@ export class ActionManager {
 
     const action = data[0];
 
-    const { viewModeEnabled } = this.getAppState();
-    if (viewModeEnabled) {
-      if (!Object.values(MODES).includes(data[0].name)) {
-        return false;
-      }
+    if (this.getAppState().viewModeEnabled && action.viewMode !== true) {
+      return false;
     }
 
     const elements = this.getElementsIncludingDeleted();
@@ -147,6 +143,7 @@ export class ActionManager {
     ) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
+      PanelComponent.displayName = "PanelComponent";
       const elements = this.getElementsIncludingDeleted();
       const appState = this.getAppState();
       const updateData = (formState?: any) => {
@@ -174,5 +171,15 @@ export class ActionManager {
     }
 
     return null;
+  };
+
+  isActionEnabled = (action: Action) => {
+    const elements = this.getElementsIncludingDeleted();
+    const appState = this.getAppState();
+
+    return (
+      !action.predicate ||
+      action.predicate(elements, appState, this.app.props, this.app)
+    );
   };
 }

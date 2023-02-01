@@ -6,6 +6,7 @@ import {
   RenderResult,
   RenderOptions,
   waitFor,
+  fireEvent,
 } from "@testing-library/react";
 
 import * as toolQueries from "./queries/toolQueries";
@@ -15,8 +16,6 @@ import { STORAGE_KEYS } from "../excalidraw-app/app_constants";
 import { SceneData } from "../types";
 import { getSelectedElements } from "../scene/selection";
 import { ExcalidrawElement } from "../element/types";
-
-require("fake-indexeddb/auto");
 
 const customQueries = {
   ...queries,
@@ -110,9 +109,18 @@ export const updateSceneData = (data: SceneData) => {
 const originalGetBoundingClientRect =
   global.window.HTMLDivElement.prototype.getBoundingClientRect;
 
-export const mockBoundingClientRect = () => {
-  // override getBoundingClientRect as by default it will always return all values as 0 even if customized in html
-  global.window.HTMLDivElement.prototype.getBoundingClientRect = () => ({
+export const mockBoundingClientRect = (
+  {
+    top = 0,
+    left = 0,
+    bottom = 0,
+    right = 0,
+    width = 1920,
+    height = 1080,
+    x = 0,
+    y = 0,
+    toJSON = () => {},
+  } = {
     top: 10,
     left: 20,
     bottom: 10,
@@ -121,8 +129,37 @@ export const mockBoundingClientRect = () => {
     x: 10,
     y: 20,
     height: 100,
-    toJSON: () => {},
+  },
+) => {
+  // override getBoundingClientRect as by default it will always return all values as 0 even if customized in html
+  global.window.HTMLDivElement.prototype.getBoundingClientRect = () => ({
+    top,
+    left,
+    bottom,
+    right,
+    width,
+    height,
+    x,
+    y,
+    toJSON,
   });
+};
+
+export const withExcalidrawDimensions = async (
+  dimensions: { width: number; height: number },
+  cb: () => void,
+) => {
+  mockBoundingClientRect(dimensions);
+  // @ts-ignore
+  window.h.app.refreshDeviceState(h.app.excalidrawContainerRef.current!);
+  window.h.app.refresh();
+
+  await cb();
+
+  restoreOriginalGetBoundingClientRect();
+  // @ts-ignore
+  window.h.app.refreshDeviceState(h.app.excalidrawContainerRef.current!);
+  window.h.app.refresh();
 };
 
 export const restoreOriginalGetBoundingClientRect = () => {
@@ -147,4 +184,9 @@ export const assertSelectedElements = (
     .map((item) => (typeof item === "string" ? item : item.id));
   expect(selectedElementIds.length).toBe(ids.length);
   expect(selectedElementIds).toEqual(expect.arrayContaining(ids));
+};
+
+export const toggleMenu = (container: HTMLElement) => {
+  // open menu
+  fireEvent.click(container.querySelector(".dropdown-menu-button")!);
 };

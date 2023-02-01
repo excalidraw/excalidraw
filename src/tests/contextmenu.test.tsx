@@ -14,7 +14,7 @@ import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { CODES } from "../keys";
+import { KEYS } from "../keys";
 import { ShortcutName } from "../actions/shortcuts";
 import { copiedStyles } from "../actions/actionStyles";
 import { API } from "./helpers/api";
@@ -240,7 +240,7 @@ describe("contextMenu element", () => {
     });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     fireEvent.contextMenu(GlobalTestState.canvas, {
@@ -289,7 +289,7 @@ describe("contextMenu element", () => {
     expect(copiedStyles).toBe("{}");
     fireEvent.click(queryByText(contextMenu as HTMLElement, "Copy styles")!);
     expect(copiedStyles).not.toBe("{}");
-    const element = JSON.parse(copiedStyles);
+    const element = JSON.parse(copiedStyles)[0];
     expect(element).toEqual(API.getSelectedElement());
   });
 
@@ -329,7 +329,7 @@ describe("contextMenu element", () => {
     });
     let contextMenu = UI.queryContextMenu();
     fireEvent.click(queryByText(contextMenu as HTMLElement, "Copy styles")!);
-    const secondRect = JSON.parse(copiedStyles);
+    const secondRect = JSON.parse(copiedStyles)[0];
     expect(secondRect.id).toBe(h.elements[1].id);
 
     mouse.reset();
@@ -537,7 +537,7 @@ describe("contextMenu element", () => {
     });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     fireEvent.contextMenu(GlobalTestState.canvas, {

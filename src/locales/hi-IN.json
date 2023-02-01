@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "चिपकाएँ",
+    "pasteAsPlaintext": "सादे पाठ के रूप में चिपकाएं",
     "pasteCharts": "चार्ट चिपकाएँ",
     "selectAll": "सभी चुनें",
     "multiSelect": "आकार को चयन में जोड़ें",
@@ -52,7 +53,7 @@
     "large": "बड़ा",
     "veryLarge": "बहुत बड़ा",
     "solid": "दृढ़",
-    "hachure": "हाचुरे",
+    "hachure": "हैशूर",
     "crossHatch": "क्रॉस हैच",
     "thin": "पतला",
     "bold": "मोटा",
@@ -71,7 +72,7 @@
     "layers": "परतें",
     "actions": "कार्रवाई",
     "language": "भाषा",
-    "liveCollaboration": "",
+    "liveCollaboration": "जीवंत सहयोग...",
     "duplicateSelection": "डुप्लिकेट",
     "untitled": "अशीर्षित",
     "name": "नाम",
@@ -101,7 +102,7 @@
     "toggleExportColorScheme": "",
     "share": "शेयर करें",
     "showStroke": "",
-    "showBackground": "",
+    "showBackground": "पृष्ठभूमि रंग वरक़ दिखाये",
     "toggleTheme": "",
     "personalLib": "",
     "excalidrawLib": "",
@@ -114,18 +115,29 @@
       "create": "",
       "label": ""
     },
+    "lineEditor": {
+      "edit": "रेखा संपादित करे",
+      "exit": "रेखा संपादक के बाहर"
+    },
     "elementLock": {
       "lock": "ताले में रखें",
       "unlock": "ताले से बाहर",
       "lockAll": "सब ताले के अंदर रखे",
       "unlockAll": "सब ताले के बाहर निकाले"
-    }
+    },
+    "statusPublished": "प्रकाशित",
+    "sidebarLock": "साइडबार खुला रखे."
+  },
+  "library": {
+    "noItems": "अभी तक कोई आइटम जोडा नहीं गया.",
+    "hint_emptyLibrary": "यहाँ जोड़ने के लिए पटल से एक वस्तु चुने, अथवा जन कोष से एक संग्रह नीचे स्थापित करें.",
+    "hint_emptyPrivateLibrary": "यहाँ जोड़ने के लिए पटल से एक वस्तु चुने."
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
     "exportJSON": "",
-    "exportImage": "",
-    "export": "निर्यात",
+    "exportImage": "प्रतिमा निर्यात करे...",
+    "export": "यंहा सुरक्षित करे...",
     "exportToPng": "पीएनजी के रूप में निर्यात करे",
     "exportToSvg": "Svg के रूप में निर्यात करे",
     "copyToClipboard": "क्लिपबोर्ड पर प्रतिलिपि बनाएँ",
@@ -133,7 +145,7 @@
     "scale": "पैमाना",
     "save": "",
     "saveAs": "सेव करे इस तरह",
-    "load": "लोड करें",
+    "load": "खोलें",
     "getShareableLink": "साझा करने योग्य लिंक प्राप्त करें",
     "close": "बंद करें",
     "selectLanguage": "भाषा चुनें",
@@ -154,11 +166,11 @@
     "zenMode": "ज़ेन मोड",
     "exitZenMode": "जेन मोड से बाहर निकलें",
     "cancel": "",
-    "clear": "",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "clear": "साफ़ करे",
+    "remove": "हटाएं",
+    "publishLibrary": "प्रकाशित करें",
+    "submit": "प्रस्तुत करे",
+    "confirm": "पुष्टि करें"
   },
   "alerts": {
     "clearReset": "इससे पूरा कैनवास साफ हो जाएगा। क्या आपको यकीन है?",
@@ -167,43 +179,45 @@
     "couldNotLoadInvalidFile": "अमान्य फ़ाइल लोड नहीं की जा सकी",
     "importBackendFailed": "बैकएंड से आयात करना विफल रहा।",
     "cannotExportEmptyCanvas": "खाली कैनवास निर्यात नहीं कर सकता।",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "क्लिपबोर्ड पर कॉपी नहीं किया जा सका",
     "decryptFailed": "डेटा को डिक्रिप्ट नहीं किया जा सका।",
     "uploadedSecurly": "अपलोड को एंड-टू-एंड एन्क्रिप्शन के साथ सुरक्षित किया गया है, जिसका मतलब है कि एक्सक्लूसिव सर्वर और थर्ड पार्टी कंटेंट नहीं पढ़ सकते हैं।",
     "loadSceneOverridePrompt": "लोड हो रहा है बाहरी ड्राइंग आपके मौजूदा सामग्री को बदल देगा। क्या आप जारी रखना चाहते हैं?",
-    "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "लाइब्रेरी लोड करने में त्रुटि",
-    "errorAddingToLibrary": "",
-    "errorRemovingFromLibrary": "",
+    "collabStopOverridePrompt": "चालू सत्र समाप्ति से आपका संग्रहित पूर्व स्थानीय अधिलेखन नष्ट होकर पुनः अधिलेखित होगा, क्या आपको यक़ीन हैं? ( यदी आपको पूर्व स्थापित अधिलेखन सुरक्षित चाहिये तो बस ब्राउज़र टैब बंद करे)",
+    "errorAddingToLibrary": "संग्रह में जोडा न जा सका",
+    "errorRemovingFromLibrary": "संग्रह से हटाया नहीं जा सका",
     "confirmAddLibrary": "लाइब्रेरी जोड़ें पुष्‍टि करें आकार संख्या",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "ऐसा लगता है कि इस छवि में कोई दृश्य डेटा नहीं है। क्या आपने निर्यात के दौरान दृश्य एम्बेडिंग अनुमतित की है?",
     "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है",
-    "invalidSceneUrl": "",
-    "resetLibrary": "",
-    "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "invalidSceneUrl": "दिये गये युआरेल से दृश्य आयात नहीं किया जा सका. यह या तो अनुचित है, या इसमें उचित Excalidraw JSON डेटा नहीं है।",
+    "resetLibrary": "यह पूरा संग्रह रिक्त करेगा. क्या आपको यक़ीन हैं?",
+    "removeItemsFromsLibrary": "{{count}} वस्तु(यें) संग्रह से हटायें?",
+    "invalidEncryptionKey": "कूटलेखन कुंजी 22 अक्षरों की होनी चाहिये, इसलिये जीवंत सहयोग अक्षम हैं"
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
-    "invalidSVGString": "",
-    "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे."
+    "unsupportedFileType": "असमर्थित फाइल प्रकार",
+    "imageInsertError": "छवि सम्मिलित नहीं की जा सकी. पुनः प्रयत्न करे...",
+    "fileTooBig": "फ़ाइल ज़रूरत से ज़्यादा बड़ी हैं. अधिकतम अनुमित परिमाण {{maxSize}} हैं",
+    "svgImageInsertError": "एसवीजी छवि सम्मिलित नहीं कर सके, एसवीजी रचना अनुचित हैं",
+    "invalidSVGString": "अनुचित SVG",
+    "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे.",
+    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका",
+    "collabSaveFailed": "किसी कारण वश अंदरूनी डेटाबेस में सहेजा नहीं जा सका। यदि समस्या बनी रहती है, तो किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।",
+    "collabSaveFailed_sizeExceeded": "लगता है कि पृष्ठ तल काफ़ी बड़ा है, इस्कारण अंदरूनी डेटाबेस में सहेजा नहीं जा सका। किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।"
   },
   "toolBar": {
     "selection": "चयन",
-    "image": "",
+    "image": "छवि सम्मिलित करें",
     "rectangle": "आयात",
     "diamond": "तिर्यग्वर्ग",
     "ellipse": "दीर्घवृत्त",
     "arrow": "तीर",
     "line": "रेखा",
-    "freedraw": "",
+    "freedraw": "चित्रांतित करे",
     "text": "पाठ",
     "library": "लाइब्रेरी",
     "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें",
-    "penMode": "",
+    "penMode": "पेन का मोड - स्पर्श टाले",
     "link": "",
     "eraser": "रबड़"
   },
@@ -224,7 +238,7 @@
     "resize": "आकार बदलते समय आप SHIFT को पकड़ कर अनुपात में कमी कर सकते हैं,\nकेंद्र से आकार बदलने के लिए ALT दबाए रखें",
     "resizeImage": "",
     "rotate": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को विवश कर सकते हैं",
-    "lineEditor_info": "बिंदुओं को संपादित करने के लिए Enter पर डबल-क्लिक करें या दबाएँ",
+    "lineEditor_info": "बिंदुओं को सम्पादित करने के लिए CtrlOrCmd को दबायें रखते हुये डबल क्लिक करे, अथवा CtrlOrCmd + Enter साथ दबाये",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -299,7 +313,9 @@
     "view": "दृश्य",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
     "zoomToSelection": "चयन तक ज़ूम करे",
-    "toggleElementLock": "ताले के अंदर/बाहर चुनाव"
+    "toggleElementLock": "ताले के अंदर/बाहर चुनाव",
+    "movePageUpDown": "पृष्ठ ऊपर/नीचे करे",
+    "movePageLeftRight": "पृष्ठ बायी/दायी तरफ करे"
   },
   "clearCanvasDialog": {
     "title": ""
@@ -323,16 +339,16 @@
     },
     "errors": {
       "required": "",
-      "website": ""
+      "website": "मान्य URL प्रविष्ट करें"
     },
     "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
+      "pre": "संग्रह सम्मिलित करने हेतु प्रस्तुत करें ",
+      "link": "सार्वजनिक संग्रहालय",
+      "post": "अन्य वक्तियों को उनके चित्रकारी में उपयोग के लिये"
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
+      "pre": "संग्रह को पहले स्वीकृति आवश्यक कृपया यह पढ़ें ",
+      "link": "दिशा-निर्देश",
       "post": ""
     },
     "noteLicense": {
@@ -341,7 +357,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": "टिप्पणी: कुछ चुने हुवे आइटम पहले ही प्रकाशित/प्रस्तुत किए जा चुके हैं। किसी प्रकाशित संग्रह को अद्यतन करते समय या पहले से प्रस्तुत आइटम को पुन्हा प्रस्तुत करते समय, आप बस उसे केवल अद्यतन करें ।"
   },
   "publishSuccessDialog": {
     "title": "",
@@ -379,7 +396,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": "एक अवयव के रूप में चिपकाने के लिए {{shortcut}} का उपयोग करें,\nया किसी मौजूदा पाठ संपादक में चिपकायें"
   },
   "colors": {
     "ffffff": "सफेद",
@@ -427,5 +445,18 @@
     "5c940d": "",
     "e67700": "पीला",
     "d9480f": "नारंगी"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

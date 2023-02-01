@@ -4,6 +4,7 @@ import {
   Arrowhead,
   ExcalidrawFreeDrawElement,
   NonDeleted,
+  ExcalidrawTextElementWithContainer,
 } from "./types";
 import { distance2d, rotate } from "../math";
 import rough from "roughjs/bin/rough";
@@ -13,27 +14,57 @@ import {
   getShapeForElement,
   generateRoughOptions,
 } from "../renderer/renderElement";
-import { isFreeDrawElement, isLinearElement } from "./typeChecks";
+import {
+  isArrowElement,
+  isFreeDrawElement,
+  isLinearElement,
+  isTextElement,
+} from "./typeChecks";
 import { rescalePoints } from "../points";
+import { getBoundTextElement, getContainerElement } from "./textElement";
+import { LinearElementEditor } from "./linearElementEditor";
 
 // x and y position of top left corner, x and y position of bottom right corner
 export type Bounds = readonly [number, number, number, number];
+type MaybeQuadraticSolution = [number | null, number | null] | false;
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
 export const getElementAbsoluteCoords = (
   element: ExcalidrawElement,
-): Bounds => {
+  includeBoundText: boolean = false,
+): [number, number, number, number, number, number] => {
   if (isFreeDrawElement(element)) {
     return getFreeDrawElementAbsoluteCoords(element);
   } else if (isLinearElement(element)) {
-    return getLinearElementAbsoluteCoords(element);
+    return LinearElementEditor.getElementAbsoluteCoords(
+      element,
+      includeBoundText,
+    );
+  } else if (isTextElement(element)) {
+    const container = getContainerElement(element);
+    if (isArrowElement(container)) {
+      const coords = LinearElementEditor.getBoundTextElementPosition(
+        container,
+        element as ExcalidrawTextElementWithContainer,
+      );
+      return [
+        coords.x,
+        coords.y,
+        coords.x + element.width,
+        coords.y + element.height,
+        coords.x + element.width / 2,
+        coords.y + element.height / 2,
+      ];
+    }
   }
   return [
     element.x,
     element.y,
     element.x + element.width,
     element.y + element.height,
+    element.x + element.width / 2,
+    element.y + element.height / 2,
   ];
 };
 
@@ -68,11 +99,102 @@ export const getCurvePathOps = (shape: Drawable): Op[] => {
   return shape.sets[0].ops;
 };
 
-const getMinMaxXYFromCurvePathOps = (
+// reference: https://eliot-jones.com/2019/12/cubic-bezier-curve-bounding-boxes
+const getBezierValueForT = (
+  t: number,
+  p0: number,
+  p1: number,
+  p2: number,
+  p3: number,
+) => {
+  const oneMinusT = 1 - t;
+  return (
+    Math.pow(oneMinusT, 3) * p0 +
+    3 * Math.pow(oneMinusT, 2) * t * p1 +
+    3 * oneMinusT * Math.pow(t, 2) * p2 +
+    Math.pow(t, 3) * p3
+  );
+};
+
+const solveQuadratic = (
+  p0: number,
+  p1: number,
+  p2: number,
+  p3: number,
+): MaybeQuadraticSolution => {
+  const i = p1 - p0;
+  const j = p2 - p1;
+  const k = p3 - p2;
+
+  const a = 3 * i - 6 * j + 3 * k;
+  const b = 6 * j - 6 * i;
+  const c = 3 * i;
+
+  const sqrtPart = b * b - 4 * a * c;
+  const hasSolution = sqrtPart >= 0;
+
+  if (!hasSolution) {
+    return false;
+  }
+
+  let s1 = null;
+  let s2 = null;
+
+  let t1 = Infinity;
+  let t2 = Infinity;
+
+  if (a === 0) {
+    t1 = t2 = -c / b;
+  } else {
+    t1 = (-b + Math.sqrt(sqrtPart)) / (2 * a);
+    t2 = (-b - Math.sqrt(sqrtPart)) / (2 * a);
+  }
+
+  if (t1 >= 0 && t1 <= 1) {
+    s1 = getBezierValueForT(t1, p0, p1, p2, p3);
+  }
+
+  if (t2 >= 0 && t2 <= 1) {
+    s2 = getBezierValueForT(t2, p0, p1, p2, p3);
+  }
+
+  return [s1, s2];
+};
+
+const getCubicBezierCurveBound = (
+  p0: Point,
+  p1: Point,
+  p2: Point,
+  p3: Point,
+): Bounds => {
+  const solX = solveQuadratic(p0[0], p1[0], p2[0], p3[0]);
+  const solY = solveQuadratic(p0[1], p1[1], p2[1], p3[1]);
+
+  let minX = Math.min(p0[0], p3[0]);
+  let maxX = Math.max(p0[0], p3[0]);
+
+  if (solX) {
+    const xs = solX.filter((x) => x !== null) as number[];
+    minX = Math.min(minX, ...xs);
+    maxX = Math.max(maxX, ...xs);
+  }
+
+  let minY = Math.min(p0[1], p3[1]);
+  let maxY = Math.max(p0[1], p3[1]);
+  if (solY) {
+    const ys = solY.filter((y) => y !== null) as number[];
+    minY = Math.min(minY, ...ys);
+    maxY = Math.max(maxY, ...ys);
+  }
+  return [minX, minY, maxX, maxY];
+};
+
+export const getMinMaxXYFromCurvePathOps = (
   ops: Op[],
   transformXY?: (x: number, y: number) => [number, number],
 ): [number, number, number, number] => {
   let currentP: Point = [0, 0];
+
   const { minX, minY, maxX, maxY } = ops.reduce(
     (limits, { op, data }) => {
       // There are only four operation types:
@@ -83,38 +205,29 @@ const getMinMaxXYFromCurvePathOps = (
         // move operation does not draw anything; so, it always
         // returns false
       } else if (op === "bcurveTo") {
-        // create points from bezier curve
-        // bezier curve stores data as a flattened array of three positions
-        // [x1, y1, x2, y2, x3, y3]
-        const p1 = [data[0], data[1]] as Point;
-        const p2 = [data[2], data[3]] as Point;
-        const p3 = [data[4], data[5]] as Point;
+        const _p1 = [data[0], data[1]] as Point;
+        const _p2 = [data[2], data[3]] as Point;
+        const _p3 = [data[4], data[5]] as Point;
 
-        const p0 = currentP;
-        currentP = p3;
+        const p1 = transformXY ? transformXY(..._p1) : _p1;
+        const p2 = transformXY ? transformXY(..._p2) : _p2;
+        const p3 = transformXY ? transformXY(..._p3) : _p3;
 
-        const equation = (t: number, idx: number) =>
-          Math.pow(1 - t, 3) * p3[idx] +
-          3 * t * Math.pow(1 - t, 2) * p2[idx] +
-          3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
-          p0[idx] * Math.pow(t, 3);
+        const p0 = transformXY ? transformXY(...currentP) : currentP;
+        currentP = _p3;
 
-        let t = 0;
-        while (t <= 1.0) {
-          let x = equation(t, 0);
-          let y = equation(t, 1);
-          if (transformXY) {
-            [x, y] = transformXY(x, y);
-          }
+        const [minX, minY, maxX, maxY] = getCubicBezierCurveBound(
+          p0,
+          p1,
+          p2,
+          p3,
+        );
 
-          limits.minY = Math.min(limits.minY, y);
-          limits.minX = Math.min(limits.minX, x);
+        limits.minX = Math.min(limits.minX, minX);
+        limits.minY = Math.min(limits.minY, minY);
 
-          limits.maxX = Math.max(limits.maxX, x);
-          limits.maxY = Math.max(limits.maxY, y);
-
-          t += 0.1;
-        }
+        limits.maxX = Math.max(limits.maxX, maxX);
+        limits.maxY = Math.max(limits.maxY, maxY);
       } else if (op === "lineTo") {
         // TODO: Implement this
       } else if (op === "qcurveTo") {
@@ -124,7 +237,6 @@ const getMinMaxXYFromCurvePathOps = (
     },
     { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
   );
-
   return [minX, minY, maxX, maxY];
 };
 
@@ -148,59 +260,13 @@ const getBoundsFromPoints = (
 
 const getFreeDrawElementAbsoluteCoords = (
   element: ExcalidrawFreeDrawElement,
-): [number, number, number, number] => {
+): [number, number, number, number, number, number] => {
   const [minX, minY, maxX, maxY] = getBoundsFromPoints(element.points);
-
-  return [
-    minX + element.x,
-    minY + element.y,
-    maxX + element.x,
-    maxY + element.y,
-  ];
-};
-
-const getLinearElementAbsoluteCoords = (
-  element: ExcalidrawLinearElement,
-): [number, number, number, number] => {
-  let coords: [number, number, number, number];
-
-  if (element.points.length < 2 || !getShapeForElement(element)) {
-    // XXX this is just a poor estimate and not very useful
-    const { minX, minY, maxX, maxY } = element.points.reduce(
-      (limits, [x, y]) => {
-        limits.minY = Math.min(limits.minY, y);
-        limits.minX = Math.min(limits.minX, x);
-
-        limits.maxX = Math.max(limits.maxX, x);
-        limits.maxY = Math.max(limits.maxY, y);
-
-        return limits;
-      },
-      { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
-    );
-    coords = [
-      minX + element.x,
-      minY + element.y,
-      maxX + element.x,
-      maxY + element.y,
-    ];
-  } else {
-    const shape = getShapeForElement(element)!;
-
-    // first element is always the curve
-    const ops = getCurvePathOps(shape[0]);
-
-    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
-
-    coords = [
-      minX + element.x,
-      minY + element.y,
-      maxX + element.x,
-      maxY + element.y,
-    ];
-  }
-
-  return coords;
+  const x1 = minX + element.x;
+  const y1 = minY + element.y;
+  const x2 = maxX + element.x;
+  const y2 = maxY + element.y;
+  return [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2];
 };
 
 export const getArrowheadPoints = (
@@ -305,35 +371,86 @@ export const getArrowheadPoints = (
   return [x2, y2, x3, y3, x4, y4];
 };
 
+const generateLinearElementShape = (
+  element: ExcalidrawLinearElement,
+): Drawable => {
+  const generator = rough.generator();
+  const options = generateRoughOptions(element);
+
+  const method = (() => {
+    if (element.roundness) {
+      return "curve";
+    }
+    if (options.fill) {
+      return "polygon";
+    }
+    return "linearPath";
+  })();
+
+  return generator[method](element.points as Mutable<Point>[], options);
+};
+
 const getLinearElementRotatedBounds = (
   element: ExcalidrawLinearElement,
   cx: number,
   cy: number,
 ): [number, number, number, number] => {
-  if (element.points.length < 2 || !getShapeForElement(element)) {
-    // XXX this is just a poor estimate and not very useful
-    const { minX, minY, maxX, maxY } = element.points.reduce(
-      (limits, [x, y]) => {
-        [x, y] = rotate(element.x + x, element.y + y, cx, cy, element.angle);
-        limits.minY = Math.min(limits.minY, y);
-        limits.minX = Math.min(limits.minX, x);
-        limits.maxX = Math.max(limits.maxX, x);
-        limits.maxY = Math.max(limits.maxY, y);
-        return limits;
-      },
-      { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
+  if (element.points.length < 2) {
+    const [pointX, pointY] = element.points[0];
+    const [x, y] = rotate(
+      element.x + pointX,
+      element.y + pointY,
+      cx,
+      cy,
+      element.angle,
     );
-    return [minX, minY, maxX, maxY];
+
+    let coords: [number, number, number, number] = [x, y, x, y];
+    const boundTextElement = getBoundTextElement(element);
+    if (boundTextElement) {
+      const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
+        element,
+        [x, y, x, y],
+        boundTextElement,
+      );
+      coords = [
+        coordsWithBoundText[0],
+        coordsWithBoundText[1],
+        coordsWithBoundText[2],
+        coordsWithBoundText[3],
+      ];
+    }
+    return coords;
   }
 
-  const shape = getShapeForElement(element)!;
-
   // first element is always the curve
-  const ops = getCurvePathOps(shape[0]);
-
+  const cachedShape = getShapeForElement(element)?.[0];
+  const shape = cachedShape ?? generateLinearElementShape(element);
+  const ops = getCurvePathOps(shape);
   const transformXY = (x: number, y: number) =>
     rotate(element.x + x, element.y + y, cx, cy, element.angle);
-  return getMinMaxXYFromCurvePathOps(ops, transformXY);
+  const res = getMinMaxXYFromCurvePathOps(ops, transformXY);
+  let coords: [number, number, number, number] = [
+    res[0],
+    res[1],
+    res[2],
+    res[3],
+  ];
+  const boundTextElement = getBoundTextElement(element);
+  if (boundTextElement) {
+    const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
+      element,
+      coords,
+      boundTextElement,
+    );
+    coords = [
+      coordsWithBoundText[0],
+      coordsWithBoundText[1],
+      coordsWithBoundText[2],
+      coordsWithBoundText[3],
+    ];
+  }
+  return coords;
 };
 
 // We could cache this stuff
@@ -342,9 +459,7 @@ export const getElementBounds = (
 ): [number, number, number, number] => {
   let bounds: [number, number, number, number];
 
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
   if (isFreeDrawElement(element)) {
     const [minX, minY, maxX, maxY] = getBoundsFromPoints(
       element.points.map(([x, y]) =>
@@ -420,6 +535,7 @@ export const getResizedElementAbsoluteCoords = (
   element: ExcalidrawElement,
   nextWidth: number,
   nextHeight: number,
+  normalizePoints: boolean,
 ): [number, number, number, number] => {
   if (!(isLinearElement(element) || isFreeDrawElement(element))) {
     return [
@@ -433,7 +549,8 @@ export const getResizedElementAbsoluteCoords = (
   const points = rescalePoints(
     0,
     nextWidth,
-    rescalePoints(1, nextHeight, element.points),
+    rescalePoints(1, nextHeight, element.points, normalizePoints),
+    normalizePoints,
   );
 
   let bounds: [number, number, number, number];
@@ -444,16 +561,13 @@ export const getResizedElementAbsoluteCoords = (
   } else {
     // Line
     const gen = rough.generator();
-    const curve =
-      element.strokeSharpness === "sharp"
-        ? gen.linearPath(
-            points as [number, number][],
-            generateRoughOptions(element),
-          )
-        : gen.curve(
-            points as [number, number][],
-            generateRoughOptions(element),
-          );
+    const curve = !element.roundness
+      ? gen.linearPath(
+          points as [number, number][],
+          generateRoughOptions(element),
+        )
+      : gen.curve(points as [number, number][], generateRoughOptions(element));
+
     const ops = getCurvePathOps(curve);
     bounds = getMinMaxXYFromCurvePathOps(ops);
   }
@@ -470,12 +584,11 @@ export const getResizedElementAbsoluteCoords = (
 export const getElementPointsCoords = (
   element: ExcalidrawLinearElement,
   points: readonly (readonly [number, number])[],
-  sharpness: ExcalidrawElement["strokeSharpness"],
 ): [number, number, number, number] => {
   // This might be computationally heavey
   const gen = rough.generator();
   const curve =
-    sharpness === "sharp"
+    element.roundness == null
       ? gen.linearPath(
           points as [number, number][],
           generateRoughOptions(element),

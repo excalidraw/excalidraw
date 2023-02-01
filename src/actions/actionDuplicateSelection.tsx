@@ -4,7 +4,6 @@ import { ExcalidrawElement } from "../element/types";
 import { duplicateElement, getNonDeletedElements } from "../element";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
-import { clone } from "../components/icons";
 import { t } from "../i18n";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -23,6 +22,7 @@ import {
 } from "../element/textElement";
 import { isBoundToContainer } from "../element/typeChecks";
 import { normalizeElementOrder } from "../element/sortElements";
+import { DuplicateIcon } from "../components/icons";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -53,7 +53,7 @@ export const actionDuplicateSelection = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"
-      icon={clone}
+      icon={DuplicateIcon}
       title={`${t("labels.duplicateSelection")} — ${getShortcutKey(
         "CtrlOrCmd+D",
       )}`}
@@ -149,12 +149,15 @@ const duplicateElements = (
       {
         ...appState,
         selectedGroupIds: {},
-        selectedElementIds: newElements.reduce((acc, element) => {
-          if (!isBoundToContainer(element)) {
-            acc[element.id] = true;
-          }
-          return acc;
-        }, {} as any),
+        selectedElementIds: newElements.reduce(
+          (acc: Record<ExcalidrawElement["id"], true>, element) => {
+            if (!isBoundToContainer(element)) {
+              acc[element.id] = true;
+            }
+            return acc;
+          },
+          {},
+        ),
       },
       getNonDeletedElements(finalElements),
     ),

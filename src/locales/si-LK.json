@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "අලවන්න",
+    "pasteAsPlaintext": "",
     "pasteCharts": "ප්‍රස්ථාරය",
     "selectAll": "සියල්ලම",
     "multiSelect": "තෝරා ගැනීමට අංගය එකතු කරන්න",
@@ -114,12 +115,23 @@
       "create": "",
       "label": ""
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "",
@@ -172,7 +184,6 @@
     "uploadedSecurly": "",
     "loadSceneOverridePrompt": "",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "",
@@ -189,7 +200,10 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": "",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "",
@@ -299,7 +313,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": "",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -341,7 +357,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
@@ -379,7 +396,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
@@ -427,5 +445,18 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

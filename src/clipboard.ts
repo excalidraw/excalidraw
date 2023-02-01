@@ -109,16 +109,16 @@ const parsePotentialSpreadsheet = (
  * Retrieves content from system clipboard (either from ClipboardEvent or
  *  via async clipboard API if supported)
  */
-const getSystemClipboard = async (
+export const getSystemClipboard = async (
   event: ClipboardEvent | null,
 ): Promise<string> => {
   try {
     const text = event
-      ? event.clipboardData?.getData("text/plain").trim()
+      ? event.clipboardData?.getData("text/plain")
       : probablySupportsClipboardReadText &&
         (await navigator.clipboard.readText());
 
-    return text || "";
+    return (text || "").trim();
   } catch {
     return "";
   }
@@ -129,19 +129,25 @@ const getSystemClipboard = async (
  */
 export const parseClipboard = async (
   event: ClipboardEvent | null,
+  isPlainPaste = false,
 ): Promise<ClipboardData> => {
   const systemClipboard = await getSystemClipboard(event);
 
   // if system clipboard empty, couldn't be resolved, or contains previously
   // copied excalidraw scene as SVG, fall back to previously copied excalidraw
   // elements
-  if (!systemClipboard || systemClipboard.includes(SVG_EXPORT_TAG)) {
+  if (
+    !systemClipboard ||
+    (!isPlainPaste && systemClipboard.includes(SVG_EXPORT_TAG))
+  ) {
     return getAppClipboard();
   }
 
   // if system clipboard contains spreadsheet, use it even though it's
   // technically possible it's staler than in-app clipboard
-  const spreadsheetResult = parsePotentialSpreadsheet(systemClipboard);
+  const spreadsheetResult =
+    !isPlainPaste && parsePotentialSpreadsheet(systemClipboard);
+
   if (spreadsheetResult) {
     return spreadsheetResult;
   }
@@ -154,30 +160,36 @@ export const parseClipboard = async (
       return {
         elements: systemClipboardData.elements,
         files: systemClipboardData.files,
+        text: isPlainPaste
+          ? JSON.stringify(systemClipboardData.elements, null, 2)
+          : undefined,
       };
     }
-    return appClipboardData;
-  } catch {
-    // system clipboard doesn't contain excalidraw elements → return plaintext
-    // unless we set a flag to prefer in-app clipboard because browser didn't
-    // support storing to system clipboard on copy
-    return PREFER_APP_CLIPBOARD && appClipboardData.elements
-      ? appClipboardData
-      : { text: systemClipboard };
-  }
+  } catch (e) {}
+  // system clipboard doesn't contain excalidraw elements → return plaintext
+  // unless we set a flag to prefer in-app clipboard because browser didn't
+  // support storing to system clipboard on copy
+  return PREFER_APP_CLIPBOARD && appClipboardData.elements
+    ? {
+        ...appClipboardData,
+        text: isPlainPaste
+          ? JSON.stringify(appClipboardData.elements, null, 2)
+          : undefined,
+      }
+    : { text: systemClipboard };
 };
 
 export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
-  let promise;
   try {
     // in Safari so far we need to construct the ClipboardItem synchronously
     // (i.e. in the same tick) otherwise browser will complain for lack of
     // user intent. Using a Promise ClipboardItem constructor solves this.
     // https://bugs.webkit.org/show_bug.cgi?id=222262
     //
-    // not await so that we can detect whether the thrown error likely relates
-    // to a lack of support for the Promise ClipboardItem constructor
-    promise = navigator.clipboard.write([
+    // Note that Firefox (and potentially others) seems to support Promise
+    // ClipboardItem constructor, but throws on an unrelated MIME type error.
+    // So we need to await this and fallback to awaiting the blob if applicable.
+    await navigator.clipboard.write([
       new window.ClipboardItem({
         [MIME_TYPES.png]: blob,
       }),
@@ -195,7 +207,6 @@ export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
       throw error;
     }
   }
-  await promise;
 };
 
 export const copyTextToSystemClipboard = async (text: string | null) => {

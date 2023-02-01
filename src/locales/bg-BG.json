@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Постави",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Постави графики",
     "selectAll": "Маркирай всичко",
     "multiSelect": "Добави елемент към селекция",
@@ -114,18 +115,29 @@
       "create": "",
       "label": ""
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
     "exportJSON": "",
-    "exportImage": "Запиши като изображение",
-    "export": "Експортиране",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Изнасяне в PNG",
     "exportToSvg": "Изнасяне в SVG",
     "copyToClipboard": "Копиране в клипборда",
@@ -133,7 +145,7 @@
     "scale": "Мащаб",
     "save": "",
     "saveAs": "Запиши като",
-    "load": "Зареждане",
+    "load": "",
     "getShareableLink": "Получаване на връзка за споделяне",
     "close": "Затвори",
     "selectLanguage": "Избор на език",
@@ -172,7 +184,6 @@
     "uploadedSecurly": "Качването е защитено с криптиране от край до край, което означава, че сървърът Excalidraw и трети страни не могат да четат съдържанието.",
     "loadSceneOverridePrompt": "Зареждането на външна рисунка ще презапише настоящото ви съдържание. Желаете ли да продължите?",
     "collabStopOverridePrompt": "Прекратяването на сесията ще презапише предишната, локално запазена, рисунка. Сигурни ли сте?\n\n(Ако искате да продължите с локалната рисунка, просто затворете таба на браузъра.)",
-    "errorLoadingLibrary": "Възникна грешка при зареждането на външна библиотека.",
     "errorAddingToLibrary": "",
     "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "Ще се добавят {{numShapes}} фигура(и) във вашата библиотека. Сигурни ли сте?",
@@ -189,7 +200,10 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": "",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Селекция",
@@ -224,7 +238,7 @@
     "resize": "Може да ограничите при преоразмеряване като задържите SHIFT,\nзадръжте ALT за преоразмерите през центъра",
     "resizeImage": "",
     "rotate": "Можете да ограничите ъглите, като държите SHIFT, докато се въртите",
-    "lineEditor_info": "Кликнете два пъти или натиснете Enter за да промените точките",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Натиснете Delete за да изтриете точка(и), CtrlOrCmd+D за дуплициране, или извлачете за да преместите",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -299,7 +313,9 @@
     "view": "Преглед",
     "zoomToFit": "Приближи докато се виждат всички елементи",
     "zoomToSelection": "Приближи селекцията",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -341,7 +357,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
@@ -379,7 +396,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
@@ -427,5 +445,18 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

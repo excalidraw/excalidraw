@@ -17,16 +17,19 @@ export const actionToggleLock = register({
 
     const operation = getOperation(selectedElements);
     const selectedElementsMap = arrayToMap(selectedElements);
-
+    const lock = operation === "lock";
     return {
       elements: elements.map((element) => {
         if (!selectedElementsMap.has(element.id)) {
           return element;
         }
 
-        return newElementWith(element, { locked: operation === "lock" });
+        return newElementWith(element, { locked: lock });
       }),
-      appState,
+      appState: {
+        ...appState,
+        selectedLinearElement: lock ? null : appState.selectedLinearElement,
+      },
       commitToHistory: true,
     };
   },
@@ -38,15 +41,9 @@ export const actionToggleLock = register({
         : "labels.elementLock.lock";
     }
 
-    if (selected.length > 1) {
-      return getOperation(selected) === "lock"
-        ? "labels.elementLock.lockAll"
-        : "labels.elementLock.unlockAll";
-    }
-
-    throw new Error(
-      "Unexpected zero elements to lock/unlock. This should never happen.",
-    );
+    return getOperation(selected) === "lock"
+      ? "labels.elementLock.lockAll"
+      : "labels.elementLock.unlockAll";
   },
   keyTest: (event, appState, elements) => {
     return (

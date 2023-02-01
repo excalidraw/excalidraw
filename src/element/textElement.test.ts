@@ -1,8 +1,30 @@
-import { wrapText } from "./textElement";
+import { BOUND_TEXT_PADDING } from "../constants";
+import { measureText, wrapText } from "./textElement";
 import { FontString } from "./types";
 
 describe("Test wrapText", () => {
   const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
+
+  it("shouldn't add new lines for trailing spaces", () => {
+    const text = "Hello whats up     ";
+    const maxWidth = 200 - BOUND_TEXT_PADDING * 2;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("Hello whats up    ");
+  });
+
+  it("should work with emojis", () => {
+    const text = "😀";
+    const maxWidth = 1;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("😀");
+  });
+
+  it("should show the text correctly when min width reached", () => {
+    const text = "Hello😀";
+    const maxWidth = 10;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("H\ne\nl\nl\no\n😀");
+  });
 
   describe("When text doesn't contain new lines", () => {
     const text = "Hello whats up";
@@ -45,7 +67,7 @@ up`,
       },
     ].forEach((data) => {
       it(`should ${data.desc}`, () => {
-        const res = wrapText(text, font, data.width);
+        const res = wrapText(text, font, data.width - BOUND_TEXT_PADDING * 2);
         expect(res).toEqual(data.res);
       });
     });
@@ -93,7 +115,7 @@ whats up`,
       },
     ].forEach((data) => {
       it(`should respect new lines and ${data.desc}`, () => {
-        const res = wrapText(text, font, data.width);
+        const res = wrapText(text, font, data.width - BOUND_TEXT_PADDING * 2);
         expect(res).toEqual(data.res);
       });
     });
@@ -132,9 +154,43 @@ break it now`,
       },
     ].forEach((data) => {
       it(`should ${data.desc}`, () => {
-        const res = wrapText(text, font, data.width);
+        const res = wrapText(text, font, data.width - BOUND_TEXT_PADDING * 2);
         expect(res).toEqual(data.res);
       });
     });
+  });
+});
+
+describe("Test measureText", () => {
+  const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
+  const text = "Hello World";
+
+  it("should add correct attributes when maxWidth is passed", () => {
+    const maxWidth = 200 - BOUND_TEXT_PADDING * 2;
+    const res = measureText(text, font, maxWidth);
+
+    expect(res.container).toMatchInlineSnapshot(`
+      <div
+        style="position: absolute; white-space: pre-wrap; font: Emoji 20px 20px; min-height: 1em; max-width: 191px; overflow: hidden; word-break: break-word; line-height: 0px;"
+      >
+        <span
+          style="display: inline-block; overflow: hidden; width: 1px; height: 1px;"
+        />
+      </div>
+    `);
+  });
+
+  it("should add correct attributes when maxWidth is not passed", () => {
+    const res = measureText(text, font);
+
+    expect(res.container).toMatchInlineSnapshot(`
+      <div
+        style="position: absolute; white-space: pre; font: Emoji 20px 20px; min-height: 1em;"
+      >
+        <span
+          style="display: inline-block; overflow: hidden; width: 1px; height: 1px;"
+        />
+      </div>
+    `);
   });
 });

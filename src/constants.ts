@@ -2,6 +2,14 @@ import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
 import { FontFamilyValues } from "./element/types";
 
+export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+export const isWindows = /^Win/.test(navigator.platform);
+export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
+export const isFirefox =
+  "netscape" in window &&
+  navigator.userAgent.indexOf("rv:") > 1 &&
+  navigator.userAgent.indexOf("Gecko") > 1;
+
 export const APP_NAME = "Excalidraw";
 
 export const DRAGGING_THRESHOLD = 10; // px
@@ -54,6 +62,7 @@ export enum EVENT {
   SCROLL = "scroll",
   // custom events
   EXCALIDRAW_LINK = "excalidraw-link",
+  MENU_ITEM_SELECT = "menu.itemSelect",
 }
 
 export const ENV = {
@@ -99,6 +108,9 @@ export const MIME_TYPES = {
   "excalidraw.png": "image/png",
   jpg: "image/jpeg",
   gif: "image/gif",
+  webp: "image/webp",
+  bmp: "image/bmp",
+  ico: "image/x-icon",
   binary: "application/octet-stream",
 } as const;
 
@@ -116,22 +128,16 @@ export const IMAGE_RENDER_TIMEOUT = 500;
 export const TAP_TWICE_TIMEOUT = 300;
 export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
-export const TOAST_TIMEOUT = 5000;
 export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
 export const ZOOM_STEP = 0.1;
+export const MIN_ZOOM = 0.1;
 export const HYPERLINK_TOOLTIP_DELAY = 300;
 
 // Report a user inactive after IDLE_THRESHOLD milliseconds
 export const IDLE_THRESHOLD = 60_000;
 // Report a user active each ACTIVE_THRESHOLD milliseconds
 export const ACTIVE_THRESHOLD = 3_000;
-
-export const MODES = {
-  VIEW: "viewMode",
-  ZEN: "zenMode",
-  GRID: "gridMode",
-};
 
 export const THEME_FILTER = cssVariables.themeFilter;
 
@@ -150,14 +156,24 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     export: { saveFileToDisk: true },
     loadScene: true,
     saveToActiveFile: true,
-    theme: true,
+    toggleTheme: null,
     saveAsImage: true,
   },
 };
 
+// breakpoints
+// -----------------------------------------------------------------------------
+// sm screen
+export const MQ_SM_MAX_WIDTH = 640;
+// md screen
 export const MQ_MAX_WIDTH_PORTRAIT = 730;
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
 export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
+// sidebar
+export const MQ_RIGHT_SIDEBAR_MIN_WIDTH = 1229;
+// -----------------------------------------------------------------------------
+
+export const LIBRARY_SIDEBAR_WIDTH = parseInt(cssVariables.rightSidebarWidth);
 
 export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 
@@ -171,6 +187,9 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
   MIME_TYPES.jpg,
   MIME_TYPES.svg,
   MIME_TYPES.gif,
+  MIME_TYPES.webp,
+  MIME_TYPES.bmp,
+  MIME_TYPES.ico,
 ] as const;
 
 export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
@@ -192,4 +211,40 @@ export const VERTICAL_ALIGN = {
   BOTTOM: "bottom",
 };
 
+export const TEXT_ALIGN = {
+  LEFT: "left",
+  CENTER: "center",
+  RIGHT: "right",
+};
+
 export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
+
+// Radius represented as 25% of element's largest side (width/height).
+// Used for LEGACY and PROPORTIONAL_RADIUS algorithms, or when the element is
+// below the cutoff size.
+export const DEFAULT_PROPORTIONAL_RADIUS = 0.25;
+// Fixed radius for the ADAPTIVE_RADIUS algorithm. In pixels.
+export const DEFAULT_ADAPTIVE_RADIUS = 32;
+// roundness type (algorithm)
+export const ROUNDNESS = {
+  // Used for legacy rounding (rectangles), which currently works the same
+  // as PROPORTIONAL_RADIUS, but we need to differentiate for UI purposes and
+  // forwards-compat.
+  LEGACY: 1,
+
+  // Used for linear elements & diamonds
+  PROPORTIONAL_RADIUS: 2,
+
+  // Current default algorithm for rectangles, using fixed pixel radius.
+  // It's working similarly to a regular border-radius, but attemps to make
+  // radius visually similar across differnt element sizes, especially
+  // very large and very small elements.
+  //
+  // NOTE right now we don't allow configuration and use a constant radius
+  // (see DEFAULT_ADAPTIVE_RADIUS constant)
+  ADAPTIVE_RADIUS: 3,
+} as const;
+
+/** key containt id of precedeing elemnt id we use in reconciliation during
+ * collaboration */
+export const PRECEDING_ELEMENT_KEY = "__precedingElement__";

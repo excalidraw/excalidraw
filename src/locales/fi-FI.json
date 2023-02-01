@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Liitä",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Liitä kaaviot",
     "selectAll": "Valitse kaikki",
     "multiSelect": "Lisää kohde valintaan",
@@ -71,7 +72,7 @@
     "layers": "Tasot",
     "actions": "Toiminnot",
     "language": "Kieli",
-    "liveCollaboration": "Live-yhteistyö",
+    "liveCollaboration": "",
     "duplicateSelection": "Monista",
     "untitled": "Nimetön",
     "name": "Nimi",
@@ -114,18 +115,29 @@
       "create": "Luo linkki",
       "label": "Linkki"
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": "Julkaistu",
+    "sidebarLock": "Pidä sivupalkki avoinna"
+  },
+  "library": {
+    "noItems": "Kirjastossa ei ole vielä yhtään kohdetta...",
+    "hint_emptyLibrary": "Valitse lisättävä kohde piirtoalueelta, tai asenna alta julkinen kirjasto.",
+    "hint_emptyPrivateLibrary": "Valitse lisättävä kohde piirtoalueelta."
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
     "exportJSON": "Vie tiedostoon",
-    "exportImage": "Tallenna kuvana",
-    "export": "Vie",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Vie PNG-tiedostona",
     "exportToSvg": "Vie SVG-tiedostona",
     "copyToClipboard": "Kopioi leikepöydälle",
@@ -133,7 +145,7 @@
     "scale": "Koko",
     "save": "Tallenna nykyiseen tiedostoon",
     "saveAs": "Tallenna nimellä",
-    "load": "Avaa",
+    "load": "",
     "getShareableLink": "Hae jaettava linkki",
     "close": "Sulje",
     "selectLanguage": "Valitse kieli",
@@ -172,7 +184,6 @@
     "uploadedSecurly": "Lähetys on turvattu päästä-päähän-salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä.",
     "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Jatketaanko?",
     "collabStopOverridePrompt": "Istunnon lopettaminen korvaa aiemman, paikallisesti tallennetun piirustuksen. Jatketaanko?\n\n(Jos haluat säilyttää paikallisesti tallennetun piirustuksen, sulje selaimen välilehti lopettamisen sijaan.)",
-    "errorLoadingLibrary": "Virhe ladattaessa kolmannen osapuolen kirjastoa.",
     "errorAddingToLibrary": "Kohdetta ei voitu lisätä kirjastoon",
     "errorRemovingFromLibrary": "Kohdetta ei voitu poistaa kirjastosta",
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Jatketaanko?",
@@ -189,7 +200,10 @@
     "fileTooBig": "Tiedosto on liian suuri. Suurin sallittu koko on {{maxSize}}.",
     "svgImageInsertError": "SVG- kuvaa ei voitu lisätä. Tiedoston SVG-sisältö näyttää virheelliseltä.",
     "invalidSVGString": "Virheellinen SVG.",
-    "cannotResolveCollabServer": "Yhteyden muodostaminen collab-palvelimeen epäonnistui. Virkistä sivu ja yritä uudelleen."
+    "cannotResolveCollabServer": "Yhteyden muodostaminen collab-palvelimeen epäonnistui. Virkistä sivu ja yritä uudelleen.",
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Valinta",
@@ -203,7 +217,7 @@
     "text": "Teksti",
     "library": "Kirjasto",
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen",
-    "penMode": "Estä nipistyszoomaus ja vastaanota ainoastaan kynällä piirretty",
+    "penMode": "",
     "link": "Lisää/päivitä linkki valitulle muodolle",
     "eraser": "Poistotyökalu"
   },
@@ -224,7 +238,7 @@
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT-näppäintä alaspainettuna kun muutat kokoa, pidä ALT-näppäintä alaspainettuna muuttaaksesi kokoa keskipisteen suhteen",
     "resizeImage": "Voit muuttaa kokoa vapaasti pitämällä SHIFTiä pohjassa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen ympäri",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
-    "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Poista piste(et) painamalla delete, monista painamalla CtrlOrCmd+D, tai liikuta raahaamalla",
     "lineEditor_nothingSelected": "Valitse muokattava piste (monivalinta pitämällä SHIFT pohjassa), tai paina Alt ja klikkaa lisätäksesi uusia pisteitä",
     "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
@@ -299,7 +313,9 @@
     "view": "Näkymä",
     "zoomToFit": "Näytä kaikki elementit",
     "zoomToSelection": "Näytä valinta",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Pyyhi piirtoalue"
@@ -341,7 +357,8 @@
       "post": "alla, mikä lyhyesti antaa muiden käyttää sitä ilman rajoituksia."
     },
     "noteItems": "Jokaisella kirjaston kohteella on oltava oma nimensä suodatusta varten. Seuraavat kirjaston kohteet sisältyvät:",
-    "atleastOneLibItem": "Valitse vähintään yksi kirjaston kohde aloittaaksesi"
+    "atleastOneLibItem": "Valitse vähintään yksi kirjaston kohde aloittaaksesi",
+    "republishWarning": "Huom! Osa valituista kohteista on merkitty jo julkaistu/lähetetyiksi. Lähetä kohteita uudelleen vain päivitettäessä olemassa olevaa kirjastoa tai ehdotusta."
   },
   "publishSuccessDialog": {
     "title": "Kirjasto lähetetty",
@@ -379,7 +396,8 @@
     "fileSaved": "Tiedosto tallennettu.",
     "fileSavedToFilename": "Tallennettiin kohteeseen {filename}",
     "canvas": "piirtoalue",
-    "selection": "valinta"
+    "selection": "valinta",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Valkoinen",
@@ -427,5 +445,18 @@
     "5c940d": "Limenvihreä 9",
     "e67700": "Keltainen 9",
     "d9480f": "Oranssi 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

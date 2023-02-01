@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Wklej",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Wklej wykresy",
     "selectAll": "Zaznacz wszystko",
     "multiSelect": "Dodaj element do zaznaczenia",
@@ -9,7 +10,7 @@
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "copyAsSvg": "Skopiuj do schowka jako plik SVG",
-    "copyText": "",
+    "copyText": "Skopiuj do schowka jako tekst",
     "bringForward": "Przenieś wyżej",
     "sendToBack": "Przenieś na spód",
     "bringToFront": "Przenieś na wierzch",
@@ -71,7 +72,7 @@
     "layers": "Warstwy",
     "actions": "Akcje",
     "language": "Język",
-    "liveCollaboration": "Współpraca na żywo",
+    "liveCollaboration": "",
     "duplicateSelection": "Powiel",
     "untitled": "Bez tytułu",
     "name": "Nazwa",
@@ -114,18 +115,29 @@
       "create": "",
       "label": ""
     },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
       "lockAll": "",
       "unlockAll": ""
-    }
+    },
+    "statusPublished": "",
+    "sidebarLock": ""
+  },
+  "library": {
+    "noItems": "",
+    "hint_emptyLibrary": "",
+    "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
     "exportJSON": "Eksportuj do pliku",
-    "exportImage": "Zapisz jako obraz",
-    "export": "Zapisz jako",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Zapisz jako PNG",
     "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
@@ -133,7 +145,7 @@
     "scale": "Skala",
     "save": "",
     "saveAs": "Zapisz jako",
-    "load": "Otwórz",
+    "load": "",
     "getShareableLink": "Udostępnij",
     "close": "Zamknij",
     "selectLanguage": "Wybierz język",
@@ -172,7 +184,6 @@
     "uploadedSecurly": "By zapewnić Ci prywatność, udostępnianie projektu jest zabezpieczone szyfrowaniem end-to-end, co oznacza, że poza tobą i osobą z którą podzielisz się linkiem, nikt nie ma dostępu do tego co udostępniasz.",
     "loadSceneOverridePrompt": "Wczytanie zewnętrznego rysunku zastąpi istniejącą zawartość. Czy chcesz kontynuować?",
     "collabStopOverridePrompt": "Zatrzymanie sesji nadpisze poprzedni, zapisany lokalnie rysunk. Jesteś pewien?\n\n(Jeśli chcesz zachować swój lokalny rysunek, po prostu zamknij zakładkę przeglądarki.)",
-    "errorLoadingLibrary": "Wystąpił błąd podczas wczytywania zewnętrznej biblioteki.",
     "errorAddingToLibrary": "Nie udało się dodać elementu do biblioteki",
     "errorRemovingFromLibrary": "Nie udało się usunąć elementu z biblioteki",
     "confirmAddLibrary": "To doda {{numShapes}} kształtów do twojej biblioteki. Jesteś pewien?",
@@ -189,7 +200,10 @@
     "fileTooBig": "Plik jest zbyt duży. Maksymalny dozwolony rozmiar to {{maxSize}}.",
     "svgImageInsertError": "Nie udało się wstawić obrazu SVG. Znacznik SVG wygląda na nieprawidłowy.",
     "invalidSVGString": "Nieprawidłowy SVG.",
-    "cannotResolveCollabServer": ""
+    "cannotResolveCollabServer": "",
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Zaznaczenie",
@@ -205,7 +219,7 @@
     "lock": "Zablokuj wybrane narzędzie",
     "penMode": "",
     "link": "",
-    "eraser": ""
+    "eraser": "Gumka"
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -224,7 +238,7 @@
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "resizeImage": "Możesz zmienić rozmiar swobodnie trzymając SHIFT,\nprzytrzymaj ALT, aby przeskalować względem środka obiektu",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
-    "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "Kliknij, aby umieścić obraz, lub kliknij i przeciągnij, aby ustawić jego rozmiar ręcznie",
@@ -291,7 +305,7 @@
     "howto": "Skorzystaj z instrukcji",
     "or": "lub",
     "preventBinding": "Zapobiegaj wiązaniu strzałek",
-    "tools": "",
+    "tools": "Narzędzia",
     "shortcuts": "Skróty klawiszowe",
     "textFinish": "Zakończ edycję (edytor tekstu)",
     "textNewLine": "Dodaj nowy wiersz (edytor tekstu)",
@@ -299,14 +313,16 @@
     "view": "Widok",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
     "zoomToSelection": "Przybliż do zaznaczenia",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Wyczyść płótno"
   },
   "publishDialog": {
     "title": "Opublikuj bibliotekę",
-    "itemName": "",
+    "itemName": "Nazwa elementu",
     "authorName": "Nazwa autora",
     "githubUsername": "Nazwa użytkownika na GitHubie",
     "twitterUsername": "Nazwa użytkownika Twitter",
@@ -341,7 +357,8 @@
       "post": "w skrócie, każdy może z nich korzystać bez ograniczeń."
     },
     "noteItems": "",
-    "atleastOneLibItem": "Proszę wybrać co najmniej jeden element biblioteki, by rozpocząć"
+    "atleastOneLibItem": "Proszę wybrać co najmniej jeden element biblioteki, by rozpocząć",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Biblioteka została przesłana",
@@ -379,7 +396,8 @@
     "fileSaved": "Zapisano plik.",
     "fileSavedToFilename": "Zapisano jako {filename}",
     "canvas": "płótno",
-    "selection": "zaznaczenie"
+    "selection": "zaznaczenie",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Biały",
@@ -427,5 +445,18 @@
     "5c940d": "Limonkowy 9",
     "e67700": "Żółty 9",
     "d9480f": "Pomarańczowy 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

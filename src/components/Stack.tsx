@@ -41,6 +41,7 @@ const ColStack = ({
   align,
   justifyContent,
   className,
+  style,
 }: StackProps) => {
   return (
     <div
@@ -49,6 +50,7 @@ const ColStack = ({
         "--gap": gap,
         justifyItems: align,
         justifyContent,
+        ...style,
       }}
     >
       {children}

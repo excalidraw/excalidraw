@@ -19,7 +19,7 @@ type ToolButtonBaseProps = {
   name?: string;
   id?: string;
   size?: ToolButtonSize;
-  keyBindingLabel?: string;
+  keyBindingLabel?: string | null;
   showAriaLabel?: boolean;
   hidden?: boolean;
   visible?: boolean;
@@ -187,3 +187,5 @@ ToolButton.defaultProps = {
   className: "",
   size: "medium",
 };
+
+ToolButton.displayName = "ToolButton";

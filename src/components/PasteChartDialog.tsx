@@ -46,7 +46,8 @@ const ChartPreviewBtn = (props: {
         },
         null, // files
       );
-
+      svg.querySelector(".style-fonts")?.remove();
+      previewNode.replaceChildren();
       previewNode.appendChild(svg);
 
       if (props.selected) {
@@ -55,7 +56,7 @@ const ChartPreviewBtn = (props: {
     })();
 
     return () => {
-      previewNode.removeChild(svg);
+      previewNode.replaceChildren();
     };
   }, [props.spreadsheet, props.chartType, props.selected]);
 

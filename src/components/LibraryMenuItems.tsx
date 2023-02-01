@@ -1,196 +1,103 @@
-import { chunk } from "lodash";
-import { useCallback, useState } from "react";
-import { importLibraryFromJSON, saveLibraryAsJSON } from "../data/json";
-import Library from "../data/library";
+import React, { useState } from "react";
+import { serializeLibraryAsJSON } from "../data/json";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
-import {
-  AppState,
-  BinaryFiles,
-  ExcalidrawProps,
-  LibraryItem,
-  LibraryItems,
-} from "../types";
-import { muteFSAbortError } from "../utils";
-import { useDeviceType } from "./App";
-import ConfirmDialog from "./ConfirmDialog";
-import { exportToFileIcon, load, publishIcon, trash } from "./icons";
+import { AppState, ExcalidrawProps, LibraryItem, LibraryItems } from "../types";
+import { arrayToMap, chunk } from "../utils";
 import { LibraryUnit } from "./LibraryUnit";
 import Stack from "./Stack";
-import { ToolButton } from "./ToolButton";
-import { Tooltip } from "./Tooltip";
 
 import "./LibraryMenuItems.scss";
-import { VERSIONS } from "../constants";
+import { MIME_TYPES } from "../constants";
 import Spinner from "./Spinner";
+import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
+import clsx from "clsx";
+
+const CELLS_PER_ROW = 4;
 
 const LibraryMenuItems = ({
   isLoading,
   libraryItems,
-  onRemoveFromLibrary,
   onAddToLibrary,
-  onInsertShape,
+  onInsertLibraryItems,
   pendingElements,
-  theme,
-  setAppState,
-  libraryReturnUrl,
-  library,
-  files,
-  id,
   selectedItems,
-  onToggle,
-  onPublish,
-  resetLibrary,
+  onSelectItems,
+  theme,
+  id,
+  libraryReturnUrl,
 }: {
   isLoading: boolean;
   libraryItems: LibraryItems;
   pendingElements: LibraryItem["elements"];
-  onRemoveFromLibrary: () => void;
-  onInsertShape: (elements: LibraryItem["elements"]) => void;
+  onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: (elements: LibraryItem["elements"]) => void;
-  theme: AppState["theme"];
-  files: BinaryFiles;
-  setAppState: React.Component<any, AppState>["setState"];
-  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
-  library: Library;
-  id: string;
   selectedItems: LibraryItem["id"][];
-  onToggle: (id: LibraryItem["id"], event: React.MouseEvent) => void;
-  onPublish: () => void;
-  resetLibrary: () => void;
+  onSelectItems: (id: LibraryItem["id"][]) => void;
+  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
+  theme: AppState["theme"];
+  id: string;
 }) => {
-  const renderRemoveLibAlert = useCallback(() => {
-    const content = selectedItems.length
-      ? t("alerts.removeItemsFromsLibrary", { count: selectedItems.length })
-      : t("alerts.resetLibrary");
-    const title = selectedItems.length
-      ? t("confirmDialog.removeItemsFromLib")
-      : t("confirmDialog.resetLibrary");
-    return (
-      <ConfirmDialog
-        onConfirm={() => {
-          if (selectedItems.length) {
-            onRemoveFromLibrary();
-          } else {
-            resetLibrary();
-          }
-          setShowRemoveLibAlert(false);
-        }}
-        onCancel={() => {
-          setShowRemoveLibAlert(false);
-        }}
-        title={title}
-      >
-        <p>{content}</p>
-      </ConfirmDialog>
-    );
-  }, [selectedItems, onRemoveFromLibrary, resetLibrary]);
+  const [lastSelectedItem, setLastSelectedItem] = useState<
+    LibraryItem["id"] | null
+  >(null);
 
-  const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
+  const onItemSelectToggle = (
+    id: LibraryItem["id"],
+    event: React.MouseEvent,
+  ) => {
+    const shouldSelect = !selectedItems.includes(id);
 
-  const isMobile = useDeviceType().isMobile;
+    const orderedItems = [...unpublishedItems, ...publishedItems];
 
-  const renderLibraryActions = () => {
-    const itemsSelected = !!selectedItems.length;
-    const items = itemsSelected
-      ? libraryItems.filter((item) => selectedItems.includes(item.id))
-      : libraryItems;
-    const resetLabel = itemsSelected
-      ? t("buttons.remove")
-      : t("buttons.resetLibrary");
-    return (
-      <div className="library-actions">
-        {(!itemsSelected || !isMobile) && (
-          <ToolButton
-            key="import"
-            type="button"
-            title={t("buttons.load")}
-            aria-label={t("buttons.load")}
-            icon={load}
-            onClick={() => {
-              importLibraryFromJSON(library)
-                .catch(muteFSAbortError)
-                .catch((error) => {
-                  console.error(error);
-                  setAppState({ errorMessage: t("errors.importLibraryError") });
-                });
-            }}
-            className="library-actions--load"
-          />
-        )}
-        {!!items.length && (
-          <>
-            <ToolButton
-              key="export"
-              type="button"
-              title={t("buttons.export")}
-              aria-label={t("buttons.export")}
-              icon={exportToFileIcon}
-              onClick={async () => {
-                const libraryItems = itemsSelected
-                  ? items
-                  : await library.getLatestLibrary();
-                saveLibraryAsJSON(libraryItems)
-                  .catch(muteFSAbortError)
-                  .catch((error) => {
-                    setAppState({ errorMessage: error.message });
-                  });
-              }}
-              className="library-actions--export"
-            >
-              {selectedItems.length > 0 && (
-                <span className="library-actions-counter">
-                  {selectedItems.length}
-                </span>
-              )}
-            </ToolButton>
-            <ToolButton
-              key="reset"
-              type="button"
-              title={resetLabel}
-              aria-label={resetLabel}
-              icon={trash}
-              onClick={() => setShowRemoveLibAlert(true)}
-              className="library-actions--remove"
-            >
-              {selectedItems.length > 0 && (
-                <span className="library-actions-counter">
-                  {selectedItems.length}
-                </span>
-              )}
-            </ToolButton>
-          </>
-        )}
-        {itemsSelected && !isPublished && (
-          <Tooltip label={t("hints.publishLibrary")}>
-            <ToolButton
-              type="button"
-              aria-label={t("buttons.publishLibrary")}
-              label={t("buttons.publishLibrary")}
-              icon={publishIcon}
-              className="library-actions--publish"
-              onClick={onPublish}
-            >
-              {!isMobile && <label>{t("buttons.publishLibrary")}</label>}
-              {selectedItems.length > 0 && (
-                <span className="library-actions-counter">
-                  {selectedItems.length}
-                </span>
-              )}
-            </ToolButton>
-          </Tooltip>
-        )}
-      </div>
-    );
+    if (shouldSelect) {
+      if (event.shiftKey && lastSelectedItem) {
+        const rangeStart = orderedItems.findIndex(
+          (item) => item.id === lastSelectedItem,
+        );
+        const rangeEnd = orderedItems.findIndex((item) => item.id === id);
+
+        if (rangeStart === -1 || rangeEnd === -1) {
+          onSelectItems([...selectedItems, id]);
+          return;
+        }
+
+        const selectedItemsMap = arrayToMap(selectedItems);
+        const nextSelectedIds = orderedItems.reduce(
+          (acc: LibraryItem["id"][], item, idx) => {
+            if (
+              (idx >= rangeStart && idx <= rangeEnd) ||
+              selectedItemsMap.has(item.id)
+            ) {
+              acc.push(item.id);
+            }
+            return acc;
+          },
+          [],
+        );
+
+        onSelectItems(nextSelectedIds);
+      } else {
+        onSelectItems([...selectedItems, id]);
+      }
+      setLastSelectedItem(id);
+    } else {
+      setLastSelectedItem(null);
+      onSelectItems(selectedItems.filter((_id) => _id !== id));
+    }
   };
 
-  const CELLS_PER_ROW = isMobile ? 4 : 6;
-
-  const referrer =
-    libraryReturnUrl || window.location.origin + window.location.pathname;
-  const isPublished = selectedItems.some(
-    (id) => libraryItems.find((item) => item.id === id)?.status === "published",
-  );
+  const getInsertedElements = (id: string) => {
+    let targetElements;
+    if (selectedItems.includes(id)) {
+      targetElements = libraryItems.filter((item) =>
+        selectedItems.includes(item.id),
+      );
+    } else {
+      targetElements = libraryItems.filter((item) => item.id === id);
+    }
+    return targetElements;
+  };
 
   const createLibraryItemCompo = (params: {
     item:
@@ -207,13 +114,16 @@ const LibraryMenuItems = ({
       <Stack.Col key={params.key}>
         <LibraryUnit
           elements={params.item?.elements}
-          files={files}
           isPending={!params.item?.id && !!params.item?.elements}
           onClick={params.onClick || (() => {})}
           id={params.item?.id || null}
           selected={!!params.item?.id && selectedItems.includes(params.item.id)}
-          onToggle={(id, event) => {
-            onToggle(id, event);
+          onToggle={onItemSelectToggle}
+          onDrag={(id, event) => {
+            event.dataTransfer.setData(
+              MIME_TYPES.excalidrawlib,
+              serializeLibraryAsJSON(getInsertedElements(id)),
+            );
           }}
         />
       </Stack.Col>
@@ -233,7 +143,7 @@ const LibraryMenuItems = ({
       if (item.id) {
         return createLibraryItemCompo({
           item,
-          onClick: () => onInsertShape(item.elements),
+          onClick: () => onInsertLibraryItems(getInsertedElements(item.id)),
           key: item.id,
         });
       }
@@ -265,59 +175,132 @@ const LibraryMenuItems = ({
         );
       }
       return (
-        <Stack.Row align="center" gap={1} key={index}>
+        <Stack.Row
+          align="center"
+          key={index}
+          className="library-menu-items-container__row"
+        >
           {rowItems}
         </Stack.Row>
       );
     });
   };
 
+  const unpublishedItems = libraryItems.filter(
+    (item) => item.status !== "published",
+  );
   const publishedItems = libraryItems.filter(
     (item) => item.status === "published",
   );
-  const unpublishedItems = [
-    // append pending library item
-    ...(pendingElements.length
-      ? [{ id: null, elements: pendingElements }]
-      : []),
-    ...libraryItems.filter((item) => item.status !== "published"),
-  ];
+
+  const showBtn =
+    !libraryItems.length &&
+    !unpublishedItems.length &&
+    !publishedItems.length &&
+    !pendingElements.length;
 
   return (
-    <div className="library-menu-items-container">
-      {showRemoveLibAlert && renderRemoveLibAlert()}
-      <div className="layer-ui__library-header" key="library-header">
-        {renderLibraryActions()}
-        {isLoading ? (
-          <Spinner />
-        ) : (
-          <a
-            href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
-              window.name || "_blank"
-            }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
-              VERSIONS.excalidrawLibrary
-            }`}
-            target="_excalidraw_libraries"
-          >
-            {t("labels.libraries")}
-          </a>
-        )}
-      </div>
+    <div
+      className="library-menu-items-container"
+      style={
+        pendingElements.length ||
+        unpublishedItems.length ||
+        publishedItems.length
+          ? { justifyContent: "flex-start" }
+          : {}
+      }
+    >
       <Stack.Col
         className="library-menu-items-container__items"
         align="start"
         gap={1}
+        style={{
+          flex: publishedItems.length > 0 ? 1 : "0 1 auto",
+          marginBottom: 0,
+        }}
       >
         <>
-          <div className="separator">{t("labels.personalLib")}</div>
-          {renderLibrarySection(unpublishedItems)}
+          <div>
+            {(pendingElements.length > 0 ||
+              unpublishedItems.length > 0 ||
+              publishedItems.length > 0) && (
+              <div className="library-menu-items-container__header">
+                {t("labels.personalLib")}
+              </div>
+            )}
+            {isLoading && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "var(--container-padding-y)",
+                  right: "var(--container-padding-x)",
+                  transform: "translateY(50%)",
+                }}
+              >
+                <Spinner />
+              </div>
+            )}
+          </div>
+          {!pendingElements.length && !unpublishedItems.length ? (
+            <div className="library-menu-items__no-items">
+              <div
+                className={clsx({
+                  "library-menu-items__no-items__label": showBtn,
+                })}
+              >
+                {t("library.noItems")}
+              </div>
+              <div className="library-menu-items__no-items__hint">
+                {publishedItems.length > 0
+                  ? t("library.hint_emptyPrivateLibrary")
+                  : t("library.hint_emptyLibrary")}
+              </div>
+            </div>
+          ) : (
+            renderLibrarySection([
+              // append pending library item
+              ...(pendingElements.length
+                ? [{ id: null, elements: pendingElements }]
+                : []),
+              ...unpublishedItems,
+            ])
+          )}
         </>
 
         <>
-          <div className="separator">{t("labels.excalidrawLib")} </div>
-
-          {renderLibrarySection(publishedItems)}
+          {(publishedItems.length > 0 ||
+            pendingElements.length > 0 ||
+            unpublishedItems.length > 0) && (
+            <div className="library-menu-items-container__header library-menu-items-container__header--excal">
+              {t("labels.excalidrawLib")}
+            </div>
+          )}
+          {publishedItems.length > 0 ? (
+            renderLibrarySection(publishedItems)
+          ) : unpublishedItems.length > 0 ? (
+            <div
+              style={{
+                margin: "1rem 0",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                fontSize: ".9rem",
+              }}
+            >
+              {t("library.noItems")}
+            </div>
+          ) : null}
         </>
+
+        {showBtn && (
+          <LibraryMenuBrowseButton
+            id={id}
+            libraryReturnUrl={libraryReturnUrl}
+            theme={theme}
+          />
+        )}
       </Stack.Col>
     </div>
   );

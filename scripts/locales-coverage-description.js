@@ -15,6 +15,7 @@ const crowdinMap = {
   "fa-IR": "en-fa",
   "fi-FI": "en-fi",
   "fr-FR": "en-fr",
+  "gl-ES": "en-gl",
   "he-IL": "en-he",
   "hi-IN": "en-hi",
   "hu-HU": "en-hu",
@@ -23,6 +24,7 @@ const crowdinMap = {
   "ja-JP": "en-ja",
   "kab-KAB": "en-kab",
   "ko-KR": "en-ko",
+  "ku-TR": "en-ku",
   "my-MM": "en-my",
   "nb-NO": "en-nb",
   "nl-NL": "en-nl",
@@ -36,6 +38,7 @@ const crowdinMap = {
   "ru-RU": "en-ru",
   "si-LK": "en-silk",
   "sk-SK": "en-sk",
+  "sl-SI": "en-sl",
   "sv-SE": "en-sv",
   "ta-IN": "en-ta",
   "tr-TR": "en-tr",
@@ -47,6 +50,8 @@ const crowdinMap = {
   "lv-LV": "en-lv",
   "cs-CZ": "en-cs",
   "kk-KZ": "en-kk",
+  "vi-VN": "en-vi",
+  "mr-IN": "en-mr",
 };
 
 const flags = {
@@ -62,6 +67,7 @@ const flags = {
   "fa-IR": "🇮🇷",
   "fi-FI": "🇫🇮",
   "fr-FR": "🇫🇷",
+  "gl-ES": "🇪🇸",
   "he-IL": "🇮🇱",
   "hi-IN": "🇮🇳",
   "hu-HU": "🇭🇺",
@@ -71,6 +77,7 @@ const flags = {
   "kab-KAB": "🏳",
   "kk-KZ": "🇰🇿",
   "ko-KR": "🇰🇷",
+  "ku-TR": "🏳",
   "lt-LT": "🇱🇹",
   "lv-LV": "🇱🇻",
   "my-MM": "🇲🇲",
@@ -86,6 +93,7 @@ const flags = {
   "ru-RU": "🇷🇺",
   "si-LK": "🇱🇰",
   "sk-SK": "🇸🇰",
+  "sl-SI": "🇸🇮",
   "sv-SE": "🇸🇪",
   "ta-IN": "🇮🇳",
   "tr-TR": "🇹🇷",
@@ -93,6 +101,9 @@ const flags = {
   "zh-CN": "🇨🇳",
   "zh-HK": "🇭🇰",
   "zh-TW": "🇹🇼",
+  "eu-ES": "🇪🇦",
+  "vi-VN": "🇻🇳",
+  "mr-IN": "🇮🇳",
 };
 
 const languages = {
@@ -109,6 +120,7 @@ const languages = {
   "fa-IR": "فارسی",
   "fi-FI": "Suomi",
   "fr-FR": "Français",
+  "gl-ES": "Galego",
   "he-IL": "עברית",
   "hi-IN": "हिन्दी",
   "hu-HU": "Magyar",
@@ -118,6 +130,7 @@ const languages = {
   "kab-KAB": "Taqbaylit",
   "kk-KZ": "Қазақ тілі",
   "ko-KR": "한국어",
+  "ku-TR": "Kurdî",
   "lt-LT": "Lietuvių",
   "lv-LV": "Latviešu",
   "my-MM": "Burmese",
@@ -133,6 +146,7 @@ const languages = {
   "ru-RU": "Русский",
   "si-LK": "සිංහල",
   "sk-SK": "Slovenčina",
+  "sl-SI": "Slovenščina",
   "sv-SE": "Svenska",
   "ta-IN": "Tamil",
   "tr-TR": "Türkçe",
@@ -140,6 +154,8 @@ const languages = {
   "zh-CN": "简体中文",
   "zh-HK": "繁體中文 (香港)",
   "zh-TW": "繁體中文",
+  "vi-VN": "Tiếng Việt",
+  "mr-IN": "मराठी",
 };
 
 const percentages = fs.readFileSync(
