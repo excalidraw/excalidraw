@@ -40,7 +40,7 @@ export const getElementsWithinSelection = (
   const [selectionX1, selectionY1, selectionX2, selectionY2] =
     getElementAbsoluteCoords(selection);
 
-  const elementsInSelection = elements.filter((element) => {
+  let elementsInSelection = elements.filter((element) => {
     const [elementX1, elementY1, elementX2, elementY2] =
       getElementBounds(element);
 
@@ -55,7 +55,10 @@ export const getElementsWithinSelection = (
     );
   });
 
-  return excludeElementsInFramesFromSelection(elementsInSelection);
+  elementsInSelection =
+    excludeElementsInFramesFromSelection(elementsInSelection);
+
+  return elementsInSelection;
 };
 
 export const isSomeElementSelected = (

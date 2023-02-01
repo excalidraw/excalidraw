@@ -9,6 +9,8 @@ import { isPointWithinBounds } from "./math";
 import { getBoundTextElement } from "./element/textElement";
 import { arrayToMap } from "./utils";
 import { mutateElement } from "./element/mutateElement";
+import { AppState } from "./types";
+import { getSelectedElements } from "./scene";
 
 export const getElementsInFrame = (
   elements: readonly ExcalidrawElement[],
@@ -54,7 +56,7 @@ export const getElementsToUpdateForFrame = (
   return elementsToUpdate;
 };
 
-export const moveElementsFromOldFramesToNewFrames = (
+export const bindElementsToFramesAfterDuplication = (
   nextElements: ExcalidrawElement[],
   oldElements: ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
@@ -79,4 +81,22 @@ export const moveElementsFromOldFramesToNewFrames = (
       }
     }
   });
+};
+
+export const getElementsToUpdateFromSelection = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const selectedElements = getSelectedElements(elements, appState, true);
+  const elementsToInclude: NonDeletedExcalidrawElement[] = [];
+  selectedElements.forEach((element) => {
+    if (element.type === "frame") {
+      getElementsInFrame(elements, element.id).forEach((e) =>
+        elementsToInclude.push(e),
+      );
+    }
+    elementsToInclude.push(element);
+  });
+
+  return elementsToInclude;
 };

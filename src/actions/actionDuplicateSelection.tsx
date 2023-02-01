@@ -2,7 +2,7 @@ import { KEYS } from "../keys";
 import { register } from "./register";
 import { ExcalidrawElement } from "../element/types";
 import { duplicateElement, getNonDeletedElements } from "../element";
-import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { arrayToMap, getShortcutKey } from "../utils";
@@ -19,6 +19,11 @@ import { GRID_SIZE } from "../constants";
 import { bindTextToShapeAfterDuplication } from "../element/textElement";
 import { isBoundToContainer } from "../element/typeChecks";
 import { DuplicateIcon } from "../components/icons";
+import {
+  getElementsToUpdateFromSelection,
+  bindElementsToFramesAfterDuplication,
+} from "../frame";
+import { excludeElementsInFramesFromSelection } from "../scene/selection";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -65,7 +70,7 @@ const duplicateElements = (
   appState: AppState,
 ): Partial<ActionResult> => {
   const groupIdMap = new Map();
-  const newElements: ExcalidrawElement[] = [];
+  let newElements: ExcalidrawElement[] = [];
   const oldElements: ExcalidrawElement[] = [];
   const oldIdToDuplicatedId = new Map();
 
@@ -88,12 +93,14 @@ const duplicateElements = (
   const finalElements: ExcalidrawElement[] = [];
 
   let index = 0;
-  const selectedElementIds = arrayToMap(
-    getSelectedElements(elements, appState, true),
+
+  const idsOfElementsToDuplicate = arrayToMap(
+    getElementsToUpdateFromSelection(elements, appState),
   );
+
   while (index < elements.length) {
     const element = elements[index];
-    if (selectedElementIds.get(element.id)) {
+    if (idsOfElementsToDuplicate.get(element.id)) {
       if (element.groupIds.length) {
         const groupId = getSelectedGroupForElement(appState, element);
         // if group selected, duplicate it atomically
@@ -121,6 +128,13 @@ const duplicateElements = (
     oldIdToDuplicatedId,
   );
   fixBindingsAfterDuplication(finalElements, oldElements, oldIdToDuplicatedId);
+  bindElementsToFramesAfterDuplication(
+    finalElements,
+    oldElements,
+    oldIdToDuplicatedId,
+  );
+
+  newElements = excludeElementsInFramesFromSelection(newElements);
 
   return {
     elements: finalElements,

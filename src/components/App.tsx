@@ -285,8 +285,9 @@ import {
   getElementsInFrame,
   getElementsToUpdateForFrame,
   isCursorInFrame,
-  moveElementsFromOldFramesToNewFrames,
+  bindElementsToFramesAfterDuplication,
 } from "../frame";
+import { excludeElementsInFramesFromSelection } from "../scene/selection";
 
 export const isMenuOpenAtom = atom(false);
 export const isDropdownOpenAtom = atom(false);
@@ -1591,8 +1592,6 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       } else if (data.elements) {
-        console.log(data.elements);
-
         // TODO remove formatting from elements if isPlainPaste
         this.addElementsFromPasteOrLibrary({
           elements: data.elements,
@@ -1643,7 +1642,7 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(dx, dy, this.state.gridSize);
 
     const oldIdToDuplicatedId = new Map();
-    const newElements = elements.map((element) => {
+    let newElements = elements.map((element) => {
       const newElement = duplicateElement(
         this.state.editingGroupId,
         groupIdMap,
@@ -1663,7 +1662,7 @@ class App extends React.Component<AppProps, AppState> {
     ];
     fixBindingsAfterDuplication(nextElements, elements, oldIdToDuplicatedId);
 
-    moveElementsFromOldFramesToNewFrames(
+    bindElementsToFramesAfterDuplication(
       nextElements,
       elements,
       oldIdToDuplicatedId,
@@ -1675,6 +1674,8 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
+
+    newElements = excludeElementsInFramesFromSelection(newElements);
 
     this.setState(
       selectGroupsForSelectedElements(

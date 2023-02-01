@@ -10,24 +10,13 @@ import { getSelectedElements } from "../scene/selection";
 import { exportCanvas } from "../data/index";
 import { getNonDeletedElements, isTextElement } from "../element";
 import { t } from "../i18n";
-import { getElementsInFrame } from "../frame";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import { getElementsToUpdateFromSelection } from "../frame";
 
 export const actionCopy = register({
   name: "copy",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
-    const selectedElements = getSelectedElements(elements, appState, true);
-
-    const elementsToCopy: NonDeletedExcalidrawElement[] = [];
-
-    selectedElements.forEach((element) => {
-      if (element.type === "frame") {
-        const elementsInFrame = getElementsInFrame(elements, element.id);
-        elementsInFrame.forEach((e) => elementsToCopy.push(e));
-      }
-      elementsToCopy.push(element);
-    });
+    const elementsToCopy = getElementsToUpdateFromSelection(elements, appState);
 
     copyToClipboard(elementsToCopy, appState, app.files);
 
