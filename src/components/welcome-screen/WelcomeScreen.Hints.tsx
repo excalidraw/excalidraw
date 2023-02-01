@@ -1,16 +1,13 @@
 import { t } from "../../i18n";
+import { useTunnels } from "../context/tunnels";
 import {
   WelcomeScreenHelpArrow,
   WelcomeScreenMenuArrow,
   WelcomeScreenTopToolbarArrow,
 } from "../icons";
-import {
-  welcomeScreenMenuHintTunnel,
-  welcomeScreenToolbarHintTunnel,
-  welcomeScreenHelpHintTunnel,
-} from "../tunnels";
 
 const MenuHint = ({ children }: { children?: React.ReactNode }) => {
+  const { welcomeScreenMenuHintTunnel } = useTunnels();
   return (
     <welcomeScreenMenuHintTunnel.In>
       <div className="virgil welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--menu">
@@ -25,6 +22,7 @@ const MenuHint = ({ children }: { children?: React.ReactNode }) => {
 MenuHint.displayName = "MenuHint";
 
 const ToolbarHint = ({ children }: { children?: React.ReactNode }) => {
+  const { welcomeScreenToolbarHintTunnel } = useTunnels();
   return (
     <welcomeScreenToolbarHintTunnel.In>
       <div className="virgil welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--toolbar">
@@ -39,6 +37,7 @@ const ToolbarHint = ({ children }: { children?: React.ReactNode }) => {
 ToolbarHint.displayName = "ToolbarHint";
 
 const HelpHint = ({ children }: { children?: React.ReactNode }) => {
+  const { welcomeScreenHelpHintTunnel } = useTunnels();
   return (
     <welcomeScreenHelpHintTunnel.In>
       <div className="virgil welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--help">

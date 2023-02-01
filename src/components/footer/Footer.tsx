@@ -9,10 +9,10 @@ import {
   ZoomActions,
 } from "../Actions";
 import { useDevice } from "../App";
+import { useTunnels } from "../context/tunnels";
 import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
-import { footerCenterTunnel, welcomeScreenHelpHintTunnel } from "../tunnels";
 
 const Footer = ({
   appState,
@@ -25,6 +25,8 @@ const Footer = ({
   showExitZenModeBtn: boolean;
   renderWelcomeScreen: boolean;
 }) => {
+  const { footerCenterTunnel, welcomeScreenHelpHintTunnel } = useTunnels();
+
   const device = useDevice();
   const showFinalize =
     !appState.viewModeEnabled && appState.multiElement && device.isTouchScreen;
