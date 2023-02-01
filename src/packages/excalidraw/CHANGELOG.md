@@ -11,7 +11,7 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
+## 0.14.2 (2023-02-01)
 
 ### Features
 
@@ -21,6 +21,42 @@ Please add the latest change on the top under the correct section.
 ### Fixes
 
 - declare css variable for font in excalidraw so its available in host [#6160](https://github.com/excalidraw/excalidraw/pull/6160)
+
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Add hand/panning tool [#6141](https://github.com/excalidraw/excalidraw/pull/6141)
+
+- Show copy-as-png export button on firefox and show steps how to enable it [#6125](https://github.com/excalidraw/excalidraw/pull/6125)
+
+### Fixes
+
+- Horizontal padding when aligning bound text containers [#6180](https://github.com/excalidraw/excalidraw/pull/6180)
+
+- Make tunnels work in multi-instance scenarios [#6178](https://github.com/excalidraw/excalidraw/pull/6178)
+
+- Add 1px width to the container to calculate more accurately [#6174](https://github.com/excalidraw/excalidraw/pull/6174)
+
+- Quick typo fix [#6167](https://github.com/excalidraw/excalidraw/pull/6167)
+
+- Set the width correctly using measureText in editor [#6162](https://github.com/excalidraw/excalidraw/pull/6162)
+
+- :bug: broken emojis when wrap text [#6153](https://github.com/excalidraw/excalidraw/pull/6153)
+
+- Button background and svg sizes [#6155](https://github.com/excalidraw/excalidraw/pull/6155)
+
+### Styles
+
+- Change in ExportButton style [#6147](https://github.com/excalidraw/excalidraw/pull/6147) (#6148)
+
+### Build
+
+- Temporarily disable pre-commit [#6132](https://github.com/excalidraw/excalidraw/pull/6132)
+
+---
 
 ## 0.14.1 (2023-01-16)
 
