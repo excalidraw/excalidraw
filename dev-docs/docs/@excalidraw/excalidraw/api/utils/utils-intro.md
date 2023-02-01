@@ -294,6 +294,8 @@ viewportCoordsToSceneCoords(&#123; clientX: number, clientY: number },<br/>&nbsp
 
 This hook can be used to check the type of device which is being used. It can only be used inside the `children` of `Excalidraw` component.
 
+Open the `main menu` in the below example to view the footer.
+
 ```jsx live noInline
 const MobileFooter = ({}) => {
   const device = useDevice();
