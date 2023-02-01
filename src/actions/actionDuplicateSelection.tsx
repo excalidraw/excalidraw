@@ -68,6 +68,10 @@ const duplicateElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ): Partial<ActionResult> => {
+  // ---------------------------------------------------------------------------
+
+  // step (1)
+
   const sortedElements = normalizeElementOrder(elements);
   const groupIdMap = new Map();
   const newElements: ExcalidrawElement[] = [];
@@ -90,14 +94,40 @@ const duplicateElements = (
     return newElement;
   };
 
-  const finalElements: ExcalidrawElement[] = [];
-
-  let index = 0;
   const selectedElementIds = arrayToMap(
     getSelectedElements(sortedElements, appState, true),
   );
-  while (index < sortedElements.length) {
+
+  // Ids of elements that have already been processed so we don't push them
+  // into the array twice if we end up backtracking when retrieving
+  // discontiguous group of elements (can happen due to a bug, or in edge
+  // cases such as a group containing deleted elements which were not selected).
+  //
+  // This is not enough to prevent duplicates, so we do a second loop afterwards
+  // to remove them.
+  //
+  // For convenience we mark even the newly created ones even though we don't
+  // loop over them.
+  const processedIds = new Map<ExcalidrawElement["id"], true>();
+
+  const markAsProcessed = (elements: ExcalidrawElement[]) => {
+    for (const element of elements) {
+      processedIds.set(element.id, true);
+    }
+    return elements;
+  };
+
+  const elementsWithClones: ExcalidrawElement[] = [];
+
+  let index = -1;
+
+  while (++index < sortedElements.length) {
     const element = sortedElements[index];
+
+    if (processedIds.get(element.id)) {
+      continue;
+    }
+
     const boundTextElement = getBoundTextElement(element);
     if (selectedElementIds.get(element.id)) {
       // if a group or a container/bound-text, duplicate atomically
@@ -105,43 +135,71 @@ const duplicateElements = (
         const groupId = getSelectedGroupForElement(appState, element);
         if (groupId) {
           const groupElements = getElementsInGroup(sortedElements, groupId);
-          finalElements.push(
-            ...groupElements,
-            ...groupElements.map((element) =>
-              duplicateAndOffsetElement(element),
-            ),
+          elementsWithClones.push(
+            ...markAsProcessed([
+              ...groupElements,
+              ...groupElements.map((element) =>
+                duplicateAndOffsetElement(element),
+              ),
+            ]),
           );
-          index += groupElements.length;
           continue;
         }
         if (boundTextElement) {
-          finalElements.push(
-            element,
-            boundTextElement,
-            duplicateAndOffsetElement(element),
-            duplicateAndOffsetElement(boundTextElement),
+          elementsWithClones.push(
+            ...markAsProcessed([
+              element,
+              boundTextElement,
+              duplicateAndOffsetElement(element),
+              duplicateAndOffsetElement(boundTextElement),
+            ]),
           );
-          // when we make getBoundTextElement() return an array,
-          // this should be changed to `+= 1 + boundTextElements.length`
-          // (yeah, no one will remember this 😭)
-          index += 2;
-
           continue;
         }
       }
-      finalElements.push(element, duplicateAndOffsetElement(element));
+      elementsWithClones.push(
+        ...markAsProcessed([element, duplicateAndOffsetElement(element)]),
+      );
     } else {
-      finalElements.push(element);
+      elementsWithClones.push(...markAsProcessed([element]));
     }
-
-    index++;
   }
+
+  // step (2)
+
+  // second pass to remove duplicates. We loop from the end as it's likelier
+  // that the last elements are in the correct order (contiguous or otherwise).
+  // Thus we need to reverse as the last step (3).
+
+  const finalElementsReversed: ExcalidrawElement[] = [];
+
+  const finalElementIds = new Map<ExcalidrawElement["id"], true>();
+  index = elementsWithClones.length;
+
+  while (--index >= 0) {
+    const element = elementsWithClones[index];
+    if (!finalElementIds.get(element.id)) {
+      finalElementIds.set(element.id, true);
+      finalElementsReversed.push(element);
+    }
+  }
+
+  // step (3)
+
+  const finalElements = finalElementsReversed.reverse();
+
+  // ---------------------------------------------------------------------------
+
   bindTextToShapeAfterDuplication(
-    finalElements,
+    elementsWithClones,
     oldElements,
     oldIdToDuplicatedId,
   );
-  fixBindingsAfterDuplication(finalElements, oldElements, oldIdToDuplicatedId);
+  fixBindingsAfterDuplication(
+    elementsWithClones,
+    oldElements,
+    oldIdToDuplicatedId,
+  );
 
   return {
     elements: finalElements,
