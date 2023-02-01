@@ -286,6 +286,7 @@ import {
   getElementsToUpdateForFrame,
   isCursorInFrame,
   bindElementsToFramesAfterDuplication,
+  getFramesCountInElements,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 
@@ -1641,8 +1642,12 @@ class App extends React.Component<AppProps, AppState> {
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.state.gridSize);
 
+    let framesCount = getFramesCountInElements(
+      this.scene.getNonDeletedElements(),
+    );
+
     const oldIdToDuplicatedId = new Map();
-    let newElements = elements.map((element) => {
+    const newElements = elements.map((element) => {
       const newElement = duplicateElement(
         this.state.editingGroupId,
         groupIdMap,
@@ -1650,6 +1655,11 @@ class App extends React.Component<AppProps, AppState> {
         {
           x: element.x + gridX - minX,
           y: element.y + gridY - minY,
+          ...(element.type === "frame"
+            ? {
+                name: `Frame ${++framesCount}`,
+              }
+            : {}),
         },
       );
       oldIdToDuplicatedId.set(element.id, newElement.id);
@@ -1675,7 +1685,8 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
 
-    newElements = excludeElementsInFramesFromSelection(newElements);
+    const nextElementsToSelect =
+      excludeElementsInFramesFromSelection(newElements);
 
     this.setState(
       selectGroupsForSelectedElements(
@@ -1692,7 +1703,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.isSidebarDocked
               ? this.state.openSidebar
               : null,
-          selectedElementIds: newElements.reduce(
+          selectedElementIds: nextElementsToSelect.reduce(
             (acc: Record<ExcalidrawElement["id"], true>, element) => {
               if (!isBoundToContainer(element)) {
                 acc[element.id] = true;

@@ -100,3 +100,11 @@ export const getElementsToUpdateFromSelection = (
 
   return elementsToInclude;
 };
+
+export const getFramesCountInElements = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  return elements.filter(
+    (element) => element.type === "frame" && !element.isDeleted,
+  ).length;
+};

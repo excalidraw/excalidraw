@@ -22,6 +22,7 @@ import { DuplicateIcon } from "../components/icons";
 import {
   getElementsToUpdateFromSelection,
   bindElementsToFramesAfterDuplication,
+  getFramesCountInElements,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 
@@ -70,9 +71,10 @@ const duplicateElements = (
   appState: AppState,
 ): Partial<ActionResult> => {
   const groupIdMap = new Map();
-  let newElements: ExcalidrawElement[] = [];
+  const newElements: ExcalidrawElement[] = [];
   const oldElements: ExcalidrawElement[] = [];
   const oldIdToDuplicatedId = new Map();
+  let framesCount = getFramesCountInElements(elements);
 
   const duplicateAndOffsetElement = (element: ExcalidrawElement) => {
     const newElement = duplicateElement(
@@ -82,6 +84,11 @@ const duplicateElements = (
       {
         x: element.x + GRID_SIZE / 2,
         y: element.y + GRID_SIZE / 2,
+        ...(element.type === "frame"
+          ? {
+              name: `Frame ${++framesCount}`,
+            }
+          : {}),
       },
     );
     oldIdToDuplicatedId.set(element.id, newElement.id);
@@ -134,7 +141,8 @@ const duplicateElements = (
     oldIdToDuplicatedId,
   );
 
-  newElements = excludeElementsInFramesFromSelection(newElements);
+  const nextElementsToSelect =
+    excludeElementsInFramesFromSelection(newElements);
 
   return {
     elements: finalElements,
@@ -142,7 +150,7 @@ const duplicateElements = (
       {
         ...appState,
         selectedGroupIds: {},
-        selectedElementIds: newElements.reduce(
+        selectedElementIds: nextElementsToSelect.reduce(
           (acc: Record<ExcalidrawElement["id"], true>, element) => {
             if (!isBoundToContainer(element)) {
               acc[element.id] = true;
