@@ -285,6 +285,7 @@ import {
   getElementsInFrame,
   getElementsToUpdateForFrame,
   isCursorInFrame,
+  moveElementsFromOldFramesToNewFrames,
 } from "../frame";
 
 export const isMenuOpenAtom = atom(false);
@@ -1590,6 +1591,8 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       } else if (data.elements) {
+        console.log(data.elements);
+
         // TODO remove formatting from elements if isPlainPaste
         this.addElementsFromPasteOrLibrary({
           elements: data.elements,
@@ -1659,6 +1662,12 @@ class App extends React.Component<AppProps, AppState> {
       ...newElements,
     ];
     fixBindingsAfterDuplication(nextElements, elements, oldIdToDuplicatedId);
+
+    moveElementsFromOldFramesToNewFrames(
+      nextElements,
+      elements,
+      oldIdToDuplicatedId,
+    );
 
     if (opts.files) {
       this.files = { ...this.files, ...opts.files };
