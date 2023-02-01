@@ -1165,5 +1165,128 @@ describe("textWysiwyg", () => {
       ).toEqual(36);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
     });
+
+    describe("should align correctly", () => {
+      let editor: HTMLTextAreaElement;
+
+      beforeEach(async () => {
+        Keyboard.keyPress(KEYS.ENTER);
+        editor = document.querySelector(
+          ".excalidraw-textEditorContainer > textarea",
+        ) as HTMLTextAreaElement;
+        await new Promise((r) => setTimeout(r, 0));
+        fireEvent.change(editor, { target: { value: "Hello" } });
+        editor.blur();
+        mouse.select(rectangle);
+        Keyboard.keyPress(KEYS.ENTER);
+        editor = document.querySelector(
+          ".excalidraw-textEditorContainer > textarea",
+        ) as HTMLTextAreaElement;
+        editor.select();
+      });
+
+      it("when top left", async () => {
+        fireEvent.click(screen.getByTitle("Left"));
+        fireEvent.click(screen.getByTitle("Align top"));
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+          Array [
+            15,
+            20,
+          ]
+        `);
+      });
+
+      it("when top center", async () => {
+        fireEvent.click(screen.getByTitle("Center"));
+        fireEvent.click(screen.getByTitle("Align top"));
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+          Array [
+            94.5,
+            20,
+          ]
+        `);
+      });
+
+      it("when top right", async () => {
+        fireEvent.click(screen.getByTitle("Right"));
+        fireEvent.click(screen.getByTitle("Align top"));
+
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              174,
+              20,
+            ]
+          `);
+      });
+
+      it("when center left", async () => {
+        fireEvent.click(screen.getByTitle("Center vertically"));
+        fireEvent.click(screen.getByTitle("Left"));
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              15,
+              25,
+            ]
+          `);
+      });
+
+      it("when center center", async () => {
+        fireEvent.click(screen.getByTitle("Center"));
+        fireEvent.click(screen.getByTitle("Center vertically"));
+
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              -25,
+              25,
+            ]
+          `);
+      });
+
+      it("when center right", async () => {
+        fireEvent.click(screen.getByTitle("Right"));
+        fireEvent.click(screen.getByTitle("Center vertically"));
+
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              174,
+              25,
+            ]
+          `);
+      });
+
+      it("when bottom left", async () => {
+        fireEvent.click(screen.getByTitle("Left"));
+        fireEvent.click(screen.getByTitle("Align bottom"));
+
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              15,
+              25,
+            ]
+          `);
+      });
+
+      it("when bottom center", async () => {
+        fireEvent.click(screen.getByTitle("Center"));
+        fireEvent.click(screen.getByTitle("Align bottom"));
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              94.5,
+              25,
+            ]
+          `);
+      });
+
+      it("when bottom right", async () => {
+        fireEvent.click(screen.getByTitle("Right"));
+        fireEvent.click(screen.getByTitle("Align bottom"));
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              174,
+              25,
+            ]
+          `);
+      });
+    });
   });
 });

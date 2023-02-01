@@ -61,30 +61,29 @@ export const redrawTextBoundingBox = (
     if (!isArrowElement(container)) {
       const containerDims = getContainerDims(container);
       let nextHeight = containerDims.height;
-      const boundTextElementPadding = getBoundTextElementOffset(textElement);
       if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-        coordY = container.y + boundTextElementPadding;
+        coordY = container.y;
       } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
         coordY =
           container.y +
           containerDims.height -
           metrics.height -
-          boundTextElementPadding;
+          BOUND_TEXT_PADDING;
       } else {
         coordY = container.y + containerDims.height / 2 - metrics.height / 2;
         if (metrics.height > getMaxContainerHeight(container)) {
-          nextHeight = metrics.height + boundTextElementPadding * 2;
+          nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
           coordY = container.y + nextHeight / 2 - metrics.height / 2;
         }
       }
       if (textElement.textAlign === TEXT_ALIGN.LEFT) {
-        coordX = container.x + boundTextElementPadding;
+        coordX = container.x + BOUND_TEXT_PADDING;
       } else if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
         coordX =
           container.x +
           containerDims.width -
           metrics.width -
-          boundTextElementPadding;
+          BOUND_TEXT_PADDING;
       } else {
         coordX = container.x + containerDims.width / 2 - metrics.width / 2;
       }
