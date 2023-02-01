@@ -1,0 +1,43 @@
+# Installation
+
+**Excalidraw** is published to npm as a component you can directly embed in your projects.
+
+Using `npm`:
+
+```bash
+npm install react react-dom @excalidraw/excalidraw
+```
+
+or `yarn`:
+
+```bash
+yarn add react react-dom @excalidraw/excalidraw
+```
+
+:::tip
+
+**If you don't want to wait for the next stable release and try out the unreleased changes you can use `@excalidraw/excalidraw@next`.**
+
+:::
+
+### Static assets
+
+Excalidraw depends on assets such as localization files (if you opt to use them), fonts, and others.
+
+By default these assets are loaded from a public CDN [`https://unpkg.com/@excalidraw/excalidraw/dist/`](https://unpkg.com/@excalidraw/excalidraw/dist), so you don't need to do anything on your end.
+
+However, if you want to host these files yourself, you can find them in your `node_modules/@excalidraw/excalidraw/dist` directory, in folders `excalidraw-assets` (for production) and `excalidraw-assets-dev` (for development).
+
+Copy these folders to your static assets directory, and add a `window.EXCALIDRAW_ASSET_PATH` variable in your `index.html` or `index.js` entry file pointing to your public assets path (relative). For example, if you serve your assets from the root of your hostname, you would do:
+
+```js
+window.EXCALIDRAW_ASSET_PATH = "/";
+```
+
+### Dimensions of Excalidraw
+
+Excalidraw takes _100%_ of `width` and `height` of the containing block so make sure the container in which you render Excalidraw has non zero dimensions.
+
+### Demo
+
+[Try here](https://codesandbox.io/s/excalidraw-ehlz3).
