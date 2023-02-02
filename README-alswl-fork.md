@@ -16,10 +16,11 @@ fork:
 
 ## Current active feature branch
 
-- feat/chinese-font-support
+- feat/chinese-font-support (active)
   - feat/chinese-font (deprecated)
   - feat/chinese-font-for-v0.12.0 (deprecated, merged to release)
 - feat/self-host-backend-origin
   - feat/self-host-backend (deprecated)
   - feat/self-host-new-pr-for-v0.12.0 (deprecated, merge to release) 
+  - feat/self-host-backend-origin-v0.14.2 (active)
 
