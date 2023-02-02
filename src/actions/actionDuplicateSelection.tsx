@@ -28,10 +28,7 @@ import {
   bindElementsToFramesAfterDuplication,
   getFramesCountInElements,
 } from "../frame";
-import {
-  excludeElementsInFramesFromSelection,
-  getSelectedElements,
-} from "../scene/selection";
+import { excludeElementsInFramesFromSelection } from "../scene/selection";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -110,7 +107,7 @@ const duplicateElements = (
   };
 
   const selectedElementIds = arrayToMap(
-    getSelectedElements(sortedElements, appState, true),
+    getElementsToUpdateFromSelection(sortedElements, appState),
   );
 
   // Ids of elements that have already been processed so we don't push them

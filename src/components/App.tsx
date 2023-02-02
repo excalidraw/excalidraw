@@ -3619,7 +3619,6 @@ class App extends React.Component<AppProps, AppState> {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
     } else if (this.state.activeTool.type === "frame") {
       this.createFrameElementOnPointerDown(pointerDownState);
-    } else if (this.state.activeTool.type !== "eraser") {
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand"
