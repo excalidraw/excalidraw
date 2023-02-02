@@ -35,7 +35,7 @@ import {
   getNonDeletedElements,
   redrawTextBoundingBox,
 } from "../../../../element";
-import { ButtonSelect } from "../../../../components/ButtonSelect";
+import { ButtonIconSelect } from "../../../../components/ButtonIconSelect";
 
 // Subtype imports
 import {
@@ -1433,38 +1433,55 @@ const createMathActions = () => {
         commitToHistory: true,
       };
     },
-    PanelComponent: ({ elements, appState, updateData }) => (
-      <fieldset>
-        <legend>{t("labels.changeMathOnly")}</legend>
-        <ButtonSelect
-          group="mathOnly"
-          options={[
-            {
-              value: false,
-              text: t("labels.mathOnlyFalse"),
-            },
-            {
-              value: true,
-              text: t("labels.mathOnlyTrue"),
-            },
-          ]}
-          value={getFormValue(
-            elements,
-            appState,
-            (element) => {
-              const el = hasBoundTextElement(element)
-                ? getBoundTextElement(element)
-                : element;
-              return isMathElement(el)
-                ? getMathProps.ensureMathProps(el.customData).mathOnly
-                : null;
-            },
-            getMathProps.getMathOnly(appState),
-          )}
-          onChange={(value) => updateData(value)}
-        />
-      </fieldset>
-    ),
+    PanelComponent: ({ elements, appState, updateData }) => {
+      const textIcon = (text: string, selected: boolean) => {
+        const color = selected
+          ? "var(--button-color, var(--color-primary-darker))"
+          : "var(--button-color, var(--text-primary-color))";
+        return (
+          <div className="buttonList">
+            <span style={{ textAlign: "center", fontSize: "0.6rem", color }}>
+              {text.replace(" ", "\n")}
+            </span>
+          </div>
+        );
+      };
+      const value = getFormValue(
+        elements,
+        appState,
+        (element) => {
+          const el = hasBoundTextElement(element)
+            ? getBoundTextElement(element)
+            : element;
+          return isMathElement(el)
+            ? getMathProps.ensureMathProps(el.customData).mathOnly
+            : null;
+        },
+        getMathProps.getMathOnly(appState),
+      );
+      return (
+        <fieldset>
+          <legend>{t("labels.changeMathOnly")}</legend>
+          <ButtonIconSelect
+            group="mathOnly"
+            options={[
+              {
+                value: false,
+                text: t("labels.mathOnlyFalse"),
+                icon: textIcon(t("labels.mathOnlyFalse"), value === false),
+              },
+              {
+                value: true,
+                text: t("labels.mathOnlyTrue"),
+                icon: textIcon(t("labels.mathOnlyTrue"), value === true),
+              },
+            ]}
+            value={value}
+            onChange={(value) => updateData(value)}
+          />
+        </fieldset>
+      );
+    },
     predicate: (...rest) =>
       rest[4] === undefined && enableActionChangeMathProps(rest[0], rest[1]),
     trackEvent: false,

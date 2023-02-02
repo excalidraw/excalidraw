@@ -1,7 +1,6 @@
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { t } from "../i18n";
 import { Action } from "../actions/types";
-import { ToolButton } from "./ToolButton";
 import clsx from "clsx";
 import {
   Subtype,
@@ -74,17 +73,13 @@ export const SubtypeButton = (
     },
     keyTest,
     PanelComponent: ({ elements, appState, updateData, data }) => (
-      <ToolButton
-        type="icon"
-        icon={icon.call(this, { theme: appState.theme })}
-        selected={
-          appState.activeSubtypes !== undefined &&
-          appState.activeSubtypes.includes(subtype)
-        }
-        className={clsx({
-          selected:
-            appState.activeSubtypes &&
+      <button
+        className={clsx("ToolIcon_type_button", "ToolIcon_type_button--show", {
+          ToolIcon: true,
+          "ToolIcon--selected":
+            appState.activeSubtypes !== undefined &&
             appState.activeSubtypes.includes(subtype),
+          "ToolIcon--plain": true,
         })}
         title={`${t(`toolBar.${subtype}`)}${title}`}
         aria-label={t(`toolBar.${subtype}`)}
@@ -105,8 +100,13 @@ export const SubtypeButton = (
               }
             : undefined
         }
-        size={data?.size || "medium"}
-      ></ToolButton>
+      >
+        {
+          <div className="ToolIcon__icon" aria-hidden="true">
+            {icon.call(this, { theme: appState.theme })}
+          </div>
+        }
+      </button>
     ),
   };
   if (key === "") {
