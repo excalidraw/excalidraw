@@ -409,6 +409,7 @@ const LayerUI = ({
           renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
           device={device}
+          renderWelcomeScreen={renderWelcomeScreen}
         />
       )}
 
