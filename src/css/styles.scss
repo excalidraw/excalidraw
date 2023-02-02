@@ -8,6 +8,10 @@
 }
 
 .excalidraw {
+  --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
+    Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--ui-font);
+
   position: relative;
   overflow: hidden;
   color: var(--text-primary-color);
@@ -408,7 +412,7 @@
     pointer-events: all;
 
     &:hover {
-      background-color: var(--button-hover);
+      background-color: var(--button-hover-bg);
     }
 
     &:active {
@@ -540,15 +544,16 @@
   }
 
   .mobile-misc-tools-container {
-    position: fixed;
-    top: 5rem;
-    right: 0;
+    position: absolute;
+    top: calc(5rem - var(--editor-container-padding));
+    right: calc(var(--editor-container-padding) * -1);
     display: flex;
     flex-direction: column;
     border: 1px solid var(--sidebar-border-color);
     border-top-left-radius: var(--border-radius-lg);
     border-bottom-left-radius: var(--border-radius-lg);
     border-right: 0;
+    overflow: hidden;
 
     background-color: var(--island-bg-color);
 
@@ -567,6 +572,20 @@
 
     .ToolIcon__keybinding {
       display: none;
+    }
+  }
+  .UserList-Wrapper {
+    margin: 0;
+    padding: 0;
+    border: none;
+    text-align: left;
+
+    legend {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 400;
+      margin: 0 0 0.25rem;
+      padding: 0;
     }
   }
 }

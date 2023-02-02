@@ -28,6 +28,8 @@ import {
 } from "../../../types";
 import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
+import CustomFooter from "./CustomFooter";
+import MobileFooter from "./MobileFooter";
 
 declare global {
   interface Window {
@@ -68,39 +70,15 @@ const {
   viewportCoordsToSceneCoords,
   restoreElements,
   Sidebar,
+  Footer,
+  WelcomeScreen,
+  MainMenu,
+  LiveCollaborationTrigger,
 } = window.ExcalidrawLib;
 
-const COMMENT_SVG = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="feather feather-message-circle"
-  >
-    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-  </svg>
-);
 const COMMENT_ICON_DIMENSION = 32;
 const COMMENT_INPUT_HEIGHT = 50;
 const COMMENT_INPUT_WIDTH = 150;
-
-const renderTopRightUI = () => {
-  return (
-    <button
-      onClick={() => alert("This is dummy top right UI")}
-      style={{ height: "2.5rem" }}
-    >
-      {" "}
-      Click me{" "}
-    </button>
-  );
-};
 
 export default function App() {
   const appRef = useRef<any>(null);
@@ -160,44 +138,23 @@ export default function App() {
     fetchData();
   }, [excalidrawAPI]);
 
-  const renderFooter = () => {
+  const renderTopRightUI = (isMobile: boolean) => {
     return (
       <>
-        {" "}
+        {!isMobile && (
+          <LiveCollaborationTrigger
+            isCollaborating={isCollaborating}
+            onSelect={() => {
+              window.alert("Collab dialog clicked");
+            }}
+          />
+        )}
         <button
-          className="custom-element"
-          onClick={() => {
-            excalidrawAPI?.setActiveTool({
-              type: "custom",
-              customType: "comment",
-            });
-            const url = `data:${MIME_TYPES.svg},${encodeURIComponent(
-              `<svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="feather feather-message-circle"
-            >
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-            </svg>`,
-            )}`;
-            excalidrawAPI?.setCursor(`url(${url}), auto`);
-          }}
-        >
-          {COMMENT_SVG}
-        </button>
-        <button
-          className="custom-footer"
-          onClick={() => alert("This is dummy footer")}
+          onClick={() => alert("This is dummy top right UI")}
+          style={{ height: "2.5rem" }}
         >
           {" "}
-          custom footer{" "}
+          Click me{" "}
         </button>
       </>
     );
@@ -386,6 +343,7 @@ export default function App() {
       }
     });
   };
+
   const renderCommentIcons = () => {
     return Object.values(commentIcons).map((commentIcon) => {
       if (!excalidrawAPI) {
@@ -538,6 +496,34 @@ export default function App() {
     );
   };
 
+  const renderMenu = () => {
+    return (
+      <MainMenu>
+        <MainMenu.DefaultItems.SaveAsImage />
+        <MainMenu.DefaultItems.Export />
+        <MainMenu.Separator />
+        <MainMenu.DefaultItems.LiveCollaborationTrigger
+          isCollaborating={isCollaborating}
+          onSelect={() => window.alert("You clicked on collab button")}
+        />
+        <MainMenu.Group title="Excalidraw links">
+          <MainMenu.DefaultItems.Socials />
+        </MainMenu.Group>
+        <MainMenu.Separator />
+        <MainMenu.ItemCustom>
+          <button
+            style={{ height: "2rem" }}
+            onClick={() => window.alert("custom menu item")}
+          >
+            custom item
+          </button>
+        </MainMenu.ItemCustom>
+        <MainMenu.DefaultItems.Help />
+
+        {excalidrawAPI && <MobileFooter excalidrawAPI={excalidrawAPI} />}
+      </MainMenu>
+    );
+  };
   return (
     <div className="App" ref={appRef}>
       <h1> Excalidraw Example</h1>
@@ -703,9 +689,6 @@ export default function App() {
               button: "down" | "up";
               pointersMap: Gesture["pointers"];
             }) => setPointerData(payload)}
-            onCollabButtonClick={() =>
-              window.alert("You clicked on collab button")
-            }
             viewModeEnabled={viewModeEnabled}
             zenModeEnabled={zenModeEnabled}
             gridModeEnabled={gridModeEnabled}
@@ -713,12 +696,19 @@ export default function App() {
             name="Custom name of drawing"
             UIOptions={{ canvasActions: { loadScene: false } }}
             renderTopRightUI={renderTopRightUI}
-            renderFooter={renderFooter}
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
             renderSidebar={renderSidebar}
-          />
+          >
+            {excalidrawAPI && (
+              <Footer>
+                <CustomFooter excalidrawAPI={excalidrawAPI} />
+              </Footer>
+            )}
+            <WelcomeScreen />
+            {renderMenu()}
+          </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}
         </div>

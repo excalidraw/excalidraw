@@ -33,6 +33,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
+import oc from "open-color";
 
 type RestoredAppState = Omit<
   AppState,
@@ -55,6 +56,7 @@ export const AllowedExcalidrawActiveTools: Record<
   eraser: false,
   custom: true,
   frame: true,
+  hand: true,
 };
 
 export type RestoredDataState = {
@@ -111,8 +113,8 @@ const restoreElementWithProperties = <
     angle: element.angle || 0,
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
-    strokeColor: element.strokeColor,
-    backgroundColor: element.backgroundColor,
+    strokeColor: element.strokeColor || oc.black,
+    backgroundColor: element.backgroundColor || "transparent",
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
@@ -278,6 +280,14 @@ const repairContainerElement = (
       ) => {
         const boundElement = elementsMap.get(binding.id);
         if (boundElement && !boundIds.has(binding.id)) {
+          boundIds.add(binding.id);
+
+          if (boundElement.isDeleted) {
+            return acc;
+          }
+
+          acc.push(binding);
+
           if (
             isTextElement(boundElement) &&
             // being slightly conservative here, preserving existing containerId
@@ -287,9 +297,6 @@ const repairContainerElement = (
             (boundElement as Mutable<ExcalidrawTextElement>).containerId =
               container.id;
           }
-
-          acc.push(binding);
-          boundIds.add(binding.id);
         }
         return acc;
       },
@@ -314,6 +321,10 @@ const repairBoundElement = (
 
   if (!container) {
     boundElement.containerId = null;
+    return;
+  }
+
+  if (boundElement.isDeleted) {
     return;
   }
 
@@ -461,7 +472,7 @@ export const restoreAppState = (
           ? nextAppState.activeTool
           : { type: "selection" },
       ),
-      lastActiveToolBeforeEraser: null,
+      lastActiveTool: null,
       locked: nextAppState.activeTool.locked ?? false,
     },
     // Migrates from previous version where appState.zoom was a number

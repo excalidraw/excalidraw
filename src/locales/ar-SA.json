@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "لصق",
+    "pasteAsPlaintext": "اللصق كنص عادي",
     "pasteCharts": "لصق الرسوم البيانية",
     "selectAll": "تحديد الكل",
     "multiSelect": "إضافة عنصر للتحديد",
@@ -65,13 +66,13 @@
     "cartoonist": "كرتوني",
     "fileTitle": "إسم الملف",
     "colorPicker": "منتقي اللون",
-    "canvasColors": "",
+    "canvasColors": "تستخدم على القماش",
     "canvasBackground": "خلفية اللوحة",
     "drawingCanvas": "لوحة الرسم",
     "layers": "الطبقات",
     "actions": "الإجراءات",
     "language": "اللغة",
-    "liveCollaboration": "بدء المشاركة الحية",
+    "liveCollaboration": "التعاون المباشر...",
     "duplicateSelection": "تكرار",
     "untitled": "غير معنون",
     "name": "الاسم",
@@ -107,7 +108,7 @@
     "excalidrawLib": "مكتبتنا",
     "decreaseFontSize": "تصغير حجم الخط",
     "increaseFontSize": "تكبير حجم الخط",
-    "unbindText": "",
+    "unbindText": "فك ربط النص",
     "bindText": "",
     "link": {
       "edit": "تعديل الرابط",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
     "exportJSON": "صدر الملف",
-    "exportImage": "إحفظ كصورة",
-    "export": "تصدير",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "تصدير بصيغة PNG",
     "exportToSvg": "تصدير بصيغة SVG",
     "copyToClipboard": "نسخ إلى الحافظة",
@@ -144,7 +145,7 @@
     "scale": "مقاس",
     "save": "احفظ للملف الحالي",
     "saveAs": "حفظ كـ",
-    "load": "تحميل",
+    "load": "فتح",
     "getShareableLink": "احصل على رابط المشاركة",
     "close": "غلق",
     "selectLanguage": "اختر اللغة",
@@ -200,7 +201,9 @@
     "svgImageInsertError": "تعذر إدراج صورة SVG. يبدو أن ترميز SVG غير صحيح.",
     "invalidSVGString": "SVG غير صالح.",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "تحديد",
@@ -235,7 +238,7 @@
     "resize": "يمكنك تقييد النسب بالضغط على SHIFT أثناء تغيير الحجم،\nاضغط على ALT لتغيير الحجم من المركز",
     "resizeImage": "يمكنك تغيير الحجم بحرية بالضغط بأستمرار على SHIFT،\nاضغط بأستمرار على ALT أيضا لتغيير الحجم من المركز",
     "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",
-    "lineEditor_info": "انقر نقراً مزدوجاً أو اضغط Enter لتعديل النقاط",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
@@ -310,7 +313,9 @@
     "view": "عرض",
     "zoomToFit": "تكبير للملائمة",
     "zoomToSelection": "تكبير للعنصر المحدد",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "مسح اللوحة"
@@ -391,7 +396,8 @@
     "fileSaved": "تم حفظ الملف.",
     "fileSavedToFilename": "حفظ باسم {filename}",
     "canvas": "لوحة الرسم",
-    "selection": "العنصر المحدد"
+    "selection": "العنصر المحدد",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "أبيض",
@@ -439,5 +445,18 @@
     "5c940d": "ليموني 9",
     "e67700": "أصفر 9",
     "d9480f": "برتقالي 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

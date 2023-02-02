@@ -3,6 +3,7 @@ import { register } from "./register";
 import {
   copyTextToSystemClipboard,
   copyToClipboard,
+  probablySupportsClipboardBlob,
   probablySupportsClipboardWriteText,
 } from "../clipboard";
 import { actionDeleteSelected } from "./actionDeleteSelected";
@@ -24,7 +25,27 @@ export const actionCopy = register({
       commitToHistory: false,
     };
   },
+  predicate: (elements, appState, appProps, app) => {
+    return app.device.isMobile && !!navigator.clipboard;
+  },
   contextItemLabel: "labels.copy",
+  // don't supply a shortcut since we handle this conditionally via onCopy event
+  keyTest: undefined,
+});
+
+export const actionPaste = register({
+  name: "paste",
+  trackEvent: { category: "element" },
+  perform: (elements: any, appStates: any, data, app) => {
+    app.pasteFromClipboard(null);
+    return {
+      commitToHistory: false,
+    };
+  },
+  predicate: (elements, appState, appProps, app) => {
+    return app.device.isMobile && !!navigator.clipboard;
+  },
+  contextItemLabel: "labels.paste",
   // don't supply a shortcut since we handle this conditionally via onCopy event
   keyTest: undefined,
 });
@@ -35,6 +56,9 @@ export const actionCut = register({
   perform: (elements, appState, data, app) => {
     actionCopy.perform(elements, appState, data, app);
     return actionDeleteSelected.perform(elements, appState);
+  },
+  predicate: (elements, appState, appProps, app) => {
+    return app.device.isMobile && !!navigator.clipboard;
   },
   contextItemLabel: "labels.cut",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.X,
@@ -77,6 +101,9 @@ export const actionCopyAsSvg = register({
         commitToHistory: false,
       };
     }
+  },
+  predicate: (elements) => {
+    return probablySupportsClipboardWriteText && elements.length > 0;
   },
   contextItemLabel: "labels.copyAsSvg",
 });
@@ -132,6 +159,9 @@ export const actionCopyAsPng = register({
       };
     }
   },
+  predicate: (elements) => {
+    return probablySupportsClipboardBlob && elements.length > 0;
+  },
   contextItemLabel: "labels.copyAsPng",
   keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
 });
@@ -159,7 +189,7 @@ export const copyText = register({
       commitToHistory: false,
     };
   },
-  contextItemPredicate: (elements, appState) => {
+  predicate: (elements, appState) => {
     return (
       probablySupportsClipboardWriteText &&
       getSelectedElements(elements, appState, true).some(isTextElement)
