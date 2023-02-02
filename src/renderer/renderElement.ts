@@ -989,7 +989,11 @@ export const renderElement = (
           element,
           renderConfig,
         );
+        if (element.type === "text" || element.type === "image") {
+          context.imageSmoothingEnabled = false;
+        }
         drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
+        context.imageSmoothingEnabled = true;
       }
       break;
     }
