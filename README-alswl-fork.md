@@ -1,6 +1,6 @@
 # Excalidraw(forked)
 
-## Branch Management
+## Branch management
 
 ```
 upstream:
@@ -10,5 +10,16 @@ fork:
     fork: alias to latest stable forked
     release/$(name) (based on upstream release tag, and merge with features)
     feat/$(name) (feature branch)
-    pr/$(name) (from feature branch, for upstream pull request, delete after merged)
+    feat/$(name)-rebase-$(date) (feature branch, with new upstream rebased)
 ```
+
+
+## Current active feature branch
+
+- feat/chinese-font-support
+  - feat/chinese-font (deprecated)
+  - feat/chinese-font-for-v0.12.0 (deprecated, merged to release)
+- feat/self-host-backend-origin
+  - feat/self-host-backend (deprecated)
+  - feat/self-host-new-pr-for-v0.12.0 (deprecated, merge to release) 
+
