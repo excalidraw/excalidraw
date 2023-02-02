@@ -20,13 +20,14 @@ import {
   bindTextToShapeAfterDuplication,
   getBoundTextElement,
 } from "../element/textElement";
-import { isBoundToContainer } from "../element/typeChecks";
+import { isBoundToContainer, isFrameElement } from "../element/typeChecks";
 import { normalizeElementOrder } from "../element/sortElements";
 import { DuplicateIcon } from "../components/icons";
 import {
   getElementsToUpdateFromSelection,
   bindElementsToFramesAfterDuplication,
   getFramesCountInElements,
+  getElementsInFrame,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 
@@ -106,7 +107,7 @@ const duplicateElements = (
     return newElement;
   };
 
-  const selectedElementIds = arrayToMap(
+  const idsOfElementsToDuplicate = arrayToMap(
     getElementsToUpdateFromSelection(sortedElements, appState),
   );
 
@@ -141,9 +142,11 @@ const duplicateElements = (
     }
 
     const boundTextElement = getBoundTextElement(element);
-    if (selectedElementIds.get(element.id)) {
-      // if a group or a container/bound-text, duplicate atomically
-      if (element.groupIds.length || boundTextElement) {
+    const isElementAFrame = isFrameElement(element);
+
+    if (idsOfElementsToDuplicate.get(element.id)) {
+      // if a group or a container/bound-text or frame, duplicate atomically
+      if (element.groupIds.length || boundTextElement || isElementAFrame) {
         const groupId = getSelectedGroupForElement(appState, element);
         if (groupId) {
           const groupElements = getElementsInGroup(sortedElements, groupId);
@@ -168,10 +171,33 @@ const duplicateElements = (
           );
           continue;
         }
+        if (isElementAFrame) {
+          const elementsInFrame = getElementsInFrame(elements, element.id);
+
+          elementsWithClones.push(
+            ...markAsProcessed([
+              ...elementsInFrame,
+              element,
+              ...elementsInFrame.map((e) => duplicateAndOffsetElement(e)),
+              duplicateAndOffsetElement(element),
+            ]),
+          );
+
+          continue;
+        }
       }
-      elementsWithClones.push(
-        ...markAsProcessed([element, duplicateAndOffsetElement(element)]),
-      );
+      // since elements in frames have a lower z-index than frame itself,
+      // they will be looped first and if their frames are selected as well,
+      // we will take care of them atomically above
+      // so we skip those elements here
+      //
+      // for normal elements (or elements that are left out from the above
+      // step for whatever) we (should at least) duplicate them here
+      if (!element.frameId || !idsOfElementsToDuplicate.has(element.frameId)) {
+        elementsWithClones.push(
+          ...markAsProcessed([element, duplicateAndOffsetElement(element)]),
+        );
+      }
     } else {
       elementsWithClones.push(...markAsProcessed([element]));
     }

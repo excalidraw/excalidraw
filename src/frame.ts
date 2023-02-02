@@ -58,7 +58,7 @@ export const getElementsToUpdateForFrame = (
 
 export const bindElementsToFramesAfterDuplication = (
   nextElements: ExcalidrawElement[],
-  oldElements: ExcalidrawElement[],
+  oldElements: readonly ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
 ) => {
   const nextElementMap = arrayToMap(nextElements) as Map<
