@@ -322,7 +322,8 @@ export const getApproxLineHeight = (font: FontString) => {
   if (cacheApproxLineHeight[font]) {
     return cacheApproxLineHeight[font];
   }
-  cacheApproxLineHeight[font] = measureText(DUMMY_TEXT, font, null).height;
+  const fontSize = parseInt(font);
+  cacheApproxLineHeight[font] = fontSize * 1.2;
   return cacheApproxLineHeight[font];
 };
 
@@ -369,14 +370,8 @@ const getLineHeight = (text: string, font: FontString) => {
   // if (metrics.fontBoundingBoxAscent && metrics.fontBoundingBoxDescent) {
   //   return metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
   // }
-  const metricsM = canvas2dContext.measureText("M");
-  const lineHeight =
-    metricsM.actualBoundingBoxAscent + metricsM.actualBoundingBoxDescent;
-  return (
-    metrics.actualBoundingBoxAscent +
-    metrics.actualBoundingBoxDescent +
-    lineHeight / 2
-  );
+
+  return metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
 };
 
 export const getTextWidth = (text: string, font: FontString) => {
@@ -391,8 +386,10 @@ export const getTextWidth = (text: string, font: FontString) => {
 export const getTextHeight = (text: string, font: FontString) => {
   const lines = text.replace(/\r\n?/g, "\n").split("\n");
   let height = 0;
+  const lineHeight = parseInt(font) * 1.2;
+
   lines.forEach((line) => {
-    height += getLineHeight(line, font);
+    height += getLineHeight(line, font) + lineHeight / 2;
   });
   return height;
 };
