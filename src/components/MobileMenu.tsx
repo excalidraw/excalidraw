@@ -41,6 +41,7 @@ type MobileMenuProps = {
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderSidebars: () => JSX.Element | null;
   device: Device;
+  renderWelcomeScreen: boolean;
 };
 
 export const MobileMenu = ({
@@ -57,12 +58,13 @@ export const MobileMenu = ({
   renderCustomStats,
   renderSidebars,
   device,
+  renderWelcomeScreen,
 }: MobileMenuProps) => {
   const { welcomeScreenCenterTunnel, mainMenuTunnel } = useTunnels();
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
-        <welcomeScreenCenterTunnel.Out />
+        {renderWelcomeScreen && <welcomeScreenCenterTunnel.Out />}
         <Section heading="shapes">
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
