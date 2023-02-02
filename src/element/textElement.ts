@@ -385,13 +385,8 @@ export const getTextWidth = (text: string, font: FontString) => {
 
 export const getTextHeight = (text: string, font: FontString) => {
   const lines = text.replace(/\r\n?/g, "\n").split("\n");
-  let height = 0;
-  const lineHeight = parseInt(font) * 1.2;
-
-  lines.forEach((line) => {
-    height += getLineHeight(line, font) + lineHeight / 2;
-  });
-  return height;
+  const lineHeight = getApproxLineHeight(font);
+  return lineHeight * lines.length;
 };
 
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
