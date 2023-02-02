@@ -28,6 +28,7 @@ import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./textWysiwyg";
+import { Fonts } from "../scene/Fonts";
 
 export const normalizeText = (text: string) => {
   return (
@@ -98,6 +99,7 @@ export const redrawTextBoundingBox = (
       coordX = centerX - (textElement.width + diffWidth) / 2;
     }
   }
+
   mutateElement(textElement, {
     width: metrics.width,
     height: metrics.height,
@@ -298,7 +300,19 @@ export const measureText = (
   if (isTestEnv()) {
     return { width, height, baseline, container };
   }
-  return { width, height, baseline };
+  const canvasHeight = getTextHeight(text, font);
+  const canvasWidth = getTextWidth(text, font);
+  console.log(
+    "canvas height",
+    canvasHeight,
+    "Dom height",
+    height,
+    "font size",
+    font,
+  );
+  console.log("canvas width", canvasWidth, "Dom width", width);
+
+  return { width: canvasWidth, height: canvasHeight, baseline };
 };
 
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
@@ -313,6 +327,16 @@ export const getApproxLineHeight = (font: FontString) => {
 };
 
 let canvas: HTMLCanvasElement | undefined;
+
+const getTextMetrics = (text: string, font: FontString) => {
+  if (!canvas) {
+    canvas = document.createElement("canvas");
+  }
+  const canvas2dContext = canvas.getContext("2d")!;
+  canvas2dContext.font = font;
+  return canvas2dContext.measureText(text);
+};
+
 const getLineWidth = (text: string, font: FontString) => {
   if (!canvas) {
     canvas = document.createElement("canvas");
@@ -334,14 +358,45 @@ const getLineWidth = (text: string, font: FontString) => {
   return metrics.width + adjustmentFactor;
 };
 
+const getLineHeight = (text: string, font: FontString) => {
+  if (!canvas) {
+    canvas = document.createElement("canvas");
+  }
+  const canvas2dContext = canvas.getContext("2d")!;
+  canvas2dContext.font = font;
+
+  const metrics = canvas2dContext.measureText(text);
+  // if (metrics.fontBoundingBoxAscent && metrics.fontBoundingBoxDescent) {
+  //   return metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
+  // }
+  const metricsM = canvas2dContext.measureText("M");
+  const lineHeight =
+    metricsM.actualBoundingBoxAscent + metricsM.actualBoundingBoxDescent;
+  return (
+    metrics.actualBoundingBoxAscent +
+    metrics.actualBoundingBoxDescent +
+    lineHeight / 2
+  );
+};
+
 export const getTextWidth = (text: string, font: FontString) => {
-  const lines = text.split("\n");
+  const lines = text.replace(/\r\n?/g, "\n").split("\n");
   let width = 0;
   lines.forEach((line) => {
     width = Math.max(width, getLineWidth(line, font));
   });
   return width;
 };
+
+export const getTextHeight = (text: string, font: FontString) => {
+  const lines = text.replace(/\r\n?/g, "\n").split("\n");
+  let height = 0;
+  lines.forEach((line) => {
+    height += getLineHeight(line, font);
+  });
+  return height;
+};
+
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   const lines: Array<string> = [];
   const originalLines = text.split("\n");

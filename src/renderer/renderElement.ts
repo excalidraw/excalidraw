@@ -272,6 +272,7 @@ const drawElementOnCanvas = (
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
         context.font = getFontString(element);
+
         context.fillStyle = element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
@@ -280,22 +281,23 @@ const drawElementOnCanvas = (
         const lineHeight = element.containerId
           ? getApproxLineHeight(getFontString(element))
           : element.height / lines.length;
-        let verticalOffset = element.height - element.baseline;
-        if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+        let verticalOffset = 0;
+        if (element.verticalAlign === VERTICAL_ALIGN.TOP) {
           verticalOffset = getBoundTextElementOffset(element);
         }
-
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
             : element.textAlign === "right"
             ? element.width
             : 0;
+        context.textBaseline = "bottom";
+
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],
             horizontalOffset,
-            (index + 1) * lineHeight - verticalOffset,
+            (index + 1) * lineHeight + verticalOffset,
           );
         }
         context.restore();
@@ -1274,7 +1276,7 @@ export const renderElementToSvg = (
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
-        const verticalOffset = element.height - element.baseline;
+        const verticalOffset = element.height;
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
