@@ -1010,7 +1010,7 @@ export const renderElement = (
         drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
 
         // reset
-        context.imageSmoothingEnabled = true;
+        context.imageSmoothingEnabled = currentImageSmoothingStatus;
       }
       break;
     }
