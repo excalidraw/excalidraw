@@ -271,6 +271,14 @@ const drawElementOnCanvas = (
         }
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
+        // context.strokeStyle = "green";
+        // context.lineWidth = 2;
+        // context.moveTo(0, 0);
+        // context.lineTo(element.width + 100, 0);
+        // context.stroke();
+        // context.fillStyle = "red";
+
+        // context.fillRect(0, 0, element.width, element.height);
         context.font = getFontString(element);
 
         context.fillStyle = element.strokeColor;
@@ -281,10 +289,6 @@ const drawElementOnCanvas = (
         const lineHeight = element.containerId
           ? getApproxLineHeight(getFontString(element))
           : element.height / lines.length;
-        let verticalOffset = 0;
-        if (element.verticalAlign === VERTICAL_ALIGN.TOP) {
-          verticalOffset = getBoundTextElementOffset(element);
-        }
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
@@ -297,7 +301,7 @@ const drawElementOnCanvas = (
           context.fillText(
             lines[index],
             horizontalOffset,
-            (index + 1) * lineHeight + verticalOffset,
+            (index + 1) * lineHeight,
           );
         }
         context.restore();
