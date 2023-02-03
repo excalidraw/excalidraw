@@ -989,7 +989,9 @@ export const renderElement = (
           element,
           renderConfig,
         );
-          const currentImageSmoothingStatus = context.imageSmoothingEnabled;
+
+        const currentImageSmoothingStatus = context.imageSmoothingEnabled;
+
         if (
           // angle is 0 -> always disable smoothing
           !element.angle ||
