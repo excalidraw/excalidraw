@@ -1,6 +1,6 @@
 import React from "react";
 import { Popover } from "./Popover";
-import { isTransparent } from "../utils";
+import { getColorNameAndShadeFromHex, isTransparent, Palette } from "../utils";
 
 import "./ColorPicker.scss";
 import { isArrowKey, KEYS } from "../keys";
@@ -9,6 +9,19 @@ import { isWritableElement } from "../utils";
 import colors from "../colors";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
+
+import oc from "open-color";
+
+const ocPalette: Palette = {};
+for (const [key, value] of Object.entries(oc)) {
+  if (Array.isArray(value)) {
+    // @ts-ignore
+    ocPalette[key] = value.filter((_, i) => i % 2 === 0);
+  } else {
+    ocPalette[key] = value;
+  }
+}
+console.log(ocPalette);
 
 const MAX_CUSTOM_COLORS = 5;
 const MAX_DEFAULT_COLORS = 15;
@@ -87,6 +100,48 @@ const keyBindings = [
   ["a", "s", "d", "f", "g"],
   ["z", "x", "c", "v", "b"],
 ].flat();
+
+const ShadeList = ({
+  hex,
+  onChange,
+}: {
+  hex: string;
+  onChange: (color: string) => void;
+}) => {
+  console.log("rendershades", hex);
+  const r = getColorNameAndShadeFromHex({
+    hex,
+    palette: ocPalette as any as Palette,
+  });
+  console.log(r);
+
+  if (r) {
+    const { colorName, shade } = r;
+
+    const c = ocPalette[colorName];
+
+    if (Array.isArray(c)) {
+      return (
+        <div className="color-picker-content--default">
+          {c.map((color, i) => (
+            <div
+              title={`${colorName} - ${i}`}
+              style={{
+                width: "1.875rem",
+                height: "1.875rem",
+                backgroundColor: color,
+                outline: i === shade ? "2px solid black" : "none",
+              }}
+              onClick={() => onChange(color)}
+            />
+          ))}
+        </div>
+      );
+    }
+  }
+
+  return null;
+};
 
 const Picker = ({
   colors,
@@ -246,6 +301,11 @@ const Picker = ({
     });
   };
 
+  const colorObj = getColorNameAndShadeFromHex({
+    hex: color!,
+    palette: ocPalette,
+  });
+
   return (
     <div
       className={`color-picker color-picker-type-${type}`}
@@ -266,9 +326,52 @@ const Picker = ({
         // to allow focusing by clicking but not by tabbing
         tabIndex={-1}
       >
-        <div className="color-picker-content--default">
+        {/* <div className="color-picker-content--default">
           {renderColors(colors)}
+        </div> */}
+
+        <div className="color-picker-content--default">
+          {Object.entries(ocPalette).map(([key, value]) => {
+            return (
+              <button
+                className="color-picker-swatch"
+                onClick={(event) => {
+                  (event.currentTarget as HTMLButtonElement).focus();
+                  onChange(Array.isArray(value) ? value[3] : value);
+                }}
+                title={key}
+                // title={`${label}${
+                //   !isTransparent(_color) ? ` (${_color})` : ""
+                // } — ${keyBinding.toUpperCase()}`}
+                aria-label={label}
+                // aria-keyshortcuts={keyBindings[i]}
+                style={{
+                  color: Array.isArray(value) ? value[3] : value,
+                  outline:
+                    colorObj?.colorName === key ? "2px solid black" : "none",
+                }}
+                key={key}
+                // ref={(el) => {
+                //   if (!custom && el && i === 0) {
+                //     firstItem.current = el;
+                //   }
+                //   if (el && _color === color) {
+                //     activeItem.current = el;
+                //   }
+                // }}
+                // onFocus={() => {
+                //   onChange(_color);
+                // }}
+              ></button>
+            );
+          })}
         </div>
+
+        <div>shades</div>
+        <div className="the-fuck">
+          {color ? <ShadeList hex={color} onChange={onChange} /> : "LOL no"}
+        </div>
+
         {!!customColors.length && (
           <div className="color-picker-content--canvas">
             <span className="color-picker-content--canvas-title">

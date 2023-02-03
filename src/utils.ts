@@ -727,3 +727,42 @@ export const composeEventHandlers = <E>(
     }
   };
 };
+
+// Color picker utils
+export type PaletteKey = keyof oc | string;
+export type PaletteValue = string | [string, string, string, string, string];
+export type Palette = Record<PaletteKey, PaletteValue>;
+
+const samplePalette: Palette = {
+  white: "#ffffff",
+  black: "#000000",
+  // every second from teal
+  teal: oc.teal.filter((_, i) => i % 2 === 0) as PaletteValue,
+  indigo: oc.indigo.filter((_, i) => i % 2 === 0) as PaletteValue,
+  fake: ["1", "2", "3", "4", "5"],
+};
+
+export const getColorNameAndShadeFromHex = ({
+  palette,
+  hex,
+}: {
+  palette: Palette;
+  hex: string;
+}) => {
+  console.log("wtf is going on.....");
+  for (const [colorName, colorVal] of Object.entries(palette)) {
+    console.log(colorName, colorVal);
+    console.log(Array.isArray(colorVal));
+    if (Array.isArray(colorVal)) {
+      console.log("is array");
+      const shade = colorVal.indexOf(hex);
+      if (shade > -1) {
+        return { colorName, shade };
+      }
+    } else if (colorVal === hex) {
+      console.log("is string");
+      return { colorName, shade: -1 };
+    }
+  }
+  return null;
+};
