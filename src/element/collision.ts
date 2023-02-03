@@ -77,18 +77,12 @@ export const hitTest = (
     isElementSelected(appState, element) &&
     shouldShowBoundingBox([element], appState)
   ) {
-    // frames needs be checked differently so as to be able to drag it
-    // by its frame, whether it has been selected or not
-    // this logic here is not ideal
-    // TODO: refactor it later...
-    if (element.type === "frame") {
-      return isHittingElementNotConsideringBoundingBox(
-        element,
-        appState,
-        point,
-      );
-    }
-    return isPointHittingElementBoundingBox(element, point, threshold);
+    return isPointHittingElementBoundingBox(
+      element,
+      point,
+      threshold,
+      appState,
+    );
   }
 
   const boundTextElement = getBoundTextElement(element);
@@ -118,7 +112,7 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
 
   return (
     !isHittingElementNotConsideringBoundingBox(element, appState, [x, y]) &&
-    isPointHittingElementBoundingBox(element, [x, y], threshold)
+    isPointHittingElementBoundingBox(element, [x, y], threshold, appState)
   );
 };
 
@@ -151,7 +145,22 @@ export const isPointHittingElementBoundingBox = (
   element: NonDeleted<ExcalidrawElement>,
   [x, y]: Point,
   threshold: number,
+  appState: AppState,
 ) => {
+  // frames needs be checked differently so as to be able to drag it
+  // by its frame, whether it has been selected or not
+  // this logic here is not ideal
+  // TODO: refactor it later...
+  if (element.type === "frame") {
+    return hitTestPointAgainstElement({
+      element,
+      point: [x, y],
+      threshold,
+      check: isInsideCheck,
+      appState,
+    });
+  }
+
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const elementCenterX = (x1 + x2) / 2;
   const elementCenterY = (y1 + y2) / 2;
