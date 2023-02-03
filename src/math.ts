@@ -459,3 +459,15 @@ export const mapIntervalToBezierT = (
 export const arePointsEqual = (p1: Point, p2: Point) => {
   return p1[0] === p2[0] && p1[1] === p2[1];
 };
+
+export const isRightAngle = (angle: number) => {
+  // if our angles were mathematically accurate, we could just check
+  //
+  //    angle % (Math.PI / 2) === 0
+  //
+  // but since we're in floating point land, we need to round.
+  //
+  // Below, after dividing by Math.PI, a multiple of 0.5 indicates a right
+  // angle, which we can check with modulo after rounding.
+  return Math.round((angle / Math.PI) * 10000) % 5000 === 0;
+};
