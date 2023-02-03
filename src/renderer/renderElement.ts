@@ -27,7 +27,7 @@ import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
-import { getCornerRadius, isPathALoop } from "../math";
+import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
@@ -989,7 +989,33 @@ export const renderElement = (
           element,
           renderConfig,
         );
+
+        const currentImageSmoothingStatus = context.imageSmoothingEnabled;
+
+        if (
+          // do not disable smoothing during zoom as blurry shapes look better
+          // on low resolution (while still zooming in) than sharp ones
+          !renderConfig?.shouldCacheIgnoreZoom &&
+          // angle is 0 -> always disable smoothing
+          (!element.angle ||
+            // or check if angle is a right angle in which case we can still
+            // disable smoothing without adversely affecting the result
+            isRightAngle(element.angle))
+        ) {
+          // Disabling smoothing makes output much sharper, especially for
+          // text. Unless for non-right angles, where the aliasing is really
+          // terrible on Chromium.
+          //
+          // Note that `context.imageSmoothingQuality="high"` has almost
+          // zero effect.
+          //
+          context.imageSmoothingEnabled = false;
+        }
+
         drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
+
+        // reset
+        context.imageSmoothingEnabled = currentImageSmoothingStatus;
       }
       break;
     }
