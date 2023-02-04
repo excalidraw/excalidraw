@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { useDevice, useExcalidrawAppState } from "../App";
+import { Button } from "../Button";
 
 const MenuTrigger = ({
   className = "",
@@ -21,15 +22,14 @@ const MenuTrigger = ({
     },
   ).trim();
   return (
-    <button
-      data-prevent-outside-click
+    <Button
+      onSelect={onToggle}
       className={classNames}
-      onClick={onToggle}
-      type="button"
+      data-prevent-outside-click
       data-testid="dropdown-menu-button"
     >
       {children}
-    </button>
+    </Button>
   );
 };
 
