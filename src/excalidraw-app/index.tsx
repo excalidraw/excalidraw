@@ -52,6 +52,7 @@ import Collab, {
   collabAPIAtom,
   collabDialogShownAtom,
   isCollaboratingAtom,
+  isOfflineAtom,
 } from "./collab/Collab";
 import {
   exportToBackend,
@@ -66,10 +67,7 @@ import {
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
 import { restore, restoreAppState, RestoredDataState } from "../data/restore";
-
-import "./index.scss";
 import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
-
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
@@ -77,13 +75,15 @@ import { loadFilesFromFirebase } from "./data/firebase";
 import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
-import { atom, Provider, useAtom } from "jotai";
+import { atom, Provider, useAtom, useAtomValue } from "jotai";
 import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 import { AppFooter } from "./components/AppFooter";
+
+import "./index.scss";
 
 polyfill();
 
@@ -599,6 +599,8 @@ const ExcalidrawWrapper = () => {
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
   };
 
+  const isOffline = useAtomValue(isOfflineAtom);
+
   return (
     <div
       style={{ height: "100%" }}
@@ -661,6 +663,11 @@ const ExcalidrawWrapper = () => {
         />
         <AppWelcomeScreen setCollabDialogShown={setCollabDialogShown} />
         <AppFooter />
+        {isCollaborating && isOffline && (
+          <div className="collab-offline-warning">
+            {t("alerts.collabOfflineWarning")}
+          </div>
+        )}
       </Excalidraw>
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
