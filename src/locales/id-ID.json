@@ -219,7 +219,8 @@
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar",
     "penMode": "Mode pena - mencegah sentuhan",
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
-    "eraser": "Penghapus"
+    "eraser": "Penghapus",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -227,7 +228,7 @@
     "shapes": "Bentuk"
   },
   "hints": {
-    "canvasPanning": "Untuk memindahkan kanvas, tekan roda mouse atau spasi ketika menarik",
+    "canvasPanning": "",
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
@@ -245,7 +246,8 @@
     "publishLibrary": "Terbitkan pustaka Anda",
     "bindTextToElement": "Tekan enter untuk tambahkan teks",
     "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran",
-    "eraserRevert": "Tahan Alt untuk mengembalikan elemen yang ditandai untuk dihapus"
+    "eraserRevert": "Tahan Alt untuk mengembalikan elemen yang ditandai untuk dihapus",
+    "firefox_clipboard_write": "Fitur ini dapat diaktifkan melalui pengaturan flag \"dom.events.asyncClipboard.clipboardItem\" ke \"true\". Untuk mengganti flag di Firefox, pergi ke laman \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",

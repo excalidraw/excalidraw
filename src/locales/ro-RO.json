@@ -219,7 +219,8 @@
     "lock": "Menține activ instrumentul selectat după desenare",
     "penMode": "Mod stilou – împiedică atingerea",
     "link": "Adăugare/actualizare URL pentru forma selectată",
-    "eraser": "Radieră"
+    "eraser": "Radieră",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
@@ -227,7 +228,7 @@
     "shapes": "Forme"
   },
   "hints": {
-    "canvasPanning": "Pentru a muta pânză, ține apăsată rotița mausului sau bara de spațiu în timpul glisării",
+    "canvasPanning": "",
     "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
@@ -245,7 +246,8 @@
     "publishLibrary": "Publică propria bibliotecă",
     "bindTextToElement": "Apasă tasta Enter pentru a adăuga text",
     "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea",
-    "eraserRevert": "Ține apăsată tasta Alt pentru a anula elementele marcate pentru ștergere"
+    "eraserRevert": "Ține apăsată tasta Alt pentru a anula elementele marcate pentru ștergere",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",

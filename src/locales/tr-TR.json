@@ -219,7 +219,8 @@
     "lock": "Seçilen aracı çizimden sonra aktif tut",
     "penMode": "Kalem modu - dokunmayı engelle",
     "link": "Seçilen şekil için bağlantı Ekle/Güncelle",
-    "eraser": "Silgi"
+    "eraser": "Silgi",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Tuval eylemleri",
@@ -227,7 +228,7 @@
     "shapes": "Şekiller"
   },
   "hints": {
-    "canvasPanning": "Tuvali taşımak için, tuvali sürüklerken aynı zamanda fare tekerleğine veya boşluk tuşuna basılı tutun",
+    "canvasPanning": "",
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
@@ -245,7 +246,8 @@
     "publishLibrary": "Kendi kitaplığınızı yayınlayın",
     "bindTextToElement": "Enter tuşuna basarak metin ekleyin",
     "deepBoxSelect": "Ctrl/Cmd tuşuna basılı tutarak derin seçim yapın ya da sürüklemeyi engelleyin",
-    "eraserRevert": "Alt tuşuna basılı tutarak silinme için işaretlenmiş ögeleri tersine çevirin"
+    "eraserRevert": "Alt tuşuna basılı tutarak silinme için işaretlenmiş ögeleri tersine çevirin",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
