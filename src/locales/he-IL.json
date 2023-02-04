@@ -219,7 +219,8 @@
     "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור",
     "penMode": "",
     "link": "הוספה/עדכון של קישור עבור הצורה הנבחרת",
-    "eraser": "מחק"
+    "eraser": "מחק",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "פעולות הלוח",
@@ -227,7 +228,7 @@
     "shapes": "צורות"
   },
   "hints": {
-    "canvasPanning": "כדי להזיז את הקנבס לחצו על גלגל העכבר או על מקש הרווח תוך כדי גרירה",
+    "canvasPanning": "",
     "linearElement": "הקלק בשביל לבחור נקודות מרובות, גרור בשביל קו בודד",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
@@ -245,7 +246,8 @@
     "publishLibrary": "פירסום ספריה אישית",
     "bindTextToElement": "יש להקיש Enter כדי להוסיף טקסט",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "לא הצלחנו להציג את התצוגה המקדימה",

@@ -202,8 +202,8 @@
     "invalidSVGString": "SVG armeɣtu.",
     "cannotResolveCollabServer": "Ulamek tuqqna s aqeddac n umyalel. Ma ulac uɣilif ales asali n usebter sakin eɛreḍ tikkelt-nniḍen.",
     "importLibraryError": "Ur d-ssalay ara tamkarḍit",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed": "Ulamek asekles deg uzadur n yisefka deg ugilal. Ma ikemmel wugur, isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
+    "collabSaveFailed_sizeExceeded": "Ulamek asekles deg uzadur n yisefka deg ugilal, taɣzut n usuneɣ tettban-d temqer aṭas. Isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem."
   },
   "toolBar": {
     "selection": "Tafrayt",
@@ -217,9 +217,10 @@
     "text": "Aḍris",
     "library": "Tamkarḍit",
     "lock": "Eǧǧ afecku n tefrayt yermed mbaɛd asuneɣ",
-    "penMode": "",
+    "penMode": "Askar n yimru - gdel tanalit",
     "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen",
-    "eraser": "Sfeḍ"
+    "eraser": "Sfeḍ",
+    "hand": "Afus (afecku n usmutti n tmuɣli)"
   },
   "headings": {
     "canvasActions": "Tigawin n teɣzut n usuneɣ",
@@ -227,7 +228,7 @@
     "shapes": "Talɣiwin"
   },
   "hints": {
-    "canvasPanning": "Akken ad tesmuttiḍ taɣzut n usuneɣ, ṭṭef ṛṛuda n umumed, neɣ afeggag n tallunt mi ara tzuɣreḍ",
+    "canvasPanning": "",
     "linearElement": "Ssit akken ad tebduḍ aṭas n tenqiḍin, zuɣer i yiwen n yizirig",
     "freeDraw": "Ssit yerna zuɣer, serreḥ ticki tfukeḍ",
     "text": "Tixidest: tzemreḍ daɣen ad ternuḍ aḍris s usiti snat n tikkal anida tebɣiḍ s ufecku n tefrayt",
@@ -245,7 +246,8 @@
     "publishLibrary": "Siẓreg tamkarḍit-inek•inem",
     "bindTextToElement": "Ssed ɣef kcem akken ad ternuḍ aḍris",
     "deepBoxSelect": "Ṭṭef CtrlOrCmd akken ad tferneḍ s telqey, yerna ad trewleḍ i uzuɣer",
-    "eraserRevert": "Ssed Alt akken ad tsefsxeḍ iferdisen yettwacerḍen i tukksa"
+    "eraserRevert": "Ssed Alt akken ad tsefsxeḍ iferdisen yettwacerḍen i tukksa",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Ulamek abeqqeḍ n teskant",

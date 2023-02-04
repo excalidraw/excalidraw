@@ -219,7 +219,8 @@
     "lock": "Geselecteerde tool actief houden na tekenen",
     "penMode": "Pen modus - Blokkeer aanraken",
     "link": "",
-    "eraser": "Gum"
+    "eraser": "Gum",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Canvasacties",
@@ -227,7 +228,7 @@
     "shapes": "Vormen"
   },
   "hints": {
-    "canvasPanning": "Om canvas te verplaatsen, houd muiswiel of spatiebalk ingedrukt tijdens slepen",
+    "canvasPanning": "",
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
@@ -245,7 +246,8 @@
     "publishLibrary": "Publiceer je eigen bibliotheek",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan voorbeeld niet tonen",

@@ -219,7 +219,8 @@
     "lock": "描画後も使用中のツールを選択したままにする",
     "penMode": "ペンモード - タッチ防止",
     "link": "選択した図形のリンクを追加/更新",
-    "eraser": "消しゴム"
+    "eraser": "消しゴム",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "キャンバス操作",
@@ -227,7 +228,7 @@
     "shapes": "図形"
   },
   "hints": {
-    "canvasPanning": "キャンバスを移動するには、マウスホイールまたはスペースバーを押しながらドラッグします",
+    "canvasPanning": "",
     "linearElement": "クリックすると複数の頂点からなる曲線を開始、ドラッグすると直線",
     "freeDraw": "クリックしてドラッグします。離すと終了します",
     "text": "ヒント: 選択ツールを使用して任意の場所をダブルクリックしてテキストを追加することもできます",
@@ -245,7 +246,8 @@
     "publishLibrary": "自分のライブラリを公開",
     "bindTextToElement": "Enterを押してテキストを追加",
     "deepBoxSelect": "CtrlOrCmd を押し続けることでドラッグを抑止し、深い選択を行います",
-    "eraserRevert": "Alt を押し続けることで削除マークされた要素を元に戻す"
+    "eraserRevert": "Alt を押し続けることで削除マークされた要素を元に戻す",
+    "firefox_clipboard_write": "この機能は、\"dom.events.asyncClipboard.clipboardItem\" フラグを \"true\" に設定することで有効になる可能性があります。Firefox でブラウザーの設定を変更するには、\"about:config\" ページを参照してください。"
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",

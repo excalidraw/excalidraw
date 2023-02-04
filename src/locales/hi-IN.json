@@ -219,7 +219,8 @@
     "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें",
     "penMode": "पेन का मोड - स्पर्श टाले",
     "link": "",
-    "eraser": "रबड़"
+    "eraser": "रबड़",
+    "hand": "हाथ ( खिसकाने का औज़ार)"
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",
@@ -227,7 +228,7 @@
     "shapes": "आकृतियाँ"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "कैनवास को सरकाने के लिए, ड्रैग करते समय माउस व्हील को पकड़े रखे या स्पेसबार को दबाए रखे, अथवा हाथ वाले औज़ार का उपयोग करें",
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, सिंगल लाइन के लिए खींचें",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोड़ो",
     "text": "आप चयन टूल से कहीं भी डबल-क्लिक करके टेक्स्ट जोड़ सकते हैं",
@@ -245,7 +246,8 @@
     "publishLibrary": "",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए"
+    "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए",
+    "firefox_clipboard_write": "\"dom.events.asyncClipboard.clipboardItem\" फ़्लैग को \"true\" पर सेट करके इस सुविधा को संभवतः सक्षम किया जा सकता है। Firefox में ब्राउज़र फ़्लैग बदलने के लिए, \"about:config\" पृष्ठ पर जाएँ।"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -448,15 +450,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "आपका सर्व डेटा ब्राउज़र के भीतर स्थानिक जगह पे सुरक्षित किया गया.",
+      "center_heading_plus": "बजाय आपको Excalidraw+ पर जाना है?",
+      "menuHint": "निर्यात, पसंद, भाषायें, ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "निर्यात, पसंद, और भी...",
+      "center_heading": "चित्रांकन। बनाया गया। सरल।",
+      "toolbarHint": "एक औजार चुने और चित्रकारी प्रारंभ करे!",
+      "helpHint": "शॉर्ट्कट और सहाय्य"
     }
   }
 }

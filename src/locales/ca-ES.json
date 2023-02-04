@@ -219,7 +219,8 @@
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
     "penMode": "",
     "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
-    "eraser": "Esborrador"
+    "eraser": "Esborrador",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -227,7 +228,7 @@
     "shapes": "Formes"
   },
   "hints": {
-    "canvasPanning": "Per a moure el llenç, mantingueu premuda la roda del ratolí o la tecla espai mentre l'arrossegueu",
+    "canvasPanning": "",
     "linearElement": "Feu clic per a dibuixar múltiples punts; arrossegueu per a una sola línia",
     "freeDraw": "Feu clic i arrossegueu, deixeu anar per a finalitzar",
     "text": "Consell: també podeu afegir text fent doble clic en qualsevol lloc amb l'eina de selecció",
@@ -245,7 +246,8 @@
     "publishLibrary": "Publiqueu la vostra pròpia llibreria",
     "bindTextToElement": "Premeu enter per a afegir-hi text",
     "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament",
-    "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar"
+    "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",

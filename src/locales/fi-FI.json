@@ -219,7 +219,8 @@
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen",
     "penMode": "",
     "link": "Lisää/päivitä linkki valitulle muodolle",
-    "eraser": "Poistotyökalu"
+    "eraser": "Poistotyökalu",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
@@ -227,7 +228,7 @@
     "shapes": "Muodot"
   },
   "hints": {
-    "canvasPanning": "Liikuttaaksesi piirtoaluetta, raahaa hiiren vieritysrulla tai välilyöntinäppäin alaspainettuna",
+    "canvasPanning": "",
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
@@ -245,7 +246,8 @@
     "publishLibrary": "Julkaise oma kirjasto",
     "bindTextToElement": "Lisää tekstiä painamalla enter",
     "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus painamalla CtrlOrCmd",
-    "eraserRevert": "Pidä Alt alaspainettuna, kumotaksesi merkittyjen elementtien poistamisen"
+    "eraserRevert": "Pidä Alt alaspainettuna, kumotaksesi merkittyjen elementtien poistamisen",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",

@@ -219,7 +219,8 @@
     "lock": "Manter a ferramenta selecionada ativa após desenhar",
     "penMode": "Modo caneta - impedir toque",
     "link": "Acrescentar/ Adicionar ligação para uma forma seleccionada",
-    "eraser": "Borracha"
+    "eraser": "Borracha",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Ações da área de desenho",
@@ -227,7 +228,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Para mover a tela, carregue na roda do rato ou na barra de espaço enquanto arrasta",
+    "canvasPanning": "",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "freeDraw": "Clique e arraste, large quando terminar",
     "text": "Dica: também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
@@ -245,7 +246,8 @@
     "publishLibrary": "Publique a sua própria biblioteca",
     "bindTextToElement": "Carregue Enter para acrescentar texto",
     "deepBoxSelect": "Mantenha a tecla CtrlOrCmd carregada para selecção profunda, impedindo o arrastamento",
-    "eraserRevert": "Carregue também em Alt para reverter os elementos marcados para serem apagados"
+    "eraserRevert": "Carregue também em Alt para reverter os elementos marcados para serem apagados",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar uma pré-visualização",

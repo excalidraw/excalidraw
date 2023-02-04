@@ -219,7 +219,8 @@
     "lock": "Manter a ferramenta seleccionada activa despois de debuxar",
     "penMode": "Modo lapis - evitar o contacto",
     "link": "Engadir/ Actualizar ligazón para a forma seleccionada",
-    "eraser": "Goma de borrar"
+    "eraser": "Goma de borrar",
+    "hand": "Man (ferramenta de desprazamento)"
   },
   "headings": {
     "canvasActions": "Accións do lenzo",
@@ -227,7 +228,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Para mover o lenzo, manteña a roda do rato ou a barra de espazo mentres arrastra",
+    "canvasPanning": "Para mover o lenzo, manteña pulsada a roda do rato ou a barra de espazo mentres arrastra, ou utilice a ferramenta da man",
     "linearElement": "Faga clic para iniciar varios puntos, arrastre para unha sola liña",
     "freeDraw": "Fai clic e arrastra, solta cando acabes",
     "text": "Consello: tamén podes engadir texto facendo dobre-clic en calquera lugar coa ferramenta de selección",
@@ -245,7 +246,8 @@
     "publishLibrary": "Publica a túa propia biblioteca",
     "bindTextToElement": "Prema a tecla enter para engadir texto",
     "deepBoxSelect": "Manteña pulsado CtrlOrCmd para seleccionar en profundidade e evitar o arrastre",
-    "eraserRevert": "Manteña pulsado Alt para reverter os elementos marcados para a súa eliminación"
+    "eraserRevert": "Manteña pulsado Alt para reverter os elementos marcados para a súa eliminación",
+    "firefox_clipboard_write": "Esta función pódese activar establecendo a opción \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar as opcións do navegador en Firefox, visita a páxina \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Non se pode mostrar a vista previa",

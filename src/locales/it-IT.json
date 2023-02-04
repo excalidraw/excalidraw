@@ -219,7 +219,8 @@
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato",
     "penMode": "Modalità penna - previene il tocco",
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
-    "eraser": "Gomma"
+    "eraser": "Gomma",
+    "hand": "Mano (strumento di panoramica)"
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
@@ -227,7 +228,7 @@
     "shapes": "Forme"
   },
   "hints": {
-    "canvasPanning": "Per spostare la tela, tieni premuta la rotella del mouse o la barra spaziatrice mentre la trascini",
+    "canvasPanning": "Per spostare la tela, tieni premuta la rotellina del mouse o la barra spaziatrice mentre trascini oppure usa lo strumento mano",
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
@@ -245,7 +246,8 @@
     "publishLibrary": "Pubblica la tua libreria",
     "bindTextToElement": "Premi invio per aggiungere il testo",
     "deepBoxSelect": "Tieni premuto CtrlOCmd per selezionare in profondità e per impedire il trascinamento",
-    "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione"
+    "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione",
+    "firefox_clipboard_write": "Questa funzione può essere abilitata impostando il flag \"dom.events.asyncClipboard.clipboardItem\" su \"true\". Per modificare i flag del browser in Firefox, visitare la pagina \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
