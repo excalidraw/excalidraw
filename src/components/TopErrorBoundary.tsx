@@ -106,7 +106,9 @@ export class TopErrorBoundary extends React.Component<
           </div>
           <div>
             <div className="ErrorSplash-paragraph">
-              {t("errorSplash.trackedToSentry", { sentryEventId: this.state.sentryEventId })}
+              {t("errorSplash.trackedToSentry", {
+                sentryEventId: this.state.sentryEventId,
+              })}
             </div>
             <div className="ErrorSplash-paragraph">
               {t("errorSplash.openIssueMessage_pre")}
