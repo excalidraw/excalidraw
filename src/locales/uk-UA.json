@@ -72,7 +72,7 @@
     "layers": "Шари",
     "actions": "Дії",
     "language": "Мова",
-    "liveCollaboration": "",
+    "liveCollaboration": "Спільна робота у режимі реального часу...",
     "duplicateSelection": "Дублювати",
     "untitled": "Без назви",
     "name": "Ім’я",
@@ -459,7 +459,7 @@
       "menuHint": "",
       "center_heading": "",
       "toolbarHint": "Оберіть інструмент і почніть малювати!",
-      "helpHint": "Комбінації клавіш і допомога"
+      "helpHint": "Гарячі клавіші і допомога"
     }
   }
 }
