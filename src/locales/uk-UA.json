@@ -193,7 +193,7 @@
     "resetLibrary": "Це призведе до очищення бібліотеки. Ви впевнені?",
     "removeItemsFromsLibrary": "Видалити {{count}} елемент(ів) з бібліотеки?",
     "invalidEncryptionKey": "Ключ шифрування повинен бути довжиною до 22 символів. Спільну роботу вимкнено.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Немає підключення до Інтернету.\nВаші зміни не будуть збережені!"
   },
   "errors": {
     "unsupportedFileType": "Непідтримуваний тип файлу.",
@@ -458,8 +458,8 @@
     "defaults": {
       "menuHint": "",
       "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "toolbarHint": "Оберіть інструмент і почніть малювати!",
+      "helpHint": "Комбінації клавіш і допомога"
     }
   }
 }
