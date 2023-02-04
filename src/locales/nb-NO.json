@@ -193,7 +193,7 @@
     "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?",
     "removeItemsFromsLibrary": "Slett {{count}} element(er) fra biblioteket?",
     "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Ingen Internett-tilkobling tilgjengelig.\nEndringer dine vil ikke bli lagret!"
   },
   "errors": {
     "unsupportedFileType": "Filtypen støttes ikke.",
