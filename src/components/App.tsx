@@ -279,6 +279,8 @@ import { shouldShowBoundingBox } from "../element/transformHandles";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionToggleHandTool } from "../actions/actionCanvas";
+import { jotaiStore } from "../jotai";
+import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -395,10 +397,6 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   lastScenePointer: { x: number; y: number } | null = null;
-
-  onConfirmDialogClose = () => {
-    this.setState({ confirmDialogTrigger: false });
-  };
 
   constructor(props: AppProps) {
     super(props);
@@ -612,10 +610,6 @@ class App extends React.Component<AppProps, AppState> {
                         this.state.activeTool.type === "selection" &&
                         !this.scene.getElementsIncludingDeleted().length
                       }
-                      confirmDialogTrigger={this.state.confirmDialogTrigger}
-                      onConfirmDialogClose={() => {
-                        this.setState({ confirmDialogTrigger: false })
-                      }}
                     >
                       {this.props.children}
                     </LayerUI>
@@ -2241,7 +2235,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ suggestedBindings: [] });
     }
     if (event.ctrlKey && event.key === KEYS.DELETE) {
-      this.setState({ confirmDialogTrigger: true });
+      jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
     }
   });
 

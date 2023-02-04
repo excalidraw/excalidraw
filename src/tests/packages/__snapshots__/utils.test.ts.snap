@@ -9,7 +9,6 @@ Object {
     "type": "selection",
   },
   "collaborators": Map {},
-  "confirmDialogTrigger": false,
   "contextMenu": null,
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
