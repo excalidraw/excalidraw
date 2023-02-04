@@ -1,3 +1,4 @@
+import { Button } from "./Button";
 import { HelpIcon } from "./icons";
 
 type HelpButtonProps = {
@@ -8,13 +9,12 @@ type HelpButtonProps = {
 };
 
 export const HelpButton = (props: HelpButtonProps) => (
-  <button
+  <Button
+    onSelect={props.onClick || (() => {})}
     className="help-icon"
-    onClick={props.onClick}
-    type="button"
     title={`${props.title} — ?`}
     aria-label={props.title}
   >
     {HelpIcon}
-  </button>
+  </Button>
 );
