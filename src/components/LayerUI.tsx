@@ -45,7 +45,6 @@ import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
-import { isOnlineAtom } from "../excalidraw-app/collab/Collab";
 import { TunnelsContext, useInitializeTunnels } from "./context/tunnels";
 
 interface LayerUIProps {
@@ -126,7 +125,6 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
-  const [isOnline] = useAtom(isOnlineAtom);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -377,11 +375,6 @@ const LayerUI = ({
             setAppState({ openDialog: null });
           }}
         />
-      )}
-      {!isOnline && (
-        <div className="DisconnectPopup">
-          {t("errors.disconnectedWhileCollaborating")}
-        </div>
       )}
       <ActiveConfirmDialog />
       {renderImageExportDialog()}

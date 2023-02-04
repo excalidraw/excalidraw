@@ -91,18 +91,4 @@
       margin-bottom: auto;
     }
   }
-  .DisconnectPopup {
-    pointer-events: none;
-    position: absolute;
-    top: 4.2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 0.25rem;
-    font-size: 0.75rem;
-    text-align: center;
-    border: 1px solid var(--button-destructive-color);
-    border-radius: var(--border-radius-md);
-    background-color: var(--island-bg-color);
-    z-index: 6;
-  }
 }

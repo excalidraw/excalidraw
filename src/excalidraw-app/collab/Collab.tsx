@@ -75,7 +75,7 @@ import { jotaiStore } from "../../jotai";
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
 export const isCollaboratingAtom = atom(false);
-export const isOnlineAtom = atom(true);
+export const isOfflineAtom = atom(false);
 
 interface CollabState {
   errorMessage: string;
@@ -153,10 +153,8 @@ class Collab extends PureComponent<Props, CollabState> {
 
   componentDidMount() {
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
-    window.addEventListener("online", () => jotaiStore.set(isOnlineAtom, true));
-    window.addEventListener("offline", () =>
-      jotaiStore.set(isOnlineAtom, false),
-    );
+    window.addEventListener("online", this.onOfflineStatusToggle);
+    window.addEventListener("offline", this.onOfflineStatusToggle);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
 
     const collabAPI: CollabAPI = {
@@ -170,7 +168,7 @@ class Collab extends PureComponent<Props, CollabState> {
     };
 
     jotaiStore.set(collabAPIAtom, collabAPI);
-    jotaiStore.set(isOnlineAtom, window.navigator.onLine);
+    this.onOfflineStatusToggle();
 
     if (
       process.env.NODE_ENV === ENV.TEST ||
@@ -186,13 +184,13 @@ class Collab extends PureComponent<Props, CollabState> {
     }
   }
 
+  onOfflineStatusToggle = () => {
+    jotaiStore.set(isOfflineAtom, !window.navigator.onLine);
+  };
+
   componentWillUnmount() {
-    window.removeEventListener("online", () =>
-      jotaiStore.set(isOnlineAtom, true),
-    );
-    window.removeEventListener("offline", () =>
-      jotaiStore.set(isOnlineAtom, false),
-    );
+    window.removeEventListener("online", this.onOfflineStatusToggle);
+    window.removeEventListener("offline", this.onOfflineStatusToggle);
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload);
     window.removeEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
