@@ -219,7 +219,8 @@
     "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
     "penMode": "Luma modua - ukipena saihestu",
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
-    "eraser": "Borragoma"
+    "eraser": "Borragoma",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -227,7 +228,7 @@
     "shapes": "Formak"
   },
   "hints": {
-    "canvasPanning": "Oihala mugitzeko, sakatu saguaren gurpila edo zuriune-barra arrastatzean",
+    "canvasPanning": "",
     "linearElement": "Egin klik hainbat puntu hasteko, arrastatu lerro bakarrerako",
     "freeDraw": "Egin klik eta arrastatu, askatu amaitutakoan",
     "text": "Aholkua: testua gehitu dezakezu edozein lekutan klik bikoitza eginez hautapen tresnarekin",
@@ -245,7 +246,8 @@
     "publishLibrary": "Argitaratu zure liburutegia",
     "bindTextToElement": "Sakatu Sartu testua gehitzeko",
     "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko",
-    "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko"
+    "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Ezin da oihala aurreikusi",
