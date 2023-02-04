@@ -193,7 +193,8 @@
     "invalidSceneUrl": "Couldn't import scene from the supplied URL. It's either malformed, or doesn't contain valid Excalidraw JSON data.",
     "resetLibrary": "This will clear your library. Are you sure?",
     "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
-    "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled."
+    "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
+    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!"
   },
   "errors": {
     "unsupportedFileType": "Unsupported file type.",

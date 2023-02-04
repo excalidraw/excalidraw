@@ -124,7 +124,6 @@ const LayerUI = ({
   children,
 }: LayerUIProps) => {
   const device = useDevice();
-
   const tunnels = useInitializeTunnels();
 
   const renderJSONExportDialog = () => {

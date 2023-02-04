@@ -95,6 +95,9 @@
   --color-gray-90: #1e1e1e;
   --color-gray-100: #121212;
 
+  --color-warning: #fceeca;
+  --color-text-warning: var(--text-primary-color);
+
   --color-danger: #db6965;
   --color-promo: #e70078;
 
@@ -162,6 +165,8 @@
     --color-primary-darker: #b2aeff;
     --color-primary-darkest: #beb9ff;
     --color-primary-light: #4f4d6f;
+
+    --color-text-warning: var(--color-gray-80);
 
     --color-danger: #ffa8a5;
     --color-promo: #d297ff;
