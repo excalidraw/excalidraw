@@ -2234,7 +2234,10 @@ class App extends React.Component<AppProps, AppState> {
         : unbindLinearElements(selectedElements);
       this.setState({ suggestedBindings: [] });
     }
-    if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.DELETE) {
+    if (
+      event[KEYS.CTRL_OR_CMD] &&
+      (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
+    ) {
       jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
     }
   });
