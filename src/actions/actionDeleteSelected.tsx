@@ -1,4 +1,4 @@
-import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { isSomeElementSelected } from "../scene";
 import { KEYS } from "../keys";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
