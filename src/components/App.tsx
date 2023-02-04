@@ -593,7 +593,6 @@ class App extends React.Component<AppProps, AppState> {
                         })
                       }
                       langCode={getLanguage().code}
-                      isCollaborating={this.props.isCollaborating}
                       renderTopRightUI={renderTopRightUI}
                       renderCustomStats={renderCustomStats}
                       renderCustomSidebar={this.props.renderSidebar}
@@ -609,7 +608,6 @@ class App extends React.Component<AppProps, AppState> {
                       onImageAction={this.onImageAction}
                       renderWelcomeScreen={
                         !this.state.isLoading &&
-                        this.props.UIOptions.welcomeScreen &&
                         this.state.showWelcomeScreen &&
                         this.state.activeTool.type === "selection" &&
                         !this.scene.getElementsIncludingDeleted().length

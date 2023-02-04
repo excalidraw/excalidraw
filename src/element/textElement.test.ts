@@ -12,6 +12,20 @@ describe("Test wrapText", () => {
     expect(res).toBe("Hello whats up    ");
   });
 
+  it("should work with emojis", () => {
+    const text = "😀";
+    const maxWidth = 1;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("😀");
+  });
+
+  it("should show the text correctly when min width reached", () => {
+    const text = "Hello😀";
+    const maxWidth = 10;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("H\ne\nl\nl\no\n😀");
+  });
+
   describe("When text doesn't contain new lines", () => {
     const text = "Hello whats up";
     [
@@ -157,7 +171,7 @@ describe("Test measureText", () => {
 
     expect(res.container).toMatchInlineSnapshot(`
       <div
-        style="position: absolute; white-space: pre-wrap; font: Emoji 20px 20px; min-height: 1em; width: 111px; overflow: hidden; word-break: break-word; line-height: 0px;"
+        style="position: absolute; white-space: pre-wrap; font: Emoji 20px 20px; min-height: 1em; max-width: 191px; overflow: hidden; word-break: break-word; line-height: 0px;"
       >
         <span
           style="display: inline-block; overflow: hidden; width: 1px; height: 1px;"

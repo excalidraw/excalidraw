@@ -109,35 +109,35 @@
     "decreaseFontSize": "تصغير حجم الخط",
     "increaseFontSize": "تكبير حجم الخط",
     "unbindText": "فك ربط النص",
-    "bindText": "",
+    "bindText": "ربط النص بالحاوية",
     "link": {
       "edit": "تعديل الرابط",
       "create": "إنشاء رابط",
       "label": "رابط"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "تحرير السطر",
+      "exit": "الخروج من المُحرر"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "قفل",
+      "unlock": "فتح",
+      "lockAll": "قفل الكل",
+      "unlockAll": "فتح الكل"
     },
-    "statusPublished": "",
-    "sidebarLock": ""
+    "statusPublished": "نُشر",
+    "sidebarLock": "إبقاء الشريط الجانبي مفتوح"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "لا توجد عناصر أضيفت بعد...",
+    "hint_emptyLibrary": "حدد عنصر على القماش لإضافته هنا، أو تثبيت مكتبة من المستودع العام أدناه.",
+    "hint_emptyPrivateLibrary": "حدد عنصر على القماش لإضافته هنا."
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
     "exportJSON": "صدر الملف",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "تصدير الصورة...",
+    "export": "حفظ إلى...",
     "exportToPng": "تصدير بصيغة PNG",
     "exportToSvg": "تصدير بصيغة SVG",
     "copyToClipboard": "نسخ إلى الحافظة",
@@ -179,7 +179,7 @@
     "couldNotLoadInvalidFile": "تعذر التحميل، الملف غير صالح",
     "importBackendFailed": "فشل الاستيراد من الخادوم.",
     "cannotExportEmptyCanvas": "لا يمكن تصدير لوحة فارغة.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "تعذر النسخ إلى الحافظة.",
     "decryptFailed": "تعذر فك تشفير البيانات.",
     "uploadedSecurly": "تم تأمين التحميل بتشفير النهاية إلى النهاية، مما يعني أن خادوم Excalidraw والأطراف الثالثة لا يمكنها قراءة المحتوى.",
     "loadSceneOverridePrompt": "تحميل الرسم الخارجي سيحل محل المحتوى الموجود لديك. هل ترغب في المتابعة؟",
@@ -200,10 +200,10 @@
     "fileTooBig": "الملف كبير جداً. الحد الأقصى المسموح به للحجم هو {{maxSize}}.",
     "svgImageInsertError": "تعذر إدراج صورة SVG. يبدو أن ترميز SVG غير صحيح.",
     "invalidSVGString": "SVG غير صالح.",
-    "cannotResolveCollabServer": "",
-    "importLibraryError": "",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "cannotResolveCollabServer": "تعذر الاتصال بخادم التعاون. الرجاء إعادة تحميل الصفحة والمحاولة مرة أخرى.",
+    "importLibraryError": "تعذر تحميل المكتبة",
+    "collabSaveFailed": "تعذر الحفظ في قاعدة البيانات. إذا استمرت المشاكل، يفضل أن تحفظ ملفك محليا كي لا تفقد عملك.",
+    "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك."
   },
   "toolBar": {
     "selection": "تحديد",
@@ -217,9 +217,10 @@
     "text": "نص",
     "library": "مكتبة",
     "lock": "الحفاظ على أداة التحديد نشطة بعد الرسم",
-    "penMode": "",
-    "link": "",
-    "eraser": "ممحاة"
+    "penMode": "وضع القلم - امنع اللمس",
+    "link": "إضافة/تحديث الرابط للشكل المحدد",
+    "eraser": "ممحاة",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
@@ -227,7 +228,7 @@
     "shapes": "الأشكال"
   },
   "hints": {
-    "canvasPanning": "لتحريك لوحة الرسم ، استمر في الضغط على عجلة الماوس أو مفتاح المسافة أثناء السحب",
+    "canvasPanning": "لتحريك القماش، اضغط على عجلة الفأرة أو مفتاح المسافة أثناء السحب، أو استخدم أداة اليد",
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
     "freeDraw": "انقر واسحب، افرج عند الانتهاء",
     "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",
@@ -238,14 +239,15 @@
     "resize": "يمكنك تقييد النسب بالضغط على SHIFT أثناء تغيير الحجم،\nاضغط على ALT لتغيير الحجم من المركز",
     "resizeImage": "يمكنك تغيير الحجم بحرية بالضغط بأستمرار على SHIFT،\nاضغط بأستمرار على ALT أيضا لتغيير الحجم من المركز",
     "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",
-    "lineEditor_info": "",
+    "lineEditor_info": "اضغط على مفتاح (Ctrl أو Cmd) و انقر بشكل مزدوج، أو اضغط على مفتاحي (Ctrl أو Cmd) و (Enter) لتعديل النقاط",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "نشر مكتبتك",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",

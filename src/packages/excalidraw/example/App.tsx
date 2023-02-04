@@ -71,6 +71,7 @@ const {
   restoreElements,
   Sidebar,
   Footer,
+  WelcomeScreen,
   MainMenu,
   LiveCollaborationTrigger,
 } = window.ExcalidrawLib;
@@ -704,6 +705,7 @@ export default function App() {
                 <CustomFooter excalidrawAPI={excalidrawAPI} />
               </Footer>
             )}
+            <WelcomeScreen />
             {renderMenu()}
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
