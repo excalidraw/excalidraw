@@ -6,6 +6,7 @@ import { SidebarPropsContext } from "./common";
 import { CloseIcon, PinIcon } from "../icons";
 import { withUpstreamOverride } from "../hoc/withUpstreamOverride";
 import { Tooltip } from "../Tooltip";
+import { Button } from "../Button";
 
 export const SidebarDockButton = (props: {
   checked: boolean;
@@ -68,14 +69,14 @@ const _SidebarHeader: React.FC<{
             />
           )}
           {renderCloseButton && (
-            <button
-              data-testid="sidebar-close"
+            <Button
+              onSelect={props.onClose || (() => {})}
               className="Sidebar__close-btn"
-              onClick={props.onClose}
+              data-testid="sidebar-close"
               aria-label={t("buttons.close")}
             >
               {CloseIcon}
-            </button>
+            </Button>
           )}
         </div>
       )}
