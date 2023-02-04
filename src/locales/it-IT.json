@@ -193,7 +193,7 @@
     "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?",
     "removeItemsFromsLibrary": "Eliminare {{count}} elementi dalla libreria?",
     "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Nessuna connessione internet disponibile.\nLe tue modifiche non verranno salvate!"
   },
   "errors": {
     "unsupportedFileType": "Tipo di file non supportato.",
