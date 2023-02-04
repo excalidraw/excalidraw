@@ -385,15 +385,16 @@ type CanvasActions = Partial<{
 
 type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
-  welcomeScreen: boolean;
   canvasActions: CanvasActions;
+  /** @deprecated does nothing. Will be removed in 0.15 */
+  welcomeScreen?: boolean;
 }>;
 
 export type AppProps = Merge<
   ExcalidrawProps,
   {
     UIOptions: Merge<
-      MarkRequired<UIOptions, "welcomeScreen">,
+      UIOptions,
       {
         canvasActions: Required<CanvasActions> & { export: ExportOpts };
       }
@@ -523,33 +524,3 @@ export type Device = Readonly<{
   isTouchScreen: boolean;
   canDeviceFitSidebar: boolean;
 }>;
-
-export type UIChildrenComponents = {
-  [k in "FooterCenter" | "Menu" | "WelcomeScreen"]?: React.ReactElement<
-    { children?: React.ReactNode },
-    React.JSXElementConstructor<any>
-  >;
-};
-
-export type UIWelcomeScreenComponents = {
-  [k in
-    | "Center"
-    | "MenuHint"
-    | "ToolbarHint"
-    | "HelpHint"]?: React.ReactElement<
-    { children?: React.ReactNode },
-    React.JSXElementConstructor<any>
-  >;
-};
-
-export type UIWelcomeScreenCenterComponents = {
-  [k in
-    | "Logo"
-    | "Heading"
-    | "Menu"
-    | "MenuItemLoadScene"
-    | "MenuItemHelp"]?: React.ReactElement<
-    { children?: React.ReactNode },
-    React.JSXElementConstructor<any>
-  >;
-};

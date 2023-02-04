@@ -61,30 +61,29 @@ export const redrawTextBoundingBox = (
     if (!isArrowElement(container)) {
       const containerDims = getContainerDims(container);
       let nextHeight = containerDims.height;
-      const boundTextElementPadding = getBoundTextElementOffset(textElement);
       if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-        coordY = container.y + boundTextElementPadding;
+        coordY = container.y;
       } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
         coordY =
           container.y +
           containerDims.height -
           metrics.height -
-          boundTextElementPadding;
+          BOUND_TEXT_PADDING;
       } else {
         coordY = container.y + containerDims.height / 2 - metrics.height / 2;
         if (metrics.height > getMaxContainerHeight(container)) {
-          nextHeight = metrics.height + boundTextElementPadding * 2;
+          nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
           coordY = container.y + nextHeight / 2 - metrics.height / 2;
         }
       }
       if (textElement.textAlign === TEXT_ALIGN.LEFT) {
-        coordX = container.x + boundTextElementPadding;
+        coordX = container.x + BOUND_TEXT_PADDING;
       } else if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
         coordX =
           container.x +
           containerDims.width -
           metrics.width -
-          boundTextElementPadding;
+          BOUND_TEXT_PADDING;
       } else {
         coordX = container.x + containerDims.width / 2 - metrics.width / 2;
       }
@@ -128,10 +127,16 @@ export const bindTextToShapeAfterDuplication = (
         const newContainer = sceneElementMap.get(newElementId);
         if (newContainer) {
           mutateElement(newContainer, {
-            boundElements: (newContainer.boundElements || []).concat({
-              type: "text",
-              id: newTextElementId,
-            }),
+            boundElements: (element.boundElements || [])
+              .filter(
+                (boundElement) =>
+                  boundElement.id !== newTextElementId &&
+                  boundElement.id !== boundTextElementId,
+              )
+              .concat({
+                type: "text",
+                id: newTextElementId,
+              }),
           });
         }
         const newTextElement = sceneElementMap.get(newTextElementId);
@@ -271,12 +276,11 @@ export const measureText = (
   container.style.whiteSpace = "pre";
   container.style.font = font;
   container.style.minHeight = "1em";
-  const textWidth = getTextWidth(text, font);
 
   if (maxWidth) {
     const lineHeight = getApproxLineHeight(font);
-    container.style.width = `${String(Math.min(textWidth, maxWidth) + 1)}px`;
-
+    // since we are adding a span of width 1px later
+    container.style.maxWidth = `${maxWidth + 1}px`;
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
     container.style.lineHeight = `${String(lineHeight)}px`;
@@ -293,11 +297,8 @@ export const measureText = (
   container.appendChild(span);
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
-  // Since span adds 1px extra width to the container
-  let width = container.offsetWidth;
-  if (maxWidth && textWidth > maxWidth) {
-    width = width - 1;
-  }
+  // since we are adding a span of width 1px
+  const width = container.offsetWidth + 1;
   const height = container.offsetHeight;
   document.body.removeChild(container);
   if (isTestEnv()) {
@@ -332,8 +333,11 @@ const getLineWidth = (text: string, font: FontString) => {
   if (isTestEnv()) {
     return metrics.width * 10;
   }
+  // Since measureText behaves differently in different browsers
+  // OS so considering a adjustment factor of 0.2
+  const adjustmentFactor = 0.2;
 
-  return metrics.width;
+  return metrics.width + adjustmentFactor;
 };
 
 export const getTextWidth = (text: string, font: FontString) => {
