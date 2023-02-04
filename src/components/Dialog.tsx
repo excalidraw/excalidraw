@@ -16,6 +16,7 @@ import { AppState } from "../types";
 import { queryFocusableElements } from "../utils";
 import { useSetAtom } from "jotai";
 import { isLibraryMenuOpenAtom } from "./LibraryMenuHeaderContent";
+import { Button } from "./Button";
 
 export interface DialogProps {
   children: React.ReactNode;
@@ -93,14 +94,14 @@ export const Dialog = (props: DialogProps) => {
       <Island ref={setIslandNode}>
         <h2 id={`${id}-dialog-title`} className="Dialog__title">
           <span className="Dialog__titleContent">{props.title}</span>
-          <button
+          <Button
+            onSelect={onClose}
             className="Modal__close"
-            onClick={onClose}
             title={t("buttons.close")}
             aria-label={t("buttons.close")}
           >
             {useDevice().isMobile ? back : CloseIcon}
-          </button>
+          </Button>
         </h2>
         <div className="Dialog__content">{props.children}</div>
       </Island>
