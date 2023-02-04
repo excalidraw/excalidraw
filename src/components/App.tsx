@@ -2195,6 +2195,13 @@ class App extends React.Component<AppProps, AppState> {
           event.stopPropagation();
         }
       }
+
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
+      ) {
+        jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
+      }
     },
   );
 
@@ -2233,12 +2240,6 @@ class App extends React.Component<AppProps, AppState> {
         ? bindOrUnbindSelectedElements(selectedElements)
         : unbindLinearElements(selectedElements);
       this.setState({ suggestedBindings: [] });
-    }
-    if (
-      event[KEYS.CTRL_OR_CMD] &&
-      (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
-    ) {
-      jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
     }
   });
 
