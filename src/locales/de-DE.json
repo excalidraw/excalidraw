@@ -193,7 +193,7 @@
     "resetLibrary": "Dieses löscht deine Bibliothek. Bist du sicher?",
     "removeItemsFromsLibrary": "{{count}} Element(e) aus der Bibliothek löschen?",
     "invalidEncryptionKey": "Verschlüsselungsschlüssel muss 22 Zeichen lang sein. Die Live-Zusammenarbeit ist deaktiviert.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Keine Internetverbindung verfügbar.\nDeine Änderungen werden nicht gespeichert!"
   },
   "errors": {
     "unsupportedFileType": "Nicht unterstützter Dateityp.",
