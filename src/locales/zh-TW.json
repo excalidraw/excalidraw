@@ -193,7 +193,7 @@
     "resetLibrary": "這會清除您的資料庫，是否確定？",
     "removeItemsFromsLibrary": "從資料庫刪除 {{count}} 項？",
     "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "沒有可用的網路連線。\n變更無法儲存！"
   },
   "errors": {
     "unsupportedFileType": "不支援的檔案類型。",
