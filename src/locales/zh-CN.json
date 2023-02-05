@@ -193,7 +193,7 @@
     "resetLibrary": "这将会清除你的素材库。你确定要这么做吗？",
     "removeItemsFromsLibrary": "确定要从素材库中删除 {{count}} 个项目吗？",
     "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "无网络连接。\n您的改动将不会被保存！"
   },
   "errors": {
     "unsupportedFileType": "不支持的文件格式。",
