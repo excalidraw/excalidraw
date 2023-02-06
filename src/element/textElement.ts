@@ -403,9 +403,12 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     let index = 0;
     while (index < words.length) {
       const currentWordWidth = getLineWidth(words[index], font);
-
+      if (currentWordWidth === maxWidth) {
+        push(words[index]);
+        index++;
+      }
       // Start breaking longer words exceeding max width
-      if (currentWordWidth >= maxWidth) {
+      else if (currentWordWidth > maxWidth) {
         // push current line since the current word exceeds the max width
         // so will be appended in next line
         push(currentLine);
