@@ -28,7 +28,6 @@ import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./textWysiwyg";
-import { Fonts } from "../scene/Fonts";
 
 export const normalizeText = (text: string) => {
   return (
@@ -302,7 +301,7 @@ export const measureText = (
   }
   const canvasHeight = getTextHeight(text, font);
   const canvasWidth = getTextWidth(text, font);
-  console.log(
+  console.info(
     "canvas height",
     canvasHeight,
     "Dom height",
@@ -310,7 +309,7 @@ export const measureText = (
     "font size",
     font,
   );
-  console.log("canvas width", canvasWidth, "Dom width", width);
+  console.info("canvas width", canvasWidth, "Dom width", width);
 
   return { width: canvasWidth, height: canvasHeight, baseline };
 };
@@ -328,15 +327,6 @@ export const getApproxLineHeight = (font: FontString) => {
 };
 
 let canvas: HTMLCanvasElement | undefined;
-
-const getTextMetrics = (text: string, font: FontString) => {
-  if (!canvas) {
-    canvas = document.createElement("canvas");
-  }
-  const canvas2dContext = canvas.getContext("2d")!;
-  canvas2dContext.font = font;
-  return canvas2dContext.measureText(text);
-};
 
 const getLineWidth = (text: string, font: FontString) => {
   if (!canvas) {
@@ -359,20 +349,20 @@ const getLineWidth = (text: string, font: FontString) => {
   return metrics.width + adjustmentFactor;
 };
 
-const getLineHeight = (text: string, font: FontString) => {
-  if (!canvas) {
-    canvas = document.createElement("canvas");
-  }
-  const canvas2dContext = canvas.getContext("2d")!;
-  canvas2dContext.font = font;
+// const getLineHeight = (text: string, font: FontString) => {
+//   if (!canvas) {
+//     canvas = document.createElement("canvas");
+//   }
+//   const canvas2dContext = canvas.getContext("2d")!;
+//   canvas2dContext.font = font;
 
-  const metrics = canvas2dContext.measureText(text);
-  // if (metrics.fontBoundingBoxAscent && metrics.fontBoundingBoxDescent) {
-  //   return metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
-  // }
+//   const metrics = canvas2dContext.measureText(text);
+//   // if (metrics.fontBoundingBoxAscent && metrics.fontBoundingBoxDescent) {
+//   //   return metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
+//   // }
 
-  return metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-};
+//   return metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+// };
 
 export const getTextWidth = (text: string, font: FontString) => {
   const lines = text.replace(/\r\n?/g, "\n").split("\n");
