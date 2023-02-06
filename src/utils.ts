@@ -749,18 +749,13 @@ export const getColorNameAndShadeFromHex = ({
   palette: Palette;
   hex: string;
 }) => {
-  console.log("wtf is going on.....");
   for (const [colorName, colorVal] of Object.entries(palette)) {
-    console.log(colorName, colorVal);
-    console.log(Array.isArray(colorVal));
     if (Array.isArray(colorVal)) {
-      console.log("is array");
       const shade = colorVal.indexOf(hex);
       if (shade > -1) {
         return { colorName, shade };
       }
     } else if (colorVal === hex) {
-      console.log("is string");
       return { colorName, shade: -1 };
     }
   }

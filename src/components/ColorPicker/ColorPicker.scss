@@ -1,6 +1,80 @@
-@import "../css/variables.module";
+@import "../../css/variables.module";
 
 .excalidraw {
+  .color-picker-container {
+    display: grid;
+    grid-template-columns: 1fr 1.25rem 1.25rem;
+    border: 1px solid var(--default-border-color);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+  }
+
+  .color-picker__top-picks {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .color-picker__button {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 0;
+    border-radius: 0.25rem;
+    filter: var(--theme-filter);
+    background-color: var(--swatch-color);
+    background-position: left center;
+
+    &.active {
+      // outline: 1px solid var(--color-primary-darkest);
+      // outline-offset: 1px;
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        outline: 1px solid var(--color-primary-darkest);
+        outline-offset: 1px;
+        border-radius: 0.25rem;
+        filter: var(--theme-filter);
+      }
+    }
+
+    &--large {
+      width: 1.875rem;
+      height: 1.875rem;
+      border-radius: 0.5rem;
+
+      &.active::after,
+      &.with-border::after {
+        border-radius: 0.5rem !important;
+      }
+    }
+
+    &.is-transparent {
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==");
+      // filter: var(--theme-filter);
+    }
+
+    &.with-border {
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 1px solid var(--default-border-color);
+        border-radius: 0.25rem;
+        filter: var(--theme-filter);
+      }
+    }
+  }
+
   .color-picker {
     background: var(--popup-bg-color);
     border: 0 solid transparentize($oc-white, 0.75);

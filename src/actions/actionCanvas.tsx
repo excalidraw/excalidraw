@@ -1,4 +1,4 @@
-import { ColorPicker } from "../components/ColorPicker";
+import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";

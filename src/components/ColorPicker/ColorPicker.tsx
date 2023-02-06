@@ -1,0 +1,201 @@
+import React from "react";
+import { Popover } from "../Popover";
+import { isTransparent, Palette } from "../../utils";
+
+import "./ColorPicker.scss";
+import colors from "../../colors";
+import { ExcalidrawElement } from "../../element/types";
+import { AppState } from "../../types";
+
+import oc from "open-color";
+import { TopPicks } from "./TopPicks";
+import { Picker } from "./Picker";
+import ActiveColor from "./ActiveColor";
+
+export const ocPalette: Palette = {};
+for (const [key, value] of Object.entries(oc)) {
+  if (key === "grape") {
+    continue;
+  }
+  if (Array.isArray(value)) {
+    // @ts-ignore
+    ocPalette[key] = value.filter((_, i) => i % 2 === 0);
+  } else {
+    ocPalette[key] = value;
+  }
+}
+// console.log(ocPalette);
+
+export const strokeTopPicks = [
+  ocPalette.black as string,
+  ocPalette.red[3],
+  ocPalette.green[3],
+  ocPalette.blue[3],
+  ocPalette.orange[3],
+];
+export const bgTopPicks = [
+  ocPalette.gray[1],
+  ocPalette.red[1],
+  ocPalette.green[1],
+  ocPalette.blue[1],
+  ocPalette.orange[1],
+];
+
+const MAX_CUSTOM_COLORS = 5;
+export const MAX_DEFAULT_COLORS = 15;
+
+export const getCustomColors = (
+  elements: readonly ExcalidrawElement[],
+  type: "elementBackground" | "elementStroke",
+) => {
+  const customColors: string[] = [];
+  const updatedElements = elements
+    .filter((element) => !element.isDeleted)
+    .sort((ele1, ele2) => ele2.updated - ele1.updated);
+
+  let index = 0;
+  const elementColorTypeMap = {
+    elementBackground: "backgroundColor",
+    elementStroke: "strokeColor",
+  };
+  const colorType = elementColorTypeMap[type] as
+    | "backgroundColor"
+    | "strokeColor";
+  while (
+    index < updatedElements.length &&
+    customColors.length < MAX_CUSTOM_COLORS
+  ) {
+    const element = updatedElements[index];
+
+    if (
+      customColors.length < MAX_CUSTOM_COLORS &&
+      isCustomColor(element[colorType], type) &&
+      !customColors.includes(element[colorType])
+    ) {
+      customColors.push(element[colorType]);
+    }
+    index++;
+  }
+  return customColors;
+};
+
+const isCustomColor = (
+  color: string,
+  type: "elementBackground" | "elementStroke",
+) => {
+  return !colors[type].includes(color);
+};
+
+const isValidColor = (color: string) => {
+  const style = new Option().style;
+  style.color = color;
+  return !!style.color;
+};
+
+export const getColor = (color: string): string | null => {
+  if (isTransparent(color)) {
+    return color;
+  }
+
+  // testing for `#` first fixes a bug on Electron (more specfically, an
+  // Obsidian popout window), where a hex color without `#` is (incorrectly)
+  // considered valid
+  return isValidColor(`#${color}`)
+    ? `#${color}`
+    : isValidColor(color)
+    ? color
+    : null;
+};
+
+// This is a narrow reimplementation of the awesome react-color Twitter component
+// https://github.com/casesandberg/react-color/blob/master/src/components/twitter/Twitter.js
+
+// Unfortunately, we can't detect keyboard layout in the browser. So this will
+// only work well for QWERTY but not AZERTY or others...
+export const keyBindings = [
+  ["1", "2", "3", "4", "5"],
+  ["q", "w", "e", "r", "t"],
+  ["a", "s", "d", "f", "g"],
+  ["z", "x", "c", "v", "b"],
+].flat();
+
+export const ColorPicker = ({
+  type,
+  color,
+  onChange,
+  label,
+  isActive,
+  setActive,
+  elements,
+  appState,
+}: {
+  type: "canvasBackground" | "elementBackground" | "elementStroke";
+  color: string | null;
+  onChange: (color: string) => void;
+  label: string;
+  isActive: boolean;
+  setActive: (active: boolean) => void;
+  elements: readonly ExcalidrawElement[];
+  appState: AppState;
+}) => {
+  const pickerButton = React.useRef<HTMLButtonElement>(null);
+  const coords = pickerButton.current?.getBoundingClientRect();
+
+  return (
+    <div>
+      <div className="color-picker-container">
+        <TopPicks activeColor={color} onChange={onChange} type={type} />
+        <div
+          style={{
+            width: 1,
+            height: 20,
+            backgroundColor: "var(--default-border-color)",
+            margin: "0 auto",
+          }}
+        />
+        <ActiveColor
+          color={color}
+          isActive={isActive}
+          label={label}
+          setActive={setActive}
+          pickerButton={pickerButton}
+        />
+      </div>
+      <React.Suspense fallback="">
+        {isActive ? (
+          <div
+            className="color-picker-popover-container"
+            style={{
+              position: "fixed",
+              top: coords?.top,
+              left: coords?.right,
+              zIndex: 1,
+            }}
+          >
+            <Popover
+              onCloseRequest={(event) =>
+                event.target !== pickerButton.current && setActive(false)
+              }
+            >
+              <Picker
+                colors={colors[type]}
+                color={color || null}
+                onChange={(changedColor) => {
+                  onChange(changedColor);
+                }}
+                onClose={() => {
+                  setActive(false);
+                  pickerButton.current?.focus();
+                }}
+                label={label}
+                showInput
+                type={type}
+                elements={elements}
+              />
+            </Popover>
+          </div>
+        ) : null}
+      </React.Suspense>
+    </div>
+  );
+};
