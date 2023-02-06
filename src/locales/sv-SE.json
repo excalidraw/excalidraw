@@ -193,7 +193,7 @@
     "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?",
     "removeItemsFromsLibrary": "Ta bort {{count}} objekt från biblioteket?",
     "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Ingen internetanslutning tillgänglig.\nDina ändringar kommer inte att sparas!"
   },
   "errors": {
     "unsupportedFileType": "Filtypen stöds inte.",
