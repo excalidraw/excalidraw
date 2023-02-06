@@ -193,7 +193,7 @@
     "resetLibrary": "Esto borrará tu biblioteca. ¿Estás seguro?",
     "removeItemsFromsLibrary": "¿Eliminar {{count}} elemento(s) de la biblioteca?",
     "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "No hay conexión a internet disponible.\n¡No se guardarán los cambios!"
   },
   "errors": {
     "unsupportedFileType": "Tipo de archivo no admitido.",
