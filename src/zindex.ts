@@ -1,10 +1,17 @@
 import { bumpVersion } from "./element/mutateElement";
+import { isFrameElement } from "./element/typeChecks";
 import { ExcalidrawElement } from "./element/types";
+import { getFrameElementsMap } from "./frame";
 import { getElementsInGroup } from "./groups";
 import { getSelectedElements } from "./scene";
 import Scene from "./scene/Scene";
 import { AppState } from "./types";
 import { arrayToMap, findIndex, findLastIndex } from "./utils";
+
+// elements that do not belong to a frame are considered a root element
+const isRootElement = (element: ExcalidrawElement) => {
+  return !element.frameId;
+};
 
 /**
  * Returns indices of elements to move based on selected elements.
@@ -23,14 +30,15 @@ const getIndicesToMove = (
     getSelectedElements(elements, appState, true),
   );
   while (++index < elements.length) {
-    if (selectedElementIds.get(elements[index].id)) {
+    const element = elements[index];
+    if (selectedElementIds.get(element.id)) {
       if (deletedIndices.length) {
         selectedIndices = selectedIndices.concat(deletedIndices);
         deletedIndices = [];
       }
       selectedIndices.push(index);
       includeDeletedIndex = index + 1;
-    } else if (elements[index].isDeleted && includeDeletedIndex === index) {
+    } else if (element.isDeleted && includeDeletedIndex === index) {
       includeDeletedIndex = index + 1;
       deletedIndices.push(index);
     } else {
@@ -168,8 +176,8 @@ const getTargetIndex = (
   return candidateIndex;
 };
 
-const getTargetElementsMap = (
-  elements: readonly ExcalidrawElement[],
+const getTargetElementsMap = <T extends ExcalidrawElement>(
+  elements: readonly T[],
   indices: number[],
 ) => {
   return indices.reduce((acc, index) => {
@@ -179,9 +187,9 @@ const getTargetElementsMap = (
   }, {} as Record<string, ExcalidrawElement>);
 };
 
-const shiftElements = (
-  appState: AppState,
+const _shiftElements = (
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
   direction: "left" | "right",
 ) => {
   const indicesToMove = getIndicesToMove(elements, appState);
@@ -246,7 +254,15 @@ const shiftElements = (
   });
 };
 
-const shiftElementsToEnd = (
+const shiftElements = (
+  appState: AppState,
+  elements: readonly ExcalidrawElement[],
+  direction: "left" | "right",
+) => {
+  return shift(elements, appState, direction, _shiftElements);
+};
+
+const _shiftElementsToEnd = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
@@ -316,6 +332,66 @@ const shiftElementsToEnd = (
         ...trailingElements,
       ];
 };
+
+const shiftElementsToEnd = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  direction: "left" | "right",
+) => {
+  return shift(elements, appState, direction, _shiftElementsToEnd);
+};
+
+function shift(
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  direction: "left" | "right",
+  shiftFunction: (
+    elements: ExcalidrawElement[],
+    appState: AppState,
+    direction: "left" | "right",
+  ) => ExcalidrawElement[] | readonly ExcalidrawElement[],
+) {
+  let rootElements = elements.filter((element) => isRootElement(element));
+  const frameElementsMap = getFrameElementsMap(elements, appState);
+
+  // shift the root elements first
+  rootElements = shiftFunction(
+    rootElements,
+    appState,
+    direction,
+  ) as ExcalidrawElement[];
+
+  // shift the elements in frames if needed
+  frameElementsMap.forEach((value, key) => {
+    if (!value.frameSelected) {
+      frameElementsMap.set(key, {
+        ...value,
+        elements: shiftFunction(
+          value.elements,
+          appState,
+          direction,
+        ) as ExcalidrawElement[],
+      });
+    }
+  });
+
+  // return the final elements
+  let finalElements: ExcalidrawElement[] = [];
+
+  rootElements.forEach((element) => {
+    if (isFrameElement(element)) {
+      finalElements = [
+        ...finalElements,
+        ...(frameElementsMap.get(element.id)?.elements ?? []),
+        element,
+      ];
+    } else {
+      finalElements = [...finalElements, element];
+    }
+  });
+
+  return finalElements;
+}
 
 // public API
 // -----------------------------------------------------------------------------

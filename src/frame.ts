@@ -11,6 +11,7 @@ import { arrayToMap } from "./utils";
 import { mutateElement } from "./element/mutateElement";
 import { AppState } from "./types";
 import { getSelectedElements } from "./scene";
+import { isFrameElement } from "./element";
 
 export const getElementsInFrame = (
   elements: readonly ExcalidrawElement[],
@@ -88,7 +89,7 @@ export const getElementsToUpdateFromSelection = (
   appState: AppState,
 ) => {
   const selectedElements = getSelectedElements(elements, appState, true);
-  const elementsToInclude: NonDeletedExcalidrawElement[] = [];
+  const elementsToInclude: ExcalidrawElement[] = [];
   selectedElements.forEach((element) => {
     if (element.type === "frame") {
       getElementsInFrame(elements, element.id).forEach((e) =>
@@ -107,4 +108,41 @@ export const getFramesCountInElements = (
   return elements.filter(
     (element) => element.type === "frame" && !element.isDeleted,
   ).length;
+};
+
+export const getFrameElementsMap = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const frameElementsMap = new Map<
+    ExcalidrawElement["id"],
+    {
+      frameSelected: boolean;
+      elements: ExcalidrawElement[];
+    }
+  >();
+
+  const selectedElements = arrayToMap(getSelectedElements(elements, appState));
+
+  elements.forEach((element) => {
+    if (isFrameElement(element)) {
+      frameElementsMap.set(element.id, {
+        frameSelected: selectedElements.has(element.id),
+        elements: frameElementsMap.has(element.id)
+          ? frameElementsMap.get(element.id)?.elements ??
+            getElementsInFrame(elements, element.id)
+          : getElementsInFrame(elements, element.id),
+      });
+    } else if (element.frameId) {
+      frameElementsMap.set(element.frameId, {
+        frameSelected: false,
+        elements: frameElementsMap.has(element.frameId)
+          ? frameElementsMap.get(element.id)?.elements ??
+            getElementsInFrame(elements, element.frameId)
+          : getElementsInFrame(elements, element.frameId),
+      });
+    }
+  });
+
+  return frameElementsMap;
 };
