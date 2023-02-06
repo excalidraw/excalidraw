@@ -157,7 +157,7 @@ export const textWysiwyg = ({
       let maxWidth = updatedTextElement.width;
 
       let maxHeight = updatedTextElement.height;
-      const width = updatedTextElement.width;
+      const textElementWidth = updatedTextElement.width;
       // Set to element height by default since that's
       // what is going to be used for unbounded text
       let textElementHeight = updatedTextElement.height;
@@ -280,12 +280,12 @@ export const textWysiwyg = ({
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
-        width: `${Math.min(width, maxWidth)}px`,
+        width: `${textElementWidth}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
         transform: getTransform(
-          width,
+          textElementWidth,
           textElementHeight,
           getTextElementAngle(updatedTextElement),
           appState,

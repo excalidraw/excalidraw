@@ -335,18 +335,19 @@ const getLineWidth = (text: string, font: FontString) => {
   const canvas2dContext = canvas.getContext("2d")!;
   canvas2dContext.font = font;
 
-  const metrics = canvas2dContext.measureText(text);
+  let width = 0;
+  text.split("").forEach((char) => {
+    const charWidth = Math.ceil(canvas2dContext.measureText(char).width);
+    width += charWidth;
+  });
   // since in test env the canvas measureText algo
   // doesn't measure text and instead just returns number of
   // characters hence we assume that each letteris 10px
   if (isTestEnv()) {
-    return metrics.width * 10;
+    return width * 10;
   }
-  // Since measureText behaves differently in different browsers
-  // OS so considering a adjustment factor of 0.2
-  const adjustmentFactor = 0.2;
-
-  return metrics.width + adjustmentFactor;
+  // return canvas2dContext.measureText(text).width;
+  return width;
 };
 
 // const getLineHeight = (text: string, font: FontString) => {
@@ -510,9 +511,9 @@ export const charWidth = (() => {
     getCache,
   };
 })();
+
 export const getApproxMinLineWidth = (font: FontString) => {
   const maxCharWidth = getMaxCharWidth(font);
-
   if (maxCharWidth === 0) {
     return (
       measureText(DUMMY_TEXT.split("").join("\n"), font).width +

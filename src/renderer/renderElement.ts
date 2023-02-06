@@ -275,8 +275,8 @@ const drawElementOnCanvas = (
         // context.lineTo(element.width + 100, 0);
         // context.stroke();
         // context.fillStyle = "red";
+        //context.fillRect(0, 0, element.width, element.height);
 
-        // context.fillRect(0, 0, element.width, element.height);
         context.font = getFontString(element);
 
         context.fillStyle = element.strokeColor;
