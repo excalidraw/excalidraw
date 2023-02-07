@@ -38,21 +38,21 @@ export const actionChangeViewBackgroundColor = register({
   PanelComponent: ({ elements, appState, updateData }) => {
     // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
-      <div style={{ position: "relative" }}>
-        <ColorPicker
-          label={t("labels.canvasBackground")}
-          type="canvasBackground"
-          color={appState.viewBackgroundColor}
-          onChange={(color) => updateData({ viewBackgroundColor: color })}
-          isActive={appState.openPopup === "canvasColorPicker"}
-          setActive={(active) =>
-            updateData({ openPopup: active ? "canvasColorPicker" : null })
-          }
-          data-testid="canvas-background-picker"
-          elements={elements}
-          appState={appState}
-        />
-      </div>
+      // <div style={{ position: "relative" }}>
+      <ColorPicker
+        label={t("labels.canvasBackground")}
+        type="canvasBackground"
+        color={appState.viewBackgroundColor}
+        onChange={(color) => updateData({ viewBackgroundColor: color })}
+        isActive={appState.openPopup === "canvasColorPicker"}
+        setActive={(active) =>
+          updateData({ openPopup: active ? "canvasColorPicker" : null })
+        }
+        data-testid="canvas-background-picker"
+        elements={elements}
+        appState={appState}
+      />
+      // </div>
     );
   },
 });

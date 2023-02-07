@@ -1,5 +1,5 @@
 import React from "react";
-import { Popover } from "../Popover";
+// import { Popover } from "../Popover";
 import { isTransparent, Palette } from "../../utils";
 
 import "./ColorPicker.scss";
@@ -11,6 +11,8 @@ import oc from "open-color";
 import { TopPicks } from "./TopPicks";
 import { Picker } from "./Picker";
 import ActiveColor from "./ActiveColor";
+
+import * as Popover from "@radix-ui/react-popover";
 
 export const ocPalette: Palette = {};
 for (const [key, value] of Object.entries(oc)) {
@@ -119,6 +121,8 @@ export const keyBindings = [
   ["z", "x", "c", "v", "b"],
 ].flat();
 
+// TODO
+// maybe extend ColorPicker with colors (=top picks for each) prop and pass it to TopPicks
 export const ColorPicker = ({
   type,
   color,
@@ -153,15 +157,45 @@ export const ColorPicker = ({
             margin: "0 auto",
           }}
         />
-        <ActiveColor
-          color={color}
-          isActive={isActive}
-          label={label}
-          setActive={setActive}
-          pickerButton={pickerButton}
-        />
+        <Popover.Root>
+          <ActiveColor
+            color={color}
+            isActive={isActive}
+            label={label}
+            setActive={setActive}
+            pickerButton={pickerButton}
+          />
+
+          <Popover.Portal
+            container={document.querySelector(".excalidraw") as HTMLDivElement}
+          >
+            <Popover.Content
+              data-prevent-outside-click
+              side="right"
+              align="start"
+              style={{ zIndex: 9999, backgroundColor: "var(--popup-bg-color)" }}
+            >
+              <Picker
+                colors={colors[type]}
+                color={color || null}
+                onChange={(changedColor) => {
+                  onChange(changedColor);
+                }}
+                onClose={() => {
+                  setActive(false);
+                  pickerButton.current?.focus();
+                }}
+                label={label}
+                showInput
+                type={type}
+                elements={elements}
+              />
+              <Popover.Arrow />
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
       </div>
-      <React.Suspense fallback="">
+      {/* <React.Suspense fallback="">
         {isActive ? (
           <div
             className="color-picker-popover-container"
@@ -195,7 +229,7 @@ export const ColorPicker = ({
             </Popover>
           </div>
         ) : null}
-      </React.Suspense>
+      </React.Suspense> */}
     </div>
   );
 };

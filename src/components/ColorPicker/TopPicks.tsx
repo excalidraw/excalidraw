@@ -9,6 +9,7 @@ interface TopPicksProps {
 
 export const TopPicks = ({ onChange, type, activeColor }: TopPicksProps) => {
   const colors = type === "elementStroke" ? strokeTopPicks : bgTopPicks;
+
   return (
     <div className="color-picker__top-picks">
       {colors.map((color) => (

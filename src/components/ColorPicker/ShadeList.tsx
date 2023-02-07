@@ -23,6 +23,7 @@ export const ShadeList = ({ hex, onChange }: ShadeListProps) => {
         <div className="color-picker-content--default">
           {shades.map((color, i) => (
             <button
+              key={i}
               type="button"
               className={clsx(
                 "color-picker__button color-picker__button--large",

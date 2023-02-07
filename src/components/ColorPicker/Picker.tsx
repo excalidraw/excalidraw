@@ -179,7 +179,7 @@ export const Picker = ({
 
   return (
     <div
-      className={`color-picker color-picker-type-${type}`}
+      // className={`color-picker color-picker-type-${type}`}
       role="dialog"
       aria-modal="true"
       aria-label={t("labels.colorPicker")}
@@ -198,12 +198,18 @@ export const Picker = ({
         tabIndex={-1}
       >
         <div className="color-picker-content--default">
-          {[["transparent", null], ...Object.entries(ocPalette)].map(
+          {[["transparent", "transparent"], ...Object.entries(ocPalette)].map(
             ([key, value]) => {
               console.log(key, value);
+
+              const prevShade = colorObj?.shade;
+              console.log("prevShade", prevShade);
+
               const color =
                 (Array.isArray(value) ? value[3] : value) || "transparent";
+
               console.log("color", color);
+
               return (
                 <button
                   type="button"
@@ -222,6 +228,11 @@ export const Picker = ({
                   )}
                   onClick={(event) => {
                     (event.currentTarget as HTMLButtonElement).focus();
+                    // const hasShade = (colorObj?.shade ?? -1) > -1;
+                    // const color =
+                    //   (Array.isArray(value)
+                    //     ? value[hasShade ? prevShade! : 3]
+                    //     : value) || "transparent";
                     onChange(color);
                   }}
                   title={`${label} — ${key}`}
