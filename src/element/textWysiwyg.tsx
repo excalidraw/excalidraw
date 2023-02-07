@@ -382,40 +382,15 @@ export const textWysiwyg = ({
       // number of lines so cannot use editable.style.height
       // as that gets updated below
       // Rounding here so that the lines calculated is more accurate in all browsers.
-      // The scrollHeight and approxLineHeight differs in diff browsers
-      // eg it gives 1.05 in firefox for handewritten small font due to which
-      // height gets updated as lines > 1 and leads to jumping text for first line in bound container
-      // hence rounding here to avoid that
       const lines = Math.round(
         editable.scrollHeight / getApproxLineHeight(font),
       );
-      // auto increase height only when lines  > 1 so its
-      // measured correctly and vertically aligns for
-      // first line as well as setting height to "auto"
-      // doubles the height as soon as user starts typing
+
       if (isBoundToContainer(element) && lines > 1) {
         const container = getContainerElement(element);
 
-        let height = "auto";
         editable.style.height = "0px";
-        let heightSet = false;
-        if (lines === 2) {
-          const actualLineCount = wrapText(
-            editable.value,
-            font,
-            getMaxContainerWidth(container!),
-          ).split("\n").length;
-          // This is browser behaviour when setting height to "auto"
-          // It sets the height needed for 2 lines even if actual
-          // line count is 1 as mentioned above as well
-          // hence reducing the height by half if actual line count is 1
-          // so single line aligns vertically when deleting
-          if (actualLineCount === 1) {
-            height = `${editable.scrollHeight / 2}px`;
-            editable.style.height = height;
-            heightSet = true;
-          }
-        }
+
         const wrappedText = wrapText(
           normalizeText(editable.value),
           font,
@@ -424,9 +399,7 @@ export const textWysiwyg = ({
         const width = getTextWidth(wrappedText, font);
         editable.style.width = `${width}px`;
 
-        if (!heightSet) {
-          editable.style.height = `${editable.scrollHeight}px`;
-        }
+        editable.style.height = `${editable.scrollHeight}px`;
       }
       onChange(normalizeText(editable.value));
     };
