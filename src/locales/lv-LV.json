@@ -219,7 +219,8 @@
     "lock": "Paturēt izvēlēto rīku pēc darbības",
     "penMode": "Pildspalvas režīms – novērst pieskaršanos",
     "link": "Pievienot/rediģēt atlasītās figūras saiti",
-    "eraser": "Dzēšgumija"
+    "eraser": "Dzēšgumija",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
@@ -227,7 +228,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Lai bīdītu tāfeli, turiet nospiestu ritināšanas vai atstarpes taustiņu, velkot ar peli",
+    "canvasPanning": "",
     "linearElement": "Klikšķiniet, lai sāktu zīmēt vairākus punktus; velciet, lai zīmētu līniju",
     "freeDraw": "Spiediet un velciet; atlaidiet, kad pabeidzat",
     "text": "Ieteikums: lai pievienotu tekstu, varat arī jebkur dubultklikšķināt ar atlases rīku",
@@ -245,7 +246,8 @@
     "publishLibrary": "Publicēt savu bibliotēku",
     "bindTextToElement": "Spiediet ievades taustiņu, lai pievienotu tekstu",
     "deepBoxSelect": "Turient nospiestu Ctrl vai Cmd, lai atlasītu dziļumā un lai nepieļautu objektu pavilkšanu",
-    "eraserRevert": "Turiet Alt, lai noņemtu elementus no dzēsšanas atlases"
+    "eraserRevert": "Turiet Alt, lai noņemtu elementus no dzēsšanas atlases",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nevar rādīt priekšskatījumu",
