@@ -28,6 +28,7 @@ import {
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
+  getTextHeight,
   getTextWidth,
   normalizeText,
   wrapText,
@@ -378,19 +379,8 @@ export const textWysiwyg = ({
         id,
       ) as ExcalidrawTextElement;
       const font = getFontString(updatedTextElement);
-      // using scrollHeight here since we need to calculate
-      // number of lines so cannot use editable.style.height
-      // as that gets updated below
-      // Rounding here so that the lines calculated is more accurate in all browsers.
-      const lines = Math.round(
-        editable.scrollHeight / getApproxLineHeight(font),
-      );
-
-      if (isBoundToContainer(element) && lines > 1) {
+      if (isBoundToContainer(element)) {
         const container = getContainerElement(element);
-
-        editable.style.height = "0px";
-
         const wrappedText = wrapText(
           normalizeText(editable.value),
           font,
@@ -398,8 +388,8 @@ export const textWysiwyg = ({
         );
         const width = getTextWidth(wrappedText, font);
         editable.style.width = `${width}px`;
-
-        editable.style.height = `${editable.scrollHeight}px`;
+        const height = getTextHeight(wrappedText, font);
+        editable.style.height = `${height}px`;
       }
       onChange(normalizeText(editable.value));
     };
