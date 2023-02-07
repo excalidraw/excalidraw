@@ -1,5 +1,5 @@
 import { BOUND_TEXT_PADDING } from "../constants";
-import { measureText, wrapText } from "./textElement";
+import { wrapText } from "./textElement";
 import { FontString } from "./types";
 
 describe("Test wrapText", () => {

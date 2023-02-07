@@ -440,7 +440,6 @@ describe("textWysiwyg", () => {
     let rectangle: any;
     const { h } = window;
 
-    const DUMMY_HEIGHT = 240;
     const DUMMY_WIDTH = 160;
     const APPROX_LINE_HEIGHT = 25;
     const INITIAL_WIDTH = 10;
