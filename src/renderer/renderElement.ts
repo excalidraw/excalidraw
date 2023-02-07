@@ -269,13 +269,6 @@ const drawElementOnCanvas = (
         }
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
-        // context.strokeStyle = "green";
-        // context.lineWidth = 2;
-        // context.moveTo(0, 0);
-        // context.lineTo(element.width + 100, 0);
-        // context.stroke();
-        // context.fillStyle = "red";
-        //context.fillRect(0, 0, element.width, element.height);
 
         context.font = getFontString(element);
 

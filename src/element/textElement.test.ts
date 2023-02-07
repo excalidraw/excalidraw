@@ -160,37 +160,3 @@ break it now`,
     });
   });
 });
-
-describe("Test measureText", () => {
-  const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
-  const text = "Hello World";
-
-  it("should add correct attributes when maxWidth is passed", () => {
-    const maxWidth = 200 - BOUND_TEXT_PADDING * 2;
-    const res = measureText(text, font, maxWidth);
-
-    expect(res.container).toMatchInlineSnapshot(`
-      <div
-        style="position: absolute; white-space: pre-wrap; font: Emoji 20px 20px; min-height: 1em; max-width: 191px; overflow: hidden; word-break: break-word; line-height: 0px;"
-      >
-        <span
-          style="display: inline-block; overflow: hidden; width: 1px; height: 1px;"
-        />
-      </div>
-    `);
-  });
-
-  it("should add correct attributes when maxWidth is not passed", () => {
-    const res = measureText(text, font);
-
-    expect(res.container).toMatchInlineSnapshot(`
-      <div
-        style="position: absolute; white-space: pre; font: Emoji 20px 20px; min-height: 1em;"
-      >
-        <span
-          style="display: inline-block; overflow: hidden; width: 1px; height: 1px;"
-        />
-      </div>
-    `);
-  });
-});

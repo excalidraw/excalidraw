@@ -171,7 +171,6 @@ const restoreElement = (
         fontSize,
         fontFamily,
         text: element.text ?? "",
-        baseline: element.baseline,
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,

@@ -53,7 +53,7 @@ export const redrawTextBoundingBox = (
       maxWidth,
     );
   }
-  const metrics = measureText(text, getFontString(textElement), maxWidth);
+  const metrics = measureText(text, getFontString(textElement));
   let coordY = textElement.y;
   let coordX = textElement.x;
   // Resize container and vertically center align the text
@@ -97,7 +97,6 @@ export const redrawTextBoundingBox = (
   mutateElement(textElement, {
     width: metrics.width,
     height: metrics.height,
-    baseline: metrics.baseline,
     y: coordY,
     x: coordX,
     text,
@@ -167,7 +166,6 @@ export const handleBindTextResize = (
     const maxWidth = getMaxContainerWidth(container);
     const maxHeight = getMaxContainerHeight(container);
     let containerHeight = containerDims.height;
-    let nextBaseLine = textElement.baseline;
     if (transformHandleType !== "n" && transformHandleType !== "s") {
       if (text) {
         text = wrapText(
@@ -176,14 +174,9 @@ export const handleBindTextResize = (
           maxWidth,
         );
       }
-      const dimensions = measureText(
-        text,
-        getFontString(textElement),
-        maxWidth,
-      );
+      const dimensions = measureText(text, getFontString(textElement));
       nextHeight = dimensions.height;
       nextWidth = dimensions.width;
-      nextBaseLine = dimensions.baseline;
     }
     // increase height in case text element height exceeds
     if (nextHeight > maxHeight) {
@@ -207,8 +200,6 @@ export const handleBindTextResize = (
       text,
       width: nextWidth,
       height: nextHeight,
-
-      baseline: nextBaseLine,
     });
     if (!isArrowElement(container)) {
       updateBoundTextPosition(
@@ -250,63 +241,19 @@ const updateBoundTextPosition = (
   mutateElement(boundTextElement, { x, y });
 };
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
-export const measureText = (
-  text: string,
-  font: FontString,
-  maxWidth?: number | null,
-) => {
+
+export const measureText = (text: string, font: FontString) => {
   text = text
     .split("\n")
     // replace empty lines with single space because leading/trailing empty
     // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
-  const container = document.createElement("div");
-  container.style.position = "absolute";
-  container.style.whiteSpace = "pre";
-  container.style.font = font;
-  container.style.minHeight = "1em";
 
-  if (maxWidth) {
-    const lineHeight = getApproxLineHeight(font);
-    // since we are adding a span of width 1px later
-    container.style.maxWidth = `${maxWidth + 1}px`;
-    container.style.overflow = "hidden";
-    container.style.wordBreak = "break-word";
-    container.style.lineHeight = `${String(lineHeight)}px`;
-    container.style.whiteSpace = "pre-wrap";
-  }
-  document.body.appendChild(container);
-  container.innerText = text;
+  const height = getTextHeight(text, font);
+  const width = getTextWidth(text, font);
 
-  const span = document.createElement("span");
-  span.style.display = "inline-block";
-  span.style.overflow = "hidden";
-  span.style.width = "1px";
-  span.style.height = "1px";
-  container.appendChild(span);
-  // Baseline is important for positioning text on canvas
-  const baseline = span.offsetTop + span.offsetHeight;
-  // since we are adding a span of width 1px
-  const width = container.offsetWidth + 1;
-  const height = container.offsetHeight;
-  document.body.removeChild(container);
-  if (isTestEnv()) {
-    return { width, height, baseline, container };
-  }
-  const canvasHeight = getTextHeight(text, font);
-  const canvasWidth = getTextWidth(text, font);
-  console.info(
-    "canvas height",
-    canvasHeight,
-    "Dom height",
-    height,
-    "font size",
-    font,
-  );
-  console.info("canvas width", canvasWidth, "Dom width", width);
-
-  return { width: canvasWidth, height: canvasHeight, baseline };
+  return { width, height };
 };
 
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
@@ -341,24 +288,8 @@ const getLineWidth = (text: string, font: FontString) => {
   if (isTestEnv()) {
     return width * 10;
   }
-  // return canvas2dContext.measureText(text).width;
   return width;
 };
-
-// const getLineHeight = (text: string, font: FontString) => {
-//   if (!canvas) {
-//     canvas = document.createElement("canvas");
-//   }
-//   const canvas2dContext = canvas.getContext("2d")!;
-//   canvas2dContext.font = font;
-
-//   const metrics = canvas2dContext.measureText(text);
-//   // if (metrics.fontBoundingBoxAscent && metrics.fontBoundingBoxDescent) {
-//   //   return metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
-//   // }
-
-//   return metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-// };
 
 export const getTextWidth = (text: string, font: FontString) => {
   const lines = text.replace(/\r\n?/g, "\n").split("\n");

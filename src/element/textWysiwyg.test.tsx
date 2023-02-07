@@ -675,38 +675,28 @@ describe("textWysiwyg", () => {
     });
 
     it("should wrap text and vertcially center align once text submitted", async () => {
-      jest
-        .spyOn(textElementUtils, "measureText")
-        .mockImplementation((text, font, maxWidth) => {
-          let width = INITIAL_WIDTH;
-          let height = APPROX_LINE_HEIGHT;
-          let baseline = 10;
-          if (!text) {
-            return {
-              width,
-              height,
-              baseline,
-            };
-          }
-          baseline = 30;
-          width = DUMMY_WIDTH;
-          if (text === "Hello \nWorld!") {
-            height = APPROX_LINE_HEIGHT * 2;
-          }
-          if (maxWidth) {
-            width = maxWidth;
-            // To capture cases where maxWidth passed is initial width
-            // due to which the text is not wrapped correctly
-            if (maxWidth === INITIAL_WIDTH) {
-              height = DUMMY_HEIGHT;
-            }
-          }
+      jest.spyOn(textElementUtils, "measureText").mockImplementation((text) => {
+        let width = INITIAL_WIDTH;
+        let height = APPROX_LINE_HEIGHT;
+        let baseline = 10;
+        if (!text) {
           return {
             width,
             height,
             baseline,
           };
-        });
+        }
+        baseline = 30;
+        width = DUMMY_WIDTH;
+        if (text === "Hello \nWorld!") {
+          height = APPROX_LINE_HEIGHT * 2;
+        }
+
+        return {
+          width,
+          height,
+        };
+      });
 
       expect(h.elements.length).toBe(1);
 
@@ -1057,29 +1047,27 @@ describe("textWysiwyg", () => {
     });
 
     it("should restore original container height and clear cache once text is unbind", async () => {
-      jest
-        .spyOn(textElementUtils, "measureText")
-        .mockImplementation((text, font, maxWidth) => {
-          let width = INITIAL_WIDTH;
-          let height = APPROX_LINE_HEIGHT;
-          let baseline = 10;
-          if (!text) {
-            return {
-              width,
-              height,
-              baseline,
-            };
-          }
-          baseline = 30;
-          width = DUMMY_WIDTH;
-          height = APPROX_LINE_HEIGHT * 5;
-
+      jest.spyOn(textElementUtils, "measureText").mockImplementation((text) => {
+        let width = INITIAL_WIDTH;
+        let height = APPROX_LINE_HEIGHT;
+        let baseline = 10;
+        if (!text) {
           return {
             width,
             height,
             baseline,
           };
-        });
+        }
+        baseline = 30;
+        width = DUMMY_WIDTH;
+        height = APPROX_LINE_HEIGHT * 5;
+
+        return {
+          width,
+          height,
+          baseline,
+        };
+      });
       const originalRectHeight = rectangle.height;
       expect(rectangle.height).toBe(originalRectHeight);
 

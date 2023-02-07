@@ -2659,7 +2659,7 @@ class App extends React.Component<AppProps, AppState> {
       // so that the text is centered to cursor position
       if (!parentCenterPosition) {
         mutateElement(element, {
-          y: element.y - element.baseline / 2,
+          y: element.y,
         });
       }
     }

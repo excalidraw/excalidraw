@@ -214,11 +214,10 @@ const measureFontSizeFromWH = (
   const metrics = measureText(
     element.text,
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
-    element.containerId ? width : null,
   );
   return {
     size: nextFontSize,
-    baseline: metrics.baseline + (nextHeight - metrics.height),
+    baseline: nextHeight - metrics.height,
   };
 };
 
@@ -318,7 +317,6 @@ const resizeSingleTextElement = (
       fontSize: nextFont.size,
       width: nextWidth,
       height: nextHeight,
-      baseline: nextFont.baseline,
       x: nextElementX,
       y: nextElementY,
     });
@@ -423,7 +421,6 @@ export const resizeSingleElement = (
     if (stateOfBoundTextElementAtResize) {
       boundTextFont = {
         fontSize: stateOfBoundTextElementAtResize.fontSize,
-        baseline: stateOfBoundTextElementAtResize.baseline,
       };
     }
     if (shouldMaintainAspectRatio) {
