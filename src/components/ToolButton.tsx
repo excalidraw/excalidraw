@@ -116,7 +116,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         )}
         data-testid={props["data-testid"]}
         hidden={props.hidden}
-        title={props.title}
+        //title={props.title} //zsviczian
         aria-label={props["aria-label"]}
         type={type}
         onClick={onClick}
