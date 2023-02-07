@@ -219,7 +219,8 @@
     "lock": "可連續使用選取的工具",
     "penMode": "筆模式 - 避免觸摸",
     "link": "為所選的形狀增加\b/更新連結",
-    "eraser": "橡皮擦"
+    "eraser": "橡皮擦",
+    "hand": "手形（平移工具）"
   },
   "headings": {
     "canvasActions": "canvas 動作",
@@ -227,7 +228,7 @@
     "shapes": "形狀"
   },
   "hints": {
-    "canvasPanning": "若要移動畫布，請在拖曳時按住滑鼠滾輪或空白鍵",
+    "canvasPanning": "若要移動畫布，請在拖曳時按住滑鼠滾輪或空白鍵，或使用手形工具",
     "linearElement": "點擊以繪製多點曲線；或拖曳以繪製直線",
     "freeDraw": "點擊並拖曳來繪圖，放開即結束",
     "text": "提示：亦可使用選取工具在任何地方雙擊來加入文字",
@@ -245,7 +246,8 @@
     "publishLibrary": "發布個人資料庫",
     "bindTextToElement": "按下 Enter 以加入文字。",
     "deepBoxSelect": "按住 Ctrl 或 Cmd 以深度選取並避免拖曳",
-    "eraserRevert": "按住 Alt 以反選取已標記待刪除的元素"
+    "eraserRevert": "按住 Alt 以反選取已標記待刪除的元素",
+    "firefox_clipboard_write": "此功能有機會透過將 \"dom.events.asyncClipboard.clipboardItem\" 設定為 \"true\" 來開啟。\n若要變更 Firefox 瀏覽器的此設定值，請至 \"about:config\" 頁面。"
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",

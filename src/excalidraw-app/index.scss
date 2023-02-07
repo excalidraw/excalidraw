@@ -45,6 +45,23 @@
       }
     }
   }
+
+  .collab-offline-warning {
+    pointer-events: none;
+    position: absolute;
+    top: 6.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    text-align: center;
+    line-height: 1.5;
+    border-radius: var(--border-radius-md);
+    background-color: var(--color-warning);
+    color: var(--color-text-warning);
+    z-index: 6;
+    white-space: pre;
+  }
 }
 
 .excalidraw-app.is-collaborating {

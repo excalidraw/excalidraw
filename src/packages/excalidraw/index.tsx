@@ -60,7 +60,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
       ...DEFAULT_UI_OPTIONS.canvasActions,
       ...canvasActions,
     },
-    welcomeScreen: props.UIOptions?.welcomeScreen ?? true,
   };
 
   if (canvasActions?.export) {

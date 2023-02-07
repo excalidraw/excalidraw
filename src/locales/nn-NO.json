@@ -219,7 +219,8 @@
     "lock": "Hald fram med valt verktøy",
     "penMode": "",
     "link": "Legg til/ oppdater lenke til valt figur",
-    "eraser": "Viskelêr"
+    "eraser": "Viskelêr",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Handlingar: lerret",
@@ -227,7 +228,7 @@
     "shapes": "Formar"
   },
   "hints": {
-    "canvasPanning": "For å flytte lerretet, hald inne musehjulet eller mellomromstasten medan du dreg",
+    "canvasPanning": "",
     "linearElement": "Klikk for å starte linje med fleire punkt, eller drag for ei enkel linje",
     "freeDraw": "Klikk og drag, slepp når du er ferdig",
     "text": "Tips: du kan òg leggje til tekst ved å dobbeltklikke kor som helst med utvalgsverktyet",
@@ -245,7 +246,8 @@
     "publishLibrary": "Publiser ditt eige bibliotek",
     "bindTextToElement": "Trykk på enter for å legge til tekst",
     "deepBoxSelect": "Hald inne Ctrl / Cmd for å velje djupt, og forhindre flytting",
-    "eraserRevert": "Hald inne Alt for å reversere markering av element for sletting"
+    "eraserRevert": "Hald inne Alt for å reversere markering av element for sletting",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikkje vise førehandsvising",
