@@ -173,7 +173,15 @@ export const ColorPicker = ({
               data-prevent-outside-click
               side="right"
               align="start"
-              style={{ zIndex: 9999, backgroundColor: "var(--popup-bg-color)" }}
+              alignOffset={-16}
+              sideOffset={42}
+              style={{
+                zIndex: 9999,
+                backgroundColor: "var(--popup-bg-color)",
+                maxWidth: "184px",
+                padding: "12px 16px",
+                borderRadius: "8px",
+              }}
             >
               <Picker
                 colors={colors[type]}
@@ -190,7 +198,11 @@ export const ColorPicker = ({
                 type={type}
                 elements={elements}
               />
-              <Popover.Arrow />
+              <Popover.Arrow
+                width={20}
+                height={10}
+                style={{ fill: "var(--popup-bg-color)" }}
+              />
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>

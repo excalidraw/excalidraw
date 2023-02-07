@@ -185,9 +185,14 @@ export const Picker = ({
       aria-label={t("labels.colorPicker")}
       onKeyDown={handleKeyDown}
     >
-      <div className="color-picker-triangle color-picker-triangle-shadow"></div>
-      <div className="color-picker-triangle"></div>
+      {/* <div className="color-picker-triangle color-picker-triangle-shadow"></div>
+      <div className="color-picker-triangle"></div> */}
       <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "0.75rem",
+        }}
         className="color-picker-content"
         ref={(el) => {
           if (el) {
@@ -197,62 +202,67 @@ export const Picker = ({
         // to allow focusing by clicking but not by tabbing
         tabIndex={-1}
       >
-        <div className="color-picker-content--default">
-          {[["transparent", "transparent"], ...Object.entries(ocPalette)].map(
-            ([key, value]) => {
-              console.log(key, value);
+        <div>
+          <div style={{ padding: "0 .5rem", fontSize: ".75rem" }}>Colors</div>
+          <div className="color-picker-content--default">
+            {[["transparent", "transparent"], ...Object.entries(ocPalette)].map(
+              ([key, value]) => {
+                console.log(key, value);
 
-              const prevShade = colorObj?.shade;
-              console.log("prevShade", prevShade);
+                const prevShade = colorObj?.shade;
+                console.log("prevShade", prevShade);
 
-              const color =
-                (Array.isArray(value) ? value[3] : value) || "transparent";
+                const color =
+                  (Array.isArray(value) ? value[3] : value) || "transparent";
 
-              console.log("color", color);
+                console.log("color", color);
 
-              return (
-                <button
-                  type="button"
-                  className={clsx(
-                    "color-picker__button color-picker__button--large",
-                    {
-                      active:
-                        (!colorObj && key === "transparent") ||
-                        colorObj?.colorName === key,
-                      "is-transparent": color === "transparent" || !color,
-                      "with-border":
-                        color === "#ffffff" ||
-                        color === "transparent" ||
-                        !color,
-                    },
-                  )}
-                  onClick={(event) => {
-                    (event.currentTarget as HTMLButtonElement).focus();
-                    // const hasShade = (colorObj?.shade ?? -1) > -1;
-                    // const color =
-                    //   (Array.isArray(value)
-                    //     ? value[hasShade ? prevShade! : 3]
-                    //     : value) || "transparent";
-                    onChange(color);
-                  }}
-                  title={`${label} — ${key}`}
-                  // title={`${label}${
-                  //   !isTransparent(_color) ? ` (${_color})` : ""
-                  // } — ${keyBinding.toUpperCase()}`}
-                  aria-label={label}
-                  // aria-keyshortcuts={keyBindings[i]}
-                  style={color ? { "--swatch-color": color } : undefined}
-                  key={key}
-                ></button>
-              );
-            },
-          )}
+                return (
+                  <button
+                    type="button"
+                    className={clsx(
+                      "color-picker__button color-picker__button--large",
+                      {
+                        active:
+                          (!colorObj && key === "transparent") ||
+                          colorObj?.colorName === key,
+                        "is-transparent": color === "transparent" || !color,
+                        "with-border":
+                          color === "#ffffff" ||
+                          color === "transparent" ||
+                          !color,
+                      },
+                    )}
+                    onClick={(event) => {
+                      (event.currentTarget as HTMLButtonElement).focus();
+                      // const hasShade = (colorObj?.shade ?? -1) > -1;
+                      // const color =
+                      //   (Array.isArray(value)
+                      //     ? value[hasShade ? prevShade! : 3]
+                      //     : value) || "transparent";
+                      onChange(color);
+                    }}
+                    title={`${label} — ${key}`}
+                    // title={`${label}${
+                    //   !isTransparent(_color) ? ` (${_color})` : ""
+                    // } — ${keyBinding.toUpperCase()}`}
+                    aria-label={label}
+                    // aria-keyshortcuts={keyBindings[i]}
+                    style={color ? { "--swatch-color": color } : undefined}
+                    key={key}
+                  ></button>
+                );
+              },
+            )}
+          </div>
         </div>
 
-        <div>shades</div>
-        <ShadeList hex={color} onChange={onChange} />
+        <div>
+          <div style={{ padding: "0 .5rem", fontSize: ".75rem" }}>Shades</div>
+          <ShadeList hex={color} onChange={onChange} />
+        </div>
 
-        {!!customColors.length && (
+        {/* {!!customColors.length && (
           <div className="color-picker-content--canvas">
             <span className="color-picker-content--canvas-title">
               {t("labels.canvasColors")}
@@ -261,17 +271,22 @@ export const Picker = ({
               {renderColors(customColors, true)}
             </div>
           </div>
-        )}
+        )} */}
 
         {showInput && (
-          <ColorInput
-            color={color}
-            label={label}
-            onChange={(color) => {
-              onChange(color);
-            }}
-            ref={colorInput}
-          />
+          <div>
+            <div style={{ padding: "0 .5rem", fontSize: ".75rem" }}>
+              Hex code
+            </div>
+            <ColorInput
+              color={color}
+              label={label}
+              onChange={(color) => {
+                onChange(color);
+              }}
+              // ref={colorInput}
+            />
+          </div>
         )}
       </div>
     </div>
