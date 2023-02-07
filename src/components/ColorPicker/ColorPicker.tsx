@@ -15,7 +15,10 @@ import ActiveColor from "./ActiveColor";
 import * as Popover from "@radix-ui/react-popover";
 
 export const ocPalette: Palette = {};
-for (const [key, value] of Object.entries(oc)) {
+for (const [key, value] of Object.entries({
+  transparent: "transparent",
+  ...oc,
+})) {
   if (key === "grape") {
     continue;
   }

@@ -43,7 +43,7 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
         boxSizing: "border-box",
       }}
     >
-      <div style={{ padding: "0 8px" }}>#</div>
+      <div style={{ padding: "0 4px" }}>#</div>
       <input
         style={{
           border: 0,

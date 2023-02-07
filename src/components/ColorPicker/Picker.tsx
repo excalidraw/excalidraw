@@ -1,5 +1,5 @@
 import React from "react";
-import { getColorNameAndShadeFromHex, isTransparent } from "../../utils";
+import { isTransparent } from "../../utils";
 import { isArrowKey, KEYS } from "../../keys";
 import { t, getLanguage } from "../../i18n";
 import { isWritableElement } from "../../utils";
@@ -12,7 +12,7 @@ import {
   ocPalette,
 } from "./ColorPicker";
 import { ColorInput } from "./ColorInput";
-import clsx from "clsx";
+import PickerColorList from "./PickerColorList";
 
 export const Picker = ({
   colors,
@@ -172,11 +172,6 @@ export const Picker = ({
     });
   };
 
-  const colorObj = getColorNameAndShadeFromHex({
-    hex: color || "transparent",
-    palette: ocPalette,
-  });
-
   return (
     <div
       // className={`color-picker color-picker-type-${type}`}
@@ -204,57 +199,12 @@ export const Picker = ({
       >
         <div>
           <div style={{ padding: "0 .5rem", fontSize: ".75rem" }}>Colors</div>
-          <div className="color-picker-content--default">
-            {[["transparent", "transparent"], ...Object.entries(ocPalette)].map(
-              ([key, value]) => {
-                console.log(key, value);
-
-                const prevShade = colorObj?.shade;
-                console.log("prevShade", prevShade);
-
-                const color =
-                  (Array.isArray(value) ? value[3] : value) || "transparent";
-
-                console.log("color", color);
-
-                return (
-                  <button
-                    type="button"
-                    className={clsx(
-                      "color-picker__button color-picker__button--large",
-                      {
-                        active:
-                          (!colorObj && key === "transparent") ||
-                          colorObj?.colorName === key,
-                        "is-transparent": color === "transparent" || !color,
-                        "with-border":
-                          color === "#ffffff" ||
-                          color === "transparent" ||
-                          !color,
-                      },
-                    )}
-                    onClick={(event) => {
-                      (event.currentTarget as HTMLButtonElement).focus();
-                      // const hasShade = (colorObj?.shade ?? -1) > -1;
-                      // const color =
-                      //   (Array.isArray(value)
-                      //     ? value[hasShade ? prevShade! : 3]
-                      //     : value) || "transparent";
-                      onChange(color);
-                    }}
-                    title={`${label} — ${key}`}
-                    // title={`${label}${
-                    //   !isTransparent(_color) ? ` (${_color})` : ""
-                    // } — ${keyBinding.toUpperCase()}`}
-                    aria-label={label}
-                    // aria-keyshortcuts={keyBindings[i]}
-                    style={color ? { "--swatch-color": color } : undefined}
-                    key={key}
-                  ></button>
-                );
-              },
-            )}
-          </div>
+          <PickerColorList
+            color={color}
+            label={label}
+            palette={ocPalette}
+            onChange={onChange}
+          />
         </div>
 
         <div>
@@ -284,7 +234,6 @@ export const Picker = ({
               onChange={(color) => {
                 onChange(color);
               }}
-              // ref={colorInput}
             />
           </div>
         )}
