@@ -385,6 +385,7 @@ const ColorInput = React.forwardRef(
           marginTop: "auto",
           marginLeft: "5px",
           marginBottom: "auto",
+          marginRight: "-0.625rem"
         }}
       />
       </label>
