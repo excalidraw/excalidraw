@@ -58,23 +58,25 @@ export const redrawTextBoundingBox = (
   let coordX = textElement.x;
   // Resize container and vertically center align the text
   if (container) {
-    if (!isArrowElement(container)) {
+    if (isArrowElement(container)) {
+      const centerX = textElement.x + textElement.width / 2;
+      const centerY = textElement.y + textElement.height / 2;
+      const diffWidth = metrics.width - textElement.width;
+      const diffHeight = metrics.height - textElement.height;
+      coordY = centerY - (textElement.height + diffHeight) / 2;
+      coordX = centerX - (textElement.width + diffWidth) / 2;
+    } else {
       const containerDims = getContainerDims(container);
       let nextHeight = containerDims.height;
+      if (metrics.height > getMaxContainerHeight(container)) {
+        nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
+      }
       if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
         coordY = container.y;
       } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-        coordY =
-          container.y +
-          containerDims.height -
-          metrics.height -
-          BOUND_TEXT_PADDING;
+        coordY = container.y + nextHeight - metrics.height - BOUND_TEXT_PADDING;
       } else {
-        coordY = container.y + containerDims.height / 2 - metrics.height / 2;
-        if (metrics.height > getMaxContainerHeight(container)) {
-          nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
-          coordY = container.y + nextHeight / 2 - metrics.height / 2;
-        }
+        coordY = container.y + nextHeight / 2 - metrics.height / 2;
       }
       if (textElement.textAlign === TEXT_ALIGN.LEFT) {
         coordX = container.x + BOUND_TEXT_PADDING;
@@ -89,13 +91,6 @@ export const redrawTextBoundingBox = (
       }
       updateOriginalContainerCache(container.id, nextHeight);
       mutateElement(container, { height: nextHeight });
-    } else {
-      const centerX = textElement.x + textElement.width / 2;
-      const centerY = textElement.y + textElement.height / 2;
-      const diffWidth = metrics.width - textElement.width;
-      const diffHeight = metrics.height - textElement.height;
-      coordY = centerY - (textElement.height + diffHeight) / 2;
-      coordX = centerX - (textElement.width + diffWidth) / 2;
     }
   }
 
