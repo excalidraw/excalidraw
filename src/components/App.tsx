@@ -2654,14 +2654,6 @@ class App extends React.Component<AppProps, AppState> {
           element,
         ]);
       }
-
-      // case: creating new text not centered to parent element → offset Y
-      // so that the text is centered to cursor position
-      if (!parentCenterPosition) {
-        mutateElement(element, {
-          y: element.y,
-        });
-      }
     }
 
     this.setState({
