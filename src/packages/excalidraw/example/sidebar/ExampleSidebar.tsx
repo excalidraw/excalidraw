@@ -10,8 +10,8 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
           x
         </button>
         <div className="sidebar-links">
-          <button>Dummy Home</button>
-          <button>Dummy About</button>{" "}
+          <button>Empty Home</button>
+          <button>Empty About</button>{" "}
         </div>
       </div>
       <div className={`${open ? "sidebar-open" : ""}`}>

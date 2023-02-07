@@ -8,6 +8,9 @@ const root = createRoot(rootElement);
 
 root.render(
   <StrictMode>
-    <App />
+    <App
+      appTitle={"Excalidraw Example"}
+      useCustom={(api: any, args?: any[]) => {}}
+    />
   </StrictMode>,
 );
