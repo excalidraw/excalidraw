@@ -6296,6 +6296,13 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       this.maybeSuggestBindingForAll([draggingElement]);
+
+      // add elements to frames on frames creation
+      if (this.state.activeTool.type === "frame") {
+        this.addElementsToFrameOnCreation(
+          draggingElement as ExcalidrawFrameElement,
+        );
+      }
     }
   };
 
@@ -6343,6 +6350,27 @@ class App extends React.Component<AppProps, AppState> {
     }
     return false;
   };
+
+  private addElementsToFrameOnCreation(frame: ExcalidrawFrameElement) {
+    getElementsInFrame(
+      this.scene.getElementsIncludingDeleted(),
+      frame.id,
+    ).forEach((element) => {
+      mutateElement(element, {
+        frameId: null,
+      });
+    });
+
+    // 2. add all the elements that can be added to the frame to the frame
+    getElementsWithinSelection(this.scene.getNonDeletedElements(), frame)
+      .filter((element) => element.type !== "frame" && !element.frameId)
+      .forEach((element) => {
+        // TODO: set element hightlight, which will be unset on pointer up
+        mutateElement(element, {
+          frameId: frame.id,
+        });
+      });
+  }
 
   private getContextMenuItems = (
     type: "canvas" | "element",
