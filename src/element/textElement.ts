@@ -276,12 +276,8 @@ const getLineWidth = (text: string, font: FontString) => {
   }
   const canvas2dContext = canvas.getContext("2d")!;
   canvas2dContext.font = font;
+  const width = Math.ceil(canvas2dContext.measureText(text).width);
 
-  let width = 0;
-  text.split("").forEach((char) => {
-    const charWidth = Math.ceil(canvas2dContext.measureText(char).width);
-    width += charWidth;
-  });
   // since in test env the canvas measureText algo
   // doesn't measure text and instead just returns number of
   // characters hence we assume that each letteris 10px
