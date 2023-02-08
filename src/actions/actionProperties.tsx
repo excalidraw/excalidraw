@@ -89,18 +89,25 @@ const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-  callback: (element: ExcalidrawElement) => ExcalidrawElement,
+  callback: (
+    element: ExcalidrawElement,
+    property?: keyof Partial<Mutable<ExcalidrawElement>>,
+  ) => ExcalidrawElement,
   includeBoundText = false,
 ) => {
   const selectedElementIds = arrayToMap(
-    getSelectedElements(elements, appState, includeBoundText),
+    getSelectedElements(elements, appState),
   );
+
   return elements.map((element) => {
     if (
       selectedElementIds.get(element.id) ||
       element.id === appState.editingElement?.id
     ) {
       return callback(element);
+    } else if (element.frameId && selectedElementIds.get(element.frameId)) {
+      // for opacity
+      return callback(element, "frameOpacity");
     }
     return element;
   });
@@ -493,10 +500,14 @@ export const actionChangeOpacity = register({
       elements: changeProperty(
         elements,
         appState,
-        (el) =>
-          newElementWith(el, {
-            opacity: value,
-          }),
+        (el, property) =>
+          property
+            ? newElementWith(el, {
+                [property]: value,
+              })
+            : newElementWith(el, {
+                opacity: value,
+              }),
         true,
       ),
       appState: { ...appState, currentItemOpacity: value },

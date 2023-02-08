@@ -206,7 +206,8 @@ const drawElementOnCanvas = (
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
 ) => {
-  context.globalAlpha = element.opacity / 100;
+  context.globalAlpha =
+    ((element.frameOpacity ?? 100) * element.opacity) / 10000;
   switch (element.type) {
     case "rectangle":
     case "diamond":

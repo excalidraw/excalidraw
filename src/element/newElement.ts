@@ -41,6 +41,7 @@ type ElementConstructorOpts = MarkOptional<
   | "angle"
   | "groupIds"
   | "frameId"
+  | "frameOpacity"
   | "boundElements"
   | "seed"
   | "version"
@@ -65,6 +66,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     angle = 0,
     groupIds = [],
     frameId = null,
+    frameOpacity = 100,
     roundness = null,
     boundElements = null,
     link = null,
@@ -90,6 +92,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     opacity,
     groupIds,
     frameId,
+    frameOpacity,
     roundness,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
