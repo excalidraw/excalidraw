@@ -6329,6 +6329,33 @@ class App extends React.Component<AppProps, AppState> {
       pointerCoords.y - pointerDownState.resize.offset.y,
       this.state.gridSize,
     );
+
+    const selectedFrames = selectedElements.filter(
+      (element) => element.type === "frame",
+    );
+
+    const frameElementsOffsetsMap = new Map<
+      string,
+      {
+        x: number;
+        y: number;
+      }
+    >();
+
+    selectedFrames.forEach((frame) => {
+      const elementsInFrame = getElementsInFrame(
+        this.scene.getNonDeletedElements(),
+        frame.id,
+      );
+
+      elementsInFrame.forEach((element) => {
+        frameElementsOffsetsMap.set(frame.id + element.id, {
+          x: element.x - frame.x,
+          y: element.y - frame.y,
+        });
+      });
+    });
+
     if (
       transformElements(
         pointerDownState,
@@ -6347,10 +6374,77 @@ class App extends React.Component<AppProps, AppState> {
       )
     ) {
       this.maybeSuggestBindingForAll(selectedElements);
+      // shift elements in frames on resizing
+      const selectedFrames = selectedElements.filter(
+        (element) => element.type === "frame",
+      );
+
+      selectedFrames.forEach((frame) => {
+        const elementsInFrame = getElementsInFrame(
+          this.scene.getNonDeletedElements(),
+          frame.id,
+        );
+
+        if (transformHandleType) {
+          if (transformHandleType.includes("w")) {
+            elementsInFrame.forEach((element) => {
+              mutateElement(element, {
+                x:
+                  frame.x +
+                  (frameElementsOffsetsMap.get(frame.id + element.id)?.x || 0),
+                y:
+                  frame.y +
+                  (frameElementsOffsetsMap.get(frame.id + element.id)?.y || 0),
+              });
+            });
+          }
+          if (transformHandleType.includes("n")) {
+            elementsInFrame.forEach((element) => {
+              mutateElement(element, {
+                x:
+                  frame.x +
+                  (frameElementsOffsetsMap.get(frame.id + element.id)?.x || 0),
+                y:
+                  frame.y +
+                  (frameElementsOffsetsMap.get(frame.id + element.id)?.y || 0),
+              });
+            });
+          }
+        }
+      });
+
       return true;
     }
     return false;
   };
+
+  private shiftElementsHorizontally(
+    pointerDownState: PointerDownState,
+    elements: ExcalidrawElement[],
+    pointerX: number,
+    pointerY: number,
+  ) {
+    const [dragDistanceX, dragDistanceY] = [
+      Math.abs(pointerX - pointerDownState.origin.x),
+      Math.abs(pointerY - pointerDownState.origin.y),
+    ];
+
+    dragSelectedElements(
+      pointerDownState,
+      elements,
+      pointerX,
+      pointerY,
+      false,
+      dragDistanceX,
+      dragDistanceY,
+      this.state,
+      this.scene,
+    );
+  }
+
+  private shiftElementsVertically(elements: ExcalidrawElement[]) {
+    // drag elements
+  }
 
   private addElementsToFrameOnCreation(frame: ExcalidrawFrameElement) {
     getElementsInFrame(
