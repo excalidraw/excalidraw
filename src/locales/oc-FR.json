@@ -38,8 +38,8 @@
     "arrowhead_bar": "Barra",
     "arrowhead_dot": "Ponch",
     "arrowhead_triangle": "Triangle",
-    "fontSize": "Talha poliça",
-    "fontFamily": "Familha de poliça",
+    "fontSize": "Talha polissa",
+    "fontFamily": "Familha de polissa",
     "onlySelected": "Seleccion sonque",
     "withBackground": "Rèireplan",
     "exportEmbedScene": "Scèna embarcada",
@@ -106,8 +106,8 @@
     "toggleTheme": "Alternar tèma",
     "personalLib": "Bibliotèca personala",
     "excalidrawLib": "Bibliotèca Excalidraw",
-    "decreaseFontSize": "Reduire talha poliça",
-    "increaseFontSize": "Aumentar talha poliça",
+    "decreaseFontSize": "Reduire talha polissa",
+    "increaseFontSize": "Aumentar talha polissa",
     "unbindText": "Dessociar lo tèxte",
     "bindText": "Ligar lo tèxt al contenidor",
     "link": {
@@ -219,7 +219,8 @@
     "lock": "Mantenir activa l’aisina aprèp dessenhar",
     "penMode": "Mòde estilo - empachar lo contact",
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
-    "eraser": "Goma"
+    "eraser": "Goma",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -227,7 +228,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Per desplaçar los canabasses, tenètz la rodeta de la mirga o la barra d’espaci pendent lo desplaçament",
+    "canvasPanning": "",
     "linearElement": "Clicatz per començar mantun punt, lisatz per una sola linha",
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
@@ -245,7 +246,8 @@
     "publishLibrary": "Publicar vòstra pròpria bibliotèca",
     "bindTextToElement": "Quichatz Entrada per apondre de tèxte",
     "deepBoxSelect": "Gardar CtrlOCmd per una seleccion gropada e empachar lo desplaçament",
-    "eraserRevert": "Tenètz quichat Alt per anullar los elements marcats per supression"
+    "eraserRevert": "Tenètz quichat Alt per anullar los elements marcats per supression",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",

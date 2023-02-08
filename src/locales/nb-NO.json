@@ -219,7 +219,8 @@
     "lock": "Behold merket verktøy som aktivt",
     "penMode": "Pennemodus - forhindre berøring",
     "link": "Legg til / oppdater link for en valgt figur",
-    "eraser": "Viskelær"
+    "eraser": "Viskelær",
+    "hand": "Hånd (panoreringsverktøy)"
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",
@@ -227,7 +228,7 @@
     "shapes": "Former"
   },
   "hints": {
-    "canvasPanning": "For å flytte lerretet, hold musehjulet eller mellomromstasten mens du drar",
+    "canvasPanning": "For å flytte lerretet, hold musehjulet eller mellomromstasten mens du drar, eller bruk hånd-verktøyet",
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
     "freeDraw": "Klikk og dra, slipp når du er ferdig",
     "text": "Tips: du kan også legge til tekst ved å dobbeltklikke hvor som helst med utvalgsverktøyet",
@@ -245,7 +246,8 @@
     "publishLibrary": "Publiser ditt eget bibliotek",
     "bindTextToElement": "Trykk Enter for å legge til tekst",
     "deepBoxSelect": "Hold CTRL/CMD for å markere dypt og forhindre flytting",
-    "eraserRevert": "Hold Alt for å reversere elementene merket for sletting"
+    "eraserRevert": "Hold Alt for å reversere elementene merket for sletting",
+    "firefox_clipboard_write": "Denne funksjonen kan sannsynligvis aktiveres ved å sette \"dom.events.asyncClipboard.clipboardItem\" flagget til \"true\". For å endre nettleserens flagg i Firefox, besøk \"about:config\"-siden."
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",

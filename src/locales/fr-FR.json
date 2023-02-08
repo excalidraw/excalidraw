@@ -45,7 +45,7 @@
     "exportEmbedScene": "Intégrer la scène",
     "exportEmbedScene_details": "Les données de scène seront enregistrées dans le fichier PNG/SVG exporté, afin que la scène puisse être restaurée à partir de celui-ci.\nCela augmentera la taille du fichier exporté.",
     "addWatermark": "Ajouter \"Réalisé avec Excalidraw\"",
-    "handDrawn": "Manuscrit",
+    "handDrawn": "À main levée",
     "normal": "Normale",
     "code": "Code",
     "small": "Petite",
@@ -219,7 +219,8 @@
     "lock": "Garder l'outil sélectionné actif après le dessin",
     "penMode": "Mode stylo - évite le toucher",
     "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
-    "eraser": "Gomme"
+    "eraser": "Gomme",
+    "hand": "Mains (outil de déplacement de la vue)"
   },
   "headings": {
     "canvasActions": "Actions du canevas",
@@ -227,7 +228,7 @@
     "shapes": "Formes"
   },
   "hints": {
-    "canvasPanning": "Pour déplacer la zone de dessin, maintenez la molette de la souris enfoncée ou la barre d'espace tout en faisant glisser",
+    "canvasPanning": "Pour déplacer la zone de dessin, maintenez la molette de la souris enfoncée ou la barre d'espace tout en faisant glisser, ou utiliser l'outil main.",
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
@@ -245,7 +246,8 @@
     "publishLibrary": "Publier votre propre bibliothèque",
     "bindTextToElement": "Appuyer sur Entrée pour ajouter du texte",
     "deepBoxSelect": "Maintenir Ctrl ou Cmd pour sélectionner dans les groupes et empêcher le déplacement",
-    "eraserRevert": "Maintenez Alt enfoncé pour annuler les éléments marqués pour suppression"
+    "eraserRevert": "Maintenez Alt enfoncé pour annuler les éléments marqués pour suppression",
+    "firefox_clipboard_write": "Cette fonctionnalité devrait pouvoir être activée en définissant l'option \"dom.events.asyncClipboard.clipboard.clipboardItem\" à \"true\". Pour modifier les paramètres du navigateur dans Firefox, visitez la page \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
