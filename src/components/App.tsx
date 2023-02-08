@@ -6374,10 +6374,6 @@ class App extends React.Component<AppProps, AppState> {
       )
     ) {
       this.maybeSuggestBindingForAll(selectedElements);
-      // shift elements in frames on resizing
-      const selectedFrames = selectedElements.filter(
-        (element) => element.type === "frame",
-      );
 
       selectedFrames.forEach((frame) => {
         const elementsInFrame = getElementsInFrame(
@@ -6417,34 +6413,6 @@ class App extends React.Component<AppProps, AppState> {
     }
     return false;
   };
-
-  private shiftElementsHorizontally(
-    pointerDownState: PointerDownState,
-    elements: ExcalidrawElement[],
-    pointerX: number,
-    pointerY: number,
-  ) {
-    const [dragDistanceX, dragDistanceY] = [
-      Math.abs(pointerX - pointerDownState.origin.x),
-      Math.abs(pointerY - pointerDownState.origin.y),
-    ];
-
-    dragSelectedElements(
-      pointerDownState,
-      elements,
-      pointerX,
-      pointerY,
-      false,
-      dragDistanceX,
-      dragDistanceY,
-      this.state,
-      this.scene,
-    );
-  }
-
-  private shiftElementsVertically(elements: ExcalidrawElement[]) {
-    // drag elements
-  }
 
   private addElementsToFrameOnCreation(frame: ExcalidrawFrameElement) {
     getElementsInFrame(
