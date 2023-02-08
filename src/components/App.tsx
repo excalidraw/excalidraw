@@ -5019,6 +5019,7 @@ class App extends React.Component<AppProps, AppState> {
         resizingElement: null,
         selectionElement: null,
         frameToHighlight: null,
+        elementsToHighlight: null,
         cursorButton: "up",
         // text elements are reset on finalize, and resetting on pointerup
         // may cause issues with double taps
@@ -6361,11 +6362,22 @@ class App extends React.Component<AppProps, AppState> {
       });
     });
 
+    this.setState({
+      elementsToHighlight: [],
+    });
+
     // 2. add all the elements that can be added to the frame to the frame
     getElementsWithinSelection(this.scene.getNonDeletedElements(), frame)
       .filter((element) => element.type !== "frame" && !element.frameId)
       .forEach((element) => {
         // TODO: set element hightlight, which will be unset on pointer up
+        this.setState((prevState) => ({
+          elementsToHighlight: [
+            ...(prevState.elementsToHighlight ?? []),
+            element,
+          ],
+        }));
+
         mutateElement(element, {
           frameId: frame.id,
         });

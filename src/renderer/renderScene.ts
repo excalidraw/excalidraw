@@ -463,6 +463,15 @@ export const _renderScene = ({
     if (appState.frameToHighlight) {
       renderFrameHighlight(context, renderConfig, appState.frameToHighlight);
     }
+
+    if (appState.elementsToHighlight) {
+      renderElementsBoxHighlight(
+        context,
+        renderConfig,
+        appState.elementsToHighlight,
+      );
+    }
+
     const locallySelectedElements = getSelectedElements(elements, appState);
 
     // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
@@ -1039,6 +1048,36 @@ const renderFrameHighlight = (
     frame.angle,
   );
   context.restore();
+};
+
+const renderElementsBoxHighlight = (
+  context: CanvasRenderingContext2D,
+  renderConfig: RenderConfig,
+  elements: NonDeleted<ExcalidrawElement>[],
+) => {
+  elements.forEach((element) => {
+    context.strokeStyle = "rgb(0,118,255)";
+    context.lineWidth = FRAME_STYLE.strokeWidth * 2;
+    const padding = (element.strokeWidth / 2) * 1.5;
+
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const width = x2 - x1 + padding * 2;
+    const height = y2 - y1 + padding * 2;
+
+    context.save();
+    context.translate(renderConfig.scrollX, renderConfig.scrollY);
+    strokeRectWithRotation(
+      context,
+      x1 - padding,
+      y1 - padding,
+      width,
+      height,
+      x1 + width / 2,
+      y1 + height / 2,
+      element.angle,
+    );
+    context.restore();
+  });
 };
 
 const renderBindingHighlightForSuggestedPointBinding = (

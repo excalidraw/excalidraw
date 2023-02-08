@@ -110,6 +110,7 @@ export type AppState = {
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
   frameToHighlight: NonDeleted<ExcalidrawFrameElement> | null;
+  elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   // element being edited, but not necessarily added to elements array yet
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
