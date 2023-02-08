@@ -124,6 +124,18 @@ export const keyBindings = [
   ["z", "x", "c", "v", "b"],
 ].flat();
 
+export interface ColorPickerProps {
+  type: "canvasBackground" | "elementBackground" | "elementStroke";
+  color: string | null;
+  onChange: (color: string) => void;
+  label: string;
+  isActive: boolean;
+  setActive: (active: boolean) => void;
+  elements: readonly ExcalidrawElement[];
+  appState: AppState;
+  palette?: Palette;
+}
+
 // TODO
 // maybe extend ColorPicker with colors (=top picks for each) prop and pass it to TopPicks
 export const ColorPicker = ({
@@ -135,16 +147,8 @@ export const ColorPicker = ({
   setActive,
   elements,
   appState,
-}: {
-  type: "canvasBackground" | "elementBackground" | "elementStroke";
-  color: string | null;
-  onChange: (color: string) => void;
-  label: string;
-  isActive: boolean;
-  setActive: (active: boolean) => void;
-  elements: readonly ExcalidrawElement[];
-  appState: AppState;
-}) => {
+  palette = ocPalette,
+}: ColorPickerProps) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
   const coords = pickerButton.current?.getBoundingClientRect();
 
@@ -187,6 +191,7 @@ export const ColorPicker = ({
               }}
             >
               <Picker
+                palette={palette}
                 colors={colors[type]}
                 color={color || null}
                 onChange={(changedColor) => {

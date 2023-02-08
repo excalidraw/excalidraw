@@ -21,7 +21,7 @@ import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
 import type App from "./components/App";
-import type { ResolvablePromise, throttleRAF } from "./utils";
+import type { Palette, ResolvablePromise, throttleRAF } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
@@ -31,6 +31,7 @@ import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
+import { ColorPickerProps } from "./components/ColorPicker/ColorPicker";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -338,6 +339,7 @@ export interface ExcalidrawProps {
    */
   renderSidebar?: () => JSX.Element | null;
   children?: React.ReactNode;
+  colorPalette?: Partial<Record<ColorPickerProps["type"], Palette>>;
 }
 
 export type SceneData = {

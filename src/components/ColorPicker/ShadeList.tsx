@@ -1,22 +1,23 @@
 import clsx from "clsx";
-import { getColorNameAndShadeFromHex } from "../../utils";
+import { Palette, getColorNameAndShadeFromHex } from "../../utils";
 import { ocPalette } from "./ColorPicker";
 
 interface ShadeListProps {
   hex: string | null;
   onChange: (color: string) => void;
+  palette: Palette;
 }
 
-export const ShadeList = ({ hex, onChange }: ShadeListProps) => {
+export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
   const colorObj = getColorNameAndShadeFromHex({
     hex: hex || "transparent",
-    palette: ocPalette,
+    palette,
   });
 
   if (colorObj) {
     const { colorName, shade } = colorObj;
 
-    const shades = ocPalette[colorName];
+    const shades = palette[colorName];
 
     if (Array.isArray(shades)) {
       return (

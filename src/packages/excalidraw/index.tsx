@@ -15,6 +15,7 @@ import Footer from "../../components/footer/FooterCenter";
 import MainMenu from "../../components/main-menu/MainMenu";
 import WelcomeScreen from "../../components/welcome-screen/WelcomeScreen";
 import LiveCollaborationTrigger from "../../components/live-collaboration/LiveCollaborationTrigger";
+import { ocPalette } from "../../components/ColorPicker/ColorPicker";
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
@@ -43,6 +44,25 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onPointerDown,
     onScrollChange,
     children,
+    colorPalette = {
+      canvasBackground: {
+        black: "black",
+        // give me five shades of blue
+        blue: ["#0000FF", "#0000CC", "#000099", "#000066", "#000033"],
+        // give me five shades of red
+        red: ["#FF0000", "#CC0000", "#990000", "#660000", "#330000"],
+        // give me five shades of green
+        green: ["#00FF00", "#00CC00", "#009900", "#006600", "#003300"],
+        // give me five shades of yellow
+        yellow: ["#FFFF00", "#CCCC00", "#999900", "#666600", "#333300"],
+        // give me five shades of orange
+        orange: ["#FFA500", "#CC7A00", "#994C00", "#663300", "#331A00"],
+        // give me five shades of purple
+        purple: ["#800080", "#660066", "#4C004C", "#330033", "#1A001A"],
+        // give me five shades of gray
+        gray: ["#808080", "#666666", "#4C4C4C", "#333333", "#1A1A1A"],
+      },
+    },
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -115,6 +135,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
           renderSidebar={renderSidebar}
+          colorPalette={colorPalette}
         >
           {children}
         </App>

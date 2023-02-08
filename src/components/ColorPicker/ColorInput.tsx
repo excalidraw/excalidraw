@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import { getColor } from "./ColorPicker";
-import ActiveColor from "./ActiveColor";
 import clsx from "clsx";
 
 interface ColorInputProps {

@@ -1,5 +1,5 @@
 import React from "react";
-import { isTransparent } from "../../utils";
+import { isTransparent, Palette } from "../../utils";
 import { isArrowKey, KEYS } from "../../keys";
 import { t, getLanguage } from "../../i18n";
 import { isWritableElement } from "../../utils";
@@ -23,6 +23,7 @@ export const Picker = ({
   showInput = true,
   type,
   elements,
+  palette,
 }: {
   colors: string[];
   color: string | null;
@@ -32,6 +33,7 @@ export const Picker = ({
   showInput: boolean;
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   elements: readonly ExcalidrawElement[];
+  palette: Palette;
 }) => {
   const firstItem = React.useRef<HTMLButtonElement>();
   const activeItem = React.useRef<HTMLButtonElement>();
@@ -202,14 +204,14 @@ export const Picker = ({
           <PickerColorList
             color={color}
             label={label}
-            palette={ocPalette}
+            palette={palette}
             onChange={onChange}
           />
         </div>
 
         <div>
           <div style={{ padding: "0 .5rem", fontSize: ".75rem" }}>Shades</div>
-          <ShadeList hex={color} onChange={onChange} />
+          <ShadeList hex={color} onChange={onChange} palette={palette} />
         </div>
 
         {/* {!!customColors.length && (

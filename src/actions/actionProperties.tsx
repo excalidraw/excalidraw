@@ -1,6 +1,6 @@
 import { AppState } from "../../src/types";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
-import { ColorPicker } from "../components/ColorPicker/ColorPicker";
+import { ColorPicker, ocPalette } from "../components/ColorPicker/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
 // TODO barnabasmolnar/editor-redesign
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
@@ -223,10 +223,11 @@ export const actionChangeStrokeColor = register({
       commitToHistory: !!value.currentItemStrokeColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, appProps }) => (
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
+        palette={appProps.colorPalette?.elementStroke}
         type="elementStroke"
         label={t("labels.stroke")}
         color={getFormValue(
@@ -266,10 +267,11 @@ export const actionChangeBackgroundColor = register({
       commitToHistory: !!value.currentItemBackgroundColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, appProps }) => (
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
+        palette={appProps.colorPalette?.elementBackground}
         type="elementBackground"
         label={t("labels.background")}
         color={getFormValue(
