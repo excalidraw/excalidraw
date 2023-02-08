@@ -63,7 +63,7 @@ const PickerColorList = ({
             // aria-keyshortcuts={keyBindings[i]}
             style={color ? { "--swatch-color": color } : undefined}
             key={key}
-          ></button>
+          />
         );
       })}
     </div>

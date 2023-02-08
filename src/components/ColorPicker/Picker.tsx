@@ -1,5 +1,9 @@
 import React from "react";
-import { isTransparent, Palette } from "../../utils";
+import {
+  getColorNameAndShadeFromHex,
+  isTransparent,
+  Palette,
+} from "../../utils";
 import { isArrowKey, KEYS } from "../../keys";
 import { t, getLanguage } from "../../i18n";
 import { isWritableElement } from "../../utils";
@@ -13,6 +17,106 @@ import {
 } from "./ColorPicker";
 import { ColorInput } from "./ColorInput";
 import PickerColorList from "./PickerColorList";
+import clsx from "clsx";
+
+const isCustomColor = ({
+  color,
+  palette,
+}: {
+  color: string;
+  palette: Palette;
+}) => {
+  const paletteValues = Object.values(palette).flat();
+  return !paletteValues.includes(color);
+};
+
+export const getMostUsedCustomColors = (
+  elements: readonly ExcalidrawElement[],
+  type: "elementBackground" | "elementStroke",
+  palette: Palette,
+) => {
+  console.log("getMostUsedCustomColors");
+  console.log(elements);
+
+  const elementColorTypeMap = {
+    elementBackground: "backgroundColor",
+    elementStroke: "strokeColor",
+  };
+
+  const cs = elements.filter((element) => {
+    if (element.isDeleted) {
+      return false;
+    }
+
+    const color =
+      element[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"];
+
+    return isCustomColor({ color, palette });
+  });
+
+  console.log("cs");
+  console.log(cs);
+
+  const result = [
+    ...new Set(
+      cs.map(
+        (c) =>
+          c[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"],
+      ),
+    ),
+  ];
+
+  console.log(result);
+
+  return result;
+};
+
+interface CustomColorListProps {
+  colors: string[];
+  color: string | null;
+  onChange: (color: string) => void;
+  label: string;
+}
+
+const CustomColorList = ({
+  colors,
+  color,
+  onChange,
+  label,
+}: CustomColorListProps) => {
+  return (
+    <div className="color-picker-content--default">
+      {colors.map((c, i) => {
+        return (
+          <button
+            type="button"
+            className={clsx(
+              "color-picker__button color-picker__button--large",
+              { active: color === c },
+            )}
+            onClick={(event) => {
+              (event.currentTarget as HTMLButtonElement).focus();
+              // const hasShade = (colorObj?.shade ?? -1) > -1;
+              // const color =
+              //   (Array.isArray(value)
+              //     ? value[hasShade ? prevShade! : 3]
+              //     : value) || "transparent";
+              onChange(c);
+            }}
+            // title={`${label} — ${key}`}
+            // title={`${label}${
+            //   !isTransparent(_color) ? ` (${_color})` : ""
+            // } — ${keyBinding.toUpperCase()}`}
+            aria-label={label}
+            // aria-keyshortcuts={keyBindings[i]}
+            style={{ "--swatch-color": c }}
+            key={i}
+          />
+        );
+      })}
+    </div>
+  );
+};
 
 export const Picker = ({
   colors,
@@ -44,8 +148,11 @@ export const Picker = ({
     if (type === "canvasBackground") {
       return [];
     }
-    return getCustomColors(elements, type);
+    return getMostUsedCustomColors(elements, type, palette);
   });
+
+  console.log("customColors");
+  console.log(customColors);
 
   React.useEffect(() => {
     // After the component is first mounted focus on first input
@@ -199,6 +306,20 @@ export const Picker = ({
         // to allow focusing by clicking but not by tabbing
         tabIndex={-1}
       >
+        {!!customColors.length && (
+          <div>
+            <div style={{ padding: "0 .5rem", fontSize: ".75rem" }}>
+              Most used custom colors
+            </div>
+            <CustomColorList
+              colors={customColors}
+              color={color}
+              label="lol"
+              onChange={onChange}
+            />
+          </div>
+        )}
+
         <div>
           <div style={{ padding: "0 .5rem", fontSize: ".75rem" }}>Colors</div>
           <PickerColorList
