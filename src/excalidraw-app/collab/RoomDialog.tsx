@@ -144,7 +144,7 @@ const RoomDialog = ({
               <input
                 type="text"
                 id="username"
-                value={username.trim() || ""}
+                value={username || ""}
                 className="RoomDialog-username TextInput"
                 onChange={(event) => onUsernameChange(event.target.value)}
                 onKeyPress={(event) => event.key === "Enter" && handleClose()}
