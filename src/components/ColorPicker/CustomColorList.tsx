@@ -44,7 +44,7 @@ export const CustomColorList = ({
             style={{ "--swatch-color": c }}
             key={i}
           >
-            {i + 1}
+            <div className="color-picker__button__hotkey-label">{i + 1}</div>
           </button>
         );
       })}

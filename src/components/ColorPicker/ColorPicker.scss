@@ -13,6 +13,10 @@
     border: 1px solid var(--default-border-color);
     padding: 0.5rem;
     border-radius: 0.5rem;
+
+    @include isMobile {
+      max-width: 175px;
+    }
   }
 
   .color-picker__top-picks {
@@ -28,15 +32,18 @@
     filter: var(--theme-filter);
     background-color: var(--swatch-color);
     background-position: left center;
+    position: relative;
+    font-family: inherit;
 
     &:focus-visible {
-      // outline: none;
-      outline: 10px solid lightblue;
+      // TODO color picker redesign
+      // I like giant ass outlines for keyboard navigation
+      // but we can tone it down/get rid of it
+      outline: 6px solid var(--color-primary-light);
+      outline-offset: 2px;
     }
 
     &.active {
-      // outline: 1px solid var(--color-primary-darkest);
-      // outline-offset: 1px;
       position: relative;
 
       &::after {
@@ -84,6 +91,15 @@
         filter: var(--theme-filter);
       }
     }
+  }
+
+  .color-picker__button__hotkey-label {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    color: white;
+    text-shadow: 0 0 2px black;
+    filter: var(--theme-filter);
   }
 
   .color-picker {

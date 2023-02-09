@@ -62,7 +62,7 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
                 onChange(color);
               }}
             >
-              {i + 1}
+              <div className="color-picker__button__hotkey-label">{i + 1}</div>
             </button>
           ))}
         </div>
@@ -96,6 +96,8 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
           fontSize: "0.75rem",
         }}
       >
+        {/* TODO color picker redesign */}
+        {/* add i18n label instead of hardcoded text */}
         no shades available for this color
       </div>
     </div>

@@ -79,7 +79,9 @@ const PickerColorList = ({
             style={color ? { "--swatch-color": color } : undefined}
             key={key}
           >
-            {colorPickerHotkeyBindings[index]}
+            <div className="color-picker__button__hotkey-label">
+              {colorPickerHotkeyBindings[index]}
+            </div>
           </button>
         );
       })}
