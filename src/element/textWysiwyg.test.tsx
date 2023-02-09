@@ -6,7 +6,7 @@ import { CODES, KEYS } from "../keys";
 import { fireEvent } from "../tests/test-utils";
 import { queryByText } from "@testing-library/react";
 
-import { BOUND_TEXT_PADDING, FONT_FAMILY } from "../constants";
+import { FONT_FAMILY } from "../constants";
 import {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -439,16 +439,6 @@ describe("textWysiwyg", () => {
   describe("Test container-bound text", () => {
     let rectangle: any;
     const { h } = window;
-
-    const DUMMY_WIDTH = 160;
-    const APPROX_LINE_HEIGHT = 25;
-    const INITIAL_WIDTH = 10;
-
-    beforeAll(() => {
-      jest
-        .spyOn(textElementUtils, "getApproxLineHeight")
-        .mockReturnValue(APPROX_LINE_HEIGHT);
-    });
 
     beforeEach(async () => {
       await render(<ExcalidrawApp />);
