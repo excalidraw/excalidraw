@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { Palette, getColorNameAndShadeFromHex } from "../../utils";
-import { ocPalette } from "./ColorPicker";
+import { useAtom } from "jotai";
+import { activeColorPickerSectionAtom } from "./Picker";
 
 interface ShadeListProps {
   hex: string | null;
@@ -14,6 +15,10 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
     palette,
   });
 
+  const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
+    activeColorPickerSectionAtom,
+  );
+
   if (colorObj) {
     const { colorName, shade } = colorObj;
 
@@ -21,9 +26,17 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
 
     if (Array.isArray(shades)) {
       return (
-        <div className="color-picker-content--default">
+        <div
+          className="color-picker-content--default shades"
+          data-active-color-picker-section={
+            activeColorPickerSection === "shades"
+          }
+        >
           {shades.map((color, i) => (
             <button
+              data-is-active-color={i === shade}
+              // autoFocus={i === shade}
+              tabIndex={-1}
               key={i}
               type="button"
               className={clsx(
@@ -32,8 +45,18 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
               )}
               title={`${colorName} - ${i}`}
               style={color ? { "--swatch-color": color } : undefined}
-              onClick={() => onChange(color)}
-            />
+              onClick={() => {
+                onChange(color);
+                setActiveColorPickerSection("shades");
+              }}
+              onFocus={() => {
+                onChange(color);
+                setActiveColorPickerSection("shades");
+              }}
+              data-keybinding={`Digit${i + 1}`}
+            >
+              {i + 1}
+            </button>
           ))}
         </div>
       );
@@ -44,9 +67,14 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
     <div
       className="color-picker-content--default"
       style={{ position: "relative" }}
+      tabIndex={-1}
     >
-      <button className="color-picker__button color-picker__button--large" />
       <div
+        tabIndex={-1}
+        className="color-picker__button color-picker__button--large"
+      />
+      <div
+        tabIndex={-1}
         style={{
           position: "absolute",
           top: 0,

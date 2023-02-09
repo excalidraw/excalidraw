@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   getColorNameAndShadeFromHex,
   isTransparent,
@@ -17,15 +17,20 @@ import {
 } from "./ColorPicker";
 import { ColorInput } from "./ColorInput";
 import PickerColorList from "./PickerColorList";
-import clsx from "clsx";
+import { atom, useAtom } from "jotai";
+import { CustomColorList } from "./CustomColorList";
+import { customOrPaletteHandler } from "./keyboardNavHandlers";
 
 const isCustomColor = ({
   color,
   palette,
 }: {
-  color: string;
+  color: string | null;
   palette: Palette;
 }) => {
+  if (!color) {
+    return false;
+  }
   const paletteValues = Object.values(palette).flat();
   return !paletteValues.includes(color);
 };
@@ -35,9 +40,6 @@ export const getMostUsedCustomColors = (
   type: "elementBackground" | "elementStroke",
   palette: Palette,
 ) => {
-  console.log("getMostUsedCustomColors");
-  console.log(elements);
-
   const elementColorTypeMap = {
     elementBackground: "backgroundColor",
     elementStroke: "strokeColor",
@@ -54,9 +56,6 @@ export const getMostUsedCustomColors = (
     return isCustomColor({ color, palette });
   });
 
-  console.log("cs");
-  console.log(cs);
-
   const result = [
     ...new Set(
       cs.map(
@@ -68,55 +67,24 @@ export const getMostUsedCustomColors = (
 
   console.log(result);
 
-  return result;
+  return result.slice(0, 5);
 };
 
-interface CustomColorListProps {
+export interface CustomColorListProps {
   colors: string[];
   color: string | null;
   onChange: (color: string) => void;
   label: string;
 }
 
-const CustomColorList = ({
-  colors,
-  color,
-  onChange,
-  label,
-}: CustomColorListProps) => {
-  return (
-    <div className="color-picker-content--default">
-      {colors.map((c, i) => {
-        return (
-          <button
-            type="button"
-            className={clsx(
-              "color-picker__button color-picker__button--large",
-              { active: color === c },
-            )}
-            onClick={(event) => {
-              (event.currentTarget as HTMLButtonElement).focus();
-              // const hasShade = (colorObj?.shade ?? -1) > -1;
-              // const color =
-              //   (Array.isArray(value)
-              //     ? value[hasShade ? prevShade! : 3]
-              //     : value) || "transparent";
-              onChange(c);
-            }}
-            // title={`${label} — ${key}`}
-            // title={`${label}${
-            //   !isTransparent(_color) ? ` (${_color})` : ""
-            // } — ${keyBinding.toUpperCase()}`}
-            aria-label={label}
-            // aria-keyshortcuts={keyBindings[i]}
-            style={{ "--swatch-color": c }}
-            key={i}
-          />
-        );
-      })}
-    </div>
-  );
-};
+export type activeColorPickerSectionAtomType =
+  | "custom"
+  | "default"
+  | "shades"
+  | "hex"
+  | null;
+export const activeColorPickerSectionAtom =
+  atom<activeColorPickerSectionAtomType>(null);
 
 export const Picker = ({
   colors,
@@ -139,11 +107,6 @@ export const Picker = ({
   elements: readonly ExcalidrawElement[];
   palette: Palette;
 }) => {
-  const firstItem = React.useRef<HTMLButtonElement>();
-  const activeItem = React.useRef<HTMLButtonElement>();
-  const gallery = React.useRef<HTMLDivElement>();
-  const colorInput = React.useRef<HTMLInputElement>();
-
   const [customColors] = React.useState(() => {
     if (type === "canvasBackground") {
       return [];
@@ -151,135 +114,15 @@ export const Picker = ({
     return getMostUsedCustomColors(elements, type, palette);
   });
 
-  console.log("customColors");
-  console.log(customColors);
+  const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
+    activeColorPickerSectionAtom,
+  );
 
-  React.useEffect(() => {
-    // After the component is first mounted focus on first input
-    if (activeItem.current) {
-      activeItem.current.focus();
-    } else if (colorInput.current) {
-      colorInput.current.focus();
-    } else if (gallery.current) {
-      gallery.current.focus();
-    }
-  }, []);
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    let handled = false;
-    if (isArrowKey(event.key)) {
-      handled = true;
-      const { activeElement } = document;
-      const isRTL = getLanguage().rtl;
-      let isCustom = false;
-      let index = Array.prototype.indexOf.call(
-        gallery.current!.querySelector(".color-picker-content--default")
-          ?.children,
-        activeElement,
-      );
-      if (index === -1) {
-        index = Array.prototype.indexOf.call(
-          gallery.current!.querySelector(".color-picker-content--canvas-colors")
-            ?.children,
-          activeElement,
-        );
-        if (index !== -1) {
-          isCustom = true;
-        }
-      }
-      const parentElement = isCustom
-        ? gallery.current?.querySelector(".color-picker-content--canvas-colors")
-        : gallery.current?.querySelector(".color-picker-content--default");
-
-      if (parentElement && index !== -1) {
-        const length = parentElement.children.length - (showInput ? 1 : 0);
-        const nextIndex =
-          event.key === (isRTL ? KEYS.ARROW_LEFT : KEYS.ARROW_RIGHT)
-            ? (index + 1) % length
-            : event.key === (isRTL ? KEYS.ARROW_RIGHT : KEYS.ARROW_LEFT)
-            ? (length + index - 1) % length
-            : !isCustom && event.key === KEYS.ARROW_DOWN
-            ? (index + 5) % length
-            : !isCustom && event.key === KEYS.ARROW_UP
-            ? (length + index - 5) % length
-            : index;
-        (parentElement.children[nextIndex] as HTMLElement | undefined)?.focus();
-      }
-      event.preventDefault();
-    } else if (
-      keyBindings.includes(event.key.toLowerCase()) &&
-      !event[KEYS.CTRL_OR_CMD] &&
-      !event.altKey &&
-      !isWritableElement(event.target)
-    ) {
-      handled = true;
-      const index = keyBindings.indexOf(event.key.toLowerCase());
-      const isCustom = index >= MAX_DEFAULT_COLORS;
-      const parentElement = isCustom
-        ? gallery?.current?.querySelector(
-            ".color-picker-content--canvas-colors",
-          )
-        : gallery?.current?.querySelector(".color-picker-content--default");
-      const actualIndex = isCustom ? index - MAX_DEFAULT_COLORS : index;
-      (
-        parentElement?.children[actualIndex] as HTMLElement | undefined
-      )?.focus();
-
-      event.preventDefault();
-    } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
-      handled = true;
-      event.preventDefault();
-      onClose();
-    }
-    if (handled) {
-      event.nativeEvent.stopImmediatePropagation();
-      event.stopPropagation();
-    }
-  };
-
-  const renderColors = (colors: Array<string>, custom: boolean = false) => {
-    return colors.map((_color, i) => {
-      const _colorWithoutHash = _color.replace("#", "");
-      const keyBinding = custom
-        ? keyBindings[i + MAX_DEFAULT_COLORS]
-        : keyBindings[i];
-      const label = custom
-        ? _colorWithoutHash
-        : t(`colors.${_colorWithoutHash}`);
-      return (
-        <button
-          className="color-picker-swatch"
-          onClick={(event) => {
-            (event.currentTarget as HTMLButtonElement).focus();
-            onChange(_color);
-          }}
-          title={`${label}${
-            !isTransparent(_color) ? ` (${_color})` : ""
-          } — ${keyBinding.toUpperCase()}`}
-          aria-label={label}
-          aria-keyshortcuts={keyBindings[i]}
-          style={{ color: _color }}
-          key={_color}
-          ref={(el) => {
-            if (!custom && el && i === 0) {
-              firstItem.current = el;
-            }
-            if (el && _color === color) {
-              activeItem.current = el;
-            }
-          }}
-          onFocus={() => {
-            onChange(_color);
-          }}
-        >
-          {isTransparent(_color) ? (
-            <div className="color-picker-transparent"></div>
-          ) : undefined}
-          <span className="color-picker-keybinding">{keyBinding}</span>
-        </button>
-      );
-    });
-  };
+  // useEffect(() => {
+  //   setActiveColorPickerSection(
+  //     isCustomColor({ color, palette }) ? "custom" : "default",
+  //   );
+  // }, [color, palette, setActiveColorPickerSection]);
 
   return (
     <div
@@ -287,24 +130,30 @@ export const Picker = ({
       role="dialog"
       aria-modal="true"
       aria-label={t("labels.colorPicker")}
-      onKeyDown={handleKeyDown}
+      // onKeyDown={handleKeyDown}
     >
-      {/* <div className="color-picker-triangle color-picker-triangle-shadow"></div>
-      <div className="color-picker-triangle"></div> */}
       <div
+        onKeyDown={(e) => {
+          console.log("lol...", e.key);
+
+          customOrPaletteHandler(
+            e,
+            activeColorPickerSection,
+            palette,
+            color,
+            onChange,
+            customColors,
+            setActiveColorPickerSection,
+          );
+        }}
         style={{
           display: "flex",
           flexDirection: "column",
           gap: "0.75rem",
         }}
         className="color-picker-content"
-        ref={(el) => {
-          if (el) {
-            gallery.current = el;
-          }
-        }}
         // to allow focusing by clicking but not by tabbing
-        tabIndex={-1}
+        // tabIndex={-1}
       >
         {!!customColors.length && (
           <div>

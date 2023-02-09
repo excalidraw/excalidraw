@@ -9,10 +9,12 @@ import { AppState } from "../../types";
 
 import oc from "open-color";
 import { TopPicks } from "./TopPicks";
-import { Picker } from "./Picker";
+import { activeColorPickerSectionAtom, Picker } from "./Picker";
 import ActiveColor from "./ActiveColor";
 
 import * as Popover from "@radix-ui/react-popover";
+import { customOrPaletteHandler } from "./keyboardNavHandlers";
+import { useAtom } from "jotai";
 
 export const ocPalette: Palette = {};
 for (const [key, value] of Object.entries({
@@ -84,7 +86,7 @@ export const getCustomColors = (
   return customColors;
 };
 
-const isCustomColor = (
+export const isCustomColor = (
   color: string,
   type: "elementBackground" | "elementStroke",
 ) => {
@@ -136,8 +138,6 @@ export interface ColorPickerProps {
   palette?: Palette;
 }
 
-// TODO
-// maybe extend ColorPicker with colors (=top picks for each) prop and pass it to TopPicks
 export const ColorPicker = ({
   type,
   color,
@@ -152,9 +152,13 @@ export const ColorPicker = ({
   const pickerButton = React.useRef<HTMLButtonElement>(null);
   const coords = pickerButton.current?.getBoundingClientRect();
 
+  const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
+    activeColorPickerSectionAtom,
+  );
+
   return (
     <div>
-      <div className="color-picker-container">
+      <div role="dialog" aria-modal="true" className="color-picker-container">
         <TopPicks activeColor={color} onChange={onChange} type={type} />
         <div
           style={{
@@ -188,6 +192,8 @@ export const ColorPicker = ({
                 maxWidth: "184px",
                 padding: "12px 16px",
                 borderRadius: "8px",
+                boxShadow:
+                  "0px 7px 14px rgba(0, 0, 0, 0.05), 0px 0px 3.12708px rgba(0, 0, 0, 0.0798), 0px 0px 0.931014px rgba(0, 0, 0, 0.1702)",
               }}
             >
               <Picker
@@ -209,7 +215,12 @@ export const ColorPicker = ({
               <Popover.Arrow
                 width={20}
                 height={10}
-                style={{ fill: "var(--popup-bg-color)" }}
+                style={{
+                  fill: "var(--popup-bg-color)",
+                  filter: "drop-shadow(rgba(0, 0, 0, 0.05) 0px 3px 2px)",
+                  // filter:
+                  //   "drop-shadow(0px 7px 14px rgba(0, 0, 0, 0.05), 0px 0px 3.12708px rgba(0, 0, 0, 0.0798), 0px 0px 0.931014px rgba(0, 0, 0, 0.1702))",
+                }}
               />
             </Popover.Content>
           </Popover.Portal>

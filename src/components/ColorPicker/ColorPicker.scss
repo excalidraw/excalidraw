@@ -23,6 +23,10 @@
     background-color: var(--swatch-color);
     background-position: left center;
 
+    &:focus-visible {
+      outline: none;
+    }
+
     &.active {
       // outline: 1px solid var(--color-primary-darkest);
       // outline-offset: 1px;

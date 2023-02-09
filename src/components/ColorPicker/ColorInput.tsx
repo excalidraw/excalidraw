@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { getColor } from "./ColorPicker";
 import clsx from "clsx";
+import { useAtom } from "jotai";
+import { activeColorPickerSectionAtom } from "./Picker";
 
 interface ColorInputProps {
   color: string | null;
@@ -10,6 +12,9 @@ interface ColorInputProps {
 
 export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
   const [innerValue, setInnerValue] = useState(color);
+  const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
+    activeColorPickerSectionAtom,
+  );
 
   useEffect(() => {
     setInnerValue(color);
@@ -52,9 +57,21 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
         spellCheck={false}
         className="color-picker-input"
         aria-label={label}
-        onChange={(event) => changeColor(event.target.value)}
+        onChange={(event) => {
+          changeColor(event.target.value);
+          // event.stopPropagation();
+        }}
         value={(innerValue || "").replace(/^#/, "")}
-        onBlur={() => setInnerValue(color)}
+        onBlur={() => {
+          setInnerValue(color);
+          setActiveColorPickerSection("default");
+        }}
+        autoFocus={false}
+        tabIndex={-1}
+        onFocus={() => setActiveColorPickerSection("hex")}
+        onKeyDown={(e) => {
+          e.stopPropagation();
+        }}
       />
       <div
         style={{
