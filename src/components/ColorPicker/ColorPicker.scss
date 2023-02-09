@@ -35,6 +35,12 @@
     position: relative;
     font-family: inherit;
 
+    &--no-focus-visible {
+      &:focus-visible {
+        outline: none !important;
+      }
+    }
+
     &:focus-visible {
       // TODO color picker redesign
       // I like giant ass outlines for keyboard navigation

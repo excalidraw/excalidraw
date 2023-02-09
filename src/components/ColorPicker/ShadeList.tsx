@@ -79,7 +79,7 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
       <button
         autoFocus
         tabIndex={-1}
-        className="color-picker__button color-picker__button--large"
+        className="color-picker__button color-picker__button--large color-picker__button--no-focus-visible"
       />
       <div
         tabIndex={-1}
