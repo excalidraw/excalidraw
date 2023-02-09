@@ -10,52 +10,11 @@ import { atom, useAtom } from "jotai";
 import { CustomColorList } from "./CustomColorList";
 import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
 import PickerHeading from "./PickerHeading";
-import { MAX_CUSTOM_COLORS, Palette } from "./colorPickerUtils";
-
-export const isCustomColor = ({
-  color,
-  palette,
-}: {
-  color: string | null;
-  palette: Palette;
-}) => {
-  if (!color) {
-    return false;
-  }
-  const paletteValues = Object.values(palette).flat();
-  return !paletteValues.includes(color);
-};
-
-export const getMostUsedCustomColors = (
-  elements: readonly ExcalidrawElement[],
-  type: "elementBackground" | "elementStroke",
-  palette: Palette,
-) => {
-  const elementColorTypeMap = {
-    elementBackground: "backgroundColor",
-    elementStroke: "strokeColor",
-  };
-
-  const colors = elements.filter((element) => {
-    if (element.isDeleted) {
-      return false;
-    }
-
-    const color =
-      element[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"];
-
-    return isCustomColor({ color, palette });
-  });
-
-  return [
-    ...new Set(
-      colors.map(
-        (c) =>
-          c[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"],
-      ),
-    ),
-  ].slice(0, MAX_CUSTOM_COLORS);
-};
+import {
+  Palette,
+  getMostUsedCustomColors,
+  isCustomColor,
+} from "./colorPickerUtils";
 
 export interface CustomColorListProps {
   colors: string[];

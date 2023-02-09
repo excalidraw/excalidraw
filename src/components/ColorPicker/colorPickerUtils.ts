@@ -1,4 +1,5 @@
 import oc from "open-color";
+import { ExcalidrawElement } from "../../element/types";
 
 export type PaletteKey = keyof oc | string;
 export type PaletteValue = string | [string, string, string, string, string];
@@ -64,3 +65,55 @@ export const bgTopPicks = [
 export const MAX_CUSTOM_COLORS = 5;
 export const COLOR_PER_ROW = 5;
 export const DEFAULT_SHADE_INDEX = 3;
+
+export const isCustomColor = ({
+  color,
+  palette,
+}: {
+  color: string | null;
+  palette: Palette;
+}) => {
+  if (!color) {
+    return false;
+  }
+  const paletteValues = Object.values(palette).flat();
+  return !paletteValues.includes(color);
+};
+
+export const getMostUsedCustomColors = (
+  elements: readonly ExcalidrawElement[],
+  type: "elementBackground" | "elementStroke",
+  palette: Palette,
+) => {
+  const elementColorTypeMap = {
+    elementBackground: "backgroundColor",
+    elementStroke: "strokeColor",
+  };
+
+  const colors = elements.filter((element) => {
+    if (element.isDeleted) {
+      return false;
+    }
+
+    const color =
+      element[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"];
+
+    return isCustomColor({ color, palette });
+  });
+
+  const colorCountMap = new Map<string, number>();
+  colors.forEach((element) => {
+    const color =
+      element[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"];
+    if (colorCountMap.has(color)) {
+      colorCountMap.set(color, colorCountMap.get(color)! + 1);
+    } else {
+      colorCountMap.set(color, 1);
+    }
+  });
+
+  return [...colorCountMap.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map((c) => c[0])
+    .slice(0, MAX_CUSTOM_COLORS);
+};
