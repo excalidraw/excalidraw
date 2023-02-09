@@ -1,10 +1,10 @@
 import clsx from "clsx";
-import { activeColorPickerSectionAtom } from "./Picker";
 import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
 import {
   DEFAULT_SHADE_INDEX,
   Palette,
+  activeColorPickerSectionAtom,
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromHex,
 } from "./colorPickerUtils";

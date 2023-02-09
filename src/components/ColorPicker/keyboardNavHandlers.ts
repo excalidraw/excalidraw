@@ -1,8 +1,8 @@
-import { activeColorPickerSectionAtomType } from "./Picker";
 import {
   COLOR_PER_ROW,
   DEFAULT_SHADE_INDEX,
   Palette,
+  activeColorPickerSectionAtomType,
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromHex,
 } from "./colorPickerUtils";

@@ -1,7 +1,14 @@
 import clsx from "clsx";
-import { CustomColorListProps, activeColorPickerSectionAtom } from "./Picker";
 import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
+import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+
+interface CustomColorListProps {
+  colors: string[];
+  color: string | null;
+  onChange: (color: string) => void;
+  label: string;
+}
 
 export const CustomColorList = ({
   colors,

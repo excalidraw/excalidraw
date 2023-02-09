@@ -6,12 +6,16 @@ import { ExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
 
 import { TopPicks } from "./TopPicks";
-import { activeColorPickerSectionAtom, Picker } from "./Picker";
+import { Picker } from "./Picker";
 import ActiveColor from "./ActiveColor";
 
 import * as Popover from "@radix-ui/react-popover";
 import { useAtom } from "jotai";
-import { ocPalette, Palette } from "./colorPickerUtils";
+import {
+  activeColorPickerSectionAtom,
+  ocPalette,
+  Palette,
+} from "./colorPickerUtils";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;

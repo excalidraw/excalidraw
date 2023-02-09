@@ -1,5 +1,6 @@
 import oc from "open-color";
 import { ExcalidrawElement } from "../../element/types";
+import { atom } from "jotai";
 
 export type PaletteKey = keyof oc | string;
 export type PaletteValue = string | [string, string, string, string, string];
@@ -117,3 +118,12 @@ export const getMostUsedCustomColors = (
     .map((c) => c[0])
     .slice(0, MAX_CUSTOM_COLORS);
 };
+
+export type activeColorPickerSectionAtomType =
+  | "custom"
+  | "default"
+  | "shades"
+  | "hex"
+  | null;
+export const activeColorPickerSectionAtom =
+  atom<activeColorPickerSectionAtomType>(null);

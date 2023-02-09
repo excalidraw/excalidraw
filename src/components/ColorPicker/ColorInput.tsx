@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getColor } from "./ColorPicker";
 import clsx from "clsx";
 import { useAtom } from "jotai";
-import { activeColorPickerSectionAtom } from "./Picker";
+import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 
 interface ColorInputProps {
   color: string | null;

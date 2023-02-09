@@ -6,31 +6,16 @@ import { ShadeList } from "./ShadeList";
 
 import { ColorInput } from "./ColorInput";
 import PickerColorList from "./PickerColorList";
-import { atom, useAtom } from "jotai";
+import { useAtom } from "jotai";
 import { CustomColorList } from "./CustomColorList";
 import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
 import PickerHeading from "./PickerHeading";
 import {
   Palette,
+  activeColorPickerSectionAtom,
   getMostUsedCustomColors,
   isCustomColor,
 } from "./colorPickerUtils";
-
-export interface CustomColorListProps {
-  colors: string[];
-  color: string | null;
-  onChange: (color: string) => void;
-  label: string;
-}
-
-export type activeColorPickerSectionAtomType =
-  | "custom"
-  | "default"
-  | "shades"
-  | "hex"
-  | null;
-export const activeColorPickerSectionAtom =
-  atom<activeColorPickerSectionAtomType>(null);
 
 export const Picker = ({
   color,
