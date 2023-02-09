@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { actionShortcuts } from "../../actions";
 import { ActionManager } from "../../actions/manager";
+import { t } from "../../i18n";
 import { AppState } from "../../types";
 import {
   ExitZenModeAction,
@@ -80,6 +81,7 @@ const Footer = ({
           {renderWelcomeScreen && <welcomeScreenHelpHintTunnel.Out />}
           <HelpButton
             onClick={() => actionManager.executeAction(actionShortcuts)}
+            title={t("helpDialog.title")}
           />
         </div>
       </div>
