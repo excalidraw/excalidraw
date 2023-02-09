@@ -24,7 +24,8 @@
     background-position: left center;
 
     &:focus-visible {
-      outline: none;
+      // outline: none;
+      outline: 10px solid lightblue;
     }
 
     &.active {

@@ -12,24 +12,21 @@ export const CustomColorList = ({
     activeColorPickerSectionAtom,
   );
 
+  console.log("render CustomColorList");
+
   return (
-    <div
-      className="color-picker-content--default"
-      data-active-color-picker-section={activeColorPickerSection === "custom"}
-      tabIndex={-1}
-    >
+    <div className="color-picker-content--default" tabIndex={-1}>
       {colors.map((c, i) => {
         return (
           <button
             tabIndex={-1}
-            data-is-active-color={color === c}
             type="button"
             className={clsx(
               "color-picker__button color-picker__button--large",
               { active: color === c },
             )}
             onClick={(event) => {
-              // (event.currentTarget as HTMLButtonElement).focus();
+              (event.currentTarget as HTMLButtonElement).focus();
               // const hasShade = (colorObj?.shade ?? -1) > -1;
               // const color =
               //   (Array.isArray(value)
@@ -38,11 +35,12 @@ export const CustomColorList = ({
               onChange(c);
               setActiveColorPickerSection("custom");
             }}
-            onFocus={() => {
+            onFocus={(event) => {
+              console.log("onFocus", event.currentTarget);
+              (event.currentTarget as HTMLButtonElement).focus();
               onChange(c);
               setActiveColorPickerSection("custom");
             }}
-            data-keybinding={i + 1}
             // title={`${label} — ${key}`}
             // title={`${label}${
             //   !isTransparent(_color) ? ` (${_color})` : ""

@@ -153,7 +153,7 @@ export const Picker = ({
         }}
         className="color-picker-content"
         // to allow focusing by clicking but not by tabbing
-        // tabIndex={-1}
+        tabIndex={-1}
       >
         {!!customColors.length && (
           <div>
