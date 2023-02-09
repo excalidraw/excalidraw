@@ -64,6 +64,18 @@ const hotkeyHandler = (
     }
   }
 
+  if (defaultPickerKeys.includes(e.key)) {
+    const index = defaultPickerKeys.indexOf(e.key);
+    console.log("index", index);
+    const paletteKey = Object.keys(palette)[index];
+    console.log("paletteKey", paletteKey);
+    const paletteValue = palette[paletteKey];
+    console.log("paletteValue", paletteValue);
+    const r = Array.isArray(paletteValue) ? paletteValue[3] : paletteValue;
+    onChange(r);
+    setActiveColorPickerSection("default");
+  }
+
   // if (
   //   ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"].includes(e.code) &&
   //   e.shiftKey
@@ -109,28 +121,6 @@ export const customOrPaletteHandler = (
     customColors,
     setActiveColorPickerSection,
   );
-
-  // if (colorObj && colorObj.shade >= 0) {
-  //   // shift + numpad is extremely fucked on windows apparently
-  //   if (
-  //     ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"].includes(e.code) &&
-  //     e.shiftKey
-  //   ) {
-  //     const newShade = Number(e.code.slice(-1)) - 1;
-  //     onChange(palette[colorObj.colorName][newShade]);
-  //     setActiveColorPickerSection("shades");
-  //   }
-  // }
-
-  // if (["1", "2", "3", "4", "5"].includes(e.key)) {
-  //   console.log(e.key);
-  //   const c = customColors[Number(e.key) - 1];
-  //   if (c) {
-  //     console.log("custom color", c);
-  //     onChange(customColors[Number(e.key) - 1]);
-  //     setActiveColorPickerSection("custom");
-  //   }
-  // }
 
   if (activeSection === "shades") {
     console.log("shades", colorObj);
