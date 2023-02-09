@@ -60,3 +60,7 @@ export const bgTopPicks = [
   ocPalette.blue[1],
   ocPalette.orange[1],
 ];
+
+export const MAX_CUSTOM_COLORS = 5;
+export const COLOR_PER_ROW = 5;
+export const DEFAULT_SHADE_INDEX = 3;

@@ -3,6 +3,7 @@ import { activeColorPickerSectionAtom } from "./Picker";
 import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
 import {
+  DEFAULT_SHADE_INDEX,
   Palette,
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromHex,
@@ -43,7 +44,8 @@ const PickerColorList = ({
         // const prevShade = colorObj?.shade;
 
         const color =
-          (Array.isArray(value) ? value[3] : value) || "transparent";
+          (Array.isArray(value) ? value[DEFAULT_SHADE_INDEX] : value) ||
+          "transparent";
 
         return (
           <button
@@ -63,7 +65,7 @@ const PickerColorList = ({
               // const hasShade = (colorObj?.shade ?? -1) > -1;
               // const color =
               //   (Array.isArray(value)
-              //     ? value[hasShade ? prevShade! : 3]
+              //     ? value[hasShade ? prevShade! : DEFAULT_SHADE_INDEX]
               //     : value) || "transparent";
               onChange(color);
               setActiveColorPickerSection("default");

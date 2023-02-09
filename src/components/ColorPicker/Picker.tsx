@@ -10,7 +10,7 @@ import { atom, useAtom } from "jotai";
 import { CustomColorList } from "./CustomColorList";
 import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
 import PickerHeading from "./PickerHeading";
-import { Palette } from "./colorPickerUtils";
+import { MAX_CUSTOM_COLORS, Palette } from "./colorPickerUtils";
 
 export const isCustomColor = ({
   color,
@@ -54,7 +54,7 @@ export const getMostUsedCustomColors = (
           c[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"],
       ),
     ),
-  ].slice(0, 5);
+  ].slice(0, MAX_CUSTOM_COLORS);
 };
 
 export interface CustomColorListProps {

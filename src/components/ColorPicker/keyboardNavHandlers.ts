@@ -1,5 +1,7 @@
 import { activeColorPickerSectionAtomType } from "./Picker";
 import {
+  COLOR_PER_ROW,
+  DEFAULT_SHADE_INDEX,
   Palette,
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromHex,
@@ -10,7 +12,7 @@ const arrowHandler = (
   currentIndex: number,
   length: number,
 ) => {
-  const rows = Math.ceil(length / 5);
+  const rows = Math.ceil(length / COLOR_PER_ROW);
 
   switch (eventKey) {
     case "ArrowLeft": {
@@ -21,12 +23,13 @@ const arrowHandler = (
       return (currentIndex + 1) % length;
     }
     case "ArrowDown": {
-      const nextIndex = currentIndex + 5;
-      return nextIndex >= length ? currentIndex % 5 : nextIndex;
+      const nextIndex = currentIndex + COLOR_PER_ROW;
+      return nextIndex >= length ? currentIndex % COLOR_PER_ROW : nextIndex;
     }
     case "ArrowUp": {
-      const prevIndex = currentIndex - 5;
-      const newIndex = prevIndex < 0 ? 5 * rows + prevIndex : prevIndex;
+      const prevIndex = currentIndex - COLOR_PER_ROW;
+      const newIndex =
+        prevIndex < 0 ? COLOR_PER_ROW * rows + prevIndex : prevIndex;
       return newIndex >= length ? undefined : newIndex;
     }
   }
@@ -69,7 +72,9 @@ const hotkeyHandler = (
     const index = colorPickerHotkeyBindings.indexOf(e.key);
     const paletteKey = Object.keys(palette)[index];
     const paletteValue = palette[paletteKey];
-    const r = Array.isArray(paletteValue) ? paletteValue[3] : paletteValue;
+    const r = Array.isArray(paletteValue)
+      ? paletteValue[DEFAULT_SHADE_INDEX]
+      : paletteValue;
     onChange(r);
     setActiveColorPickerSection("default");
   }
@@ -108,7 +113,7 @@ export const colorPickerKeyNavHandler = (
   if (activeSection === "shades") {
     if (colorObj) {
       const { shade } = colorObj;
-      const newShade = arrowHandler(e.key, shade, 5);
+      const newShade = arrowHandler(e.key, shade, COLOR_PER_ROW);
 
       if (newShade !== undefined) {
         onChange(palette[colorObj.colorName][newShade]);
@@ -134,7 +139,7 @@ export const colorPickerKeyNavHandler = (
 
         onChange(
           Array.isArray(newColorNameValue)
-            ? newColorNameValue[3]
+            ? newColorNameValue[DEFAULT_SHADE_INDEX]
             : newColorNameValue,
         );
       }
