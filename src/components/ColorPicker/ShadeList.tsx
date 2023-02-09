@@ -34,7 +34,6 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
         >
           {shades.map((color, i) => (
             <button
-              data-is-active-color={i === shade}
               autoFocus={i === shade}
               tabIndex={-1}
               key={i}
@@ -43,7 +42,8 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
                 "color-picker__button color-picker__button--large",
                 { active: i === shade },
               )}
-              title={`${colorName} - ${i}`}
+              aria-label="Shade"
+              title={`${colorName} - ${i + 1}`}
               style={color ? { "--swatch-color": color } : undefined}
               onClick={() => {
                 onChange(color);
@@ -51,9 +51,7 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
               }}
               onFocus={() => {
                 onChange(color);
-                // setActiveColorPickerSection("shades");
               }}
-              data-keybinding={`Digit${i + 1}`}
             >
               {i + 1}
             </button>

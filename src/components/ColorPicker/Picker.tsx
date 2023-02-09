@@ -1,25 +1,15 @@
 import React, { useEffect } from "react";
-import {
-  getColorNameAndShadeFromHex,
-  isTransparent,
-  Palette,
-} from "../../utils";
-import { isArrowKey, KEYS } from "../../keys";
-import { t, getLanguage } from "../../i18n";
-import { isWritableElement } from "../../utils";
+import { Palette } from "../../utils";
+import { t } from "../../i18n";
+
 import { ExcalidrawElement } from "../../element/types";
 import { ShadeList } from "./ShadeList";
-import {
-  // getCustomColors,
-  keyBindings,
-  MAX_DEFAULT_COLORS,
-  ocPalette,
-} from "./ColorPicker";
+
 import { ColorInput } from "./ColorInput";
 import PickerColorList from "./PickerColorList";
 import { atom, useAtom } from "jotai";
 import { CustomColorList } from "./CustomColorList";
-import { customOrPaletteHandler } from "./keyboardNavHandlers";
+import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
 
 export const isCustomColor = ({
   color,
@@ -45,7 +35,7 @@ export const getMostUsedCustomColors = (
     elementStroke: "strokeColor",
   };
 
-  const cs = elements.filter((element) => {
+  const colors = elements.filter((element) => {
     if (element.isDeleted) {
       return false;
     }
@@ -56,18 +46,14 @@ export const getMostUsedCustomColors = (
     return isCustomColor({ color, palette });
   });
 
-  const result = [
+  return [
     ...new Set(
-      cs.map(
+      colors.map(
         (c) =>
           c[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"],
       ),
     ),
-  ];
-
-  console.log(result);
-
-  return result.slice(0, 5);
+  ].slice(0, 5);
 };
 
 export interface CustomColorListProps {
@@ -87,10 +73,8 @@ export const activeColorPickerSectionAtom =
   atom<activeColorPickerSectionAtomType>(null);
 
 export const Picker = ({
-  colors,
   color,
   onChange,
-  onClose,
   label,
   showInput = true,
   type,
@@ -100,7 +84,6 @@ export const Picker = ({
   colors: string[];
   color: string | null;
   onChange: (color: string) => void;
-  onClose: () => void;
   label: string;
   showInput: boolean;
   type: "canvasBackground" | "elementBackground" | "elementStroke";
@@ -127,18 +110,10 @@ export const Picker = ({
   }, [activeColorPickerSection, color, palette, setActiveColorPickerSection]);
 
   return (
-    <div
-      // className={`color-picker color-picker-type-${type}`}
-      role="dialog"
-      aria-modal="true"
-      aria-label={t("labels.colorPicker")}
-      // onKeyDown={handleKeyDown}
-    >
+    <div role="dialog" aria-modal="true" aria-label={t("labels.colorPicker")}>
       <div
         onKeyDown={(e) => {
-          console.log("lol...", e.key);
-
-          customOrPaletteHandler(
+          colorPickerKeyNavHandler(
             e,
             activeColorPickerSection,
             palette,
@@ -165,7 +140,7 @@ export const Picker = ({
             <CustomColorList
               colors={customColors}
               color={color}
-              label="lol"
+              label="Most used custom colors"
               onChange={onChange}
             />
           </div>
@@ -185,17 +160,6 @@ export const Picker = ({
           <div style={{ padding: "0 .5rem", fontSize: ".75rem" }}>Shades</div>
           <ShadeList hex={color} onChange={onChange} palette={palette} />
         </div>
-
-        {/* {!!customColors.length && (
-          <div className="color-picker-content--canvas">
-            <span className="color-picker-content--canvas-title">
-              {t("labels.canvasColors")}
-            </span>
-            <div className="color-picker-content--canvas-colors">
-              {renderColors(customColors, true)}
-            </div>
-          </div>
-        )} */}
 
         {showInput && (
           <div>

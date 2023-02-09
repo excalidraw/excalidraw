@@ -1,5 +1,3 @@
-import React from "react";
-// import { Popover } from "../Popover";
 import { isTransparent, Palette } from "../../utils";
 
 import "./ColorPicker.scss";
@@ -9,11 +7,10 @@ import { AppState } from "../../types";
 
 import oc from "open-color";
 import { TopPicks } from "./TopPicks";
-import { activeColorPickerSectionAtom, isCustomColor, Picker } from "./Picker";
+import { activeColorPickerSectionAtom, Picker } from "./Picker";
 import ActiveColor from "./ActiveColor";
 
 import * as Popover from "@radix-ui/react-popover";
-import { customOrPaletteHandler } from "./keyboardNavHandlers";
 import { useAtom } from "jotai";
 
 export const ocPalette: Palette = {};
@@ -50,48 +47,6 @@ export const bgTopPicks = [
 
 const MAX_CUSTOM_COLORS = 5;
 export const MAX_DEFAULT_COLORS = 15;
-
-// export const getCustomColors = (
-//   elements: readonly ExcalidrawElement[],
-//   type: "elementBackground" | "elementStroke",
-// ) => {
-//   const customColors: string[] = [];
-//   const updatedElements = elements
-//     .filter((element) => !element.isDeleted)
-//     .sort((ele1, ele2) => ele2.updated - ele1.updated);
-
-//   let index = 0;
-//   const elementColorTypeMap = {
-//     elementBackground: "backgroundColor",
-//     elementStroke: "strokeColor",
-//   };
-//   const colorType = elementColorTypeMap[type] as
-//     | "backgroundColor"
-//     | "strokeColor";
-//   while (
-//     index < updatedElements.length &&
-//     customColors.length < MAX_CUSTOM_COLORS
-//   ) {
-//     const element = updatedElements[index];
-
-//     if (
-//       customColors.length < MAX_CUSTOM_COLORS &&
-//       isCustomColor(element[colorType], type) &&
-//       !customColors.includes(element[colorType])
-//     ) {
-//       customColors.push(element[colorType]);
-//     }
-//     index++;
-//   }
-//   return customColors;
-// };
-
-// export const isCustomColor = (
-//   color: string,
-//   type: "elementBackground" | "elementStroke",
-// ) => {
-//   return !colors[type].includes(color);
-// };
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -146,15 +101,9 @@ export const ColorPicker = ({
   isActive,
   setActive,
   elements,
-  appState,
   palette = ocPalette,
 }: ColorPickerProps) => {
-  const pickerButton = React.useRef<HTMLButtonElement>(null);
-  const coords = pickerButton.current?.getBoundingClientRect();
-
-  const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
-    activeColorPickerSectionAtom,
-  );
+  const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
   return (
     <div>
@@ -174,7 +123,6 @@ export const ColorPicker = ({
             isActive={isActive}
             label={label}
             setActive={setActive}
-            pickerButton={pickerButton}
           />
 
           <Popover.Portal
@@ -182,9 +130,6 @@ export const ColorPicker = ({
           >
             <Popover.Content
               onCloseAutoFocus={() => {
-                const b = isCustomColor({ color, palette });
-                console.log(b);
-
                 setActiveColorPickerSection(null);
               }}
               data-prevent-outside-click
@@ -209,10 +154,6 @@ export const ColorPicker = ({
                 onChange={(changedColor) => {
                   onChange(changedColor);
                 }}
-                onClose={() => {
-                  setActive(false);
-                  pickerButton.current?.focus();
-                }}
                 label={label}
                 showInput
                 type={type}
@@ -224,49 +165,12 @@ export const ColorPicker = ({
                 style={{
                   fill: "var(--popup-bg-color)",
                   filter: "drop-shadow(rgba(0, 0, 0, 0.05) 0px 3px 2px)",
-                  // filter:
-                  //   "drop-shadow(0px 7px 14px rgba(0, 0, 0, 0.05), 0px 0px 3.12708px rgba(0, 0, 0, 0.0798), 0px 0px 0.931014px rgba(0, 0, 0, 0.1702))",
                 }}
               />
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
       </div>
-      {/* <React.Suspense fallback="">
-        {isActive ? (
-          <div
-            className="color-picker-popover-container"
-            style={{
-              position: "fixed",
-              top: coords?.top,
-              left: coords?.right,
-              zIndex: 1,
-            }}
-          >
-            <Popover
-              onCloseRequest={(event) =>
-                event.target !== pickerButton.current && setActive(false)
-              }
-            >
-              <Picker
-                colors={colors[type]}
-                color={color || null}
-                onChange={(changedColor) => {
-                  onChange(changedColor);
-                }}
-                onClose={() => {
-                  setActive(false);
-                  pickerButton.current?.focus();
-                }}
-                label={label}
-                showInput
-                type={type}
-                elements={elements}
-              />
-            </Popover>
-          </div>
-        ) : null}
-      </React.Suspense> */}
     </div>
   );
 };

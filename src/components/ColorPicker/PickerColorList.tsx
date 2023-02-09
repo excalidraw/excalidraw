@@ -26,36 +26,20 @@ const PickerColorList = ({
     hex: color || "transparent",
     palette,
   });
-  const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
-    activeColorPickerSectionAtom,
-  );
+  const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
   return (
-    <div
-      className="color-picker-content--default"
-      tabIndex={-1}
-      data-active-color-picker-section={activeColorPickerSection === "default"}
-    >
+    <div className="color-picker-content--default" tabIndex={-1}>
       {Object.entries(palette).map(([key, value], index) => {
-        // console.log(key, value);
-
-        // console.log(Object.keys(palette));
-
-        const prevShade = colorObj?.shade;
-        // console.log("prevShade", prevShade);
+        // const prevShade = colorObj?.shade;
 
         const color =
           (Array.isArray(value) ? value[3] : value) || "transparent";
-
-        // console.log("color", color);
-
-        // console.log("colorObj", colorObj);
 
         return (
           <button
             tabIndex={-1}
             type="button"
-            data-is-active-color={colorObj?.colorName === key}
             className={clsx(
               "color-picker__button color-picker__button--large",
               {
@@ -65,8 +49,7 @@ const PickerColorList = ({
                   color === "#ffffff" || color === "transparent" || !color,
               },
             )}
-            onClick={(event) => {
-              // (event.currentTarget as HTMLButtonElement).focus();
+            onClick={() => {
               // const hasShade = (colorObj?.shade ?? -1) > -1;
               // const color =
               //   (Array.isArray(value)
@@ -80,12 +63,7 @@ const PickerColorList = ({
               setActiveColorPickerSection("default");
             }}
             title={`${label} — ${key}`}
-            data-keybinding={defaultPickerKeys[index]}
-            // title={`${label}${
-            //   !isTransparent(_color) ? ` (${_color})` : ""
-            // } — ${keyBinding.toUpperCase()}`}
             aria-label={label}
-            // aria-keyshortcuts={keyBindings[i]}
             style={color ? { "--swatch-color": color } : undefined}
             key={key}
           >

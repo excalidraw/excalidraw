@@ -8,11 +8,7 @@ export const CustomColorList = ({
   onChange,
   label,
 }: CustomColorListProps) => {
-  const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
-    activeColorPickerSectionAtom,
-  );
-
-  console.log("render CustomColorList");
+  const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
   return (
     <div className="color-picker-content--default" tabIndex={-1}>
@@ -25,28 +21,16 @@ export const CustomColorList = ({
               "color-picker__button color-picker__button--large",
               { active: color === c },
             )}
-            onClick={(event) => {
-              (event.currentTarget as HTMLButtonElement).focus();
-              // const hasShade = (colorObj?.shade ?? -1) > -1;
-              // const color =
-              //   (Array.isArray(value)
-              //     ? value[hasShade ? prevShade! : 3]
-              //     : value) || "transparent";
+            onClick={() => {
               onChange(c);
               setActiveColorPickerSection("custom");
             }}
-            onFocus={(event) => {
-              console.log("onFocus", event.currentTarget);
-              (event.currentTarget as HTMLButtonElement).focus();
+            onFocus={() => {
               onChange(c);
               setActiveColorPickerSection("custom");
             }}
-            // title={`${label} — ${key}`}
-            // title={`${label}${
-            //   !isTransparent(_color) ? ` (${_color})` : ""
-            // } — ${keyBinding.toUpperCase()}`}
+            title={c}
             aria-label={label}
-            // aria-keyshortcuts={keyBindings[i]}
             style={{ "--swatch-color": c }}
             key={i}
           >
