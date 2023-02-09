@@ -193,7 +193,7 @@
     "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?",
     "removeItemsFromsLibrary": "Ștergi {{count}} element(e) din bibliotecă?",
     "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Nu este disponibilă nicio conexiune la internet.\nModificările nu vor fi salvate!"
   },
   "errors": {
     "unsupportedFileType": "Tip de fișier neacceptat.",
@@ -221,7 +221,7 @@
     "penMode": "Mod stilou – împiedică atingerea",
     "link": "Adăugare/actualizare URL pentru forma selectată",
     "eraser": "Radieră",
-    "hand": ""
+    "hand": "Mână (instrument de panoramare)"
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
@@ -229,7 +229,7 @@
     "shapes": "Forme"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Pentru a muta pânză, ține apăsată rotița mausului sau bara de spațiu sau folosește instrumentul în formă de mână",
     "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
