@@ -20,7 +20,7 @@ export const CustomColorList = ({
   }, [color]);
 
   return (
-    <div className="color-picker-content--default" tabIndex={-1}>
+    <div className="color-picker-content--default">
       {colors.map((c, i) => {
         return (
           <button

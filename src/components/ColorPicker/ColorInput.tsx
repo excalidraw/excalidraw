@@ -31,27 +31,10 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
   );
 
   return (
-    <label
-      style={{
-        // display: "flex",
-        display: "grid",
-        gridTemplateColumns: "auto 1fr auto auto",
-        gap: "8px",
-        alignItems: "center",
-        border: "1px solid var(--default-border-color)",
-        borderRadius: "8px",
-        padding: "0 12px",
-        margin: "8px",
-        boxSizing: "border-box",
-      }}
-    >
-      <div style={{ padding: "0 4px" }}>#</div>
+    <label className="color-picker__input-label">
+      <div className="color-picker__input-hash">#</div>
       <input
-        style={{
-          border: 0,
-          padding: 0,
-          // width: "auto",
-        }}
+        style={{ border: 0, padding: 0 }}
         spellCheck={false}
         className="color-picker-input"
         aria-label={label}

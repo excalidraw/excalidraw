@@ -1,52 +1,17 @@
-import { isTransparent, Palette } from "../../utils";
+import { isTransparent } from "../../utils";
 
 import "./ColorPicker.scss";
 import colors from "../../colors";
 import { ExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
 
-import oc from "open-color";
 import { TopPicks } from "./TopPicks";
 import { activeColorPickerSectionAtom, Picker } from "./Picker";
 import ActiveColor from "./ActiveColor";
 
 import * as Popover from "@radix-ui/react-popover";
 import { useAtom } from "jotai";
-
-export const ocPalette: Palette = {};
-for (const [key, value] of Object.entries({
-  transparent: "transparent",
-  ...oc,
-})) {
-  if (key === "grape") {
-    continue;
-  }
-  if (Array.isArray(value)) {
-    // @ts-ignore
-    ocPalette[key] = value.filter((_, i) => i % 2 === 0);
-  } else {
-    ocPalette[key] = value;
-  }
-}
-// console.log(ocPalette);
-
-export const strokeTopPicks = [
-  ocPalette.black as string,
-  ocPalette.red[3],
-  ocPalette.green[3],
-  ocPalette.blue[3],
-  ocPalette.orange[3],
-];
-export const bgTopPicks = [
-  ocPalette.gray[1],
-  ocPalette.red[1],
-  ocPalette.green[1],
-  ocPalette.blue[1],
-  ocPalette.orange[1],
-];
-
-const MAX_CUSTOM_COLORS = 5;
-export const MAX_DEFAULT_COLORS = 15;
+import { ocPalette, Palette } from "./colorPickerUtils";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -68,18 +33,6 @@ export const getColor = (color: string): string | null => {
     ? color
     : null;
 };
-
-// This is a narrow reimplementation of the awesome react-color Twitter component
-// https://github.com/casesandberg/react-color/blob/master/src/components/twitter/Twitter.js
-
-// Unfortunately, we can't detect keyboard layout in the browser. So this will
-// only work well for QWERTY but not AZERTY or others...
-export const keyBindings = [
-  ["1", "2", "3", "4", "5"],
-  ["q", "w", "e", "r", "t"],
-  ["a", "s", "d", "f", "g"],
-  ["z", "x", "c", "v", "b"],
-].flat();
 
 export interface ColorPickerProps {
   type: "canvasBackground" | "elementBackground" | "elementStroke";

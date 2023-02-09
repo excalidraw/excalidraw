@@ -1,8 +1,8 @@
 import clsx from "clsx";
-import { Palette, getColorNameAndShadeFromHex } from "../../utils";
 import { useAtom } from "jotai";
 import { activeColorPickerSectionAtom } from "./Picker";
 import { useEffect, useRef } from "react";
+import { Palette, getColorNameAndShadeFromHex } from "./colorPickerUtils";
 
 interface ShadeListProps {
   hex: string | null;

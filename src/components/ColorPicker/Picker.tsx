@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { Palette } from "../../utils";
 import { t } from "../../i18n";
 
 import { ExcalidrawElement } from "../../element/types";
@@ -10,6 +9,8 @@ import PickerColorList from "./PickerColorList";
 import { atom, useAtom } from "jotai";
 import { CustomColorList } from "./CustomColorList";
 import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
+import PickerHeading from "./PickerHeading";
+import { Palette } from "./colorPickerUtils";
 
 export const isCustomColor = ({
   color,
@@ -123,20 +124,13 @@ export const Picker = ({
             setActiveColorPickerSection,
           );
         }}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "0.75rem",
-        }}
         className="color-picker-content"
         // to allow focusing by clicking but not by tabbing
         tabIndex={-1}
       >
         {!!customColors.length && (
           <div>
-            <div style={{ padding: "0 .5rem", fontSize: ".75rem" }}>
-              Most used custom colors
-            </div>
+            <PickerHeading>Most used custom colors</PickerHeading>
             <CustomColorList
               colors={customColors}
               color={color}
@@ -147,7 +141,7 @@ export const Picker = ({
         )}
 
         <div>
-          <div style={{ padding: "0 .5rem", fontSize: ".75rem" }}>Colors</div>
+          <PickerHeading>Colors</PickerHeading>
           <PickerColorList
             color={color}
             label={label}
@@ -157,15 +151,13 @@ export const Picker = ({
         </div>
 
         <div>
-          <div style={{ padding: "0 .5rem", fontSize: ".75rem" }}>Shades</div>
+          <PickerHeading>Shades</PickerHeading>
           <ShadeList hex={color} onChange={onChange} palette={palette} />
         </div>
 
         {showInput && (
           <div>
-            <div style={{ padding: "0 .5rem", fontSize: ".75rem" }}>
-              Hex code
-            </div>
+            <PickerHeading>Hex code</PickerHeading>
             <ColorInput
               color={color}
               label={label}

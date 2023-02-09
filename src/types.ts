@@ -21,7 +21,7 @@ import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
 import type App from "./components/App";
-import type { Palette, ResolvablePromise, throttleRAF } from "./utils";
+import type { ResolvablePromise, throttleRAF } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
@@ -32,6 +32,7 @@ import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { ColorPickerProps } from "./components/ColorPicker/ColorPicker";
+import { Palette } from "./components/ColorPicker/colorPickerUtils";
 
 export type Point = Readonly<RoughPoint>;
 

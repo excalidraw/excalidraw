@@ -1,6 +1,9 @@
-import { Palette, getColorNameAndShadeFromHex } from "../../utils";
 import { activeColorPickerSectionAtomType } from "./Picker";
-import { defaultPickerKeys } from "./PickerColorList";
+import {
+  Palette,
+  colorPickerHotkeyBindings,
+  getColorNameAndShadeFromHex,
+} from "./colorPickerUtils";
 
 const arrowHandler = (
   eventKey: string,
@@ -62,8 +65,8 @@ const hotkeyHandler = (
     }
   }
 
-  if (defaultPickerKeys.includes(e.key)) {
-    const index = defaultPickerKeys.indexOf(e.key);
+  if (colorPickerHotkeyBindings.includes(e.key)) {
+    const index = colorPickerHotkeyBindings.indexOf(e.key);
     const paletteKey = Object.keys(palette)[index];
     const paletteValue = palette[paletteKey];
     const r = Array.isArray(paletteValue) ? paletteValue[3] : paletteValue;

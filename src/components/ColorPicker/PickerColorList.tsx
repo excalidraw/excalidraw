@@ -1,8 +1,12 @@
 import clsx from "clsx";
-import { Palette, getColorNameAndShadeFromHex } from "../../utils";
 import { activeColorPickerSectionAtom } from "./Picker";
 import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
+import {
+  Palette,
+  colorPickerHotkeyBindings,
+  getColorNameAndShadeFromHex,
+} from "./colorPickerUtils";
 
 interface PickerColorListProps {
   palette: Palette;
@@ -10,12 +14,6 @@ interface PickerColorListProps {
   onChange: (color: string) => void;
   label: string;
 }
-
-export const defaultPickerKeys = [
-  ["q", "w", "e", "r", "t"],
-  ["a", "s", "d", "f", "g"],
-  ["z", "x", "c", "v", "b"],
-].flat();
 
 const PickerColorList = ({
   palette,
@@ -79,7 +77,7 @@ const PickerColorList = ({
             style={color ? { "--swatch-color": color } : undefined}
             key={key}
           >
-            {defaultPickerKeys[index]}
+            {colorPickerHotkeyBindings[index]}
           </button>
         );
       })}

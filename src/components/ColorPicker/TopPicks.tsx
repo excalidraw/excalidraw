@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { strokeTopPicks, bgTopPicks } from "./ColorPicker";
+import { bgTopPicks, strokeTopPicks } from "./colorPickerUtils";
 
 interface TopPicksProps {
   onChange: (color: string) => void;

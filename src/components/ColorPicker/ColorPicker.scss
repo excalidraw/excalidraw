@@ -1,6 +1,12 @@
 @import "../../css/variables.module";
 
 .excalidraw {
+  .color-picker__heading {
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    text-align: left;
+  }
+
   .color-picker-container {
     display: grid;
     grid-template-columns: 1fr 1.25rem 1.25rem;
@@ -151,10 +157,16 @@
     }
   }
 
+  .color-picker-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
   .color-picker-content--default {
     padding: 0.5rem;
     display: grid;
-    grid-template-columns: repeat(5, auto);
+    grid-template-columns: repeat(5, 1fr);
     grid-gap: 0.25rem;
     border-radius: 4px;
 
@@ -255,6 +267,22 @@
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
       border-radius: var(--border-radius-lg);
     }
+  }
+
+  .color-picker__input-label {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 8px;
+    align-items: center;
+    border: 1px solid var(--default-border-color);
+    border-radius: 8px;
+    padding: 0 12px;
+    margin: 8px;
+    box-sizing: border-box;
+  }
+
+  .color-picker__input-hash {
+    padding: 0 0.25rem;
   }
 
   .color-picker-input {

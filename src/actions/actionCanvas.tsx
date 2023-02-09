@@ -1,4 +1,4 @@
-import { ColorPicker, ocPalette } from "../components/ColorPicker/ColorPicker";
+import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
@@ -38,9 +38,7 @@ export const actionChangeViewBackgroundColor = register({
   PanelComponent: ({ elements, appState, updateData, appProps }) => {
     // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
-      // <div style={{ position: "relative" }}>
       <ColorPicker
-        palette={appProps.colorPalette?.canvasBackground}
         label={t("labels.canvasBackground")}
         type="canvasBackground"
         color={appState.viewBackgroundColor}
@@ -53,7 +51,6 @@ export const actionChangeViewBackgroundColor = register({
         elements={elements}
         appState={appState}
       />
-      // </div>
     );
   },
 });
