@@ -164,7 +164,7 @@ export type AppState = {
     | "backgroundColorPicker"
     | "strokeColorPicker"
     | null;
-  openSidebar: "library" | "customSidebar" | null;
+  openSidebar: { name: string; tab?: string } | null;
   openDialog: "imageExport" | "help" | "jsonExport" | null;
   isSidebarDocked: boolean;
 
@@ -424,6 +424,8 @@ export type AppClassProperties = {
   device: App["device"];
   scene: App["scene"];
   pasteFromClipboard: App["pasteFromClipboard"];
+  id: App["id"];
+  onInsertElements: App["onInsertElements"];
 };
 
 export type PointerDownState = Readonly<{
@@ -515,7 +517,7 @@ export type ExcalidrawImperativeAPI = {
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
-  toggleMenu: InstanceType<typeof App>["toggleMenu"];
+  toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
 };
 
 export type Device = Readonly<{

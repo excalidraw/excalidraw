@@ -124,5 +124,17 @@
     display: flex;
     align-items: center;
     gap: 0.625rem;
+    margin-left: auto;
+  }
+
+  .sidebar-triggers {
+    display: grid;
+    padding: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    grid-gap: 1rem;
+  }
+
+  .sidebar-tab-trigger {
+    width: auto !important;
   }
 }

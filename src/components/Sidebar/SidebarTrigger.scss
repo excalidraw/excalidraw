@@ -1,6 +1,6 @@
-@import "../css/variables.module";
+@import "../../css/variables.module";
 
-.library-button {
+.sidebar-trigger {
   @include outlineButtonStyles;
 
   background-color: var(--island-bg-color);

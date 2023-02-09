@@ -697,16 +697,30 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
     : [];
 };
 
-export const isShallowEqual = <T extends Record<string, any>>(
+export const isShallowEqual = <
+  T extends Record<string, any>,
+  I extends keyof T,
+>(
   objA: T,
   objB: T,
+  comparators?: Record<I, (a: T[I], b: T[I]) => boolean>,
+  debug = false,
 ) => {
   const aKeys = Object.keys(objA);
-  const bKeys = Object.keys(objA);
+  const bKeys = Object.keys(objB);
   if (aKeys.length !== bKeys.length) {
     return false;
   }
-  return aKeys.every((key) => objA[key] === objB[key]);
+  return aKeys.every((key) => {
+    const comparator = comparators?.[key as I];
+    const ret = comparator
+      ? comparator(objA[key], objB[key])
+      : objA[key] === objB[key];
+    if (!ret && debug) {
+      console.warn(`isShallowEqual: ${key} not equal ->`, objA[key], objB[key]);
+    }
+    return ret;
+  });
 };
 
 // taken from Radix UI

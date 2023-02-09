@@ -488,7 +488,7 @@ export default function App() {
 
   const renderSidebar = () => {
     return (
-      <Sidebar>
+      <Sidebar name="custom">
         <Sidebar.Header>Custom header!</Sidebar.Header>
         Custom sidebar!
       </Sidebar>
@@ -673,7 +673,11 @@ export default function App() {
               gap: "1rem",
             }}
           >
-            <button onClick={() => excalidrawAPI?.toggleMenu("customSidebar")}>
+            <button
+              onClick={() =>
+                excalidrawAPI?.toggleSidebar({ name: "customSidebar" })
+              }
+            >
               Toggle Custom Sidebar
             </button>
           </div>

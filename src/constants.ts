@@ -248,3 +248,5 @@ export const ROUNDNESS = {
 /** key containt id of precedeing elemnt id we use in reconciliation during
  * collaboration */
 export const PRECEDING_ELEMENT_KEY = "__precedingElement__";
+
+export const LIBRARY_SIDEBAR = { name: "default", tab: "library" } as const;

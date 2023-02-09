@@ -4,8 +4,8 @@ import { t } from "../../i18n";
 import { useDevice } from "../App";
 import { SidebarPropsContext } from "./common";
 import { CloseIcon, PinIcon } from "../icons";
-import { withUpstreamOverride } from "../hoc/withUpstreamOverride";
 import { Tooltip } from "../Tooltip";
+import { withInternalFallback } from "../hoc/withInternalFallback";
 
 export const SidebarDockButton = (props: {
   checked: boolean;
@@ -41,49 +41,52 @@ export const SidebarDockButton = (props: {
   );
 };
 
-const _SidebarHeader: React.FC<{
-  children?: React.ReactNode;
-  className?: string;
-}> = ({ children, className }) => {
-  const device = useDevice();
-  const props = useContext(SidebarPropsContext);
+export const SidebarHeader = withInternalFallback(
+  "SidebarHeader",
+  ({
+    children,
+    className,
+  }: {
+    children?: React.ReactNode;
+    className?: string;
+  }) => {
+    const device = useDevice();
+    const props = useContext(SidebarPropsContext);
 
-  const renderDockButton = !!(device.canDeviceFitSidebar && props.dockable);
-  const renderCloseButton = !!props.onClose;
+    const renderDockButton = !!(device.canDeviceFitSidebar && props.dockable);
+    const renderCloseButton = !!props.onClose;
 
-  return (
-    <div
-      className={clsx("layer-ui__sidebar__header", className)}
-      data-testid="sidebar-header"
-    >
-      {children}
-      {(renderDockButton || renderCloseButton) && (
-        <div className="layer-ui__sidebar__header__buttons">
-          {renderDockButton && (
-            <SidebarDockButton
-              checked={!!props.docked}
-              onChange={() => {
-                props.onDock?.(!props.docked);
-              }}
-            />
-          )}
-          {renderCloseButton && (
-            <button
-              data-testid="sidebar-close"
-              className="Sidebar__close-btn"
-              onClick={props.onClose}
-              aria-label={t("buttons.close")}
-            >
-              {CloseIcon}
-            </button>
+    return (
+      <props.SidebarHeaderTunnel.In>
+        <div
+          className={clsx("layer-ui__sidebar__header", className)}
+          data-testid="sidebar-header"
+        >
+          {children}
+          {(renderDockButton || renderCloseButton) && (
+            <div className="layer-ui__sidebar__header__buttons">
+              {renderDockButton && (
+                <SidebarDockButton
+                  checked={!!props.docked}
+                  onChange={() => {
+                    props.onDock?.(!props.docked);
+                  }}
+                />
+              )}
+              {renderCloseButton && (
+                <button
+                  data-testid="sidebar-close"
+                  className="Sidebar__close-btn"
+                  onClick={props.onClose}
+                  aria-label={t("buttons.close")}
+                >
+                  {CloseIcon}
+                </button>
+              )}
+            </div>
           )}
         </div>
-      )}
-    </div>
-  );
-};
-
-const [Context, Component] = withUpstreamOverride(_SidebarHeader);
-
-/** @private */
-export const SidebarHeaderComponents = { Context, Component };
+      </props.SidebarHeaderTunnel.In>
+    );
+  },
+);
