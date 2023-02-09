@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { Palette, getColorNameAndShadeFromHex } from "../../utils";
 import { activeColorPickerSectionAtom } from "./Picker";
 import { useAtom } from "jotai";
+import { useEffect, useRef } from "react";
 
 interface PickerColorListProps {
   palette: Palette;
@@ -26,10 +27,20 @@ const PickerColorList = ({
     hex: color || "transparent",
     palette,
   });
-  const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
+  const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
+    activeColorPickerSectionAtom,
+  );
+
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (btnRef.current && activeColorPickerSection === "default") {
+      btnRef.current.focus();
+    }
+  }, [colorObj?.colorName, activeColorPickerSection]);
 
   return (
-    <div className="color-picker-content--default" tabIndex={-1}>
+    <div className="color-picker-content--default">
       {Object.entries(palette).map(([key, value], index) => {
         // const prevShade = colorObj?.shade;
 
@@ -38,6 +49,7 @@ const PickerColorList = ({
 
         return (
           <button
+            ref={colorObj?.colorName === key ? btnRef : undefined}
             tabIndex={-1}
             type="button"
             className={clsx(

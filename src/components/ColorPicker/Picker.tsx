@@ -104,7 +104,7 @@ export const Picker = ({
   useEffect(() => {
     if (!activeColorPickerSection) {
       setActiveColorPickerSection(
-        isCustomColor({ color, palette }) ? "custom" : "default",
+        isCustomColor({ color, palette }) ? "custom" : "shades",
       );
     }
   }, [activeColorPickerSection, color, palette, setActiveColorPickerSection]);

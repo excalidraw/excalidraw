@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { Palette, getColorNameAndShadeFromHex } from "../../utils";
 import { useAtom } from "jotai";
 import { activeColorPickerSectionAtom } from "./Picker";
+import { useEffect, useRef } from "react";
 
 interface ShadeListProps {
   hex: string | null;
@@ -19,6 +20,14 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
     activeColorPickerSectionAtom,
   );
 
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (btnRef.current && activeColorPickerSection === "shades") {
+      btnRef.current.focus();
+    }
+  }, [colorObj, activeColorPickerSection]);
+
   if (colorObj) {
     const { colorName, shade } = colorObj;
 
@@ -26,15 +35,15 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
 
     if (Array.isArray(shades)) {
       return (
-        <div
-          className="color-picker-content--default shades"
-          data-active-color-picker-section={
-            activeColorPickerSection === "shades"
-          }
-        >
+        <div className="color-picker-content--default shades">
           {shades.map((color, i) => (
             <button
-              autoFocus={i === shade}
+              ref={
+                i === shade && activeColorPickerSection === "shades"
+                  ? btnRef
+                  : undefined
+              }
+              // autoFocus={i === shade}
               tabIndex={-1}
               key={i}
               type="button"
