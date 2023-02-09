@@ -5261,29 +5261,43 @@ class App extends React.Component<AppProps, AppState> {
             childEvent,
             this.state,
           );
-          const topLayerFrame = this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
-          const selectedElements = getSelectedElements(
-            this.scene.getNonDeletedElements(),
-            this.state,
-          );
+          // moving the points of a linear element has no
+          // effect on its belonging to a frame or not
+          if (
+            !(
+              this.state.selectedLinearElement &&
+              this.state.selectedLinearElement.isDragging
+            )
+          ) {
+            const topLayerFrame =
+              this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
-          if (topLayerFrame) {
-            const elementsToAddToFrame = getElementsToUpdateForFrame(
-              selectedElements,
-              (element) =>
-                !isFrameElement(element) &&
-                element.frameId !== topLayerFrame.id,
+            const selectedElements = getSelectedElements(
+              this.scene.getNonDeletedElements(),
+              this.state,
             );
 
-            this.scene.addElementsToFrame(elementsToAddToFrame, topLayerFrame);
-          } else {
-            const elementsToRemoveFromFrame = getElementsToUpdateForFrame(
-              selectedElements,
-              (element) => !isFrameElement(element),
-            );
+            if (topLayerFrame) {
+              const elementsToAddToFrame = getElementsToUpdateForFrame(
+                selectedElements,
+                (element) =>
+                  !isFrameElement(element) &&
+                  element.frameId !== topLayerFrame.id,
+              );
 
-            this.scene.removeElementsFromFrame(elementsToRemoveFromFrame);
+              this.scene.addElementsToFrame(
+                elementsToAddToFrame,
+                topLayerFrame,
+              );
+            } else {
+              const elementsToRemoveFromFrame = getElementsToUpdateForFrame(
+                selectedElements,
+                (element) => !isFrameElement(element),
+              );
+
+              this.scene.removeElementsFromFrame(elementsToRemoveFromFrame);
+            }
           }
         }
 
