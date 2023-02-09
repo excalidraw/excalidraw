@@ -50,6 +50,7 @@ const hotkeyHandler = (
     ) {
       const newShade = Number(e.code.slice(-1)) - 1;
       onChange(palette[colorObj.colorName][newShade]);
+      console.log("newShade", newShade);
       setActiveColorPickerSection("shades");
     }
   }

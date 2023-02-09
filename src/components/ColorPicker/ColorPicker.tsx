@@ -9,7 +9,7 @@ import { AppState } from "../../types";
 
 import oc from "open-color";
 import { TopPicks } from "./TopPicks";
-import { activeColorPickerSectionAtom, Picker } from "./Picker";
+import { activeColorPickerSectionAtom, isCustomColor, Picker } from "./Picker";
 import ActiveColor from "./ActiveColor";
 
 import * as Popover from "@radix-ui/react-popover";
@@ -51,47 +51,47 @@ export const bgTopPicks = [
 const MAX_CUSTOM_COLORS = 5;
 export const MAX_DEFAULT_COLORS = 15;
 
-export const getCustomColors = (
-  elements: readonly ExcalidrawElement[],
-  type: "elementBackground" | "elementStroke",
-) => {
-  const customColors: string[] = [];
-  const updatedElements = elements
-    .filter((element) => !element.isDeleted)
-    .sort((ele1, ele2) => ele2.updated - ele1.updated);
+// export const getCustomColors = (
+//   elements: readonly ExcalidrawElement[],
+//   type: "elementBackground" | "elementStroke",
+// ) => {
+//   const customColors: string[] = [];
+//   const updatedElements = elements
+//     .filter((element) => !element.isDeleted)
+//     .sort((ele1, ele2) => ele2.updated - ele1.updated);
 
-  let index = 0;
-  const elementColorTypeMap = {
-    elementBackground: "backgroundColor",
-    elementStroke: "strokeColor",
-  };
-  const colorType = elementColorTypeMap[type] as
-    | "backgroundColor"
-    | "strokeColor";
-  while (
-    index < updatedElements.length &&
-    customColors.length < MAX_CUSTOM_COLORS
-  ) {
-    const element = updatedElements[index];
+//   let index = 0;
+//   const elementColorTypeMap = {
+//     elementBackground: "backgroundColor",
+//     elementStroke: "strokeColor",
+//   };
+//   const colorType = elementColorTypeMap[type] as
+//     | "backgroundColor"
+//     | "strokeColor";
+//   while (
+//     index < updatedElements.length &&
+//     customColors.length < MAX_CUSTOM_COLORS
+//   ) {
+//     const element = updatedElements[index];
 
-    if (
-      customColors.length < MAX_CUSTOM_COLORS &&
-      isCustomColor(element[colorType], type) &&
-      !customColors.includes(element[colorType])
-    ) {
-      customColors.push(element[colorType]);
-    }
-    index++;
-  }
-  return customColors;
-};
+//     if (
+//       customColors.length < MAX_CUSTOM_COLORS &&
+//       isCustomColor(element[colorType], type) &&
+//       !customColors.includes(element[colorType])
+//     ) {
+//       customColors.push(element[colorType]);
+//     }
+//     index++;
+//   }
+//   return customColors;
+// };
 
-export const isCustomColor = (
-  color: string,
-  type: "elementBackground" | "elementStroke",
-) => {
-  return !colors[type].includes(color);
-};
+// export const isCustomColor = (
+//   color: string,
+//   type: "elementBackground" | "elementStroke",
+// ) => {
+//   return !colors[type].includes(color);
+// };
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -181,6 +181,12 @@ export const ColorPicker = ({
             container={document.querySelector(".excalidraw") as HTMLDivElement}
           >
             <Popover.Content
+              onCloseAutoFocus={() => {
+                const b = isCustomColor({ color, palette });
+                console.log(b);
+
+                setActiveColorPickerSection(null);
+              }}
               data-prevent-outside-click
               side="right"
               align="start"

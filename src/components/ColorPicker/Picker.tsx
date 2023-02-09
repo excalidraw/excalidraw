@@ -10,7 +10,7 @@ import { isWritableElement } from "../../utils";
 import { ExcalidrawElement } from "../../element/types";
 import { ShadeList } from "./ShadeList";
 import {
-  getCustomColors,
+  // getCustomColors,
   keyBindings,
   MAX_DEFAULT_COLORS,
   ocPalette,
@@ -21,7 +21,7 @@ import { atom, useAtom } from "jotai";
 import { CustomColorList } from "./CustomColorList";
 import { customOrPaletteHandler } from "./keyboardNavHandlers";
 
-const isCustomColor = ({
+export const isCustomColor = ({
   color,
   palette,
 }: {
@@ -118,11 +118,13 @@ export const Picker = ({
     activeColorPickerSectionAtom,
   );
 
-  // useEffect(() => {
-  //   setActiveColorPickerSection(
-  //     isCustomColor({ color, palette }) ? "custom" : "default",
-  //   );
-  // }, [color, palette, setActiveColorPickerSection]);
+  useEffect(() => {
+    if (!activeColorPickerSection) {
+      setActiveColorPickerSection(
+        isCustomColor({ color, palette }) ? "custom" : "default",
+      );
+    }
+  }, [activeColorPickerSection, color, palette, setActiveColorPickerSection]);
 
   return (
     <div

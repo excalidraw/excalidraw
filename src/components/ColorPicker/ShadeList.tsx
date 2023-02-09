@@ -35,7 +35,7 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
           {shades.map((color, i) => (
             <button
               data-is-active-color={i === shade}
-              // autoFocus={i === shade}
+              autoFocus={i === shade}
               tabIndex={-1}
               key={i}
               type="button"
@@ -51,7 +51,7 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
               }}
               onFocus={() => {
                 onChange(color);
-                setActiveColorPickerSection("shades");
+                // setActiveColorPickerSection("shades");
               }}
               data-keybinding={`Digit${i + 1}`}
             >
