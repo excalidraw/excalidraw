@@ -371,8 +371,13 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     .join("\n");
 };
 
+const splitLineInWords = (line: string): Array<string> => {
+  return line.match(
+    /([\uD800-\uDBFF][\uDC00-\uDFFF])|([^\uD800-\uDBFF\uDC00-\uDFFF ]+)| +/g,
+  )!;
+};
 const breakLine = (line: string, font: FontString, maxWidth: number) => {
-  const words = line.match(/(\S+ *)| +/g)!.flatMap((word) => {
+  const words = splitLineInWords(line).flatMap((word) => {
     // break big words
     return getLineWidth(word.trim(), font) <= maxWidth ||
       Array.from(word.trim()).length === 1
