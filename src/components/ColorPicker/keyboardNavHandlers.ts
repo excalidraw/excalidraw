@@ -1,5 +1,6 @@
 import {
   COLOR_PER_ROW,
+  ColorPickerOpenState,
   DEFAULT_SHADE_INDEX,
   Palette,
   activeColorPickerSectionAtomType,
@@ -90,14 +91,14 @@ export const colorPickerKeyNavHandler = (
   setActiveColorPickerSection: (
     update: React.SetStateAction<activeColorPickerSectionAtomType>,
   ) => void,
+  setColorPickerOpenState: (
+    update: React.SetStateAction<ColorPickerOpenState>,
+  ) => void,
 ) => {
   if (e.key === "Escape" || !hex) {
+    setColorPickerOpenState(null);
     return;
   }
-
-  e.preventDefault();
-  e.nativeEvent.stopImmediatePropagation();
-  e.stopPropagation();
 
   const colorObj = getColorNameAndShadeFromHex({ hex, palette });
 

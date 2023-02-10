@@ -13,6 +13,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { useAtom } from "jotai";
 import {
   activeColorPickerSectionAtom,
+  colorPickerOpenStateAtom,
   ColorTuple,
   ocPalette,
   Palette,
@@ -61,6 +62,10 @@ export const ColorPicker = ({
 }: ColorPickerProps) => {
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
+  const [colorPickerOpenState, setColorPickerOpenState] = useAtom(
+    colorPickerOpenStateAtom,
+  );
+
   return (
     <div>
       <div role="dialog" aria-modal="true" className="color-picker-container">
@@ -78,7 +83,12 @@ export const ColorPicker = ({
             margin: "0 auto",
           }}
         />
-        <Popover.Root>
+        <Popover.Root
+          open={colorPickerOpenState ? colorPickerOpenState === type : false}
+          onOpenChange={(open) => {
+            setColorPickerOpenState(open ? type : null);
+          }}
+        >
           <ActiveColor color={color} label={label} />
 
           <Popover.Portal

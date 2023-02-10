@@ -129,3 +129,6 @@ export type activeColorPickerSectionAtomType =
   | null;
 export const activeColorPickerSectionAtom =
   atom<activeColorPickerSectionAtomType>(null);
+
+export type ColorPickerOpenState = ColorPickerProps["type"] | null;
+export const colorPickerOpenStateAtom = atom<ColorPickerOpenState>(null);

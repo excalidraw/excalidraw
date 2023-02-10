@@ -13,6 +13,7 @@ import PickerHeading from "./PickerHeading";
 import {
   Palette,
   activeColorPickerSectionAtom,
+  colorPickerOpenStateAtom,
   getMostUsedCustomColors,
   isCustomColor,
 } from "./colorPickerUtils";
@@ -54,10 +55,15 @@ export const Picker = ({
     }
   }, [activeColorPickerSection, color, palette, setActiveColorPickerSection]);
 
+  const [, setColorPickerOpenState] = useAtom(colorPickerOpenStateAtom);
+
   return (
     <div role="dialog" aria-modal="true" aria-label={t("labels.colorPicker")}>
       <div
         onKeyDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
           colorPickerKeyNavHandler(
             e,
             activeColorPickerSection,
@@ -66,6 +72,7 @@ export const Picker = ({
             onChange,
             customColors,
             setActiveColorPickerSection,
+            setColorPickerOpenState,
           );
         }}
         className="color-picker-content"
