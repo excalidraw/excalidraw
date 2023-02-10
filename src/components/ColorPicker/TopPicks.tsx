@@ -5,10 +5,20 @@ interface TopPicksProps {
   onChange: (color: string) => void;
   type: "elementBackground" | "elementStroke" | "canvasBackground";
   activeColor: string | null;
+  topPicks?: string[];
 }
 
-export const TopPicks = ({ onChange, type, activeColor }: TopPicksProps) => {
-  const colors = type === "elementStroke" ? strokeTopPicks : bgTopPicks;
+export const TopPicks = ({
+  onChange,
+  type,
+  activeColor,
+  topPicks,
+}: TopPicksProps) => {
+  const colors = topPicks
+    ? topPicks
+    : type === "elementStroke"
+    ? strokeTopPicks
+    : bgTopPicks;
 
   return (
     <div className="color-picker__top-picks">

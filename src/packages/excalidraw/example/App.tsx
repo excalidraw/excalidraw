@@ -679,6 +679,15 @@ export default function App() {
           </div>
           <Excalidraw
             colorPalette={{
+              topPicks: {
+                elementBackground: [
+                  "#ffffff",
+                  "#000000",
+                  "#f5f5f5",
+                  "#e0e0e0",
+                  "#c8c8c8",
+                ],
+              },
               elementStroke: {
                 // give me five shades of blue
                 blue: ["#0000FF", "#0000CC", "#000099", "#000066", "#000033"],

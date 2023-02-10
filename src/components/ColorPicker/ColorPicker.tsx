@@ -13,6 +13,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { useAtom } from "jotai";
 import {
   activeColorPickerSectionAtom,
+  ColorTuple,
   ocPalette,
   Palette,
 } from "./colorPickerUtils";
@@ -43,11 +44,10 @@ export interface ColorPickerProps {
   color: string | null;
   onChange: (color: string) => void;
   label: string;
-  isActive: boolean;
-  setActive: (active: boolean) => void;
   elements: readonly ExcalidrawElement[];
   appState: AppState;
   palette?: Palette;
+  topPicks?: ColorTuple;
 }
 
 export const ColorPicker = ({
@@ -55,17 +55,21 @@ export const ColorPicker = ({
   color,
   onChange,
   label,
-  isActive,
-  setActive,
   elements,
   palette = ocPalette,
+  topPicks,
 }: ColorPickerProps) => {
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
   return (
     <div>
       <div role="dialog" aria-modal="true" className="color-picker-container">
-        <TopPicks activeColor={color} onChange={onChange} type={type} />
+        <TopPicks
+          activeColor={color}
+          onChange={onChange}
+          type={type}
+          topPicks={topPicks}
+        />
         <div
           style={{
             width: 1,
@@ -75,12 +79,7 @@ export const ColorPicker = ({
           }}
         />
         <Popover.Root>
-          <ActiveColor
-            color={color}
-            isActive={isActive}
-            label={label}
-            setActive={setActive}
-          />
+          <ActiveColor color={color} label={label} />
 
           <Popover.Portal
             container={document.querySelector(".excalidraw") as HTMLDivElement}
@@ -89,7 +88,6 @@ export const ColorPicker = ({
               onCloseAutoFocus={() => {
                 setActiveColorPickerSection(null);
               }}
-              data-prevent-outside-click
               side="right"
               align="start"
               alignOffset={-16}

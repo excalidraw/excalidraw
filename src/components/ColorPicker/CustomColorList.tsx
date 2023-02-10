@@ -36,7 +36,11 @@ export const CustomColorList = ({
             type="button"
             className={clsx(
               "color-picker__button color-picker__button--large",
-              { active: color === c },
+              {
+                active: color === c,
+                "is-transparent": c === "transparent" || !c,
+                "with-border": c === "#ffffff" || c === "transparent" || !c,
+              },
             )}
             onClick={() => {
               onChange(c);

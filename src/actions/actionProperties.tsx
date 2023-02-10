@@ -227,6 +227,7 @@ export const actionChangeStrokeColor = register({
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
+        topPicks={appProps.colorPalette?.topPicks?.elementStroke}
         palette={appProps.colorPalette?.elementStroke}
         type="elementStroke"
         label={t("labels.stroke")}
@@ -237,10 +238,6 @@ export const actionChangeStrokeColor = register({
           appState.currentItemStrokeColor,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
-        isActive={appState.openPopup === "strokeColorPicker"}
-        setActive={(active) =>
-          updateData({ openPopup: active ? "strokeColorPicker" : null })
-        }
         elements={elements}
         appState={appState}
       />
@@ -271,6 +268,7 @@ export const actionChangeBackgroundColor = register({
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
+        topPicks={appProps.colorPalette?.topPicks?.elementBackground}
         palette={appProps.colorPalette?.elementBackground}
         type="elementBackground"
         label={t("labels.background")}
@@ -281,10 +279,6 @@ export const actionChangeBackgroundColor = register({
           appState.currentItemBackgroundColor,
         )}
         onChange={(color) => updateData({ currentItemBackgroundColor: color })}
-        isActive={appState.openPopup === "backgroundColorPicker"}
-        setActive={(active) =>
-          updateData({ openPopup: active ? "backgroundColorPicker" : null })
-        }
         elements={elements}
         appState={appState}
       />

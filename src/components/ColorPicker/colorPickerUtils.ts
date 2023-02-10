@@ -1,9 +1,11 @@
 import oc from "open-color";
 import { ExcalidrawElement } from "../../element/types";
 import { atom } from "jotai";
+import { ColorPickerProps } from "./ColorPicker";
 
 export type PaletteKey = keyof oc | string;
-export type PaletteValue = string | [string, string, string, string, string];
+export type ColorTuple = [string, string, string, string, string];
+export type PaletteValue = string | ColorTuple;
 export type Palette = Record<PaletteKey, PaletteValue>;
 
 export const getColorNameAndShadeFromHex = ({
@@ -54,14 +56,14 @@ export const strokeTopPicks = [
   ocPalette.green[3],
   ocPalette.blue[3],
   ocPalette.orange[3],
-];
+] as ColorTuple;
 export const bgTopPicks = [
   ocPalette.gray[1],
   ocPalette.red[1],
   ocPalette.green[1],
   ocPalette.blue[1],
   ocPalette.orange[1],
-];
+] as ColorTuple;
 
 export const MAX_CUSTOM_COLORS = 5;
 export const COLOR_PER_ROW = 5;

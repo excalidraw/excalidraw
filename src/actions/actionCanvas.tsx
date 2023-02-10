@@ -39,6 +39,8 @@ export const actionChangeViewBackgroundColor = register({
     // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
       <ColorPicker
+        palette={appProps.colorPalette?.canvasBackground}
+        topPicks={appProps.colorPalette?.topPicks?.canvasBackground}
         // TODO color picker redesign
         // test with uneven number of colors
         // palette={{
@@ -50,14 +52,11 @@ export const actionChangeViewBackgroundColor = register({
         //   purple: ["#9900ff", "#9933ff", "#9966ff", "#9999f2", "#99ccff"],
         //   pink: ["#ff00ff", "#ff33ff", "#ff66ff", "#ff99ff", "#ffccff"],
         // }}
+        // topPicks={["#ff0000", "#ff3333", "#ff6666", "#ff9919", "#ffcccc"]}
         label={t("labels.canvasBackground")}
         type="canvasBackground"
         color={appState.viewBackgroundColor}
         onChange={(color) => updateData({ viewBackgroundColor: color })}
-        isActive={appState.openPopup === "canvasColorPicker"}
-        setActive={(active) =>
-          updateData({ openPopup: active ? "canvasColorPicker" : null })
-        }
         data-testid="canvas-background-picker"
         elements={elements}
         appState={appState}

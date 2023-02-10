@@ -4,16 +4,9 @@ import * as Popover from "@radix-ui/react-popover";
 interface ActiveColorProps {
   color: string | null;
   label: string;
-  isActive: boolean;
-  setActive: (active: boolean) => void;
 }
 
-const ActiveColor = ({
-  label,
-  color,
-  setActive,
-  isActive,
-}: ActiveColorProps) => {
+const ActiveColor = ({ label, color }: ActiveColorProps) => {
   return (
     <Popover.Trigger
       type="button"
@@ -23,7 +16,6 @@ const ActiveColor = ({
       })}
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}
-      onClick={() => setActive(!isActive)}
     />
   );
 };
