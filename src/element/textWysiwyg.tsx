@@ -30,6 +30,7 @@ import {
   getTextElementAngle,
   getTextHeight,
   getTextWidth,
+  measureText,
   normalizeText,
   wrapText,
 } from "./textElement";
@@ -386,9 +387,8 @@ export const textWysiwyg = ({
           font,
           getMaxContainerWidth(container!),
         );
-        const width = getTextWidth(wrappedText, font);
+        const { width, height } = measureText(wrappedText, font);
         editable.style.width = `${width}px`;
-        const height = getTextHeight(wrappedText, font);
         editable.style.height = `${height}px`;
       }
       onChange(normalizeText(editable.value));
