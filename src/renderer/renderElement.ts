@@ -211,8 +211,7 @@ const drawElementOnCanvas = (
   switch (element.type) {
     case "rectangle":
     case "diamond":
-    case "ellipse":
-    case "frame": {
+    case "ellipse": {
       context.lineJoin = "round";
       context.lineCap = "round";
       rc.draw(getShapeForElement(element)!);
@@ -390,15 +389,6 @@ export const generateRoughOptions = (
       }
       return options;
     }
-    case "frame": {
-      options.fill = "transparent";
-      options.fillStyle = FRAME_STYLE.fillStyle;
-      options.strokeWidth = FRAME_STYLE.strokeWidth;
-      options.stroke = FRAME_STYLE.strokeColor;
-      options.roughness = FRAME_STYLE.roughness;
-
-      return options;
-    }
     case "line":
     case "freedraw": {
       if (isPathALoop(element.points)) {
@@ -435,8 +425,7 @@ const generateElementShape = (
     elementWithCanvasCache.delete(element);
 
     switch (element.type) {
-      case "rectangle":
-      case "frame":
+      case "rectangle": {
         if (element.roundness) {
           const w = element.width;
           const h = element.height;
@@ -461,6 +450,7 @@ const generateElementShape = (
         setShapeForElement(element, shape);
 
         break;
+      }
       case "diamond": {
         const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
           getDiamondPoints(element);
@@ -844,7 +834,8 @@ export const renderElement = (
 ) => {
   const generator = rc.generator;
   switch (element.type) {
-    case "selection": {
+    case "selection":
+    case "frame": {
       context.save();
       context.translate(
         element.x + renderConfig.scrollX,
@@ -858,9 +849,13 @@ export const renderElement = (
       // from right to left
       const offset = 0.5 / renderConfig.zoom.value;
 
-      context.fillRect(offset, offset, element.width, element.height);
+      element.type === "selection" &&
+        context.fillRect(offset, offset, element.width, element.height);
       context.lineWidth = 1 / renderConfig.zoom.value;
-      context.strokeStyle = "rgb(105, 101, 219)";
+      context.strokeStyle =
+        element.type === "frame"
+          ? FRAME_STYLE.strokeColor
+          : "rgb(105, 101, 219)";
       context.strokeRect(offset, offset, element.width, element.height);
 
       context.restore();
@@ -897,7 +892,6 @@ export const renderElement = (
     case "line":
     case "arrow":
     case "image":
-    case "frame":
     case "text": {
       generateElementShape(element, generator);
       if (renderConfig.isExporting) {
