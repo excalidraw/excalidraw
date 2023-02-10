@@ -687,7 +687,7 @@ describe("textWysiwyg", () => {
       expect(text.y).toBe(
         rectangle.y + h.elements[0].height / 2 - text.height / 2,
       );
-      // expect(text.x).toBe(rectangle.x + BOUND_TEXT_PADDING);
+      expect(text.x).toBe(25);
       expect(text.height).toBe(48);
       expect(text.width).toBe(60);
 
