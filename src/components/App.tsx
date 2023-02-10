@@ -1892,7 +1892,7 @@ class App extends React.Component<AppProps, AppState> {
   private sanitizeCollaborators = (
     collaborators: Map<String, Collaborator>,
   ): void => {
-    collaborators.forEach((collaborator, _) => {
+    collaborators.forEach((collaborator) => {
       const { username } = collaborator;
       if (username) {
         collaborator.username =
