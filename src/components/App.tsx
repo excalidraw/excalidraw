@@ -290,6 +290,7 @@ import {
   isCursorInFrame,
   bindElementsToFramesAfterDuplication,
   getFramesCountInElements,
+  getElementsToUpdateFromSelection,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
@@ -4303,10 +4304,6 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin,
       this.scene,
     );
-    this.scene.replaceAllElements([
-      ...this.scene.getElementsIncludingDeleted(),
-      element,
-    ]);
     this.scene.addNewElement(element);
     this.setState({
       draggingElement: element,
@@ -4809,13 +4806,70 @@ class App extends React.Component<AppProps, AppState> {
 
             pointerDownState.hit.hasBeenDuplicated = true;
 
+            const nextElements = [];
+            const elementsToAppend = [];
+            const groupIdMap = new Map();
+            const oldIdToDuplicatedId = new Map();
+            const hitElement = pointerDownState.hit.element;
             const elements = this.scene.getElementsIncludingDeleted();
+            let framesCount = getFramesCountInElements(elements);
+            const selectedElementIds: Array<ExcalidrawElement["id"]> =
+              getElementsToUpdateFromSelection(elements, this.state).map(
+                (element) => element.id,
+              );
 
-            const ret = actionDuplicateSelection.perform(elements, this.state);
-
-            if (ret) {
-              this.scene.replaceAllElements(ret.elements ?? elements);
+            for (const element of elements) {
+              if (
+                selectedElementIds.includes(element.id) ||
+                // case: the state.selectedElementIds might not have been
+                // updated yet by the time this mousemove event is fired
+                (element.id === hitElement?.id &&
+                  pointerDownState.hit.wasAddedToSelection)
+              ) {
+                const duplicatedElement = duplicateElement(
+                  this.state.editingGroupId,
+                  groupIdMap,
+                  element,
+                );
+                const [originDragX, originDragY] = getGridPoint(
+                  pointerDownState.origin.x - pointerDownState.drag.offset.x,
+                  pointerDownState.origin.y - pointerDownState.drag.offset.y,
+                  this.state.gridSize,
+                );
+                mutateElement(duplicatedElement, {
+                  x: duplicatedElement.x + (originDragX - dragX),
+                  y: duplicatedElement.y + (originDragY - dragY),
+                  ...(element.type === "frame"
+                    ? {
+                        name: `Frame ${++framesCount}`,
+                      }
+                    : {}),
+                });
+                nextElements.push(duplicatedElement);
+                elementsToAppend.push(element);
+                oldIdToDuplicatedId.set(element.id, duplicatedElement.id);
+              } else {
+                nextElements.push(element);
+              }
             }
+            const nextSceneElements = [...nextElements, ...elementsToAppend];
+            bindTextToShapeAfterDuplication(
+              nextElements,
+              elementsToAppend,
+              oldIdToDuplicatedId,
+            );
+            fixBindingsAfterDuplication(
+              nextSceneElements,
+              elementsToAppend,
+              oldIdToDuplicatedId,
+              "duplicatesServeAsOld",
+            );
+            bindElementsToFramesAfterDuplication(
+              nextSceneElements,
+              elementsToAppend,
+              oldIdToDuplicatedId,
+            );
+            this.scene.replaceAllElements(nextSceneElements);
           }
           return;
         }

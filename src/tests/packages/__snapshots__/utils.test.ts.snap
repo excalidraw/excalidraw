@@ -29,6 +29,7 @@ Object {
   "editingElement": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
