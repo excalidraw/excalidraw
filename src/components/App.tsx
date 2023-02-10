@@ -556,7 +556,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private renderFrameNames = () => {
-    return this.scene.getNonDeletedFrames().map((f) => {
+    return this.scene.getNonDeletedFrames().map((f, index) => {
       const { x, y } = sceneCoordsToViewportCoords(
         { sceneX: f.x, sceneY: f.y },
         this.state,
@@ -589,7 +589,7 @@ class App extends React.Component<AppProps, AppState> {
             });
           }}
         >
-          {f.name}
+          {`Frame ${index + 1}`}
         </div>
       );
     });
@@ -4527,14 +4527,11 @@ class App extends React.Component<AppProps, AppState> {
       this.state.gridSize,
     );
 
-    const frames = this.scene.getNonDeletedFrames();
-
     const frame = newFrameElement({
       x: gridX,
       y: gridY,
       opacity: this.state.currentItemOpacity,
       locked: false,
-      name: `Frame ${frames.length + 1}`,
       ...FRAME_STYLE,
     });
 

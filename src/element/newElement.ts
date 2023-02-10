@@ -114,15 +114,12 @@ export const newElement = (
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
 export const newFrameElement = (
-  opts: {
-    name: string;
-  } & ElementConstructorOpts,
+  opts: ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFrameElement> => {
   const frameElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawFrameElement>("frame", opts),
       type: "frame",
-      name: opts.name,
     },
     {},
   );
