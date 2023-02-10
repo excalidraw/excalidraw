@@ -28,7 +28,6 @@ import {
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
-  getTextHeight,
   getTextWidth,
   measureText,
   normalizeText,
