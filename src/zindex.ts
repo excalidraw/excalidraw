@@ -17,19 +17,25 @@ const isRootElement = (element: ExcalidrawElement) => {
  * Returns indices of elements to move based on selected elements.
  * Includes contiguous deleted elements that are between two selected elements,
  *  e.g.: [0 (selected), 1 (deleted), 2 (deleted), 3 (selected)]
+ *
+ * Specified elements (elementsToBeMoved) take precedence over
+ * appState.selectedElementsIds
  */
 const getIndicesToMove = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
   let selectedIndices: number[] = [];
   let deletedIndices: number[] = [];
   let includeDeletedIndex = null;
   let index = -1;
   const selectedElementIds = arrayToMap(
-    getSelectedElements(elements, appState, {
-      includeBoundTextElement: true,
-    }),
+    elementsToBeMoved
+      ? elementsToBeMoved
+      : getSelectedElements(elements, appState, {
+          includeBoundTextElement: true,
+        }),
   );
   while (++index < elements.length) {
     const element = elements[index];
@@ -193,8 +199,9 @@ const _shiftElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  const indicesToMove = getIndicesToMove(elements, appState);
+  const indicesToMove = getIndicesToMove(elements, appState, elementsToBeMoved);
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
   let groupedIndices = toContiguousGroups(indicesToMove);
 
@@ -260,8 +267,15 @@ const shiftElements = (
   appState: AppState,
   elements: readonly ExcalidrawElement[],
   direction: "left" | "right",
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shift(elements, appState, direction, _shiftElements);
+  return shift(
+    elements,
+    appState,
+    direction,
+    _shiftElements,
+    elementsToBeMoved,
+  );
 };
 
 const _shiftElementsToEnd = (
@@ -339,8 +353,15 @@ const shiftElementsToEnd = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shift(elements, appState, direction, _shiftElementsToEnd);
+  return shift(
+    elements,
+    appState,
+    direction,
+    _shiftElementsToEnd,
+    elementsToBeMoved,
+  );
 };
 
 function shift(
@@ -351,7 +372,9 @@ function shift(
     elements: ExcalidrawElement[],
     appState: AppState,
     direction: "left" | "right",
+    elementsToBeMoved?: readonly ExcalidrawElement[],
   ) => ExcalidrawElement[] | readonly ExcalidrawElement[],
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) {
   let rootElements = elements.filter((element) => isRootElement(element));
   const frameElementsMap = getFrameElementsMap(elements, appState);
@@ -372,6 +395,7 @@ function shift(
           value.elements,
           appState,
           direction,
+          elementsToBeMoved,
         ) as ExcalidrawElement[],
       });
     }
@@ -401,27 +425,31 @@ function shift(
 export const moveOneLeft = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shiftElements(appState, elements, "left");
+  return shiftElements(appState, elements, "left", elementsToBeMoved);
 };
 
 export const moveOneRight = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shiftElements(appState, elements, "right");
+  return shiftElements(appState, elements, "right", elementsToBeMoved);
 };
 
 export const moveAllLeft = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shiftElementsToEnd(elements, appState, "left");
+  return shiftElementsToEnd(elements, appState, "left", elementsToBeMoved);
 };
 
 export const moveAllRight = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shiftElementsToEnd(elements, appState, "right");
+  return shiftElementsToEnd(elements, appState, "right", elementsToBeMoved);
 };

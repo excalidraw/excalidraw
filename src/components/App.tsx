@@ -5349,7 +5349,10 @@ class App extends React.Component<AppProps, AppState> {
                 (element) => !isFrameElement(element),
               );
 
-              this.scene.removeElementsFromFrame(elementsToRemoveFromFrame);
+              this.scene.removeElementsFromFrame(
+                elementsToRemoveFromFrame,
+                this.state,
+              );
             }
           }
         }

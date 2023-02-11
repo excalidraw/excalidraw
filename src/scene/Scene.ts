@@ -13,6 +13,8 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { isFrameElement } from "../element/typeChecks";
 import { mutateElement } from "../element/mutateElement";
 import { findIndex } from "../utils";
+import { moveOneRight } from "../zindex";
+import { AppState } from "../types";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -131,12 +133,20 @@ class Scene {
     this.replaceAllElements(nextElements);
   }
 
-  removeElementsFromFrame(elementsToRemove: NonDeletedExcalidrawElement[]) {
+  removeElementsFromFrame(
+    elementsToRemove: NonDeletedExcalidrawElement[],
+    appState: AppState,
+  ) {
     elementsToRemove.forEach((element) => {
       mutateElement(element, {
         frameId: null,
       });
     });
+
+    // we also need to move these elements to the right of the frame
+    this.replaceAllElements(
+      moveOneRight(this.elements, appState, elementsToRemove),
+    );
   }
 
   getElement<T extends ExcalidrawElement>(id: T["id"]): T | null {
