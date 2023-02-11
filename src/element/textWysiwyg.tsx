@@ -653,39 +653,57 @@ export const textWysiwyg = ({
     // Also to handle cases such as picking a color which would trigger a blur
     // in that same tick.
     const target = event?.target;
+    console.log("target from bindBlur", target);
 
-    const isTargetColorPicker =
-      target instanceof HTMLInputElement &&
-      target.closest(".color-picker-input") &&
-      isWritableElement(target);
+    const htmlTarget = target as HTMLElement;
+
+    if (htmlTarget?.classList.contains("active-color")) {
+      console.log("returning");
+      return;
+    }
 
     setTimeout(() => {
       editable.onblur = handleSubmit;
-      if (target && isTargetColorPicker) {
+      if (target && htmlTarget?.classList.contains("active-color")) {
+        // @ts-ignore
         target.onblur = () => {
           editable.focus();
         };
       }
+
       // case: clicking on the same property → no change → no update → no focus
-      if (!isTargetColorPicker) {
+      if (
+        !htmlTarget?.classList.contains("active-color") &&
+        (document.querySelector(".active-color") as HTMLElement).dataset
+          .state !== "open"
+      ) {
+        console.log("focusing");
+        console.log("target from bindBlur", target);
         editable.focus();
       }
-    });
+    }, 1);
   };
 
   // prevent blur when changing properties from the menu
   const onPointerDown = (event: MouseEvent) => {
-    const isTargetColorPicker =
-      event.target instanceof HTMLInputElement &&
-      event.target.closest(".color-picker-input") &&
-      isWritableElement(event.target);
+    console.log("pointer down", event.target);
+
+    if (!(event.target === editable)) {
+      console.log("CSODA pointerdown");
+      // editable.blur();
+      // editable.onblur = null;
+      // (document.querySelector(".color-picker__button") as HTMLElement).click();
+      // (document.querySelector(".color-picker__button") as HTMLElement).focus();
+      window.addEventListener("pointerup", bindBlurEvent);
+    }
+
     if (
-      ((event.target instanceof HTMLElement ||
+      (event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
-        !isWritableElement(event.target)) ||
-      isTargetColorPicker
+      event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`)
+      // ||      !(event.target as HTMLElement).classList.contains("active-color")
     ) {
+      console.log("IF pointerdown");
       editable.onblur = null;
       window.addEventListener("pointerup", bindBlurEvent);
       // handle edge-case where pointerup doesn't fire e.g. due to user
@@ -697,10 +715,11 @@ export const textWysiwyg = ({
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
     updateWysiwygStyle();
-    const isColorPickerActive = !!document.activeElement?.closest(
-      ".color-picker-input",
-    );
-    if (!isColorPickerActive) {
+
+    console.log(document.activeElement?.closest(".color-picker-content"));
+
+    if (!!!document.activeElement?.closest(".color-picker-content")) {
+      console.log("focusing from unbindUpdate");
       editable.focus();
     }
   });

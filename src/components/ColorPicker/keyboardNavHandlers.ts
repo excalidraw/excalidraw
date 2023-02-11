@@ -96,6 +96,51 @@ export const colorPickerKeyNavHandler = (
   ) => void,
 ) => {
   if (e.key === "Escape" || !hex) {
+    console.log("keyed up yo");
+    // document.body.click();
+    // console.log(document.activeElement);
+    // document.activeElement?.blur();
+    setTimeout(() => {
+      // @ts-ignore
+      document.querySelector(".excalidraw-wysiwyg")?.focus();
+    }, 1);
+
+    // (document.querySelector(".excalidraw-wysiwyg") as HTMLElement).blur();
+    // (document.querySelector(".App-menu__left") as HTMLElement).click();
+
+    // console.log(document.querySelector(".buttonList"));
+    // (document.querySelector(".buttonList") as HTMLElement).dispatchEvent(
+    //   myEvent,
+    // );
+
+    // setTimeout(() => {
+    //   // (document.querySelector(".App-menu__left") as HTMLElement).focus();
+    //   // // (document.querySelector(".App-menu__left") as HTMLElement).blur();
+    //   // (document.querySelector(".App-menu__left") as HTMLElement).click();
+
+    //   const btn = document.querySelector(".color-picker__button.active");
+    //   console.log(btn);
+
+    //   console.log("toppicks");
+    //   console.log(document.querySelector(".color-picker__top-picks"));
+
+    //   // (document.querySelector(".color-picker__button") as HTMLElement).click();
+
+    //   // console.log(document.activeElement);
+
+    //   // create a specific "pointerdown" event
+    //   // var clickEvent = new MouseEvent("mouseup", {
+    //   //   view: window,
+    //   //   bubbles: true,
+    //   //   cancelable: true,
+    //   // });
+
+    //   // // Dispatch the event (on the "<body>" element)
+    //   // (document.querySelector(".App-menu__left") as HTMLElement).dispatchEvent(
+    //   //   clickEvent,
+    //   // );
+    // }, 1);
+
     setColorPickerOpenState(null);
     return;
   }

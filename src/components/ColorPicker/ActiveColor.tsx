@@ -10,7 +10,7 @@ const ActiveColor = ({ label, color }: ActiveColorProps) => {
   return (
     <Popover.Trigger
       type="button"
-      className={clsx("color-picker__button", {
+      className={clsx("color-picker__button active-color", {
         "is-transparent": color === "transparent" || !color,
         "with-border": color === "#ffffff" || color === "transparent" || !color,
       })}
