@@ -12,7 +12,7 @@ export const HelpButton = (props: HelpButtonProps) => (
   <Button
     onSelect={props.onClick || (() => {})}
     className="help-icon"
-    title={`${props.title} — ?`}
+    title={props.title && `${props.title} — ?`}
     aria-label={props.title}
   >
     {HelpIcon}
