@@ -24,12 +24,14 @@ import { isBoundToContainer, isFrameElement } from "../element/typeChecks";
 import { normalizeElementOrder } from "../element/sortElements";
 import { DuplicateIcon } from "../components/icons";
 import {
-  getElementsToUpdateFromSelection,
   bindElementsToFramesAfterDuplication,
   getFramesCountInElements,
   getElementsInFrame,
 } from "../frame";
-import { excludeElementsInFramesFromSelection } from "../scene/selection";
+import {
+  excludeElementsInFramesFromSelection,
+  getSelectedElements,
+} from "../scene/selection";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -108,7 +110,10 @@ const duplicateElements = (
   };
 
   const idsOfElementsToDuplicate = arrayToMap(
-    getElementsToUpdateFromSelection(sortedElements, appState),
+    getSelectedElements(sortedElements, appState, {
+      includeBoundTextElement: true,
+      includeElementsInFrames: true,
+    }),
   );
 
   // Ids of elements that have already been processed so we don't push them

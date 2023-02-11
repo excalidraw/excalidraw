@@ -291,7 +291,9 @@ export const LibraryMenu: React.FC<{
         />
       </Sidebar.Header>
       <LibraryMenuContent
-        pendingElements={getSelectedElements(elements, appState, true)}
+        pendingElements={getSelectedElements(elements, appState, {
+          includeBoundTextElement: true,
+        })}
         onInsertLibraryItems={(libraryItems) => {
           onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
         }}

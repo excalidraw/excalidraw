@@ -62,7 +62,9 @@ export const actionPasteStyles = register({
       return { elements, commitToHistory: false };
     }
 
-    const selectedElements = getSelectedElements(elements, appState, true);
+    const selectedElements = getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    });
     const selectedElementIds = selectedElements.map((element) => element.id);
     return {
       elements: elements.map((element) => {

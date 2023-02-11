@@ -84,24 +84,6 @@ export const bindElementsToFramesAfterDuplication = (
   });
 };
 
-export const getElementsToUpdateFromSelection = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  const selectedElements = getSelectedElements(elements, appState, true);
-  const elementsToInclude: ExcalidrawElement[] = [];
-  selectedElements.forEach((element) => {
-    if (element.type === "frame") {
-      getElementsInFrame(elements, element.id).forEach((e) =>
-        elementsToInclude.push(e),
-      );
-    }
-    elementsToInclude.push(element);
-  });
-
-  return elementsToInclude;
-};
-
 export const getFramesCountInElements = (
   elements: readonly ExcalidrawElement[],
 ) => {

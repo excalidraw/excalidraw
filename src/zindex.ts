@@ -27,7 +27,9 @@ const getIndicesToMove = (
   let includeDeletedIndex = null;
   let index = -1;
   const selectedElementIds = arrayToMap(
-    getSelectedElements(elements, appState, true),
+    getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    }),
   );
   while (++index < elements.length) {
     const element = elements[index];

@@ -12,7 +12,9 @@ export const actionAddToLibrary = register({
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
-      true,
+      {
+        includeBoundTextElement: true,
+      },
     );
     if (selectedElements.some((element) => element.type === "image")) {
       return {

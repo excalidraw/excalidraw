@@ -45,7 +45,9 @@ const enableActionGroup = (
   const selectedElements = getSelectedElements(
     getNonDeletedElements(elements),
     appState,
-    true,
+    {
+      includeBoundTextElement: true,
+    },
   );
   return (
     selectedElements.length >= 2 && !allElementsInSameGroup(selectedElements)
@@ -59,7 +61,9 @@ export const actionGroup = register({
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
-      true,
+      {
+        includeBoundTextElement: true,
+      },
     );
     if (selectedElements.length < 2) {
       // nothing to group

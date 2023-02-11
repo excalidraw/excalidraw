@@ -9,7 +9,9 @@ export const actionToggleLock = register({
   name: "toggleLock",
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(elements, appState, true);
+    const selectedElements = getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    });
 
     if (!selectedElements.length) {
       return false;
@@ -34,7 +36,9 @@ export const actionToggleLock = register({
     };
   },
   contextItemLabel: (elements, appState) => {
-    const selected = getSelectedElements(elements, appState, false);
+    const selected = getSelectedElements(elements, appState, {
+      includeBoundTextElement: false,
+    });
     if (selected.length === 1) {
       return selected[0].locked
         ? "labels.elementLock.unlock"
@@ -50,7 +54,9 @@ export const actionToggleLock = register({
       event.key.toLocaleLowerCase() === KEYS.L &&
       event[KEYS.CTRL_OR_CMD] &&
       event.shiftKey &&
-      getSelectedElements(elements, appState, false).length > 0
+      getSelectedElements(elements, appState, {
+        includeBoundTextElement: false,
+      }).length > 0
     );
   },
 });

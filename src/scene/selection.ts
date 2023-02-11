@@ -5,6 +5,7 @@ import {
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
+import { getElementsInFrame } from "../frame";
 
 /**
  * Frames and their containing elements are not to be selected at the same time.
@@ -89,14 +90,17 @@ export const getCommonAttributeOfSelectedElements = <T>(
 export const getSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  includeBoundTextElement: boolean = false,
-) =>
-  elements.filter((element) => {
+  opts?: {
+    includeBoundTextElement?: boolean;
+    includeElementsInFrames?: boolean;
+  },
+) => {
+  const selectedElements = elements.filter((element) => {
     if (appState.selectedElementIds[element.id]) {
       return element;
     }
     if (
-      includeBoundTextElement &&
+      opts?.includeBoundTextElement &&
       isBoundToContainer(element) &&
       appState.selectedElementIds[element?.containerId]
     ) {
@@ -105,10 +109,29 @@ export const getSelectedElements = (
     return null;
   });
 
+  if (opts?.includeElementsInFrames) {
+    const elementsToInclude: ExcalidrawElement[] = [];
+    selectedElements.forEach((element) => {
+      if (element.type === "frame") {
+        getElementsInFrame(elements, element.id).forEach((e) =>
+          elementsToInclude.push(e),
+        );
+      }
+      elementsToInclude.push(element);
+    });
+
+    return elementsToInclude;
+  }
+
+  return selectedElements;
+};
+
 export const getTargetElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
 ) =>
   appState.editingElement
     ? [appState.editingElement]
-    : getSelectedElements(elements, appState, true);
+    : getSelectedElements(elements, appState, {
+        includeBoundTextElement: true,
+      });

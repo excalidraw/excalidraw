@@ -290,7 +290,6 @@ import {
   isCursorInFrame,
   bindElementsToFramesAfterDuplication,
   getFramesCountInElements,
-  getElementsToUpdateFromSelection,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
@@ -2167,7 +2166,9 @@ class App extends React.Component<AppProps, AppState> {
         const selectedElements = getSelectedElements(
           this.scene.getNonDeletedElements(),
           this.state,
-          true,
+          {
+            includeBoundTextElement: true,
+          },
         );
 
         selectedElements.forEach((element) => {
@@ -4811,9 +4812,10 @@ class App extends React.Component<AppProps, AppState> {
             const elements = this.scene.getElementsIncludingDeleted();
             let framesCount = getFramesCountInElements(elements);
             const selectedElementIds: Array<ExcalidrawElement["id"]> =
-              getElementsToUpdateFromSelection(elements, this.state).map(
-                (element) => element.id,
-              );
+              getSelectedElements(elements, this.state, {
+                includeBoundTextElement: true,
+                includeElementsInFrames: true,
+              }).map((element) => element.id);
 
             for (const element of elements) {
               if (
