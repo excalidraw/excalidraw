@@ -117,7 +117,7 @@
     },
     "lineEditor": {
       "edit": "Muokkaa riviä",
-      "exit": ""
+      "exit": "Poistu rivieditorista"
     },
     "elementLock": {
       "lock": "Lukitse",
@@ -204,7 +204,7 @@
     "cannotResolveCollabServer": "Yhteyden muodostaminen collab-palvelimeen epäonnistui. Virkistä sivu ja yritä uudelleen.",
     "importLibraryError": "Kokoelman lataaminen epäonnistui",
     "collabSaveFailed": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi.",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi."
   },
   "toolBar": {
     "selection": "Valinta",
@@ -218,10 +218,10 @@
     "text": "Teksti",
     "library": "Kirjasto",
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen",
-    "penMode": "",
+    "penMode": "Kynätila - estä kosketus",
     "link": "Lisää/päivitä linkki valitulle muodolle",
     "eraser": "Poistotyökalu",
-    "hand": ""
+    "hand": "Käsi (panning-työkalu)"
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
@@ -229,7 +229,7 @@
     "shapes": "Muodot"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Piirtoalueen liikuttamiseksi pidä hiiren pyörää tai välilyöntiä pohjassa tai käytä käsityökalua",
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
@@ -248,7 +248,7 @@
     "bindTextToElement": "Lisää tekstiä painamalla enter",
     "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus painamalla CtrlOrCmd",
     "eraserRevert": "Pidä Alt alaspainettuna, kumotaksesi merkittyjen elementtien poistamisen",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Tämä ominaisuus voidaan todennäköisesti ottaa käyttöön asettamalla \"dom.events.asyncClipboard.clipboardItem\" kohta \"true\":ksi. Vaihtaaksesi selaimen kohdan Firefoxissa, käy \"about:config\" sivulla."
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
@@ -316,9 +316,9 @@
     "view": "Näkymä",
     "zoomToFit": "Näytä kaikki elementit",
     "zoomToSelection": "Näytä valinta",
-    "toggleElementLock": "",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "toggleElementLock": "Lukitse / poista lukitus valinta",
+    "movePageUpDown": "Siirrä sivua ylös/alas",
+    "movePageLeftRight": "Siirrä sivua vasemmalle/oikealle"
   },
   "clearCanvasDialog": {
     "title": "Pyyhi piirtoalue"
@@ -451,14 +451,14 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Kaikki tietosi on tallennettu paikallisesti selaimellesi.",
+      "center_heading_plus": "Haluatko sen sijaan mennä Excalidraw+:aan?",
+      "menuHint": "Vie, asetukset, kielet, ..."
     },
     "defaults": {
-      "menuHint": "",
+      "menuHint": "Vie, asetukset ja lisää...",
       "center_heading": "Kaaviot. Tehty. Yksinkertaiseksi.",
-      "toolbarHint": "",
+      "toolbarHint": "Valitse työkalu ja aloita piirtäminen!",
       "helpHint": "Pikanäppäimet & ohje"
     }
   }
