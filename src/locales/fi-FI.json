@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Liitä",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Liitä pelkkänä tekstinä",
     "pasteCharts": "Liitä kaaviot",
     "selectAll": "Valitse kaikki",
     "multiSelect": "Lisää kohde valintaan",
@@ -72,7 +72,7 @@
     "layers": "Tasot",
     "actions": "Toiminnot",
     "language": "Kieli",
-    "liveCollaboration": "",
+    "liveCollaboration": "Live Yhteistyö...",
     "duplicateSelection": "Monista",
     "untitled": "Nimetön",
     "name": "Nimi",
@@ -116,14 +116,14 @@
       "label": "Linkki"
     },
     "lineEditor": {
-      "edit": "",
+      "edit": "Muokkaa riviä",
       "exit": ""
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Lukitse",
+      "unlock": "Poista lukitus",
+      "lockAll": "Lukitse kaikki",
+      "unlockAll": "Poista lukitus kaikista"
     },
     "statusPublished": "Julkaistu",
     "sidebarLock": "Pidä sivupalkki avoinna"
@@ -136,8 +136,8 @@
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
     "exportJSON": "Vie tiedostoon",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Vie kuva...",
+    "export": "Tallenna nimellä...",
     "exportToPng": "Vie PNG-tiedostona",
     "exportToSvg": "Vie SVG-tiedostona",
     "copyToClipboard": "Kopioi leikepöydälle",
@@ -145,7 +145,7 @@
     "scale": "Koko",
     "save": "Tallenna nykyiseen tiedostoon",
     "saveAs": "Tallenna nimellä",
-    "load": "",
+    "load": "Avaa",
     "getShareableLink": "Hae jaettava linkki",
     "close": "Sulje",
     "selectLanguage": "Valitse kieli",
@@ -193,7 +193,7 @@
     "resetLibrary": "Tämä tyhjentää kirjastosi. Jatketaanko?",
     "removeItemsFromsLibrary": "Poista {{count}} kohdetta kirjastosta?",
     "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Internet-yhteyttä ei ole saatavilla.\nMuutoksiasi ei tallenneta!"
   },
   "errors": {
     "unsupportedFileType": "Tiedostotyyppiä ei tueta.",
@@ -202,8 +202,8 @@
     "svgImageInsertError": "SVG- kuvaa ei voitu lisätä. Tiedoston SVG-sisältö näyttää virheelliseltä.",
     "invalidSVGString": "Virheellinen SVG.",
     "cannotResolveCollabServer": "Yhteyden muodostaminen collab-palvelimeen epäonnistui. Virkistä sivu ja yritä uudelleen.",
-    "importLibraryError": "",
-    "collabSaveFailed": "",
+    "importLibraryError": "Kokoelman lataaminen epäonnistui",
+    "collabSaveFailed": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi.",
     "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
@@ -457,9 +457,9 @@
     },
     "defaults": {
       "menuHint": "",
-      "center_heading": "",
+      "center_heading": "Kaaviot. Tehty. Yksinkertaiseksi.",
       "toolbarHint": "",
-      "helpHint": ""
+      "helpHint": "Pikanäppäimet & ohje"
     }
   }
 }
