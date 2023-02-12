@@ -226,15 +226,15 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
-const currentLangCode = languageDetector.detect() || defaultLang.code;
-
-export const langCodeAtom = atom(
-  Array.isArray(currentLangCode) ? currentLangCode[0] : currentLangCode,
+const detectedLangCode = languageDetector.detect() || defaultLang.code;
+export const appLangCodeAtom = atom(
+  Array.isArray(detectedLangCode) ? detectedLangCode[0] : detectedLangCode,
 );
 
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [langCode, setLangCode] = useAtom(langCodeAtom);
+  const [langCode, setLangCode] = useAtom(appLangCodeAtom);
+
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -389,6 +389,7 @@ const ExcalidrawWrapper = () => {
             langCode = langCode[0];
           }
           setLangCode(langCode);
+          console.warn("setLangCode");
           excalidrawAPI.updateScene({
             ...localDataState,
           });
@@ -485,6 +486,7 @@ const ExcalidrawWrapper = () => {
   }, [excalidrawAPI]);
 
   useEffect(() => {
+    console.warn("cacheUserLanguage", langCode);
     languageDetector.cacheUserLanguage(langCode);
   }, [langCode]);
 
