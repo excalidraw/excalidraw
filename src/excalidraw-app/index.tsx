@@ -390,7 +390,6 @@ const ExcalidrawWrapper = () => {
             langCode = langCode[0];
           }
           setLangCode(langCode);
-          console.warn("setLangCode");
           excalidrawAPI.updateScene({
             ...localDataState,
           });
@@ -487,7 +486,6 @@ const ExcalidrawWrapper = () => {
   }, [excalidrawAPI]);
 
   useEffect(() => {
-    console.warn("cacheUserLanguage", langCode);
     languageDetector.cacheUserLanguage(langCode);
   }, [langCode]);
 
