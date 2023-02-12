@@ -198,7 +198,7 @@ export {
   isInvisiblySmallElement,
   getNonDeletedElements,
 } from "../../element";
-export { defaultLang, languages } from "../../i18n";
+export { defaultLang, useI18n, languages } from "../../i18n";
 export {
   restore,
   restoreAppState,
