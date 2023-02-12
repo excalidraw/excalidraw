@@ -240,7 +240,7 @@
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT-näppäintä alaspainettuna kun muutat kokoa, pidä ALT-näppäintä alaspainettuna muuttaaksesi kokoa keskipisteen suhteen",
     "resizeImage": "Voit muuttaa kokoa vapaasti pitämällä SHIFTiä pohjassa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen ympäri",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
-    "lineEditor_info": "",
+    "lineEditor_info": "Pidä CtrlOrCmd pohjassa ja kaksoisnapsauta tai paina CtrlOrCmd + Enter muokataksesi pisteitä",
     "lineEditor_pointSelected": "Poista piste(et) painamalla delete, monista painamalla CtrlOrCmd+D, tai liikuta raahaamalla",
     "lineEditor_nothingSelected": "Valitse muokattava piste (monivalinta pitämällä SHIFT pohjassa), tai paina Alt ja klikkaa lisätäksesi uusia pisteitä",
     "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
@@ -400,7 +400,7 @@
     "fileSavedToFilename": "Tallennettiin kohteeseen {filename}",
     "canvas": "piirtoalue",
     "selection": "valinta",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Käytä {{shortcut}} liittääksesi yhtenä elementtinä,\ntai liittääksesi olemassa olevaan tekstieditoriin"
   },
   "colors": {
     "ffffff": "Valkoinen",
