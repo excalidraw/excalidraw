@@ -152,7 +152,6 @@ export const t = (
 const editorLangCodeAtom = atom(defaultLang.code);
 
 // Should be used in components that fall under these cases:
-// - component is rendered outside of the <Excalidraw> component
 // - component is rendered as an <Excalidraw> child
 // - component is rendered internally by <Excalidraw>, but the component
 //   is memoized w/o being updated on `langCode`, `AppState`, or `UIAppState`
