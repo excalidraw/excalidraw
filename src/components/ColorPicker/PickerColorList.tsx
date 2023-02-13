@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   DEFAULT_SHADE_INDEX,
   Palette,
@@ -38,14 +38,22 @@ const PickerColorList = ({
     }
   }, [colorObj?.colorName, activeColorPickerSection]);
 
+  const initialShade =
+    colorObj && colorObj.shade >= 0 ? colorObj.shade : DEFAULT_SHADE_INDEX;
+
+  const [activeShade, setActiveShade] = useState(initialShade);
+
+  useEffect(() => {
+    if (colorObj && colorObj.shade >= 0) {
+      setActiveShade(colorObj.shade);
+    }
+  }, [colorObj]);
+
   return (
     <div className="color-picker-content--default">
       {Object.entries(palette).map(([key, value], index) => {
-        // const prevShade = colorObj?.shade;
-
         const color =
-          (Array.isArray(value) ? value[DEFAULT_SHADE_INDEX] : value) ||
-          "transparent";
+          (Array.isArray(value) ? value[activeShade] : value) || "transparent";
 
         return (
           <button
@@ -62,11 +70,6 @@ const PickerColorList = ({
               },
             )}
             onClick={() => {
-              // const hasShade = (colorObj?.shade ?? -1) > -1;
-              // const color =
-              //   (Array.isArray(value)
-              //     ? value[hasShade ? prevShade! : DEFAULT_SHADE_INDEX]
-              //     : value) || "transparent";
               onChange(color);
               setActiveColorPickerSection("default");
             }}
