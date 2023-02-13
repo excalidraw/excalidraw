@@ -193,7 +193,7 @@
     "resetLibrary": "पटल स्वच्छ होणार, तुम्हाला खात्री आहे का?",
     "removeItemsFromsLibrary": "संग्रहातून {{count}} तत्व (एक किव्हा अनेक) काढू?",
     "invalidEncryptionKey": "कूटबद्धन कुंजी 22 अक्षरांची असणे आवश्यक आहे. थेट सहयोग अक्षम केले आहे.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "इंटरनेट कनेक्शन उपलब्ध नाही.\nतुमचे बदल जतन केले जाणार नाहीत!"
   },
   "errors": {
     "unsupportedFileType": "असमर्थित फाइल प्रकार.",
