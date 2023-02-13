@@ -47,7 +47,6 @@ export const CustomColorList = ({
               setActiveColorPickerSection("custom");
             }}
             onFocus={() => {
-              onChange(c);
               setActiveColorPickerSection("custom");
             }}
             title={c}

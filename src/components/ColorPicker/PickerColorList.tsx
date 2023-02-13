@@ -1,8 +1,7 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import {
-  DEFAULT_SHADE_INDEX,
   Palette,
   activeColorPickerSectionAtom,
   colorPickerHotkeyBindings,
@@ -14,6 +13,7 @@ interface PickerColorListProps {
   color: string | null;
   onChange: (color: string) => void;
   label: string;
+  activeShade: number;
 }
 
 const PickerColorList = ({
@@ -21,6 +21,7 @@ const PickerColorList = ({
   color,
   onChange,
   label,
+  activeShade,
 }: PickerColorListProps) => {
   const colorObj = getColorNameAndShadeFromHex({
     hex: color || "transparent",
@@ -37,17 +38,6 @@ const PickerColorList = ({
       btnRef.current.focus();
     }
   }, [colorObj?.colorName, activeColorPickerSection]);
-
-  const initialShade =
-    colorObj && colorObj.shade >= 0 ? colorObj.shade : DEFAULT_SHADE_INDEX;
-
-  const [activeShade, setActiveShade] = useState(initialShade);
-
-  useEffect(() => {
-    if (colorObj && colorObj.shade >= 0) {
-      setActiveShade(colorObj.shade);
-    }
-  }, [colorObj]);
 
   return (
     <div className="color-picker-content--default">
@@ -74,7 +64,6 @@ const PickerColorList = ({
               setActiveColorPickerSection("default");
             }}
             onFocus={() => {
-              onChange(color);
               setActiveColorPickerSection("default");
             }}
             title={`${label} — ${key}`}

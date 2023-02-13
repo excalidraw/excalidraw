@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { t } from "../../i18n";
 
 import { ExcalidrawElement } from "../../element/types";
@@ -11,8 +11,10 @@ import { CustomColorList } from "./CustomColorList";
 import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
 import PickerHeading from "./PickerHeading";
 import {
+  DEFAULT_SHADE_INDEXES,
   Palette,
   activeColorPickerSectionAtom,
+  getColorNameAndShadeFromHex,
   getMostUsedCustomColors,
   isCustomColor,
 } from "./colorPickerUtils";
@@ -58,6 +60,24 @@ export const Picker = ({
     }
   }, [activeColorPickerSection, color, palette, setActiveColorPickerSection]);
 
+  const colorObj = getColorNameAndShadeFromHex({
+    hex: color || "transparent",
+    palette,
+  });
+
+  const initialShade =
+    colorObj && colorObj.shade >= 0
+      ? colorObj.shade
+      : DEFAULT_SHADE_INDEXES[type];
+
+  const [activeShade, setActiveShade] = useState(initialShade);
+
+  useEffect(() => {
+    if (colorObj && colorObj.shade >= 0) {
+      setActiveShade(colorObj.shade);
+    }
+  }, [colorObj]);
+
   return (
     <div role="dialog" aria-modal="true" aria-label={t("labels.colorPicker")}>
       <div
@@ -74,6 +94,8 @@ export const Picker = ({
             customColors,
             setActiveColorPickerSection,
             updateData,
+            type,
+            activeShade,
           });
         }}
         className="color-picker-content"
@@ -103,6 +125,7 @@ export const Picker = ({
             label={label}
             palette={palette}
             onChange={onChange}
+            activeShade={activeShade}
           />
         </div>
 

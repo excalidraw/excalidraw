@@ -50,24 +50,29 @@ for (const [key, value] of Object.entries({
   }
 }
 
+export const DEFAULT_SHADE_INDEXES: Record<ColorPickerProps["type"], number> = {
+  elementStroke: 3,
+  elementBackground: 1,
+  canvasBackground: 1,
+};
+
 export const strokeTopPicks = [
   ocPalette.black as string,
-  ocPalette.red[3],
-  ocPalette.green[3],
-  ocPalette.blue[3],
-  ocPalette.orange[3],
+  ocPalette.red[DEFAULT_SHADE_INDEXES.elementStroke],
+  ocPalette.green[DEFAULT_SHADE_INDEXES.elementStroke],
+  ocPalette.blue[DEFAULT_SHADE_INDEXES.elementStroke],
+  ocPalette.orange[DEFAULT_SHADE_INDEXES.elementStroke],
 ] as ColorTuple;
 export const bgTopPicks = [
-  ocPalette.gray[1],
-  ocPalette.red[1],
-  ocPalette.green[1],
-  ocPalette.blue[1],
-  ocPalette.orange[1],
+  ocPalette.gray[DEFAULT_SHADE_INDEXES.elementBackground],
+  ocPalette.red[DEFAULT_SHADE_INDEXES.elementBackground],
+  ocPalette.green[DEFAULT_SHADE_INDEXES.elementBackground],
+  ocPalette.blue[DEFAULT_SHADE_INDEXES.elementBackground],
+  ocPalette.orange[DEFAULT_SHADE_INDEXES.elementBackground],
 ] as ColorTuple;
 
 export const MAX_CUSTOM_COLORS = 5;
 export const COLOR_PER_ROW = 5;
-export const DEFAULT_SHADE_INDEX = 3;
 
 export const isCustomColor = ({
   color,
@@ -129,6 +134,3 @@ export type activeColorPickerSectionAtomType =
   | null;
 export const activeColorPickerSectionAtom =
   atom<activeColorPickerSectionAtomType>(null);
-
-export type ColorPickerOpenState = ColorPickerProps["type"] | null;
-export const colorPickerOpenStateAtom = atom<ColorPickerOpenState>(null);

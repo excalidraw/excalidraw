@@ -1,6 +1,6 @@
+import { ColorPickerProps } from "./ColorPicker";
 import {
   COLOR_PER_ROW,
-  DEFAULT_SHADE_INDEX,
   Palette,
   activeColorPickerSectionAtomType,
   colorPickerHotkeyBindings,
@@ -35,19 +35,32 @@ const arrowHandler = (
   }
 };
 
-const hotkeyHandler = (
-  e: React.KeyboardEvent,
+interface HotkeyHandlerProps {
+  e: React.KeyboardEvent;
   colorObj: {
     colorName: string;
     shade: number;
-  } | null,
-  onChange: (color: string) => void,
-  palette: Palette,
-  customColors: string[],
+  } | null;
+  onChange: (color: string) => void;
+  palette: Palette;
+  customColors: string[];
   setActiveColorPickerSection: (
     update: React.SetStateAction<activeColorPickerSectionAtomType>,
-  ) => void,
-) => {
+  ) => void;
+  type: ColorPickerProps["type"];
+  activeShade: number;
+}
+
+const hotkeyHandler = ({
+  e,
+  colorObj,
+  onChange,
+  palette,
+  customColors,
+  setActiveColorPickerSection,
+  type,
+  activeShade,
+}: HotkeyHandlerProps) => {
   if (colorObj && colorObj.shade >= 0) {
     // shift + numpad is extremely messed up on windows apparently
     if (
@@ -73,7 +86,7 @@ const hotkeyHandler = (
     const paletteKey = Object.keys(palette)[index];
     const paletteValue = palette[paletteKey];
     const r = Array.isArray(paletteValue)
-      ? paletteValue[DEFAULT_SHADE_INDEX]
+      ? paletteValue[activeShade]
       : paletteValue;
     onChange(r);
     setActiveColorPickerSection("default");
@@ -91,6 +104,8 @@ interface ColorPickerKeyNavHandlerProps {
     update: React.SetStateAction<activeColorPickerSectionAtomType>,
   ) => void;
   updateData: (formData?: any) => void;
+  type: ColorPickerProps["type"];
+  activeShade: number;
 }
 
 export const colorPickerKeyNavHandler = ({
@@ -102,6 +117,8 @@ export const colorPickerKeyNavHandler = ({
   customColors,
   setActiveColorPickerSection,
   updateData,
+  type,
+  activeShade,
 }: ColorPickerKeyNavHandlerProps) => {
   if (e.key === "Escape" || !hex) {
     console.log("keyed up yo");
@@ -156,14 +173,16 @@ export const colorPickerKeyNavHandler = ({
 
   const colorObj = getColorNameAndShadeFromHex({ hex, palette });
 
-  hotkeyHandler(
+  hotkeyHandler({
     e,
     colorObj,
     onChange,
     palette,
     customColors,
     setActiveColorPickerSection,
-  );
+    type,
+    activeShade,
+  });
 
   if (activeColorPickerSection === "shades") {
     if (colorObj) {
@@ -194,7 +213,7 @@ export const colorPickerKeyNavHandler = ({
 
         onChange(
           Array.isArray(newColorNameValue)
-            ? newColorNameValue[DEFAULT_SHADE_INDEX]
+            ? newColorNameValue[activeShade]
             : newColorNameValue,
         );
       }

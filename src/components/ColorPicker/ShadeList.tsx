@@ -61,9 +61,6 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
                 onChange(color);
                 setActiveColorPickerSection("shades");
               }}
-              onFocus={() => {
-                onChange(color);
-              }}
             >
               <div className="color-picker__button__hotkey-label">{i + 1}</div>
             </button>
