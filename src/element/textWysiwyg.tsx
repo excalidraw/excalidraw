@@ -158,7 +158,7 @@ export const textWysiwyg = ({
       let maxWidth = updatedTextElement.width;
 
       let maxHeight = updatedTextElement.height;
-      const textElementWidth = updatedTextElement.width;
+      let textElementWidth = updatedTextElement.width;
       // Set to element height by default since that's
       // what is going to be used for unbounded text
       let textElementHeight = updatedTextElement.height;
@@ -273,7 +273,10 @@ export const textWysiwyg = ({
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
       }
-
+      // As firefox needs little higher dimensions on DOM
+      if (navigator.userAgent.search("Firefox") !== -1) {
+        textElementWidth += 0.05;
+      }
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
