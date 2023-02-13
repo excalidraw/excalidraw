@@ -13,7 +13,6 @@ import * as Popover from "@radix-ui/react-popover";
 import { useAtom } from "jotai";
 import {
   activeColorPickerSectionAtom,
-  colorPickerOpenStateAtom,
   ColorTuple,
   ocPalette,
   Palette,
@@ -49,6 +48,7 @@ export interface ColorPickerProps {
   appState: AppState;
   palette?: Palette;
   topPicks?: ColorTuple;
+  updateData: (formData?: any) => void;
 }
 
 export const ColorPicker = ({
@@ -59,12 +59,10 @@ export const ColorPicker = ({
   elements,
   palette = ocPalette,
   topPicks,
+  updateData,
+  appState,
 }: ColorPickerProps) => {
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
-
-  const [colorPickerOpenState, setColorPickerOpenState] = useAtom(
-    colorPickerOpenStateAtom,
-  );
 
   return (
     <div>
@@ -84,9 +82,9 @@ export const ColorPicker = ({
           }}
         />
         <Popover.Root
-          open={colorPickerOpenState ? colorPickerOpenState === type : false}
+          open={appState.openPopup ? appState.openPopup === type : false}
           onOpenChange={(open) => {
-            setColorPickerOpenState(open ? type : null);
+            updateData({ openPopup: open ? type : null });
           }}
         >
           <ActiveColor color={color} label={label} />
@@ -95,6 +93,8 @@ export const ColorPicker = ({
             container={document.querySelector(".excalidraw") as HTMLDivElement}
           >
             <Popover.Content
+              className="focus-visible-none"
+              data-prevent-outside-click
               onInteractOutside={(e) => {
                 console.log("interact outside");
               }}
@@ -148,6 +148,7 @@ export const ColorPicker = ({
                 showInput
                 type={type}
                 elements={elements}
+                updateData={updateData}
               />
               <Popover.Arrow
                 width={20}

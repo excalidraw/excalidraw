@@ -2186,11 +2186,11 @@ class App extends React.Component<AppProps, AppState> {
           (hasBackground(this.state.activeTool.type) ||
             selectedElements.some((element) => hasBackground(element.type)))
         ) {
-          this.setState({ openPopup: "backgroundColorPicker" });
+          this.setState({ openPopup: "elementBackground" });
           event.stopPropagation();
         }
         if (event.key === KEYS.S) {
-          this.setState({ openPopup: "strokeColorPicker" });
+          this.setState({ openPopup: "elementStroke" });
           event.stopPropagation();
         }
       }

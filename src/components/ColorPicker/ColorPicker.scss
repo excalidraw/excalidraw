@@ -1,6 +1,12 @@
 @import "../../css/variables.module";
 
 .excalidraw {
+  .focus-visible-none {
+    &:focus-visible {
+      outline: none !important;
+    }
+  }
+
   .color-picker__heading {
     padding: 0 0.5rem;
     font-size: 0.75rem;

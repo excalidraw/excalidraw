@@ -13,10 +13,21 @@ import PickerHeading from "./PickerHeading";
 import {
   Palette,
   activeColorPickerSectionAtom,
-  colorPickerOpenStateAtom,
   getMostUsedCustomColors,
   isCustomColor,
 } from "./colorPickerUtils";
+
+interface PickerProps {
+  colors: string[];
+  color: string | null;
+  onChange: (color: string) => void;
+  label: string;
+  showInput: boolean;
+  type: "canvasBackground" | "elementBackground" | "elementStroke";
+  elements: readonly ExcalidrawElement[];
+  palette: Palette;
+  updateData: (formData?: any) => void;
+}
 
 export const Picker = ({
   color,
@@ -26,16 +37,8 @@ export const Picker = ({
   type,
   elements,
   palette,
-}: {
-  colors: string[];
-  color: string | null;
-  onChange: (color: string) => void;
-  label: string;
-  showInput: boolean;
-  type: "canvasBackground" | "elementBackground" | "elementStroke";
-  elements: readonly ExcalidrawElement[];
-  palette: Palette;
-}) => {
+  updateData,
+}: PickerProps) => {
   const [customColors] = React.useState(() => {
     if (type === "canvasBackground") {
       return [];
@@ -55,8 +58,6 @@ export const Picker = ({
     }
   }, [activeColorPickerSection, color, palette, setActiveColorPickerSection]);
 
-  const [, setColorPickerOpenState] = useAtom(colorPickerOpenStateAtom);
-
   return (
     <div role="dialog" aria-modal="true" aria-label={t("labels.colorPicker")}>
       <div
@@ -64,16 +65,16 @@ export const Picker = ({
           e.preventDefault();
           e.stopPropagation();
 
-          colorPickerKeyNavHandler(
+          colorPickerKeyNavHandler({
             e,
             activeColorPickerSection,
             palette,
-            color,
+            hex: color,
             onChange,
             customColors,
             setActiveColorPickerSection,
-            setColorPickerOpenState,
-          );
+            updateData,
+          });
         }}
         className="color-picker-content"
         // to allow focusing by clicking but not by tabbing

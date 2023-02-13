@@ -240,6 +240,7 @@ export const actionChangeStrokeColor = register({
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
         elements={elements}
         appState={appState}
+        updateData={updateData}
       />
     </>
   ),
@@ -281,6 +282,7 @@ export const actionChangeBackgroundColor = register({
         onChange={(color) => updateData({ currentItemBackgroundColor: color })}
         elements={elements}
         appState={appState}
+        updateData={updateData}
       />
     </>
   ),

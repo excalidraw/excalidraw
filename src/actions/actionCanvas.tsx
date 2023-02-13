@@ -60,6 +60,7 @@ export const actionChangeViewBackgroundColor = register({
         data-testid="canvas-background-picker"
         elements={elements}
         appState={appState}
+        updateData={updateData}
       />
     );
   },

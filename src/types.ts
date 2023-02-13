@@ -161,11 +161,7 @@ export type AppState = {
   zoom: Zoom;
   // mobile-only
   openMenu: "canvas" | "shape" | null;
-  openPopup:
-    | "canvasColorPicker"
-    | "backgroundColorPicker"
-    | "strokeColorPicker"
-    | null;
+  openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
   openSidebar: "library" | "customSidebar" | null;
   openDialog: "imageExport" | "help" | "jsonExport" | null;
   isSidebarDocked: boolean;

@@ -1,6 +1,5 @@
 import {
   COLOR_PER_ROW,
-  ColorPickerOpenState,
   DEFAULT_SHADE_INDEX,
   Palette,
   activeColorPickerSectionAtomType,
@@ -81,20 +80,29 @@ const hotkeyHandler = (
   }
 };
 
-export const colorPickerKeyNavHandler = (
-  e: React.KeyboardEvent,
-  activeSection: activeColorPickerSectionAtomType,
-  palette: Palette,
-  hex: string | null,
-  onChange: (color: string) => void,
-  customColors: string[],
+interface ColorPickerKeyNavHandlerProps {
+  e: React.KeyboardEvent;
+  activeColorPickerSection: activeColorPickerSectionAtomType;
+  palette: Palette;
+  hex: string | null;
+  onChange: (color: string) => void;
+  customColors: string[];
   setActiveColorPickerSection: (
     update: React.SetStateAction<activeColorPickerSectionAtomType>,
-  ) => void,
-  setColorPickerOpenState: (
-    update: React.SetStateAction<ColorPickerOpenState>,
-  ) => void,
-) => {
+  ) => void;
+  updateData: (formData?: any) => void;
+}
+
+export const colorPickerKeyNavHandler = ({
+  e,
+  activeColorPickerSection,
+  palette,
+  hex,
+  onChange,
+  customColors,
+  setActiveColorPickerSection,
+  updateData,
+}: ColorPickerKeyNavHandlerProps) => {
   if (e.key === "Escape" || !hex) {
     console.log("keyed up yo");
     // document.body.click();
@@ -141,7 +149,8 @@ export const colorPickerKeyNavHandler = (
     //   // );
     // }, 1);
 
-    setColorPickerOpenState(null);
+    // setColorPickerOpenState(null);
+    updateData({ openPopup: null });
     return;
   }
 
@@ -156,7 +165,7 @@ export const colorPickerKeyNavHandler = (
     setActiveColorPickerSection,
   );
 
-  if (activeSection === "shades") {
+  if (activeColorPickerSection === "shades") {
     if (colorObj) {
       const { shade } = colorObj;
       const newShade = arrowHandler(e.key, shade, COLOR_PER_ROW);
@@ -167,7 +176,7 @@ export const colorPickerKeyNavHandler = (
     }
   }
 
-  if (activeSection === "default") {
+  if (activeColorPickerSection === "default") {
     if (colorObj) {
       const { colorName } = colorObj;
       const colorNames = Object.keys(palette);
@@ -192,7 +201,7 @@ export const colorPickerKeyNavHandler = (
     }
   }
 
-  if (activeSection === "custom") {
+  if (activeColorPickerSection === "custom") {
     const indexOfColor = customColors.indexOf(hex);
 
     const newColorIndex = arrowHandler(
