@@ -132,6 +132,11 @@ const config = {
       tableOfContents: {
         maxHeadingLevel: 4,
       },
+      algolia: {
+        appId: "8FEAOD28DI",
+        apiKey: "4b07cca33ff2d2919bc95ff98f148e9e",
+        indexName: "excalidraw",
+      },
     }),
   themes: ["@docusaurus/theme-live-codeblock"],
   plugins: ["docusaurus-plugin-sass"],
