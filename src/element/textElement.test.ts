@@ -65,6 +65,13 @@ up`,
         width: 250,
         res: "Hello whats up",
       },
+      {
+        desc: "should push the word if its equal to max width",
+        width: 60,
+        res: `Hello
+whats
+up`,
+      },
     ].forEach((data) => {
       it(`should ${data.desc}`, () => {
         const res = wrapText(text, font, data.width - BOUND_TEXT_PADDING * 2);
@@ -72,6 +79,7 @@ up`,
       });
     });
   });
+
   describe("When text contain new lines", () => {
     const text = `Hello
 whats up`;

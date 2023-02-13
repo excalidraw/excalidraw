@@ -323,12 +323,15 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     let currentLineWidthTillNow = 0;
 
     let index = 0;
+
     while (index < words.length) {
       const currentWordWidth = getLineWidth(words[index], font);
+      // This will only happen when single word takes entire width
       if (currentWordWidth === maxWidth) {
         push(words[index]);
         index++;
       }
+
       // Start breaking longer words exceeding max width
       else if (currentWordWidth > maxWidth) {
         // push current line since the current word exceeds the max width
@@ -336,6 +339,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
         push(currentLine);
         currentLine = "";
         currentLineWidthTillNow = 0;
+
         while (words[index].length > 0) {
           const currentChar = String.fromCodePoint(
             words[index].codePointAt(0)!,
