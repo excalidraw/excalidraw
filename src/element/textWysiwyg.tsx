@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, VERTICAL_ALIGN } from "../constants";
+import { CLASSES, isFirefox, isSafari, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -273,8 +273,8 @@ export const textWysiwyg = ({
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
       }
-      // As firefox needs little higher dimensions on DOM
-      if (navigator.userAgent.search("Firefox") !== -1) {
+      // As firefox, Safari needs little higher dimensions on DOM
+      if (isFirefox || isSafari) {
         textElementWidth += 0.5;
       }
       // Make sure text editor height doesn't go beyond viewport
