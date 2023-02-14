@@ -521,7 +521,9 @@ class App extends React.Component<AppProps, AppState> {
           width={canvasWidth}
           height={canvasHeight}
           ref={this.handleCanvasRef}
-          onContextMenu={this.handleCanvasContextMenu}
+          onContextMenu={(event: React.PointerEvent<HTMLCanvasElement>) =>
+            this.handleCanvasContextMenu(event)
+          }
           onPointerMove={this.handleCanvasPointerMove}
           onPointerUp={this.handleCanvasPointerUp}
           onPointerCancel={this.removePointer}
@@ -542,7 +544,9 @@ class App extends React.Component<AppProps, AppState> {
         width={canvasWidth}
         height={canvasHeight}
         ref={this.handleCanvasRef}
-        onContextMenu={this.handleCanvasContextMenu}
+        onContextMenu={(event: React.PointerEvent<HTMLCanvasElement>) =>
+          this.handleCanvasContextMenu(event)
+        }
         onPointerDown={this.handleCanvasPointerDown}
         onDoubleClick={this.handleCanvasDoubleClick}
         onPointerMove={this.handleCanvasPointerMove}
@@ -587,6 +591,9 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({
               frameToHighlight: null,
             });
+          }}
+          onContextMenu={(event: React.PointerEvent<HTMLDivElement>) => {
+            this.handleCanvasContextMenu(event);
           }}
         >
           {`Frame ${index + 1}`}
@@ -6247,7 +6254,9 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleCanvasContextMenu = (
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event:
+      | React.PointerEvent<HTMLCanvasElement>
+      | React.PointerEvent<HTMLDivElement>,
   ) => {
     event.preventDefault();
 
