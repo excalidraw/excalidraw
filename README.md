@@ -69,7 +69,7 @@
 
 ## Quick start
 
-- Don't forget to check out our [Documentation](https://docs.excalidraw.com) & [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw)
+Install [Excalidraw npm package](https://www.npmjs.com/package/@excalidraw/excalidraw):
 
 ```
 npm install react react-dom @excalidraw/excalidraw
