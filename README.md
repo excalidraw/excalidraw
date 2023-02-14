@@ -76,9 +76,9 @@ yarn add react react-dom @excalidraw/excalidraw
 
 ## Contributions
 
-- Missing something or found a bug ? [report here](https://github.com/excalidraw/excalidraw/issues)
-- Want to contribute ? Check-out [contribution guide](https://docs.excalidraw.com/docs/introduction/contributing) or let us know on [Discord](https://discord.gg/UexuTaE)
-- Want to help with translation? [translation contribution guide](https://docs.excalidraw.com/docs/introduction/contributing#translating)
+- Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
+- Want to contribute? Check out our [contribution guide](https://docs.excalidraw.com/docs/introduction/contributing) or let us know on [Discord](https://discord.gg/UexuTaE).
+- Want to help with translations? See the [translation guide](https://docs.excalidraw.com/docs/introduction/contributing#translating).
 
 ## Who's integrating Excalidraw
 
