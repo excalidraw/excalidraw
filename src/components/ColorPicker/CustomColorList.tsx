@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import HotkeyLabel from "./HotkeyLabel";
 
 interface CustomColorListProps {
   colors: string[];
@@ -54,7 +55,7 @@ export const CustomColorList = ({
             style={{ "--swatch-color": c }}
             key={i}
           >
-            <div className="color-picker__button__hotkey-label">{i + 1}</div>
+            <HotkeyLabel color={c} keyLabel={i + 1} isCustomColor />
           </button>
         );
       })}

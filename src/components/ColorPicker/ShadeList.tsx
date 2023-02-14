@@ -6,6 +6,7 @@ import {
   activeColorPickerSectionAtom,
   getColorNameAndShadeFromHex,
 } from "./colorPickerUtils";
+import HotkeyLabel from "./HotkeyLabel";
 
 interface ShadeListProps {
   hex: string | null;
@@ -62,7 +63,7 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
                 setActiveColorPickerSection("shades");
               }}
             >
-              <div className="color-picker__button__hotkey-label">{i + 1}</div>
+              <HotkeyLabel color={color} keyLabel={i + 1} isShade />
             </button>
           ))}
         </div>

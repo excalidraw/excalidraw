@@ -7,6 +7,7 @@ import {
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromHex,
 } from "./colorPickerUtils";
+import HotkeyLabel from "./HotkeyLabel";
 
 interface PickerColorListProps {
   palette: Palette;
@@ -71,9 +72,10 @@ const PickerColorList = ({
             style={color ? { "--swatch-color": color } : undefined}
             key={key}
           >
-            <div className="color-picker__button__hotkey-label">
-              {colorPickerHotkeyBindings[index]}
-            </div>
+            <HotkeyLabel
+              color={color}
+              keyLabel={colorPickerHotkeyBindings[index]}
+            />
           </button>
         );
       })}

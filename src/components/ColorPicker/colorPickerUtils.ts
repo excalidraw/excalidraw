@@ -134,3 +134,39 @@ export type activeColorPickerSectionAtomType =
   | null;
 export const activeColorPickerSectionAtom =
   atom<activeColorPickerSectionAtomType>(null);
+
+const calculateContrast = (r: number, g: number, b: number) => {
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 160 ? "black" : "white";
+};
+
+// inspiration from https://stackoverflow.com/a/11868398
+export const getContrastYIQ = (bgHex: string, isCustomColor: boolean) => {
+  if (isCustomColor) {
+    const style = new Option().style;
+    style.color = bgHex;
+
+    if (style.color) {
+      const rgb = style.color
+        .replace(/^(rgb|rgba)\(/, "")
+        .replace(/\)$/, "")
+        .replace(/\s/g, "")
+        .split(",");
+      const r = parseInt(rgb[0]);
+      const g = parseInt(rgb[1]);
+      const b = parseInt(rgb[2]);
+
+      return calculateContrast(r, g, b);
+    }
+  }
+
+  if (bgHex === "transparent") {
+    return "black";
+  }
+
+  const r = parseInt(bgHex.substring(1, 3), 16);
+  const g = parseInt(bgHex.substring(3, 5), 16);
+  const b = parseInt(bgHex.substring(5, 7), 16);
+
+  return calculateContrast(r, g, b);
+};
