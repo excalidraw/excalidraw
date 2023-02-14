@@ -653,57 +653,65 @@ export const textWysiwyg = ({
     // Also to handle cases such as picking a color which would trigger a blur
     // in that same tick.
     const target = event?.target;
-    console.log("target from bindBlur", target);
 
-    const htmlTarget = target as HTMLElement;
-
-    if (htmlTarget?.classList.contains("active-color")) {
-      console.log("returning");
-      return;
-    }
+    const isTargetPickerTrigger =
+      target instanceof HTMLElement &&
+      target.classList.contains("active-color");
 
     setTimeout(() => {
       editable.onblur = handleSubmit;
-      if (target && htmlTarget?.classList.contains("active-color")) {
-        // @ts-ignore
-        target.onblur = () => {
-          editable.focus();
+
+      if (isTargetPickerTrigger) {
+        const callback = (
+          mutationList: MutationRecord[],
+          observer: MutationObserver,
+        ) => {
+          const radixIsRemoved = mutationList.find(
+            (mutation) =>
+              mutation.removedNodes.length > 0 &&
+              (mutation.removedNodes[0] as HTMLElement).dataset
+                ?.radixPopperContentWrapper !== undefined,
+          );
+
+          if (radixIsRemoved) {
+            // should work without this in theory
+            // and i think it does actually but radix probably somewhere,
+            // somehow sets the focus elsewhere
+            setTimeout(() => {
+              editable.focus();
+            });
+
+            observer.disconnect();
+          }
         };
+
+        const observer = new MutationObserver(callback);
+
+        observer.observe(document.querySelector(".excalidraw-container")!, {
+          childList: true,
+        });
       }
 
       // case: clicking on the same property → no change → no update → no focus
-      if (
-        !htmlTarget?.classList.contains("active-color") &&
-        (document.querySelector(".active-color") as HTMLElement).dataset
-          .state !== "open"
-      ) {
-        console.log("focusing");
-        console.log("target from bindBlur", target);
+      if (!isTargetPickerTrigger) {
         editable.focus();
       }
-    }, 1);
+    });
   };
 
   // prevent blur when changing properties from the menu
   const onPointerDown = (event: MouseEvent) => {
-    console.log("pointer down", event.target);
-
-    if (!(event.target === editable)) {
-      console.log("CSODA pointerdown");
-      // editable.blur();
-      // editable.onblur = null;
-      // (document.querySelector(".color-picker__button") as HTMLElement).click();
-      // (document.querySelector(".color-picker__button") as HTMLElement).focus();
-      window.addEventListener("pointerup", bindBlurEvent);
-    }
+    const isTargetPickerTrigger =
+      event.target instanceof HTMLElement &&
+      event.target.classList.contains("active-color");
 
     if (
-      (event.target instanceof HTMLElement ||
+      ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-      event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`)
-      // ||      !(event.target as HTMLElement).classList.contains("active-color")
+        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
+        !isWritableElement(event.target)) ||
+      isTargetPickerTrigger
     ) {
-      console.log("IF pointerdown");
       editable.onblur = null;
       window.addEventListener("pointerup", bindBlurEvent);
       // handle edge-case where pointerup doesn't fire e.g. due to user
@@ -715,11 +723,10 @@ export const textWysiwyg = ({
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
     updateWysiwygStyle();
-
-    console.log(document.activeElement?.closest(".color-picker-content"));
-
-    if (!!!document.activeElement?.closest(".color-picker-content")) {
-      console.log("focusing from unbindUpdate");
+    const isColorPickerActive = !!document.activeElement?.closest(
+      ".color-picker-content",
+    );
+    if (!isColorPickerActive) {
       editable.focus();
     }
   });

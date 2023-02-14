@@ -1,4 +1,3 @@
-import { ColorPickerProps } from "./ColorPicker";
 import {
   COLOR_PER_ROW,
   Palette,
@@ -47,7 +46,6 @@ interface HotkeyHandlerProps {
   setActiveColorPickerSection: (
     update: React.SetStateAction<activeColorPickerSectionAtomType>,
   ) => void;
-  type: ColorPickerProps["type"];
   activeShade: number;
 }
 
@@ -58,7 +56,6 @@ const hotkeyHandler = ({
   palette,
   customColors,
   setActiveColorPickerSection,
-  type,
   activeShade,
 }: HotkeyHandlerProps) => {
   if (colorObj && colorObj.shade >= 0) {
@@ -104,7 +101,6 @@ interface ColorPickerKeyNavHandlerProps {
     update: React.SetStateAction<activeColorPickerSectionAtomType>,
   ) => void;
   updateData: (formData?: any) => void;
-  type: ColorPickerProps["type"];
   activeShade: number;
 }
 
@@ -117,56 +113,9 @@ export const colorPickerKeyNavHandler = ({
   customColors,
   setActiveColorPickerSection,
   updateData,
-  type,
   activeShade,
 }: ColorPickerKeyNavHandlerProps) => {
   if (e.key === "Escape" || !hex) {
-    console.log("keyed up yo");
-    // document.body.click();
-    // console.log(document.activeElement);
-    // document.activeElement?.blur();
-    setTimeout(() => {
-      // @ts-ignore
-      document.querySelector(".excalidraw-wysiwyg")?.focus();
-    }, 1);
-
-    // (document.querySelector(".excalidraw-wysiwyg") as HTMLElement).blur();
-    // (document.querySelector(".App-menu__left") as HTMLElement).click();
-
-    // console.log(document.querySelector(".buttonList"));
-    // (document.querySelector(".buttonList") as HTMLElement).dispatchEvent(
-    //   myEvent,
-    // );
-
-    // setTimeout(() => {
-    //   // (document.querySelector(".App-menu__left") as HTMLElement).focus();
-    //   // // (document.querySelector(".App-menu__left") as HTMLElement).blur();
-    //   // (document.querySelector(".App-menu__left") as HTMLElement).click();
-
-    //   const btn = document.querySelector(".color-picker__button.active");
-    //   console.log(btn);
-
-    //   console.log("toppicks");
-    //   console.log(document.querySelector(".color-picker__top-picks"));
-
-    //   // (document.querySelector(".color-picker__button") as HTMLElement).click();
-
-    //   // console.log(document.activeElement);
-
-    //   // create a specific "pointerdown" event
-    //   // var clickEvent = new MouseEvent("mouseup", {
-    //   //   view: window,
-    //   //   bubbles: true,
-    //   //   cancelable: true,
-    //   // });
-
-    //   // // Dispatch the event (on the "<body>" element)
-    //   // (document.querySelector(".App-menu__left") as HTMLElement).dispatchEvent(
-    //   //   clickEvent,
-    //   // );
-    // }, 1);
-
-    // setColorPickerOpenState(null);
     updateData({ openPopup: null });
     return;
   }
@@ -180,7 +129,6 @@ export const colorPickerKeyNavHandler = ({
     palette,
     customColors,
     setActiveColorPickerSection,
-    type,
     activeShade,
   });
 

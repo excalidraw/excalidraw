@@ -95,33 +95,11 @@ export const ColorPicker = ({
             <Popover.Content
               className="focus-visible-none"
               data-prevent-outside-click
-              onInteractOutside={(e) => {
-                console.log("interact outside");
-              }}
-              onPointerDownOutside={() => {
-                console.log("pointer down outside");
-              }}
-              onFocusOutside={(e) => {
-                console.log("focus outside");
-              }}
-              onEscapeKeyDown={() => {
-                console.log("escape key down");
-              }}
               onCloseAutoFocus={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
                 setActiveColorPickerSection(null);
-
-                // setTimeout(() => {
-                //   // (document.querySelector(".App-menu__left") as HTMLElement).click();
-                //   // (document.querySelector(".App-menu__left") as HTMLElement).focus();
-
-                //   (
-                //     document.querySelector(".App-menu__left") as HTMLElement
-                //   ).click();
-                //   console.log(document.activeElement);
-                // }, 1);
               }}
               side="right"
               align="start"

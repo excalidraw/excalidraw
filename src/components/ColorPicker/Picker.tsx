@@ -94,7 +94,6 @@ export const Picker = ({
             customColors,
             setActiveColorPickerSection,
             updateData,
-            type,
             activeShade,
           });
         }}
