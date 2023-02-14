@@ -52,7 +52,7 @@
 - 🏗️&nbsp;Customizable.
 - 📷&nbsp;Image support.
 - 😀&nbsp;Shape libraries support.
-- 👅&nbsp;Localization (a18n) support.
+- 👅&nbsp;Localization (i18n) support.
 - 🖼️&nbsp;Export to PNG, SVG & clipboard.
 - 💾&nbsp;Open format - save drawing as `.excalidraw` json file.
 - ⚒️&nbsp;Wide range of tools - Panning, rectangle, circle, diamond, arrow, line, free-draw, eraser.
