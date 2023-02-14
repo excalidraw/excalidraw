@@ -14,11 +14,8 @@
 
 <div align="center">
   <h2>
-    An open source virtual whiteboard. </br>
+    An open source virtual hand-drawn style whiteboard. </br>
     Collaborative and end-to-end encrypted. </br>
-    Unique hand-drawn style, endless scrolling & libraries.
-
-  <br />
   <br />
   </h3>
 </div>
