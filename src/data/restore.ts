@@ -361,7 +361,6 @@ export const restoreElements = (
     return elements;
   }, [] as ExcalidrawElement[]);
 
-  // To make sure elements are not repaired during reconciliation
   if (!opts?.repair) {
     return restoredElements;
   }
