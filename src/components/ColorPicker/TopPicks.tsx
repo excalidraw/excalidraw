@@ -35,7 +35,10 @@ export const TopPicks = ({
           type="button"
           title={color}
           onClick={() => onChange(color)}
-        />
+        >
+          <div className="color-picker__button-border" />
+          <div className="color-picker__button-outline" />
+        </button>
       ))}
     </div>
   );

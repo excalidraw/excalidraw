@@ -68,7 +68,9 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
           "with-border":
             color === "#ffffff" || color === "transparent" || !color,
         })}
-      />
+      >
+        <div className="color-picker__button-border" />
+      </div>
     </label>
   );
 };

@@ -55,6 +55,8 @@ export const CustomColorList = ({
             style={{ "--swatch-color": c }}
             key={i}
           >
+            <div className="color-picker__button-border" />
+            <div className="color-picker__button-outline" />
             <HotkeyLabel color={c} keyLabel={i + 1} isCustomColor />
           </button>
         );

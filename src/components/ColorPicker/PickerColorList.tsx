@@ -72,6 +72,8 @@ const PickerColorList = ({
             style={color ? { "--swatch-color": color } : undefined}
             key={key}
           >
+            <div className="color-picker__button-border" />
+            <div className="color-picker__button-outline" />
             <HotkeyLabel
               color={color}
               keyLabel={colorPickerHotkeyBindings[index]}

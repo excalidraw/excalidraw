@@ -31,76 +31,79 @@
   }
 
   .color-picker__button {
+    --radius: 0.25rem;
+
     width: 1.25rem;
     height: 1.25rem;
     border: 0;
-    border-radius: 0.25rem;
+    border-radius: var(--radius);
     filter: var(--theme-filter);
     background-color: var(--swatch-color);
     background-position: left center;
     position: relative;
     font-family: inherit;
-
-    &--no-focus-visible {
-      &:focus-visible {
-        outline: none !important;
-      }
-    }
-
-    &:focus-visible {
-      // TODO color picker redesign
-      // I like giant ass outlines for keyboard navigation
-      // but we can tone it down/get rid of it
-      outline: 6px solid var(--color-primary-light);
-      outline-offset: 2px;
-    }
-
-    &.active {
-      position: relative;
-
-      &::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        outline: 1px solid var(--color-primary-darkest);
-        outline-offset: 1px;
-        border-radius: 0.25rem;
-        filter: var(--theme-filter);
-      }
-    }
-
-    &--large {
-      width: 1.875rem;
-      height: 1.875rem;
-      border-radius: 0.5rem;
-
-      &.active::after,
-      &.with-border::after {
-        border-radius: 0.5rem !important;
-      }
-    }
-
-    &.is-transparent {
-      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==");
-      // filter: var(--theme-filter);
-    }
+    box-sizing: border-box;
 
     &.with-border {
-      position: relative;
-
-      &::after {
-        content: "";
+      .color-picker__button-border {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
         border: 1px solid var(--default-border-color);
-        border-radius: 0.25rem;
+        border-radius: calc(var(--radius) + 1px);
         filter: var(--theme-filter);
+      }
+    }
+
+    &.active {
+      .color-picker__button-outline {
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 1px solid var(--color-primary-darkest);
+        border-radius: calc(var(--radius) + 1px);
+        filter: var(--theme-filter);
+      }
+    }
+
+    &:focus-visible {
+      outline: none;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        bottom: -4px;
+        left: -4px;
+        border: 3px solid var(--focus-highlight-color);
+        border-radius: calc(var(--radius) + 1px);
+      }
+
+      &.active {
+        .color-picker__button-outline {
+          display: none;
+        }
+      }
+    }
+
+    &--large {
+      --radius: 0.5rem;
+      width: 1.875rem;
+      height: 1.875rem;
+    }
+
+    &.is-transparent {
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==");
+    }
+
+    &--no-focus-visible {
+      &:focus-visible {
+        outline: none !important;
       }
     }
   }

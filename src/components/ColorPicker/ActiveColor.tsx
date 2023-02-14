@@ -16,7 +16,10 @@ const ActiveColor = ({ label, color }: ActiveColorProps) => {
       })}
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}
-    />
+    >
+      <div className="color-picker__button-border" />
+      <div className="color-picker__button-outline" />
+    </Popover.Trigger>
   );
 };
 
