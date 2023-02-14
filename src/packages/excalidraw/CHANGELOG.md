@@ -14,11 +14,13 @@ Please add the latest change on the top under the correct section.
 ## Unreleased
 
 ### Features
+
 - [`restoreElements`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restoreelements) API now takes an optional parameter `opts` which currentl supports the below attributes
 
 ```js
 { refreshDimensions?: boolean, repair?: boolean }
 ```
+
 The same `opts` param has been added to [`restore`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restore) API as well.
 
 For more details refer to the [docs](https://docs.excalidraw.com)
