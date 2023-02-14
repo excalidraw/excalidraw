@@ -17,6 +17,7 @@ import {
   ocPalette,
   Palette,
 } from "./colorPickerUtils";
+import { useExcalidrawContainer } from "../App";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -64,6 +65,8 @@ export const ColorPicker = ({
 }: ColorPickerProps) => {
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
+  const { container } = useExcalidrawContainer();
+
   return (
     <div>
       <div role="dialog" aria-modal="true" className="color-picker-container">
@@ -89,17 +92,12 @@ export const ColorPicker = ({
         >
           <ActiveColor color={color} label={label} />
 
-          <Popover.Portal
-            container={document.querySelector(".excalidraw") as HTMLDivElement}
-          >
+          <Popover.Portal container={container}>
             <Popover.Content
               className="focus-visible-none"
               data-prevent-outside-click
               onCloseAutoFocus={(e) => {
                 // return focus to excalidraw container
-                const container = document.querySelector(
-                  ".excalidraw-container",
-                ) as HTMLElement;
                 if (container) {
                   container.focus();
                 }
