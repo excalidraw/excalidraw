@@ -361,6 +361,11 @@ export const restoreElements = (
     return elements;
   }, [] as ExcalidrawElement[]);
 
+  // To make sure elements are not repaired during reconciliation
+  if (!localElements) {
+    return restoredElements;
+  }
+
   // repair binding. Mutates elements.
   const restoredElementsMap = arrayToMap(restoredElements);
   for (const element of restoredElements) {
