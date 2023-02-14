@@ -42,6 +42,7 @@ export const KEYS = {
   CHEVRON_RIGHT: ">",
   PERIOD: ".",
   COMMA: ",",
+  SUBTRACT: "-",
 
   A: "a",
   C: "c",

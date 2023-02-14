@@ -87,8 +87,8 @@ export const SHAPES = [
   {
     icon: RectangleIcon,
     value: "frame",
-    key: KEYS.G,
-    numericKey: "10",
+    key: KEYS.F,
+    numericKey: KEYS.SUBTRACT,
     fillable: false,
   },
 ] as const;
