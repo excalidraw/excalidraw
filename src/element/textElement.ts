@@ -276,7 +276,7 @@ const getLineWidth = (text: string, font: FontString) => {
   }
   const canvas2dContext = canvas.getContext("2d")!;
   canvas2dContext.font = font;
-  const width = Math.ceil(canvas2dContext.measureText(text).width);
+  const width = canvas2dContext.measureText(text).width;
 
   // since in test env the canvas measureText algo
   // doesn't measure text and instead just returns number of

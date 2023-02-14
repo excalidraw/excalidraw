@@ -275,7 +275,7 @@ export const textWysiwyg = ({
       }
       // As firefox needs little higher dimensions on DOM
       if (navigator.userAgent.search("Firefox") !== -1) {
-        textElementWidth += 0.05;
+        textElementWidth += 0.5;
       }
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
