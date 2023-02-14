@@ -339,7 +339,7 @@ export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
-  opts?: { refreshDimensions?: boolean; repair?: boolean } | undefined,
+  opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,
 ): ExcalidrawElement[] => {
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
   const restoredElements = (elements || []).reduce((elements, element) => {
@@ -361,7 +361,7 @@ export const restoreElements = (
     return elements;
   }, [] as ExcalidrawElement[]);
 
-  if (!opts?.repair) {
+  if (!opts?.repairBindings) {
     return restoredElements;
   }
 
@@ -501,7 +501,7 @@ export const restore = (
    */
   localAppState: Partial<AppState> | null | undefined,
   localElements: readonly ExcalidrawElement[] | null | undefined,
-  elementsConfig?: { refreshDimensions?: boolean; repair?: boolean },
+  elementsConfig?: { refreshDimensions?: boolean; repairBindings?: boolean },
 ): RestoredDataState => {
   return {
     elements: restoreElements(data?.elements, localElements, elementsConfig),

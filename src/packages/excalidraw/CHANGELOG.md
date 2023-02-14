@@ -15,7 +15,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- [`restoreElements`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restoreelements) API now takes an optional parameter `opts` which currentl supports the below attributes
+- [`restoreElements`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restoreelements) API now takes an optional parameter `opts` which currently supports the below attributes
 
 ```js
 { refreshDimensions?: boolean, repair?: boolean }
@@ -27,7 +27,7 @@ For more details refer to the [docs](https://docs.excalidraw.com)
 
 #### BREAKING CHANGE
 
-- The optional parameter `refreshDimensions` in[`restoreElements`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restoreelements) has been removed and can be enabled via `opts`
+- The optional parameter `refreshDimensions` in [`restoreElements`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restoreelements) has been removed and can be enabled via `opts`
 
 ## 0.14.2 (2023-02-01)
 

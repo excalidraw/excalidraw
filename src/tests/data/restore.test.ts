@@ -565,7 +565,7 @@ describe("repairing bindings", () => {
     restoredElements = restore.restoreElements(
       [container, boundElement],
       null,
-      { repair: true },
+      { repairBindings: true },
     );
 
     expect(restoredElements).toEqual([
@@ -609,7 +609,7 @@ describe("repairing bindings", () => {
     restoredElements = restore.restoreElements(
       [container, boundElement],
       null,
-      { repair: true },
+      { repairBindings: true },
     );
 
     expect(restoredElements).toEqual([
@@ -705,7 +705,7 @@ describe("repairing bindings", () => {
     restoredElements = restore.restoreElements(
       [container, invisibleBoundElement, boundElement],
       null,
-      { repair: true },
+      { repairBindings: true },
     );
 
     expect(restoredElements).toEqual([
@@ -750,7 +750,7 @@ describe("repairing bindings", () => {
     restoredElements = restore.restoreElements(
       [boundElement, boundElementDeleted],
       null,
-      { repair: true },
+      { repairBindings: true },
     );
 
     expect(restoredElements).toEqual([

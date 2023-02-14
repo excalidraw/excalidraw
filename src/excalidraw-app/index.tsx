@@ -362,7 +362,7 @@ const ExcalidrawWrapper = () => {
           if (data.scene) {
             excalidrawAPI.updateScene({
               ...data.scene,
-              ...restore(data.scene, null, null, { repair: true }),
+              ...restore(data.scene, null, null, { repairBindings: true }),
               commitToHistory: true,
             });
           }
