@@ -58,7 +58,7 @@
 - ⚒️&nbsp;Wide range of tools - Panning, rectangle, circle, diamond, arrow, line, free-draw, eraser.
 - ➡️&nbsp;Arrow-binding & labeled arrows.
 - 🔙&nbsp;Undo / Redo.
-- 🔍&nbsp;Zoom.
+- 🔍&nbsp;Zoom and panning support.
 
 ## Quick start
 
