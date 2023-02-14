@@ -37,6 +37,7 @@ export const excludeElementsInFramesFromSelection = <
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
+  excludeElementsInFrames: boolean = true,
 ) => {
   const [selectionX1, selectionY1, selectionX2, selectionY2] =
     getElementAbsoluteCoords(selection);
@@ -56,8 +57,9 @@ export const getElementsWithinSelection = (
     );
   });
 
-  elementsInSelection =
-    excludeElementsInFramesFromSelection(elementsInSelection);
+  elementsInSelection = excludeElementsInFrames
+    ? excludeElementsInFramesFromSelection(elementsInSelection)
+    : elementsInSelection;
 
   return elementsInSelection;
 };

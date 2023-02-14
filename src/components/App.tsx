@@ -290,6 +290,7 @@ import {
   isCursorInFrame,
   bindElementsToFramesAfterDuplication,
   getFramesCountInElements,
+  FrameGeometry,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
@@ -6402,7 +6403,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const selectedFrames = selectedElements.filter(
       (element) => element.type === "frame",
-    );
+    ) as ExcalidrawFrameElement[];
 
     const frameElementsOffsetsMap = new Map<
       string,
@@ -6451,6 +6452,7 @@ class App extends React.Component<AppProps, AppState> {
           frame.id,
         );
 
+        // keep elements' positions relative to their frames on frames resizing
         if (transformHandleType) {
           if (transformHandleType.includes("w")) {
             elementsInFrame.forEach((element) => {
@@ -6477,6 +6479,9 @@ class App extends React.Component<AppProps, AppState> {
             });
           }
         }
+
+        // add elements that are now in the area of frames
+        this.updateFrameElementsOnResizing(frame);
       });
 
       return true;
@@ -6498,22 +6503,69 @@ class App extends React.Component<AppProps, AppState> {
       elementsToHighlight: [],
     });
 
-    // 2. add all the elements that can be added to the frame to the frame
-    getElementsWithinSelection(this.scene.getNonDeletedElements(), frame)
-      .filter((element) => element.type !== "frame" && !element.frameId)
-      .forEach((element) => {
-        // TODO: set element hightlight, which will be unset on pointer up
-        this.setState((prevState) => ({
-          elementsToHighlight: [
-            ...(prevState.elementsToHighlight ?? []),
-            element,
-          ],
-        }));
+    const elementsInFrame = getElementsWithinSelection(
+      this.scene.getNonDeletedElements(),
+      frame,
+    ).filter((element) => element.type !== "frame" && !element.frameId);
 
-        mutateElement(element, {
-          frameId: frame.id,
-        });
+    this.scene.addElementsToFrame(elementsInFrame, frame);
+    this.setState((prevState) => ({
+      elementsToHighlight: [
+        ...(prevState.elementsToHighlight ?? []),
+        ...elementsInFrame,
+      ],
+    }));
+  }
+
+  private updateFrameElementsOnResizing(frame: ExcalidrawFrameElement) {
+    this.setState({
+      elementsToHighlight: [],
+    });
+
+    const elementsCompletelyInFrame = getElementsWithinSelection(
+      this.scene.getNonDeletedElements(),
+      frame,
+      false,
+    ).filter(
+      (element) =>
+        element.type !== "frame" &&
+        (!element.frameId || element.frameId === frame.id),
+    );
+    const elementsCompletelyInFrameSet = new Set(elementsCompletelyInFrame);
+
+    const prevElementsInFrame = getElementsInFrame(
+      this.scene.getNonDeletedElements(),
+      frame.id,
+    );
+
+    const elementsToBeRemoved = prevElementsInFrame
+      .filter((element) => !elementsCompletelyInFrameSet.has(element))
+      .filter((element) => {
+        return !FrameGeometry.isElementIntersectingFrame(element, frame);
       });
+
+    this.scene.removeElementsFromFrame(elementsToBeRemoved, this.state);
+    const elementsToBeRemovedSet = new Set(elementsToBeRemoved);
+
+    const nextElementsInFrames = [
+      ...elementsCompletelyInFrame,
+      ...prevElementsInFrame.filter(
+        (element) =>
+          !elementsToBeRemovedSet.has(element) &&
+          !elementsCompletelyInFrameSet.has(element),
+      ),
+    ];
+
+    nextElementsInFrames.forEach((element) => {
+      this.setState((prevState) => ({
+        elementsToHighlight: [
+          ...(prevState.elementsToHighlight ?? []),
+          element,
+        ],
+      }));
+    });
+
+    this.scene.addElementsToFrame(nextElementsInFrames, frame);
   }
 
   private getContextMenuItems = (

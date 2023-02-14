@@ -96,7 +96,7 @@ class Scene {
    */
   addElementsToFrame(
     elementsToAdd: NonDeletedExcalidrawElement[],
-    frame: NonDeleted<ExcalidrawFrameElement>,
+    frame: ExcalidrawFrameElement,
   ) {
     let nextElements = [...this.elements];
 
