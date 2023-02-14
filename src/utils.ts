@@ -719,4 +719,3 @@ export const composeEventHandlers = <E>(
     }
   };
 };
-
