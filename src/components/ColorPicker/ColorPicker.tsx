@@ -96,6 +96,14 @@ export const ColorPicker = ({
               className="focus-visible-none"
               data-prevent-outside-click
               onCloseAutoFocus={(e) => {
+                // return focus to excalidraw container
+                const container = document.querySelector(
+                  ".excalidraw-container",
+                ) as HTMLElement;
+                if (container) {
+                  container.focus();
+                }
+
                 e.preventDefault();
                 e.stopPropagation();
 
