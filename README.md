@@ -6,9 +6,9 @@
 </a>
 
 <h4 align="center">
+  <a href="https://excalidraw.com">Excalidraw Editor</a> |
   <a href="https://blog.excalidraw.com">Blog</a> |
   <a href="https://docs.excalidraw.com">Documentation</a> |
-  <a href="https://excalidraw.com">Excalidraw Editor</a> |
   <a href="https://plus.excalidraw.com">Excalidraw+</a>
 </h4>
 
@@ -38,7 +38,9 @@
 
 <div align="center">
   <figure>
-    <img src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2Fproduct_showcase.png" alt="Product showcase" />
+    <a href="https://excalidraw.com" target="_blank" rel="noopener">
+      <img src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2Fproduct_showcase.png" alt="Product showcase" />
+    </a>
     <figcaption>
       <p align="center">
         Create beautiful hand-drawn like diagrams, wireframes, or whatever you like.
@@ -66,7 +68,7 @@
 
 ## Quick start
 
-Install [Excalidraw npm package](https://www.npmjs.com/package/@excalidraw/excalidraw):
+Install the [Excalidraw npm package](https://www.npmjs.com/package/@excalidraw/excalidraw):
 
 ```
 npm install react react-dom @excalidraw/excalidraw
@@ -77,6 +79,8 @@ or via yarn
 ```
 yarn add react react-dom @excalidraw/excalidraw
 ```
+
+Don't forget to check out our [Documentation](https://docs.excalidraw.com)!
 
 ## Contributing
 
