@@ -79,7 +79,6 @@ or via yarn
 
 ```
 yarn add react react-dom @excalidraw/excalidraw
-```
 
 ## Contributing
 
