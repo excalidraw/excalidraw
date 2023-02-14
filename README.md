@@ -56,7 +56,7 @@
 - 🖼️&nbsp;Export to PNG, SVG & clipboard.
 - 💾&nbsp;Open format - save drawing as `.excalidraw` json file.
 - ⚒️&nbsp;Wide range of tools - Panning, rectangle, circle, diamond, arrow, line, free-draw, eraser.
-- ➡️&nbsp;Arrow-binding & Labeled arrows.
+- ➡️&nbsp;Arrow-binding & labeled arrows.
 - 🔙&nbsp;Undo / Redo.
 - 🔍&nbsp;Zoom.
 
