@@ -54,7 +54,7 @@
 - 😀&nbsp;Shape libraries support.
 - 👅&nbsp;Localization (i18n) support.
 - 🖼️&nbsp;Export to PNG, SVG & clipboard.
-- 💾&nbsp;Open format - save drawing as `.excalidraw` json file.
+- 💾&nbsp;Open format - export drawings as an `.excalidraw` json file.
 - ⚒️&nbsp;Wide range of tools - rectangle, circle, diamond, arrow, line, free-draw, eraser...
 - ➡️&nbsp;Arrow-binding & labeled arrows.
 - 🔙&nbsp;Undo / Redo.
