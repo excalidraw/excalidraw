@@ -836,7 +836,7 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-    const scene = restore(initialData, null, null);
+    const scene = restore(initialData, null, null, { repair: true });
     scene.appState = {
       ...scene.appState,
       theme: this.props.theme || scene.appState.theme,
