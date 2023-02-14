@@ -13,11 +13,17 @@
 </h4>
 
 <div align="center">
-  <h3>An open source whiteboard "hand-drawn" editor. </br> Collaborative and end-to-end encrypted.</h3>
+  <h2>
+    An open source virtual whiteboard. </br>
+    Collaborative and end-to-end encrypted. </br>
+    Unique hand-drawn style, endless scrolling & libraries.
+
+  <br />
+  <br />
+  </h3>
 </div>
 
 <br />
-
 <p align="center">
   <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
     <img alt="Excalidraw is released under the MIT license." src="https://img.shields.io/badge/license-MIT-blue.svg"  />
@@ -46,8 +52,9 @@
 
 ## Features
 
+- 🎨&nbsp;Infinite, canvas-based, online whiteboard.
+- ✍️&nbsp;Hand-drawn like style.
 - 💯&nbsp;Free & open-source.
-- 🎨&nbsp;Infinite, canvas-based, hand-drawn whiteboard.
 - 🌓&nbsp;Dark mode.
 - 🏗️&nbsp;Customizable.
 - 📷&nbsp;Image support.
@@ -80,9 +87,14 @@ yarn add react react-dom @excalidraw/excalidraw
 - Want to contribute? Check out our [contribution guide](https://docs.excalidraw.com/docs/introduction/contributing) or let us know on [Discord](https://discord.gg/UexuTaE).
 - Want to help with translations? See the [translation guide](https://docs.excalidraw.com/docs/introduction/contributing#translating).
 
+## Integrations
+
+- [VScode extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
+- [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw)
+
 ## Who's integrating Excalidraw
 
-[Google Cloud](https://googlecloudcheatsheet.withgoogle.com/architecture) • [Meta](https://meta.com/) • [CodeSandbox](https://codesandbox.io/) • [Obsidian Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) • [Replit](https://replit.com/) • [Slite](https://slite.com/) • [Notion](https://notion.so/) • [HackerRank](https://www.hackerrank.com/)
+[Google Cloud](https://googlecloudcheatsheet.withgoogle.com/architecture) • [Meta](https://meta.com/) • [CodeSandbox](https://codesandbox.io/) • [Obsidian Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) • [Replit](https://replit.com/) • [Slite](https://slite.com/) • [Notion](https://notion.so/) • [HackerRank](https://www.hackerrank.com/) • and many others
 
 ## Sponsors & support
 
