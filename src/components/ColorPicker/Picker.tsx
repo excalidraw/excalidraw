@@ -52,18 +52,30 @@ export const Picker = ({
     activeColorPickerSectionAtom,
   );
 
-  useEffect(() => {
-    if (!activeColorPickerSection) {
-      setActiveColorPickerSection(
-        isCustomColor({ color, palette }) ? "custom" : "shades",
-      );
-    }
-  }, [activeColorPickerSection, color, palette, setActiveColorPickerSection]);
-
   const colorObj = getColorNameAndShadeFromHex({
     hex: color || "transparent",
     palette,
   });
+
+  useEffect(() => {
+    if (!activeColorPickerSection) {
+      const hasShade = colorObj && colorObj.shade >= 0;
+
+      setActiveColorPickerSection(
+        isCustomColor({ color, palette })
+          ? "custom"
+          : hasShade
+          ? "shades"
+          : "default",
+      );
+    }
+  }, [
+    activeColorPickerSection,
+    color,
+    palette,
+    setActiveColorPickerSection,
+    colorObj,
+  ]);
 
   const initialShade =
     colorObj && colorObj.shade >= 0
