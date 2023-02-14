@@ -47,7 +47,7 @@
 ## Features
 
 - 💯&nbsp;Free & open-source.
-- 🎨&nbsp;Infinite, canvas based, hand-drawn whiteboard.
+- 🎨&nbsp;Infinite, canvas-based, hand-drawn whiteboard.
 - 🌓&nbsp;Dark mode.
 - 🏗️&nbsp;Customizable.
 - 📷&nbsp;Image support.
