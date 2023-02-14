@@ -44,7 +44,7 @@
     <img src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2Fproduct_showcase.png" alt="Product showcase" />
     <figcaption>
       <p align="center">
-        Create beautiful hand-drawn like diagrams, wireframes or whatever you like.
+        Create beautiful hand-drawn like diagrams, wireframes, or whatever you like.
       </p>
     </figcaption>
   </figure>
