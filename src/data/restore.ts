@@ -339,7 +339,7 @@ export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
-  refreshDimensions = false,
+  opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,
 ): ExcalidrawElement[] => {
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
   const restoredElements = (elements || []).reduce((elements, element) => {
@@ -348,7 +348,7 @@ export const restoreElements = (
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
       let migratedElement: ExcalidrawElement | null = restoreElement(
         element,
-        refreshDimensions,
+        opts?.refreshDimensions,
       );
       if (migratedElement) {
         const localElement = localElementsMap?.get(element.id);
@@ -360,6 +360,10 @@ export const restoreElements = (
     }
     return elements;
   }, [] as ExcalidrawElement[]);
+
+  if (!opts?.repairBindings) {
+    return restoredElements;
+  }
 
   // repair binding. Mutates elements.
   const restoredElementsMap = arrayToMap(restoredElements);
@@ -497,9 +501,10 @@ export const restore = (
    */
   localAppState: Partial<AppState> | null | undefined,
   localElements: readonly ExcalidrawElement[] | null | undefined,
+  elementsConfig?: { refreshDimensions?: boolean; repairBindings?: boolean },
 ): RestoredDataState => {
   return {
-    elements: restoreElements(data?.elements, localElements),
+    elements: restoreElements(data?.elements, localElements, elementsConfig),
     appState: restoreAppState(data?.appState, localAppState || null),
     files: data?.files || {},
   };
