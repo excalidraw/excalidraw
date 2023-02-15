@@ -53,6 +53,7 @@
 
 - 🎨&nbsp;Infinite, canvas-based, online whiteboard.
 - ✍️&nbsp;Hand-drawn like style.
+- 📍&nbsp;Local first. Everything is stored in `localStorage`.
 - 💯&nbsp;Free & open-source.
 - 🌓&nbsp;Dark mode.
 - 🏗️&nbsp;Customizable.
