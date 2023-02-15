@@ -583,9 +583,15 @@ class App extends React.Component<AppProps, AppState> {
             this.handleCanvasPointerDown(event as any);
           }}
           onPointerOver={(event) => {
-            this.setState({
-              frameToHighlight: this.scene.getElement(event.currentTarget.id),
-            });
+            this.state.selectedElementIds[event.currentTarget.id]
+              ? this.setState({
+                  frameToHighlight: null,
+                })
+              : this.setState({
+                  frameToHighlight: this.scene.getElement(
+                    event.currentTarget.id,
+                  ),
+                });
           }}
           onPointerLeave={() => {
             this.setState({
