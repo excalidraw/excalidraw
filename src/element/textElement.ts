@@ -730,7 +730,6 @@ export const isHittingContainerStroke = (
   container: ExcalidrawTextContainer,
   zoom: number,
 ) => {
-  const threshold = 10 / zoom;
   const bounds = getElementBounds(container);
   const topLeft = [bounds[0], bounds[1]];
   const topRight = [bounds[2], bounds[1]];
@@ -739,8 +738,32 @@ export const isHittingContainerStroke = (
 
   const strokeWidth = container.strokeWidth;
   if (container.type === "ellipse") {
+    const threshold = 10 * zoom;
+    const h = (topLeft[0] + topRight[0]) / 2;
+    const k = (topLeft[1] + bottomLeft[1]) / 2;
+    let a = container.width / 2 + threshold;
+    let b = container.height / 2 + threshold;
+    const checkPointOnOuterEllipse =
+      Math.pow(x - h, 2) / Math.pow(a, 2) + Math.pow(y - k, 2) / Math.pow(b, 2);
+
+    a = container.width / 2 - strokeWidth - threshold;
+    b = container.height / 2 - strokeWidth - threshold;
+
+    const checkPointOnInnerEllipse =
+      Math.pow(x - h, 2) / Math.pow(a, 2) + Math.pow(y - k, 2) / Math.pow(b, 2);
+
+    // The expression evaluates to 1 means point is on ellipse,
+    // < 1 means inside ellipse and > 1 means outside ellipse
+    if (
+      checkPointOnInnerEllipse === 1 ||
+      checkPointOnOuterEllipse === 1 ||
+      (checkPointOnInnerEllipse > 1 && checkPointOnOuterEllipse < 1)
+    ) {
+      return true;
+    }
     return false;
   }
+  const threshold = 10 / zoom;
 
   // Left Stroke
   if (
