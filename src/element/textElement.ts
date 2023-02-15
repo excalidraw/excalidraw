@@ -11,7 +11,7 @@ import { mutateElement } from "./mutateElement";
 import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
-import { getElementBounds, isTextElement } from ".";
+import { isTextElement } from ".";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import {
   isBoundToContainer,
@@ -28,6 +28,7 @@ import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./textWysiwyg";
+import { rotatePoint } from "../math";
 
 export const normalizeText = (text: string) => {
   return (
@@ -730,11 +731,17 @@ export const isHittingContainerStroke = (
   container: ExcalidrawTextContainer,
   zoom: number,
 ) => {
-  const bounds = getElementBounds(container);
-  const topLeft = [bounds[0], bounds[1]];
-  const topRight = [bounds[2], bounds[1]];
-  const bottomLeft = [bounds[0], bounds[3]];
-  const bottomRight = [bounds[2], bounds[3]];
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(container);
+  const topLeft = [x1, y1];
+  const topRight = [x2, y1];
+  const bottomLeft = [x1, y2];
+  const bottomRight = [x2, y2];
+
+  const [counterRotateX, counterRotateY] = rotatePoint(
+    [x, y],
+    [cx, cy],
+    -container.angle,
+  );
 
   const strokeWidth = container.strokeWidth;
   if (container.type === "ellipse") {
@@ -744,13 +751,15 @@ export const isHittingContainerStroke = (
     let a = container.width / 2 + threshold;
     let b = container.height / 2 + threshold;
     const checkPointOnOuterEllipse =
-      Math.pow(x - h, 2) / Math.pow(a, 2) + Math.pow(y - k, 2) / Math.pow(b, 2);
+      Math.pow(counterRotateX - h, 2) / Math.pow(a, 2) +
+      Math.pow(counterRotateY - k, 2) / Math.pow(b, 2);
 
     a = container.width / 2 - strokeWidth - threshold;
     b = container.height / 2 - strokeWidth - threshold;
 
     const checkPointOnInnerEllipse =
-      Math.pow(x - h, 2) / Math.pow(a, 2) + Math.pow(y - k, 2) / Math.pow(b, 2);
+      Math.pow(counterRotateX - h, 2) / Math.pow(a, 2) +
+      Math.pow(counterRotateY - k, 2) / Math.pow(b, 2);
 
     // The expression evaluates to 1 means point is on ellipse,
     // < 1 means inside ellipse and > 1 means outside ellipse
@@ -767,39 +776,39 @@ export const isHittingContainerStroke = (
 
   // Left Stroke
   if (
-    x >= topLeft[0] - threshold &&
-    x <= topLeft[0] + strokeWidth + threshold &&
-    y >= topLeft[1] - threshold &&
-    y <= bottomRight[1] + threshold
+    counterRotateX >= topLeft[0] - threshold &&
+    counterRotateX <= topLeft[0] + strokeWidth + threshold &&
+    counterRotateY >= topLeft[1] - threshold &&
+    counterRotateY <= bottomRight[1] + threshold
   ) {
     return true;
   }
   // Top stroke
   if (
-    x >= topLeft[0] - threshold &&
-    x <= topRight[0] + threshold &&
-    y >= topLeft[1] - threshold &&
-    y <= topLeft[1] + threshold + strokeWidth
+    counterRotateX >= topLeft[0] - threshold &&
+    counterRotateX <= topRight[0] + threshold &&
+    counterRotateY >= topLeft[1] - threshold &&
+    counterRotateY <= topLeft[1] + threshold + strokeWidth
   ) {
     return true;
   }
 
   // Right stroke
   if (
-    x >= topRight[0] - threshold - strokeWidth &&
-    x <= topRight[0] + threshold &&
-    y >= topRight[1] - threshold &&
-    y <= bottomRight[1] + threshold
+    counterRotateX >= topRight[0] - threshold - strokeWidth &&
+    counterRotateX <= topRight[0] + threshold &&
+    counterRotateY >= topRight[1] - threshold &&
+    counterRotateY <= bottomRight[1] + threshold
   ) {
     return true;
   }
 
   // Bottom Stroke
   if (
-    x >= bottomLeft[0] - threshold &&
-    x <= bottomRight[0] + threshold &&
-    y >= bottomLeft[1] - threshold - strokeWidth &&
-    y <= bottomLeft[1] + threshold
+    counterRotateX >= bottomLeft[0] - threshold &&
+    counterRotateX <= bottomRight[0] + threshold &&
+    counterRotateY >= bottomLeft[1] - threshold - strokeWidth &&
+    counterRotateY <= bottomLeft[1] + threshold
   ) {
     return true;
   }
