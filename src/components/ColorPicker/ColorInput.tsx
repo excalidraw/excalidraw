@@ -65,8 +65,6 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
         style={color ? { "--swatch-color": color } : undefined}
         className={clsx("color-picker__button", {
           "is-transparent": color === "transparent" || !color,
-          "with-border":
-            color === "#ffffff" || color === "transparent" || !color,
         })}
       >
         <div className="color-picker__button-border" />

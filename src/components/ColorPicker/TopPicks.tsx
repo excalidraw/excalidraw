@@ -27,8 +27,6 @@ export const TopPicks = ({
           className={clsx("color-picker__button", {
             active: color === activeColor,
             "is-transparent": color === "transparent" || !color,
-            "with-border":
-              color === "#ffffff" || color === "transparent" || !color,
           })}
           style={{ "--swatch-color": color }}
           key={color}
@@ -36,7 +34,6 @@ export const TopPicks = ({
           title={color}
           onClick={() => onChange(color)}
         >
-          <div className="color-picker__button-border" />
           <div className="color-picker__button-outline" />
         </button>
       ))}

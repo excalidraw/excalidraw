@@ -12,12 +12,10 @@ const ActiveColor = ({ label, color }: ActiveColorProps) => {
       type="button"
       className={clsx("color-picker__button active-color", {
         "is-transparent": color === "transparent" || !color,
-        "with-border": color === "#ffffff" || color === "transparent" || !color,
       })}
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}
     >
-      <div className="color-picker__button-border" />
       <div className="color-picker__button-outline" />
     </Popover.Trigger>
   );

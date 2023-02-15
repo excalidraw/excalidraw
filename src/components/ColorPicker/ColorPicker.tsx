@@ -80,7 +80,7 @@ export const ColorPicker = ({
         <div
           style={{
             width: 1,
-            height: 20,
+            height: "100%",
             backgroundColor: "var(--default-border-color)",
             margin: "0 auto",
           }}
@@ -111,12 +111,12 @@ export const ColorPicker = ({
               side={isMobile && !isLandscape ? "bottom" : "right"}
               align={isMobile && !isLandscape ? "center" : "start"}
               alignOffset={-16}
-              sideOffset={isMobile ? 16 : 42}
+              sideOffset={isMobile ? 16 : 32}
               style={{
                 zIndex: 9999,
                 backgroundColor: "var(--popup-bg-color)",
                 maxWidth: "184px",
-                padding: "12px 16px",
+                padding: "12px",
                 borderRadius: "8px",
                 boxShadow:
                   "0px 7px 14px rgba(0, 0, 0, 0.05), 0px 0px 3.12708px rgba(0, 0, 0, 0.0798), 0px 0px 0.931014px rgba(0, 0, 0, 0.1702)",

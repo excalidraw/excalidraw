@@ -56,8 +56,6 @@ const PickerColorList = ({
               {
                 active: colorObj?.colorName === key,
                 "is-transparent": color === "transparent" || !color,
-                "with-border":
-                  color === "#ffffff" || color === "transparent" || !color,
               },
             )}
             onClick={() => {
@@ -72,7 +70,6 @@ const PickerColorList = ({
             style={color ? { "--swatch-color": color } : undefined}
             key={key}
           >
-            <div className="color-picker__button-border" />
             <div className="color-picker__button-outline" />
             <HotkeyLabel
               color={color}

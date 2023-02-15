@@ -63,7 +63,6 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
                 setActiveColorPickerSection("shades");
               }}
             >
-              <div className="color-picker__button-border" />
               <div className="color-picker__button-outline" />
               <HotkeyLabel color={color} keyLabel={i + 1} isShade />
             </button>

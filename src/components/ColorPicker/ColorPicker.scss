@@ -15,10 +15,8 @@
 
   .color-picker-container {
     display: grid;
-    grid-template-columns: 1fr 1.25rem 1.25rem;
-    border: 1px solid var(--default-border-color);
-    padding: 0.5rem;
-    border-radius: 0.5rem;
+    grid-template-columns: 1fr 20px 1.35rem;
+    padding: 0.5rem 2px;
 
     @include isMobile {
       max-width: 175px;
@@ -33,9 +31,11 @@
   .color-picker__button {
     --radius: 0.25rem;
 
-    width: 1.25rem;
-    height: 1.25rem;
-    border: 0;
+    padding: 0;
+    margin: 0;
+    width: 1.35rem;
+    height: 1.35rem;
+    border: 1px solid var(--color-gray-30);
     border-radius: var(--radius);
     filter: var(--theme-filter);
     background-color: var(--swatch-color);
@@ -44,19 +44,6 @@
     font-family: inherit;
     box-sizing: border-box;
 
-    &.with-border {
-      .color-picker__button-border {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border: 1px solid var(--default-border-color);
-        border-radius: calc(var(--radius) + 1px);
-        filter: var(--theme-filter);
-      }
-    }
-
     &.active {
       .color-picker__button-outline {
         position: absolute;
@@ -64,7 +51,7 @@
         left: -2px;
         right: -2px;
         bottom: -2px;
-        border: 1px solid var(--color-primary-darkest);
+        box-shadow: 0 0 0 1px var(--color-primary-darkest);
         border-radius: calc(var(--radius) + 1px);
         filter: var(--theme-filter);
       }
@@ -102,6 +89,7 @@
     }
 
     &--no-focus-visible {
+      border: 0;
       &::after {
         display: none;
       }
@@ -116,7 +104,7 @@
     right: 4px;
     bottom: 4px;
     filter: none;
-    font-size: 0.75rem;
+    font-size: 11px;
   }
 
   .color-picker {
@@ -199,7 +187,7 @@
   .color-picker-content--default {
     padding: 0.5rem;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, 1.875rem);
     grid-gap: 0.25rem;
     border-radius: 4px;
 
