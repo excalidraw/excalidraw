@@ -15,6 +15,7 @@ import { mutateElement } from "../element/mutateElement";
 import { findIndex } from "../utils";
 import { moveOneRight } from "../zindex";
 import { AppState } from "../types";
+import { getElementsInFrame } from "../frame";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -147,6 +148,14 @@ class Scene {
     this.replaceAllElements(
       moveOneRight(this.elements, appState, elementsToRemove),
     );
+  }
+
+  removeAllElementsFromFrame(
+    frame: ExcalidrawFrameElement,
+    appState: AppState,
+  ) {
+    const elementsInFrame = getElementsInFrame(this.elements, frame.id);
+    this.removeElementsFromFrame(elementsInFrame, appState);
   }
 
   getElement<T extends ExcalidrawElement>(id: T["id"]): T | null {

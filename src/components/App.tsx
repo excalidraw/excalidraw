@@ -3696,6 +3696,18 @@ class App extends React.Component<AppProps, AppState> {
       this.redirectToLink(event, this.device.isTouchScreen);
     }
 
+    const selectedFrames = getSelectedElements(
+      this.scene.getNonDeletedElements(),
+      this.state,
+    ).filter((element) => element.type === "frame") as ExcalidrawFrameElement[];
+
+    selectedFrames.forEach((frame) => {
+      // important to keep the calling orders in the manner :)
+      const nextElementsInFrame = this.getElementsInResizingFrame(frame);
+      this.scene.removeAllElementsFromFrame(frame, this.state);
+      this.scene.addElementsToFrame(nextElementsInFrame, frame);
+    });
+
     this.removePointer(event);
   };
 
@@ -6495,8 +6507,14 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        // add elements that are now in the area of frames
-        this.updateFrameElementsOnResizing(frame);
+        this.setState((prevState) => ({
+          elementsToHighlight: [
+            ...(prevState.elementsToHighlight?.filter(
+              (element) => element.frameId !== frame.id,
+            ) ?? []),
+            ...this.getElementsInResizingFrame(frame),
+          ],
+        }));
       });
 
       return true;
@@ -6532,11 +6550,11 @@ class App extends React.Component<AppProps, AppState> {
     }));
   }
 
-  private updateFrameElementsOnResizing(frame: ExcalidrawFrameElement) {
-    this.setState({
-      elementsToHighlight: [],
-    });
-
+  // return an array of elements that are considered to belong to the
+  // given frame as it get resized
+  private getElementsInResizingFrame(
+    frame: ExcalidrawFrameElement,
+  ): ExcalidrawElement[] {
     const elementsCompletelyInFrame = getElementsWithinSelection(
       this.scene.getNonDeletedElements(),
       frame,
@@ -6546,6 +6564,7 @@ class App extends React.Component<AppProps, AppState> {
         element.type !== "frame" &&
         (!element.frameId || element.frameId === frame.id),
     );
+
     const elementsCompletelyInFrameSet = new Set(elementsCompletelyInFrame);
 
     const prevElementsInFrame = getElementsInFrame(
@@ -6559,10 +6578,9 @@ class App extends React.Component<AppProps, AppState> {
         return !FrameGeometry.isElementIntersectingFrame(element, frame);
       });
 
-    this.scene.removeElementsFromFrame(elementsToBeRemoved, this.state);
     const elementsToBeRemovedSet = new Set(elementsToBeRemoved);
 
-    const nextElementsInFrames = [
+    const nextElementsInFrame = [
       ...elementsCompletelyInFrame,
       ...prevElementsInFrame.filter(
         (element) =>
@@ -6571,16 +6589,7 @@ class App extends React.Component<AppProps, AppState> {
       ),
     ];
 
-    nextElementsInFrames.forEach((element) => {
-      this.setState((prevState) => ({
-        elementsToHighlight: [
-          ...(prevState.elementsToHighlight ?? []),
-          element,
-        ],
-      }));
-    });
-
-    this.scene.addElementsToFrame(nextElementsInFrames, frame);
+    return nextElementsInFrame;
   }
 
   private getContextMenuItems = (
