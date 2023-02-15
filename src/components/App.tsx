@@ -285,6 +285,7 @@ const deviceContextInitialValue = {
   isMobile: false,
   isTouchScreen: false,
   canDeviceFitSidebar: false,
+  isLandscape: false,
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 DeviceContext.displayName = "DeviceContext";
@@ -887,6 +888,7 @@ class App extends React.Component<AppProps, AppState> {
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
     this.device = updateObject(this.device, {
+      isLandscape: width > height,
       isSmScreen: width < MQ_SM_MAX_WIDTH,
       isMobile:
         width < MQ_MAX_WIDTH_PORTRAIT ||

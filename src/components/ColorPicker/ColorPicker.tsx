@@ -17,7 +17,7 @@ import {
   ocPalette,
   Palette,
 } from "./colorPickerUtils";
-import { useExcalidrawContainer } from "../App";
+import { useDevice, useExcalidrawContainer } from "../App";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -66,6 +66,7 @@ export const ColorPicker = ({
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
   const { container } = useExcalidrawContainer();
+  const { isMobile, isLandscape } = useDevice();
 
   return (
     <div>
@@ -107,10 +108,10 @@ export const ColorPicker = ({
 
                 setActiveColorPickerSection(null);
               }}
-              side="right"
-              align="start"
+              side={isMobile && !isLandscape ? "bottom" : "right"}
+              align={isMobile && !isLandscape ? "center" : "start"}
               alignOffset={-16}
-              sideOffset={42}
+              sideOffset={isMobile ? 16 : 42}
               style={{
                 zIndex: 9999,
                 backgroundColor: "var(--popup-bg-color)",

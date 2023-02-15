@@ -526,4 +526,5 @@ export type Device = Readonly<{
   isMobile: boolean;
   isTouchScreen: boolean;
   canDeviceFitSidebar: boolean;
+  isLandscape: boolean;
 }>;
