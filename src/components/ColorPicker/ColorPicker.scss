@@ -102,6 +102,9 @@
     }
 
     &--no-focus-visible {
+      &::after {
+        display: none;
+      }
       &:focus-visible {
         outline: none !important;
       }
