@@ -28,6 +28,7 @@ import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./textWysiwyg";
+import { rotatePoint } from "../math";
 
 export const normalizeText = (text: string) => {
   return (
@@ -722,4 +723,94 @@ export const isValidTextContainer = (element: ExcalidrawElement) => {
     isImageElement(element) ||
     isArrowElement(element)
   );
+};
+
+export const isHittingContainerStroke = (
+  x: number,
+  y: number,
+  container: ExcalidrawTextContainer,
+  zoom: number,
+) => {
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(container);
+  const topLeft = [x1, y1];
+  const topRight = [x2, y1];
+  const bottomLeft = [x1, y2];
+  const bottomRight = [x2, y2];
+
+  const [counterRotateX, counterRotateY] = rotatePoint(
+    [x, y],
+    [cx, cy],
+    -container.angle,
+  );
+
+  const strokeWidth = container.strokeWidth;
+  if (container.type === "ellipse") {
+    const threshold = 10 * zoom;
+    const h = (topLeft[0] + topRight[0]) / 2;
+    const k = (topLeft[1] + bottomLeft[1]) / 2;
+    let a = container.width / 2 + threshold;
+    let b = container.height / 2 + threshold;
+    const checkPointOnOuterEllipse =
+      Math.pow(counterRotateX - h, 2) / Math.pow(a, 2) +
+      Math.pow(counterRotateY - k, 2) / Math.pow(b, 2);
+
+    a = container.width / 2 - strokeWidth - threshold;
+    b = container.height / 2 - strokeWidth - threshold;
+
+    const checkPointOnInnerEllipse =
+      Math.pow(counterRotateX - h, 2) / Math.pow(a, 2) +
+      Math.pow(counterRotateY - k, 2) / Math.pow(b, 2);
+
+    // The expression evaluates to 1 means point is on ellipse,
+    // < 1 means inside ellipse and > 1 means outside ellipse
+    if (
+      checkPointOnInnerEllipse === 1 ||
+      checkPointOnOuterEllipse === 1 ||
+      (checkPointOnInnerEllipse > 1 && checkPointOnOuterEllipse < 1)
+    ) {
+      return true;
+    }
+    return false;
+  }
+  const threshold = 10 / zoom;
+
+  // Left Stroke
+  if (
+    counterRotateX >= topLeft[0] - threshold &&
+    counterRotateX <= topLeft[0] + strokeWidth + threshold &&
+    counterRotateY >= topLeft[1] - threshold &&
+    counterRotateY <= bottomRight[1] + threshold
+  ) {
+    return true;
+  }
+  // Top stroke
+  if (
+    counterRotateX >= topLeft[0] - threshold &&
+    counterRotateX <= topRight[0] + threshold &&
+    counterRotateY >= topLeft[1] - threshold &&
+    counterRotateY <= topLeft[1] + threshold + strokeWidth
+  ) {
+    return true;
+  }
+
+  // Right stroke
+  if (
+    counterRotateX >= topRight[0] - threshold - strokeWidth &&
+    counterRotateX <= topRight[0] + threshold &&
+    counterRotateY >= topRight[1] - threshold &&
+    counterRotateY <= bottomRight[1] + threshold
+  ) {
+    return true;
+  }
+
+  // Bottom Stroke
+  if (
+    counterRotateX >= bottomLeft[0] - threshold &&
+    counterRotateX <= bottomRight[0] + threshold &&
+    counterRotateY >= bottomLeft[1] - threshold - strokeWidth &&
+    counterRotateY <= bottomLeft[1] + threshold
+  ) {
+    return true;
+  }
+  return false;
 };

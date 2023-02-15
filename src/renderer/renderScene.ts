@@ -37,7 +37,10 @@ import {
   getSelectedGroupIds,
   getElementsInGroup,
 } from "../groups";
-import { maxBindingGap } from "../element/collision";
+import {
+  isHittingElementNotConsideringBoundingBox,
+  maxBindingGap,
+} from "../element/collision";
 import {
   SuggestedBinding,
   SuggestedPointBinding,
@@ -60,6 +63,8 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
+import { rotatePoint } from "../math";
+import { isHittingContainerStroke } from "../element/textElement";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -407,9 +412,44 @@ export const _renderScene = ({
 
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
+    let idx = -1;
     visibleElements.forEach((element) => {
+      idx++;
       try {
+        const useProdAlgo = idx % 2 === 0;
+        context.fillStyle = useProdAlgo ? "lime" : "red";
+        const padding = 40 / renderConfig.zoom.value;
+        const bounds = getCommonBounds([element]);
+        const box = [
+          bounds[0] + renderConfig.scrollX,
+          bounds[1] + renderConfig.scrollY,
+          bounds[2] + renderConfig.scrollX,
+          bounds[3] + renderConfig.scrollY,
+        ];
+        for (let x = box[0] - padding; x < box[2] + padding; x++) {
+          for (let y = box[1] - padding; y < box[3] + padding; y++) {
+            const sceneX = x - renderConfig.scrollX;
+            const sceneY = y - renderConfig.scrollY;
+            if (
+              useProdAlgo
+                ? isHittingElementNotConsideringBoundingBox(element, appState, [
+                    sceneX,
+                    sceneY,
+                  ])
+                : isHittingContainerStroke(
+                    sceneX,
+                    sceneY,
+                    // @ts-ignore
+                    element,
+                    renderConfig.zoom.value,
+                  )
+            ) {
+              context.fillRect(x, y, 1, 1);
+            }
+          }
+        }
         renderElement(element, rc, context, renderConfig, appState);
+
         // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
         // ShapeCache returns empty hence making sure that we get the
         // correct element from visible elements
