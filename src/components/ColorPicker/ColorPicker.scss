@@ -15,8 +15,9 @@
 
   .color-picker-container {
     display: grid;
-    grid-template-columns: 1fr 20px 1.35rem;
+    grid-template-columns: 1fr 20px 1.625rem;
     padding: 0.5rem 2px;
+    align-items: center;
 
     @include isMobile {
       max-width: 175px;
@@ -96,6 +97,12 @@
       &:focus-visible {
         outline: none !important;
       }
+    }
+
+    &.active-color {
+      border-radius: 50%;
+      width: 1.625rem;
+      height: 1.625rem;
     }
   }
 

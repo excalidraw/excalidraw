@@ -91,7 +91,7 @@ export const ColorPicker = ({
             updateData({ openPopup: open ? type : null });
           }}
         >
-          <ActiveColor color={color} label={label} />
+          <ActiveColor color={color} label={label} type={type} />
 
           <Popover.Portal container={container}>
             <Popover.Content
