@@ -121,22 +121,20 @@ export const Picker = ({
       >
         {!!customColors.length && (
           <div>
-            {/* TODO color picker redesign */}
-            {/* add i18n label instead of hardcoded text */}
-            <PickerHeading>Most used custom colors</PickerHeading>
+            <PickerHeading>
+              {t("colorPicker.mostUsedCustomColors")}
+            </PickerHeading>
             <CustomColorList
               colors={customColors}
               color={color}
-              label="Most used custom colors"
+              label={t("colorPicker.mostUsedCustomColors")}
               onChange={onChange}
             />
           </div>
         )}
 
         <div>
-          {/* TODO color picker redesign */}
-          {/* add i18n label instead of hardcoded text */}
-          <PickerHeading>Colors</PickerHeading>
+          <PickerHeading>{t("colorPicker.colors")}</PickerHeading>
           <PickerColorList
             color={color}
             label={label}
@@ -147,17 +145,13 @@ export const Picker = ({
         </div>
 
         <div>
-          {/* TODO color picker redesign */}
-          {/* add i18n label instead of hardcoded text */}
-          <PickerHeading>Shades</PickerHeading>
+          <PickerHeading>{t("colorPicker.shades")}</PickerHeading>
           <ShadeList hex={color} onChange={onChange} palette={palette} />
         </div>
 
         {showInput && (
           <div>
-            {/* TODO color picker redesign */}
-            {/* add i18n label instead of hardcoded text */}
-            <PickerHeading>Hex code</PickerHeading>
+            <PickerHeading>{t("colorPicker.hexCode")}</PickerHeading>
             <ColorInput
               color={color}
               label={label}

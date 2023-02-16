@@ -7,6 +7,7 @@ import {
   getColorNameAndShadeFromHex,
 } from "./colorPickerUtils";
 import HotkeyLabel from "./HotkeyLabel";
+import { t } from "../../i18n";
 
 interface ShadeListProps {
   hex: string | null;
@@ -97,9 +98,7 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
           fontSize: "0.75rem",
         }}
       >
-        {/* TODO color picker redesign */}
-        {/* add i18n label instead of hardcoded text */}
-        no shades available for this color
+        {t("colorPicker.noShades")}
       </div>
     </div>
   );
