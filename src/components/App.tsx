@@ -2762,7 +2762,15 @@ class App extends React.Component<AppProps, AppState> {
         sceneX,
         sceneY,
       );
+      console.log("contaienr", container);
       if (container) {
+        console.log(
+          isHittingElementNotConsideringBoundingBox(container, this.state, [
+            sceneX,
+            sceneY,
+          ]),
+          "HELLOO",
+        );
         if (
           isArrowElement(container) ||
           hasBoundTextElement(container) ||
