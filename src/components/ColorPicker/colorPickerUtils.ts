@@ -126,14 +126,14 @@ export const getMostUsedCustomColors = (
     .slice(0, MAX_CUSTOM_COLORS);
 };
 
-export type activeColorPickerSectionAtomType =
+export type ActiveColorPickerSectionAtomType =
   | "custom"
   | "default"
   | "shades"
   | "hex"
   | null;
 export const activeColorPickerSectionAtom =
-  atom<activeColorPickerSectionAtomType>(null);
+  atom<ActiveColorPickerSectionAtomType>(null);
 
 const calculateContrast = (r: number, g: number, b: number) => {
   const yiq = (r * 299 + g * 587 + b * 114) / 1000;

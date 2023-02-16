@@ -1,7 +1,7 @@
 import {
   COLOR_PER_ROW,
   Palette,
-  activeColorPickerSectionAtomType,
+  ActiveColorPickerSectionAtomType,
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromHex,
 } from "./colorPickerUtils";
@@ -44,7 +44,7 @@ interface HotkeyHandlerProps {
   palette: Palette;
   customColors: string[];
   setActiveColorPickerSection: (
-    update: React.SetStateAction<activeColorPickerSectionAtomType>,
+    update: React.SetStateAction<ActiveColorPickerSectionAtomType>,
   ) => void;
   activeShade: number;
 }
@@ -92,13 +92,13 @@ const hotkeyHandler = ({
 
 interface ColorPickerKeyNavHandlerProps {
   e: React.KeyboardEvent;
-  activeColorPickerSection: activeColorPickerSectionAtomType;
+  activeColorPickerSection: ActiveColorPickerSectionAtomType;
   palette: Palette;
   hex: string | null;
   onChange: (color: string) => void;
   customColors: string[];
   setActiveColorPickerSection: (
-    update: React.SetStateAction<activeColorPickerSectionAtomType>,
+    update: React.SetStateAction<ActiveColorPickerSectionAtomType>,
   ) => void;
   updateData: (formData?: any) => void;
   activeShade: number;
@@ -121,6 +121,49 @@ export const colorPickerKeyNavHandler = ({
   }
 
   const colorObj = getColorNameAndShadeFromHex({ hex, palette });
+
+  if (e.key === "Tab") {
+    const sectionsMap = {
+      custom: !!customColors.length,
+      default: true,
+      shades: !!(colorObj && colorObj.shade >= 0),
+      hex: true,
+    };
+
+    const sections = Object.entries(sectionsMap).reduce((acc, [key, value]) => {
+      if (value) {
+        acc.push(key as ActiveColorPickerSectionAtomType);
+      }
+      return acc;
+    }, [] as ActiveColorPickerSectionAtomType[]);
+
+    const activeSectionIndex = sections.indexOf(activeColorPickerSection);
+    const nextSectionIndex = (activeSectionIndex + 1) % sections.length;
+    const nextSection = sections[nextSectionIndex];
+
+    if (nextSection) {
+      setActiveColorPickerSection(nextSection);
+    }
+
+    if (nextSection === "custom") {
+      onChange(customColors[0]);
+    } else if (
+      activeColorPickerSection === "custom" ||
+      activeColorPickerSection === "hex"
+    ) {
+      const keys = Object.keys(palette);
+      const firstColor = palette[keys[0]];
+
+      onChange(
+        Array.isArray(firstColor) ? firstColor[activeShade] : firstColor,
+      );
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    return;
+  }
 
   hotkeyHandler({
     e,

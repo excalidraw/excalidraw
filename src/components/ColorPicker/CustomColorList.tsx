@@ -46,9 +46,6 @@ export const CustomColorList = ({
               onChange(c);
               setActiveColorPickerSection("custom");
             }}
-            onFocus={() => {
-              setActiveColorPickerSection("custom");
-            }}
             title={c}
             aria-label={label}
             style={{ "--swatch-color": c }}

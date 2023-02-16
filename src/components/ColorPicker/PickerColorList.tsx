@@ -62,9 +62,6 @@ const PickerColorList = ({
               onChange(color);
               setActiveColorPickerSection("default");
             }}
-            onFocus={() => {
-              setActiveColorPickerSection("default");
-            }}
             title={`${label} — ${key}`}
             aria-label={label}
             style={color ? { "--swatch-color": color } : undefined}
