@@ -124,7 +124,7 @@ export const colorPickerKeyNavHandler = ({
 
   if (e.key === "Tab") {
     const sectionsMap: Record<
-      Exclude<ActiveColorPickerSectionAtomType, null>,
+      NonNullable<ActiveColorPickerSectionAtomType>,
       boolean
     > = {
       custom: !!customColors.length,
