@@ -631,7 +631,7 @@ export const resizeMultipleElements = (
   };
 
   // anchor point must be on the opposite side of the dragged selection handle
-  // or be the center of the selection if alt is pressed
+  // or be the center of the selection if shouldResizeFromCenter
   const [anchorX, anchorY]: Point = shouldResizeFromCenter
     ? [midX, midY]
     : mapDirectionsToAnchors[direction];
@@ -707,23 +707,10 @@ export const resizeMultipleElements = (
       ...rescaledPoints,
     };
 
-    // don't flip text vertically
-    // flip a single image horizontally & vertically (angle & content)
-    // flip images in a multiple selection - only horizontally (angle)
-    // currently linear & free draw elements are not rotated
-    if (
-      isFlippedByY &&
-      !isTextElement(element) &&
-      !(isImageElement(element) && targetElements.length > 1) &&
-      !isLinearOrFreeDraw
-    ) {
-      update.angle = normalizeAngle(Math.PI + angle);
-    }
-
     if (isImageElement(element) && targetElements.length === 1) {
       update.scale = [
-        (element.scale[0] * flipFactorX * flipFactorY) as -1 | 1,
-        1,
+        (element.scale[0] * flipFactorX) as -1 | 1,
+        (element.scale[1] * flipFactorY) as -1 | 1,
       ];
     }
 
@@ -744,7 +731,7 @@ export const resizeMultipleElements = (
       );
 
       if (!textMeasurements) {
-        return;
+        return; // FIXME
       }
 
       if (isTextElement(element)) {
@@ -758,7 +745,7 @@ export const resizeMultipleElements = (
           boundTextUpdates = { angle, fontSize, baseline };
         } else {
           boundTextUpdates = {
-            angle: update.angle,
+            angle,
             fontSize: textMeasurements.size,
             baseline: textMeasurements.baseline,
           };
