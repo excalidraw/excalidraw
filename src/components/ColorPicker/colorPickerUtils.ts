@@ -177,3 +177,8 @@ export const getContrastYIQ = (bgHex: string, isCustomColor: boolean) => {
 
   return calculateContrast(r, g, b);
 };
+
+export type ColorPickerType =
+  | "canvasBackground"
+  | "elementBackground"
+  | "elementStroke";

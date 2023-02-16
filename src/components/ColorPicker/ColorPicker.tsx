@@ -13,6 +13,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { useAtom } from "jotai";
 import {
   activeColorPickerSectionAtom,
+  ColorPickerType,
   ColorTuple,
   ocPalette,
   Palette,
@@ -41,7 +42,7 @@ export const getColor = (color: string): string | null => {
 };
 
 export interface ColorPickerProps {
-  type: "canvasBackground" | "elementBackground" | "elementStroke";
+  type: ColorPickerType;
   color: string | null;
   onChange: (color: string) => void;
   label: string;

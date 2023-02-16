@@ -11,6 +11,7 @@ import { CustomColorList } from "./CustomColorList";
 import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
 import PickerHeading from "./PickerHeading";
 import {
+  ColorPickerType,
   DEFAULT_SHADE_INDEXES,
   Palette,
   activeColorPickerSectionAtom,
@@ -25,7 +26,7 @@ interface PickerProps {
   onChange: (color: string) => void;
   label: string;
   showInput: boolean;
-  type: "canvasBackground" | "elementBackground" | "elementStroke";
+  type: ColorPickerType;
   elements: readonly ExcalidrawElement[];
   palette: Palette;
   updateData: (formData?: any) => void;

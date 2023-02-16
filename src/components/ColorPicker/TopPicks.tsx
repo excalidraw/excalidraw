@@ -1,9 +1,14 @@
 import clsx from "clsx";
-import { bgTopPicks, strokeTopPicks, canvasTopPicks } from "./colorPickerUtils";
+import {
+  bgTopPicks,
+  strokeTopPicks,
+  canvasTopPicks,
+  ColorPickerType,
+} from "./colorPickerUtils";
 
 interface TopPicksProps {
   onChange: (color: string) => void;
-  type: "elementBackground" | "elementStroke" | "canvasBackground";
+  type: ColorPickerType;
   activeColor: string | null;
   topPicks?: string[];
 }

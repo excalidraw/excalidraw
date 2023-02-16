@@ -1,11 +1,12 @@
 import clsx from "clsx";
 import * as Popover from "@radix-ui/react-popover";
 import { t } from "../../i18n";
+import { ColorPickerType } from "./colorPickerUtils";
 
 interface ActiveColorProps {
   color: string | null;
   label: string;
-  type: "canvasBackground" | "elementBackground" | "elementStroke";
+  type: ColorPickerType;
 }
 
 const ActiveColor = ({ label, color, type }: ActiveColorProps) => {
