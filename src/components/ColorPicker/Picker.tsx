@@ -60,9 +60,14 @@ export const Picker = ({
   useEffect(() => {
     if (!activeColorPickerSection) {
       const hasShade = colorObj && colorObj.shade >= 0;
+      const isCustom = isCustomColor({ color, palette });
+      const isCustomButNotInList =
+        isCustom && !customColors.includes(color || "");
 
       setActiveColorPickerSection(
-        isCustomColor({ color, palette })
+        isCustomButNotInList
+          ? "hex"
+          : isCustom
           ? "custom"
           : hasShade
           ? "shades"
@@ -75,6 +80,7 @@ export const Picker = ({
     palette,
     setActiveColorPickerSection,
     colorObj,
+    customColors,
   ]);
 
   const initialShade =
