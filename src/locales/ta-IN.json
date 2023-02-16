@@ -54,7 +54,7 @@
     "veryLarge": "மிகப் பெரிய",
     "solid": "திடமான",
     "hachure": "மலைக்குறிக்கோடு",
-    "crossHatch": "",
+    "crossHatch": "குறுக்குகதவு",
     "thin": "மெல்லிய",
     "bold": "பட்டை",
     "left": "இடது",
@@ -72,7 +72,7 @@
     "layers": "அடுக்குகள்",
     "actions": "செயல்கள்",
     "language": "மொழி",
-    "liveCollaboration": "",
+    "liveCollaboration": "நேரடி கூட்டுப்பணி...",
     "duplicateSelection": "நகலாக்கு",
     "untitled": "தலைப்பற்றது",
     "name": "பெயர்",
@@ -116,7 +116,7 @@
       "label": "தொடுப்பு"
     },
     "lineEditor": {
-      "edit": "",
+      "edit": "தொடுப்பைத் திருத்து",
       "exit": ""
     },
     "elementLock": {
@@ -137,7 +137,7 @@
     "clearReset": "கித்தானை அகரமாக்கு",
     "exportJSON": "கோப்புக்கு ஏற்றுமதிசெய்",
     "exportImage": "",
-    "export": "",
+    "export": "இதில் சேமி...",
     "exportToPng": "PNGக்கு ஏற்றுமதிசெய்",
     "exportToSvg": "SVGக்கு ஏற்றுமதிசெய்",
     "copyToClipboard": "நகலகத்திற்கு நகலெடு",
@@ -145,7 +145,7 @@
     "scale": "அளவு",
     "save": "தற்போதைய கோப்புக்குச் சேமி",
     "saveAs": "இப்படி சேமி",
-    "load": "",
+    "load": "திற",
     "getShareableLink": "பகிரக்கூடிய தொடுப்பைப் பெறு",
     "close": "மூடு",
     "selectLanguage": "மொழியைத் தேர்ந்தெடு",
@@ -457,9 +457,9 @@
     },
     "defaults": {
       "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "center_heading": "எளிமையாக வரைபடங்கள் உருவாக்க!",
+      "toolbarHint": "கருவியைத் தேர்ந்தெடு & வரை!",
+      "helpHint": "குறுக்குவழிகள் & உதவி"
     }
   }
 }
