@@ -2765,8 +2765,8 @@ class App extends React.Component<AppProps, AppState> {
       if (container) {
         if (
           isArrowElement(container) ||
-          !isTransparent(container.backgroundColor) ||
           hasBoundTextElement(container) ||
+          !isTransparent(container.backgroundColor) ||
           isHittingElementNotConsideringBoundingBox(container, this.state, [
             sceneX,
             sceneY,
