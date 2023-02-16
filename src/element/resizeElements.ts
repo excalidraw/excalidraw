@@ -697,7 +697,7 @@ export const resizeMultipleElements = (
       points?: Point[];
       fontSize?: number;
       baseline?: number;
-      scale?: [-1 | 1, -1 | 1];
+      scale?: [number, number];
     } = {
       width,
       height,
@@ -709,56 +709,23 @@ export const resizeMultipleElements = (
 
     if (isImageElement(element) && targetElements.length === 1) {
       update.scale = [
-        (element.scale[0] * flipFactorX) as -1 | 1,
-        (element.scale[1] * flipFactorY) as -1 | 1,
+        element.scale[0] * flipFactorX,
+        element.scale[1] * flipFactorY,
       ];
     }
 
-    let boundTextUpdates: {
-      angle: number;
-      fontSize: number;
-      baseline: number;
-    } | null = null;
-
-    const boundTextElement = getBoundTextElement(latestElement);
-
-    if (boundTextElement || isTextElement(element)) {
-      const optionalPadding = getBoundTextElementOffset(boundTextElement) * 2;
-      const textMeasurements = measureFontSizeFromWH(
-        boundTextElement ?? (element as ExcalidrawTextElement),
-        width - optionalPadding,
-        height - optionalPadding,
-      );
-
-      if (!textMeasurements) {
-        return; // FIXME
-      }
-
-      if (isTextElement(element)) {
-        update.fontSize = textMeasurements.size;
-        update.baseline = textMeasurements.baseline;
-      }
-
-      if (boundTextElement) {
-        if (isArrowElement(element)) {
-          const { angle, fontSize, baseline } = boundTextElement;
-          boundTextUpdates = { angle, fontSize, baseline };
-        } else {
-          boundTextUpdates = {
-            angle,
-            fontSize: textMeasurements.size,
-            baseline: textMeasurements.baseline,
-          };
-        }
-      }
+    if (isTextElement(element)) {
+      const textMeasurements = measureFontSizeFromWH(element, width, height);
+      update.fontSize = textMeasurements?.size ?? element.fontSize;
+      update.baseline = textMeasurements?.baseline ?? element.baseline;
     }
 
     updateBoundElements(latestElement, { newSize: { width, height } });
-
     mutateElement(latestElement, update);
 
-    if (boundTextElement && boundTextUpdates) {
-      mutateElement(boundTextElement, boundTextUpdates);
+    const boundTextElement = getBoundTextElement(latestElement);
+    if (boundTextElement) {
+      mutateElement(boundTextElement, { angle });
       handleBindTextResize(latestElement, transformHandleType);
     }
   });
