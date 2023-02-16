@@ -226,6 +226,7 @@ import {
   setEraserCursor,
   updateActiveTool,
   getShortcutKey,
+  isTransparent,
 } from "../utils";
 import {
   ContextMenu,
@@ -264,6 +265,7 @@ import {
   getContainerCenter,
   getContainerDims,
   getTextBindableContainerAtPosition,
+  isHittingContainerStroke,
   isValidTextContainer,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
@@ -2762,7 +2764,19 @@ class App extends React.Component<AppProps, AppState> {
         sceneY,
       );
       if (container) {
-        if (isArrowElement(container) || hasBoundTextElement(container)) {
+        if (
+          isArrowElement(container) ||
+          hasBoundTextElement(container) ||
+          !isTransparent(
+            (container as ExcalidrawTextContainer).backgroundColor,
+          ) ||
+          isHittingContainerStroke(
+            sceneX,
+            sceneY,
+            container,
+            this.state.zoom.value,
+          )
+        ) {
           const midPoint = getContainerCenter(container, this.state);
 
           sceneX = midPoint.x;
