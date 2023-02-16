@@ -94,6 +94,31 @@ export const selectGroupsForSelectedElements = (
   return nextAppState;
 };
 
+// given a list of elements, return the the actual group ids that should be selected
+// or used to update the elements
+export const selectGroupsFromGivenElements = (
+  elements: readonly NonDeleted<ExcalidrawElement>[],
+  appState: AppState,
+) => {
+  let nextAppState: AppState = { ...appState, selectedGroupIds: {} };
+
+  for (const element of elements) {
+    let groupIds = element.groupIds;
+    if (appState.editingGroupId) {
+      const indexOfEditingGroup = groupIds.indexOf(appState.editingGroupId);
+      if (indexOfEditingGroup > -1) {
+        groupIds = groupIds.slice(0, indexOfEditingGroup);
+      }
+    }
+    if (groupIds.length > 0) {
+      const groupId = groupIds[groupIds.length - 1];
+      nextAppState = selectGroup(groupId, nextAppState, elements);
+    }
+  }
+
+  return nextAppState.selectedGroupIds;
+};
+
 export const editGroupForSelectedElement = (
   appState: AppState,
   element: NonDeleted<ExcalidrawElement>,

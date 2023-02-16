@@ -37,6 +37,7 @@ import {
   isSelectedViaGroup,
   getSelectedGroupIds,
   getElementsInGroup,
+  selectGroupsFromGivenElements,
 } from "../groups";
 import { maxBindingGap } from "../element/collision";
 import {
@@ -469,6 +470,7 @@ export const _renderScene = ({
         context,
         renderConfig,
         appState.elementsToHighlight,
+        appState,
       );
     }
 
@@ -1054,30 +1056,47 @@ const renderElementsBoxHighlight = (
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
   elements: NonDeleted<ExcalidrawElement>[],
+  appState: AppState,
 ) => {
-  elements.forEach((element) => {
-    context.strokeStyle = "rgb(0,118,255)";
-    context.lineWidth = FRAME_STYLE.strokeWidth * 2;
-    const padding = (element.strokeWidth / 2) * 1.5;
+  const individualElements = elements.filter(
+    (element) => element.groupIds.length === 0,
+  );
 
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    const width = x2 - x1 + padding * 2;
-    const height = y2 - y1 + padding * 2;
+  const elementsInGroups = elements.filter(
+    (element) => element.groupIds.length > 0,
+  );
 
-    context.save();
-    context.translate(renderConfig.scrollX, renderConfig.scrollY);
-    strokeRectWithRotation(
-      context,
-      x1 - padding,
-      y1 - padding,
-      width,
-      height,
-      x1 + width / 2,
-      y1 + height / 2,
-      element.angle,
+  const getSelectionFromElements = (elements: ExcalidrawElement[]) => {
+    const [elementX1, elementY1, elementX2, elementY2] =
+      getCommonBounds(elements);
+    return {
+      angle: 0,
+      elementX1,
+      elementX2,
+      elementY1,
+      elementY2,
+      selectionColors: ["rgb(0,118,255)"],
+      dashed: false,
+      cx: elementX1 + (elementX2 - elementX1) / 2,
+      cy: elementY1 + (elementY2 - elementY1) / 2,
+    };
+  };
+
+  const getSelectionForGroupId = (groupId: GroupId) => {
+    const groupElements = getElementsInGroup(elements, groupId);
+    return getSelectionFromElements(groupElements);
+  };
+
+  Object.entries(selectGroupsFromGivenElements(elementsInGroups, appState))
+    .filter(([id, isSelected]) => isSelected)
+    .map(([id, isSelected]) => id)
+    .map((groupId) => getSelectionForGroupId(groupId))
+    .concat(
+      individualElements.map((element) => getSelectionFromElements([element])),
+    )
+    .forEach((selection) =>
+      renderSelectionBorder(context, renderConfig, selection),
     );
-    context.restore();
-  });
 };
 
 const renderBindingHighlightForSuggestedPointBinding = (

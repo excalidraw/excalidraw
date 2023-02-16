@@ -109,6 +109,7 @@ import {
   textWysiwyg,
   transformElements,
   updateTextElement,
+  getElementAbsoluteCoords,
 } from "../element";
 import {
   bindOrUnbindLinearElement,
@@ -168,6 +169,7 @@ import {
   isElementInGroup,
   isSelectedViaGroup,
   selectGroupsForSelectedElements,
+  selectGroupsFromGivenElements,
 } from "../groups";
 import History from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
@@ -3696,17 +3698,26 @@ class App extends React.Component<AppProps, AppState> {
       this.redirectToLink(event, this.device.isTouchScreen);
     }
 
-    const selectedFrames = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    ).filter((element) => element.type === "frame") as ExcalidrawFrameElement[];
-
-    selectedFrames.forEach((frame) => {
-      // important to keep the calling orders in the manner :)
-      const nextElementsInFrame = this.getElementsInResizingFrame(frame);
-      this.scene.removeAllElementsFromFrame(frame, this.state);
-      this.scene.addElementsToFrame(nextElementsInFrame, frame);
-    });
+    if (this.state.draggingElement?.type === "frame") {
+      // the newly created element is a frame element
+      this.scene.addElementsToFrame(
+        this.getElementsInNewFrame(this.state.draggingElement),
+        this.state.draggingElement,
+      );
+    } else {
+      const selectedFrames = getSelectedElements(
+        this.scene.getNonDeletedElements(),
+        this.state,
+      ).filter(
+        (element) => element.type === "frame",
+      ) as ExcalidrawFrameElement[];
+      selectedFrames.forEach((frame) => {
+        // important to keep the calling orders in the manner :)
+        const nextElementsInFrame = this.getElementsInResizingFrame(frame);
+        this.scene.removeAllElementsFromFrame(frame, this.state);
+        this.scene.addElementsToFrame(nextElementsInFrame, frame);
+      });
+    }
 
     this.removePointer(event);
   };
@@ -6396,11 +6407,15 @@ class App extends React.Component<AppProps, AppState> {
 
       this.maybeSuggestBindingForAll([draggingElement]);
 
-      // add elements to frames on frames creation
+      // highlight elements that are to be added to frames on frames creation
       if (this.state.activeTool.type === "frame") {
-        this.addElementsToFrameOnCreation(
-          draggingElement as ExcalidrawFrameElement,
-        );
+        this.setState((prevState) => ({
+          elementsToHighlight: [
+            ...this.getElementsInResizingFrame(
+              draggingElement as ExcalidrawFrameElement,
+            ),
+          ],
+        }));
       }
     }
   };
@@ -6508,12 +6523,7 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         this.setState((prevState) => ({
-          elementsToHighlight: [
-            ...(prevState.elementsToHighlight?.filter(
-              (element) => element.frameId !== frame.id,
-            ) ?? []),
-            ...this.getElementsInResizingFrame(frame),
-          ],
+          elementsToHighlight: [...this.getElementsInResizingFrame(frame)],
         }));
       });
 
@@ -6522,39 +6532,7 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   };
 
-  private addElementsToFrameOnCreation(frame: ExcalidrawFrameElement) {
-    getElementsInFrame(
-      this.scene.getElementsIncludingDeleted(),
-      frame.id,
-    ).forEach((element) => {
-      mutateElement(element, {
-        frameId: null,
-      });
-    });
-
-    this.setState({
-      elementsToHighlight: [],
-    });
-
-    const elementsInFrame = getElementsWithinSelection(
-      this.scene.getNonDeletedElements(),
-      frame,
-    ).filter((element) => element.type !== "frame" && !element.frameId);
-
-    this.scene.addElementsToFrame(elementsInFrame, frame);
-    this.setState((prevState) => ({
-      elementsToHighlight: [
-        ...(prevState.elementsToHighlight ?? []),
-        ...elementsInFrame,
-      ],
-    }));
-  }
-
-  // return an array of elements that are considered to belong to the
-  // given frame as it get resized
-  private getElementsInResizingFrame(
-    frame: ExcalidrawFrameElement,
-  ): ExcalidrawElement[] {
+  private getElementsInNewFrame(frame: ExcalidrawElement): ExcalidrawElement[] {
     const elementsCompletelyInFrame = getElementsWithinSelection(
       this.scene.getNonDeletedElements(),
       frame,
@@ -6565,31 +6543,156 @@ class App extends React.Component<AppProps, AppState> {
         (!element.frameId || element.frameId === frame.id),
     );
 
-    const elementsCompletelyInFrameSet = new Set(elementsCompletelyInFrame);
+    const individualElements = elementsCompletelyInFrame.filter(
+      (element) => element.groupIds.length === 0,
+    );
+    const elementsToBeAddedSet = new Set<ExcalidrawElement>(individualElements);
 
+    // for elements that are completely in the frame
+    // if they are part of a group, then we add the elements to the frame
+    // only if their commond bounds is inside the frame
+    const groupElements = elementsCompletelyInFrame.filter(
+      (element) => element.groupIds.length > 0,
+    );
+
+    const groupIds = selectGroupsFromGivenElements(groupElements, this.state);
+
+    const [selectionX1, selectionY1, selectionX2, selectionY2] =
+      getElementAbsoluteCoords(frame);
+
+    Object.entries(groupIds).forEach(([id, isSelected]) => {
+      if (isSelected) {
+        const elementsInGroup = getElementsInGroup(
+          this.scene.getNonDeletedElements(),
+          id,
+        );
+        const [elementX1, elementY1, elementX2, elementY2] =
+          getCommonBounds(elementsInGroup);
+
+        if (
+          selectionX1 <= elementX1 &&
+          selectionY1 <= elementY1 &&
+          selectionX2 >= elementX2 &&
+          selectionY2 >= elementY2
+        ) {
+          elementsInGroup.forEach((element) => {
+            elementsToBeAddedSet.add(element);
+          });
+        }
+      }
+    });
+
+    return [...elementsToBeAddedSet];
+  }
+
+  // return an array of elements that are considered to belong to the
+  // given frame as it get resized
+  private getElementsInResizingFrame(
+    frame: ExcalidrawFrameElement,
+  ): ExcalidrawElement[] {
     const prevElementsInFrame = getElementsInFrame(
       this.scene.getNonDeletedElements(),
       frame.id,
     );
+    const nextElementsInFrame = new Set<ExcalidrawElement>(prevElementsInFrame);
 
-    const elementsToBeRemoved = prevElementsInFrame
-      .filter((element) => !elementsCompletelyInFrameSet.has(element))
-      .filter((element) => {
-        return !FrameGeometry.isElementIntersectingFrame(element, frame);
-      });
-
-    const elementsToBeRemovedSet = new Set(elementsToBeRemoved);
-
-    const nextElementsInFrame = [
-      ...elementsCompletelyInFrame,
-      ...prevElementsInFrame.filter(
+    const elementsCompletelyInFrame = new Set(
+      getElementsWithinSelection(
+        this.scene.getNonDeletedElements(),
+        frame,
+        false,
+      ).filter(
         (element) =>
-          !elementsToBeRemovedSet.has(element) &&
-          !elementsCompletelyInFrameSet.has(element),
+          element.type !== "frame" &&
+          (!element.frameId || element.frameId === frame.id),
       ),
-    ];
+    );
 
-    return nextElementsInFrame;
+    const elementsNotCompletelyInFrame = prevElementsInFrame.filter(
+      (element) => !elementsCompletelyInFrame.has(element),
+    );
+
+    // for elements that are completely in the frame
+    // if they are part of some groups, then those groups are still
+    // considered to belong to the frame
+    const groupsToKeep = new Set<string>(
+      Array.from(elementsCompletelyInFrame).flatMap(
+        (element) => element.groupIds,
+      ),
+    );
+
+    elementsNotCompletelyInFrame.forEach((element) => {
+      if (!FrameGeometry.isElementIntersectingFrame(element, frame)) {
+        if (element.groupIds.length === 0) {
+          nextElementsInFrame.delete(element);
+        }
+      } else if (element.groupIds.length > 0) {
+        // group element intersects with the frame, we should keep the groups
+        // that this element is part of
+        element.groupIds.forEach((id) => groupsToKeep.add(id));
+      }
+    });
+
+    elementsNotCompletelyInFrame.forEach((element) => {
+      if (element.groupIds.length > 0) {
+        let shouldRemoveElement = true;
+
+        element.groupIds.forEach((id) => {
+          if (groupsToKeep.has(id)) {
+            shouldRemoveElement = false;
+          }
+        });
+
+        if (shouldRemoveElement) {
+          nextElementsInFrame.delete(element);
+        }
+      }
+    });
+
+    const individualElementsCompletelyInFrame = Array.from(
+      elementsCompletelyInFrame,
+    ).filter((element) => element.groupIds.length === 0);
+
+    individualElementsCompletelyInFrame.forEach((element) =>
+      nextElementsInFrame.add(element),
+    );
+
+    const newGroupElementsCompletelyInFrame = Array.from(
+      elementsCompletelyInFrame,
+    ).filter((element) => element.groupIds.length > 0);
+
+    const groupIds = selectGroupsFromGivenElements(
+      newGroupElementsCompletelyInFrame,
+      this.state,
+    );
+
+    const [selectionX1, selectionY1, selectionX2, selectionY2] =
+      getElementAbsoluteCoords(frame);
+
+    // new group elements
+    Object.entries(groupIds).forEach(([id, isSelected]) => {
+      if (isSelected) {
+        const elementsInGroup = getElementsInGroup(
+          this.scene.getNonDeletedElements(),
+          id,
+        );
+        const [elementX1, elementY1, elementX2, elementY2] =
+          getCommonBounds(elementsInGroup);
+
+        if (
+          selectionX1 <= elementX1 &&
+          selectionY1 <= elementY1 &&
+          selectionX2 >= elementX2 &&
+          selectionY2 >= elementY2
+        ) {
+          elementsInGroup.forEach((element) => {
+            nextElementsInFrame.add(element);
+          });
+        }
+      }
+    });
+
+    return [...nextElementsInFrame];
   }
 
   private getContextMenuItems = (
