@@ -2770,12 +2770,10 @@ class App extends React.Component<AppProps, AppState> {
           !isTransparent(
             (container as ExcalidrawTextContainer).backgroundColor,
           ) ||
-          isHittingContainerStroke(
+          isHittingElementNotConsideringBoundingBox(container, this.state, [
             sceneX,
             sceneY,
-            container,
-            this.state.zoom.value,
-          )
+          ])
         ) {
           const midPoint = getContainerCenter(container, this.state);
 
