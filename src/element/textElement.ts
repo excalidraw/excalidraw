@@ -744,18 +744,19 @@ export const isHittingContainerStroke = (
   );
 
   const strokeWidth = container.strokeWidth;
+  const threshold = 10 / zoom;
+
   if (container.type === "ellipse") {
-    const threshold = 10 * zoom;
     const h = (topLeft[0] + topRight[0]) / 2;
     const k = (topLeft[1] + bottomLeft[1]) / 2;
-    let a = container.width / 2 + threshold;
-    let b = container.height / 2 + threshold;
+    let a = container.width / 2 + strokeWidth / 2 + threshold;
+    let b = container.height / 2 + strokeWidth / 2 + threshold;
     const checkPointOnOuterEllipse =
       Math.pow(counterRotateX - h, 2) / Math.pow(a, 2) +
       Math.pow(counterRotateY - k, 2) / Math.pow(b, 2);
 
-    a = container.width / 2 - strokeWidth - threshold;
-    b = container.height / 2 - strokeWidth - threshold;
+    a = container.width / 2 - strokeWidth / 2 - threshold;
+    b = container.height / 2 - strokeWidth / 2 - threshold;
 
     const checkPointOnInnerEllipse =
       Math.pow(counterRotateX - h, 2) / Math.pow(a, 2) +
@@ -772,12 +773,11 @@ export const isHittingContainerStroke = (
     }
     return false;
   }
-  const threshold = 10 / zoom;
 
   // Left Stroke
   if (
-    counterRotateX >= topLeft[0] - threshold &&
-    counterRotateX <= topLeft[0] + strokeWidth + threshold &&
+    counterRotateX >= topLeft[0] - strokeWidth / 2 - threshold &&
+    counterRotateX <= topLeft[0] + strokeWidth / 2 + threshold &&
     counterRotateY >= topLeft[1] - threshold &&
     counterRotateY <= bottomRight[1] + threshold
   ) {
@@ -787,16 +787,16 @@ export const isHittingContainerStroke = (
   if (
     counterRotateX >= topLeft[0] - threshold &&
     counterRotateX <= topRight[0] + threshold &&
-    counterRotateY >= topLeft[1] - threshold &&
-    counterRotateY <= topLeft[1] + threshold + strokeWidth
+    counterRotateY >= topLeft[1] - threshold - strokeWidth / 2 &&
+    counterRotateY <= topLeft[1] + threshold + strokeWidth / 2
   ) {
     return true;
   }
 
   // Right stroke
   if (
-    counterRotateX >= topRight[0] - threshold - strokeWidth &&
-    counterRotateX <= topRight[0] + threshold &&
+    counterRotateX >= topRight[0] - threshold - strokeWidth / 2 &&
+    counterRotateX <= topRight[0] + threshold + strokeWidth / 2 &&
     counterRotateY >= topRight[1] - threshold &&
     counterRotateY <= bottomRight[1] + threshold
   ) {
@@ -807,8 +807,8 @@ export const isHittingContainerStroke = (
   if (
     counterRotateX >= bottomLeft[0] - threshold &&
     counterRotateX <= bottomRight[0] + threshold &&
-    counterRotateY >= bottomLeft[1] - threshold - strokeWidth &&
-    counterRotateY <= bottomLeft[1] + threshold
+    counterRotateY >= bottomLeft[1] - threshold - strokeWidth / 2 &&
+    counterRotateY <= bottomLeft[1] + threshold + strokeWidth / 2
   ) {
     return true;
   }
