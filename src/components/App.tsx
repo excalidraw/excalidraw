@@ -2766,11 +2766,11 @@ class App extends React.Component<AppProps, AppState> {
         if (
           isArrowElement(container) ||
           !isTransparent(container.backgroundColor) ||
+          hasBoundTextElement(container) ||
           isHittingElementNotConsideringBoundingBox(container, this.state, [
             sceneX,
             sceneY,
-          ]) ||
-          hasBoundTextElement(container)
+          ])
         ) {
           const midPoint = getContainerCenter(container, this.state);
 
