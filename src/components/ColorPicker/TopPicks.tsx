@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { bgTopPicks, strokeTopPicks } from "./colorPickerUtils";
+import { bgTopPicks, strokeTopPicks, canvasTopPicks } from "./colorPickerUtils";
 
 interface TopPicksProps {
   onChange: (color: string) => void;
@@ -18,7 +18,9 @@ export const TopPicks = ({
     ? topPicks
     : type === "elementStroke"
     ? strokeTopPicks
-    : bgTopPicks;
+    : type === "elementBackground"
+    ? bgTopPicks
+    : canvasTopPicks;
 
   return (
     <div className="color-picker__top-picks">

@@ -64,12 +64,19 @@ export const strokeTopPicks = [
   ocPalette.orange[DEFAULT_SHADE_INDEXES.elementStroke],
 ] as ColorTuple;
 export const bgTopPicks = [
-  ocPalette.gray[DEFAULT_SHADE_INDEXES.elementBackground],
+  "transparent",
   ocPalette.red[DEFAULT_SHADE_INDEXES.elementBackground],
   ocPalette.green[DEFAULT_SHADE_INDEXES.elementBackground],
   ocPalette.blue[DEFAULT_SHADE_INDEXES.elementBackground],
   ocPalette.orange[DEFAULT_SHADE_INDEXES.elementBackground],
 ] as ColorTuple;
+export const canvasTopPicks = [
+  "white",
+  ocPalette.gray[0],
+  "gray",
+  ocPalette.blue[0],
+  ocPalette.yellow[0],
+];
 
 export const MAX_CUSTOM_COLORS = 5;
 export const COLOR_PER_ROW = 5;
