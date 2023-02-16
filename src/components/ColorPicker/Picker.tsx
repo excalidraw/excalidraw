@@ -71,7 +71,7 @@ export const Picker = ({
           ? "custom"
           : hasShade
           ? "shades"
-          : "default",
+          : "baseColors",
       );
     }
   }, [

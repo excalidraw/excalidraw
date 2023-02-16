@@ -35,7 +35,7 @@ const PickerColorList = ({
   const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (btnRef.current && activeColorPickerSection === "default") {
+    if (btnRef.current && activeColorPickerSection === "baseColors") {
       btnRef.current.focus();
     }
   }, [colorObj?.colorName, activeColorPickerSection]);
@@ -60,7 +60,7 @@ const PickerColorList = ({
             )}
             onClick={() => {
               onChange(color);
-              setActiveColorPickerSection("default");
+              setActiveColorPickerSection("baseColors");
             }}
             title={`${label} — ${key}`}
             aria-label={label}

@@ -86,7 +86,7 @@ const hotkeyHandler = ({
       ? paletteValue[activeShade]
       : paletteValue;
     onChange(r);
-    setActiveColorPickerSection("default");
+    setActiveColorPickerSection("baseColors");
   }
 };
 
@@ -123,9 +123,12 @@ export const colorPickerKeyNavHandler = ({
   const colorObj = getColorNameAndShadeFromHex({ hex, palette });
 
   if (e.key === "Tab") {
-    const sectionsMap = {
+    const sectionsMap: Record<
+      Exclude<ActiveColorPickerSectionAtomType, null>,
+      boolean
+    > = {
       custom: !!customColors.length,
-      default: true,
+      baseColors: true,
       shades: !!(colorObj && colorObj.shade >= 0),
       hex: true,
     };
@@ -186,7 +189,7 @@ export const colorPickerKeyNavHandler = ({
     }
   }
 
-  if (activeColorPickerSection === "default") {
+  if (activeColorPickerSection === "baseColors") {
     if (colorObj) {
       const { colorName } = colorObj;
       const colorNames = Object.keys(palette);

@@ -128,7 +128,7 @@ export const getMostUsedCustomColors = (
 
 export type ActiveColorPickerSectionAtomType =
   | "custom"
-  | "default"
+  | "baseColors"
   | "shades"
   | "hex"
   | null;
