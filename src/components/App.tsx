@@ -265,7 +265,6 @@ import {
   getContainerCenter,
   getContainerDims,
   getTextBindableContainerAtPosition,
-  isHittingContainerStroke,
   isValidTextContainer,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";

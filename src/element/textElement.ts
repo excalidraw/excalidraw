@@ -11,7 +11,7 @@ import { mutateElement } from "./mutateElement";
 import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
-import { getElementBounds, isTextElement } from ".";
+import { isTextElement } from ".";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import {
   isBoundToContainer,
@@ -722,63 +722,4 @@ export const isValidTextContainer = (element: ExcalidrawElement) => {
     isImageElement(element) ||
     isArrowElement(element)
   );
-};
-
-export const isHittingContainerStroke = (
-  x: number,
-  y: number,
-  container: ExcalidrawTextContainer,
-  zoom: number,
-) => {
-  const threshold = 10 / zoom;
-  const bounds = getElementBounds(container);
-  const topLeft = [bounds[0], bounds[1]];
-  const topRight = [bounds[2], bounds[1]];
-  const bottomLeft = [bounds[0], bounds[3]];
-  const bottomRight = [bounds[2], bounds[3]];
-
-  const strokeWidth = container.strokeWidth;
-  if (container.type === "ellipse") {
-    return false;
-  }
-
-  // Left Stroke
-  if (
-    x >= topLeft[0] - threshold &&
-    x <= topLeft[0] + strokeWidth + threshold &&
-    y >= topLeft[1] - threshold &&
-    y <= bottomRight[1] + threshold
-  ) {
-    return true;
-  }
-  // Top stroke
-  if (
-    x >= topLeft[0] - threshold &&
-    x <= topRight[0] + threshold &&
-    y >= topLeft[1] - threshold &&
-    y <= topLeft[1] + threshold + strokeWidth
-  ) {
-    return true;
-  }
-
-  // Right stroke
-  if (
-    x >= topRight[0] - threshold - strokeWidth &&
-    x <= topRight[0] + threshold &&
-    y >= topRight[1] - threshold &&
-    y <= bottomRight[1] + threshold
-  ) {
-    return true;
-  }
-
-  // Bottom Stroke
-  if (
-    x >= bottomLeft[0] - threshold &&
-    x <= bottomRight[0] + threshold &&
-    y >= bottomLeft[1] - threshold - strokeWidth &&
-    y <= bottomLeft[1] + threshold
-  ) {
-    return true;
-  }
-  return false;
 };
