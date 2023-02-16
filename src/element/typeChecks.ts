@@ -137,7 +137,7 @@ export const isExcalidrawElement = (element: any): boolean => {
 
 export const hasBoundTextElement = (
   element: ExcalidrawElement | null,
-): element is ExcalidrawBindableElement => {
+): element is MarkNonNullable<ExcalidrawBindableElement, "boundElements"> => {
   return (
     isBindableElement(element) &&
     !!element.boundElements?.some(({ type }) => type === "text")
