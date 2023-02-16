@@ -638,15 +638,15 @@ export const resizeMultipleElements = (
 
   const scale =
     Math.max(
-      Math.abs(pointerX - anchorX) / (maxX - minX),
-      Math.abs(pointerY - anchorY) / (maxY - minY),
+      Math.abs(pointerX - anchorX) / (maxX - minX) || 0,
+      Math.abs(pointerY - anchorY) / (maxY - minY) || 0,
     ) * (shouldResizeFromCenter ? 2 : 1);
 
   if (scale === 0) {
     return;
   }
 
-  const mapDirectionsToFlipConditions: Record<
+  const mapDirectionsToPointerPositions: Record<
     typeof direction,
     [x: boolean, y: boolean]
   > = {
@@ -659,9 +659,9 @@ export const resizeMultipleElements = (
   // to flip an element:
   // 1. mirror x,y relative to the anchor over the x/y/both axis (flipFactor)
   // 2. shift by the width/height/both (flipAdjust) or mirror points in case of
-  //    linear/free draw element (hasPoints)
+  //    linear/free draw element
   // 3. adjust the angle
-  const [flipFactorX, flipFactorY] = mapDirectionsToFlipConditions[
+  const [flipFactorX, flipFactorY] = mapDirectionsToPointerPositions[
     direction
   ].map((condition) => (condition ? 1 : -1));
   const isFlippedByX = flipFactorX < 0;
@@ -681,8 +681,6 @@ export const resizeMultipleElements = (
     const x = anchorX + flipFactorX * (offsetX * scale + flipAdjustX);
     const y = anchorY + flipFactorY * (offsetY * scale + flipAdjustY);
 
-    // TODO curved lines adjustment
-    // readjust points for linear & free draw elements
     const rescaledPoints = rescalePointsInElement(
       element,
       width * flipFactorX,
@@ -735,7 +733,7 @@ export const resizeMultipleElements = (
       baseline: number;
     } | null = null;
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(latestElement);
 
     if (boundTextElement || isTextElement(element)) {
       const optionalPadding = getBoundTextElementOffset(boundTextElement) * 2;
@@ -755,11 +753,16 @@ export const resizeMultipleElements = (
       }
 
       if (boundTextElement) {
-        boundTextUpdates = {
-          angle,
-          fontSize: textMeasurements.size,
-          baseline: textMeasurements.baseline,
-        };
+        if (isArrowElement(element)) {
+          const { angle, fontSize, baseline } = boundTextElement;
+          boundTextUpdates = { angle, fontSize, baseline };
+        } else {
+          boundTextUpdates = {
+            angle: update.angle,
+            fontSize: textMeasurements.size,
+            baseline: textMeasurements.baseline,
+          };
+        }
       }
     }
 
