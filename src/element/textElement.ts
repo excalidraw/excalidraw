@@ -245,7 +245,6 @@ const updateBoundTextPosition = (
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
   const containerCoords = getContainerCoords(container);
-  const containerDims = getContainerDims(container);
   const maxContainerHeight = getMaxContainerHeight(container);
   const maxContainerWidth = getMaxContainerWidth(container);
   const padding = container.type === "ellipse" ? 0 : BOUND_TEXT_PADDING;
@@ -638,8 +637,10 @@ export const getContainerCenter = (
 
 export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
   if (container.type === "ellipse") {
-    const offsetX = (container.width / 2) * (1 - Math.sqrt(2) / 2);
-    const offsetY = (container.height / 2) * (1 - Math.sqrt(2) / 2);
+    const offsetX =
+      (container.width / 2) * (1 - Math.sqrt(2) / 2) + BOUND_TEXT_PADDING;
+    const offsetY =
+      (container.height / 2) * (1 - Math.sqrt(2) / 2) + BOUND_TEXT_PADDING;
     return {
       x: container.x + offsetX,
       y: container.y + offsetY,

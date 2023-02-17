@@ -231,11 +231,12 @@ export const textWysiwyg = ({
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
         else {
-          const containerCoords = getContainerCoords(container);
           const padding =
             container.type === "ellipse"
               ? 0
               : getBoundTextElementOffset(updatedTextElement);
+          const containerCoords = getContainerCoords(container);
+
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
             if (!isArrowElement(container)) {
