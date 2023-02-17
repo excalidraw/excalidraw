@@ -315,18 +315,6 @@ export const getMaxContainerHeight = (container: ExcalidrawElement) => {
   return height - BOUND_TEXT_PADDING * 2;
 };
 
-export const computeContainerHeightForBoundText = (
-  container: NonDeletedExcalidrawElement,
-  boundTextElementHeight: number,
-) => {
-  if (container.type === "ellipse") {
-    return Math.round((boundTextElementHeight / Math.sqrt(2)) * 2);
-  }
-  if (isArrowElement(container)) {
-    return boundTextElementHeight + BOUND_TEXT_PADDING * 8 * 2;
-  }
-  return boundTextElementHeight + BOUND_TEXT_PADDING * 2;
-};
 
 export const updateTextElement = (
   textElement: ExcalidrawTextElement,
