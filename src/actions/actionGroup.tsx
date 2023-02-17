@@ -95,6 +95,8 @@ export const actionGroup = register({
       }
     }
 
+    let nextElements = [...elements];
+
     // this includes the case where we are grouping elements inside a frame
     // and elements outside that frame
     const groupingElementsFromDifferentFrames =
@@ -106,14 +108,18 @@ export const actionGroup = register({
         getFrameElementsMapFromElements(selectedElements);
 
       frameElementsMap.forEach((elementsInFrame, frameId) => {
-        elements = removeElementsFromFrame(elements, elementsInFrame, appState);
+        nextElements = removeElementsFromFrame(
+          nextElements,
+          elementsInFrame,
+          appState,
+        );
       });
     }
 
     const newGroupId = randomId();
     const selectElementIds = arrayToMap(selectedElements);
 
-    const updatedElements = elements.map((element) => {
+    nextElements = nextElements.map((element) => {
       if (!selectElementIds.get(element.id)) {
         return element;
       }
@@ -127,17 +133,16 @@ export const actionGroup = register({
     });
     // keep the z order within the group the same, but move them
     // to the z order of the highest element in the layer stack
-    const elementsInGroup = getElementsInGroup(updatedElements, newGroupId);
+    const elementsInGroup = getElementsInGroup(nextElements, newGroupId);
     const lastElementInGroup = elementsInGroup[elementsInGroup.length - 1];
-    const lastGroupElementIndex =
-      updatedElements.lastIndexOf(lastElementInGroup);
-    const elementsAfterGroup = updatedElements.slice(lastGroupElementIndex + 1);
-    const elementsBeforeGroup = updatedElements
+    const lastGroupElementIndex = nextElements.lastIndexOf(lastElementInGroup);
+    const elementsAfterGroup = nextElements.slice(lastGroupElementIndex + 1);
+    const elementsBeforeGroup = nextElements
       .slice(0, lastGroupElementIndex)
       .filter(
         (updatedElement) => !isElementInGroup(updatedElement, newGroupId),
       );
-    const updatedElementsInOrder = [
+    nextElements = [
       ...elementsBeforeGroup,
       ...elementsInGroup,
       ...elementsAfterGroup,
@@ -147,9 +152,9 @@ export const actionGroup = register({
       appState: selectGroup(
         newGroupId,
         { ...appState, selectedGroupIds: {} },
-        getNonDeletedElements(updatedElementsInOrder),
+        getNonDeletedElements(nextElements),
       ),
-      elements: updatedElementsInOrder,
+      elements: nextElements,
       commitToHistory: true,
     };
   },
