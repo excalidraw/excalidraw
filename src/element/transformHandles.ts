@@ -10,6 +10,7 @@ import { AppState, Zoom } from "../types";
 import { isTextElement } from ".";
 import { isLinearElement } from "./typeChecks";
 import { DEFAULT_SPACING } from "../renderer/renderScene";
+import { isSnapped, Snap } from "../snapping";
 
 export type TransformHandleDirection =
   | "n"
@@ -23,7 +24,13 @@ export type TransformHandleDirection =
 
 export type TransformHandleType = TransformHandleDirection | "rotation";
 
-export type TransformHandle = [number, number, number, number];
+export type TransformHandle = [
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  isMagnetismAttracted?: boolean,
+];
 export type TransformHandles = Partial<{
   [T in TransformHandleType]: TransformHandle;
 }>;
@@ -67,17 +74,24 @@ const OMIT_SIDES_FOR_LINE_BACKSLASH = {
   w: true,
 };
 
-const generateTransformHandle = (
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  cx: number,
-  cy: number,
+export const getBorderPointsFormCoords = (
+  [x1, y1, x2, y2, cx, cy]: [number, number, number, number, number, number],
   angle: number,
-): TransformHandle => {
-  const [xx, yy] = rotate(x + width / 2, y + height / 2, cx, cy, angle);
-  return [xx - width / 2, yy - height / 2, width, height];
+) => {
+  const width = x2 - x1;
+  const height = y2 - y1;
+  const applyAngle = (x: number, y: number) => rotate(x, y, cx, cy, angle);
+
+  return {
+    nw: applyAngle(x1, y1),
+    ne: applyAngle(x2, y1),
+    sw: applyAngle(x1, y2),
+    se: applyAngle(x2, y2),
+    w: applyAngle(x1, y1 + height / 2),
+    n: applyAngle(x1 + width / 2, y1),
+    s: applyAngle(x1 + width / 2, y2),
+    e: applyAngle(x2, y1 + height / 2),
+  };
 };
 
 export const getTransformHandlesFromCoords = (
@@ -86,7 +100,8 @@ export const getTransformHandlesFromCoords = (
   zoom: Zoom,
   pointerType: PointerType,
   omitSides: { [T in TransformHandleType]?: boolean } = {},
-  margin = 4,
+  margin = 0,
+  snap: Snap | null = null,
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
   const handleWidth = size / zoom.value;
@@ -100,65 +115,56 @@ export const getTransformHandlesFromCoords = (
   const dashedLineMargin = margin / zoom.value;
   const centeringOffset = (size - DEFAULT_SPACING * 2) / (2 * zoom.value);
 
+  const borderPoints = getBorderPointsFormCoords(
+    [x1, y1, x2, y2, cx, cy],
+    angle,
+  );
+
+  const generateTransformHandle = (
+    [x, y]: [x: number, y: number],
+    [dx, dy]: [x: number, y: number],
+    isMagnetismAttracted = isSnapped(snap, [x, y]),
+  ): TransformHandle => {
+    return [x + dx, y + dy, handleWidth, handleHeight, isMagnetismAttracted];
+  };
+
   const transformHandles: TransformHandles = {
     nw: omitSides.nw
       ? undefined
-      : generateTransformHandle(
-          x1 - dashedLineMargin - handleMarginX + centeringOffset,
-          y1 - dashedLineMargin - handleMarginY + centeringOffset,
-          handleWidth,
-          handleHeight,
-          cx,
-          cy,
-          angle,
-        ),
+      : generateTransformHandle(borderPoints.nw, [
+          centeringOffset - dashedLineMargin - handleMarginX,
+          centeringOffset - dashedLineMargin - handleMarginY,
+        ]),
     ne: omitSides.ne
       ? undefined
-      : generateTransformHandle(
-          x2 + dashedLineMargin - centeringOffset,
-          y1 - dashedLineMargin - handleMarginY + centeringOffset,
-          handleWidth,
-          handleHeight,
-          cx,
-          cy,
-          angle,
-        ),
+      : generateTransformHandle(borderPoints.ne, [
+          dashedLineMargin - centeringOffset,
+          centeringOffset - dashedLineMargin - handleMarginY,
+        ]),
     sw: omitSides.sw
       ? undefined
-      : generateTransformHandle(
-          x1 - dashedLineMargin - handleMarginX + centeringOffset,
-          y2 + dashedLineMargin - centeringOffset,
-          handleWidth,
-          handleHeight,
-          cx,
-          cy,
-          angle,
-        ),
+      : generateTransformHandle(borderPoints.sw, [
+          centeringOffset - dashedLineMargin - handleMarginX,
+          dashedLineMargin - centeringOffset,
+        ]),
     se: omitSides.se
       ? undefined
-      : generateTransformHandle(
-          x2 + dashedLineMargin - centeringOffset,
-          y2 + dashedLineMargin - centeringOffset,
-          handleWidth,
-          handleHeight,
-          cx,
-          cy,
-          angle,
-        ),
+      : generateTransformHandle(borderPoints.se, [
+          dashedLineMargin - centeringOffset,
+          dashedLineMargin - centeringOffset,
+        ]),
     rotation: omitSides.rotation
       ? undefined
       : generateTransformHandle(
-          x1 + width / 2 - handleWidth / 2,
-          y1 -
-            dashedLineMargin -
-            handleMarginY +
+          borderPoints.n,
+          [
+            -handleWidth / 2,
             centeringOffset -
-            ROTATION_RESIZE_HANDLE_GAP / zoom.value,
-          handleWidth,
-          handleHeight,
-          cx,
-          cy,
-          angle,
+              dashedLineMargin -
+              handleMarginY -
+              ROTATION_RESIZE_HANDLE_GAP / zoom.value,
+          ],
+          false,
         ),
   };
 
@@ -168,50 +174,30 @@ export const getTransformHandlesFromCoords = (
     (5 * transformHandleSizes.mouse) / zoom.value;
   if (Math.abs(width) > minimumSizeForEightHandles) {
     if (!omitSides.n) {
-      transformHandles.n = generateTransformHandle(
-        x1 + width / 2 - handleWidth / 2,
-        y1 - dashedLineMargin - handleMarginY + centeringOffset,
-        handleWidth,
-        handleHeight,
-        cx,
-        cy,
-        angle,
-      );
+      transformHandles.n = generateTransformHandle(borderPoints.n, [
+        -handleWidth / 2,
+        centeringOffset - dashedLineMargin - handleMarginY,
+      ]);
     }
     if (!omitSides.s) {
-      transformHandles.s = generateTransformHandle(
-        x1 + width / 2 - handleWidth / 2,
-        y2 + dashedLineMargin - centeringOffset,
-        handleWidth,
-        handleHeight,
-        cx,
-        cy,
-        angle,
-      );
+      transformHandles.s = generateTransformHandle(borderPoints.s, [
+        -handleWidth / 2,
+        -centeringOffset + dashedLineMargin,
+      ]);
     }
   }
   if (Math.abs(height) > minimumSizeForEightHandles) {
     if (!omitSides.w) {
-      transformHandles.w = generateTransformHandle(
-        x1 - dashedLineMargin - handleMarginX + centeringOffset,
-        y1 + height / 2 - handleHeight / 2,
-        handleWidth,
-        handleHeight,
-        cx,
-        cy,
-        angle,
-      );
+      transformHandles.w = generateTransformHandle(borderPoints.w, [
+        -dashedLineMargin - handleMarginX + centeringOffset,
+        -handleHeight / 2,
+      ]);
     }
     if (!omitSides.e) {
-      transformHandles.e = generateTransformHandle(
-        x2 + dashedLineMargin - centeringOffset,
-        y1 + height / 2 - handleHeight / 2,
-        handleWidth,
-        handleHeight,
-        cx,
-        cy,
-        angle,
-      );
+      transformHandles.e = generateTransformHandle(borderPoints.e, [
+        +dashedLineMargin - centeringOffset,
+        -handleHeight / 2,
+      ]);
     }
   }
 
@@ -222,6 +208,7 @@ export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: Zoom,
   pointerType: PointerType = "mouse",
+  snap: Snap | null = null,
 ): TransformHandles => {
   // so that when locked element is selected (especially when you toggle lock
   // via keyboard) the locked element is visually distinct, indicating
@@ -260,6 +247,7 @@ export const getTransformHandles = (
     pointerType,
     omitSides,
     dashedLineMargin,
+    snap,
   );
 };
 

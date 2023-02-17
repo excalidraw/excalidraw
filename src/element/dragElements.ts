@@ -6,6 +6,8 @@ import { NonDeletedExcalidrawElement } from "./types";
 import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
+import { Snap } from "../snapping";
+import * as Snapping from "./snapping";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -16,6 +18,7 @@ export const dragSelectedElements = (
   distanceX: number = 0,
   distanceY: number = 0,
   appState: AppState,
+  snap: Snap | null = null,
 ) => {
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
@@ -27,6 +30,7 @@ export const dragSelectedElements = (
       pointerDownState,
       element,
       offset,
+      snap,
     );
     // update coords of bound text only if we're dragging the container directly
     // (we don't drag the group that it's part of)
@@ -46,6 +50,7 @@ export const dragSelectedElements = (
           pointerDownState,
           textElement,
           offset,
+          snap,
         );
       }
     }
@@ -62,23 +67,23 @@ const updateElementCoords = (
   pointerDownState: PointerDownState,
   element: NonDeletedExcalidrawElement,
   offset: { x: number; y: number },
+  snap: Snap | null = null,
 ) => {
-  let x: number;
-  let y: number;
-  if (lockDirection) {
-    const lockX = lockDirection && distanceX < distanceY;
-    const lockY = lockDirection && distanceX > distanceY;
-    const original = pointerDownState.originalElements.get(element.id);
-    x = lockX && original ? original.x : element.x + offset.x;
-    y = lockY && original ? original.y : element.y + offset.y;
-  } else {
-    x = element.x + offset.x;
-    y = element.y + offset.y;
-  }
+  const lockX = lockDirection && distanceX < distanceY;
+  const lockY = lockDirection && distanceX > distanceY;
+  const original = pointerDownState.originalElements.get(element.id);
+  const x = lockX && original ? original.x : element.x;
+  const y = lockY && original ? original.y : element.y;
+
+  const projection = Snapping.project({
+    origin: { x, y },
+    offset,
+    snap,
+  });
 
   mutateElement(element, {
-    x,
-    y,
+    x: lockX ? x : projection.x,
+    y: lockY ? y : projection.y,
   });
 };
 export const getDragOffsetXY = (
