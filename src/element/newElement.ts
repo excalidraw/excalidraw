@@ -12,7 +12,6 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawTextContainer,
-  NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -314,7 +313,6 @@ export const getMaxContainerHeight = (container: ExcalidrawElement) => {
   }
   return height - BOUND_TEXT_PADDING * 2;
 };
-
 
 export const updateTextElement = (
   textElement: ExcalidrawTextElement,
