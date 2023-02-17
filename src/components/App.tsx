@@ -109,7 +109,6 @@ import {
   textWysiwyg,
   transformElements,
   updateTextElement,
-  getElementAbsoluteCoords,
 } from "../element";
 import {
   bindOrUnbindLinearElement,
@@ -293,6 +292,8 @@ import {
   bindElementsToFramesAfterDuplication,
   getFramesCountInElements,
   FrameGeometry,
+  getElementsCompletelyInFrame,
+  elementsAreInFrameBounds,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
@@ -3712,10 +3713,11 @@ class App extends React.Component<AppProps, AppState> {
         (element) => element.type === "frame",
       ) as ExcalidrawFrameElement[];
       selectedFrames.forEach((frame) => {
-        // important to keep the calling orders in the manner :)
-        const nextElementsInFrame = this.getElementsInResizingFrame(frame);
-        this.scene.removeAllElementsFromFrame(frame, this.state);
-        this.scene.addElementsToFrame(nextElementsInFrame, frame);
+        this.scene.replaceAllElementsInFrame(
+          this.getElementsInResizingFrame(frame),
+          frame,
+          this.state,
+        );
       });
     }
 
@@ -5369,16 +5371,72 @@ class App extends React.Component<AppProps, AppState> {
             );
 
             if (topLayerFrame) {
-              const elementsToAddToFrame = getElementsToUpdateForFrame(
+              const nextElementsInFrame = new Set(
+                getElementsInFrame(
+                  this.scene.getNonDeletedElements(),
+                  topLayerFrame.id,
+                ),
+              );
+
+              // add new elements
+              getElementsToUpdateForFrame(
                 selectedElements,
                 (element) =>
                   !isFrameElement(element) &&
-                  element.frameId !== topLayerFrame.id,
+                  element.frameId !== topLayerFrame.id &&
+                  (element.groupIds.length > 0 ||
+                    elementsAreInFrameBounds([element], topLayerFrame) ||
+                    FrameGeometry.isElementIntersectingFrame(
+                      element,
+                      topLayerFrame,
+                    )),
+              ).forEach((element) => nextElementsInFrame.add(element));
+
+              // remove some selected elements from the frame if needed
+              const groupsToKeep = new Set<string>(
+                selectedElements
+                  .filter((element) => element.groupIds.length > 0)
+                  .filter(
+                    (element) =>
+                      elementsAreInFrameBounds([element], topLayerFrame) ||
+                      FrameGeometry.isElementIntersectingFrame(
+                        element,
+                        topLayerFrame,
+                      ),
+                  )
+                  .flatMap((element) => element.groupIds),
               );
 
-              this.scene.addElementsToFrame(
-                elementsToAddToFrame,
+              selectedElements.forEach((element) => {
+                if (element.groupIds.length === 0) {
+                  if (
+                    !elementsAreInFrameBounds([element], topLayerFrame) &&
+                    !FrameGeometry.isElementIntersectingFrame(
+                      element,
+                      topLayerFrame,
+                    )
+                  ) {
+                    nextElementsInFrame.delete(element);
+                  }
+                } else {
+                  let shouldRemoveElement = true;
+
+                  element.groupIds.forEach((id) => {
+                    if (groupsToKeep.has(id)) {
+                      shouldRemoveElement = false;
+                    }
+                  });
+
+                  if (shouldRemoveElement) {
+                    nextElementsInFrame.delete(element);
+                  }
+                }
+              });
+
+              this.scene.replaceAllElementsInFrame(
+                [...nextElementsInFrame],
                 topLayerFrame,
+                this.state,
               );
             } else {
               const elementsToRemoveFromFrame = getElementsToUpdateForFrame(
@@ -6532,15 +6590,12 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   };
 
-  private getElementsInNewFrame(frame: ExcalidrawElement): ExcalidrawElement[] {
-    const elementsCompletelyInFrame = getElementsWithinSelection(
+  private getElementsInNewFrame(
+    frame: ExcalidrawFrameElement,
+  ): ExcalidrawElement[] {
+    const elementsCompletelyInFrame = getElementsCompletelyInFrame(
       this.scene.getNonDeletedElements(),
       frame,
-      false,
-    ).filter(
-      (element) =>
-        element.type !== "frame" &&
-        (!element.frameId || element.frameId === frame.id),
     );
 
     const individualElements = elementsCompletelyInFrame.filter(
@@ -6557,24 +6612,14 @@ class App extends React.Component<AppProps, AppState> {
 
     const groupIds = selectGroupsFromGivenElements(groupElements, this.state);
 
-    const [selectionX1, selectionY1, selectionX2, selectionY2] =
-      getElementAbsoluteCoords(frame);
-
     Object.entries(groupIds).forEach(([id, isSelected]) => {
       if (isSelected) {
         const elementsInGroup = getElementsInGroup(
           this.scene.getNonDeletedElements(),
           id,
         );
-        const [elementX1, elementY1, elementX2, elementY2] =
-          getCommonBounds(elementsInGroup);
 
-        if (
-          selectionX1 <= elementX1 &&
-          selectionY1 <= elementY1 &&
-          selectionX2 >= elementX2 &&
-          selectionY2 >= elementY2
-        ) {
+        if (elementsAreInFrameBounds(elementsInGroup, frame)) {
           elementsInGroup.forEach((element) => {
             elementsToBeAddedSet.add(element);
           });
@@ -6597,15 +6642,7 @@ class App extends React.Component<AppProps, AppState> {
     const nextElementsInFrame = new Set<ExcalidrawElement>(prevElementsInFrame);
 
     const elementsCompletelyInFrame = new Set(
-      getElementsWithinSelection(
-        this.scene.getNonDeletedElements(),
-        frame,
-        false,
-      ).filter(
-        (element) =>
-          element.type !== "frame" &&
-          (!element.frameId || element.frameId === frame.id),
-      ),
+      getElementsCompletelyInFrame(this.scene.getNonDeletedElements(), frame),
     );
 
     const elementsNotCompletelyInFrame = prevElementsInFrame.filter(
@@ -6666,9 +6703,6 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
 
-    const [selectionX1, selectionY1, selectionX2, selectionY2] =
-      getElementAbsoluteCoords(frame);
-
     // new group elements
     Object.entries(groupIds).forEach(([id, isSelected]) => {
       if (isSelected) {
@@ -6676,15 +6710,8 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
           id,
         );
-        const [elementX1, elementY1, elementX2, elementY2] =
-          getCommonBounds(elementsInGroup);
 
-        if (
-          selectionX1 <= elementX1 &&
-          selectionY1 <= elementY1 &&
-          selectionX2 >= elementX2 &&
-          selectionY2 >= elementY2
-        ) {
+        if (elementsAreInFrameBounds(elementsInGroup, frame)) {
           elementsInGroup.forEach((element) => {
             nextElementsInFrame.add(element);
           });

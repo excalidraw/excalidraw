@@ -134,6 +134,15 @@ class Scene {
     this.replaceAllElements(nextElements);
   }
 
+  replaceAllElementsInFrame(
+    nextElementsInFrame: ExcalidrawElement[],
+    frame: ExcalidrawFrameElement,
+    appState: AppState,
+  ) {
+    this.removeAllElementsFromFrame(frame, appState);
+    this.addElementsToFrame(nextElementsInFrame, frame);
+  }
+
   removeElementsFromFrame(
     elementsToRemove: NonDeletedExcalidrawElement[],
     appState: AppState,

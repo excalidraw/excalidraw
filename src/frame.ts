@@ -1,4 +1,8 @@
-import { getElementAbsoluteCoords, getElementBounds } from "./element";
+import {
+  getCommonBounds,
+  getElementAbsoluteCoords,
+  getElementBounds,
+} from "./element";
 import {
   ExcalidrawElement,
   ExcalidrawFrameElement,
@@ -10,7 +14,7 @@ import { getBoundTextElement } from "./element/textElement";
 import { arrayToMap } from "./utils";
 import { mutateElement } from "./element/mutateElement";
 import { AppState } from "./types";
-import { getSelectedElements } from "./scene";
+import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
 
 export const getElementsInFrame = (
@@ -127,6 +131,42 @@ export const getFrameElementsMap = (
   });
 
   return frameElementsMap;
+};
+
+export const getElementsCompletelyInFrame = (
+  elements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameElement,
+) =>
+  getElementsWithinSelection(elements, frame, false).filter(
+    (element) =>
+      element.type !== "frame" &&
+      (!element.frameId || element.frameId === frame.id),
+  );
+
+export const getElementsIntersectingFrame = (
+  elements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameElement,
+) =>
+  elements.filter((element) =>
+    FrameGeometry.isElementIntersectingFrame(element, frame),
+  );
+
+export const elementsAreInFrameBounds = (
+  elements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameElement,
+) => {
+  const [selectionX1, selectionY1, selectionX2, selectionY2] =
+    getElementAbsoluteCoords(frame);
+
+  const [elementX1, elementY1, elementX2, elementY2] =
+    getCommonBounds(elements);
+
+  return (
+    selectionX1 <= elementX1 &&
+    selectionY1 <= elementY1 &&
+    selectionX2 >= elementX2 &&
+    selectionY2 >= elementY2
+  );
 };
 
 class Point {
