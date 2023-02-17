@@ -68,14 +68,14 @@ export const redrawTextBoundingBox = (
       const maxContainerHeight = getMaxContainerHeight(container);
       const maxContainerWidth = getMaxContainerWidth(container);
       let nextHeight = containerDims.height;
+
+      const padding = container.type === "ellipse" ? 0 : BOUND_TEXT_PADDING;
+
       if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-        coordY = container.y;
+        coordY = containerCoords.y + padding;
       } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
         coordY =
-          containerCoords.y +
-          maxContainerHeight -
-          metrics.height -
-          BOUND_TEXT_PADDING;
+          containerCoords.y + (maxContainerHeight - metrics.height + padding);
       } else {
         coordY = container.y + containerDims.height / 2 - metrics.height / 2;
         if (metrics.height > maxContainerHeight) {
@@ -87,15 +87,12 @@ export const redrawTextBoundingBox = (
         }
       }
       if (textElement.textAlign === TEXT_ALIGN.LEFT) {
-        coordX = container.x + BOUND_TEXT_PADDING;
+        coordX = containerCoords.x + padding;
       } else if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
         coordX =
-          containerCoords.x +
-          maxContainerWidth -
-          metrics.width -
-          BOUND_TEXT_PADDING;
+          containerCoords.x + (maxContainerWidth - metrics.width + padding);
       } else {
-        coordX = container.x + containerDims.width / 2 - metrics.width / 2;
+        coordX = containerCoords.x + maxContainerWidth / 2 - metrics.width / 2;
       }
       updateOriginalContainerCache(container.id, nextHeight);
       mutateElement(container, { height: nextHeight });
@@ -247,32 +244,38 @@ const updateBoundTextPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
+  const containerCoords = getContainerCoords(container);
   const containerDims = getContainerDims(container);
-  const boundTextElementPadding = getBoundTextElementOffset(boundTextElement);
+  const maxContainerHeight = getMaxContainerHeight(container);
+  const maxContainerWidth = getMaxContainerWidth(container);
+  const padding = container.type === "ellipse" ? 0 : BOUND_TEXT_PADDING;
+
+  let x;
   let y;
   if (boundTextElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-    y = container.y + boundTextElementPadding;
+    y = containerCoords.y + padding;
   } else if (boundTextElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
     y =
-      container.y +
-      containerDims.height -
-      boundTextElement.height -
-      boundTextElementPadding;
+      containerCoords.y +
+      (maxContainerHeight - boundTextElement.height + padding);
   } else {
-    y = container.y + containerDims.height / 2 - boundTextElement.height / 2;
+    y =
+      containerCoords.y +
+      containerDims.height / 2 -
+      boundTextElement.height / 2;
   }
-  const x =
-    boundTextElement.textAlign === TEXT_ALIGN.LEFT
-      ? container.x + boundTextElementPadding
-      : boundTextElement.textAlign === TEXT_ALIGN.RIGHT
-      ? container.x +
-        containerDims.width -
-        boundTextElement.width -
-        boundTextElementPadding
-      : container.x + containerDims.width / 2 - boundTextElement.width / 2;
-
+  if (boundTextElement.textAlign === TEXT_ALIGN.LEFT) {
+    x = containerCoords.x + padding;
+  } else if (boundTextElement.textAlign === TEXT_ALIGN.RIGHT) {
+    x =
+      containerCoords.x +
+      (maxContainerWidth - boundTextElement.width + padding);
+  } else {
+    x = containerCoords.x + maxContainerWidth / 2 - boundTextElement.width / 2;
+  }
   mutateElement(boundTextElement, { x, y });
 };
+
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
 export const measureText = (
   text: string,
