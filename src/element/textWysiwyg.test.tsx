@@ -791,9 +791,7 @@ describe("textWysiwyg", () => {
       text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.text).toBe("Hello \nWorld!");
       expect(text.originalText).toBe("Hello World!");
-      expect(text.y).toBe(
-        rectangle.y + rectangle.height / 2 - (APPROX_LINE_HEIGHT * 2) / 2,
-      );
+      expect(text.y).toBe(27.5);
       expect(text.x).toBe(rectangle.x + BOUND_TEXT_PADDING);
       expect(text.height).toBe(APPROX_LINE_HEIGHT * 2);
       expect(text.width).toBe(rectangle.width - BOUND_TEXT_PADDING * 2);
@@ -827,9 +825,7 @@ describe("textWysiwyg", () => {
 
       expect(text.text).toBe("Hello");
       expect(text.originalText).toBe("Hello");
-      expect(text.y).toBe(
-        rectangle.y + rectangle.height / 2 - APPROX_LINE_HEIGHT / 2,
-      );
+      expect(text.y).toBe(40);
       expect(text.x).toBe(rectangle.x + BOUND_TEXT_PADDING);
       expect(text.height).toBe(APPROX_LINE_HEIGHT);
       expect(text.width).toBe(rectangle.width - BOUND_TEXT_PADDING * 2);
@@ -1248,7 +1244,7 @@ describe("textWysiwyg", () => {
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
             15,
-            20,
+            25,
           ]
         `);
       });
@@ -1259,7 +1255,7 @@ describe("textWysiwyg", () => {
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
             94.5,
-            20,
+            25,
           ]
         `);
       });
@@ -1269,22 +1265,22 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align top"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-            Array [
-              174,
-              20,
-            ]
-          `);
+          Array [
+            174,
+            25,
+          ]
+        `);
       });
 
       it("when center left", async () => {
         fireEvent.click(screen.getByTitle("Center vertically"));
         fireEvent.click(screen.getByTitle("Left"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-            Array [
-              15,
-              25,
-            ]
-          `);
+          Array [
+            15,
+            20,
+          ]
+        `);
       });
 
       it("when center center", async () => {
@@ -1292,11 +1288,11 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Center vertically"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-            Array [
-              -25,
-              25,
-            ]
-          `);
+          Array [
+            -25,
+            20,
+          ]
+        `);
       });
 
       it("when center right", async () => {
@@ -1304,11 +1300,11 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Center vertically"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-            Array [
-              174,
-              25,
-            ]
-          `);
+          Array [
+            174,
+            20,
+          ]
+        `);
       });
 
       it("when bottom left", async () => {
