@@ -17,6 +17,7 @@ import { AppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
 import { moveOneRight } from "./zindex";
+import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -344,6 +345,131 @@ export const getElementsInFrame = (
   frameId: string,
 ) => elements.filter((element) => element.frameId === frameId);
 
+export const getElementsInResizingFrame = (
+  allElements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameElement,
+  appState: AppState,
+): ExcalidrawElement[] => {
+  const prevElementsInFrame = getElementsInFrame(allElements, frame.id);
+  const nextElementsInFrame = new Set<ExcalidrawElement>(prevElementsInFrame);
+
+  const elementsCompletelyInFrame = new Set(
+    getElementsCompletelyInFrame(allElements, frame),
+  );
+
+  const elementsNotCompletelyInFrame = prevElementsInFrame.filter(
+    (element) => !elementsCompletelyInFrame.has(element),
+  );
+
+  // for elements that are completely in the frame
+  // if they are part of some groups, then those groups are still
+  // considered to belong to the frame
+  const groupsToKeep = new Set<string>(
+    Array.from(elementsCompletelyInFrame).flatMap(
+      (element) => element.groupIds,
+    ),
+  );
+
+  elementsNotCompletelyInFrame.forEach((element) => {
+    if (!FrameGeometry.isElementIntersectingFrame(element, frame)) {
+      if (element.groupIds.length === 0) {
+        nextElementsInFrame.delete(element);
+      }
+    } else if (element.groupIds.length > 0) {
+      // group element intersects with the frame, we should keep the groups
+      // that this element is part of
+      element.groupIds.forEach((id) => groupsToKeep.add(id));
+    }
+  });
+
+  elementsNotCompletelyInFrame.forEach((element) => {
+    if (element.groupIds.length > 0) {
+      let shouldRemoveElement = true;
+
+      element.groupIds.forEach((id) => {
+        if (groupsToKeep.has(id)) {
+          shouldRemoveElement = false;
+        }
+      });
+
+      if (shouldRemoveElement) {
+        nextElementsInFrame.delete(element);
+      }
+    }
+  });
+
+  const individualElementsCompletelyInFrame = Array.from(
+    elementsCompletelyInFrame,
+  ).filter((element) => element.groupIds.length === 0);
+
+  individualElementsCompletelyInFrame.forEach((element) =>
+    nextElementsInFrame.add(element),
+  );
+
+  const newGroupElementsCompletelyInFrame = Array.from(
+    elementsCompletelyInFrame,
+  ).filter((element) => element.groupIds.length > 0);
+
+  const groupIds = selectGroupsFromGivenElements(
+    newGroupElementsCompletelyInFrame,
+    appState,
+  );
+
+  // new group elements
+  Object.entries(groupIds).forEach(([id, isSelected]) => {
+    if (isSelected) {
+      const elementsInGroup = getElementsInGroup(allElements, id);
+
+      if (elementsAreInFrameBounds(elementsInGroup, frame)) {
+        elementsInGroup.forEach((element) => {
+          nextElementsInFrame.add(element);
+        });
+      }
+    }
+  });
+
+  return [...nextElementsInFrame];
+};
+
+export const getElementsInNewFrame = (
+  allElements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameElement,
+  appState: AppState,
+) => {
+  const elementsCompletelyInFrame = getElementsCompletelyInFrame(
+    allElements,
+    frame,
+  );
+
+  const individualElements = elementsCompletelyInFrame.filter(
+    (element) => element.groupIds.length === 0,
+  );
+  const elementsToBeAddedSet = new Set<ExcalidrawElement>(individualElements);
+
+  // for elements that are completely in the frame
+  // if they are part of a group, then we add the elements to the frame
+  // only if their commond bounds is inside the frame
+  const groupElements = elementsCompletelyInFrame.filter(
+    (element) => element.groupIds.length > 0,
+  );
+
+  const groupIds = selectGroupsFromGivenElements(groupElements, appState);
+
+  Object.entries(groupIds).forEach(([id, isSelected]) => {
+    if (isSelected) {
+      const elementsInGroup = getElementsInGroup(allElements, id);
+
+      if (elementsAreInFrameBounds(elementsInGroup, frame)) {
+        elementsInGroup.forEach((element) => {
+          elementsToBeAddedSet.add(element);
+        });
+      }
+    }
+  });
+
+  return [...elementsToBeAddedSet];
+};
+
 // --------------------------- Frame Operations -------------------------------
 export const addElementsToFrame = (
   allElements: readonly ExcalidrawElement[],
@@ -387,14 +513,18 @@ export const removeElementsFromFrame = (
   elementsToRemove: NonDeletedExcalidrawElement[],
   appState: AppState,
 ) => {
-  elementsToRemove.forEach((element) => {
+  const _elementsToRemove =
+    elementsToRemove.filter((element) => element.frameId) ?? [];
+
+  _elementsToRemove.forEach((element) =>
     mutateElement(element, {
       frameId: null,
-    });
-  });
+    }),
+  );
 
-  // we also need to move these elements to the right of the frame
-  return moveOneRight(allElements, appState, elementsToRemove);
+  const nextElements = moveOneRight(allElements, appState, _elementsToRemove);
+
+  return nextElements;
 };
 
 export const removeAllElementsFromFrame = (

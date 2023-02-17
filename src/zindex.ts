@@ -387,6 +387,7 @@ function shift(
     rootElements,
     appState,
     direction,
+    elementsToBeMoved,
   ) as ExcalidrawElement[];
 
   // shift the elements in frames if needed

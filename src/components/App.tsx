@@ -168,7 +168,6 @@ import {
   isElementInGroup,
   isSelectedViaGroup,
   selectGroupsForSelectedElements,
-  selectGroupsFromGivenElements,
 } from "../groups";
 import History from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
@@ -291,11 +290,12 @@ import {
   isCursorInFrame,
   bindElementsToFramesAfterDuplication,
   FrameGeometry,
-  getElementsCompletelyInFrame,
   elementsAreInFrameBounds,
   addElementsToFrame,
   replaceAllElementsInFrame,
   removeElementsFromFrame,
+  getElementsInResizingFrame,
+  getElementsInNewFrame,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
@@ -3697,7 +3697,11 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.replaceAllElements(
         addElementsToFrame(
           this.scene.getElementsIncludingDeleted(),
-          this.getElementsInNewFrame(this.state.draggingElement),
+          getElementsInNewFrame(
+            this.scene.getNonDeletedElements(),
+            this.state.draggingElement,
+            this.state,
+          ),
           this.state.draggingElement,
         ),
       );
@@ -3712,7 +3716,11 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.replaceAllElements(
           replaceAllElementsInFrame(
             this.scene.getElementsIncludingDeleted(),
-            this.getElementsInResizingFrame(frame),
+            getElementsInResizingFrame(
+              this.scene.getNonDeletedElements(),
+              frame,
+              this.state,
+            ),
             frame,
             this.state,
           ),
@@ -5437,7 +5445,8 @@ class App extends React.Component<AppProps, AppState> {
             } else {
               const elementsToRemoveFromFrame = getElementsToUpdateForFrame(
                 selectedElements,
-                (element) => !isFrameElement(element),
+                (element) =>
+                  !isFrameElement(element) && element.frameId !== null,
               );
 
               this.scene.replaceAllElements(
@@ -6466,13 +6475,13 @@ class App extends React.Component<AppProps, AppState> {
 
       // highlight elements that are to be added to frames on frames creation
       if (this.state.activeTool.type === "frame") {
-        this.setState((prevState) => ({
-          elementsToHighlight: [
-            ...this.getElementsInResizingFrame(
-              draggingElement as ExcalidrawFrameElement,
-            ),
-          ],
-        }));
+        this.setState({
+          elementsToHighlight: getElementsInResizingFrame(
+            this.scene.getNonDeletedElements(),
+            draggingElement as ExcalidrawFrameElement,
+            this.state,
+          ),
+        });
       }
     }
   };
@@ -6579,147 +6588,19 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        this.setState((prevState) => ({
-          elementsToHighlight: [...this.getElementsInResizingFrame(frame)],
-        }));
+        this.setState({
+          elementsToHighlight: getElementsInResizingFrame(
+            this.scene.getNonDeletedElements(),
+            frame,
+            this.state,
+          ),
+        });
       });
 
       return true;
     }
     return false;
   };
-
-  private getElementsInNewFrame(
-    frame: ExcalidrawFrameElement,
-  ): ExcalidrawElement[] {
-    const elementsCompletelyInFrame = getElementsCompletelyInFrame(
-      this.scene.getNonDeletedElements(),
-      frame,
-    );
-
-    const individualElements = elementsCompletelyInFrame.filter(
-      (element) => element.groupIds.length === 0,
-    );
-    const elementsToBeAddedSet = new Set<ExcalidrawElement>(individualElements);
-
-    // for elements that are completely in the frame
-    // if they are part of a group, then we add the elements to the frame
-    // only if their commond bounds is inside the frame
-    const groupElements = elementsCompletelyInFrame.filter(
-      (element) => element.groupIds.length > 0,
-    );
-
-    const groupIds = selectGroupsFromGivenElements(groupElements, this.state);
-
-    Object.entries(groupIds).forEach(([id, isSelected]) => {
-      if (isSelected) {
-        const elementsInGroup = getElementsInGroup(
-          this.scene.getNonDeletedElements(),
-          id,
-        );
-
-        if (elementsAreInFrameBounds(elementsInGroup, frame)) {
-          elementsInGroup.forEach((element) => {
-            elementsToBeAddedSet.add(element);
-          });
-        }
-      }
-    });
-
-    return [...elementsToBeAddedSet];
-  }
-
-  // return an array of elements that are considered to belong to the
-  // given frame as it get resized
-  private getElementsInResizingFrame(
-    frame: ExcalidrawFrameElement,
-  ): ExcalidrawElement[] {
-    const prevElementsInFrame = getElementsInFrame(
-      this.scene.getNonDeletedElements(),
-      frame.id,
-    );
-    const nextElementsInFrame = new Set<ExcalidrawElement>(prevElementsInFrame);
-
-    const elementsCompletelyInFrame = new Set(
-      getElementsCompletelyInFrame(this.scene.getNonDeletedElements(), frame),
-    );
-
-    const elementsNotCompletelyInFrame = prevElementsInFrame.filter(
-      (element) => !elementsCompletelyInFrame.has(element),
-    );
-
-    // for elements that are completely in the frame
-    // if they are part of some groups, then those groups are still
-    // considered to belong to the frame
-    const groupsToKeep = new Set<string>(
-      Array.from(elementsCompletelyInFrame).flatMap(
-        (element) => element.groupIds,
-      ),
-    );
-
-    elementsNotCompletelyInFrame.forEach((element) => {
-      if (!FrameGeometry.isElementIntersectingFrame(element, frame)) {
-        if (element.groupIds.length === 0) {
-          nextElementsInFrame.delete(element);
-        }
-      } else if (element.groupIds.length > 0) {
-        // group element intersects with the frame, we should keep the groups
-        // that this element is part of
-        element.groupIds.forEach((id) => groupsToKeep.add(id));
-      }
-    });
-
-    elementsNotCompletelyInFrame.forEach((element) => {
-      if (element.groupIds.length > 0) {
-        let shouldRemoveElement = true;
-
-        element.groupIds.forEach((id) => {
-          if (groupsToKeep.has(id)) {
-            shouldRemoveElement = false;
-          }
-        });
-
-        if (shouldRemoveElement) {
-          nextElementsInFrame.delete(element);
-        }
-      }
-    });
-
-    const individualElementsCompletelyInFrame = Array.from(
-      elementsCompletelyInFrame,
-    ).filter((element) => element.groupIds.length === 0);
-
-    individualElementsCompletelyInFrame.forEach((element) =>
-      nextElementsInFrame.add(element),
-    );
-
-    const newGroupElementsCompletelyInFrame = Array.from(
-      elementsCompletelyInFrame,
-    ).filter((element) => element.groupIds.length > 0);
-
-    const groupIds = selectGroupsFromGivenElements(
-      newGroupElementsCompletelyInFrame,
-      this.state,
-    );
-
-    // new group elements
-    Object.entries(groupIds).forEach(([id, isSelected]) => {
-      if (isSelected) {
-        const elementsInGroup = getElementsInGroup(
-          this.scene.getNonDeletedElements(),
-          id,
-        );
-
-        if (elementsAreInFrameBounds(elementsInGroup, frame)) {
-          elementsInGroup.forEach((element) => {
-            nextElementsInFrame.add(element);
-          });
-        }
-      }
-    });
-
-    return [...nextElementsInFrame];
-  }
 
   private getContextMenuItems = (
     type: "canvas" | "element",

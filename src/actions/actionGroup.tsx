@@ -17,12 +17,18 @@ import {
 import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
 import { ToolButton } from "../components/ToolButton";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawFrameElement,
+  ExcalidrawTextElement,
+} from "../element/types";
 import { AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
+  getElementsInResizingFrame,
   getFrameElementsMapFromElements,
   removeElementsFromFrame,
+  replaceAllElementsInFrame,
 } from "../frame";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
@@ -178,14 +184,23 @@ export const actionGroup = register({
 export const actionUngroup = register({
   name: "ungroup",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     const groupIds = getSelectedGroupIds(appState);
     if (groupIds.length === 0) {
       return { appState, elements, commitToHistory: false };
     }
 
+    let nextElements = [...elements];
+
+    const selectedElements = getSelectedElements(nextElements, appState);
+    const frames = selectedElements
+      .filter((element) => element.frameId)
+      .map((element) =>
+        app.scene.getElement(element.frameId!),
+      ) as ExcalidrawFrameElement[];
+
     const boundTextElementIds: ExcalidrawTextElement["id"][] = [];
-    const nextElements = elements.map((element) => {
+    nextElements = nextElements.map((element) => {
       if (isBoundToContainer(element)) {
         boundTextElementIds.push(element.id);
       }
@@ -206,13 +221,23 @@ export const actionUngroup = register({
       getNonDeletedElements(nextElements),
     );
 
+    frames.forEach((frame) => {
+      if (frame) {
+        nextElements = replaceAllElementsInFrame(
+          nextElements,
+          getElementsInResizingFrame(nextElements, frame, appState),
+          frame,
+          appState,
+        );
+      }
+    });
+
     // remove binded text elements from selection
     boundTextElementIds.forEach(
       (id) => (updateAppState.selectedElementIds[id] = false),
     );
     return {
       appState: updateAppState,
-
       elements: nextElements,
       commitToHistory: true,
     };
