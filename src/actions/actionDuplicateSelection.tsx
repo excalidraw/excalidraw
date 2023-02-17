@@ -25,7 +25,6 @@ import { normalizeElementOrder } from "../element/sortElements";
 import { DuplicateIcon } from "../components/icons";
 import {
   bindElementsToFramesAfterDuplication,
-  getFramesCountInElements,
   getElementsInFrame,
 } from "../frame";
 import {
@@ -86,7 +85,6 @@ const duplicateElements = (
   const newElements: ExcalidrawElement[] = [];
   const oldElements: ExcalidrawElement[] = [];
   const oldIdToDuplicatedId = new Map();
-  let framesCount = getFramesCountInElements(elements);
 
   const duplicateAndOffsetElement = (element: ExcalidrawElement) => {
     const newElement = duplicateElement(
@@ -96,11 +94,6 @@ const duplicateElements = (
       {
         x: element.x + GRID_SIZE / 2,
         y: element.y + GRID_SIZE / 2,
-        ...(element.type === "frame"
-          ? {
-              name: `Frame ${++framesCount}`,
-            }
-          : {}),
       },
     );
     oldIdToDuplicatedId.set(element.id, newElement.id);

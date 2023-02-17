@@ -1,7 +1,7 @@
 import { bumpVersion } from "./element/mutateElement";
 import { isFrameElement } from "./element/typeChecks";
 import { ExcalidrawElement } from "./element/types";
-import { getFrameElementsMap } from "./frame";
+import { getAllFrameElementsMapFromAppState } from "./frame";
 import { getElementsInGroup } from "./groups";
 import { getSelectedElements } from "./scene";
 import Scene from "./scene/Scene";
@@ -377,7 +377,10 @@ function shift(
   elementsToBeMoved?: readonly ExcalidrawElement[],
 ) {
   let rootElements = elements.filter((element) => isRootElement(element));
-  const frameElementsMap = getFrameElementsMap(elements, appState);
+  const frameElementsMap = getAllFrameElementsMapFromAppState(
+    elements,
+    appState,
+  );
 
   // shift the root elements first
   rootElements = shiftFunction(

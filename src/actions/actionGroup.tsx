@@ -20,6 +20,10 @@ import { ToolButton } from "../components/ToolButton";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
+import {
+  getFrameElementsMapFromElements,
+  removeElementsFromFrame,
+} from "../frame";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -57,7 +61,7 @@ const enableActionGroup = (
 export const actionGroup = register({
   name: "group",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
@@ -90,8 +94,25 @@ export const actionGroup = register({
         return { appState, elements, commitToHistory: false };
       }
     }
+
+    // this includes the case where we are grouping elements inside a frame
+    // and elements outside that frame
+    const groupingElementsFromDifferentFrames =
+      new Set(selectedElements.map((element) => element.frameId)).size > 1;
+    // when it happens, we want to remove elements that are in the frame
+    // and are going to be grouped from the frame (mouthful, I know)
+    if (groupingElementsFromDifferentFrames) {
+      const frameElementsMap =
+        getFrameElementsMapFromElements(selectedElements);
+
+      frameElementsMap.forEach((elementsInFrame, frameId) => {
+        elements = removeElementsFromFrame(elements, elementsInFrame, appState);
+      });
+    }
+
     const newGroupId = randomId();
     const selectElementIds = arrayToMap(selectedElements);
+
     const updatedElements = elements.map((element) => {
       if (!selectElementIds.get(element.id)) {
         return element;

@@ -11,11 +11,6 @@ import {
 } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { isFrameElement } from "../element/typeChecks";
-import { mutateElement } from "../element/mutateElement";
-import { findIndex } from "../utils";
-import { moveOneRight } from "../zindex";
-import { AppState } from "../types";
-import { getElementsInFrame } from "../frame";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -84,87 +79,6 @@ class Scene {
 
   getNonDeletedFrames(): readonly NonDeleted<ExcalidrawFrameElement>[] {
     return this.nonDeletedFrames;
-  }
-
-  /**
-   * Add the given elements to the given frame, which consists of the following tasks:
-   * 1. update elements' frameId
-   * 2. update elements' z-indexes
-   *    - elements are all below the frame
-   *    - elements are all above the current elements in the frame
-   *    - elements' z-index to each other remain unchanged
-   *    - frame's elements are kept contiguously
-   */
-  addElementsToFrame(
-    elementsToAdd: NonDeletedExcalidrawElement[],
-    frame: ExcalidrawFrameElement,
-  ) {
-    let nextElements = [...this.elements];
-
-    elementsToAdd.forEach((element) => {
-      // only necessary if the element is not already in the frame
-      if (element.frameId !== frame.id) {
-        mutateElement(element, {
-          frameId: frame.id,
-        });
-        const frameIndex = findIndex(nextElements, (e) => e.id === frame.id);
-        const elementIndex = findIndex(
-          nextElements,
-          (e) => e.id === element.id,
-        );
-
-        if (elementIndex < frameIndex) {
-          nextElements = [
-            ...nextElements.slice(0, elementIndex),
-            ...nextElements.slice(elementIndex + 1, frameIndex),
-            element,
-            ...nextElements.slice(frameIndex),
-          ];
-        } else {
-          nextElements = [
-            ...nextElements.slice(0, frameIndex),
-            element,
-            ...nextElements.slice(frameIndex, elementIndex),
-            ...nextElements.slice(elementIndex + 1),
-          ];
-        }
-      }
-    });
-
-    this.replaceAllElements(nextElements);
-  }
-
-  replaceAllElementsInFrame(
-    nextElementsInFrame: ExcalidrawElement[],
-    frame: ExcalidrawFrameElement,
-    appState: AppState,
-  ) {
-    this.removeAllElementsFromFrame(frame, appState);
-    this.addElementsToFrame(nextElementsInFrame, frame);
-  }
-
-  removeElementsFromFrame(
-    elementsToRemove: NonDeletedExcalidrawElement[],
-    appState: AppState,
-  ) {
-    elementsToRemove.forEach((element) => {
-      mutateElement(element, {
-        frameId: null,
-      });
-    });
-
-    // we also need to move these elements to the right of the frame
-    this.replaceAllElements(
-      moveOneRight(this.elements, appState, elementsToRemove),
-    );
-  }
-
-  removeAllElementsFromFrame(
-    frame: ExcalidrawFrameElement,
-    appState: AppState,
-  ) {
-    const elementsInFrame = getElementsInFrame(this.elements, frame.id);
-    this.removeElementsFromFrame(elementsInFrame, appState);
   }
 
   getElement<T extends ExcalidrawElement>(id: T["id"]): T | null {

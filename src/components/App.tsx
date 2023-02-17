@@ -290,10 +290,12 @@ import {
   getElementsToUpdateForFrame,
   isCursorInFrame,
   bindElementsToFramesAfterDuplication,
-  getFramesCountInElements,
   FrameGeometry,
   getElementsCompletelyInFrame,
   elementsAreInFrameBounds,
+  addElementsToFrame,
+  replaceAllElementsInFrame,
+  removeElementsFromFrame,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
@@ -1681,10 +1683,6 @@ class App extends React.Component<AppProps, AppState> {
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.state.gridSize);
 
-    let framesCount = getFramesCountInElements(
-      this.scene.getNonDeletedElements(),
-    );
-
     const oldIdToDuplicatedId = new Map();
     const newElements = elements.map((element) => {
       const newElement = duplicateElement(
@@ -1694,11 +1692,6 @@ class App extends React.Component<AppProps, AppState> {
         {
           x: element.x + gridX - minX,
           y: element.y + gridY - minY,
-          ...(element.type === "frame"
-            ? {
-                name: `Frame ${++framesCount}`,
-              }
-            : {}),
         },
       );
       oldIdToDuplicatedId.set(element.id, newElement.id);
@@ -3701,9 +3694,12 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.draggingElement?.type === "frame") {
       // the newly created element is a frame element
-      this.scene.addElementsToFrame(
-        this.getElementsInNewFrame(this.state.draggingElement),
-        this.state.draggingElement,
+      this.scene.replaceAllElements(
+        addElementsToFrame(
+          this.scene.getElementsIncludingDeleted(),
+          this.getElementsInNewFrame(this.state.draggingElement),
+          this.state.draggingElement,
+        ),
       );
     } else {
       const selectedFrames = getSelectedElements(
@@ -3713,10 +3709,13 @@ class App extends React.Component<AppProps, AppState> {
         (element) => element.type === "frame",
       ) as ExcalidrawFrameElement[];
       selectedFrames.forEach((frame) => {
-        this.scene.replaceAllElementsInFrame(
-          this.getElementsInResizingFrame(frame),
-          frame,
-          this.state,
+        this.scene.replaceAllElements(
+          replaceAllElementsInFrame(
+            this.scene.getElementsIncludingDeleted(),
+            this.getElementsInResizingFrame(frame),
+            frame,
+            this.state,
+          ),
         );
       });
     }
@@ -4849,7 +4848,6 @@ class App extends React.Component<AppProps, AppState> {
             const oldIdToDuplicatedId = new Map();
             const hitElement = pointerDownState.hit.element;
             const elements = this.scene.getElementsIncludingDeleted();
-            let framesCount = getFramesCountInElements(elements);
             const selectedElementIds: Array<ExcalidrawElement["id"]> =
               getSelectedElements(elements, this.state, {
                 includeBoundTextElement: true,
@@ -4877,11 +4875,6 @@ class App extends React.Component<AppProps, AppState> {
                 mutateElement(duplicatedElement, {
                   x: duplicatedElement.x + (originDragX - dragX),
                   y: duplicatedElement.y + (originDragY - dragY),
-                  ...(element.type === "frame"
-                    ? {
-                        name: `Frame ${++framesCount}`,
-                      }
-                    : {}),
                 });
                 nextElements.push(duplicatedElement);
                 elementsToAppend.push(element);
@@ -5433,10 +5426,13 @@ class App extends React.Component<AppProps, AppState> {
                 }
               });
 
-              this.scene.replaceAllElementsInFrame(
-                [...nextElementsInFrame],
-                topLayerFrame,
-                this.state,
+              this.scene.replaceAllElements(
+                replaceAllElementsInFrame(
+                  this.scene.getElementsIncludingDeleted(),
+                  [...nextElementsInFrame],
+                  topLayerFrame,
+                  this.state,
+                ),
               );
             } else {
               const elementsToRemoveFromFrame = getElementsToUpdateForFrame(
@@ -5444,9 +5440,12 @@ class App extends React.Component<AppProps, AppState> {
                 (element) => !isFrameElement(element),
               );
 
-              this.scene.removeElementsFromFrame(
-                elementsToRemoveFromFrame,
-                this.state,
+              this.scene.replaceAllElements(
+                removeElementsFromFrame(
+                  this.scene.getElementsIncludingDeleted(),
+                  elementsToRemoveFromFrame,
+                  this.state,
+                ),
               );
             }
           }

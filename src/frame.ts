@@ -11,56 +11,14 @@ import {
 } from "./element/types";
 import { isPointWithinBounds } from "./math";
 import { getBoundTextElement } from "./element/textElement";
-import { arrayToMap } from "./utils";
+import { arrayToMap, findIndex } from "./utils";
 import { mutateElement } from "./element/mutateElement";
 import { AppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
+import { moveOneRight } from "./zindex";
 
-export const getElementsInFrame = (
-  elements: readonly ExcalidrawElement[],
-  frameId: string,
-) => elements.filter((element) => element.frameId === frameId);
-
-// TODO: include rotation when rotation is enabled
-export const isCursorInFrame = (
-  cursorCoords: {
-    x: number;
-    y: number;
-  },
-  frame: NonDeleted<ExcalidrawFrameElement>,
-) => {
-  const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame);
-
-  return isPointWithinBounds(
-    [fx1, fy1],
-    [cursorCoords.x, cursorCoords.y],
-    [fx2, fy2],
-  );
-};
-
-export const getElementsToUpdateForFrame = (
-  selectedElements: NonDeletedExcalidrawElement[],
-  predicate: (element: NonDeletedExcalidrawElement) => boolean,
-): NonDeletedExcalidrawElement[] => {
-  const elementsToUpdate: NonDeletedExcalidrawElement[] = [];
-
-  selectedElements.forEach((element) => {
-    if (predicate(element)) {
-      elementsToUpdate.push(element);
-      // since adding elements to a frame will alter the z-indexes
-      // we have to add bound text element to the update array as well
-      // to keep the text right next to its container
-      const textElement = getBoundTextElement(element);
-      if (textElement) {
-        elementsToUpdate.push(textElement);
-      }
-    }
-  });
-
-  return elementsToUpdate;
-};
-
+// --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
   nextElements: ExcalidrawElement[],
   oldElements: readonly ExcalidrawElement[],
@@ -88,87 +46,7 @@ export const bindElementsToFramesAfterDuplication = (
   });
 };
 
-export const getFramesCountInElements = (
-  elements: readonly ExcalidrawElement[],
-) => {
-  return elements.filter(
-    (element) => element.type === "frame" && !element.isDeleted,
-  ).length;
-};
-
-export const getFrameElementsMap = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  const frameElementsMap = new Map<
-    ExcalidrawElement["id"],
-    {
-      frameSelected: boolean;
-      elements: ExcalidrawElement[];
-    }
-  >();
-
-  const selectedElements = arrayToMap(getSelectedElements(elements, appState));
-
-  elements.forEach((element) => {
-    if (isFrameElement(element)) {
-      frameElementsMap.set(element.id, {
-        frameSelected: selectedElements.has(element.id),
-        elements: frameElementsMap.has(element.id)
-          ? frameElementsMap.get(element.id)?.elements ??
-            getElementsInFrame(elements, element.id)
-          : getElementsInFrame(elements, element.id),
-      });
-    } else if (element.frameId) {
-      frameElementsMap.set(element.frameId, {
-        frameSelected: false,
-        elements: frameElementsMap.has(element.frameId)
-          ? frameElementsMap.get(element.id)?.elements ??
-            getElementsInFrame(elements, element.frameId)
-          : getElementsInFrame(elements, element.frameId),
-      });
-    }
-  });
-
-  return frameElementsMap;
-};
-
-export const getElementsCompletelyInFrame = (
-  elements: readonly ExcalidrawElement[],
-  frame: ExcalidrawFrameElement,
-) =>
-  getElementsWithinSelection(elements, frame, false).filter(
-    (element) =>
-      element.type !== "frame" &&
-      (!element.frameId || element.frameId === frame.id),
-  );
-
-export const getElementsIntersectingFrame = (
-  elements: readonly ExcalidrawElement[],
-  frame: ExcalidrawFrameElement,
-) =>
-  elements.filter((element) =>
-    FrameGeometry.isElementIntersectingFrame(element, frame),
-  );
-
-export const elementsAreInFrameBounds = (
-  elements: readonly ExcalidrawElement[],
-  frame: ExcalidrawFrameElement,
-) => {
-  const [selectionX1, selectionY1, selectionX2, selectionY2] =
-    getElementAbsoluteCoords(frame);
-
-  const [elementX1, elementY1, elementX2, elementY2] =
-    getCommonBounds(elements);
-
-  return (
-    selectionX1 <= elementX1 &&
-    selectionY1 <= elementY1 &&
-    selectionX2 >= elementX2 &&
-    selectionY2 >= elementY2
-  );
-};
-
+// --------------------------- Frame Geometry ---------------------------------
 class Point {
   x: number;
   y: number;
@@ -329,3 +207,214 @@ export class FrameGeometry {
     return intersections.flat().some((intersection) => intersection);
   }
 }
+
+export const getElementsCompletelyInFrame = (
+  elements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameElement,
+) =>
+  getElementsWithinSelection(elements, frame, false).filter(
+    (element) =>
+      element.type !== "frame" &&
+      (!element.frameId || element.frameId === frame.id),
+  );
+
+export const getElementsIntersectingFrame = (
+  elements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameElement,
+) =>
+  elements.filter((element) =>
+    FrameGeometry.isElementIntersectingFrame(element, frame),
+  );
+
+export const elementsAreInFrameBounds = (
+  elements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameElement,
+) => {
+  const [selectionX1, selectionY1, selectionX2, selectionY2] =
+    getElementAbsoluteCoords(frame);
+
+  const [elementX1, elementY1, elementX2, elementY2] =
+    getCommonBounds(elements);
+
+  return (
+    selectionX1 <= elementX1 &&
+    selectionY1 <= elementY1 &&
+    selectionX2 >= elementX2 &&
+    selectionY2 >= elementY2
+  );
+};
+
+export const isCursorInFrame = (
+  cursorCoords: {
+    x: number;
+    y: number;
+  },
+  frame: NonDeleted<ExcalidrawFrameElement>,
+) => {
+  const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame);
+
+  return isPointWithinBounds(
+    [fx1, fy1],
+    [cursorCoords.x, cursorCoords.y],
+    [fx2, fy2],
+  );
+};
+
+// --------------------------- Frame Utils ------------------------------------
+export const getFrameElementsMapFromElements = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  const frameElementsMap = new Map<
+    ExcalidrawFrameElement["id"],
+    ExcalidrawElement[]
+  >();
+  elements.forEach((element) => {
+    if (element.frameId) {
+      frameElementsMap.set(element.frameId, [
+        ...(frameElementsMap.get(element.frameId) ?? []),
+        element,
+      ]);
+    }
+  });
+
+  return frameElementsMap;
+};
+
+export const getAllFrameElementsMapFromAppState = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const frameElementsMap = new Map<
+    ExcalidrawElement["id"],
+    {
+      frameSelected: boolean;
+      elements: ExcalidrawElement[];
+    }
+  >();
+
+  const selectedElements = arrayToMap(getSelectedElements(elements, appState));
+
+  elements.forEach((element) => {
+    if (isFrameElement(element)) {
+      frameElementsMap.set(element.id, {
+        frameSelected: selectedElements.has(element.id),
+        elements: frameElementsMap.has(element.id)
+          ? frameElementsMap.get(element.id)?.elements ??
+            getElementsInFrame(elements, element.id)
+          : getElementsInFrame(elements, element.id),
+      });
+    } else if (element.frameId) {
+      frameElementsMap.set(element.frameId, {
+        frameSelected: false,
+        elements: frameElementsMap.has(element.frameId)
+          ? frameElementsMap.get(element.id)?.elements ??
+            getElementsInFrame(elements, element.frameId)
+          : getElementsInFrame(elements, element.frameId),
+      });
+    }
+  });
+
+  return frameElementsMap;
+};
+
+export const getElementsToUpdateForFrame = (
+  selectedElements: NonDeletedExcalidrawElement[],
+  predicate: (element: NonDeletedExcalidrawElement) => boolean,
+): NonDeletedExcalidrawElement[] => {
+  const elementsToUpdate: NonDeletedExcalidrawElement[] = [];
+
+  selectedElements.forEach((element) => {
+    if (predicate(element)) {
+      elementsToUpdate.push(element);
+      // since adding elements to a frame will alter the z-indexes
+      // we have to add bound text element to the update array as well
+      // to keep the text right next to its container
+      const textElement = getBoundTextElement(element);
+      if (textElement) {
+        elementsToUpdate.push(textElement);
+      }
+    }
+  });
+
+  return elementsToUpdate;
+};
+
+export const getElementsInFrame = (
+  elements: readonly ExcalidrawElement[],
+  frameId: string,
+) => elements.filter((element) => element.frameId === frameId);
+
+// --------------------------- Frame Operations -------------------------------
+export const addElementsToFrame = (
+  allElements: readonly ExcalidrawElement[],
+  elementsToAdd: NonDeletedExcalidrawElement[],
+  frame: ExcalidrawFrameElement,
+) => {
+  let nextElements = [...allElements];
+
+  elementsToAdd.forEach((element) => {
+    // only necessary if the element is not already in the frame
+    if (element.frameId !== frame.id) {
+      mutateElement(element, {
+        frameId: frame.id,
+      });
+      const frameIndex = findIndex(nextElements, (e) => e.id === frame.id);
+      const elementIndex = findIndex(nextElements, (e) => e.id === element.id);
+
+      if (elementIndex < frameIndex) {
+        nextElements = [
+          ...nextElements.slice(0, elementIndex),
+          ...nextElements.slice(elementIndex + 1, frameIndex),
+          element,
+          ...nextElements.slice(frameIndex),
+        ];
+      } else {
+        nextElements = [
+          ...nextElements.slice(0, frameIndex),
+          element,
+          ...nextElements.slice(frameIndex, elementIndex),
+          ...nextElements.slice(elementIndex + 1),
+        ];
+      }
+    }
+  });
+
+  return nextElements;
+};
+
+export const removeElementsFromFrame = (
+  allElements: readonly ExcalidrawElement[],
+  elementsToRemove: NonDeletedExcalidrawElement[],
+  appState: AppState,
+) => {
+  elementsToRemove.forEach((element) => {
+    mutateElement(element, {
+      frameId: null,
+    });
+  });
+
+  // we also need to move these elements to the right of the frame
+  return moveOneRight(allElements, appState, elementsToRemove);
+};
+
+export const removeAllElementsFromFrame = (
+  allElements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameElement,
+  appState: AppState,
+) => {
+  const elementsInFrame = getElementsInFrame(allElements, frame.id);
+  return removeElementsFromFrame(allElements, elementsInFrame, appState);
+};
+
+export const replaceAllElementsInFrame = (
+  allElements: readonly ExcalidrawElement[],
+  nextElementsInFrame: ExcalidrawElement[],
+  frame: ExcalidrawFrameElement,
+  appState: AppState,
+) => {
+  return addElementsToFrame(
+    removeAllElementsFromFrame(allElements, frame, appState),
+    nextElementsInFrame,
+    frame,
+  );
+};
