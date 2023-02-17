@@ -260,9 +260,7 @@ const updateBoundTextPosition = (
       (maxContainerHeight - boundTextElement.height + padding);
   } else {
     y =
-      containerCoords.y +
-      containerDims.height / 2 -
-      boundTextElement.height / 2;
+      containerCoords.y + maxContainerHeight / 2 - boundTextElement.height / 2;
   }
   if (boundTextElement.textAlign === TEXT_ALIGN.LEFT) {
     x = containerCoords.x + padding;
