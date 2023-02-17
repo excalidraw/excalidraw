@@ -226,6 +226,7 @@ import {
   setEraserCursor,
   updateActiveTool,
   getShortcutKey,
+  isTransparent,
 } from "../utils";
 import {
   ContextMenu,
@@ -279,6 +280,8 @@ import { shouldShowBoundingBox } from "../element/transformHandles";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionToggleHandTool } from "../actions/actionCanvas";
+import { jotaiStore } from "../jotai";
+import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -589,7 +592,6 @@ class App extends React.Component<AppProps, AppState> {
                         })
                       }
                       langCode={getLanguage().code}
-                      isCollaborating={this.props.isCollaborating}
                       renderTopRightUI={renderTopRightUI}
                       renderCustomStats={renderCustomStats}
                       renderCustomSidebar={this.props.renderSidebar}
@@ -605,7 +607,6 @@ class App extends React.Component<AppProps, AppState> {
                       onImageAction={this.onImageAction}
                       renderWelcomeScreen={
                         !this.state.isLoading &&
-                        this.props.UIOptions.welcomeScreen &&
                         this.state.showWelcomeScreen &&
                         this.state.activeTool.type === "selection" &&
                         !this.scene.getElementsIncludingDeleted().length
@@ -836,7 +837,7 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-    const scene = restore(initialData, null, null);
+    const scene = restore(initialData, null, null, { repairBindings: true });
     scene.appState = {
       ...scene.appState,
       theme: this.props.theme || scene.appState.theme,
@@ -1954,7 +1955,6 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   // Input handling
-
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
       // normalize `event.key` when CapsLock is pressed #2372
@@ -2195,6 +2195,13 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({ openPopup: "strokeColorPicker" });
           event.stopPropagation();
         }
+      }
+
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
+      ) {
+        jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
       }
     },
   );
@@ -2756,7 +2763,15 @@ class App extends React.Component<AppProps, AppState> {
         sceneY,
       );
       if (container) {
-        if (isArrowElement(container) || hasBoundTextElement(container)) {
+        if (
+          isArrowElement(container) ||
+          hasBoundTextElement(container) ||
+          !isTransparent(container.backgroundColor) ||
+          isHittingElementNotConsideringBoundingBox(container, this.state, [
+            sceneX,
+            sceneY,
+          ])
+        ) {
           const midPoint = getContainerCenter(container, this.state);
 
           sceneX = midPoint.x;

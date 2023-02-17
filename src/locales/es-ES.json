@@ -219,7 +219,8 @@
     "lock": "Mantener la herramienta seleccionada activa después de dibujar",
     "penMode": "Modo Lápiz - previene toque",
     "link": "Añadir/Actualizar enlace para una forma seleccionada",
-    "eraser": "Borrar"
+    "eraser": "Borrar",
+    "hand": "Mano (herramienta de panoramización)"
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
@@ -227,7 +228,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Para mover el lienzo, mantenga la rueda del ratón o la barra de espacio mientras arrastra",
+    "canvasPanning": "Para mover el lienzo, mantenga la rueda del ratón o la barra espaciadora mientras arrastra o utilice la herramienta de mano",
     "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
@@ -245,7 +246,8 @@
     "publishLibrary": "Publica tu propia biblioteca",
     "bindTextToElement": "Presione Entrar para agregar",
     "deepBoxSelect": "Mantén CtrlOrCmd para seleccionar en profundidad, y para evitar arrastrar",
-    "eraserRevert": "Mantenga pulsado Alt para revertir los elementos marcados para su eliminación"
+    "eraserRevert": "Mantenga pulsado Alt para revertir los elementos marcados para su eliminación",
+    "firefox_clipboard_write": "Esta característica puede ser habilitada estableciendo la bandera \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar las banderas del navegador en Firefox, visite la página \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",

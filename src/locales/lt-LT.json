@@ -219,7 +219,8 @@
     "lock": "Baigus piešti, išlaikyti pasirinktą įrankį",
     "penMode": "Rašyklio režimas - neleisti prisilietimų",
     "link": "Pridėti / Atnaujinti pasirinktos figūros nuorodą",
-    "eraser": "Trintukas"
+    "eraser": "Trintukas",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Veiksmai su drobe",
@@ -227,7 +228,7 @@
     "shapes": "Figūros"
   },
   "hints": {
-    "canvasPanning": "Norint judinti drobę, judink pelę kartu įspaudus pelės ratuką arba tarpo klavišą",
+    "canvasPanning": "",
     "linearElement": "Paspaudimai sukurs papildomus taškus, nepertraukiamas tempimas sukurs liniją",
     "freeDraw": "Spausk ir tempk, paleisk kai norėsi pabaigti",
     "text": "Užuomina: tekstą taip pat galima pridėti bet kur su dvigubu pelės paspaudimu, kol parinkas žymėjimo įrankis",
@@ -245,7 +246,8 @@
     "publishLibrary": "",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "",

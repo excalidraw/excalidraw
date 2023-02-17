@@ -463,14 +463,21 @@ describe("textWysiwyg", () => {
       });
     });
 
-    it("should bind text to container when double clicked on center of filled container", async () => {
+    it("should bind text to container when double clicked inside filled container", async () => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+        backgroundColor: "red",
+      });
+      h.elements = [rectangle];
+
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
 
-      mouse.doubleClickAt(
-        rectangle.x + rectangle.width / 2,
-        rectangle.y + rectangle.height / 2,
-      );
+      mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
       expect(h.elements.length).toBe(2);
 
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
@@ -504,24 +511,37 @@ describe("textWysiwyg", () => {
       });
       h.elements = [rectangle];
 
+      mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
+      expect(h.elements.length).toBe(2);
+      let text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBe(null);
+      mouse.down();
+      let editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+      await new Promise((r) => setTimeout(r, 0));
+      editor.blur();
+
       mouse.doubleClickAt(
         rectangle.x + rectangle.width / 2,
         rectangle.y + rectangle.height / 2,
       );
-      expect(h.elements.length).toBe(2);
+      expect(h.elements.length).toBe(3);
 
-      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.type).toBe("text");
       expect(text.containerId).toBe(rectangle.id);
+
       mouse.down();
-      const editor = document.querySelector(
+      editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
 
       fireEvent.change(editor, { target: { value: "Hello World!" } });
-
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
+
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
@@ -545,6 +565,43 @@ describe("textWysiwyg", () => {
       await new Promise((r) => setTimeout(r, 0));
 
       fireEvent.change(editor, { target: { value: "Hello World!" } });
+      editor.blur();
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: text.id, type: "text" },
+      ]);
+    });
+
+    it("should bind text to container when double clicked on container stroke", async () => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+        strokeWidth: 4,
+      });
+      h.elements = [rectangle];
+
+      expect(h.elements.length).toBe(1);
+      expect(h.elements[0].id).toBe(rectangle.id);
+
+      mouse.doubleClickAt(rectangle.x + 2, rectangle.y + 2);
+      expect(h.elements.length).toBe(2);
+
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBe(rectangle.id);
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: text.id, type: "text" },
+      ]);
+      mouse.down();
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      fireEvent.change(editor, { target: { value: "Hello World!" } });
+
+      await new Promise((r) => setTimeout(r, 0));
       editor.blur();
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
@@ -862,7 +919,7 @@ describe("textWysiwyg", () => {
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
-          110,
+          109.5,
           17,
         ]
       `);
@@ -910,7 +967,7 @@ describe("textWysiwyg", () => {
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
-          425,
+          424,
           -539,
         ]
       `);
@@ -1026,7 +1083,7 @@ describe("textWysiwyg", () => {
       mouse.up(rectangle.x + 100, rectangle.y + 50);
       expect(rectangle.x).toBe(80);
       expect(rectangle.y).toBe(85);
-      expect(text.x).toBe(90);
+      expect(text.x).toBe(89.5);
       expect(text.y).toBe(90);
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -1164,6 +1221,129 @@ describe("textWysiwyg", () => {
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontSize,
       ).toEqual(36);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
+    });
+
+    describe("should align correctly", () => {
+      let editor: HTMLTextAreaElement;
+
+      beforeEach(async () => {
+        Keyboard.keyPress(KEYS.ENTER);
+        editor = document.querySelector(
+          ".excalidraw-textEditorContainer > textarea",
+        ) as HTMLTextAreaElement;
+        await new Promise((r) => setTimeout(r, 0));
+        fireEvent.change(editor, { target: { value: "Hello" } });
+        editor.blur();
+        mouse.select(rectangle);
+        Keyboard.keyPress(KEYS.ENTER);
+        editor = document.querySelector(
+          ".excalidraw-textEditorContainer > textarea",
+        ) as HTMLTextAreaElement;
+        editor.select();
+      });
+
+      it("when top left", async () => {
+        fireEvent.click(screen.getByTitle("Left"));
+        fireEvent.click(screen.getByTitle("Align top"));
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+          Array [
+            15,
+            20,
+          ]
+        `);
+      });
+
+      it("when top center", async () => {
+        fireEvent.click(screen.getByTitle("Center"));
+        fireEvent.click(screen.getByTitle("Align top"));
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+          Array [
+            94.5,
+            20,
+          ]
+        `);
+      });
+
+      it("when top right", async () => {
+        fireEvent.click(screen.getByTitle("Right"));
+        fireEvent.click(screen.getByTitle("Align top"));
+
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              174,
+              20,
+            ]
+          `);
+      });
+
+      it("when center left", async () => {
+        fireEvent.click(screen.getByTitle("Center vertically"));
+        fireEvent.click(screen.getByTitle("Left"));
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              15,
+              25,
+            ]
+          `);
+      });
+
+      it("when center center", async () => {
+        fireEvent.click(screen.getByTitle("Center"));
+        fireEvent.click(screen.getByTitle("Center vertically"));
+
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              -25,
+              25,
+            ]
+          `);
+      });
+
+      it("when center right", async () => {
+        fireEvent.click(screen.getByTitle("Right"));
+        fireEvent.click(screen.getByTitle("Center vertically"));
+
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              174,
+              25,
+            ]
+          `);
+      });
+
+      it("when bottom left", async () => {
+        fireEvent.click(screen.getByTitle("Left"));
+        fireEvent.click(screen.getByTitle("Align bottom"));
+
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              15,
+              25,
+            ]
+          `);
+      });
+
+      it("when bottom center", async () => {
+        fireEvent.click(screen.getByTitle("Center"));
+        fireEvent.click(screen.getByTitle("Align bottom"));
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              94.5,
+              25,
+            ]
+          `);
+      });
+
+      it("when bottom right", async () => {
+        fireEvent.click(screen.getByTitle("Right"));
+        fireEvent.click(screen.getByTitle("Align bottom"));
+        expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
+            Array [
+              174,
+              25,
+            ]
+          `);
+      });
     });
   });
 });

@@ -68,15 +68,14 @@ export const redrawTextBoundingBox = (
       const maxContainerHeight = getMaxContainerHeight(container);
       const maxContainerWidth = getMaxContainerWidth(container);
       let nextHeight = containerDims.height;
-      const boundTextElementPadding = getBoundTextElementOffset(textElement);
       if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-        coordY = containerCoords.y + boundTextElementPadding;
+        coordY = container.y;
       } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
         coordY =
           containerCoords.y +
           maxContainerHeight -
           metrics.height -
-          boundTextElementPadding;
+          BOUND_TEXT_PADDING;
       } else {
         coordY = container.y + containerDims.height / 2 - metrics.height / 2;
         if (metrics.height > maxContainerHeight) {
@@ -88,13 +87,13 @@ export const redrawTextBoundingBox = (
         }
       }
       if (textElement.textAlign === TEXT_ALIGN.LEFT) {
-        coordX = containerCoords.x + boundTextElementPadding;
+        coordX = container.x + BOUND_TEXT_PADDING;
       } else if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
         coordX =
           containerCoords.x +
           maxContainerWidth -
           metrics.width -
-          boundTextElementPadding;
+          BOUND_TEXT_PADDING;
       } else {
         coordX = container.x + containerDims.width / 2 - metrics.width / 2;
       }
@@ -138,10 +137,16 @@ export const bindTextToShapeAfterDuplication = (
         const newContainer = sceneElementMap.get(newElementId);
         if (newContainer) {
           mutateElement(newContainer, {
-            boundElements: (newContainer.boundElements || []).concat({
-              type: "text",
-              id: newTextElementId,
-            }),
+            boundElements: (element.boundElements || [])
+              .filter(
+                (boundElement) =>
+                  boundElement.id !== newTextElementId &&
+                  boundElement.id !== boundTextElementId,
+              )
+              .concat({
+                type: "text",
+                id: newTextElementId,
+              }),
           });
         }
         const newTextElement = sceneElementMap.get(newTextElementId);
@@ -306,7 +311,8 @@ export const measureText = (
   container.appendChild(span);
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
-  const width = container.offsetWidth;
+  // since we are adding a span of width 1px
+  const width = container.offsetWidth + 1;
   const height = container.offsetHeight;
   document.body.removeChild(container);
   if (isTestEnv()) {
