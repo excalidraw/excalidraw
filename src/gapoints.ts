@@ -15,6 +15,11 @@ export const from = ([x, y]: readonly [number, number]): Point => [
 
 export const toTuple = (point: Point): [number, number] => [point[5], point[4]];
 
+export const toObject = (point: Point): { x: number; y: number } => ({
+  x: point[5],
+  y: point[4],
+});
+
 export const abs = (point: Point): Point => [
   0,
   0,

@@ -60,6 +60,8 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
+import { renderSnap } from "./renderSnap";
+import { getSnap } from "../snapping";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -586,12 +588,26 @@ export const _renderScene = ({
       context.save();
       context.translate(renderConfig.scrollX, renderConfig.scrollY);
 
+      const isMagnetismEnabled = true;
+
+      const snap = isMagnetismEnabled ? getSnap({ elements, appState }) : null;
+      if (snap) {
+        renderSnap(
+          {
+            renderConfig,
+            context,
+          },
+          { snap },
+        );
+      }
+
       if (locallySelectedElements.length === 1) {
         context.fillStyle = oc.white;
         const transformHandles = getTransformHandles(
           locallySelectedElements[0],
           renderConfig.zoom,
           "mouse", // when we render we don't know which pointer type so use mouse
+          snap,
         );
         if (!appState.viewModeEnabled && showBoundingBox) {
           renderTransformHandles(
@@ -629,6 +645,8 @@ export const _renderScene = ({
           renderConfig.zoom,
           "mouse",
           OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+          undefined,
+          snap,
         );
         if (locallySelectedElements.some((element) => !element.locked)) {
           renderTransformHandles(context, renderConfig, transformHandles, 0);
@@ -841,7 +859,7 @@ const renderTransformHandles = (
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];
     if (transformHandle !== undefined) {
-      const [x, y, width, height] = transformHandle;
+      const [x, y, width, height, isMagnetismAttracted] = transformHandle;
 
       context.save();
       context.lineWidth = 1 / renderConfig.zoom.value;
@@ -854,6 +872,9 @@ const renderTransformHandles = (
       } else if (context.roundRect) {
         context.beginPath();
         context.roundRect(x, y, width, height, 2 / renderConfig.zoom.value);
+        if (isMagnetismAttracted && renderConfig.selectionColor) {
+          context.fillStyle = renderConfig.selectionColor;
+        }
         context.fill();
         context.stroke();
       } else {

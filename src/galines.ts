@@ -33,10 +33,33 @@ export const orthogonal = (line: Line, point: Point): Line =>
 export const orthogonalThrough = (against: Point, intersection: Point): Line =>
   orthogonal(through(against, intersection), intersection);
 
+export const orthogonalProjection = (
+  [, , , , y, x]: GA.Point,
+  [, c, a, b]: GA.Line,
+) =>
+  GA.point(
+    (b * (b * x - a * y) - a * c) / (a * a + b * b),
+    (a * (-b * x + a * y) - b * c) / (a * a + b * b),
+  );
+
 export const parallel = (line: Line, distance: number): Line => {
   const result = line.slice();
   result[1] -= distance;
   return result as unknown as Line;
+};
+
+export const slope = ([, , a, b]: Line): number =>
+  b === 0 ? Infinity : -a / b;
+
+export const areParallel = (a: Line, b: Line, precision = 0) => {
+  const deltaSlope = Math.abs(slope(a) - slope(b));
+  if (Number.isNaN(deltaSlope)) {
+    return true;
+  }
+  if (!Number.isFinite(deltaSlope)) {
+    return false;
+  }
+  return deltaSlope <= precision;
 };
 
 export const parallelThrough = (line: Line, point: Point): Line =>
