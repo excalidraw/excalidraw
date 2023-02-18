@@ -41,7 +41,6 @@ import App from "../components/App";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
-import { getLanguage } from "../i18n";
 
 const getTransform = (
   width: number,
