@@ -636,7 +636,7 @@ describe("textWysiwyg", () => {
       await new Promise((r) => setTimeout(r, 0));
       fireEvent.change(editor, { target: { value: "Hello World!" } });
       editor.blur();
-      expect(text.fontFamily).toEqual(FONT_FAMILY['Virgil, HanziPen SC, Kai']);
+      expect(text.fontFamily).toEqual(FONT_FAMILY['Virgil, HanziPen SC, KaiTi']);
       UI.clickTool("text");
 
       mouse.clickAt(
@@ -663,7 +663,7 @@ describe("textWysiwyg", () => {
       });
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY['Virgil, HanziPen SC, Kai']);
+      ).toEqual(FONT_FAMILY['Virgil, HanziPen SC, KaiTi']);
 
       //redo
       Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
