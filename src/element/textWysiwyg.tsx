@@ -41,6 +41,7 @@ import App from "../components/App";
 import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
+import { getLanguage } from "../i18n";
 
 const getTransform = (
   width: number,
@@ -463,7 +464,9 @@ export const textWysiwyg = ({
           event.code === CODES.BRACKET_RIGHT))
     ) {
       event.preventDefault();
-      if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
+      if (getLanguage().code === "ja-JP") {
+        return;
+      } else if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
         outdent();
       } else {
         indent();
