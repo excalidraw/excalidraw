@@ -463,7 +463,7 @@ export const textWysiwyg = ({
           event.code === CODES.BRACKET_RIGHT))
     ) {
       event.preventDefault();
-      if (getLanguage().code === "ja-JP") {
+      if (event.isComposing) {
         return;
       } else if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
         outdent();
