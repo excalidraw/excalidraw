@@ -111,6 +111,7 @@ const sidebars = {
         "codebase/contexts",
         "codebase/hooks",
         "codebase/utils",
+        "codebase/tests",
         "codebase/styling",
         "codebase/env-values",
         "codebase/other",
