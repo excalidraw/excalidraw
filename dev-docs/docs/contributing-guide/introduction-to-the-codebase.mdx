@@ -1,0 +1,138 @@
+---
+title: Introduction to the codebase
+slug: ../
+---
+
+# Contributing guide for Excalidraw
+
+This guide is meant to help you get started contributing to Excalidraw and to help you understand the codebase. If you have any questions, feel free to ask in the [Excalidraw Discord server](https://discord.gg/UexuTaE) or [open an issue in Github](https://github.com/excalidraw/excalidraw/issues/new).
+
+You can also contribute via [CodeSandbox](https://codesandbox.io/p/github/excalidraw/excalidraw)
+
+<details>
+<summary>Here's how</summary>
+
+1. Go to https://codesandbox.io/p/github/excalidraw/excalidraw
+2. Connect your GitHub account
+3. Go to Git tab on left side
+4. Tap on `Fork Sandbox`
+5. Write your code
+6. Commit and PR automatically
+
+</details>
+
+## Introduction
+
+### Prerequisites
+
+In order to get started, you should have the following installed:
+
+- [Node.js](https://nodejs.org/) (Preferred version: Latest LTS)
+- Optional: [Yarn](https://yarnpkg.com/)
+- [Git](https://git-scm.com/)
+
+### Setting up the development environment
+
+Clone the repository from github to your local machine and create a new branch.
+
+```bash
+git clone https://github.com/excalidraw/excalidraw.git && cd excalidraw
+git checkout -b my-branch
+```
+
+<details>
+<summary>To keep `master` branch pointing to remote repository and make pull requests from branches on your fork. Check this
+</summary>
+Run the following commands to set up your local repository to track the upstream repository.
+
+```bash
+git remote add upstream https://github.com/excalidraw/excalidraw.git
+git fetch upstream
+git branch --set-upstream-to=upstream/master master
+```
+
+</details>
+
+Excalidraw is a monorepo, so if you want to contribute to the core library, you'll need to install all dependencies in the root directory. If you want to contribute to the documentation, you'll need to install all dependencies in the `dev-docs` directory.
+
+```bash
+yarn install
+```
+
+### Development
+
+To start the development server, run the following command:
+
+```bash
+yarn start
+# or to run the production build (only core library)
+yarn start:production
+```
+
+This will start a development server on `localhost:3000` and open the app in your default browser.
+
+### Testing and linting (only core library)
+
+```bash
+yarn test
+```
+
+Or be more specific:
+
+```bash
+# React components
+test:app
+# Linting
+test:code
+#
+test:debug
+# Prettier
+test:other
+# TypeScript
+test:typecheck
+#
+test:update
+```
+
+## Creating a pull request
+
+### Title
+
+Make sure the title starts with a semantic prefix:
+
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation only changes
+- **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance
+- **test**: Adding missing tests or correcting existing tests
+- **build**: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+- **ci**: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
+- **chore**: Other changes that don't modify src or test files
+- **revert**: Reverts a previous commit
+
+### Testing
+
+Once you submit your pull request it will automatically be tested. Be sure to check the results of the test and fix any issues that arise.
+
+It's also a good idea to consider if your change should include additional tests. This is highly recommended for new features or bug-fixes. For example, it's good practice to create a test for each bug you fix which ensures that we don't regress the code in the future.
+
+Finally - always manually test your changes using the convenient staging environment deployed for each pull request. As much as local development attempts to replicate production, there can still be subtle differences in behavior. For larger features consider testing your change in multiple browsers as well.
+
+## Other notes and ways to contribute
+
+### Changelog
+
+Add a brief description of your pull request to the changelog located here: [changelog](https://github.com/excalidraw/excalidraw/blob/master/CHANGELOG.md)
+
+Notes:
+
+- Make sure to prepend to the section corresponding with the semantic prefix you selected in the title
+- Link to your pull request - this will require updating the CHANGELOG _after_ creating the pull request
+
+### Translating
+
+To translate Excalidraw into other languages, please visit [our Crowdin page](https://crowdin.com/project/excalidraw). To add a new language, [open an issue](https://github.com/excalidraw/excalidraw/issues/new) so we can get things set up on our end first.
+
+Translations will be available on the app if they exceed a certain threshold of completion (currently **85%**).
