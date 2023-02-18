@@ -92,6 +92,16 @@ const sidebars = {
         "@excalidraw/excalidraw/development",
       ],
     },
+
+    {
+      type: "category",
+      label: "Excalidraw codebase",
+      link: {
+        type: "doc",
+        id: "codebase/introduction-to-the-codebase",
+      },
+      items: [],
+    },
   ],
 };
 
