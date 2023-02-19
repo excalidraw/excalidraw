@@ -52,7 +52,7 @@ git branch --set-upstream-to=upstream/master master
 
 </details>
 
-Excalidraw is a monorepo, so if you want to contribute to the core library, you'll need to install all dependencies in the root directory. If you want to contribute to the documentation, you'll need to install all dependencies in the `dev-docs` directory.
+Excalidraw is a monorepo, so if you want to contribute to the core app, you'll need to install all dependencies in the root directory. If you want to contribute to the documentation, you'll need to install all dependencies in the `dev-docs` directory.
 
 ```bash
 yarn install
@@ -64,13 +64,13 @@ To start the development server, run the following command:
 
 ```bash
 yarn start
-# or to run the production build (only core library)
+# or to run the production build (only core app)
 yarn start:production
 ```
 
 This will start a development server on `localhost:3000` and open the app in your default browser.
 
-### Testing and linting (only core library)
+### Testing and linting (only core app)
 
 ```bash
 yarn test
