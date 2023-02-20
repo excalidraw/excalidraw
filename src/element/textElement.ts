@@ -756,7 +756,7 @@ export const isValidTextContainer = (element: ExcalidrawElement) => {
   );
 };
 
-const computeContainerHeightForBoundText = (
+export const computeContainerHeightForBoundText = (
   container: NonDeletedExcalidrawElement,
   boundTextElementHeight: number,
 ) => {
