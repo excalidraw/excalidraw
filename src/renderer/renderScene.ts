@@ -320,6 +320,7 @@ export const _renderScene = ({
   scale,
   rc,
   canvas,
+  canvasUi,
   renderConfig,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
@@ -327,6 +328,7 @@ export const _renderScene = ({
   scale: number;
   rc: RoughCanvas;
   canvas: HTMLCanvasElement;
+  canvasUi: HTMLCanvasElement;
   renderConfig: RenderConfig;
 }) =>
   // extra options passed to the renderer
@@ -343,7 +345,7 @@ export const _renderScene = ({
 
     const selectionColor = renderConfig.selectionColor || oc.black;
 
-    const context = canvas.getContext("2d")!;
+    let context = canvas.getContext("2d")!;
 
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.save();
@@ -435,7 +437,19 @@ export const _renderScene = ({
         editingLinearElement,
       );
     }
+    context.restore();
+    context.restore();
 
+    // All the context will paint within CANVAS-UI from here
+    context = canvasUi.getContext("2d")!;
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.save();
+    context.scale(scale, scale);
+    context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
+    
+    // Apply zoom to canvas-ui
+    context.save();
+    context.scale(renderConfig.zoom.value, renderConfig.zoom.value);
     // Paint selection element
     if (appState.selectionElement) {
       try {
@@ -799,6 +813,7 @@ const renderSceneThrottled = throttleRAF(
     scale: number;
     rc: RoughCanvas;
     canvas: HTMLCanvasElement;
+    canvasUi: HTMLCanvasElement;
     renderConfig: RenderConfig;
     callback?: (data: ReturnType<typeof _renderScene>) => void;
   }) => {
@@ -816,6 +831,7 @@ export const renderScene = <T extends boolean = false>(
     scale: number;
     rc: RoughCanvas;
     canvas: HTMLCanvasElement;
+    canvasUi: HTMLCanvasElement;
     renderConfig: RenderConfig;
     callback?: (data: ReturnType<typeof _renderScene>) => void;
   },

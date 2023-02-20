@@ -40,6 +40,7 @@ export const exportToCanvas = async (
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
   const { canvas, scale = 1 } = createCanvas(width, height);
+  const { canvas:canvasUi } = createCanvas(width, height);
 
   const defaultAppState = getDefaultAppState();
 
@@ -57,6 +58,7 @@ export const exportToCanvas = async (
     scale,
     rc: rough.canvas(canvas),
     canvas,
+    canvasUi,
     renderConfig: {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
       scrollX: -minX + exportPadding,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import { Popover } from "./Popover";
 import { isTransparent } from "../utils";
 
@@ -377,7 +377,7 @@ export const ColorPicker = ({
           <button
             className="color-picker-label-swatch"
             aria-label={label}
-            style={color ? { "--swatch-color": color } : undefined}
+            style={color ? { "--swatch-color": color } as CSSProperties : undefined}
             onClick={() => setActive(!isActive)}
             ref={pickerButton}
           />
