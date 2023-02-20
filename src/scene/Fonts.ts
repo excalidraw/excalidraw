@@ -1,9 +1,4 @@
-import {
-  isTextElement,
-  redrawTextBoundingBox,
-  refreshTextDimensions,
-} from "../element";
-import { newElementWith } from "../element/mutateElement";
+import { isTextElement, redrawTextBoundingBox } from "../element";
 import { getContainerElement } from "../element/textElement";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
