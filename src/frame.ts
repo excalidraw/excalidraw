@@ -39,7 +39,7 @@ export const bindElementsToFramesAfterDuplication = (
         const nextElement = nextElementMap.get(nextElementId);
         if (nextElement) {
           mutateElement(nextElement, {
-            frameId: nextFrameId ?? null,
+            frameId: nextFrameId ?? element.frameId,
           });
         }
       }

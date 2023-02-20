@@ -170,7 +170,10 @@ const duplicateElements = (
           continue;
         }
         if (isElementAFrame) {
-          const elementsInFrame = getElementsInFrame(elements, element.id);
+          const elementsInFrame = getElementsInFrame(
+            sortedElements,
+            element.id,
+          );
 
           elementsWithClones.push(
             ...markAsProcessed([
@@ -184,13 +187,14 @@ const duplicateElements = (
           continue;
         }
       }
-      // since elements in frames have a lower z-index than frame itself,
+      // since elements in frames have a lower z-index than the frame itself,
       // they will be looped first and if their frames are selected as well,
-      // we will take care of them atomically above
-      // so we skip those elements here
+      // they will have been copied along with the frame atomically in the
+      // above branch, so we must skip those elements here
       //
-      // for normal elements (or elements that are left out from the above
-      // step for whatever) we (should at least) duplicate them here
+      // now, for elements do not belong any frames or elements whose frames
+      // are selected (or elements that are left out from the above
+      // steps for whatever reason) we (should at least) duplicate them here
       if (!element.frameId || !idsOfElementsToDuplicate.has(element.frameId)) {
         elementsWithClones.push(
           ...markAsProcessed([element, duplicateAndOffsetElement(element)]),
