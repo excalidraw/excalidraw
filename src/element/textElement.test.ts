@@ -225,12 +225,6 @@ describe("Test measureText", () => {
   });
 
   describe("Test computeContainerHeightForBoundText", () => {
-    // const boundTextElement = API.createElement({
-    //   type: "text",
-    //   width: 166,
-    //   height: 150,
-    //   text: "Hello there!!! this specs are testing whether container height is computed correctly!",
-    // });
     const params = {
       width: 178,
       height: 194,
