@@ -4450,8 +4450,6 @@ class App extends React.Component<AppProps, AppState> {
         this.state.gridSize,
       );
 
-      // TODO: frame, linear elements takes extra care, what we have here
-      // is an extremely simplification
       const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
         x: gridX,
         y: gridY,
@@ -5355,9 +5353,41 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           );
 
-          // moving the points of a linear element has no
-          // effect on its belonging to a frame or not
+          // when editing the points of a linear element, we check if the
+          // linear element still is in the frame afterwards
+          // if not, the linear element will be removed from its frame (if any)
           if (
+            this.state.selectedLinearElement &&
+            this.state.selectedLinearElement.isDragging
+          ) {
+            const linearElement = this.scene.getElement(
+              this.state.selectedLinearElement.elementId,
+            );
+
+            if (linearElement?.frameId) {
+              const frame = this.scene.getElement(
+                linearElement.frameId,
+              ) as ExcalidrawFrameElement;
+
+              if (frame && linearElement) {
+                if (
+                  !elementsAreInFrameBounds([linearElement], frame) &&
+                  !FrameGeometry.isElementIntersectingFrame(
+                    linearElement,
+                    frame,
+                  )
+                ) {
+                  this.scene.replaceAllElements(
+                    removeElementsFromFrame(
+                      this.scene.getElementsIncludingDeleted(),
+                      [linearElement],
+                      this.state,
+                    ),
+                  );
+                }
+              }
+            }
+          } else if (
             !(
               this.state.selectedLinearElement &&
               this.state.selectedLinearElement.isDragging
