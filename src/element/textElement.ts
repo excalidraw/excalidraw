@@ -45,14 +45,7 @@ export const redrawTextBoundingBox = (
 ) => {
   let maxWidth = undefined;
 
-  const boundTextUpdates: {
-    x: number;
-    y: number;
-    text: string;
-    width: number;
-    height: number;
-    baseline: number;
-  } = {
+  const boundTextUpdates = {
     x: textElement.x,
     y: textElement.y,
     text: textElement.text,
@@ -229,15 +222,17 @@ export const handleBindTextResize = (
       text,
       width: nextWidth,
       height: nextHeight,
-
       baseline: nextBaseLine,
     });
+
     if (!isArrowElement(container)) {
-      const { x, y } = computeBoundTextPosition(
-        container,
-        textElement as ExcalidrawTextElementWithContainer,
+      mutateElement(
+        textElement,
+        computeBoundTextPosition(
+          container,
+          textElement as ExcalidrawTextElementWithContainer,
+        ),
       );
-      mutateElement(textElement, { x, y });
     }
   }
 };
