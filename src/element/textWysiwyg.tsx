@@ -232,7 +232,7 @@ export const textWysiwyg = ({
         // is reached
         else {
           const padding =
-            container.type === "ellipse"
+            container.type === "ellipse" || container.type === "diamond"
               ? 0
               : getBoundTextElementOffset(updatedTextElement);
           const containerCoords = getContainerCoords(container);

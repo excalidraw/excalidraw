@@ -647,6 +647,14 @@ export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
       y: container.y + offsetY,
     };
   }
+  if (container.type === "diamond") {
+    const offsetX = container.width / 4 + BOUND_TEXT_PADDING;
+    const offsetY = container.height / 4 + BOUND_TEXT_PADDING;
+    return {
+      x: container.x + offsetX,
+      y: container.y + offsetY,
+    };
+  }
   return {
     x: container.x,
     y: container.y,
@@ -766,6 +774,9 @@ export const computeContainerHeightForBoundText = (
   }
   if (isArrowElement(container)) {
     return boundTextElementHeight + BOUND_TEXT_PADDING * 8 * 2;
+  }
+  if (container.type === "diamond") {
+    return 2 * boundTextElementHeight;
   }
   return boundTextElementHeight + BOUND_TEXT_PADDING * 2;
 };

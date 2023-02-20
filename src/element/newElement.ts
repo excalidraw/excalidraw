@@ -295,6 +295,8 @@ export const getMaxContainerWidth = (container: ExcalidrawElement) => {
     // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse -https://github.com/excalidraw/excalidraw/pull/6172
     return Math.round((width / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
+  } else if (container.type === "diamond") {
+    return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
   }
   return width - BOUND_TEXT_PADDING * 2;
 };
@@ -316,6 +318,8 @@ export const getMaxContainerHeight = (container: ExcalidrawElement) => {
     // Math.round((ellipse.height / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse - https://github.com/excalidraw/excalidraw/pull/6172
     return Math.round((height / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
+  } else if (container.type === "diamond") {
+    return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
   }
   return height - BOUND_TEXT_PADDING * 2;
 };
