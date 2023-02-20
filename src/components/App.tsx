@@ -5377,6 +5377,12 @@ class App extends React.Component<AppProps, AppState> {
                     frame,
                   )
                 ) {
+                  // remove the linear element from all groups
+                  // before removing it from the frame as well
+                  mutateElement(linearElement, {
+                    groupIds: [],
+                  });
+
                   this.scene.replaceAllElements(
                     removeElementsFromFrame(
                       this.scene.getElementsIncludingDeleted(),
@@ -5387,12 +5393,7 @@ class App extends React.Component<AppProps, AppState> {
                 }
               }
             }
-          } else if (
-            !(
-              this.state.selectedLinearElement &&
-              this.state.selectedLinearElement.isDragging
-            )
-          ) {
+          } else {
             const topLayerFrame =
               this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
@@ -5402,11 +5403,15 @@ class App extends React.Component<AppProps, AppState> {
             );
 
             if (topLayerFrame) {
-              const nextElementsInFrame = new Set(
+              const prevElementsInFrame = new Set(
                 getElementsInFrame(
                   this.scene.getNonDeletedElements(),
                   topLayerFrame.id,
                 ),
+              );
+
+              const nextElementsInFrame = new Set(
+                Array.from(prevElementsInFrame),
               );
 
               // add new elements
@@ -5422,6 +5427,29 @@ class App extends React.Component<AppProps, AppState> {
                       topLayerFrame,
                     )),
               ).forEach((element) => nextElementsInFrame.add(element));
+
+              // if we are editing a group, then we need to remove the selected
+              // elements from the editing group as well
+              if (this.state.editingGroupId) {
+                selectedElements.forEach((element) => {
+                  // element must be a new addition to the frame
+                  // which means that we need to remove it from the editing group
+                  // and also from any outer groups
+                  if (
+                    !prevElementsInFrame.has(element) &&
+                    nextElementsInFrame.has(element)
+                  ) {
+                    const index = element.groupIds.indexOf(
+                      this.state.editingGroupId!,
+                    );
+                    if (index !== -1) {
+                      mutateElement(element, {
+                        groupIds: element.groupIds.slice(0, index),
+                      });
+                    }
+                  }
+                });
+              }
 
               // remove some selected elements from the frame if needed
               const groupsToKeep = new Set<string>(
@@ -5479,13 +5507,61 @@ class App extends React.Component<AppProps, AppState> {
                   !isFrameElement(element) && element.frameId !== null,
               );
 
-              this.scene.replaceAllElements(
-                removeElementsFromFrame(
-                  this.scene.getElementsIncludingDeleted(),
-                  elementsToRemoveFromFrame,
-                  this.state,
-                ),
-              );
+              if (elementsToRemoveFromFrame.length > 0) {
+                // if we are editing a group, then we need to remove these
+                // elements from the editing group and any outer groups as well
+
+                if (this.state.editingGroupId) {
+                  // some group elements might not be visible after parts of
+                  // their groups are dragged outside of the frame
+                  const groupIdsToCheck = new Set<string>();
+
+                  elementsToRemoveFromFrame.forEach((element) => {
+                    const index = element.groupIds.indexOf(
+                      this.state.editingGroupId!,
+                    );
+
+                    const removedGroupIds = element.groupIds.slice(index);
+                    removedGroupIds.forEach((gid) => groupIdsToCheck.add(gid));
+
+                    mutateElement(element, {
+                      groupIds: element.groupIds.slice(0, index),
+                    });
+                  });
+
+                  groupIdsToCheck.forEach((gid) => {
+                    const elementsInGroup = getElementsInGroup(
+                      this.scene.getNonDeletedElements(),
+                      gid,
+                    );
+
+                    elementsInGroup.forEach((element) => {
+                      if (element.frameId) {
+                        const frame = this.scene.getElement(
+                          element.frameId,
+                        ) as ExcalidrawFrameElement;
+                        if (
+                          !elementsAreInFrameBounds([element], frame) &&
+                          !FrameGeometry.isElementIntersectingFrame(
+                            element,
+                            frame,
+                          )
+                        ) {
+                          elementsToRemoveFromFrame.push(element);
+                        }
+                      }
+                    });
+                  });
+                }
+
+                this.scene.replaceAllElements(
+                  removeElementsFromFrame(
+                    this.scene.getElementsIncludingDeleted(),
+                    elementsToRemoveFromFrame,
+                    this.state,
+                  ),
+                );
+              }
             }
           }
         }
