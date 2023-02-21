@@ -202,24 +202,37 @@ describe("Test measureText", () => {
 
   describe("Test getContainerCoords", () => {
     const params = { width: 200, height: 100, x: 10, y: 20 };
+
     it("should compute coords correctly when ellipse", () => {
-      const ellipse = API.createElement({
+      const element = API.createElement({
         type: "ellipse",
         ...params,
       });
-      expect(getContainerCoords(ellipse)).toEqual({
+      expect(getContainerCoords(element)).toEqual({
         x: 44.2893218813452455,
         y: 39.64466094067262,
       });
     });
+
     it("should compute coords correctly when rectangle", () => {
-      const rectangle = API.createElement({
+      const element = API.createElement({
         type: "rectangle",
         ...params,
       });
-      expect(getContainerCoords(rectangle)).toEqual({
+      expect(getContainerCoords(element)).toEqual({
         x: 10,
         y: 20,
+      });
+    });
+
+    it("should compute coords correctly when diamond", () => {
+      const element = API.createElement({
+        type: "diamond",
+        ...params,
+      });
+      expect(getContainerCoords(element)).toEqual({
+        x: 65,
+        y: 50,
       });
     });
   });
@@ -229,6 +242,7 @@ describe("Test measureText", () => {
       width: 178,
       height: 194,
     };
+
     it("should compute container height correctly for rectangle", () => {
       const element = API.createElement({
         type: "rectangle",
@@ -236,12 +250,21 @@ describe("Test measureText", () => {
       });
       expect(computeContainerHeightForBoundText(element, 150)).toEqual(160);
     });
+
     it("should compute container height correctly for ellipse", () => {
       const element = API.createElement({
         type: "ellipse",
         ...params,
       });
       expect(computeContainerHeightForBoundText(element, 150)).toEqual(212);
+    });
+
+    it("should compute container height correctly for diamond", () => {
+      const element = API.createElement({
+        type: "diamond",
+        ...params,
+      });
+      expect(computeContainerHeightForBoundText(element, 150)).toEqual(300);
     });
   });
 });
