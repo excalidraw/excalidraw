@@ -1,8 +1,5 @@
-import { getElementAbsoluteCoords } from "./element";
-import {
-  getBorderPointsFormCoords,
-  TransformHandleDirection,
-} from "./element/transformHandles";
+import { getCommonBounds } from "./element";
+import { TransformHandleDirection } from "./element/transformHandles";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -32,19 +29,20 @@ export type SnapLine = {
 
 const MAX_DISTANCE = 150;
 
-const getElementCoordinates = (element: ExcalidrawElement) => {
-  const coordinates = getElementAbsoluteCoords(element);
-  const borderPoints = getBorderPointsFormCoords(coordinates, element.angle);
+const getElementsCoordinates = (elements: ExcalidrawElement[]) => {
+  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  const width = maxX - minX;
+  const height = maxY - minY;
 
   return {
-    nw: GA.point(...borderPoints.nw),
-    ne: GA.point(...borderPoints.ne),
-    sw: GA.point(...borderPoints.sw),
-    se: GA.point(...borderPoints.se),
-    n: GA.point(...borderPoints.n),
-    s: GA.point(...borderPoints.s),
-    w: GA.point(...borderPoints.w),
-    e: GA.point(...borderPoints.e),
+    nw: GA.point(minX, maxY),
+    ne: GA.point(maxX, maxY),
+    sw: GA.point(minX, minY),
+    se: GA.point(maxX, minY),
+    n: GA.point(minX + width / 2, maxY),
+    s: GA.point(minX + width / 2, minY),
+    w: GA.point(minX, minY + height / 2),
+    e: GA.point(maxX, minY + height / 2),
   };
 };
 
@@ -77,7 +75,7 @@ const snapLine = (from: GA.Point, to: GA.Point) => ({
 });
 
 const getElementSnapLines = (element: ExcalidrawElement) => {
-  const borderPoints = getElementCoordinates(element);
+  const borderPoints = getElementsCoordinates([element]);
 
   return {
     left: snapLine(borderPoints.nw, borderPoints.sw),
@@ -96,14 +94,11 @@ export const getSnap = ({
   appState: AppState;
 }): Snap | null => {
   const selectedElements = getSelectedElements(elements, appState);
-
-  if (selectedElements.length !== 1) {
+  if (selectedElements.length === 0) {
     return null;
   }
 
-  // FIXME: handle multi selection box
-  const selectedElement = selectedElements[0];
-  const selectionCoordinates = getElementCoordinates(selectedElement);
+  const selectionCoordinates = getElementsCoordinates(selectedElements);
 
   const selectionToSnapLine = elements
     // non selected
