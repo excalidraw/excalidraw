@@ -29,11 +29,9 @@ import {
 } from "../scene/scrollbars";
 import { getSelectedElements } from "../scene/selection";
 
-import {
-  renderElement,
-  renderElementUI,
-  renderElementToSvg,
-} from "./renderElement";
+import { renderElement, renderElementToSvg } from "./renderElement";
+
+import { renderSelectionElement } from "./renderSelectionElement";
 import { getClientColors } from "../clients";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -466,7 +464,7 @@ export const renderCanvasUI = ({
   // Paint selection element
   if (appState.selectionElement) {
     try {
-      renderElementUI(appState.selectionElement, context, renderConfig);
+      renderSelectionElement(appState.selectionElement, context, renderConfig);
     } catch (error: any) {
       console.error(error);
     }
