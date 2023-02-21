@@ -701,11 +701,15 @@ const resizeMultipleElements = (
     const boundTextElement = getBoundTextElement(element.latest);
 
     if (boundTextElement || isTextElement(element.orig)) {
-      const optionalPadding = getBoundTextElementOffset(boundTextElement) * 2;
-      const textMeasurements = measureFontSizeFromWH(
-        boundTextElement ?? (element.orig as ExcalidrawTextElement),
+      const updatedElement = {
+        ...element.latest,
         width,
         height,
+      };
+      const textMeasurements = measureFontSizeFromWH(
+        boundTextElement ?? (element.orig as ExcalidrawTextElement),
+        getMaxContainerWidth(updatedElement),
+        getMaxContainerHeight(updatedElement),
       );
 
       if (!textMeasurements) {
