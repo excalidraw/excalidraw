@@ -204,7 +204,7 @@ const measureFontSizeFromWH = (
   if (hasContainer) {
     const container = getContainerElement(element);
     if (container) {
-      width = getMaxContainerWidth(container, true);
+      width = container.width;
     }
   }
   const nextFontSize = element.fontSize * (nextWidth / width);
@@ -431,8 +431,8 @@ export const resizeSingleElement = (
         getBoundTextElementOffset(boundTextElement);
       const nextFont = measureFontSizeFromWH(
         boundTextElement,
-        eleNewWidth - boundTextElementPadding * 2,
-        eleNewHeight - boundTextElementPadding * 2,
+        eleNewWidth,
+        eleNewHeight,
       );
       if (nextFont === null) {
         return;
@@ -700,8 +700,8 @@ const resizeMultipleElements = (
       const optionalPadding = getBoundTextElementOffset(boundTextElement) * 2;
       const textMeasurements = measureFontSizeFromWH(
         boundTextElement ?? (element.orig as ExcalidrawTextElement),
-        width - optionalPadding,
-        height - optionalPadding,
+        width,
+        height,
       );
 
       if (!textMeasurements) {

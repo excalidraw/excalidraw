@@ -278,10 +278,7 @@ export const refreshTextDimensions = (
   return { text, ...dimensions };
 };
 
-export const getMaxContainerWidth = (
-  container: ExcalidrawElement,
-  shouldMaintainAspectRatio = false,
-) => {
+export const getMaxContainerWidth = (container: ExcalidrawElement) => {
   const width = getContainerDims(container).width;
   if (isArrowElement(container)) {
     const containerWidth = width - BOUND_TEXT_PADDING * 8 * 2;
@@ -295,11 +292,6 @@ export const getMaxContainerWidth = (
     return containerWidth;
   }
 
-  // Since when shouldMaintainAspectRatio is true the original width
-  // of container except padding is used to calculate scale
-  if (shouldMaintainAspectRatio) {
-    return width - BOUND_TEXT_PADDING * 2;
-  }
   if (container.type === "ellipse") {
     // The width of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
