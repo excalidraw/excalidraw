@@ -637,6 +637,7 @@ export const getContainerCenter = (
 
 export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
   if (container.type === "ellipse") {
+    // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6172
     const offsetX =
       (container.width / 2) * (1 - Math.sqrt(2) / 2) + BOUND_TEXT_PADDING;
     const offsetY =
