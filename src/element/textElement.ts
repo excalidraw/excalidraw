@@ -257,7 +257,7 @@ const computeBoundTextPosition = (
   } else {
     y =
       containerCoords.y +
-      (maxContainerHeight / 2 - boundTextElement.height / 2);
+      (maxContainerHeight / 2 - boundTextElement.height / 2 + padding);
   }
   if (boundTextElement.textAlign === TEXT_ALIGN.LEFT) {
     x = containerCoords.x + padding;

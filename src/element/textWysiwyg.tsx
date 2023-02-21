@@ -242,7 +242,10 @@ export const textWysiwyg = ({
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
             if (!isArrowElement(container)) {
               coordY =
-                containerCoords.y + maxHeight / 2 - textElementHeight / 2;
+                containerCoords.y +
+                maxHeight / 2 -
+                textElementHeight / 2 +
+                padding;
             }
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
