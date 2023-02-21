@@ -329,11 +329,7 @@ export const renderCanvasContent = ({
   canvas: HTMLCanvasElement;
   renderConfig: RenderConfig;
 }) => {
-
-  const {
-    renderGrid = true,
-    isExporting,
-  } = renderConfig;
+  const { renderGrid = true, isExporting } = renderConfig;
 
   const context = canvas.getContext("2d")!;
 
@@ -376,11 +372,11 @@ export const renderCanvasContent = ({
       context,
       appState.gridSize,
       -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
-      appState.gridSize +
-      (renderConfig.scrollX % appState.gridSize),
+        appState.gridSize +
+        (renderConfig.scrollX % appState.gridSize),
       -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
-      appState.gridSize +
-      (renderConfig.scrollY % appState.gridSize),
+        appState.gridSize +
+        (renderConfig.scrollY % appState.gridSize),
       normalizedCanvasWidth / renderConfig.zoom.value,
       normalizedCanvasHeight / renderConfig.zoom.value,
     );
@@ -407,8 +403,7 @@ export const renderCanvasContent = ({
       // correct element from visible elements
       if (appState.editingLinearElement?.elementId === element.id) {
         if (element) {
-          editingLinearElement =
-            element as NonDeleted<ExcalidrawLinearElement>;
+          editingLinearElement = element as NonDeleted<ExcalidrawLinearElement>;
         }
       }
       if (!isExporting) {
@@ -430,8 +425,8 @@ export const renderCanvasContent = ({
   context.restore();
   context.restore();
 
-  return { atLeastOneVisibleElement: visibleElements.length > 0 }
-}
+  return { atLeastOneVisibleElement: visibleElements.length > 0 };
+};
 
 export const renderCanvasUI = ({
   elements,
@@ -441,7 +436,7 @@ export const renderCanvasUI = ({
   canvasUi,
   renderConfig,
   normalizedCanvasWidth,
-  normalizedCanvasHeight
+  normalizedCanvasHeight,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
@@ -449,14 +444,10 @@ export const renderCanvasUI = ({
   rc: RoughCanvas;
   canvasUi: HTMLCanvasElement;
   renderConfig: RenderConfig;
-  normalizedCanvasWidth: number
-  normalizedCanvasHeight: number
+  normalizedCanvasWidth: number;
+  normalizedCanvasHeight: number;
 }) => {
-
-  const {
-    renderScrollbars = true,
-    renderSelection = true,
-  } = renderConfig;
+  const { renderScrollbars = true, renderSelection = true } = renderConfig;
 
   // All the context will paint within CANVAS-UI from here
   const selectionColor = renderConfig.selectionColor || oc.black;
@@ -536,7 +527,7 @@ export const renderCanvasUI = ({
     if (
       isSingleLinearElementSelected &&
       appState.selectedLinearElement?.elementId ===
-      locallySelectedElements[0].id &&
+        locallySelectedElements[0].id &&
       !locallySelectedElements[0].locked
     ) {
       renderLinearPointHandles(
@@ -636,8 +627,7 @@ export const renderCanvasUI = ({
         );
       }
     } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
-      const dashedLinePadding =
-        (DEFAULT_SPACING * 2) / renderConfig.zoom.value;
+      const dashedLinePadding = (DEFAULT_SPACING * 2) / renderConfig.zoom.value;
       context.fillStyle = oc.white;
       const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
       const initialLineDash = context.getLineDash();
@@ -743,8 +733,9 @@ export const renderCanvasUI = ({
       idleState = hasEmojiSupport ? "💤" : ` (${UserIdleState.IDLE})`;
     }
 
-    const usernameAndIdleState = `${username || ""}${idleState ? ` ${idleState}` : ""
-      }`;
+    const usernameAndIdleState = `${username || ""}${
+      idleState ? ` ${idleState}` : ""
+    }`;
 
     if (!isOutOfBounds && usernameAndIdleState) {
       const offsetX = x + width;
@@ -823,8 +814,8 @@ export const renderCanvasUI = ({
 
   context.restore();
 
-  return { scrollBars }
-}
+  return { scrollBars };
+};
 export const _renderScene = ({
   elements,
   appState,
@@ -842,37 +833,37 @@ export const _renderScene = ({
   canvasUi: HTMLCanvasElement;
   renderConfig: RenderConfig;
 }) =>
-// extra options passed to the renderer
-{
-  if (canvas === null) {
-    return { atLeastOneVisibleElement: false };
-  }
-  // When doing calculations based on canvas width we should used normalized one
-  const normalizedCanvasWidth = canvas.width / scale;
-  const normalizedCanvasHeight = canvas.height / scale;
+  // extra options passed to the renderer
+  {
+    if (canvas === null) {
+      return { atLeastOneVisibleElement: false };
+    }
+    // When doing calculations based on canvas width we should used normalized one
+    const normalizedCanvasWidth = canvas.width / scale;
+    const normalizedCanvasHeight = canvas.height / scale;
 
-  const { atLeastOneVisibleElement } = renderCanvasContent({
-    elements,
-    appState,
-    scale,
-    rc,
-    canvas,
-    renderConfig
-  })
+    const { atLeastOneVisibleElement } = renderCanvasContent({
+      elements,
+      appState,
+      scale,
+      rc,
+      canvas,
+      renderConfig,
+    });
 
-  const { scrollBars } = renderCanvasUI({
-    elements,
-    appState,
-    scale,
-    rc,
-    canvasUi,
-    renderConfig,
-    normalizedCanvasWidth,
-    normalizedCanvasHeight,
-  })
+    const { scrollBars } = renderCanvasUI({
+      elements,
+      appState,
+      scale,
+      rc,
+      canvasUi,
+      renderConfig,
+      normalizedCanvasWidth,
+      normalizedCanvasHeight,
+    });
 
-  return { atLeastOneVisibleElement, scrollBars };
-};
+    return { atLeastOneVisibleElement, scrollBars };
+  };
 
 const renderSceneThrottled = throttleRAF(
   (config: {

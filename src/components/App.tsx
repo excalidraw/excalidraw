@@ -498,41 +498,45 @@ class App extends React.Component<AppProps, AppState> {
     const canvasWidth = canvasDOMWidth * canvasScale;
     const canvasHeight = canvasDOMHeight * canvasScale;
 
-    return (<>
-      <canvas
-        className="excalidraw__canvas"
-        style={{
-          width: canvasDOMWidth,
-          height: canvasDOMHeight,
-          cursor: viewModeEnabled?CURSOR_TYPE.GRAB:CURSOR_TYPE.AUTO,
-        }}
-        width={canvasWidth}
-        height={canvasHeight}
-        ref={this.handleCanvasRef}
-        onContextMenu={this.handleCanvasContextMenu}
-        onPointerMove={this.handleCanvasPointerMove}
-        onPointerUp={this.handleCanvasPointerUp}
-        onPointerCancel={this.removePointer}
-        onTouchMove={this.handleTouchMove}
-        onPointerDown={this.handleCanvasPointerDown}
-        onDoubleClick={viewModeEnabled?undefined:this.handleCanvasDoubleClick}
-      >
-        {t("labels.drawingCanvas")}
-      </canvas>
-      <canvas
-        className="excalidraw__canvas ui_draw"
-        style={{
-          width: canvasDOMWidth,
-          height: canvasDOMHeight,
-          pointerEvents: 'none'
-        }}
-        width={canvasWidth}
-        height={canvasHeight}
-        ref={this.handleCanvasUiRef}
-      >
-        {t("labels.drawingCanvas")}
-      </canvas>
-      </>);
+    return (
+      <>
+        <canvas
+          className="excalidraw__canvas"
+          style={{
+            width: canvasDOMWidth,
+            height: canvasDOMHeight,
+            cursor: viewModeEnabled ? CURSOR_TYPE.GRAB : CURSOR_TYPE.AUTO,
+          }}
+          width={canvasWidth}
+          height={canvasHeight}
+          ref={this.handleCanvasRef}
+          onContextMenu={this.handleCanvasContextMenu}
+          onPointerMove={this.handleCanvasPointerMove}
+          onPointerUp={this.handleCanvasPointerUp}
+          onPointerCancel={this.removePointer}
+          onTouchMove={this.handleTouchMove}
+          onPointerDown={this.handleCanvasPointerDown}
+          onDoubleClick={
+            viewModeEnabled ? undefined : this.handleCanvasDoubleClick
+          }
+        >
+          {t("labels.drawingCanvas")}
+        </canvas>
+        <canvas
+          className="excalidraw__canvas ui_draw"
+          style={{
+            width: canvasDOMWidth,
+            height: canvasDOMHeight,
+            pointerEvents: "none",
+          }}
+          width={canvasWidth}
+          height={canvasHeight}
+          ref={this.handleCanvasUiRef}
+        >
+          {t("labels.drawingCanvas")}
+        </canvas>
+      </>
+    );
   }
 
   public render() {

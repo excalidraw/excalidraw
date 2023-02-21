@@ -377,7 +377,9 @@ export const ColorPicker = ({
           <button
             className="color-picker-label-swatch"
             aria-label={label}
-            style={color ? { "--swatch-color": color } as CSSProperties : undefined}
+            style={
+              color ? ({ "--swatch-color": color } as CSSProperties) : undefined
+            }
             onClick={() => setActive(!isActive)}
             ref={pickerButton}
           />

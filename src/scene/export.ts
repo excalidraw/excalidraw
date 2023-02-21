@@ -40,7 +40,7 @@ export const exportToCanvas = async (
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
   const { canvas, scale = 1 } = createCanvas(width, height);
-  const { canvas:canvasUi } = createCanvas(width, height);
+  const { canvas: canvasUi } = createCanvas(width, height);
 
   const defaultAppState = getDefaultAppState();
 
