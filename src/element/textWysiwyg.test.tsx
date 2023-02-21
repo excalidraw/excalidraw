@@ -791,7 +791,7 @@ describe("textWysiwyg", () => {
       text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.text).toBe("Hello \nWorld!");
       expect(text.originalText).toBe("Hello World!");
-      expect(text.y).toBe(27.5);
+      expect(text.y).toBe(52.5);
       expect(text.x).toBe(rectangle.x + BOUND_TEXT_PADDING);
       expect(text.height).toBe(APPROX_LINE_HEIGHT * 2);
       expect(text.width).toBe(rectangle.width - BOUND_TEXT_PADDING * 2);
@@ -825,7 +825,7 @@ describe("textWysiwyg", () => {
 
       expect(text.text).toBe("Hello");
       expect(text.originalText).toBe("Hello");
-      expect(text.y).toBe(40);
+      expect(text.y).toBe(52.5);
       expect(text.x).toBe(rectangle.x + BOUND_TEXT_PADDING);
       expect(text.height).toBe(APPROX_LINE_HEIGHT);
       expect(text.width).toBe(rectangle.width - BOUND_TEXT_PADDING * 2);
@@ -916,7 +916,7 @@ describe("textWysiwyg", () => {
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
           109.5,
-          17,
+          12,
         ]
       `);
 
@@ -930,6 +930,8 @@ describe("textWysiwyg", () => {
       editor.select();
 
       fireEvent.click(screen.getByTitle("Left"));
+      await new Promise((r) => setTimeout(r, 0));
+
       fireEvent.click(screen.getByTitle("Align bottom"));
       await new Promise((r) => setTimeout(r, 0));
 
@@ -1080,7 +1082,7 @@ describe("textWysiwyg", () => {
       expect(rectangle.x).toBe(80);
       expect(rectangle.y).toBe(85);
       expect(text.x).toBe(89.5);
-      expect(text.y).toBe(90);
+      expect(text.y).toBe(85);
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {
         Keyboard.keyPress(KEYS.Z);
