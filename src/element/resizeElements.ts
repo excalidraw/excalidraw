@@ -43,7 +43,6 @@ import {
   getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
-  getBoundTextElementOffset,
   getContainerElement,
   handleBindTextResize,
   measureText,
