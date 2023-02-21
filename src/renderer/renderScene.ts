@@ -21,7 +21,10 @@ import {
 } from "../element";
 
 import { roundRect } from "./roundRect";
-import { RenderConfig } from "../scene/types";
+import {
+  CanvasUIRenderConfig,
+  CanvasContentRenderConfig,
+} from "../scene/types";
 import {
   getScrollBars,
   SCROLLBAR_COLOR,
@@ -162,7 +165,7 @@ const strokeGrid = (
 const renderSingleLinearPoint = (
   context: CanvasRenderingContext2D,
   appState: AppState,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasUIRenderConfig,
   point: Point,
   radius: number,
   isSelected: boolean,
@@ -189,7 +192,7 @@ const renderSingleLinearPoint = (
 const renderLinearPointHandles = (
   context: CanvasRenderingContext2D,
   appState: AppState,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasUIRenderConfig,
   element: NonDeleted<ExcalidrawLinearElement>,
 ) => {
   if (!appState.selectedLinearElement) {
@@ -276,7 +279,7 @@ const renderLinearPointHandles = (
 const highlightPoint = (
   point: Point,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasUIRenderConfig,
 ) => {
   context.fillStyle = "rgba(105, 101, 219, 0.4)";
 
@@ -291,7 +294,7 @@ const highlightPoint = (
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: AppState,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasUIRenderConfig,
 ) => {
   const { elementId, hoverPointIndex } = appState.selectedLinearElement!;
   if (
@@ -322,15 +325,16 @@ export const renderCanvasContent = ({
   scale,
   rc,
   canvas,
-  renderConfig,
+  canvasContentRenderConfig,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
   scale: number;
   rc: RoughCanvas;
   canvas: HTMLCanvasElement;
-  renderConfig: RenderConfig;
+  canvasContentRenderConfig: CanvasContentRenderConfig;
 }) => {
+  const renderConfig = canvasContentRenderConfig;
   const { renderGrid = true, isExporting } = renderConfig;
 
   const context = canvas.getContext("2d")!;
@@ -416,18 +420,13 @@ export const renderCanvasContent = ({
     }
   });
 
-  if (editingLinearElement) {
-    renderLinearPointHandles(
-      context,
-      appState,
-      renderConfig,
-      editingLinearElement,
-    );
-  }
   context.restore();
   context.restore();
 
-  return { atLeastOneVisibleElement: visibleElements.length > 0 };
+  return {
+    atLeastOneVisibleElement: visibleElements.length > 0,
+    editingLinearElement,
+  };
 };
 
 export const renderCanvasUI = ({
@@ -435,18 +434,22 @@ export const renderCanvasUI = ({
   appState,
   scale,
   canvasUi,
-  renderConfig,
+  canvasUIRenderConfig,
   normalizedCanvasWidth,
   normalizedCanvasHeight,
+  editingLinearElement,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
   scale: number;
   canvasUi: HTMLCanvasElement;
-  renderConfig: RenderConfig;
+  canvasUIRenderConfig: CanvasUIRenderConfig;
   normalizedCanvasWidth: number;
   normalizedCanvasHeight: number;
+  editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined;
 }) => {
+  const renderConfig = canvasUIRenderConfig;
+
   const { renderScrollbars = true, renderSelection = true } = renderConfig;
 
   // All the context will paint within CANVAS-UI from here
@@ -461,6 +464,15 @@ export const renderCanvasUI = ({
   // Apply zoom to canvas-ui
   context.save();
   context.scale(renderConfig.zoom.value, renderConfig.zoom.value);
+
+  if (editingLinearElement) {
+    renderLinearPointHandles(
+      context,
+      appState,
+      renderConfig,
+      editingLinearElement,
+    );
+  }
   // Paint selection element
   if (appState.selectionElement) {
     try {
@@ -817,7 +829,8 @@ export const _renderScene = ({
   rc,
   canvas,
   canvasUi,
-  renderConfig,
+  canvasUIRenderConfig,
+  canvasContentRenderConfig,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
@@ -825,7 +838,8 @@ export const _renderScene = ({
   rc: RoughCanvas;
   canvas: HTMLCanvasElement;
   canvasUi: HTMLCanvasElement;
-  renderConfig: RenderConfig;
+  canvasUIRenderConfig: CanvasUIRenderConfig;
+  canvasContentRenderConfig: CanvasContentRenderConfig;
 }) =>
   // extra options passed to the renderer
   {
@@ -836,21 +850,23 @@ export const _renderScene = ({
     const normalizedCanvasWidth = canvas.width / scale;
     const normalizedCanvasHeight = canvas.height / scale;
 
-    const { atLeastOneVisibleElement } = renderCanvasContent({
-      elements,
-      appState,
-      scale,
-      rc,
-      canvas,
-      renderConfig,
-    });
+    const { atLeastOneVisibleElement, editingLinearElement } =
+      renderCanvasContent({
+        elements,
+        appState,
+        scale,
+        rc,
+        canvas,
+        canvasContentRenderConfig,
+      });
 
     const { scrollBars } = renderCanvasUI({
       elements,
       appState,
       scale,
       canvasUi,
-      renderConfig,
+      canvasUIRenderConfig,
+      editingLinearElement,
       normalizedCanvasWidth,
       normalizedCanvasHeight,
     });
@@ -866,7 +882,8 @@ const renderSceneThrottled = throttleRAF(
     rc: RoughCanvas;
     canvas: HTMLCanvasElement;
     canvasUi: HTMLCanvasElement;
-    renderConfig: RenderConfig;
+    canvasUIRenderConfig: CanvasUIRenderConfig;
+    canvasContentRenderConfig: CanvasContentRenderConfig;
     callback?: (data: ReturnType<typeof _renderScene>) => void;
   }) => {
     const ret = _renderScene(config);
@@ -884,7 +901,8 @@ export const renderScene = <T extends boolean = false>(
     rc: RoughCanvas;
     canvas: HTMLCanvasElement;
     canvasUi: HTMLCanvasElement;
-    renderConfig: RenderConfig;
+    canvasUIRenderConfig: CanvasUIRenderConfig;
+    canvasContentRenderConfig: CanvasContentRenderConfig;
     callback?: (data: ReturnType<typeof _renderScene>) => void;
   },
   /** Whether to throttle rendering. Defaults to false.
@@ -902,7 +920,7 @@ export const renderScene = <T extends boolean = false>(
 
 const renderTransformHandles = (
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasUIRenderConfig,
   transformHandles: TransformHandles,
   angle: number,
 ): void => {
@@ -944,7 +962,7 @@ const renderTransformHandles = (
 
 const renderSelectionBorder = (
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasUIRenderConfig,
   elementProperties: {
     angle: number;
     elementX1: number;
@@ -1006,7 +1024,7 @@ const renderSelectionBorder = (
 
 const renderBindingHighlight = (
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasUIRenderConfig,
   suggestedBinding: SuggestedBinding,
 ) => {
   const renderHighlight = Array.isArray(suggestedBinding)

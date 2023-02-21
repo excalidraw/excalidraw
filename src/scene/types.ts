@@ -1,16 +1,10 @@
 import { ExcalidrawTextElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 
-export type RenderConfig = {
-  // AppState values
-  // ---------------------------------------------------------------------------
+export type CanvasUIRenderConfig = {
   scrollX: AppState["scrollX"];
   scrollY: AppState["scrollY"];
-  /** null indicates transparent bg */
-  viewBackgroundColor: AppState["viewBackgroundColor"] | null;
   zoom: AppState["zoom"];
-  shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
-  theme: AppState["theme"];
   // collab-related state
   // ---------------------------------------------------------------------------
   remotePointerViewportCoords: { [id: string]: { x: number; y: number } };
@@ -20,14 +14,28 @@ export type RenderConfig = {
   remotePointerUserStates: { [id: string]: string };
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
-  imageCache: AppClassProperties["imageCache"];
   renderScrollbars?: boolean;
   renderSelection?: boolean;
+  selectionColor?: string;
+};
+
+export type CanvasContentRenderConfig = {
+  // AppState values
+  // ---------------------------------------------------------------------------
+  scrollX: AppState["scrollX"];
+  scrollY: AppState["scrollY"];
+  zoom: AppState["zoom"];
+  /** null indicates transparent bg */
+  viewBackgroundColor: AppState["viewBackgroundColor"] | null;
+  shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
+  theme: AppState["theme"];
+
+  imageCache: AppClassProperties["imageCache"];
   renderGrid?: boolean;
+
   /** when exporting the behavior is slightly different (e.g. we can't use
     CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
-  selectionColor?: string;
 };
 
 export type SceneScroll = {

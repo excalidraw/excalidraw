@@ -1,10 +1,10 @@
 import { NonDeletedExcalidrawElement } from "../element/types";
-import { RenderConfig } from "../scene/types";
+import { CanvasUIRenderConfig } from "../scene/types";
 
 export const renderSelectionElement = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasUIRenderConfig,
 ) => {
   switch (element.type) {
     case "selection": {

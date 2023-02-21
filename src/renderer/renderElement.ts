@@ -25,7 +25,7 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
-import { RenderConfig } from "../scene/types";
+import { CanvasContentRenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
@@ -57,14 +57,14 @@ const defaultAppState = getDefaultAppState();
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
 ) =>
   isInitializedImageElement(element) &&
   !renderConfig.imageCache.has(element.fileId);
 
 const shouldResetImageFilter = (
   element: ExcalidrawElement,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
 ) => {
   return (
     renderConfig.theme === "dark" &&
@@ -84,7 +84,7 @@ const getCanvasPadding = (element: ExcalidrawElement) =>
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
-  theme: RenderConfig["theme"];
+  theme: CanvasContentRenderConfig["theme"];
   canvasZoom: Zoom["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
@@ -94,7 +94,7 @@ export interface ExcalidrawElementWithCanvas {
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -203,7 +203,7 @@ const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
 ) => {
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
@@ -662,7 +662,7 @@ const generateElementShape = (
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
 ) => {
   const zoom: Zoom = renderConfig ? renderConfig.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
@@ -695,7 +695,7 @@ const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
 ) => {
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
@@ -826,7 +826,7 @@ export const renderElement = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
   appState: AppState,
 ) => {
   const generator = rc.generator;

@@ -59,22 +59,27 @@ export const exportToCanvas = async (
     rc: rough.canvas(canvas),
     canvas,
     canvasUi,
-    renderConfig: {
+    canvasContentRenderConfig: {
+      scrollX: -minX + exportPadding,
+      scrollY: -minY + exportPadding,
+      zoom: defaultAppState.zoom,
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+      shouldCacheIgnoreZoom: false,
+      theme: appState.exportWithDarkMode ? "dark" : "light",
+      imageCache,
+      renderGrid: false,
+      isExporting: true,
+    },
+    canvasUIRenderConfig: {
       scrollX: -minX + exportPadding,
       scrollY: -minY + exportPadding,
       zoom: defaultAppState.zoom,
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},
-      shouldCacheIgnoreZoom: false,
       remotePointerUsernames: {},
       remotePointerUserStates: {},
-      theme: appState.exportWithDarkMode ? "dark" : "light",
-      imageCache,
       renderScrollbars: false,
       renderSelection: false,
-      renderGrid: false,
-      isExporting: true,
     },
   });
 

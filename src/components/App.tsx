@@ -186,7 +186,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import Scene from "../scene/Scene";
-import { RenderConfig, ScrollBars } from "../scene/types";
+import { CanvasUIRenderConfig, ScrollBars } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
 import { findShapeByKey, SHAPES } from "../shapes";
 import {
@@ -1282,9 +1282,9 @@ class App extends React.Component<AppProps, AppState> {
     const cursorButton: {
       [id: string]: string | undefined;
     } = {};
-    const pointerViewportCoords: RenderConfig["remotePointerViewportCoords"] =
+    const pointerViewportCoords: CanvasUIRenderConfig["remotePointerViewportCoords"] =
       {};
-    const remoteSelectedElementIds: RenderConfig["remoteSelectedElementIds"] =
+    const remoteSelectedElementIds: CanvasUIRenderConfig["remoteSelectedElementIds"] =
       {};
     const pointerUsernames: { [id: string]: string } = {};
     const pointerUserStates: { [id: string]: string } = {};
@@ -1348,21 +1348,26 @@ class App extends React.Component<AppProps, AppState> {
         rc: this.rc!,
         canvas: this.canvas!,
         canvasUi: this.canvasUi!,
-        renderConfig: {
-          selectionColor,
+        canvasContentRenderConfig: {
           scrollX: this.state.scrollX,
           scrollY: this.state.scrollY,
           viewBackgroundColor: this.state.viewBackgroundColor,
+          zoom: this.state.zoom,
+          shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
+          theme: this.state.theme,
+          imageCache: this.imageCache,
+          isExporting: false,
+        },
+        canvasUIRenderConfig: {
+          selectionColor,
+          scrollX: this.state.scrollX,
+          scrollY: this.state.scrollY,
           zoom: this.state.zoom,
           remotePointerViewportCoords: pointerViewportCoords,
           remotePointerButton: cursorButton,
           remoteSelectedElementIds,
           remotePointerUsernames: pointerUsernames,
           remotePointerUserStates: pointerUserStates,
-          shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
-          theme: this.state.theme,
-          imageCache: this.imageCache,
-          isExporting: false,
           renderScrollbars: !this.device.isMobile,
         },
         callback: ({ atLeastOneVisibleElement, scrollBars }) => {
