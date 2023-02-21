@@ -18,6 +18,7 @@ import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
 import { moveOneRight } from "./zindex";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
+import Scene from "./scene/Scene";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -468,6 +469,17 @@ export const getElementsInNewFrame = (
   });
 
   return [...elementsToBeAddedSet];
+};
+
+export const getContainingFrame = (element: ExcalidrawElement) => {
+  if (element.frameId) {
+    return (
+      (Scene.getScene(element)?.getElement(
+        element.frameId,
+      ) as ExcalidrawFrameElement) || null
+    );
+  }
+  return null;
 };
 
 // --------------------------- Frame Operations -------------------------------

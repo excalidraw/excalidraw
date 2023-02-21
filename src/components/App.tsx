@@ -296,6 +296,7 @@ import {
   removeElementsFromFrame,
   getElementsInResizingFrame,
   getElementsInNewFrame,
+  getContainingFrame,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
@@ -5365,9 +5366,7 @@ class App extends React.Component<AppProps, AppState> {
             );
 
             if (linearElement?.frameId) {
-              const frame = this.scene.getElement(
-                linearElement.frameId,
-              ) as ExcalidrawFrameElement;
+              const frame = getContainingFrame(linearElement);
 
               if (frame && linearElement) {
                 if (
@@ -5537,10 +5536,9 @@ class App extends React.Component<AppProps, AppState> {
 
                     elementsInGroup.forEach((element) => {
                       if (element.frameId) {
-                        const frame = this.scene.getElement(
-                          element.frameId,
-                        ) as ExcalidrawFrameElement;
+                        const frame = getContainingFrame(element);
                         if (
+                          frame &&
                           !elementsAreInFrameBounds([element], frame) &&
                           !FrameGeometry.isElementIntersectingFrame(
                             element,

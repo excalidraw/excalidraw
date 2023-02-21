@@ -62,6 +62,11 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
+import {
+  elementsAreInFrameBounds,
+  FrameGeometry,
+  getContainingFrame,
+} from "../frame";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -411,7 +416,37 @@ export const _renderScene = ({
       undefined;
     visibleElements.forEach((element) => {
       try {
-        renderElement(element, rc, context, renderConfig, appState);
+        if (element.frameId) {
+          const containgFrame = getContainingFrame(element);
+          if (containgFrame) {
+            context.save();
+            context.translate(
+              containgFrame.x + renderConfig.scrollX,
+              containgFrame.y + renderConfig.scrollY,
+            );
+            const offset = 0.5 / renderConfig.zoom.value;
+            context.rect(
+              offset,
+              offset,
+              containgFrame.width,
+              containgFrame.height,
+            );
+            (elementsAreInFrameBounds([element], containgFrame) ||
+              FrameGeometry.isElementIntersectingFrame(
+                element,
+                containgFrame,
+              )) &&
+              context.clip();
+            context.translate(
+              -(containgFrame.x + renderConfig.scrollX),
+              -(containgFrame.y + renderConfig.scrollY),
+            );
+            renderElement(element, rc, context, renderConfig, appState);
+            context.restore();
+          }
+        } else {
+          renderElement(element, rc, context, renderConfig, appState);
+        }
         // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
         // ShapeCache returns empty hence making sure that we get the
         // correct element from visible elements
