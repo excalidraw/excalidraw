@@ -647,6 +647,7 @@ export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
       y: container.y + offsetY,
     };
   }
+  // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6265
   if (container.type === "diamond") {
     const offsetX = container.width / 4 + BOUND_TEXT_PADDING;
     const offsetY = container.height / 4 + BOUND_TEXT_PADDING;
