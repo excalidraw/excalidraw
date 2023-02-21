@@ -31,6 +31,7 @@ import {
   getTextElementAngle,
   getTextWidth,
   normalizeText,
+  redrawTextBoundingBox,
   wrapText,
 } from "./textElement";
 import {
@@ -616,6 +617,7 @@ export const textWysiwyg = ({
           ),
         });
       }
+      redrawTextBoundingBox(updateElement, container);
     }
 
     onSubmit({
