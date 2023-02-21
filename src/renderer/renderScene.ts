@@ -29,7 +29,11 @@ import {
 } from "../scene/scrollbars";
 import { getSelectedElements } from "../scene/selection";
 
-import { renderElement, renderElementToSvg } from "./renderElement";
+import {
+  renderElement,
+  renderElementUI,
+  renderElementToSvg,
+} from "./renderElement";
 import { getClientColors } from "../clients";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -432,7 +436,6 @@ export const renderCanvasUI = ({
   elements,
   appState,
   scale,
-  rc,
   canvasUi,
   renderConfig,
   normalizedCanvasWidth,
@@ -441,7 +444,6 @@ export const renderCanvasUI = ({
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
   scale: number;
-  rc: RoughCanvas;
   canvasUi: HTMLCanvasElement;
   renderConfig: RenderConfig;
   normalizedCanvasWidth: number;
@@ -464,13 +466,7 @@ export const renderCanvasUI = ({
   // Paint selection element
   if (appState.selectionElement) {
     try {
-      renderElement(
-        appState.selectionElement,
-        rc,
-        context,
-        renderConfig,
-        appState,
-      );
+      renderElementUI(appState.selectionElement, context, renderConfig);
     } catch (error: any) {
       console.error(error);
     }

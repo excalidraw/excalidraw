@@ -822,14 +822,11 @@ const drawElementFromCanvas = (
   // Clear the nested element we appended to the DOM
 };
 
-export const renderElement = (
+export const renderElementUI = (
   element: NonDeletedExcalidrawElement,
-  rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
-  appState: AppState,
 ) => {
-  const generator = rc.generator;
   switch (element.type) {
     case "selection": {
       context.save();
@@ -853,6 +850,22 @@ export const renderElement = (
       context.restore();
       break;
     }
+    default: {
+      // @ts-ignore
+      throw new Error(`Unimplemented type ${element.type}`);
+    }
+  }
+};
+
+export const renderElement = (
+  element: NonDeletedExcalidrawElement,
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+  renderConfig: RenderConfig,
+  appState: AppState,
+) => {
+  const generator = rc.generator;
+  switch (element.type) {
     case "freedraw": {
       generateElementShape(element, generator);
 
