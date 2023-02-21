@@ -851,7 +851,6 @@ export const _renderScene = ({
       elements,
       appState,
       scale,
-      rc,
       canvasUi,
       renderConfig,
       normalizedCanvasWidth,
