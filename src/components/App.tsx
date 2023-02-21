@@ -108,6 +108,7 @@ import {
   textWysiwyg,
   transformElements,
   updateTextElement,
+  redrawTextBoundingBox,
 } from "../element";
 import {
   bindOrUnbindLinearElement,
@@ -264,6 +265,7 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerDims,
+  getContainerElement,
   getTextBindableContainerAtPosition,
   isValidTextContainer,
 } from "../element/textElement";
@@ -1637,6 +1639,14 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.scene.replaceAllElements(nextElements);
+
+    nextElements.forEach((nextElement) => {
+      if (isTextElement(nextElement) && isBoundToContainer(nextElement)) {
+        const container = getContainerElement(nextElement);
+        redrawTextBoundingBox(nextElement, container);
+      }
+    });
+
     this.history.resumeRecording();
 
     this.setState(

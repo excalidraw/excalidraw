@@ -1,5 +1,11 @@
 import { BOUND_TEXT_PADDING } from "../constants";
-import { measureText, wrapText } from "./textElement";
+import { API } from "../tests/helpers/api";
+import {
+  computeContainerHeightForBoundText,
+  getContainerCoords,
+  measureText,
+  wrapText,
+} from "./textElement";
 import { FontString } from "./types";
 
 describe("Test wrapText", () => {
@@ -192,5 +198,50 @@ describe("Test measureText", () => {
         />
       </div>
     `);
+  });
+
+  describe("Test getContainerCoords", () => {
+    const params = { width: 200, height: 100, x: 10, y: 20 };
+    it("should compute coords correctly when ellipse", () => {
+      const ellipse = API.createElement({
+        type: "ellipse",
+        ...params,
+      });
+      expect(getContainerCoords(ellipse)).toEqual({
+        x: 44.2893218813452455,
+        y: 39.64466094067262,
+      });
+    });
+    it("should compute coords correctly when rectangle", () => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        ...params,
+      });
+      expect(getContainerCoords(rectangle)).toEqual({
+        x: 10,
+        y: 20,
+      });
+    });
+  });
+
+  describe("Test computeContainerHeightForBoundText", () => {
+    const params = {
+      width: 178,
+      height: 194,
+    };
+    it("should compute container height correctly for rectangle", () => {
+      const element = API.createElement({
+        type: "rectangle",
+        ...params,
+      });
+      expect(computeContainerHeightForBoundText(element, 150)).toEqual(160);
+    });
+    it("should compute container height correctly for ellipse", () => {
+      const element = API.createElement({
+        type: "ellipse",
+        ...params,
+      });
+      expect(computeContainerHeightForBoundText(element, 150)).toEqual(212);
+    });
   });
 });

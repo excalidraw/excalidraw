@@ -290,6 +290,11 @@ export const getMaxContainerWidth = (container: ExcalidrawElement) => {
       return BOUND_TEXT_PADDING * 8 * 2;
     }
     return containerWidth;
+  } else if (container.type === "ellipse") {
+    // The width of the largest rectangle inscribed inside an ellipse is
+    // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
+    // equation of an ellipse -https://github.com/excalidraw/excalidraw/pull/6172
+    return Math.round((width / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
   }
   return width - BOUND_TEXT_PADDING * 2;
 };
@@ -306,6 +311,11 @@ export const getMaxContainerHeight = (container: ExcalidrawElement) => {
       return BOUND_TEXT_PADDING * 8 * 2;
     }
     return height;
+  } else if (container.type === "ellipse") {
+    // The height of the largest rectangle inscribed inside an ellipse is
+    // Math.round((ellipse.height / 2) * Math.sqrt(2)) which is derived from
+    // equation of an ellipse - https://github.com/excalidraw/excalidraw/pull/6172
+    return Math.round((height / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
   }
   return height - BOUND_TEXT_PADDING * 2;
 };
