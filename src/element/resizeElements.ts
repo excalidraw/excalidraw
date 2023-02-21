@@ -48,7 +48,7 @@ import {
   handleBindTextResize,
   measureText,
 } from "./textElement";
-import { getMaxContainerWidth } from "./newElement";
+import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -204,7 +204,7 @@ const measureFontSizeFromWH = (
   if (hasContainer) {
     const container = getContainerElement(element);
     if (container) {
-      width = container.width;
+      width = getMaxContainerWidth(container);
     }
   }
   const nextFontSize = element.fontSize * (nextWidth / width);
@@ -427,12 +427,16 @@ export const resizeSingleElement = (
       };
     }
     if (shouldMaintainAspectRatio) {
-      const boundTextElementPadding =
-        getBoundTextElementOffset(boundTextElement);
+      const updatedElement = {
+        ...element,
+        width: eleNewWidth,
+        height: eleNewHeight,
+      };
+
       const nextFont = measureFontSizeFromWH(
         boundTextElement,
-        eleNewWidth,
-        eleNewHeight,
+        getMaxContainerWidth(updatedElement),
+        getMaxContainerHeight(updatedElement),
       );
       if (nextFont === null) {
         return;
