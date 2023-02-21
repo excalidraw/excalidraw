@@ -278,7 +278,10 @@ export const refreshTextDimensions = (
   return { text, ...dimensions };
 };
 
-export const getMaxContainerWidth = (container: ExcalidrawElement) => {
+export const getMaxContainerWidth = (
+  container: ExcalidrawElement,
+  shouldMaintainAspectRatio = false,
+) => {
   const width = getContainerDims(container).width;
   if (isArrowElement(container)) {
     const containerWidth = width - BOUND_TEXT_PADDING * 8 * 2;
@@ -290,12 +293,20 @@ export const getMaxContainerWidth = (container: ExcalidrawElement) => {
       return BOUND_TEXT_PADDING * 8 * 2;
     }
     return containerWidth;
-  } else if (container.type === "ellipse") {
+  }
+
+  // Since when shouldMaintainAspectRatio is true the original width
+  // of container except padding is used to calculate scale
+  if (shouldMaintainAspectRatio) {
+    return width - BOUND_TEXT_PADDING * 2;
+  }
+  if (container.type === "ellipse") {
     // The width of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse -https://github.com/excalidraw/excalidraw/pull/6172
     return Math.round((width / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
-  } else if (container.type === "diamond") {
+  }
+  if (container.type === "diamond") {
     // The width of the largest rectangle inscribed inside a rhombus is
     // Math.round(width / 2) - https://github.com/excalidraw/excalidraw/pull/6265
     return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
@@ -315,12 +326,14 @@ export const getMaxContainerHeight = (container: ExcalidrawElement) => {
       return BOUND_TEXT_PADDING * 8 * 2;
     }
     return height;
-  } else if (container.type === "ellipse") {
+  }
+  if (container.type === "ellipse") {
     // The height of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.height / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse - https://github.com/excalidraw/excalidraw/pull/6172
     return Math.round((height / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
-  } else if (container.type === "diamond") {
+  }
+  if (container.type === "diamond") {
     // The height of the largest rectangle inscribed inside a rhombus is
     // Math.round(height / 2) - https://github.com/excalidraw/excalidraw/pull/6265
     return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;

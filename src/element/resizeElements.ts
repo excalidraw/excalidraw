@@ -204,7 +204,7 @@ const measureFontSizeFromWH = (
   if (hasContainer) {
     const container = getContainerElement(element);
     if (container) {
-      width = getMaxContainerWidth(container);
+      width = getMaxContainerWidth(container, true);
     }
   }
   const nextFontSize = element.fontSize * (nextWidth / width);
