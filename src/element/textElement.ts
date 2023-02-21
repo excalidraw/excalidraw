@@ -44,68 +44,69 @@ export const redrawTextBoundingBox = (
   container: ExcalidrawElement | null,
 ) => {
   let maxWidth = undefined;
-  let text = textElement.text;
+
+  const boundTextUpdates = {
+    x: textElement.x,
+    y: textElement.y,
+    text: textElement.text,
+    width: textElement.width,
+    height: textElement.height,
+    baseline: textElement.baseline,
+  };
+
+  boundTextUpdates.text = textElement.text;
+
   if (container) {
     maxWidth = getMaxContainerWidth(container);
-    text = wrapText(
+    boundTextUpdates.text = wrapText(
       textElement.originalText,
       getFontString(textElement),
       maxWidth,
     );
   }
-  const metrics = measureText(text, getFontString(textElement), maxWidth);
-  let coordY = textElement.y;
-  let coordX = textElement.x;
-  // Resize container and vertically center align the text
+  const metrics = measureText(
+    boundTextUpdates.text,
+    getFontString(textElement),
+    maxWidth,
+  );
+
+  boundTextUpdates.width = metrics.width;
+  boundTextUpdates.height = metrics.height;
+  boundTextUpdates.baseline = metrics.baseline;
+
   if (container) {
-    if (!isArrowElement(container)) {
-      const containerDims = getContainerDims(container);
-      let nextHeight = containerDims.height;
-      if (textElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-        coordY = container.y;
-      } else if (textElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-        coordY =
-          container.y +
-          containerDims.height -
-          metrics.height -
-          BOUND_TEXT_PADDING;
-      } else {
-        coordY = container.y + containerDims.height / 2 - metrics.height / 2;
-        if (metrics.height > getMaxContainerHeight(container)) {
-          nextHeight = metrics.height + BOUND_TEXT_PADDING * 2;
-          coordY = container.y + nextHeight / 2 - metrics.height / 2;
-        }
-      }
-      if (textElement.textAlign === TEXT_ALIGN.LEFT) {
-        coordX = container.x + BOUND_TEXT_PADDING;
-      } else if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
-        coordX =
-          container.x +
-          containerDims.width -
-          metrics.width -
-          BOUND_TEXT_PADDING;
-      } else {
-        coordX = container.x + containerDims.width / 2 - metrics.width / 2;
-      }
-      updateOriginalContainerCache(container.id, nextHeight);
-      mutateElement(container, { height: nextHeight });
-    } else {
+    if (isArrowElement(container)) {
       const centerX = textElement.x + textElement.width / 2;
       const centerY = textElement.y + textElement.height / 2;
       const diffWidth = metrics.width - textElement.width;
       const diffHeight = metrics.height - textElement.height;
-      coordY = centerY - (textElement.height + diffHeight) / 2;
-      coordX = centerX - (textElement.width + diffWidth) / 2;
+      boundTextUpdates.x = centerY - (textElement.height + diffHeight) / 2;
+      boundTextUpdates.y = centerX - (textElement.width + diffWidth) / 2;
+    } else {
+      const containerDims = getContainerDims(container);
+      let maxContainerHeight = getMaxContainerHeight(container);
+
+      let nextHeight = containerDims.height;
+      if (metrics.height > maxContainerHeight) {
+        nextHeight = computeContainerHeightForBoundText(
+          container,
+          metrics.height,
+        );
+        mutateElement(container, { height: nextHeight });
+        maxContainerHeight = getMaxContainerHeight(container);
+        updateOriginalContainerCache(container.id, nextHeight);
+      }
+      const updatedTextElement = {
+        ...textElement,
+        ...boundTextUpdates,
+      } as ExcalidrawTextElementWithContainer;
+      const { x, y } = computeBoundTextPosition(container, updatedTextElement);
+      boundTextUpdates.x = x;
+      boundTextUpdates.y = y;
     }
   }
-  mutateElement(textElement, {
-    width: metrics.width,
-    height: metrics.height,
-    baseline: metrics.baseline,
-    y: coordY,
-    x: coordX,
-    text,
-  });
+
+  mutateElement(textElement, boundTextUpdates);
 };
 
 export const bindTextToShapeAfterDuplication = (
@@ -197,7 +198,11 @@ export const handleBindTextResize = (
     }
     // increase height in case text element height exceeds
     if (nextHeight > maxHeight) {
-      containerHeight = nextHeight + getBoundTextElementOffset(textElement) * 2;
+      containerHeight = computeContainerHeightForBoundText(
+        container,
+        nextHeight,
+      );
+
       const diff = containerHeight - containerDims.height;
       // fix the y coord when resizing from ne/nw/n
       const updatedY =
@@ -217,48 +222,57 @@ export const handleBindTextResize = (
       text,
       width: nextWidth,
       height: nextHeight,
-
       baseline: nextBaseLine,
     });
+
     if (!isArrowElement(container)) {
-      updateBoundTextPosition(
-        container,
-        textElement as ExcalidrawTextElementWithContainer,
+      mutateElement(
+        textElement,
+        computeBoundTextPosition(
+          container,
+          textElement as ExcalidrawTextElementWithContainer,
+        ),
       );
     }
   }
 };
 
-const updateBoundTextPosition = (
+const computeBoundTextPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
-  const containerDims = getContainerDims(container);
-  const boundTextElementPadding = getBoundTextElementOffset(boundTextElement);
+  const containerCoords = getContainerCoords(container);
+  const maxContainerHeight = getMaxContainerHeight(container);
+  const maxContainerWidth = getMaxContainerWidth(container);
+  const padding = container.type === "ellipse" ? 0 : BOUND_TEXT_PADDING;
+
+  let x;
   let y;
   if (boundTextElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-    y = container.y + boundTextElementPadding;
+    y = containerCoords.y + padding;
   } else if (boundTextElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
     y =
-      container.y +
-      containerDims.height -
-      boundTextElement.height -
-      boundTextElementPadding;
+      containerCoords.y +
+      (maxContainerHeight - boundTextElement.height + padding);
   } else {
-    y = container.y + containerDims.height / 2 - boundTextElement.height / 2;
+    y =
+      containerCoords.y +
+      (maxContainerHeight / 2 - boundTextElement.height / 2 + padding);
   }
-  const x =
-    boundTextElement.textAlign === TEXT_ALIGN.LEFT
-      ? container.x + boundTextElementPadding
-      : boundTextElement.textAlign === TEXT_ALIGN.RIGHT
-      ? container.x +
-        containerDims.width -
-        boundTextElement.width -
-        boundTextElementPadding
-      : container.x + containerDims.width / 2 - boundTextElement.width / 2;
-
-  mutateElement(boundTextElement, { x, y });
+  if (boundTextElement.textAlign === TEXT_ALIGN.LEFT) {
+    x = containerCoords.x + padding;
+  } else if (boundTextElement.textAlign === TEXT_ALIGN.RIGHT) {
+    x =
+      containerCoords.x +
+      (maxContainerWidth - boundTextElement.width + padding);
+  } else {
+    x =
+      containerCoords.x +
+      (maxContainerWidth / 2 - boundTextElement.width / 2 + padding);
+  }
+  return { x, y };
 };
+
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
 export const measureText = (
   text: string,
@@ -621,6 +635,24 @@ export const getContainerCenter = (
   return { x: midSegmentMidpoint[0], y: midSegmentMidpoint[1] };
 };
 
+export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
+  if (container.type === "ellipse") {
+    // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6172
+    const offsetX =
+      (container.width / 2) * (1 - Math.sqrt(2) / 2) + BOUND_TEXT_PADDING;
+    const offsetY =
+      (container.height / 2) * (1 - Math.sqrt(2) / 2) + BOUND_TEXT_PADDING;
+    return {
+      x: container.x + offsetX,
+      y: container.y + offsetY,
+    };
+  }
+  return {
+    x: container.x,
+    y: container.y,
+  };
+};
+
 export const getTextElementAngle = (textElement: ExcalidrawTextElement) => {
   const container = getContainerElement(textElement);
   if (!container || isArrowElement(container)) {
@@ -633,12 +665,13 @@ export const getBoundTextElementOffset = (
   boundTextElement: ExcalidrawTextElement | null,
 ) => {
   const container = getContainerElement(boundTextElement);
-  if (!container) {
+  if (!container || !boundTextElement) {
     return 0;
   }
   if (isArrowElement(container)) {
     return BOUND_TEXT_PADDING * 8;
   }
+
   return BOUND_TEXT_PADDING;
 };
 
@@ -722,4 +755,17 @@ export const isValidTextContainer = (element: ExcalidrawElement) => {
     isImageElement(element) ||
     isArrowElement(element)
   );
+};
+
+export const computeContainerHeightForBoundText = (
+  container: NonDeletedExcalidrawElement,
+  boundTextElementHeight: number,
+) => {
+  if (container.type === "ellipse") {
+    return Math.round((boundTextElementHeight / Math.sqrt(2)) * 2);
+  }
+  if (isArrowElement(container)) {
+    return boundTextElementHeight + BOUND_TEXT_PADDING * 8 * 2;
+  }
+  return boundTextElementHeight + BOUND_TEXT_PADDING * 2;
 };
