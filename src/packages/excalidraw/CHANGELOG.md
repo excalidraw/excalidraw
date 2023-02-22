@@ -17,6 +17,20 @@ Please add the latest change on the top under the correct section.
 
 - Expose `useI18n()` hook return an object containing `t()` i18n helper and current `langCode`. You can use this in components you render as `<Excalidraw>` children to render any of our i18n locale strings. [#6224](https://github.com/excalidraw/excalidraw/pull/6224)
 
+- [`restoreElements`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restoreelements) API now takes an optional parameter `opts` which currently supports the below attributes
+
+```js
+{ refreshDimensions?: boolean, repairBindings?: boolean }
+```
+
+The same `opts` param has been added to [`restore`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restore) API as well.
+
+For more details refer to the [docs](https://docs.excalidraw.com)
+
+#### BREAKING CHANGE
+
+- The optional parameter `refreshDimensions` in [`restoreElements`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restoreelements) has been removed and can be enabled via `opts`
+
 ## 0.14.2 (2023-02-01)
 
 ### Features
