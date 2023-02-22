@@ -177,9 +177,6 @@ break it now`,
 });
 
 describe("Test measureText", () => {
-  const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
-  const text = "Hello World";
-
   describe("Test getContainerCoords", () => {
     const params = { width: 200, height: 100, x: 10, y: 20 };
 
