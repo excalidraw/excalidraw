@@ -92,6 +92,7 @@ export const getDefaultAppState = (): Omit<
     pendingImageElementId: null,
     showHyperlinkPopup: false,
     selectedLinearElement: null,
+    snaps: null,
   };
 };
 
@@ -185,6 +186,7 @@ const APP_STATE_STORAGE_CONF = (<
   pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
+  snaps: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

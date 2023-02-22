@@ -18,7 +18,6 @@ export const dragSelectedElements = (
   distanceX: number = 0,
   distanceY: number = 0,
   appState: AppState,
-  snaps: Snaps | null = null,
 ) => {
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
@@ -31,7 +30,7 @@ export const dragSelectedElements = (
       element,
       offset,
       appState.zoom,
-      snaps,
+      appState.snaps,
     );
     // update coords of bound text only if we're dragging the container directly
     // (we don't drag the group that it's part of)
@@ -52,7 +51,7 @@ export const dragSelectedElements = (
           textElement,
           offset,
           appState.zoom,
-          snaps,
+          appState.snaps,
         );
       }
     }

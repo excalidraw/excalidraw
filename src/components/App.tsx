@@ -282,7 +282,7 @@ import { actionPaste } from "../actions/actionClipboard";
 import { actionToggleHandTool } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
-import { getSnap } from "../snapping";
+import { getSnaps } from "../snapping";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -4444,10 +4444,13 @@ class App extends React.Component<AppProps, AppState> {
         this.state.gridSize,
       );
 
-      const snap = getSnap({
-        elements: this.scene.getNonDeletedElements(),
-        appState: this.state,
-      });
+      this.setState((prevState) => ({
+        snaps: getSnaps({
+          elements: this.scene.getNonDeletedElements(),
+          appState: prevState,
+          event,
+        }),
+      }));
 
       // for arrows/lines, don't start dragging until a given threshold
       // to ensure we don't create a 2-point arrow by mistake when
@@ -4619,7 +4622,6 @@ class App extends React.Component<AppProps, AppState> {
             dragDistanceX,
             dragDistanceY,
             this.state,
-            snap,
           );
           this.maybeSuggestBindingForAll(selectedElements);
 

@@ -31,6 +31,7 @@ import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
+import { Snaps } from "./snapping";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -205,6 +206,8 @@ export type AppState = {
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
+
+  snaps: Snaps | null;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

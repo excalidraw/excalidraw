@@ -61,7 +61,7 @@ import {
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
 import { renderSnap } from "./renderSnap";
-import { getSnap } from "../snapping";
+import { getSnaps } from "../snapping";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -588,18 +588,13 @@ export const _renderScene = ({
       context.save();
       context.translate(renderConfig.scrollX, renderConfig.scrollY);
 
-      const isMagnetismEnabled = true;
-
-      const snap = isMagnetismEnabled ? getSnap({ elements, appState }) : null;
-      if (snap) {
-        renderSnap(
-          {
-            renderConfig,
-            context,
-          },
-          { snaps: snap },
-        );
-      }
+      renderSnap(
+        {
+          renderConfig,
+          context,
+        },
+        { snaps: appState.snaps ?? [] },
+      );
 
       if (locallySelectedElements.length === 1) {
         context.fillStyle = oc.white;
@@ -607,7 +602,7 @@ export const _renderScene = ({
           locallySelectedElements[0],
           renderConfig.zoom,
           "mouse", // when we render we don't know which pointer type so use mouse
-          snap,
+          appState.snaps,
         );
         if (!appState.viewModeEnabled && showBoundingBox) {
           renderTransformHandles(
@@ -646,7 +641,7 @@ export const _renderScene = ({
           "mouse",
           OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
           undefined,
-          snap,
+          appState.snaps,
         );
         if (locallySelectedElements.some((element) => !element.locked)) {
           renderTransformHandles(context, renderConfig, transformHandles, 0);

@@ -86,13 +86,19 @@ const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
   };
 };
 
-export const getSnap = ({
+export const getSnaps = ({
   elements,
   appState,
+  event,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
+  event: PointerEvent;
 }): Snaps | null => {
+  if (!isSnapEnabled({ appState, event })) {
+    return null;
+  }
+
   const selectedElements = getSelectedElements(elements, appState);
   if (selectedElements.length === 0) {
     return null;
@@ -101,6 +107,9 @@ export const getSnap = ({
   const selectionCoordinates = getElementsCoordinates(selectedElements);
 
   return getMaximumGroups(getVisibleAndNonSelectedElements(elements, appState))
+    .filter(
+      (elementsGroup) => !elementsGroup.every((element) => element.locked),
+    )
     .flatMap((elementsGroup) => {
       const snapLines = getElementsSnapLines(elementsGroup);
 
@@ -134,3 +143,10 @@ export const isSnapped = (snaps: Snaps | null, [x, y]: TuplePoint) => {
 export const shouldSnap = (snap: Snap, zoom: Zoom) => {
   return snap.distance < SNAP_DISTANCE / zoom.value;
 };
+
+const isSnapEnabled = ({
+  event,
+}: {
+  appState: AppState;
+  event: PointerEvent;
+}) => !event.metaKey;
