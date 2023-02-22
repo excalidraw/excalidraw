@@ -8,6 +8,7 @@ import * as GA from "./ga";
 import * as GALines from "./galines";
 import * as GAPoints from "./gapoints";
 import { getSelectedElements } from "./scene";
+import { getVisibleAndNonSelectedElements } from "./scene/selection";
 import { AppState } from "./types";
 
 export type TuplePoint = [x: number, y: number];
@@ -100,15 +101,10 @@ export const getSnap = ({
 
   const selectionCoordinates = getElementsCoordinates(selectedElements);
 
-  const selectionToSnapLine = elements
-    // non selected
-    .filter(
-      (sceneElement) =>
-        selectedElements.some(
-          (selectedElement) => selectedElement.id === sceneElement.id,
-        ) === false,
-    )
-    // FIXME: filter only visible elements
+  const selectionToSnapLine = getVisibleAndNonSelectedElements(
+    elements,
+    appState,
+  )
     .flatMap((element) => {
       const snapLines = getElementSnapLines(element);
 
