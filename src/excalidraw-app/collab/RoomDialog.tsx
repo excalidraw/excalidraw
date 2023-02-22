@@ -10,13 +10,13 @@ import {
   shareWindows,
 } from "../../components/icons";
 import { ToolButton } from "../../components/ToolButton";
-import { t } from "../../i18n";
 import "./RoomDialog.scss";
 import Stack from "../../components/Stack";
 import { AppState } from "../../types";
 import { trackEvent } from "../../analytics";
 import { getFrame } from "../../utils";
 import DialogActionButton from "../../components/DialogActionButton";
+import { useI18n } from "../../i18n";
 
 const getShareIcon = () => {
   const navigator = window.navigator as any;
@@ -51,6 +51,7 @@ const RoomDialog = ({
   setErrorMessage: (message: string) => void;
   theme: AppState["theme"];
 }) => {
+  const { t } = useI18n();
   const roomLinkInput = useRef<HTMLInputElement>(null);
 
   const copyRoomLink = async () => {

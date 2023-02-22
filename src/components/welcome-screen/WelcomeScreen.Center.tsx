@@ -1,6 +1,6 @@
 import { actionLoadScene, actionShortcuts } from "../../actions";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
-import { t } from "../../i18n";
+import { t, useI18n } from "../../i18n";
 import {
   useDevice,
   useExcalidrawActionManager,
@@ -172,10 +172,7 @@ const MenuItemLiveCollaborationTrigger = ({
 }: {
   onSelect: () => any;
 }) => {
-  // FIXME when we tie t() to lang state
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const appState = useExcalidrawAppState();
-
+  const { t } = useI18n();
   return (
     <WelcomeScreenMenuItem shortcut={null} onSelect={onSelect} icon={usersIcon}>
       {t("labels.liveCollaboration")}
