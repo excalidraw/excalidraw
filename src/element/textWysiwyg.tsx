@@ -463,7 +463,9 @@ export const textWysiwyg = ({
           event.code === CODES.BRACKET_RIGHT))
     ) {
       event.preventDefault();
-      if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
+      if (event.isComposing) {
+        return;
+      } else if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
         outdent();
       } else {
         indent();
