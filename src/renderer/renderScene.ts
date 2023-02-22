@@ -446,7 +446,8 @@ export const _renderScene = ({
                 context.clip();
               } else if (
                 !(element.id in appState.selectedElementIds) &&
-                (elementsAreInFrameBounds([element], containgFrame) ||
+                (element.groupIds.length > 0 ||
+                  elementsAreInFrameBounds([element], containgFrame) ||
                   FrameGeometry.isElementIntersectingFrame(
                     element,
                     containgFrame,
@@ -457,7 +458,8 @@ export const _renderScene = ({
               } else if (
                 element.id in appState.selectedElementIds &&
                 !appState.selectedElementsAreBeingDragged &&
-                (elementsAreInFrameBounds([element], containgFrame) ||
+                (element.groupIds.length > 0 ||
+                  elementsAreInFrameBounds([element], containgFrame) ||
                   FrameGeometry.isElementIntersectingFrame(
                     element,
                     containgFrame,
