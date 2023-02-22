@@ -120,7 +120,6 @@ const restoreElementWithProperties = <
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
     frameId: element.frameId ?? null,
-    frameOpacity: element.frameOpacity ?? 100,
     roundness: element.roundness
       ? element.roundness
       : element.strokeSharpness === "round"

@@ -198,7 +198,6 @@ export default function App() {
             seed: 1968410350,
             groupIds: [],
             frameId: null,
-            frameOpacity: 100,
             boundElements: null,
             locked: false,
             link: null,

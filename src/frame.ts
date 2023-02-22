@@ -496,6 +496,7 @@ export const addElementsToFrame = (
       mutateElement(element, {
         frameId: frame.id,
       });
+
       const frameIndex = findIndex(nextElements, (e) => e.id === frame.id);
       const elementIndex = findIndex(nextElements, (e) => e.id === element.id);
 

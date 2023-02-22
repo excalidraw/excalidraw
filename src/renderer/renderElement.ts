@@ -47,6 +47,7 @@ import {
   getContainerElement,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { getContainingFrame } from "../frame";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -90,6 +91,7 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetX: number;
   canvasOffsetY: number;
   boundTextElementVersion: number | null;
+  containingFrameOpacity: number;
 }
 
 const generateElementCanvas = (
@@ -159,6 +161,7 @@ const generateElementCanvas = (
     canvasOffsetX,
     canvasOffsetY,
     boundTextElementVersion: getBoundTextElement(element)?.version || null,
+    containingFrameOpacity: getContainingFrame(element)?.opacity || 100,
   };
 };
 
@@ -207,7 +210,7 @@ const drawElementOnCanvas = (
   renderConfig: RenderConfig,
 ) => {
   context.globalAlpha =
-    ((element.frameOpacity ?? 100) * element.opacity) / 10000;
+    ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
   switch (element.type) {
     case "rectangle":
     case "diamond":
@@ -674,12 +677,14 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.canvasZoom !== zoom.value &&
     !renderConfig?.shouldCacheIgnoreZoom;
   const boundTextElementVersion = getBoundTextElement(element)?.version || null;
+  const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
 
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== renderConfig.theme ||
-    prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion
+    prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
+    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,

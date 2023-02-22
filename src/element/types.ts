@@ -52,9 +52,7 @@ type _ExcalidrawElementBase = Readonly<{
   /** List of groups the element belongs to.
       Ordered from deepest to shallowest. */
   groupIds: readonly GroupId[];
-  // must be updated together
   frameId: string | null;
-  frameOpacity: number;
   /** other elements that are bound to this element */
   boundElements:
     | readonly Readonly<{

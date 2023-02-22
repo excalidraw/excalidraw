@@ -142,7 +142,6 @@ export class API {
       | "isDeleted"
       | "groupIds"
       | "frameId"
-      | "frameOpacity"
       | "link"
       | "updated"
     > = {
