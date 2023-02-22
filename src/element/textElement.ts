@@ -244,7 +244,10 @@ const computeBoundTextPosition = (
   const containerCoords = getContainerCoords(container);
   const maxContainerHeight = getMaxContainerHeight(container);
   const maxContainerWidth = getMaxContainerWidth(container);
-  const padding = container.type === "ellipse" ? 0 : BOUND_TEXT_PADDING;
+  const padding =
+    container.type === "ellipse" || container.type === "diamond"
+      ? 0
+      : BOUND_TEXT_PADDING;
 
   let x;
   let y;
