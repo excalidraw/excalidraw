@@ -43,12 +43,12 @@ import {
   getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
-  getBoundTextElementOffset,
   getContainerElement,
   handleBindTextResize,
   measureText,
+  getMaxContainerHeight,
+  getMaxContainerWidth,
 } from "./textElement";
-import { getMaxContainerWidth } from "./newElement";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -427,12 +427,16 @@ export const resizeSingleElement = (
       };
     }
     if (shouldMaintainAspectRatio) {
-      const boundTextElementPadding =
-        getBoundTextElementOffset(boundTextElement);
+      const updatedElement = {
+        ...element,
+        width: eleNewWidth,
+        height: eleNewHeight,
+      };
+
       const nextFont = measureFontSizeFromWH(
         boundTextElement,
-        eleNewWidth - boundTextElementPadding * 2,
-        eleNewHeight - boundTextElementPadding * 2,
+        getMaxContainerWidth(updatedElement),
+        getMaxContainerHeight(updatedElement),
       );
       if (nextFont === null) {
         return;
@@ -697,11 +701,15 @@ const resizeMultipleElements = (
     const boundTextElement = getBoundTextElement(element.latest);
 
     if (boundTextElement || isTextElement(element.orig)) {
-      const optionalPadding = getBoundTextElementOffset(boundTextElement) * 2;
+      const updatedElement = {
+        ...element.latest,
+        width,
+        height,
+      };
       const textMeasurements = measureFontSizeFromWH(
         boundTextElement ?? (element.orig as ExcalidrawTextElement),
-        width - optionalPadding,
-        height - optionalPadding,
+        getMaxContainerWidth(updatedElement),
+        getMaxContainerHeight(updatedElement),
       );
 
       if (!textMeasurements) {

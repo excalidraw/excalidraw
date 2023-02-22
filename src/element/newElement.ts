@@ -22,15 +22,15 @@ import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
-  getBoundTextElement,
   getBoundTextElementOffset,
   getContainerDims,
   getContainerElement,
   measureText,
   normalizeText,
   wrapText,
+  getMaxContainerWidth,
 } from "./textElement";
-import { BOUND_TEXT_PADDING, VERTICAL_ALIGN } from "../constants";
+import { VERTICAL_ALIGN } from "../constants";
 import { isArrowElement } from "./typeChecks";
 
 type ElementConstructorOpts = MarkOptional<
@@ -276,48 +276,6 @@ export const refreshTextDimensions = (
   }
   const dimensions = getAdjustedDimensions(textElement, text);
   return { text, ...dimensions };
-};
-
-export const getMaxContainerWidth = (container: ExcalidrawElement) => {
-  const width = getContainerDims(container).width;
-  if (isArrowElement(container)) {
-    const containerWidth = width - BOUND_TEXT_PADDING * 8 * 2;
-    if (containerWidth <= 0) {
-      const boundText = getBoundTextElement(container);
-      if (boundText) {
-        return boundText.width;
-      }
-      return BOUND_TEXT_PADDING * 8 * 2;
-    }
-    return containerWidth;
-  } else if (container.type === "ellipse") {
-    // The width of the largest rectangle inscribed inside an ellipse is
-    // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
-    // equation of an ellipse -https://github.com/excalidraw/excalidraw/pull/6172
-    return Math.round((width / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
-  }
-  return width - BOUND_TEXT_PADDING * 2;
-};
-
-export const getMaxContainerHeight = (container: ExcalidrawElement) => {
-  const height = getContainerDims(container).height;
-  if (isArrowElement(container)) {
-    const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
-    if (containerHeight <= 0) {
-      const boundText = getBoundTextElement(container);
-      if (boundText) {
-        return boundText.height;
-      }
-      return BOUND_TEXT_PADDING * 8 * 2;
-    }
-    return height;
-  } else if (container.type === "ellipse") {
-    // The height of the largest rectangle inscribed inside an ellipse is
-    // Math.round((ellipse.height / 2) * Math.sqrt(2)) which is derived from
-    // equation of an ellipse - https://github.com/excalidraw/excalidraw/pull/6172
-    return Math.round((height / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
-  }
-  return height - BOUND_TEXT_PADDING * 2;
 };
 
 export const updateTextElement = (

@@ -24,14 +24,16 @@ import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
-  getBoundTextElementOffset,
   getContainerCoords,
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
   getTextWidth,
   normalizeText,
+  redrawTextBoundingBox,
   wrapText,
+  getMaxContainerHeight,
+  getMaxContainerWidth,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -39,7 +41,6 @@ import {
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
-import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
 
@@ -231,10 +232,6 @@ export const textWysiwyg = ({
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
         else {
-          const padding =
-            container.type === "ellipse"
-              ? 0
-              : getBoundTextElementOffset(updatedTextElement);
           const containerCoords = getContainerCoords(container);
 
           // vertically center align the text
@@ -245,8 +242,7 @@ export const textWysiwyg = ({
             }
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-            coordY =
-              containerCoords.y + (maxHeight - textElementHeight + padding);
+            coordY = containerCoords.y + (maxHeight - textElementHeight);
           }
         }
       }
@@ -616,6 +612,7 @@ export const textWysiwyg = ({
           ),
         });
       }
+      redrawTextBoundingBox(updateElement, container);
     }
 
     onSubmit({

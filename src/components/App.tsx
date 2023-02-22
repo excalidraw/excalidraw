@@ -1627,6 +1627,7 @@ class App extends React.Component<AppProps, AppState> {
       oldIdToDuplicatedId.set(element.id, newElement.id);
       return newElement;
     });
+
     bindTextToShapeAfterDuplication(newElements, elements, oldIdToDuplicatedId);
     const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
@@ -1640,10 +1641,10 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene.replaceAllElements(nextElements);
 
-    nextElements.forEach((nextElement) => {
-      if (isTextElement(nextElement) && isBoundToContainer(nextElement)) {
-        const container = getContainerElement(nextElement);
-        redrawTextBoundingBox(nextElement, container);
+    newElements.forEach((newElement) => {
+      if (isTextElement(newElement) && isBoundToContainer(newElement)) {
+        const container = getContainerElement(newElement);
+        redrawTextBoundingBox(newElement, container);
       }
     });
 
