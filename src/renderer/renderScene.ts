@@ -416,30 +416,73 @@ export const _renderScene = ({
       undefined;
     visibleElements.forEach((element) => {
       try {
-        if (element.frameId) {
+        if (element.frameId || appState.frameToHighlight) {
+          let frame: ExcalidrawFrameElement | null = null;
           const containgFrame = getContainingFrame(element);
+
           if (containgFrame) {
+            frame = containgFrame;
+          } else if (appState.frameToHighlight) {
+            frame = appState.frameToHighlight;
+          }
+
+          if (frame) {
             context.save();
             context.translate(
-              containgFrame.x + renderConfig.scrollX,
-              containgFrame.y + renderConfig.scrollY,
+              frame.x + renderConfig.scrollX,
+              frame.y + renderConfig.scrollY,
             );
             const offset = 0.5 / renderConfig.zoom.value;
-            context.rect(
-              offset,
-              offset,
-              containgFrame.width,
-              containgFrame.height,
-            );
-            (elementsAreInFrameBounds([element], containgFrame) ||
-              FrameGeometry.isElementIntersectingFrame(
-                element,
-                containgFrame,
-              )) &&
+            context.rect(offset, offset, frame.width, frame.height);
+
+            // dragging an element in the frame
+            if (containgFrame) {
+              if (
+                element.id in appState.selectedElementIds &&
+                appState.selectedElementsAreBeingDragged &&
+                appState.frameToHighlight
+              ) {
+                // CLIP dragged elements that are still in the frame
+                context.clip();
+              } else if (
+                !(element.id in appState.selectedElementIds) &&
+                (elementsAreInFrameBounds([element], containgFrame) ||
+                  FrameGeometry.isElementIntersectingFrame(
+                    element,
+                    containgFrame,
+                  ))
+              ) {
+                // CLIP elements that are not selected but are in the frame
+                context.clip();
+              } else if (
+                element.id in appState.selectedElementIds &&
+                !appState.selectedElementsAreBeingDragged &&
+                (elementsAreInFrameBounds([element], containgFrame) ||
+                  FrameGeometry.isElementIntersectingFrame(
+                    element,
+                    containgFrame,
+                  ))
+              ) {
+                // CLIP elements that are selected in a frame but not dragged
+                context.clip();
+              }
+            } else if (
+              appState.frameToHighlight &&
+              element.id in appState.selectedElementIds &&
+              (elementsAreInFrameBounds([element], appState.frameToHighlight) ||
+                FrameGeometry.isElementIntersectingFrame(
+                  element,
+                  appState.frameToHighlight,
+                ))
+            ) {
+              // CLIP elements that are now in the frame
+              // (elements are not yet added to the frame)
               context.clip();
+            }
+
             context.translate(
-              -(containgFrame.x + renderConfig.scrollX),
-              -(containgFrame.y + renderConfig.scrollY),
+              -(frame.x + renderConfig.scrollX),
+              -(frame.y + renderConfig.scrollY),
             );
             renderElement(element, rc, context, renderConfig, appState);
             context.restore();

@@ -64,6 +64,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {},
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,

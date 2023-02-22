@@ -77,6 +77,7 @@ Object {
     "id2": true,
     "id7": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {
     "id5": true,
   },
@@ -641,6 +642,7 @@ Object {
     "id5": true,
     "id6": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {
     "id0": true,
     "id1": true,
@@ -1199,6 +1201,7 @@ Object {
     "id12": true,
     "id7": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -2154,6 +2157,7 @@ Object {
     "id0": true,
     "id1": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -2395,6 +2399,7 @@ Object {
     "id3": true,
     "id4": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {
     "id5": true,
   },
@@ -2951,6 +2956,7 @@ Object {
     "id0": true,
     "id1": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -3249,6 +3255,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -3442,6 +3449,7 @@ Object {
     "id1": true,
     "id3": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -3981,6 +3989,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -4262,6 +4271,7 @@ Object {
     "id0": true,
     "id1": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -4502,6 +4512,7 @@ Object {
     "id1": true,
     "id2": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -4786,6 +4797,7 @@ Object {
     "id0": true,
     "id2": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -5087,6 +5099,7 @@ Object {
     "id1": true,
     "id3": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -5552,6 +5565,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {},
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": Object {
@@ -5909,6 +5923,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {},
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -6235,6 +6250,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {},
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": Object {
@@ -6456,6 +6472,7 @@ Object {
   "selectedElementIds": Object {
     "id1": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -6646,6 +6663,7 @@ Object {
   "selectedElementIds": Object {
     "id2": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -7207,6 +7225,7 @@ Object {
     "id2": true,
     "id3": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -7581,6 +7600,7 @@ Object {
   "selectedElementIds": Object {
     "id8": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -10463,6 +10483,7 @@ Object {
     "id1": true,
     "id4": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -10903,6 +10924,7 @@ Object {
     "id2": true,
     "id3": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -11202,6 +11224,7 @@ Object {
     "id1": true,
     "id3": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -11461,6 +11484,7 @@ Object {
     "id2": true,
     "id3": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -11791,6 +11815,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -11981,6 +12006,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -12171,6 +12197,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -12361,6 +12388,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": LinearElementEditor {
     "elementId": "id0",
@@ -12604,6 +12632,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": LinearElementEditor {
     "elementId": "id0",
@@ -12847,6 +12876,7 @@ Object {
   "selectedElementIds": Object {
     "id0": false,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -13081,6 +13111,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": LinearElementEditor {
     "elementId": "id0",
@@ -13324,6 +13355,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -13514,6 +13546,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": LinearElementEditor {
     "elementId": "id0",
@@ -13757,6 +13790,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -13947,6 +13981,7 @@ Object {
   "selectedElementIds": Object {
     "id0": false,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -14181,6 +14216,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -14380,6 +14416,7 @@ Object {
     "id3": true,
     "id5": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {
     "id4": true,
   },
@@ -15258,6 +15295,7 @@ Object {
     "id1": true,
     "id4": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -15555,6 +15593,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -15666,6 +15705,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {},
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -15782,6 +15822,7 @@ Object {
     "id0": false,
     "id1": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -15981,6 +16022,7 @@ Object {
     "id3": true,
     "id4": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -16362,6 +16404,7 @@ Object {
     "id3": true,
     "id5": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -17019,6 +17062,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -17262,6 +17306,7 @@ Object {
     "id5": true,
     "id6": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {
     "id10": true,
   },
@@ -18264,6 +18309,7 @@ Object {
   "scrollY": 60,
   "scrolledOutside": false,
   "selectedElementIds": Object {},
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -18379,6 +18425,7 @@ Object {
   "selectedElementIds": Object {
     "id1": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -19313,6 +19360,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": Object {
@@ -19807,6 +19855,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": Object {
@@ -20133,6 +20182,7 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -20176,7 +20226,7 @@ Object {
 
 exports[`regression tests two-finger scroll works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `13`;
+exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests undo/redo drawing an element: [end of test] appState 1`] = `
 Object {
@@ -20246,6 +20296,7 @@ Object {
   "selectedElementIds": Object {
     "id1": true,
   },
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -20841,6 +20892,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {},
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -20952,6 +21004,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {},
+  "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
