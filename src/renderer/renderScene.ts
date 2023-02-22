@@ -325,16 +325,15 @@ export const renderCanvasContent = ({
   scale,
   rc,
   canvas,
-  canvasContentRenderConfig,
+  renderConfig,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
   scale: number;
   rc: RoughCanvas;
   canvas: HTMLCanvasElement;
-  canvasContentRenderConfig: CanvasContentRenderConfig;
+  renderConfig: CanvasContentRenderConfig;
 }) => {
-  const renderConfig = canvasContentRenderConfig;
   const { renderGrid = true, isExporting } = renderConfig;
 
   const context = canvas.getContext("2d")!;
@@ -434,7 +433,7 @@ export const renderCanvasUI = ({
   appState,
   scale,
   canvasUi,
-  canvasUIRenderConfig,
+  renderConfig,
   normalizedCanvasWidth,
   normalizedCanvasHeight,
   editingLinearElement,
@@ -443,12 +442,11 @@ export const renderCanvasUI = ({
   appState: AppState;
   scale: number;
   canvasUi: HTMLCanvasElement;
-  canvasUIRenderConfig: CanvasUIRenderConfig;
+  renderConfig: CanvasUIRenderConfig;
   normalizedCanvasWidth: number;
   normalizedCanvasHeight: number;
   editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined;
 }) => {
-  const renderConfig = canvasUIRenderConfig;
 
   const { renderScrollbars = true, renderSelection = true } = renderConfig;
 
@@ -857,7 +855,7 @@ export const _renderScene = ({
         scale,
         rc,
         canvas,
-        canvasContentRenderConfig,
+        renderConfig: canvasContentRenderConfig,
       });
 
     const { scrollBars } = renderCanvasUI({
@@ -865,7 +863,7 @@ export const _renderScene = ({
       appState,
       scale,
       canvasUi,
-      canvasUIRenderConfig,
+      renderConfig: canvasUIRenderConfig,
       editingLinearElement,
       normalizedCanvasWidth,
       normalizedCanvasHeight,
