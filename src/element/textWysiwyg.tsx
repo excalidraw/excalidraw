@@ -24,13 +24,16 @@ import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
-  getBoundTextElementOffset,
+  getContainerCoords,
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
   getTextWidth,
   normalizeText,
+  redrawTextBoundingBox,
   wrapText,
+  getMaxContainerHeight,
+  getMaxContainerWidth,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -38,7 +41,6 @@ import {
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
-import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
 
@@ -230,19 +232,17 @@ export const textWysiwyg = ({
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
         else {
+          const containerCoords = getContainerCoords(container);
+
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
             if (!isArrowElement(container)) {
               coordY =
-                container.y + containerDims.height / 2 - textElementHeight / 2;
+                containerCoords.y + maxHeight / 2 - textElementHeight / 2;
             }
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-            coordY =
-              container.y +
-              containerDims.height -
-              textElementHeight -
-              getBoundTextElementOffset(updatedTextElement);
+            coordY = containerCoords.y + (maxHeight - textElementHeight);
           }
         }
       }
@@ -463,7 +463,9 @@ export const textWysiwyg = ({
           event.code === CODES.BRACKET_RIGHT))
     ) {
       event.preventDefault();
-      if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
+      if (event.isComposing) {
+        return;
+      } else if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
         outdent();
       } else {
         indent();
@@ -612,6 +614,7 @@ export const textWysiwyg = ({
           ),
         });
       }
+      redrawTextBoundingBox(updateElement, container);
     }
     app.setState({ openPopup: null }); //zsviczian (container text color issue)
     onSubmit({

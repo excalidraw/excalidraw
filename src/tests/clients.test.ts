@@ -36,4 +36,9 @@ describe("getClientInitials", () => {
     result = getClientInitials(null);
     expect(result).toBe("?");
   });
+
+  it('returns "?" when value is blank', () => {
+    const result = getClientInitials(" ");
+    expect(result).toBe("?");
+  });
 });

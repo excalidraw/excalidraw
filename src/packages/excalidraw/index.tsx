@@ -94,8 +94,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   }, []);
 
   return (
-    <InitializeApp langCode={langCode} theme={theme}>
-      <Provider unstable_createStore={() => jotaiStore} scope={jotaiScope}>
+    <Provider unstable_createStore={() => jotaiStore} scope={jotaiScope}>
+      <InitializeApp langCode={langCode} theme={theme}>
         <App
           onChange={onChange}
           initialData={initialData}
@@ -132,8 +132,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
         >
           {children}
         </App>
-      </Provider>
-    </InitializeApp>
+      </InitializeApp>
+    </Provider>
   );
 };
 
@@ -212,7 +212,7 @@ export {
   isInvisiblySmallElement,
   getNonDeletedElements,
 } from "../../element";
-export { defaultLang, languages } from "../../i18n";
+export { defaultLang, useI18n, languages } from "../../i18n";
 export {
   restore,
   restoreAppState,

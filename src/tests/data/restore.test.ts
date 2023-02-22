@@ -535,7 +535,7 @@ describe("restore", () => {
 });
 
 describe("repairing bindings", () => {
-  it("should repair container boundElements", () => {
+  it("should repair container boundElements when repair is true", () => {
     const container = API.createElement({
       type: "rectangle",
       boundElements: [],
@@ -547,9 +547,26 @@ describe("repairing bindings", () => {
 
     expect(container.boundElements).toEqual([]);
 
-    const restoredElements = restore.restoreElements(
+    let restoredElements = restore.restoreElements(
       [container, boundElement],
       null,
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: container.id,
+        boundElements: [],
+      }),
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: container.id,
+      }),
+    ]);
+
+    restoredElements = restore.restoreElements(
+      [container, boundElement],
+      null,
+      { repairBindings: true },
     );
 
     expect(restoredElements).toEqual([
@@ -564,7 +581,7 @@ describe("repairing bindings", () => {
     ]);
   });
 
-  it("should repair containerId of boundElements", () => {
+  it("should repair containerId of boundElements when repair is true", () => {
     const boundElement = API.createElement({
       type: "text",
       containerId: null,
@@ -574,9 +591,26 @@ describe("repairing bindings", () => {
       boundElements: [{ type: boundElement.type, id: boundElement.id }],
     });
 
-    const restoredElements = restore.restoreElements(
+    let restoredElements = restore.restoreElements(
       [container, boundElement],
       null,
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: container.id,
+        boundElements: [{ type: boundElement.type, id: boundElement.id }],
+      }),
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: null,
+      }),
+    ]);
+
+    restoredElements = restore.restoreElements(
+      [container, boundElement],
+      null,
+      { repairBindings: true },
     );
 
     expect(restoredElements).toEqual([
@@ -621,7 +655,7 @@ describe("repairing bindings", () => {
     ]);
   });
 
-  it("should remove bindings of deleted elements from boundElements", () => {
+  it("should remove bindings of deleted elements from boundElements when repair is true", () => {
     const container = API.createElement({
       type: "rectangle",
       boundElements: [],
@@ -643,6 +677,8 @@ describe("repairing bindings", () => {
       type: invisibleBoundElement.type,
       id: invisibleBoundElement.id,
     };
+    expect(container.boundElements).toEqual([]);
+
     const nonExistentBinding = { type: "text", id: "non-existent" };
     // @ts-ignore
     container.boundElements = [
@@ -651,15 +687,26 @@ describe("repairing bindings", () => {
       nonExistentBinding,
     ];
 
-    expect(container.boundElements).toEqual([
-      obsoleteBinding,
-      invisibleBinding,
-      nonExistentBinding,
-    ]);
-
-    const restoredElements = restore.restoreElements(
+    let restoredElements = restore.restoreElements(
       [container, invisibleBoundElement, boundElement],
       null,
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: container.id,
+        boundElements: [obsoleteBinding, invisibleBinding, nonExistentBinding],
+      }),
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: container.id,
+      }),
+    ]);
+
+    restoredElements = restore.restoreElements(
+      [container, invisibleBoundElement, boundElement],
+      null,
+      { repairBindings: true },
     );
 
     expect(restoredElements).toEqual([
@@ -674,7 +721,7 @@ describe("repairing bindings", () => {
     ]);
   });
 
-  it("should remove containerId if container not exists", () => {
+  it("should remove containerId if container not exists when repair is true", () => {
     const boundElement = API.createElement({
       type: "text",
       containerId: "non-existent",
@@ -685,9 +732,26 @@ describe("repairing bindings", () => {
       isDeleted: true,
     });
 
-    const restoredElements = restore.restoreElements(
+    let restoredElements = restore.restoreElements(
       [boundElement, boundElementDeleted],
       null,
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: "non-existent",
+      }),
+      expect.objectContaining({
+        id: boundElementDeleted.id,
+        containerId: "non-existent",
+      }),
+    ]);
+
+    restoredElements = restore.restoreElements(
+      [boundElement, boundElementDeleted],
+      null,
+      { repairBindings: true },
     );
 
     expect(restoredElements).toEqual([
