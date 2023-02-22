@@ -10,7 +10,7 @@ import { AppState, Zoom } from "../types";
 import { isTextElement } from ".";
 import { isLinearElement } from "./typeChecks";
 import { DEFAULT_SPACING } from "../renderer/renderScene";
-import { isSnapped, Snap } from "../snapping";
+import { isSnapped, Snaps } from "../snapping";
 
 export type TransformHandleDirection =
   | "n"
@@ -101,7 +101,7 @@ export const getTransformHandlesFromCoords = (
   pointerType: PointerType,
   omitSides: { [T in TransformHandleType]?: boolean } = {},
   margin = 0,
-  snap: Snap | null = null,
+  snaps: Snaps | null = null,
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
   const handleWidth = size / zoom.value;
@@ -123,7 +123,7 @@ export const getTransformHandlesFromCoords = (
   const generateTransformHandle = (
     [x, y]: [x: number, y: number],
     [dx, dy]: [x: number, y: number],
-    isMagnetismAttracted = isSnapped(snap, [x, y]),
+    isMagnetismAttracted = isSnapped(snaps, [x, y]),
   ): TransformHandle => {
     return [x + dx, y + dy, handleWidth, handleHeight, isMagnetismAttracted];
   };
@@ -208,7 +208,7 @@ export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: Zoom,
   pointerType: PointerType = "mouse",
-  snap: Snap | null = null,
+  snaps: Snaps | null = null,
 ): TransformHandles => {
   // so that when locked element is selected (especially when you toggle lock
   // via keyboard) the locked element is visually distinct, indicating
@@ -247,7 +247,7 @@ export const getTransformHandles = (
     pointerType,
     omitSides,
     dashedLineMargin,
-    snap,
+    snaps,
   );
 };
 

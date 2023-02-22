@@ -1,5 +1,4 @@
 import { getCommonBounds } from "./element";
-import { TransformHandleDirection } from "./element/transformHandles";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -10,18 +9,17 @@ import * as GAPoints from "./gapoints";
 import { getMaximumGroups } from "./groups";
 import { getSelectedElements } from "./scene";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
-import { AppState } from "./types";
+import { AppState, Zoom } from "./types";
 
 export type TuplePoint = [x: number, y: number];
 
 export type Snap = {
-  selectionToSnapLine: {
-    distance: number;
-    point: GA.Point;
-    snapLine: SnapLine;
-  }[];
-  selectionCoordinates: Record<TransformHandleDirection, GA.Point>;
+  distance: number;
+  point: GA.Point;
+  snapLine: SnapLine;
 };
+
+export type Snaps = Snap[];
 
 export type SnapLine = {
   line: GA.Line;
@@ -29,7 +27,7 @@ export type SnapLine = {
   fromTo(addPoints?: GA.Point[]): { from: TuplePoint; to: TuplePoint };
 };
 
-const MAX_DISTANCE = 150;
+const SNAP_DISTANCE = 15;
 
 const getElementsCoordinates = (elements: ExcalidrawElement[]) => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
@@ -94,7 +92,7 @@ export const getSnap = ({
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
-}): Snap | null => {
+}): Snaps | null => {
   const selectedElements = getSelectedElements(elements, appState);
   if (selectedElements.length === 0) {
     return null;
@@ -102,9 +100,7 @@ export const getSnap = ({
 
   const selectionCoordinates = getElementsCoordinates(selectedElements);
 
-  const selectionToSnapLine = getMaximumGroups(
-    getVisibleAndNonSelectedElements(elements, appState),
-  )
+  return getMaximumGroups(getVisibleAndNonSelectedElements(elements, appState))
     .flatMap((elementsGroup) => {
       const snapLines = getElementsSnapLines(elementsGroup);
 
@@ -118,14 +114,12 @@ export const getSnap = ({
         return { distance, point, snapLine };
       }),
     )
-    .sort((a, b) => a.distance - b.distance)
-    .filter((a) => a.distance < MAX_DISTANCE);
-
-  return { selectionToSnapLine, selectionCoordinates };
+    .filter((snap) => shouldSnap(snap, appState.zoom))
+    .sort((a, b) => a.distance - b.distance);
 };
 
-export const isSnapped = (snap: Snap | null, [x, y]: TuplePoint) => {
-  const currentSnap = snap?.selectionToSnapLine[0];
+export const isSnapped = (snaps: Snaps | null, [x, y]: TuplePoint) => {
+  const currentSnap = snaps?.[0];
   if (!currentSnap) {
     return false;
   }
@@ -135,4 +129,8 @@ export const isSnapped = (snap: Snap | null, [x, y]: TuplePoint) => {
       GAPoints.distanceToLine(GA.point(x, y), currentSnap.snapLine.line),
     ) < 1
   );
+};
+
+export const shouldSnap = (snap: Snap, zoom: Zoom) => {
+  return snap.distance < SNAP_DISTANCE / zoom.value;
 };

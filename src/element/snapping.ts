@@ -1,23 +1,27 @@
 import * as GA from "../ga";
-import * as GADirections from "../gadirections";
 import * as GAPoints from "../gapoints";
 import * as GALines from "../galines";
-import { Snap } from "../snapping";
+import { Zoom } from "../types";
+import { shouldSnap, Snaps } from "../snapping";
 
 export interface ProjectionOptions {
+  zoom: Zoom;
   origin: { x: number; y: number };
   offset: { x: number; y: number };
-  snap: Snap | null;
+  snaps: Snaps | null;
 }
 
-export const project = ({ origin, offset, snap }: ProjectionOptions) => {
-  if (!snap) {
+export const project = ({ origin, offset, snaps, zoom }: ProjectionOptions) => {
+  if (!snaps) {
     return applyOffset({ origin, offset });
   }
 
-  const snapLineMetadata = closestSnapLine(snap, GA.offset(offset.x, offset.y));
+  const snapLineMetadata = closestSnapLine(
+    snaps,
+    GA.offset(offset.x, offset.y),
+  );
 
-  if (!snapLineMetadata || snapLineMetadata.distance > 30) {
+  if (!snapLineMetadata || !shouldSnap(snapLineMetadata, zoom)) {
     return applyOffset({ origin, offset });
   }
 
@@ -37,17 +41,17 @@ export const project = ({ origin, offset, snap }: ProjectionOptions) => {
   return GAPoints.toObject(projection);
 };
 
-const closestSnapLine = (snap: Snap, offset: GA.Point) => {
-  const [closest] = snap.selectionToSnapLine
-    .map(({ snapLine, point }) => {
-      const origin = point;
+const closestSnapLine = (snaps: Snaps, offset: GA.Point) => {
+  const [closest] = snaps
+    .map((snap) => {
+      const origin = snap.point;
       const projection = GA.add(origin, offset);
 
       const distance = Math.abs(
-        GAPoints.distanceToLine(projection, snapLine.line),
+        GAPoints.distanceToLine(projection, snap.snapLine.line),
       );
 
-      return { distance, origin, projection, snapLine };
+      return { ...snap, distance, origin, projection };
     })
     .sort((a, b) => a.distance - b.distance);
 

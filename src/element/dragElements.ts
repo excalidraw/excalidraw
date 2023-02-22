@@ -3,10 +3,10 @@ import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { NonDeletedExcalidrawElement } from "./types";
-import { AppState, PointerDownState } from "../types";
+import { AppState, PointerDownState, Zoom } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
-import { Snap } from "../snapping";
+import { Snaps } from "../snapping";
 import * as Snapping from "./snapping";
 
 export const dragSelectedElements = (
@@ -18,7 +18,7 @@ export const dragSelectedElements = (
   distanceX: number = 0,
   distanceY: number = 0,
   appState: AppState,
-  snap: Snap | null = null,
+  snaps: Snaps | null = null,
 ) => {
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
@@ -30,7 +30,8 @@ export const dragSelectedElements = (
       pointerDownState,
       element,
       offset,
-      snap,
+      appState.zoom,
+      snaps,
     );
     // update coords of bound text only if we're dragging the container directly
     // (we don't drag the group that it's part of)
@@ -50,7 +51,8 @@ export const dragSelectedElements = (
           pointerDownState,
           textElement,
           offset,
-          snap,
+          appState.zoom,
+          snaps,
         );
       }
     }
@@ -67,7 +69,8 @@ const updateElementCoords = (
   pointerDownState: PointerDownState,
   element: NonDeletedExcalidrawElement,
   offset: { x: number; y: number },
-  snap: Snap | null = null,
+  zoom: Zoom,
+  snaps: Snaps | null = null,
 ) => {
   const lockX = lockDirection && distanceX < distanceY;
   const lockY = lockDirection && distanceX > distanceY;
@@ -78,7 +81,8 @@ const updateElementCoords = (
   const projection = Snapping.project({
     origin: { x, y },
     offset,
-    snap,
+    snaps,
+    zoom,
   });
 
   mutateElement(element, {

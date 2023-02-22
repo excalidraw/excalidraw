@@ -597,7 +597,7 @@ export const _renderScene = ({
             renderConfig,
             context,
           },
-          { snap },
+          { snaps: snap },
         );
       }
 
