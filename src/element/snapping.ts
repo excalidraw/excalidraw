@@ -35,6 +35,10 @@ export const project = ({ origin, offset, snaps, zoom }: ProjectionOptions) => {
     line,
   );
 
+  if (GA.isNaN(projectedPoint)) {
+    return applyOffset({ origin, offset });
+  }
+
   const snapOffset = GA.sub(selectionReference, projectedPoint);
   const projection = GA.sub(GA.point(origin.x, origin.y), snapOffset);
 

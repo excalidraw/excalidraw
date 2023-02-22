@@ -305,6 +305,15 @@ export const inormalized = (a: NVector): NVector => {
   return mul(a, 1 / n);
 };
 
+export const isNaN = (a: NVector): boolean => a.some(Number.isNaN);
+
+export const equal = (a: NVector, b: NVector, precision = 0): boolean => {
+  if (precision === 0) {
+    return a.every((v, i) => v === b[i]);
+  }
+  return a.every((v, i) => Math.abs(v - b[i]) <= precision);
+};
+
 const isNumber = (a: any): a is number => typeof a === "number";
 
 export const E0: NVector = nvector(1, 1);
