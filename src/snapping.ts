@@ -7,6 +7,7 @@ import {
 import * as GA from "./ga";
 import * as GALines from "./galines";
 import * as GAPoints from "./gapoints";
+import { getMaximumGroups } from "./groups";
 import { getSelectedElements } from "./scene";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
 import { AppState } from "./types";
@@ -75,8 +76,8 @@ const snapLine = (from: GA.Point, to: GA.Point) => ({
   },
 });
 
-const getElementSnapLines = (element: ExcalidrawElement) => {
-  const borderPoints = getElementsCoordinates([element]);
+const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
+  const borderPoints = getElementsCoordinates(elements);
 
   return {
     left: snapLine(borderPoints.nw, borderPoints.sw),
@@ -101,12 +102,11 @@ export const getSnap = ({
 
   const selectionCoordinates = getElementsCoordinates(selectedElements);
 
-  const selectionToSnapLine = getVisibleAndNonSelectedElements(
-    elements,
-    appState,
+  const selectionToSnapLine = getMaximumGroups(
+    getVisibleAndNonSelectedElements(elements, appState),
   )
-    .flatMap((element) => {
-      const snapLines = getElementSnapLines(element);
+    .flatMap((elementsGroup) => {
+      const snapLines = getElementsSnapLines(elementsGroup);
 
       return [snapLines.left, snapLines.right, snapLines.top, snapLines.bottom];
     })
