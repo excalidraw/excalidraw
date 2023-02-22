@@ -1,4 +1,5 @@
 import { getCommonBounds } from "./element";
+import { TransformHandleDirection } from "./element/transformHandles";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -24,7 +25,6 @@ export type Snaps = Snap[];
 export type SnapLine = {
   line: GA.Line;
   points: GA.Point[];
-  fromTo(addPoints?: GA.Point[]): { from: TuplePoint; to: TuplePoint };
 };
 
 const SNAP_DISTANCE = 15;
@@ -48,7 +48,7 @@ const getElementsCoordinates = (elements: ExcalidrawElement[]) => {
   };
 };
 
-const snapLine = (from: GA.Point, to: GA.Point) => {
+const snapLine = (from: GA.Point, to: GA.Point): SnapLine | null => {
   if (GA.equal(from, to, PRECISION)) {
     return null;
   }
@@ -56,29 +56,6 @@ const snapLine = (from: GA.Point, to: GA.Point) => {
   return {
     line: GALines.through(from, to),
     points: [from, to],
-    fromTo(addPoints = []) {
-      let [pa, pb, ...rest] = [
-        ...this.points,
-        ...addPoints.map((point) =>
-          GALines.orthogonalProjection(point, this.line),
-        ),
-      ] as [GA.Point, GA.Point, ...GA.Point[]];
-
-      let d = GAPoints.distance(pa, pb);
-      for (const p of rest) {
-        const da = GAPoints.distance(p, pa);
-        const db = GAPoints.distance(p, pb);
-        if (da > d && da > db) {
-          pb = p;
-          d = da;
-        } else if (db > d && db > da) {
-          pa = p;
-          d = db;
-        }
-      }
-
-      return { from: GAPoints.toTuple(pa), to: GAPoints.toTuple(pb) };
-    },
   };
 };
 
@@ -142,21 +119,28 @@ export const getSnaps = ({
     .sort((a, b) => a.distance - b.distance);
 };
 
-export const isSnapped = (snaps: Snaps | null, [x, y]: TuplePoint) => {
-  const currentSnap = snaps?.[0];
-  if (!currentSnap) {
-    return false;
-  }
+export const isSnapped = (snaps: Snaps, [x, y]: TuplePoint) =>
+  snaps[0] &&
+  Math.abs(GAPoints.distanceToLine(GA.point(x, y), snaps[0].snapLine.line)) < 1;
 
-  return (
-    Math.abs(
-      GAPoints.distanceToLine(GA.point(x, y), currentSnap.snapLine.line),
-    ) < 1
+export const shouldSnap = (snap: Snap, zoom: Zoom) =>
+  snap.distance < SNAP_DISTANCE / zoom.value;
+
+export const getSnapLineCoordinates = (
+  snapLine: SnapLine,
+  expansionFactor: number,
+) => {
+  const { from, to } = getLineExtremities(
+    snapLine.line,
+    snapLine.points as [GA.Point, GA.Point, ...GA.Point[]],
   );
-};
 
-export const shouldSnap = (snap: Snap, zoom: Zoom) => {
-  return snap.distance < SNAP_DISTANCE / zoom.value;
+  const delta = GA.mul(GA.sub(to, from), expansionFactor);
+
+  return {
+    from: GAPoints.toObject(GA.sub(from, delta)),
+    to: GAPoints.toObject(GA.add(to, delta)),
+  };
 };
 
 const isSnapEnabled = ({
@@ -168,3 +152,27 @@ const isSnapEnabled = ({
 }) =>
   (appState.objectsSnapModeEnabled && !event.metaKey) ||
   (!appState.objectsSnapModeEnabled && event.metaKey);
+
+const getLineExtremities = (
+  line: GA.Line,
+  points: [GA.Point, GA.Point, ...GA.Point[]],
+) => {
+  let [pa, pb, ...rest] = points.map((point) =>
+    GALines.orthogonalProjection(point, line),
+  );
+
+  let d = GAPoints.distance(pa, pb);
+  for (const p of rest) {
+    const da = GAPoints.distance(p, pa);
+    const db = GAPoints.distance(p, pb);
+    if (da > d && da > db) {
+      pb = p;
+      d = da;
+    } else if (db > d && db > da) {
+      pa = p;
+      d = db;
+    }
+  }
+
+  return { from: pa, to: pb };
+};

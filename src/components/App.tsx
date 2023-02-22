@@ -3138,6 +3138,7 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerY,
         this.state.zoom,
         event.pointerType,
+        this.state.snaps,
       );
       if (transformHandleType) {
         setCursor(
@@ -3902,6 +3903,7 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.origin.y,
           this.state.zoom,
           event.pointerType,
+          this.state.snaps,
         );
       }
       if (pointerDownState.resize.handleType) {

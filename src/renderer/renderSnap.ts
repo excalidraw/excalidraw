@@ -1,6 +1,6 @@
 import oc from "open-color";
 import { RenderConfig } from "../scene/types";
-import { Snaps, SnapLine } from "../snapping";
+import { Snaps, SnapLine, getSnapLineCoordinates } from "../snapping";
 import * as GA from "../ga";
 import * as GALines from "../galines";
 
@@ -42,14 +42,17 @@ const renderAxes = (
   for (const { snapLine, points } of axes) {
     context.strokeStyle = renderConfig.selectionColor ?? oc.black;
 
-    const { from, to } = snapLine.fromTo(points);
-
-    const deltaX = (to[0] - from[0]) * MAGNETISM_AXE_EXPANSION_FACTOR;
-    const deltaY = (to[1] - from[1]) * MAGNETISM_AXE_EXPANSION_FACTOR;
+    const { from, to } = getSnapLineCoordinates(
+      {
+        line: snapLine.line,
+        points: [...points, ...snapLine.points],
+      },
+      MAGNETISM_AXE_EXPANSION_FACTOR,
+    );
 
     context.beginPath();
-    context.lineTo(from[0] - deltaX, from[1] - deltaY);
-    context.lineTo(to[0] + deltaX, to[1] + deltaY);
+    context.lineTo(from.x, from.y);
+    context.lineTo(to.x, to.y);
     context.stroke();
   }
 };

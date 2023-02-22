@@ -61,7 +61,6 @@ import {
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
 import { renderSnap } from "./renderSnap";
-import { getSnaps } from "../snapping";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -854,7 +853,7 @@ const renderTransformHandles = (
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];
     if (transformHandle !== undefined) {
-      const [x, y, width, height, isMagnetismAttracted] = transformHandle;
+      const [x, y, width, height, isHighlighted] = transformHandle;
 
       context.save();
       context.lineWidth = 1 / renderConfig.zoom.value;
@@ -867,7 +866,7 @@ const renderTransformHandles = (
       } else if (context.roundRect) {
         context.beginPath();
         context.roundRect(x, y, width, height, 2 / renderConfig.zoom.value);
-        if (isMagnetismAttracted && renderConfig.selectionColor) {
+        if (isHighlighted && renderConfig.selectionColor) {
           context.fillStyle = renderConfig.selectionColor;
         }
         context.fill();

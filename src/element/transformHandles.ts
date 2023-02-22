@@ -29,7 +29,7 @@ export type TransformHandle = [
   y: number,
   width: number,
   height: number,
-  isMagnetismAttracted?: boolean,
+  isHighlighted?: boolean,
 ];
 export type TransformHandles = Partial<{
   [T in TransformHandleType]: TransformHandle;
@@ -74,26 +74,6 @@ const OMIT_SIDES_FOR_LINE_BACKSLASH = {
   w: true,
 };
 
-export const getBorderPointsFormCoords = (
-  [x1, y1, x2, y2, cx, cy]: [number, number, number, number, number, number],
-  angle: number,
-) => {
-  const width = x2 - x1;
-  const height = y2 - y1;
-  const applyAngle = (x: number, y: number) => rotate(x, y, cx, cy, angle);
-
-  return {
-    nw: applyAngle(x1, y1),
-    ne: applyAngle(x2, y1),
-    sw: applyAngle(x1, y2),
-    se: applyAngle(x2, y2),
-    w: applyAngle(x1, y1 + height / 2),
-    n: applyAngle(x1 + width / 2, y1),
-    s: applyAngle(x1 + width / 2, y2),
-    e: applyAngle(x2, y1 + height / 2),
-  };
-};
-
 export const getTransformHandlesFromCoords = (
   [x1, y1, x2, y2, cx, cy]: [number, number, number, number, number, number],
   angle: number,
@@ -115,48 +95,68 @@ export const getTransformHandlesFromCoords = (
   const dashedLineMargin = margin / zoom.value;
   const centeringOffset = (size - DEFAULT_SPACING * 2) / (2 * zoom.value);
 
-  const borderPoints = getBorderPointsFormCoords(
-    [x1, y1, x2, y2, cx, cy],
-    angle,
-  );
+  const applyAngle = (x: number, y: number) => rotate(x, y, cx, cy, angle);
 
   const generateTransformHandle = (
     [x, y]: [x: number, y: number],
     [dx, dy]: [x: number, y: number],
-    isMagnetismAttracted = isSnapped(snaps, [x, y]),
+    isHighlighted = isSnapped(snaps ?? [], applyAngle(x, y)),
   ): TransformHandle => {
-    return [x + dx, y + dy, handleWidth, handleHeight, isMagnetismAttracted];
+    const [xx, yy] = applyAngle(
+      x + dx + handleWidth / 2,
+      y + dy + handleHeight / 2,
+    );
+
+    return [
+      xx - handleWidth / 2,
+      yy - handleHeight / 2,
+      handleWidth,
+      handleHeight,
+      isHighlighted,
+    ];
   };
 
   const transformHandles: TransformHandles = {
     nw: omitSides.nw
       ? undefined
-      : generateTransformHandle(borderPoints.nw, [
-          centeringOffset - dashedLineMargin - handleMarginX,
-          centeringOffset - dashedLineMargin - handleMarginY,
-        ]),
+      : generateTransformHandle(
+          [x1, y1],
+          [
+            centeringOffset - dashedLineMargin - handleMarginX,
+            centeringOffset - dashedLineMargin - handleMarginY,
+          ],
+        ),
     ne: omitSides.ne
       ? undefined
-      : generateTransformHandle(borderPoints.ne, [
-          dashedLineMargin - centeringOffset,
-          centeringOffset - dashedLineMargin - handleMarginY,
-        ]),
+      : generateTransformHandle(
+          [x2, y1],
+          [
+            dashedLineMargin - centeringOffset,
+            centeringOffset - dashedLineMargin - handleMarginY,
+          ],
+        ),
     sw: omitSides.sw
       ? undefined
-      : generateTransformHandle(borderPoints.sw, [
-          centeringOffset - dashedLineMargin - handleMarginX,
-          dashedLineMargin - centeringOffset,
-        ]),
+      : generateTransformHandle(
+          [x1, y2],
+          [
+            centeringOffset - dashedLineMargin - handleMarginX,
+            dashedLineMargin - centeringOffset,
+          ],
+        ),
     se: omitSides.se
       ? undefined
-      : generateTransformHandle(borderPoints.se, [
-          dashedLineMargin - centeringOffset,
-          dashedLineMargin - centeringOffset,
-        ]),
+      : generateTransformHandle(
+          [x2, y2],
+          [
+            dashedLineMargin - centeringOffset,
+            dashedLineMargin - centeringOffset,
+          ],
+        ),
     rotation: omitSides.rotation
       ? undefined
       : generateTransformHandle(
-          borderPoints.n,
+          [x1 + width / 2, y1],
           [
             -handleWidth / 2,
             centeringOffset -
@@ -174,30 +174,33 @@ export const getTransformHandlesFromCoords = (
     (5 * transformHandleSizes.mouse) / zoom.value;
   if (Math.abs(width) > minimumSizeForEightHandles) {
     if (!omitSides.n) {
-      transformHandles.n = generateTransformHandle(borderPoints.n, [
-        -handleWidth / 2,
-        centeringOffset - dashedLineMargin - handleMarginY,
-      ]);
+      transformHandles.n = generateTransformHandle(
+        [x1 + width / 2, y1],
+        [-handleWidth / 2, centeringOffset - dashedLineMargin - handleMarginY],
+      );
     }
     if (!omitSides.s) {
-      transformHandles.s = generateTransformHandle(borderPoints.s, [
-        -handleWidth / 2,
-        -centeringOffset + dashedLineMargin,
-      ]);
+      transformHandles.s = generateTransformHandle(
+        [x1 + width / 2, y2],
+        [-handleWidth / 2, -centeringOffset + dashedLineMargin],
+      );
     }
   }
   if (Math.abs(height) > minimumSizeForEightHandles) {
     if (!omitSides.w) {
-      transformHandles.w = generateTransformHandle(borderPoints.w, [
-        -dashedLineMargin - handleMarginX + centeringOffset,
-        -handleHeight / 2,
-      ]);
+      transformHandles.w = generateTransformHandle(
+        [x1, y1 + height / 2],
+        [
+          -dashedLineMargin - handleMarginX + centeringOffset,
+          -handleHeight / 2,
+        ],
+      );
     }
     if (!omitSides.e) {
-      transformHandles.e = generateTransformHandle(borderPoints.e, [
-        +dashedLineMargin - centeringOffset,
-        -handleHeight / 2,
-      ]);
+      transformHandles.e = generateTransformHandle(
+        [x2, y1 + height / 2],
+        [+dashedLineMargin - centeringOffset, -handleHeight / 2],
+      );
     }
   }
 

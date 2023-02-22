@@ -13,6 +13,7 @@ import {
   MaybeTransformHandleType,
 } from "./transformHandles";
 import { AppState, Zoom } from "../types";
+import { Snaps } from "../snapping";
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
@@ -37,7 +38,7 @@ export const resizeTest = (
   }
 
   const { rotation: rotationTransformHandle, ...transformHandles } =
-    getTransformHandles(element, zoom, pointerType);
+    getTransformHandles(element, zoom, pointerType, appState.snaps);
 
   if (
     rotationTransformHandle &&
@@ -92,6 +93,7 @@ export const getTransformHandleTypeFromCoords = (
   scenePointerY: number,
   zoom: Zoom,
   pointerType: PointerType,
+  snaps: Snaps | null,
 ): MaybeTransformHandleType => {
   const transformHandles = getTransformHandlesFromCoords(
     [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
@@ -99,6 +101,8 @@ export const getTransformHandleTypeFromCoords = (
     zoom,
     pointerType,
     OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+    undefined,
+    snaps,
   );
 
   const found = Object.keys(transformHandles).find((key) => {
