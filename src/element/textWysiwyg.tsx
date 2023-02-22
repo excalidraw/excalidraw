@@ -32,6 +32,8 @@ import {
   normalizeText,
   redrawTextBoundingBox,
   wrapText,
+  getMaxContainerHeight,
+  getMaxContainerWidth,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -39,7 +41,6 @@ import {
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
-import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
 

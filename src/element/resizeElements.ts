@@ -46,8 +46,9 @@ import {
   getContainerElement,
   handleBindTextResize,
   measureText,
+  getMaxContainerHeight,
+  getMaxContainerWidth,
 } from "./textElement";
-import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {

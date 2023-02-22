@@ -12,7 +12,6 @@ import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
-import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import {
   isBoundToContainer,
   isImageElement,
@@ -767,4 +766,59 @@ export const computeContainerHeightForBoundText = (
     return 2 * boundTextElementHeight;
   }
   return boundTextElementHeight + BOUND_TEXT_PADDING * 2;
+};
+
+export const getMaxContainerWidth = (container: ExcalidrawElement) => {
+  const width = getContainerDims(container).width;
+  if (isArrowElement(container)) {
+    const containerWidth = width - BOUND_TEXT_PADDING * 8 * 2;
+    if (containerWidth <= 0) {
+      const boundText = getBoundTextElement(container);
+      if (boundText) {
+        return boundText.width;
+      }
+      return BOUND_TEXT_PADDING * 8 * 2;
+    }
+    return containerWidth;
+  }
+
+  if (container.type === "ellipse") {
+    // The width of the largest rectangle inscribed inside an ellipse is
+    // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
+    // equation of an ellipse -https://github.com/excalidraw/excalidraw/pull/6172
+    return Math.round((width / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
+  }
+  if (container.type === "diamond") {
+    // The width of the largest rectangle inscribed inside a rhombus is
+    // Math.round(width / 2) - https://github.com/excalidraw/excalidraw/pull/6265
+    return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
+  }
+  return width - BOUND_TEXT_PADDING * 2;
+};
+
+export const getMaxContainerHeight = (container: ExcalidrawElement) => {
+  const height = getContainerDims(container).height;
+  if (isArrowElement(container)) {
+    const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
+    if (containerHeight <= 0) {
+      const boundText = getBoundTextElement(container);
+      if (boundText) {
+        return boundText.height;
+      }
+      return BOUND_TEXT_PADDING * 8 * 2;
+    }
+    return height;
+  }
+  if (container.type === "ellipse") {
+    // The height of the largest rectangle inscribed inside an ellipse is
+    // Math.round((ellipse.height / 2) * Math.sqrt(2)) which is derived from
+    // equation of an ellipse - https://github.com/excalidraw/excalidraw/pull/6172
+    return Math.round((height / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
+  }
+  if (container.type === "diamond") {
+    // The height of the largest rectangle inscribed inside a rhombus is
+    // Math.round(height / 2) - https://github.com/excalidraw/excalidraw/pull/6265
+    return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
+  }
+  return height - BOUND_TEXT_PADDING * 2;
 };
