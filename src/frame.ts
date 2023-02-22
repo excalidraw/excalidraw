@@ -262,6 +262,48 @@ export const isCursorInFrame = (
   );
 };
 
+export const groupsAreAtLeastIntersectingTheFrame = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  groupIds: readonly string[],
+  frame: ExcalidrawFrameElement,
+) => {
+  const elementsInGroup = groupIds.flatMap((groupId) =>
+    getElementsInGroup(elements, groupId),
+  );
+
+  if (elementsInGroup.length === 0) {
+    return true;
+  }
+
+  return !!elementsInGroup.find(
+    (element) =>
+      elementsAreInFrameBounds([element], frame) ||
+      FrameGeometry.isElementIntersectingFrame(element, frame),
+  );
+};
+
+export const groupsAreCompletelyOutOfFrame = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  groupIds: readonly string[],
+  frame: ExcalidrawFrameElement,
+) => {
+  const elementsInGroup = groupIds.flatMap((groupId) =>
+    getElementsInGroup(elements, groupId),
+  );
+
+  if (elementsInGroup.length === 0) {
+    return true;
+  }
+
+  return (
+    elementsInGroup.find(
+      (element) =>
+        elementsAreInFrameBounds([element], frame) ||
+        FrameGeometry.isElementIntersectingFrame(element, frame),
+    ) === undefined
+  );
+};
+
 // --------------------------- Frame Utils ------------------------------------
 export const getFrameElementsMapFromElements = (
   elements: readonly ExcalidrawElement[],

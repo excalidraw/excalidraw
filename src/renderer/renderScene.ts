@@ -66,6 +66,7 @@ import {
   elementsAreInFrameBounds,
   FrameGeometry,
   getContainingFrame,
+  groupsAreCompletelyOutOfFrame,
 } from "../frame";
 
 const hasEmojiSupport = supportsEmoji();
@@ -412,6 +413,8 @@ export const _renderScene = ({
       }),
     );
 
+    const groupsToBeAddedToFrame = new Set<string>();
+
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
     visibleElements.forEach((element) => {
@@ -427,6 +430,8 @@ export const _renderScene = ({
           }
 
           if (frame) {
+            // --------- clipping ----------
+            // step 1: clipping set up
             context.save();
             context.translate(
               frame.x + renderConfig.scrollX,
@@ -435,28 +440,34 @@ export const _renderScene = ({
             const offset = 0.5 / renderConfig.zoom.value;
             context.rect(offset, offset, frame.width, frame.height);
 
-            // dragging an element in the frame
+            // --------- clipping ----------
+            // step 2: clip according to different states (frame, elements, appState)
             if (containgFrame) {
               if (
-                element.id in appState.selectedElementIds &&
+                appState.selectedElementIds[element.id] &&
                 appState.selectedElementsAreBeingDragged &&
                 appState.frameToHighlight
               ) {
-                // CLIP dragged elements that are still in the frame
+                // CLIP elements that are being dragged but still in the frame
                 context.clip();
               } else if (
-                !(element.id in appState.selectedElementIds) &&
-                (element.groupIds.length > 0 ||
-                  elementsAreInFrameBounds([element], containgFrame) ||
+                !appState.selectedElementIds[element.id] &&
+                (elementsAreInFrameBounds([element], containgFrame) ||
                   FrameGeometry.isElementIntersectingFrame(
                     element,
                     containgFrame,
-                  ))
+                  ) ||
+                  (element.groupIds.length > 0 &&
+                    !groupsAreCompletelyOutOfFrame(
+                      elements,
+                      element.groupIds,
+                      containgFrame,
+                    )))
               ) {
                 // CLIP elements that are not selected but are in the frame
                 context.clip();
               } else if (
-                element.id in appState.selectedElementIds &&
+                appState.selectedElementIds[element.id] &&
                 !appState.selectedElementsAreBeingDragged &&
                 (element.groupIds.length > 0 ||
                   elementsAreInFrameBounds([element], containgFrame) ||
@@ -470,18 +481,29 @@ export const _renderScene = ({
               }
             } else if (
               appState.frameToHighlight &&
-              element.id in appState.selectedElementIds &&
+              appState.selectedElementIds[element.id] &&
               (elementsAreInFrameBounds([element], appState.frameToHighlight) ||
                 FrameGeometry.isElementIntersectingFrame(
                   element,
                   appState.frameToHighlight,
-                ))
+                ) ||
+                (element.groupIds.length > 0 &&
+                  element.groupIds.find((groupId) =>
+                    groupsToBeAddedToFrame.has(groupId),
+                  )))
             ) {
-              // CLIP elements that are now in the frame
-              // (elements are not yet added to the frame)
+              // CLIP elements that are to be added to a frame
               context.clip();
+
+              if (element.groupIds.length > 0) {
+                element.groupIds.forEach((groupId) =>
+                  groupsToBeAddedToFrame.add(groupId),
+                );
+              }
             }
 
+            // --------- clipping ----------
+            // step 3: reset translation and render element and restore context
             context.translate(
               -(frame.x + renderConfig.scrollX),
               -(frame.y + renderConfig.scrollY),
