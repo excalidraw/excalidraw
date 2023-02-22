@@ -24,7 +24,6 @@ import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
-  getBoundTextElementOffset,
   getContainerCoords,
   getContainerDims,
   getContainerElement,

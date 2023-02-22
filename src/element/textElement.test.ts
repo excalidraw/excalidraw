@@ -220,8 +220,8 @@ describe("Test measureText", () => {
         ...params,
       });
       expect(getContainerCoords(element)).toEqual({
-        x: 10,
-        y: 20,
+        x: 15,
+        y: 25,
       });
     });
 
