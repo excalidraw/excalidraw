@@ -12,7 +12,6 @@ import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
-import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import {
   isBoundToContainer,
   isImageElement,
@@ -244,31 +243,25 @@ const computeBoundTextPosition = (
   const containerCoords = getContainerCoords(container);
   const maxContainerHeight = getMaxContainerHeight(container);
   const maxContainerWidth = getMaxContainerWidth(container);
-  const padding = container.type === "ellipse" ? 0 : BOUND_TEXT_PADDING;
 
   let x;
   let y;
   if (boundTextElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-    y = containerCoords.y + padding;
+    y = containerCoords.y;
   } else if (boundTextElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-    y =
-      containerCoords.y +
-      (maxContainerHeight - boundTextElement.height + padding);
+    y = containerCoords.y + (maxContainerHeight - boundTextElement.height);
   } else {
     y =
       containerCoords.y +
-      (maxContainerHeight / 2 - boundTextElement.height / 2 + padding);
+      (maxContainerHeight / 2 - boundTextElement.height / 2);
   }
   if (boundTextElement.textAlign === TEXT_ALIGN.LEFT) {
-    x = containerCoords.x + padding;
+    x = containerCoords.x;
   } else if (boundTextElement.textAlign === TEXT_ALIGN.RIGHT) {
-    x =
-      containerCoords.x +
-      (maxContainerWidth - boundTextElement.width + padding);
+    x = containerCoords.x + (maxContainerWidth - boundTextElement.width);
   } else {
     x =
-      containerCoords.x +
-      (maxContainerWidth / 2 - boundTextElement.width / 2 + padding);
+      containerCoords.x + (maxContainerWidth / 2 - boundTextElement.width / 2);
   }
   return { x, y };
 };
@@ -636,20 +629,22 @@ export const getContainerCenter = (
 };
 
 export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
+  let offsetX = BOUND_TEXT_PADDING;
+  let offsetY = BOUND_TEXT_PADDING;
+
   if (container.type === "ellipse") {
     // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6172
-    const offsetX =
-      (container.width / 2) * (1 - Math.sqrt(2) / 2) + BOUND_TEXT_PADDING;
-    const offsetY =
-      (container.height / 2) * (1 - Math.sqrt(2) / 2) + BOUND_TEXT_PADDING;
-    return {
-      x: container.x + offsetX,
-      y: container.y + offsetY,
-    };
+    offsetX += (container.width / 2) * (1 - Math.sqrt(2) / 2);
+    offsetY += (container.height / 2) * (1 - Math.sqrt(2) / 2);
+  }
+  // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6265
+  if (container.type === "diamond") {
+    offsetX += container.width / 4;
+    offsetY += container.height / 4;
   }
   return {
-    x: container.x,
-    y: container.y,
+    x: container.x + offsetX,
+    y: container.y + offsetY,
   };
 };
 
@@ -767,5 +762,63 @@ export const computeContainerHeightForBoundText = (
   if (isArrowElement(container)) {
     return boundTextElementHeight + BOUND_TEXT_PADDING * 8 * 2;
   }
+  if (container.type === "diamond") {
+    return 2 * boundTextElementHeight;
+  }
   return boundTextElementHeight + BOUND_TEXT_PADDING * 2;
+};
+
+export const getMaxContainerWidth = (container: ExcalidrawElement) => {
+  const width = getContainerDims(container).width;
+  if (isArrowElement(container)) {
+    const containerWidth = width - BOUND_TEXT_PADDING * 8 * 2;
+    if (containerWidth <= 0) {
+      const boundText = getBoundTextElement(container);
+      if (boundText) {
+        return boundText.width;
+      }
+      return BOUND_TEXT_PADDING * 8 * 2;
+    }
+    return containerWidth;
+  }
+
+  if (container.type === "ellipse") {
+    // The width of the largest rectangle inscribed inside an ellipse is
+    // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
+    // equation of an ellipse -https://github.com/excalidraw/excalidraw/pull/6172
+    return Math.round((width / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
+  }
+  if (container.type === "diamond") {
+    // The width of the largest rectangle inscribed inside a rhombus is
+    // Math.round(width / 2) - https://github.com/excalidraw/excalidraw/pull/6265
+    return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
+  }
+  return width - BOUND_TEXT_PADDING * 2;
+};
+
+export const getMaxContainerHeight = (container: ExcalidrawElement) => {
+  const height = getContainerDims(container).height;
+  if (isArrowElement(container)) {
+    const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
+    if (containerHeight <= 0) {
+      const boundText = getBoundTextElement(container);
+      if (boundText) {
+        return boundText.height;
+      }
+      return BOUND_TEXT_PADDING * 8 * 2;
+    }
+    return height;
+  }
+  if (container.type === "ellipse") {
+    // The height of the largest rectangle inscribed inside an ellipse is
+    // Math.round((ellipse.height / 2) * Math.sqrt(2)) which is derived from
+    // equation of an ellipse - https://github.com/excalidraw/excalidraw/pull/6172
+    return Math.round((height / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
+  }
+  if (container.type === "diamond") {
+    // The height of the largest rectangle inscribed inside a rhombus is
+    // Math.round(height / 2) - https://github.com/excalidraw/excalidraw/pull/6265
+    return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
+  }
+  return height - BOUND_TEXT_PADDING * 2;
 };
