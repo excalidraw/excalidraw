@@ -232,25 +232,17 @@ export const textWysiwyg = ({
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
         else {
-          const padding =
-            container.type === "ellipse" || container.type === "diamond"
-              ? 0
-              : getBoundTextElementOffset(updatedTextElement);
           const containerCoords = getContainerCoords(container);
 
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
             if (!isArrowElement(container)) {
               coordY =
-                containerCoords.y +
-                maxHeight / 2 -
-                textElementHeight / 2 +
-                padding;
+                containerCoords.y + maxHeight / 2 - textElementHeight / 2;
             }
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-            coordY =
-              containerCoords.y + (maxHeight - textElementHeight + padding);
+            coordY = containerCoords.y + (maxHeight - textElementHeight);
           }
         }
       }

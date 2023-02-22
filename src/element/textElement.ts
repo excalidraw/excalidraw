@@ -244,34 +244,25 @@ const computeBoundTextPosition = (
   const containerCoords = getContainerCoords(container);
   const maxContainerHeight = getMaxContainerHeight(container);
   const maxContainerWidth = getMaxContainerWidth(container);
-  const padding =
-    container.type === "ellipse" || container.type === "diamond"
-      ? 0
-      : BOUND_TEXT_PADDING;
 
   let x;
   let y;
   if (boundTextElement.verticalAlign === VERTICAL_ALIGN.TOP) {
-    y = containerCoords.y + padding;
+    y = containerCoords.y;
   } else if (boundTextElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-    y =
-      containerCoords.y +
-      (maxContainerHeight - boundTextElement.height + padding);
+    y = containerCoords.y + (maxContainerHeight - boundTextElement.height);
   } else {
     y =
       containerCoords.y +
-      (maxContainerHeight / 2 - boundTextElement.height / 2 + padding);
+      (maxContainerHeight / 2 - boundTextElement.height / 2);
   }
   if (boundTextElement.textAlign === TEXT_ALIGN.LEFT) {
-    x = containerCoords.x + padding;
+    x = containerCoords.x;
   } else if (boundTextElement.textAlign === TEXT_ALIGN.RIGHT) {
-    x =
-      containerCoords.x +
-      (maxContainerWidth - boundTextElement.width + padding);
+    x = containerCoords.x + (maxContainerWidth - boundTextElement.width);
   } else {
     x =
-      containerCoords.x +
-      (maxContainerWidth / 2 - boundTextElement.width / 2 + padding);
+      containerCoords.x + (maxContainerWidth / 2 - boundTextElement.width / 2);
   }
   return { x, y };
 };
@@ -639,29 +630,22 @@ export const getContainerCenter = (
 };
 
 export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
+  let offsetX = BOUND_TEXT_PADDING;
+  let offsetY = BOUND_TEXT_PADDING;
+
   if (container.type === "ellipse") {
     // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6172
-    const offsetX =
-      (container.width / 2) * (1 - Math.sqrt(2) / 2) + BOUND_TEXT_PADDING;
-    const offsetY =
-      (container.height / 2) * (1 - Math.sqrt(2) / 2) + BOUND_TEXT_PADDING;
-    return {
-      x: container.x + offsetX,
-      y: container.y + offsetY,
-    };
+    offsetX += (container.width / 2) * (1 - Math.sqrt(2) / 2);
+    offsetY += (container.height / 2) * (1 - Math.sqrt(2) / 2);
   }
   // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6265
   if (container.type === "diamond") {
-    const offsetX = container.width / 4 + BOUND_TEXT_PADDING;
-    const offsetY = container.height / 4 + BOUND_TEXT_PADDING;
-    return {
-      x: container.x + offsetX,
-      y: container.y + offsetY,
-    };
+    offsetX += container.width / 4;
+    offsetY += container.height / 4;
   }
   return {
-    x: container.x,
-    y: container.y,
+    x: container.x + offsetX,
+    y: container.y + offsetY,
   };
 };
 
