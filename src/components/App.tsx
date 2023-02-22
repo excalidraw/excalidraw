@@ -35,6 +35,7 @@ import {
   actionLink,
   actionToggleLock,
   actionToggleLinearEditor,
+  actionToggleObjectsSnapMode,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -408,6 +409,7 @@ class App extends React.Component<AppProps, AppState> {
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
+      objectsSnapModeEnabled = false,
       theme = defaultAppState.theme,
       name = defaultAppState.name,
     } = props;
@@ -418,6 +420,7 @@ class App extends React.Component<AppProps, AppState> {
       ...this.getCanvasOffsets(),
       viewModeEnabled,
       zenModeEnabled,
+      objectsSnapModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
       name,
       width: window.innerWidth,
@@ -6218,6 +6221,7 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleGridMode,
         actionToggleZenMode,
         actionToggleViewMode,
+        actionToggleObjectsSnapMode,
         actionToggleStats,
       ];
     }

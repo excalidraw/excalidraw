@@ -208,6 +208,7 @@ export type AppState = {
   selectedLinearElement: LinearElementEditor | null;
 
   snaps: Snaps | null;
+  objectsSnapModeEnabled: boolean;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -312,6 +313,7 @@ export interface ExcalidrawProps {
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
+  objectsSnapModeEnabled?: boolean;
   libraryReturnUrl?: string;
   theme?: Theme;
   name?: string;

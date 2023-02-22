@@ -146,7 +146,10 @@ export const shouldSnap = (snap: Snap, zoom: Zoom) => {
 
 const isSnapEnabled = ({
   event,
+  appState,
 }: {
   appState: AppState;
   event: PointerEvent;
-}) => !event.metaKey;
+}) =>
+  (appState.objectsSnapModeEnabled && !event.metaKey) ||
+  (!appState.objectsSnapModeEnabled && event.metaKey);
