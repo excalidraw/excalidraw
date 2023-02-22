@@ -1,5 +1,12 @@
 import { BOUND_TEXT_PADDING } from "../constants";
-import { wrapText } from "./textElement";
+import { API } from "../tests/helpers/api";
+import {
+  computeContainerHeightForBoundText,
+  getContainerCoords,
+  getMaxContainerWidth,
+  getMaxContainerHeight,
+  wrapText,
+} from "./textElement";
 import { FontString } from "./types";
 
 describe("Test wrapText", () => {
@@ -165,6 +172,123 @@ break it now`,
         const res = wrapText(text, font, data.width - BOUND_TEXT_PADDING * 2);
         expect(res).toEqual(data.res);
       });
+    });
+  });
+});
+
+describe("Test measureText", () => {
+  const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
+  const text = "Hello World";
+
+  describe("Test getContainerCoords", () => {
+    const params = { width: 200, height: 100, x: 10, y: 20 };
+
+    it("should compute coords correctly when ellipse", () => {
+      const element = API.createElement({
+        type: "ellipse",
+        ...params,
+      });
+      expect(getContainerCoords(element)).toEqual({
+        x: 44.2893218813452455,
+        y: 39.64466094067262,
+      });
+    });
+
+    it("should compute coords correctly when rectangle", () => {
+      const element = API.createElement({
+        type: "rectangle",
+        ...params,
+      });
+      expect(getContainerCoords(element)).toEqual({
+        x: 15,
+        y: 25,
+      });
+    });
+
+    it("should compute coords correctly when diamond", () => {
+      const element = API.createElement({
+        type: "diamond",
+        ...params,
+      });
+      expect(getContainerCoords(element)).toEqual({
+        x: 65,
+        y: 50,
+      });
+    });
+  });
+
+  describe("Test computeContainerHeightForBoundText", () => {
+    const params = {
+      width: 178,
+      height: 194,
+    };
+
+    it("should compute container height correctly for rectangle", () => {
+      const element = API.createElement({
+        type: "rectangle",
+        ...params,
+      });
+      expect(computeContainerHeightForBoundText(element, 150)).toEqual(160);
+    });
+
+    it("should compute container height correctly for ellipse", () => {
+      const element = API.createElement({
+        type: "ellipse",
+        ...params,
+      });
+      expect(computeContainerHeightForBoundText(element, 150)).toEqual(212);
+    });
+
+    it("should compute container height correctly for diamond", () => {
+      const element = API.createElement({
+        type: "diamond",
+        ...params,
+      });
+      expect(computeContainerHeightForBoundText(element, 150)).toEqual(300);
+    });
+  });
+
+  describe("Test getMaxContainerWidth", () => {
+    const params = {
+      width: 178,
+      height: 194,
+    };
+
+    it("should return max width when container is rectangle", () => {
+      const container = API.createElement({ type: "rectangle", ...params });
+      expect(getMaxContainerWidth(container)).toBe(168);
+    });
+
+    it("should return max width when container is ellipse", () => {
+      const container = API.createElement({ type: "ellipse", ...params });
+      expect(getMaxContainerWidth(container)).toBe(116);
+    });
+
+    it("should return max width when container is diamond", () => {
+      const container = API.createElement({ type: "diamond", ...params });
+      expect(getMaxContainerWidth(container)).toBe(79);
+    });
+  });
+
+  describe("Test getMaxContainerHeight", () => {
+    const params = {
+      width: 178,
+      height: 194,
+    };
+
+    it("should return max height when container is rectangle", () => {
+      const container = API.createElement({ type: "rectangle", ...params });
+      expect(getMaxContainerHeight(container)).toBe(184);
+    });
+
+    it("should return max height when container is ellipse", () => {
+      const container = API.createElement({ type: "ellipse", ...params });
+      expect(getMaxContainerHeight(container)).toBe(127);
+    });
+
+    it("should return max height when container is diamond", () => {
+      const container = API.createElement({ type: "diamond", ...params });
+      expect(getMaxContainerHeight(container)).toBe(87);
     });
   });
 });

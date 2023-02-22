@@ -108,6 +108,7 @@ import {
   textWysiwyg,
   transformElements,
   updateTextElement,
+  redrawTextBoundingBox,
 } from "../element";
 import {
   bindOrUnbindLinearElement,
@@ -226,6 +227,7 @@ import {
   setEraserCursor,
   updateActiveTool,
   getShortcutKey,
+  isTransparent,
 } from "../utils";
 import {
   ContextMenu,
@@ -263,6 +265,7 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerDims,
+  getContainerElement,
   getTextBindableContainerAtPosition,
   isValidTextContainer,
 } from "../element/textElement";
@@ -279,6 +282,8 @@ import { shouldShowBoundingBox } from "../element/transformHandles";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionToggleHandTool } from "../actions/actionCanvas";
+import { jotaiStore } from "../jotai";
+import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -834,7 +839,7 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-    const scene = restore(initialData, null, null);
+    const scene = restore(initialData, null, null, { repairBindings: true });
     scene.appState = {
       ...scene.appState,
       theme: this.props.theme || scene.appState.theme,
@@ -1622,6 +1627,7 @@ class App extends React.Component<AppProps, AppState> {
       oldIdToDuplicatedId.set(element.id, newElement.id);
       return newElement;
     });
+
     bindTextToShapeAfterDuplication(newElements, elements, oldIdToDuplicatedId);
     const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
@@ -1634,6 +1640,14 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.scene.replaceAllElements(nextElements);
+
+    newElements.forEach((newElement) => {
+      if (isTextElement(newElement) && isBoundToContainer(newElement)) {
+        const container = getContainerElement(newElement);
+        redrawTextBoundingBox(newElement, container);
+      }
+    });
+
     this.history.resumeRecording();
 
     this.setState(
@@ -1952,7 +1966,6 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   // Input handling
-
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
       // normalize `event.key` when CapsLock is pressed #2372
@@ -2193,6 +2206,13 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({ openPopup: "strokeColorPicker" });
           event.stopPropagation();
         }
+      }
+
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
+      ) {
+        jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
       }
     },
   );
@@ -2746,7 +2766,15 @@ class App extends React.Component<AppProps, AppState> {
         sceneY,
       );
       if (container) {
-        if (isArrowElement(container) || hasBoundTextElement(container)) {
+        if (
+          isArrowElement(container) ||
+          hasBoundTextElement(container) ||
+          !isTransparent(container.backgroundColor) ||
+          isHittingElementNotConsideringBoundingBox(container, this.state, [
+            sceneX,
+            sceneY,
+          ])
+        ) {
           const midPoint = getContainerCenter(container, this.state);
 
           sceneX = midPoint.x;
