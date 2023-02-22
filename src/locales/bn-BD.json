@@ -192,7 +192,8 @@
     "invalidSceneUrl": "সরবরাহ করা লিঙ্ক থেকে দৃশ্য লোড করা যায়নি৷ এটি হয় বিকৃত, অথবা বৈধ এক্সক্যালিড্র জেসন তথ্য নেই৷",
     "resetLibrary": "এটি আপনার সংগ্রহ পরিষ্কার করবে। আপনি কি নিশ্চিত?",
     "removeItemsFromsLibrary": "সংগ্রহ থেকে {{count}} বস্তু বিয়োগ করা হবে। আপনি কি নিশ্চিত?",
-    "invalidEncryptionKey": "অবৈধ এনক্রীপশন কী।"
+    "invalidEncryptionKey": "অবৈধ এনক্রীপশন কী।",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "অসমর্থিত ফাইল।",

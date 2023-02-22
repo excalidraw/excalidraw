@@ -72,7 +72,7 @@
     "layers": "Шари",
     "actions": "Дії",
     "language": "Мова",
-    "liveCollaboration": "",
+    "liveCollaboration": "Спільна робота у режимі реального часу...",
     "duplicateSelection": "Дублювати",
     "untitled": "Без назви",
     "name": "Ім’я",
@@ -192,7 +192,8 @@
     "invalidSceneUrl": "Не вдалося імпортувати сцену з наданого URL. Він або недоформований, або не містить дійсних даних Excalidraw JSON.",
     "resetLibrary": "Це призведе до очищення бібліотеки. Ви впевнені?",
     "removeItemsFromsLibrary": "Видалити {{count}} елемент(ів) з бібліотеки?",
-    "invalidEncryptionKey": "Ключ шифрування повинен бути довжиною до 22 символів. Спільну роботу вимкнено."
+    "invalidEncryptionKey": "Ключ шифрування повинен бути довжиною до 22 символів. Спільну роботу вимкнено.",
+    "collabOfflineWarning": "Немає підключення до Інтернету.\nВаші зміни не будуть збережені!"
   },
   "errors": {
     "unsupportedFileType": "Непідтримуваний тип файлу.",
@@ -457,8 +458,8 @@
     "defaults": {
       "menuHint": "",
       "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "toolbarHint": "Оберіть інструмент і почніть малювати!",
+      "helpHint": "Гарячі клавіші і допомога"
     }
   }
 }

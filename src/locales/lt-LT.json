@@ -192,7 +192,8 @@
     "invalidSceneUrl": "Nepavyko suimportuoti scenos iš pateiktos nuorodos (URL). Ji arba blogai suformatuota, arba savyje neturi teisingų Excalidraw JSON duomenų.",
     "resetLibrary": "Tai išvalys tavo biblioteką. Ar tikrai to nori?",
     "removeItemsFromsLibrary": "Ištrinti {{count}} elementą/-us iš bibliotekos?",
-    "invalidEncryptionKey": "Šifravimo raktas turi būti iš 22 simbolių. Redagavimas gyvai yra išjungtas."
+    "invalidEncryptionKey": "Šifravimo raktas turi būti iš 22 simbolių. Redagavimas gyvai yra išjungtas.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "Nepalaikomas failo tipas.",

@@ -192,7 +192,8 @@
     "invalidSceneUrl": "指定された URL からシーンをインポートできませんでした。不正な形式であるか、有効な Excalidraw JSON データが含まれていません。",
     "resetLibrary": "ライブラリを消去します。本当によろしいですか？",
     "removeItemsFromsLibrary": "{{count}} 個のアイテムをライブラリから削除しますか？",
-    "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。ライブコラボレーションは無効化されています。"
+    "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。ライブコラボレーションは無効化されています。",
+    "collabOfflineWarning": "インターネットに接続されていません。\n変更は保存されません！"
   },
   "errors": {
     "unsupportedFileType": "サポートされていないファイル形式です。",
@@ -220,7 +221,7 @@
     "penMode": "ペンモード - タッチ防止",
     "link": "選択した図形のリンクを追加/更新",
     "eraser": "消しゴム",
-    "hand": ""
+    "hand": "手 (パンニングツール)"
   },
   "headings": {
     "canvasActions": "キャンバス操作",
@@ -228,7 +229,7 @@
     "shapes": "図形"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "キャンバスを移動するには、マウスホイールまたはスペースバーを押しながらドラッグするか、手ツールを使用します",
     "linearElement": "クリックすると複数の頂点からなる曲線を開始、ドラッグすると直線",
     "freeDraw": "クリックしてドラッグします。離すと終了します",
     "text": "ヒント: 選択ツールを使用して任意の場所をダブルクリックしてテキストを追加することもできます",

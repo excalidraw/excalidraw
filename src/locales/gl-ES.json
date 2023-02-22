@@ -192,7 +192,8 @@
     "invalidSceneUrl": "Non se puido importar a escena dende a URL proporcionada. Ou ben está malformada ou non contén un JSON con información válida para Excalidraw.",
     "resetLibrary": "Isto limpará a súa biblioteca. Está seguro?",
     "removeItemsFromsLibrary": "Eliminar {{count}} elemento(s) da biblioteca?",
-    "invalidEncryptionKey": "A clave de cifrado debe ter 22 caracteres. A colaboración en directo está desactivada."
+    "invalidEncryptionKey": "A clave de cifrado debe ter 22 caracteres. A colaboración en directo está desactivada.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "Tipo de ficheiro non soportado.",
