@@ -411,8 +411,12 @@ export const renderCanvasContent = ({
           editingLinearElement = element as NonDeleted<ExcalidrawLinearElement>;
         }
       }
-      if (!isExporting) {
-        renderLinkIcon(element, context, appState);
+      if (
+        !isExporting &&
+        element.link &&
+        !appState.selectedElementIds[element.id]
+      ) {
+        renderLinkIcon(element, context, renderConfig);
       }
     } catch (error: any) {
       console.error(error);
@@ -447,7 +451,6 @@ export const renderCanvasUI = ({
   normalizedCanvasHeight: number;
   editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined;
 }) => {
-
   const { renderScrollbars = true, renderSelection = true } = renderConfig;
 
   // All the context will paint within CANVAS-UI from here
@@ -847,7 +850,7 @@ export const _renderScene = ({
     // When doing calculations based on canvas width we should used normalized one
     const normalizedCanvasWidth = canvas.width / scale;
     const normalizedCanvasHeight = canvas.height / scale;
-    // const { runCanvas, runCanvasUi } = renderCheck(elements.length,canvasUIRenderConfig, canvasContentRenderConfig) 
+    // const { runCanvas, runCanvasUi } = renderCheck(elements.length,canvasUIRenderConfig, canvasContentRenderConfig)
     const { atLeastOneVisibleElement, editingLinearElement } =
       renderCanvasContent({
         elements,
@@ -1122,55 +1125,44 @@ let linkCanvasCache: any;
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
-  appState: AppState,
+  renderConfig: CanvasContentRenderConfig,
 ) => {
-  if (element.link && !appState.selectedElementIds[element.id]) {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    const [x, y, width, height] = getLinkHandleFromCoords(
-      [x1, y1, x2, y2],
-      element.angle,
-      appState.zoom,
-    );
-    const centerX = x + width / 2;
-    const centerY = y + height / 2;
-    context.save();
-    context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
-    context.rotate(element.angle);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [x, y, width, height] = getLinkHandleFromCoords(
+    [x1, y1, x2, y2],
+    element.angle,
+    renderConfig.zoom,
+  );
+  const centerX = x + width / 2;
+  const centerY = y + height / 2;
+  context.save();
+  context.translate(
+    renderConfig.scrollX + centerX,
+    renderConfig.scrollY + centerY,
+  );
+  context.rotate(element.angle);
 
-    if (!linkCanvasCache || linkCanvasCache.zoom !== appState.zoom.value) {
-      linkCanvasCache = document.createElement("canvas");
-      linkCanvasCache.zoom = appState.zoom.value;
-      linkCanvasCache.width =
-        width * window.devicePixelRatio * appState.zoom.value;
-      linkCanvasCache.height =
-        height * window.devicePixelRatio * appState.zoom.value;
-      const linkCanvasCacheContext = linkCanvasCache.getContext("2d")!;
-      linkCanvasCacheContext.scale(
-        window.devicePixelRatio * appState.zoom.value,
-        window.devicePixelRatio * appState.zoom.value,
-      );
-      linkCanvasCacheContext.fillStyle = "#fff";
-      linkCanvasCacheContext.fillRect(0, 0, width, height);
-      linkCanvasCacheContext.drawImage(EXTERNAL_LINK_IMG, 0, 0, width, height);
-      linkCanvasCacheContext.restore();
-      context.drawImage(
-        linkCanvasCache,
-        x - centerX,
-        y - centerY,
-        width,
-        height,
-      );
-    } else {
-      context.drawImage(
-        linkCanvasCache,
-        x - centerX,
-        y - centerY,
-        width,
-        height,
-      );
-    }
-    context.restore();
+  if (!linkCanvasCache || linkCanvasCache.zoom !== renderConfig.zoom.value) {
+    linkCanvasCache = document.createElement("canvas");
+    linkCanvasCache.zoom = renderConfig.zoom.value;
+    linkCanvasCache.width =
+      width * window.devicePixelRatio * renderConfig.zoom.value;
+    linkCanvasCache.height =
+      height * window.devicePixelRatio * renderConfig.zoom.value;
+    const linkCanvasCacheContext = linkCanvasCache.getContext("2d")!;
+    linkCanvasCacheContext.scale(
+      window.devicePixelRatio * renderConfig.zoom.value,
+      window.devicePixelRatio * renderConfig.zoom.value,
+    );
+    linkCanvasCacheContext.fillStyle = "#fff";
+    linkCanvasCacheContext.fillRect(0, 0, width, height);
+    linkCanvasCacheContext.drawImage(EXTERNAL_LINK_IMG, 0, 0, width, height);
+    linkCanvasCacheContext.restore();
+    context.drawImage(linkCanvasCache, x - centerX, y - centerY, width, height);
+  } else {
+    context.drawImage(linkCanvasCache, x - centerX, y - centerY, width, height);
   }
+  context.restore();
 };
 
 const isVisibleElement = (
