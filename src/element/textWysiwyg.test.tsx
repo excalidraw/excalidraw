@@ -6,12 +6,11 @@ import { CODES, KEYS } from "../keys";
 import { fireEvent } from "../tests/test-utils";
 import { queryByText } from "@testing-library/react";
 
-import { BOUND_TEXT_PADDING, FONT_FAMILY } from "../constants";
+import { FONT_FAMILY } from "../constants";
 import {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
 } from "./types";
-import * as textElementUtils from "./textElement";
 import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
 import { resize } from "../tests/utils";
@@ -440,17 +439,6 @@ describe("textWysiwyg", () => {
     let rectangle: any;
     const { h } = window;
 
-    const DUMMY_HEIGHT = 240;
-    const DUMMY_WIDTH = 160;
-    const APPROX_LINE_HEIGHT = 25;
-    const INITIAL_WIDTH = 10;
-
-    beforeAll(() => {
-      jest
-        .spyOn(textElementUtils, "getApproxLineHeight")
-        .mockReturnValue(APPROX_LINE_HEIGHT);
-    });
-
     beforeEach(async () => {
       await render(<ExcalidrawApp />);
       h.elements = [];
@@ -732,39 +720,6 @@ describe("textWysiwyg", () => {
     });
 
     it("should wrap text and vertcially center align once text submitted", async () => {
-      jest
-        .spyOn(textElementUtils, "measureText")
-        .mockImplementation((text, font, maxWidth) => {
-          let width = INITIAL_WIDTH;
-          let height = APPROX_LINE_HEIGHT;
-          let baseline = 10;
-          if (!text) {
-            return {
-              width,
-              height,
-              baseline,
-            };
-          }
-          baseline = 30;
-          width = DUMMY_WIDTH;
-          if (text === "Hello \nWorld!") {
-            height = APPROX_LINE_HEIGHT * 2;
-          }
-          if (maxWidth) {
-            width = maxWidth;
-            // To capture cases where maxWidth passed is initial width
-            // due to which the text is not wrapped correctly
-            if (maxWidth === INITIAL_WIDTH) {
-              height = DUMMY_HEIGHT;
-            }
-          }
-          return {
-            width,
-            height,
-            baseline,
-          };
-        });
-
       expect(h.elements.length).toBe(1);
 
       Keyboard.keyDown(KEYS.ENTER);
@@ -772,11 +727,6 @@ describe("textWysiwyg", () => {
       let editor = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       ) as HTMLTextAreaElement;
-
-      // mock scroll height
-      jest
-        .spyOn(editor, "scrollHeight", "get")
-        .mockImplementation(() => APPROX_LINE_HEIGHT * 2);
 
       fireEvent.change(editor, {
         target: {
@@ -791,10 +741,12 @@ describe("textWysiwyg", () => {
       text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.text).toBe("Hello \nWorld!");
       expect(text.originalText).toBe("Hello World!");
-      expect(text.y).toBe(57.5);
-      expect(text.x).toBe(rectangle.x + BOUND_TEXT_PADDING);
-      expect(text.height).toBe(APPROX_LINE_HEIGHT * 2);
-      expect(text.width).toBe(rectangle.width - BOUND_TEXT_PADDING * 2);
+      expect(text.y).toBe(
+        rectangle.y + h.elements[0].height / 2 - text.height / 2,
+      );
+      expect(text.x).toBe(25);
+      expect(text.height).toBe(48);
+      expect(text.width).toBe(60);
 
       // Edit and text by removing second line and it should
       // still vertically align correctly
@@ -811,11 +763,6 @@ describe("textWysiwyg", () => {
         },
       });
 
-      // mock scroll height
-      jest
-        .spyOn(editor, "scrollHeight", "get")
-        .mockImplementation(() => APPROX_LINE_HEIGHT);
-      editor.style.height = "25px";
       editor.dispatchEvent(new Event("input"));
 
       await new Promise((r) => setTimeout(r, 0));
@@ -825,10 +772,12 @@ describe("textWysiwyg", () => {
 
       expect(text.text).toBe("Hello");
       expect(text.originalText).toBe("Hello");
-      expect(text.y).toBe(57.5);
-      expect(text.x).toBe(rectangle.x + BOUND_TEXT_PADDING);
-      expect(text.height).toBe(APPROX_LINE_HEIGHT);
-      expect(text.width).toBe(rectangle.width - BOUND_TEXT_PADDING * 2);
+      expect(text.height).toBe(24);
+      expect(text.width).toBe(50);
+      expect(text.y).toBe(
+        rectangle.y + h.elements[0].height / 2 - text.height / 2,
+      );
+      expect(text.x).toBe(30);
     });
 
     it("should unbind bound text when unbind action from context menu is triggered", async () => {
@@ -915,8 +864,8 @@ describe("textWysiwyg", () => {
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
-          109.5,
-          17,
+          85,
+          5,
         ]
       `);
 
@@ -942,7 +891,7 @@ describe("textWysiwyg", () => {
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
           15,
-          90,
+          66,
         ]
       `);
 
@@ -965,7 +914,7 @@ describe("textWysiwyg", () => {
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
-          424,
+          375,
           -539,
         ]
       `);
@@ -1080,9 +1029,9 @@ describe("textWysiwyg", () => {
       mouse.moveTo(rectangle.x + 100, rectangle.y + 50);
       mouse.up(rectangle.x + 100, rectangle.y + 50);
       expect(rectangle.x).toBe(80);
-      expect(rectangle.y).toBe(85);
-      expect(text.x).toBe(89.5);
-      expect(text.y).toBe(90);
+      expect(rectangle.y).toBe(-35);
+      expect(text.x).toBe(85);
+      expect(text.y).toBe(-30);
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {
         Keyboard.keyPress(KEYS.Z);
@@ -1112,29 +1061,6 @@ describe("textWysiwyg", () => {
     });
 
     it("should restore original container height and clear cache once text is unbind", async () => {
-      jest
-        .spyOn(textElementUtils, "measureText")
-        .mockImplementation((text, font, maxWidth) => {
-          let width = INITIAL_WIDTH;
-          let height = APPROX_LINE_HEIGHT;
-          let baseline = 10;
-          if (!text) {
-            return {
-              width,
-              height,
-              baseline,
-            };
-          }
-          baseline = 30;
-          width = DUMMY_WIDTH;
-          height = APPROX_LINE_HEIGHT * 5;
-
-          return {
-            width,
-            height,
-            baseline,
-          };
-        });
       const originalRectHeight = rectangle.height;
       expect(rectangle.height).toBe(originalRectHeight);
 
@@ -1148,7 +1074,7 @@ describe("textWysiwyg", () => {
         target: { value: "Online whiteboard collaboration made easy" },
       });
       editor.blur();
-      expect(rectangle.height).toBe(135);
+      expect(rectangle.height).toBe(178);
       mouse.select(rectangle);
       fireEvent.contextMenu(GlobalTestState.canvas, {
         button: 2,
@@ -1174,7 +1100,7 @@ describe("textWysiwyg", () => {
       editor.blur();
 
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
-      expect(rectangle.height).toBe(215);
+      expect(rectangle.height).toBe(156);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(null);
 
       mouse.select(rectangle);
@@ -1186,13 +1112,12 @@ describe("textWysiwyg", () => {
 
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
-      expect(rectangle.height).toBe(215);
+      expect(rectangle.height).toBe(156);
       // cache updated again
-      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(215);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(156);
     });
 
-    //@todo fix this test later once measureText is mocked correctly
-    it.skip("should reset the container height cache when font properties updated", async () => {
+    it("should reset the container height cache when font properties updated", async () => {
       Keyboard.keyPress(KEYS.ENTER);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
 
@@ -1218,7 +1143,9 @@ describe("textWysiwyg", () => {
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontSize,
       ).toEqual(36);
-      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(
+        96.39999999999999,
+      );
     });
 
     describe("should align correctly", () => {
@@ -1256,7 +1183,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align top"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
-            94.5,
+            30,
             25,
           ]
         `);
@@ -1268,7 +1195,7 @@ describe("textWysiwyg", () => {
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
-            174,
+            45,
             25,
           ]
         `);
@@ -1280,7 +1207,7 @@ describe("textWysiwyg", () => {
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
             15,
-            25,
+            45.5,
           ]
         `);
       });
@@ -1291,8 +1218,8 @@ describe("textWysiwyg", () => {
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
-            -25,
-            25,
+            30,
+            45.5,
           ]
         `);
       });
@@ -1303,8 +1230,8 @@ describe("textWysiwyg", () => {
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
-            174,
-            25,
+            45,
+            45.5,
           ]
         `);
       });
@@ -1314,33 +1241,33 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align bottom"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-            Array [
-              15,
-              25,
-            ]
-          `);
+          Array [
+            15,
+            66,
+          ]
+        `);
       });
 
       it("when bottom center", async () => {
         fireEvent.click(screen.getByTitle("Center"));
         fireEvent.click(screen.getByTitle("Align bottom"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-            Array [
-              94.5,
-              25,
-            ]
-          `);
+          Array [
+            30,
+            66,
+          ]
+        `);
       });
 
       it("when bottom right", async () => {
         fireEvent.click(screen.getByTitle("Right"));
         fireEvent.click(screen.getByTitle("Align bottom"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-            Array [
-              174,
-              25,
-            ]
-          `);
+          Array [
+            45,
+            66,
+          ]
+        `);
       });
     });
   });

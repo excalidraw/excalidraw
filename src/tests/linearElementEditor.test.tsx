@@ -1031,7 +1031,7 @@ describe("Test Linear Elements", () => {
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
         Object {
-          "height": 10,
+          "height": 128,
           "width": 367,
         }
       `);
@@ -1039,8 +1039,8 @@ describe("Test Linear Elements", () => {
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
         Object {
-          "x": 386.5,
-          "y": 70,
+          "x": 272,
+          "y": 46,
         }
       `);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
@@ -1052,11 +1052,11 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
         Array [
           20,
-          60,
-          391.8122896842806,
-          70,
+          36,
+          502,
+          94,
           205.9061448421403,
-          65,
+          53,
         ]
       `);
     });
@@ -1090,7 +1090,7 @@ describe("Test Linear Elements", () => {
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
         Object {
-          "height": 0,
+          "height": 128,
           "width": 340,
         }
       `);
@@ -1098,8 +1098,8 @@ describe("Test Linear Elements", () => {
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
         Object {
-          "x": 189.5,
-          "y": 20,
+          "x": 75,
+          "y": -4,
         }
       `);
       expect(textElement.text).toMatchInlineSnapshot(`
