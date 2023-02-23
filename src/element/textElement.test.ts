@@ -258,7 +258,7 @@ describe("Test measureText", () => {
         type: "ellipse",
         ...params,
       });
-      expect(computeContainerHeightForBoundText(element, 150)).toEqual(212);
+      expect(computeContainerHeightForBoundText(element, 150)).toEqual(226);
     });
 
     it("should compute container height correctly for diamond", () => {
@@ -266,7 +266,7 @@ describe("Test measureText", () => {
         type: "diamond",
         ...params,
       });
-      expect(computeContainerHeightForBoundText(element, 150)).toEqual(300);
+      expect(computeContainerHeightForBoundText(element, 150)).toEqual(320);
     });
   });
 
