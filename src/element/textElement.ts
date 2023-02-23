@@ -50,7 +50,6 @@ export const redrawTextBoundingBox = (
     text: textElement.text,
     width: textElement.width,
     height: textElement.height,
-    baseline: textElement.baseline,
   };
 
   boundTextUpdates.text = textElement.text;
@@ -66,12 +65,10 @@ export const redrawTextBoundingBox = (
   const metrics = measureText(
     boundTextUpdates.text,
     getFontString(textElement),
-    maxWidth,
   );
 
   boundTextUpdates.width = metrics.width;
   boundTextUpdates.height = metrics.height;
-  boundTextUpdates.baseline = metrics.baseline;
 
   if (container) {
     if (isArrowElement(container)) {
@@ -177,7 +174,6 @@ export const handleBindTextResize = (
     const maxWidth = getMaxContainerWidth(container);
     const maxHeight = getMaxContainerHeight(container);
     let containerHeight = containerDims.height;
-    let nextBaseLine = textElement.baseline;
     if (transformHandleType !== "n" && transformHandleType !== "s") {
       if (text) {
         text = wrapText(
@@ -186,14 +182,9 @@ export const handleBindTextResize = (
           maxWidth,
         );
       }
-      const dimensions = measureText(
-        text,
-        getFontString(textElement),
-        maxWidth,
-      );
+      const dimensions = measureText(text, getFontString(textElement));
       nextHeight = dimensions.height;
       nextWidth = dimensions.width;
-      nextBaseLine = dimensions.baseline;
     }
     // increase height in case text element height exceeds
     if (nextHeight > maxHeight) {
@@ -221,7 +212,6 @@ export const handleBindTextResize = (
       text,
       width: nextWidth,
       height: nextHeight,
-      baseline: nextBaseLine,
     });
 
     if (!isArrowElement(container)) {
@@ -267,51 +257,19 @@ const computeBoundTextPosition = (
 };
 
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
-export const measureText = (
-  text: string,
-  font: FontString,
-  maxWidth?: number | null,
-) => {
+
+export const measureText = (text: string, font: FontString) => {
   text = text
     .split("\n")
     // replace empty lines with single space because leading/trailing empty
     // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
-  const container = document.createElement("div");
-  container.style.position = "absolute";
-  container.style.whiteSpace = "pre";
-  container.style.font = font;
-  container.style.minHeight = "1em";
 
-  if (maxWidth) {
-    const lineHeight = getApproxLineHeight(font);
-    // since we are adding a span of width 1px later
-    container.style.maxWidth = `${maxWidth + 1}px`;
-    container.style.overflow = "hidden";
-    container.style.wordBreak = "break-word";
-    container.style.lineHeight = `${String(lineHeight)}px`;
-    container.style.whiteSpace = "pre-wrap";
-  }
-  document.body.appendChild(container);
-  container.innerText = text;
+  const height = getTextHeight(text, font);
+  const width = getTextWidth(text, font);
 
-  const span = document.createElement("span");
-  span.style.display = "inline-block";
-  span.style.overflow = "hidden";
-  span.style.width = "1px";
-  span.style.height = "1px";
-  container.appendChild(span);
-  // Baseline is important for positioning text on canvas
-  const baseline = span.offsetTop + span.offsetHeight;
-  // since we are adding a span of width 1px
-  const width = container.offsetWidth + 1;
-  const height = container.offsetHeight;
-  document.body.removeChild(container);
-  if (isTestEnv()) {
-    return { width, height, baseline, container };
-  }
-  return { width, height, baseline };
+  return { width, height };
 };
 
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
@@ -321,40 +279,45 @@ export const getApproxLineHeight = (font: FontString) => {
   if (cacheApproxLineHeight[font]) {
     return cacheApproxLineHeight[font];
   }
-  cacheApproxLineHeight[font] = measureText(DUMMY_TEXT, font, null).height;
+  const fontSize = parseInt(font);
+  cacheApproxLineHeight[font] = fontSize * 1.2;
   return cacheApproxLineHeight[font];
 };
 
 let canvas: HTMLCanvasElement | undefined;
+
 const getLineWidth = (text: string, font: FontString) => {
   if (!canvas) {
     canvas = document.createElement("canvas");
   }
   const canvas2dContext = canvas.getContext("2d")!;
   canvas2dContext.font = font;
+  const width = canvas2dContext.measureText(text).width;
 
-  const metrics = canvas2dContext.measureText(text);
   // since in test env the canvas measureText algo
   // doesn't measure text and instead just returns number of
   // characters hence we assume that each letteris 10px
   if (isTestEnv()) {
-    return metrics.width * 10;
+    return width * 10;
   }
-  // Since measureText behaves differently in different browsers
-  // OS so considering a adjustment factor of 0.2
-  const adjustmentFactor = 0.2;
-
-  return metrics.width + adjustmentFactor;
+  return width;
 };
 
 export const getTextWidth = (text: string, font: FontString) => {
-  const lines = text.split("\n");
+  const lines = text.replace(/\r\n?/g, "\n").split("\n");
   let width = 0;
   lines.forEach((line) => {
     width = Math.max(width, getLineWidth(line, font));
   });
   return width;
 };
+
+export const getTextHeight = (text: string, font: FontString) => {
+  const lines = text.replace(/\r\n?/g, "\n").split("\n");
+  const lineHeight = getApproxLineHeight(font);
+  return lineHeight * lines.length;
+};
+
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
@@ -376,16 +339,23 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     let currentLineWidthTillNow = 0;
 
     let index = 0;
+
     while (index < words.length) {
       const currentWordWidth = getLineWidth(words[index], font);
+      // This will only happen when single word takes entire width
+      if (currentWordWidth === maxWidth) {
+        push(words[index]);
+        index++;
+      }
 
       // Start breaking longer words exceeding max width
-      if (currentWordWidth >= maxWidth) {
+      else if (currentWordWidth > maxWidth) {
         // push current line since the current word exceeds the max width
         // so will be appended in next line
         push(currentLine);
         currentLine = "";
         currentLineWidthTillNow = 0;
+
         while (words[index].length > 0) {
           const currentChar = String.fromCodePoint(
             words[index].codePointAt(0)!,
@@ -486,9 +456,9 @@ export const charWidth = (() => {
     getCache,
   };
 })();
+
 export const getApproxMinLineWidth = (font: FontString) => {
   const maxCharWidth = getMaxCharWidth(font);
-
   if (maxCharWidth === 0) {
     return (
       measureText(DUMMY_TEXT.split("").join("\n"), font).width +
