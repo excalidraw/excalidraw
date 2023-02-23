@@ -1,5 +1,5 @@
-import { isTextElement, redrawTextBoundingBox } from "../element";
-import { getContainerElement } from "../element/textElement";
+import { isTextElement, refreshTextDimensions } from "../element";
+import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { getFontString } from "../utils";
@@ -55,7 +55,9 @@ export class Fonts {
       if (isTextElement(element)) {
         invalidateShapeForElement(element);
         didUpdate = true;
-        redrawTextBoundingBox(element, getContainerElement(element));
+        return newElementWith(element, {
+          ...refreshTextDimensions(element),
+        });
       }
       return element;
     });
