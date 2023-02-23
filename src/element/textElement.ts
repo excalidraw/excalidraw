@@ -280,6 +280,8 @@ export const getApproxLineHeight = (font: FontString) => {
     return cacheApproxLineHeight[font];
   }
   const fontSize = parseInt(font);
+
+  // Calculate line height relative to font size
   cacheApproxLineHeight[font] = fontSize * 1.2;
   return cacheApproxLineHeight[font];
 };
