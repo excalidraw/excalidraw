@@ -567,8 +567,8 @@
   }
 
   .App-toolbar--mobile {
-    overflow-x: hidden;
-    max-width: 100vw;
+    overflow-x: auto;
+    max-width: 90vw;
 
     .ToolIcon__keybinding {
       display: none;
