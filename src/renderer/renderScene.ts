@@ -847,7 +847,7 @@ export const _renderScene = ({
     // When doing calculations based on canvas width we should used normalized one
     const normalizedCanvasWidth = canvas.width / scale;
     const normalizedCanvasHeight = canvas.height / scale;
-
+    // const { runCanvas, runCanvasUi } = renderCheck(elements.length,canvasUIRenderConfig, canvasContentRenderConfig) 
     const { atLeastOneVisibleElement, editingLinearElement } =
       renderCanvasContent({
         elements,
@@ -1129,7 +1129,7 @@ const renderLinkIcon = (
     const [x, y, width, height] = getLinkHandleFromCoords(
       [x1, y1, x2, y2],
       element.angle,
-      appState,
+      appState.zoom,
     );
     const centerX = x + width / 2;
     const centerY = y + height / 2;
