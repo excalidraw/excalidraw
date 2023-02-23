@@ -757,13 +757,15 @@ export const computeContainerHeightForBoundText = (
   boundTextElementHeight: number,
 ) => {
   if (container.type === "ellipse") {
-    return Math.round((boundTextElementHeight / Math.sqrt(2)) * 2);
+    return Math.round(
+      ((boundTextElementHeight + BOUND_TEXT_PADDING * 2) / Math.sqrt(2)) * 2,
+    );
   }
   if (isArrowElement(container)) {
     return boundTextElementHeight + BOUND_TEXT_PADDING * 8 * 2;
   }
   if (container.type === "diamond") {
-    return 2 * boundTextElementHeight;
+    return 2 * (boundTextElementHeight + BOUND_TEXT_PADDING * 2);
   }
   return boundTextElementHeight + BOUND_TEXT_PADDING * 2;
 };
