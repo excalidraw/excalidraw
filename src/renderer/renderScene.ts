@@ -587,13 +587,15 @@ export const _renderScene = ({
       context.save();
       context.translate(renderConfig.scrollX, renderConfig.scrollY);
 
-      renderSnap(
-        {
-          renderConfig,
-          context,
-        },
-        { snaps: appState.snaps ?? [] },
-      );
+      if (appState.draggingElement) {
+        renderSnap(
+          {
+            renderConfig,
+            context,
+          },
+          { snaps: appState.snaps ?? [] },
+        );
+      }
 
       if (locallySelectedElements.length === 1) {
         context.fillStyle = oc.white;
@@ -609,6 +611,7 @@ export const _renderScene = ({
             renderConfig,
             transformHandles,
             locallySelectedElements[0].angle,
+            !!appState.draggingElement,
           );
         }
       } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
@@ -643,7 +646,13 @@ export const _renderScene = ({
           appState.snaps,
         );
         if (locallySelectedElements.some((element) => !element.locked)) {
-          renderTransformHandles(context, renderConfig, transformHandles, 0);
+          renderTransformHandles(
+            context,
+            renderConfig,
+            transformHandles,
+            0,
+            !!appState.draggingElement,
+          );
         }
       }
       context.restore();
@@ -849,6 +858,7 @@ const renderTransformHandles = (
   renderConfig: RenderConfig,
   transformHandles: TransformHandles,
   angle: number,
+  highlights = false,
 ): void => {
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];
@@ -866,7 +876,7 @@ const renderTransformHandles = (
       } else if (context.roundRect) {
         context.beginPath();
         context.roundRect(x, y, width, height, 2 / renderConfig.zoom.value);
-        if (isHighlighted && renderConfig.selectionColor) {
+        if (highlights && isHighlighted && renderConfig.selectionColor) {
           context.fillStyle = renderConfig.selectionColor;
         }
         context.fill();
