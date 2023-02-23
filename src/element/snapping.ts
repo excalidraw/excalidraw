@@ -11,61 +11,64 @@ export interface ProjectionOptions {
   snaps: Snaps | null;
 }
 
+// handle floating point errors
+const PRECISION = 0.001;
+
 export const project = ({ origin, offset, snaps, zoom }: ProjectionOptions) => {
   if (!snaps) {
-    return applyOffset({ origin, offset });
+    return GAPoints.toObject(
+      GA.add(GA.point(origin.x, origin.y), GA.offset(offset.x, offset.y)),
+    );
   }
 
-  const snapLineMetadata = closestSnapLine(
-    snaps,
-    GA.offset(offset.x, offset.y),
+  let totalOffset = GA.offset(0, 0);
+
+  for (const snap of keepOnlyClosestPoints(snaps)) {
+    if (!shouldSnap(snap, zoom)) {
+      continue;
+    }
+
+    const snapReferencePoint = GA.add(snap.point, totalOffset);
+    const snapProjection = GALines.orthogonalProjection(
+      snapReferencePoint,
+      snap.snapLine.line,
+    );
+
+    if (GA.isNaN(snapProjection)) {
+      continue;
+    }
+
+    const snapOffset = GA.sub(snapReferencePoint, snapProjection);
+    totalOffset = GA.sub(totalOffset, snapOffset);
+  }
+
+  return GAPoints.toObject(
+    GA.add(
+      GA.point(origin.x, origin.y),
+      GA.add(totalOffset, GA.offset(offset.x, offset.y)),
+    ),
   );
-
-  if (!snapLineMetadata || !shouldSnap(snapLineMetadata, zoom)) {
-    return applyOffset({ origin, offset });
-  }
-
-  const {
-    snapLine: { line },
-    origin: selectionReference,
-  } = snapLineMetadata;
-
-  const projectedPoint = GALines.orthogonalProjection(
-    GA.add(selectionReference, GA.offset(offset.x, offset.y)),
-    line,
-  );
-
-  if (GA.isNaN(projectedPoint)) {
-    return applyOffset({ origin, offset });
-  }
-
-  const snapOffset = GA.sub(selectionReference, projectedPoint);
-  const projection = GA.sub(GA.point(origin.x, origin.y), snapOffset);
-
-  return GAPoints.toObject(projection);
 };
 
-const closestSnapLine = (snaps: Snaps, offset: GA.Point) => {
-  const [closest] = snaps
-    .map((snap) => {
-      const origin = snap.point;
-      const projection = GA.add(origin, offset);
+/**
+ * Group all snap lines that are using the same axe (parallel and close enough)
+ */
+const keepOnlyClosestPoints = (snaps: Snaps) => {
+  const groups = snaps.reduce((axes, snap) => {
+    const axeIndex = axes.findIndex(
+      (axe) =>
+        GALines.areParallel(axe.snapLine.line, snap.snapLine.line, PRECISION) &&
+        GALines.distance(axe.snapLine.line, snap.snapLine.line) < PRECISION,
+    );
 
-      const distance = Math.abs(
-        GAPoints.distanceToLine(projection, snap.snapLine.line),
-      );
+    if (axeIndex === -1) {
+      axes.push(snap);
+    } else if (snap.distance < axes[axeIndex].distance) {
+      axes[axeIndex] = snap;
+    }
 
-      return { ...snap, distance, origin, projection };
-    })
-    .sort((a, b) => a.distance - b.distance);
+    return axes;
+  }, [] as Snaps);
 
-  return closest ?? null;
+  return groups;
 };
-
-const applyOffset = ({
-  origin,
-  offset,
-}: Pick<ProjectionOptions, "origin" | "offset">) => ({
-  x: origin.x + offset.x,
-  y: origin.y + offset.y,
-});

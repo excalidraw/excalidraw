@@ -4443,19 +4443,12 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      this.setState({ snaps: [] });
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
         this.state.gridSize,
       );
-
-      this.setState((prevState) => ({
-        snaps: getSnaps({
-          elements: this.scene.getNonDeletedElements(),
-          appState: prevState,
-          event,
-        }),
-      }));
 
       // for arrows/lines, don't start dragging until a given threshold
       // to ensure we don't create a 2-point arrow by mistake when
@@ -4611,22 +4604,28 @@ class App extends React.Component<AppProps, AppState> {
             this.state.gridSize,
           );
 
-          const [dragDistanceX, dragDistanceY] = [
-            Math.abs(pointerCoords.x - pointerDownState.origin.x),
-            Math.abs(pointerCoords.y - pointerDownState.origin.y),
-          ];
+          const dragOffset = {
+            x: pointerCoords.x - pointerDownState.origin.x,
+            y: pointerCoords.y - pointerDownState.origin.y,
+          };
+
+          const snaps = getSnaps({
+            elements: [...pointerDownState.originalElements.values()],
+            appState: this.state,
+            event,
+            dragOffset,
+          });
+          this.setState({ snaps });
 
           // We only drag in one direction if shift is pressed
           const lockDirection = event.shiftKey;
           dragSelectedElements(
             pointerDownState,
             selectedElements,
-            dragX,
-            dragY,
+            dragOffset,
             lockDirection,
-            dragDistanceX,
-            dragDistanceY,
             this.state,
+            snaps,
           );
           this.maybeSuggestBindingForAll(selectedElements);
 

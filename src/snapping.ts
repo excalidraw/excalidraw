@@ -1,5 +1,4 @@
 import { getCommonBounds } from "./element";
-import { TransformHandleDirection } from "./element/transformHandles";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -37,12 +36,12 @@ const getElementsCoordinates = (elements: ExcalidrawElement[]) => {
   const height = maxY - minY;
 
   return {
-    nw: GA.point(minX, maxY),
-    ne: GA.point(maxX, maxY),
-    sw: GA.point(minX, minY),
-    se: GA.point(maxX, minY),
-    n: GA.point(minX + width / 2, maxY),
-    s: GA.point(minX + width / 2, minY),
+    nw: GA.point(minX, minY),
+    ne: GA.point(maxX, minY),
+    sw: GA.point(minX, maxY),
+    se: GA.point(maxX, maxY),
+    n: GA.point(minX + width / 2, minY),
+    s: GA.point(minX + width / 2, maxY),
     w: GA.point(minX, minY + height / 2),
     e: GA.point(maxX, minY + height / 2),
   };
@@ -79,11 +78,14 @@ export const getSnaps = ({
   elements,
   appState,
   event,
+  dragOffset,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
   event: PointerEvent;
+  dragOffset: { x: number; y: number };
 }): Snaps | null => {
+  const offset = GA.offset(dragOffset.x, dragOffset.y);
   if (!isSnapEnabled({ appState, event })) {
     return null;
   }
@@ -102,7 +104,8 @@ export const getSnaps = ({
     .flatMap(getElementsSnapLines)
     .flatMap((snapLine) =>
       Object.values(selectionCoordinates)
-        .map((point) => {
+        .map((originPoint) => {
+          const point = GA.add(originPoint, offset);
           const distance = Math.abs(
             GAPoints.distanceToLine(point, snapLine.line),
           );
@@ -120,8 +123,10 @@ export const getSnaps = ({
 };
 
 export const isSnapped = (snaps: Snaps, [x, y]: TuplePoint) =>
-  snaps[0] &&
-  Math.abs(GAPoints.distanceToLine(GA.point(x, y), snaps[0].snapLine.line)) < 1;
+  snaps.some(
+    (snap) =>
+      Math.abs(GAPoints.distanceToLine(GA.point(x, y), snap.snapLine.line)) < 1,
+  );
 
 export const shouldSnap = (snap: Snap, zoom: Zoom) =>
   snap.distance < SNAP_DISTANCE / zoom.value;
