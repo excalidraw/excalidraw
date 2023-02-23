@@ -282,7 +282,6 @@ exports[`restoreElements should restore text element correctly passing value for
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": Array [],
   "containerId": null,
   "fillStyle": "hachure",
@@ -312,8 +311,8 @@ Object {
   "versionNonce": 0,
   "verticalAlign": "middle",
   "width": 100,
-  "x": -0.5,
-  "y": 0,
+  "x": -20,
+  "y": -8.4,
 }
 `;
 
@@ -321,7 +320,6 @@ exports[`restoreElements should restore text element correctly with unknown font
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": Array [],
   "containerId": null,
   "fillStyle": "hachure",
