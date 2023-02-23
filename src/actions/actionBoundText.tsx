@@ -38,7 +38,7 @@ export const actionUnbindText = register({
     selectedElements.forEach((element) => {
       const boundTextElement = getBoundTextElement(element);
       if (boundTextElement) {
-        const { width, height, baseline } = measureText(
+        const { width, height } = measureText(
           boundTextElement.originalText,
           getFontString(boundTextElement),
         );
@@ -51,7 +51,6 @@ export const actionUnbindText = register({
           containerId: null,
           width,
           height,
-          baseline,
           text: boundTextElement.originalText,
         });
         mutateElement(element, {

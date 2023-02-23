@@ -153,7 +153,6 @@ export const newTextElement = (
       y: opts.y - offsets.y,
       width: metrics.width,
       height: metrics.height,
-      baseline: metrics.baseline,
       containerId: opts.containerId || null,
       originalText: text,
     },
@@ -170,18 +169,13 @@ const getAdjustedDimensions = (
   y: number;
   width: number;
   height: number;
-  baseline: number;
 } => {
-  let maxWidth = null;
   const container = getContainerElement(element);
-  if (container) {
-    maxWidth = getMaxContainerWidth(container);
-  }
-  const {
-    width: nextWidth,
-    height: nextHeight,
-    baseline: nextBaseline,
-  } = measureText(nextText, getFontString(element), maxWidth);
+
+  const { width: nextWidth, height: nextHeight } = measureText(
+    nextText,
+    getFontString(element),
+  );
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;
@@ -190,11 +184,7 @@ const getAdjustedDimensions = (
     verticalAlign === VERTICAL_ALIGN.MIDDLE &&
     !element.containerId
   ) {
-    const prevMetrics = measureText(
-      element.text,
-      getFontString(element),
-      maxWidth,
-    );
+    const prevMetrics = measureText(element.text, getFontString(element));
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
       height: nextHeight - prevMetrics.height,
@@ -258,7 +248,6 @@ const getAdjustedDimensions = (
     height: nextHeight,
     x: Number.isFinite(x) ? x : element.x,
     y: Number.isFinite(y) ? y : element.y,
-    baseline: nextBaseline,
   };
 };
 

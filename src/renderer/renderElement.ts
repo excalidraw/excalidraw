@@ -36,13 +36,11 @@ import {
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
-  VERTICAL_ALIGN,
 } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
   getApproxLineHeight,
   getBoundTextElement,
-  getBoundTextElementOffset,
   getContainerElement,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -280,22 +278,19 @@ const drawElementOnCanvas = (
         const lineHeight = element.containerId
           ? getApproxLineHeight(getFontString(element))
           : element.height / lines.length;
-        let verticalOffset = element.height - element.baseline;
-        if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-          verticalOffset = getBoundTextElementOffset(element);
-        }
-
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
             : element.textAlign === "right"
             ? element.width
             : 0;
+        context.textBaseline = "bottom";
+
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],
             horizontalOffset,
-            (index + 1) * lineHeight - verticalOffset,
+            (index + 1) * lineHeight,
           );
         }
         context.restore();
@@ -1300,7 +1295,7 @@ export const renderElementToSvg = (
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
-        const verticalOffset = element.height - element.baseline;
+        const verticalOffset = element.height;
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
