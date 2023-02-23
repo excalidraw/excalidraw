@@ -190,10 +190,10 @@ const rescalePointsInElement = (
 
 const MIN_FONT_SIZE = 1;
 
-const measureFontSizeFromWH = (
+const measureFontSizeFromWidth = (
   element: NonDeleted<ExcalidrawTextElement>,
   nextWidth: number,
-): { size: number } | null => {
+): number | null => {
   // We only use width to scale font on resize
   let width = element.width;
 
@@ -209,9 +209,7 @@ const measureFontSizeFromWH = (
     return null;
   }
 
-  return {
-    size: nextFontSize,
-  };
+  return nextFontSize;
 };
 
 const getSidesForTransformHandle = (
@@ -282,8 +280,8 @@ const resizeSingleTextElement = (
   if (scale > 0) {
     const nextWidth = element.width * scale;
     const nextHeight = element.height * scale;
-    const nextFont = measureFontSizeFromWH(element, nextWidth);
-    if (nextFont === null) {
+    const nextFontSize = measureFontSizeFromWidth(element, nextWidth);
+    if (nextFontSize === null) {
       return;
     }
     const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
@@ -307,7 +305,7 @@ const resizeSingleTextElement = (
       deltaY2,
     );
     mutateElement(element, {
-      fontSize: nextFont.size,
+      fontSize: nextFontSize,
       width: nextWidth,
       height: nextHeight,
       x: nextElementX,
@@ -423,15 +421,15 @@ export const resizeSingleElement = (
         height: eleNewHeight,
       };
 
-      const nextFont = measureFontSizeFromWH(
+      const nextFontSize = measureFontSizeFromWidth(
         boundTextElement,
         getMaxContainerWidth(updatedElement),
       );
-      if (nextFont === null) {
+      if (nextFontSize === null) {
         return;
       }
       boundTextFont = {
-        fontSize: nextFont.size,
+        fontSize: nextFontSize,
       };
     } else {
       const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
@@ -693,22 +691,22 @@ const resizeMultipleElements = (
         width,
         height,
       };
-      const textMeasurements = measureFontSizeFromWH(
+      const fontSize = measureFontSizeFromWidth(
         boundTextElement ?? (element.orig as ExcalidrawTextElement),
         getMaxContainerWidth(updatedElement),
       );
 
-      if (!textMeasurements) {
+      if (!fontSize) {
         return;
       }
 
       if (isTextElement(element.orig)) {
-        update.fontSize = textMeasurements.size;
+        update.fontSize = fontSize;
       }
 
       if (boundTextElement) {
         boundTextUpdates = {
-          fontSize: textMeasurements.size,
+          fontSize,
         };
       }
     }
