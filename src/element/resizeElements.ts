@@ -45,8 +45,6 @@ import {
   getBoundTextElementId,
   getContainerElement,
   handleBindTextResize,
-  measureText,
-  getMaxContainerHeight,
   getMaxContainerWidth,
 } from "./textElement";
 
