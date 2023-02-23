@@ -6,11 +6,13 @@ type renderCheck = {
 }
 let canvasUIRenderConfigCache: CanvasUIRenderConfig | undefined = undefined
 let canvasContentRenderConfigCache: CanvasContentRenderConfig | undefined = undefined
+let elementsLengthCache: number | undefined
 
-export const renderCheck = (canvasUIRenderConfig: CanvasUIRenderConfig,
+export const renderCheck = (elementsLength: number, canvasUIRenderConfig: CanvasUIRenderConfig,
   canvasContentRenderConfig: CanvasContentRenderConfig): renderCheck => {
 
   if (canvasUIRenderConfigCache === undefined) {
+    elementsLengthCache = elementsLength
     canvasUIRenderConfigCache = structuredClone(canvasUIRenderConfig)
     canvasContentRenderConfigCache = structuredClone(canvasContentRenderConfig)
     return { runCanvas: true, runCanvasUi: true }
@@ -19,7 +21,7 @@ export const renderCheck = (canvasUIRenderConfig: CanvasUIRenderConfig,
   let runCanvas = false, runCanvasUi = false;
 
   // checking for any change
-  
+
   // checking in common part
   const { scrollX, scrollY, zoom } = canvasContentRenderConfig
   const cache = canvasContentRenderConfigCache
@@ -33,6 +35,7 @@ export const renderCheck = (canvasUIRenderConfig: CanvasUIRenderConfig,
 
     const { viewBackgroundColor, shouldCacheIgnoreZoom, theme, renderGrid, isExporting, imageCache } = canvasContentRenderConfig
     if (
+      elementsLength !== elementsLengthCache ||
       viewBackgroundColor !== cache?.viewBackgroundColor ||
       shouldCacheIgnoreZoom !== cache?.shouldCacheIgnoreZoom ||
       theme !== cache?.theme ||
@@ -41,7 +44,7 @@ export const renderCheck = (canvasUIRenderConfig: CanvasUIRenderConfig,
     ) {
       runCanvas = true
     }
-    
+
     // if runCanvas is still false, we need to check 'imageCache'
     if (!runCanvas) {
       for (let [key, value] of imageCache.entries()) {
@@ -67,6 +70,7 @@ export const renderCheck = (canvasUIRenderConfig: CanvasUIRenderConfig,
   }
 
   // setting to the latest values
+  elementsLengthCache = elementsLength
   canvasUIRenderConfigCache = structuredClone(canvasUIRenderConfig)
   canvasContentRenderConfigCache = structuredClone(canvasContentRenderConfig)
 
