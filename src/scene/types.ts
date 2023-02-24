@@ -31,6 +31,7 @@ export type CanvasContentRenderConfig = {
   theme: AppState["theme"];
 
   imageCache: AppClassProperties["imageCache"];
+  gridSize?: AppState["gridSize"];
   renderGrid?: boolean;
 
   /** when exporting the behavior is slightly different (e.g. we can't use

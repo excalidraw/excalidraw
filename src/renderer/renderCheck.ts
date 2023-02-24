@@ -44,6 +44,7 @@ export const renderCheck = (
       shouldCacheIgnoreZoom,
       theme,
       renderGrid,
+      gridSize,
       isExporting,
       imageCache,
     } = canvasContentRenderConfig;
@@ -53,7 +54,8 @@ export const renderCheck = (
       shouldCacheIgnoreZoom !== cache?.shouldCacheIgnoreZoom ||
       theme !== cache?.theme ||
       renderGrid !== cache?.renderGrid ||
-      isExporting !== cache?.isExporting
+      isExporting !== cache?.isExporting ||
+      gridSize !== cache?.gridSize
     ) {
       runCanvas = true;
     }

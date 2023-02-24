@@ -67,6 +67,7 @@ export const exportToCanvas = async (
       shouldCacheIgnoreZoom: false,
       theme: appState.exportWithDarkMode ? "dark" : "light",
       imageCache,
+      gridSize: appState.gridSize,
       renderGrid: false,
       isExporting: true,
     },

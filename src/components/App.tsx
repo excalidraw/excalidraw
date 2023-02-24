@@ -1356,6 +1356,7 @@ class App extends React.Component<AppProps, AppState> {
           shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
           theme: this.state.theme,
           imageCache: this.imageCache,
+          gridSize: this.state.gridSize,
           isExporting: false,
         },
         canvasUIRenderConfig: {

@@ -372,16 +372,16 @@ export const renderCanvasContent = ({
   context.scale(renderConfig.zoom.value, renderConfig.zoom.value);
 
   // Grid
-  if (renderGrid && appState.gridSize) {
+  if (renderGrid && renderConfig.gridSize) {
     strokeGrid(
       context,
-      appState.gridSize,
-      -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
-        appState.gridSize +
-        (renderConfig.scrollX % appState.gridSize),
-      -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
-        appState.gridSize +
-        (renderConfig.scrollY % appState.gridSize),
+      renderConfig.gridSize,
+      -Math.ceil(renderConfig.zoom.value / renderConfig.gridSize) *
+        renderConfig.gridSize +
+        (renderConfig.scrollX % renderConfig.gridSize),
+      -Math.ceil(renderConfig.zoom.value / renderConfig.gridSize) *
+        renderConfig.gridSize +
+        (renderConfig.scrollY % renderConfig.gridSize),
       normalizedCanvasWidth / renderConfig.zoom.value,
       normalizedCanvasHeight / renderConfig.zoom.value,
     );
@@ -851,6 +851,9 @@ export const _renderScene = ({
     const normalizedCanvasWidth = canvas.width / scale;
     const normalizedCanvasHeight = canvas.height / scale;
     // const { runCanvas, runCanvasUi } = renderCheck(elements.length,canvasUIRenderConfig, canvasContentRenderConfig)
+    const elementId = appState.editingLinearElement?.elementId;
+    const element = elementId && LinearElementEditor.getElement(elementId);
+
     const { atLeastOneVisibleElement, editingLinearElement } =
       renderCanvasContent({
         elements,
