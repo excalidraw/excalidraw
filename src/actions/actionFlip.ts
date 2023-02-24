@@ -7,13 +7,7 @@ import { AppState, PointerDownState } from "../types";
 import { updateBoundElements } from "../element/binding";
 import { arrayToMap } from "../utils";
 import { KEYS } from "../keys";
-import {
-  getCommonBoundingBox,
-  getElementPointsCoords,
-} from "../element/bounds";
-import { isLinearElement } from "../element/typeChecks";
-import { type ExcalidrawLinearElement } from "../element/types";
-import { mutateElement } from "../element/mutateElement";
+import { getCommonBoundingBox } from "../element/bounds";
 
 const enableActionFlipHorizontal = (
   elements: readonly ExcalidrawElement[],
@@ -92,15 +86,6 @@ const flipElements = (
 ): ExcalidrawElement[] => {
   const { minX, minY, maxX, maxY } = getCommonBoundingBox(elements);
 
-  const linearElements = elements
-    .filter((element): element is ExcalidrawLinearElement =>
-      isLinearElement(element),
-    )
-    .map((element) => {
-      const origCoords = getElementPointsCoords(element, element.points);
-      return [element, origCoords] as const;
-    });
-
   resizeMultipleElements(
     { originalElements: arrayToMap(elements) } as PointerDownState,
     elements,
@@ -109,19 +94,6 @@ const flipElements = (
     flipDirection === "horizontal" ? maxX : minX,
     flipDirection === "horizontal" ? minY : maxY,
   );
-
-  linearElements.forEach(([element, origCoords]) => {
-    const latestCoords = getElementPointsCoords(element, element.points);
-    const coordsDiffX =
-      origCoords[0] - latestCoords[0] + origCoords[2] - latestCoords[2];
-    const coordsDiffY =
-      origCoords[1] - latestCoords[1] + origCoords[3] - latestCoords[3];
-
-    mutateElement(element, {
-      x: element.x + coordsDiffX * 0.5,
-      y: element.y + coordsDiffY * 0.5,
-    });
-  });
 
   elements.forEach((element) => updateBoundElements(element));
 
