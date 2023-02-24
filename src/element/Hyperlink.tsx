@@ -431,7 +431,7 @@ export const shouldHideLinkPopup = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   [clientX, clientY]: Point,
-): Boolean => {
+): boolean => {
   const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
     { clientX, clientY },
     appState,

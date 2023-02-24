@@ -163,10 +163,7 @@ export const removeFromSelectedGroups = (
 export const getMaximumGroups = (
   elements: ExcalidrawElement[],
 ): ExcalidrawElement[][] => {
-  const groups: Map<String, ExcalidrawElement[]> = new Map<
-    String,
-    ExcalidrawElement[]
-  >();
+  const groups = new Map<string, ExcalidrawElement[]>();
 
   elements.forEach((element: ExcalidrawElement) => {
     const groupId =
