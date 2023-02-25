@@ -9,6 +9,9 @@ export const isFirefox =
   "netscape" in window &&
   navigator.userAgent.indexOf("rv:") > 1 &&
   navigator.userAgent.indexOf("Gecko") > 1;
+export const isChrome = navigator.userAgent.indexOf("Chrome") !== -1;
+export const isSafari =
+  !isChrome && navigator.userAgent.indexOf("Safari") !== -1;
 
 export const APP_NAME = "Excalidraw";
 
