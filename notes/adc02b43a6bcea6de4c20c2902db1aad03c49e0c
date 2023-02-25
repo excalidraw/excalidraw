@@ -1,0 +1,4 @@
+extend collab feature to update window.locations/#room={data},{key}
+
+- when user makes changes to scene
+- when collaborator makes changes and those changes are available in child snapshot
