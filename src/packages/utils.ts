@@ -210,5 +210,5 @@ export { intersectElementWithLine } from "../element/collision"; //zsviczian
 export { determineFocusDistance } from "../element/collision"; //zsviczian
 export { measureText, wrapText } from "../element/textElement"; //zsviczian
 export { getFontString } from "../utils"; //zsviczian
-export { getMaxContainerWidth } from "../element/newElement"; //zsviczian
+export { getMaxContainerWidth } from "../element/textElement"; //zsviczian
 export { mergeLibraryItems } from "../data/library";
