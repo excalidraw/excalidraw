@@ -40,12 +40,13 @@ import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
-import { Provider, useAtom } from "jotai";
+import { atom, Provider, useAtom } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "./context/tunnels";
+import { BrushIcon } from "./icons";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -98,6 +99,9 @@ const DefaultMainMenu: React.FC<{
     </MainMenu>
   );
 };
+
+
+const sideContainerAtom = atom(true);
 
 const LayerUI = ({
   actionManager,
@@ -202,32 +206,49 @@ const LayerUI = ({
     </div>
   );
 
-  const renderSelectedShapeActions = () => (
+  const renderSelectedShapeActions = ({
+    isSideContainerOpen,
+    setSideContainerOpen,
+  }: {
+    isSideContainerOpen: boolean;
+    setSideContainerOpen: (update: React.SetStateAction<boolean>) => void;
+  }) => (
     <Section
       heading="selectedShapeActions"
       className={clsx("selected-shape-actions zen-mode-transition", {
         "transition-left": appState.zenModeEnabled,
       })}
     >
-      <Island
-        className={CLASSES.SHAPE_ACTIONS_MENU}
-        padding={2}
-        style={{
-          // we want to make sure this doesn't overflow so subtracting the
-          // approximate height of hamburgerMenu + footer
-          maxHeight: `${appState.height - 166}px`,
-        }}
-      >
-        <SelectedShapeActions
-          appState={appState}
-          elements={elements}
-          renderAction={actionManager.renderAction}
-        />
-      </Island>
+      <div onClick={() => setSideContainerOpen(!isSideContainerOpen)}>
+        {BrushIcon}
+      </div>
+      {isSideContainerOpen && (
+        <Island
+          className={CLASSES.SHAPE_ACTIONS_MENU}
+          padding={2}
+          style={{
+            // we want to make sure this doesn't overflow so subtracting the
+            // approximate height of hamburgerMenu + footer
+            maxHeight: `${appState.height - 166}px`,
+          }}
+        >
+          <SelectedShapeActions
+            appState={appState}
+            elements={elements}
+            renderAction={actionManager.renderAction}
+          />
+        </Island>
+      )}
     </Section>
   );
 
-  const renderFixedSideContainer = () => {
+  const renderFixedSideContainer = ({
+    isSideContainerOpen,
+    setSideContainerOpen,
+  }: {
+    isSideContainerOpen: boolean;
+    setSideContainerOpen: (update: React.SetStateAction<boolean>) => void;
+  }) => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
       appState,
       elements,
@@ -243,7 +264,11 @@ const LayerUI = ({
             })}
           >
             {renderCanvasActions()}
-            {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
+            {shouldRenderSelectedShapeActions &&
+              renderSelectedShapeActions({
+                isSideContainerOpen,
+                setSideContainerOpen,
+              })}
           </Stack.Col>
           {!appState.viewModeEnabled && (
             <Section heading="shapes" className="shapes-section">
@@ -349,6 +374,8 @@ const LayerUI = ({
   };
 
   const [hostSidebarCounters] = useAtom(hostSidebarCountersAtom, jotaiScope);
+  const [isSideContainerOpen, setSideContainerOpen] =
+    useAtom(sideContainerAtom);
 
   const layerUIJSX = (
     <>
@@ -426,13 +453,16 @@ const LayerUI = ({
               ((appState.openSidebar === "library" &&
                 appState.isSidebarDocked) ||
                 hostSidebarCounters.docked) &&
-              device.canDeviceFitSidebar
+                device.canDeviceFitSidebar
                 ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
                 : {}
             }
           >
             {renderWelcomeScreen && <tunnels.welcomeScreenCenterTunnel.Out />}
-            {renderFixedSideContainer()}
+            {renderFixedSideContainer({
+              isSideContainerOpen,
+              setSideContainerOpen,
+            })}
             <Footer
               appState={appState}
               actionManager={actionManager}
