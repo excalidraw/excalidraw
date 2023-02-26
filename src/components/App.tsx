@@ -6376,11 +6376,12 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.unmounted) {
       //generateElementWithCanvas
       const elements = this.scene.getNonDeletedElements();
-      for (let i = 0; i < elements.length; i += 200) {
+      let i = 0;
+      for (; i < elements.length; i += 200) {
         const chunk = elements.slice(i, i + 200);
-        setTimeout(() => this.renderScene(chunk, false));
+        setTimeout(() => this.renderScene(chunk, false),i*100);
       }
-      setTimeout(() => this.setState({ shouldCacheIgnoreZoom: false }));
+      setTimeout(() => this.setState({ shouldCacheIgnoreZoom: false }),i*100);
     }
   }, 300);
 
