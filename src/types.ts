@@ -536,6 +536,7 @@ export type ExcalidrawImperativeAPI = {
   };
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
   zoomToFit: InstanceType<typeof App>["zoomToFit"]; //zsviczian
+  startLineEditor: InstanceType<typeof App>["startLineEditor"]; //zsviczian
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];

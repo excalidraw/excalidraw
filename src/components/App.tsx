@@ -455,6 +455,7 @@ class App extends React.Component<AppProps, AppState> {
         },
         scrollToContent: this.scrollToContent,
         zoomToFit: this.zoomToFit, //zsviczian
+        startLineEditor: this.startLineEditor, //zsviczian
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
@@ -1891,6 +1892,24 @@ class App extends React.Component<AppProps, AppState> {
       zoomToFitElements(target, this.state, false, maxZoom, margin).appState,
     );
   };
+
+  //zsviczian
+  startLineEditor = (
+    el: ExcalidrawLinearElement,
+    selectedPointsIndices: number[]|null = null,
+  ) => {
+    if(!el || !isLinearElement(el)) {
+      return;
+    }
+    const editingLinearElement = new LinearElementEditor(el, this.scene);
+    this.setState({
+      selectedLinearElement: editingLinearElement,
+      editingLinearElement:{
+        ...editingLinearElement,
+        selectedPointsIndices
+      }
+    });
+  }
 
   //zsviczian
   updateContainerSize = withBatchedUpdates(

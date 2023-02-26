@@ -165,15 +165,36 @@ export const LibraryMenuHeader: React.FC<{
     }
   };
 
+  //zsviczian
+  const download = (encoding: string, data: any, filename: string) => {
+    const element = document.createElement("a");
+    element.setAttribute("href", (encoding ? `${encoding},` : "") + data);
+    element.setAttribute("download", filename);
+    element.style.display = "none";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  }
+
   const onLibraryExport = async () => {
     const libraryItems = itemsSelected
       ? items
       : await library.getLatestLibrary();
+    download(
+      "data:text/plain;charset=utf-8",
+      encodeURIComponent(JSON.stringify({
+        type: "excalidrawlib",
+        version: 2,
+        source: "https://excalidraw.com",
+        libraryItems
+      }, null, "\t")),
+      "my-obsidian-library.excalidrawlib",
+    );/*
     saveLibraryAsJSON(libraryItems)
       .catch(muteFSAbortError)
       .catch((error) => {
         setAppState({ errorMessage: error.message });
-      });
+      });*/
   };
 
   const renderLibraryMenu = () => {
