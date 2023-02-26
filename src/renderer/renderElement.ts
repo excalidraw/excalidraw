@@ -1295,7 +1295,6 @@ export const renderElementToSvg = (
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
-        const verticalOffset = element.height;
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
@@ -1313,7 +1312,7 @@ export const renderElementToSvg = (
           const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
-          text.setAttribute("y", `${(i + 1) * lineHeight - verticalOffset}`);
+          text.setAttribute("y", `${i * lineHeight}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
           text.setAttribute("fill", element.strokeColor);
