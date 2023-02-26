@@ -1,47 +1,27 @@
-SUPPORT_IMAGES_IN_LIBRARIES
+
 ---
 
-# Why restic?
 
-```js
-- security
-- efficient
-- tagging
+    #### a9c6a80cce8b1a4a4f34c00c1447498c84ce47e0
+    - Why restic?
 
+    #### 6e501686853a97d30aacf8c5ce245e4ce91de00c
+    - Storybook
 
-```
-
-
-02/25/23:
+    #### 39f40cd5017c99c123e2a9c67289b8484f2fd9cc
+    - Chromatic
 
 
-```js
-bug: conflicts when syncing data
-can use restic "parent" snapshot as anchor for business logic around collab syncing
 
+    #### f5b1df2ca97378eeda400878cbfcc70f42916f3c
+    - (bug) conflicts when syncing data
 
-```
+    #### fb085825733d8b1d04a303051a387a0bb48bbec7
+    - (chore) setup storybook
 
-```js
-chore: setup storybook
-https://storybook.js.org/docs/react/get-started/install
+    #### dbe32b98512f37bb7ef184400d82a03f8040d97c
+    - (feat) restore library item(s)
 
+    #### 04b2022776b49be5d08264bf304270cf4278db3e
+    - (feat) save library item(s)
 
-```
-
-```js
-feat: restore library item(s)
-extend collab feature to update window.locations/#room={data},{key}
-
-- when user makes changes to scene
-- when collaborator makes changes and those changes are available in child snapshot
-
-
-```
-
-```js
-feat: save library item(s)
-when the use clicks "save" (or whatever), then the data are persisted (in restic)
-
-
-```

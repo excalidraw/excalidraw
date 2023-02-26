@@ -1,0 +1,8 @@
+when the use clicks "save" (or whatever), then the data are persisted (in restic)
+
+await $`cat library.excalidraw`
+await $`cat snapshots.json`
+
+Notice how there is not that much translation between an instance of a snapshot and a drawing
+just pulling out filenames and md5 like how calcurse works
+
