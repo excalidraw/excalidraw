@@ -1320,6 +1320,7 @@ export const renderElementToSvg = (
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);
+          text.setAttribute("dominant-baseline", "text-before-edge");
           node.appendChild(text);
         }
         root.appendChild(node);
