@@ -175,7 +175,10 @@ import {
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer/renderScene";
-import { invalidateShapeForElement } from "../renderer/renderElement";
+import {
+  generateElementWithCanvas,
+  invalidateShapeForElement,
+} from "../renderer/renderElement";
 import {
   calculateScrollCenter,
   getElementsAtPosition,
@@ -1283,10 +1286,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private renderScene = (
-    renderingElements: NonDeletedExcalidrawElement[] = [],
-    shouldCacheIgnoreZoom: boolean | null = null,
-  ) => {
+  private renderScene = () => {
     const cursorButton: {
       [id: string]: string | undefined;
     } = {};
@@ -1324,26 +1324,25 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton[socketId] = user.button;
     });
 
-    renderingElements =
-      renderingElements.length > 0
-        ? renderingElements
-        : this.scene.getNonDeletedElements().filter((element) => {
-            if (isImageElement(element)) {
-              if (
-                // not placed on canvas yet (but in elements array)
-                this.state.pendingImageElementId === element.id
-              ) {
-                return false;
-              }
-            }
-            // don't render text element that's being currently edited (it's
-            // rendered on remote only)
-            return (
-              !this.state.editingElement ||
-              this.state.editingElement.type !== "text" ||
-              element.id !== this.state.editingElement.id
-            );
-          });
+    const renderingElements = this.scene
+      .getNonDeletedElements()
+      .filter((element) => {
+        if (isImageElement(element)) {
+          if (
+            // not placed on canvas yet (but in elements array)
+            this.state.pendingImageElementId === element.id
+          ) {
+            return false;
+          }
+        }
+        // don't render text element that's being currently edited (it's
+        // rendered on remote only)
+        return (
+          !this.state.editingElement ||
+          this.state.editingElement.type !== "text" ||
+          element.id !== this.state.editingElement.id
+        );
+      });
 
     const selectionColor = getComputedStyle(
       document.querySelector(".excalidraw")!,
@@ -1367,10 +1366,7 @@ class App extends React.Component<AppProps, AppState> {
           remoteSelectedElementIds,
           remotePointerUsernames: pointerUsernames,
           remotePointerUserStates: pointerUserStates,
-          shouldCacheIgnoreZoom:
-            shouldCacheIgnoreZoom === null
-              ? this.state.shouldCacheIgnoreZoom
-              : shouldCacheIgnoreZoom,
+          shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
           theme: this.state.theme,
           imageCache: this.imageCache,
           isExporting: false,
@@ -6374,14 +6370,88 @@ class App extends React.Component<AppProps, AppState> {
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
     if (!this.unmounted) {
-      //generateElementWithCanvas
-      const elements = this.scene.getNonDeletedElements();
-      let i = 0;
-      for (; i < elements.length; i += 200) {
-        const chunk = elements.slice(i, i + 200);
-        setTimeout(() => this.renderScene(chunk, false),i*100);
-      }
-      setTimeout(() => this.setState({ shouldCacheIgnoreZoom: false }),i*100);
+      const cursorButton: {
+        [id: string]: string | undefined;
+      } = {};
+      const pointerViewportCoords: RenderConfig["remotePointerViewportCoords"] =
+        {};
+      const remoteSelectedElementIds: RenderConfig["remoteSelectedElementIds"] =
+        {};
+      const pointerUsernames: { [id: string]: string } = {};
+      const pointerUserStates: { [id: string]: string } = {};
+      this.state.collaborators.forEach((user, socketId) => {
+        if (user.selectedElementIds) {
+          for (const id of Object.keys(user.selectedElementIds)) {
+            if (!(id in remoteSelectedElementIds)) {
+              remoteSelectedElementIds[id] = [];
+            }
+            remoteSelectedElementIds[id].push(socketId);
+          }
+        }
+        if (!user.pointer) {
+          return;
+        }
+        if (user.username) {
+          pointerUsernames[socketId] = user.username;
+        }
+        if (user.userState) {
+          pointerUserStates[socketId] = user.userState;
+        }
+        pointerViewportCoords[socketId] = sceneCoordsToViewportCoords(
+          {
+            sceneX: user.pointer.x,
+            sceneY: user.pointer.y,
+          },
+          this.state,
+        );
+        cursorButton[socketId] = user.button;
+      });
+
+      const renderingElements = this.scene
+        .getNonDeletedElements()
+        .filter((element) => {
+          if (isImageElement(element)) {
+            if (
+              // not placed on canvas yet (but in elements array)
+              this.state.pendingImageElementId === element.id
+            ) {
+              return false;
+            }
+          }
+          // don't render text element that's being currently edited (it's
+          // rendered on remote only)
+          return (
+            !this.state.editingElement ||
+            this.state.editingElement.type !== "text" ||
+            element.id !== this.state.editingElement.id
+          );
+        });
+
+      const selectionColor = getComputedStyle(
+        document.querySelector(".excalidraw")!,
+      ).getPropertyValue("--color-selection");
+
+      const renderConfig: RenderConfig = {
+        selectionColor,
+        scrollX: this.state.scrollX,
+        scrollY: this.state.scrollY,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+        zoom: this.state.zoom,
+        remotePointerViewportCoords: pointerViewportCoords,
+        remotePointerButton: cursorButton,
+        remoteSelectedElementIds,
+        remotePointerUsernames: pointerUsernames,
+        remotePointerUserStates: pointerUserStates,
+        shouldCacheIgnoreZoom: false,
+        theme: this.state.theme,
+        imageCache: this.imageCache,
+        isExporting: false,
+        renderScrollbars: !this.device.isMobile,
+      };
+      renderingElements.forEach((el) =>
+        setTimeout(() => generateElementWithCanvas(el, renderConfig)),
+      );
+      setTimeout(() => this.setState({ shouldCacheIgnoreZoom: false }));
     }
   }, 300);
 
