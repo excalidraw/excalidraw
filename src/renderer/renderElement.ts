@@ -655,7 +655,7 @@ const generateElementShape = (
   }
 };
 
-const generateElementWithCanvas = (
+export const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   renderConfig: RenderConfig,
 ) => {

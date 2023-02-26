@@ -175,7 +175,10 @@ import {
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer/renderScene";
-import { invalidateShapeForElement } from "../renderer/renderElement";
+import {
+  generateElementWithCanvas,
+  invalidateShapeForElement,
+} from "../renderer/renderElement";
 import {
   calculateScrollCenter,
   getElementsAtPosition,
@@ -6367,7 +6370,94 @@ class App extends React.Component<AppProps, AppState> {
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
     if (!this.unmounted) {
-      this.setState({ shouldCacheIgnoreZoom: false });
+      const cursorButton: {
+        [id: string]: string | undefined;
+      } = {};
+      const pointerViewportCoords: RenderConfig["remotePointerViewportCoords"] =
+        {};
+      const remoteSelectedElementIds: RenderConfig["remoteSelectedElementIds"] =
+        {};
+      const pointerUsernames: { [id: string]: string } = {};
+      const pointerUserStates: { [id: string]: string } = {};
+      this.state.collaborators.forEach((user, socketId) => {
+        if (user.selectedElementIds) {
+          for (const id of Object.keys(user.selectedElementIds)) {
+            if (!(id in remoteSelectedElementIds)) {
+              remoteSelectedElementIds[id] = [];
+            }
+            remoteSelectedElementIds[id].push(socketId);
+          }
+        }
+        if (!user.pointer) {
+          return;
+        }
+        if (user.username) {
+          pointerUsernames[socketId] = user.username;
+        }
+        if (user.userState) {
+          pointerUserStates[socketId] = user.userState;
+        }
+        pointerViewportCoords[socketId] = sceneCoordsToViewportCoords(
+          {
+            sceneX: user.pointer.x,
+            sceneY: user.pointer.y,
+          },
+          this.state,
+        );
+        cursorButton[socketId] = user.button;
+      });
+
+      const renderingElements = this.scene
+        .getNonDeletedElements()
+        .filter((element) => {
+          if (isImageElement(element)) {
+            if (
+              // not placed on canvas yet (but in elements array)
+              this.state.pendingImageElementId === element.id
+            ) {
+              return false;
+            }
+          }
+          // don't render text element that's being currently edited (it's
+          // rendered on remote only)
+          return (
+            !this.state.editingElement ||
+            this.state.editingElement.type !== "text" ||
+            element.id !== this.state.editingElement.id
+          );
+        });
+
+      const selectionColor = getComputedStyle(
+        document.querySelector(".excalidraw")!,
+      ).getPropertyValue("--color-selection");
+
+      const renderConfig: RenderConfig = {
+        selectionColor,
+        scrollX: this.state.scrollX,
+        scrollY: this.state.scrollY,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+        zoom: this.state.zoom,
+        remotePointerViewportCoords: pointerViewportCoords,
+        remotePointerButton: cursorButton,
+        remoteSelectedElementIds,
+        remotePointerUsernames: pointerUsernames,
+        remotePointerUserStates: pointerUserStates,
+        shouldCacheIgnoreZoom: false,
+        theme: this.state.theme,
+        imageCache: this.imageCache,
+        isExporting: false,
+        renderScrollbars: !this.device.isMobile,
+      };
+      let i = 0;
+      for (; i < renderingElements.length; i += 200) {
+        const chunk = renderingElements.slice(i, i + 200);
+        setTimeout(
+          () =>
+            chunk.forEach((el) => generateElementWithCanvas(el, renderConfig)),
+          i * 50,
+        );
+      }
+      setTimeout(() => this.setState({ shouldCacheIgnoreZoom: false }), i * 50);
     }
   }, 300);
 
