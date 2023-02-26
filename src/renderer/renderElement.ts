@@ -234,7 +234,7 @@ const drawElementOnCanvas = (
       if (fillShape) {
         rc.draw(fillShape);
       }
-      
+
       context.fillStyle = element.strokeColor;
       context.fill(path);
 

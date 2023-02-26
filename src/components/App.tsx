@@ -1283,7 +1283,10 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private renderScene = () => {
+  private renderScene = (
+    renderingElements: NonDeletedExcalidrawElement[] = [],
+    shouldCacheIgnoreZoom: boolean | null = null,
+  ) => {
     const cursorButton: {
       [id: string]: string | undefined;
     } = {};
@@ -1321,25 +1324,26 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton[socketId] = user.button;
     });
 
-    const renderingElements = this.scene
-      .getNonDeletedElements()
-      .filter((element) => {
-        if (isImageElement(element)) {
-          if (
-            // not placed on canvas yet (but in elements array)
-            this.state.pendingImageElementId === element.id
-          ) {
-            return false;
-          }
-        }
-        // don't render text element that's being currently edited (it's
-        // rendered on remote only)
-        return (
-          !this.state.editingElement ||
-          this.state.editingElement.type !== "text" ||
-          element.id !== this.state.editingElement.id
-        );
-      });
+    renderingElements =
+      renderingElements.length > 0
+        ? renderingElements
+        : this.scene.getNonDeletedElements().filter((element) => {
+            if (isImageElement(element)) {
+              if (
+                // not placed on canvas yet (but in elements array)
+                this.state.pendingImageElementId === element.id
+              ) {
+                return false;
+              }
+            }
+            // don't render text element that's being currently edited (it's
+            // rendered on remote only)
+            return (
+              !this.state.editingElement ||
+              this.state.editingElement.type !== "text" ||
+              element.id !== this.state.editingElement.id
+            );
+          });
 
     const selectionColor = getComputedStyle(
       document.querySelector(".excalidraw")!,
@@ -1363,7 +1367,10 @@ class App extends React.Component<AppProps, AppState> {
           remoteSelectedElementIds,
           remotePointerUsernames: pointerUsernames,
           remotePointerUserStates: pointerUserStates,
-          shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
+          shouldCacheIgnoreZoom:
+            shouldCacheIgnoreZoom === null
+              ? this.state.shouldCacheIgnoreZoom
+              : shouldCacheIgnoreZoom,
           theme: this.state.theme,
           imageCache: this.imageCache,
           isExporting: false,
@@ -6367,7 +6374,13 @@ class App extends React.Component<AppProps, AppState> {
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
     if (!this.unmounted) {
-      this.setState({ shouldCacheIgnoreZoom: false });
+      //generateElementWithCanvas
+      const elements = this.scene.getNonDeletedElements();
+      for (let i = 0; i < elements.length; i += 200) {
+        const chunk = elements.slice(i, i + 200);
+        setTimeout(() => this.renderScene(chunk, false));
+      }
+      setTimeout(() => this.setState({ shouldCacheIgnoreZoom: false }));
     }
   }, 300);
 
