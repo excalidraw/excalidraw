@@ -6448,10 +6448,16 @@ class App extends React.Component<AppProps, AppState> {
         isExporting: false,
         renderScrollbars: !this.device.isMobile,
       };
-      renderingElements.forEach((el) =>
-        setTimeout(() => generateElementWithCanvas(el, renderConfig)),
-      );
-      setTimeout(() => this.setState({ shouldCacheIgnoreZoom: false }));
+      let i = 0;
+      for (; i < renderingElements.length; i += 200) {
+        const chunk = renderingElements.slice(i, i + 200);
+        setTimeout(
+          () =>
+            chunk.forEach((el) => generateElementWithCanvas(el, renderConfig)),
+          i * 50,
+        );
+      }
+      setTimeout(() => this.setState({ shouldCacheIgnoreZoom: false }), i * 50);
     }
   }, 300);
 
