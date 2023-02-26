@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "لصق",
+    "pasteAsPlaintext": "اللصق كنص عادي",
     "pasteCharts": "لصق الرسوم البيانية",
     "selectAll": "تحديد الكل",
     "multiSelect": "إضافة عنصر للتحديد",
@@ -65,13 +66,13 @@
     "cartoonist": "كرتوني",
     "fileTitle": "إسم الملف",
     "colorPicker": "منتقي اللون",
-    "canvasColors": "",
+    "canvasColors": "تستخدم على القماش",
     "canvasBackground": "خلفية اللوحة",
     "drawingCanvas": "لوحة الرسم",
     "layers": "الطبقات",
     "actions": "الإجراءات",
     "language": "اللغة",
-    "liveCollaboration": "بدء المشاركة الحية",
+    "liveCollaboration": "التعاون المباشر...",
     "duplicateSelection": "تكرار",
     "untitled": "غير معنون",
     "name": "الاسم",
@@ -107,36 +108,36 @@
     "excalidrawLib": "مكتبتنا",
     "decreaseFontSize": "تصغير حجم الخط",
     "increaseFontSize": "تكبير حجم الخط",
-    "unbindText": "",
-    "bindText": "",
+    "unbindText": "فك ربط النص",
+    "bindText": "ربط النص بالحاوية",
     "link": {
       "edit": "تعديل الرابط",
       "create": "إنشاء رابط",
       "label": "رابط"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "تحرير السطر",
+      "exit": "الخروج من المُحرر"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "قفل",
+      "unlock": "فتح",
+      "lockAll": "قفل الكل",
+      "unlockAll": "فتح الكل"
     },
-    "statusPublished": "",
-    "sidebarLock": ""
+    "statusPublished": "نُشر",
+    "sidebarLock": "إبقاء الشريط الجانبي مفتوح"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "لا توجد عناصر أضيفت بعد...",
+    "hint_emptyLibrary": "حدد عنصر على القماش لإضافته هنا، أو تثبيت مكتبة من المستودع العام أدناه.",
+    "hint_emptyPrivateLibrary": "حدد عنصر على القماش لإضافته هنا."
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
     "exportJSON": "صدر الملف",
-    "exportImage": "إحفظ كصورة",
-    "export": "تصدير",
+    "exportImage": "تصدير الصورة...",
+    "export": "حفظ إلى...",
     "exportToPng": "تصدير بصيغة PNG",
     "exportToSvg": "تصدير بصيغة SVG",
     "copyToClipboard": "نسخ إلى الحافظة",
@@ -144,7 +145,7 @@
     "scale": "مقاس",
     "save": "احفظ للملف الحالي",
     "saveAs": "حفظ كـ",
-    "load": "تحميل",
+    "load": "فتح",
     "getShareableLink": "احصل على رابط المشاركة",
     "close": "غلق",
     "selectLanguage": "اختر اللغة",
@@ -178,7 +179,7 @@
     "couldNotLoadInvalidFile": "تعذر التحميل، الملف غير صالح",
     "importBackendFailed": "فشل الاستيراد من الخادوم.",
     "cannotExportEmptyCanvas": "لا يمكن تصدير لوحة فارغة.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "تعذر النسخ إلى الحافظة.",
     "decryptFailed": "تعذر فك تشفير البيانات.",
     "uploadedSecurly": "تم تأمين التحميل بتشفير النهاية إلى النهاية، مما يعني أن خادوم Excalidraw والأطراف الثالثة لا يمكنها قراءة المحتوى.",
     "loadSceneOverridePrompt": "تحميل الرسم الخارجي سيحل محل المحتوى الموجود لديك. هل ترغب في المتابعة؟",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "تعذر استيراد المشهد من عنوان URL المتوفر. إما أنها مشوهة، أو لا تحتوي على بيانات Excalidraw JSON صالحة.",
     "resetLibrary": "هذا سوف يمسح مكتبتك. هل أنت متأكد؟",
     "removeItemsFromsLibrary": "حذف {{count}} عنصر (عناصر) من المكتبة؟",
-    "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل."
+    "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "نوع الملف غير مدعوم.",
@@ -199,8 +201,10 @@
     "fileTooBig": "الملف كبير جداً. الحد الأقصى المسموح به للحجم هو {{maxSize}}.",
     "svgImageInsertError": "تعذر إدراج صورة SVG. يبدو أن ترميز SVG غير صحيح.",
     "invalidSVGString": "SVG غير صالح.",
-    "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "cannotResolveCollabServer": "تعذر الاتصال بخادم التعاون. الرجاء إعادة تحميل الصفحة والمحاولة مرة أخرى.",
+    "importLibraryError": "تعذر تحميل المكتبة",
+    "collabSaveFailed": "تعذر الحفظ في قاعدة البيانات. إذا استمرت المشاكل، يفضل أن تحفظ ملفك محليا كي لا تفقد عملك.",
+    "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك."
   },
   "toolBar": {
     "selection": "تحديد",
@@ -214,9 +218,10 @@
     "text": "نص",
     "library": "مكتبة",
     "lock": "الحفاظ على أداة التحديد نشطة بعد الرسم",
-    "penMode": "",
-    "link": "",
-    "eraser": "ممحاة"
+    "penMode": "وضع القلم - امنع اللمس",
+    "link": "إضافة/تحديث الرابط للشكل المحدد",
+    "eraser": "ممحاة",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
@@ -224,7 +229,7 @@
     "shapes": "الأشكال"
   },
   "hints": {
-    "canvasPanning": "لتحريك لوحة الرسم ، استمر في الضغط على عجلة الماوس أو مفتاح المسافة أثناء السحب",
+    "canvasPanning": "لتحريك القماش، اضغط على عجلة الفأرة أو مفتاح المسافة أثناء السحب، أو استخدم أداة اليد",
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
     "freeDraw": "انقر واسحب، افرج عند الانتهاء",
     "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",
@@ -235,14 +240,15 @@
     "resize": "يمكنك تقييد النسب بالضغط على SHIFT أثناء تغيير الحجم،\nاضغط على ALT لتغيير الحجم من المركز",
     "resizeImage": "يمكنك تغيير الحجم بحرية بالضغط بأستمرار على SHIFT،\nاضغط بأستمرار على ALT أيضا لتغيير الحجم من المركز",
     "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",
-    "lineEditor_info": "انقر نقراً مزدوجاً أو اضغط Enter لتعديل النقاط",
+    "lineEditor_info": "اضغط على مفتاح (Ctrl أو Cmd) و انقر بشكل مزدوج، أو اضغط على مفتاحي (Ctrl أو Cmd) و (Enter) لتعديل النقاط",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "نشر مكتبتك",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",
@@ -310,7 +316,9 @@
     "view": "عرض",
     "zoomToFit": "تكبير للملائمة",
     "zoomToSelection": "تكبير للعنصر المحدد",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "مسح اللوحة"
@@ -391,7 +399,8 @@
     "fileSaved": "تم حفظ الملف.",
     "fileSavedToFilename": "حفظ باسم {filename}",
     "canvas": "لوحة الرسم",
-    "selection": "العنصر المحدد"
+    "selection": "العنصر المحدد",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "أبيض",
@@ -439,5 +448,18 @@
     "5c940d": "ليموني 9",
     "e67700": "أصفر 9",
     "d9480f": "برتقالي 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

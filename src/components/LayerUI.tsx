@@ -9,9 +9,8 @@ import { Language, t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { ExportType } from "../scene/types";
 import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
-import { muteFSAbortError } from "../utils";
+import { isShallowEqual, muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
-import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
@@ -35,26 +34,18 @@ import "./LayerUI.scss";
 import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
-import { isMenuOpenAtom, useDevice } from "../components/App";
+import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
-import Footer from "./Footer";
-import {
-  ExportImageIcon,
-  HamburgerMenuIcon,
-  WelcomeScreenMenuArrow,
-  WelcomeScreenTopToolbarArrow,
-} from "./icons";
-import { MenuLinks, Separator } from "./MenuUtils";
-import { useOutsideClickHook } from "../hooks/useOutsideClick";
-import WelcomeScreen from "./WelcomeScreen";
+import Footer from "./footer/Footer";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
-import { useAtom } from "jotai";
-import { LanguageList } from "../excalidraw-app/components/LanguageList";
-import WelcomeScreenDecor from "./WelcomeScreenDecor";
-import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import MenuItem from "./MenuItem";
+import { Provider, useAtom } from "jotai";
+import MainMenu from "./main-menu/MainMenu";
+import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
+import { HandButton } from "./HandButton";
+import { isHandToolActive } from "../appState";
+import { TunnelsContext, useInitializeTunnels } from "./context/tunnels";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -63,15 +54,13 @@ interface LayerUIProps {
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  onCollabButtonClick?: () => void;
   onLockToggle: () => void;
+  onHandToolToggle: () => void;
   onPenModeToggle: () => void;
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
-  isCollaborating: boolean;
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
-  renderCustomFooter?: ExcalidrawProps["renderFooter"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
@@ -81,7 +70,35 @@ interface LayerUIProps {
   id: string;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderWelcomeScreen: boolean;
+  children?: React.ReactNode;
 }
+
+const DefaultMainMenu: React.FC<{
+  UIOptions: AppProps["UIOptions"];
+}> = ({ UIOptions }) => {
+  return (
+    <MainMenu __fallback>
+      <MainMenu.DefaultItems.LoadScene />
+      <MainMenu.DefaultItems.SaveToActiveFile />
+      {/* FIXME we should to test for this inside the item itself */}
+      {UIOptions.canvasActions.export && <MainMenu.DefaultItems.Export />}
+      {/* FIXME we should to test for this inside the item itself */}
+      {UIOptions.canvasActions.saveAsImage && (
+        <MainMenu.DefaultItems.SaveAsImage />
+      )}
+      <MainMenu.DefaultItems.Help />
+      <MainMenu.DefaultItems.ClearCanvas />
+      <MainMenu.Separator />
+      <MainMenu.Group title="Excalidraw links">
+        <MainMenu.DefaultItems.Socials />
+      </MainMenu.Group>
+      <MainMenu.Separator />
+      <MainMenu.DefaultItems.ToggleTheme />
+      <MainMenu.DefaultItems.ChangeCanvasBackground />
+    </MainMenu>
+  );
+};
+
 const LayerUI = ({
   actionManager,
   appState,
@@ -89,14 +106,12 @@ const LayerUI = ({
   setAppState,
   elements,
   canvas,
-  onCollabButtonClick,
   onLockToggle,
+  onHandToolToggle,
   onPenModeToggle,
   onInsertElements,
   showExitZenModeBtn,
-  isCollaborating,
   renderTopRightUI,
-  renderCustomFooter,
   renderCustomStats,
   renderCustomSidebar,
   libraryReturnUrl,
@@ -106,8 +121,10 @@ const LayerUI = ({
   id,
   onImageAction,
   renderWelcomeScreen,
+  children,
 }: LayerUIProps) => {
   const device = useDevice();
+  const tunnels = useInitializeTunnels();
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -122,6 +139,7 @@ const LayerUI = ({
         actionManager={actionManager}
         exportOpts={UIOptions.canvasActions.export}
         canvas={canvas}
+        setAppState={setAppState}
       />
     );
   };
@@ -175,100 +193,12 @@ const LayerUI = ({
     );
   };
 
-  const [isMenuOpen, setIsMenuOpen] = useAtom(isMenuOpenAtom);
-  const menuRef = useOutsideClickHook(() => setIsMenuOpen(false));
-
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
-      <WelcomeScreenDecor
-        shouldRender={renderWelcomeScreen && !appState.isLoading}
-      >
-        <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--menu-pointer">
-          {WelcomeScreenMenuArrow}
-          <div>{t("welcomeScreen.menuHints")}</div>
-        </div>
-      </WelcomeScreenDecor>
-
-      <button
-        data-prevent-outside-click
-        className={clsx("menu-button", "zen-mode-transition", {
-          "transition-left": appState.zenModeEnabled,
-        })}
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        type="button"
-        data-testid="menu-button"
-      >
-        {HamburgerMenuIcon}
-      </button>
-
-      {isMenuOpen && (
-        <div
-          ref={menuRef}
-          style={{ position: "absolute", top: "100%", marginTop: ".25rem" }}
-        >
-          <Section heading="canvasActions">
-            {/* the zIndex ensures this menu has higher stacking order,
-         see https://github.com/excalidraw/excalidraw/pull/1445 */}
-            <Island
-              className="menu-container"
-              padding={2}
-              style={{ zIndex: 1 }}
-            >
-              {!appState.viewModeEnabled &&
-                actionManager.renderAction("loadScene")}
-              {/* // TODO barnabasmolnar/editor-redesign  */}
-              {/* is this fine here? */}
-              {appState.fileHandle &&
-                actionManager.renderAction("saveToActiveFile")}
-              {renderJSONExportDialog()}
-              {UIOptions.canvasActions.saveAsImage && (
-                <MenuItem
-                  label={t("buttons.exportImage")}
-                  icon={ExportImageIcon}
-                  dataTestId="image-export-button"
-                  onClick={() => setAppState({ openDialog: "imageExport" })}
-                  shortcut={getShortcutFromShortcutName("imageExport")}
-                />
-              )}
-              {onCollabButtonClick && (
-                <CollabButton
-                  isCollaborating={isCollaborating}
-                  collaboratorCount={appState.collaborators.size}
-                  onClick={onCollabButtonClick}
-                />
-              )}
-              {actionManager.renderAction("toggleShortcuts", undefined, true)}
-              {!appState.viewModeEnabled &&
-                actionManager.renderAction("clearCanvas")}
-              <Separator />
-              <MenuLinks />
-              <Separator />
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  rowGap: ".5rem",
-                }}
-              >
-                <div>{actionManager.renderAction("toggleTheme")}</div>
-                <div style={{ padding: "0 0.625rem" }}>
-                  <LanguageList style={{ width: "100%" }} />
-                </div>
-                {!appState.viewModeEnabled && (
-                  <div>
-                    <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
-                      {t("labels.canvasBackground")}
-                    </div>
-                    <div style={{ padding: "0 0.625rem" }}>
-                      {actionManager.renderAction("changeViewBackgroundColor")}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Island>
-          </Section>
-        </div>
-      )}
+      {/* wrapping to Fragment stops React from occasionally complaining
+                about identical Keys */}
+      <tunnels.mainMenuTunnel.Out />
+      {renderWelcomeScreen && <tunnels.welcomeScreenMenuHintTunnel.Out />}
     </div>
   );
 
@@ -305,9 +235,6 @@ const LayerUI = ({
 
     return (
       <FixedSideContainer side="top">
-        {renderWelcomeScreen && !appState.isLoading && (
-          <WelcomeScreen appState={appState} actionManager={actionManager} />
-        )}
         <div className="App-menu App-menu_top">
           <Stack.Col
             gap={6}
@@ -322,17 +249,9 @@ const LayerUI = ({
             <Section heading="shapes" className="shapes-section">
               {(heading: React.ReactNode) => (
                 <div style={{ position: "relative" }}>
-                  <WelcomeScreenDecor
-                    shouldRender={renderWelcomeScreen && !appState.isLoading}
-                  >
-                    <div className="virgil WelcomeScreen-decor WelcomeScreen-decor--top-toolbar-pointer">
-                      <div className="WelcomeScreen-decor--top-toolbar-pointer__label">
-                        {t("welcomeScreen.toolbarHints")}
-                      </div>
-                      {WelcomeScreenTopToolbarArrow}
-                    </div>
-                  </WelcomeScreenDecor>
-
+                  {renderWelcomeScreen && (
+                    <tunnels.welcomeScreenToolbarHintTunnel.Out />
+                  )}
                   <Stack.Col gap={4} align="start">
                     <Stack.Row
                       gap={1}
@@ -362,12 +281,19 @@ const LayerUI = ({
                             penDetected={appState.penDetected}
                           />
                           <LockButton
-                            zenModeEnabled={appState.zenModeEnabled}
                             checked={appState.activeTool.locked}
-                            onChange={() => onLockToggle()}
+                            onChange={onLockToggle}
                             title={t("toolBar.lock")}
                           />
+
                           <div className="App-toolbar__divider"></div>
+
+                          <HandButton
+                            checked={isHandToolActive(appState)}
+                            onChange={() => onHandToolToggle()}
+                            title={t("toolBar.hand")}
+                            isMobile
+                          />
 
                           <ShapesSwitcher
                             appState={appState}
@@ -380,9 +306,6 @@ const LayerUI = ({
                               });
                             }}
                           />
-                          {/* {actionManager.renderAction("eraser", {
-                          // size: "small",
-                        })} */}
                         </Stack.Row>
                       </Island>
                     </Stack.Row>
@@ -399,18 +322,7 @@ const LayerUI = ({
               },
             )}
           >
-            <UserList
-              collaborators={appState.collaborators}
-              actionManager={actionManager}
-            />
-            {onCollabButtonClick && (
-              <CollabButton
-                isInHamburgerMenu={false}
-                isCollaborating={isCollaborating}
-                collaboratorCount={appState.collaborators.size}
-                onClick={onCollabButtonClick}
-              />
-            )}
+            <UserList collaborators={appState.collaborators} />
             {renderTopRightUI?.(device.isMobile, appState)}
             {!appState.viewModeEnabled && (
               <LibraryButton appState={appState} setAppState={setAppState} />
@@ -438,8 +350,18 @@ const LayerUI = ({
 
   const [hostSidebarCounters] = useAtom(hostSidebarCountersAtom, jotaiScope);
 
-  return (
+  const layerUIJSX = (
     <>
+      {/* ------------------------- tunneled UI ---------------------------- */}
+      {/* make sure we render host app components first so that we can detect
+          them first on initial render to optimize layout shift */}
+      {children}
+      {/* render component fallbacks. Can be rendered anywhere as they'll be
+          tunneled away. We only render tunneled components that actually
+          have defaults when host do not render anything. */}
+      <DefaultMainMenu UIOptions={UIOptions} />
+      {/* ------------------------------------------------------------------ */}
+
       {appState.isLoading && <LoadingMessage delay={250} />}
       {appState.errorMessage && (
         <ErrorDialog
@@ -454,7 +376,9 @@ const LayerUI = ({
           }}
         />
       )}
+      <ActiveConfirmDialog />
       {renderImageExportDialog()}
+      {renderJSONExportDialog()}
       {appState.pasteDialog.shown && (
         <PasteChartDialog
           setAppState={setAppState}
@@ -469,24 +393,22 @@ const LayerUI = ({
       )}
       {device.isMobile && (
         <MobileMenu
-          renderWelcomeScreen={renderWelcomeScreen}
           appState={appState}
           elements={elements}
           actionManager={actionManager}
           renderJSONExportDialog={renderJSONExportDialog}
           renderImageExportDialog={renderImageExportDialog}
           setAppState={setAppState}
-          onCollabButtonClick={onCollabButtonClick}
-          onLockToggle={() => onLockToggle()}
+          onLockToggle={onLockToggle}
+          onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
           canvas={canvas}
-          isCollaborating={isCollaborating}
-          renderCustomFooter={renderCustomFooter}
           onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
           device={device}
+          renderWelcomeScreen={renderWelcomeScreen}
         />
       )}
 
@@ -509,13 +431,13 @@ const LayerUI = ({
                 : {}
             }
           >
+            {renderWelcomeScreen && <tunnels.welcomeScreenCenterTunnel.Out />}
             {renderFixedSideContainer()}
             <Footer
-              renderWelcomeScreen={renderWelcomeScreen}
               appState={appState}
               actionManager={actionManager}
-              renderCustomFooter={renderCustomFooter}
               showExitZenModeBtn={showExitZenModeBtn}
+              renderWelcomeScreen={renderWelcomeScreen}
             />
             {appState.showStats && (
               <Stats
@@ -546,31 +468,49 @@ const LayerUI = ({
       )}
     </>
   );
-};
-
-const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
-  const getNecessaryObj = (appState: AppState): Partial<AppState> => {
-    const {
-      suggestedBindings,
-      startBoundElement: boundElement,
-      ...ret
-    } = appState;
-    return ret;
-  };
-  const prevAppState = getNecessaryObj(prev.appState);
-  const nextAppState = getNecessaryObj(next.appState);
-
-  const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
 
   return (
-    prev.renderCustomFooter === next.renderCustomFooter &&
-    prev.renderTopRightUI === next.renderTopRightUI &&
-    prev.renderCustomStats === next.renderCustomStats &&
-    prev.renderCustomSidebar === next.renderCustomSidebar &&
-    prev.langCode === next.langCode &&
-    prev.elements === next.elements &&
-    prev.files === next.files &&
-    keys.every((key) => prevAppState[key] === nextAppState[key])
+    <Provider scope={tunnels.jotaiScope}>
+      <TunnelsContext.Provider value={tunnels}>
+        {layerUIJSX}
+      </TunnelsContext.Provider>
+    </Provider>
+  );
+};
+
+const stripIrrelevantAppStateProps = (
+  appState: AppState,
+): Partial<AppState> => {
+  const { suggestedBindings, startBoundElement, cursorButton, ...ret } =
+    appState;
+  return ret;
+};
+
+const areEqual = (prevProps: LayerUIProps, nextProps: LayerUIProps) => {
+  // short-circuit early
+  if (prevProps.children !== nextProps.children) {
+    return false;
+  }
+
+  const {
+    canvas: _prevCanvas,
+    // not stable, but shouldn't matter in our case
+    onInsertElements: _prevOnInsertElements,
+    appState: prevAppState,
+    ...prev
+  } = prevProps;
+  const {
+    canvas: _nextCanvas,
+    onInsertElements: _nextOnInsertElements,
+    appState: nextAppState,
+    ...next
+  } = nextProps;
+
+  return (
+    isShallowEqual(
+      stripIrrelevantAppStateProps(prevAppState),
+      stripIrrelevantAppStateProps(nextAppState),
+    ) && isShallowEqual(prev, next)
   );
 };
 

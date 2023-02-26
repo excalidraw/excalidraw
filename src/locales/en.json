@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Paste",
+    "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Couldn't import scene from the supplied URL. It's either malformed, or doesn't contain valid Excalidraw JSON data.",
     "resetLibrary": "This will clear your library. Are you sure?",
     "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
-    "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled."
+    "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
+    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!"
   },
   "errors": {
     "unsupportedFileType": "Unsupported file type.",
@@ -201,7 +203,9 @@
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
     "invalidSVGString": "Invalid SVG.",
     "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
-    "importLibraryError": "Couldn't load library"
+    "importLibraryError": "Couldn't load library",
+    "collabSaveFailed": "Couldn't save to the backend database. If problems persist, you should save your file locally to ensure you don't lose your work.",
+    "collabSaveFailed_sizeExceeded": "Couldn't save to the backend database, the canvas seems to be too big. You should save the file locally to ensure you don't lose your work."
   },
   "toolBar": {
     "selection": "Selection",
@@ -217,7 +221,8 @@
     "lock": "Keep selected tool active after drawing",
     "penMode": "Pen mode - prevent touch",
     "link": "Add/ Update link for a selected shape",
-    "eraser": "Eraser"
+    "eraser": "Eraser",
+    "hand": "Hand (panning tool)"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -225,7 +230,7 @@
     "shapes": "Shapes"
   },
   "hints": {
-    "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging",
+    "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging, or use the hand tool",
     "linearElement": "Click to start multiple points, drag for single line",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
@@ -236,14 +241,15 @@
     "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
     "resizeImage": "You can resize freely by holding SHIFT,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating",
-    "lineEditor_info": "Double-click or press Enter to edit points",
+    "lineEditor_info": "Hold CtrlOrCmd and Double-click or press CtrlOrCmd + Enter to edit points",
     "lineEditor_pointSelected": "Press Delete to remove point(s),\nCtrlOrCmd+D to duplicate, or drag to move",
     "lineEditor_nothingSelected": "Select a point to edit (hold SHIFT to select multiple),\nor hold Alt and click to add new points",
     "placeImage": "Click to place the image, or click and drag to set its size manually",
     "publishLibrary": "Publish your own library",
     "bindTextToElement": "Press enter to add text",
     "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
-    "eraserRevert": "Hold Alt to revert the elements marked for deletion"
+    "eraserRevert": "Hold Alt to revert the elements marked for deletion",
+    "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page."
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -311,7 +317,9 @@
     "view": "View",
     "zoomToFit": "Zoom to fit all elements",
     "zoomToSelection": "Zoom to selection",
-    "toggleElementLock": "Lock/unlock selection"
+    "toggleElementLock": "Lock/unlock selection",
+    "movePageUpDown": "Move page up/down",
+    "movePageLeftRight": "Move page left/right"
   },
   "clearCanvasDialog": {
     "title": "Clear canvas"
@@ -392,7 +400,8 @@
     "fileSaved": "File saved.",
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
-    "selection": "selection"
+    "selection": "selection",
+    "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor"
   },
   "colors": {
     "ffffff": "White",
@@ -442,10 +451,16 @@
     "d9480f": "Orange 9"
   },
   "welcomeScreen": {
-    "data": "All your data is saved locally in your browser.",
-    "switchToPlusApp": "Did you want to go to the Excalidraw+ instead?",
-    "menuHints": "Export, preferences, languages, ...",
-    "toolbarHints": "Pick a tool & Start drawing!",
-    "helpHints": "Shortcuts & help"
+    "app": {
+      "center_heading": "All your data is saved locally in your browser.",
+      "center_heading_plus": "Did you want to go to the Excalidraw+ instead?",
+      "menuHint": "Export, preferences, languages, ..."
+    },
+    "defaults": {
+      "menuHint": "Export, preferences, and more...",
+      "center_heading": "Diagrams. Made. Simple.",
+      "toolbarHint": "Pick a tool & Start drawing!",
+      "helpHint": "Shortcuts & help"
+    }
   }
 }

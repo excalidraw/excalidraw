@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Vložiť",
+    "pasteAsPlaintext": "Vložiť ako obyčajný text",
     "pasteCharts": "Vložiť grafy",
     "selectAll": "Vybrať všetko",
     "multiSelect": "Pridať prvok do výberu",
@@ -71,7 +72,7 @@
     "layers": "Vrstvy",
     "actions": "Akcie",
     "language": "Jazyk",
-    "liveCollaboration": "Živá spolupráca",
+    "liveCollaboration": "Živá spolupráca...",
     "duplicateSelection": "Duplikovať",
     "untitled": "Bez názvu",
     "name": "Meno",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Obnoviť plátno",
     "exportJSON": "Exportovať do súboru",
-    "exportImage": "Uložiť ako obrázok",
-    "export": "Exportovať",
+    "exportImage": "Exportovať obrázok...",
+    "export": "Uložiť do...",
     "exportToPng": "Exportovať do PNG",
     "exportToSvg": "Exportovať do SVG",
     "copyToClipboard": "Kopírovať do schránky",
@@ -144,7 +145,7 @@
     "scale": "Mierka",
     "save": "Uložiť do aktuálneho súboru",
     "saveAs": "Uložiť ako",
-    "load": "Nahrať",
+    "load": "Otvoriť",
     "getShareableLink": "Získať odkaz na zdieľanie",
     "close": "Zavrieť",
     "selectLanguage": "Zvoliť jazyk",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "Nepodarilo sa načítať scénu z poskytnutej URL. Je nevalidná alebo neobsahuje žiadne validné Excalidraw JSON dáta.",
     "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?",
     "removeItemsFromsLibrary": "Odstrániť {{count}} položiek z knižnice?",
-    "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá."
+    "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá.",
+    "collabOfflineWarning": "Internetové pripojenie nie je dostupné.\nVaše zmeny nebudú uložené!"
   },
   "errors": {
     "unsupportedFileType": "Nepodporovaný typ súboru.",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "Nepodarilo sa vložiť SVG obrázok. SVG formát je pravdepodobne nevalidný.",
     "invalidSVGString": "Nevalidné SVG.",
     "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu.",
-    "importLibraryError": "Nepodarilo sa načítať knižnicu"
+    "importLibraryError": "Nepodarilo sa načítať knižnicu",
+    "collabSaveFailed": "Uloženie do databázy sa nepodarilo. Ak tento problém pretrváva uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
+    "collabSaveFailed_sizeExceeded": "Uloženie do databázy sa nepodarilo, pretože veľkosť plátna je príliš veľká. Uložte si váš súbor lokálne aby ste nestratili vašu prácu."
   },
   "toolBar": {
     "selection": "Výber",
@@ -214,9 +218,10 @@
     "text": "Text",
     "library": "Knižnica",
     "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia",
-    "penMode": "Zabrániť priblíženiu potiahnutím a povoliť vstup voľnou rokou iba z pera",
+    "penMode": "Režim pera – zabrániť dotyku",
     "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
-    "eraser": "Guma"
+    "eraser": "Guma",
+    "hand": "Ruka (nástroj pre pohyb plátna)"
   },
   "headings": {
     "canvasActions": "Akcie plátna",
@@ -224,7 +229,7 @@
     "shapes": "Tvary"
   },
   "hints": {
-    "canvasPanning": "Pre pohyb plátna podržte koliesko myši alebo medzerník počas ťahania",
+    "canvasPanning": "Pre pohyb plátna podržte koliesko myši alebo medzerník počas ťahania, alebo použite nástroj ruka",
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
@@ -235,14 +240,15 @@
     "resize": "Počas zmeny veľkosti zachováte proporcie podržaním SHIFT,\\npodržaním ALT meníte veľkosť so zachovaním stredu",
     "resizeImage": "Podržte SHIFT pre voľnú zmenu veľkosti, podržte ALT pre zmenu veľkosti od stredu",
     "rotate": "Počas rotácie obmedzíte uhol podržaním SHIFT",
-    "lineEditor_info": "Použite dvojklik alebo stlačte Enter na editáciu bodov",
+    "lineEditor_info": "Podržte CtrlOrCmd a kliknite dva krát alebo stlačte CtrlOrCmd + Enter pre editáciu bodov",
     "lineEditor_pointSelected": "Stačte Delete na vymazanie bodu (bodov), CtrlOrCmd+D na duplikovanie, alebo potiahnite na presunutie",
     "lineEditor_nothingSelected": "Zvoľte bod na upravovanie (podržte SHIFT pre zvolenie viacerých bodov) alebo podržte Alt a kliknite na pridanie nového bodu",
     "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti",
     "publishLibrary": "Uverejniť vašu knižnicu",
     "bindTextToElement": "Stlačte enter na pridanie textu",
     "deepBoxSelect": "Podržte CtrlOrCmd na výber v skupine alebo zamedzeniu poťiahnutia",
-    "eraserRevert": "Podržte Alt pre prehodenie položiek určených na vymazanie"
+    "eraserRevert": "Podržte Alt pre prehodenie položiek určených na vymazanie",
+    "firefox_clipboard_write": "Táto sa funkcionalita sa dá zapnúť nastavením \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Pre zmenu nastavení vo Firefox-e otvorte stránku \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
@@ -310,7 +316,9 @@
     "view": "Zobrazenie",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
     "zoomToSelection": "Priblížiť na výber",
-    "toggleElementLock": "Zamknúť/odomknúť vybrané"
+    "toggleElementLock": "Zamknúť/odomknúť vybrané",
+    "movePageUpDown": "Posunúť stranu hore/dole",
+    "movePageLeftRight": "Posunúť stranu doľava/doprava"
   },
   "clearCanvasDialog": {
     "title": "Vyčistiť plátno"
@@ -391,7 +399,8 @@
     "fileSaved": "Súbor uložený.",
     "fileSavedToFilename": "Uložený ako {filename}",
     "canvas": "plátna",
-    "selection": "výberu"
+    "selection": "výberu",
+    "pasteAsSingleElement": "Použitím {{shortcut}} vložte ako samostatný prvok alebo vložte do existujúceho editovaného textu"
   },
   "colors": {
     "ffffff": "Biela",
@@ -439,5 +448,18 @@
     "5c940d": "Limetková 9",
     "e67700": "Žltá 9",
     "d9480f": "Oranžová 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "Všetky vaše dáta sú uložené lokálne vo vašom prehliadači.",
+      "center_heading_plus": "Chceli ste namiesto toho prejsť do Excalidraw+?",
+      "menuHint": "Exportovanie, nastavenia, jazyky, ..."
+    },
+    "defaults": {
+      "menuHint": "Exportovanie, nastavenia a ďalšie...",
+      "center_heading": "Diagramy. Jednoducho.",
+      "toolbarHint": "Zvoľte nástroj a začnite kresliť!",
+      "helpHint": "Klávesové skratky a pomocník"
+    }
   }
 }

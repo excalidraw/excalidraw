@@ -6,15 +6,16 @@ import {
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
+  isDarwin,
   MIME_TYPES,
   THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { AppState, DataURL, LastActiveToolBeforeEraser, Zoom } from "./types";
+import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
-import { isDarwin } from "./keys";
 import { SHAPES } from "./shapes";
+import { isEraserActive, isHandToolActive } from "./appState";
 
 let mockDateTime: string | null = null;
 
@@ -218,9 +219,9 @@ export const distance = (x: number, y: number) => Math.abs(x - y);
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: (
-    | { type: typeof SHAPES[number]["value"] | "eraser" }
+    | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" }
     | { type: "custom"; customType: string }
-  ) & { lastActiveToolBeforeEraser?: LastActiveToolBeforeEraser },
+  ) & { lastActiveToolBeforeEraser?: LastActiveTool },
 ): AppState["activeTool"] => {
   if (data.type === "custom") {
     return {
@@ -232,9 +233,9 @@ export const updateActiveTool = (
 
   return {
     ...appState.activeTool,
-    lastActiveToolBeforeEraser:
+    lastActiveTool:
       data.lastActiveToolBeforeEraser === undefined
-        ? appState.activeTool.lastActiveToolBeforeEraser
+        ? appState.activeTool.lastActiveTool
         : data.lastActiveToolBeforeEraser,
     type: data.type,
     customType: null,
@@ -304,7 +305,9 @@ export const setCursorForShape = (
   }
   if (appState.activeTool.type === "selection") {
     resetCursor(canvas);
-  } else if (appState.activeTool.type === "eraser") {
+  } else if (isHandToolActive(appState)) {
+    canvas.style.cursor = CURSOR_TYPE.GRAB;
+  } else if (isEraserActive(appState)) {
     setEraserCursor(canvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
@@ -327,13 +330,12 @@ export const getShortcutKey = (shortcut: string): string => {
     .replace(/\bAlt\b/i, "Alt")
     .replace(/\bShift\b/i, "Shift")
     .replace(/\b(Enter|Return)\b/i, "Enter");
-
   if (isDarwin) {
     return shortcut
-      .replace(/\bCtrlOrCmd\b/i, "Cmd")
+      .replace(/\bCtrlOrCmd\b/gi, "Cmd")
       .replace(/\bAlt\b/i, "Option");
   }
-  return shortcut.replace(/\bCtrlOrCmd\b/i, "Ctrl");
+  return shortcut.replace(/\bCtrlOrCmd\b/gi, "Ctrl");
 };
 
 export const viewportCoordsToSceneCoords = (
@@ -352,9 +354,8 @@ export const viewportCoordsToSceneCoords = (
     scrollY: number;
   },
 ) => {
-  const invScale = 1 / zoom.value;
-  const x = (clientX - offsetLeft) * invScale - scrollX;
-  const y = (clientY - offsetTop) * invScale - scrollY;
+  const x = (clientX - offsetLeft) / zoom.value - scrollX;
+  const y = (clientY - offsetTop) / zoom.value - scrollY;
 
   return { x, y };
 };
@@ -606,6 +607,14 @@ export const arrayToMap = <T extends { id: string } | string>(
   }, new Map());
 };
 
+export const arrayToMapWithIndex = <T extends { id: string }>(
+  elements: readonly T[],
+) =>
+  elements.reduce((acc, element: T, idx) => {
+    acc.set(element.id, [element, idx]);
+    return acc;
+  }, new Map<string, [element: T, index: number]>());
+
 export const isTestEnv = () =>
   typeof process !== "undefined" && process.env?.NODE_ENV === "test";
 
@@ -686,4 +695,35 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
           element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
       )
     : [];
+};
+
+export const isShallowEqual = <T extends Record<string, any>>(
+  objA: T,
+  objB: T,
+) => {
+  const aKeys = Object.keys(objA);
+  const bKeys = Object.keys(objA);
+  if (aKeys.length !== bKeys.length) {
+    return false;
+  }
+  return aKeys.every((key) => objA[key] === objB[key]);
+};
+
+// taken from Radix UI
+// https://github.com/radix-ui/primitives/blob/main/packages/core/primitive/src/primitive.tsx
+export const composeEventHandlers = <E>(
+  originalEventHandler?: (event: E) => void,
+  ourEventHandler?: (event: E) => void,
+  { checkForDefaultPrevented = true } = {},
+) => {
+  return function handleEvent(event: E) {
+    originalEventHandler?.(event);
+
+    if (
+      !checkForDefaultPrevented ||
+      !(event as unknown as Event).defaultPrevented
+    ) {
+      return ourEventHandler?.(event);
+    }
+  };
 };

@@ -9,7 +9,6 @@ import {
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
-import { MODES } from "../constants";
 import { trackEvent } from "../analytics";
 
 const trackAction = (
@@ -103,11 +102,8 @@ export class ActionManager {
 
     const action = data[0];
 
-    const { viewModeEnabled } = this.getAppState();
-    if (viewModeEnabled) {
-      if (!Object.values(MODES).includes(data[0].name)) {
-        return false;
-      }
+    if (this.getAppState().viewModeEnabled && action.viewMode !== true) {
+      return false;
     }
 
     const elements = this.getElementsIncludingDeleted();
@@ -135,11 +131,7 @@ export class ActionManager {
   /**
    * @param data additional data sent to the PanelComponent
    */
-  renderAction = (
-    name: ActionName,
-    data?: PanelComponentProps["data"],
-    isInHamburgerMenu = false,
-  ) => {
+  renderAction = (name: ActionName, data?: PanelComponentProps["data"]) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
     if (
@@ -174,11 +166,20 @@ export class ActionManager {
           updateData={updateData}
           appProps={this.app.props}
           data={data}
-          isInHamburgerMenu={isInHamburgerMenu}
         />
       );
     }
 
     return null;
+  };
+
+  isActionEnabled = (action: Action) => {
+    const elements = this.getElementsIncludingDeleted();
+    const appState = this.getAppState();
+
+    return (
+      !action.predicate ||
+      action.predicate(elements, appState, this.app.props, this.app)
+    );
   };
 }

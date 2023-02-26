@@ -28,7 +28,7 @@ Export an Excalidraw diagram to a [SVGElement](https://developer.mozilla.org/en-
 
 ## Usage
 
-Excalidraw utils is published as a UMD (Universal Module Definition). If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module:
+Excalidraw utils is published as a UMD (Universal Module Definition). If you are using a module bundler (for instance, Webpack), you can import it as an ES6 module:
 
 ```js
 import { exportToSvg, exportToBlob } from "@excalidraw/utils";
@@ -68,7 +68,7 @@ const excalidrawDiagram = {
       roughness: 1,
       opacity: 100,
       groupIds: [],
-      strokeSharpness: "sharp",
+      roundness: null,
       seed: 1041657908,
       version: 120,
       versionNonce: 1188004276,

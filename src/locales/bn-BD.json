@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "পেস্ট করুন",
+    "pasteAsPlaintext": "",
     "pasteCharts": "চার্ট পেস্ট করুন",
     "selectAll": "সবটা সিলেক্ট করুন",
     "multiSelect": "একাধিক সিলেক্ট করুন",
@@ -71,7 +72,7 @@
     "layers": "মাত্রা",
     "actions": "ক্রিয়া",
     "language": "ভাষা",
-    "liveCollaboration": "যুগ্ম কার্য",
+    "liveCollaboration": "",
     "duplicateSelection": "সদৃশ সিলেক্ট",
     "untitled": "অনামী",
     "name": "নাম",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "ক্যানভাস সাফ করুন",
     "exportJSON": "জেসন নিবদ্ধ করুন",
-    "exportImage": "চিত্র নিবদ্ধ করুন",
-    "export": "নিবদ্ধ",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "পীএনজী ছবির মতন নিবদ্ধ করুন",
     "exportToSvg": "এসভীজী ছবির মতন নিবদ্ধ করুন",
     "copyToClipboard": "ক্লিপবোর্ডে কপি করুন",
@@ -144,7 +145,7 @@
     "scale": "মাপ",
     "save": "জমা করুন",
     "saveAs": "অন্যভাবে জমা করুন",
-    "load": "লোড করুন",
+    "load": "",
     "getShareableLink": "ভাগযোগ্য লিঙ্ক পান",
     "close": "বন্ধ করুন",
     "selectLanguage": "ভাষা চিহ্নিত করুন",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "সরবরাহ করা লিঙ্ক থেকে দৃশ্য লোড করা যায়নি৷ এটি হয় বিকৃত, অথবা বৈধ এক্সক্যালিড্র জেসন তথ্য নেই৷",
     "resetLibrary": "এটি আপনার সংগ্রহ পরিষ্কার করবে। আপনি কি নিশ্চিত?",
     "removeItemsFromsLibrary": "সংগ্রহ থেকে {{count}} বস্তু বিয়োগ করা হবে। আপনি কি নিশ্চিত?",
-    "invalidEncryptionKey": "অবৈধ এনক্রীপশন কী।"
+    "invalidEncryptionKey": "অবৈধ এনক্রীপশন কী।",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "অসমর্থিত ফাইল।",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "এসভীজী ছবি সন্নিবেশ করা যায়নি। এসভীজী মার্কআপটি অবৈধ মনে হচ্ছে৷",
     "invalidSVGString": "এসভীজী মার্কআপটি অবৈধ মনে হচ্ছে৷",
     "cannotResolveCollabServer": "কোল্যাব সার্ভারের সাথে সংযোগ করা যায়নি। পৃষ্ঠাটি পুনরায় লোড করে আবার চেষ্টা করুন।",
-    "importLibraryError": "সংগ্রহ লোড করা যায়নি"
+    "importLibraryError": "সংগ্রহ লোড করা যায়নি",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "বাছাই",
@@ -214,9 +218,10 @@
     "text": "লেখা",
     "library": "সংগ্রহ",
     "lock": "আঁকার পরে নির্বাচিত টুল সক্রিয় রাখুন",
-    "penMode": "পিঞ্চ-জুম প্রতিরোধ করুন এবং শুধুমাত্র কলম থেকে ইনপুট গ্রহণ করুন",
+    "penMode": "",
     "link": "একটি নির্বাচিত আকৃতির জন্য লিঙ্ক যোগ বা আপডেট করুন",
-    "eraser": "ঝাড়ন"
+    "eraser": "ঝাড়ন",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "ক্যানভাস কার্যকলাপ",
@@ -224,7 +229,7 @@
     "shapes": "আকার(গুলি)"
   },
   "hints": {
-    "canvasPanning": "ক্যানভাস সরানোর জন্য মাউস হুইল বা স্পেসবার ধরে টানুন",
+    "canvasPanning": "",
     "linearElement": "একাধিক বিন্দু শুরু করতে ক্লিক করুন, একক লাইনের জন্য টেনে আনুন",
     "freeDraw": "ক্লিক করুন এবং টেনে আনুন, আপনার কাজ শেষ হলে ছেড়ে দিন",
     "text": "বিশেষ্য: আপনি নির্বাচন টুলের সাথে যে কোনো জায়গায় ডাবল-ক্লিক করে পাঠ্য যোগ করতে পারেন",
@@ -235,14 +240,15 @@
     "resize": "আপনি আকার পরিবর্তন করার সময় শিফ্ট ধরে রেখে অনুপাতকে সীমাবদ্ধ করতে পারেন,\nকেন্দ্র থেকে আকার পরিবর্তন করতে অল্ট ধরে রাখুন",
     "resizeImage": "আপনি শিফ্ট ধরে রেখে অবাধে আকার পরিবর্তন করতে পারেন, কেন্দ্র থেকে আকার পরিবর্তন করতে অল্ট ধরুন",
     "rotate": "আপনি ঘোরানোর সময় শিফ্ট ধরে রেখে কোণগুলিকে সীমাবদ্ধ করতে পারেন",
-    "lineEditor_info": "পয়েন্ট সম্পাদনা করতে ডাবল-ক্লিক করুন বা এন্টার টিপুন",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "বিন্দু(গুলি) মুছতে ডিলিট টিপুন, কন্ট্রোল/কম্যান্ড যোগে ডি টিপুন নকল করতে অথবা সরানোর জন্য টানুন",
     "lineEditor_nothingSelected": "সম্পাদনা করার জন্য একটি বিন্দু নির্বাচন করুন (একাধিক নির্বাচন করতে শিফ্ট ধরে রাখুন),\nঅথবা অল্ট ধরে রাখুন এবং নতুন বিন্দু যোগ করতে ক্লিক করুন",
     "placeImage": "ছবিটি স্থাপন করতে ক্লিক করুন, অথবা নিজে আকার সেট করতে ক্লিক করুন এবং টেনে আনুন",
     "publishLibrary": "আপনার নিজস্ব সংগ্রহ প্রকাশ করুন",
     "bindTextToElement": "লেখা যোগ করতে এন্টার টিপুন",
     "deepBoxSelect": "",
-    "eraserRevert": "মুছে ফেলার জন্য চিহ্নিত উপাদানগুলিকে ফিরিয়ে আনতে অল্ট ধরে রাখুন"
+    "eraserRevert": "মুছে ফেলার জন্য চিহ্নিত উপাদানগুলিকে ফিরিয়ে আনতে অল্ট ধরে রাখুন",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "প্রিভিউ দেখাতে অপারগ",
@@ -310,7 +316,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": "",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -391,7 +399,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": "বাছাই"
+    "selection": "বাছাই",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "সাদা",
@@ -439,5 +448,18 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

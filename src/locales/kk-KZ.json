@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Қою",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Диаграммаларды қою",
     "selectAll": "Бәрін таңдау",
     "multiSelect": "",
@@ -136,7 +137,7 @@
     "clearReset": "",
     "exportJSON": "",
     "exportImage": "",
-    "export": "Экспорт",
+    "export": "",
     "exportToPng": "",
     "exportToSvg": "",
     "copyToClipboard": "",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "",
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "",
     "invalidSVGString": "",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "",
@@ -216,7 +220,8 @@
     "lock": "",
     "penMode": "",
     "link": "",
-    "eraser": ""
+    "eraser": "",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "",
@@ -242,7 +247,8 @@
     "publishLibrary": "",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -310,7 +316,9 @@
     "view": "Көру",
     "zoomToFit": "Барлық элементтердің көлеміне сәйкес үлкейту",
     "zoomToSelection": "Таңдалғанды үлкейту",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -391,7 +399,8 @@
     "fileSaved": "Файл сақталды.",
     "fileSavedToFilename": "{filename} сақталды",
     "canvas": "",
-    "selection": "таңдау"
+    "selection": "таңдау",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
@@ -439,5 +448,18 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

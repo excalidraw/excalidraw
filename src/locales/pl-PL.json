@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Wklej",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Wklej wykresy",
     "selectAll": "Zaznacz wszystko",
     "multiSelect": "Dodaj element do zaznaczenia",
@@ -71,7 +72,7 @@
     "layers": "Warstwy",
     "actions": "Akcje",
     "language": "Język",
-    "liveCollaboration": "Współpraca na żywo",
+    "liveCollaboration": "",
     "duplicateSelection": "Powiel",
     "untitled": "Bez tytułu",
     "name": "Nazwa",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
     "exportJSON": "Eksportuj do pliku",
-    "exportImage": "Zapisz jako obraz",
-    "export": "Zapisz jako",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Zapisz jako PNG",
     "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
@@ -144,7 +145,7 @@
     "scale": "Skala",
     "save": "",
     "saveAs": "Zapisz jako",
-    "load": "Otwórz",
+    "load": "",
     "getShareableLink": "Udostępnij",
     "close": "Zamknij",
     "selectLanguage": "Wybierz język",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "Nie udało się zaimportować sceny z podanego adresu URL. Jest ona wadliwa lub nie zawiera poprawnych danych Excalidraw w formacie JSON.",
     "resetLibrary": "To wyczyści twoją bibliotekę. Jesteś pewien?",
     "removeItemsFromsLibrary": "Usunąć {{count}} element(ów) z biblioteki?",
-    "invalidEncryptionKey": "Klucz szyfrowania musi składać się z 22 znaków. Współpraca na żywo jest wyłączona."
+    "invalidEncryptionKey": "Klucz szyfrowania musi składać się z 22 znaków. Współpraca na żywo jest wyłączona.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "Nieobsługiwany typ pliku.",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "Nie udało się wstawić obrazu SVG. Znacznik SVG wygląda na nieprawidłowy.",
     "invalidSVGString": "Nieprawidłowy SVG.",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Zaznaczenie",
@@ -216,7 +220,8 @@
     "lock": "Zablokuj wybrane narzędzie",
     "penMode": "",
     "link": "",
-    "eraser": "Gumka"
+    "eraser": "Gumka",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -224,7 +229,7 @@
     "shapes": "Kształty"
   },
   "hints": {
-    "canvasPanning": "Aby przesunąć płótno, przytrzymaj kółko myszy lub spację podczas przeciągania",
+    "canvasPanning": "",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
@@ -235,14 +240,15 @@
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "resizeImage": "Możesz zmienić rozmiar swobodnie trzymając SHIFT,\nprzytrzymaj ALT, aby przeskalować względem środka obiektu",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
-    "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "Kliknij, aby umieścić obraz, lub kliknij i przeciągnij, aby ustawić jego rozmiar ręcznie",
     "publishLibrary": "Opublikuj własną bibliotekę",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
@@ -310,7 +316,9 @@
     "view": "Widok",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
     "zoomToSelection": "Przybliż do zaznaczenia",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Wyczyść płótno"
@@ -391,7 +399,8 @@
     "fileSaved": "Zapisano plik.",
     "fileSavedToFilename": "Zapisano jako {filename}",
     "canvas": "płótno",
-    "selection": "zaznaczenie"
+    "selection": "zaznaczenie",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Biały",
@@ -439,5 +448,18 @@
     "5c940d": "Limonkowy 9",
     "e67700": "Żółty 9",
     "d9480f": "Pomarańczowy 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

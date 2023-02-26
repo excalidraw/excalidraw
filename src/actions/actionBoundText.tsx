@@ -7,6 +7,10 @@ import {
   redrawTextBoundingBox,
 } from "../element/textElement";
 import {
+  getOriginalContainerHeightFromCache,
+  resetOriginalContainerCache,
+} from "../element/textWysiwyg";
+import {
   hasBoundTextElement,
   isTextBindableContainer,
 } from "../element/typeChecks";
@@ -22,7 +26,7 @@ export const actionUnbindText = register({
   name: "unbindText",
   contextItemLabel: "labels.unbindText",
   trackEvent: { category: "element" },
-  contextItemPredicate: (elements, appState) => {
+  predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
     return selectedElements.some((element) => hasBoundTextElement(element));
   },
@@ -34,21 +38,28 @@ export const actionUnbindText = register({
     selectedElements.forEach((element) => {
       const boundTextElement = getBoundTextElement(element);
       if (boundTextElement) {
-        const { width, height, baseline } = measureText(
+        const { width, height } = measureText(
           boundTextElement.originalText,
           getFontString(boundTextElement),
         );
+        const originalContainerHeight = getOriginalContainerHeightFromCache(
+          element.id,
+        );
+        resetOriginalContainerCache(element.id);
+
         mutateElement(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
           width,
           height,
-          baseline,
           text: boundTextElement.originalText,
         });
         mutateElement(element, {
           boundElements: element.boundElements?.filter(
             (ele) => ele.id !== boundTextElement.id,
           ),
+          height: originalContainerHeight
+            ? originalContainerHeight
+            : element.height,
         });
       }
     });
@@ -64,7 +75,7 @@ export const actionBindText = register({
   name: "bindText",
   contextItemLabel: "labels.bindText",
   trackEvent: { category: "element" },
-  contextItemPredicate: (elements, appState) => {
+  predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
 
     if (selectedElements.length === 2) {

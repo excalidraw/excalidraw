@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Beillesztés",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Grafikon beillesztése",
     "selectAll": "Összes kijelölése",
     "multiSelect": "Elem hozzáadása a kijelöléshez",
@@ -71,7 +72,7 @@
     "layers": "Rétegek",
     "actions": "Műveletek",
     "language": "Nyelv",
-    "liveCollaboration": "Élő együttműködés",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplikálás",
     "untitled": "Névtelen",
     "name": "Név",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Vászon törlése",
     "exportJSON": "Exportálás fájlba",
-    "exportImage": "Mentés képként",
-    "export": "Exportálás",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Exportálás PNG-be",
     "exportToSvg": "Exportálás SVG-be",
     "copyToClipboard": "Vágólapra másolás",
@@ -144,7 +145,7 @@
     "scale": "Nagyítás",
     "save": "Mentés az aktuális fájlba",
     "saveAs": "Mentés másként",
-    "load": "Betöltés",
+    "load": "",
     "getShareableLink": "Megosztható link létrehozása",
     "close": "Bezárás",
     "selectLanguage": "Nyelv kiválasztása",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "Nem sikerült importálni a jelenetet a megadott URL-ről. Rossz formátumú, vagy nem tartalmaz érvényes Excalidraw JSON-adatokat.",
     "resetLibrary": "Ezzel törlöd a könyvtárát. biztos vagy ebben?",
     "removeItemsFromsLibrary": "{{count}} elemet törölsz a könyvtárból?",
-    "invalidEncryptionKey": "A titkosítási kulcsnak 22 karakterből kell állnia. Az élő együttműködés le van tiltva."
+    "invalidEncryptionKey": "A titkosítási kulcsnak 22 karakterből kell állnia. Az élő együttműködés le van tiltva.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "Nem támogatott fájltípus.",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "Nem sikerült beszúrni az SVG-képet. Az SVG szintaktika érvénytelennek tűnik.",
     "invalidSVGString": "Érvénytelen SVG.",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Kijelölés",
@@ -214,9 +218,10 @@
     "text": "Szöveg",
     "library": "Könyvtár",
     "lock": "Rajzolás után az aktív eszközt tartsa kijelölve",
-    "penMode": "Akadályozza meg a kicsinyítést, és csak tollról fogadja el a szabadkézi bevitelt",
+    "penMode": "",
     "link": "Hivatkozás hozzáadása/frissítése a kiválasztott alakzathoz",
-    "eraser": ""
+    "eraser": "",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Vászon műveletek",
@@ -224,7 +229,7 @@
     "shapes": "Alakzatok"
   },
   "hints": {
-    "canvasPanning": "A vászon mozgatásához tartsd lenyomva az egér görgőjét vagy a szóköz billentyűt húzás közben",
+    "canvasPanning": "",
     "linearElement": "Kattintással görbe, az eger húzásával pedig egyenes nyilat rajzolhatsz",
     "freeDraw": "Kattints és húzd, majd engedd el, amikor végeztél",
     "text": "Tipp: A kijelölés eszközzel a dupla kattintás új szöveget hoz létre",
@@ -235,14 +240,15 @@
     "resize": "A SHIFT billentyű lenyomva tartásával az átméretezés megtartja az arányokat,\naz ALT lenyomva tartásával pedig a középpont egy helyben marad",
     "resizeImage": "A SHIFT billentyű lenyomva tartásával szabadon átméretezheted,\ntartsd lenyomva az ALT billentyűt a középről való átméretezéshez",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
-    "lineEditor_info": "Kattints duplán, vagy nyomj entert a pontok szerkesztéséhez",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Nyomd meg a Törlés gombot a pont(ok) eltávolításához,\nA Ctrl/Cmd+D a többszörözéshez, vagy húzással mozgathatja",
     "lineEditor_nothingSelected": "Válaszd ki a szerkeszteni kívánt pontot (több kijelöléséhez tartsd lenyomva a SHIFT billentyűt),\nvagy Alt, és kattintson az új pontok hozzáadásához",
     "placeImage": "Kattints a kép elhelyezéséhez, vagy kattints és méretezd manuálisan",
     "publishLibrary": "Tedd közzé saját könyvtáradat",
     "bindTextToElement": "Nyomd meg az Entert szöveg hozzáadáshoz",
     "deepBoxSelect": "Tartsd lenyomva a Ctrl/Cmd billentyűt a mély kijelöléshez és a húzás megakadályozásához",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Előnézet nem jeleníthető meg",
@@ -310,7 +316,9 @@
     "view": "Nézet",
     "zoomToFit": "Az összes elem látótérbe hozása",
     "zoomToSelection": "Kijelölésre nagyítás",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Rajzvászon alaphelyzetbe"
@@ -391,7 +399,8 @@
     "fileSaved": "Fájl elmentve.",
     "fileSavedToFilename": "Mentve mint {filename}",
     "canvas": "rajzvászon",
-    "selection": "kijelölés"
+    "selection": "kijelölés",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Fehér",
@@ -441,9 +450,16 @@
     "d9480f": "Narancs 9"
   },
   "welcomeScreen": {
-    "data": "Minden adatodat kizárólag a böngésződben tároljuk.",
-    "menuHints": "Export, beállítások, nyelvek, ...",
-    "toolbarHints": "Válassz egy eszközt & kezdj alkotni!",
-    "helpHints": "Gyorsbillentyűk & súgó"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

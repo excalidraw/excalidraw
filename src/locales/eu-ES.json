@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Itsatsi",
+    "pasteAsPlaintext": "Itsatsi testu arrunt gisa",
     "pasteCharts": "Itsatsi grafikoak",
     "selectAll": "Hautatu dena",
     "multiSelect": "Gehitu elementua hautapenera",
@@ -71,7 +72,7 @@
     "layers": "Geruzak",
     "actions": "Ekintzak",
     "language": "Hizkuntza",
-    "liveCollaboration": "Zuzeneko elkarlana",
+    "liveCollaboration": "Zuzeneko elkarlana...",
     "duplicateSelection": "Bikoiztu",
     "untitled": "Izengabea",
     "name": "Izena",
@@ -115,8 +116,8 @@
       "label": "Esteka"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Editatu lerroa",
+      "exit": "Irten lerro-editoretik"
     },
     "elementLock": {
       "lock": "Blokeatu",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Garbitu oihala",
     "exportJSON": "Esportatu fitxategira",
-    "exportImage": "Gorde irudi gisa",
-    "export": "Esportatu",
+    "exportImage": "Esportatu irudia...",
+    "export": "Gorde hemen...",
     "exportToPng": "Esportatu PNG gisa",
     "exportToSvg": "Esportatu SVG gisa",
     "copyToClipboard": "Kopiatu arbelera",
@@ -144,7 +145,7 @@
     "scale": "Eskala",
     "save": "Gorde uneko fitxategian",
     "saveAs": "Gorde honela",
-    "load": "Kargatu",
+    "load": "Ireki",
     "getShareableLink": "Lortu partekatzeko esteka",
     "close": "Itxi",
     "selectLanguage": "Hautatu hizkuntza",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "Ezin izan da eszena inportatu emandako URLtik. Gaizki eratuta dago edo ez du baliozko Excalidraw JSON daturik.",
     "resetLibrary": "Honek zure liburutegia garbituko du. Ziur zaude?",
     "removeItemsFromsLibrary": "Liburutegitik {{count}} elementu ezabatu?",
-    "invalidEncryptionKey": "Enkriptazio-gakoak 22 karaktere izan behar ditu. Zuzeneko lankidetza desgaituta dago."
+    "invalidEncryptionKey": "Enkriptazio-gakoak 22 karaktere izan behar ditu. Zuzeneko lankidetza desgaituta dago.",
+    "collabOfflineWarning": "Ez dago Interneteko konexiorik.\nZure aldaketak ez dira gordeko!"
   },
   "errors": {
     "unsupportedFileType": "Onartu gabeko fitxategi mota.",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "Ezin izan da SVG irudia txertatu. SVG markak baliogabea dirudi.",
     "invalidSVGString": "SVG baliogabea.",
     "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro.",
-    "importLibraryError": "Ezin izan da liburutegia kargatu"
+    "importLibraryError": "Ezin izan da liburutegia kargatu",
+    "collabSaveFailed": "Ezin izan da backend datu-basean gorde. Arazoak jarraitzen badu, zure fitxategia lokalean gorde beharko zenuke zure lana ez duzula galtzen ziurtatzeko.",
+    "collabSaveFailed_sizeExceeded": "Ezin izan da backend datu-basean gorde, ohiala handiegia dela dirudi. Fitxategia lokalean gorde beharko zenuke zure lana galtzen ez duzula ziurtatzeko."
   },
   "toolBar": {
     "selection": "Hautapena",
@@ -214,9 +218,10 @@
     "text": "Testua",
     "library": "Liburutegia",
     "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
-    "penMode": "Saihestu txikiagotzea eta onartu marrazte libreko idazketa solik arkatza bidez",
+    "penMode": "Luma modua - ukipena saihestu",
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
-    "eraser": "Borragoma"
+    "eraser": "Borragoma",
+    "hand": "Eskua (panoratze tresna)"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -224,7 +229,7 @@
     "shapes": "Formak"
   },
   "hints": {
-    "canvasPanning": "Oihala mugitzeko, sakatu saguaren gurpila edo zuriune-barra arrastatzean",
+    "canvasPanning": "Oihala mugitzeko, eutsi saguaren gurpila edo zuriune-barra arrastatzean, edo erabili esku tresna",
     "linearElement": "Egin klik hainbat puntu hasteko, arrastatu lerro bakarrerako",
     "freeDraw": "Egin klik eta arrastatu, askatu amaitutakoan",
     "text": "Aholkua: testua gehitu dezakezu edozein lekutan klik bikoitza eginez hautapen tresnarekin",
@@ -235,14 +240,15 @@
     "resize": "Proportzioak mantendu ditzakezu SHIFT sakatuta tamaina aldatzen duzun bitartean.\nsakatu ALT erditik tamaina aldatzeko",
     "resizeImage": "Tamaina libreki alda dezakezu SHIFT sakatuta,\nsakatu ALT erditik tamaina aldatzeko",
     "rotate": "Angeluak mantendu ditzakezu SHIFT sakatuta biratzen duzun bitartean",
-    "lineEditor_info": "Egin klik bikoitza edo sakatu Sartu puntuak editatzeko",
+    "lineEditor_info": "Eutsi sakatuta Ctrl edo Cmd eta egin klik bikoitza edo sakatu Ctrl edo Cmd + Sartu puntuak editatzeko",
     "lineEditor_pointSelected": "Sakatu Ezabatu puntuak kentzeko,\nKtrl+D bikoizteko, edo arrastatu mugitzeko",
     "lineEditor_nothingSelected": "Hautatu editatzeko puntu bat (SHIFT sakatuta anitz hautatzeko),\nedo eduki Alt sakatuta eta egin klik puntu berriak gehitzeko",
     "placeImage": "Egin klik irudia kokatzeko, edo egin klik eta arrastatu bere tamaina eskuz ezartzeko",
     "publishLibrary": "Argitaratu zure liburutegia",
     "bindTextToElement": "Sakatu Sartu testua gehitzeko",
     "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko",
-    "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko"
+    "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko",
+    "firefox_clipboard_write": "Ezaugarri hau \"dom.events.asyncClipboard.clipboardItem\" marka \"true\" gisa ezarrita gaitu daiteke. Firefox-en arakatzailearen banderak aldatzeko, bisitatu \"about:config\" orrialdera."
   },
   "canvasError": {
     "cannotShowPreview": "Ezin da oihala aurreikusi",
@@ -310,7 +316,9 @@
     "view": "Bistaratu",
     "zoomToFit": "Egin zoom elementu guztiak ikusteko",
     "zoomToSelection": "Zooma hautapenera",
-    "toggleElementLock": "Blokeatu/desbloketatu hautapena"
+    "toggleElementLock": "Blokeatu/desbloketatu hautapena",
+    "movePageUpDown": "Mugitu orria gora/behera",
+    "movePageLeftRight": "Mugitu orria ezker/eskuin"
   },
   "clearCanvasDialog": {
     "title": "Garbitu oihala"
@@ -391,7 +399,8 @@
     "fileSaved": "Fitxategia gorde da.",
     "fileSavedToFilename": "{filename}-n gorde da",
     "canvas": "oihala",
-    "selection": "hautapena"
+    "selection": "hautapena",
+    "pasteAsSingleElement": "Erabili {{shortcut}} elementu bakar gisa itsasteko,\nedo itsatsi lehendik dagoen testu-editore batean"
   },
   "colors": {
     "ffffff": "Zuria",
@@ -439,5 +448,18 @@
     "5c940d": "Lima 9",
     "e67700": "Horia 9",
     "d9480f": "Laranja 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "Zure datu guztiak lokalean gordetzen dira zure nabigatzailean.",
+      "center_heading_plus": "Horren ordez Excalidraw+-era joan nahi al zenuen?",
+      "menuHint": "Esportatu, hobespenak, hizkuntzak..."
+    },
+    "defaults": {
+      "menuHint": "Esportatu, hobespenak eta gehiago...",
+      "center_heading": "Diagramak. Egina. Sinplea.",
+      "toolbarHint": "Aukeratu tresna bat eta hasi marrazten!",
+      "helpHint": "Lasterbideak eta laguntza"
+    }
   }
 }

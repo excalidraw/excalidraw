@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Incolla",
+    "pasteAsPlaintext": "Incolla come testo normale",
     "pasteCharts": "Incolla grafici",
     "selectAll": "Seleziona tutto",
     "multiSelect": "Aggiungi elemento alla selezione",
@@ -71,7 +72,7 @@
     "layers": "Livelli",
     "actions": "Azioni",
     "language": "Lingua",
-    "liveCollaboration": "Collaborazione live",
+    "liveCollaboration": "Collaborazione dal vivo...",
     "duplicateSelection": "Duplica",
     "untitled": "Senza titolo",
     "name": "Nome",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Svuota la tela",
     "exportJSON": "Esporta su file",
-    "exportImage": "Salva come immagine",
-    "export": "Esporta",
+    "exportImage": "Esporta immagine...",
+    "export": "Salva in...",
     "exportToPng": "Esporta come PNG",
     "exportToSvg": "Esporta come SVG",
     "copyToClipboard": "Copia negli appunti",
@@ -144,7 +145,7 @@
     "scale": "Scala",
     "save": "Salva sul file corrente",
     "saveAs": "Salva con nome",
-    "load": "Carica",
+    "load": "Apri",
     "getShareableLink": "Ottieni link condivisibile",
     "close": "Chiudi",
     "selectLanguage": "Seleziona lingua",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "Impossibile importare la scena dall'URL fornito. Potrebbe essere malformato o non contenere dati JSON Excalidraw validi.",
     "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?",
     "removeItemsFromsLibrary": "Eliminare {{count}} elementi dalla libreria?",
-    "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata."
+    "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata.",
+    "collabOfflineWarning": "Nessuna connessione internet disponibile.\nLe tue modifiche non verranno salvate!"
   },
   "errors": {
     "unsupportedFileType": "Tipo di file non supportato.",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "Impossibile inserire l'immagine SVG. Il markup SVG non sembra corretto.",
     "invalidSVGString": "SVG non valido.",
     "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova.",
-    "importLibraryError": "Impossibile caricare la libreria"
+    "importLibraryError": "Impossibile caricare la libreria",
+    "collabSaveFailed": "Impossibile salvare nel database di backend. Se i problemi persistono, dovresti salvare il tuo file localmente per assicurarti di non perdere il tuo lavoro.",
+    "collabSaveFailed_sizeExceeded": "Impossibile salvare nel database di backend, la tela sembra essere troppo grande. Dovresti salvare il file localmente per assicurarti di non perdere il tuo lavoro."
   },
   "toolBar": {
     "selection": "Selezione",
@@ -214,9 +218,10 @@
     "text": "Testo",
     "library": "Libreria",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato",
-    "penMode": "Impedisci il pinch-zoom e accetta l'input di disegno libero solo dalla penna",
+    "penMode": "Modalità penna - previene il tocco",
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
-    "eraser": "Gomma"
+    "eraser": "Gomma",
+    "hand": "Mano (strumento di panoramica)"
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
@@ -224,7 +229,7 @@
     "shapes": "Forme"
   },
   "hints": {
-    "canvasPanning": "Per spostare la tela, tieni premuta la rotella del mouse o la barra spaziatrice mentre la trascini",
+    "canvasPanning": "Per spostare la tela, tieni premuta la rotellina del mouse o la barra spaziatrice mentre trascini oppure usa lo strumento mano",
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
@@ -235,14 +240,15 @@
     "resize": "Per vincolare le proporzioni, tieni premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tieni premuto ALT",
     "resizeImage": "Puoi ridimensionare liberamente tenendo premuto SHIFT,\ntieni premuto ALT per ridimensionare dal centro",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
-    "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
+    "lineEditor_info": "Tieni premuto Ctrl o Cmd e doppio clic oppure premi Ctrl o Cmd + Invio per modificare i punti",
     "lineEditor_pointSelected": "Premi Elimina per rimuovere il punto(i),\nCtrlOCmd+D per duplicare o trascinare per spostare",
     "lineEditor_nothingSelected": "Seleziona un punto da modificare (tieni premuto MAIUSC per selezionare più punti),\noppure tieni premuto Alt e fai clic per aggiungere nuovi punti",
     "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente",
     "publishLibrary": "Pubblica la tua libreria",
     "bindTextToElement": "Premi invio per aggiungere il testo",
     "deepBoxSelect": "Tieni premuto CtrlOCmd per selezionare in profondità e per impedire il trascinamento",
-    "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione"
+    "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione",
+    "firefox_clipboard_write": "Questa funzione può essere abilitata impostando il flag \"dom.events.asyncClipboard.clipboardItem\" su \"true\". Per modificare i flag del browser in Firefox, visitare la pagina \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
@@ -310,7 +316,9 @@
     "view": "Vista",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
     "zoomToSelection": "Zoom alla selezione",
-    "toggleElementLock": "Blocca/sblocca selezione"
+    "toggleElementLock": "Blocca/sblocca selezione",
+    "movePageUpDown": "Sposta la pagina su/giù",
+    "movePageLeftRight": "Sposta la pagina a sinistra/destra"
   },
   "clearCanvasDialog": {
     "title": "Svuota la tela"
@@ -391,7 +399,8 @@
     "fileSaved": "File salvato.",
     "fileSavedToFilename": "Salvato in {filename}",
     "canvas": "tela",
-    "selection": "selezione"
+    "selection": "selezione",
+    "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente"
   },
   "colors": {
     "ffffff": "Bianco",
@@ -439,5 +448,18 @@
     "5c940d": "Lime 9",
     "e67700": "Giallo 9",
     "d9480f": "Arancio 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "Tutti i tuoi dati sono salvati localmente nel browser.",
+      "center_heading_plus": "Volevi invece andare su Excalidraw+?",
+      "menuHint": "Esporta, preferenze, lingue, ..."
+    },
+    "defaults": {
+      "menuHint": "Esporta, preferenze, e altro...",
+      "center_heading": "Diagrammi. Fatto. Semplice.",
+      "toolbarHint": "Scegli uno strumento & Inizia a disegnare!",
+      "helpHint": "Scorciatoie & aiuto"
+    }
   }
 }

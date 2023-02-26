@@ -1,11 +1,4 @@
-import {
-  ExcalidrawElement,
-  ExcalidrawTextContainer,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
-
-import { getElementAbsoluteCoords } from "../element";
-import { isTextBindableContainer } from "../element/typeChecks";
+import { NonDeletedExcalidrawElement } from "../element/types";
 
 export const hasBackground = (type: string) =>
   type === "rectangle" ||
@@ -31,7 +24,7 @@ export const hasStrokeStyle = (type: string) =>
   type === "arrow" ||
   type === "line";
 
-export const canChangeSharpness = (type: string) =>
+export const canChangeRoundness = (type: string) =>
   type === "rectangle" ||
   type === "arrow" ||
   type === "line" ||
@@ -72,24 +65,4 @@ export const getElementsAtPosition = (
   return elements.filter(
     (element) => !element.isDeleted && isAtPositionFn(element),
   );
-};
-
-export const getTextBindableContainerAtPosition = (
-  elements: readonly ExcalidrawElement[],
-  x: number,
-  y: number,
-): ExcalidrawTextContainer | null => {
-  let hitElement = null;
-  // We need to to hit testing from front (end of the array) to back (beginning of the array)
-  for (let index = elements.length - 1; index >= 0; --index) {
-    if (elements[index].isDeleted) {
-      continue;
-    }
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
-    if (x1 < x && x < x2 && y1 < y && y < y2) {
-      hitElement = elements[index];
-      break;
-    }
-  }
-  return isTextBindableContainer(hitElement, false) ? hitElement : null;
 };

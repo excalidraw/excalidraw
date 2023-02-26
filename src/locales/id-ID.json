@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Tempel",
+    "pasteAsPlaintext": "Tempel sebagai teks biasa",
     "pasteCharts": "Tempel diagram",
     "selectAll": "Pilih semua",
     "multiSelect": "Tambahkan elemen ke pilihan",
@@ -71,7 +72,7 @@
     "layers": "Lapisan",
     "actions": "Aksi",
     "language": "Bahasa",
-    "liveCollaboration": "Kolaborasi langsung",
+    "liveCollaboration": "Kolaborasi langsung...",
     "duplicateSelection": "Duplikat",
     "untitled": "Tanpa judul",
     "name": "Nama",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
     "exportJSON": "Ekspor ke file",
-    "exportImage": "Simpan gambar",
-    "export": "Ekspor",
+    "exportImage": "Ekspor gambar...",
+    "export": "Simpan ke...",
     "exportToPng": "Ekspor ke PNG",
     "exportToSvg": "Ekspor ke SVG",
     "copyToClipboard": "Salin ke Papan Klip",
@@ -144,7 +145,7 @@
     "scale": "Skala",
     "save": "Simpan ke file sekarang",
     "saveAs": "Simpan sebagai",
-    "load": "Muat",
+    "load": "Buka",
     "getShareableLink": "Buat Tautan yang Bisa Dibagian",
     "close": "Tutup",
     "selectLanguage": "Pilih bahasa",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "Tidak dapat impor pemandangan dari URL. Kemungkinan URL itu rusak atau tidak berisi data JSON Excalidraw yang valid.",
     "resetLibrary": "Ini akan menghapus pustaka Anda. Anda yakin?",
     "removeItemsFromsLibrary": "Hapus {{count}} item dari pustaka?",
-    "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan."
+    "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "Tipe file tidak didukung.",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "Tidak dapat menyisipkan gambar SVG. Markup SVG sepertinya tidak valid.",
     "invalidSVGString": "SVG tidak valid.",
     "cannotResolveCollabServer": "Tidak dapat terhubung ke server kolab. Muat ulang laman dan coba lagi.",
-    "importLibraryError": "Tidak dapat memuat pustaka"
+    "importLibraryError": "Tidak dapat memuat pustaka",
+    "collabSaveFailed": "Tidak dapat menyimpan ke dalam basis data server. Jika masih berlanjut, Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
+    "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang."
   },
   "toolBar": {
     "selection": "Pilihan",
@@ -214,9 +218,10 @@
     "text": "Teks",
     "library": "Pustaka",
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar",
-    "penMode": "Cegah jepit perbesar dan terima hanya input freedraw dari pena",
+    "penMode": "Mode pena - mencegah sentuhan",
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
-    "eraser": "Penghapus"
+    "eraser": "Penghapus",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -224,7 +229,7 @@
     "shapes": "Bentuk"
   },
   "hints": {
-    "canvasPanning": "Untuk memindahkan kanvas, tekan roda mouse atau spasi ketika menarik",
+    "canvasPanning": "",
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
@@ -235,14 +240,15 @@
     "resize": "Anda dapat menjaga proposi dengan menekan SHIFT sambil mengubah ukuran,\ntekan AlT untuk mengubah ukuran dari tengah",
     "resizeImage": "Anda dapat mengubah secara bebas dengan menekan SHIFT,\nTekan ALT untuk mengubah dari tengah",
     "rotate": "Anda dapat menjaga sudut dengan menahan SHIFT sambil memutar",
-    "lineEditor_info": "Klik ganda atau tekan Enter untuk mengedit titik",
+    "lineEditor_info": "Tekan Ctrl/Cmd dan Dobel-klik atau tekan Ctrl/Cmd +Enter untuk mengedit poin",
     "lineEditor_pointSelected": "Tekan Delete untuk menghapus titik, Ctrl/Cmd + D untuk menduplikasi, atau seret untuk memindahkan",
     "lineEditor_nothingSelected": "Pilih titik untuk mengedit (tekan SHIFT untuk pilih banyak), atau tekan Alt dan klik untuk tambahkan titik baru",
     "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
     "publishLibrary": "Terbitkan pustaka Anda",
     "bindTextToElement": "Tekan enter untuk tambahkan teks",
     "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran",
-    "eraserRevert": "Tahan Alt untuk mengembalikan elemen yang ditandai untuk dihapus"
+    "eraserRevert": "Tahan Alt untuk mengembalikan elemen yang ditandai untuk dihapus",
+    "firefox_clipboard_write": "Fitur ini dapat diaktifkan melalui pengaturan flag \"dom.events.asyncClipboard.clipboardItem\" ke \"true\". Untuk mengganti flag di Firefox, pergi ke laman \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
@@ -310,7 +316,9 @@
     "view": "Tampilan",
     "zoomToFit": "Perbesar agar sesuai dengan semua elemen",
     "zoomToSelection": "Perbesar ke seleksi",
-    "toggleElementLock": "Kunci/lepas seleksi"
+    "toggleElementLock": "Kunci/lepas seleksi",
+    "movePageUpDown": "Pindah halaman keatas/kebawah",
+    "movePageLeftRight": "Pindah halaman kebawah/keatas"
   },
   "clearCanvasDialog": {
     "title": "Hapus kanvas"
@@ -391,7 +399,8 @@
     "fileSaved": "File tersimpan.",
     "fileSavedToFilename": "Disimpan ke {filename}",
     "canvas": "kanvas",
-    "selection": "pilihan"
+    "selection": "pilihan",
+    "pasteAsSingleElement": "Gunakan {{shortcut}} untuk menempelkan sebagai satu elemen,\natau tempelkan ke teks editor yang ada"
   },
   "colors": {
     "ffffff": "Putih",
@@ -439,5 +448,18 @@
     "5c940d": "Lime 9",
     "e67700": "Kuning 9",
     "d9480f": "Jingga 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "Semua data Anda disimpan secara lokal di peramban Anda.",
+      "center_heading_plus": "Apa Anda ingin berpindah ke Excalidraw+?",
+      "menuHint": "Ekspor, preferensi, bahasa, ..."
+    },
+    "defaults": {
+      "menuHint": "Ekspor, preferensi, dan selebihnya...",
+      "center_heading": "Diagram. Menjadi. Mudah.",
+      "toolbarHint": "Pilih alat & mulai menggambar!",
+      "helpHint": "Pintasan & bantuan"
+    }
   }
 }

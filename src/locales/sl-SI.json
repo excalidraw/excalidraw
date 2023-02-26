@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Prilepi",
+    "pasteAsPlaintext": "Prilepi kot navadno besedilo",
     "pasteCharts": "Prilepi grafikone",
     "selectAll": "Izberi vse",
     "multiSelect": "Dodaj element v izbor",
@@ -71,7 +72,7 @@
     "layers": "Plasti",
     "actions": "Dejanja",
     "language": "Jezik",
-    "liveCollaboration": "Sodelovanje v živo",
+    "liveCollaboration": "Sodelovanje v živo...",
     "duplicateSelection": "Podvoji",
     "untitled": "Neimenovana",
     "name": "Ime",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "Ponastavi platno",
     "exportJSON": "Izvozi v datoteko",
-    "exportImage": "Shrani kot sliko",
-    "export": "Izvoz",
+    "exportImage": "Izvozi sliko...",
+    "export": "Shrani v...",
     "exportToPng": "Izvozi v PNG",
     "exportToSvg": "Izvozi v SVG",
     "copyToClipboard": "Kopiraj v odložišče",
@@ -144,7 +145,7 @@
     "scale": "Povečava",
     "save": "Shrani v trenutno datoteko",
     "saveAs": "Shrani kot",
-    "load": "Naloži",
+    "load": "Odpri",
     "getShareableLink": "Pridobi povezavo za deljenje",
     "close": "Zapri",
     "selectLanguage": "Izberi jezik",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "S priloženega URL-ja ni bilo mogoče uvoziti scene. Je napačno oblikovana ali pa ne vsebuje veljavnih podatkov Excalidraw JSON.",
     "resetLibrary": "To bo počistilo vašo knjižnico. Ali ste prepričani?",
     "removeItemsFromsLibrary": "Izbriši elemente ({{count}}) iz knjižnice?",
-    "invalidEncryptionKey": "Ključ za šifriranje mora vsebovati 22 znakov. Sodelovanje v živo je onemogočeno."
+    "invalidEncryptionKey": "Ključ za šifriranje mora vsebovati 22 znakov. Sodelovanje v živo je onemogočeno.",
+    "collabOfflineWarning": "Internetna povezava ni na voljo.\nVaše spremembe ne bodo shranjene!"
   },
   "errors": {
     "unsupportedFileType": "Nepodprt tip datoteke.",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "Vstavljanje slike SVG ni uspelo. Oznake SVG so videti neveljavne.",
     "invalidSVGString": "Neveljaven SVG.",
     "cannotResolveCollabServer": "Povezave s strežnikom za sodelovanje ni bilo mogoče vzpostaviti. Ponovno naložite stran in poskusite znova.",
-    "importLibraryError": "Nalaganje knjižnice ni uspelo"
+    "importLibraryError": "Nalaganje knjižnice ni uspelo",
+    "collabSaveFailed": "Ni bilo mogoče shraniti v zaledno bazo podatkov. Če se težave nadaljujejo, shranite datoteko lokalno, da ne boste izgubili svojega dela.",
+    "collabSaveFailed_sizeExceeded": "Ni bilo mogoče shraniti v zaledno bazo podatkov, zdi se, da je platno preveliko. Datoteko shranite lokalno, da ne izgubite svojega dela."
   },
   "toolBar": {
     "selection": "Izbor",
@@ -214,9 +218,10 @@
     "text": "Besedilo",
     "library": "Knjižnica",
     "lock": "Ohrani izbrano orodje aktivno po risanju",
-    "penMode": "Prepreči povečavo s prsti in dovoli samo risanje s peresom",
+    "penMode": "Način peresa - prepreči dotik",
     "link": "Dodaj/posodobi povezavo za izbrano obliko",
-    "eraser": "Radirka"
+    "eraser": "Radirka",
+    "hand": "Roka (orodje za premikanje)"
   },
   "headings": {
     "canvasActions": "Dejanja za platno",
@@ -224,7 +229,7 @@
     "shapes": "Oblike"
   },
   "hints": {
-    "canvasPanning": "Za premik platna med vlečenjem držite kolesce miške ali preslednico",
+    "canvasPanning": "Za premikanje platna med vlečenjem držite kolesce miške ali preslednico ali uporabite orodje roka",
     "linearElement": "Kliknite za začetek več točk, povlecite za posamezno črto",
     "freeDraw": "Kliknite in povlecite, spustite, ko končate",
     "text": "Namig: besedilo lahko dodate tudi z dvoklikom kjer koli z orodjem za izbiro",
@@ -235,14 +240,15 @@
     "resize": "Razmerja lahko omejite tako, da držite tipko Shift med spreminjanjem velikosti. Držite tipko Alt, da spremenite velikost od središča",
     "resizeImage": "Velikost lahko prosto spreminjate tako, da držite tipko Shift. Držite tipko Alt, da spremenite velikost od središča",
     "rotate": "Kote lahko omejite tako, da med vrtenjem držite tipko Shift",
-    "lineEditor_info": "Dvokliknite ali pritisnite tipko Enter, da uredite točke",
+    "lineEditor_info": "Držite CtrlOrCmd in dvokliknite ali pritisnite CtrlOrCmd + Enter za urejanje točk",
     "lineEditor_pointSelected": "Pritisnite tipko Delete, da odstranite točko(e), CtrlOrCmd+D za podvojitev ali povlecite za premikanje",
     "lineEditor_nothingSelected": "Izberite točko za urejanje (pridržite tipko Shift za izbiro več točk), ali držite tipko Alt in kliknite za dodajanje novih točk",
     "placeImage": "Kliknite, da postavite sliko, ali kliknite in povlecite, da ročno nastavite njeno velikost",
     "publishLibrary": "Objavi svojo knjižnico",
     "bindTextToElement": "Pritisnite tipko Enter za dodajanje besedila",
     "deepBoxSelect": "Držite tipko CtrlOrCmd za globoko izbiro in preprečitev vlečenja",
-    "eraserRevert": "Pridržite tipko Alt, da razveljavite elemente, označene za brisanje"
+    "eraserRevert": "Pridržite tipko Alt, da razveljavite elemente, označene za brisanje",
+    "firefox_clipboard_write": "To funkcijo lahko verjetno omogočite z nastavitvijo zastavice \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Če želite spremeniti zastavice brskalnika v Firefoxu, obiščite stran \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Predogleda ni bilo mogoče prikazati",
@@ -310,7 +316,9 @@
     "view": "Pogled",
     "zoomToFit": "Približaj na vse elemente",
     "zoomToSelection": "Približaj na izbor",
-    "toggleElementLock": "Zakleni/odkleni izbor"
+    "toggleElementLock": "Zakleni/odkleni izbor",
+    "movePageUpDown": "Premakni stran gor/dol",
+    "movePageLeftRight": "Premakni stran levo/desno"
   },
   "clearCanvasDialog": {
     "title": "Počisti platno"
@@ -391,7 +399,8 @@
     "fileSaved": "Datoteka shranjena.",
     "fileSavedToFilename": "Shranjeno v {filename}",
     "canvas": "platno",
-    "selection": "izbor"
+    "selection": "izbor",
+    "pasteAsSingleElement": "Uporabite {{shortcut}}, da prilepite kot en element,\n ali prilepite v obstoječ urejevalnik besedil"
   },
   "colors": {
     "ffffff": "Bela",
@@ -439,5 +448,18 @@
     "5c940d": "Limeta 9",
     "e67700": "Rumena 9",
     "d9480f": "Oranžna 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "Vsi vaši podatki so shranjeni lokalno v vašem brskalniku.",
+      "center_heading_plus": "Ste namesto tega želeli odpreti Excalidraw+?",
+      "menuHint": "Izvoz, nastavitve, jeziki, ..."
+    },
+    "defaults": {
+      "menuHint": "Izvoz, nastavitve in več ...",
+      "center_heading": "Diagrami. Enostavno.",
+      "toolbarHint": "Izberi orodje in začni z risanjem!",
+      "helpHint": "Bližnjice in pomoč"
+    }
   }
 }

@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "הדבק",
+    "pasteAsPlaintext": "",
     "pasteCharts": "הדבק גרפים",
     "selectAll": "בחר הכל",
     "multiSelect": "הוסף אובייקט לבחירה",
@@ -71,7 +72,7 @@
     "layers": "שכבות",
     "actions": "פעולות",
     "language": "שפה",
-    "liveCollaboration": "התחל שיתוף חי",
+    "liveCollaboration": "",
     "duplicateSelection": "שכפל",
     "untitled": "ללא כותרת",
     "name": "שם",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "אפס את הלוח",
     "exportJSON": "ייצא לקובץ",
-    "exportImage": "שמירה כתמונה",
-    "export": "ייצא",
+    "exportImage": "ייצוא התמונה...",
+    "export": "שמור ל...",
     "exportToPng": "יצא ל PNG",
     "exportToSvg": "יצא ל SVG",
     "copyToClipboard": "העתק ללוח",
@@ -144,7 +145,7 @@
     "scale": "קנה מידה",
     "save": "שמירת קובץ נוכחי",
     "saveAs": "שמירה בשם",
-    "load": "טען",
+    "load": "פתח",
     "getShareableLink": "קבל קישור לשיתוף",
     "close": "סגור",
     "selectLanguage": "בחר שפה",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "ייבוא המידע מן סצינה מכתובת האינטרנט נכשלה. המידע בנוי באופן משובש או שהוא אינו קובץ JSON תקין של Excalidraw.",
     "resetLibrary": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
     "removeItemsFromsLibrary": "מחיקת {{count}} פריטים(ים) מתוך הספריה?",
-    "invalidEncryptionKey": "מפתח ההצפנה חייב להיות בן 22 תוים. השיתוף החי מבוטל."
+    "invalidEncryptionKey": "מפתח ההצפנה חייב להיות בן 22 תוים. השיתוף החי מבוטל.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "סוג הקובץ אינו נתמך.",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "לא ניתן היה להטמיע את תמונת ה-SVG. קידוד ה-SVG אינו תקני.",
     "invalidSVGString": "SVG בלתי תקני.",
     "cannotResolveCollabServer": "",
-    "importLibraryError": "לא ניתן היה לטעון את הספריה"
+    "importLibraryError": "לא ניתן היה לטעון את הספריה",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "בחירה",
@@ -216,7 +220,8 @@
     "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור",
     "penMode": "",
     "link": "הוספה/עדכון של קישור עבור הצורה הנבחרת",
-    "eraser": "מחק"
+    "eraser": "מחק",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "פעולות הלוח",
@@ -224,7 +229,7 @@
     "shapes": "צורות"
   },
   "hints": {
-    "canvasPanning": "כדי להזיז את הקנבס לחצו על גלגל העכבר או על מקש הרווח תוך כדי גרירה",
+    "canvasPanning": "",
     "linearElement": "הקלק בשביל לבחור נקודות מרובות, גרור בשביל קו בודד",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
@@ -235,14 +240,15 @@
     "resize": "ניתן להגביל פרופורציות על ידי לחיצה על SHIFT תוך כדי שינוי גודל,\nהחזק ALT בשביל לשנות גודל ביחס למרכז",
     "resizeImage": "",
     "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב",
-    "lineEditor_info": "לחץ לחיצה כפולה או אנטר לעריכת הנקודות",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "פירסום ספריה אישית",
     "bindTextToElement": "יש להקיש Enter כדי להוסיף טקסט",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "לא הצלחנו להציג את התצוגה המקדימה",
@@ -310,7 +316,9 @@
     "view": "תצוגה",
     "zoomToFit": "גלילה להצגת כל האלמנטים במסך",
     "zoomToSelection": "התמקד בבחירה",
-    "toggleElementLock": "נעילה/ביטול הנעילה של הרכיבים הנבחרים"
+    "toggleElementLock": "נעילה/ביטול הנעילה של הרכיבים הנבחרים",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "ניקוי הקנבס"
@@ -391,7 +399,8 @@
     "fileSaved": "קובץ נשמר.",
     "fileSavedToFilename": "נשמר לקובץ {filename}",
     "canvas": "משטח ציור",
-    "selection": "בחירה"
+    "selection": "בחירה",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "לבן",
@@ -439,5 +448,18 @@
     "5c940d": "ליים 9",
     "e67700": "ירוק 9",
     "d9480f": "כתום 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "चिपकाएँ",
+    "pasteAsPlaintext": "सादे पाठ के रूप में चिपकाएं",
     "pasteCharts": "चार्ट चिपकाएँ",
     "selectAll": "सभी चुनें",
     "multiSelect": "आकार को चयन में जोड़ें",
@@ -52,7 +53,7 @@
     "large": "बड़ा",
     "veryLarge": "बहुत बड़ा",
     "solid": "दृढ़",
-    "hachure": "हाचुरे",
+    "hachure": "हैशूर",
     "crossHatch": "क्रॉस हैच",
     "thin": "पतला",
     "bold": "मोटा",
@@ -71,7 +72,7 @@
     "layers": "परतें",
     "actions": "कार्रवाई",
     "language": "भाषा",
-    "liveCollaboration": "जीवंत सहयोग",
+    "liveCollaboration": "जीवंत सहयोग...",
     "duplicateSelection": "डुप्लिकेट",
     "untitled": "अशीर्षित",
     "name": "नाम",
@@ -135,8 +136,8 @@
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
     "exportJSON": "",
-    "exportImage": "",
-    "export": "निर्यात",
+    "exportImage": "प्रतिमा निर्यात करे...",
+    "export": "यंहा सुरक्षित करे...",
     "exportToPng": "पीएनजी के रूप में निर्यात करे",
     "exportToSvg": "Svg के रूप में निर्यात करे",
     "copyToClipboard": "क्लिपबोर्ड पर प्रतिलिपि बनाएँ",
@@ -144,7 +145,7 @@
     "scale": "पैमाना",
     "save": "",
     "saveAs": "सेव करे इस तरह",
-    "load": "लोड करें",
+    "load": "खोलें",
     "getShareableLink": "साझा करने योग्य लिंक प्राप्त करें",
     "close": "बंद करें",
     "selectLanguage": "भाषा चुनें",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "दिये गये युआरेल से दृश्य आयात नहीं किया जा सका. यह या तो अनुचित है, या इसमें उचित Excalidraw JSON डेटा नहीं है।",
     "resetLibrary": "यह पूरा संग्रह रिक्त करेगा. क्या आपको यक़ीन हैं?",
     "removeItemsFromsLibrary": "{{count}} वस्तु(यें) संग्रह से हटायें?",
-    "invalidEncryptionKey": "कूटलेखन कुंजी 22 अक्षरों की होनी चाहिये, इसलिये जीवंत सहयोग अक्षम हैं"
+    "invalidEncryptionKey": "कूटलेखन कुंजी 22 अक्षरों की होनी चाहिये, इसलिये जीवंत सहयोग अक्षम हैं",
+    "collabOfflineWarning": "कोई इंटरनेट कनेक्शन उपलब्ध नहीं है।\nआपके बदलाव सहेजे नहीं जाएंगे!"
   },
   "errors": {
     "unsupportedFileType": "असमर्थित फाइल प्रकार",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "एसवीजी छवि सम्मिलित नहीं कर सके, एसवीजी रचना अनुचित हैं",
     "invalidSVGString": "अनुचित SVG",
     "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे.",
-    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका"
+    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका",
+    "collabSaveFailed": "किसी कारण वश अंदरूनी डेटाबेस में सहेजा नहीं जा सका। यदि समस्या बनी रहती है, तो किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।",
+    "collabSaveFailed_sizeExceeded": "लगता है कि पृष्ठ तल काफ़ी बड़ा है, इस्कारण अंदरूनी डेटाबेस में सहेजा नहीं जा सका। किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।"
   },
   "toolBar": {
     "selection": "चयन",
@@ -214,9 +218,10 @@
     "text": "पाठ",
     "library": "लाइब्रेरी",
     "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें",
-    "penMode": "",
+    "penMode": "पेन का मोड - स्पर्श टाले",
     "link": "",
-    "eraser": "रबड़"
+    "eraser": "रबड़",
+    "hand": "हाथ ( खिसकाने का औज़ार)"
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",
@@ -224,7 +229,7 @@
     "shapes": "आकृतियाँ"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "कैनवास को सरकाने के लिए, ड्रैग करते समय माउस व्हील को पकड़े रखे या स्पेसबार को दबाए रखे, अथवा हाथ वाले औज़ार का उपयोग करें",
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, सिंगल लाइन के लिए खींचें",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोड़ो",
     "text": "आप चयन टूल से कहीं भी डबल-क्लिक करके टेक्स्ट जोड़ सकते हैं",
@@ -235,14 +240,15 @@
     "resize": "आकार बदलते समय आप SHIFT को पकड़ कर अनुपात में कमी कर सकते हैं,\nकेंद्र से आकार बदलने के लिए ALT दबाए रखें",
     "resizeImage": "",
     "rotate": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को विवश कर सकते हैं",
-    "lineEditor_info": "बिंदुओं को संपादित करने के लिए Enter पर डबल-क्लिक करें या दबाएँ",
+    "lineEditor_info": "बिंदुओं को सम्पादित करने के लिए CtrlOrCmd को दबायें रखते हुये डबल क्लिक करे, अथवा CtrlOrCmd + Enter साथ दबाये",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए"
+    "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए",
+    "firefox_clipboard_write": "\"dom.events.asyncClipboard.clipboardItem\" फ़्लैग को \"true\" पर सेट करके इस सुविधा को संभवतः सक्षम किया जा सकता है। Firefox में ब्राउज़र फ़्लैग बदलने के लिए, \"about:config\" पृष्ठ पर जाएँ।"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -310,7 +316,9 @@
     "view": "दृश्य",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
     "zoomToSelection": "चयन तक ज़ूम करे",
-    "toggleElementLock": "ताले के अंदर/बाहर चुनाव"
+    "toggleElementLock": "ताले के अंदर/बाहर चुनाव",
+    "movePageUpDown": "पृष्ठ ऊपर/नीचे करे",
+    "movePageLeftRight": "पृष्ठ बायी/दायी तरफ करे"
   },
   "clearCanvasDialog": {
     "title": ""
@@ -391,7 +399,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": "एक अवयव के रूप में चिपकाने के लिए {{shortcut}} का उपयोग करें,\nया किसी मौजूदा पाठ संपादक में चिपकायें"
   },
   "colors": {
     "ffffff": "सफेद",
@@ -439,5 +448,18 @@
     "5c940d": "",
     "e67700": "पीला",
     "d9480f": "नारंगी"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "आपका सर्व डेटा ब्राउज़र के भीतर स्थानिक जगह पे सुरक्षित किया गया.",
+      "center_heading_plus": "बजाय आपको Excalidraw+ पर जाना है?",
+      "menuHint": "निर्यात, पसंद, भाषायें, ..."
+    },
+    "defaults": {
+      "menuHint": "निर्यात, पसंद, और भी...",
+      "center_heading": "चित्रांकन। बनाया गया। सरल।",
+      "toolbarHint": "एक औजार चुने और चित्रकारी प्रारंभ करे!",
+      "helpHint": "शॉर्ट्कट और सहाय्य"
+    }
   }
 }

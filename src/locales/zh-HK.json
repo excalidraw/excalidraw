@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "貼上",
+    "pasteAsPlaintext": "",
     "pasteCharts": "貼上圖表",
     "selectAll": "全選",
     "multiSelect": "多重選取",
@@ -71,7 +72,7 @@
     "layers": "圖層",
     "actions": "動作",
     "language": "🌏 語言",
-    "liveCollaboration": "多人連線",
+    "liveCollaboration": "",
     "duplicateSelection": "製作副本",
     "untitled": "未命名的作品",
     "name": "",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "",
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "",
     "invalidSVGString": "",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "",
@@ -216,7 +220,8 @@
     "lock": "",
     "penMode": "",
     "link": "",
-    "eraser": ""
+    "eraser": "",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "畫布動作",
@@ -242,7 +247,8 @@
     "publishLibrary": "",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
@@ -310,7 +316,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": "",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -391,7 +399,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "畫布",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
@@ -439,5 +448,18 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

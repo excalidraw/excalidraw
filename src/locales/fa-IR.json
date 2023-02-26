@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "جای گذاری",
+    "pasteAsPlaintext": "",
     "pasteCharts": "قراردادن نمودارها",
     "selectAll": "انتخاب همه",
     "multiSelect": "یک ایتم به انتخاب شده ها اضافه کنید.",
@@ -71,7 +72,7 @@
     "layers": "لایه ها",
     "actions": "عملیات",
     "language": "زبان",
-    "liveCollaboration": "همکاری زنده",
+    "liveCollaboration": "همکاری آنلاین...",
     "duplicateSelection": "تکرار",
     "untitled": "بدون عنوان",
     "name": "نام",
@@ -115,8 +116,8 @@
       "label": "لینک"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "ویرایش لینک",
+      "exit": "خروج از ویرایشگر"
     },
     "elementLock": {
       "lock": "قفل",
@@ -125,18 +126,18 @@
       "unlockAll": "باز کردن قفل همه"
     },
     "statusPublished": "منتشر شده",
-    "sidebarLock": ""
+    "sidebarLock": "باز نگه داشتن سایدبار"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "آیتمی به اینجا اضافه نشده...",
+    "hint_emptyLibrary": "یک آیتم روی بوم را برای اضافه شده به اینجا انتخاب کنید، یا یک کتابخانه از مخزن عمومی در بخش پایین را نصب کنید.",
+    "hint_emptyPrivateLibrary": "یک آیتم روی بوم را برای اضافه شدن به اینجا انتخاب کنید."
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
     "exportJSON": "خروجی در فایل",
-    "exportImage": "ذخیره به عنوان عکس",
-    "export": "تبدیل",
+    "exportImage": "خروجی گرفتن از تصویر...",
+    "export": "ذخیره در...",
     "exportToPng": "تبدیل به PNG",
     "exportToSvg": "تبدیل به SVG",
     "copyToClipboard": "کپی در حافظه موقت",
@@ -144,7 +145,7 @@
     "scale": "مقیاس",
     "save": "ذخیره در همین فایل",
     "saveAs": "ذخیره با نام",
-    "load": "بارگذاری",
+    "load": "باز کردن",
     "getShareableLink": "دریافت لینک قابل اشتراک",
     "close": "بستن",
     "selectLanguage": "انتخاب زبان",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "بوم نقاشی از آدرس ارائه شده وارد نشد. این یا نادرست است، یا حاوی داده Excalidraw JSON معتبر نیست.",
     "resetLibrary": "ین کار کل صفحه را پاک میکند. آیا مطمئنید?",
     "removeItemsFromsLibrary": "حذف {{count}} آیتم(ها) از کتابخانه?",
-    "invalidEncryptionKey": "کلید رمزگذاری باید 22 کاراکتر باشد. همکاری زنده غیرفعال است."
+    "invalidEncryptionKey": "کلید رمزگذاری باید 22 کاراکتر باشد. همکاری زنده غیرفعال است.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "نوع فایل پشتیبانی نشده.",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "تصویر SVG وارد نشد. نشانه گذاری SVG نامعتبر به نظر می رسد.",
     "invalidSVGString": "SVG نادرست.",
     "cannotResolveCollabServer": "به سرور collab متصل نشد. لطفا صفحه را مجددا بارگذاری کنید و دوباره تلاش کنید.",
-    "importLibraryError": "داده‌ها بارگذاری نشدند"
+    "importLibraryError": "داده‌ها بارگذاری نشدند",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "گزینش",
@@ -214,9 +218,10 @@
     "text": "متن",
     "library": "کتابخانه",
     "lock": "ابزار انتخاب شده را بعد از کشیدن نگه دار",
-    "penMode": "از زوم کوچک کردن جلوگیری کنید و ورودی آزاد را فقط از قلم بپذیرید",
+    "penMode": "حالت قلم - جلوگیری از تماس",
     "link": "افزودن/به‌روزرسانی پیوند برای شکل انتخابی",
-    "eraser": "پاک کن"
+    "eraser": "پاک کن",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",
@@ -224,7 +229,7 @@
     "shapes": "شکل‌ها"
   },
   "hints": {
-    "canvasPanning": "برای حرکت دادن بوم، چرخ ماوس یا فاصله را در حین کشیدن نگه دارید",
+    "canvasPanning": "",
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
@@ -235,14 +240,15 @@
     "resize": "می توانید با نگه داشتن SHIFT در هنگام تغییر اندازه، نسبت ها را محدود کنید،ALT را برای تغییر اندازه از مرکز نگه دارید",
     "resizeImage": "با نگه داشتن SHIFT می توانید آزادانه اندازه را تغییر دهید،\nبرای تغییر اندازه از مرکز، ALT را نگه دارید",
     "rotate": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
-    "lineEditor_info": "دوبار کلیک کنید یا Enter را فشار دهید تا نقاط را ویرایش کنید",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "برای حذف نقطه Delete برای کپی زدن Ctrl یا Cmd+D را بزنید و یا برای جابجایی بکشید",
     "lineEditor_nothingSelected": "یک نقطه را برای ویرایش انتخاب کنید (SHIFT را برای انتخاب چندگانه نگه دارید)،\nیا Alt را نگه دارید و برای افزودن نقاط جدید کلیک کنید",
     "placeImage": "برای قرار دادن تصویر کلیک کنید، یا کلیک کنید و بکشید تا اندازه آن به صورت دستی تنظیم شود",
     "publishLibrary": "کتابخانه خود را منتشر کنید",
     "bindTextToElement": "برای افزودن اینتر را بزنید",
     "deepBoxSelect": "CtrlOrCmd را برای انتخاب عمیق و جلوگیری از کشیدن نگه دارید",
-    "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند"
+    "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -310,7 +316,9 @@
     "view": "مشاهده",
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
     "zoomToSelection": "بزرگنمایی قسمت انتخاب شده",
-    "toggleElementLock": "قفل/بازکردن انتخاب شده ها"
+    "toggleElementLock": "قفل/بازکردن انتخاب شده ها",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "پاک کردن بوم"
@@ -391,7 +399,8 @@
     "fileSaved": "فایل ذخیره شد.",
     "fileSavedToFilename": "ذخیره در {filename}",
     "canvas": "بوم",
-    "selection": "انتخاب"
+    "selection": "انتخاب",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "سفید",
@@ -439,5 +448,18 @@
     "5c940d": "لیمویی 9",
     "e67700": "زرد 9",
     "d9480f": "نارنجی 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

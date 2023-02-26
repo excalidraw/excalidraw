@@ -10,16 +10,20 @@ import { API } from "../helpers/api";
 import { getDefaultAppState } from "../../appState";
 import { ImportedDataState } from "../../data/types";
 import { NormalizedZoomValue } from "../../types";
-import { FONT_FAMILY } from "../../constants";
+import { FONT_FAMILY, ROUNDNESS } from "../../constants";
 import { newElementWith } from "../../element/mutateElement";
 
-const mockSizeHelper = jest.spyOn(sizeHelpers, "isInvisiblySmallElement");
-
-beforeEach(() => {
-  mockSizeHelper.mockReset();
-});
-
 describe("restoreElements", () => {
+  const mockSizeHelper = jest.spyOn(sizeHelpers, "isInvisiblySmallElement");
+
+  beforeEach(() => {
+    mockSizeHelper.mockReset();
+  });
+
+  afterAll(() => {
+    mockSizeHelper.mockRestore();
+  });
+
   it("should return empty array when element is null", () => {
     expect(restore.restoreElements(null, null)).toStrictEqual([]);
   });
@@ -255,7 +259,7 @@ describe("restoreElements", () => {
         width: 100,
         height: 200,
         groupIds: ["1", "2", "3"],
-        strokeSharpness: "round",
+        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
       });
 
       elements.push(element);
@@ -524,6 +528,239 @@ describe("restore", () => {
         id: ellipse.id,
         version: ellipse.version,
         versionNonce: ellipse.versionNonce,
+      }),
+    ]);
+  });
+});
+
+describe("repairing bindings", () => {
+  it("should repair container boundElements when repair is true", () => {
+    const container = API.createElement({
+      type: "rectangle",
+      boundElements: [],
+    });
+    const boundElement = API.createElement({
+      type: "text",
+      containerId: container.id,
+    });
+
+    expect(container.boundElements).toEqual([]);
+
+    let restoredElements = restore.restoreElements(
+      [container, boundElement],
+      null,
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: container.id,
+        boundElements: [],
+      }),
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: container.id,
+      }),
+    ]);
+
+    restoredElements = restore.restoreElements(
+      [container, boundElement],
+      null,
+      { repairBindings: true },
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: container.id,
+        boundElements: [{ type: boundElement.type, id: boundElement.id }],
+      }),
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: container.id,
+      }),
+    ]);
+  });
+
+  it("should repair containerId of boundElements when repair is true", () => {
+    const boundElement = API.createElement({
+      type: "text",
+      containerId: null,
+    });
+    const container = API.createElement({
+      type: "rectangle",
+      boundElements: [{ type: boundElement.type, id: boundElement.id }],
+    });
+
+    let restoredElements = restore.restoreElements(
+      [container, boundElement],
+      null,
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: container.id,
+        boundElements: [{ type: boundElement.type, id: boundElement.id }],
+      }),
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: null,
+      }),
+    ]);
+
+    restoredElements = restore.restoreElements(
+      [container, boundElement],
+      null,
+      { repairBindings: true },
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: container.id,
+        boundElements: [{ type: boundElement.type, id: boundElement.id }],
+      }),
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: container.id,
+      }),
+    ]);
+  });
+
+  it("should ignore bound element if deleted", () => {
+    const container = API.createElement({
+      type: "rectangle",
+      boundElements: [],
+    });
+    const boundElement = API.createElement({
+      type: "text",
+      containerId: container.id,
+      isDeleted: true,
+    });
+
+    expect(container.boundElements).toEqual([]);
+
+    const restoredElements = restore.restoreElements(
+      [container, boundElement],
+      null,
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: container.id,
+        boundElements: [],
+      }),
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: container.id,
+      }),
+    ]);
+  });
+
+  it("should remove bindings of deleted elements from boundElements when repair is true", () => {
+    const container = API.createElement({
+      type: "rectangle",
+      boundElements: [],
+    });
+    const boundElement = API.createElement({
+      type: "text",
+      containerId: container.id,
+      isDeleted: true,
+    });
+    const invisibleBoundElement = API.createElement({
+      type: "text",
+      containerId: container.id,
+      width: 0,
+      height: 0,
+    });
+
+    const obsoleteBinding = { type: boundElement.type, id: boundElement.id };
+    const invisibleBinding = {
+      type: invisibleBoundElement.type,
+      id: invisibleBoundElement.id,
+    };
+    expect(container.boundElements).toEqual([]);
+
+    const nonExistentBinding = { type: "text", id: "non-existent" };
+    // @ts-ignore
+    container.boundElements = [
+      obsoleteBinding,
+      invisibleBinding,
+      nonExistentBinding,
+    ];
+
+    let restoredElements = restore.restoreElements(
+      [container, invisibleBoundElement, boundElement],
+      null,
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: container.id,
+        boundElements: [obsoleteBinding, invisibleBinding, nonExistentBinding],
+      }),
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: container.id,
+      }),
+    ]);
+
+    restoredElements = restore.restoreElements(
+      [container, invisibleBoundElement, boundElement],
+      null,
+      { repairBindings: true },
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: container.id,
+        boundElements: [],
+      }),
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: container.id,
+      }),
+    ]);
+  });
+
+  it("should remove containerId if container not exists when repair is true", () => {
+    const boundElement = API.createElement({
+      type: "text",
+      containerId: "non-existent",
+    });
+    const boundElementDeleted = API.createElement({
+      type: "text",
+      containerId: "non-existent",
+      isDeleted: true,
+    });
+
+    let restoredElements = restore.restoreElements(
+      [boundElement, boundElementDeleted],
+      null,
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: "non-existent",
+      }),
+      expect.objectContaining({
+        id: boundElementDeleted.id,
+        containerId: "non-existent",
+      }),
+    ]);
+
+    restoredElements = restore.restoreElements(
+      [boundElement, boundElementDeleted],
+      null,
+      { repairBindings: true },
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: boundElement.id,
+        containerId: null,
+      }),
+      expect.objectContaining({
+        id: boundElementDeleted.id,
+        containerId: null,
       }),
     ]);
   });

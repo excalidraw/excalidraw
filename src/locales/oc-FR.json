@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Pegar",
+    "pasteAsPlaintext": "Pegar en tèxt brut",
     "pasteCharts": "Pegar los grafics",
     "selectAll": "Tot seleccionar",
     "multiSelect": "Apondre un element a la seleccion",
@@ -37,8 +38,8 @@
     "arrowhead_bar": "Barra",
     "arrowhead_dot": "Ponch",
     "arrowhead_triangle": "Triangle",
-    "fontSize": "Talha poliça",
-    "fontFamily": "Familha de poliça",
+    "fontSize": "Talha polissa",
+    "fontFamily": "Familha de polissa",
     "onlySelected": "Seleccion sonque",
     "withBackground": "Rèireplan",
     "exportEmbedScene": "Scèna embarcada",
@@ -71,7 +72,7 @@
     "layers": "Calques",
     "actions": "Accions",
     "language": "Lenga",
-    "liveCollaboration": "Collaboracion en dirèct",
+    "liveCollaboration": "Collaboracion en dirèct...",
     "duplicateSelection": "Duplicar",
     "untitled": "Sens títol",
     "name": "Nom",
@@ -105,8 +106,8 @@
     "toggleTheme": "Alternar tèma",
     "personalLib": "Bibliotèca personala",
     "excalidrawLib": "Bibliotèca Excalidraw",
-    "decreaseFontSize": "Reduire talha poliça",
-    "increaseFontSize": "Aumentar talha poliça",
+    "decreaseFontSize": "Reduire talha polissa",
+    "increaseFontSize": "Aumentar talha polissa",
     "unbindText": "Dessociar lo tèxte",
     "bindText": "Ligar lo tèxt al contenidor",
     "link": {
@@ -129,14 +130,14 @@
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Seleccionatz un element d’apondre aquí, o installatz una bibliotèca del depaus public, çai-jos.",
+    "hint_emptyPrivateLibrary": "Seleccionatz un element d’apondre aquí pel canabàs."
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
     "exportJSON": "Exportar en fichièr",
-    "exportImage": "Salvar coma imatge",
-    "export": "Exportar",
+    "exportImage": "Exportar imatges...",
+    "export": "Enregistrar dins...",
     "exportToPng": "Exportar en PNG",
     "exportToSvg": "Exportar en SVG",
     "copyToClipboard": "Copiar al quichapapièrs",
@@ -144,7 +145,7 @@
     "scale": "Escala",
     "save": "Salvar al fichièr actual",
     "saveAs": "Enregistrar jos",
-    "load": "Cargar",
+    "load": "Dobrir",
     "getShareableLink": "Obténer lo ligam de partatge",
     "close": "Tampar",
     "selectLanguage": "Causir una lenga",
@@ -191,7 +192,8 @@
     "invalidSceneUrl": "Importacion impossibla de la scèna a partir de l’URL provesida. Es siá mal formatada o siá conten pas cap de donada JSON Excalidraw valida.",
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. O volètz vertadièrament ?",
     "removeItemsFromsLibrary": "Suprimir {{count}} element(s) de la bibliotèca ?",
-    "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada."
+    "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada.",
+    "collabOfflineWarning": "Cap de connexion pas disponibla.\nVòstras modificacions seràn pas salvadas !"
   },
   "errors": {
     "unsupportedFileType": "Tipe de fichièr pas pres en carga.",
@@ -200,7 +202,9 @@
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
     "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar.",
-    "importLibraryError": "Impossible de cargar la bibliotèca"
+    "importLibraryError": "Impossible de cargar la bibliotèca",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": ""
   },
   "toolBar": {
     "selection": "Seleccion",
@@ -214,9 +218,10 @@
     "text": "Tèxt",
     "library": "Bibliotèca",
     "lock": "Mantenir activa l’aisina aprèp dessenhar",
-    "penMode": "Empachar l’agradiment tactil e acceptar la picada liura solament amb un estilò",
+    "penMode": "Mòde estilo - empachar lo contact",
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
-    "eraser": "Goma"
+    "eraser": "Goma",
+    "hand": "Man (aisina de desplaçament de la vista)"
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -224,7 +229,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Per desplaçar los canabasses, tenètz la rodeta de la mirga o la barra d’espaci pendent lo desplaçament",
+    "canvasPanning": "",
     "linearElement": "Clicatz per començar mantun punt, lisatz per una sola linha",
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
@@ -235,14 +240,15 @@
     "resize": "Podètz servar las proporcions en mantenent la tòca MAJ pendent lo redimensionament,\nmantenètz la tòca ALT per redimensionar a partir del centre",
     "resizeImage": "Podètz retalhar liurament en quichant CTRL,\nquichatz ALT per retalhar a partir del centre",
     "rotate": "Podètz restrénger los angles en mantenent MAJ pendent la rotacion",
-    "lineEditor_info": "Doble-clicatz o quichatz Entrada per modificar los punts",
+    "lineEditor_info": "Tenètz quichat Ctrl o Cmd e doble clic o quichatz Ctrl o Cmd + Entrada per modificar los ponches",
     "lineEditor_pointSelected": "Quichar Suprimir per tirar lo(s) punt(s),\nCtrlOCmd+D per duplicar, o lisatz per desplaçar",
     "lineEditor_nothingSelected": "Seleccionar un punt d’editar (manténer Maj. per ne seleccionar mantun),\no manténer Alt e clicar per n’apondre de novèls",
     "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament",
     "publishLibrary": "Publicar vòstra pròpria bibliotèca",
     "bindTextToElement": "Quichatz Entrada per apondre de tèxte",
     "deepBoxSelect": "Gardar CtrlOCmd per una seleccion gropada e empachar lo desplaçament",
-    "eraserRevert": "Tenètz quichat Alt per anullar los elements marcats per supression"
+    "eraserRevert": "Tenètz quichat Alt per anullar los elements marcats per supression",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
@@ -310,7 +316,9 @@
     "view": "Vista",
     "zoomToFit": "Zoomar per veire totes los elements",
     "zoomToSelection": "Zoomar la seleccion",
-    "toggleElementLock": "Verrolhar/Desverrolhar la seleccion"
+    "toggleElementLock": "Verrolhar/Desverrolhar la seleccion",
+    "movePageUpDown": "Desplaçar la pagina ennaut/enbàs",
+    "movePageLeftRight": "Desplaçar la pagina a esquèrra/drecha"
   },
   "clearCanvasDialog": {
     "title": "Escafar canabàs"
@@ -353,7 +361,7 @@
     },
     "noteItems": "Cada element de bibliotèca deu aver un nom pròpri per èsser filtrable. Los elements de bibliotèca seguentas seràn incluses :",
     "atleastOneLibItem": "Volgatz seleccionar almens un element de bibliotèca per començar",
-    "republishWarning": ""
+    "republishWarning": "Nòta : d’unes elements seleccionats son marcats ja coma publicats/enviats. Deuriatz sonque tornar enviar los elements pendent l’actualizacion d’una bibliotèca existenta o un mandadís."
   },
   "publishSuccessDialog": {
     "title": "Bibliotèca somesa",
@@ -391,7 +399,8 @@
     "fileSaved": "Fichièr enregistrat.",
     "fileSavedToFilename": "Enregistrat jos {filename}",
     "canvas": "canabàs",
-    "selection": "seleccion"
+    "selection": "seleccion",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Blanc",
@@ -439,5 +448,18 @@
     "5c940d": "Verd citron 9",
     "e67700": "Jaune 9",
     "d9480f": "Irange 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "Totas las donadas son enregistradas dins vòstre navegador.",
+      "center_heading_plus": "Voliatz puslèu utilizar Excalidraw+ a la plaça ?",
+      "menuHint": "Exportar, preferéncias, lengas, ..."
+    },
+    "defaults": {
+      "menuHint": "Exportar, preferéncias, e mai...",
+      "center_heading": "Diagram. Tot. Simplament.",
+      "toolbarHint": "Prenètz un esplech e començatz de dessenhar !",
+      "helpHint": "Acorchis e ajuda"
+    }
   }
 }
