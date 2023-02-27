@@ -21,6 +21,7 @@ import {
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import {
+  getLinearShapeWith0Roughness,
   getCurvePathOps,
   getElementPointsCoords,
   getMinMaxXYFromCurvePathOps,
@@ -1436,10 +1437,10 @@ export class LinearElementEditor {
       x2 = maxX + element.x;
       y2 = maxY + element.y;
     } else {
-      const shape = getShapeForElement(element)!;
+      const shape = getLinearShapeWith0Roughness(element);
 
       // first element is always the curve
-      const ops = getCurvePathOps(shape[0]);
+      const ops = getCurvePathOps(shape);
 
       const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
       x1 = minX + element.x;

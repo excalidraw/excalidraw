@@ -24,6 +24,11 @@ import { rescalePoints } from "../points";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 
+const linearShapeCache = new WeakMap<
+  ExcalidrawLinearElement,
+  Drawable | null
+>();
+
 // x and y position of top left corner, x and y position of bottom right corner
 export type Bounds = readonly [number, number, number, number];
 type MaybeQuadraticSolution = [number | null, number | null] | false;
@@ -371,11 +376,18 @@ export const getArrowheadPoints = (
   return [x2, y2, x3, y3, x4, y4];
 };
 
-const generateLinearElementShape = (
+export const getLinearShapeWith0Roughness = (
   element: ExcalidrawLinearElement,
 ): Drawable => {
+  const cachedShape = linearShapeCache.get(element);
+
+  if (cachedShape) {
+    return cachedShape;
+  }
+
   const generator = rough.generator();
   const options = generateRoughOptions(element);
+  options.roughness = 0;
 
   const method = (() => {
     if (element.roundness) {
@@ -387,7 +399,9 @@ const generateLinearElementShape = (
     return "linearPath";
   })();
 
-  return generator[method](element.points as Mutable<Point>[], options);
+  const shape = generator[method](element.points as Mutable<Point>[], options);
+  linearShapeCache.set(element, shape);
+  return shape;
 };
 
 const getLinearElementRotatedBounds = (
@@ -424,8 +438,7 @@ const getLinearElementRotatedBounds = (
   }
 
   // first element is always the curve
-  const cachedShape = getShapeForElement(element)?.[0];
-  const shape = cachedShape ?? generateLinearElementShape(element);
+  const shape = getLinearShapeWith0Roughness(element);
   const ops = getCurvePathOps(shape);
   const transformXY = (x: number, y: number) =>
     rotate(element.x + x, element.y + y, cx, cy, element.angle);
@@ -560,15 +573,14 @@ export const getResizedElementAbsoluteCoords = (
     bounds = getBoundsFromPoints(points);
   } else {
     // Line
-    const gen = rough.generator();
-    const curve = !element.roundness
-      ? gen.linearPath(
-          points as [number, number][],
-          generateRoughOptions(element),
-        )
-      : gen.curve(points as [number, number][], generateRoughOptions(element));
-
-    const ops = getCurvePathOps(curve);
+    // const gen = rough.generator();
+    // const options = generateRoughOptions(element);
+    // options.roughness = 0;
+    // const curve = !element.roundness
+    //   ? gen.linearPath(points as [number, number][], options)
+    //   : gen.curve(points as [number, number][], options);
+    const shape = getLinearShapeWith0Roughness(element);
+    const ops = getCurvePathOps(shape);
     bounds = getMinMaxXYFromCurvePathOps(ops);
   }
 
@@ -586,15 +598,15 @@ export const getElementPointsCoords = (
   points: readonly (readonly [number, number])[],
 ): [number, number, number, number] => {
   // This might be computationally heavey
-  const gen = rough.generator();
-  const curve =
-    element.roundness == null
-      ? gen.linearPath(
-          points as [number, number][],
-          generateRoughOptions(element),
-        )
-      : gen.curve(points as [number, number][], generateRoughOptions(element));
-  const ops = getCurvePathOps(curve);
+  // const gen = rough.generator();
+  // const options = generateRoughOptions(element);
+  // options.roughness = 0;
+  // const curve =
+  //   element.roundness == null
+  //     ? gen.linearPath(points as [number, number][], options)
+  //     : gen.curve(points as [number, number][], options);
+  const shape = getLinearShapeWith0Roughness(element);
+  const ops = getCurvePathOps(shape);
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
   return [
     minX + element.x,
