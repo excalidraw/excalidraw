@@ -443,13 +443,25 @@ const math2Svg = (
             : mathJax.amHtml.convert(text, userOptions),
         )
       : text;
+    let mmlError = false;
+    if (isMathJaxLoaded) {
+      const errDiv = document.createElement("div");
+      errDiv.innerHTML = mmlString;
+      mmlError =
+        errDiv.children[0].children.length > 0 &&
+        errDiv.children[0].children[0].nodeName === "merror";
+    }
     // For rendering
     const htmlString = isMathJaxLoaded
-      ? mathJax.adaptor.outerHTML(mathJax.mmlSvg.convert(mmlString))
+      ? mmlError
+        ? errorSvg
+        : mathJax.adaptor.outerHTML(mathJax.mmlSvg.convert(mmlString))
       : text;
     // For accessibility
     const ariaString = isMathJaxLoaded
-      ? useSRE
+      ? mmlError
+        ? errorAria
+        : useSRE
         ? mathJax.mmlSre.toSpeech(mmlString)
         : text
       : mmlString;
