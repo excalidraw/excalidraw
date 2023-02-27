@@ -6,6 +6,7 @@ import {
   getApproxLineHeight,
   getBoundTextElement,
   getContainerElement,
+  getMaxContainerWidth,
   getTextWidth,
   measureText,
   wrapText,
@@ -46,7 +47,6 @@ import {
 import { mathSubtypeIcon } from "./icon";
 import { getMathSubtypeRecord } from "./types";
 import { SubtypeButton } from "../../../../components/Subtypes";
-import { getMaxContainerWidth } from "../../../../element/newElement";
 
 const mathSubtype = getMathSubtypeRecord().subtype;
 const FONT_FAMILY_MATH = FONT_FAMILY.Helvetica;
@@ -607,7 +607,10 @@ const measureMarkup = (
       const grandchild = child as Text;
       const text = grandchild.textContent ?? "";
       if (text !== "") {
-        const textMetrics = measureText(text, font, maxWidth);
+        const constrainedText = maxWidth
+          ? wrapText(text, font, maxWidth)
+          : text;
+        const textMetrics = measureText(constrainedText, font);
         childMetrics.push({
           x: nextX,
           y: baseline,
@@ -834,25 +837,16 @@ const cleanMathElementUpdate = function (updates) {
   return oldUpdates;
 } as SubtypeMethods["clean"];
 
-const measureMathElement = function (element, next, maxWidth) {
+const measureMathElement = function (element, next) {
   ensureMathElement(element);
   const isMathJaxLoaded = mathJaxLoaded;
   const fontSize = next?.fontSize ?? element.fontSize;
   const text = next?.text ?? element.text;
   const customData = next?.customData ?? element.customData;
   const mathProps = getMathProps.ensureMathProps(customData);
-  const noMaxWidth = mathProps.mathOnly;
-  const cWidth = noMaxWidth ? undefined : maxWidth;
-  const metrics = getImageMetrics(
-    text,
-    fontSize,
-    mathProps,
-    isMathJaxLoaded,
-    cWidth,
-  );
-  const { height, baseline } = metrics;
-  const width = noMaxWidth ? maxWidth ?? metrics.width : metrics.width;
-  return { width, height, baseline };
+  const metrics = getImageMetrics(text, fontSize, mathProps, isMathJaxLoaded);
+  const { width, height } = metrics;
+  return { width, height };
 } as SubtypeMethods["measureText"];
 
 const renderMathElement = function (element, context, renderCb) {

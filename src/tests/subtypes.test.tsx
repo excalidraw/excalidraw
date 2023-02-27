@@ -33,7 +33,7 @@ import { actionChangeRoundness } from "../actions/actionProperties";
 const MW = 200;
 const TWIDTH = 200;
 const THEIGHT = 20;
-const TBASELINE = 15;
+const TBASELINE = 0;
 const FONTSIZE = 20;
 const DBFONTSIZE = 40;
 const TRFONTSIZE = 60;
@@ -155,11 +155,7 @@ const prepareTest1Subtype = function (
   return { actions, methods };
 } as SubtypePrepFn;
 
-const measureTest2: SubtypeMethods["measureText"] = function (
-  element,
-  next,
-  maxWidth,
-) {
+const measureTest2: SubtypeMethods["measureText"] = function (element, next) {
   const text = next?.text ?? element.text;
   const customData = next?.customData ?? {};
   const fontSize = customData.triple
@@ -167,10 +163,10 @@ const measureTest2: SubtypeMethods["measureText"] = function (
     : next?.fontSize ?? element.fontSize;
   const fontFamily = element.fontFamily;
   const fontString = getFontString({ fontSize, fontFamily });
-  const metrics = textElementUtils.measureText(text, fontString, maxWidth);
+  const metrics = textElementUtils.measureText(text, fontString);
   const width = Math.max(metrics.width - 10, 0);
   const height = Math.max(metrics.height - 5, 0);
-  return { width, height, baseline: metrics.baseline + 1 };
+  return { width, height, baseline: 1 };
 };
 
 const wrapTest2: SubtypeMethods["wrapText"] = function (
@@ -450,12 +446,6 @@ describe("subtypes", () => {
           height: THEIGHT - 5,
           baseline: TBASELINE + 1,
         });
-        const mMetrics = textElementUtils.measureTextElement(el, {}, MW);
-        expect(mMetrics).toStrictEqual({
-          width: Math.min(TWIDTH, MW) - 10,
-          height: THEIGHT - 5,
-          baseline: TBASELINE + 1,
-        });
         const wrappedText = textElementUtils.wrapTextElement(el, MW);
         expect(wrappedText).toEqual(
           `${testString.split(" ").join("\n")}\nHello world.`,
@@ -482,12 +472,6 @@ describe("subtypes", () => {
           height: 2 * THEIGHT - 5,
           baseline: 2 * TBASELINE + 1,
         });
-        const nextFMW = textElementUtils.measureTextElement(el, next, MW);
-        expect(nextFMW).toStrictEqual({
-          width: Math.min(2 * TWIDTH, MW) - 10,
-          height: 2 * THEIGHT - 5,
-          baseline: 2 * TBASELINE + 1,
-        });
         const nextFWrText = textElementUtils.wrapTextElement(el, MW, next);
         expect(nextFWrText).toEqual(
           `${testString.split(" ").join("\n")}\nHELLO World.`,
@@ -498,12 +482,6 @@ describe("subtypes", () => {
         const nextCD = textElementUtils.measureTextElement(el, next);
         expect(nextCD).toStrictEqual({
           width: 3 * TWIDTH - 10,
-          height: 3 * THEIGHT - 5,
-          baseline: 3 * TBASELINE + 1,
-        });
-        const nextCDMW = textElementUtils.measureTextElement(el, next, MW);
-        expect(nextCDMW).toStrictEqual({
-          width: Math.min(3 * TWIDTH, MW) - 10,
           height: 3 * THEIGHT - 5,
           baseline: 3 * TBASELINE + 1,
         });

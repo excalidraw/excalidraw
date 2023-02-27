@@ -109,6 +109,7 @@ import {
   textWysiwyg,
   transformElements,
   updateTextElement,
+  redrawTextBoundingBox,
 } from "../element";
 import {
   bindOrUnbindLinearElement,
@@ -276,7 +277,6 @@ import {
   getContainerElement,
   getTextBindableContainerAtPosition,
   isValidTextContainer,
-  redrawTextBoundingBox,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
@@ -1688,6 +1688,7 @@ class App extends React.Component<AppProps, AppState> {
       oldIdToDuplicatedId.set(element.id, newElement.id);
       return newElement;
     });
+
     bindTextToShapeAfterDuplication(newElements, elements, oldIdToDuplicatedId);
     const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
@@ -1700,6 +1701,14 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.scene.replaceAllElements(nextElements);
+
+    newElements.forEach((newElement) => {
+      if (isTextElement(newElement) && isBoundToContainer(newElement)) {
+        const container = getContainerElement(newElement);
+        redrawTextBoundingBox(newElement, container);
+      }
+    });
+
     this.history.resumeRecording();
 
     this.setState(
@@ -2727,14 +2736,6 @@ class App extends React.Component<AppProps, AppState> {
           ...this.scene.getElementsIncludingDeleted(),
           element,
         ]);
-      }
-
-      // case: creating new text not centered to parent element → offset Y
-      // so that the text is centered to cursor position
-      if (!parentCenterPosition) {
-        mutateElement(element, {
-          y: element.y - element.baseline / 2,
-        });
       }
     }
 

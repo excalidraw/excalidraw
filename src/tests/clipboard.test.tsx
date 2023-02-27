@@ -182,3 +182,73 @@ describe("paste text as a single element", () => {
     });
   });
 });
+
+describe("Paste bound text container", () => {
+  const container = {
+    type: "ellipse",
+    id: "container-id",
+    x: 554.984375,
+    y: 196.0234375,
+    width: 166,
+    height: 187.01953125,
+    roundness: { type: 2 },
+    boundElements: [{ type: "text", id: "text-id" }],
+  };
+  const textElement = {
+    type: "text",
+    id: "text-id",
+    x: 560.51171875,
+    y: 202.033203125,
+    width: 154,
+    height: 175,
+    fontSize: 20,
+    fontFamily: 1,
+    text: "Excalidraw is a\nvirtual \nopensource \nwhiteboard for \nsketching \nhand-drawn like\ndiagrams",
+    baseline: 168,
+    textAlign: "center",
+    verticalAlign: "middle",
+    containerId: container.id,
+    originalText:
+      "Excalidraw is a virtual opensource whiteboard for sketching hand-drawn like diagrams",
+  };
+
+  it("should fix ellipse bounding box", async () => {
+    const data = JSON.stringify({
+      type: "excalidraw/clipboard",
+      elements: [container, textElement],
+    });
+    setClipboardText(data);
+    pasteWithCtrlCmdShiftV();
+
+    await waitFor(async () => {
+      await sleep(1);
+      expect(h.elements.length).toEqual(2);
+      const container = h.elements[0];
+      expect(container.height).toBe(354);
+      expect(container.width).toBe(166);
+    });
+  });
+
+  it("should fix diamond bounding box", async () => {
+    const data = JSON.stringify({
+      type: "excalidraw/clipboard",
+      elements: [
+        {
+          ...container,
+          type: "diamond",
+        },
+        textElement,
+      ],
+    });
+    setClipboardText(data);
+    pasteWithCtrlCmdShiftV();
+
+    await waitFor(async () => {
+      await sleep(1);
+      expect(h.elements.length).toEqual(2);
+      const container = h.elements[0];
+      expect(container.height).toBe(740);
+      expect(container.width).toBe(166);
+    });
+  });
+});

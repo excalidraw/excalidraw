@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, VERTICAL_ALIGN } from "../constants";
+import { CLASSES, isFirefox, isSafari, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -24,14 +24,17 @@ import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
-  getBoundTextElementOffset,
+  getContainerCoords,
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
-  measureText,
   getTextWidth,
+  measureText,
   normalizeText,
+  redrawTextBoundingBox,
   wrapText,
+  getMaxContainerHeight,
+  getMaxContainerWidth,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -39,7 +42,6 @@ import {
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
-import { getMaxContainerHeight, getMaxContainerWidth } from "./newElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
 
@@ -155,19 +157,23 @@ export const textWysiwyg = ({
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
-      let eCoordY = coordY;
       const container = getContainerElement(updatedTextElement);
+      let maxWidth = updatedTextElement.width;
 
       // Editing metrics
       const eMetrics = measureText(
-        updatedTextElement.originalText,
+        container && updatedTextElement.containerId
+          ? wrapText(
+              updatedTextElement.originalText,
+              getFontString(updatedTextElement),
+              getMaxContainerWidth(container),
+            )
+          : updatedTextElement.originalText,
         getFontString(updatedTextElement),
-        container ? getContainerDims(container).width : null,
       );
 
-      let maxWidth = eMetrics.width;
       let maxHeight = eMetrics.height;
-      const width = eMetrics.width;
+      let textElementWidth = Math.max(updatedTextElement.width, eMetrics.width);
       // Set to element height by default since that's
       // what is going to be used for unbounded text
       let textElementHeight = Math.max(updatedTextElement.height, maxHeight);
@@ -181,7 +187,6 @@ export const textWysiwyg = ({
             );
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
-          eCoordY = coordY;
         }
         const propertiesUpdated = textPropertiesUpdated(
           updatedTextElement,
@@ -198,7 +203,11 @@ export const textWysiwyg = ({
           const font = getFontString(updatedTextElement);
           textElementHeight =
             getApproxLineHeight(font) *
-            updatedTextElement.text.split("\n").length;
+            wrapText(
+              updatedTextElement.originalText,
+              font,
+              getMaxContainerWidth(container),
+            ).split("\n").length;
           textElementHeight = Math.max(
             textElementHeight,
             updatedTextElement.height,
@@ -248,25 +257,21 @@ export const textWysiwyg = ({
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
         else {
+          const containerCoords = getContainerCoords(container);
+
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
             if (!isArrowElement(container)) {
               coordY =
-                container.y + containerDims.height / 2 - textElementHeight / 2;
-              eCoordY = coordY + textElementHeight / 2 - eMetrics.height / 2;
+                containerCoords.y + maxHeight / 2 - textElementHeight / 2;
             }
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-            coordY =
-              container.y +
-              containerDims.height -
-              textElementHeight -
-              getBoundTextElementOffset(updatedTextElement);
-            eCoordY = coordY + textElementHeight - eMetrics.height;
+            coordY = containerCoords.y + (maxHeight - textElementHeight);
           }
         }
       }
-      const [viewportX, viewportY] = getViewportCoords(coordX, eCoordY);
+      const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
       const initialSelectionStart = editable.selectionStart;
       const initialSelectionEnd = editable.selectionEnd;
       const initialLength = editable.value.length;
@@ -308,6 +313,12 @@ export const textWysiwyg = ({
           : 0;
       const { width: w, height: h } = updatedTextElement;
 
+      let transformWidth = updatedTextElement.width;
+      // As firefox, Safari needs little higher dimensions on DOM
+      if (isFirefox || isSafari) {
+        textElementWidth += 0.5;
+        transformWidth += 0.5;
+      }
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
@@ -315,14 +326,14 @@ export const textWysiwyg = ({
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
-        width: `${Math.min(width, maxWidth)}px`,
+        width: `${Math.min(textElementWidth, maxWidth)}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
         transformOrigin: `${w / 2}px ${h / 2}px`,
         transform: getTransform(
           offsetX,
-          updatedTextElement.width,
+          transformWidth,
           updatedTextElement.height,
           getTextElementAngle(updatedTextElement),
           appState,
@@ -415,55 +426,16 @@ export const textWysiwyg = ({
         id,
       ) as ExcalidrawTextElement;
       const font = getFontString(updatedTextElement);
-      // using scrollHeight here since we need to calculate
-      // number of lines so cannot use editable.style.height
-      // as that gets updated below
-      // Rounding here so that the lines calculated is more accurate in all browsers.
-      // The scrollHeight and approxLineHeight differs in diff browsers
-      // eg it gives 1.05 in firefox for handewritten small font due to which
-      // height gets updated as lines > 1 and leads to jumping text for first line in bound container
-      // hence rounding here to avoid that
-      const lines = Math.round(
-        editable.scrollHeight / getApproxLineHeight(font),
-      );
-      // auto increase height only when lines  > 1 so its
-      // measured correctly and vertically aligns for
-      // first line as well as setting height to "auto"
-      // doubles the height as soon as user starts typing
-      if (isBoundToContainer(element) && lines > 1) {
+      if (isBoundToContainer(element)) {
         const container = getContainerElement(element);
-
-        let height = "auto";
-        editable.style.height = "0px";
-        let heightSet = false;
-        if (lines === 2) {
-          const actualLineCount = wrapText(
-            editable.value,
-            font,
-            getMaxContainerWidth(container!),
-          ).split("\n").length;
-          // This is browser behaviour when setting height to "auto"
-          // It sets the height needed for 2 lines even if actual
-          // line count is 1 as mentioned above as well
-          // hence reducing the height by half if actual line count is 1
-          // so single line aligns vertically when deleting
-          if (actualLineCount === 1) {
-            height = `${editable.scrollHeight / 2}px`;
-            editable.style.height = height;
-            heightSet = true;
-          }
-        }
         const wrappedText = wrapText(
           normalizeText(editable.value),
           font,
           getMaxContainerWidth(container!),
         );
-        const width = getTextWidth(wrappedText, font);
+        const { width, height } = measureText(wrappedText, font);
         editable.style.width = `${width}px`;
-
-        if (!heightSet) {
-          editable.style.height = `${editable.scrollHeight}px`;
-        }
+        editable.style.height = `${height}px`;
       }
       onChange(normalizeText(editable.value));
     };
@@ -500,7 +472,9 @@ export const textWysiwyg = ({
           event.code === CODES.BRACKET_RIGHT))
     ) {
       event.preventDefault();
-      if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
+      if (event.isComposing) {
+        return;
+      } else if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
         outdent();
       } else {
         indent();
@@ -649,6 +623,7 @@ export const textWysiwyg = ({
           ),
         });
       }
+      redrawTextBoundingBox(updateElement, container);
     }
 
     onSubmit({
