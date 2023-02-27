@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isFirefox, isSafari, VERTICAL_ALIGN } from "../constants";
+import { CLASSES, isFirefox, isSafari } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -24,7 +24,6 @@ import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
-  getContainerCoords,
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
@@ -35,6 +34,8 @@ import {
   wrapText,
   getMaxContainerHeight,
   getMaxContainerWidth,
+  computeBoundTextPosition,
+  getTextHeight,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -180,15 +181,11 @@ export const textWysiwyg = ({
           editable,
         );
         const containerDims = getContainerDims(container);
-        // using editor.style.height to get the accurate height of text editor
-        const editorHeight = Number(editable.style.height.slice(0, -2));
-        if (editorHeight > 0) {
-          textElementHeight = editorHeight;
-        }
-        if (propertiesUpdated) {
-          // update height of the editor after properties updated
-          textElementHeight = updatedTextElement.height;
-        }
+
+        textElementHeight = getTextHeight(
+          updatedTextElement.text,
+          getFontString(updatedTextElement),
+        );
 
         let originalContainerData;
         if (propertiesUpdated) {
@@ -229,22 +226,12 @@ export const textWysiwyg = ({
             approxLineHeight,
           );
           mutateElement(container, { height: containerDims.height - diff });
-        }
-        // Start pushing text upward until a diff of 30px (padding)
-        // is reached
-        else {
-          const containerCoords = getContainerCoords(container);
-
-          // vertically center align the text
-          if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
-            if (!isArrowElement(container)) {
-              coordY =
-                containerCoords.y + maxHeight / 2 - textElementHeight / 2;
-            }
-          }
-          if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-            coordY = containerCoords.y + (maxHeight - textElementHeight);
-          }
+        } else {
+          const { y } = computeBoundTextPosition(
+            container,
+            updatedTextElement as ExcalidrawTextElementWithContainer,
+          );
+          coordY = y;
         }
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);

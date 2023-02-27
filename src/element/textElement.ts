@@ -226,7 +226,7 @@ export const handleBindTextResize = (
   }
 };
 
-const computeBoundTextPosition = (
+export const computeBoundTextPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
@@ -236,6 +236,12 @@ const computeBoundTextPosition = (
 
   let x;
   let y;
+  if (isArrowElement(container)) {
+    return LinearElementEditor.getBoundTextElementPosition(
+      container,
+      boundTextElement,
+    );
+  }
   if (boundTextElement.verticalAlign === VERTICAL_ALIGN.TOP) {
     y = containerCoords.y;
   } else if (boundTextElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
