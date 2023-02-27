@@ -179,6 +179,10 @@ export const textWysiwyg = ({
       let textElementHeight = Math.max(updatedTextElement.height, maxHeight);
 
       if (container && updatedTextElement.containerId) {
+        textElementHeight = Math.min(
+          getMaxContainerHeight(container),
+          textElementHeight,
+        );
         if (isArrowElement(container)) {
           const boundTextCoords =
             LinearElementEditor.getBoundTextElementPosition(
@@ -187,6 +191,8 @@ export const textWysiwyg = ({
             );
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
+        } else {
+          coordX = Math.max(coordX, getContainerCoords(container).x);
         }
         const propertiesUpdated = textPropertiesUpdated(
           updatedTextElement,
@@ -294,8 +300,14 @@ export const textWysiwyg = ({
       const lineHeight = updatedTextElement.containerId
         ? approxLineHeight
         : eMetrics.height / lines.length;
+      let transformWidth = updatedTextElement.width;
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
+        textElementWidth = Math.min(textElementWidth, maxWidth);
+      } else if (isFirefox || isSafari) {
+        // As firefox, Safari needs little higher dimensions on DOM
+        textElementWidth += 0.5;
+        transformWidth += 0.5;
       }
       // Horizontal offset in case updatedTextElement has a non-WYSIWYG subtype
       const offWidth = container
@@ -312,13 +324,6 @@ export const textWysiwyg = ({
           ? offWidth / 2
           : 0;
       const { width: w, height: h } = updatedTextElement;
-
-      let transformWidth = updatedTextElement.width;
-      // As firefox, Safari needs little higher dimensions on DOM
-      if (isFirefox || isSafari) {
-        textElementWidth += 0.5;
-        transformWidth += 0.5;
-      }
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
