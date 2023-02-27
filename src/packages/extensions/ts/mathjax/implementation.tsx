@@ -250,6 +250,10 @@ const loadMathJax = async () => {
 
       // Finalize loading MathJax
       mathJaxLoaded = true;
+
+      // Clear any caches from before loading MathJax
+      clearCaches();
+
       if (mathJaxLoadedCallback !== undefined) {
         mathJaxLoadedCallback(isMathElement);
       }
@@ -394,6 +398,29 @@ const metricsCache = {} as {
 const svgCache = {} as { [key: string]: string };
 // Cache the rendered MathJax images for renderMathElement()
 const imageCache = {} as { [key: string]: HTMLImageElement };
+// Cache the MathJax-wrapped text strings for wrapMathElement()
+const wrappedMathCache: { [key: string]: string } = {};
+
+const clearCaches = () => {
+  for (const key in mathJaxSvgCacheAM) {
+    delete mathJaxSvgCacheAM[key];
+  }
+  for (const key in mathJaxSvgCacheTex) {
+    delete mathJaxSvgCacheTex[key];
+  }
+  for (const key in metricsCache) {
+    delete metricsCache[key];
+  }
+  for (const key in svgCache) {
+    delete svgCache[key];
+  }
+  for (const key in imageCache) {
+    delete imageCache[key];
+  }
+  for (const key in wrappedMathCache) {
+    delete wrappedMathCache[key];
+  }
+};
 
 const textAsMjxContainer = (
   text: string,
@@ -852,6 +879,10 @@ const cleanMathElementUpdate = function (updates) {
 const measureMathElement = function (element, next) {
   ensureMathElement(element);
   const isMathJaxLoaded = mathJaxLoaded;
+  if (!isMathJaxLoaded && isMathElement(element as ExcalidrawElement)) {
+    const { width, height } = element as ExcalidrawMathElement;
+    return { width, height };
+  }
   const fontSize = next?.fontSize ?? element.fontSize;
   const text = next?.text ?? element.text;
   const customData = next?.customData ?? element.customData;
@@ -1134,8 +1165,6 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   node.appendChild(tempSvg);
   root.appendChild(node);
 } as SubtypeMethods["renderSvg"];
-
-const wrappedMathCache: { [key: string]: string } = {};
 
 const wrapMathElement = function (element, containerWidth, next) {
   ensureMathElement(element);
