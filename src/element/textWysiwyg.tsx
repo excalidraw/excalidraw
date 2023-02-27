@@ -272,9 +272,9 @@ export const textWysiwyg = ({
         : updatedTextElement.height / lines.length;
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
-      }
-      // As firefox, Safari needs little higher dimensions on DOM
-      if (isFirefox || isSafari) {
+        textElementWidth = Math.min(textElementWidth, maxWidth);
+      } else if (isFirefox || isSafari) {
+        // As firefox, Safari needs little higher dimensions on DOM
         textElementWidth += 0.5;
       }
       // Make sure text editor height doesn't go beyond viewport
