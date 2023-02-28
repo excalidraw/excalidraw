@@ -42,7 +42,6 @@ import {
   getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
-  getContainerElement,
   handleBindTextResize,
   getMaxContainerWidth,
 } from "./textElement";
