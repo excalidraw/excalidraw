@@ -53,7 +53,7 @@ export const redrawTextBoundingBox = (
   };
 
   if (container) {
-    maxWidth = getMaxContainerWidth(container);
+    maxWidth = getContainerMaxWidth(container);
     boundTextUpdates.text = wrapText(
       textElement.originalText,
       getFontString(textElement),
@@ -71,7 +71,7 @@ export const redrawTextBoundingBox = (
 
   if (container) {
     const containerDims = getContainerDims(container);
-    const maxContainerHeight = getMaxContainerHeight(
+    const maxContainerHeight = getContainerMaxHeight(
       container,
       textElement as ExcalidrawTextElementWithContainer,
     );
@@ -164,8 +164,8 @@ export const handleBindTextResize = (
     let nextHeight = textElement.height;
     let nextWidth = textElement.width;
     const containerDims = getContainerDims(container);
-    const maxWidth = getMaxContainerWidth(container);
-    const maxHeight = getMaxContainerHeight(
+    const maxWidth = getContainerMaxWidth(container);
+    const maxHeight = getContainerMaxHeight(
       container,
       textElement as ExcalidrawTextElementWithContainer,
     );
@@ -227,8 +227,8 @@ export const computeBoundTextPosition = (
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
   const containerCoords = getContainerCoords(container);
-  const maxContainerHeight = getMaxContainerHeight(container, boundTextElement);
-  const maxContainerWidth = getMaxContainerWidth(container);
+  const maxContainerHeight = getContainerMaxHeight(container, boundTextElement);
+  const maxContainerWidth = getContainerMaxWidth(container);
 
   let x;
   let y;
@@ -732,7 +732,7 @@ export const computeContainerHeightForBoundText = (
   return boundTextElementHeight + BOUND_TEXT_PADDING * 2;
 };
 
-export const getMaxContainerWidth = (container: ExcalidrawElement) => {
+export const getContainerMaxWidth = (container: ExcalidrawElement) => {
   const width = getContainerDims(container).width;
   if (isArrowElement(container)) {
     return width - BOUND_TEXT_PADDING * 8 * 2;
@@ -752,7 +752,7 @@ export const getMaxContainerWidth = (container: ExcalidrawElement) => {
   return width - BOUND_TEXT_PADDING * 2;
 };
 
-export const getMaxContainerHeight = (
+export const getContainerMaxHeight = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {

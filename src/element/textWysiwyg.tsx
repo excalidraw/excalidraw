@@ -32,8 +32,8 @@ import {
   normalizeText,
   redrawTextBoundingBox,
   wrapText,
-  getMaxContainerHeight,
-  getMaxContainerWidth,
+  getContainerMaxHeight,
+  getContainerMaxWidth,
   computeBoundTextPosition,
   getTextHeight,
 } from "./textElement";
@@ -203,8 +203,8 @@ export const textWysiwyg = ({
           }
         }
 
-        maxWidth = getMaxContainerWidth(container);
-        maxHeight = getMaxContainerHeight(
+        maxWidth = getContainerMaxWidth(container);
+        maxHeight = getContainerMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
         );
@@ -360,7 +360,7 @@ export const textWysiwyg = ({
         const wrappedText = wrapText(
           `${editable.value}${data}`,
           font,
-          getMaxContainerWidth(container),
+          getContainerMaxWidth(container),
         );
         const width = getTextWidth(wrappedText, font);
         editable.style.width = `${width}px`;
@@ -377,7 +377,7 @@ export const textWysiwyg = ({
         const wrappedText = wrapText(
           normalizeText(editable.value),
           font,
-          getMaxContainerWidth(container!),
+          getContainerMaxWidth(container!),
         );
         const { width, height } = measureText(wrappedText, font);
         editable.style.width = `${width}px`;

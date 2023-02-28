@@ -3,8 +3,8 @@ import { API } from "../tests/helpers/api";
 import {
   computeContainerHeightForBoundText,
   getContainerCoords,
-  getMaxContainerWidth,
-  getMaxContainerHeight,
+  getContainerMaxWidth,
+  getContainerMaxHeight,
   wrapText,
 } from "./textElement";
 import { ExcalidrawTextElementWithContainer, FontString } from "./types";
@@ -245,7 +245,7 @@ describe("Test measureText", () => {
     });
   });
 
-  describe("Test getMaxContainerWidth", () => {
+  describe("Test getContainerMaxWidth", () => {
     const params = {
       width: 178,
       height: 194,
@@ -253,17 +253,17 @@ describe("Test measureText", () => {
 
     it("should return max width when container is rectangle", () => {
       const container = API.createElement({ type: "rectangle", ...params });
-      expect(getMaxContainerWidth(container)).toBe(168);
+      expect(getContainerMaxWidth(container)).toBe(168);
     });
 
     it("should return max width when container is ellipse", () => {
       const container = API.createElement({ type: "ellipse", ...params });
-      expect(getMaxContainerWidth(container)).toBe(116);
+      expect(getContainerMaxWidth(container)).toBe(116);
     });
 
     it("should return max width when container is diamond", () => {
       const container = API.createElement({ type: "diamond", ...params });
-      expect(getMaxContainerWidth(container)).toBe(79);
+      expect(getContainerMaxWidth(container)).toBe(79);
     });
 
     it("should return max width when container is arrow", () => {
@@ -271,11 +271,11 @@ describe("Test measureText", () => {
         type: "arrow",
         ...params,
       });
-      expect(getMaxContainerWidth(container)).toBe(220);
+      expect(getContainerMaxWidth(container)).toBe(220);
     });
   });
 
-  describe("Test getMaxContainerHeight", () => {
+  describe("Test getContainerMaxHeight", () => {
     const params = {
       width: 178,
       height: 194,
@@ -299,17 +299,17 @@ describe("Test measureText", () => {
 
     it("should return max height when container is rectangle", () => {
       const container = API.createElement({ type: "rectangle", ...params });
-      expect(getMaxContainerHeight(container, boundTextElement)).toBe(184);
+      expect(getContainerMaxHeight(container, boundTextElement)).toBe(184);
     });
 
     it("should return max height when container is ellipse", () => {
       const container = API.createElement({ type: "ellipse", ...params });
-      expect(getMaxContainerHeight(container, boundTextElement)).toBe(127);
+      expect(getContainerMaxHeight(container, boundTextElement)).toBe(127);
     });
 
     it("should return max height when container is diamond", () => {
       const container = API.createElement({ type: "diamond", ...params });
-      expect(getMaxContainerHeight(container, boundTextElement)).toBe(87);
+      expect(getContainerMaxHeight(container, boundTextElement)).toBe(87);
     });
 
     it("should return max height when container is arrow", () => {
@@ -317,7 +317,7 @@ describe("Test measureText", () => {
         type: "arrow",
         ...params,
       });
-      expect(getMaxContainerHeight(container, boundTextElement)).toBe(194);
+      expect(getContainerMaxHeight(container, boundTextElement)).toBe(194);
     });
 
     it("should return max height when container is arrow and height is less than threshold", () => {
@@ -328,7 +328,7 @@ describe("Test measureText", () => {
         boundElements: [{ type: "text", id: "text-id" }],
       });
 
-      expect(getMaxContainerHeight(container, boundTextElement)).toBe(
+      expect(getContainerMaxHeight(container, boundTextElement)).toBe(
         boundTextElement.height,
       );
     });
