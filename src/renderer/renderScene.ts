@@ -68,6 +68,7 @@ import {
   getContainingFrame,
   groupsAreCompletelyOutOfFrame,
 } from "../frame";
+import Scene from "../scene/Scene";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -442,31 +443,35 @@ export const _renderScene = ({
 
             // --------- clipping ----------
             // step 2: clip according to different states (frame, elements, appState)
+
+            // element is in some frame
+            // we decide if we need to clip the element based on its state
             if (containgFrame) {
+              // selected elements are being dragged
+              // clip if they are to be added to the frame
               if (
                 appState.selectedElementIds[element.id] &&
                 appState.selectedElementsAreBeingDragged &&
                 appState.frameToHighlight
               ) {
-                // CLIP elements that are being dragged but still in the frame
                 context.clip();
-              } else if (
-                !appState.selectedElementIds[element.id] &&
-                (elementsAreInFrameBounds([element], containgFrame) ||
-                  FrameGeometry.isElementIntersectingFrame(
-                    element,
-                    containgFrame,
-                  ) ||
-                  (element.groupIds.length > 0 &&
-                    !groupsAreCompletelyOutOfFrame(
-                      elements,
-                      element.groupIds,
-                      containgFrame,
-                    )))
+              }
+
+              // bound text elements of the elements above
+              // clip if the dragged elements are to be added to the frame
+              else if (
+                element.type === "text" &&
+                element.containerId &&
+                appState.selectedElementIds[element.containerId] &&
+                appState.selectedElementsAreBeingDragged &&
+                appState.frameToHighlight
               ) {
-                // CLIP elements that are not selected but are in the frame
                 context.clip();
-              } else if (
+              }
+
+              // elements that are selected in the frame but not dragged
+              // clip if they are part of a group or if they at least intersect with the frame
+              else if (
                 appState.selectedElementIds[element.id] &&
                 !appState.selectedElementsAreBeingDragged &&
                 (element.groupIds.length > 0 ||
@@ -476,10 +481,52 @@ export const _renderScene = ({
                     containgFrame,
                   ))
               ) {
-                // CLIP elements that are selected in a frame but not dragged
                 context.clip();
               }
-            } else if (
+
+              // elements that are not selected but are in the frame
+              else if (!appState.selectedElementIds[element.id]) {
+                // normal elements
+                if (
+                  !(element.type === "text" && element.containerId) &&
+                  (elementsAreInFrameBounds([element], containgFrame) ||
+                    FrameGeometry.isElementIntersectingFrame(
+                      element,
+                      containgFrame,
+                    ) ||
+                    (element.groupIds.length > 0 &&
+                      !groupsAreCompletelyOutOfFrame(
+                        elements,
+                        element.groupIds,
+                        containgFrame,
+                      )))
+                ) {
+                  context.clip();
+                }
+
+                // bound text elements
+                else if (element.type === "text" && element.containerId) {
+                  const containerElement = Scene.getScene(element)?.getElement(
+                    element.containerId,
+                  );
+                  if (containerElement) {
+                    // we should we not clip the bound text element
+                    if (
+                      appState.selectedElementIds[containerElement.id] &&
+                      appState.selectedElementsAreBeingDragged &&
+                      !appState.frameToHighlight
+                    ) {
+                    } else {
+                      context.clip();
+                    }
+                  }
+                }
+              }
+            }
+
+            // element is not in any frame yet
+            // CLIP: elements that are being dragged to a frame
+            else if (
               appState.frameToHighlight &&
               appState.selectedElementIds[element.id] &&
               (elementsAreInFrameBounds([element], appState.frameToHighlight) ||
@@ -492,13 +539,40 @@ export const _renderScene = ({
                     groupsToBeAddedToFrame.has(groupId),
                   )))
             ) {
-              // CLIP elements that are to be added to a frame
               context.clip();
-
               if (element.groupIds.length > 0) {
                 element.groupIds.forEach((groupId) =>
                   groupsToBeAddedToFrame.add(groupId),
                 );
+              }
+            }
+
+            // bound text element of an element that is not in the frame yet
+            // clip when the container element is going to be added to the frame
+            else if (
+              appState.frameToHighlight &&
+              element.type === "text" &&
+              element.containerId &&
+              appState.selectedElementIds[element.containerId]
+            ) {
+              const containerElement = Scene.getScene(element)?.getElement(
+                element.containerId,
+              );
+
+              if (containerElement) {
+                if (
+                  elementsAreInFrameBounds(
+                    [containerElement],
+                    appState.frameToHighlight,
+                  ) ||
+                  FrameGeometry.isElementIntersectingFrame(
+                    containerElement,
+                    appState.frameToHighlight,
+                  )
+                ) {
+                  // CLIP bound text elements
+                  context.clip();
+                }
               }
             }
 
