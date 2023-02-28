@@ -530,9 +530,20 @@ export const addElementsToFrame = (
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameElement,
 ) => {
-  let nextElements = [...allElements];
+  const _elementsToAdd = new Set<ExcalidrawElement>();
 
   elementsToAdd.forEach((element) => {
+    _elementsToAdd.add(element);
+
+    const boundTextElement = getBoundTextElement(element);
+    if (boundTextElement) {
+      _elementsToAdd.add(boundTextElement);
+    }
+  });
+
+  let nextElements = [...allElements];
+
+  Array.from(_elementsToAdd).forEach((element) => {
     // only necessary if the element is not already in the frame
     if (element.frameId !== frame.id) {
       mutateElement(element, {
@@ -568,16 +579,28 @@ export const removeElementsFromFrame = (
   elementsToRemove: NonDeletedExcalidrawElement[],
   appState: AppState,
 ) => {
-  const _elementsToRemove =
-    elementsToRemove.filter((element) => element.frameId) ?? [];
+  const _elementsToRemove = new Set<ExcalidrawElement>();
 
-  _elementsToRemove.forEach((element) =>
+  elementsToRemove.forEach((element) => {
+    if (element.frameId) {
+      _elementsToRemove.add(element);
+      const boundTextElement = getBoundTextElement(element);
+      if (boundTextElement) {
+        _elementsToRemove.add(boundTextElement);
+      }
+    }
+  });
+  _elementsToRemove.forEach((element) => {
     mutateElement(element, {
       frameId: null,
-    }),
-  );
+    });
+  });
 
-  const nextElements = moveOneRight(allElements, appState, _elementsToRemove);
+  const nextElements = moveOneRight(
+    allElements,
+    appState,
+    Array.from(_elementsToRemove),
+  );
 
   return nextElements;
 };
