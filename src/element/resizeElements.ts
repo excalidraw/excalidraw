@@ -23,7 +23,6 @@ import {
 } from "./bounds";
 import {
   isArrowElement,
-  isBoundToContainer,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
