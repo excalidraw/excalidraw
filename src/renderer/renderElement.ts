@@ -14,6 +14,7 @@ import {
   isFreeDrawElement,
   isInitializedImageElement,
   isArrowElement,
+  hasBoundTextElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -41,7 +42,10 @@ import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
   getApproxLineHeight,
   getBoundTextElement,
+  getContainerCoords,
   getContainerElement,
+  getMaxContainerHeight,
+  getMaxContainerWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -811,6 +815,23 @@ const drawElementFromCanvas = (
       elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
       elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
     );
+
+    if (
+      process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX &&
+      hasBoundTextElement(element)
+    ) {
+      const coords = getContainerCoords(element);
+      context.save();
+      context.restore();
+      context.strokeStyle = "red";
+      context.lineWidth = 3;
+      context.strokeRect(
+        (coords.x + renderConfig.scrollX) * window.devicePixelRatio,
+        (coords.y + renderConfig.scrollY) * window.devicePixelRatio,
+        getMaxContainerWidth(element) * window.devicePixelRatio,
+        getMaxContainerHeight(element) * window.devicePixelRatio,
+      );
+    }
   }
   context.restore();
 
