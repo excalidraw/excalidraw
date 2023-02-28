@@ -204,7 +204,10 @@ export const textWysiwyg = ({
         }
 
         maxWidth = getMaxContainerWidth(container);
-        maxHeight = getMaxContainerHeight(container);
+        maxHeight = getMaxContainerHeight(
+          container,
+          updatedTextElement as ExcalidrawTextElementWithContainer,
+        );
 
         // autogrow container height if text exceeds
         if (!isArrowElement(container) && textElementHeight > maxHeight) {
