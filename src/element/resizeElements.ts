@@ -195,15 +195,8 @@ const measureFontSizeFromWidth = (
   nextWidth: number,
 ): number | null => {
   // We only use width to scale font on resize
-  let width = element.width;
+  const width = element.width;
 
-  const hasContainer = isBoundToContainer(element);
-  if (hasContainer) {
-    const container = getContainerElement(element);
-    if (container) {
-      width = getMaxContainerWidth(container);
-    }
-  }
   const nextFontSize = element.fontSize * (nextWidth / width);
   if (nextFontSize < MIN_FONT_SIZE) {
     return null;
@@ -414,29 +407,11 @@ export const resizeSingleElement = (
         fontSize: stateOfBoundTextElementAtResize.fontSize,
       };
     }
-    if (shouldMaintainAspectRatio) {
-      const updatedElement = {
-        ...element,
-        width: eleNewWidth,
-        height: eleNewHeight,
-      };
 
-      const nextFontSize = measureFontSizeFromWidth(
-        boundTextElement,
-        getMaxContainerWidth(updatedElement),
-      );
-      if (nextFontSize === null) {
-        return;
-      }
-      boundTextFont = {
-        fontSize: nextFontSize,
-      };
-    } else {
-      const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
-      const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
-      eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
-      eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
-    }
+    const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
+    const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
+    eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
+    eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
   }
 
   const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] =
