@@ -249,8 +249,6 @@ export const textWysiwyg = ({
         editable.selectionEnd = editable.value.length - diff;
       }
 
-      const lines = updatedTextElement.originalText.split("\n");
-
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
