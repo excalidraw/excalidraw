@@ -267,7 +267,6 @@ export const shouldShowBoundingBox = (
   elements: NonDeletedExcalidrawElement[],
   appState: AppState,
 ) => {
-  
   if (appState.draggingElement || appState.editingLinearElement) {
     return false;
   }

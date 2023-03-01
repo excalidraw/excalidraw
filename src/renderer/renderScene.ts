@@ -190,7 +190,12 @@ const renderLinearPointHandles = (
   renderConfig: RenderConfig,
   element: NonDeleted<ExcalidrawLinearElement>,
 ) => {
-  if (!appState.selectedLinearElement || appState.selectedLinearElement.isDragging) {
+  if (
+    !appState.selectedLinearElement ||
+    (!appState.editingLinearElement &&
+      appState.selectedLinearElement.isDragging) ||
+    appState.editingLinearElement?.isDragging
+  ) {
     return;
   }
   context.save();
@@ -330,7 +335,7 @@ export const _renderScene = ({
   canvas: HTMLCanvasElement;
   renderConfig: RenderConfig;
 }) =>
-  // extra options passed to the renderer 
+  // extra options passed to the renderer
   {
     if (canvas === null) {
       return { atLeastOneVisibleElement: false };
