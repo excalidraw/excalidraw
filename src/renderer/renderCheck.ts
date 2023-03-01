@@ -3,7 +3,7 @@ import {
   CanvasUIRenderConfig,
 } from "../scene/types";
 
-type renderCheck = {
+type RenderCheck = {
   runCanvas: boolean;
   runCanvasUi: boolean;
 };
@@ -16,7 +16,7 @@ export const renderCheck = (
   elementsLength: number,
   canvasUIRenderConfig: CanvasUIRenderConfig,
   canvasContentRenderConfig: CanvasContentRenderConfig,
-): renderCheck => {
+): RenderCheck => {
   if (canvasUIRenderConfigCache === undefined) {
     elementsLengthCache = elementsLength;
     canvasUIRenderConfigCache = structuredClone(canvasUIRenderConfig);
@@ -30,12 +30,13 @@ export const renderCheck = (
   // checking for any change
 
   // checking in common part
-  const { scrollX, scrollY, zoom } = canvasContentRenderConfig;
+  const { scrollX, scrollY, zoom, isElementsChanged } = canvasContentRenderConfig;
   const cache = canvasContentRenderConfigCache;
   if (
     scrollX !== cache?.scrollX ||
     scrollY !== cache?.scrollY ||
-    zoom.value !== cache?.zoom.value
+    zoom.value !== cache?.zoom.value ||
+    isElementsChanged !== cache?.isElementsChanged
   ) {
     runCanvas = runCanvasUi = true;
   } else {

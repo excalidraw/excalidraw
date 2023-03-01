@@ -1358,6 +1358,7 @@ class App extends React.Component<AppProps, AppState> {
           imageCache: this.imageCache,
           gridSize: this.state.gridSize,
           isExporting: false,
+          isElementsChanged: this.scene.getIsElementsChanged(),
         },
         canvasUIRenderConfig: {
           selectionColor,
@@ -1370,6 +1371,7 @@ class App extends React.Component<AppProps, AppState> {
           remotePointerUsernames: pointerUsernames,
           remotePointerUserStates: pointerUserStates,
           renderScrollbars: !this.device.isMobile,
+          isElementsChanged: this.scene.getIsElementsChanged(),
         },
         callback: ({ atLeastOneVisibleElement, scrollBars }) => {
           if (scrollBars) {

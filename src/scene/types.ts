@@ -1,10 +1,13 @@
 import { ExcalidrawTextElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
+import Scene from "./Scene";
 
 export type CanvasUIRenderConfig = {
   scrollX: AppState["scrollX"];
   scrollY: AppState["scrollY"];
   zoom: AppState["zoom"];
+
+  isElementsChanged?: Scene["isElementsChanged"];
   // collab-related state
   // ---------------------------------------------------------------------------
   remotePointerViewportCoords: { [id: string]: { x: number; y: number } };
@@ -25,6 +28,9 @@ export type CanvasContentRenderConfig = {
   scrollX: AppState["scrollX"];
   scrollY: AppState["scrollY"];
   zoom: AppState["zoom"];
+
+  isElementsChanged?: Scene["isElementsChanged"];
+
   /** null indicates transparent bg */
   viewBackgroundColor: AppState["viewBackgroundColor"] | null;
   shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
@@ -44,9 +50,9 @@ export type SceneScroll = {
   scrollY: number;
 };
 
-export interface Scene {
-  elements: ExcalidrawTextElement[];
-}
+// export interface Scene {
+//   elements: ExcalidrawTextElement[];
+// }
 
 export type ExportType =
   | "png"

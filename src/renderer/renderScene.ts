@@ -65,6 +65,7 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
+import { renderCheck } from "./renderCheck";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -850,9 +851,15 @@ export const _renderScene = ({
     // When doing calculations based on canvas width we should used normalized one
     const normalizedCanvasWidth = canvas.width / scale;
     const normalizedCanvasHeight = canvas.height / scale;
-    // const { runCanvas, runCanvasUi } = renderCheck(elements.length,canvasUIRenderConfig, canvasContentRenderConfig)
-    const elementId = appState.editingLinearElement?.elementId;
-    const element = elementId && LinearElementEditor.getElement(elementId);
+    const { runCanvas, runCanvasUi } = renderCheck(
+      elements.length,
+      canvasUIRenderConfig,
+      canvasContentRenderConfig,
+    );
+
+    console.log("runCanvas, runCanvasUi", runCanvas, runCanvasUi, appState, appState.selectionElement,appState.selectedLinearElement);
+    // const elementId = appState.editingLinearElement?.elementId;
+    // const element = elementId && LinearElementEditor.getElement(elementId);
 
     const { atLeastOneVisibleElement, editingLinearElement } =
       renderCanvasContent({
