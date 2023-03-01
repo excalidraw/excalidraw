@@ -23,6 +23,7 @@ import {
 } from "./bounds";
 import {
   isArrowElement,
+  isBoundToContainer,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
@@ -44,6 +45,7 @@ import {
   getBoundTextElementId,
   handleBindTextResize,
   getMaxContainerWidth,
+  getContainerElement,
 } from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
@@ -193,8 +195,15 @@ const measureFontSizeFromWidth = (
   nextWidth: number,
 ): number | null => {
   // We only use width to scale font on resize
-  const width = element.width;
+  let width = element.width;
 
+  const hasContainer = isBoundToContainer(element);
+  if (hasContainer) {
+    const container = getContainerElement(element);
+    if (container) {
+      width = getMaxContainerWidth(container);
+    }
+  }
   const nextFontSize = element.fontSize * (nextWidth / width);
   if (nextFontSize < MIN_FONT_SIZE) {
     return null;
