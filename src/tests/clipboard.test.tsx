@@ -3,7 +3,7 @@ import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import ExcalidrawApp from "../excalidraw-app";
 import { KEYS } from "../keys";
-import { getApproxLineHeight } from "../element/textElement";
+import { getLineHeight } from "../element/textElement";
 import { getFontString } from "../utils";
 import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";
@@ -119,7 +119,7 @@ describe("paste text as single lines", () => {
   it("should space items correctly", async () => {
     const text = "hkhkjhki\njgkjhffjh\njgkjhffjh";
     const lineHeight =
-      getApproxLineHeight(
+      getLineHeight(
         getFontString({
           fontSize: h.app.state.currentItemFontSize,
           fontFamily: h.app.state.currentItemFontFamily,
@@ -143,7 +143,7 @@ describe("paste text as single lines", () => {
   it("should leave a space for blank new lines", async () => {
     const text = "hkhkjhki\n\njgkjhffjh";
     const lineHeight =
-      getApproxLineHeight(
+      getLineHeight(
         getFontString({
           fontSize: h.app.state.currentItemFontSize,
           fontFamily: h.app.state.currentItemFontFamily,

@@ -22,7 +22,7 @@ import {
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
-  getApproxLineHeight,
+  getLineHeight,
   getBoundTextElementId,
   getContainerDims,
   getContainerElement,
@@ -151,9 +151,8 @@ export const textWysiwyg = ({
       return;
     }
     const { textAlign, verticalAlign } = updatedTextElement;
-    const approxLineHeight = getApproxLineHeight(
-      getFontString(updatedTextElement),
-    );
+    const lineHeight = getLineHeight(getFontString(updatedTextElement));
+
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
@@ -211,10 +210,7 @@ export const textWysiwyg = ({
 
         // autogrow container height if text exceeds
         if (!isArrowElement(container) && textElementHeight > maxHeight) {
-          const diff = Math.min(
-            textElementHeight - maxHeight,
-            approxLineHeight,
-          );
+          const diff = Math.min(textElementHeight - maxHeight, lineHeight);
           mutateElement(container, { height: containerDims.height + diff });
           return;
         } else if (
@@ -224,10 +220,7 @@ export const textWysiwyg = ({
           containerDims.height > originalContainerData.height &&
           textElementHeight < maxHeight
         ) {
-          const diff = Math.min(
-            maxHeight - textElementHeight,
-            approxLineHeight,
-          );
+          const diff = Math.min(maxHeight - textElementHeight, lineHeight);
           mutateElement(container, { height: containerDims.height - diff });
         } else {
           const { y } = computeBoundTextPosition(
@@ -257,9 +250,7 @@ export const textWysiwyg = ({
       }
 
       const lines = updatedTextElement.originalText.split("\n");
-      const lineHeight = updatedTextElement.containerId
-        ? approxLineHeight
-        : updatedTextElement.height / lines.length;
+
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);

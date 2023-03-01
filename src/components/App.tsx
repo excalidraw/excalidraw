@@ -259,7 +259,7 @@ import throttle from "lodash.throttle";
 import { fileOpen, FileSystemHandle } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
-  getApproxLineHeight,
+  getLineHeight,
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
@@ -1734,7 +1734,7 @@ class App extends React.Component<AppProps, AppState> {
           // add paragraph only if previous line was not empty, IOW don't add
           // more than one empty line
           if (prevLine) {
-            const defaultLineHeight = getApproxLineHeight(
+            const defaultLineHeight = getLineHeight(
               getFontString({
                 fontSize: textElementProps.fontSize,
                 fontFamily: textElementProps.fontFamily,

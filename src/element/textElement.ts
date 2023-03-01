@@ -275,17 +275,17 @@ export const measureText = (text: string, font: FontString) => {
 };
 
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
-const cacheApproxLineHeight: { [key: FontString]: number } = {};
+const cacheLineHeight: { [key: FontString]: number } = {};
 
-export const getApproxLineHeight = (font: FontString) => {
-  if (cacheApproxLineHeight[font]) {
-    return cacheApproxLineHeight[font];
+export const getLineHeight = (font: FontString) => {
+  if (cacheLineHeight[font]) {
+    return cacheLineHeight[font];
   }
   const fontSize = parseInt(font);
 
   // Calculate line height relative to font size
-  cacheApproxLineHeight[font] = fontSize * 1.2;
-  return cacheApproxLineHeight[font];
+  cacheLineHeight[font] = fontSize * 1.2;
+  return cacheLineHeight[font];
 };
 
 let canvas: HTMLCanvasElement | undefined;
@@ -318,7 +318,7 @@ export const getTextWidth = (text: string, font: FontString) => {
 
 export const getTextHeight = (text: string, font: FontString) => {
   const lines = text.replace(/\r\n?/g, "\n").split("\n");
-  const lineHeight = getApproxLineHeight(font);
+  const lineHeight = getLineHeight(font);
   return lineHeight * lines.length;
 };
 
@@ -473,7 +473,7 @@ export const getApproxMinLineWidth = (font: FontString) => {
 };
 
 export const getApproxMinLineHeight = (font: FontString) => {
-  return getApproxLineHeight(font) + BOUND_TEXT_PADDING * 2;
+  return getLineHeight(font) + BOUND_TEXT_PADDING * 2;
 };
 
 export const getMinCharWidth = (font: FontString) => {
