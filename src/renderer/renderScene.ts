@@ -190,7 +190,7 @@ const renderLinearPointHandles = (
   renderConfig: RenderConfig,
   element: NonDeleted<ExcalidrawLinearElement>,
 ) => {
-  if (!appState.selectedLinearElement) {
+  if (!appState.selectedLinearElement || appState.selectedLinearElement.isDragging) {
     return;
   }
   context.save();
