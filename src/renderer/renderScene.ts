@@ -293,6 +293,7 @@ const renderLinearElementPointHighlight = (
 ) => {
   const { elementId, hoverPointIndex } = appState.selectedLinearElement!;
   if (
+    appState.selectedLinearElement?.isDragging ||
     appState.editingLinearElement?.selectedPointsIndices?.includes(
       hoverPointIndex,
     )
