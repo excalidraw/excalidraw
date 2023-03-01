@@ -821,9 +821,7 @@ const drawElementFromCanvas = (
       hasBoundTextElement(element)
     ) {
       const coords = getContainerCoords(element);
-      context.save();
-      context.restore();
-      context.strokeStyle = "red";
+      context.strokeStyle = "#c92a2a";
       context.lineWidth = 3;
       context.strokeRect(
         (coords.x + renderConfig.scrollX) * window.devicePixelRatio,
