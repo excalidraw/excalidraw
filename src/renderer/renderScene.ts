@@ -329,7 +329,7 @@ export const _renderScene = ({
   canvas: HTMLCanvasElement;
   renderConfig: RenderConfig;
 }) =>
-  // extra options passed to the renderer
+  // extra options passed to the renderer 
   {
     if (canvas === null) {
       return { atLeastOneVisibleElement: false };
