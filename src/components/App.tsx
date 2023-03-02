@@ -302,6 +302,10 @@ import {
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionToggleHandTool } from "../actions/actionCanvas";
+import {
+  actionRemoveAllElementsInFrame,
+  actionSelectAllElementsInFrame,
+} from "../actions/actionFrame";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -6804,6 +6808,8 @@ class App extends React.Component<AppProps, AppState> {
       actionCut,
       actionCopy,
       actionPaste,
+      actionSelectAllElementsInFrame,
+      actionRemoveAllElementsInFrame,
       CONTEXT_MENU_SEPARATOR,
       ...options,
       CONTEXT_MENU_SEPARATOR,

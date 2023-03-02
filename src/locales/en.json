@@ -127,7 +127,9 @@
       "unlockAll": "Unlock all"
     },
     "statusPublished": "Published",
-    "sidebarLock": "Keep sidebar open"
+    "sidebarLock": "Keep sidebar open",
+    "selectAllElementsInFrame": "Select all elements in frame",
+    "removeAllElementsFromFrame": "Remove all elements from frame"
   },
   "library": {
     "noItems": "No items added yet...",
