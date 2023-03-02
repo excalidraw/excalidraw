@@ -1,7 +1,14 @@
-import { VERTICAL_ALIGN } from "../constants";
-import { getNonDeletedElements, isTextElement } from "../element";
+import {
+  BOUND_TEXT_PADDING,
+  ROUNDNESS,
+  TEXT_ALIGN,
+  VERTICAL_ALIGN,
+} from "../constants";
+import { getNonDeletedElements, isTextElement, newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import {
+  computeContainerHeightForBoundText,
+  computeContainerWidthForBoundText,
   getBoundTextElement,
   measureText,
   redrawTextBoundingBox,
@@ -15,6 +22,7 @@ import {
   isTextBindableContainer,
 } from "../element/typeChecks";
 import {
+  ExcalidrawElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
 } from "../element/types";
@@ -129,18 +137,98 @@ export const actionBindText = register({
       }),
     });
     redrawTextBoundingBox(textElement, container);
+
+    return {
+      elements: adjustZIndexForContainer(elements, textElement, container.id),
+      appState: { ...appState, selectedElementIds: { [container.id]: true } },
+      commitToHistory: true,
+    };
+  },
+});
+
+const adjustZIndexForContainer = (
+  elements: readonly ExcalidrawElement[],
+  textElement: ExcalidrawTextElement,
+  containerId: string,
+) => {
+  const updatedElements = elements.slice();
+  const textElementIndex = updatedElements.findIndex(
+    (ele) => ele.id === textElement.id,
+  );
+  updatedElements.splice(textElementIndex, 1);
+  const containerIndex = updatedElements.findIndex(
+    (ele) => ele.id === containerId,
+  );
+  updatedElements.splice(containerIndex + 1, 0, textElement);
+  return updatedElements;
+};
+
+export const actionCreateContainerFromText = register({
+  name: "createContainerFromText",
+  contextItemLabel: "labels.createContainerFromText",
+  trackEvent: { category: "element" },
+  predicate: (elements, appState) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    return selectedElements.length === 1 && isTextElement(selectedElements[0]);
+  },
+  perform: (elements, appState) => {
+    const selectedElements = getSelectedElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
     const updatedElements = elements.slice();
-    const textElementIndex = updatedElements.findIndex(
-      (ele) => ele.id === textElement.id,
-    );
-    updatedElements.splice(textElementIndex, 1);
-    const containerIndex = updatedElements.findIndex(
-      (ele) => ele.id === container.id,
-    );
-    updatedElements.splice(containerIndex + 1, 0, textElement);
+    if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
+      const textElement = selectedElements[0];
+      const container = newElement({
+        type: "rectangle",
+        backgroundColor: appState.currentItemBackgroundColor,
+        boundElements: [{ id: textElement.id, type: "text" }],
+        angle: textElement.angle,
+        fillStyle: appState.currentItemFillStyle,
+        strokeColor: appState.currentItemStrokeColor,
+        roughness: appState.currentItemRoughness,
+        strokeWidth: appState.currentItemStrokeWidth,
+        strokeStyle: appState.currentItemStrokeStyle,
+        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+        opacity: 100,
+        locked: false,
+        x: textElement.x - BOUND_TEXT_PADDING,
+        y: textElement.y - BOUND_TEXT_PADDING,
+        width: computeContainerWidthForBoundText(
+          textElement.width,
+          "rectangle",
+        ),
+        height: computeContainerHeightForBoundText(
+          textElement.height,
+          "rectangle",
+        ),
+      });
+      mutateElement(textElement, {
+        containerId: container.id,
+        verticalAlign: VERTICAL_ALIGN.MIDDLE,
+        textAlign: TEXT_ALIGN.CENTER,
+      });
+      redrawTextBoundingBox(textElement, container);
+
+      return {
+        elements: adjustZIndexForContainer(
+          [...elements, container],
+          textElement,
+          container.id,
+        ),
+        appState: {
+          ...appState,
+          selectedElementIds: {
+            [container.id]: true,
+            [textElement.id]: false,
+          },
+        },
+        commitToHistory: true,
+      };
+    }
     return {
       elements: updatedElements,
-      appState: { ...appState, selectedElementIds: { [container.id]: true } },
+      appState,
       commitToHistory: true,
     };
   },
