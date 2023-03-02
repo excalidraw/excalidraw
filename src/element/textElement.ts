@@ -80,7 +80,7 @@ export const redrawTextBoundingBox = (
 
       let nextHeight = containerDims.height;
       if (metrics.height > maxContainerHeight) {
-        nextHeight = computeContainerHeightForBoundText(
+        nextHeight = computeContainerDimensionForBoundText(
           metrics.height,
           container.type,
         );
@@ -184,7 +184,7 @@ export const handleBindTextResize = (
     }
     // increase height in case text element height exceeds
     if (nextHeight > maxHeight) {
-      containerHeight = computeContainerHeightForBoundText(
+      containerHeight = computeContainerDimensionForBoundText(
         nextHeight,
         container.type,
       );
@@ -722,41 +722,23 @@ export type ValidContainerType<T> = T extends Set<infer U> ? U : never;
 export const isValidTextContainer = (element: ExcalidrawElement) =>
   VALID_CONTAINER_TYPES.has(element.type);
 
-export const computeContainerHeightForBoundText = (
-  boundTextElementHeight: number,
+export const computeContainerDimensionForBoundText = (
+  dimension: number,
   containerType: ValidContainerType<typeof VALID_CONTAINER_TYPES>,
 ) => {
-  boundTextElementHeight = Math.ceil(boundTextElementHeight);
+  dimension = Math.ceil(dimension);
   const padding = BOUND_TEXT_PADDING * 2;
 
   if (containerType === "ellipse") {
-    return Math.round(((boundTextElementHeight + padding) / Math.sqrt(2)) * 2);
+    return Math.round(((dimension + padding) / Math.sqrt(2)) * 2);
   }
   if (containerType === "arrow") {
-    return boundTextElementHeight + padding * 8;
+    return dimension + padding * 8;
   }
   if (containerType === "diamond") {
-    return 2 * (boundTextElementHeight + padding);
+    return 2 * (dimension + padding);
   }
-  return boundTextElementHeight + padding;
-};
-
-export const computeContainerWidthForBoundText = (
-  boundTextElementWidth: number,
-  containerType: ValidContainerType<typeof VALID_CONTAINER_TYPES>,
-) => {
-  boundTextElementWidth = Math.ceil(boundTextElementWidth);
-  const padding = BOUND_TEXT_PADDING * 2;
-  if (containerType === "ellipse") {
-    return Math.round(((boundTextElementWidth + padding) / Math.sqrt(2)) * 2);
-  }
-  if (containerType === "arrow") {
-    return boundTextElementWidth + padding * 8;
-  }
-  if (containerType === "diamond") {
-    return 2 * (boundTextElementWidth + padding);
-  }
-  return boundTextElementWidth + padding;
+  return dimension + padding;
 };
 
 export const getMaxContainerWidth = (container: ExcalidrawElement) => {

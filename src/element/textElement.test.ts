@@ -1,7 +1,7 @@
 import { BOUND_TEXT_PADDING } from "../constants";
 import { API } from "../tests/helpers/api";
 import {
-  computeContainerHeightForBoundText,
+  computeContainerDimensionForBoundText,
   getContainerCoords,
   getMaxContainerWidth,
   getMaxContainerHeight,
@@ -214,7 +214,7 @@ describe("Test measureText", () => {
     });
   });
 
-  describe("Test computeContainerHeightForBoundText", () => {
+  describe("Test computeContainerDimensionForBoundText", () => {
     const params = {
       width: 178,
       height: 194,
@@ -225,7 +225,7 @@ describe("Test measureText", () => {
         type: "rectangle",
         ...params,
       });
-      expect(computeContainerHeightForBoundText(150, element.type)).toEqual(
+      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
         160,
       );
     });
@@ -235,7 +235,7 @@ describe("Test measureText", () => {
         type: "ellipse",
         ...params,
       });
-      expect(computeContainerHeightForBoundText(150, element.type)).toEqual(
+      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
         226,
       );
     });
@@ -245,7 +245,7 @@ describe("Test measureText", () => {
         type: "diamond",
         ...params,
       });
-      expect(computeContainerHeightForBoundText(150, element.type)).toEqual(
+      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
         320,
       );
     });

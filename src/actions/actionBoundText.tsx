@@ -7,8 +7,7 @@ import {
 import { getNonDeletedElements, isTextElement, newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import {
-  computeContainerHeightForBoundText,
-  computeContainerWidthForBoundText,
+  computeContainerDimensionForBoundText,
   getBoundTextElement,
   measureText,
   redrawTextBoundingBox,
@@ -202,11 +201,11 @@ export const actionCreateContainerFromText = register({
         locked: false,
         x: textElement.x - BOUND_TEXT_PADDING,
         y: textElement.y - BOUND_TEXT_PADDING,
-        width: computeContainerWidthForBoundText(
+        width: computeContainerDimensionForBoundText(
           textElement.width,
           "rectangle",
         ),
-        height: computeContainerHeightForBoundText(
+        height: computeContainerDimensionForBoundText(
           textElement.height,
           "rectangle",
         ),
