@@ -20,6 +20,7 @@ import {
 import {
   hasBoundTextElement,
   isTextBindableContainer,
+  isUsingAdaptiveRadius,
 } from "../element/typeChecks";
 import {
   ExcalidrawElement,
@@ -189,7 +190,14 @@ export const actionCreateContainerFromText = register({
         roughness: appState.currentItemRoughness,
         strokeWidth: appState.currentItemStrokeWidth,
         strokeStyle: appState.currentItemStrokeStyle,
-        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+        roundness:
+          appState.currentItemRoundness === "round"
+            ? {
+                type: isUsingAdaptiveRadius("rectangle")
+                  ? ROUNDNESS.ADAPTIVE_RADIUS
+                  : ROUNDNESS.PROPORTIONAL_RADIUS,
+              }
+            : null,
         opacity: 100,
         locked: false,
         x: textElement.x - BOUND_TEXT_PADDING,
