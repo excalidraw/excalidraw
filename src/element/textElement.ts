@@ -12,11 +12,7 @@ import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
-import {
-  isBoundToContainer,
-  isImageElement,
-  isArrowElement,
-} from "./typeChecks";
+import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 import { AppState } from "../types";
 import { isTextBindableContainer } from "./typeChecks";
