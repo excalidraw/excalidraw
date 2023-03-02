@@ -465,11 +465,24 @@ export const _renderScene = ({
                     element.groupIds,
                     containgFrame,
                   )) ||
-                // single element, completely out of frame
+                // single normal element, completely out of frame
                 (element.groupIds.length === 0 &&
+                  !(element.type === "text" && element.containerId) &&
                   !elementsAreInFrameBounds([element], containgFrame) &&
                   !FrameGeometry.isElementIntersectingFrame(
                     element,
+                    containgFrame,
+                  )) ||
+                // single bound text element, container out of frame
+                (element.groupIds.length === 0 &&
+                  element.type === "text" &&
+                  element.containerId &&
+                  !elementsAreInFrameBounds(
+                    [Scene.getScene(element)?.getElement(element.containerId)!],
+                    containgFrame,
+                  ) &&
+                  !FrameGeometry.isElementIntersectingFrame(
+                    Scene.getScene(element)?.getElement(element.containerId)!,
                     containgFrame,
                   ))
               ) {

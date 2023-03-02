@@ -297,6 +297,7 @@ import {
   getElementsInResizingFrame,
   getElementsInNewFrame,
   getContainingFrame,
+  groupsAreCompletelyOutOfFrame,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
@@ -3715,6 +3716,39 @@ class App extends React.Component<AppProps, AppState> {
         ),
       );
     } else {
+      // handle resizing elements
+      getSelectedElements(this.scene.getNonDeletedElements(), this.state)
+        .filter((element) => element.type !== "frame" && element.frameId)
+        .forEach((element) => {
+          const containingFrame = getContainingFrame(element);
+
+          if (containingFrame) {
+            if (
+              (element.groupIds.length > 0 &&
+                groupsAreCompletelyOutOfFrame(
+                  this.scene.getNonDeletedElements(),
+                  element.groupIds,
+                  containingFrame,
+                )) ||
+              (element.groupIds.length === 0 &&
+                !elementsAreInFrameBounds([element], containingFrame) &&
+                !FrameGeometry.isElementIntersectingFrame(
+                  element,
+                  containingFrame,
+                ))
+            ) {
+              this.scene.replaceAllElements(
+                removeElementsFromFrame(
+                  this.scene.getNonDeletedElements(),
+                  [element],
+                  this.state,
+                ),
+              );
+            }
+          }
+        });
+
+      // handle resizing frames
       const selectedFrames = getSelectedElements(
         this.scene.getNonDeletedElements(),
         this.state,
