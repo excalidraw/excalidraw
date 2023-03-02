@@ -724,7 +724,7 @@ export const computeContainerHeightForBoundText = (
   boundTextElementHeight: number,
   containerType: typeof VALID_CONTAINER_TYPES[number],
 ) => {
-  boundTextElementHeight = Math.round(boundTextElementHeight);
+  boundTextElementHeight = Math.ceil(boundTextElementHeight);
   if (containerType === "ellipse") {
     return Math.round(
       ((boundTextElementHeight + BOUND_TEXT_PADDING * 2) / Math.sqrt(2)) * 2,
@@ -743,7 +743,7 @@ export const computeContainerWidthForBoundText = (
   boundTextElementWidth: number,
   containerType: typeof VALID_CONTAINER_TYPES[number],
 ) => {
-  boundTextElementWidth = Math.round(boundTextElementWidth);
+  boundTextElementWidth = Math.ceil(boundTextElementWidth);
   if (containerType === "ellipse") {
     return Math.round(
       ((boundTextElementWidth + BOUND_TEXT_PADDING * 2) / Math.sqrt(2)) * 2,
