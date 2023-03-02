@@ -320,7 +320,6 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   const spaceWidth = getLineWidth(" ", font);
-
   const push = (str: string) => {
     if (str.trim()) {
       lines.push(str);
@@ -725,6 +724,7 @@ export const computeContainerHeightForBoundText = (
   boundTextElementHeight: number,
   containerType: typeof VALID_CONTAINER_TYPES[number],
 ) => {
+  boundTextElementHeight = Math.round(boundTextElementHeight);
   if (containerType === "ellipse") {
     return Math.round(
       ((boundTextElementHeight + BOUND_TEXT_PADDING * 2) / Math.sqrt(2)) * 2,
@@ -743,6 +743,7 @@ export const computeContainerWidthForBoundText = (
   boundTextElementWidth: number,
   containerType: typeof VALID_CONTAINER_TYPES[number],
 ) => {
+  boundTextElementWidth = Math.round(boundTextElementWidth);
   if (containerType === "ellipse") {
     return Math.round(
       ((boundTextElementWidth + BOUND_TEXT_PADDING * 2) / Math.sqrt(2)) * 2,
