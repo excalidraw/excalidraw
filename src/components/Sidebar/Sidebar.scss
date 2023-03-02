@@ -139,8 +139,16 @@
     border: none !important;
     background-color: inherit !important;
 
+    &:hover svg {
+      stroke: var(--color-primary) !important;
+      color: var(--color-primary);
+    }
+
     &[data-state="active"] {
       background-color: var(--color-primary-light) !important;
+    }
+    &:active {
+      background-color: var(--color-primary-light-darker) !important;
     }
   }
 }
