@@ -12,11 +12,7 @@ import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
-import {
-  isBoundToContainer,
-  isImageElement,
-  isArrowElement,
-} from "./typeChecks";
+import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 import { AppState } from "../types";
 import { isTextBindableContainer } from "./typeChecks";
@@ -84,9 +80,9 @@ export const redrawTextBoundingBox = (
 
       let nextHeight = containerDims.height;
       if (metrics.height > maxContainerHeight) {
-        nextHeight = computeContainerHeightForBoundText(
-          container,
+        nextHeight = computeContainerDimensionForBoundText(
           metrics.height,
+          container.type,
         );
         mutateElement(container, { height: nextHeight });
         maxContainerHeight = getMaxContainerHeight(container);
@@ -188,9 +184,9 @@ export const handleBindTextResize = (
     }
     // increase height in case text element height exceeds
     if (nextHeight > maxHeight) {
-      containerHeight = computeContainerHeightForBoundText(
-        container,
+      containerHeight = computeContainerDimensionForBoundText(
         nextHeight,
+        container.type,
       );
 
       const diff = containerHeight - containerDims.height;
@@ -324,7 +320,6 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   const spaceWidth = getLineWidth(" ", font);
-
   const push = (str: string) => {
     if (str.trim()) {
       lines.push(str);
@@ -398,7 +393,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           const word = words[index];
           currentLineWidthTillNow = getLineWidth(currentLine + word, font);
 
-          if (currentLineWidthTillNow >= maxWidth) {
+          if (currentLineWidthTillNow > maxWidth) {
             push(currentLine);
             currentLineWidthTillNow = 0;
             currentLine = "";
@@ -714,32 +709,34 @@ export const getTextBindableContainerAtPosition = (
   return isTextBindableContainer(hitElement, false) ? hitElement : null;
 };
 
-export const isValidTextContainer = (element: ExcalidrawElement) => {
-  return (
-    element.type === "rectangle" ||
-    element.type === "ellipse" ||
-    element.type === "diamond" ||
-    isImageElement(element) ||
-    isArrowElement(element)
-  );
-};
+const VALID_CONTAINER_TYPES = new Set([
+  "rectangle",
+  "ellipse",
+  "diamond",
+  "image",
+  "arrow",
+]);
 
-export const computeContainerHeightForBoundText = (
-  container: NonDeletedExcalidrawElement,
-  boundTextElementHeight: number,
+export const isValidTextContainer = (element: ExcalidrawElement) =>
+  VALID_CONTAINER_TYPES.has(element.type);
+
+export const computeContainerDimensionForBoundText = (
+  dimension: number,
+  containerType: ExtractSetType<typeof VALID_CONTAINER_TYPES>,
 ) => {
-  if (container.type === "ellipse") {
-    return Math.round(
-      ((boundTextElementHeight + BOUND_TEXT_PADDING * 2) / Math.sqrt(2)) * 2,
-    );
+  dimension = Math.ceil(dimension);
+  const padding = BOUND_TEXT_PADDING * 2;
+
+  if (containerType === "ellipse") {
+    return Math.round(((dimension + padding) / Math.sqrt(2)) * 2);
   }
-  if (isArrowElement(container)) {
-    return boundTextElementHeight + BOUND_TEXT_PADDING * 8 * 2;
+  if (containerType === "arrow") {
+    return dimension + padding * 8;
   }
-  if (container.type === "diamond") {
-    return 2 * (boundTextElementHeight + BOUND_TEXT_PADDING * 2);
+  if (containerType === "diamond") {
+    return 2 * (dimension + padding);
   }
-  return boundTextElementHeight + BOUND_TEXT_PADDING * 2;
+  return dimension + padding;
 };
 
 export const getMaxContainerWidth = (container: ExcalidrawElement) => {
