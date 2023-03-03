@@ -110,6 +110,7 @@
     "increaseFontSize": "Palielināt fonta izmēru",
     "unbindText": "Atdalīt tekstu",
     "bindText": "Piesaistīt tekstu figūrai",
+    "createContainerFromText": "",
     "link": {
       "edit": "Rediģēt saiti",
       "create": "Izveidot saiti",
