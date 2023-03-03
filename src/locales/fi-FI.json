@@ -110,6 +110,7 @@
     "increaseFontSize": "Kasvata kirjasinkokoa",
     "unbindText": "Irroita teksti",
     "bindText": "Kiinnitä teksti säiliöön",
+    "createContainerFromText": "",
     "link": {
       "edit": "Muokkaa linkkiä",
       "create": "Luo linkki",
