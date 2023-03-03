@@ -416,22 +416,17 @@ const breakWord = (word: string, font: FontString, maxWidth: number) => {
   const trimmedWord = word.trimEnd();
   const symbols = Array.from(trimmedWord);
   const wordSections: Array<string> = [];
+  let lastWordWidth = 0;
   symbols.forEach((symbol) => {
+    const currentCharWidth = charWidth.calculate(symbol, font);
     if (wordSections.length === 0) {
       wordSections.push(symbol);
+      lastWordWidth = currentCharWidth;
       return;
     }
-    const widthWithLastLine = getLineWidth(
-      wordSections[wordSections.length - 1] + symbol,
-      font,
-    );
-
+    const widthWithLastLine = lastWordWidth + currentCharWidth;
     // fits in wordSection above
-    if (
-      widthWithLastLine <= maxWidth ||
-      widthWithLastLine <=
-        getLineWidth(wordSections[wordSections.length - 1], font)
-    ) {
+    if (widthWithLastLine <= maxWidth || widthWithLastLine <= lastWordWidth) {
       wordSections[wordSections.length - 1] += symbol;
       return; // next word
     }
