@@ -18,8 +18,6 @@ import {
 } from "../element/textWysiwyg";
 import {
   hasBoundTextElement,
-  isArrowElement,
-  isLinearElement,
   isTextBindableContainer,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
