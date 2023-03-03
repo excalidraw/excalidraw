@@ -194,7 +194,7 @@
     "resetLibrary": "Dit zal je bibliotheek wissen. Weet je het zeker?",
     "removeItemsFromsLibrary": "Verwijder {{count}} item(s) uit bibliotheek?",
     "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Geen internetverbinding beschikbaar.\nJe wijzigingen worden niet opgeslagen!"
   },
   "errors": {
     "unsupportedFileType": "Niet-ondersteund bestandstype.",
@@ -296,7 +296,7 @@
   "helpDialog": {
     "blog": "Lees onze blog",
     "click": "klik",
-    "deepSelect": "",
+    "deepSelect": "Deep selecteer",
     "deepBoxSelect": "",
     "curvedArrow": "Gebogen pijl",
     "curvedLine": "Kromme lijn",
@@ -365,13 +365,13 @@
     "republishWarning": ""
   },
   "publishSuccessDialog": {
-    "title": "",
+    "title": "Bibliotheek ingediend",
     "content": "",
     "link": "Hier"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Reset bibliotheek",
+    "removeItemsFromLib": "Verwijder geselecteerde items uit bibliotheek"
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent.",
@@ -393,7 +393,7 @@
     "width": "Breedte"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Toegevoegd aan bibliotheek",
     "copyStyles": "Stijlen gekopieerd.",
     "copyToClipboard": "Gekopieerd naar het klembord.",
     "copyToClipboardAsPng": "{{exportSelection}} naar klembord gekopieerd als PNG\n({{exportColorScheme}})",
@@ -458,9 +458,9 @@
     },
     "defaults": {
       "menuHint": "",
-      "center_heading": "",
+      "center_heading": "Diagrammen. Eenvoudig. Gemaakt.",
       "toolbarHint": "",
-      "helpHint": ""
+      "helpHint": "Snelkoppelingen en hulp"
     }
   }
 }
