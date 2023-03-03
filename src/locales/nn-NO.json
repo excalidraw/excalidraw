@@ -110,6 +110,7 @@
     "increaseFontSize": "Gjer skriftstorleik større",
     "unbindText": "Avbind tekst",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "Rediger lenke",
       "create": "Lag lenke",
