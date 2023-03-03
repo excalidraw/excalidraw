@@ -259,7 +259,6 @@ export const actionCreateContainerFromText = register({
       mutateElement(textElement, {
         containerId: container.id,
         verticalAlign: VERTICAL_ALIGN.MIDDLE,
-        textAlign: TEXT_ALIGN.CENTER,
         boundElements: null,
       });
       redrawTextBoundingBox(textElement, container);
