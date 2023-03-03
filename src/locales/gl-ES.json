@@ -110,7 +110,7 @@
     "increaseFontSize": "Aumentar o tamaño da fonte",
     "unbindText": "Desvincular texto",
     "bindText": "Ligar o texto ao contedor",
-    "createContainerFromText": "",
+    "createContainerFromText": "Envolver o texto nun contedor",
     "link": {
       "edit": "Editar ligazón",
       "create": "Crear ligazón",
@@ -194,7 +194,7 @@
     "resetLibrary": "Isto limpará a súa biblioteca. Está seguro?",
     "removeItemsFromsLibrary": "Eliminar {{count}} elemento(s) da biblioteca?",
     "invalidEncryptionKey": "A clave de cifrado debe ter 22 caracteres. A colaboración en directo está desactivada.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Non hai conexión a Internet dispoñible.\nOs teus cambios non serán gardados!"
   },
   "errors": {
     "unsupportedFileType": "Tipo de ficheiro non soportado.",
