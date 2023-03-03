@@ -110,6 +110,7 @@
     "increaseFontSize": "הגדל את גודל הגופן",
     "unbindText": "ביטול קיבוע הטקסט",
     "bindText": "קיבוע הטקסט לאוגד",
+    "createContainerFromText": "",
     "link": {
       "edit": "עריכת קישור",
       "create": "יצירת קישור",
