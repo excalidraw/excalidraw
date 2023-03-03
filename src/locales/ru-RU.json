@@ -110,6 +110,7 @@
     "increaseFontSize": "Увеличить шрифт",
     "unbindText": "Отвязать текст",
     "bindText": "Привязать текст к контейнеру",
+    "createContainerFromText": "",
     "link": {
       "edit": "Редактировать ссылку",
       "create": "Создать ссылку",
