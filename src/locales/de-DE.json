@@ -110,6 +110,7 @@
     "increaseFontSize": "Schrift vergrößern",
     "unbindText": "Text lösen",
     "bindText": "Text an Container binden",
+    "createContainerFromText": "",
     "link": {
       "edit": "Link bearbeiten",
       "create": "Link erstellen",
