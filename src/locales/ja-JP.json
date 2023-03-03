@@ -110,6 +110,7 @@
     "increaseFontSize": "フォントサイズを拡大",
     "unbindText": "テキストのバインド解除",
     "bindText": "テキストをコンテナにバインド",
+    "createContainerFromText": "",
     "link": {
       "edit": "リンクを編集",
       "create": "リンクを作成",
