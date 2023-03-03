@@ -110,6 +110,7 @@
     "increaseFontSize": "Збільшити розмір шрифту",
     "unbindText": "Відв'язати текст",
     "bindText": "Прив’язати текст до контейнера",
+    "createContainerFromText": "",
     "link": {
       "edit": "Редагування посилання",
       "create": "Створити посилання",
