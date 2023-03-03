@@ -110,6 +110,7 @@
     "increaseFontSize": "Zväčšiť veľkosť písma",
     "unbindText": "Zrušiť previazanie textu",
     "bindText": "Previazať text s kontajnerom",
+    "createContainerFromText": "",
     "link": {
       "edit": "Upraviť odkaz",
       "create": "Vytvoriť odkaz",
