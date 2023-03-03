@@ -110,6 +110,7 @@
     "increaseFontSize": "Yazı Tipi Boyutunu Büyült",
     "unbindText": "Metni çöz",
     "bindText": "Metni taşıyıcıya bağla",
+    "createContainerFromText": "",
     "link": {
       "edit": "Bağlantıyı düzenle",
       "create": "Bağlantı oluştur",
