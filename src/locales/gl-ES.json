@@ -110,6 +110,7 @@
     "increaseFontSize": "Aumentar o tamaño da fonte",
     "unbindText": "Desvincular texto",
     "bindText": "Ligar o texto ao contedor",
+    "createContainerFromText": "",
     "link": {
       "edit": "Editar ligazón",
       "create": "Crear ligazón",
