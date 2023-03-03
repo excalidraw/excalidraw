@@ -110,6 +110,7 @@
     "increaseFontSize": "Aumentar talha polissa",
     "unbindText": "Dessociar lo tèxte",
     "bindText": "Ligar lo tèxt al contenidor",
+    "createContainerFromText": "",
     "link": {
       "edit": "Modificar lo ligam",
       "create": "Crear un ligam",
