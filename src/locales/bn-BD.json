@@ -110,6 +110,7 @@
     "increaseFontSize": "লেখনীর মাত্রা বাড়ান",
     "unbindText": "",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "লিঙ্ক সংশোধন",
       "create": "লিঙ্ক তৈরী",
