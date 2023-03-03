@@ -363,22 +363,26 @@ const breakLine = (line: string, font: FontString, maxWidth: number) => {
       lastLineWidth + wordWidthWithoutTrailingSpaces <= maxWidth
     ) {
       lastLineWidth += wordWidth;
-
-      if (lastLineWidth > maxWidth) {
-        // if the method that draw the text is refactored, this code must be removed
-        // remove trailing spaces
-        const spacesToRemove = Math.ceil(
-          (lastLineWidth - maxWidth) / spaceWidth,
-        );
-        word = word.slice(0, -spacesToRemove);
-      }
       lines[lines.length - 1] += word;
+
       return; // next word
+    }
+
+    if (lastLineWidth > maxWidth) {
+      // if the method that draw the text is refactored, this code must be removed
+      // remove trailing spaces
+      const spacesToRemove = Math.ceil((lastLineWidth - maxWidth) / spaceWidth);
+      lines[lines.length - 1] = lines[lines.length - 1].slice(
+        0,
+        -spacesToRemove,
+      );
     }
     // remove previous line if only has spaces
     if (lines.length > 0 && lines[lines.length - 1].trim().length === 0) {
+      // if the method that draw the text is refactored, this code must be removed
       lines.splice(-1);
     }
+
     lastLineWidth = wordWidth;
     lines.push(word);
   });
