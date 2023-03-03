@@ -110,6 +110,7 @@
     "increaseFontSize": "Augmenta la mida de la lletra",
     "unbindText": "Desvincular el text",
     "bindText": "Ajusta el text al contenidor",
+    "createContainerFromText": "",
     "link": {
       "edit": "Edita l'enllaç",
       "create": "Crea un enllaç",
