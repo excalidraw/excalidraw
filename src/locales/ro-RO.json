@@ -110,7 +110,7 @@
     "increaseFontSize": "Mărește dimensiunea fontului",
     "unbindText": "Deconectare text",
     "bindText": "Legare text de container",
-    "createContainerFromText": "",
+    "createContainerFromText": "Încadrare text într-un container",
     "link": {
       "edit": "Editare URL",
       "create": "Creare URL",
