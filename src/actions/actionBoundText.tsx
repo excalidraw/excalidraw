@@ -228,6 +228,7 @@ export const actionCreateContainerFromText = register({
           textElement.height,
           "rectangle",
         ),
+        groupIds: textElement.groupIds,
       });
       mutateElement(textElement, {
         containerId: container.id,
