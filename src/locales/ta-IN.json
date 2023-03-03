@@ -110,6 +110,7 @@
     "increaseFontSize": "எழுத்துரு அளவை அதிகரி",
     "unbindText": "உரையைப் பிணைவவிழ்",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "தொடுப்பைத் திருத்து",
       "create": "தொடுப்பைப் படை",
