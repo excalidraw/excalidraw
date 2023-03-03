@@ -18,11 +18,14 @@ import {
 } from "../element/textWysiwyg";
 import {
   hasBoundTextElement,
+  isArrowElement,
+  isLinearElement,
   isTextBindableContainer,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
 import {
   ExcalidrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
 } from "../element/types";
@@ -201,7 +204,10 @@ export const actionCreateContainerFromText = register({
       const container = newElement({
         type: "rectangle",
         backgroundColor: appState.currentItemBackgroundColor,
-        boundElements: [{ id: textElement.id, type: "text" }],
+        boundElements: [
+          ...(textElement.boundElements || []),
+          { id: textElement.id, type: "text" },
+        ],
         angle: textElement.angle,
         fillStyle: appState.currentItemFillStyle,
         strokeColor: appState.currentItemStrokeColor,
@@ -230,10 +236,33 @@ export const actionCreateContainerFromText = register({
         ),
         groupIds: textElement.groupIds,
       });
+
+      // update bindings
+      if (textElement.boundElements?.length) {
+        const linearElementIds = textElement.boundElements
+          .filter((ele) => ele.type === "arrow")
+          .map((el) => el.id);
+        const linearElements = updatedElements.filter((ele) =>
+          linearElementIds.includes(ele.id),
+        ) as ExcalidrawLinearElement[];
+        linearElements.forEach((ele) => {
+          let startBinding = null;
+          let endBinding = null;
+          if (ele.startBinding) {
+            startBinding = { ...ele.startBinding, elementId: container.id };
+          }
+          if (ele.endBinding) {
+            endBinding = { ...ele.endBinding, elementId: container.id };
+          }
+          mutateElement(ele, { startBinding, endBinding });
+        });
+      }
+
       mutateElement(textElement, {
         containerId: container.id,
         verticalAlign: VERTICAL_ALIGN.MIDDLE,
         textAlign: TEXT_ALIGN.CENTER,
+        boundElements: null,
       });
       redrawTextBoundingBox(textElement, container);
 
