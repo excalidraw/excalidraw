@@ -110,6 +110,7 @@
     "increaseFontSize": "زایدکردنی قەبارەی فۆنت",
     "unbindText": "دەقەکە جیابکەرەوە",
     "bindText": "دەقەکە ببەستەوە بە کۆنتەینەرەکەوە",
+    "createContainerFromText": "",
     "link": {
       "edit": "دەستکاریکردنی بەستەر",
       "create": "دروستکردنی بەستەر",
