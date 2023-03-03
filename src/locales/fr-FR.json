@@ -110,7 +110,7 @@
     "increaseFontSize": "Augmenter la taille de la police",
     "unbindText": "Dissocier le texte",
     "bindText": "Associer le texte au conteneur",
-    "createContainerFromText": "",
+    "createContainerFromText": "Encadrer le texte dans un conteneur",
     "link": {
       "edit": "Modifier le lien",
       "create": "Ajouter un lien",
