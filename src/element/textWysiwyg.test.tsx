@@ -10,7 +10,7 @@ import {
 } from "../tests/test-utils";
 import { queryByText } from "@testing-library/react";
 
-import { FONT_FAMILY } from "../constants";
+import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -1324,14 +1324,22 @@ describe("textWysiwyg", () => {
 
       editor.dispatchEvent(new Event("input"));
       await new Promise((cb) => setTimeout(cb, 0));
+
+      editor.select();
+      fireEvent.click(screen.getByTitle("Left"));
+      await new Promise((r) => setTimeout(r, 0));
+
       editor.blur();
-      expect(h.elements[1].width).toBe(600);
-      expect(h.elements[1].height).toBe(24);
-      expect((h.elements[1] as ExcalidrawTextElement).text).toBe(
+
+      const textElement = h.elements[1] as ExcalidrawTextElement;
+      expect(textElement.width).toBe(600);
+      expect(textElement.height).toBe(24);
+      expect(textElement.textAlign).toBe(TEXT_ALIGN.LEFT);
+      expect((textElement as ExcalidrawTextElement).text).toBe(
         "Excalidraw is an opensource virtual collaborative whiteboard",
       );
 
-      API.setSelectedElements([h.elements[1]]);
+      API.setSelectedElements([textElement]);
 
       fireEvent.contextMenu(GlobalTestState.canvas, {
         button: 2,
@@ -1377,8 +1385,13 @@ describe("textWysiwyg", () => {
           y: 25,
         }),
       );
-      expect((h.elements[2] as ExcalidrawTextElement).text).toBe(
-        "Excalidraw is an opensource virtual collaborative whiteboard",
+      expect(h.elements[2] as ExcalidrawTextElement).toEqual(
+        expect.objectContaining({
+          text: "Excalidraw is an opensource virtual collaborative whiteboard",
+          verticalAlign: VERTICAL_ALIGN.MIDDLE,
+          textAlign: TEXT_ALIGN.LEFT,
+          boundElements: null,
+        }),
       );
     });
   });
