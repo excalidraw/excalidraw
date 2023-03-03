@@ -139,27 +139,46 @@ export const actionBindText = register({
     redrawTextBoundingBox(textElement, container);
 
     return {
-      elements: adjustZIndexForContainer(elements, textElement, container.id),
+      elements: pushTextAboveContainer(elements, container, textElement),
       appState: { ...appState, selectedElementIds: { [container.id]: true } },
       commitToHistory: true,
     };
   },
 });
 
-const adjustZIndexForContainer = (
+const pushTextAboveContainer = (
   elements: readonly ExcalidrawElement[],
+  container: ExcalidrawElement,
   textElement: ExcalidrawTextElement,
-  containerId: string,
 ) => {
   const updatedElements = elements.slice();
   const textElementIndex = updatedElements.findIndex(
     (ele) => ele.id === textElement.id,
   );
   updatedElements.splice(textElementIndex, 1);
+
   const containerIndex = updatedElements.findIndex(
-    (ele) => ele.id === containerId,
+    (ele) => ele.id === container.id,
   );
   updatedElements.splice(containerIndex + 1, 0, textElement);
+  return updatedElements;
+};
+
+const pushContainerBelowText = (
+  elements: readonly ExcalidrawElement[],
+  container: ExcalidrawElement,
+  textElement: ExcalidrawTextElement,
+) => {
+  const updatedElements = elements.slice();
+  const containerIndex = updatedElements.findIndex(
+    (ele) => ele.id === container.id,
+  );
+  updatedElements.splice(containerIndex, 1);
+
+  const textElementIndex = updatedElements.findIndex(
+    (ele) => ele.id === textElement.id,
+  );
+  updatedElements.splice(textElementIndex, 0, container);
   return updatedElements;
 };
 
@@ -218,10 +237,10 @@ export const actionCreateContainerFromText = register({
       redrawTextBoundingBox(textElement, container);
 
       return {
-        elements: adjustZIndexForContainer(
+        elements: pushContainerBelowText(
           [...elements, container],
+          container,
           textElement,
-          container.id,
         ),
         appState: {
           ...appState,

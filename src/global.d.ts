@@ -165,3 +165,5 @@ declare module "image-blob-reduce" {
   const reduce: ImageBlobReduce.ImageBlobReduceStatic;
   export = reduce;
 }
+
+type ExtractSetType<T extends Set<any>> = T extends Set<infer U> ? U : never;

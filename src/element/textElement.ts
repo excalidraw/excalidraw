@@ -717,14 +717,12 @@ const VALID_CONTAINER_TYPES = new Set([
   "arrow",
 ]);
 
-export type ValidContainerType<T> = T extends Set<infer U> ? U : never;
-
 export const isValidTextContainer = (element: ExcalidrawElement) =>
   VALID_CONTAINER_TYPES.has(element.type);
 
 export const computeContainerDimensionForBoundText = (
   dimension: number,
-  containerType: ValidContainerType<typeof VALID_CONTAINER_TYPES>,
+  containerType: ExtractSetType<typeof VALID_CONTAINER_TYPES>,
 ) => {
   dimension = Math.ceil(dimension);
   const padding = BOUND_TEXT_PADDING * 2;
