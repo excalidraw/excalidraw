@@ -110,6 +110,7 @@
     "increaseFontSize": "",
     "unbindText": "",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "Redeguoti nuorodą",
       "create": "Sukurti nuorodą",
