@@ -110,6 +110,7 @@
     "increaseFontSize": "폰트 사이즈 키우기",
     "unbindText": "텍스트 분리",
     "bindText": "텍스트를 컨테이너에 결합",
+    "createContainerFromText": "",
     "link": {
       "edit": "링크 수정하기",
       "create": "링크 만들기",
