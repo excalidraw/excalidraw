@@ -110,6 +110,7 @@
     "increaseFontSize": "Letters vergroten",
     "unbindText": "Ontkoppel tekst",
     "bindText": "Koppel tekst aan de container",
+    "createContainerFromText": "",
     "link": {
       "edit": "Wijzig link",
       "create": "Maak link",
