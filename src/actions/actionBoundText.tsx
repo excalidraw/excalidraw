@@ -1,9 +1,4 @@
-import {
-  BOUND_TEXT_PADDING,
-  ROUNDNESS,
-  TEXT_ALIGN,
-  VERTICAL_ALIGN,
-} from "../constants";
+import { BOUND_TEXT_PADDING, ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { getNonDeletedElements, isTextElement, newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import {
@@ -259,7 +254,6 @@ export const actionCreateContainerFromText = register({
       mutateElement(textElement, {
         containerId: container.id,
         verticalAlign: VERTICAL_ALIGN.MIDDLE,
-        textAlign: TEXT_ALIGN.CENTER,
         boundElements: null,
       });
       redrawTextBoundingBox(textElement, container);
