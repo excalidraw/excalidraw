@@ -323,12 +323,14 @@ export const getTextHeight = (text: string, font: FontString) => {
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   return text
     .split("\n")
-    .flatMap((line) => {
-      // break big lines
-      return getLineWidth(line.trimEnd(), font) <= maxWidth
-        ? line
-        : breakLine(line, font, maxWidth);
-    })
+    .reduce((array: Array<string>, line: string) => {
+      if (getLineWidth(line, font) <= maxWidth) {
+        array.push(line);
+      } else {
+        array.push(...breakLine(line, font, maxWidth));
+      }
+      return array;
+    }, [])
     .join("\n");
 };
 
@@ -337,13 +339,21 @@ const splitLineInWords = (line: string): Array<string> => {
 };
 
 const breakLine = (line: string, font: FontString, maxWidth: number) => {
-  const words = splitLineInWords(line).flatMap((word) => {
-    // break big words
-    return getLineWidth(word.trim(), font) <= maxWidth ||
-      Array.from(word.trim()).length === 1
-      ? word
-      : breakWord(word, font, maxWidth);
-  });
+  const words = splitLineInWords(line).reduce(
+    // flatMap is so slow
+    (array: Array<string>, word: string) => {
+      if (
+        getLineWidth(word.trim(), font) <= maxWidth ||
+        Array.from(word.trim()).length === 1
+      ) {
+        array.push(word);
+      } else {
+        array.push(...breakWord(word, font, maxWidth));
+      }
+      return array;
+    },
+    [],
+  );
   const lines: Array<string> = [];
   let lastLineWidth = 0;
   const spaceWidth = getLineWidth(" ", font);
