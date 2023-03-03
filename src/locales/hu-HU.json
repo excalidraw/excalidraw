@@ -110,6 +110,7 @@
     "increaseFontSize": "Betűméret növelése",
     "unbindText": "Szövegkötés feloldása",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "Hivatkozás szerkesztése",
       "create": "Hivatkozás létrehozása",
