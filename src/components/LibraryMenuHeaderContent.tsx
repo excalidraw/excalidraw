@@ -48,6 +48,7 @@ export const LibraryMenuHeader: React.FC<{
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
   const [isLibraryMenuOpen, setIsLibraryMenuOpen] = useAtom(
     isLibraryMenuOpenAtom,
+    jotaiScope,
   );
   const renderRemoveLibAlert = useCallback(() => {
     const content = selectedItems.length
