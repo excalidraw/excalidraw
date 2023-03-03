@@ -110,6 +110,7 @@
     "increaseFontSize": "افزایش دادن اندازه فونت",
     "unbindText": "بازکردن نوشته",
     "bindText": "بستن نوشته",
+    "createContainerFromText": "",
     "link": {
       "edit": "ویرایش لینک",
       "create": "ایجاد پیوند",
