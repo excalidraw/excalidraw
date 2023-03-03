@@ -110,6 +110,7 @@
     "increaseFontSize": "Povečaj velikost pisave",
     "unbindText": "Veži besedilo",
     "bindText": "Veži besedilo na element",
+    "createContainerFromText": "",
     "link": {
       "edit": "Uredi povezavo",
       "create": "Ustvari povezavo",
