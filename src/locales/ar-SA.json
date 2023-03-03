@@ -110,6 +110,7 @@
     "increaseFontSize": "تكبير حجم الخط",
     "unbindText": "فك ربط النص",
     "bindText": "ربط النص بالحاوية",
+    "createContainerFromText": "",
     "link": {
       "edit": "تعديل الرابط",
       "create": "إنشاء رابط",
