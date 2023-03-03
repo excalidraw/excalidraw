@@ -110,6 +110,7 @@
     "increaseFontSize": "Zvětšit písmo",
     "unbindText": "Zrušit vazbu textu",
     "bindText": "Vázat text s kontejnerem",
+    "createContainerFromText": "",
     "link": {
       "edit": "Upravit odkaz",
       "create": "Vytvořit odkaz",
