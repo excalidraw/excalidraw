@@ -339,21 +339,7 @@ const splitLineInWords = (line: string): Array<string> => {
 };
 
 const breakLine = (line: string, font: FontString, maxWidth: number) => {
-  const words = splitLineInWords(line).reduce(
-    // flatMap is so slow
-    (array: Array<string>, word: string) => {
-      if (
-        getLineWidth(word.trim(), font) <= maxWidth ||
-        Array.from(word.trim()).length === 1
-      ) {
-        array.push(word);
-      } else {
-        array.push(...breakWord(word, font, maxWidth));
-      }
-      return array;
-    },
-    [],
-  );
+  const words = splitLineInWords(line);
   const lines: Array<string> = [];
   let lastLineWidth = 0;
   const spaceWidth = getLineWidth(" ", font);
@@ -374,7 +360,6 @@ const breakLine = (line: string, font: FontString, maxWidth: number) => {
     ) {
       lastLineWidth += wordWidth;
       lines[lines.length - 1] += word;
-
       return; // next word
     }
 
@@ -393,8 +378,16 @@ const breakLine = (line: string, font: FontString, maxWidth: number) => {
       lines.splice(-1);
     }
 
-    lastLineWidth = wordWidth;
-    lines.push(word);
+    if (
+      wordWithoutTrailingSpaces.length <= 1 ||
+      getLineWidth(wordWithoutTrailingSpaces, font) <= maxWidth
+    ) {
+      lines.push(word);
+    } else {
+      lines.push(...breakWord(word, font, maxWidth));
+    }
+
+    lastLineWidth = getLineWidth(lines[lines.length - 1], font);
   });
   return lines;
 };
@@ -409,7 +402,7 @@ const breakWord = (word: string, font: FontString, maxWidth: number) => {
       return;
     }
     const widthWithLastLine = getLineWidth(
-      wordSections[wordSections.length - 1] + symbol.trimEnd(),
+      wordSections[wordSections.length - 1] + symbol,
       font,
     );
 
