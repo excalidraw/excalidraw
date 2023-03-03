@@ -110,6 +110,7 @@
     "increaseFontSize": "放大文字",
     "unbindText": "取消綁定文字",
     "bindText": "結合文字至容器",
+    "createContainerFromText": "",
     "link": {
       "edit": "編輯連結",
       "create": "建立連結",
