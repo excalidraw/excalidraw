@@ -19,6 +19,7 @@ import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
 import { resize } from "../tests/utils";
 import { getOriginalContainerHeightFromCache } from "./textWysiwyg";
+
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -1306,6 +1307,79 @@ describe("textWysiwyg", () => {
           ]
         `);
       });
+    });
+
+    it("should wrap text in a container when wrap text in container triggered from context menu", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(20, 30);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      fireEvent.change(editor, {
+        target: {
+          value: "Excalidraw is an opensource virtual collaborative whiteboard",
+        },
+      });
+
+      editor.dispatchEvent(new Event("input"));
+      await new Promise((cb) => setTimeout(cb, 0));
+      editor.blur();
+      expect(h.elements[1].width).toBe(600);
+      expect(h.elements[1].height).toBe(24);
+      expect((h.elements[1] as ExcalidrawTextElement).text).toBe(
+        "Excalidraw is an opensource virtual collaborative whiteboard",
+      );
+
+      API.setSelectedElements([h.elements[1]]);
+
+      fireEvent.contextMenu(GlobalTestState.canvas, {
+        button: 2,
+        clientX: 20,
+        clientY: 30,
+      });
+
+      const contextMenu = document.querySelector(".context-menu");
+      fireEvent.click(
+        queryByText(contextMenu as HTMLElement, "Wrap text in a container")!,
+      );
+      expect(h.elements.length).toBe(3);
+
+      expect(h.elements[1]).toEqual(
+        expect.objectContaining({
+          angle: 0,
+          backgroundColor: "transparent",
+          boundElements: [
+            {
+              id: h.elements[2].id,
+              type: "text",
+            },
+          ],
+          fillStyle: "hachure",
+          groupIds: [],
+          height: 34,
+          isDeleted: false,
+          link: null,
+          locked: false,
+          opacity: 100,
+          roughness: 1,
+          roundness: {
+            type: 3,
+          },
+          strokeColor: "#000000",
+          strokeStyle: "solid",
+          strokeWidth: 1,
+          type: "rectangle",
+          updated: 1,
+          version: 1,
+          width: 610,
+          x: 15,
+          y: 25,
+        }),
+      );
+      expect((h.elements[2] as ExcalidrawTextElement).text).toBe(
+        "Excalidraw is an opensource virtual collaborative whiteboard",
+      );
     });
   });
 });
