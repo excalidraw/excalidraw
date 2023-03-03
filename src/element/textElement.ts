@@ -360,22 +360,15 @@ const breakLine = (line: string, font: FontString, maxWidth: number) => {
     ) {
       lastLineWidth += wordWidth;
       lines[lines.length - 1] += word;
+      if (lastLineWidth > maxWidth) {
+        lines[lines.length - 1] = removeTrailingSpaces(
+          lines[lines.length - 1],
+          lastLineWidth,
+          maxWidth,
+          spaceWidth,
+        );
+      }
       return; // next word
-    }
-
-    if (lastLineWidth > maxWidth) {
-      // if the method that draw the text is refactored, this code must be removed
-      // remove trailing spaces
-      const spacesToRemove = Math.ceil((lastLineWidth - maxWidth) / spaceWidth);
-      lines[lines.length - 1] = lines[lines.length - 1].slice(
-        0,
-        -spacesToRemove,
-      );
-    }
-    // remove previous line if only has spaces
-    if (lines.length > 0 && lines[lines.length - 1].trim().length === 0) {
-      // if the method that draw the text is refactored, this code must be removed
-      lines.splice(-1);
     }
 
     if (
@@ -388,8 +381,35 @@ const breakLine = (line: string, font: FontString, maxWidth: number) => {
     }
 
     lastLineWidth = getLineWidth(lines[lines.length - 1], font);
+
+    if (lastLineWidth > maxWidth) {
+      lines[lines.length - 1] = removeTrailingSpaces(
+        lines[lines.length - 1],
+        lastLineWidth,
+        maxWidth,
+        spaceWidth,
+      );
+    }
+    // remove previous line if only has spaces
+    if (lines.length > 0 && lines[lines.length - 1].trim().length === 0) {
+      // if the method that draw the text is refactored, this code must be removed
+      lines.splice(-1);
+    }
+
+    lastLineWidth = getLineWidth(lines[lines.length - 1], font);
   });
   return lines;
+};
+
+// if the method that draw the text is refactored, this code must be removed
+const removeTrailingSpaces = (
+  line: string,
+  lastLineWidth: number,
+  maxWidth: number,
+  spaceWidth: number,
+) => {
+  const spacesToRemove = Math.ceil((lastLineWidth - maxWidth) / spaceWidth);
+  return line.slice(0, -spacesToRemove);
 };
 
 const breakWord = (word: string, font: FontString, maxWidth: number) => {
