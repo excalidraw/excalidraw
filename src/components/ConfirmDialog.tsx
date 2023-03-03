@@ -6,6 +6,7 @@ import DialogActionButton from "./DialogActionButton";
 import { useSetAtom } from "jotai";
 import { isLibraryMenuOpenAtom } from "./LibraryMenuHeaderContent";
 import { useExcalidrawSetAppState } from "./App";
+import { jotaiScope } from "../jotai";
 
 interface Props extends Omit<DialogProps, "onCloseRequest"> {
   onConfirm: () => void;
@@ -24,7 +25,7 @@ const ConfirmDialog = (props: Props) => {
     ...rest
   } = props;
   const setAppState = useExcalidrawSetAppState();
-  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
+  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom, jotaiScope);
 
   return (
     <Dialog
