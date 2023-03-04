@@ -108,6 +108,7 @@ import {
   textWysiwyg,
   transformElements,
   updateTextElement,
+  redrawTextBoundingBox,
 } from "../element";
 import {
   bindOrUnbindLinearElement,
@@ -264,6 +265,7 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerDims,
+  getContainerElement,
   getTextBindableContainerAtPosition,
   isValidTextContainer,
 } from "../element/textElement";
@@ -282,6 +284,7 @@ import { actionPaste } from "../actions/actionClipboard";
 import { actionToggleHandTool } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { actionCreateContainerFromText } from "../actions/actionBoundText";
 import { randomId } from "../random";
 
 const deviceContextInitialValue = {
@@ -1632,6 +1635,7 @@ class App extends React.Component<AppProps, AppState> {
       oldIdToDuplicatedId.set(element.id, newElement.id);
       return newElement;
     });
+
     bindTextToShapeAfterDuplication(newElements, elements, oldIdToDuplicatedId);
     const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
@@ -1644,6 +1648,14 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.scene.replaceAllElements(nextElements);
+
+    newElements.forEach((newElement) => {
+      if (isTextElement(newElement) && isBoundToContainer(newElement)) {
+        const container = getContainerElement(newElement);
+        redrawTextBoundingBox(newElement, container);
+      }
+    });
+
     this.history.resumeRecording();
 
     this.setState(
@@ -2670,14 +2682,6 @@ class App extends React.Component<AppProps, AppState> {
           element,
         ]);
       }
-
-      // case: creating new text not centered to parent element → offset Y
-      // so that the text is centered to cursor position
-      if (!parentCenterPosition) {
-        mutateElement(element, {
-          y: element.y - element.baseline / 2,
-        });
-      }
     }
 
     this.setState({
@@ -2771,7 +2775,6 @@ class App extends React.Component<AppProps, AppState> {
       );
       if (container) {
         if (
-          isArrowElement(container) ||
           hasBoundTextElement(container) ||
           !isTransparent(container.backgroundColor) ||
           isHittingElementNotConsideringBoundingBox(container, this.state, [
@@ -6250,6 +6253,7 @@ class App extends React.Component<AppProps, AppState> {
       actionGroup,
       actionUnbindText,
       actionBindText,
+      actionCreateContainerFromText,
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,

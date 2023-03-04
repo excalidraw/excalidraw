@@ -14,6 +14,7 @@ import {
   isFreeDrawElement,
   isInitializedImageElement,
   isArrowElement,
+  hasBoundTextElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -36,14 +37,15 @@ import {
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
-  VERTICAL_ALIGN,
 } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
   getApproxLineHeight,
   getBoundTextElement,
-  getBoundTextElementOffset,
+  getContainerCoords,
   getContainerElement,
+  getMaxContainerHeight,
+  getMaxContainerWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -280,22 +282,19 @@ const drawElementOnCanvas = (
         const lineHeight = element.containerId
           ? getApproxLineHeight(getFontString(element))
           : element.height / lines.length;
-        let verticalOffset = element.height - element.baseline;
-        if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-          verticalOffset = getBoundTextElementOffset(element);
-        }
-
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
             : element.textAlign === "right"
             ? element.width
             : 0;
+        context.textBaseline = "bottom";
+
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],
             horizontalOffset,
-            (index + 1) * lineHeight - verticalOffset,
+            (index + 1) * lineHeight,
           );
         }
         context.restore();
@@ -816,6 +815,21 @@ const drawElementFromCanvas = (
       elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
       elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
     );
+
+    if (
+      process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX &&
+      hasBoundTextElement(element)
+    ) {
+      const coords = getContainerCoords(element);
+      context.strokeStyle = "#c92a2a";
+      context.lineWidth = 3;
+      context.strokeRect(
+        (coords.x + renderConfig.scrollX) * window.devicePixelRatio,
+        (coords.y + renderConfig.scrollY) * window.devicePixelRatio,
+        getMaxContainerWidth(element) * window.devicePixelRatio,
+        getMaxContainerHeight(element) * window.devicePixelRatio,
+      );
+    }
   }
   context.restore();
 
@@ -1278,7 +1292,6 @@ export const renderElementToSvg = (
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
-        const verticalOffset = element.height - element.baseline;
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
@@ -1296,13 +1309,14 @@ export const renderElementToSvg = (
           const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
-          text.setAttribute("y", `${(i + 1) * lineHeight - verticalOffset}`);
+          text.setAttribute("y", `${i * lineHeight}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
           text.setAttribute("fill", element.strokeColor);
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);
+          text.setAttribute("dominant-baseline", "text-before-edge");
           node.appendChild(text);
         }
         root.appendChild(node);
