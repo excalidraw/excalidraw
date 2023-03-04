@@ -6,11 +6,15 @@ import {
 type RenderCheck = {
   runCanvas: boolean;
   runCanvasUi: boolean;
+  renderCache: {
+    [key: string]: any;
+  };
 };
 let canvasUIRenderConfigCache: CanvasUIRenderConfig | undefined = undefined;
 let canvasContentRenderConfigCache: CanvasContentRenderConfig | undefined =
   undefined;
 let elementsLengthCache: number | undefined;
+const renderCache: RenderCheck["renderCache"] = {};
 
 export const renderCheck = (
   elementsLength: number,
@@ -21,7 +25,7 @@ export const renderCheck = (
     elementsLengthCache = elementsLength;
     canvasUIRenderConfigCache = structuredClone(canvasUIRenderConfig);
     canvasContentRenderConfigCache = structuredClone(canvasContentRenderConfig);
-    return { runCanvas: true, runCanvasUi: true };
+    return { runCanvas: true, runCanvasUi: true, renderCache };
   }
 
   let runCanvas = false;
@@ -30,7 +34,8 @@ export const renderCheck = (
   // checking for any change
 
   // checking in common part
-  const { scrollX, scrollY, zoom, isElementsChanged } = canvasContentRenderConfig;
+  const { scrollX, scrollY, zoom, isElementsChanged } =
+    canvasContentRenderConfig;
   const cache = canvasContentRenderConfigCache;
   if (
     scrollX !== cache?.scrollX ||
@@ -83,28 +88,39 @@ export const renderCheck = (
       selectedElementIds,
       selectedLinearElement,
       selectionElement,
+      editingLinearElement,
     } = canvasUIRenderConfig;
-    
+
     if (
       renderScrollbars !== canvasUIRenderConfigCache?.renderScrollbars ||
       renderSelection !== canvasUIRenderConfigCache?.renderSelection ||
       selectionColor !== canvasUIRenderConfigCache?.selectionColor ||
       Object.keys(remotePointerUsernames).length ||
-      selectedLinearElement?.hoverPointIndex !== canvasUIRenderConfigCache?.selectedLinearElement?.hoverPointIndex ||
-      selectedLinearElement?.segmentMidPointHoveredCoords?.toString() !== canvasUIRenderConfigCache?.selectedLinearElement?.segmentMidPointHoveredCoords?.toString() ||
-      selectionElement?.versionNonce !== canvasUIRenderConfigCache?.selectionElement?.versionNonce
+      editingLinearElement ||
+      selectedLinearElement?.hoverPointIndex !==
+        canvasUIRenderConfigCache?.selectedLinearElement?.hoverPointIndex ||
+      selectedLinearElement?.segmentMidPointHoveredCoords?.toString() !==
+        canvasUIRenderConfigCache?.selectedLinearElement?.segmentMidPointHoveredCoords?.toString() ||
+      selectionElement?.versionNonce !==
+        canvasUIRenderConfigCache?.selectionElement?.versionNonce
     ) {
       runCanvasUi = true;
     }
 
-    if(!runCanvasUi){
-      const { selectedElementIds: selectedElementIdsCache = {} } = canvasUIRenderConfigCache
+    if (!runCanvasUi) {
+      const { selectedElementIds: selectedElementIdsCache = {} } =
+        canvasUIRenderConfigCache;
 
-      const selectedElementIdsCacheKeys = Object.keys(selectedElementIdsCache)
-      const selectedElementIdsKeys = Object.keys(selectedElementIds || {})
+      const selectionId =
+        selectionElement?.type === "selection" ? selectionElement?.id : null;
 
-      if (selectedElementIdsKeys.length !== selectedElementIdsCacheKeys.length ||
-        selectedElementIdsKeys.some((id) => !(id in selectedElementIdsCache))) {
+      const selectedElementIdsCacheKeys = Object.keys(selectedElementIdsCache);
+      const selectedElementIdsKeys = Object.keys(selectedElementIds || {});
+
+      if (
+        selectedElementIdsKeys.length !== selectedElementIdsCacheKeys.length ||
+        selectedElementIdsKeys.some((id) => !(id in selectedElementIdsCache))
+      ) {
         runCanvasUi = true;
       }
     }
@@ -115,5 +131,5 @@ export const renderCheck = (
   canvasUIRenderConfigCache = structuredClone(canvasUIRenderConfig);
   canvasContentRenderConfigCache = structuredClone(canvasContentRenderConfig);
 
-  return { runCanvas, runCanvasUi };
+  return { runCanvas, runCanvasUi, renderCache };
 };

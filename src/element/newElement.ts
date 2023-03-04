@@ -35,7 +35,7 @@ import { isArrowElement } from "./typeChecks";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "type" | "isDeleted" | "updated">,
-  | "id" 
+  | "id"
   | "width"
   | "height"
   | "angle"

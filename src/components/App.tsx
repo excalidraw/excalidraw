@@ -1378,6 +1378,7 @@ class App extends React.Component<AppProps, AppState> {
           isElementsChanged: this.scene.getIsElementsChanged(),
           selectedElementIds: this.state.selectedElementIds,
           selectedLinearElement: this.state.selectedLinearElement,
+          editingLinearElement: this.state.editingLinearElement,
           selectionElement: this.state.selectionElement,
         },
         callback: ({ atLeastOneVisibleElement, scrollBars }) => {
@@ -4357,7 +4358,7 @@ class App extends React.Component<AppProps, AppState> {
       type: elementType,
       x: gridX,
       y: gridY,
-      id: (elementType === "selection") ? this.selectionID : undefined,
+      id: elementType === "selection" ? this.selectionID : undefined,
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,

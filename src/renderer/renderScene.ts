@@ -851,38 +851,45 @@ export const _renderScene = ({
     // When doing calculations based on canvas width we should used normalized one
     const normalizedCanvasWidth = canvas.width / scale;
     const normalizedCanvasHeight = canvas.height / scale;
-    const { runCanvas, runCanvasUi } = renderCheck(
+    const { runCanvas, runCanvasUi, renderCache } = renderCheck(
       elements.length,
       canvasUIRenderConfig,
       canvasContentRenderConfig,
     );
 
-    console.log("runCanvas, runCanvasUi", runCanvas, runCanvasUi, appState, appState.selectionElement,appState.selectedLinearElement);
-    // const elementId = appState.editingLinearElement?.elementId;
-    // const element = elementId && LinearElementEditor.getElement(elementId);
+    if (runCanvas) {
+      const { atLeastOneVisibleElement, editingLinearElement } =
+        renderCanvasContent({
+          elements,
+          appState,
+          scale,
+          rc,
+          canvas,
+          renderConfig: canvasContentRenderConfig,
+        });
 
-    const { atLeastOneVisibleElement, editingLinearElement } =
-      renderCanvasContent({
+      renderCache.atLeastOneVisibleElement = atLeastOneVisibleElement;
+      renderCache.editingLinearElement = editingLinearElement;
+    }
+
+    if (runCanvasUi) {
+      const { scrollBars } = renderCanvasUI({
         elements,
         appState,
         scale,
-        rc,
-        canvas,
-        renderConfig: canvasContentRenderConfig,
+        canvasUi,
+        renderConfig: canvasUIRenderConfig,
+        editingLinearElement: renderCache.editingLinearElement,
+        normalizedCanvasWidth,
+        normalizedCanvasHeight,
       });
 
-    const { scrollBars } = renderCanvasUI({
-      elements,
-      appState,
-      scale,
-      canvasUi,
-      renderConfig: canvasUIRenderConfig,
-      editingLinearElement,
-      normalizedCanvasWidth,
-      normalizedCanvasHeight,
-    });
-
-    return { atLeastOneVisibleElement, scrollBars };
+      renderCache.scrollBars = scrollBars;
+    }
+    return {
+      atLeastOneVisibleElement: renderCache.atLeastOneVisibleElement,
+      scrollBars: renderCache.scrollBar,
+    };
   };
 
 const renderSceneThrottled = throttleRAF(
