@@ -327,7 +327,6 @@ export const renderCanvasContent = ({
   rc,
   canvas,
   renderConfig,
-  visibleElements,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
@@ -335,7 +334,6 @@ export const renderCanvasContent = ({
   rc: RoughCanvas;
   canvas: HTMLCanvasElement;
   renderConfig: CanvasContentRenderConfig;
-  visibleElements?: readonly NonDeletedExcalidrawElement[] | undefined;
 }) => {
   const { renderGrid = true, isExporting } = renderConfig;
 
@@ -391,17 +389,15 @@ export const renderCanvasContent = ({
   }
 
   // Paint visible elements
-  if (!visibleElements) {
-    visibleElements = elements.filter((element) =>
-      isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight, {
-        zoom: renderConfig.zoom,
-        offsetLeft: appState.offsetLeft,
-        offsetTop: appState.offsetTop,
-        scrollX: renderConfig.scrollX,
-        scrollY: renderConfig.scrollY,
-      }),
-    );
-  }
+  const visibleElements = elements.filter((element) =>
+    isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight, {
+      zoom: renderConfig.zoom,
+      offsetLeft: appState.offsetLeft,
+      offsetTop: appState.offsetTop,
+      scrollX: renderConfig.scrollX,
+      scrollY: renderConfig.scrollY,
+    }),
+  );
 
   let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
     undefined;
@@ -434,7 +430,6 @@ export const renderCanvasContent = ({
   return {
     atLeastOneVisibleElement: visibleElements.length > 0,
     editingLinearElement,
-    visibleElements,
   };
 };
 
@@ -856,35 +851,27 @@ export const _renderScene = ({
     // When doing calculations based on canvas width we should used normalized one
     const normalizedCanvasWidth = canvas.width / scale;
     const normalizedCanvasHeight = canvas.height / scale;
-    const { runCanvas, runCanvasUi, renderCache, runCanvasVisibleElement } =
-      renderCheck(
-        elements.length,
-        canvasUIRenderConfig,
-        canvasContentRenderConfig,
-        normalizedCanvasWidth,
-        normalizedCanvasHeight,
-      );
+    const { runCanvas, runCanvasUi, renderCache } = renderCheck(
+      elements.length,
+      canvasUIRenderConfig,
+      canvasContentRenderConfig,
+      normalizedCanvasWidth,
+      normalizedCanvasHeight,
+    );
 
     if (runCanvas) {
-      const {
-        atLeastOneVisibleElement,
-        editingLinearElement,
-        visibleElements,
-      } = renderCanvasContent({
-        elements,
-        appState,
-        scale,
-        rc,
-        canvas,
-        renderConfig: canvasContentRenderConfig,
-        visibleElements: runCanvasVisibleElement
-          ? undefined
-          : renderCache.visibleElements,
-      });
+      const { atLeastOneVisibleElement, editingLinearElement } =
+        renderCanvasContent({
+          elements,
+          appState,
+          scale,
+          rc,
+          canvas,
+          renderConfig: canvasContentRenderConfig,
+        });
 
       renderCache.atLeastOneVisibleElement = atLeastOneVisibleElement;
       renderCache.editingLinearElement = editingLinearElement;
-      renderCache.visibleElements = visibleElements;
     }
 
     if (runCanvasUi) {

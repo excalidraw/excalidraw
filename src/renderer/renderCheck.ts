@@ -6,7 +6,6 @@ import {
 type RenderCheck = {
   runCanvas: boolean;
   runCanvasUi: boolean;
-  runCanvasVisibleElement: boolean;
   renderCache: {
     [key: string]: any;
   };
@@ -26,28 +25,25 @@ export const renderCheck = (
   normalizedCanvasWidth: number,
   normalizedCanvasHeight: number,
 ): RenderCheck => {
-
-  function setCachedValues(){
+  function setCachedValues() {
     elementsLengthCache = elementsLength;
     normalizedCanvasWidthCache = normalizedCanvasWidth;
     normalizedCanvasHeightCache = normalizedCanvasHeight;
     canvasUIRenderConfigCache = structuredClone(canvasUIRenderConfig);
     canvasContentRenderConfigCache = structuredClone(canvasContentRenderConfig);
   }
-  
+
   if (canvasUIRenderConfigCache === undefined) {
-    setCachedValues()
+    setCachedValues();
     return {
       runCanvas: true,
       runCanvasUi: true,
       renderCache,
-      runCanvasVisibleElement: true,
     };
   }
 
   let runCanvas = false;
   let runCanvasUi = false;
-  let runCanvasVisibleElement = false;
 
   // checking for any change
 
@@ -63,7 +59,7 @@ export const renderCheck = (
     normalizedCanvasWidth !== normalizedCanvasWidthCache ||
     isElementsChanged !== cache?.isElementsChanged
   ) {
-    runCanvas = runCanvasUi = runCanvasVisibleElement = true;
+    runCanvas = runCanvasUi = true;
   } else {
     const {
       viewBackgroundColor,
@@ -146,14 +142,8 @@ export const renderCheck = (
     }
   }
 
-  // on collabration we recheck Visible elements all time as of now
-  runCanvasVisibleElement =
-    runCanvasVisibleElement ||
-    elementsLength !== elementsLengthCache ||
-    Boolean(Object.keys(canvasUIRenderConfig.remotePointerUsernames).length);
-
   // setting to the latest values
-  setCachedValues()
+  setCachedValues();
 
-  return { runCanvas, runCanvasUi, renderCache, runCanvasVisibleElement };
+  return { runCanvas, runCanvasUi, renderCache };
 };
