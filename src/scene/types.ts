@@ -22,6 +22,7 @@ export type CanvasUIRenderConfig = {
   selectionColor?: string;
   selectedElementIds?: AppState["selectedElementIds"];
   selectedLinearElement?: AppState["selectedLinearElement"];
+  editingLinearElement?: AppState["selectedLinearElement"];
   selectionElement?: AppState["selectionElement"];
 };
 
