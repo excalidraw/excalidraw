@@ -282,6 +282,7 @@ import { actionPaste } from "../actions/actionClipboard";
 import { actionToggleHandTool } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { randomId } from "../random";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -378,7 +379,7 @@ class App extends React.Component<AppProps, AppState> {
     // needed for tests to pass since we directly render App in many tests
     UIOptions: DEFAULT_UI_OPTIONS,
   };
-
+  private selectionID: string = randomId();
   public scene: Scene;
   private fonts: Fonts;
   private resizeObserver: ResizeObserver | undefined;
@@ -4350,6 +4351,7 @@ class App extends React.Component<AppProps, AppState> {
       type: elementType,
       x: gridX,
       y: gridY,
+      id: (elementType === "selection") ? this.selectionID : undefined,
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
