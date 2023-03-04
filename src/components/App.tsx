@@ -288,6 +288,7 @@ export let showFourthFont: boolean = false;
 import { actionToggleHandTool } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { actionCreateContainerFromText } from "../actions/actionBoundText";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -2988,7 +2989,6 @@ class App extends React.Component<AppProps, AppState> {
       );
       if (container) {
         if (
-          isArrowElement(container) ||
           hasBoundTextElement(container) ||
           !isTransparent(container.backgroundColor) ||
           isHittingElementNotConsideringBoundingBox(container, this.state, [
@@ -6497,6 +6497,7 @@ class App extends React.Component<AppProps, AppState> {
       actionGroup,
       actionUnbindText,
       actionBindText,
+      actionCreateContainerFromText,
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,

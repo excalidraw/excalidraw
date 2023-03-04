@@ -1,7 +1,7 @@
 import { BOUND_TEXT_PADDING } from "../constants";
 import { API } from "../tests/helpers/api";
 import {
-  computeContainerHeightForBoundText,
+  computeContainerDimensionForBoundText,
   getContainerCoords,
   getMaxContainerWidth,
   getMaxContainerHeight,
@@ -35,10 +35,11 @@ describe("Test wrapText", () => {
 
   describe("When text doesn't contain new lines", () => {
     const text = "Hello whats up";
+
     [
       {
         desc: "break all words when width of each word is less than container width",
-        width: 90,
+        width: 80,
         res: `Hello 
 whats 
 up`,
@@ -62,7 +63,7 @@ p`,
       {
         desc: "break words as per the width",
 
-        width: 150,
+        width: 140,
         res: `Hello whats 
 up`,
       },
@@ -93,7 +94,7 @@ whats up`;
     [
       {
         desc: "break all words when width of each word is less than container width",
-        width: 90,
+        width: 80,
         res: `Hello
 whats 
 up`,
@@ -214,7 +215,7 @@ describe("Test measureText", () => {
     });
   });
 
-  describe("Test computeContainerHeightForBoundText", () => {
+  describe("Test computeContainerDimensionForBoundText", () => {
     const params = {
       width: 178,
       height: 194,
@@ -225,7 +226,9 @@ describe("Test measureText", () => {
         type: "rectangle",
         ...params,
       });
-      expect(computeContainerHeightForBoundText(element, 150)).toEqual(160);
+      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
+        160,
+      );
     });
 
     it("should compute container height correctly for ellipse", () => {
@@ -233,7 +236,9 @@ describe("Test measureText", () => {
         type: "ellipse",
         ...params,
       });
-      expect(computeContainerHeightForBoundText(element, 150)).toEqual(226);
+      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
+        226,
+      );
     });
 
     it("should compute container height correctly for diamond", () => {
@@ -241,7 +246,9 @@ describe("Test measureText", () => {
         type: "diamond",
         ...params,
       });
-      expect(computeContainerHeightForBoundText(element, 150)).toEqual(320);
+      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
+        320,
+      );
     });
   });
 

@@ -31,6 +31,7 @@ import "./DefaultItems.scss";
 import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
+import { jotaiScope } from "../../jotai";
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -113,7 +114,10 @@ Help.displayName = "Help";
 export const ClearCanvas = () => {
   const { t } = useI18n();
 
-  const setActiveConfirmDialog = useSetAtom(activeConfirmDialogAtom);
+  const setActiveConfirmDialog = useSetAtom(
+    activeConfirmDialogAtom,
+    jotaiScope,
+  );
   const actionManager = useExcalidrawActionManager();
 
   if (!actionManager.isActionEnabled(actionClearCanvas)) {

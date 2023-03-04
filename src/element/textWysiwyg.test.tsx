@@ -3,10 +3,14 @@ import ExcalidrawApp from "../excalidraw-app";
 import { GlobalTestState, render, screen } from "../tests/test-utils";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { CODES, KEYS } from "../keys";
-import { fireEvent } from "../tests/test-utils";
+import {
+  fireEvent,
+  mockBoundingClientRect,
+  restoreOriginalGetBoundingClientRect,
+} from "../tests/test-utils";
 import { queryByText } from "@testing-library/react";
 
-import { FONT_FAMILY } from "../constants";
+import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -15,6 +19,7 @@ import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
 import { resize } from "../tests/utils";
 import { getOriginalContainerHeightFromCache } from "./textWysiwyg";
+
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -221,11 +226,19 @@ describe("textWysiwyg", () => {
 
   describe("Test container-unbound text", () => {
     const { h } = window;
+    const dimensions = { height: 400, width: 800 };
 
     let textarea: HTMLTextAreaElement;
     let textElement: ExcalidrawTextElement;
+
+    beforeAll(() => {
+      mockBoundingClientRect(dimensions);
+    });
+
     beforeEach(async () => {
       await render(<ExcalidrawApp />);
+      //@ts-ignore
+      h.app.refreshDeviceState(h.app.excalidrawContainerRef.current!);
 
       textElement = UI.createElement("text");
 
@@ -233,6 +246,10 @@ describe("textWysiwyg", () => {
       textarea = document.querySelector(
         ".excalidraw-textEditorContainer > textarea",
       )!;
+    });
+
+    afterAll(() => {
+      restoreOriginalGetBoundingClientRect();
     });
 
     it("should add a tab at the start of the first line", () => {
@@ -433,6 +450,27 @@ describe("textWysiwyg", () => {
       );
       expect(h.state.zoom.value).toBe(1);
     });
+
+    it("text should never go beyond max width", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(750, 300);
+
+      textarea = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      )!;
+      fireEvent.change(textarea, {
+        target: {
+          value:
+            "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+        },
+      });
+
+      textarea.dispatchEvent(new Event("input"));
+      await new Promise((cb) => setTimeout(cb, 0));
+      textarea.blur();
+      expect(textarea.style.width).toBe("792px");
+      expect(h.elements[0].width).toBe(1000);
+    });
   });
 
   describe("Test container-bound text", () => {
@@ -631,11 +669,11 @@ describe("textWysiwyg", () => {
     ["freedraw", "line"].forEach((type: any) => {
       it(`shouldn't create text element when pressing 'Enter' key on ${type} `, async () => {
         h.elements = [];
-        const elemnet = UI.createElement(type, {
+        const element = UI.createElement(type, {
           width: 100,
           height: 50,
         });
-        API.setSelectedElements([elemnet]);
+        API.setSelectedElements([element]);
         Keyboard.keyPress(KEYS.ENTER);
         expect(h.elements.length).toBe(1);
       });
@@ -1269,6 +1307,92 @@ describe("textWysiwyg", () => {
           ]
         `);
       });
+    });
+
+    it("should wrap text in a container when wrap text in container triggered from context menu", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(20, 30);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      fireEvent.change(editor, {
+        target: {
+          value: "Excalidraw is an opensource virtual collaborative whiteboard",
+        },
+      });
+
+      editor.dispatchEvent(new Event("input"));
+      await new Promise((cb) => setTimeout(cb, 0));
+
+      editor.select();
+      fireEvent.click(screen.getByTitle("Left"));
+      await new Promise((r) => setTimeout(r, 0));
+
+      editor.blur();
+
+      const textElement = h.elements[1] as ExcalidrawTextElement;
+      expect(textElement.width).toBe(600);
+      expect(textElement.height).toBe(24);
+      expect(textElement.textAlign).toBe(TEXT_ALIGN.LEFT);
+      expect((textElement as ExcalidrawTextElement).text).toBe(
+        "Excalidraw is an opensource virtual collaborative whiteboard",
+      );
+
+      API.setSelectedElements([textElement]);
+
+      fireEvent.contextMenu(GlobalTestState.canvas, {
+        button: 2,
+        clientX: 20,
+        clientY: 30,
+      });
+
+      const contextMenu = document.querySelector(".context-menu");
+      fireEvent.click(
+        queryByText(contextMenu as HTMLElement, "Wrap text in a container")!,
+      );
+      expect(h.elements.length).toBe(3);
+
+      expect(h.elements[1]).toEqual(
+        expect.objectContaining({
+          angle: 0,
+          backgroundColor: "transparent",
+          boundElements: [
+            {
+              id: h.elements[2].id,
+              type: "text",
+            },
+          ],
+          fillStyle: "hachure",
+          groupIds: [],
+          height: 34,
+          isDeleted: false,
+          link: null,
+          locked: false,
+          opacity: 100,
+          roughness: 1,
+          roundness: {
+            type: 3,
+          },
+          strokeColor: "#000000",
+          strokeStyle: "solid",
+          strokeWidth: 1,
+          type: "rectangle",
+          updated: 1,
+          version: 1,
+          width: 610,
+          x: 15,
+          y: 25,
+        }),
+      );
+      expect(h.elements[2] as ExcalidrawTextElement).toEqual(
+        expect.objectContaining({
+          text: "Excalidraw is an opensource virtual collaborative whiteboard",
+          verticalAlign: VERTICAL_ALIGN.MIDDLE,
+          textAlign: TEXT_ALIGN.LEFT,
+          boundElements: null,
+        }),
+      );
     });
   });
 });
