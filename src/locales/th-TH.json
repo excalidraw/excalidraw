@@ -86,7 +86,7 @@
     "removeFromLibrary": "นำออกจากคลัง",
     "libraryLoadingMessage": "กำลังโหลดคลัง...",
     "libraries": "",
-    "loadingScene": "",
+    "loadingScene": "กำลังโหลดฉาก",
     "align": "",
     "alignTop": "",
     "alignBottom": "",
@@ -156,7 +156,7 @@
     "resetZoom": "",
     "menu": "เมนู",
     "done": "",
-    "edit": "",
+    "edit": "แก้ไข",
     "undo": "เลิกทำ",
     "redo": "ทำซ้ำ",
     "resetLibrary": "รีเซ็ตคลัง",
@@ -166,12 +166,12 @@
     "lightMode": "โหมดกลางวัน",
     "zenMode": "โหมด Zen",
     "exitZenMode": "ออกจากโหมด Zen",
-    "cancel": "",
+    "cancel": "ยกเลิก",
     "clear": "",
-    "remove": "",
-    "publishLibrary": "",
+    "remove": "ลบ",
+    "publishLibrary": "เผยแพร่",
     "submit": "",
-    "confirm": ""
+    "confirm": "ยืนยัน"
   },
   "alerts": {
     "clearReset": "",
@@ -242,7 +242,7 @@
     "resizeImage": "",
     "rotate": "",
     "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "กดปุ่ม Delete เพื่อลบจุด\nกด Ctrl หรือ Cmd + D เพื่อทำซ้ำหรือลากเพื่อเคลื่อนย้าย",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "",
@@ -291,7 +291,7 @@
     "link_button": "",
     "excalidrawplus_description": "",
     "excalidrawplus_button": "",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_exportError": "ไม่สามารถส่งออกไปที่ Excalidraw+ ได้ในขณะนี้"
   },
   "helpDialog": {
     "blog": "",
