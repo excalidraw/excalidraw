@@ -1378,6 +1378,7 @@ class App extends React.Component<AppProps, AppState> {
           isElementsChanged: this.scene.getIsElementsChanged(),
           selectedElementIds: this.state.selectedElementIds,
           selectedLinearElement: this.state.selectedLinearElement,
+          selectionElement: this.state.selectionElement,
         },
         callback: ({ atLeastOneVisibleElement, scrollBars }) => {
           if (scrollBars) {

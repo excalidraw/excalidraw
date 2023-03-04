@@ -22,6 +22,7 @@ export type CanvasUIRenderConfig = {
   selectionColor?: string;
   selectedElementIds?: AppState["selectedElementIds"];
   selectedLinearElement?: AppState["selectedLinearElement"];
+  selectionElement?: AppState["selectionElement"];
 };
 
 export type CanvasContentRenderConfig = {

@@ -82,6 +82,7 @@ export const renderCheck = (
       remotePointerUsernames,
       selectedElementIds,
       selectedLinearElement,
+      selectionElement,
     } = canvasUIRenderConfig;
     
     if (
@@ -90,7 +91,8 @@ export const renderCheck = (
       selectionColor !== canvasUIRenderConfigCache?.selectionColor ||
       Object.keys(remotePointerUsernames).length ||
       selectedLinearElement?.hoverPointIndex !== canvasUIRenderConfigCache?.selectedLinearElement?.hoverPointIndex ||
-      selectedLinearElement?.segmentMidPointHoveredCoords?.toString() !== canvasUIRenderConfigCache?.selectedLinearElement?.segmentMidPointHoveredCoords?.toString()
+      selectedLinearElement?.segmentMidPointHoveredCoords?.toString() !== canvasUIRenderConfigCache?.selectedLinearElement?.segmentMidPointHoveredCoords?.toString() ||
+      selectionElement?.versionNonce !== canvasUIRenderConfigCache?.selectionElement?.versionNonce
     ) {
       runCanvasUi = true;
     }
