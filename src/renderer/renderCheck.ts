@@ -80,14 +80,31 @@ export const renderCheck = (
       renderSelection,
       selectionColor,
       remotePointerUsernames,
+      selectedElementIds,
+      selectedLinearElement,
     } = canvasUIRenderConfig;
+    
     if (
       renderScrollbars !== canvasUIRenderConfigCache?.renderScrollbars ||
       renderSelection !== canvasUIRenderConfigCache?.renderSelection ||
       selectionColor !== canvasUIRenderConfigCache?.selectionColor ||
-      Object.keys(remotePointerUsernames).length
+      Object.keys(remotePointerUsernames).length ||
+      selectedLinearElement?.hoverPointIndex !== canvasUIRenderConfigCache?.selectedLinearElement?.hoverPointIndex ||
+      selectedLinearElement?.segmentMidPointHoveredCoords?.toString() !== canvasUIRenderConfigCache?.selectedLinearElement?.segmentMidPointHoveredCoords?.toString()
     ) {
       runCanvasUi = true;
+    }
+
+    if(!runCanvasUi){
+      const { selectedElementIds: selectedElementIdsCache = {} } = canvasUIRenderConfigCache
+
+      const selectedElementIdsCacheKeys = Object.keys(selectedElementIdsCache)
+      const selectedElementIdsKeys = Object.keys(selectedElementIds || {})
+
+      if (selectedElementIdsKeys.length !== selectedElementIdsCacheKeys.length ||
+        selectedElementIdsKeys.some((id) => !(id in selectedElementIdsCache))) {
+        runCanvasUi = true;
+      }
     }
   }
 

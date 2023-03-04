@@ -1376,6 +1376,8 @@ class App extends React.Component<AppProps, AppState> {
           remotePointerUserStates: pointerUserStates,
           renderScrollbars: !this.device.isMobile,
           isElementsChanged: this.scene.getIsElementsChanged(),
+          selectedElementIds: this.state.selectedElementIds,
+          selectedLinearElement: this.state.selectedLinearElement,
         },
         callback: ({ atLeastOneVisibleElement, scrollBars }) => {
           if (scrollBars) {

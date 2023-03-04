@@ -20,6 +20,8 @@ export type CanvasUIRenderConfig = {
   renderScrollbars?: boolean;
   renderSelection?: boolean;
   selectionColor?: string;
+  selectedElementIds?: AppState["selectedElementIds"];
+  selectedLinearElement?: AppState["selectedLinearElement"];
 };
 
 export type CanvasContentRenderConfig = {
@@ -39,7 +41,6 @@ export type CanvasContentRenderConfig = {
   imageCache: AppClassProperties["imageCache"];
   gridSize?: AppState["gridSize"];
   renderGrid?: boolean;
-
   /** when exporting the behavior is slightly different (e.g. we can't use
     CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
