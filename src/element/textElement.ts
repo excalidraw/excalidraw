@@ -23,6 +23,7 @@ import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./textWysiwyg";
+import { ExtractSetType } from "../utility-types";
 
 export const normalizeText = (text: string) => {
   return (

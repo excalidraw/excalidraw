@@ -38,6 +38,7 @@ import { isTextElement } from ".";
 import { isTransparent } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
 import { getBoundTextElement } from "./textElement";
+import { Mutable } from "../utility-types";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
