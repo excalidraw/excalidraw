@@ -50,36 +50,6 @@ interface Clipboard extends EventTarget {
   write(data: any[]): Promise<void>;
 }
 
-type Mutable<T> = {
-  -readonly [P in keyof T]: T[P];
-};
-
-type ValueOf<T> = T[keyof T];
-
-type Merge<M, N> = Omit<M, keyof N> & N;
-
-/** utility type to assert that the second type is a subtype of the first type.
- * Returns the subtype. */
-type SubtypeOf<Supertype, Subtype extends Supertype> = Subtype;
-
-type ResolutionType<T extends (...args: any) => any> = T extends (
-  ...args: any
-) => Promise<infer R>
-  ? R
-  : any;
-
-// https://github.com/krzkaczor/ts-essentials
-type MarkOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
-type MarkRequired<T, RK extends keyof T> = Exclude<T, RK> &
-  Required<Pick<T, RK>>;
-
-type MarkNonNullable<T, K extends keyof T> = {
-  [P in K]-?: P extends K ? NonNullable<T[P]> : T[P];
-} & { [P in keyof T]: T[P] };
-
-type NonOptional<T> = Exclude<T, undefined>;
-
 // PNG encoding/decoding
 // -----------------------------------------------------------------------------
 type TEXtChunk = { name: "tEXt"; data: Uint8Array };
@@ -100,23 +70,6 @@ declare module "png-chunks-extract" {
   export = extract;
 }
 // -----------------------------------------------------------------------------
-
-// -----------------------------------------------------------------------------
-// type getter for interface's callable type
-// src: https://stackoverflow.com/a/58658851/927631
-// -----------------------------------------------------------------------------
-type SignatureType<T> = T extends (...args: infer R) => any ? R : never;
-type CallableType<T extends (...args: any[]) => any> = (
-  ...args: SignatureType<T>
-) => ReturnType<T>;
-// --------------------------------------------------------------------------—
-
-// Type for React.forwardRef --- supply only the first generic argument T
-type ForwardRef<T, P = any> = Parameters<
-  CallableType<React.ForwardRefRenderFunction<T, P>>
->[1];
-
-// --------------------------------------------------------------------------—
 
 interface Blob {
   handle?: import("browser-fs-acces").FileSystemHandle;
@@ -165,5 +118,3 @@ declare module "image-blob-reduce" {
   const reduce: ImageBlobReduce.ImageBlobReduceStatic;
   export = reduce;
 }
-
-type ExtractSetType<T extends Set<any>> = T extends Set<infer U> ? U : never;

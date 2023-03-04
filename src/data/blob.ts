@@ -7,6 +7,7 @@ import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { AppState, DataURL, LibraryItem } from "../types";
+import { ValueOf } from "../utility-types";
 import { bytesToHexString } from "../utils";
 import { FileSystemHandle, nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
