@@ -6,6 +6,7 @@ import {
 type RenderCheck = {
   runCanvas: boolean;
   runCanvasUi: boolean;
+  runCanvasVisibleElement: boolean;
   renderCache: {
     [key: string]: any;
   };
@@ -14,22 +15,39 @@ let canvasUIRenderConfigCache: CanvasUIRenderConfig | undefined = undefined;
 let canvasContentRenderConfigCache: CanvasContentRenderConfig | undefined =
   undefined;
 let elementsLengthCache: number | undefined;
+let normalizedCanvasWidthCache: number | undefined;
+let normalizedCanvasHeightCache: number | undefined;
 const renderCache: RenderCheck["renderCache"] = {};
 
 export const renderCheck = (
   elementsLength: number,
   canvasUIRenderConfig: CanvasUIRenderConfig,
   canvasContentRenderConfig: CanvasContentRenderConfig,
+  normalizedCanvasWidth: number,
+  normalizedCanvasHeight: number,
 ): RenderCheck => {
-  if (canvasUIRenderConfigCache === undefined) {
+
+  function setCachedValues(){
     elementsLengthCache = elementsLength;
+    normalizedCanvasWidthCache = normalizedCanvasWidth;
+    normalizedCanvasHeightCache = normalizedCanvasHeight;
     canvasUIRenderConfigCache = structuredClone(canvasUIRenderConfig);
     canvasContentRenderConfigCache = structuredClone(canvasContentRenderConfig);
-    return { runCanvas: true, runCanvasUi: true, renderCache };
+  }
+  
+  if (canvasUIRenderConfigCache === undefined) {
+    setCachedValues()
+    return {
+      runCanvas: true,
+      runCanvasUi: true,
+      renderCache,
+      runCanvasVisibleElement: true,
+    };
   }
 
   let runCanvas = false;
   let runCanvasUi = false;
+  let runCanvasVisibleElement = false;
 
   // checking for any change
 
@@ -41,8 +59,11 @@ export const renderCheck = (
     scrollX !== cache?.scrollX ||
     scrollY !== cache?.scrollY ||
     zoom.value !== cache?.zoom.value ||
-    isElementsChanged !== cache?.isElementsChanged
+    normalizedCanvasHeight !== normalizedCanvasHeightCache ||
+    normalizedCanvasWidth !== normalizedCanvasWidthCache
   ) {
+    runCanvas = runCanvasUi = runCanvasVisibleElement = true;
+  } else if (isElementsChanged !== cache?.isElementsChanged) {
     runCanvas = runCanvasUi = true;
   } else {
     const {
@@ -111,8 +132,8 @@ export const renderCheck = (
       const { selectedElementIds: selectedElementIdsCache = {} } =
         canvasUIRenderConfigCache;
 
-      const selectionId =
-        selectionElement?.type === "selection" ? selectionElement?.id : null;
+      // const selectionId =
+      //   selectionElement?.type === "selection" ? selectionElement?.id : null;
 
       const selectedElementIdsCacheKeys = Object.keys(selectedElementIdsCache);
       const selectedElementIdsKeys = Object.keys(selectedElementIds || {});
@@ -126,10 +147,14 @@ export const renderCheck = (
     }
   }
 
-  // setting to the latest values
-  elementsLengthCache = elementsLength;
-  canvasUIRenderConfigCache = structuredClone(canvasUIRenderConfig);
-  canvasContentRenderConfigCache = structuredClone(canvasContentRenderConfig);
+  // on collabration we recheck Visible elements all time as of now
+  runCanvasVisibleElement =
+    runCanvasVisibleElement ||
+    elementsLength !== elementsLengthCache ||
+    Boolean(Object.keys(canvasUIRenderConfig.remotePointerUsernames).length);
 
-  return { runCanvas, runCanvasUi, renderCache };
+  // setting to the latest values
+  setCachedValues()
+
+  return { runCanvas, runCanvasUi, renderCache, runCanvasVisibleElement };
 };
