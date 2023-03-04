@@ -139,7 +139,7 @@ export const hasBoundTextElement = (
   element: ExcalidrawElement | null,
 ): element is MarkNonNullable<ExcalidrawBindableElement, "boundElements"> => {
   return (
-    isBindableElement(element) &&
+    isTextBindableContainer(element) &&
     !!element.boundElements?.some(({ type }) => type === "text")
   );
 };
