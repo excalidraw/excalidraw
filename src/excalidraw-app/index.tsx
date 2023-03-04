@@ -85,6 +85,7 @@ import { useAtomWithInitialValue } from "../jotai";
 import { appJotaiStore } from "./app-jotai";
 
 import "./index.scss";
+import { ResolutionType } from "../utility-types";
 
 polyfill();
 

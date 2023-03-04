@@ -1,5 +1,6 @@
 import { ROUNDNESS } from "../constants";
 import { AppState } from "../types";
+import { MarkNonNullable } from "../utility-types";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,

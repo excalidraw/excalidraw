@@ -41,6 +41,7 @@ import { shouldRotateWithDiscreteAngle } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { getShapeForElement } from "../renderer/renderElement";
 import { DRAGGING_THRESHOLD } from "../constants";
+import { Mutable } from "../utility-types";
 
 const editorMidPointsCache: {
   version: number | null;

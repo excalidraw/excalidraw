@@ -31,6 +31,7 @@ import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
+import { Merge, ForwardRef } from "./utility-types";
 
 export type Point = Readonly<RoughPoint>;
 

@@ -12,6 +12,7 @@ import {
 } from "./element/types";
 import { getShapeForElement } from "./renderer/renderElement";
 import { getCurvePathOps } from "./element/bounds";
+import { Mutable } from "./utility-types";
 
 export const rotate = (
   x1: number,
