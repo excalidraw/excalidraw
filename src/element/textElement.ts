@@ -360,7 +360,10 @@ const breakLine = (line: string, font: FontString, maxWidth: number) => {
     ) {
       lastLineWidth += wordWidth;
       lines[lines.length - 1] += word;
-      if (lastLineWidth > maxWidth) {
+      if (
+        lastLineWidth > maxWidth &&
+        lines[lines.length - 1].slice(-1) === " "
+      ) {
         lines[lines.length - 1] = removeTrailingSpaces(
           lines[lines.length - 1],
           lastLineWidth,
@@ -382,7 +385,7 @@ const breakLine = (line: string, font: FontString, maxWidth: number) => {
 
     lastLineWidth = getLineWidth(lines[lines.length - 1], font);
 
-    if (lastLineWidth > maxWidth) {
+    if (lastLineWidth > maxWidth && lines[lines.length - 1].slice(-1) === " ") {
       lines[lines.length - 1] = removeTrailingSpaces(
         lines[lines.length - 1],
         lastLineWidth,
@@ -390,13 +393,14 @@ const breakLine = (line: string, font: FontString, maxWidth: number) => {
         spaceWidth,
       );
     }
+
+    lastLineWidth = getLineWidth(lines[lines.length - 1], font);
+
     // remove previous line if only has spaces
     if (lines.length > 0 && lines[lines.length - 1].trim().length === 0) {
       // if the method that draw the text is refactored, this code must be removed
       lines.splice(-1);
     }
-
-    lastLineWidth = getLineWidth(lines[lines.length - 1], font);
   });
   return lines;
 };
@@ -408,7 +412,11 @@ const removeTrailingSpaces = (
   maxWidth: number,
   spaceWidth: number,
 ) => {
-  const spacesToRemove = Math.ceil((lastLineWidth - maxWidth) / spaceWidth);
+  const spacesToRemove = Math.min(
+    Math.ceil((lastLineWidth - maxWidth) / spaceWidth),
+    line.length - line.trimEnd().length,
+  );
+
   return line.slice(0, -spacesToRemove);
 };
 
@@ -427,6 +435,7 @@ const breakWord = (word: string, font: FontString, maxWidth: number) => {
     const widthWithLastLine = lastWordWidth + currentCharWidth;
     // fits in wordSection above
     if (widthWithLastLine <= maxWidth || widthWithLastLine <= lastWordWidth) {
+      lastWordWidth = widthWithLastLine;
       wordSections[wordSections.length - 1] += symbol;
       return; // next word
     }
