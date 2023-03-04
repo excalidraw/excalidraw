@@ -60,11 +60,10 @@ export const renderCheck = (
     scrollY !== cache?.scrollY ||
     zoom.value !== cache?.zoom.value ||
     normalizedCanvasHeight !== normalizedCanvasHeightCache ||
-    normalizedCanvasWidth !== normalizedCanvasWidthCache
+    normalizedCanvasWidth !== normalizedCanvasWidthCache ||
+    isElementsChanged !== cache?.isElementsChanged
   ) {
     runCanvas = runCanvasUi = runCanvasVisibleElement = true;
-  } else if (isElementsChanged !== cache?.isElementsChanged) {
-    runCanvas = runCanvasUi = true;
   } else {
     const {
       viewBackgroundColor,
