@@ -204,6 +204,7 @@ import {
   PointerDownState,
   SceneData,
   Device,
+  NormalizedZoomValue,
 } from "../types";
 import {
   debounce,
@@ -281,7 +282,11 @@ import {
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
-import { actionToggleHandTool } from "../actions/actionCanvas";
+import {
+  actionToggleHandTool,
+  easeToValuesRAF,
+  zoomToFitElements,
+} from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionCreateContainerFromText } from "../actions/actionBoundText";
@@ -1839,14 +1844,45 @@ class App extends React.Component<AppProps, AppState> {
     target:
       | ExcalidrawElement
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
+    opts?: { fitToContent?: boolean; animate?: true },
   ) => {
-    this.setState({
-      ...calculateScrollCenter(
-        Array.isArray(target) ? target : [target],
-        this.state,
-        this.canvas,
-      ),
-    });
+    // convert provided target into ExcalidrawElement[] if necessary
+    const targets = Array.isArray(target) ? target : [target];
+
+    let zoom = this.state.zoom;
+    let scrollX = this.state.scrollX;
+    let scrollY = this.state.scrollY;
+
+    // do we need to also recompute the zoom?
+    if (opts?.fitToContent) {
+      const { appState } = zoomToFitElements(targets, this.state, false);
+      zoom = appState.zoom;
+      scrollX = appState.scrollX;
+      scrollY = appState.scrollY;
+    } else {
+      const scroll = calculateScrollCenter(targets, this.state, this.canvas);
+      scrollX = scroll.scrollX;
+      scrollY = scroll.scrollY;
+    }
+
+    // when animating, using RequestAnimationFrame will prevent the
+    // animation from slowing down other processes
+    if (opts?.animate) {
+      easeToValuesRAF(
+        [this.state.scrollX, this.state.scrollY, this.state.zoom.value],
+        [scrollX, scrollY, zoom.value],
+        (scrollX, scrollY, zoomValue) => {
+          this.setState({
+            scrollX,
+            scrollY,
+            zoom: { value: zoomValue as NormalizedZoomValue },
+          });
+        },
+        { duration: 500 },
+      );
+    } else {
+      this.setState({ scrollX, scrollY, zoom });
+    }
   };
 
   setToast = (
