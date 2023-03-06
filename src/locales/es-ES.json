@@ -110,6 +110,7 @@
     "increaseFontSize": "Aumentar el tamaño de letra",
     "unbindText": "Desvincular texto",
     "bindText": "Vincular texto al contenedor",
+    "createContainerFromText": "Encapsula el texto en un contenedor",
     "link": {
       "edit": "Editar enlace",
       "create": "Crear enlace",
@@ -130,8 +131,8 @@
   },
   "library": {
     "noItems": "No hay elementos añadidos todavía...",
-    "hint_emptyLibrary": "Seleccione un elemento en el lienzo para añadirlo aquí, o instale una biblioteca del repositorio público, a continuación.",
-    "hint_emptyPrivateLibrary": "Seleccione un elemento del lienzo para añadirlo aquí."
+    "hint_emptyLibrary": "Selecciona un elemento en el lienzo para añadirlo aquí, o instala una biblioteca del repositorio público, a continuación.",
+    "hint_emptyPrivateLibrary": "Selecciona un elemento del lienzo para añadirlo aquí."
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -181,13 +182,13 @@
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se pudo copiar al portapapeles.",
     "decryptFailed": "No se pudieron descifrar los datos.",
-    "uploadedSecurly": "La carga ha sido asegurada con cifrado de principio a fin, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido.",
-    "loadSceneOverridePrompt": "Si carga este dibujo externo, reemplazará el que tiene. ¿Desea continuar?",
-    "collabStopOverridePrompt": "Detener la sesión sobrescribirá su dibujo anterior almacenado localmente. ¿Está seguro?\n\n(Si desea mantener su dibujo local, simplemente cierre la pestaña del navegador.)",
+    "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido.",
+    "loadSceneOverridePrompt": "Si cargas este dibujo externo, reemplazarás el que tienes. ¿Deseas continuar?",
+    "collabStopOverridePrompt": "Detener la sesión sobrescribirá tu dibujo anterior almacenado localmente. ¿Estás seguro?\n\n(Si deseas mantener tu dibujo local, simplemente cierra la pestaña del navegador.)",
     "errorAddingToLibrary": "No se pudo agregar el elemento a la biblioteca",
     "errorRemovingFromLibrary": "No se pudo quitar el elemento de la biblioteca",
     "confirmAddLibrary": "Esto añadirá {{numShapes}} forma(s) a tu biblioteca. ¿Estás seguro?",
-    "imageDoesNotContainScene": "Esta imagen no parece contener datos de escena. ¿Ha habilitado la inserción de la escena durante la exportación?",
+    "imageDoesNotContainScene": "Esta imagen no parece contener datos de escena. ¿Has habilitado la inserción de la escena durante la exportación?",
     "cannotRestoreFromImage": "No se pudo restaurar la escena desde este archivo de imagen",
     "invalidSceneUrl": "No se ha podido importar la escena desde la URL proporcionada. Está mal formada, o no contiene datos de Excalidraw JSON válidos.",
     "resetLibrary": "Esto borrará tu biblioteca. ¿Estás seguro?",
@@ -203,8 +204,8 @@
     "invalidSVGString": "SVG no válido.",
     "cannotResolveCollabServer": "No se pudo conectar al servidor colaborador. Por favor, vuelva a cargar la página y vuelva a intentarlo.",
     "importLibraryError": "No se pudo cargar la librería",
-    "collabSaveFailed": "No se pudo guardar en la base de datos del backend. Si los problemas persisten, debería guardar su archivo localmente para asegurarse de que no pierde su trabajo.",
-    "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Debería guardar el archivo localmente para asegurarse de que no pierde su trabajo."
+    "collabSaveFailed": "No se pudo guardar en la base de datos del backend. Si los problemas persisten. Guarda tu archivo localmente para asegurarte de no perder tu trabajo.",
+    "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Guarda el archivo localmente para asegurarte de no pierder tu trabajo."
   },
   "toolBar": {
     "selection": "Selección",
@@ -234,21 +235,21 @@
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
     "text_selected": "Doble clic o pulse ENTER para editar el texto",
-    "text_editing": "Pulse Escape o Ctrl/Cmd + ENTER para terminar de editar",
+    "text_editing": "Pulsa Escape o Ctrl/Cmd + ENTER para terminar de editar",
     "linearElementMulti": "Haz clic en el último punto o presiona Escape o Enter para finalizar",
     "lockAngle": "Puedes restringir el ángulo manteniendo presionado el botón SHIFT",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
-    "resizeImage": "Puede redimensionar libremente pulsando SHIFT,\npulse ALT para redimensionar desde el centro",
+    "resizeImage": "Puedes redimensionar libremente pulsando SHIFT,\npulse ALT para redimensionar desde el centro",
     "rotate": "Puedes restringir los ángulos manteniendo presionado SHIFT mientras giras",
-    "lineEditor_info": "Mantenga pulsado CtrlOrCmd y haga doble click o presione CtrlOrCmd + Enter para editar puntos",
-    "lineEditor_pointSelected": "Presione Suprimir para eliminar el/los punto(s), CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
-    "lineEditor_nothingSelected": "Seleccione un punto a editar (mantenga MAYÚSCULAS para seleccionar múltiples),\no mantenga pulsado Alt y haga click para añadir nuevos puntos",
-    "placeImage": "Haga clic para colocar la imagen o haga click y arrastre para establecer su tamaño manualmente",
+    "lineEditor_info": "Mantén pulsado CtrlOrCmd y haz doble click o presiona CtrlOrCmd + Enter para editar puntos",
+    "lineEditor_pointSelected": "Presiona Suprimir para eliminar el/los punto(s), CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
+    "lineEditor_nothingSelected": "Selecciona un punto a editar (mantenga MAYÚSCULAS para seleccionar múltiples),\no mantén pulsado Alt y haga click para añadir nuevos puntos",
+    "placeImage": "Haz clic para colocar la imagen o haz click y arrastre para establecer su tamaño manualmente",
     "publishLibrary": "Publica tu propia biblioteca",
-    "bindTextToElement": "Presione Entrar para agregar",
+    "bindTextToElement": "Presiona Entrar para agregar texto",
     "deepBoxSelect": "Mantén CtrlOrCmd para seleccionar en profundidad, y para evitar arrastrar",
-    "eraserRevert": "Mantenga pulsado Alt para revertir los elementos marcados para su eliminación",
-    "firefox_clipboard_write": "Esta característica puede ser habilitada estableciendo la bandera \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar las banderas del navegador en Firefox, visite la página \"about:config\"."
+    "eraserRevert": "Mantén pulsado Alt para revertir los elementos marcados para su eliminación",
+    "firefox_clipboard_write": "Esta característica puede ser habilitada estableciendo la bandera \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar las banderas del navegador en Firefox, visita la página \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
@@ -256,62 +257,62 @@
     "canvasTooBigTip": "Sugerencia: intenta acercar un poco más los elementos más lejanos."
   },
   "errorSplash": {
-    "headingMain_pre": "Se encontró un error. Intente ",
-    "headingMain_button": "recargando la página.",
-    "clearCanvasMessage": "Si la recarga no funciona, intente ",
-    "clearCanvasMessage_button": "limpiando el lienzo.",
-    "clearCanvasCaveat": " Esto provocará la pérdida de su trabajo ",
+    "headingMain_pre": "Se encontró un error. Intenta ",
+    "headingMain_button": "recargar la página.",
+    "clearCanvasMessage": "Si la recarga no funciona, intenta ",
+    "clearCanvasMessage_button": "limpiar el lienzo.",
+    "clearCanvasCaveat": " Esto provocará la pérdida de tu trabajo ",
     "trackedToSentry_pre": "El error con el identificador ",
     "trackedToSentry_post": " fue rastreado en nuestro sistema.",
     "openIssueMessage_pre": "Fuimos muy cautelosos de no incluir la información de tu escena en el error. Si tu escena no es privada, por favor considera seguir nuestro ",
     "openIssueMessage_button": "rastreador de errores.",
-    "openIssueMessage_post": " Por favor, incluya la siguiente información copiándola y pegándola en el issue de GitHub.",
+    "openIssueMessage_post": " Por favor, incluye la siguiente información copiándola y pegándola en el issue de GitHub.",
     "sceneContent": "Contenido de la escena:"
   },
   "roomDialog": {
     "desc_intro": "Puede invitar a otras personas a tu actual escena para que colaboren contigo.",
-    "desc_privacy": "No te preocupes, la sesión usa encriptación de punta a punta, por lo que todo lo que se dibuje se mantendrá privadamente. Ni siquiera nuestro servidor podrá ver lo que haces.",
+    "desc_privacy": "No te preocupes, la sesión usa encriptación de extremo a extremo, por lo que todo lo que se dibuje se mantendrá privadamente. Ni siquiera nuestro servidor podrá ver lo que haces.",
     "button_startSession": "Iniciar sesión",
     "button_stopSession": "Detener sesión",
     "desc_inProgressIntro": "La sesión de colaboración en vivo está ahora en progreso.",
     "desc_shareLink": "Comparte este enlace con cualquier persona con quien quieras colaborar:",
-    "desc_exitSession": "Detener la sesión te desconectará de la sala, pero podrás seguir trabajando con la escena en su computadora, esto es de modo local. Ten en cuenta que esto no afectará a otras personas, y que las mismas seguirán siendo capaces de colaborar en tu escena.",
-    "shareTitle": "Únase a una sesión colaborativa en vivo en Excalidraw"
+    "desc_exitSession": "Detener la sesión te desconectará de la sala, pero podrás seguir trabajando con la escena en tu computadora, esto es de modo local. Ten en cuenta que esto no afectará a otras personas, y que las mismas seguirán siendo capaces de colaborar en tu escena.",
+    "shareTitle": "Únete a una sesión colaborativa en vivo en Excalidraw"
   },
   "errorDialog": {
     "title": "Error"
   },
   "exportDialog": {
     "disk_title": "Guardar en disco",
-    "disk_details": "Exportar los datos de la escena a un archivo desde el cual pueda importar más tarde.",
+    "disk_details": "Exportar los datos de la escena a un archivo desde el cual puedas importar más tarde.",
     "disk_button": "Guardar en archivo",
     "link_title": "Enlace para compartir",
     "link_details": "Exportar como enlace de sólo lectura.",
     "link_button": "Exportar a Link",
-    "excalidrawplus_description": "Guarde la escena en su espacio de trabajo de Excalidraw+.",
+    "excalidrawplus_description": "Guarda la escena en tu espacio de trabajo de Excalidraw+.",
     "excalidrawplus_button": "Exportar",
     "excalidrawplus_exportError": "No se pudo exportar a Excalidraw+ en este momento..."
   },
   "helpDialog": {
-    "blog": "Lea nuestro blog",
+    "blog": "Lee nuestro blog",
     "click": "click",
     "deepSelect": "Selección profunda",
     "deepBoxSelect": "Seleccione en profundidad dentro de la caja, y evite arrastrar",
     "curvedArrow": "Flecha curva",
     "curvedLine": "Línea curva",
     "documentation": "Documentación",
-    "doubleClick": "doble clic",
+    "doubleClick": "doble click",
     "drag": "arrastrar",
     "editor": "Editor",
     "editSelectedShape": "Editar la forma seleccionada (texto/flecha/línea)",
-    "github": "¿Ha encontrado un problema? Envíelo",
-    "howto": "Siga nuestras guías",
+    "github": "¿Has encontrado un problema? Envíanoslo",
+    "howto": "Sigue nuestras guías",
     "or": "o",
     "preventBinding": "Evitar enlace de flechas",
     "tools": "Herramientas",
     "shortcuts": "Atajos del teclado",
     "textFinish": "Finalizar edición (editor de texto)",
-    "textNewLine": "Añadir nueva linea (editor de texto)",
+    "textNewLine": "Añadir nueva línea (editor de texto)",
     "title": "Ayuda",
     "view": "Vista",
     "zoomToFit": "Ajustar la vista para mostrar todos los elementos",
@@ -333,9 +334,9 @@
     "libraryDesc": "Descripción de la biblioteca",
     "website": "Sitio Web",
     "placeholder": {
-      "authorName": "Nombre o nombre de usuario",
+      "authorName": "Tu nombre o nombre de usuario",
       "libraryName": "Nombre de tu biblioteca",
-      "libraryDesc": "Descripción de su biblioteca para ayudar a la gente a entender su uso",
+      "libraryDesc": "Descripción de tu biblioteca para ayudar a la gente a entender su uso",
       "githubHandle": "Nombre de usuario de GitHub (opcional), así podrá editar la biblioteca una vez enviada para su revisión",
       "twitterHandle": "Nombre de usuario de Twitter (opcional), así sabemos a quién acreditar cuando se promociona en Twitter",
       "website": "Enlace a su sitio web personal o en cualquier otro lugar (opcional)"
@@ -373,7 +374,7 @@
     "removeItemsFromLib": "Eliminar elementos seleccionados de la biblioteca"
   },
   "encrypted": {
-    "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán.",
+    "tooltip": "Tus dibujos están cifrados de extremo a extremo, por lo que los servidores de Excalidraw nunca los verán.",
     "link": "Entrada en el blog sobre cifrado de extremo a extremo"
   },
   "stats": {
@@ -451,13 +452,13 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Toda su información es guardada localmente en su navegador.",
+      "center_heading": "Toda tu información se guarda localmente en tu navegador.",
       "center_heading_plus": "¿Quieres ir a Excalidraw+?",
       "menuHint": "Exportar, preferencias, idiomas, ..."
     },
     "defaults": {
       "menuHint": "Exportar, preferencias y más...",
-      "center_heading": "Diagramas. Hecho. Simplemente.",
+      "center_heading": "Diagramas. Hecho. Simple.",
       "toolbarHint": "¡Elige una herramienta y empieza a dibujar!",
       "helpHint": "Atajos y ayuda"
     }
