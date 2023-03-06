@@ -347,6 +347,7 @@ export const textWysiwyg = ({
     boxSizing: "content-box",
   });
 
+  //As Firefox, Safari needs little higher dimensions on DOM
   const magicOffset =
     isFirefox || isSafari
       ? (excalidrawContainer
