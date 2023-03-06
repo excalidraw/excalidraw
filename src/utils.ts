@@ -16,6 +16,7 @@ import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
 import { isEraserActive, isHandToolActive } from "./appState";
+import { ResolutionType } from "./utility-types";
 
 let mockDateTime: string | null = null;
 
