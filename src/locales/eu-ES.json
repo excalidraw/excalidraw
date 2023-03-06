@@ -110,7 +110,7 @@
     "increaseFontSize": "Handitu letra tamaina",
     "unbindText": "Askatu testua",
     "bindText": "Lotu testua edukiontziari",
-    "createContainerFromText": "",
+    "createContainerFromText": "Bilatu testua edukiontzi batean",
     "link": {
       "edit": "Editatu esteka",
       "create": "Sortu esteka",
