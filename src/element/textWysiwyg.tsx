@@ -270,13 +270,15 @@ export const textWysiwyg = ({
       const lineHeight = updatedTextElement.containerId
         ? approxLineHeight
         : updatedTextElement.height / lines.length;
+      let magicOffset = 0;
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
+      } else {
+        magicOffset = excalidrawContainer
+          ? parseFloat(getComputedStyle(excalidrawContainer).fontSize)
+          : 16;
       }
-      const magicOffset = excalidrawContainer
-        ? parseFloat(getComputedStyle(excalidrawContainer).fontSize)
-        : 16;
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
