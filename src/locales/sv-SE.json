@@ -110,7 +110,7 @@
     "increaseFontSize": "Öka fontstorleken",
     "unbindText": "Koppla bort text",
     "bindText": "Bind texten till behållaren",
-    "createContainerFromText": "",
+    "createContainerFromText": "Radbryt text i en avgränsad yta",
     "link": {
       "edit": "Redigera länk",
       "create": "Skapa länk",
