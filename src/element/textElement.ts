@@ -231,8 +231,9 @@ export const handleBindTextResize = (
           container,
           nextHeight,
         );
+        const { y } = computeContainerCoords(textElement, container.type);
         mutateElement(container, {
-          y: textElement.y - BOUND_TEXT_PADDING,
+          y,
           height: containerHeight,
         });
       }
@@ -633,6 +634,27 @@ export const computeBoundTextElementCoords = (
   return {
     x: container.x + offsetX,
     y: container.y + offsetY,
+  };
+};
+
+export const computeContainerCoords = (
+  boundTextElement: ExcalidrawTextElement,
+  containerType: string,
+) => {
+  let offsetX = BOUND_TEXT_PADDING;
+  let offsetY = BOUND_TEXT_PADDING;
+
+  if (containerType === "ellipse") {
+    offsetX += (boundTextElement.width / 2) * (1 - Math.sqrt(2) / 2);
+    offsetY += (boundTextElement.height / 2) * (1 - Math.sqrt(2) / 2);
+  }
+  if (containerType === "diamond") {
+    offsetX += boundTextElement.width / 4;
+    offsetY += boundTextElement.height / 4;
+  }
+  return {
+    x: boundTextElement.x - offsetX,
+    y: boundTextElement.y - offsetY,
   };
 };
 
