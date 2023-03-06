@@ -191,7 +191,7 @@ export const handleBindTextResize = (
       nextWidth = dimensions.width;
     }
     // increase height in case text element height exceeds
-    if (nextHeight > maxHeight) {
+    if (!shouldMaintainAspectRatio && nextHeight > maxHeight) {
       containerHeight = computeContainerHeightForBoundText(
         container,
         nextHeight,
@@ -226,6 +226,16 @@ export const handleBindTextResize = (
           textElement as ExcalidrawTextElementWithContainer,
         ),
       );
+      if (shouldMaintainAspectRatio && nextHeight > maxHeight) {
+        containerHeight = computeContainerHeightForBoundText(
+          container,
+          nextHeight,
+        );
+        mutateElement(container, {
+          y: textElement.y - BOUND_TEXT_PADDING,
+          height: containerHeight,
+        });
+      }
     }
   }
 };
@@ -800,3 +810,9 @@ export const getMaxContainerHeight = (container: ExcalidrawElement) => {
   }
   return height - BOUND_TEXT_PADDING * 2;
 };
+
+// export const computeContainerCoordsFromBoundText = (
+//   boundText: ExcalidrawTextElementWithContainer,
+// ) => {
+
+// };
