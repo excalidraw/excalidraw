@@ -270,14 +270,10 @@ export const textWysiwyg = ({
       const lineHeight = updatedTextElement.containerId
         ? approxLineHeight
         : updatedTextElement.height / lines.length;
-      let magicOffset = 0;
+
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
-      } else {
-        magicOffset = excalidrawContainer
-          ? parseFloat(getComputedStyle(excalidrawContainer).fontSize)
-          : 16;
       }
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
@@ -286,9 +282,9 @@ export const textWysiwyg = ({
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
-        width: `${textElementWidth + magicOffset * 2}px`,
+        width: `${textElementWidth}px`,
         height: `${textElementHeight}px`,
-        left: `${viewportX - magicOffset}px`,
+        left: `${viewportX}px`,
         top: `${viewportY}px`,
         transform: getTransform(
           textElementWidth,
@@ -350,6 +346,12 @@ export const textWysiwyg = ({
     overflowWrap: "break-word",
     boxSizing: "content-box",
   });
+
+  const magicOffset =
+    (excalidrawContainer
+      ? parseFloat(getComputedStyle(excalidrawContainer).fontSize)
+      : 16) / 8;
+
   const onEditableInput = () => {
     const updatedTextElement = Scene.getScene(element)?.getElement(
       id,
@@ -363,7 +365,7 @@ export const textWysiwyg = ({
         getMaxContainerWidth(container!),
       );
       const { width, height } = measureText(wrappedText, font);
-      editable.style.width = `${width}px`;
+      editable.style.width = `${width + magicOffset}px`;
       editable.style.height = `${height}px`;
     }
   };
