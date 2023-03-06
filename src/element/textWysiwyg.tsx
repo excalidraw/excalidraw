@@ -350,7 +350,26 @@ export const textWysiwyg = ({
     overflowWrap: "break-word",
     boxSizing: "content-box",
   });
+  const onEditableInput = () => {
+    const updatedTextElement = Scene.getScene(element)?.getElement(
+      id,
+    ) as ExcalidrawTextElement;
+    const font = getFontString(updatedTextElement);
+    if (isBoundToContainer(element)) {
+      const container = getContainerElement(element);
+      const wrappedText = wrapText(
+        normalizeText(editable.value),
+        font,
+        getMaxContainerWidth(container!),
+      );
+      const { width, height } = measureText(wrappedText, font);
+      editable.style.width = `${width}px`;
+      editable.style.height = `${height}px`;
+    }
+  };
+
   updateWysiwygStyle();
+  onEditableInput();
 
   if (onChange) {
     editable.onpaste = async (event) => {
@@ -380,21 +399,7 @@ export const textWysiwyg = ({
     };
 
     editable.oninput = () => {
-      const updatedTextElement = Scene.getScene(element)?.getElement(
-        id,
-      ) as ExcalidrawTextElement;
-      const font = getFontString(updatedTextElement);
-      if (isBoundToContainer(element)) {
-        const container = getContainerElement(element);
-        const wrappedText = wrapText(
-          normalizeText(editable.value),
-          font,
-          getMaxContainerWidth(container!),
-        );
-        const { width, height } = measureText(wrappedText, font);
-        editable.style.width = `${width}px`;
-        editable.style.height = `${height}px`;
-      }
+      onEditableInput();
       onChange(normalizeText(editable.value));
     };
   }
