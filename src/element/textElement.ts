@@ -150,6 +150,7 @@ export const bindTextToShapeAfterDuplication = (
 export const handleBindTextResize = (
   container: NonDeletedExcalidrawElement,
   transformHandleType: MaybeTransformHandleType,
+  shouldMaintainAspectRatio = false,
 ) => {
   const boundTextElementId = getBoundTextElementId(container);
   if (!boundTextElementId) {
@@ -174,7 +175,10 @@ export const handleBindTextResize = (
     const maxWidth = getMaxContainerWidth(container);
     const maxHeight = getMaxContainerHeight(container);
     let containerHeight = containerDims.height;
-    if (transformHandleType !== "n" && transformHandleType !== "s") {
+    if (
+      shouldMaintainAspectRatio ||
+      (transformHandleType !== "n" && transformHandleType !== "s")
+    ) {
       if (text) {
         text = wrapText(
           textElement.originalText,

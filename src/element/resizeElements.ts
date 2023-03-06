@@ -551,7 +551,11 @@ export const resizeSingleElement = (
     if (boundTextElement && boundTextFont) {
       mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
     }
-    handleBindTextResize(element, transformHandleDirection);
+    handleBindTextResize(
+      element,
+      transformHandleDirection,
+      shouldMaintainAspectRatio,
+    );
   }
 };
 
