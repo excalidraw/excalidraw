@@ -1844,7 +1844,7 @@ class App extends React.Component<AppProps, AppState> {
     target:
       | ExcalidrawElement
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
-    opts?: { fitToContent?: boolean; animate?: true },
+    opts?: { fitToContent?: boolean; animate?: boolean },
   ) => {
     // convert provided target into ExcalidrawElement[] if necessary
     const targets = Array.isArray(target) ? target : [target];
