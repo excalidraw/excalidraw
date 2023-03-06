@@ -1871,13 +1871,12 @@ class App extends React.Component<AppProps, AppState> {
       easeToValuesRAF(
         [this.state.scrollX, this.state.scrollY, this.state.zoom.value],
         [scrollX, scrollY, zoom.value],
-        (scrollX, scrollY, zoomValue) => {
+        (scrollX, scrollY, zoomValue) =>
           this.setState({
             scrollX,
             scrollY,
             zoom: { value: zoomValue as NormalizedZoomValue },
-          });
-        },
+          }),
         { duration: 500 },
       );
     } else {
