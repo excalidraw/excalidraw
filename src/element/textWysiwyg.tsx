@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, VERTICAL_ALIGN } from "../constants";
+import { CLASSES, isFirefox, isSafari, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -348,9 +348,11 @@ export const textWysiwyg = ({
   });
 
   const magicOffset =
-    (excalidrawContainer
-      ? parseFloat(getComputedStyle(excalidrawContainer).fontSize)
-      : 16) / 8;
+    isFirefox || isSafari
+      ? (excalidrawContainer
+          ? parseFloat(getComputedStyle(excalidrawContainer).fontSize)
+          : 16) / 16
+      : 0;
 
   const onEditableInput = () => {
     const updatedTextElement = Scene.getScene(element)?.getElement(
