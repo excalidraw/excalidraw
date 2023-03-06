@@ -273,9 +273,6 @@ export const textWysiwyg = ({
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
-      } else if (isFirefox || isSafari) {
-        // As firefox, Safari needs little higher dimensions on DOM
-        textElementWidth += 0.5;
       }
       const magicOffset = excalidrawContainer
         ? parseFloat(getComputedStyle(excalidrawContainer).fontSize)
@@ -287,9 +284,9 @@ export const textWysiwyg = ({
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
-        width: `${textElementWidth+magicOffset*2}px`,
+        width: `${textElementWidth + magicOffset * 2}px`,
         height: `${textElementHeight}px`,
-        left: `${viewportX-magicOffset}px`,
+        left: `${viewportX - magicOffset}px`,
         top: `${viewportY}px`,
         transform: getTransform(
           textElementWidth,
