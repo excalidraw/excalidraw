@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "הדבק",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "הדבק ללא עיצוב",
     "pasteCharts": "הדבק גרפים",
     "selectAll": "בחר הכל",
     "multiSelect": "הוסף אובייקט לבחירה",
@@ -72,7 +72,7 @@
     "layers": "שכבות",
     "actions": "פעולות",
     "language": "שפה",
-    "liveCollaboration": "",
+    "liveCollaboration": "התחל שיתוף חי...",
     "duplicateSelection": "שכפל",
     "untitled": "ללא כותרת",
     "name": "שם",
@@ -110,15 +110,15 @@
     "increaseFontSize": "הגדל את גודל הגופן",
     "unbindText": "ביטול קיבוע הטקסט",
     "bindText": "קיבוע הטקסט לאוגד",
-    "createContainerFromText": "",
+    "createContainerFromText": "ארוז טקסט במיכל",
     "link": {
       "edit": "עריכת קישור",
       "create": "יצירת קישור",
       "label": "קישור"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "ערוך קו",
+      "exit": "צא מעורך הקו"
     },
     "elementLock": {
       "lock": "נעילה",
@@ -126,13 +126,13 @@
       "lockAll": "לנעול הכל",
       "unlockAll": "שחרור הכול"
     },
-    "statusPublished": "",
-    "sidebarLock": ""
+    "statusPublished": "פורסם",
+    "sidebarLock": "שמור את סרגל הצד פתוח"
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "עוד לא הוספת דברים...",
+    "hint_emptyLibrary": "בחר משהו בקנבס כדי להוסיף אותו לכאן, או שתתקין ספריה מהספריה הציבורית מטה.",
+    "hint_emptyPrivateLibrary": "בחר משהו בקנבס כדי להוסיף אותו לכאן."
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -194,7 +194,7 @@
     "resetLibrary": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
     "removeItemsFromsLibrary": "מחיקת {{count}} פריטים(ים) מתוך הספריה?",
     "invalidEncryptionKey": "מפתח ההצפנה חייב להיות בן 22 תוים. השיתוף החי מבוטל.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "אין חיבור זמין לאינטרנט.\nהשינויים שלך לא ישמרו!"
   },
   "errors": {
     "unsupportedFileType": "סוג הקובץ אינו נתמך.",
@@ -202,10 +202,10 @@
     "fileTooBig": "הקובץ כבד מדי. הגודל המקסימלי המותר הוא {{maxSize}}.",
     "svgImageInsertError": "לא ניתן היה להטמיע את תמונת ה-SVG. קידוד ה-SVG אינו תקני.",
     "invalidSVGString": "SVG בלתי תקני.",
-    "cannotResolveCollabServer": "",
+    "cannotResolveCollabServer": "לא הצלחתי להתחבר לשרת השיתוף. אנא רענן את הדף ונסה שוב.",
     "importLibraryError": "לא ניתן היה לטעון את הספריה",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed": "לא הצלחתי להתחבר למסד הנתונים האחורי. אם הבעיה ממשיכה, כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך.",
+    "collabSaveFailed_sizeExceeded": "לא הצלחתי לשמור למסד הנתונים האחורי, נראה שהקנבס שלך גדול מדי. כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך."
   },
   "toolBar": {
     "selection": "בחירה",
@@ -219,10 +219,10 @@
     "text": "טקסט",
     "library": "ספריה",
     "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור",
-    "penMode": "",
+    "penMode": "מצב עט - מנע נגיעה",
     "link": "הוספה/עדכון של קישור עבור הצורה הנבחרת",
     "eraser": "מחק",
-    "hand": ""
+    "hand": "יד (כלי הזזה)"
   },
   "headings": {
     "canvasActions": "פעולות הלוח",
@@ -230,7 +230,7 @@
     "shapes": "צורות"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "כדי להזיז את הקנבס, החזק את גלגל העכבר לחוץ או את מקש הרווח לחוץ תוך כדי גרירה, או השתמש בכלי היד",
     "linearElement": "הקלק בשביל לבחור נקודות מרובות, גרור בשביל קו בודד",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
@@ -239,17 +239,17 @@
     "linearElementMulti": "הקלק על הנקודה האחרונה או הקש Escape או Enter לסיום",
     "lockAngle": "אתה יכול להגביל זווית ע״י לחיצה על SHIFT",
     "resize": "ניתן להגביל פרופורציות על ידי לחיצה על SHIFT תוך כדי שינוי גודל,\nהחזק ALT בשביל לשנות גודל ביחס למרכז",
-    "resizeImage": "",
+    "resizeImage": "אתה יכול לשנות את הגודל בחופשיות על ידי החזקת מקש SHIFT,\nהחזק את מקש ALT כדי לבצע שינוי גודל מהמרכז",
     "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
-    "placeImage": "",
+    "lineEditor_info": "החזק Ctrl / Cmd ובצע לחיצה כפולה או לחץ Ctrl / Cmd + Enter לעריכת נקודות",
+    "lineEditor_pointSelected": "לחץ Delete למחיקת נקודה/ות,\nCtrl / Cmd + D לשכפול, או גרור להזזה",
+    "lineEditor_nothingSelected": "בחר נקודה כדי לערוך (החזק SHIFT לבחירת כמה),\nאו החזק Alt והקלק להוספת נקודות חדשות",
+    "placeImage": "הקלק להנחת התמונה, או הקלק וגרור להגדרת הגודל שלו ידנית",
     "publishLibrary": "פירסום ספריה אישית",
     "bindTextToElement": "יש להקיש Enter כדי להוסיף טקסט",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
-    "firefox_clipboard_write": ""
+    "deepBoxSelect": "החזק Ctrl / Cmd לבחירה עמוקה ולמניעת גרירה",
+    "eraserRevert": "החזק Alt להחזרת רכיבים מסומנים למחיקה",
+    "firefox_clipboard_write": "יכולות זה ניתנת להפעלה על ידי שינוי הדגל של \"dom.events.asyncClipboard.clipboardItem\" למצב \"true\". כדי לשנות את הדגל בדפדפן Firefox, בקר בעמוד ״about:config״."
   },
   "canvasError": {
     "cannotShowPreview": "לא הצלחנו להציג את התצוגה המקדימה",
@@ -318,8 +318,8 @@
     "zoomToFit": "גלילה להצגת כל האלמנטים במסך",
     "zoomToSelection": "התמקד בבחירה",
     "toggleElementLock": "נעילה/ביטול הנעילה של הרכיבים הנבחרים",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "זוז עמוד למעלה/למטה",
+    "movePageLeftRight": "זוז עמוד שמאלה/ימינה"
   },
   "clearCanvasDialog": {
     "title": "ניקוי הקנבס"
