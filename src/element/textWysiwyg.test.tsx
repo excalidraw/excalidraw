@@ -1062,12 +1062,14 @@ ard`,
         expect(rectangle.height).toBe(232);
         expect(textElement.fontSize).toBe(20);
         expect(textElement.text).toBe(
-          `Excalidra
-w is an 
-opensourc
-e virtual
-whiteboar
-d`,
+          `Excalid
+raw is 
+an 
+opensou
+rce 
+virtual
+whitebo
+ard`,
         );
       });
 

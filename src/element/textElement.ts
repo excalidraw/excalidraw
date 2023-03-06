@@ -172,10 +172,7 @@ export const handleBindTextResize = (
     const maxWidth = getMaxContainerWidth(container);
     const maxHeight = getMaxContainerHeight(container);
     let containerHeight = containerDims.height;
-    if (
-      shouldMaintainAspectRatio ||
-      (transformHandleType !== "n" && transformHandleType !== "s")
-    ) {
+    if (transformHandleType !== "n" && transformHandleType !== "s") {
       if (text) {
         text = wrapText(
           textElement.originalText,
@@ -209,6 +206,53 @@ export const handleBindTextResize = (
       });
     }
 
+    if (
+      shouldMaintainAspectRatio &&
+      (nextHeight > maxHeight || nextWidth > maxWidth)
+    ) {
+      let height = containerDims.height;
+      let width = containerDims.width;
+      let x = container.x;
+      let y = container.y;
+
+      if (nextHeight > maxHeight) {
+        height = computeContainerDimensionForBoundText(
+          nextHeight,
+          container.type,
+        );
+      }
+      if (nextWidth > maxWidth) {
+        width = computeContainerDimensionForBoundText(
+          nextWidth,
+          container.type,
+        );
+      }
+      const diffX = width - containerDims.width;
+      const diffY = height - containerDims.height;
+
+      if (transformHandleType === "n") {
+        y = container.y - diffY;
+      } else if (
+        transformHandleType === "e" ||
+        transformHandleType === "w" ||
+        transformHandleType === "ne" ||
+        transformHandleType === "nw"
+      ) {
+        y = container.y - diffY / 2;
+      }
+
+      if (transformHandleType === "s" || transformHandleType === "n") {
+        x = container.x - diffX / 2;
+      }
+
+      mutateElement(container, {
+        height,
+        width,
+        x,
+        y,
+      });
+    }
+
     mutateElement(textElement, {
       text,
       width: nextWidth,
@@ -223,17 +267,6 @@ export const handleBindTextResize = (
           textElement as ExcalidrawTextElementWithContainer,
         ),
       );
-      if (shouldMaintainAspectRatio && nextHeight > maxHeight) {
-        containerHeight = computeContainerDimensionForBoundText(
-          nextHeight,
-          container.type,
-        );
-        const { y } = computeContainerCoords(textElement, container.type);
-        mutateElement(container, {
-          y,
-          height: containerHeight,
-        });
-      }
     }
   }
 };
