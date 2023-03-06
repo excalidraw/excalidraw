@@ -24,7 +24,7 @@ import { mutateElement } from "./mutateElement";
 import {
   getApproxLineHeight,
   getBoundTextElementId,
-  getContainerCoords,
+  computeBoundTextElementCoords,
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
@@ -233,7 +233,7 @@ export const textWysiwyg = ({
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
         else {
-          const containerCoords = getContainerCoords(container);
+          const containerCoords = computeBoundTextElementCoords(container);
 
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {

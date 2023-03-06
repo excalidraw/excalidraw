@@ -2,7 +2,7 @@ import { BOUND_TEXT_PADDING } from "../constants";
 import { API } from "../tests/helpers/api";
 import {
   computeContainerHeightForBoundText,
-  getContainerCoords,
+  computeBoundTextElementCoords,
   getMaxContainerWidth,
   getMaxContainerHeight,
   wrapText,
@@ -177,7 +177,7 @@ break it now`,
 });
 
 describe("Test measureText", () => {
-  describe("Test getContainerCoords", () => {
+  describe("Test computeBoundTextElementCoords", () => {
     const params = { width: 200, height: 100, x: 10, y: 20 };
 
     it("should compute coords correctly when ellipse", () => {
@@ -185,7 +185,7 @@ describe("Test measureText", () => {
         type: "ellipse",
         ...params,
       });
-      expect(getContainerCoords(element)).toEqual({
+      expect(computeBoundTextElementCoords(element)).toEqual({
         x: 44.2893218813452455,
         y: 39.64466094067262,
       });
@@ -196,7 +196,7 @@ describe("Test measureText", () => {
         type: "rectangle",
         ...params,
       });
-      expect(getContainerCoords(element)).toEqual({
+      expect(computeBoundTextElementCoords(element)).toEqual({
         x: 15,
         y: 25,
       });
@@ -207,7 +207,7 @@ describe("Test measureText", () => {
         type: "diamond",
         ...params,
       });
-      expect(getContainerCoords(element)).toEqual({
+      expect(computeBoundTextElementCoords(element)).toEqual({
         x: 65,
         y: 50,
       });

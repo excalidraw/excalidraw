@@ -244,7 +244,7 @@ const computeBoundTextPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
-  const containerCoords = getContainerCoords(container);
+  const containerCoords = computeBoundTextElementCoords(container);
   const maxContainerHeight = getMaxContainerHeight(container);
   const maxContainerWidth = getMaxContainerWidth(container);
 
@@ -614,7 +614,9 @@ export const getContainerCenter = (
   return { x: midSegmentMidpoint[0], y: midSegmentMidpoint[1] };
 };
 
-export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
+export const computeBoundTextElementCoords = (
+  container: NonDeletedExcalidrawElement,
+) => {
   let offsetX = BOUND_TEXT_PADDING;
   let offsetY = BOUND_TEXT_PADDING;
 
@@ -810,9 +812,3 @@ export const getMaxContainerHeight = (container: ExcalidrawElement) => {
   }
   return height - BOUND_TEXT_PADDING * 2;
 };
-
-// export const computeContainerCoordsFromBoundText = (
-//   boundText: ExcalidrawTextElementWithContainer,
-// ) => {
-
-// };
