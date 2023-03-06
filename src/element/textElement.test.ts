@@ -6,6 +6,7 @@ import {
   getMaxContainerWidth,
   getMaxContainerHeight,
   wrapText,
+  computeContainerCoords,
 } from "./textElement";
 import { FontString } from "./types";
 
@@ -177,122 +178,150 @@ break it now`,
   });
 });
 
-describe("Test measureText", () => {
-  describe("Test computeBoundTextElementCoords", () => {
-    const params = { width: 200, height: 100, x: 10, y: 20 };
+describe("Test computeBoundTextElementCoords", () => {
+  const params = { width: 200, height: 100, x: 10, y: 20 };
 
-    it("should compute coords correctly when ellipse", () => {
-      const element = API.createElement({
-        type: "ellipse",
-        ...params,
-      });
-      expect(computeBoundTextElementCoords(element)).toEqual({
-        x: 44.2893218813452455,
-        y: 39.64466094067262,
-      });
+  it("should compute coords correctly when ellipse", () => {
+    const element = API.createElement({
+      type: "ellipse",
+      ...params,
     });
-
-    it("should compute coords correctly when rectangle", () => {
-      const element = API.createElement({
-        type: "rectangle",
-        ...params,
-      });
-      expect(computeBoundTextElementCoords(element)).toEqual({
-        x: 15,
-        y: 25,
-      });
-    });
-
-    it("should compute coords correctly when diamond", () => {
-      const element = API.createElement({
-        type: "diamond",
-        ...params,
-      });
-      expect(computeBoundTextElementCoords(element)).toEqual({
-        x: 65,
-        y: 50,
-      });
+    expect(computeBoundTextElementCoords(element)).toEqual({
+      x: 44.2893218813452455,
+      y: 39.64466094067262,
     });
   });
 
-  describe("Test computeContainerDimensionForBoundText", () => {
-    const params = {
-      width: 178,
-      height: 194,
-    };
-
-    it("should compute container height correctly for rectangle", () => {
-      const element = API.createElement({
-        type: "rectangle",
-        ...params,
-      });
-      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
-        160,
-      );
+  it("should compute coords correctly when rectangle", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      ...params,
     });
-
-    it("should compute container height correctly for ellipse", () => {
-      const element = API.createElement({
-        type: "ellipse",
-        ...params,
-      });
-      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
-        226,
-      );
-    });
-
-    it("should compute container height correctly for diamond", () => {
-      const element = API.createElement({
-        type: "diamond",
-        ...params,
-      });
-      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
-        320,
-      );
+    expect(computeBoundTextElementCoords(element)).toEqual({
+      x: 15,
+      y: 25,
     });
   });
 
-  describe("Test getMaxContainerWidth", () => {
-    const params = {
-      width: 178,
-      height: 194,
-    };
-
-    it("should return max width when container is rectangle", () => {
-      const container = API.createElement({ type: "rectangle", ...params });
-      expect(getMaxContainerWidth(container)).toBe(168);
+  it("should compute coords correctly when diamond", () => {
+    const element = API.createElement({
+      type: "diamond",
+      ...params,
     });
-
-    it("should return max width when container is ellipse", () => {
-      const container = API.createElement({ type: "ellipse", ...params });
-      expect(getMaxContainerWidth(container)).toBe(116);
+    expect(computeBoundTextElementCoords(element)).toEqual({
+      x: 65,
+      y: 50,
     });
+  });
+});
 
-    it("should return max width when container is diamond", () => {
-      const container = API.createElement({ type: "diamond", ...params });
-      expect(getMaxContainerWidth(container)).toBe(79);
+describe("Test computeContainerCoords", () => {
+  const boundTextElement = API.createElement({
+    type: "text",
+    width: 200,
+    height: 100,
+    x: 10,
+    y: 20,
+  });
+  it("should compute coords correctly when ellipse", () => {
+    expect(computeContainerCoords(boundTextElement, "ellipse")).toEqual({
+      x: -24.289321881345245,
+      y: 0.3553390593273775,
     });
   });
 
-  describe("Test getMaxContainerHeight", () => {
-    const params = {
-      width: 178,
-      height: 194,
-    };
-
-    it("should return max height when container is rectangle", () => {
-      const container = API.createElement({ type: "rectangle", ...params });
-      expect(getMaxContainerHeight(container)).toBe(184);
+  it("should compute coords correctly when rectangle", () => {
+    expect(computeContainerCoords(boundTextElement, "rectangle")).toEqual({
+      x: 5,
+      y: 15,
     });
+  });
 
-    it("should return max height when container is ellipse", () => {
-      const container = API.createElement({ type: "ellipse", ...params });
-      expect(getMaxContainerHeight(container)).toBe(127);
+  it("should compute coords correctly when diamond", () => {
+    expect(computeContainerCoords(boundTextElement, "diamond")).toEqual({
+      x: -45,
+      y: -10,
     });
+  });
+});
 
-    it("should return max height when container is diamond", () => {
-      const container = API.createElement({ type: "diamond", ...params });
-      expect(getMaxContainerHeight(container)).toBe(87);
+describe("Test computeContainerDimensionForBoundText", () => {
+  const params = {
+    width: 178,
+    height: 194,
+  };
+
+  it("should compute container height correctly for rectangle", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      ...params,
     });
+    expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
+      160,
+    );
+  });
+
+  it("should compute container height correctly for ellipse", () => {
+    const element = API.createElement({
+      type: "ellipse",
+      ...params,
+    });
+    expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
+      226,
+    );
+  });
+
+  it("should compute container height correctly for diamond", () => {
+    const element = API.createElement({
+      type: "diamond",
+      ...params,
+    });
+    expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
+      320,
+    );
+  });
+});
+
+describe("Test getMaxContainerWidth", () => {
+  const params = {
+    width: 178,
+    height: 194,
+  };
+
+  it("should return max width when container is rectangle", () => {
+    const container = API.createElement({ type: "rectangle", ...params });
+    expect(getMaxContainerWidth(container)).toBe(168);
+  });
+
+  it("should return max width when container is ellipse", () => {
+    const container = API.createElement({ type: "ellipse", ...params });
+    expect(getMaxContainerWidth(container)).toBe(116);
+  });
+
+  it("should return max width when container is diamond", () => {
+    const container = API.createElement({ type: "diamond", ...params });
+    expect(getMaxContainerWidth(container)).toBe(79);
+  });
+});
+
+describe("Test getMaxContainerHeight", () => {
+  const params = {
+    width: 178,
+    height: 194,
+  };
+
+  it("should return max height when container is rectangle", () => {
+    const container = API.createElement({ type: "rectangle", ...params });
+    expect(getMaxContainerHeight(container)).toBe(184);
+  });
+
+  it("should return max height when container is ellipse", () => {
+    const container = API.createElement({ type: "ellipse", ...params });
+    expect(getMaxContainerHeight(container)).toBe(127);
+  });
+
+  it("should return max height when container is diamond", () => {
+    const container = API.createElement({ type: "diamond", ...params });
+    expect(getMaxContainerHeight(container)).toBe(87);
   });
 });
