@@ -4,15 +4,15 @@
     "pasteAsPlaintext": "הדבק ללא עיצוב",
     "pasteCharts": "הדבק גרפים",
     "selectAll": "בחר הכל",
-    "multiSelect": "הוסף אובייקט לבחירה",
+    "multiSelect": "הוסף רכיב לבחירה",
     "moveCanvas": "הזז את הקנבס",
-    "cut": "חתוך",
+    "cut": "גזור",
     "copy": "העתק",
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
-    "copyText": "העתק ללוח כ-PNG",
+    "copyText": "העתק ללוח כטקסט",
     "bringForward": "הבא שכבה קדימה",
-    "sendToBack": "העבר לסוף",
+    "sendToBack": "שלח אחורה",
     "bringToFront": "העבר לחזית",
     "sendBackward": "העבר שכבה אחורה",
     "delete": "מחק",
@@ -26,7 +26,7 @@
     "strokeStyle_solid": "מלא",
     "strokeStyle_dashed": "מקווקו",
     "strokeStyle_dotted": "מנוקד",
-    "sloppiness": "סגנון",
+    "sloppiness": "רישול",
     "opacity": "אטימות",
     "textAlign": "יישור טקסט",
     "edges": "קצוות",
@@ -35,23 +35,23 @@
     "arrowheads": "ראשי חצים",
     "arrowhead_none": "ללא",
     "arrowhead_arrow": "חץ",
-    "arrowhead_bar": "שורה",
+    "arrowhead_bar": "קצה אנכי",
     "arrowhead_dot": "נקודה",
     "arrowhead_triangle": "משולש",
     "fontSize": "גודל גופן",
-    "fontFamily": "סוג הגופן",
+    "fontFamily": "גופן",
     "onlySelected": "רק מה שנבחר",
     "withBackground": "רקע",
     "exportEmbedScene": "הטמעה של מידע הסצנה",
-    "exportEmbedScene_details": "מידע התצוגה יישמר לקובץ המיוצא מסוג PNG/SVG כך שיהיה ניתן לשחזרה ממנו.\nהפעולה תגדיל את גודל הקובץ המיוצא.",
+    "exportEmbedScene_details": "הייצוא יבוצע לקובץ מסוג PNG/SVG כדי שהמידע על הסצנה ישמר בו וניתן יהיה לבצע שחזור ממנו.\nיגדיל את גודל הקובץ של הייצוא.",
     "addWatermark": "הוסף \"נוצר באמצעות Excalidraw\"",
-    "handDrawn": "כתב יד",
+    "handDrawn": "ציור יד",
     "normal": "רגיל",
     "code": "קוד",
     "small": "קטן",
-    "medium": "בנוני",
+    "medium": "בינוני",
     "large": "גדול",
-    "veryLarge": "ענק",
+    "veryLarge": "גדול מאוד",
     "solid": "מוצק",
     "hachure": "קווים משופעים",
     "crossHatch": "קווים מוצלבים",
@@ -109,7 +109,7 @@
     "decreaseFontSize": "הקטן את גודל הגופן",
     "increaseFontSize": "הגדל את גודל הגופן",
     "unbindText": "ביטול קיבוע הטקסט",
-    "bindText": "קיבוע הטקסט לאוגד",
+    "bindText": "קיבוע הטקסט למיכל",
     "createContainerFromText": "ארוז טקסט במיכל",
     "link": {
       "edit": "עריכת קישור",
@@ -135,7 +135,7 @@
     "hint_emptyPrivateLibrary": "בחר משהו בקנבס כדי להוסיף אותו לכאן."
   },
   "buttons": {
-    "clearReset": "אפס את הלוח",
+    "clearReset": "אפס את הקנבאס",
     "exportJSON": "ייצא לקובץ",
     "exportImage": "ייצוא התמונה...",
     "export": "שמור ל...",
@@ -144,7 +144,7 @@
     "copyToClipboard": "העתק ללוח",
     "copyPngToClipboard": "העתק PNG ללוח",
     "scale": "קנה מידה",
-    "save": "שמירת קובץ נוכחי",
+    "save": "שמור לקובץ נוכחי",
     "saveAs": "שמירה בשם",
     "load": "פתח",
     "getShareableLink": "קבל קישור לשיתוף",
@@ -160,16 +160,16 @@
     "undo": "בטל",
     "redo": "בצע מחדש",
     "resetLibrary": "איפוס ספריה",
-    "createNewRoom": "צור חדר",
+    "createNewRoom": "צור חדר חדש",
     "fullScreen": "מסך מלא",
     "darkMode": "מצב כהה",
     "lightMode": "מצב בהיר",
     "zenMode": "מצב זן",
-    "exitZenMode": "צא ממצב תפריט מרחף",
+    "exitZenMode": "צא ממצב זן",
     "cancel": "ביטול",
     "clear": "ניקוי",
-    "remove": "מחיקה",
-    "publishLibrary": "פירסום",
+    "remove": "הסר",
+    "publishLibrary": "פרסום",
     "submit": "שליחה",
     "confirm": "לאשר"
   },
@@ -337,8 +337,8 @@
       "authorName": "שם או שם משתמש",
       "libraryName": "תנו שם לספריה",
       "libraryDesc": "תיאור של הספריה שלך כדי לסייע למשתמשים להבין את השימוש בה",
-      "githubHandle": "",
-      "twitterHandle": "",
+      "githubHandle": "כינוי GitHub (לא חובה), כדי שתוכל לערוך את הספרית לאחר שנשלחה לבדיקה",
+      "twitterHandle": "שם משתמש טוויטר (לא חובה), כדי שנדע למי לתת קרדיט כשאנחנו מפרסמים בטוויטר",
       "website": "קישור לאתר הפרטי שלך או לכל מקום אחר (אופציונאלי)"
     },
     "errors": {
@@ -353,16 +353,16 @@
     "noteGuidelines": {
       "pre": "הספריה צריכה לקבל אישור ידני. אנא קרא את ",
       "link": "הנחיות",
-      "post": ""
+      "post": " לפני השליחה. אתה תצטרך לחשבון GitHub כדי לתקשר ולבצע שינויים אם תתבקש, אבל זה לא דרישה הכרחית."
     },
     "noteLicense": {
-      "pre": "",
+      "pre": "על ידי שליחה, אתה מסכים שהסיפריה תפורסם תחת ה- ",
       "link": "רישיון MIT, ",
       "post": "שאומר בקצרה שכל אחד יכול לעשות בהם שימוש ללא מגבלות."
     },
-    "noteItems": "",
-    "atleastOneLibItem": "",
-    "republishWarning": ""
+    "noteItems": "לכל פריט בסיפריה חייב להיות שם כדי שאפשר יהיה לסנן. הפריטי סיפריה הבאים יהיו כלולים:",
+    "atleastOneLibItem": "אנא בחר לפחות פריט אחד מספריה כדי להתחיל",
+    "republishWarning": "הערה: חלק מהפריטים שבחרת מסומנים ככאלו שכבר פורסמו/נשלחו. אתה צריך לשלוח פריטים מחדש כאשר אתה מעדכן ספריה או הגשה קיימים."
   },
   "publishSuccessDialog": {
     "title": "הספריה נשלחה",
@@ -401,7 +401,7 @@
     "fileSavedToFilename": "נשמר לקובץ {filename}",
     "canvas": "משטח ציור",
     "selection": "בחירה",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "השתמש ב- {{shortcut}} כדי להדביק כפריט יחיד,\nאו הדבק לתוך עורך טקסט קיים"
   },
   "colors": {
     "ffffff": "לבן",
@@ -452,15 +452,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "כל המידע שלח נשמר מקומית בדפדפן.",
+      "center_heading_plus": "אתה רוצה ללכת אל Excalidraw+ במקום?",
+      "menuHint": "ייצוא, העדפות, שפות, ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "ייצוא, העדפות, ועוד...",
+      "center_heading": "איורים. נעשים. פשוטים.",
+      "toolbarHint": "בחר כלי & והתחל לצייר!",
+      "helpHint": "קיצורים & עזרה"
     }
   }
 }
