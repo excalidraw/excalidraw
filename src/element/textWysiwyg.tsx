@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isFirefox, isSafari, VERTICAL_ALIGN } from "../constants";
+import { CLASSES, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -347,13 +347,10 @@ export const textWysiwyg = ({
     boxSizing: "content-box",
   });
 
-  //As Firefox, Safari needs little higher dimensions on DOM
-  const magicOffset =
-    isFirefox || isSafari
-      ? (excalidrawContainer
-          ? parseFloat(getComputedStyle(excalidrawContainer).fontSize)
-          : 16) / 16
-      : 0;
+  const magicOffset = 
+    (excalidrawContainer
+      ? parseFloat(getComputedStyle(excalidrawContainer).fontSize)
+      : 16) / 16;
 
   const onEditableInput = () => {
     const updatedTextElement = Scene.getScene(element)?.getElement(
