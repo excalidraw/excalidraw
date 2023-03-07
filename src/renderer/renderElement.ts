@@ -1032,6 +1032,23 @@ const roughSVGDrawWithPrecision = (
   return rsvg.draw(pshape);
 };
 
+const maybeWrapNodesInFrameClipPath = (
+  element: NonDeletedExcalidrawElement,
+  root: SVGElement,
+  nodes: SVGElement[],
+  exportedFrameIds?: { [id: string]: boolean },
+) => {
+  const frame = getContainingFrame(element);
+  if (frame && exportedFrameIds?.[frame.id]) {
+    const g = root.ownerDocument!.createElementNS(SVG_NS, "g");
+    g.setAttributeNS(SVG_NS, "clip-path", `url(#${frame.id})`);
+    nodes.forEach((node) => g.appendChild(node));
+    return g;
+  }
+
+  return null;
+};
+
 export const renderElementToSvg = (
   element: NonDeletedExcalidrawElement,
   rsvg: RoughSVG,
@@ -1040,6 +1057,7 @@ export const renderElementToSvg = (
   offsetX: number,
   offsetY: number,
   exportWithDarkMode?: boolean,
+  exportedFrameIds?: { [id: string]: boolean },
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   let cx = (x2 - x1) / 2 - (element.x - x1);
@@ -1100,7 +1118,15 @@ export const renderElementToSvg = (
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
-      root.appendChild(node);
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [node],
+        exportedFrameIds,
+      );
+
+      g ? root.appendChild(g) : root.appendChild(node);
       break;
     }
     case "line":
@@ -1181,8 +1207,19 @@ export const renderElementToSvg = (
         }
         group.appendChild(node);
       });
-      root.appendChild(group);
-      root.append(maskPath);
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [group, maskPath],
+        exportedFrameIds,
+      );
+      if (g) {
+        root.appendChild(g);
+      } else {
+        root.appendChild(group);
+        root.append(maskPath);
+      }
       break;
     }
     case "freedraw": {
@@ -1208,7 +1245,15 @@ export const renderElementToSvg = (
       path.setAttribute("fill", element.strokeColor);
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
-      root.appendChild(node);
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [node],
+        exportedFrameIds,
+      );
+
+      g ? root.appendChild(g) : root.appendChild(node);
       break;
     }
     case "image": {
@@ -1269,7 +1314,13 @@ export const renderElementToSvg = (
           }) rotate(${degree} ${cx} ${cy})`,
         );
 
-        root.appendChild(g);
+        const clipG = maybeWrapNodesInFrameClipPath(
+          element,
+          root,
+          [g],
+          exportedFrameIds,
+        );
+        clipG ? root.appendChild(clipG) : root.appendChild(g);
       }
       break;
     }
@@ -1321,7 +1372,15 @@ export const renderElementToSvg = (
           text.setAttribute("direction", direction);
           node.appendChild(text);
         }
-        root.appendChild(node);
+
+        const g = maybeWrapNodesInFrameClipPath(
+          element,
+          root,
+          [node],
+          exportedFrameIds,
+        );
+
+        g ? root.appendChild(g) : root.appendChild(node);
       } else {
         // @ts-ignore
         throw new Error(`Unimplemented type ${element.type}`);

@@ -1,6 +1,6 @@
 import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
-import { getCommonBounds } from "../element/bounds";
+import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance } from "../utils";
 import { AppState, BinaryFiles } from "../types";
@@ -11,6 +11,7 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
+import Scene from "./Scene";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -135,6 +136,19 @@ export const exportToSvg = async (
     }
     assetPath = `${assetPath}/dist/excalidraw-assets/`;
   }
+
+  // do not apply clipping when we're exporting the whole scene
+  const isExportingWholeCanvas =
+    Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
+    elements.length;
+
+  const offsetX = -minX + exportPadding;
+  const offsetY = -minY + exportPadding;
+
+  const frames = isExportingWholeCanvas
+    ? []
+    : elements.filter((element) => element.type === "frame");
+
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
@@ -149,8 +163,28 @@ export const exportToSvg = async (
         src: url("${assetPath}Cascadia.woff2");
       }
     </style>
+    ${frames.map((frame) => {
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame);
+      const cx = (x2 - x1) / 2 - (frame.x - x1);
+      const cy = (y2 - y1) / 2 - (frame.y - y1);
+
+      return `<clipPath id=${frame.id}>
+          <rect transform="translate(${frame.x + offsetX} ${
+        frame.y + offsetY
+      }) rotate(${frame.angle} ${cx} ${cy})"
+        width="${frame.width}"
+        height="${frame.height}"
+        >
+        </rect>
+      </clipPath>`;
+    })}
   </defs>
   `;
+
+  const exportedFrameIds = frames.reduce((acc, frame) => {
+    acc[frame.id] = true;
+    return acc;
+  }, {} as Record<string, true>);
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
@@ -164,9 +198,10 @@ export const exportToSvg = async (
 
   const rsvg = rough.svg(svgRoot);
   renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
-    offsetX: -minX + exportPadding,
-    offsetY: -minY + exportPadding,
+    offsetX,
+    offsetY,
     exportWithDarkMode: appState.exportWithDarkMode,
+    exportedFrameIds,
   });
 
   return svgRoot;

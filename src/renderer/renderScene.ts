@@ -414,13 +414,28 @@ export const _renderScene = ({
       }),
     );
 
+    const isExportingWholeCanvas =
+      Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
+      elements.length;
+
     const groupsToBeAddedToFrame = new Set<string>();
 
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
     visibleElements.forEach((element) => {
       try {
-        if (element.frameId || appState.frameToHighlight) {
+        // - when exporting the whole canvas, we DO NOT apply clipping
+        // - when we are exporting a particular frame, apply clipping
+        //   if the containing frame is not selected, apply clipping
+        const frameId = element.frameId || appState.frameToHighlight?.id;
+
+        if (
+          frameId &&
+          ((renderConfig.isExporting &&
+            !isExportingWholeCanvas &&
+            appState.selectedElementIds[frameId]) ||
+            !renderConfig.isExporting)
+        ) {
           let frame: ExcalidrawFrameElement | null = null;
           const containgFrame = getContainingFrame(element);
 
@@ -1371,15 +1386,18 @@ export const renderSceneToSvg = (
     offsetX = 0,
     offsetY = 0,
     exportWithDarkMode = false,
+    exportedFrameIds = {},
   }: {
     offsetX?: number;
     offsetY?: number;
     exportWithDarkMode?: boolean;
+    exportedFrameIds?: { [id: string]: boolean };
   } = {},
 ) => {
   if (!svgRoot) {
     return;
   }
+
   // render elements
   elements.forEach((element, index) => {
     if (!element.isDeleted) {
@@ -1392,6 +1410,7 @@ export const renderSceneToSvg = (
           element.x + offsetX,
           element.y + offsetY,
           exportWithDarkMode,
+          exportedFrameIds,
         );
       } catch (error: any) {
         console.error(error);

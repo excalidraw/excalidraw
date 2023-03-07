@@ -41,6 +41,24 @@ Object {
           "category": "element",
         },
       },
+      Object {
+        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "name": "selectAllElementsInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "canvas",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "name": "removeAllElementsInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "history",
+        },
+      },
       "separator",
       Object {
         "contextItemLabel": "labels.copyAsPng",
@@ -4544,6 +4562,24 @@ Object {
           "category": "element",
         },
       },
+      Object {
+        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "name": "selectAllElementsInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "canvas",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "name": "removeAllElementsInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "history",
+        },
+      },
       "separator",
       Object {
         "contextItemLabel": "labels.copyAsPng",
@@ -5091,6 +5127,24 @@ Object {
         "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "name": "selectAllElementsInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "canvas",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "name": "removeAllElementsInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "history",
         },
       },
       "separator",
@@ -5946,6 +6000,24 @@ Object {
           "category": "element",
         },
       },
+      Object {
+        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "name": "selectAllElementsInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "canvas",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "name": "removeAllElementsInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "history",
+        },
+      },
       "separator",
       Object {
         "contextItemLabel": "labels.copyAsPng",
@@ -6284,6 +6356,24 @@ Object {
         "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "name": "selectAllElementsInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "canvas",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "name": "removeAllElementsInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "history",
         },
       },
       "separator",
