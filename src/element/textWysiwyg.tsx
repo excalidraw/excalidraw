@@ -347,7 +347,7 @@ export const textWysiwyg = ({
     boxSizing: "content-box",
   });
 
-  const magicOffset = 
+  const magicOffset =
     (excalidrawContainer
       ? parseFloat(getComputedStyle(excalidrawContainer).fontSize)
       : 16) / 16;
