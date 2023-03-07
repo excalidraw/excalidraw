@@ -245,53 +245,53 @@
     "lineEditor_pointSelected": "לחץ Delete למחיקת נקודה/ות,\nCtrl / Cmd + D לשכפול, או גרור להזזה",
     "lineEditor_nothingSelected": "בחר נקודה כדי לערוך (החזק SHIFT לבחירת כמה),\nאו החזק Alt והקלק להוספת נקודות חדשות",
     "placeImage": "הקלק להנחת התמונה, או הקלק וגרור להגדרת הגודל שלו ידנית",
-    "publishLibrary": "פירסום ספריה אישית",
-    "bindTextToElement": "יש להקיש Enter כדי להוסיף טקסט",
+    "publishLibrary": "פרסם ספריה משלך",
+    "bindTextToElement": "הקש Enter כדי להוספת טקסט",
     "deepBoxSelect": "החזק Ctrl / Cmd לבחירה עמוקה ולמניעת גרירה",
     "eraserRevert": "החזק Alt להחזרת רכיבים מסומנים למחיקה",
     "firefox_clipboard_write": "יכולות זה ניתנת להפעלה על ידי שינוי הדגל של \"dom.events.asyncClipboard.clipboardItem\" למצב \"true\". כדי לשנות את הדגל בדפדפן Firefox, בקר בעמוד ״about:config״."
   },
   "canvasError": {
-    "cannotShowPreview": "לא הצלחנו להציג את התצוגה המקדימה",
+    "cannotShowPreview": "לא ניתן להראות תצוגה מקדימה",
     "canvasTooBig": "הקנבס עלול להיות גדול מדי.",
-    "canvasTooBigTip": "טיפ: נסה להזיז את האלמנטים הרחוקים ביותר מעט קרוב יותר יחד."
+    "canvasTooBigTip": "טיפ: נסה להזיז את הרכיבים הרחוקים ביותר מעט קרוב יותר האחד לשני."
   },
   "errorSplash": {
     "headingMain_pre": "אירעה שגיאה. נסה ",
     "headingMain_button": "טוען את העמוד מחדש.",
     "clearCanvasMessage": "אם טעינה מחדש לא עובדת, נסה ",
-    "clearCanvasMessage_button": "מנקה את הלוח.",
-    "clearCanvasCaveat": " זה יביא לאובדן עבודה ",
-    "trackedToSentry_pre": "שגיאה עם מזהה ",
+    "clearCanvasMessage_button": "מנקה את הקנבאס.",
+    "clearCanvasCaveat": " זה יגרום לאובדן העבודה ",
+    "trackedToSentry_pre": "השגיאה עם מזהה ",
     "trackedToSentry_post": " נמצאה במערכת שלנו.",
-    "openIssueMessage_pre": "נזהרנו מאוד שלא לכלול מידע שלך בשגיאה. אם המידע איננו אישי, בבקשה עקוב אחר ",
+    "openIssueMessage_pre": "נזהרנו מאוד שלא לכלול מידע מהקנבאס שלך בשגיאה. אם המידע בקנבאס אינו אישי, שקול לבצע מעקב אחר הטיפול שלנו ",
     "openIssueMessage_button": "מעקב באגים.",
-    "openIssueMessage_post": " בבקשה כלול את המידע למטה באמצעות העתקה והדבקה בנושא ב GitHub.",
-    "sceneContent": "תוכן הלוח:"
+    "openIssueMessage_post": " בבקשה כלול את המידע מטה באמצעות העתקתה שלו, והדבקה שלו ב- GitHub Issue.",
+    "sceneContent": "תוכן הקנבאס:"
   },
   "roomDialog": {
-    "desc_intro": "אתה יכול להזמין אנשים ללוח הנוכחי שלך בכדי לשתף פעולה.",
+    "desc_intro": "אתה יכול להזמין אנשים לקנבאס הנוכחי שלך לעבודה משותפת.",
     "desc_privacy": "אל דאגה, השיתוף מוצפן מקצה לקצה, כך שכל מה שתצייר ישאר פרטי. אפילו השרתים שלנו לא יוכלו לראות את מה שאתה ממציא.",
     "button_startSession": "התחל שיתוף",
     "button_stopSession": "הפסק שיתוף",
-    "desc_inProgressIntro": "שיתוף חי כרגע בפעולה.",
+    "desc_inProgressIntro": "שיתוף חי פעיל כרגע.",
     "desc_shareLink": "שתף את הקישור עם כל מי שאתה מעוניין לעבוד אתו:",
-    "desc_exitSession": "עצירת השיתוף תנתק אותך מהחדר, אבל עדיין תוכל להמשיך לעבוד על הלוח, מקומית. שים לב שזה לא ישפיע על אנשים אחרים, והם עדיין יוכלו לשתף פעולה עם הגירסה שלהם.",
-    "shareTitle": "הצטרף לסשן שיתוף בזמן אמת של Excalidraw"
+    "desc_exitSession": "עצירת השיתוף תנתק אותך מהחדר, אבל עדיין תוכל להמשיך לעבוד על הקנבאס, מקומית. שים לב שזה לא ישפיע על אנשים אחרים, והם עדיין יוכלו לבצע שיתוף עם הגרסה שלהם.",
+    "shareTitle": "הצטרף לשיתוף לעבודה משותפת חיה, בזמן אמת, על גבי Excalidraw"
   },
   "errorDialog": {
     "title": "שגיאה"
   },
   "exportDialog": {
     "disk_title": "שמור לכונן",
-    "disk_details": "ייצוא מידע הסצינה לקובץ אותו ניתן יהיה לייבא בהמשך.",
+    "disk_details": "ייצא מידע של הקנבאס לקובץ שתוכל לייבא אחר כך.",
     "disk_button": "שמירה לקובץ",
-    "link_title": "העתקת קישור לשיתוף",
+    "link_title": "קבל קישור לשיתוף",
     "link_details": "ייצוא כקישור לקריאה בלבד.",
-    "link_button": "ייצוא כקישור",
-    "excalidrawplus_description": "שמור את המפה לסביבת העבודה שלך ב-Excalidraw+.",
+    "link_button": "ייצוא לקישור",
+    "excalidrawplus_description": "שמור את הקנבאס לסביבת העבודה שלך ב- +Excalidraw.",
     "excalidrawplus_button": "ייצוא",
-    "excalidrawplus_exportError": "הייצוא ל-Excalidraw+ לא הצליח לעת עתה..."
+    "excalidrawplus_exportError": "לא הצלחתי לייצא ל- +Excalidraw כרגע..."
   },
   "helpDialog": {
     "blog": "קרא את הבלוג שלנו",
@@ -302,7 +302,7 @@
     "curvedLine": "קו מעוגל",
     "documentation": "תיעוד",
     "doubleClick": "לחיצה כפולה",
-    "drag": "לגרור",
+    "drag": "גרור",
     "editor": "עורך",
     "editSelectedShape": "ערוך את הצורה הנבחרת (טקסט/חץ/קו)",
     "github": "מצאת בעיה? דווח",
@@ -394,12 +394,12 @@
   },
   "toast": {
     "addedToLibrary": "נוסף לספריה",
-    "copyStyles": "העתק סגנונות.",
-    "copyToClipboard": "הועתק אל הלוח.",
+    "copyStyles": "סגנונות הועתקו.",
+    "copyToClipboard": "הועתק ללוח.",
     "copyToClipboardAsPng": "{{exportSelection}} הועתקה ללוח כ-PNG\n({{exportColorScheme}})",
     "fileSaved": "קובץ נשמר.",
     "fileSavedToFilename": "נשמר לקובץ {filename}",
-    "canvas": "משטח ציור",
+    "canvas": "קנבאס",
     "selection": "בחירה",
     "pasteAsSingleElement": "השתמש ב- {{shortcut}} כדי להדביק כפריט יחיד,\nאו הדבק לתוך עורך טקסט קיים"
   },
