@@ -1,4 +1,3 @@
-import { isBrave } from "../constants";
 import { isTextElement, refreshTextDimensions } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
