@@ -13,6 +13,11 @@ export const isChrome = navigator.userAgent.indexOf("Chrome") !== -1;
 export const isSafari =
   !isChrome && navigator.userAgent.indexOf("Safari") !== -1;
 
+export const isBrave =
+  (navigator as any).brave &&
+  (navigator as any).brave.isBrave &&
+  (navigator as any).brave.isBrave.name === "isBrave";
+
 export const APP_NAME = "Excalidraw";
 
 export const DRAGGING_THRESHOLD = 10; // px

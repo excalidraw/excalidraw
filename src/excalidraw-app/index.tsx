@@ -673,10 +673,9 @@ const ExcalidrawWrapper = () => {
       </Excalidraw>
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
-        <ErrorDialog
-          message={errorMessage}
-          onClose={() => setErrorMessage("")}
-        />
+        <ErrorDialog onClose={() => setErrorMessage("")}>
+          {errorMessage}
+        </ErrorDialog>
       )}
     </div>
   );

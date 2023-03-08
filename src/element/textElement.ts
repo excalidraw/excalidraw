@@ -8,7 +8,13 @@ import {
   NonDeletedExcalidrawElement,
 } from "./types";
 import { mutateElement } from "./mutateElement";
-import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
+import {
+  BOUND_TEXT_PADDING,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  TEXT_ALIGN,
+  VERTICAL_ALIGN,
+} from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
@@ -793,4 +799,15 @@ export const getMaxContainerHeight = (container: ExcalidrawElement) => {
     return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
   }
   return height - BOUND_TEXT_PADDING * 2;
+};
+
+export const isMeasureTextSupported = () => {
+  const width = getTextWidth(
+    DUMMY_TEXT,
+    getFontString({
+      fontSize: DEFAULT_FONT_SIZE,
+      fontFamily: DEFAULT_FONT_FAMILY,
+    }),
+  );
+  return width > 0;
 };
