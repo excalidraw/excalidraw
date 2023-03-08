@@ -1007,15 +1007,22 @@ class App extends React.Component<AppProps, AppState> {
         errorMessage: (
           <div>
             <p>
-              Whoops!!!! looks like{" "}
-              <span style={{ fontWeight: "bold" }}>
-                Aggresive block filtering
+              Looks like you are using Brave browser with &nbsp;
+              <span style={{ fontWeight: 600 }}>
+                Aggresively Block Fingerprinting!!
               </span>{" "}
-              is turned on in your browser sheilds!!
+              <br />
+              <br />
+              This could result in breaking the{" "}
+              <span style={{ fontWeight: 600 }}>Text Elements</span> in your
+              drawings.
             </p>
             <p>
-              This could break the Text Elements. Please turn it off to
-              continue!
+              Please turn it off to continue!
+              <a href="http://docs.excalidraw.com/docs/@excalidraw/excalidraw/faq#turning-off-aggresive-block-fingerprinting-in-brave-browser">
+                &nbsp;Here
+              </a>{" "}
+              is how you can turn it off.
             </p>
           </div>
         ),
