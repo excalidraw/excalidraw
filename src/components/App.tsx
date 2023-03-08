@@ -1009,7 +1009,7 @@ class App extends React.Component<AppProps, AppState> {
             <p>
               Looks like you are using Brave browser with &nbsp;
               <span style={{ fontWeight: 600 }}>
-                Aggresively Block Fingerprinting!!
+                Aggressively Block Fingerprinting
               </span>{" "}
               <br />
               <br />
