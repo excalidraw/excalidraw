@@ -1002,37 +1002,44 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.updateDOMRect(this.initializeScene);
     }
-    if (isBrave && !isMeasureTextSupported()) {
+    if (isBrave && isMeasureTextSupported()) {
       this.setState({
         errorMessage: (
           <div>
             <p>
-              Looks like you are using Brave browser with &nbsp;
+              {t("errors.brave_measure_text_error.start")} &nbsp;
               <span style={{ fontWeight: 600 }}>
-                Aggressively Block Fingerprinting
+                {t(
+                  "errors.brave_measure_text_error.aggressive_block_fingerprint",
+                )}
               </span>{" "}
-              setting enabled.
+              {t("errors.brave_measure_text_error.setting_enabled")}.
               <br />
               <br />
-              This could result in breaking the{" "}
-              <span style={{ fontWeight: 600 }}>Text Elements</span> in your
-              drawings.
+              {t("errors.brave_measure_text_error.break")}{" "}
+              <span style={{ fontWeight: 600 }}>
+                {t("errors.brave_measure_text_error.text_elements")}
+              </span>{" "}
+              {t("errors.brave_measure_text_error.in_your_drawings")}.
             </p>
             <p>
-              We strongly recommend disabling this setting. You can follow{" "}
+              {t("errors.brave_measure_text_error.strongly_recommend")}{" "}
               <a href="http://docs.excalidraw.com/docs/@excalidraw/excalidraw/faq#turning-off-aggresive-block-fingerprinting-in-brave-browser">
-                &nbsp;these steps
+                {" "}
+                {t("errors.brave_measure_text_error.steps")}
               </a>{" "}
-              on how to do so.
+              {t("errors.brave_measure_text_error.how")}.
             </p>
             <p>
-              If disabling this setting doesn't fix the display of text
-              elements, please open{" "}
+              {t("errors.brave_measure_text_error.disable_setting")}{" "}
               <a href="https://github.com/excalidraw/excalidraw/issues/new">
-                issue
+                {t("errors.brave_measure_text_error.issue")}
               </a>{" "}
-              on our GitHub, or write us on{" "}
-              <a href="https://discord.gg/UexuTaE">Discord</a>.
+              {t("errors.brave_measure_text_error.write")}{" "}
+              <a href="https://discord.gg/UexuTaE">
+                {t("errors.brave_measure_text_error.discord")}
+              </a>
+              .
             </p>
           </div>
         ),
