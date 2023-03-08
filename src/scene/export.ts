@@ -15,6 +15,22 @@ import Scene from "./Scene";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
+const isOnlyExportingFrames = (
+  elements: readonly NonDeletedExcalidrawElement[],
+) => {
+  const frames = elements.filter((element) => element.type === "frame");
+
+  const exportedFrameIds = frames.reduce((acc, frame) => {
+    acc[frame.id] = true;
+    return acc;
+  }, {} as Record<string, true>);
+
+  return elements.every(
+    (element) =>
+      element.type === "frame" || exportedFrameIds[element.frameId ?? ""],
+  );
+};
+
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -52,6 +68,13 @@ export const exportToCanvas = async (
     files,
   });
 
+  const isExportingWholeCanvas =
+    Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
+    elements.length;
+
+  const onlyExportingFrames =
+    !isExportingWholeCanvas && isOnlyExportingFrames(elements);
+
   renderScene({
     elements,
     appState,
@@ -60,8 +83,8 @@ export const exportToCanvas = async (
     canvas,
     renderConfig: {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: -minX + exportPadding,
-      scrollY: -minY + exportPadding,
+      scrollX: -minX + (onlyExportingFrames ? 0 : exportPadding),
+      scrollY: -minY + (onlyExportingFrames ? 0 : exportPadding),
       zoom: defaultAppState.zoom,
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},
@@ -212,9 +235,39 @@ const getCanvasSize = (
   elements: readonly NonDeletedExcalidrawElement[],
   exportPadding: number,
 ): [number, number, number, number] => {
+  // we should decide if we are exporting the whole canvas
+  // if so, we are not clipping elements in the frame
+  // and therefore, we should not do anything special
+
+  const isExportingWholeCanvas =
+    Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
+    elements.length;
+
+  const onlyExportingFrames =
+    !isExportingWholeCanvas && isOnlyExportingFrames(elements);
+
+  if (!isExportingWholeCanvas) {
+    const frames = isExportingWholeCanvas
+      ? []
+      : elements.filter((element) => element.type === "frame");
+
+    const exportedFrameIds = frames.reduce((acc, frame) => {
+      acc[frame.id] = true;
+      return acc;
+    }, {} as Record<string, true>);
+
+    // elements in a frame do not affect the canvas size if we're not exporting
+    // the whole canvas
+    elements = elements.filter(
+      (element) => !exportedFrameIds[element.frameId ?? ""],
+    );
+  }
+
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  const width = distance(minX, maxX) + exportPadding * 2;
-  const height = distance(minY, maxY) + exportPadding + exportPadding;
+  const width =
+    distance(minX, maxX) + (onlyExportingFrames ? 0 : exportPadding * 2);
+  const height =
+    distance(minY, maxY) + (onlyExportingFrames ? 0 : exportPadding * 2);
 
   return [minX, minY, width, height];
 };
