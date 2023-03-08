@@ -1011,6 +1011,7 @@ class App extends React.Component<AppProps, AppState> {
               <span style={{ fontWeight: 600 }}>
                 Aggressively Block Fingerprinting
               </span>{" "}
+              setting enabled.
               <br />
               <br />
               This could result in breaking the{" "}
@@ -1018,11 +1019,20 @@ class App extends React.Component<AppProps, AppState> {
               drawings.
             </p>
             <p>
-              Please turn it off to continue!
+              We strongly recommend disabling this setting. You can follow{" "}
               <a href="http://docs.excalidraw.com/docs/@excalidraw/excalidraw/faq#turning-off-aggresive-block-fingerprinting-in-brave-browser">
-                &nbsp;Here
+                &nbsp;these steps
               </a>{" "}
-              is how you can turn it off.
+              on how to do so.
+            </p>
+            <p>
+              If disabling this setting doesn't fix the display of text
+              elements, please open{" "}
+              <a href="https://github.com/excalidraw/excalidraw/issues/new">
+                issue
+              </a>{" "}
+              on our GitHub, or write us on{" "}
+              <a href="https://discord.gg/UexuTaE">Discord</a>.
             </p>
           </div>
         ),
