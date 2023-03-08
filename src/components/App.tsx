@@ -5862,6 +5862,7 @@ class App extends React.Component<AppProps, AppState> {
   private maybeSuggestBindingForAll(
     selectedElements: NonDeleted<ExcalidrawElement>[],
   ): void {
+    if (selectedElements.length > 150) return;
     const suggestedBindings = getEligibleElementsForBinding(selectedElements);
     this.setState({ suggestedBindings });
   }

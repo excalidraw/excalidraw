@@ -123,7 +123,6 @@ class Scene {
     });
     this.nonDeletedElements = getNonDeletedElements(this.elements);
     this.informMutation();
-    this.isElementsChanged = nanoid();
   }
 
   informMutation() {

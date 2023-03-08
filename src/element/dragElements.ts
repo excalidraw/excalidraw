@@ -46,6 +46,7 @@ export const dragSelectedElements = (
           pointerDownState,
           textElement,
           offset,
+          true,
         );
       }
     }
@@ -62,6 +63,7 @@ const updateElementCoords = (
   pointerDownState: PointerDownState,
   element: NonDeletedExcalidrawElement,
   offset: { x: number; y: number },
+  isShapeText = false,
 ) => {
   let x: number;
   let y: number;
@@ -79,7 +81,7 @@ const updateElementCoords = (
   mutateElement(element, {
     x,
     y,
-  });
+  }, true, isShapeText);
 };
 export const getDragOffsetXY = (
   selectedElements: NonDeletedExcalidrawElement[],
