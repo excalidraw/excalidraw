@@ -471,7 +471,7 @@ export const _renderScene = ({
               // selected element is being dragged and the cursor is outside the frame
               (appState.selectedElementIds[element.id] &&
                 appState.selectedElementsAreBeingDragged &&
-                !appState.frameToHighlight) ||
+                appState.frameToHighlight !== containgFrame) ||
               // bound text element of the above elements
               (element.type === "text" &&
                 element.containerId &&
