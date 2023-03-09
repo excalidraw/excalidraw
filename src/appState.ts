@@ -1,5 +1,4 @@
 import oc from "open-color";
-import React from "react";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
