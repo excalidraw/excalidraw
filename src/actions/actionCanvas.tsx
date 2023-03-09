@@ -395,7 +395,7 @@ function easeOut(k: number): number {
  *
  * for example:
  * ```ts
- * easeToValues([10, 20, 10], [0, 0, 0], (a, b, c) => setState(a,b, c))
+ * easeToValuesRAF([10, 20, 10], [0, 0, 0], (a, b, c) => setState(a,b, c))
  * ```
  *
  * @param fromValues The initial values, must be numeric
@@ -431,6 +431,7 @@ export const easeToValuesRAF = (
       callback(...newValues);
       window.requestAnimationFrame(step);
     } else {
+      // ensure final values are reached at the end of the transition
       callback(...toValues);
     }
   }
