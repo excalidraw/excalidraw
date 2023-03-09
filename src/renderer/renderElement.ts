@@ -1091,6 +1091,9 @@ export const renderElementToSvg = (
     root = anchorTag;
   }
 
+  const opacity =
+    ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
+
   switch (element.type) {
     case "selection": {
       // Since this is used only during editing experience, which is canvas based,
@@ -1106,7 +1109,6 @@ export const renderElementToSvg = (
         getShapeForElement(element)!,
         MAX_DECIMALS_FOR_SVG_EXPORT,
       );
-      const opacity = element.opacity / 100;
       if (opacity !== 1) {
         node.setAttribute("stroke-opacity", `${opacity}`);
         node.setAttribute("fill-opacity", `${opacity}`);
@@ -1179,7 +1181,6 @@ export const renderElementToSvg = (
       if (boundText) {
         group.setAttribute("mask", `url(#mask-${element.id})`);
       }
-      const opacity = element.opacity / 100;
       group.setAttribute("stroke-linecap", "round");
 
       getShapeForElement(element)!.forEach((shape) => {
@@ -1225,7 +1226,6 @@ export const renderElementToSvg = (
     case "freedraw": {
       generateElementShape(element, generator);
       generateFreeDrawShape(element);
-      const opacity = element.opacity / 100;
       const shape = getShapeForElement(element);
       const node = shape
         ? roughSVGDrawWithPrecision(rsvg, shape, MAX_DECIMALS_FOR_SVG_EXPORT)
@@ -1289,6 +1289,7 @@ export const renderElementToSvg = (
 
         use.setAttribute("width", `${width}`);
         use.setAttribute("height", `${height}`);
+        use.setAttribute("opacity", `${opacity}`);
 
         // We first apply `scale` transforms (horizontal/vertical mirroring)
         // on the <use> element, then apply translation and rotation
@@ -1330,7 +1331,6 @@ export const renderElementToSvg = (
     }
     default: {
       if (isTextElement(element)) {
-        const opacity = element.opacity / 100;
         const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
         if (opacity !== 1) {
           node.setAttribute("stroke-opacity", `${opacity}`);
