@@ -54,7 +54,6 @@ import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
   getBoundTextElement,
   getContainerElement,
-  suppportsHorizontalAlign,
 } from "../element/textElement";
 import {
   isBoundToContainer,
