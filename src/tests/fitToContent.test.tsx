@@ -136,7 +136,7 @@ describe("fitToContent animated", () => {
     expect(h.state.scrollY).not.toBe(pastScrollY);
   });
 
-  it("should ease zoom and scroll the viewport to the selected element", async () => {
+  it("should animate the scroll but not the zoom", async () => {
     await render(<ExcalidrawApp />);
 
     h.state.width = 10;

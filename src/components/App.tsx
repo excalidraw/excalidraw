@@ -1866,11 +1866,11 @@ class App extends React.Component<AppProps, AppState> {
       scrollY = scroll.scrollY;
     }
 
-    // when animating, using RequestAnimationFrame will prevent the
-    // animation from slowing down other processes
+    // when animating, we use RequestAnimationFrame to prevent the animation
+    // from slowing down other processes
     if (opts?.animate) {
-      // zoom animation could become problematic on scenes with a large number
-      // of element so we just set it to its final value for better user experience.
+      // zoom animation could become problematic on scenes with large number
+      // of elements, setting it to its final value to improve user experience.
       this.setState({ zoom });
 
       easeToValuesRAF(
