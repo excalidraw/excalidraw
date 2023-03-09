@@ -673,6 +673,29 @@ export const shouldAllowVerticalAlign = (
   });
 };
 
+export const suppportsHorizontalAlign = (
+  selectedElements: NonDeletedExcalidrawElement[],
+) => {
+  return selectedElements.some((element) => {
+    const hasBoundContainer = isBoundToContainer(element);
+    if (hasBoundContainer) {
+      const container = getContainerElement(element);
+      if (isTextElement(element) && isArrowElement(container)) {
+        return false;
+      }
+      return true;
+    }
+    const boundTextElement = getBoundTextElement(element);
+    if (boundTextElement) {
+      if (isArrowElement(element)) {
+        return false;
+      }
+      return true;
+    }
+    return isTextElement(element);
+  });
+};
+
 export const getTextBindableContainerAtPosition = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
