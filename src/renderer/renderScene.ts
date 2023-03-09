@@ -454,6 +454,7 @@ export const _renderScene = ({
               frame.y + renderConfig.scrollY,
             );
             const offset = 0.5 / renderConfig.zoom.value;
+            context.beginPath();
             context.rect(offset, offset, frame.width, frame.height);
 
             // --------- clipping ----------
