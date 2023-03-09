@@ -266,7 +266,6 @@ export const loadScene = async (
       { repairBindings: true, refreshDimensions: true },
     );
   } else {
-    console.trace("DUDE");
     data = restore(localDataState || null, null, null, {
       repairBindings: true,
     });
