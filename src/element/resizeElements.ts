@@ -693,7 +693,9 @@ const resizeMultipleElements = (
       };
       const fontSize = measureFontSizeFromWidth(
         boundTextElement ?? (element.orig as ExcalidrawTextElement),
-        getContainerMaxWidth(updatedElement),
+        boundTextElement
+          ? getContainerMaxWidth(updatedElement)
+          : updatedElement.width,
       );
 
       if (!fontSize) {
