@@ -1003,6 +1003,8 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.updateDOMRect(this.initializeScene);
     }
+
+    // note that this check seems to always pass in localhost
     if (isBrave() && !isMeasureTextSupported()) {
       this.setState({
         errorMessage: <BraveMeasureTextError />,

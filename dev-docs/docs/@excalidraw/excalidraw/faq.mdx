@@ -4,15 +4,13 @@
 
 No, Excalidraw package doesn't come with collaboration built in, since the implementation is specific to each host app. We expose APIs which you can use to communicate with Excalidraw which you can use to implement it. You can check our own implementation [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx). Here is a [detailed answer](https://github.com/excalidraw/excalidraw/discussions/3879#discussioncomment-1110524) on how you can achieve the same.
 
-### Turning off Aggresive Block Fingerprinting in Brave browser
+### Turning off Aggressive Anti-Fingerprinting in Brave browser
 
-Since when *Aggresive Block Fingerprinting* is turned on, the `measureText` API breaks which in turn breaks the Test Elements in your drawings. Here is more [info](https://github.com/excalidraw/excalidraw/pull/6336) on the same.
+When *Aggressive Anti-Fingerprinting* is turned on, the `measureText` API breaks which in turn breaks the Text Elements in your drawings. Here is more [info](https://github.com/excalidraw/excalidraw/pull/6336) on the same.
 
-Hence we have added a *warning* when such situtation is encountered.
+We strongly recommend turning it off. You can follow the steps below on how to do so.
 
-We strongly recomment turning it off. You can follow :point_down: steps on how to do so.
-
-1. Open [excalidraw.com](https://excalidraw.com) in Brave and click on the `Sheild` button
+1. Open [excalidraw.com](https://excalidraw.com) in Brave and click on the **Shield** button
 ![sheild Button](../../assets/brave-sheild.png)
 
 2. Once opened, look for **Aggressively Block Fingerprinting**
@@ -25,7 +23,7 @@ We strongly recomment turning it off. You can follow :point_down: steps on how t
 
 4. Thats all. All text elements should be fixed now 🎉
 
-If disabling this setting doesn't fix the display of text elements, please consider opening an [issue](https://github.com/excalidraw/excalidraw/issues/new) on our GitHub or join write to us on [Discord](https://discord.gg/UexuTaE).
+If disabling this setting doesn't fix the display of text elements, please consider opening an [issue](https://github.com/excalidraw/excalidraw/issues/new) on our GitHub, or message us on [Discord](https://discord.gg/UexuTaE).
 
 
 

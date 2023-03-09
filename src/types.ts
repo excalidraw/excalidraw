@@ -102,7 +102,7 @@ export type AppState = {
   } | null;
   showWelcomeScreen: boolean;
   isLoading: boolean;
-  errorMessage: string | null | React.ReactNode;
+  errorMessage: React.ReactNode;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;

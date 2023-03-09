@@ -14,9 +14,7 @@ export const isSafari =
   !isChrome && navigator.userAgent.indexOf("Safari") !== -1;
 // keeping function so it can be mocked in test
 export const isBrave = () =>
-  (navigator as any).brave &&
-  (navigator as any).brave.isBrave &&
-  (navigator as any).brave.isBrave.name === "isBrave";
+  (navigator as any).brave?.isBrave?.name === "isBrave";
 
 export const APP_NAME = "Excalidraw";
 
