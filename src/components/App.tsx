@@ -287,6 +287,7 @@ import { actionToggleHandTool } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionCreateContainerFromText } from "../actions/actionBoundText";
+import BraveMeasureTextError from "./BraveMeasureTextError";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -1004,45 +1005,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (isBrave && !isMeasureTextSupported()) {
       this.setState({
-        errorMessage: (
-          <div>
-            <p>
-              {t("errors.brave_measure_text_error.start")} &nbsp;
-              <span style={{ fontWeight: 600 }}>
-                {t(
-                  "errors.brave_measure_text_error.aggressive_block_fingerprint",
-                )}
-              </span>{" "}
-              {t("errors.brave_measure_text_error.setting_enabled")}.
-              <br />
-              <br />
-              {t("errors.brave_measure_text_error.break")}{" "}
-              <span style={{ fontWeight: 600 }}>
-                {t("errors.brave_measure_text_error.text_elements")}
-              </span>{" "}
-              {t("errors.brave_measure_text_error.in_your_drawings")}.
-            </p>
-            <p>
-              {t("errors.brave_measure_text_error.strongly_recommend")}{" "}
-              <a href="http://docs.excalidraw.com/docs/@excalidraw/excalidraw/faq#turning-off-aggresive-block-fingerprinting-in-brave-browser">
-                {" "}
-                {t("errors.brave_measure_text_error.steps")}
-              </a>{" "}
-              {t("errors.brave_measure_text_error.how")}.
-            </p>
-            <p>
-              {t("errors.brave_measure_text_error.disable_setting")}{" "}
-              <a href="https://github.com/excalidraw/excalidraw/issues/new">
-                {t("errors.brave_measure_text_error.issue")}
-              </a>{" "}
-              {t("errors.brave_measure_text_error.write")}{" "}
-              <a href="https://discord.gg/UexuTaE">
-                {t("errors.brave_measure_text_error.discord")}
-              </a>
-              .
-            </p>
-          </div>
-        ),
+        errorMessage: <BraveMeasureTextError />,
       });
     }
   }
