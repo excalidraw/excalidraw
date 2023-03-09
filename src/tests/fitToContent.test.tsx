@@ -158,7 +158,7 @@ describe("fitToContent animated", () => {
     expect(h.state.scrollY).toBe(0);
     expect(h.state.scrollY).toBe(0);
 
-    // zoom is not animated, it should be set already be set to its final value
+    // zoom is not animated, it should be already be set to its final value
     expect(h.state.zoom.value).toBeLessThanOrEqual(0.1);
 
     // wait around the 50ms mark
