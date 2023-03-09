@@ -1,7 +1,7 @@
 import { t } from "../i18n";
 const BraveMeasureTextError = () => {
   return (
-    <>
+    <div data-testid="brave-measure-text-error">
       <p>
         {t("errors.brave_measure_text_error.start")} &nbsp;
         <span style={{ fontWeight: 600 }}>
@@ -35,7 +35,7 @@ const BraveMeasureTextError = () => {
         </a>
         .
       </p>
-    </>
+    </div>
   );
 };
 

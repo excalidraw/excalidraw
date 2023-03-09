@@ -1003,7 +1003,7 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.updateDOMRect(this.initializeScene);
     }
-    if (isBrave && !isMeasureTextSupported()) {
+    if (isBrave() && !isMeasureTextSupported()) {
       this.setState({
         errorMessage: <BraveMeasureTextError />,
       });
