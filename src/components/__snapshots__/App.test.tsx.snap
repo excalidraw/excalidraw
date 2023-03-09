@@ -5,7 +5,7 @@ exports[`Test <App/> should show error modal when using brave and measureText AP
   data-testid="brave-measure-text-error"
 >
   <p>
-    Looks like you are using Brave browser with
+    Looks like you are using Brave browser with the
       
     <span
       style="font-weight: 600;"
@@ -42,7 +42,7 @@ exports[`Test <App/> should show error modal when using brave and measureText AP
     .
   </p>
   <p>
-     If disabling this setting doesn't fix the display of text elements, please open
+     If disabling this setting doesn't fix the display of text elements, please open an
      
     <a
       href="https://github.com/excalidraw/excalidraw/issues/new"
