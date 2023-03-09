@@ -136,7 +136,7 @@ describe("fitToContent animated", () => {
     expect(h.state.scrollY).not.toBe(pastScrollY);
   });
 
-  it("should scroll ease zoom and scroll the viewport to the selected element", async () => {
+  it("should ease zoom and scroll the viewport to the selected element", async () => {
     await render(<ExcalidrawApp />);
 
     h.state.width = 10;
@@ -155,24 +155,23 @@ describe("fitToContent animated", () => {
 
     // Since this is an animation, we expect values to change through time.
     // We'll verify that the zoom and scroll values changes at 50ms and 100ms
-    expect(h.state.zoom.value).toBe(1);
     expect(h.state.scrollY).toBe(0);
     expect(h.state.scrollY).toBe(0);
+
+    // zoom is not animated, it should be set already be set to its final value
+    expect(h.state.zoom.value).toBeLessThanOrEqual(0.1);
 
     // wait around the 50ms mark
     await waitFor(50);
 
-    const pastZoom = h.state.zoom.value;
     const pastScrollX = h.state.scrollX;
     const pastScrollY = h.state.scrollY;
 
-    expect(h.state.zoom.value).not.toBe(1);
     expect(h.state.scrollX).not.toBe(0);
     expect(h.state.scrollY).not.toBe(0);
 
     // wait around the 100ms mark (+50ms)
     await waitFor(50);
-    expect(h.state.zoom.value).not.toBe(pastZoom);
     expect(h.state.scrollX).not.toBe(pastScrollX);
     expect(h.state.scrollY).not.toBe(pastScrollY);
   });

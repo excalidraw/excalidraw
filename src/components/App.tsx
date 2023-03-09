@@ -204,7 +204,6 @@ import {
   PointerDownState,
   SceneData,
   Device,
-  NormalizedZoomValue,
 } from "../types";
 import {
   debounce,
@@ -1853,13 +1852,15 @@ class App extends React.Component<AppProps, AppState> {
     let scrollX = this.state.scrollX;
     let scrollY = this.state.scrollY;
 
-    // do we need to also recompute the zoom?
     if (opts?.fitToContent) {
+      // compute an appropriate viewport location (scroll X, Y) and zoom level
+      // that fit the target elements on the scene
       const { appState } = zoomToFitElements(targets, this.state, false);
       zoom = appState.zoom;
       scrollX = appState.scrollX;
       scrollY = appState.scrollY;
     } else {
+      // compute only the viewport location, without any zoom adjustment
       const scroll = calculateScrollCenter(targets, this.state, this.canvas);
       scrollX = scroll.scrollX;
       scrollY = scroll.scrollY;
@@ -1868,15 +1869,14 @@ class App extends React.Component<AppProps, AppState> {
     // when animating, using RequestAnimationFrame will prevent the
     // animation from slowing down other processes
     if (opts?.animate) {
+      // zoom animation could become problematic on scenes with a large number
+      // of element so we just set it to its final value for better user experience.
+      this.setState({ zoom });
+
       easeToValuesRAF(
-        [this.state.scrollX, this.state.scrollY, this.state.zoom.value],
-        [scrollX, scrollY, zoom.value],
-        (scrollX, scrollY, zoomValue) =>
-          this.setState({
-            scrollX,
-            scrollY,
-            zoom: { value: zoomValue as NormalizedZoomValue },
-          }),
+        [this.state.scrollX, this.state.scrollY],
+        [scrollX, scrollY],
+        (scrollX, scrollY) => this.setState({ scrollX, scrollY }),
         { duration: 500 },
       );
     } else {
