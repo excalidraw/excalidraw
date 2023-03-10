@@ -23,7 +23,7 @@ describe("fitToContent", () => {
 
     h.app.scrollToContent(rectElement, { fitToContent: true });
 
-    // element is 10x taller than the stage,
+    // element is 10x taller than the viewport size,
     // zoom should be at least 1/10
     expect(h.state.zoom.value).toBeLessThanOrEqual(0.1);
   });
@@ -54,7 +54,7 @@ describe("fitToContent", () => {
       fitToContent: true,
     });
 
-    // elements take 100x100, which is 10x bigger than the stage,
+    // elements take 100x100, which is 10x bigger than the viewport size,
     // zoom should be at least 1/10
     expect(h.state.zoom.value).toBeLessThanOrEqual(0.1);
   });
@@ -158,7 +158,7 @@ describe("fitToContent animated", () => {
     expect(h.state.scrollY).toBe(0);
     expect(h.state.scrollY).toBe(0);
 
-    // zoom is not animated, it should be already be set to its final value
+    // zoom is not animated, it should be set to its final value
     expect(h.state.zoom.value).toBeLessThanOrEqual(0.1);
 
     // wait around the 50ms mark
