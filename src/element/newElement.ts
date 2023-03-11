@@ -35,7 +35,8 @@ import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
 
 type ElementConstructorOpts = MarkOptional<
-  Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
+  Omit<ExcalidrawGenericElement, "type" | "isDeleted" | "updated">,
+  | "id"
   | "width"
   | "height"
   | "angle"
@@ -67,12 +68,13 @@ const _newElementBase = <T extends ExcalidrawElement>(
     boundElements = null,
     link = null,
     locked,
+    id,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
   // assign type to guard against excess properties
   const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
-    id: rest.id || randomId(),
+    id: id || randomId(),
     type,
     x,
     y,

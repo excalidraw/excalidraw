@@ -1,16 +1,13 @@
 import { ExcalidrawTextElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
+import Scene from "./Scene";
 
-export type RenderConfig = {
-  // AppState values
-  // ---------------------------------------------------------------------------
+export type CanvasUIRenderConfig = {
   scrollX: AppState["scrollX"];
   scrollY: AppState["scrollY"];
-  /** null indicates transparent bg */
-  viewBackgroundColor: AppState["viewBackgroundColor"] | null;
   zoom: AppState["zoom"];
-  shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
-  theme: AppState["theme"];
+
+  isElementsChanged?: Scene["isElementsChanged"];
   // collab-related state
   // ---------------------------------------------------------------------------
   remotePointerViewportCoords: { [id: string]: { x: number; y: number } };
@@ -20,14 +17,35 @@ export type RenderConfig = {
   remotePointerUserStates: { [id: string]: string };
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
-  imageCache: AppClassProperties["imageCache"];
   renderScrollbars?: boolean;
   renderSelection?: boolean;
+  selectionColor?: string;
+  selectedElementIds?: AppState["selectedElementIds"];
+  selectedLinearElement?: AppState["selectedLinearElement"];
+  editingLinearElement?: AppState["selectedLinearElement"];
+  selectionElement?: AppState["selectionElement"];
+};
+
+export type CanvasContentRenderConfig = {
+  // AppState values
+  // ---------------------------------------------------------------------------
+  scrollX: AppState["scrollX"];
+  scrollY: AppState["scrollY"];
+  zoom: AppState["zoom"];
+
+  isElementsChanged?: Scene["isElementsChanged"];
+
+  /** null indicates transparent bg */
+  viewBackgroundColor: AppState["viewBackgroundColor"] | null;
+  shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
+  theme: AppState["theme"];
+
+  imageCache: AppClassProperties["imageCache"];
+  gridSize?: AppState["gridSize"];
   renderGrid?: boolean;
   /** when exporting the behavior is slightly different (e.g. we can't use
     CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
-  selectionColor?: string;
 };
 
 export type SceneScroll = {
@@ -35,9 +53,9 @@ export type SceneScroll = {
   scrollY: number;
 };
 
-export interface Scene {
-  elements: ExcalidrawTextElement[];
-}
+// export interface Scene {
+//   elements: ExcalidrawTextElement[];
+// }
 
 export type ExportType =
   | "png"

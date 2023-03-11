@@ -26,7 +26,7 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
-import { RenderConfig } from "../scene/types";
+import { CanvasContentRenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
@@ -59,14 +59,14 @@ const defaultAppState = getDefaultAppState();
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
 ) =>
   isInitializedImageElement(element) &&
   !renderConfig.imageCache.has(element.fileId);
 
 const shouldResetImageFilter = (
   element: ExcalidrawElement,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
 ) => {
   return (
     renderConfig.theme === "dark" &&
@@ -86,7 +86,7 @@ const getCanvasPadding = (element: ExcalidrawElement) =>
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
-  theme: RenderConfig["theme"];
+  theme: CanvasContentRenderConfig["theme"];
   canvasZoom: Zoom["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
@@ -96,7 +96,7 @@ export interface ExcalidrawElementWithCanvas {
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -205,7 +205,7 @@ const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
 ) => {
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
@@ -661,7 +661,7 @@ const generateElementShape = (
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
 ) => {
   const zoom: Zoom = renderConfig ? renderConfig.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
@@ -694,7 +694,7 @@ const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
 ) => {
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
@@ -840,33 +840,11 @@ export const renderElement = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: CanvasContentRenderConfig,
   appState: AppState,
 ) => {
   const generator = rc.generator;
   switch (element.type) {
-    case "selection": {
-      context.save();
-      context.translate(
-        element.x + renderConfig.scrollX,
-        element.y + renderConfig.scrollY,
-      );
-      context.fillStyle = "rgba(0, 0, 200, 0.04)";
-
-      // render from 0.5px offset  to get 1px wide line
-      // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
-      // TODO can be be improved by offseting to the negative when user selects
-      // from right to left
-      const offset = 0.5 / renderConfig.zoom.value;
-
-      context.fillRect(offset, offset, element.width, element.height);
-      context.lineWidth = 1 / renderConfig.zoom.value;
-      context.strokeStyle = "rgb(105, 101, 219)";
-      context.strokeRect(offset, offset, element.width, element.height);
-
-      context.restore();
-      break;
-    }
     case "freedraw": {
       generateElementShape(element, generator);
 

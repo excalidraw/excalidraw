@@ -20,6 +20,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
   informMutation = true,
+  isShapeText = false
 ): TElement => {
   let didChange = false;
 
@@ -83,6 +84,10 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     return element;
   }
 
+  if(isShapeText){
+    element.versionNonce = randomInteger();
+    return element
+  }
   if (
     typeof updates.height !== "undefined" ||
     typeof updates.width !== "undefined" ||

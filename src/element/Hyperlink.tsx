@@ -300,16 +300,16 @@ export const getContextMenuLabel = (
 export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
-  appState: AppState,
+  zoom: AppState["zoom"],
 ): [x: number, y: number, width: number, height: number] => {
   const size = DEFAULT_LINK_SIZE;
-  const linkWidth = size / appState.zoom.value;
-  const linkHeight = size / appState.zoom.value;
-  const linkMarginY = size / appState.zoom.value;
+  const linkWidth = size / zoom.value;
+  const linkHeight = size / zoom.value;
+  const linkMarginY = size / zoom.value;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
-  const centeringOffset = (size - 8) / (2 * appState.zoom.value);
-  const dashedLineMargin = 4 / appState.zoom.value;
+  const centeringOffset = (size - 8) / (2 * zoom.value);
+  const dashedLineMargin = 4 / zoom.value;
 
   // Same as `ne` resize handle
   const x = x2 + dashedLineMargin - centeringOffset;
@@ -352,7 +352,7 @@ export const isPointHittingLinkIcon = (
   const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
     [x1, y1, x2, y2],
     element.angle,
-    appState,
+    appState.zoom,
   );
   const hitLink =
     x > linkX - threshold &&
@@ -395,7 +395,7 @@ const renderTooltip = (
   const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
     [x1, y1, x2, y2],
     element.angle,
-    appState,
+    appState.zoom,
   );
 
   const linkViewportCoords = sceneCoordsToViewportCoords(

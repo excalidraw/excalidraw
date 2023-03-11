@@ -187,7 +187,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import Scene from "../scene/Scene";
-import { RenderConfig, ScrollBars } from "../scene/types";
+import { CanvasUIRenderConfig, ScrollBars } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
 import { findShapeByKey, SHAPES } from "../shapes";
 import {
@@ -285,6 +285,7 @@ import { actionToggleHandTool } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionCreateContainerFromText } from "../actions/actionBoundText";
+import { randomId } from "../random";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -368,6 +369,7 @@ const gesture: Gesture = {
 
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"] = null;
+  canvasUi: AppClassProperties["canvas"] = null;
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
@@ -380,7 +382,7 @@ class App extends React.Component<AppProps, AppState> {
     // needed for tests to pass since we directly render App in many tests
     UIOptions: DEFAULT_UI_OPTIONS,
   };
-
+  private selectionID: string = randomId();
   public scene: Scene;
   private fonts: Fonts;
   private resizeObserver: ResizeObserver | undefined;
@@ -499,14 +501,15 @@ class App extends React.Component<AppProps, AppState> {
     } = this.state;
     const canvasWidth = canvasDOMWidth * canvasScale;
     const canvasHeight = canvasDOMHeight * canvasScale;
-    if (viewModeEnabled) {
-      return (
+
+    return (
+      <>
         <canvas
           className="excalidraw__canvas"
           style={{
             width: canvasDOMWidth,
             height: canvasDOMHeight,
-            cursor: CURSOR_TYPE.GRAB,
+            cursor: viewModeEnabled ? CURSOR_TYPE.GRAB : CURSOR_TYPE.AUTO,
           }}
           width={canvasWidth}
           height={canvasHeight}
@@ -517,31 +520,26 @@ class App extends React.Component<AppProps, AppState> {
           onPointerCancel={this.removePointer}
           onTouchMove={this.handleTouchMove}
           onPointerDown={this.handleCanvasPointerDown}
+          onDoubleClick={
+            viewModeEnabled ? undefined : this.handleCanvasDoubleClick
+          }
         >
           {t("labels.drawingCanvas")}
         </canvas>
-      );
-    }
-    return (
-      <canvas
-        className="excalidraw__canvas"
-        style={{
-          width: canvasDOMWidth,
-          height: canvasDOMHeight,
-        }}
-        width={canvasWidth}
-        height={canvasHeight}
-        ref={this.handleCanvasRef}
-        onContextMenu={this.handleCanvasContextMenu}
-        onPointerDown={this.handleCanvasPointerDown}
-        onDoubleClick={this.handleCanvasDoubleClick}
-        onPointerMove={this.handleCanvasPointerMove}
-        onPointerUp={this.handleCanvasPointerUp}
-        onPointerCancel={this.removePointer}
-        onTouchMove={this.handleTouchMove}
-      >
-        {t("labels.drawingCanvas")}
-      </canvas>
+        <canvas
+          className="excalidraw__canvas ui_draw"
+          style={{
+            width: canvasDOMWidth,
+            height: canvasDOMHeight,
+            pointerEvents: "none",
+          }}
+          width={canvasWidth}
+          height={canvasHeight}
+          ref={this.handleCanvasUiRef}
+        >
+          {t("labels.drawingCanvas")}
+        </canvas>
+      </>
     );
   }
 
@@ -1288,9 +1286,9 @@ class App extends React.Component<AppProps, AppState> {
     const cursorButton: {
       [id: string]: string | undefined;
     } = {};
-    const pointerViewportCoords: RenderConfig["remotePointerViewportCoords"] =
+    const pointerViewportCoords: CanvasUIRenderConfig["remotePointerViewportCoords"] =
       {};
-    const remoteSelectedElementIds: RenderConfig["remoteSelectedElementIds"] =
+    const remoteSelectedElementIds: CanvasUIRenderConfig["remoteSelectedElementIds"] =
       {};
     const pointerUsernames: { [id: string]: string } = {};
     const pointerUserStates: { [id: string]: string } = {};
@@ -1353,22 +1351,35 @@ class App extends React.Component<AppProps, AppState> {
         scale: window.devicePixelRatio,
         rc: this.rc!,
         canvas: this.canvas!,
-        renderConfig: {
-          selectionColor,
+        canvasUi: this.canvasUi!,
+        canvasContentRenderConfig: {
           scrollX: this.state.scrollX,
           scrollY: this.state.scrollY,
           viewBackgroundColor: this.state.viewBackgroundColor,
+          zoom: this.state.zoom,
+          shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
+          theme: this.state.theme,
+          imageCache: this.imageCache,
+          gridSize: this.state.gridSize,
+          isExporting: false,
+          isElementsChanged: this.scene.getIsElementsChanged(),
+        },
+        canvasUIRenderConfig: {
+          selectionColor,
+          scrollX: this.state.scrollX,
+          scrollY: this.state.scrollY,
           zoom: this.state.zoom,
           remotePointerViewportCoords: pointerViewportCoords,
           remotePointerButton: cursorButton,
           remoteSelectedElementIds,
           remotePointerUsernames: pointerUsernames,
           remotePointerUserStates: pointerUserStates,
-          shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
-          theme: this.state.theme,
-          imageCache: this.imageCache,
-          isExporting: false,
           renderScrollbars: !this.device.isMobile,
+          isElementsChanged: this.scene.getIsElementsChanged(),
+          selectedElementIds: this.state.selectedElementIds,
+          selectedLinearElement: this.state.selectedLinearElement,
+          editingLinearElement: this.state.editingLinearElement,
+          selectionElement: this.state.selectionElement,
         },
         callback: ({ atLeastOneVisibleElement, scrollBars }) => {
           if (scrollBars) {
@@ -4347,6 +4358,7 @@ class App extends React.Component<AppProps, AppState> {
       type: elementType,
       x: gridX,
       y: gridY,
+      id: elementType === "selection" ? this.selectionID : undefined,
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
@@ -5850,6 +5862,7 @@ class App extends React.Component<AppProps, AppState> {
   private maybeSuggestBindingForAll(
     selectedElements: NonDeleted<ExcalidrawElement>[],
   ): void {
+    if (selectedElements.length > 150) return;
     const suggestedBindings = getEligibleElementsForBinding(selectedElements);
     this.setState({ suggestedBindings });
   }
@@ -5888,6 +5901,13 @@ class App extends React.Component<AppProps, AppState> {
       this.canvas?.removeEventListener(EVENT.WHEEL, this.handleWheel);
       this.canvas?.removeEventListener(EVENT.TOUCH_START, this.onTapStart);
       this.canvas?.removeEventListener(EVENT.TOUCH_END, this.onTapEnd);
+    }
+  };
+
+  private handleCanvasUiRef = (canvas: HTMLCanvasElement) => {
+    // canvas is null when unmounting
+    if (canvas !== null) {
+      this.canvasUi = canvas;
     }
   };
 

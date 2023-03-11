@@ -5,6 +5,7 @@ import {
 } from "../element/types";
 import { getNonDeletedElements, isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { nanoid } from "nanoid";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -56,9 +57,14 @@ class Scene {
   private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
   private elements: readonly ExcalidrawElement[] = [];
   private elementsMap = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
+  private isElementsChanged: string | undefined;
 
   getElementsIncludingDeleted() {
     return this.elements;
+  }
+
+  getIsElementsChanged() {
+    return this.isElementsChanged;
   }
 
   getNonDeletedElements(): readonly NonDeletedExcalidrawElement[] {
@@ -123,6 +129,7 @@ class Scene {
     for (const callback of Array.from(this.callbacks)) {
       callback();
     }
+    this.isElementsChanged = nanoid();
   }
 
   addCallback(cb: SceneStateCallback): SceneStateCallbackRemover {

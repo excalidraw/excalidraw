@@ -40,6 +40,7 @@ export const exportToCanvas = async (
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
   const { canvas, scale = 1 } = createCanvas(width, height);
+  const { canvas: canvasUi } = createCanvas(width, height);
 
   const defaultAppState = getDefaultAppState();
 
@@ -57,22 +58,29 @@ export const exportToCanvas = async (
     scale,
     rc: rough.canvas(canvas),
     canvas,
-    renderConfig: {
+    canvasUi,
+    canvasContentRenderConfig: {
+      scrollX: -minX + exportPadding,
+      scrollY: -minY + exportPadding,
+      zoom: defaultAppState.zoom,
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+      shouldCacheIgnoreZoom: false,
+      theme: appState.exportWithDarkMode ? "dark" : "light",
+      imageCache,
+      gridSize: appState.gridSize,
+      renderGrid: false,
+      isExporting: true,
+    },
+    canvasUIRenderConfig: {
       scrollX: -minX + exportPadding,
       scrollY: -minY + exportPadding,
       zoom: defaultAppState.zoom,
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},
-      shouldCacheIgnoreZoom: false,
       remotePointerUsernames: {},
       remotePointerUserStates: {},
-      theme: appState.exportWithDarkMode ? "dark" : "light",
-      imageCache,
       renderScrollbars: false,
       renderSelection: false,
-      renderGrid: false,
-      isExporting: true,
     },
   });
 
