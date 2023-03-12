@@ -15,7 +15,7 @@ import Scene from "./Scene";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
-const isOnlyExportingFrames = (
+export const isOnlyExportingFrames = (
   elements: readonly NonDeletedExcalidrawElement[],
 ) => {
   const frames = elements.filter((element) => element.type === "frame");
@@ -68,12 +68,7 @@ export const exportToCanvas = async (
     files,
   });
 
-  const isExportingWholeCanvas =
-    Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
-    elements.length;
-
-  const onlyExportingFrames =
-    !isExportingWholeCanvas && isOnlyExportingFrames(elements);
+  const onlyExportingFrames = isOnlyExportingFrames(elements);
 
   renderScene({
     elements,
@@ -165,12 +160,15 @@ export const exportToSvg = async (
     Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
     elements.length;
 
+  const onlyExportingFrames = isOnlyExportingFrames(elements);
+
   const offsetX = -minX + exportPadding;
   const offsetY = -minY + exportPadding;
 
-  const frames = isExportingWholeCanvas
-    ? []
-    : elements.filter((element) => element.type === "frame");
+  const frames =
+    isExportingWholeCanvas && !onlyExportingFrames
+      ? []
+      : elements.filter((element) => element.type === "frame");
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
@@ -243,13 +241,10 @@ const getCanvasSize = (
     Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
     elements.length;
 
-  const onlyExportingFrames =
-    !isExportingWholeCanvas && isOnlyExportingFrames(elements);
+  const onlyExportingFrames = isOnlyExportingFrames(elements);
 
-  if (!isExportingWholeCanvas) {
-    const frames = isExportingWholeCanvas
-      ? []
-      : elements.filter((element) => element.type === "frame");
+  if (!isExportingWholeCanvas || onlyExportingFrames) {
+    const frames = elements.filter((element) => element.type === "frame");
 
     const exportedFrameIds = frames.reduce((acc, frame) => {
       acc[frame.id] = true;

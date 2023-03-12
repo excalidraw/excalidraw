@@ -69,6 +69,7 @@ import {
   groupsAreCompletelyOutOfFrame,
 } from "../frame";
 import Scene from "../scene/Scene";
+import { isOnlyExportingFrames } from "../scene/export";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -437,6 +438,8 @@ export const _renderScene = ({
       Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
       elements.length;
 
+    const onlyExportingFrames = isOnlyExportingFrames(elements);
+
     const groupsToBeAddedToFrame = new Set<string>();
 
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
@@ -451,8 +454,10 @@ export const _renderScene = ({
         if (
           frameId &&
           ((renderConfig.isExporting &&
-            !isExportingWholeCanvas &&
-            appState.selectedElementIds[frameId]) ||
+            ((!isExportingWholeCanvas &&
+              !onlyExportingFrames &&
+              appState.selectedElementIds[frameId]) ||
+              (isExportingWholeCanvas && onlyExportingFrames))) ||
             !renderConfig.isExporting)
         ) {
           const containgFrame = getContainingFrame(element);
