@@ -454,13 +454,13 @@
     "app": {
       "center_heading": "",
       "center_heading_plus": "",
-      "menuHint": ""
+      "menuHint": "Dışa aktar, seçenekler, diller, ..."
     },
     "defaults": {
-      "menuHint": "",
+      "menuHint": "Dışa aktar, seçenekler, ve daha fazlası...",
       "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "toolbarHint": "Bir araç seçin ve çizime başlayın!",
+      "helpHint": "Kısayollar & yardım"
     }
   }
 }
