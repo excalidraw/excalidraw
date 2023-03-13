@@ -1,3 +1,4 @@
+import { wrap } from "@sentry/browser/dist/helpers";
 import { BOUND_TEXT_PADDING } from "../constants";
 import { API } from "../tests/helpers/api";
 import {
@@ -26,7 +27,7 @@ describe("Test wrapText", () => {
     expect(res).toBe("😀");
   });
 
-  it("should show the text correctly when min width reached", () => {
+  it("should show the text correctly when max width reached", () => {
     const text = "Hello😀";
     const maxWidth = 10;
     const res = wrapText(text, font, maxWidth);
@@ -175,6 +176,14 @@ break it now`,
         expect(res).toEqual(data.res);
       });
     });
+  });
+
+  it("should wrap the text correctly when word length is exactly equal to max width", () => {
+    const text = "Hello Excalidraw";
+    // Length of "Excalidraw" is 100 and exacty equal to max width
+    const res = wrapText(text, font, 100);
+    expect(res).toEqual(`Hello 
+Excalidraw`);
   });
 });
 
