@@ -207,19 +207,19 @@
     "collabSaveFailed": "Nu s-a putut salva în baza de date la nivel de server. Dacă problemele persistă, ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
     "collabSaveFailed_sizeExceeded": "Nu s-a putut salva în baza de date la nivel de server, întrucât se pare că pânza este prea mare. Ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "start": "Se pare că folosești navigatorul Brave cu",
+      "aggressive_block_fingerprint": "setarea „Blocați amprentarea” în modul strict",
+      "setting_enabled": "activată",
+      "break": "Acest lucru ar putea duce la întreruperea",
+      "text_elements": "elementelor de text",
+      "in_your_drawings": "din desenele tale",
+      "strongly_recommend": "Recomandăm insistent dezactivarea acestei setări. Poți urma",
+      "steps": "acești pași",
+      "how": "pentru efectuarea procedurii",
+      "disable_setting": " Dacă dezactivarea acestei setări nu remediază afișarea elementelor de text, deschide",
+      "issue": "un tichet cu probleme",
+      "write": "pe pagina noastră de GitHub sau scrie-ne pe",
+      "discord": "Discord"
     }
   },
   "toolBar": {
