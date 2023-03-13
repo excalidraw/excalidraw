@@ -35,6 +35,7 @@ import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import { isValidSubtype } from "../subtypes";
 import oc from "open-color";
+import { MarkOptional, Mutable } from "../utility-types";
 
 type RestoredAppState = Omit<
   AppState,

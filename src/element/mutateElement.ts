@@ -5,6 +5,7 @@ import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
 import { Point } from "../types";
 import { getUpdatedTimestamp } from "../utils";
+import { Mutable } from "../utility-types";
 import { maybeGetSubtypeProps } from "./newElement";
 import { getSubtypeMethods } from "../subtypes";
 

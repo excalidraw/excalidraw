@@ -32,6 +32,7 @@ import {
 } from "./textElement";
 import { VERTICAL_ALIGN } from "../constants";
 import { isArrowElement } from "./typeChecks";
+import { MarkOptional, Merge, Mutable } from "../utility-types";
 import { getSubtypeMethods, isValidSubtype } from "../subtypes";
 
 export const maybeGetSubtypeProps = (

@@ -30,6 +30,7 @@ import {
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { isLinearElementType } from "../../element/typeChecks";
+import { Mutable } from "../../utility-types";
 
 const readFile = util.promisify(fs.readFile);
 

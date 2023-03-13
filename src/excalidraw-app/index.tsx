@@ -86,6 +86,7 @@ import { useAtomWithInitialValue } from "../jotai";
 import { appJotaiStore } from "./app-jotai";
 
 import "./index.scss";
+import { ResolutionType } from "../utility-types";
 
 polyfill();
 
@@ -677,10 +678,9 @@ const ExcalidrawWrapper = () => {
       </Excalidraw>
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
-        <ErrorDialog
-          message={errorMessage}
-          onClose={() => setErrorMessage("")}
-        />
+        <ErrorDialog onClose={() => setErrorMessage("")}>
+          {errorMessage}
+        </ErrorDialog>
       )}
     </div>
   );

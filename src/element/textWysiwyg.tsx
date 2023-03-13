@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isFirefox, isSafari, VERTICAL_ALIGN } from "../constants";
+import { CLASSES, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -304,8 +304,7 @@ export const textWysiwyg = ({
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
-      } else if (isFirefox || isSafari) {
-        // As firefox, Safari needs little higher dimensions on DOM
+      } else {
         textElementWidth += 0.5;
         transformWidth += 0.5;
       }
