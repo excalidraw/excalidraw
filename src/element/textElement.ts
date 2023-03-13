@@ -327,12 +327,15 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     }
   };
   originalLines.forEach((originalLine) => {
-    const words = originalLine.split(" ");
-    // This means its newline so push it
-    if (words.length === 1 && words[0] === "") {
-      lines.push(words[0]);
+    const currentLineWidth = getTextWidth(originalLine, font);
+
+    //Push the line if its <= maxWidth
+    if (currentLineWidth <= maxWidth) {
+      lines.push(originalLine);
       return; // continue
     }
+    const words = originalLine.split(" ");
+
     let currentLine = "";
     let currentLineWidthTillNow = 0;
 
@@ -340,6 +343,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
 
     while (index < words.length) {
       const currentWordWidth = getLineWidth(words[index], font);
+
       // This will only happen when single word takes entire width
       if (currentWordWidth === maxWidth) {
         push(words[index]);

@@ -16,7 +16,7 @@ describe("Test wrapText", () => {
     const text = "Hello whats up     ";
     const maxWidth = 200 - BOUND_TEXT_PADDING * 2;
     const res = wrapText(text, font, maxWidth);
-    expect(res).toBe("Hello whats up    ");
+    expect(res).toBe(text);
   });
 
   it("should work with emojis", () => {
@@ -136,6 +136,7 @@ whats up`,
       });
     });
   });
+
   describe("When text is long", () => {
     const text = `hellolongtextthisiswhatsupwithyouIamtypingggggandtypinggg break it now`;
     [
