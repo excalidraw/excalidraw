@@ -210,16 +210,16 @@
       "start": "",
       "aggressive_block_fingerprint": "",
       "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
+      "break": "Isto podería provocar unha ruptura dos",
+      "text_elements": "Elementos de Texto",
+      "in_your_drawings": "nos seus debuxos",
+      "strongly_recommend": "Recomendámoslle encarecidamente que desactive esa opción. Pode seguir",
+      "steps": "estes pasos",
+      "how": "sobre como facelo",
       "disable_setting": "",
       "issue": "",
-      "write": "",
-      "discord": ""
+      "write": "no noso GitHub, ou escríbenos ao",
+      "discord": "Discord"
     }
   },
   "toolBar": {
