@@ -205,7 +205,22 @@
     "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen.",
     "importLibraryError": "Kunde inte ladda bibliotek",
     "collabSaveFailed": "Det gick inte att spara i backend-databasen. Om problemen kvarstår bör du spara filen lokalt för att se till att du inte förlorar ditt arbete.",
-    "collabSaveFailed_sizeExceeded": "Det gick inte att spara till backend-databasen, whiteboarden verkar vara för stor. Du bör spara filen lokalt för att du inte ska förlora ditt arbete."
+    "collabSaveFailed_sizeExceeded": "Det gick inte att spara till backend-databasen, whiteboarden verkar vara för stor. Du bör spara filen lokalt för att du inte ska förlora ditt arbete.",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "Markering",
