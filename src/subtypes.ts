@@ -220,6 +220,7 @@ export type SubtypeMethods = {
       "id" | "version" | "versionNonce"
     >,
   ) => Omit<Partial<ExcalidrawElement>, "id" | "version" | "versionNonce">;
+  getEditorStyle: (element: ExcalidrawTextElement) => Record<string, any>;
   ensureLoaded: (callback?: () => void) => Promise<void>;
   measureText: (
     element: Pick<
@@ -261,7 +262,9 @@ type MethodMap = { subtype: Subtype; methods: Partial<SubtypeMethods> };
 const methodMaps = [] as Array<MethodMap>;
 
 // Use `getSubtypeMethods` to call subtype-specialized methods, like `render`.
-export const getSubtypeMethods = (subtype: Subtype | undefined) => {
+export const getSubtypeMethods = (
+  subtype: Subtype | undefined,
+): Partial<SubtypeMethods> | undefined => {
   const map = methodMaps.find((method) => method.subtype === subtype);
   return map?.methods;
 };

@@ -44,6 +44,7 @@ import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
+import { SubtypeMethods, getSubtypeMethods } from "../subtypes";
 
 const getTransform = (
   offsetX: number,
@@ -98,6 +99,14 @@ export const getOriginalContainerHeightFromCache = (
 ) => {
   return originalContainerCache[id]?.height ?? null;
 };
+
+const getEditorStyle = function (element) {
+  const map = getSubtypeMethods(element.subtype);
+  if (map?.getEditorStyle) {
+    return map.getEditorStyle(element);
+  }
+  return {};
+} as SubtypeMethods["getEditorStyle"];
 
 export const textWysiwyg = ({
   id,
@@ -395,6 +404,7 @@ export const textWysiwyg = ({
     whiteSpace,
     overflowWrap: "break-word",
     boxSizing: "content-box",
+    ...getEditorStyle(element),
   });
   updateWysiwygStyle();
 

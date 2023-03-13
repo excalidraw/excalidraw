@@ -876,6 +876,13 @@ const cleanMathElementUpdate = function (updates) {
   return oldUpdates;
 } as SubtypeMethods["clean"];
 
+const getMathEditorStyle = function (element) {
+  if (isMathElement(element)) {
+    return { background: undefined };
+  }
+  return {};
+} as SubtypeMethods["getEditorStyle"];
+
 const measureMathElement = function (element, next) {
   ensureMathElement(element);
   const isMathJaxLoaded = mathJaxLoaded;
@@ -1542,6 +1549,7 @@ export const prepareMathSubtype = function (
   const methods = {} as SubtypeMethods;
   methods.clean = cleanMathElementUpdate;
   methods.ensureLoaded = ensureMathJaxLoaded;
+  methods.getEditorStyle = getMathEditorStyle;
   methods.measureText = measureMathElement;
   methods.render = renderMathElement;
   methods.renderSvg = renderSvgMathElement;
