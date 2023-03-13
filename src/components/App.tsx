@@ -2634,7 +2634,13 @@ class App extends React.Component<AppProps, AppState> {
 
     return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, x, y),
-    );
+    ).filter((element) => {
+      // hitting a frame's element from outside the frame is not considered a hit
+      const containingFrame = getContainingFrame(element);
+      return containingFrame
+        ? isCursorInFrame({ x, y }, containingFrame)
+        : true;
+    });
   }
 
   private startTextEditing = ({
