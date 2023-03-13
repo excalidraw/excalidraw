@@ -248,11 +248,11 @@ const loadMathJax = async () => {
       errorSvg = mathJax.adaptor.outerHTML(mathJax.mmlSvg.convert(errorMML));
       errorAria = useSRE ? mathJax.mmlSre.toSpeech(errorMML) : "ERR";
 
-      // Finalize loading MathJax
-      mathJaxLoaded = true;
-
       // Clear any caches from before loading MathJax
       clearCaches();
+
+      // Finalize loading MathJax
+      mathJaxLoaded = true;
 
       if (mathJaxLoadedCallback !== undefined) {
         mathJaxLoadedCallback(isMathElement);
@@ -1201,7 +1201,7 @@ const wrapMathElement = function (element, containerWidth, next) {
   const spaceWidth = getTextWidth(" ", font);
   for (let index = 0; index < lines.length; index++) {
     const mathLineKey = `${containerWidth} ${fontSize} ${mathProps.useTex} ${mathProps.mathOnly} ${lines[index]}`;
-    if (wrappedMathCache[mathLineKey] !== undefined) {
+    if (isMathJaxLoaded && wrappedMathCache[mathLineKey] !== undefined) {
       wrappedLines.push(...wrappedMathCache[mathLineKey].split("\n"));
       continue;
     }
@@ -1299,7 +1299,11 @@ const wrapMathElement = function (element, containerWidth, next) {
         }
       }
     }
-    wrappedMathCache[mathLineKey] = wrappedLines.slice(currLineNum).join("\n");
+    if (isMathJaxLoaded) {
+      wrappedMathCache[mathLineKey] = wrappedLines
+        .slice(currLineNum)
+        .join("\n");
+    }
   }
 
   if (wrappedLines[0] === "") {
