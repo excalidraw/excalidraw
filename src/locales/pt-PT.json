@@ -110,7 +110,7 @@
     "increaseFontSize": "Aumentar o tamanho do tipo de letra",
     "unbindText": "Desvincular texto",
     "bindText": "Ligar texto ao recipiente",
-    "createContainerFromText": "",
+    "createContainerFromText": "Envolver texto num recipiente",
     "link": {
       "edit": "Editar ligação",
       "create": "Criar ligação",
@@ -219,7 +219,7 @@
       "disable_setting": " Se desactivar esta configuração não consertar a exibição de elementos de texto, por favor, abra um",
       "issue": "problema",
       "write": "no nosso GitHub ou então escreva-nos no",
-      "discord": ""
+      "discord": "Discord"
     }
   },
   "toolBar": {
