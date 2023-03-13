@@ -205,7 +205,22 @@
     "cannotResolveCollabServer": "לא הצלחתי להתחבר לשרת השיתוף. אנא רענן את הדף ונסה שוב.",
     "importLibraryError": "לא ניתן היה לטעון את הספריה",
     "collabSaveFailed": "לא הצלחתי להתחבר למסד הנתונים האחורי. אם הבעיה ממשיכה, כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך.",
-    "collabSaveFailed_sizeExceeded": "לא הצלחתי לשמור למסד הנתונים האחורי, נראה שהקנבס שלך גדול מדי. כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך."
+    "collabSaveFailed_sizeExceeded": "לא הצלחתי לשמור למסד הנתונים האחורי, נראה שהקנבס שלך גדול מדי. כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך.",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "בחירה",
