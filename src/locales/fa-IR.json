@@ -205,7 +205,22 @@
     "cannotResolveCollabServer": "به سرور collab متصل نشد. لطفا صفحه را مجددا بارگذاری کنید و دوباره تلاش کنید.",
     "importLibraryError": "داده‌ها بارگذاری نشدند",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "گزینش",
