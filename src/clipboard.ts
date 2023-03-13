@@ -8,6 +8,8 @@ import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "./constants";
 import { isInitializedImageElement } from "./element/typeChecks";
 import { isPromiseLike } from "./utils";
+import { deepCopyElement } from "./element/newElement";
+import { mutateElement } from "./element/mutateElement";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
@@ -61,7 +63,13 @@ export const copyToClipboard = async (
   // select binded text elements when copying
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
-    elements,
+    elements: elements.map((element) => {
+      const copiedElement = deepCopyElement(element);
+      mutateElement(copiedElement, {
+        frameId: null,
+      });
+      return copiedElement;
+    }),
     files: files
       ? elements.reduce((acc, element) => {
           if (isInitializedImageElement(element) && files[element.fileId]) {
