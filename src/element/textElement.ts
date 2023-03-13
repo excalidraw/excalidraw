@@ -367,10 +367,6 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           words[index] = words[index].slice(currentChar.length);
 
           if (currentLineWidthTillNow >= maxWidth) {
-            // only remove last trailing space which we have added when joining words
-            if (currentLine.slice(-1) === " ") {
-              currentLine = currentLine.slice(0, -1);
-            }
             push(currentLine);
             currentLine = currentChar;
             currentLineWidthTillNow = width;
