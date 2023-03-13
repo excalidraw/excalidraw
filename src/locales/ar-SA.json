@@ -205,7 +205,22 @@
     "cannotResolveCollabServer": "تعذر الاتصال بخادم التعاون. الرجاء إعادة تحميل الصفحة والمحاولة مرة أخرى.",
     "importLibraryError": "تعذر تحميل المكتبة",
     "collabSaveFailed": "تعذر الحفظ في قاعدة البيانات. إذا استمرت المشاكل، يفضل أن تحفظ ملفك محليا كي لا تفقد عملك.",
-    "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك."
+    "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك.",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "تحديد",
