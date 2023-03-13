@@ -205,7 +205,22 @@
     "cannotResolveCollabServer": "Non se puido conectar ao servidor de colaboración. Por favor recargue a páxina e probe de novo.",
     "importLibraryError": "Non se puido cargar a biblioteca",
     "collabSaveFailed": "Non se puido gardar na base de datos. Se o problema persiste, deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
-    "collabSaveFailed_sizeExceeded": "Non se puido gardar na base de datos, o lenzo semella demasiado grande. Deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo."
+    "collabSaveFailed_sizeExceeded": "Non se puido gardar na base de datos, o lenzo semella demasiado grande. Deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "Selección",
