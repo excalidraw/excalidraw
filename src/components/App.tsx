@@ -593,22 +593,6 @@ class App extends React.Component<AppProps, AppState> {
           onPointerDown={(event) => {
             this.handleCanvasPointerDown(event as any);
           }}
-          onPointerOver={(event) => {
-            this.state.selectedElementIds[event.currentTarget.id]
-              ? this.setState({
-                  frameToHighlight: null,
-                })
-              : this.setState({
-                  frameToHighlight: this.scene.getElement(
-                    event.currentTarget.id,
-                  ),
-                });
-          }}
-          onPointerLeave={() => {
-            this.setState({
-              frameToHighlight: null,
-            });
-          }}
           onContextMenu={(event: React.PointerEvent<HTMLDivElement>) => {
             this.handleCanvasContextMenu(event);
           }}
