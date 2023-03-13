@@ -15,19 +15,16 @@ import Scene from "./Scene";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
-export const isOnlyExportingFrames = (
+export const isOnlyExportingSingleFrame = (
   elements: readonly NonDeletedExcalidrawElement[],
 ) => {
   const frames = elements.filter((element) => element.type === "frame");
 
-  const exportedFrameIds = frames.reduce((acc, frame) => {
-    acc[frame.id] = true;
-    return acc;
-  }, {} as Record<string, true>);
-
-  return elements.every(
-    (element) =>
-      element.type === "frame" || exportedFrameIds[element.frameId ?? ""],
+  return (
+    frames.length === 1 &&
+    elements.every(
+      (element) => element.type === "frame" || element.frameId === frames[0].id,
+    )
   );
 };
 
@@ -68,7 +65,7 @@ export const exportToCanvas = async (
     files,
   });
 
-  const onlyExportingFrames = isOnlyExportingFrames(elements);
+  const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
   renderScene({
     elements,
@@ -78,8 +75,8 @@ export const exportToCanvas = async (
     canvas,
     renderConfig: {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: -minX + (onlyExportingFrames ? 0 : exportPadding),
-      scrollY: -minY + (onlyExportingFrames ? 0 : exportPadding),
+      scrollX: -minX + (onlyExportingSingleFrame ? 0 : exportPadding),
+      scrollY: -minY + (onlyExportingSingleFrame ? 0 : exportPadding),
       zoom: defaultAppState.zoom,
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},
@@ -160,13 +157,13 @@ export const exportToSvg = async (
     Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
     elements.length;
 
-  const onlyExportingFrames = isOnlyExportingFrames(elements);
+  const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
   const offsetX = -minX + exportPadding;
   const offsetY = -minY + exportPadding;
 
   const frames =
-    isExportingWholeCanvas && !onlyExportingFrames
+    isExportingWholeCanvas && !onlyExportingSingleFrame
       ? []
       : elements.filter((element) => element.type === "frame");
 
@@ -241,9 +238,9 @@ const getCanvasSize = (
     Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
     elements.length;
 
-  const onlyExportingFrames = isOnlyExportingFrames(elements);
+  const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
-  if (!isExportingWholeCanvas || onlyExportingFrames) {
+  if (!isExportingWholeCanvas || onlyExportingSingleFrame) {
     const frames = elements.filter((element) => element.type === "frame");
 
     const exportedFrameIds = frames.reduce((acc, frame) => {
@@ -260,9 +257,9 @@ const getCanvasSize = (
 
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   const width =
-    distance(minX, maxX) + (onlyExportingFrames ? 0 : exportPadding * 2);
+    distance(minX, maxX) + (onlyExportingSingleFrame ? 0 : exportPadding * 2);
   const height =
-    distance(minY, maxY) + (onlyExportingFrames ? 0 : exportPadding * 2);
+    distance(minY, maxY) + (onlyExportingSingleFrame ? 0 : exportPadding * 2);
 
   return [minX, minY, width, height];
 };

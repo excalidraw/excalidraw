@@ -69,7 +69,7 @@ import {
   groupsAreCompletelyOutOfFrame,
 } from "../frame";
 import Scene from "../scene/Scene";
-import { isOnlyExportingFrames } from "../scene/export";
+import { isOnlyExportingSingleFrame } from "../scene/export";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -434,11 +434,7 @@ export const _renderScene = ({
       }),
     );
 
-    const isExportingWholeCanvas =
-      Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
-      elements.length;
-
-    const onlyExportingFrames = isOnlyExportingFrames(elements);
+    const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
     const groupsToBeAddedToFrame = new Set<string>();
 
@@ -453,11 +449,7 @@ export const _renderScene = ({
 
         if (
           frameId &&
-          ((renderConfig.isExporting &&
-            ((!isExportingWholeCanvas &&
-              !onlyExportingFrames &&
-              appState.selectedElementIds[frameId]) ||
-              (isExportingWholeCanvas && onlyExportingFrames))) ||
+          ((renderConfig.isExporting && onlyExportingSingleFrame) ||
             !renderConfig.isExporting)
         ) {
           const containgFrame = getContainingFrame(element);
