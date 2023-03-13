@@ -1,4 +1,3 @@
-import { wrap } from "@sentry/browser/dist/helpers";
 import { BOUND_TEXT_PADDING } from "../constants";
 import { API } from "../tests/helpers/api";
 import {
