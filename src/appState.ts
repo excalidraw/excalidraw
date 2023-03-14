@@ -83,7 +83,7 @@ export const getDefaultAppState = (): Omit<
     showStats: false,
     startBoundElement: null,
     suggestedBindings: [],
-    shouldRenderFrame: false,
+    shouldRenderFrame: true,
     frameToHighlight: null,
     elementsToHighlight: null,
     toast: null,

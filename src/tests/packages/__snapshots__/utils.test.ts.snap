@@ -69,7 +69,7 @@ Object {
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrame": false,
+  "shouldRenderFrame": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": false,
