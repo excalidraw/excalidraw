@@ -2,7 +2,7 @@ import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance } from "../utils";
+import { distance, isOnlyExportingSingleFrame } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import { DEFAULT_EXPORT_PADDING, SVG_NS, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
@@ -14,19 +14,6 @@ import {
 import Scene from "./Scene";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
-
-export const isOnlyExportingSingleFrame = (
-  elements: readonly NonDeletedExcalidrawElement[],
-) => {
-  const frames = elements.filter((element) => element.type === "frame");
-
-  return (
-    frames.length === 1 &&
-    elements.every(
-      (element) => element.type === "frame" || element.frameId === frames[0].id,
-    )
-  );
-};
 
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],

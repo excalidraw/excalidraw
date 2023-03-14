@@ -54,6 +54,7 @@ import {
   viewportCoordsToSceneCoords,
   supportsEmoji,
   throttleRAF,
+  isOnlyExportingSingleFrame,
 } from "../utils";
 import { UserIdleState } from "../types";
 import { FRAME_STYLE, THEME_FILTER } from "../constants";
@@ -69,7 +70,6 @@ import {
   groupsAreCompletelyOutOfFrame,
 } from "../frame";
 import Scene from "../scene/Scene";
-import { isOnlyExportingSingleFrame } from "../scene/export";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
