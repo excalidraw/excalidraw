@@ -10,6 +10,7 @@ import { isInitializedImageElement } from "./element/typeChecks";
 import { isPromiseLike } from "./utils";
 import { deepCopyElement } from "./element/newElement";
 import { mutateElement } from "./element/mutateElement";
+import { getContainingFrame } from "./frame";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
@@ -60,15 +61,26 @@ export const copyToClipboard = async (
   appState: AppState,
   files: BinaryFiles | null,
 ) => {
+  const framesToCopy = new Set(
+    elements.filter((element) => element.type === "frame"),
+  );
+
   // select binded text elements when copying
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
     elements: elements.map((element) => {
-      const copiedElement = deepCopyElement(element);
-      mutateElement(copiedElement, {
-        frameId: null,
-      });
-      return copiedElement;
+      if (
+        getContainingFrame(element) &&
+        !framesToCopy.has(getContainingFrame(element)!)
+      ) {
+        const copiedElement = deepCopyElement(element);
+        mutateElement(copiedElement, {
+          frameId: null,
+        });
+        return copiedElement;
+      }
+
+      return element;
     }),
     files: files
       ? elements.reduce((acc, element) => {
