@@ -662,14 +662,6 @@ export const shouldAllowVerticalAlign = (
       }
       return true;
     }
-    const boundTextElement = getBoundTextElement(element);
-    if (boundTextElement) {
-      if (isArrowElement(element)) {
-        return false;
-      }
-      return true;
-    }
-    return false;
   });
 };
 
@@ -685,13 +677,7 @@ export const suppportsHorizontalAlign = (
       }
       return true;
     }
-    const boundTextElement = getBoundTextElement(element);
-    if (boundTextElement) {
-      if (isArrowElement(element)) {
-        return false;
-      }
-      return true;
-    }
+
     return isTextElement(element);
   });
 };
