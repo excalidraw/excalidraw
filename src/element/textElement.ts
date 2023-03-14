@@ -662,6 +662,7 @@ export const shouldAllowVerticalAlign = (
       }
       return true;
     }
+    return false;
   });
 };
 
