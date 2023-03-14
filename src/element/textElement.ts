@@ -293,6 +293,11 @@ export const getLineHeight = (font: FontString) => {
 
 let canvas: HTMLCanvasElement | undefined;
 
+// since in test env the canvas measureText algo
+// doesn't measure text and instead just returns number of
+// characters hence we assume that each letter is 10px
+const DUMMY_CHAR_WIDTH = 10;
+
 const getLineWidth = (text: string, font: FontString) => {
   if (!canvas) {
     canvas = document.createElement("canvas");
@@ -301,12 +306,11 @@ const getLineWidth = (text: string, font: FontString) => {
   canvas2dContext.font = font;
   const width = canvas2dContext.measureText(text).width;
 
-  // since in test env the canvas measureText algo
-  // doesn't measure text and instead just returns number of
-  // characters hence we assume that each letteris 10px
+  /* istanbul ignore else */
   if (isTestEnv()) {
-    return width * 10;
+    return width * DUMMY_CHAR_WIDTH;
   }
+  /* istanbul ignore next */
   return width;
 };
 
