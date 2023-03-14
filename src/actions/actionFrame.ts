@@ -1,6 +1,7 @@
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { getElementsInFrame } from "../frame";
+import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { AppState } from "../types";
 import { register } from "./register";
@@ -89,4 +90,26 @@ export const actionRemoveAllElementsInFrame = register({
   },
   contextItemLabel: "labels.removeAllElementsFromFrame",
   predicate: (elements, appState) => enableFrameAction(elements, appState),
+});
+
+export const actionToggleFrameRendering = register({
+  name: "toggleFrameRendering",
+  viewMode: true,
+  trackEvent: { category: "canvas" },
+  perform: (elements, appState) => {
+    return {
+      elements,
+      appState: {
+        ...appState,
+        shouldRenderFrame: !appState.shouldRenderFrame,
+      },
+      commitToHistory: false,
+    };
+  },
+  contextItemLabel: "labels.toggleFrameRendering",
+  checked: (appState: AppState) => appState.shouldRenderFrame,
+  keyTest: (event) =>
+    event.key.toLocaleLowerCase() === KEYS.F &&
+    event[KEYS.CTRL_OR_CMD] &&
+    event.shiftKey,
 });

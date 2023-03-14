@@ -104,6 +104,7 @@ export const exportToSvg = async (
     viewBackgroundColor: string;
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
+    renderFrame?: boolean;
   },
   files: BinaryFiles | null,
 ): Promise<SVGSVGElement> => {

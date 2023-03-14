@@ -115,7 +115,8 @@ export type ActionName =
   | "toggleEraserTool"
   | "toggleHandTool"
   | "selectAllElementsInFrame"
-  | "removeAllElementsInFrame";
+  | "removeAllElementsInFrame"
+  | "toggleFrameRendering";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

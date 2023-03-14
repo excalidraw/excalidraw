@@ -110,6 +110,7 @@ export type AppState = {
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
   frameToHighlight: NonDeleted<ExcalidrawFrameElement> | null;
+  shouldRenderFrame: boolean;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   // element being edited, but not necessarily added to elements array yet
   // (e.g. text element when typing into the input)
@@ -520,6 +521,7 @@ export type ExcalidrawImperativeAPI = {
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
   toggleMenu: InstanceType<typeof App>["toggleMenu"];
+  toggleFrameRendering: InstanceType<typeof App>["toggleFrameRendering"];
 };
 
 export type Device = Readonly<{

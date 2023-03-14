@@ -33,6 +33,7 @@ export type ShortcutName =
       | "flipVertical"
       | "hyperlink"
       | "toggleLock"
+      | "toggleFrameRendering"
     >
   | "saveScene"
   | "imageExport";
@@ -78,6 +79,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   viewMode: [getShortcutKey("Alt+R")],
   hyperlink: [getShortcutKey("CtrlOrCmd+K")],
   toggleLock: [getShortcutKey("CtrlOrCmd+Shift+L")],
+  toggleFrameRendering: [getShortcutKey("CtrlOrCmd+Shift+F")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName) => {

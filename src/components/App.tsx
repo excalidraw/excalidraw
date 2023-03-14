@@ -305,6 +305,7 @@ import { actionToggleHandTool } from "../actions/actionCanvas";
 import {
   actionRemoveAllElementsInFrame,
   actionSelectAllElementsInFrame,
+  actionToggleFrameRendering,
 } from "../actions/actionFrame";
 
 const deviceContextInitialValue = {
@@ -479,6 +480,7 @@ class App extends React.Component<AppProps, AppState> {
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
         toggleMenu: this.toggleMenu,
+        toggleFrameRendering: this.toggleFrameRendering,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -571,36 +573,38 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private renderFrameNames = () => {
-    return this.scene.getNonDeletedFrames().map((f, index) => {
-      const { x, y } = sceneCoordsToViewportCoords(
-        { sceneX: f.x, sceneY: f.y },
-        this.state,
-      );
+    return this.state.shouldRenderFrame
+      ? this.scene.getNonDeletedFrames().map((f, index) => {
+          const { x, y } = sceneCoordsToViewportCoords(
+            { sceneX: f.x, sceneY: f.y },
+            this.state,
+          );
 
-      const FRAME_NAME_GAP = 20;
+          const FRAME_NAME_GAP = 20;
 
-      return (
-        <div
-          id={f.id}
-          key={f.id}
-          style={{
-            top: `${y - FRAME_NAME_GAP - this.state.offsetTop}px`,
-            left: `${x - this.state.offsetLeft}px`,
-            position: "absolute",
-            zIndex: 2,
-            fontSize: "14px",
-          }}
-          onPointerDown={(event) => {
-            this.handleCanvasPointerDown(event as any);
-          }}
-          onContextMenu={(event: React.PointerEvent<HTMLDivElement>) => {
-            this.handleCanvasContextMenu(event);
-          }}
-        >
-          {`Frame ${index + 1}`}
-        </div>
-      );
-    });
+          return (
+            <div
+              id={f.id}
+              key={f.id}
+              style={{
+                top: `${y - FRAME_NAME_GAP - this.state.offsetTop}px`,
+                left: `${x - this.state.offsetLeft}px`,
+                position: "absolute",
+                zIndex: 2,
+                fontSize: "14px",
+              }}
+              onPointerDown={(event) => {
+                this.handleCanvasPointerDown(event as any);
+              }}
+              onContextMenu={(event: React.PointerEvent<HTMLDivElement>) => {
+                this.handleCanvasContextMenu(event);
+              }}
+            >
+              {`Frame ${index + 1}`}
+            </div>
+          );
+        })
+      : null;
   };
 
   public render() {
@@ -1897,6 +1901,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  toggleFrameRendering = () => {
+    this.setState((prevState) => {
+      return {
+        shouldRenderFrame: !prevState.shouldRenderFrame,
+      };
+    });
+  };
+
   togglePenMode = () => {
     this.setState((prevState) => {
       return {
@@ -2621,7 +2633,7 @@ class App extends React.Component<AppProps, AppState> {
     ).filter((element) => {
       // hitting a frame's element from outside the frame is not considered a hit
       const containingFrame = getContainingFrame(element);
-      return containingFrame
+      return containingFrame && this.state.shouldRenderFrame
         ? isCursorInFrame({ x, y }, containingFrame)
         : true;
     });
@@ -6766,6 +6778,7 @@ class App extends React.Component<AppProps, AppState> {
           actionToggleZenMode,
           actionToggleViewMode,
           actionToggleStats,
+          actionToggleFrameRendering,
         ];
       }
 
@@ -6782,6 +6795,8 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleZenMode,
         actionToggleViewMode,
         actionToggleStats,
+        CONTEXT_MENU_SEPARATOR,
+        actionToggleFrameRendering,
       ];
     }
 
