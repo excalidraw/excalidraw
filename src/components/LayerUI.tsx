@@ -364,10 +364,9 @@ const LayerUI = ({
 
       {appState.isLoading && <LoadingMessage delay={250} />}
       {appState.errorMessage && (
-        <ErrorDialog
-          message={appState.errorMessage}
-          onClose={() => setAppState({ errorMessage: null })}
-        />
+        <ErrorDialog onClose={() => setAppState({ errorMessage: null })}>
+          {appState.errorMessage}
+        </ErrorDialog>
       )}
       {appState.openDialog === "help" && (
         <HelpDialog

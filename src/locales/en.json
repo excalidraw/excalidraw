@@ -120,7 +120,6 @@
       "edit": "Edit line",
       "exit": "Exit line editor"
     },
-
     "elementLock": {
       "lock": "Lock",
       "unlock": "Unlock",
@@ -206,7 +205,22 @@
     "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
     "importLibraryError": "Couldn't load library",
     "collabSaveFailed": "Couldn't save to the backend database. If problems persist, you should save your file locally to ensure you don't lose your work.",
-    "collabSaveFailed_sizeExceeded": "Couldn't save to the backend database, the canvas seems to be too big. You should save the file locally to ensure you don't lose your work."
+    "collabSaveFailed_sizeExceeded": "Couldn't save to the backend database, the canvas seems to be too big. You should save the file locally to ensure you don't lose your work.",
+    "brave_measure_text_error": {
+      "start": "Looks like you are using Brave browser with the",
+      "aggressive_block_fingerprint": "Aggressively Block Fingerprinting",
+      "setting_enabled": "setting enabled",
+      "break": "This could result in breaking the",
+      "text_elements": "Text Elements",
+      "in_your_drawings": "in your drawings",
+      "strongly_recommend": "We strongly recommend disabling this setting. You can follow",
+      "steps": "these steps",
+      "how": "on how to do so",
+      "disable_setting": " If disabling this setting doesn't fix the display of text elements, please open an",
+      "issue": "issue",
+      "write": "on our GitHub, or write us on",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Selection",
