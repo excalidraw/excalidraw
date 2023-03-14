@@ -745,16 +745,19 @@ export const actionChangeTextAlign = register({
               value: "left",
               text: t("labels.left"),
               icon: TextAlignLeftIcon,
+              testId: "align-left",
             },
             {
               value: "center",
               text: t("labels.center"),
               icon: TextAlignCenterIcon,
+              testId: "align-horizontal-center",
             },
             {
               value: "right",
               text: t("labels.right"),
               icon: TextAlignRightIcon,
+              testId: "align-right",
             },
           ]}
           value={getFormValue(

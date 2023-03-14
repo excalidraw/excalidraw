@@ -1179,5 +1179,17 @@ describe("Test Linear Elements", () => {
         easy"
       `);
     });
+
+    it("should not render horizontal align tool when element selected", () => {
+      createTwoPointerLinearElement("arrow");
+      const arrow = h.elements[0] as ExcalidrawLinearElement;
+
+      createBoundTextElement(DEFAULT_TEXT, arrow);
+      API.setSelectedElements([arrow]);
+
+      expect(queryByTestId(container, "align-left")).toBeNull();
+      expect(queryByTestId(container, "align-horizontal-center")).toBeNull();
+      expect(queryByTestId(container, "align-right")).toBeNull();
+    });
   });
 });
