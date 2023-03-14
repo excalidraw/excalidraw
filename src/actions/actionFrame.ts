@@ -1,7 +1,7 @@
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { getElementsInFrame } from "../frame";
-import { KEYS } from "../keys";
+// import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { AppState } from "../types";
 import { register } from "./register";
@@ -108,8 +108,8 @@ export const actionToggleFrameRendering = register({
   },
   contextItemLabel: "labels.toggleFrameRendering",
   checked: (appState: AppState) => appState.shouldRenderFrame,
-  keyTest: (event) =>
-    event.key.toLocaleLowerCase() === KEYS.F &&
-    event[KEYS.CTRL_OR_CMD] &&
-    event.shiftKey,
+  // keyTest: (event) =>
+  //   event.key.toLocaleLowerCase() === KEYS.F &&
+  //   event[KEYS.CTRL_OR_CMD] &&
+  //   event.shiftKey,
 });

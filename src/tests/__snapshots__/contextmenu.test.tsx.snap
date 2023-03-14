@@ -5867,18 +5867,6 @@ Object {
         },
         "viewMode": true,
       },
-      "separator",
-      Object {
-        "checked": [Function],
-        "contextItemLabel": "labels.toggleFrameRendering",
-        "keyTest": [Function],
-        "name": "toggleFrameRendering",
-        "perform": [Function],
-        "trackEvent": Object {
-          "category": "canvas",
-        },
-        "viewMode": true,
-      },
     ],
     "left": -19,
     "top": -9,

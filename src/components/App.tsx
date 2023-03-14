@@ -305,7 +305,6 @@ import { actionToggleHandTool } from "../actions/actionCanvas";
 import {
   actionRemoveAllElementsInFrame,
   actionSelectAllElementsInFrame,
-  actionToggleFrameRendering,
 } from "../actions/actionFrame";
 
 const deviceContextInitialValue = {
@@ -6778,7 +6777,6 @@ class App extends React.Component<AppProps, AppState> {
           actionToggleZenMode,
           actionToggleViewMode,
           actionToggleStats,
-          actionToggleFrameRendering,
         ];
       }
 
@@ -6795,8 +6793,6 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleZenMode,
         actionToggleViewMode,
         actionToggleStats,
-        CONTEXT_MENU_SEPARATOR,
-        actionToggleFrameRendering,
       ];
     }
 
