@@ -17,7 +17,7 @@ import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { queryByTestId, queryByText } from "@testing-library/react";
 import { resize, rotate } from "./utils";
-import { wrapText, getContainerMaxWidth } from "../element/textElement";
+import { wrapText, getBoundTextMaxWidth } from "../element/textElement";
 import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS } from "../constants";
 
@@ -725,7 +725,7 @@ describe("Test Linear Elements", () => {
         type: "text",
         x: 0,
         y: 0,
-        text: wrapText(text, font, getContainerMaxWidth(container)),
+        text: wrapText(text, font, getBoundTextMaxWidth(container)),
         containerId: container.id,
         width: 30,
         height: 20,
@@ -1151,7 +1151,7 @@ describe("Test Linear Elements", () => {
       expect(rect.x).toBe(400);
       expect(rect.y).toBe(0);
       expect(
-        wrapText(textElement.originalText, font, getContainerMaxWidth(arrow)),
+        wrapText(textElement.originalText, font, getBoundTextMaxWidth(arrow)),
       ).toMatchInlineSnapshot(`
         "Online whiteboard collaboration
         made easy"
@@ -1174,7 +1174,7 @@ describe("Test Linear Elements", () => {
         false,
       );
       expect(
-        wrapText(textElement.originalText, font, getContainerMaxWidth(arrow)),
+        wrapText(textElement.originalText, font, getBoundTextMaxWidth(arrow)),
       ).toMatchInlineSnapshot(`
         "Online whiteboard 
         collaboration made 

@@ -28,7 +28,7 @@ import {
   measureText,
   normalizeText,
   wrapText,
-  getContainerMaxWidth,
+  getBoundTextMaxWidth,
 } from "./textElement";
 import { VERTICAL_ALIGN } from "../constants";
 import { isArrowElement } from "./typeChecks";
@@ -261,7 +261,7 @@ export const refreshTextDimensions = (
     text = wrapText(
       text,
       getFontString(textElement),
-      getContainerMaxWidth(container),
+      getBoundTextMaxWidth(container),
     );
   }
   const dimensions = getAdjustedDimensions(textElement, text);

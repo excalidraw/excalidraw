@@ -45,7 +45,7 @@ import {
   getBoundTextElementId,
   getContainerElement,
   handleBindTextResize,
-  getContainerMaxWidth,
+  getBoundTextMaxWidth,
 } from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
@@ -201,7 +201,7 @@ const measureFontSizeFromWidth = (
   if (hasContainer) {
     const container = getContainerElement(element);
     if (container) {
-      width = getContainerMaxWidth(container);
+      width = getBoundTextMaxWidth(container);
     }
   }
   const nextFontSize = element.fontSize * (nextWidth / width);
@@ -423,7 +423,7 @@ export const resizeSingleElement = (
 
       const nextFontSize = measureFontSizeFromWidth(
         boundTextElement,
-        getContainerMaxWidth(updatedElement),
+        getBoundTextMaxWidth(updatedElement),
       );
       if (nextFontSize === null) {
         return;
@@ -694,7 +694,7 @@ const resizeMultipleElements = (
       const fontSize = measureFontSizeFromWidth(
         boundTextElement ?? (element.orig as ExcalidrawTextElement),
         boundTextElement
-          ? getContainerMaxWidth(updatedElement)
+          ? getBoundTextMaxWidth(updatedElement)
           : updatedElement.width,
       );
 
