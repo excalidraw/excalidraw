@@ -388,7 +388,6 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
         if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
           push(currentLine);
           resetParams();
-          currentLineWidthTillNow = 0;
         } else {
           // space needs to be appended before next word
           // as currentLine contains chars which couldn't be appended
