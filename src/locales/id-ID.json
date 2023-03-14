@@ -194,7 +194,7 @@
     "resetLibrary": "Ini akan menghapus pustaka Anda. Anda yakin?",
     "removeItemsFromsLibrary": "Hapus {{count}} item dari pustaka?",
     "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Tidak ada koneksi internet.\nPerubahan tidak akan disimpan!"
   },
   "errors": {
     "unsupportedFileType": "Tipe file tidak didukung.",
@@ -207,18 +207,18 @@
     "collabSaveFailed": "Tidak dapat menyimpan ke dalam basis data server. Jika masih berlanjut, Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "brave_measure_text_error": {
-      "start": "",
+      "start": "Sepertinya kamu menggunakan browser Brave dengan",
       "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
+      "setting_enabled": "pengaturan diaktifkan",
       "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
+      "text_elements": "Elemen Teks",
+      "in_your_drawings": "dalam gambar anda",
+      "strongly_recommend": "Kami sangat menyarankan untuk mematikan pengaturan ini. Kamu dapat mengikuti",
+      "steps": "langkah-langkah ini",
+      "how": "dalam bagaimana melakukan itu",
+      "disable_setting": " Jika pengaturan ini dimatikan tidak mengatasi masalah tampilan dari elemen teks, silahkan buka",
       "issue": "isu",
-      "write": "",
+      "write": "di GitHub kami, atau tulis kami di",
       "discord": "Discord"
     }
   },
