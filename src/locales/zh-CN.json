@@ -216,10 +216,10 @@
       "strongly_recommend": "我们强烈建议禁用此设置。您可以按照",
       "steps": "这些步骤",
       "how": "来设置",
-      "disable_setting": " 如果禁用此设置无法修复文本元素的显示，请打开一个",
-      "issue": "问题",
-      "write": "在我们的GitHub上，或者给我们写信",
-      "discord": "Discord"
+      "disable_setting": " 如果禁用此设置无法修复文本元素的显示，请在 GitHub 提交一个",
+      "issue": "issue",
+      "write": "，或者通过",
+      "discord": "Discord 反馈"
     }
   },
   "toolBar": {
