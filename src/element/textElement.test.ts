@@ -1,4 +1,3 @@
-import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import { BOUND_TEXT_PADDING } from "../constants";
 import { API } from "../tests/helpers/api";
 import {
