@@ -185,7 +185,7 @@ break it now`,
 Excalidraw`);
   });
 
-  it("should wrap the text correctly when text container hyphen", () => {
+  it("should wrap the text correctly when text contains hyphen", () => {
     const text =
       "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range of other projects.";
     const res = wrapText(text, font, 110);
