@@ -1,3 +1,4 @@
+import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import { BOUND_TEXT_PADDING } from "../constants";
 import { API } from "../tests/helpers/api";
 import {
@@ -183,6 +184,27 @@ break it now`,
     const res = wrapText(text, font, 100);
     expect(res).toEqual(`Hello 
 Excalidraw`);
+  });
+
+  it("should wrap the text correctly when text container hyphen", () => {
+    const text =
+      "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range of other projects.";
+    const res = wrapText(text, font, 110);
+    expect(res).toBe(
+      `Wikipedia 
+is hosted 
+by 
+Wikimedia-
+Foundation,
+a non-
+profit 
+organizati
+on that 
+also hosts
+a range of
+other 
+projects.`,
+    );
   });
 });
 

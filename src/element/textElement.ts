@@ -324,17 +324,15 @@ export const getTextHeight = (text: string, font: FontString) => {
 };
 
 const splitTextByToken = (text: string, token: string) => {
-  const splitWords = text.split("-");
-  // Splitting words containing "-" as those are treated as separate words
-  // by css wrapping algorithm eg non-profit => non-, profit
-  if (splitWords.length > 1) {
-    splitWords.forEach((word, index) => {
-      if (index !== splitWords.length - 1) {
-        splitWords[index] = word += "-";
+  const words = text.split("-");
+  if (words.length > 1) {
+    words.forEach((word, index) => {
+      if (index !== words.length - 1) {
+        words[index] = word += "-";
       }
     });
   }
-  return splitWords.join(",");
+  return words.join(" ");
 };
 
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
@@ -366,11 +364,13 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     }
 
     const wordsSplitBySpace = originalLine.split(" ");
+    // Splitting words containing "-" as those are treated as separate words
+    // by css wrapping algorithm eg non-profit => non-, profit
     const wordsSplitByHyphen = splitTextByToken(
-      wordsSplitBySpace.join(","),
+      wordsSplitBySpace.join(" "),
       "-",
     );
-    const words = wordsSplitByHyphen.split(",");
+    const words = wordsSplitByHyphen.split(" ");
     resetParams();
 
     let index = 0;
@@ -434,6 +434,8 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
             break;
           }
           index++;
+
+          // if word ends with "-" then we don't need to add space
           const shouldAppendSpace = !word.endsWith("-");
           currentLine += word;
 
