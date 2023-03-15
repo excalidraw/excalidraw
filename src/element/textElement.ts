@@ -363,13 +363,9 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
       return; // continue
     }
 
-    const wordsSplitBySpace = originalLine.split(" ");
     // Splitting words containing "-" as those are treated as separate words
     // by css wrapping algorithm eg non-profit => non-, profit
-    const wordsSplitByHyphen = splitTextByToken(
-      wordsSplitBySpace.join(" "),
-      "-",
-    );
+    const wordsSplitByHyphen = splitTextByToken(originalLine, "-");
     const words = wordsSplitByHyphen.split(" ");
     resetParams();
 
