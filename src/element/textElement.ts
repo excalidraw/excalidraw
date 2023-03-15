@@ -323,6 +323,20 @@ export const getTextHeight = (text: string, font: FontString) => {
   return lineHeight * lines.length;
 };
 
+const splitTextByToken = (text: string, token: string) => {
+  const splitWords = text.split("-");
+  // Splitting words containing "-" as those are treated as separate words
+  // by css wrapping algorithm eg non-profit => non-, profit
+  if (splitWords.length > 1) {
+    splitWords.forEach((word, index) => {
+      if (index !== splitWords.length - 1) {
+        splitWords[index] = word += "-";
+      }
+    });
+  }
+  return splitWords.join(",");
+};
+
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
@@ -350,31 +364,16 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
       lines.push(originalLine);
       return; // continue
     }
-    const words = originalLine.split(" ");
 
+    const wordsSplitBySpace = originalLine.split(" ");
+    const wordsSplitByHyphen = splitTextByToken(
+      wordsSplitBySpace.join(","),
+      "-",
+    );
+    const words = wordsSplitByHyphen.split(",");
     resetParams();
+
     let index = 0;
-    while (index < words.length) {
-      const word = words[index];
-      const splitWords = word.split("-");
-      // Splitting words containing "-" as those are treated as separate words
-      // by css wrapping algorithm eg non-profit => non-, profit
-      if (splitWords.length > 1) {
-        splitWords.forEach((word, index) => {
-          if (index !== splitWords.length - 1) {
-            splitWords[index] = word += "-";
-          }
-        });
-        words[index] = splitWords[0];
-        for (let i = 1; i < splitWords.length; i++) {
-          words.splice(index + i, 0, splitWords[i]);
-        }
-        index = index + splitWords.length;
-      } else {
-        index++;
-      }
-    }
-    index = 0;
 
     while (index < words.length) {
       const currentWordWidth = getLineWidth(words[index], font);
