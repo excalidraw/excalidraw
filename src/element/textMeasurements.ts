@@ -112,16 +112,6 @@ export const charWidth = (() => {
   };
 })();
 
-export const getMinCharWidth = (font: FontString) => {
-  const cache = charWidth.getCache(font);
-  if (!cache) {
-    return 0;
-  }
-  const cacheWithOutEmpty = cache.filter((val) => val !== undefined);
-
-  return Math.min(...cacheWithOutEmpty);
-};
-
 export const getMaxCharWidth = (font: FontString) => {
   const cache = charWidth.getCache(font);
   if (!cache) {
