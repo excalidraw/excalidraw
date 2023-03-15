@@ -22,20 +22,15 @@ import {
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
-  getLineHeight,
   getBoundTextElementId,
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
-  getTextWidth,
-  measureText,
   normalizeText,
   redrawTextBoundingBox,
-  wrapText,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
   computeBoundTextPosition,
-  getTextHeight,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -45,6 +40,13 @@ import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
+import {
+  getLineHeight,
+  getTextWidth,
+  measureText,
+  wrapText,
+  getTextHeight,
+} from "./textMeasurements";
 
 const getTransform = (
   width: number,

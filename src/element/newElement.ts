@@ -25,14 +25,13 @@ import {
   getBoundTextElementOffset,
   getContainerDims,
   getContainerElement,
-  measureText,
   normalizeText,
-  wrapText,
   getBoundTextMaxWidth,
 } from "./textElement";
 import { VERTICAL_ALIGN } from "../constants";
 import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
+import { measureText, wrapText } from "./textMeasurements";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,

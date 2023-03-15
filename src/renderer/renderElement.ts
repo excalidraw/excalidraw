@@ -40,7 +40,6 @@ import {
 } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
-  getLineHeight,
   getBoundTextElement,
   getContainerCoords,
   getContainerElement,
@@ -48,6 +47,7 @@ import {
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { getLineHeight } from "../element/textMeasurements";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original

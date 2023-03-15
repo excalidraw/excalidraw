@@ -39,15 +39,16 @@ import {
 import { Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
   getContainerElement,
   handleBindTextResize,
   getBoundTextMaxWidth,
 } from "./textElement";
-
+import {
+  getApproxMinLineHeight,
+  getApproxMinLineWidth,
+} from "./textMeasurements";
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
     return angle - 2 * Math.PI;

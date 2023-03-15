@@ -3,7 +3,7 @@ import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import ExcalidrawApp from "../excalidraw-app";
 import { KEYS } from "../keys";
-import { getLineHeight } from "../element/textElement";
+import { getLineHeight } from "../element/textMeasurements";
 import { getFontString } from "../utils";
 import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";

@@ -17,7 +17,8 @@ import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { queryByTestId, queryByText } from "@testing-library/react";
 import { resize, rotate } from "./utils";
-import { wrapText, getBoundTextMaxWidth } from "../element/textElement";
+import { getBoundTextMaxWidth } from "../element/textElement";
+import { wrapText } from "../element/textMeasurements";
 import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS } from "../constants";
 

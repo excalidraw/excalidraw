@@ -260,17 +260,19 @@ import throttle from "lodash.throttle";
 import { fileOpen, FileSystemHandle } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
-  getLineHeight,
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
   getBoundTextElement,
   getContainerCenter,
   getContainerDims,
   getContainerElement,
   getTextBindableContainerAtPosition,
-  isMeasureTextSupported,
   isValidTextContainer,
 } from "../element/textElement";
+import {
+  getLineHeight,
+  getApproxMinLineHeight,
+  getApproxMinLineWidth,
+  isMeasureTextSupported,
+} from "../element/textMeasurements";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
   normalizeLink,
