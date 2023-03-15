@@ -15,7 +15,68 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Expose `useI18n()` hook return an object containing `t()` i18n helper and current `langCode`. You can use this in components you render as `<Excalidraw>` children to render any of our i18n locale strings. [#6224](https://github.com/excalidraw/excalidraw/pull/6224)
+
+- [`restoreElements`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restoreelements) API now takes an optional parameter `opts` which currently supports the below attributes
+
+```js
+{ refreshDimensions?: boolean, repairBindings?: boolean }
+```
+
+The same `opts` param has been added to [`restore`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restore) API as well.
+
+For more details refer to the [docs](https://docs.excalidraw.com)
+
+#### BREAKING CHANGE
+
+- The optional parameter `refreshDimensions` in [`restoreElements`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restoreelements) has been removed and can be enabled via `opts`
+
+## 0.14.2 (2023-02-01)
+
+### Features
+
+- Welcome screen no longer renders by default, and you need to render it yourself. `UIOptions.welcomeScreen` option is now deprecated. [#6117](https://github.com/excalidraw/excalidraw/pull/6117)
 - `MainMenu`, `MainMenu.Item`, and `MainMenu.ItemLink` components now all support `onSelect(event: Event): void` callback. If you call `event.preventDefault()`, it will prevent the menu from closing when an item is selected (clicked on). [#6152](https://github.com/excalidraw/excalidraw/pull/6152)
+
+### Fixes
+
+- declare css variable for font in excalidraw so its available in host [#6160](https://github.com/excalidraw/excalidraw/pull/6160)
+
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Add hand/panning tool [#6141](https://github.com/excalidraw/excalidraw/pull/6141)
+
+- Show copy-as-png export button on firefox and show steps how to enable it [#6125](https://github.com/excalidraw/excalidraw/pull/6125)
+
+### Fixes
+
+- Horizontal padding when aligning bound text containers [#6180](https://github.com/excalidraw/excalidraw/pull/6180)
+
+- Make tunnels work in multi-instance scenarios [#6178](https://github.com/excalidraw/excalidraw/pull/6178)
+
+- Add 1px width to the container to calculate more accurately [#6174](https://github.com/excalidraw/excalidraw/pull/6174)
+
+- Quick typo fix [#6167](https://github.com/excalidraw/excalidraw/pull/6167)
+
+- Set the width correctly using measureText in editor [#6162](https://github.com/excalidraw/excalidraw/pull/6162)
+
+- :bug: broken emojis when wrap text [#6153](https://github.com/excalidraw/excalidraw/pull/6153)
+
+- Button background and svg sizes [#6155](https://github.com/excalidraw/excalidraw/pull/6155)
+
+### Styles
+
+- Change in ExportButton style [#6147](https://github.com/excalidraw/excalidraw/pull/6147) (#6148)
+
+### Build
+
+- Temporarily disable pre-commit [#6132](https://github.com/excalidraw/excalidraw/pull/6132)
+
+---
 
 ## 0.14.1 (2023-01-16)
 

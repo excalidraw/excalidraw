@@ -1,11 +1,7 @@
 import clsx from "clsx";
 import { actionShortcuts } from "../../actions";
 import { ActionManager } from "../../actions/manager";
-import {
-  AppState,
-  UIChildrenComponents,
-  UIWelcomeScreenComponents,
-} from "../../types";
+import { AppState } from "../../types";
 import {
   ExitZenModeAction,
   FinalizeAction,
@@ -13,6 +9,7 @@ import {
   ZoomActions,
 } from "../Actions";
 import { useDevice } from "../App";
+import { useTunnels } from "../context/tunnels";
 import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
@@ -21,15 +18,15 @@ const Footer = ({
   appState,
   actionManager,
   showExitZenModeBtn,
-  footerCenter,
-  welcomeScreenHelp,
+  renderWelcomeScreen,
 }: {
   appState: AppState;
   actionManager: ActionManager;
   showExitZenModeBtn: boolean;
-  footerCenter: UIChildrenComponents["FooterCenter"];
-  welcomeScreenHelp: UIWelcomeScreenComponents["HelpHint"];
+  renderWelcomeScreen: boolean;
 }) => {
+  const { footerCenterTunnel, welcomeScreenHelpHintTunnel } = useTunnels();
+
   const device = useDevice();
   const showFinalize =
     !appState.viewModeEnabled && appState.multiElement && device.isTouchScreen;
@@ -73,14 +70,14 @@ const Footer = ({
           </Section>
         </Stack.Col>
       </div>
-      {footerCenter}
+      <footerCenterTunnel.Out />
       <div
         className={clsx("layer-ui__wrapper__footer-right zen-mode-transition", {
           "transition-right disable-pointerEvents": appState.zenModeEnabled,
         })}
       >
         <div style={{ position: "relative" }}>
-          {welcomeScreenHelp}
+          {renderWelcomeScreen && <welcomeScreenHelpHintTunnel.Out />}
           <HelpButton
             onClick={() => actionManager.executeAction(actionShortcuts)}
           />

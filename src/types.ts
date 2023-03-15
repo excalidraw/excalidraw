@@ -31,6 +31,8 @@ import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
+import { Merge, ForwardRef } from "./utility-types";
+import React from "react";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -100,7 +102,7 @@ export type AppState = {
   } | null;
   showWelcomeScreen: boolean;
   isLoading: boolean;
-  errorMessage: string | null;
+  errorMessage: React.ReactNode;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
@@ -385,15 +387,16 @@ type CanvasActions = Partial<{
 
 type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
-  welcomeScreen: boolean;
   canvasActions: CanvasActions;
+  /** @deprecated does nothing. Will be removed in 0.15 */
+  welcomeScreen?: boolean;
 }>;
 
 export type AppProps = Merge<
   ExcalidrawProps,
   {
     UIOptions: Merge<
-      MarkRequired<UIOptions, "welcomeScreen">,
+      UIOptions,
       {
         canvasActions: Required<CanvasActions> & { export: ExportOpts };
       }
@@ -523,33 +526,3 @@ export type Device = Readonly<{
   isTouchScreen: boolean;
   canDeviceFitSidebar: boolean;
 }>;
-
-export type UIChildrenComponents = {
-  [k in "FooterCenter" | "Menu" | "WelcomeScreen"]?: React.ReactElement<
-    { children?: React.ReactNode },
-    React.JSXElementConstructor<any>
-  >;
-};
-
-export type UIWelcomeScreenComponents = {
-  [k in
-    | "Center"
-    | "MenuHint"
-    | "ToolbarHint"
-    | "HelpHint"]?: React.ReactElement<
-    { children?: React.ReactNode },
-    React.JSXElementConstructor<any>
-  >;
-};
-
-export type UIWelcomeScreenCenterComponents = {
-  [k in
-    | "Logo"
-    | "Heading"
-    | "Menu"
-    | "MenuItemLoadScene"
-    | "MenuItemHelp"]?: React.ReactElement<
-    { children?: React.ReactNode },
-    React.JSXElementConstructor<any>
-  >;
-};

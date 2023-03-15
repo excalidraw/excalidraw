@@ -14,6 +14,7 @@ import {
   isFreeDrawElement,
   isInitializedImageElement,
   isArrowElement,
+  hasBoundTextElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -27,7 +28,7 @@ import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
-import { getCornerRadius, isPathALoop } from "../math";
+import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
@@ -36,14 +37,15 @@ import {
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
-  VERTICAL_ALIGN,
 } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
   getApproxLineHeight,
   getBoundTextElement,
-  getBoundTextElementOffset,
+  getContainerCoords,
   getContainerElement,
+  getMaxContainerHeight,
+  getMaxContainerWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -280,22 +282,19 @@ const drawElementOnCanvas = (
         const lineHeight = element.containerId
           ? getApproxLineHeight(getFontString(element))
           : element.height / lines.length;
-        let verticalOffset = element.height - element.baseline;
-        if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-          verticalOffset = getBoundTextElementOffset(element);
-        }
-
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
             : element.textAlign === "right"
             ? element.width
             : 0;
+        context.textBaseline = "bottom";
+
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],
             horizontalOffset,
-            (index + 1) * lineHeight - verticalOffset,
+            (index + 1) * lineHeight,
           );
         }
         context.restore();
@@ -816,6 +815,21 @@ const drawElementFromCanvas = (
       elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
       elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
     );
+
+    if (
+      process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX &&
+      hasBoundTextElement(element)
+    ) {
+      const coords = getContainerCoords(element);
+      context.strokeStyle = "#c92a2a";
+      context.lineWidth = 3;
+      context.strokeRect(
+        (coords.x + renderConfig.scrollX) * window.devicePixelRatio,
+        (coords.y + renderConfig.scrollY) * window.devicePixelRatio,
+        getMaxContainerWidth(element) * window.devicePixelRatio,
+        getMaxContainerHeight(element) * window.devicePixelRatio,
+      );
+    }
   }
   context.restore();
 
@@ -989,7 +1003,33 @@ export const renderElement = (
           element,
           renderConfig,
         );
+
+        const currentImageSmoothingStatus = context.imageSmoothingEnabled;
+
+        if (
+          // do not disable smoothing during zoom as blurry shapes look better
+          // on low resolution (while still zooming in) than sharp ones
+          !renderConfig?.shouldCacheIgnoreZoom &&
+          // angle is 0 -> always disable smoothing
+          (!element.angle ||
+            // or check if angle is a right angle in which case we can still
+            // disable smoothing without adversely affecting the result
+            isRightAngle(element.angle))
+        ) {
+          // Disabling smoothing makes output much sharper, especially for
+          // text. Unless for non-right angles, where the aliasing is really
+          // terrible on Chromium.
+          //
+          // Note that `context.imageSmoothingQuality="high"` has almost
+          // zero effect.
+          //
+          context.imageSmoothingEnabled = false;
+        }
+
         drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
+
+        // reset
+        context.imageSmoothingEnabled = currentImageSmoothingStatus;
       }
       break;
     }
@@ -1274,7 +1314,6 @@ export const renderElementToSvg = (
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.height / lines.length;
-        const verticalOffset = element.height - element.baseline;
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
@@ -1292,13 +1331,14 @@ export const renderElementToSvg = (
           const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
-          text.setAttribute("y", `${(i + 1) * lineHeight - verticalOffset}`);
+          text.setAttribute("y", `${i * lineHeight}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
           text.setAttribute("fill", element.strokeColor);
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);
+          text.setAttribute("dominant-baseline", "text-before-edge");
           node.appendChild(text);
         }
         root.appendChild(node);

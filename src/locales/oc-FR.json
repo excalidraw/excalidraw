@@ -38,8 +38,8 @@
     "arrowhead_bar": "Barra",
     "arrowhead_dot": "Ponch",
     "arrowhead_triangle": "Triangle",
-    "fontSize": "Talha poliça",
-    "fontFamily": "Familha de poliça",
+    "fontSize": "Talha polissa",
+    "fontFamily": "Familha de polissa",
     "onlySelected": "Seleccion sonque",
     "withBackground": "Rèireplan",
     "exportEmbedScene": "Scèna embarcada",
@@ -106,8 +106,8 @@
     "toggleTheme": "Alternar tèma",
     "personalLib": "Bibliotèca personala",
     "excalidrawLib": "Bibliotèca Excalidraw",
-    "decreaseFontSize": "Reduire talha poliça",
-    "increaseFontSize": "Aumentar talha poliça",
+    "decreaseFontSize": "Reduire talha polissa",
+    "increaseFontSize": "Aumentar talha polissa",
     "unbindText": "Dessociar lo tèxte",
     "bindText": "Ligar lo tèxt al contenidor",
     "link": {
@@ -192,7 +192,8 @@
     "invalidSceneUrl": "Importacion impossibla de la scèna a partir de l’URL provesida. Es siá mal formatada o siá conten pas cap de donada JSON Excalidraw valida.",
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. O volètz vertadièrament ?",
     "removeItemsFromsLibrary": "Suprimir {{count}} element(s) de la bibliotèca ?",
-    "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada."
+    "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada.",
+    "collabOfflineWarning": "Cap de connexion pas disponibla.\nVòstras modificacions seràn pas salvadas !"
   },
   "errors": {
     "unsupportedFileType": "Tipe de fichièr pas pres en carga.",
@@ -219,7 +220,8 @@
     "lock": "Mantenir activa l’aisina aprèp dessenhar",
     "penMode": "Mòde estilo - empachar lo contact",
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
-    "eraser": "Goma"
+    "eraser": "Goma",
+    "hand": "Man (aisina de desplaçament de la vista)"
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -227,7 +229,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Per desplaçar los canabasses, tenètz la rodeta de la mirga o la barra d’espaci pendent lo desplaçament",
+    "canvasPanning": "",
     "linearElement": "Clicatz per començar mantun punt, lisatz per una sola linha",
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
@@ -238,14 +240,15 @@
     "resize": "Podètz servar las proporcions en mantenent la tòca MAJ pendent lo redimensionament,\nmantenètz la tòca ALT per redimensionar a partir del centre",
     "resizeImage": "Podètz retalhar liurament en quichant CTRL,\nquichatz ALT per retalhar a partir del centre",
     "rotate": "Podètz restrénger los angles en mantenent MAJ pendent la rotacion",
-    "lineEditor_info": "",
+    "lineEditor_info": "Tenètz quichat Ctrl o Cmd e doble clic o quichatz Ctrl o Cmd + Entrada per modificar los ponches",
     "lineEditor_pointSelected": "Quichar Suprimir per tirar lo(s) punt(s),\nCtrlOCmd+D per duplicar, o lisatz per desplaçar",
     "lineEditor_nothingSelected": "Seleccionar un punt d’editar (manténer Maj. per ne seleccionar mantun),\no manténer Alt e clicar per n’apondre de novèls",
     "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament",
     "publishLibrary": "Publicar vòstra pròpria bibliotèca",
     "bindTextToElement": "Quichatz Entrada per apondre de tèxte",
     "deepBoxSelect": "Gardar CtrlOCmd per una seleccion gropada e empachar lo desplaçament",
-    "eraserRevert": "Tenètz quichat Alt per anullar los elements marcats per supression"
+    "eraserRevert": "Tenètz quichat Alt per anullar los elements marcats per supression",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
@@ -314,8 +317,8 @@
     "zoomToFit": "Zoomar per veire totes los elements",
     "zoomToSelection": "Zoomar la seleccion",
     "toggleElementLock": "Verrolhar/Desverrolhar la seleccion",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Desplaçar la pagina ennaut/enbàs",
+    "movePageLeftRight": "Desplaçar la pagina a esquèrra/drecha"
   },
   "clearCanvasDialog": {
     "title": "Escafar canabàs"

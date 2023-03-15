@@ -16,6 +16,7 @@ import { AppState } from "../types";
 import { queryFocusableElements } from "../utils";
 import { useSetAtom } from "jotai";
 import { isLibraryMenuOpenAtom } from "./LibraryMenuHeaderContent";
+import { jotaiScope } from "../jotai";
 
 export interface DialogProps {
   children: React.ReactNode;
@@ -72,7 +73,7 @@ export const Dialog = (props: DialogProps) => {
   }, [islandNode, props.autofocus]);
 
   const setAppState = useExcalidrawSetAppState();
-  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
+  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom, jotaiScope);
 
   const onClose = () => {
     setAppState({ openMenu: null });

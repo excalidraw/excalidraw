@@ -1,0 +1,131 @@
+# Integration
+
+## Module bundler
+
+If you are using a module bundler (for instance, Webpack), you can import it as an ES6 module as shown below
+
+```js
+import { Excalidraw } from "@excalidraw/excalidraw";
+```
+
+:::info
+
+Throughout the documentation we use live, editable Excalidraw examples like the one shown below.
+
+While we aim for the examples to closely reflect what you'd get if you rendered it yourself, we actually initialize it with some props behind the scenes.  
+For example, we're passing a `theme` prop to it based on the current color theme of the docs you're just reading.
+
+:::
+
+```jsx live
+function App() {
+  return (
+    <>
+      <h1 style={{ textAlign: "center" }}>Excalidraw Example</h1>
+      <div style={{ height: "500px" }}>
+        <Excalidraw />
+      </div>
+    </>
+  );
+}
+```
+
+### Rendering Excalidraw only on client
+
+Since _Excalidraw_ doesn't support server side rendering, you should render the component once the host is `mounted`.
+
+The following worfklow shows one way how to render Excalidraw on Next.js. We'll add more detailed and alternative Next.js examples, soon.
+
+```jsx showLineNumbers
+import { useState, useEffect } from "react";
+export default function App() {
+  const [Excalidraw, setExcalidraw] = useState(null);
+  useEffect(() => {
+    import("@excalidraw/excalidraw").then((comp) => setExcalidraw(comp.Excalidraw));
+  }, []);
+  return <>{Excalidraw && <Excalidraw />}</>;
+}
+```
+
+The `types` are available at `@excalidraw/excalidraw/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
+
+## Browser
+
+To use it in a browser directly:
+
+For development use :point_down:
+
+```js
+<script
+  type="text/javascript"
+  src="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.development.js"
+></script>
+```
+
+For production use :point_down:
+
+```js
+<script
+  type="text/javascript"
+  src="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.production.min.js"
+></script>
+```
+
+You will need to make sure `react`, `react-dom` is available as shown in the below example. For prod please use the production versions of `react`, `react-dom`.
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+<Tabs>
+  <TabItem value="html" label="html">
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Excalidraw in browser</title>
+    <meta charset="UTF-8" />
+    <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.development.js"
+    ></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Excalidraw Embed Example</h1>
+      <div id="app"></div>
+    </div>
+    <script type="text/javascript" src="src/index.js"></script>
+  </body>
+</html>
+```
+
+</TabItem>
+<TabItem value="js" label="Javascript">
+
+```js showLineNumbers
+const App = () => {
+  return React.createElement(
+    React.Fragment,
+    null,
+    React.createElement(
+      "div",
+      {
+        style: { height: "500px" },
+      },
+      React.createElement(ExcalidrawLib.Excalidraw),
+    ),
+  );
+};
+
+const excalidrawWrapper = document.getElementById("app");
+const root = ReactDOM.createRoot(excalidrawWrapper);
+root.render(React.createElement(App));
+```
+
+</TabItem>
+</Tabs>

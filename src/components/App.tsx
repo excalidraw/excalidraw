@@ -62,6 +62,7 @@ import {
   GRID_SIZE,
   IMAGE_RENDER_TIMEOUT,
   isAndroid,
+  isBrave,
   LINE_CONFIRM_THRESHOLD,
   MAX_ALLOWED_FILE_BYTES,
   MIME_TYPES,
@@ -108,6 +109,7 @@ import {
   textWysiwyg,
   transformElements,
   updateTextElement,
+  redrawTextBoundingBox,
 } from "../element";
 import {
   bindOrUnbindLinearElement,
@@ -226,6 +228,7 @@ import {
   setEraserCursor,
   updateActiveTool,
   getShortcutKey,
+  isTransparent,
 } from "../utils";
 import {
   ContextMenu,
@@ -263,7 +266,9 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerDims,
+  getContainerElement,
   getTextBindableContainerAtPosition,
+  isMeasureTextSupported,
   isValidTextContainer,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
@@ -279,6 +284,10 @@ import { shouldShowBoundingBox } from "../element/transformHandles";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionToggleHandTool } from "../actions/actionCanvas";
+import { jotaiStore } from "../jotai";
+import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { actionCreateContainerFromText } from "../actions/actionBoundText";
+import BraveMeasureTextError from "./BraveMeasureTextError";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -423,7 +432,6 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.id = nanoid();
-
     this.library = new Library(this);
     if (excalidrawRef) {
       const readyPromise =
@@ -589,7 +597,6 @@ class App extends React.Component<AppProps, AppState> {
                         })
                       }
                       langCode={getLanguage().code}
-                      isCollaborating={this.props.isCollaborating}
                       renderTopRightUI={renderTopRightUI}
                       renderCustomStats={renderCustomStats}
                       renderCustomSidebar={this.props.renderSidebar}
@@ -605,7 +612,6 @@ class App extends React.Component<AppProps, AppState> {
                       onImageAction={this.onImageAction}
                       renderWelcomeScreen={
                         !this.state.isLoading &&
-                        this.props.UIOptions.welcomeScreen &&
                         this.state.showWelcomeScreen &&
                         this.state.activeTool.type === "selection" &&
                         !this.scene.getElementsIncludingDeleted().length
@@ -707,6 +713,8 @@ class App extends React.Component<AppProps, AppState> {
         const theme =
           actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
         let name = actionResult?.appState?.name ?? this.state.name;
+        const errorMessage =
+          actionResult?.appState?.errorMessage ?? this.state.errorMessage;
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
         }
@@ -722,7 +730,6 @@ class App extends React.Component<AppProps, AppState> {
         if (typeof this.props.name !== "undefined") {
           name = this.props.name;
         }
-
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
@@ -740,6 +747,7 @@ class App extends React.Component<AppProps, AppState> {
               gridSize,
               theme,
               name,
+              errorMessage,
             });
           },
           () => {
@@ -836,7 +844,7 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-    const scene = restore(initialData, null, null);
+    const scene = restore(initialData, null, null, { repairBindings: true });
     scene.appState = {
       ...scene.appState,
       theme: this.props.theme || scene.appState.theme,
@@ -868,7 +876,6 @@ class App extends React.Component<AppProps, AppState> {
         ),
       };
     }
-
     // FontFaceSet loadingdone event we listen on may not always fire
     // (looking at you Safari), so on init we manually load fonts for current
     // text elements on canvas, and rerender them once done. This also
@@ -995,6 +1002,13 @@ class App extends React.Component<AppProps, AppState> {
       this.restoreFileFromShare();
     } else {
       this.updateDOMRect(this.initializeScene);
+    }
+
+    // note that this check seems to always pass in localhost
+    if (isBrave() && !isMeasureTextSupported()) {
+      this.setState({
+        errorMessage: <BraveMeasureTextError />,
+      });
     }
   }
 
@@ -1624,6 +1638,7 @@ class App extends React.Component<AppProps, AppState> {
       oldIdToDuplicatedId.set(element.id, newElement.id);
       return newElement;
     });
+
     bindTextToShapeAfterDuplication(newElements, elements, oldIdToDuplicatedId);
     const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
@@ -1636,6 +1651,14 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.scene.replaceAllElements(nextElements);
+
+    newElements.forEach((newElement) => {
+      if (isTextElement(newElement) && isBoundToContainer(newElement)) {
+        const container = getContainerElement(newElement);
+        redrawTextBoundingBox(newElement, container);
+      }
+    });
+
     this.history.resumeRecording();
 
     this.setState(
@@ -1954,7 +1977,6 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   // Input handling
-
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
       // normalize `event.key` when CapsLock is pressed #2372
@@ -2195,6 +2217,13 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({ openPopup: "strokeColorPicker" });
           event.stopPropagation();
         }
+      }
+
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
+      ) {
+        jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
       }
     },
   );
@@ -2656,14 +2685,6 @@ class App extends React.Component<AppProps, AppState> {
           element,
         ]);
       }
-
-      // case: creating new text not centered to parent element → offset Y
-      // so that the text is centered to cursor position
-      if (!parentCenterPosition) {
-        mutateElement(element, {
-          y: element.y - element.baseline / 2,
-        });
-      }
     }
 
     this.setState({
@@ -2756,7 +2777,14 @@ class App extends React.Component<AppProps, AppState> {
         sceneY,
       );
       if (container) {
-        if (isArrowElement(container) || hasBoundTextElement(container)) {
+        if (
+          hasBoundTextElement(container) ||
+          !isTransparent(container.backgroundColor) ||
+          isHittingElementNotConsideringBoundingBox(container, this.state, [
+            sceneX,
+            sceneY,
+          ])
+        ) {
           const midPoint = getContainerCenter(container, this.state);
 
           sceneX = midPoint.x;
@@ -6220,6 +6248,7 @@ class App extends React.Component<AppProps, AppState> {
       actionGroup,
       actionUnbindText,
       actionBindText,
+      actionCreateContainerFromText,
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,

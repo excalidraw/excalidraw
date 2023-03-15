@@ -3,12 +3,21 @@ import { MenuHint, ToolbarHint, HelpHint } from "./WelcomeScreen.Hints";
 
 import "./WelcomeScreen.scss";
 
-const WelcomeScreen = (props: { children: React.ReactNode }) => {
-  // NOTE this component is used as a dummy wrapper to retrieve child props
-  // from, and will never be rendered to DOM directly. As such, we can't
-  // do anything here (use hooks and such)
-  return null;
+const WelcomeScreen = (props: { children?: React.ReactNode }) => {
+  return (
+    <>
+      {props.children || (
+        <>
+          <Center />
+          <MenuHint />
+          <ToolbarHint />
+          <HelpHint />
+        </>
+      )}
+    </>
+  );
 };
+
 WelcomeScreen.displayName = "WelcomeScreen";
 
 WelcomeScreen.Center = Center;

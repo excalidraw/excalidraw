@@ -17,8 +17,11 @@ import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { queryByTestId, queryByText } from "@testing-library/react";
 import { resize, rotate } from "./utils";
-import { getBoundTextElementPosition, wrapText } from "../element/textElement";
-import { getMaxContainerWidth } from "../element/newElement";
+import {
+  getBoundTextElementPosition,
+  wrapText,
+  getMaxContainerWidth,
+} from "../element/textElement";
 import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS } from "../constants";
 
@@ -1028,7 +1031,7 @@ describe("Test Linear Elements", () => {
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
         Object {
-          "height": 10,
+          "height": 128,
           "width": 367,
         }
       `);
@@ -1036,8 +1039,8 @@ describe("Test Linear Elements", () => {
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
         Object {
-          "x": 387,
-          "y": 70,
+          "x": 272,
+          "y": 46,
         }
       `);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
@@ -1049,11 +1052,11 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
         Array [
           20,
-          60,
-          391.8122896842806,
-          70,
+          36,
+          502,
+          94,
           205.9061448421403,
-          65,
+          53,
         ]
       `);
     });
@@ -1087,7 +1090,7 @@ describe("Test Linear Elements", () => {
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
         Object {
-          "height": 0,
+          "height": 128,
           "width": 340,
         }
       `);
@@ -1095,8 +1098,8 @@ describe("Test Linear Elements", () => {
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
         Object {
-          "x": 190,
-          "y": 20,
+          "x": 75,
+          "y": -4,
         }
       `);
       expect(textElement.text).toMatchInlineSnapshot(`
@@ -1175,6 +1178,18 @@ describe("Test Linear Elements", () => {
         collaboration made 
         easy"
       `);
+    });
+
+    it("should not render horizontal align tool when element selected", () => {
+      createTwoPointerLinearElement("arrow");
+      const arrow = h.elements[0] as ExcalidrawLinearElement;
+
+      createBoundTextElement(DEFAULT_TEXT, arrow);
+      API.setSelectedElements([arrow]);
+
+      expect(queryByTestId(container, "align-left")).toBeNull();
+      expect(queryByTestId(container, "align-horizontal-center")).toBeNull();
+      expect(queryByTestId(container, "align-right")).toBeNull();
     });
   });
 });
