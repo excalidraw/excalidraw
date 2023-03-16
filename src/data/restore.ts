@@ -35,6 +35,7 @@ import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import oc from "open-color";
 import { MarkOptional, Mutable } from "../utility-types";
+import { getLegacyLineHeightForText } from "../element/textElement";
 
 type RestoredAppState = Omit<
   AppState,
@@ -169,7 +170,6 @@ const restoreElement = (
         fontFamily = getFontFamilyByName(_fontFamily);
       }
       const text = element.text ?? "";
-      const lineCount = text.split("\n").length;
 
       element = restoreElementWithProperties(element, {
         fontSize,
@@ -179,7 +179,7 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || element.text,
-        lineHeight: element.lineHeight || element.height / lineCount,
+        lineHeight: element.lineHeight || getLegacyLineHeightForText(element),
       });
 
       if (refreshDimensions) {

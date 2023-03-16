@@ -326,6 +326,15 @@ export const getTextHeight = (
   return getApproxLineHeight(fontSize) * lineCount;
 };
 
+// use old algorithm to calculate line height for
+// backward compatibility
+export const getLegacyLineHeightForText = (
+  textElement: ExcalidrawTextElement,
+) => {
+  const lineCount = textElement.text.replace(/\r\n?/g, "\n").split("\n").length;
+  return textElement.height / lineCount;
+};
+
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
