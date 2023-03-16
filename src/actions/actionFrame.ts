@@ -1,9 +1,11 @@
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { getElementsInFrame } from "../frame";
+import { KEYS } from "../keys";
 // import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { AppState } from "../types";
+import { setCursorForShape, updateActiveTool } from "../utils";
 import { register } from "./register";
 
 const enableFrameAction = (
@@ -112,4 +114,35 @@ export const actionToggleFrameRendering = register({
   //   event.key.toLocaleLowerCase() === KEYS.F &&
   //   event[KEYS.CTRL_OR_CMD] &&
   //   event.shiftKey,
+});
+
+export const actionSetFrameAsActiveTool = register({
+  name: "setFrameAsActiveTool",
+  trackEvent: { category: "toolbar" },
+  perform: (elements, appState, _, app) => {
+    const nextActiveTool = updateActiveTool(appState, {
+      type: "frame",
+    });
+
+    setCursorForShape(app.canvas, {
+      ...appState,
+      activeTool: nextActiveTool,
+    });
+
+    return {
+      elements,
+      appState: {
+        ...appState,
+        activeTool: updateActiveTool(appState, {
+          type: "frame",
+        }),
+      },
+      commitToHistory: false,
+    };
+  },
+  keyTest: (event) =>
+    !event[KEYS.CTRL_OR_CMD] &&
+    !event.shiftKey &&
+    !event.altKey &&
+    event.key.toLocaleLowerCase() === KEYS.F,
 });

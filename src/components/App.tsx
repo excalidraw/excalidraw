@@ -2417,7 +2417,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private setActiveTool = (
     tool:
-      | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" }
+      | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame" }
       | { type: "custom"; customType: string },
   ) => {
     const nextActiveTool = updateActiveTool(this.state, tool);

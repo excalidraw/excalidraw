@@ -116,7 +116,8 @@ export type ActionName =
   | "toggleHandTool"
   | "selectAllElementsInFrame"
   | "removeAllElementsInFrame"
-  | "toggleFrameRendering";
+  | "toggleFrameRendering"
+  | "setFrameAsActiveTool";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

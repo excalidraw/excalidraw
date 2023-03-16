@@ -102,10 +102,6 @@ describe("regression tests", () => {
     mouse.down(40, -20);
     mouse.up(50, 10);
 
-    UI.clickTool("frame");
-    mouse.down(100, 100);
-    mouse.up(120, 120);
-
     expect(h.elements.map((element) => element.type)).toEqual([
       "rectangle",
       "diamond",
@@ -115,7 +111,6 @@ describe("regression tests", () => {
       "arrow",
       "line",
       "freedraw",
-      "frame",
     ]);
   });
 

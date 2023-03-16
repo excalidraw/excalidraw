@@ -223,7 +223,7 @@ export const distance = (x: number, y: number) => Math.abs(x - y);
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: (
-    | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" }
+    | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame" }
     | { type: "custom"; customType: string }
   ) & { lastActiveToolBeforeEraser?: LastActiveTool },
 ): AppState["activeTool"] => {
