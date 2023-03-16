@@ -294,17 +294,10 @@ export const computeNextLineHeightForText = (
     const originalLineHeight = originalElement.lineHeight;
     // Calculate line height relative to font size
     if (originalLineHeight === originalElement.fontSize * 1.2) {
-      console.log("NEWWWWW");
       return updatedElement.fontSize * 1.2;
     }
   }
-  console.log(
-    "legacy",
-    originalElement.lineHeight,
-    originalElement.height,
-    updatedElement.height,
-    getLegacyLineHeightForText(updatedElement),
-  );
+
   return getLegacyLineHeightForText(updatedElement);
 };
 
@@ -332,14 +325,11 @@ export const computeMinHeightForBoundText = (
 ) => {
   if (originalElement) {
     const originalLineHeight = originalElement.lineHeight;
-    console.log(originalLineHeight, originalElement.fontSize * 1.2);
     // Calculate line height relative to font size
     if (originalLineHeight === originalElement.fontSize * 1.2) {
-      console.log("new min height");
       return updatedElement.fontSize * 1.2 + BOUND_TEXT_PADDING * 2;
     }
   }
-  console.log("Legacy min height");
   return getLegacyLineHeightForText(updatedElement) + BOUND_TEXT_PADDING * 2;
 };
 
