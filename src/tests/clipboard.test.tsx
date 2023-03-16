@@ -199,6 +199,7 @@ describe("Paste bound text container", () => {
     containerId: container.id,
     originalText:
       "Excalidraw is a virtual opensource whiteboard for sketching hand-drawn like diagrams",
+    lineHeight: 24,
   };
 
   it("should fix ellipse bounding box", async () => {

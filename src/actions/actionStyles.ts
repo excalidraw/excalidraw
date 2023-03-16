@@ -95,7 +95,6 @@ export const actionPasteStyles = register({
           });
 
           if (isTextElement(newElement)) {
-            console.log(elementStylesToCopyFrom.lineHeight, "HELLLO");
             const fontSize =
               elementStylesToCopyFrom?.fontSize || DEFAULT_FONT_SIZE;
             newElement = newElementWith(newElement, {
