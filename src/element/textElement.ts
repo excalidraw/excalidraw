@@ -52,7 +52,6 @@ export const redrawTextBoundingBox = (
     text: textElement.text,
     width: textElement.width,
     height: textElement.height,
-    lineHeight: getApproxLineHeight(textElement.fontSize),
   };
 
   boundTextUpdates.text = textElement.text;
@@ -68,7 +67,7 @@ export const redrawTextBoundingBox = (
   const metrics = measureText(
     boundTextUpdates.text,
     getFontString(textElement),
-    boundTextUpdates.lineHeight,
+    textElement.lineHeight,
   );
 
   boundTextUpdates.width = metrics.width;
