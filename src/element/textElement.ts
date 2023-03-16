@@ -46,7 +46,6 @@ export const redrawTextBoundingBox = (
   container: ExcalidrawElement | null,
 ) => {
   let maxWidth = undefined;
-
   const boundTextUpdates = {
     x: textElement.x,
     y: textElement.y,
@@ -68,6 +67,7 @@ export const redrawTextBoundingBox = (
   const metrics = measureText(
     boundTextUpdates.text,
     getFontString(textElement),
+    textElement.lineHeight,
   );
 
   boundTextUpdates.width = metrics.width;
@@ -261,32 +261,29 @@ const computeBoundTextPosition = (
 
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
 
-export const measureText = (text: string, font: FontString) => {
+export const measureText = (
+  text: string,
+  font: FontString,
+  lineHeight?: number,
+) => {
   text = text
     .split("\n")
     // replace empty lines with single space because leading/trailing empty
     // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
-
-  const height = getTextHeight(text, font);
+  const fontSize = parseInt(font);
+  const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
 
   return { width, height };
 };
 
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
-const cacheApproxLineHeight: { [key: FontString]: number } = {};
 
-export const getApproxLineHeight = (font: FontString) => {
-  if (cacheApproxLineHeight[font]) {
-    return cacheApproxLineHeight[font];
-  }
-  const fontSize = parseInt(font);
-
+export const getApproxLineHeight = (fontSize: number) => {
   // Calculate line height relative to font size
-  cacheApproxLineHeight[font] = fontSize * 1.2;
-  return cacheApproxLineHeight[font];
+  return fontSize * 1.2;
 };
 
 let canvas: HTMLCanvasElement | undefined;
@@ -317,10 +314,16 @@ export const getTextWidth = (text: string, font: FontString) => {
   return width;
 };
 
-export const getTextHeight = (text: string, font: FontString) => {
-  const lines = text.replace(/\r\n?/g, "\n").split("\n");
-  const lineHeight = getApproxLineHeight(font);
-  return lineHeight * lines.length;
+export const getTextHeight = (
+  text: string,
+  fontSize: number,
+  lineHeight?: number,
+) => {
+  const lineCount = text.replace(/\r\n?/g, "\n").split("\n").length;
+  if (lineHeight) {
+    return lineHeight * lineCount;
+  }
+  return getApproxLineHeight(fontSize) * lineCount;
 };
 
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
@@ -472,8 +475,8 @@ export const getApproxMinLineWidth = (font: FontString) => {
   return maxCharWidth + BOUND_TEXT_PADDING * 2;
 };
 
-export const getApproxMinLineHeight = (font: FontString) => {
-  return getApproxLineHeight(font) + BOUND_TEXT_PADDING * 2;
+export const getApproxMinLineHeight = (fontSize: number) => {
+  return getApproxLineHeight(fontSize) + BOUND_TEXT_PADDING * 2;
 };
 
 export const getMinCharWidth = (font: FontString) => {

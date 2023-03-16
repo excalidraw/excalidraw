@@ -168,6 +168,8 @@ const restoreElement = (
         fontSize = parseInt(fontPx, 10);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
+      const lineCount = element.text.split("\n").length;
+
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
@@ -176,6 +178,7 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || element.text,
+        lineHeight: element.lineHeight || element.height / lineCount,
       });
 
       if (refreshDimensions) {

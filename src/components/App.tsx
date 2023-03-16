@@ -1730,6 +1730,7 @@ class App extends React.Component<AppProps, AppState> {
     const textElements = lines.reduce(
       (acc: ExcalidrawTextElement[], line, idx) => {
         const text = line.trim();
+        const lineHeight = getApproxLineHeight(textElementProps.fontSize);
 
         if (text.length) {
           const element = newTextElement({
@@ -1737,6 +1738,7 @@ class App extends React.Component<AppProps, AppState> {
             x,
             y: currentY,
             text,
+            lineHeight,
           });
           acc.push(element);
           currentY += element.height + LINE_GAP;
@@ -1745,14 +1747,7 @@ class App extends React.Component<AppProps, AppState> {
           // add paragraph only if previous line was not empty, IOW don't add
           // more than one empty line
           if (prevLine) {
-            const defaultLineHeight = getApproxLineHeight(
-              getFontString({
-                fontSize: textElementProps.fontSize,
-                fontFamily: textElementProps.fontFamily,
-              }),
-            );
-
-            currentY += defaultLineHeight + LINE_GAP;
+            currentY += lineHeight + LINE_GAP;
           }
         }
 
@@ -2618,7 +2613,7 @@ class App extends React.Component<AppProps, AppState> {
         fontFamily: this.state.currentItemFontFamily,
       };
       const minWidth = getApproxMinLineWidth(getFontString(fontString));
-      const minHeight = getApproxMinLineHeight(getFontString(fontString));
+      const minHeight = getApproxMinLineHeight(this.state.currentItemFontSize);
       const containerDims = getContainerDims(container);
       const newHeight = Math.max(containerDims.height, minHeight);
       const newWidth = Math.max(containerDims.width, minWidth);
@@ -2663,6 +2658,7 @@ class App extends React.Component<AppProps, AppState> {
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
           locked: false,
+          lineHeight: getApproxLineHeight(this.state.currentItemFontSize),
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {

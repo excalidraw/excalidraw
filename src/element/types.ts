@@ -135,6 +135,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
+    lineHeight: number;
   }>;
 
 export type ExcalidrawBindableElement =

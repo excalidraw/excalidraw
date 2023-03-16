@@ -46,6 +46,7 @@ import {
   getContainerElement,
   handleBindTextResize,
   getMaxContainerWidth,
+  getApproxLineHeight,
 } from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
@@ -304,12 +305,14 @@ const resizeSingleTextElement = (
       deltaX2,
       deltaY2,
     );
+
     mutateElement(element, {
       fontSize: nextFontSize,
       width: nextWidth,
       height: nextHeight,
       x: nextElementX,
       y: nextElementY,
+      lineHeight: getApproxLineHeight(nextFontSize),
     });
   }
 };
@@ -433,7 +436,7 @@ export const resizeSingleElement = (
       };
     } else {
       const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
-      const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
+      const minHeight = getApproxMinLineHeight(boundTextElement.fontSize);
       eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
       eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
     }
@@ -566,8 +569,11 @@ export const resizeSingleElement = (
     });
 
     mutateElement(element, resizedElement);
-    if (boundTextElement && boundTextFont) {
-      mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
+    if (boundTextElement && boundTextFont?.fontSize) {
+      mutateElement(boundTextElement, {
+        fontSize: boundTextFont.fontSize,
+        lineHeight: getApproxLineHeight(boundTextFont.fontSize),
+      });
     }
     handleBindTextResize(element, transformHandleDirection);
   }

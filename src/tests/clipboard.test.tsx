@@ -119,12 +119,7 @@ describe("paste text as single lines", () => {
   it("should space items correctly", async () => {
     const text = "hkhkjhki\njgkjhffjh\njgkjhffjh";
     const lineHeight =
-      getApproxLineHeight(
-        getFontString({
-          fontSize: h.app.state.currentItemFontSize,
-          fontFamily: h.app.state.currentItemFontFamily,
-        }),
-      ) +
+      getApproxLineHeight(h.app.state.currentItemFontSize) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
     setClipboardText(text);
@@ -143,12 +138,7 @@ describe("paste text as single lines", () => {
   it("should leave a space for blank new lines", async () => {
     const text = "hkhkjhki\n\njgkjhffjh";
     const lineHeight =
-      getApproxLineHeight(
-        getFontString({
-          fontSize: h.app.state.currentItemFontSize,
-          fontFamily: h.app.state.currentItemFontFamily,
-        }),
-      ) +
+      getApproxLineHeight(h.app.state.currentItemFontSize) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
     setClipboardText(text);

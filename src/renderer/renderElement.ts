@@ -40,7 +40,6 @@ import {
 } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
-  getApproxLineHeight,
   getBoundTextElement,
   getContainerCoords,
   getContainerElement,
@@ -279,9 +278,7 @@ const drawElementOnCanvas = (
 
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-        const lineHeight = element.containerId
-          ? getApproxLineHeight(getFontString(element))
-          : element.height / lines.length;
+
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
@@ -294,7 +291,7 @@ const drawElementOnCanvas = (
           context.fillText(
             lines[index],
             horizontalOffset,
-            (index + 1) * lineHeight,
+            (index + 1) * element.lineHeight,
           );
         }
         context.restore();

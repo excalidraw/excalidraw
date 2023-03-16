@@ -137,6 +137,7 @@ export const newTextElement = (
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
     containerId?: ExcalidrawTextContainer["id"];
+    lineHeight: number;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const text = normalizeText(opts.text);
@@ -156,6 +157,7 @@ export const newTextElement = (
       height: metrics.height,
       containerId: opts.containerId || null,
       originalText: text,
+      lineHeight: opts.lineHeight,
     },
     {},
   );
@@ -176,6 +178,7 @@ const getAdjustedDimensions = (
   const { width: nextWidth, height: nextHeight } = measureText(
     nextText,
     getFontString(element),
+    element.lineHeight,
   );
   const { textAlign, verticalAlign } = element;
   let x: number;
@@ -185,7 +188,11 @@ const getAdjustedDimensions = (
     verticalAlign === VERTICAL_ALIGN.MIDDLE &&
     !element.containerId
   ) {
-    const prevMetrics = measureText(element.text, getFontString(element));
+    const prevMetrics = measureText(
+      element.text,
+      getFontString(element),
+      element.lineHeight,
+    );
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
       height: nextHeight - prevMetrics.height,
