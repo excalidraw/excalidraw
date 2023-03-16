@@ -117,6 +117,7 @@ export const newFrameElement = (
     {
       ..._newElementBase<ExcalidrawFrameElement>("frame", opts),
       type: "frame",
+      name: null,
     },
     {},
   );

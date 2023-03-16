@@ -100,6 +100,7 @@ export type InitializedExcalidrawImageElement = MarkNonNullable<
 
 export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
   type: "frame";
+  name: string | null;
 };
 
 /**

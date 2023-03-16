@@ -579,18 +579,50 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           );
 
+          const { x: xRight } = sceneCoordsToViewportCoords(
+            { sceneX: f.x + f.width, sceneY: f.y + f.height },
+            this.state,
+          );
+
           const FRAME_NAME_GAP = 20;
+          const FRAME_NAME_EDIT_PADDING = 3;
+
+          const reset = () => {
+            f.name?.trim() === "" &&
+              mutateElement(f, {
+                name: null,
+              });
+
+            this.setState({
+              editingFrame: null,
+            });
+          };
+
+          const frameNameInEdit =
+            f.name === null ? `Frame ${index + 1}` : f.name;
 
           return (
             <div
               id={f.id}
               key={f.id}
               style={{
-                top: `${y - FRAME_NAME_GAP - this.state.offsetTop}px`,
-                left: `${x - this.state.offsetLeft}px`,
                 position: "absolute",
+                top: `${y - FRAME_NAME_GAP - this.state.offsetTop}px`,
+                left: `${
+                  x -
+                  this.state.offsetLeft -
+                  (this.state.editingFrame === f.id
+                    ? FRAME_NAME_EDIT_PADDING
+                    : 0)
+                }px`,
                 zIndex: 2,
                 fontSize: "14px",
+                color: "#3D3D3D",
+                width: "max-content",
+                maxWidth: `${xRight - x + FRAME_NAME_EDIT_PADDING * 2}px`,
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
               }}
               onPointerDown={(event) => {
                 this.handleCanvasPointerDown(event as any);
@@ -598,8 +630,54 @@ class App extends React.Component<AppProps, AppState> {
               onContextMenu={(event: React.PointerEvent<HTMLDivElement>) => {
                 this.handleCanvasContextMenu(event);
               }}
+              onDoubleClick={() => {
+                this.setState({
+                  editingFrame: f.id,
+                });
+              }}
             >
-              {`Frame ${index + 1}`}
+              {f.id === this.state.editingFrame ? (
+                <input
+                  autoFocus
+                  value={frameNameInEdit}
+                  onChange={(e) => {
+                    mutateElement(f, {
+                      name: e.target.value,
+                    });
+                  }}
+                  onBlur={(event) => reset()}
+                  onKeyUp={(event) => {
+                    if (event.key === KEYS.ENTER) {
+                      reset();
+                    }
+                  }}
+                  style={{
+                    zIndex: 2,
+                    border: "none",
+                    display: "block",
+                    padding: `0 ${FRAME_NAME_EDIT_PADDING}px`,
+                    borderRadius: "2px",
+                    boxShadow: "inset 0 0 0 2px var(--color-primary)",
+                    fontFamily: "Assistant",
+                    fontSize: "14px",
+                    color: "#3D3D3D",
+                    overflow: "hidden",
+                    maxWidth: `${Math.min(
+                      xRight - x - FRAME_NAME_EDIT_PADDING,
+                      document.body.clientWidth - x - FRAME_NAME_EDIT_PADDING,
+                    )}px`,
+                  }}
+                  size={frameNameInEdit.length + 1 || 1}
+                  dir="auto"
+                  autoComplete="off"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                />
+              ) : f.name === null || f.name.trim() === "" ? (
+                `Frame ${index + 1}`
+              ) : (
+                f.name.trim()
+              )}
             </div>
           );
         })

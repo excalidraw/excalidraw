@@ -111,6 +111,7 @@ export type AppState = {
   suggestedBindings: SuggestedBinding[];
   frameToHighlight: NonDeleted<ExcalidrawFrameElement> | null;
   shouldRenderFrame: boolean;
+  editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   // element being edited, but not necessarily added to elements array yet
   // (e.g. text element when typing into the input)

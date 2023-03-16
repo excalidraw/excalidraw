@@ -27,6 +27,7 @@ Object {
   "cursorButton": "up",
   "draggingElement": null,
   "editingElement": null,
+  "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
   "elementsToHighlight": null,
