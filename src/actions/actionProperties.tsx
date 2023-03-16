@@ -174,6 +174,7 @@ const changeFontSize = (
             lineHeight: computeNextLineHeightForText(oldElement, {
               ...oldElement,
               fontSize: newFontSize,
+              height: oldElement.height * (newFontSize / oldElement.fontSize),
             }),
           });
           redrawTextBoundingBox(newElement, getContainerElement(oldElement));
