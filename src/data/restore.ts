@@ -168,12 +168,13 @@ const restoreElement = (
         fontSize = parseInt(fontPx, 10);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
-      const lineCount = element.text.split("\n").length;
+      const text = element.text ?? "";
+      const lineCount = text.split("\n").length;
 
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
-        text: element.text ?? "",
+        text,
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
