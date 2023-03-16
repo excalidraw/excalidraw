@@ -5,6 +5,7 @@ import {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
   FontString,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
 import { mutateElement } from "./mutateElement";
@@ -185,7 +186,11 @@ export const handleBindTextResize = (
           maxWidth,
         );
       }
-      const dimensions = measureText(text, getFontString(textElement));
+      const dimensions = measureText(
+        text,
+        getFontString(textElement),
+        textElement.lineHeight,
+      );
       nextHeight = dimensions.height;
       nextWidth = dimensions.width;
     }
@@ -281,9 +286,61 @@ export const measureText = (
 
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
 
+export const computeNextLineHeightForText = (
+  originalElement: NonDeleted<ExcalidrawTextElement>,
+  updatedElement: NonDeleted<ExcalidrawTextElement>,
+) => {
+  if (originalElement) {
+    const originalLineHeight = originalElement.lineHeight;
+    // Calculate line height relative to font size
+    if (originalLineHeight === originalElement.fontSize * 1.2) {
+      console.log("NEWWWWW");
+      return updatedElement.fontSize * 1.2;
+    }
+  }
+  console.log(
+    "legacy",
+    originalElement.lineHeight,
+    originalElement.height,
+    updatedElement.height,
+    getLegacyLineHeightForText(updatedElement),
+  );
+  return getLegacyLineHeightForText(updatedElement);
+};
+
+// use old algorithm to calculate line height for
+// backward compatibility
+export const getLegacyLineHeightForText = (
+  textElement: ExcalidrawTextElement,
+) => {
+  const lineCount = textElement.text.replace(/\r\n?/g, "\n").split("\n").length;
+  return textElement.height / lineCount;
+};
+
 export const getApproxLineHeight = (fontSize: number) => {
   // Calculate line height relative to font size
   return fontSize * 1.2;
+};
+
+export const getApproxMinLineHeight = (fontSize: number) => {
+  return getApproxLineHeight(fontSize) + BOUND_TEXT_PADDING * 2;
+};
+
+export const computeMinHeightForBoundText = (
+  originalElement: NonDeleted<ExcalidrawTextElement>,
+  updatedElement: NonDeleted<ExcalidrawTextElement>,
+) => {
+  if (originalElement) {
+    const originalLineHeight = originalElement.lineHeight;
+    console.log(originalLineHeight, originalElement.fontSize * 1.2);
+    // Calculate line height relative to font size
+    if (originalLineHeight === originalElement.fontSize * 1.2) {
+      console.log("new min height");
+      return updatedElement.fontSize * 1.2 + BOUND_TEXT_PADDING * 2;
+    }
+  }
+  console.log("Legacy min height");
+  return getLegacyLineHeightForText(updatedElement) + BOUND_TEXT_PADDING * 2;
 };
 
 let canvas: HTMLCanvasElement | undefined;
@@ -324,15 +381,6 @@ export const getTextHeight = (
     return lineHeight * lineCount;
   }
   return getApproxLineHeight(fontSize) * lineCount;
-};
-
-// use old algorithm to calculate line height for
-// backward compatibility
-export const getLegacyLineHeightForText = (
-  textElement: ExcalidrawTextElement,
-) => {
-  const lineCount = textElement.text.replace(/\r\n?/g, "\n").split("\n").length;
-  return textElement.height / lineCount;
 };
 
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
@@ -482,10 +530,6 @@ export const getApproxMinLineWidth = (font: FontString) => {
     );
   }
   return maxCharWidth + BOUND_TEXT_PADDING * 2;
-};
-
-export const getApproxMinLineHeight = (fontSize: number) => {
-  return getApproxLineHeight(fontSize) + BOUND_TEXT_PADDING * 2;
 };
 
 export const getMinCharWidth = (font: FontString) => {
