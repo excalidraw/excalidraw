@@ -679,6 +679,7 @@ const resizeMultipleElements = (
       y: number;
       points?: Point[];
       fontSize?: number;
+      lineHeight?: number;
     } = {
       width,
       height,
@@ -687,7 +688,8 @@ const resizeMultipleElements = (
       ...rescaledPoints,
     };
 
-    let boundTextUpdates: { fontSize: number } | null = null;
+    let boundTextUpdates: { fontSize: number; lineHeight: number } | null =
+      null;
 
     const boundTextElement = getBoundTextElement(element.latest);
 
@@ -708,13 +710,16 @@ const resizeMultipleElements = (
         return;
       }
 
+      const lineHeight = getApproxLineHeight(fontSize);
       if (isTextElement(element.orig)) {
         update.fontSize = fontSize;
+        update.lineHeight = lineHeight;
       }
 
       if (boundTextElement) {
         boundTextUpdates = {
           fontSize,
+          lineHeight,
         };
       }
     }
