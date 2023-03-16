@@ -21,7 +21,6 @@ import { getSelectedElements } from "../../scene/selection";
 import { isLinearElementType } from "../../element/typeChecks";
 import { Mutable } from "../../utility-types";
 import { getApproxLineHeight } from "../../element/textElement";
-import { getFontString } from "../../utils";
 
 const readFile = util.promisify(fs.readFile);
 

@@ -48,12 +48,10 @@ import {
 import {
   getNonDeletedElements,
   isTextElement,
-  newElement,
   redrawTextBoundingBox,
 } from "../element";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
-  getApproxLineHeight,
   getBoundTextElement,
   getContainerElement,
 } from "../element/textElement";
@@ -83,7 +81,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import { arrayToMap, getFontString } from "../utils";
+import { arrayToMap } from "../utils";
 import { register } from "./register";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;

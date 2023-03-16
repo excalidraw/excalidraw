@@ -4,7 +4,6 @@ import { Pointer, Keyboard } from "./helpers/ui";
 import ExcalidrawApp from "../excalidraw-app";
 import { KEYS } from "../keys";
 import { getApproxLineHeight } from "../element/textElement";
-import { getFontString } from "../utils";
 import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";
 

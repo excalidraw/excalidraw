@@ -9,7 +9,6 @@ import { newElement, newLinearElement, newTextElement } from "./element";
 import { getApproxLineHeight } from "./element/textElement";
 import { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
-import { getFontString } from "./utils";
 
 export type ChartElements = readonly NonDeletedExcalidrawElement[];
 
