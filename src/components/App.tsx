@@ -1653,7 +1653,7 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.replaceAllElements(nextElements);
 
     newElements.forEach((newElement) => {
-      if (isTextElement(newElement) && isBoundToContainer(newElement)) {
+      if (isTextElement(newElement)) {
         const container = getContainerElement(newElement);
         redrawTextBoundingBox(newElement, container);
       }
