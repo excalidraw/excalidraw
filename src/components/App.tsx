@@ -627,6 +627,7 @@ class App extends React.Component<AppProps, AppState> {
               onPointerDown={(event) => {
                 this.handleCanvasPointerDown(event as any);
               }}
+              onWheel={(event) => this.handleWheel(event)}
               onContextMenu={(event: React.PointerEvent<HTMLDivElement>) => {
                 this.handleCanvasContextMenu(event);
               }}
@@ -6919,60 +6920,62 @@ class App extends React.Component<AppProps, AppState> {
     ];
   };
 
-  private handleWheel = withBatchedUpdates((event: WheelEvent) => {
-    event.preventDefault();
-    if (isPanning) {
-      return;
-    }
-
-    const { deltaX, deltaY } = event;
-    // note that event.ctrlKey is necessary to handle pinch zooming
-    if (event.metaKey || event.ctrlKey) {
-      const sign = Math.sign(deltaY);
-      const MAX_STEP = ZOOM_STEP * 100;
-      const absDelta = Math.abs(deltaY);
-      let delta = deltaY;
-      if (absDelta > MAX_STEP) {
-        delta = MAX_STEP * sign;
+  private handleWheel = withBatchedUpdates(
+    (event: WheelEvent | React.WheelEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      if (isPanning) {
+        return;
       }
 
-      let newZoom = this.state.zoom.value - delta / 100;
-      // increase zoom steps the more zoomed-in we are (applies to >100% only)
-      newZoom +=
-        Math.log10(Math.max(1, this.state.zoom.value)) *
-        -sign *
-        // reduced amplification for small deltas (small movements on a trackpad)
-        Math.min(1, absDelta / 20);
+      const { deltaX, deltaY } = event;
+      // note that event.ctrlKey is necessary to handle pinch zooming
+      if (event.metaKey || event.ctrlKey) {
+        const sign = Math.sign(deltaY);
+        const MAX_STEP = ZOOM_STEP * 100;
+        const absDelta = Math.abs(deltaY);
+        let delta = deltaY;
+        if (absDelta > MAX_STEP) {
+          delta = MAX_STEP * sign;
+        }
 
-      this.setState((state) => ({
-        ...getStateForZoom(
-          {
-            viewportX: cursorX,
-            viewportY: cursorY,
-            nextZoom: getNormalizedZoom(newZoom),
-          },
-          state,
-        ),
-        shouldCacheIgnoreZoom: true,
+        let newZoom = this.state.zoom.value - delta / 100;
+        // increase zoom steps the more zoomed-in we are (applies to >100% only)
+        newZoom +=
+          Math.log10(Math.max(1, this.state.zoom.value)) *
+          -sign *
+          // reduced amplification for small deltas (small movements on a trackpad)
+          Math.min(1, absDelta / 20);
+
+        this.setState((state) => ({
+          ...getStateForZoom(
+            {
+              viewportX: cursorX,
+              viewportY: cursorY,
+              nextZoom: getNormalizedZoom(newZoom),
+            },
+            state,
+          ),
+          shouldCacheIgnoreZoom: true,
+        }));
+        this.resetShouldCacheIgnoreZoomDebounced();
+        return;
+      }
+
+      // scroll horizontally when shift pressed
+      if (event.shiftKey) {
+        this.setState(({ zoom, scrollX }) => ({
+          // on Mac, shift+wheel tends to result in deltaX
+          scrollX: scrollX - (deltaY || deltaX) / zoom.value,
+        }));
+        return;
+      }
+
+      this.setState(({ zoom, scrollX, scrollY }) => ({
+        scrollX: scrollX - deltaX / zoom.value,
+        scrollY: scrollY - deltaY / zoom.value,
       }));
-      this.resetShouldCacheIgnoreZoomDebounced();
-      return;
-    }
-
-    // scroll horizontally when shift pressed
-    if (event.shiftKey) {
-      this.setState(({ zoom, scrollX }) => ({
-        // on Mac, shift+wheel tends to result in deltaX
-        scrollX: scrollX - (deltaY || deltaX) / zoom.value,
-      }));
-      return;
-    }
-
-    this.setState(({ zoom, scrollX, scrollY }) => ({
-      scrollX: scrollX - deltaX / zoom.value,
-      scrollY: scrollY - deltaY / zoom.value,
-    }));
-  });
+    },
+  );
 
   private getTextWysiwygSnappedToCenterPosition(
     x: number,
