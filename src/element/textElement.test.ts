@@ -9,7 +9,7 @@ import {
   wrapText,
   computeNextLineHeightForText,
 } from "./textElement";
-import { ExcalidrawTextElement, FontString, NonDeleted } from "./types";
+import { FontString } from "./types";
 
 describe("Test wrapText", () => {
   const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
