@@ -194,7 +194,7 @@
     "resetLibrary": "Ayagi ad isfeḍ tamkarḍit-inek•m. Tetḥeqqeḍ?",
     "removeItemsFromsLibrary": "Ad tekkseḍ {{count}} n uferdis (en) si temkarḍit?",
     "invalidEncryptionKey": "Tasarut n uwgelhen isefk ad tesɛu 22 n yiekkilen. Amɛiwen srid yensa.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Ulac tuqqna n internet.\nIbedilen-ik ur ttwaklasen ara!"
   },
   "errors": {
     "unsupportedFileType": "Anaw n ufaylu ur yettwasefrak ara.",
@@ -207,18 +207,18 @@
     "collabSaveFailed": "Ulamek asekles deg uzadur n yisefka deg ugilal. Ma ikemmel wugur, isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
     "collabSaveFailed_sizeExceeded": "Ulamek asekles deg uzadur n yisefka deg ugilal, taɣzut n usuneɣ tettban-d temqer aṭas. Isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
     "brave_measure_text_error": {
-      "start": "",
+      "start": "Ittban-d am wakken tsseqdaceḍ iminig Brave akked",
       "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
+      "setting_enabled": "yermed",
+      "break": "Ayagi yezmer ad d-iseglu s truẓi n",
+      "text_elements": "Iferdisen iḍrisen",
+      "in_your_drawings": "deg wunuɣen-inek",
       "strongly_recommend": "",
-      "steps": "",
+      "steps": "isurifen-agi",
       "how": "",
       "disable_setting": "",
       "issue": "",
-      "write": "",
+      "write": "di GitHub inek neɣ aru-yaɣ-d di",
       "discord": ""
     }
   },
@@ -256,7 +256,7 @@
     "resize": "Tzemreḍ ad tḥettemeḍ assaɣ s tuṭṭfa n tqeffalt SHIFT mi ara tettbeddileḍ tiddi,\nma teṭṭfeḍ ALT abeddel n tiddi ad yili si tlemmast",
     "resizeImage": "Tzemreḍ ad talseḍ tiddi s tilelli s tuṭṭfa n SHIFT,\nṭṭef ALT akken ad talseḍ tiddi si tlemmast",
     "rotate": "Tzemreḍ ad tḥettemeḍ tiɣemmar s tuṭṭfa n SHIFT di tuzzya",
-    "lineEditor_info": "",
+    "lineEditor_info": "Ssed ɣef CtrlOrCmd yerna ssit snat n tikkal neɣ ssed ɣef CtrlOrCmd + Kcem akken ad tẓergeḍ tineqqiḍin",
     "lineEditor_pointSelected": "Ssed taqeffalt kkes akken ad tekkseḍ tanqiḍ (tinqiḍin),\nCtrlOrCmd+D akken ad tsiselgeḍ, neɣ zuɣer akken ad tesmuttiḍ",
     "lineEditor_nothingSelected": "Fren tanqiḍt akken ad tẓergeḍ (ṭṭef SHIFT akken ad tferneḍ aṭas),\nneɣ ṭṭef Alt akken ad ternuḍ tinqiḍin timaynutin",
     "placeImage": "Ssit akken ad tserseḍ tugna, neɣ ssit u zuɣer akken ad tesbaduḍ tiddi-ines s ufus",
