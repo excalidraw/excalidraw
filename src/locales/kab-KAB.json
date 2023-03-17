@@ -245,7 +245,7 @@
     "shapes": "Talɣiwin"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Akken ad tesmuttiḍ taɣzut n usuneɣ, ṭṭef ṛṛuda n umumed, neɣ seqdec afecku Afus",
     "linearElement": "Ssit akken ad tebduḍ aṭas n tenqiḍin, zuɣer i yiwen n yizirig",
     "freeDraw": "Ssit yerna zuɣer, serreḥ ticki tfukeḍ",
     "text": "Tixidest: tzemreḍ daɣen ad ternuḍ aḍris s usiti snat n tikkal anida tebɣiḍ s ufecku n tefrayt",
@@ -468,11 +468,11 @@
   "welcomeScreen": {
     "app": {
       "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading_plus": "Tebɣiḍ ad tedduḍ ɣer Excalidraw+ deg umḍiq?",
+      "menuHint": "Asifeḍ, ismenyifen, tutlayin, ..."
     },
     "defaults": {
-      "menuHint": "",
+      "menuHint": "Asifeḍ, ismenyifen, d wayen-nniḍen...",
       "center_heading": "",
       "toolbarHint": "",
       "helpHint": ""
