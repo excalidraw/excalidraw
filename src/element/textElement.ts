@@ -284,18 +284,14 @@ export const measureText = (
   return { width, height };
 };
 
-const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
-
 export const computeNextLineHeightForText = (
   originalElement: NonDeleted<ExcalidrawTextElement>,
   updatedElement: NonDeleted<ExcalidrawTextElement>,
 ) => {
-  if (originalElement) {
-    const originalLineHeight = originalElement.lineHeight;
-    // Calculate line height relative to font size
-    if (originalLineHeight === originalElement.fontSize * 1.2) {
-      return updatedElement.fontSize * 1.2;
-    }
+  const originalLineHeight = originalElement.lineHeight;
+  // Calculate line height relative to font size
+  if (originalLineHeight === originalElement.fontSize * 1.2) {
+    return updatedElement.fontSize * 1.2;
   }
 
   return getLegacyLineHeightForText(updatedElement);
@@ -323,14 +319,12 @@ export const computeMinHeightForBoundText = (
   originalElement: NonDeleted<ExcalidrawTextElement>,
   updatedElement: NonDeleted<ExcalidrawTextElement>,
 ) => {
-  if (originalElement) {
-    const originalLineHeight = originalElement.lineHeight;
-    // Calculate line height relative to font size
-    if (originalLineHeight === originalElement.fontSize * 1.2) {
-      return updatedElement.fontSize * 1.2 + BOUND_TEXT_PADDING * 2;
-    }
-  }
-  return getLegacyLineHeightForText(updatedElement) + BOUND_TEXT_PADDING * 2;
+  const lineHeight = computeNextLineHeightForText(
+    originalElement,
+    updatedElement,
+  );
+
+  return lineHeight + BOUND_TEXT_PADDING * 2;
 };
 
 let canvas: HTMLCanvasElement | undefined;
@@ -510,6 +504,8 @@ export const charWidth = (() => {
     getCache,
   };
 })();
+
+const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
 
 export const getApproxMinLineWidth = (font: FontString) => {
   const maxCharWidth = getMaxCharWidth(font);

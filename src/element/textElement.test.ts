@@ -1,13 +1,15 @@
 import { BOUND_TEXT_PADDING } from "../constants";
 import { API } from "../tests/helpers/api";
+import { mutateElement } from "./mutateElement";
 import {
   computeContainerDimensionForBoundText,
   getContainerCoords,
   getMaxContainerWidth,
   getMaxContainerHeight,
   wrapText,
+  computeNextLineHeightForText,
 } from "./textElement";
-import { FontString } from "./types";
+import { ExcalidrawTextElement, FontString, NonDeleted } from "./types";
 
 describe("Test wrapText", () => {
   const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
@@ -303,5 +305,35 @@ describe("Test measureText", () => {
       const container = API.createElement({ type: "diamond", ...params });
       expect(getMaxContainerHeight(container)).toBe(87);
     });
+  });
+});
+
+describe("Test computeNextLineHeightForText", () => {
+  const originalTextElement = API.createElement({
+    type: "text",
+    fontSize: 20,
+    height: 175,
+    text: "Excalidraw is a\nvirtual \nopensource \nwhiteboard for \nsketching \nhand-drawn like\ndiagrams",
+  });
+
+  it("should return line height relative to font size if prev line height was relative to font size", () => {
+    expect(originalTextElement.lineHeight).toBe(24);
+    const updatedTextElement = { ...originalTextElement, fontSize: 36 };
+    expect(
+      computeNextLineHeightForText(originalTextElement, updatedTextElement),
+    ).toBe(43.199999999999996);
+  });
+
+  it("should return line height using legacy algorithm if prev line height was not relative to font size", () => {
+    mutateElement(originalTextElement, { lineHeight: 25 });
+    expect(originalTextElement.lineHeight).toBe(25);
+    const updatedTextElement = {
+      ...originalTextElement,
+      fontSize: 36,
+      height: 190,
+    };
+    expect(
+      computeNextLineHeightForText(originalTextElement, updatedTextElement),
+    ).toBe(27.142857142857142);
   });
 });
