@@ -36,3 +36,15 @@
   font-display: swap;
   font-weight: 700;
 }
+/* added by Coyote */
+@font-face {
+  font-family: "XiaolaiSC";
+  src: url("XiaolaiSC-Regular.ttf");
+  font-display: swap;
+}
+/* added by Coyote */
+@font-face {
+  font-family: "LXGWWenKai";
+  src: url("LXGWWenKai-Regular.ttf");
+  font-display: swap;
+}

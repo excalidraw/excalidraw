@@ -1,6 +1,7 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
 import { FontFamilyValues } from "./element/types";
+import { addFontFamily } from "./fork_by_coyote/add-font-family";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
@@ -86,6 +87,8 @@ export const FONT_FAMILY = {
   Helvetica: 2,
   Cascadia: 3,
 };
+// immediately add fonts
+addFontFamily(FONT_FAMILY);
 
 export const THEME = {
   LIGHT: "light",
