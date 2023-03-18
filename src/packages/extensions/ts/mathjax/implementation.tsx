@@ -123,7 +123,6 @@ const mathJax = {} as {
   amFixes: any;
 };
 
-let stopLoadingMathJax = false;
 let mathJaxLoaded = false;
 let mathJaxLoading = false;
 let mathJaxLoadedCallback: SubtypeLoadedCb | undefined;
@@ -135,19 +134,7 @@ let errorSvg: string;
 let errorAria: string;
 
 const loadMathJax = async () => {
-  const shouldLoad =
-    !mathJaxLoaded &&
-    !mathJaxLoading &&
-    (mathJax.adaptor === undefined ||
-      mathJax.amHtml === undefined ||
-      mathJax.texHtml === undefined ||
-      mathJax.visitor === undefined ||
-      mathJax.mmlSvg === undefined ||
-      mathJax.amFixes === undefined ||
-      (useSRE && mathJax.mmlSre === undefined));
-  if (!shouldLoad && !mathJaxLoaded) {
-    stopLoadingMathJax = true;
-  }
+  const continueLoading = !mathJaxLoading;
   if (!mathJaxLoaded) {
     mathJaxLoading = true;
 
@@ -208,8 +195,7 @@ const loadMathJax = async () => {
     type E = typeof LiteElement;
     type T = typeof LiteText;
     type D = typeof LiteDocument;
-    if (stopLoadingMathJax) {
-      stopLoadingMathJax = false;
+    if (mathJaxLoading && !continueLoading) {
       return;
     }
 
