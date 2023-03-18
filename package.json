@@ -130,5 +130,6 @@
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
     "release": "node scripts/release.js"
-  }
+  },
+  "packageManager": "yarn@3.5.0"
 }
