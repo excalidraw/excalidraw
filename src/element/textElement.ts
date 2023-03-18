@@ -42,6 +42,10 @@ export const normalizeText = (text: string) => {
   );
 };
 
+export const splitInToLines = (text: string) => {
+  return normalizeText(text).split("\n");
+};
+
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
@@ -284,31 +288,46 @@ export const measureText = (
   return { width, height };
 };
 
+// Using this factor to align with most of the browsers and legacy algorithm
+const LINE_HEIGHT_FACTOR = 1.25;
+
 export const computeNextLineHeightForText = (
   originalElement: NonDeleted<ExcalidrawTextElement>,
   updatedElement: NonDeleted<ExcalidrawTextElement>,
 ) => {
   const originalLineHeight = originalElement.lineHeight;
-  // Calculate line height relative to font size
-  if (originalLineHeight === originalElement.fontSize * 1.2) {
-    return updatedElement.fontSize * 1.2;
-  }
 
+  // Calculate line height relative to font size
+  if (
+    Math.abs(
+      originalLineHeight - originalElement.fontSize * LINE_HEIGHT_FACTOR,
+    ) < Number.EPSILON
+  ) {
+    return updatedElement.fontSize * LINE_HEIGHT_FACTOR;
+  }
   return getLegacyLineHeightForText(updatedElement);
 };
 
-// use old algorithm to calculate line height for
-// backward compatibility
+/**
+ * To maintain backward compatibility with old diagrams where the line height
+ * was browser-dependent, calculating the line height based on the height of the
+ * text element and the number of lines gives us a pretty accurate
+ * original line height.
+ */
 export const getLegacyLineHeightForText = (
   textElement: ExcalidrawTextElement,
 ) => {
-  const lineCount = textElement.text.replace(/\r\n?/g, "\n").split("\n").length;
+  const lineCount = splitInToLines(textElement.text).length;
   return textElement.height / lineCount;
 };
 
+/**
+ * We calculate the line height from the font size and the line height factor,
+ * aligning with the W3C spec.
+ */
 export const getApproxLineHeight = (fontSize: number) => {
   // Calculate line height relative to font size
-  return fontSize * 1.2;
+  return fontSize * LINE_HEIGHT_FACTOR;
 };
 
 export const getApproxMinLineHeight = (fontSize: number) => {
@@ -347,7 +366,7 @@ const getLineWidth = (text: string, font: FontString) => {
 };
 
 export const getTextWidth = (text: string, font: FontString) => {
-  const lines = text.replace(/\r\n?/g, "\n").split("\n");
+  const lines = splitInToLines(text);
   let width = 0;
   lines.forEach((line) => {
     width = Math.max(width, getLineWidth(line, font));
@@ -360,7 +379,7 @@ export const getTextHeight = (
   fontSize: number,
   lineHeight?: number,
 ) => {
-  const lineCount = text.replace(/\r\n?/g, "\n").split("\n").length;
+  const lineCount = splitInToLines(text).length;
   if (lineHeight) {
     return lineHeight * lineCount;
   }

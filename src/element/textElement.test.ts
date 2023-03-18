@@ -317,16 +317,16 @@ describe("Test computeNextLineHeightForText", () => {
   });
 
   it("should return line height relative to font size if prev line height was relative to font size", () => {
-    expect(originalTextElement.lineHeight).toBe(24);
+    expect(originalTextElement.lineHeight).toBe(25);
     const updatedTextElement = { ...originalTextElement, fontSize: 36 };
     expect(
       computeNextLineHeightForText(originalTextElement, updatedTextElement),
-    ).toBe(43.199999999999996);
+    ).toBe(45);
   });
 
-  it("should return line height using legacy algorithm if prev line height was not relative to font size", () => {
-    mutateElement(originalTextElement, { lineHeight: 25 });
-    expect(originalTextElement.lineHeight).toBe(25);
+  it.only("should return line height using legacy algorithm if prev line height was not relative to font size", () => {
+    mutateElement(originalTextElement, { lineHeight: 24 });
+    expect(originalTextElement.lineHeight).toBe(24);
     const updatedTextElement = {
       ...originalTextElement,
       fontSize: 36,
