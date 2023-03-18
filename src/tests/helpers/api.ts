@@ -111,6 +111,9 @@ export class API {
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
     status?: T extends "image" ? ExcalidrawImageElement["status"] : never;
+    startBinding?: T extends "arrow"
+      ? ExcalidrawLinearElement["startBinding"]
+      : never;
     endBinding?: T extends "arrow"
       ? ExcalidrawLinearElement["endBinding"]
       : never;
@@ -220,6 +223,10 @@ export class API {
           scale: rest.scale || [1, 1],
         });
         break;
+    }
+    if (element.type === "arrow") {
+      element.startBinding = rest.startBinding ?? null;
+      element.endBinding = rest.endBinding ?? null;
     }
     if (id) {
       element.id = id;
