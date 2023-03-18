@@ -244,12 +244,10 @@ export const actionCreateContainerFromText = register({
               ...ele.startBinding,
               elementId: container.id,
             };
-
             mutateElement(ele, { startBinding });
           }
           if (ele.endBinding?.elementId === textElement.id) {
             const endBinding = { ...ele.endBinding, elementId: container.id };
-
             mutateElement(ele, { endBinding });
           }
         });
