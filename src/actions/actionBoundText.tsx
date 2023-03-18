@@ -239,16 +239,22 @@ export const actionCreateContainerFromText = register({
           linearElementIds.includes(ele.id),
         ) as ExcalidrawLinearElement[];
         linearElements.forEach((ele) => {
-          if (ele.startBinding?.elementId === textElement.id) {
-            const startBinding = {
-              ...ele.startBinding,
+          let startBinding = ele.startBinding;
+          let endBinding = ele.endBinding;
+
+          if (startBinding?.elementId === textElement.id) {
+            startBinding = {
+              ...startBinding,
               elementId: container.id,
             };
-            mutateElement(ele, { startBinding });
           }
-          if (ele.endBinding?.elementId === textElement.id) {
-            const endBinding = { ...ele.endBinding, elementId: container.id };
-            mutateElement(ele, { endBinding });
+
+          if (endBinding?.elementId === textElement.id) {
+            endBinding = { ...endBinding, elementId: container.id };
+          }
+
+          if (startBinding || endBinding) {
+            mutateElement(ele, { startBinding, endBinding });
           }
         });
       }
