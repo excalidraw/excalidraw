@@ -252,8 +252,6 @@ export const actionCreateContainerFromText = register({
 
             mutateElement(ele, { endBinding });
           }
-
-          console.log(ele);
         });
       }
 
