@@ -324,6 +324,10 @@ export const getTextHeight = (text: string, font: FontString) => {
 };
 
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
+  if(!maxWidth) {
+    return text;
+  }
+
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   const spaceWidth = getLineWidth(" ", font);
