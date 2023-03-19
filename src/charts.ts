@@ -6,7 +6,6 @@ import {
   VERTICAL_ALIGN,
 } from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
-import { getApproxLineHeight } from "./element/textElement";
 import { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
 
@@ -208,7 +207,6 @@ const chartXLabels = (
         fontSize: 16,
         textAlign: "center",
         verticalAlign: "top",
-        lineHeight: getApproxLineHeight(commonProps.fontSize),
       });
     }) || []
   );
@@ -229,7 +227,6 @@ const chartYLabels = (
     y: y - BAR_GAP,
     text: "0",
     textAlign: "right",
-    lineHeight: getApproxLineHeight(commonProps.fontSize),
   });
 
   const maxYLabel = newTextElement({
@@ -240,7 +237,6 @@ const chartYLabels = (
     y: y - BAR_HEIGHT - minYLabel.height / 2,
     text: Math.max(...spreadsheet.values).toLocaleString(),
     textAlign: "right",
-    lineHeight: getApproxLineHeight(commonProps.fontSize),
   });
 
   return [minYLabel, maxYLabel];
@@ -329,7 +325,6 @@ const chartBaseElements = (
         roundness: null,
         strokeStyle: "solid",
         textAlign: "center",
-        lineHeight: getApproxLineHeight(commonProps.fontSize),
       })
     : null;
 

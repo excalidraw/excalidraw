@@ -27,6 +27,7 @@ import {
   PRECEDING_ELEMENT_KEY,
   FONT_FAMILY,
   ROUNDNESS,
+  DEFAULT_LINE_HEIGHT,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -35,7 +36,7 @@ import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import oc from "open-color";
 import { MarkOptional, Mutable } from "../utility-types";
-import { getLegacyLineHeightForText } from "../element/textElement";
+import { detectLineHeight } from "../element/textElement";
 
 type RestoredAppState = Omit<
   AppState,
@@ -179,7 +180,11 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || element.text,
-        lineHeight: element.lineHeight || getLegacyLineHeightForText(element),
+        // if no lineHeight set, detect it from text height, provided `height`
+        // is non-0, otherwise use the default
+        lineHeight:
+          element.lineHeight ||
+          (element.height ? detectLineHeight(element) : DEFAULT_LINE_HEIGHT),
       });
 
       if (refreshDimensions) {

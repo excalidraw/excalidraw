@@ -3,9 +3,10 @@ import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import ExcalidrawApp from "../excalidraw-app";
 import { KEYS } from "../keys";
-import { getApproxLineHeight } from "../element/textElement";
+import { getLineHeightInPx } from "../element/textElement";
 import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";
+import { DEFAULT_LINE_HEIGHT } from "../constants";
 
 const { h } = window;
 
@@ -117,8 +118,8 @@ describe("paste text as single lines", () => {
 
   it("should space items correctly", async () => {
     const text = "hkhkjhki\njgkjhffjh\njgkjhffjh";
-    const lineHeight =
-      getApproxLineHeight(h.app.state.currentItemFontSize) +
+    const lineHeightPx =
+      getLineHeightInPx(h.app.state.currentItemFontSize, DEFAULT_LINE_HEIGHT) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
     setClipboardText(text);
@@ -129,15 +130,15 @@ describe("paste text as single lines", () => {
       for (let i = 1; i < h.elements.length; i++) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [fx, elY] = getElementBounds(h.elements[i]);
-        expect(elY).toEqual(firstElY + lineHeight * i);
+        expect(elY).toEqual(firstElY + lineHeightPx * i);
       }
     });
   });
 
   it("should leave a space for blank new lines", async () => {
     const text = "hkhkjhki\n\njgkjhffjh";
-    const lineHeight =
-      getApproxLineHeight(h.app.state.currentItemFontSize) +
+    const lineHeightPx =
+      getLineHeightInPx(h.app.state.currentItemFontSize, DEFAULT_LINE_HEIGHT) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
     setClipboardText(text);
@@ -147,7 +148,7 @@ describe("paste text as single lines", () => {
       const [fx, firstElY] = getElementBounds(h.elements[0]);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [lx, lastElY] = getElementBounds(h.elements[1]);
-      expect(lastElY).toEqual(firstElY + lineHeight * 2);
+      expect(lastElY).toEqual(firstElY + lineHeightPx * 2);
     });
   });
 });
@@ -199,7 +200,6 @@ describe("Paste bound text container", () => {
     containerId: container.id,
     originalText:
       "Excalidraw is a virtual opensource whiteboard for sketching hand-drawn like diagrams",
-    lineHeight: 24,
   };
 
   it("should fix ellipse bounding box", async () => {
@@ -214,7 +214,7 @@ describe("Paste bound text container", () => {
       await sleep(1);
       expect(h.elements.length).toEqual(2);
       const container = h.elements[0];
-      expect(container.height).toBe(354);
+      expect(container.height).toBe(368);
       expect(container.width).toBe(166);
     });
   });
@@ -237,7 +237,7 @@ describe("Paste bound text container", () => {
       await sleep(1);
       expect(h.elements.length).toEqual(2);
       const container = h.elements[0];
-      expect(container.height).toBe(740);
+      expect(container.height).toBe(770);
       expect(container.width).toBe(166);
     });
   });

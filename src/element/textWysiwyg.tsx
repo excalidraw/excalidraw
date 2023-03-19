@@ -275,7 +275,7 @@ export const textWysiwyg = ({
       Object.assign(editable.style, {
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
-        lineHeight: `${element.lineHeight}px`,
+        lineHeight: element.lineHeight,
         width: `${textElementWidth}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,

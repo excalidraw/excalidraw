@@ -1,13 +1,11 @@
 import { BOUND_TEXT_PADDING } from "../constants";
 import { API } from "../tests/helpers/api";
-import { mutateElement } from "./mutateElement";
 import {
   computeContainerDimensionForBoundText,
   getContainerCoords,
   getMaxContainerWidth,
   getMaxContainerHeight,
   wrapText,
-  computeNextLineHeightForText,
 } from "./textElement";
 import { FontString } from "./types";
 
@@ -42,9 +40,7 @@ describe("Test wrapText", () => {
       {
         desc: "break all words when width of each word is less than container width",
         width: 80,
-        res: `Hello 
-whats 
-up`,
+        res: `Hello \nwhats \nup`,
       },
       {
         desc: "break all characters when width of each character is less than container width",
@@ -66,8 +62,7 @@ p`,
         desc: "break words as per the width",
 
         width: 140,
-        res: `Hello whats 
-up`,
+        res: `Hello whats \nup`,
       },
       {
         desc: "fit the container",
@@ -97,9 +92,7 @@ whats up`;
       {
         desc: "break all words when width of each word is less than container width",
         width: 80,
-        res: `Hello
-whats 
-up`,
+        res: `Hello\nwhats \nup`,
       },
       {
         desc: "break all characters when width of each character is less than container width",
@@ -145,11 +138,7 @@ whats up`,
       {
         desc: "fit characters of long string as per container width",
         width: 170,
-        res: `hellolongtextth
-isiswhatsupwith
-youIamtypingggg
-gandtypinggg 
-break it now`,
+        res: `hellolongtextth\nisiswhatsupwith\nyouIamtypingggg\ngandtypinggg \nbreak it now`,
       },
 
       {
@@ -168,8 +157,7 @@ now`,
         desc: "fit the long text when container width is greater than text length and move the rest to next line",
 
         width: 600,
-        res: `hellolongtextthisiswhatsupwithyouIamtypingggggandtypinggg 
-break it now`,
+        res: `hellolongtextthisiswhatsupwithyouIamtypingggggandtypinggg \nbreak it now`,
       },
     ].forEach((data) => {
       it(`should ${data.desc}`, () => {
@@ -183,8 +171,7 @@ break it now`,
     const text = "Hello Excalidraw";
     // Length of "Excalidraw" is 100 and exacty equal to max width
     const res = wrapText(text, font, 100);
-    expect(res).toEqual(`Hello 
-Excalidraw`);
+    expect(res).toEqual(`Hello \nExcalidraw`);
   });
 });
 
@@ -305,35 +292,5 @@ describe("Test measureText", () => {
       const container = API.createElement({ type: "diamond", ...params });
       expect(getMaxContainerHeight(container)).toBe(87);
     });
-  });
-});
-
-describe("Test computeNextLineHeightForText", () => {
-  const originalTextElement = API.createElement({
-    type: "text",
-    fontSize: 20,
-    height: 175,
-    text: "Excalidraw is a\nvirtual \nopensource \nwhiteboard for \nsketching \nhand-drawn like\ndiagrams",
-  });
-
-  it("should return line height relative to font size if prev line height was relative to font size", () => {
-    expect(originalTextElement.lineHeight).toBe(25);
-    const updatedTextElement = { ...originalTextElement, fontSize: 36 };
-    expect(
-      computeNextLineHeightForText(originalTextElement, updatedTextElement),
-    ).toBe(45);
-  });
-
-  it.only("should return line height using legacy algorithm if prev line height was not relative to font size", () => {
-    mutateElement(originalTextElement, { lineHeight: 24 });
-    expect(originalTextElement.lineHeight).toBe(24);
-    const updatedTextElement = {
-      ...originalTextElement,
-      fontSize: 36,
-      height: 190,
-    };
-    expect(
-      computeNextLineHeightForText(originalTextElement, updatedTextElement),
-    ).toBe(27.142857142857142);
   });
 });

@@ -45,8 +45,7 @@ import {
   getContainerElement,
   handleBindTextResize,
   getMaxContainerWidth,
-  computeNextLineHeightForText,
-  computeMinHeightForBoundText,
+  getApproxMinLineHeight,
 } from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
@@ -312,13 +311,7 @@ const resizeSingleTextElement = (
       x: nextElementX,
       y: nextElementY,
     };
-    mutateElement(element, {
-      ...updates,
-      lineHeight: computeNextLineHeightForText(element, {
-        ...element,
-        ...updates,
-      }),
-    });
+    mutateElement(element, updates);
   }
 };
 
@@ -440,11 +433,14 @@ export const resizeSingleElement = (
         fontSize: nextFontSize,
       };
     } else {
-      const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
-      const minHeight = computeMinHeightForBoundText(boundTextElement, {
-        ...boundTextElement,
-        fontSize: boundTextElement.fontSize,
-      });
+      const minWidth = getApproxMinLineWidth(
+        getFontString(boundTextElement),
+        boundTextElement.lineHeight,
+      );
+      const minHeight = getApproxMinLineHeight(
+        boundTextElement.fontSize,
+        boundTextElement.lineHeight,
+      );
       eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
       eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
     }
@@ -578,14 +574,8 @@ export const resizeSingleElement = (
 
     mutateElement(element, resizedElement);
     if (boundTextElement && boundTextFont?.fontSize) {
-      const ratio = boundTextFont.fontSize / boundTextElement.fontSize;
       mutateElement(boundTextElement, {
         fontSize: boundTextFont.fontSize,
-        lineHeight: computeNextLineHeightForText(boundTextElement, {
-          ...boundTextElement,
-          fontSize: boundTextFont.fontSize,
-          height: boundTextElement.height * ratio,
-        }),
       });
     }
     handleBindTextResize(element, transformHandleDirection);
@@ -701,8 +691,7 @@ const resizeMultipleElements = (
       ...rescaledPoints,
     };
 
-    let boundTextUpdates: { fontSize: number; lineHeight: number } | null =
-      null;
+    let boundTextUpdates: { fontSize: number } | null = null;
 
     const boundTextElement = getBoundTextElement(element.latest);
 
@@ -725,26 +714,11 @@ const resizeMultipleElements = (
 
       if (isTextElement(element.orig)) {
         update.fontSize = fontSize;
-        const lineHeight = computeNextLineHeightForText(element.orig, {
-          ...element.orig,
-          ...update,
-        });
-
-        update.lineHeight = lineHeight;
       }
 
       if (boundTextElement) {
-        const ratio = fontSize / boundTextElement.fontSize;
-
-        const lineHeight = computeNextLineHeightForText(boundTextElement, {
-          ...boundTextElement,
-          fontSize,
-          height: boundTextElement.height * ratio,
-        });
-
         boundTextUpdates = {
           fontSize,
-          lineHeight,
         };
       }
     }

@@ -52,7 +52,6 @@ import {
 } from "../element";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
-  computeNextLineHeightForText,
   getBoundTextElement,
   getContainerElement,
 } from "../element/textElement";
@@ -171,11 +170,6 @@ const changeFontSize = (
 
           let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
             fontSize: newFontSize,
-            lineHeight: computeNextLineHeightForText(oldElement, {
-              ...oldElement,
-              fontSize: newFontSize,
-              height: oldElement.height * (newFontSize / oldElement.fontSize),
-            }),
           });
           redrawTextBoundingBox(newElement, getContainerElement(oldElement));
 

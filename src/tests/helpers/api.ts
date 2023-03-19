@@ -20,7 +20,6 @@ import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { isLinearElementType } from "../../element/typeChecks";
 import { Mutable } from "../../utility-types";
-import { getApproxLineHeight } from "../../element/textElement";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -189,7 +188,6 @@ export class API {
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
           containerId: rest.containerId ?? undefined,
-          lineHeight: getApproxLineHeight(fontSize),
         });
         element.width = width;
         element.height = height;

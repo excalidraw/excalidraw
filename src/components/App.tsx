@@ -50,6 +50,7 @@ import { parseClipboard } from "../clipboard";
 import {
   APP_NAME,
   CURSOR_TYPE,
+  DEFAULT_LINE_HEIGHT,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
@@ -260,13 +261,13 @@ import throttle from "lodash.throttle";
 import { fileOpen, FileSystemHandle } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
-  getApproxLineHeight,
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
   getContainerCenter,
   getContainerDims,
   getContainerElement,
+  getLineHeightInPx,
   getTextBindableContainerAtPosition,
   isMeasureTextSupported,
   isValidTextContainer,
@@ -1730,7 +1731,8 @@ class App extends React.Component<AppProps, AppState> {
     const textElements = lines.reduce(
       (acc: ExcalidrawTextElement[], line, idx) => {
         const text = line.trim();
-        const lineHeight = getApproxLineHeight(textElementProps.fontSize);
+
+        const lineHeight = DEFAULT_LINE_HEIGHT;
 
         if (text.length) {
           const element = newTextElement({
@@ -1747,7 +1749,9 @@ class App extends React.Component<AppProps, AppState> {
           // add paragraph only if previous line was not empty, IOW don't add
           // more than one empty line
           if (prevLine) {
-            currentY += lineHeight + LINE_GAP;
+            currentY +=
+              getLineHeightInPx(textElementProps.fontSize, lineHeight) +
+              LINE_GAP;
           }
         }
 
@@ -2602,6 +2606,8 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
 
+    const lineHeight = existingTextElement?.lineHeight || DEFAULT_LINE_HEIGHT;
+
     if (
       !existingTextElement &&
       shouldBindToContainer &&
@@ -2612,8 +2618,14 @@ class App extends React.Component<AppProps, AppState> {
         fontSize: this.state.currentItemFontSize,
         fontFamily: this.state.currentItemFontFamily,
       };
-      const minWidth = getApproxMinLineWidth(getFontString(fontString));
-      const minHeight = getApproxMinLineHeight(this.state.currentItemFontSize);
+      const minWidth = getApproxMinLineWidth(
+        getFontString(fontString),
+        lineHeight,
+      );
+      const minHeight = getApproxMinLineHeight(
+        this.state.currentItemFontSize,
+        lineHeight,
+      );
       const containerDims = getContainerDims(container);
       const newHeight = Math.max(containerDims.height, minHeight);
       const newWidth = Math.max(containerDims.width, minWidth);
@@ -2658,7 +2670,7 @@ class App extends React.Component<AppProps, AppState> {
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
           locked: false,
-          lineHeight: getApproxLineHeight(this.state.currentItemFontSize),
+          lineHeight,
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {

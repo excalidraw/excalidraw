@@ -5,7 +5,6 @@ import {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
   FontString,
-  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
 import { mutateElement } from "./mutateElement";
@@ -13,6 +12,7 @@ import {
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_LINE_HEIGHT,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -273,7 +273,7 @@ const computeBoundTextPosition = (
 export const measureText = (
   text: string,
   font: FontString,
-  lineHeight?: number,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
   text = text
     .split("\n")
@@ -288,62 +288,36 @@ export const measureText = (
   return { width, height };
 };
 
-// Using this factor to align with most of the browsers and legacy algorithm
-const LINE_HEIGHT_FACTOR = 1.25;
-
-export const computeNextLineHeightForText = (
-  originalElement: NonDeleted<ExcalidrawTextElement>,
-  updatedElement: NonDeleted<ExcalidrawTextElement>,
-) => {
-  const originalLineHeight = originalElement.lineHeight;
-
-  // Calculate line height relative to font size
-  if (
-    Math.abs(
-      originalLineHeight - originalElement.fontSize * LINE_HEIGHT_FACTOR,
-    ) < Number.EPSILON
-  ) {
-    return updatedElement.fontSize * LINE_HEIGHT_FACTOR;
-  }
-  return getLegacyLineHeightForText(updatedElement);
-};
-
 /**
  * To maintain backward compatibility with old diagrams where the line height
  * was browser-dependent, calculating the line height based on the height of the
  * text element and the number of lines gives us a pretty accurate
  * original line height.
  */
-export const getLegacyLineHeightForText = (
-  textElement: ExcalidrawTextElement,
-) => {
+export const detectLineHeight = (textElement: ExcalidrawTextElement) => {
   const lineCount = splitInToLines(textElement.text).length;
-  return textElement.height / lineCount;
+  return (textElement.height /
+    lineCount /
+    textElement.fontSize) as ExcalidrawTextElement["lineHeight"];
 };
 
 /**
- * We calculate the line height from the font size and the line height factor,
+ * We calculate the line height from the font size and the unitless line height,
  * aligning with the W3C spec.
  */
-export const getApproxLineHeight = (fontSize: number) => {
-  // Calculate line height relative to font size
-  return fontSize * LINE_HEIGHT_FACTOR;
-};
-
-export const getApproxMinLineHeight = (fontSize: number) => {
-  return getApproxLineHeight(fontSize) + BOUND_TEXT_PADDING * 2;
-};
-
-export const computeMinHeightForBoundText = (
-  originalElement: NonDeleted<ExcalidrawTextElement>,
-  updatedElement: NonDeleted<ExcalidrawTextElement>,
+export const getLineHeightInPx = (
+  fontSize: ExcalidrawTextElement["fontSize"],
+  lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
-  const lineHeight = computeNextLineHeightForText(
-    originalElement,
-    updatedElement,
-  );
+  return fontSize * lineHeight;
+};
 
-  return lineHeight + BOUND_TEXT_PADDING * 2;
+// FIXME rename to getApproxMinContainerHeight
+export const getApproxMinLineHeight = (
+  fontSize: ExcalidrawTextElement["fontSize"],
+  lineHeight: ExcalidrawTextElement["lineHeight"],
+) => {
+  return getLineHeightInPx(fontSize, lineHeight) + BOUND_TEXT_PADDING * 2;
 };
 
 let canvas: HTMLCanvasElement | undefined;
@@ -377,13 +351,10 @@ export const getTextWidth = (text: string, font: FontString) => {
 export const getTextHeight = (
   text: string,
   fontSize: number,
-  lineHeight?: number,
+  lineHeight = DEFAULT_LINE_HEIGHT,
 ) => {
   const lineCount = splitInToLines(text).length;
-  if (lineHeight) {
-    return lineHeight * lineCount;
-  }
-  return getApproxLineHeight(fontSize) * lineCount;
+  return getLineHeightInPx(fontSize, lineHeight) * lineCount;
 };
 
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
@@ -526,11 +497,15 @@ export const charWidth = (() => {
 
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
 
-export const getApproxMinLineWidth = (font: FontString) => {
+// FIXME rename to getApproxMinContainerWidth
+export const getApproxMinLineWidth = (
+  font: FontString,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
+) => {
   const maxCharWidth = getMaxCharWidth(font);
   if (maxCharWidth === 0) {
     return (
-      measureText(DUMMY_TEXT.split("").join("\n"), font).width +
+      measureText(DUMMY_TEXT.split("").join("\n"), font, lineHeight).width +
       BOUND_TEXT_PADDING * 2
     );
   }

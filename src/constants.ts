@@ -1,6 +1,6 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
-import { FontFamilyValues } from "./element/types";
+import { FontFamilyValues, ExcalidrawTextElement } from "./element/types";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
@@ -254,3 +254,14 @@ export const ROUNDNESS = {
 /** key containt id of precedeing elemnt id we use in reconciliation during
  * collaboration */
 export const PRECEDING_ELEMENT_KEY = "__precedingElement__";
+
+/**
+ * Unitless line height
+ *
+ * 1.25 aligns with `normal` value in WebKit and Blink. Gecko (FF) uses 1.3.
+ * In previous version of Excalidraw we used these browser-specific value
+ * instead of a single default value. As such, importing text from new versions
+ * to old versions may not look the same for browsers that didn't use 1.25 line
+ * height. *
+ */
+export const DEFAULT_LINE_HEIGHT = 1.25 as ExcalidrawTextElement["lineHeight"];
