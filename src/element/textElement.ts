@@ -12,7 +12,6 @@ import {
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
-  DEFAULT_LINE_HEIGHT,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -351,7 +350,7 @@ export const getTextWidth = (text: string, font: FontString) => {
 export const getTextHeight = (
   text: string,
   fontSize: number,
-  lineHeight = DEFAULT_LINE_HEIGHT,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
   const lineCount = splitInToLines(text).length;
   return getLineHeightInPx(fontSize, lineHeight) * lineCount;
