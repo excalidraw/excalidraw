@@ -641,21 +641,29 @@ export const fixBindingsAfterDuplication = (
   });
 
   // Update the bindable shapes
-  sceneElements
-    .filter(({ id }) => allBindableElementIds.has(id))
-    .forEach((bindableElement) => {
-      const { boundElements } = bindableElement;
+  oldElements
+    .filter(({ id }) =>
+      allBindableElementIds.has(oldIdToDuplicatedId.get(id) as string),
+    )
+    .forEach((oldElement) => {
+      const { boundElements } = oldElement;
       if (boundElements != null && boundElements.length > 0) {
-        mutateElement(bindableElement, {
-          boundElements: boundElements.map((boundElement) =>
-            oldIdToDuplicatedId.has(boundElement.id)
-              ? {
-                  id: oldIdToDuplicatedId.get(boundElement.id)!,
-                  type: boundElement.type,
-                }
-              : boundElement,
-          ),
-        });
+        mutateElement(
+          sceneElements.find(
+            ({ id }) =>
+              id === (oldIdToDuplicatedId.get(oldElement.id) as string),
+          ) as ExcalidrawElement,
+          {
+            boundElements: boundElements.map((boundElement) =>
+              oldIdToDuplicatedId.has(boundElement.id)
+                ? {
+                    id: oldIdToDuplicatedId.get(boundElement.id)!,
+                    type: boundElement.type,
+                  }
+                : boundElement,
+            ),
+          },
+        );
       }
     });
 };
