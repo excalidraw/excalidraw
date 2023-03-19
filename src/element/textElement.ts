@@ -8,7 +8,13 @@ import {
   NonDeletedExcalidrawElement,
 } from "./types";
 import { mutateElement } from "./mutateElement";
-import { BOUND_TEXT_PADDING, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
+import {
+  BOUND_TEXT_PADDING,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  TEXT_ALIGN,
+  VERTICAL_ALIGN,
+} from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
 import { isTextElement } from ".";
@@ -323,25 +329,38 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   const spaceWidth = getLineWidth(" ", font);
+
+  let currentLine = "";
+  let currentLineWidthTillNow = 0;
+
   const push = (str: string) => {
     if (str.trim()) {
       lines.push(str);
     }
   };
+
+  const resetParams = () => {
+    currentLine = "";
+    currentLineWidthTillNow = 0;
+  };
+
   originalLines.forEach((originalLine) => {
-    const words = originalLine.split(" ");
-    // This means its newline so push it
-    if (words.length === 1 && words[0] === "") {
-      lines.push(words[0]);
+    const currentLineWidth = getTextWidth(originalLine, font);
+
+    //Push the line if its <= maxWidth
+    if (currentLineWidth <= maxWidth) {
+      lines.push(originalLine);
       return; // continue
     }
-    let currentLine = "";
-    let currentLineWidthTillNow = 0;
+    const words = originalLine.split(" ");
+
+    resetParams();
 
     let index = 0;
 
     while (index < words.length) {
       const currentWordWidth = getLineWidth(words[index], font);
+
       // This will only happen when single word takes entire width
       if (currentWordWidth === maxWidth) {
         push(words[index]);
@@ -353,8 +372,8 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
         // push current line since the current word exceeds the max width
         // so will be appended in next line
         push(currentLine);
-        currentLine = "";
-        currentLineWidthTillNow = 0;
+
+        resetParams();
 
         while (words[index].length > 0) {
           const currentChar = String.fromCodePoint(
@@ -365,10 +384,6 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           words[index] = words[index].slice(currentChar.length);
 
           if (currentLineWidthTillNow >= maxWidth) {
-            // only remove last trailing space which we have added when joining words
-            if (currentLine.slice(-1) === " ") {
-              currentLine = currentLine.slice(0, -1);
-            }
             push(currentLine);
             currentLine = currentChar;
             currentLineWidthTillNow = width;
@@ -376,11 +391,11 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
             currentLine += currentChar;
           }
         }
+
         // push current line if appending space exceeds max width
         if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
           push(currentLine);
-          currentLine = "";
-          currentLineWidthTillNow = 0;
+          resetParams();
         } else {
           // space needs to be appended before next word
           // as currentLine contains chars which couldn't be appended
@@ -388,7 +403,6 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           currentLine += " ";
           currentLineWidthTillNow += spaceWidth;
         }
-
         index++;
       } else {
         // Start appending words in a line till max width reached
@@ -398,8 +412,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
 
           if (currentLineWidthTillNow > maxWidth) {
             push(currentLine);
-            currentLineWidthTillNow = 0;
-            currentLine = "";
+            resetParams();
 
             break;
           }
@@ -410,22 +423,15 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
             const word = currentLine.slice(0, -1);
             push(word);
-            currentLine = "";
-            currentLineWidthTillNow = 0;
+            resetParams();
             break;
           }
         }
-        if (currentLineWidthTillNow === maxWidth) {
-          currentLine = "";
-          currentLineWidthTillNow = 0;
-        }
       }
     }
-    if (currentLine) {
+    if (currentLine.slice(-1) === " ") {
       // only remove last trailing space which we have added when joining words
-      if (currentLine.slice(-1) === " ") {
-        currentLine = currentLine.slice(0, -1);
-      }
+      currentLine = currentLine.slice(0, -1);
       push(currentLine);
     }
   });
@@ -666,14 +672,24 @@ export const shouldAllowVerticalAlign = (
       }
       return true;
     }
-    const boundTextElement = getBoundTextElement(element);
-    if (boundTextElement) {
-      if (isArrowElement(element)) {
+    return false;
+  });
+};
+
+export const suppportsHorizontalAlign = (
+  selectedElements: NonDeletedExcalidrawElement[],
+) => {
+  return selectedElements.some((element) => {
+    const hasBoundContainer = isBoundToContainer(element);
+    if (hasBoundContainer) {
+      const container = getContainerElement(element);
+      if (isTextElement(element) && isArrowElement(container)) {
         return false;
       }
       return true;
     }
-    return false;
+
+    return isTextElement(element);
   });
 };
 
@@ -803,4 +819,15 @@ export const getMaxContainerHeight = (container: ExcalidrawElement) => {
     return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
   }
   return height - BOUND_TEXT_PADDING * 2;
+};
+
+export const isMeasureTextSupported = () => {
+  const width = getTextWidth(
+    DUMMY_TEXT,
+    getFontString({
+      fontSize: DEFAULT_FONT_SIZE,
+      fontFamily: DEFAULT_FONT_FAMILY,
+    }),
+  );
+  return width > 0;
 };

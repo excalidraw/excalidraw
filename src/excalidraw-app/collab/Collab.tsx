@@ -838,10 +838,9 @@ class Collab extends PureComponent<Props, CollabState> {
           />
         )}
         {errorMessage && (
-          <ErrorDialog
-            message={errorMessage}
-            onClose={() => this.setState({ errorMessage: "" })}
-          />
+          <ErrorDialog onClose={() => this.setState({ errorMessage: "" })}>
+            {errorMessage}
+          </ErrorDialog>
         )}
       </>
     );
