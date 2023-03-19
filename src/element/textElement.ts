@@ -324,7 +324,7 @@ export const getTextHeight = (text: string, font: FontString) => {
 };
 
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
-  if(!maxWidth) {
+  if (!maxWidth) {
     return text;
   }
 
