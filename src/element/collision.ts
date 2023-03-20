@@ -794,7 +794,7 @@ export const findFocusPointForEllipse = (
   }
 
   const x = -(a ** 2 * m) / (n ** 2 * b ** 2 + m ** 2 * a ** 2);
-  return GA.point(x, (-m * x - 1) / (n === 0 ? 0.0001 : n));
+  return GA.point(x, (-m * x - 1) / n);
 };
 
 export const findFocusPointForRectangulars = (
