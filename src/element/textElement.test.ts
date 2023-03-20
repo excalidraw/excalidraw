@@ -185,7 +185,7 @@ break it now`,
 Excalidraw`);
   });
 
-  it("should return the text as is if max width in invalid", () => {
+  it("should return the text as is if max width is invalid", () => {
     const text = "Hello Excalidraw";
     expect(wrapText(text, font, NaN)).toEqual(text);
     expect(wrapText(text, font, -1)).toEqual(text);
