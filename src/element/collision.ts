@@ -790,7 +790,7 @@ export const findFocusPointForEllipse = (
 
   if (n === 0) {
     // if zero {-0, 0}, fall back to a same-sign value in the similar range
-    n = (Object.is(Math.sign(n), -0) ? -1 : 1) * 0.01;
+    n = (Object.is(n, -0) ? -1 : 1) * 0.01;
   }
 
   const x = -(a ** 2 * m) / (n ** 2 * b ** 2 + m ** 2 * a ** 2);
