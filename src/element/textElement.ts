@@ -324,7 +324,10 @@ export const getTextHeight = (text: string, font: FontString) => {
 };
 
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
-  if (!maxWidth) {
+  // if maxWidth is not finite or NaN which can happen in case of bugs in
+  // computation, we need to make sure we don't continue as we'll end up
+  // in an infinite loop
+  if (!Number.isFinite(maxWidth)) {
     return text;
   }
 
