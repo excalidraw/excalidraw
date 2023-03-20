@@ -209,17 +209,17 @@
     "brave_measure_text_error": {
       "start": "",
       "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "setting_enabled": "ajuste activado",
+      "break": "Esto podría resultar en romper los",
+      "text_elements": "Elementos de texto",
+      "in_your_drawings": "en tus dibujos",
+      "strongly_recommend": "Recomendamos desactivar esta configuración. Puedes seguir",
+      "steps": "estos pasos",
+      "how": "sobre cómo hacerlo",
+      "disable_setting": " Si deshabilitar esta opción no arregla la visualización de elementos de texto, por favor abre un",
+      "issue": "issue",
+      "write": "en GitHub, o escríbenos en",
+      "discord": "Discord"
     }
   },
   "toolBar": {
