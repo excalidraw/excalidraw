@@ -1,6 +1,6 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
-import { FontFamilyValues, ExcalidrawTextElement } from "./element/types";
+import { FontFamilyValues } from "./element/types";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
