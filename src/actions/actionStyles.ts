@@ -97,15 +97,16 @@ export const actionPasteStyles = register({
           if (isTextElement(newElement)) {
             const fontSize =
               elementStylesToCopyFrom?.fontSize || DEFAULT_FONT_SIZE;
+            const fontFamily =
+              elementStylesToCopyFrom?.fontFamily || DEFAULT_FONT_FAMILY;
             newElement = newElementWith(newElement, {
               fontSize,
-              fontFamily:
-                elementStylesToCopyFrom?.fontFamily || DEFAULT_FONT_FAMILY,
+              fontFamily,
               textAlign:
                 elementStylesToCopyFrom?.textAlign || DEFAULT_TEXT_ALIGN,
               lineHeight:
                 elementStylesToCopyFrom.lineHeight ||
-                getDefaultLineHeight(elementStylesToCopyFrom.fontFamily),
+                getDefaultLineHeight(fontFamily),
             });
             let container = null;
             if (newElement.containerId) {
