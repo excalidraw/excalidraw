@@ -1186,6 +1186,41 @@ describe("textWysiwyg", () => {
       );
     });
 
+    it("should update line height when font family updated", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
+
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      editor.blur();
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
+      ).toEqual(1.25);
+
+      mouse.select(rectangle);
+      Keyboard.keyPress(KEYS.ENTER);
+
+      fireEvent.click(screen.getByTitle(/code/i));
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
+      ).toEqual(FONT_FAMILY.Cascadia);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
+      ).toEqual(1.2);
+
+      fireEvent.click(screen.getByTitle(/normal/i));
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
+      ).toEqual(FONT_FAMILY.Helvetica);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
+      ).toEqual(1.15);
+    });
+
     describe("should align correctly", () => {
       let editor: HTMLTextAreaElement;
 
