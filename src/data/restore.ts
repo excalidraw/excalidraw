@@ -167,7 +167,7 @@ const restoreElement = (
         const [fontPx, _fontFamily]: [string, string] = (
           element as any
         ).font.split(" ");
-        fontSize = parseInt(fontPx, 10);
+        fontSize = parseFloat(fontPx);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
       const text = element.text ?? "";
