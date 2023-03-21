@@ -43,9 +43,9 @@ import {
   getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
-  getContainerElement,
   handleBindTextResize,
   getMaxContainerWidth,
+  getContainerElement,
 } from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
@@ -414,29 +414,11 @@ export const resizeSingleElement = (
         fontSize: stateOfBoundTextElementAtResize.fontSize,
       };
     }
-    if (shouldMaintainAspectRatio) {
-      const updatedElement = {
-        ...element,
-        width: eleNewWidth,
-        height: eleNewHeight,
-      };
 
-      const nextFontSize = measureFontSizeFromWidth(
-        boundTextElement,
-        getMaxContainerWidth(updatedElement),
-      );
-      if (nextFontSize === null) {
-        return;
-      }
-      boundTextFont = {
-        fontSize: nextFontSize,
-      };
-    } else {
-      const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
-      const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
-      eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
-      eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
-    }
+    const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
+    const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
+    eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
+    eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
   }
 
   const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] =
@@ -569,7 +551,11 @@ export const resizeSingleElement = (
     if (boundTextElement && boundTextFont) {
       mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
     }
-    handleBindTextResize(element, transformHandleDirection);
+    handleBindTextResize(
+      element,
+      transformHandleDirection,
+      shouldMaintainAspectRatio,
+    );
   }
 };
 

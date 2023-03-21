@@ -42,7 +42,7 @@ import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
   getApproxLineHeight,
   getBoundTextElement,
-  getContainerCoords,
+  computeBoundTextElementCoords,
   getContainerElement,
   getMaxContainerHeight,
   getMaxContainerWidth,
@@ -820,7 +820,7 @@ const drawElementFromCanvas = (
       process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX &&
       hasBoundTextElement(element)
     ) {
-      const coords = getContainerCoords(element);
+      const coords = computeBoundTextElementCoords(element);
       context.strokeStyle = "#c92a2a";
       context.lineWidth = 3;
       context.strokeRect(

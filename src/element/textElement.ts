@@ -153,6 +153,7 @@ export const bindTextToShapeAfterDuplication = (
 export const handleBindTextResize = (
   container: NonDeletedExcalidrawElement,
   transformHandleType: MaybeTransformHandleType,
+  shouldMaintainAspectRatio = false,
 ) => {
   const boundTextElementId = getBoundTextElementId(container);
   if (!boundTextElementId) {
@@ -190,7 +191,7 @@ export const handleBindTextResize = (
       nextWidth = dimensions.width;
     }
     // increase height in case text element height exceeds
-    if (nextHeight > maxHeight) {
+    if (!shouldMaintainAspectRatio && nextHeight > maxHeight) {
       containerHeight = computeContainerDimensionForBoundText(
         nextHeight,
         container.type,
@@ -208,6 +209,53 @@ export const handleBindTextResize = (
       mutateElement(container, {
         height: containerHeight,
         y: updatedY,
+      });
+    }
+
+    if (
+      shouldMaintainAspectRatio &&
+      (nextHeight > maxHeight || nextWidth > maxWidth)
+    ) {
+      let height = containerDims.height;
+      let width = containerDims.width;
+      let x = container.x;
+      let y = container.y;
+
+      if (nextHeight > maxHeight) {
+        height = computeContainerDimensionForBoundText(
+          nextHeight,
+          container.type,
+        );
+      }
+      if (nextWidth > maxWidth) {
+        width = computeContainerDimensionForBoundText(
+          nextWidth,
+          container.type,
+        );
+      }
+      const diffX = width - containerDims.width;
+      const diffY = height - containerDims.height;
+
+      if (transformHandleType === "n") {
+        y = container.y - diffY;
+      } else if (
+        transformHandleType === "e" ||
+        transformHandleType === "w" ||
+        transformHandleType === "ne" ||
+        transformHandleType === "nw"
+      ) {
+        y = container.y - diffY / 2;
+      }
+
+      if (transformHandleType === "s" || transformHandleType === "n") {
+        x = container.x - diffX / 2;
+      }
+
+      mutateElement(container, {
+        height,
+        width,
+        x,
+        y,
       });
     }
 
@@ -233,7 +281,7 @@ const computeBoundTextPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
-  const containerCoords = getContainerCoords(container);
+  const containerCoords = computeBoundTextElementCoords(container);
   const maxContainerHeight = getMaxContainerHeight(container);
   const maxContainerWidth = getMaxContainerWidth(container);
 
@@ -609,7 +657,9 @@ export const getContainerCenter = (
   return { x: midSegmentMidpoint[0], y: midSegmentMidpoint[1] };
 };
 
-export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
+export const computeBoundTextElementCoords = (
+  container: NonDeletedExcalidrawElement,
+) => {
   let offsetX = BOUND_TEXT_PADDING;
   let offsetY = BOUND_TEXT_PADDING;
 
@@ -626,6 +676,27 @@ export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
   return {
     x: container.x + offsetX,
     y: container.y + offsetY,
+  };
+};
+
+export const computeContainerCoords = (
+  boundTextElement: ExcalidrawTextElement,
+  containerType: string,
+) => {
+  let offsetX = BOUND_TEXT_PADDING;
+  let offsetY = BOUND_TEXT_PADDING;
+
+  if (containerType === "ellipse") {
+    offsetX += (boundTextElement.width / 2) * (1 - Math.sqrt(2) / 2);
+    offsetY += (boundTextElement.height / 2) * (1 - Math.sqrt(2) / 2);
+  }
+  if (containerType === "diamond") {
+    offsetX += boundTextElement.width / 4;
+    offsetY += boundTextElement.height / 4;
+  }
+  return {
+    x: boundTextElement.x - offsetX,
+    y: boundTextElement.y - offsetY,
   };
 };
 

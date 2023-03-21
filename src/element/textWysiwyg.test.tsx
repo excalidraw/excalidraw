@@ -989,26 +989,136 @@ describe("textWysiwyg", () => {
       ]);
     });
 
-    it("should scale font size correctly when resizing using shift", async () => {
-      Keyboard.keyPress(KEYS.ENTER);
+    describe.only("when using shift resize", () => {
+      it("should wrap text correctly when resizing using shift from 'ne' handle", async () => {
+        Keyboard.keyPress(KEYS.ENTER);
 
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
-      await new Promise((r) => setTimeout(r, 0));
-      fireEvent.change(editor, { target: { value: "Hello" } });
-      editor.blur();
-      const textElement = h.elements[1] as ExcalidrawTextElement;
-      expect(rectangle.width).toBe(90);
-      expect(rectangle.height).toBe(75);
-      expect(textElement.fontSize).toBe(20);
+        const editor = document.querySelector(
+          ".excalidraw-textEditorContainer > textarea",
+        ) as HTMLTextAreaElement;
+        await new Promise((r) => setTimeout(r, 0));
+        fireEvent.change(editor, {
+          target: { value: "Excalidraw is an opensource virtual whiteboard" },
+        });
+        editor.blur();
+        const textElement = h.elements[1] as ExcalidrawTextElement;
+        expect(rectangle.width).toBe(90);
+        expect(rectangle.height).toBe(202);
+        expect(textElement.fontSize).toBe(20);
+        expect(textElement.text).toBe(
+          `Excalid
+raw is 
+an 
+opensou
+rce 
+virtual
+whitebo
+ard`,
+        );
 
-      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 50], {
-        shift: true,
+        resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 50], {
+          shift: true,
+        });
+        expect(rectangle.width).toBe(200);
+        expect(rectangle.height).toBe(449);
+        expect(textElement.fontSize).toBe(20);
+        expect(textElement.text).toBe(
+          `Excalidraw is an 
+opensource virtual
+whiteboard`,
+        );
       });
-      expect(rectangle.width).toBe(200);
-      expect(rectangle.height).toBe(166.66666666666669);
-      expect(textElement.fontSize).toBe(47.5);
+
+      it("should wrap text correctly when resizing using shift vertically using 'n' handle", async () => {
+        Keyboard.keyPress(KEYS.ENTER);
+
+        const editor = document.querySelector(
+          ".excalidraw-textEditorContainer > textarea",
+        ) as HTMLTextAreaElement;
+        await new Promise((r) => setTimeout(r, 0));
+        fireEvent.change(editor, {
+          target: { value: "Excalidraw is an opensource virtual whiteboard" },
+        });
+        editor.blur();
+        const textElement = h.elements[1] as ExcalidrawTextElement;
+        expect(rectangle.width).toBe(90);
+        expect(rectangle.height).toBe(202);
+        expect(textElement.fontSize).toBe(20);
+        expect(textElement.text).toBe(
+          `Excalid
+raw is 
+an 
+opensou
+rce 
+virtual
+whitebo
+ard`,
+        );
+
+        resize(rectangle, "n", [rectangle.x + 30, rectangle.y - 50], {
+          shift: true,
+        });
+        expect(rectangle.width).toBe(104);
+        expect(rectangle.height).toBe(232);
+        expect(textElement.fontSize).toBe(20);
+        expect(textElement.text).toBe(
+          `Excalid
+raw is 
+an 
+opensou
+rce 
+virtual
+whitebo
+ard`,
+        );
+      });
+
+      it("should wrap text correctly when resizing using shift horizontally and text overflows", async () => {
+        Keyboard.keyPress(KEYS.ENTER);
+
+        const editor = document.querySelector(
+          ".excalidraw-textEditorContainer > textarea",
+        ) as HTMLTextAreaElement;
+        await new Promise((r) => setTimeout(r, 0));
+        fireEvent.change(editor, {
+          target: { value: "Excalidraw is an opensource virtual whiteboard" },
+        });
+        editor.blur();
+        const textElement = h.elements[1] as ExcalidrawTextElement;
+        expect(rectangle.width).toBe(90);
+        expect(rectangle.height).toBe(202);
+        expect(rectangle.y).toBe(20);
+        expect(textElement.fontSize).toBe(20);
+        expect(textElement.text).toBe(
+          `Excalid
+raw is 
+an 
+opensou
+rce 
+virtual
+whitebo
+ard`,
+        );
+
+        resize(rectangle, "e", [rectangle.x - 30, rectangle.y + 30], {
+          shift: true,
+        });
+        expect(rectangle.width).toBe(70);
+        expect(rectangle.height).toBe(226);
+        expect(rectangle.y).toBe(8);
+        expect(textElement.fontSize).toBe(20);
+        expect(textElement.text).toBe(
+          `Excal
+idraw
+is an
+opens
+ource
+virtu
+al 
+white
+board`,
+        );
+      });
     });
 
     it("should bind text correctly when container duplicated with alt-drag", async () => {
