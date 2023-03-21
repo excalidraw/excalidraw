@@ -320,7 +320,7 @@ describe("Test getLineHeightInPx", () => {
   });
 });
 
-describe("Test getLineHeightInPx", () => {
+describe("Test getDefaultLineHeight", () => {
   it("should return line height using default font family when not passed", () => {
     //@ts-ignore
     expect(getDefaultLineHeight()).toBe(1.25);

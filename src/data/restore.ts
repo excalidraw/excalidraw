@@ -179,13 +179,19 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || text,
-        // if no lineHeight set, detect it from text height, provided `height`
-        // is non-0, otherwise use the default
+        // line-height might not specified either when creating elements
+        // programmatically, or when importing old diagrams.
+        // For the latter we want to detect the original line height which
+        // will likely differ from our per-font fixed line height we now use,
+        // to maintain backward compatibility.
         lineHeight:
           element.lineHeight ||
           (element.height
-            ? detectLineHeight(element)
-            : getDefaultLineHeight(element.fontFamily)),
+            ? // detect line-height from current element height and font-size
+              detectLineHeight(element)
+            : // no element height likely means programmatic use, so default
+              // to a fixed line height
+              getDefaultLineHeight(element.fontFamily)),
       });
 
       if (refreshDimensions) {

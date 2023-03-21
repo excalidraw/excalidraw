@@ -304,14 +304,13 @@ const resizeSingleTextElement = (
       deltaX2,
       deltaY2,
     );
-    const updates = {
+    mutateElement(element, {
       fontSize: nextFontSize,
       width: nextWidth,
       height: nextHeight,
       x: nextElementX,
       y: nextElementY,
-    };
-    mutateElement(element, updates);
+    });
   }
 };
 
@@ -361,7 +360,7 @@ export const resizeSingleElement = (
   let scaleX = atStartBoundsWidth / boundsCurrentWidth;
   let scaleY = atStartBoundsHeight / boundsCurrentHeight;
 
-  let boundTextFont: { fontSize?: number } = {};
+  let boundTextFontSize: number | null = null;
   const boundTextElement = getBoundTextElement(element);
 
   if (transformHandleDirection.includes("e")) {
@@ -411,9 +410,7 @@ export const resizeSingleElement = (
       boundTextElement.id,
     ) as typeof boundTextElement | undefined;
     if (stateOfBoundTextElementAtResize) {
-      boundTextFont = {
-        fontSize: stateOfBoundTextElementAtResize.fontSize,
-      };
+      boundTextFontSize = stateOfBoundTextElementAtResize.fontSize;
     }
     if (shouldMaintainAspectRatio) {
       const updatedElement = {
@@ -429,9 +426,7 @@ export const resizeSingleElement = (
       if (nextFontSize === null) {
         return;
       }
-      boundTextFont = {
-        fontSize: nextFontSize,
-      };
+      boundTextFontSize = nextFontSize;
     } else {
       const minWidth = getApproxMinLineWidth(
         getFontString(boundTextElement),
@@ -573,9 +568,9 @@ export const resizeSingleElement = (
     });
 
     mutateElement(element, resizedElement);
-    if (boundTextElement && boundTextFont?.fontSize) {
+    if (boundTextElement && boundTextFontSize != null) {
       mutateElement(boundTextElement, {
-        fontSize: boundTextFont.fontSize,
+        fontSize: boundTextFontSize,
       });
     }
     handleBindTextResize(element, transformHandleDirection);
@@ -682,7 +677,6 @@ const resizeMultipleElements = (
       y: number;
       points?: Point[];
       fontSize?: number;
-      lineHeight?: number;
     } = {
       width,
       height,

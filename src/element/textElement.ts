@@ -43,7 +43,7 @@ export const normalizeText = (text: string) => {
   );
 };
 
-export const splitInToLines = (text: string) => {
+export const splitIntoLines = (text: string) => {
   return normalizeText(text).split("\n");
 };
 
@@ -290,13 +290,11 @@ export const measureText = (
 };
 
 /**
- * To maintain backward compatibility with old diagrams where the line height
- * was browser-dependent, calculating the line height based on the height of the
- * text element and the number of lines gives us a pretty accurate
- * original line height.
+ * To get unitless line-height (if unknown) we can calculate it by dividing
+ * height-per-line by fontSize.
  */
 export const detectLineHeight = (textElement: ExcalidrawTextElement) => {
-  const lineCount = splitInToLines(textElement.text).length;
+  const lineCount = splitIntoLines(textElement.text).length;
   return (textElement.height /
     lineCount /
     textElement.fontSize) as ExcalidrawTextElement["lineHeight"];
@@ -341,7 +339,7 @@ const getLineWidth = (text: string, font: FontString) => {
 };
 
 export const getTextWidth = (text: string, font: FontString) => {
-  const lines = splitInToLines(text);
+  const lines = splitIntoLines(text);
   let width = 0;
   lines.forEach((line) => {
     width = Math.max(width, getLineWidth(line, font));
@@ -354,7 +352,7 @@ export const getTextHeight = (
   fontSize: number,
   lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
-  const lineCount = splitInToLines(text).length;
+  const lineCount = splitIntoLines(text).length;
   return getLineHeightInPx(fontSize, lineHeight) * lineCount;
 };
 
@@ -863,21 +861,27 @@ export const isMeasureTextSupported = () => {
  * Unitless line height
  *
  * In previous versions we used `normal` line height, which browsers interpret
- * differently, for different fonts.
+ * differently, and based on font-family and font-size.
  *
- * 1.25 aligns with `normal` for Virgil in WebKit and Blink. Gecko (FF) uses 1.3.
- * 1.15 aligns with `normal` for `Helvetica` and 1.2 aligns with `normal` for `Cascadia`
+ * To make line heights consistent across browsers we hardcode the values for
+ * each of our fonts based on most common average line-heights.
+ * See https://github.com/excalidraw/excalidraw/pull/6360#issuecomment-1477635971
+ * where the values come from.
  */
-
 const DEFAULT_LINE_HEIGHT = {
+  // ~1.25 is the average for Virgil in WebKit and Blink.
+  // Gecko (FF) uses ~1.28.
   [FONT_FAMILY.Virgil]: 1.25 as ExcalidrawTextElement["lineHeight"],
+  // ~1.15 is the average for Virgil in WebKit and Blink.
+  // Gecko if all over the place.
   [FONT_FAMILY.Helvetica]: 1.15 as ExcalidrawTextElement["lineHeight"],
+  // ~1.2 is the average for Virgil in WebKit and Blink, and kinda Gecko too
   [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
 };
 
 export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
-  if (!fontFamily) {
-    return DEFAULT_LINE_HEIGHT[DEFAULT_FONT_FAMILY];
+  if (fontFamily) {
+    return DEFAULT_LINE_HEIGHT[fontFamily];
   }
-  return DEFAULT_LINE_HEIGHT[fontFamily];
+  return DEFAULT_LINE_HEIGHT[DEFAULT_FONT_FAMILY];
 };
