@@ -2605,11 +2605,12 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
 
+    const fontFamily =
+      existingTextElement?.fontFamily || this.state.currentItemFontFamily;
+
     const lineHeight =
-      existingTextElement?.lineHeight ||
-      getDefaultLineHeight(
-        existingTextElement?.fontFamily || this.state.currentItemFontFamily,
-      );
+      existingTextElement?.lineHeight || getDefaultLineHeight(fontFamily);
+    const fontSize = this.state.currentItemFontSize;
 
     if (
       !existingTextElement &&
@@ -2618,17 +2619,14 @@ class App extends React.Component<AppProps, AppState> {
       !isArrowElement(container)
     ) {
       const fontString = {
-        fontSize: this.state.currentItemFontSize,
-        fontFamily: this.state.currentItemFontFamily,
+        fontSize,
+        fontFamily,
       };
       const minWidth = getApproxMinLineWidth(
         getFontString(fontString),
         lineHeight,
       );
-      const minHeight = getApproxMinLineHeight(
-        this.state.currentItemFontSize,
-        lineHeight,
-      );
+      const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
       const containerDims = getContainerDims(container);
       const newHeight = Math.max(containerDims.height, minHeight);
       const newWidth = Math.max(containerDims.width, minWidth);
@@ -2662,8 +2660,8 @@ class App extends React.Component<AppProps, AppState> {
           opacity: this.state.currentItemOpacity,
           roundness: null,
           text: "",
-          fontSize: this.state.currentItemFontSize,
-          fontFamily: this.state.currentItemFontFamily,
+          fontSize,
+          fontFamily,
           textAlign: parentCenterPosition
             ? "center"
             : this.state.currentItemTextAlign,
