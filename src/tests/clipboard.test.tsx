@@ -3,10 +3,9 @@ import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import ExcalidrawApp from "../excalidraw-app";
 import { KEYS } from "../keys";
-import { getLineHeightInPx } from "../element/textElement";
+import { getLineHeight, getLineHeightInPx } from "../element/textElement";
 import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";
-import { DEFAULT_LINE_HEIGHT } from "../constants";
 
 const { h } = window;
 
@@ -119,7 +118,10 @@ describe("paste text as single lines", () => {
   it("should space items correctly", async () => {
     const text = "hkhkjhki\njgkjhffjh\njgkjhffjh";
     const lineHeightPx =
-      getLineHeightInPx(h.app.state.currentItemFontSize, DEFAULT_LINE_HEIGHT) +
+      getLineHeightInPx(
+        h.app.state.currentItemFontSize,
+        getLineHeight(h.state.currentItemFontFamily),
+      ) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
     setClipboardText(text);
@@ -138,7 +140,10 @@ describe("paste text as single lines", () => {
   it("should leave a space for blank new lines", async () => {
     const text = "hkhkjhki\n\njgkjhffjh";
     const lineHeightPx =
-      getLineHeightInPx(h.app.state.currentItemFontSize, DEFAULT_LINE_HEIGHT) +
+      getLineHeightInPx(
+        h.app.state.currentItemFontSize,
+        getLineHeight(h.state.currentItemFontFamily),
+      ) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
     setClipboardText(text);

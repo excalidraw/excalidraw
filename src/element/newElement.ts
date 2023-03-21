@@ -29,8 +29,9 @@ import {
   normalizeText,
   wrapText,
   getMaxContainerWidth,
+  getLineHeight,
 } from "./textElement";
-import { DEFAULT_LINE_HEIGHT, VERTICAL_ALIGN } from "../constants";
+import { VERTICAL_ALIGN } from "../constants";
 import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
 
@@ -140,7 +141,7 @@ export const newTextElement = (
     lineHeight?: ExcalidrawTextElement["lineHeight"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const lineHeight = opts.lineHeight || DEFAULT_LINE_HEIGHT;
+  const lineHeight = opts.lineHeight || getLineHeight(opts.fontFamily);
   const text = normalizeText(opts.text);
   const metrics = measureText(text, getFontString(opts), lineHeight);
   const offsets = getTextElementPositionOffsets(opts, metrics);

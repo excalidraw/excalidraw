@@ -50,7 +50,6 @@ import { parseClipboard } from "../clipboard";
 import {
   APP_NAME,
   CURSOR_TYPE,
-  DEFAULT_LINE_HEIGHT,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
@@ -267,6 +266,7 @@ import {
   getContainerCenter,
   getContainerDims,
   getContainerElement,
+  getLineHeight,
   getLineHeightInPx,
   getTextBindableContainerAtPosition,
   isMeasureTextSupported,
@@ -1732,8 +1732,7 @@ class App extends React.Component<AppProps, AppState> {
       (acc: ExcalidrawTextElement[], line, idx) => {
         const text = line.trim();
 
-        const lineHeight = DEFAULT_LINE_HEIGHT;
-
+        const lineHeight = getLineHeight(textElementProps.fontFamily);
         if (text.length) {
           const element = newTextElement({
             ...textElementProps,
@@ -2606,7 +2605,11 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
 
-    const lineHeight = existingTextElement?.lineHeight || DEFAULT_LINE_HEIGHT;
+    const lineHeight =
+      existingTextElement?.lineHeight ||
+      getLineHeight(
+        existingTextElement?.fontFamily || this.state.currentItemFontFamily,
+      );
 
     if (
       !existingTextElement &&

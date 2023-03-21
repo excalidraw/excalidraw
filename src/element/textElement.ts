@@ -4,6 +4,7 @@ import {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
+  FontFamilyValues,
   FontString,
   NonDeletedExcalidrawElement,
 } from "./types";
@@ -12,6 +13,7 @@ import {
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  FONT_FAMILY,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -855,4 +857,27 @@ export const isMeasureTextSupported = () => {
     }),
   );
   return width > 0;
+};
+
+/**
+ * Unitless line height
+ *
+ * In previous versions we used `normal` line height, which browsers interpret
+ * differently, for different fonts.
+ *
+ * 1.25 aligns with `normal` for Virgil in WebKit and Blink. Gecko (FF) uses 1.3.
+ * 1.15 aligns with `normal` for `Helvetica` and 1.2 aligns with `normal` for `Cascadia`
+ */
+
+const DEFAULT_LINE_HEIGHT = {
+  [FONT_FAMILY.Virgil]: 1.25 as ExcalidrawTextElement["lineHeight"],
+  [FONT_FAMILY.Helvetica]: 1.15 as ExcalidrawTextElement["lineHeight"],
+  [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
+};
+
+export const getLineHeight = (fontFamily?: FontFamilyValues) => {
+  if (!fontFamily) {
+    return DEFAULT_LINE_HEIGHT[DEFAULT_FONT_FAMILY];
+  }
+  return DEFAULT_LINE_HEIGHT[fontFamily];
 };

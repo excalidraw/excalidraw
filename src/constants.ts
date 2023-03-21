@@ -254,16 +254,3 @@ export const ROUNDNESS = {
 /** key containt id of precedeing elemnt id we use in reconciliation during
  * collaboration */
 export const PRECEDING_ELEMENT_KEY = "__precedingElement__";
-
-/**
- * Unitless line height
- *
- * In previous versions we used `normal` line height, which browsers interpret
- * differently, for different fonts.
- *
- * 1.25 aligns with `normal` for Virgil in WebKit and Blink. Gecko (FF) uses 1.3.
- * As such, importing text from new versions to old versions may not look the
- * same for browsers that didn't use 1.25 line height, or if users don't use
- * Virgil.
- */
-export const DEFAULT_LINE_HEIGHT = 1.25 as ExcalidrawTextElement["lineHeight"];

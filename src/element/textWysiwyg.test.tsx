@@ -1181,7 +1181,9 @@ describe("textWysiwyg", () => {
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontSize,
       ).toEqual(36);
-      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(100);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(
+        96.39999999999999,
+      );
     });
 
     describe("should align correctly", () => {
