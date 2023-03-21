@@ -8,7 +8,7 @@ import {
   wrapText,
   detectLineHeight,
   getLineHeightInPx,
-  getLineHeight,
+  getDefaultLineHeight,
 } from "./textElement";
 import { FontString } from "./types";
 
@@ -322,9 +322,10 @@ describe("Test getLineHeightInPx", () => {
 
 describe("Test getLineHeightInPx", () => {
   it("should return line height using default font family when not passed", () => {
-    expect(getLineHeight()).toBe(1.25);
+    //@ts-ignore
+    expect(getDefaultLineHeight()).toBe(1.25);
   });
   it("should return correct line height", () => {
-    expect(getLineHeight(FONT_FAMILY.Cascadia)).toBe(1.2);
+    expect(getDefaultLineHeight(FONT_FAMILY.Cascadia)).toBe(1.2);
   });
 });

@@ -875,7 +875,7 @@ const DEFAULT_LINE_HEIGHT = {
   [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
 };
 
-export const getLineHeight = (fontFamily?: FontFamilyValues) => {
+export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
   if (!fontFamily) {
     return DEFAULT_LINE_HEIGHT[DEFAULT_FONT_FAMILY];
   }

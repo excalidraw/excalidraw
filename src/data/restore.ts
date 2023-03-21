@@ -35,7 +35,7 @@ import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import oc from "open-color";
 import { MarkOptional, Mutable } from "../utility-types";
-import { detectLineHeight, getLineHeight } from "../element/textElement";
+import { detectLineHeight, getDefaultLineHeight } from "../element/textElement";
 
 type RestoredAppState = Omit<
   AppState,
@@ -185,7 +185,7 @@ const restoreElement = (
           element.lineHeight ||
           (element.height
             ? detectLineHeight(element)
-            : getLineHeight(element.fontFamily)),
+            : getDefaultLineHeight(element.fontFamily)),
       });
 
       if (refreshDimensions) {

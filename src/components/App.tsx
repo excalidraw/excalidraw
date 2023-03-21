@@ -266,7 +266,7 @@ import {
   getContainerCenter,
   getContainerDims,
   getContainerElement,
-  getLineHeight,
+  getDefaultLineHeight,
   getLineHeightInPx,
   getTextBindableContainerAtPosition,
   isMeasureTextSupported,
@@ -1732,7 +1732,7 @@ class App extends React.Component<AppProps, AppState> {
       (acc: ExcalidrawTextElement[], line, idx) => {
         const text = line.trim();
 
-        const lineHeight = getLineHeight(textElementProps.fontFamily);
+        const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
         if (text.length) {
           const element = newTextElement({
             ...textElementProps,
@@ -2607,7 +2607,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const lineHeight =
       existingTextElement?.lineHeight ||
-      getLineHeight(
+      getDefaultLineHeight(
         existingTextElement?.fontFamily || this.state.currentItemFontFamily,
       );
 

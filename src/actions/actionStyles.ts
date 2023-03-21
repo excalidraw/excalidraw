@@ -12,7 +12,10 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
-import { getBoundTextElement, getLineHeight } from "../element/textElement";
+import {
+  getBoundTextElement,
+  getDefaultLineHeight,
+} from "../element/textElement";
 import {
   hasBoundTextElement,
   canApplyRoundnessTypeToElement,
@@ -102,7 +105,7 @@ export const actionPasteStyles = register({
                 elementStylesToCopyFrom?.textAlign || DEFAULT_TEXT_ALIGN,
               lineHeight:
                 elementStylesToCopyFrom.lineHeight ||
-                getLineHeight(elementStylesToCopyFrom.fontFamily),
+                getDefaultLineHeight(elementStylesToCopyFrom.fontFamily),
             });
             let container = null;
             if (newElement.containerId) {

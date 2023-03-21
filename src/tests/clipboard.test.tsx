@@ -3,7 +3,10 @@ import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import ExcalidrawApp from "../excalidraw-app";
 import { KEYS } from "../keys";
-import { getLineHeight, getLineHeightInPx } from "../element/textElement";
+import {
+  getDefaultLineHeight,
+  getLineHeightInPx,
+} from "../element/textElement";
 import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";
 
@@ -120,7 +123,7 @@ describe("paste text as single lines", () => {
     const lineHeightPx =
       getLineHeightInPx(
         h.app.state.currentItemFontSize,
-        getLineHeight(h.state.currentItemFontFamily),
+        getDefaultLineHeight(h.state.currentItemFontFamily),
       ) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
@@ -142,7 +145,7 @@ describe("paste text as single lines", () => {
     const lineHeightPx =
       getLineHeightInPx(
         h.app.state.currentItemFontSize,
-        getLineHeight(h.state.currentItemFontFamily),
+        getDefaultLineHeight(h.state.currentItemFontFamily),
       ) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
