@@ -178,7 +178,7 @@ const restoreElement = (
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
-        originalText: element.originalText || element.text,
+        originalText: element.originalText || text,
         // if no lineHeight set, detect it from text height, provided `height`
         // is non-0, otherwise use the default
         lineHeight:
