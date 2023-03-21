@@ -1,4 +1,4 @@
-import { BOUND_TEXT_PADDING } from "../constants";
+import { BOUND_TEXT_PADDING, FONT_FAMILY } from "../constants";
 import { API } from "../tests/helpers/api";
 import {
   computeContainerDimensionForBoundText,
@@ -6,6 +6,9 @@ import {
   getMaxContainerWidth,
   getMaxContainerHeight,
   wrapText,
+  detectLineHeight,
+  getLineHeightInPx,
+  getLineHeight,
 } from "./textElement";
 import { FontString } from "./types";
 
@@ -292,5 +295,36 @@ describe("Test measureText", () => {
       const container = API.createElement({ type: "diamond", ...params });
       expect(getMaxContainerHeight(container)).toBe(87);
     });
+  });
+});
+
+const textElement = API.createElement({
+  type: "text",
+  text: "Excalidraw is a\nvirtual \nopensource \nwhiteboard for \nsketching \nhand-drawn like\ndiagrams",
+  fontSize: 20,
+  fontFamily: 1,
+  height: 175,
+});
+
+describe("Test detectLineHeight", () => {
+  it("should return correct line height", () => {
+    expect(detectLineHeight(textElement)).toBe(1.25);
+  });
+});
+
+describe("Test getLineHeightInPx", () => {
+  it("should return correct line height", () => {
+    expect(
+      getLineHeightInPx(textElement.fontSize, textElement.lineHeight),
+    ).toBe(25);
+  });
+});
+
+describe("Test getLineHeightInPx", () => {
+  it("should return line height using default font family when not passed", () => {
+    expect(getLineHeight()).toBe(1.25);
+  });
+  it("should return correct line height", () => {
+    expect(getLineHeight(FONT_FAMILY.Cascadia)).toBe(1.2);
   });
 });
