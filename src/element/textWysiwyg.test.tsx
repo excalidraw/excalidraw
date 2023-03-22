@@ -783,7 +783,7 @@ describe("textWysiwyg", () => {
         rectangle.y + h.elements[0].height / 2 - text.height / 2,
       );
       expect(text.x).toBe(25);
-      expect(text.height).toBe(48);
+      expect(text.height).toBe(50);
       expect(text.width).toBe(60);
 
       // Edit and text by removing second line and it should
@@ -810,7 +810,7 @@ describe("textWysiwyg", () => {
 
       expect(text.text).toBe("Hello");
       expect(text.originalText).toBe("Hello");
-      expect(text.height).toBe(24);
+      expect(text.height).toBe(25);
       expect(text.width).toBe(50);
       expect(text.y).toBe(
         rectangle.y + h.elements[0].height / 2 - text.height / 2,
@@ -903,7 +903,7 @@ describe("textWysiwyg", () => {
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
           85,
-          5,
+          4.5,
         ]
       `);
 
@@ -929,7 +929,7 @@ describe("textWysiwyg", () => {
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         Array [
           15,
-          66,
+          65,
         ]
       `);
 
@@ -1067,9 +1067,9 @@ describe("textWysiwyg", () => {
       mouse.moveTo(rectangle.x + 100, rectangle.y + 50);
       mouse.up(rectangle.x + 100, rectangle.y + 50);
       expect(rectangle.x).toBe(80);
-      expect(rectangle.y).toBe(-35);
+      expect(rectangle.y).toBe(-40);
       expect(text.x).toBe(85);
-      expect(text.y).toBe(-30);
+      expect(text.y).toBe(-35);
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {
         Keyboard.keyPress(KEYS.Z);
@@ -1112,7 +1112,7 @@ describe("textWysiwyg", () => {
         target: { value: "Online whiteboard collaboration made easy" },
       });
       editor.blur();
-      expect(rectangle.height).toBe(178);
+      expect(rectangle.height).toBe(185);
       mouse.select(rectangle);
       fireEvent.contextMenu(GlobalTestState.canvas, {
         button: 2,
@@ -1186,6 +1186,41 @@ describe("textWysiwyg", () => {
       );
     });
 
+    it("should update line height when font family updated", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
+
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      await new Promise((r) => setTimeout(r, 0));
+      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      editor.blur();
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
+      ).toEqual(1.25);
+
+      mouse.select(rectangle);
+      Keyboard.keyPress(KEYS.ENTER);
+
+      fireEvent.click(screen.getByTitle(/code/i));
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
+      ).toEqual(FONT_FAMILY.Cascadia);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
+      ).toEqual(1.2);
+
+      fireEvent.click(screen.getByTitle(/normal/i));
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
+      ).toEqual(FONT_FAMILY.Helvetica);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
+      ).toEqual(1.15);
+    });
+
     describe("should align correctly", () => {
       let editor: HTMLTextAreaElement;
 
@@ -1245,7 +1280,7 @@ describe("textWysiwyg", () => {
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
             15,
-            45.5,
+            45,
           ]
         `);
       });
@@ -1257,7 +1292,7 @@ describe("textWysiwyg", () => {
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
             30,
-            45.5,
+            45,
           ]
         `);
       });
@@ -1269,7 +1304,7 @@ describe("textWysiwyg", () => {
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
             45,
-            45.5,
+            45,
           ]
         `);
       });
@@ -1281,7 +1316,7 @@ describe("textWysiwyg", () => {
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
             15,
-            66,
+            65,
           ]
         `);
       });
@@ -1292,7 +1327,7 @@ describe("textWysiwyg", () => {
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
             30,
-            66,
+            65,
           ]
         `);
       });
@@ -1303,7 +1338,7 @@ describe("textWysiwyg", () => {
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           Array [
             45,
-            66,
+            65,
           ]
         `);
       });
@@ -1333,7 +1368,7 @@ describe("textWysiwyg", () => {
 
       const textElement = h.elements[1] as ExcalidrawTextElement;
       expect(textElement.width).toBe(600);
-      expect(textElement.height).toBe(24);
+      expect(textElement.height).toBe(25);
       expect(textElement.textAlign).toBe(TEXT_ALIGN.LEFT);
       expect((textElement as ExcalidrawTextElement).text).toBe(
         "Excalidraw is an opensource virtual collaborative whiteboard",
@@ -1365,7 +1400,7 @@ describe("textWysiwyg", () => {
           ],
           fillStyle: "hachure",
           groupIds: [],
-          height: 34,
+          height: 35,
           isDeleted: false,
           link: null,
           locked: false,
