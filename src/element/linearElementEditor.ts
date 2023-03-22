@@ -1290,7 +1290,7 @@ export class LinearElementEditor {
       let midSegmentMidpoint = editorMidPointsCache.points[index];
       if (element.points.length === 2) {
         midSegmentMidpoint = centerPoint(points[0], points[1]);
-      }
+    }
       if (
         !midSegmentMidpoint ||
         editorMidPointsCache.version !== element.version

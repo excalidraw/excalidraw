@@ -9,18 +9,6 @@ import { normalizeText } from "./textElement";
 import { ExcalidrawTextElement, FontFamilyValues, FontString } from "./types";
 
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
-const cacheLineHeight: { [key: FontString]: number } = {};
-
-export const getLineHeight = (font: FontString) => {
-  if (cacheLineHeight[font]) {
-    return cacheLineHeight[font];
-  }
-  const fontSize = parseInt(font);
-
-  // Calculate line height relative to font size
-  cacheLineHeight[font] = fontSize * 1.2;
-  return cacheLineHeight[font];
-};
 
 let canvas: HTMLCanvasElement | undefined;
 
@@ -37,9 +25,11 @@ const getLineWidth = (text: string, font: FontString) => {
   canvas2dContext.font = font;
   const width = canvas2dContext.measureText(text).width;
 
+  /* istanbul ignore else */
   if (isTestEnv()) {
     return width * DUMMY_CHAR_WIDTH;
   }
+  /* istanbul ignore next */
   return width;
 };
 
