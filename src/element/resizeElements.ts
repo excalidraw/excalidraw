@@ -46,8 +46,8 @@ import {
   getBoundTextMaxWidth,
 } from "./textElement";
 import {
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
+  getApproxMinContainerHeight,
+  getApproxMinContainerWidth,
 } from "./textMeasurements";
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -429,11 +429,11 @@ export const resizeSingleElement = (
       }
       boundTextFontSize = nextFontSize;
     } else {
-      const minWidth = getApproxMinLineWidth(
+      const minWidth = getApproxMinContainerWidth(
         getFontString(boundTextElement),
         boundTextElement.lineHeight,
       );
-      const minHeight = getApproxMinLineHeight(
+      const minHeight = getApproxMinContainerHeight(
         boundTextElement.fontSize,
         boundTextElement.lineHeight,
       );

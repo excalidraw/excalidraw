@@ -83,7 +83,7 @@ export const measureText = (
   return { width, height };
 };
 
-export const getApproxMinLineWidth = (
+export const getApproxMinContainerWidth = (
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
@@ -97,8 +97,7 @@ export const getApproxMinLineWidth = (
   return maxCharWidth + BOUND_TEXT_PADDING * 2;
 };
 
-// FIXME rename to getApproxMinContainerHeight
-export const getApproxMinLineHeight = (
+export const getApproxMinContainerHeight = (
   fontSize: ExcalidrawTextElement["fontSize"],
   lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
