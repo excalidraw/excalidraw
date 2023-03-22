@@ -34,6 +34,7 @@ import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
+  FONT_FAMILY,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
@@ -286,7 +287,13 @@ const drawElementOnCanvas = (
             : element.textAlign === "right"
             ? element.width
             : 0;
-        context.textBaseline = "bottom";
+
+        // FIXME temporary hack
+        context.textBaseline =
+          element.fontFamily === FONT_FAMILY.Virgil ||
+          element.fontFamily === FONT_FAMILY.Cascadia
+            ? "ideographic"
+            : "bottom";
 
         const lineHeightPx = getLineHeightInPx(
           element.fontSize,
