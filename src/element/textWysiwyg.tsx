@@ -41,7 +41,6 @@ import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
 import {
-  getLineHeight,
   getTextWidth,
   measureText,
   wrapText,
@@ -153,7 +152,6 @@ export const textWysiwyg = ({
       return;
     }
     const { textAlign, verticalAlign } = updatedTextElement;
-    const lineHeight = getLineHeight(getFontString(updatedTextElement));
 
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
@@ -185,7 +183,8 @@ export const textWysiwyg = ({
 
         textElementHeight = getTextHeight(
           updatedTextElement.text,
-          getFontString(updatedTextElement),
+          updatedTextElement.fontSize,
+          updatedTextElement.lineHeight,
         );
 
         let originalContainerData;
@@ -212,7 +211,10 @@ export const textWysiwyg = ({
 
         // autogrow container height if text exceeds
         if (!isArrowElement(container) && textElementHeight > maxHeight) {
-          const diff = Math.min(textElementHeight - maxHeight, lineHeight);
+          const diff = Math.min(
+            textElementHeight - maxHeight,
+            element.lineHeight,
+          );
           mutateElement(container, { height: containerDims.height + diff });
           return;
         } else if (
@@ -222,7 +224,10 @@ export const textWysiwyg = ({
           containerDims.height > originalContainerData.height &&
           textElementHeight < maxHeight
         ) {
-          const diff = Math.min(maxHeight - textElementHeight, lineHeight);
+          const diff = Math.min(
+            maxHeight - textElementHeight,
+            element.lineHeight,
+          );
           mutateElement(container, { height: containerDims.height - diff });
         } else {
           const { y } = computeBoundTextPosition(
@@ -263,7 +268,7 @@ export const textWysiwyg = ({
       Object.assign(editable.style, {
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
-        lineHeight: `${lineHeight}px`,
+        lineHeight: element.lineHeight,
         width: `${textElementWidth}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
@@ -369,7 +374,11 @@ export const textWysiwyg = ({
           font,
           getBoundTextMaxWidth(container!),
         );
-        const { width, height } = measureText(wrappedText, font);
+        const { width, height } = measureText(
+          wrappedText,
+          font,
+          updatedTextElement.lineHeight,
+        );
         editable.style.width = `${width}px`;
         editable.style.height = `${height}px`;
       }

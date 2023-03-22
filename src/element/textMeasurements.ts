@@ -2,9 +2,11 @@ import {
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  FONT_FAMILY,
 } from "../constants";
 import { getFontString, isTestEnv } from "../utils";
-import { FontString } from "./types";
+import { normalizeText } from "./textElement";
+import { ExcalidrawTextElement, FontFamilyValues, FontString } from "./types";
 
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
 const cacheLineHeight: { [key: FontString]: number } = {};
@@ -35,16 +37,14 @@ const getLineWidth = (text: string, font: FontString) => {
   canvas2dContext.font = font;
   const width = canvas2dContext.measureText(text).width;
 
-  /* istanbul ignore else */
   if (isTestEnv()) {
     return width * DUMMY_CHAR_WIDTH;
   }
-  /* istanbul ignore next */
   return width;
 };
 
 export const getTextWidth = (text: string, font: FontString) => {
-  const lines = text.replace(/\r\n?/g, "\n").split("\n");
+  const lines = splitIntoLines(text);
   let width = 0;
   lines.forEach((line) => {
     width = Math.max(width, getLineWidth(line, font));
@@ -52,39 +52,57 @@ export const getTextWidth = (text: string, font: FontString) => {
   return width;
 };
 
-export const getTextHeight = (text: string, font: FontString) => {
-  const lines = text.replace(/\r\n?/g, "\n").split("\n");
-  const lineHeight = getLineHeight(font);
-  return lineHeight * lines.length;
+export const getTextHeight = (
+  text: string,
+  fontSize: number,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
+) => {
+  const lineCount = splitIntoLines(text).length;
+  return getLineHeightInPx(fontSize, lineHeight) * lineCount;
 };
 
-export const measureText = (text: string, font: FontString) => {
+export const splitIntoLines = (text: string) => {
+  return normalizeText(text).split("\n");
+};
+
+export const measureText = (
+  text: string,
+  font: FontString,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
+) => {
   text = text
     .split("\n")
     // replace empty lines with single space because leading/trailing empty
     // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
-
-  const height = getTextHeight(text, font);
+  const fontSize = parseFloat(font);
+  const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
 
   return { width, height };
 };
 
-export const getApproxMinLineWidth = (font: FontString) => {
+export const getApproxMinLineWidth = (
+  font: FontString,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
+) => {
   const maxCharWidth = getMaxCharWidth(font);
   if (maxCharWidth === 0) {
     return (
-      measureText(DUMMY_TEXT.split("").join("\n"), font).width +
+      measureText(DUMMY_TEXT.split("").join("\n"), font, lineHeight).width +
       BOUND_TEXT_PADDING * 2
     );
   }
   return maxCharWidth + BOUND_TEXT_PADDING * 2;
 };
 
-export const getApproxMinLineHeight = (font: FontString) => {
-  return getLineHeight(font) + BOUND_TEXT_PADDING * 2;
+// FIXME rename to getApproxMinContainerHeight
+export const getApproxMinLineHeight = (
+  fontSize: ExcalidrawTextElement["fontSize"],
+  lineHeight: ExcalidrawTextElement["lineHeight"],
+) => {
+  return getLineHeightInPx(fontSize, lineHeight) + BOUND_TEXT_PADDING * 2;
 };
 
 export const charWidth = (() => {
@@ -150,6 +168,13 @@ export const getApproxCharsToFitInWidth = (font: FontString, width: number) => {
 };
 
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
+  // if maxWidth is not finite or NaN which can happen in case of bugs in
+  // computation, we need to make sure we don't continue as we'll end up
+  // in an infinite loop
+  if (!Number.isFinite(maxWidth) || maxWidth < 0) {
+    return text;
+  }
+
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   const spaceWidth = getLineWidth(" ", font);
@@ -271,4 +296,55 @@ export const isMeasureTextSupported = () => {
     }),
   );
   return width > 0;
+};
+
+/**
+ * We calculate the line height from the font size and the unitless line height,
+ * aligning with the W3C spec.
+ */
+export const getLineHeightInPx = (
+  fontSize: ExcalidrawTextElement["fontSize"],
+  lineHeight: ExcalidrawTextElement["lineHeight"],
+) => {
+  return fontSize * lineHeight;
+};
+
+/**
+ * To get unitless line-height (if unknown) we can calculate it by dividing
+ * height-per-line by fontSize.
+ */
+export const detectLineHeight = (textElement: ExcalidrawTextElement) => {
+  const lineCount = splitIntoLines(textElement.text).length;
+  return (textElement.height /
+    lineCount /
+    textElement.fontSize) as ExcalidrawTextElement["lineHeight"];
+};
+
+/**
+ * Unitless line height
+ *
+ * In previous versions we used `normal` line height, which browsers interpret
+ * differently, and based on font-family and font-size.
+ *
+ * To make line heights consistent across browsers we hardcode the values for
+ * each of our fonts based on most common average line-heights.
+ * See https://github.com/excalidraw/excalidraw/pull/6360#issuecomment-1477635971
+ * where the values come from.
+ */
+const DEFAULT_LINE_HEIGHT = {
+  // ~1.25 is the average for Virgil in WebKit and Blink.
+  // Gecko (FF) uses ~1.28.
+  [FONT_FAMILY.Virgil]: 1.25 as ExcalidrawTextElement["lineHeight"],
+  // ~1.15 is the average for Virgil in WebKit and Blink.
+  // Gecko if all over the place.
+  [FONT_FAMILY.Helvetica]: 1.15 as ExcalidrawTextElement["lineHeight"],
+  // ~1.2 is the average for Virgil in WebKit and Blink, and kinda Gecko too
+  [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
+};
+
+export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
+  if (fontFamily) {
+    return DEFAULT_LINE_HEIGHT[fontFamily];
+  }
+  return DEFAULT_LINE_HEIGHT[DEFAULT_FONT_FAMILY];
 };

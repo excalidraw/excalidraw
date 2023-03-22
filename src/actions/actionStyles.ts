@@ -19,6 +19,7 @@ import {
   getDefaultRoundnessTypeForElement,
 } from "../element/typeChecks";
 import { getSelectedElements } from "../scene";
+import { getDefaultLineHeight } from "../element/textMeasurements";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";
@@ -92,12 +93,18 @@ export const actionPasteStyles = register({
           });
 
           if (isTextElement(newElement)) {
+            const fontSize =
+              elementStylesToCopyFrom?.fontSize || DEFAULT_FONT_SIZE;
+            const fontFamily =
+              elementStylesToCopyFrom?.fontFamily || DEFAULT_FONT_FAMILY;
             newElement = newElementWith(newElement, {
-              fontSize: elementStylesToCopyFrom?.fontSize || DEFAULT_FONT_SIZE,
-              fontFamily:
-                elementStylesToCopyFrom?.fontFamily || DEFAULT_FONT_FAMILY,
+              fontSize,
+              fontFamily,
               textAlign:
                 elementStylesToCopyFrom?.textAlign || DEFAULT_TEXT_ALIGN,
+              lineHeight:
+                elementStylesToCopyFrom.lineHeight ||
+                getDefaultLineHeight(fontFamily),
             });
             let container = null;
             if (newElement.containerId) {

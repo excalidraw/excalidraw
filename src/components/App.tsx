@@ -268,10 +268,11 @@ import {
   isValidTextContainer,
 } from "../element/textElement";
 import {
-  getLineHeight,
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   isMeasureTextSupported,
+  getLineHeightInPx,
+  getDefaultLineHeight,
 } from "../element/textMeasurements";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
@@ -1733,12 +1734,14 @@ class App extends React.Component<AppProps, AppState> {
       (acc: ExcalidrawTextElement[], line, idx) => {
         const text = line.trim();
 
+        const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
         if (text.length) {
           const element = newTextElement({
             ...textElementProps,
             x,
             y: currentY,
             text,
+            lineHeight,
           });
           acc.push(element);
           currentY += element.height + LINE_GAP;
@@ -1747,14 +1750,9 @@ class App extends React.Component<AppProps, AppState> {
           // add paragraph only if previous line was not empty, IOW don't add
           // more than one empty line
           if (prevLine) {
-            const defaultLineHeight = getLineHeight(
-              getFontString({
-                fontSize: textElementProps.fontSize,
-                fontFamily: textElementProps.fontFamily,
-              }),
-            );
-
-            currentY += defaultLineHeight + LINE_GAP;
+            currentY +=
+              getLineHeightInPx(textElementProps.fontSize, lineHeight) +
+              LINE_GAP;
           }
         }
 
@@ -2609,6 +2607,13 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
 
+    const fontFamily =
+      existingTextElement?.fontFamily || this.state.currentItemFontFamily;
+
+    const lineHeight =
+      existingTextElement?.lineHeight || getDefaultLineHeight(fontFamily);
+    const fontSize = this.state.currentItemFontSize;
+
     if (
       !existingTextElement &&
       shouldBindToContainer &&
@@ -2616,11 +2621,14 @@ class App extends React.Component<AppProps, AppState> {
       !isArrowElement(container)
     ) {
       const fontString = {
-        fontSize: this.state.currentItemFontSize,
-        fontFamily: this.state.currentItemFontFamily,
+        fontSize,
+        fontFamily,
       };
-      const minWidth = getApproxMinLineWidth(getFontString(fontString));
-      const minHeight = getApproxMinLineHeight(getFontString(fontString));
+      const minWidth = getApproxMinLineWidth(
+        getFontString(fontString),
+        lineHeight,
+      );
+      const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
       const containerDims = getContainerDims(container);
       const newHeight = Math.max(containerDims.height, minHeight);
       const newWidth = Math.max(containerDims.width, minWidth);
@@ -2654,8 +2662,8 @@ class App extends React.Component<AppProps, AppState> {
           opacity: this.state.currentItemOpacity,
           roundness: null,
           text: "",
-          fontSize: this.state.currentItemFontSize,
-          fontFamily: this.state.currentItemFontFamily,
+          fontSize,
+          fontFamily,
           textAlign: parentCenterPosition
             ? "center"
             : this.state.currentItemTextAlign,
@@ -2665,6 +2673,7 @@ class App extends React.Component<AppProps, AppState> {
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
           locked: false,
+          lineHeight,
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {

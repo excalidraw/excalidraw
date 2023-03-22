@@ -135,6 +135,11 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
+    /**
+     * Unitless line height (aligned to W3C). To get line height in px, multiply
+     *  with font size (using `getLineHeightInPx` helper).
+     */
+    lineHeight: number & { _brand: "unitlessLineHeight" };
   }>;
 
 export type ExcalidrawBindableElement =

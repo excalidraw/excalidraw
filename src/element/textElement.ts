@@ -40,7 +40,6 @@ export const redrawTextBoundingBox = (
   container: ExcalidrawElement | null,
 ) => {
   let maxWidth = undefined;
-
   const boundTextUpdates = {
     x: textElement.x,
     y: textElement.y,
@@ -61,6 +60,7 @@ export const redrawTextBoundingBox = (
   const metrics = measureText(
     boundTextUpdates.text,
     getFontString(textElement),
+    textElement.lineHeight,
   );
 
   boundTextUpdates.width = metrics.width;
@@ -175,7 +175,11 @@ export const handleBindTextResize = (
           maxWidth,
         );
       }
-      const dimensions = measureText(text, getFontString(textElement));
+      const dimensions = measureText(
+        text,
+        getFontString(textElement),
+        textElement.lineHeight,
+      );
       nextHeight = dimensions.height;
       nextWidth = dimensions.width;
     }

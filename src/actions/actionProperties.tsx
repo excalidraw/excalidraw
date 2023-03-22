@@ -55,6 +55,7 @@ import {
   getBoundTextElement,
   getContainerElement,
 } from "../element/textElement";
+import { getDefaultLineHeight } from "../element/textMeasurements";
 import {
   isBoundToContainer,
   isLinearElement,
@@ -637,6 +638,7 @@ export const actionChangeFontFamily = register({
               oldElement,
               {
                 fontFamily: value,
+                lineHeight: getDefaultLineHeight(value),
               },
             );
             redrawTextBoundingBox(newElement, getContainerElement(oldElement));

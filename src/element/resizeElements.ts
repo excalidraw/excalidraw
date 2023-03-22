@@ -361,7 +361,7 @@ export const resizeSingleElement = (
   let scaleX = atStartBoundsWidth / boundsCurrentWidth;
   let scaleY = atStartBoundsHeight / boundsCurrentHeight;
 
-  let boundTextFont: { fontSize?: number } = {};
+  let boundTextFontSize: number | null = null;
   const boundTextElement = getBoundTextElement(element);
 
   if (transformHandleDirection.includes("e")) {
@@ -411,9 +411,7 @@ export const resizeSingleElement = (
       boundTextElement.id,
     ) as typeof boundTextElement | undefined;
     if (stateOfBoundTextElementAtResize) {
-      boundTextFont = {
-        fontSize: stateOfBoundTextElementAtResize.fontSize,
-      };
+      boundTextFontSize = stateOfBoundTextElementAtResize.fontSize;
     }
     if (shouldMaintainAspectRatio) {
       const updatedElement = {
@@ -429,12 +427,16 @@ export const resizeSingleElement = (
       if (nextFontSize === null) {
         return;
       }
-      boundTextFont = {
-        fontSize: nextFontSize,
-      };
+      boundTextFontSize = nextFontSize;
     } else {
-      const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
-      const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
+      const minWidth = getApproxMinLineWidth(
+        getFontString(boundTextElement),
+        boundTextElement.lineHeight,
+      );
+      const minHeight = getApproxMinLineHeight(
+        boundTextElement.fontSize,
+        boundTextElement.lineHeight,
+      );
       eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
       eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
     }
@@ -567,8 +569,10 @@ export const resizeSingleElement = (
     });
 
     mutateElement(element, resizedElement);
-    if (boundTextElement && boundTextFont) {
-      mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
+    if (boundTextElement && boundTextFontSize != null) {
+      mutateElement(boundTextElement, {
+        fontSize: boundTextFontSize,
+      });
     }
     handleBindTextResize(element, transformHandleDirection);
   }
