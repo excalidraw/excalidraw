@@ -48,7 +48,7 @@ export const isTextElement = (
 export const isFrameElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawFrameElement => {
-  return element !== null && element.type === "frame";
+  return element != null && element.type === "frame";
 };
 
 export const isFreeDrawElement = (

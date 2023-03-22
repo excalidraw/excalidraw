@@ -2,7 +2,6 @@ import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { getElementsInFrame } from "../frame";
 import { KEYS } from "../keys";
-// import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { AppState } from "../types";
 import { setCursorForShape, updateActiveTool } from "../utils";

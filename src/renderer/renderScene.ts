@@ -455,7 +455,7 @@ export const _renderScene = ({
           const containgFrame = getContainingFrame(element);
 
           // --------- clipping ----------
-          // step 1: save context (since clipping is a permanent context state change)
+          // step 1: save context so we can remove the clip path afterwards
           context.save();
 
           // --------- clipping ----------
