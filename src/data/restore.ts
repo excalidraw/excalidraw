@@ -179,7 +179,7 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || text,
-        // line-height might not specified either when creating elements
+        // line-height might not be specified either when creating elements
         // programmatically, or when importing old diagrams.
         // For the latter we want to detect the original line height which
         // will likely differ from our per-font fixed line height we now use,
