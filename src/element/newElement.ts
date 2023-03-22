@@ -29,6 +29,7 @@ import {
   normalizeText,
   wrapText,
   getMaxContainerWidth,
+  getDefaultLineHeight,
 } from "./textElement";
 import { VERTICAL_ALIGN } from "../constants";
 import { isArrowElement } from "./typeChecks";
@@ -137,10 +138,12 @@ export const newTextElement = (
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
     containerId?: ExcalidrawTextContainer["id"];
+    lineHeight?: ExcalidrawTextElement["lineHeight"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
+  const lineHeight = opts.lineHeight || getDefaultLineHeight(opts.fontFamily);
   const text = normalizeText(opts.text);
-  const metrics = measureText(text, getFontString(opts));
+  const metrics = measureText(text, getFontString(opts), lineHeight);
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
@@ -156,6 +159,7 @@ export const newTextElement = (
       height: metrics.height,
       containerId: opts.containerId || null,
       originalText: text,
+      lineHeight,
     },
     {},
   );
@@ -176,6 +180,7 @@ const getAdjustedDimensions = (
   const { width: nextWidth, height: nextHeight } = measureText(
     nextText,
     getFontString(element),
+    element.lineHeight,
   );
   const { textAlign, verticalAlign } = element;
   let x: number;
@@ -185,7 +190,11 @@ const getAdjustedDimensions = (
     verticalAlign === VERTICAL_ALIGN.MIDDLE &&
     !element.containerId
   ) {
-    const prevMetrics = measureText(element.text, getFontString(element));
+    const prevMetrics = measureText(
+      element.text,
+      getFontString(element),
+      element.lineHeight,
+    );
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
       height: nextHeight - prevMetrics.height,

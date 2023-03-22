@@ -22,7 +22,6 @@ import {
 import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
-  getApproxLineHeight,
   getBoundTextElementId,
   getContainerCoords,
   getContainerDims,
@@ -150,9 +149,7 @@ export const textWysiwyg = ({
       return;
     }
     const { textAlign, verticalAlign } = updatedTextElement;
-    const approxLineHeight = getApproxLineHeight(
-      getFontString(updatedTextElement),
-    );
+
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
@@ -213,7 +210,7 @@ export const textWysiwyg = ({
         if (!isArrowElement(container) && textElementHeight > maxHeight) {
           const diff = Math.min(
             textElementHeight - maxHeight,
-            approxLineHeight,
+            element.lineHeight,
           );
           mutateElement(container, { height: containerDims.height + diff });
           return;
@@ -226,7 +223,7 @@ export const textWysiwyg = ({
         ) {
           const diff = Math.min(
             maxHeight - textElementHeight,
-            approxLineHeight,
+            element.lineHeight,
           );
           mutateElement(container, { height: containerDims.height - diff });
         }
@@ -266,10 +263,6 @@ export const textWysiwyg = ({
         editable.selectionEnd = editable.value.length - diff;
       }
 
-      const lines = updatedTextElement.originalText.split("\n");
-      const lineHeight = updatedTextElement.containerId
-        ? approxLineHeight
-        : updatedTextElement.height / lines.length;
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
@@ -282,7 +275,7 @@ export const textWysiwyg = ({
       Object.assign(editable.style, {
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
-        lineHeight: `${lineHeight}px`,
+        lineHeight: element.lineHeight,
         width: `${textElementWidth}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
@@ -388,7 +381,11 @@ export const textWysiwyg = ({
           font,
           getMaxContainerWidth(container!),
         );
-        const { width, height } = measureText(wrappedText, font);
+        const { width, height } = measureText(
+          wrappedText,
+          font,
+          updatedTextElement.lineHeight,
+        );
         editable.style.width = `${width}px`;
         editable.style.height = `${height}px`;
       }
