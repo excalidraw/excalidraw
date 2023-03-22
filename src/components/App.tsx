@@ -4957,17 +4957,20 @@ class App extends React.Component<AppProps, AppState> {
 
           // We only drag in one direction if shift is pressed
           const lockDirection = event.shiftKey;
-          dragSelectedElements(
-            pointerDownState,
-            selectedElements,
-            dragX,
-            dragY,
-            lockDirection,
-            dragDistanceX,
-            dragDistanceY,
-            this.state,
-            this.scene,
-          );
+          // when we're editing the name of a frame, we want the user to be
+          // able to select and interact with the text input
+          !this.state.editingFrame &&
+            dragSelectedElements(
+              pointerDownState,
+              selectedElements,
+              dragX,
+              dragY,
+              lockDirection,
+              dragDistanceX,
+              dragDistanceY,
+              this.state,
+              this.scene,
+            );
           this.maybeSuggestBindingForAll(selectedElements);
 
           // We duplicate the selected element if alt is pressed on pointer move
