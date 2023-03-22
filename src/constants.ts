@@ -38,6 +38,8 @@ export const POINTER_BUTTON = {
   WHEEL: 1,
   SECONDARY: 2,
   TOUCH: -1,
+  // Pen eraser button: https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events
+  ERASER: 5,
 } as const;
 
 export enum EVENT {

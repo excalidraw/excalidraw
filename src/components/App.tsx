@@ -3457,10 +3457,11 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    // only handle left mouse button or touch
+    // Only handle main, touch and eraser button events.
     if (
       event.button !== POINTER_BUTTON.MAIN &&
-      event.button !== POINTER_BUTTON.TOUCH
+      event.button !== POINTER_BUTTON.TOUCH &&
+      event.button !== POINTER_BUTTON.ERASER
     ) {
       return;
     }
@@ -3473,6 +3474,32 @@ class App extends React.Component<AppProps, AppState> {
     // State for the duration of a pointer interaction, which starts with a
     // pointerDown event, ends with a pointerUp event (or another pointerDown)
     const pointerDownState = this.initialPointerDownState(event);
+
+    if (pointerDownState.withEraserButton && !isEraserActive(this.state)) {
+      // If button was an eraser event and not already explicitly erasing,
+      // switch to erase, store the old tool, and re-handle the pointer down
+      // event in the new tool state.
+
+      const eraserWithLastActive = updateActiveTool(
+        this.state,
+        {
+          type: "eraser",
+          lastActiveToolBeforeEraser: this.state.activeTool,
+        }
+      );
+      // Some magic in setActiveTool allows clean transition to eraser state,
+      // otherwise end up in broken selection state.
+      this.setActiveTool({type: "eraser"});
+      this.setState(
+        { 
+          activeTool: eraserWithLastActive 
+        },
+        // re-handle in callback after state update
+        () => { this.handleCanvasPointerDown(event) }
+      );
+
+      return;
+    }
 
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
       return;
@@ -3774,6 +3801,7 @@ class App extends React.Component<AppProps, AppState> {
     return {
       origin,
       withCmdOrCtrl: event[KEYS.CTRL_OR_CMD],
+      withEraserButton: event.button == POINTER_BUTTON.ERASER,
       originInGrid: tupleToCoors(
         getGridPoint(origin.x, origin.y, this.state.gridSize),
       ),
@@ -5197,6 +5225,15 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
         this.eraseElements(pointerDownState);
+
+        // If this was an eraser-button toggled erase action,
+        // and we have a previous tool in the tool stack,
+        // then we entered the stack via a tool switch. 
+        // Pop back out to the previous tool.
+        if (pointerDownState.withEraserButton && this.state.activeTool.lastActiveTool) {
+          this.setActiveTool(this.state.activeTool.lastActiveTool);
+        }
+
         return;
       } else if (Object.keys(pointerDownState.elementIdsToErase).length) {
         this.restoreReadyToEraseElements(pointerDownState);

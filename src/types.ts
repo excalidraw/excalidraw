@@ -466,6 +466,8 @@ export type PointerDownState = Readonly<{
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
   };
   withCmdOrCtrl: boolean;
+  // Whether the event was triggered with an eraser button
+  withEraserButton: boolean;
   drag: {
     // Might change during the pointer interaction
     hasOccurred: boolean;
