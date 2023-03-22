@@ -9,6 +9,10 @@
     z-index: 10;
     pointer-events: all;
 
+    .section {
+      padding: 12px;
+    }
+
     h3 {
       margin: 0 24px 8px 0;
       white-space: nowrap;
@@ -37,6 +41,12 @@
           text-align: right;
         }
       }
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background-color: var(--default-border-color);
     }
 
     :root[dir="rtl"] & {

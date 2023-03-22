@@ -115,7 +115,8 @@ export type ActionName =
   | "toggleLinearEditor"
   | "toggleEraserTool"
   | "toggleHandTool"
-  | "createContainerFromText";
+  | "createContainerFromText"
+  | "elementStats";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

@@ -239,6 +239,17 @@
     "eraser": "Eraser",
     "hand": "Hand (panning tool)"
   },
+  "element": {
+    "rectangle": "Rectangle",
+    "diamond": "Diamond",
+    "ellipse": "Ellipse",
+    "arrow": "Arrow",
+    "line": "Line",
+    "freeDraw": "Freedraw",
+    "text": "Text",
+    "image": "Image",
+    "group": "Group"
+  },
   "headings": {
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
@@ -400,7 +411,9 @@
     "scene": "Scene",
     "selected": "Selected",
     "storage": "Storage",
-    "title": "General stats",
+    "title": "Stats",
+    "generalStats": "General stats",
+    "elementStats": "Element stats",
     "total": "Total",
     "version": "Version",
     "versionCopy": "Click to copy",
