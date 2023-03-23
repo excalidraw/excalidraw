@@ -126,7 +126,7 @@
       "lockAll": "ล็อกทั้งหมด",
       "unlockAll": "ปลดล็อกทั้งหมด"
     },
-    "statusPublished": "",
+    "statusPublished": "เผยแพร่",
     "sidebarLock": ""
   },
   "library": {
@@ -138,7 +138,7 @@
     "clearReset": "",
     "exportJSON": "ส่งออกไปยังไฟล์",
     "exportImage": "ส่งออกเป็นรูปภาพ",
-    "export": "",
+    "export": "บันทึกไปยัง",
     "exportToPng": "ส่งออกไปเป็น PNG",
     "exportToSvg": "ส่งออกไปเป็น SVG",
     "copyToClipboard": "คัดลอกไปยังคลิปบอร์ด",
@@ -167,17 +167,17 @@
     "zenMode": "โหมด Zen",
     "exitZenMode": "ออกจากโหมด Zen",
     "cancel": "ยกเลิก",
-    "clear": "",
+    "clear": "เคลียร์",
     "remove": "ลบ",
     "publishLibrary": "เผยแพร่",
-    "submit": "",
+    "submit": "ตกลง",
     "confirm": "ยืนยัน"
   },
   "alerts": {
     "clearReset": "",
     "couldNotCreateShareableLink": "",
     "couldNotCreateShareableLinkTooBig": "",
-    "couldNotLoadInvalidFile": "",
+    "couldNotLoadInvalidFile": "ไม่สามารถโหลดไฟล์ที่ผิดพลาดได้",
     "importBackendFailed": "",
     "cannotExportEmptyCanvas": "",
     "couldNotCopyToClipboard": "ไม่สามารถคัดลอกไปยังคลิปบอร์ดได้",
@@ -219,13 +219,13 @@
       "disable_setting": "",
       "issue": "",
       "write": "",
-      "discord": ""
+      "discord": "Discord"
     }
   },
   "toolBar": {
     "selection": "",
     "image": "",
-    "rectangle": "",
+    "rectangle": "สี่เหลี่ยมผืนผ้า",
     "diamond": "",
     "ellipse": "",
     "arrow": "",
@@ -274,7 +274,7 @@
   "errorSplash": {
     "headingMain_pre": "",
     "headingMain_button": "กำลังรีโหลดหน้า",
-    "clearCanvasMessage": "",
+    "clearCanvasMessage": "ถ้าโหลดไม่ได้ ให้ลอง ",
     "clearCanvasMessage_button": "เคลียร์ผืนผ้าใบ",
     "clearCanvasCaveat": "",
     "trackedToSentry_pre": "",
@@ -334,7 +334,7 @@
     "zoomToSelection": "",
     "toggleElementLock": "",
     "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageLeftRight": "ย้ายหน้าไปด้าน ซ้าย/ขวา"
   },
   "clearCanvasDialog": {
     "title": ""
@@ -342,7 +342,7 @@
   "publishDialog": {
     "title": "",
     "itemName": "",
-    "authorName": "",
+    "authorName": "ชื่อเจ้าของ",
     "githubUsername": "ชื่อผู้ใช้ GitHub",
     "twitterUsername": "ชื่อผู้ใช้ Twitter",
     "libraryName": "",
