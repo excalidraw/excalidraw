@@ -184,12 +184,11 @@ export const throttleRAF = <T extends any[]>(
 /**
  * Exponential ease-out method
  *
- * @see: https://github.com/kaelzhang/easing-functions
  * @param {number} k - The value to be tweened.
  * @returns {number} The tweened value.
  */
 function easeOut(k: number): number {
-  return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
+  return 1 - Math.pow(1 - k, 4);
 }
 
 /**
