@@ -1892,6 +1892,9 @@ class App extends React.Component<AppProps, AppState> {
     // when animating, we use RequestAnimationFrame to prevent the animation
     // from slowing down other processes
     if (opts?.animate) {
+      const origScrollX = this.state.scrollX;
+      const origScrollY = this.state.scrollY;
+
       // zoom animation could become problematic on scenes with large number
       // of elements, setting it to its final value to improve user experience.
       //
@@ -1899,7 +1902,7 @@ class App extends React.Component<AppProps, AppState> {
       this.zoomCanvas(zoom.value);
 
       const cancel = easeToValuesRAF(
-        [this.state.scrollX, this.state.scrollY],
+        [origScrollX, origScrollY],
         [scrollX, scrollY],
         (scrollX, scrollY) => this.setState({ scrollX, scrollY }),
         { duration: 500 },
