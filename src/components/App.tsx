@@ -1839,6 +1839,25 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.executeAction(actionToggleHandTool);
   };
 
+  /**
+   * Zooms on canvas viewport center
+   */
+  zoomCanvas = (
+    /** decimal fraction between 0.1 (10% zoom) and 30 (3000% zoom) */
+    value: number,
+  ) => {
+    this.setState({
+      ...getStateForZoom(
+        {
+          viewportX: this.state.width / 2 + this.state.offsetLeft,
+          viewportY: this.state.height / 2 + this.state.offsetTop,
+          nextZoom: getNormalizedZoom(value),
+        },
+        this.state,
+      ),
+    });
+  };
+
   scrollToContent = (
     target:
       | ExcalidrawElement
@@ -1871,7 +1890,9 @@ class App extends React.Component<AppProps, AppState> {
     if (opts?.animate) {
       // zoom animation could become problematic on scenes with large number
       // of elements, setting it to its final value to improve user experience.
-      this.setState({ zoom });
+      //
+      // using zoomCanvas() to zoom on current viewport center
+      this.zoomCanvas(zoom.value);
 
       easeToValuesRAF(
         [this.state.scrollX, this.state.scrollY],
