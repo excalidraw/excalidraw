@@ -1864,7 +1864,7 @@ class App extends React.Component<AppProps, AppState> {
     target:
       | ExcalidrawElement
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
-    opts?: { fitToContent?: boolean; animate?: boolean },
+    opts?: { fitToContent?: boolean; animate?: boolean; duration?: number },
   ) => {
     this.cancelInProgresAnimation?.();
 
@@ -1905,7 +1905,7 @@ class App extends React.Component<AppProps, AppState> {
         [origScrollX, origScrollY],
         [scrollX, scrollY],
         (scrollX, scrollY) => this.setState({ scrollX, scrollY }),
-        { duration: 500 },
+        { duration: opts?.duration ?? 500 },
       );
       this.cancelInProgresAnimation = () => {
         cancel();

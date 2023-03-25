@@ -264,7 +264,7 @@ Resets the scene. If `resetLoadingState` is passed as true then it will also for
 
 <pre>
   () =>{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
     ExcalidrawElement[]
   </a>
 </pre>
@@ -275,7 +275,7 @@ Returns all the elements including the deleted in the scene.
 
 <pre>
   () => NonDeleted&#60;
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
     ExcalidrawElement
   </a>
   []&#62;
@@ -310,16 +310,18 @@ This is the history API. history.clear() will clear the history.
   (<br />
   {"  "}
   target?:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
     ExcalidrawElement
   </a>{" "}
   &#124;{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
     ExcalidrawElement
   </a>
-  [], <br />
-  {"  "}opts?: &#123; fitToContent?: boolean; animate?: boolean &#125; <br />)
-  => void
+  [],
+  <br />
+  {"  "}opts?: &#123; fitToContent?: boolean; animate?: boolean; duration?: number
+  &#125;
+  <br />) => void
 </pre>
 
 Scroll the nearest element out of the elements supplied to the center of the viewport. Defaults to the elements on the scene.
@@ -329,6 +331,7 @@ Scroll the nearest element out of the elements supplied to the center of the vie
 | target | <code>ExcalidrawElement &#124; ExcalidrawElement[]</code> | All scene elements | The element(s) to scroll to. |
 | opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. |
 | opts.animate | boolean | false | Whether to animate between starting and ending position. Note that for larger scenes the animation may not be smooth due to performance issues. |
+| opts.duration | number | 500 | Duration of the animation if `opts.animate` is `true`. |
 
 ## refresh
 
