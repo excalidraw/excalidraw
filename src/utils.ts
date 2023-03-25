@@ -214,12 +214,17 @@ export const easeToValuesRAF = (
   callback: (...values: number[]) => void,
   opts?: { duration?: number; easeFn?: (value: number) => number },
 ) => {
+  let canceled = false;
+  let frameId = 0;
   let startTime: number;
 
   const duration = opts?.duration || 250; // default animation to 0.25 seconds
   const easeFn = opts?.easeFn || easeOut; // default the easeFn to easeOut
 
   function step(timestamp: number) {
+    if (canceled) {
+      return;
+    }
     if (startTime === undefined) {
       startTime = timestamp;
     }
@@ -235,14 +240,19 @@ export const easeToValuesRAF = (
       );
 
       callback(...newValues);
-      window.requestAnimationFrame(step);
+      frameId = window.requestAnimationFrame(step);
     } else {
       // ensure final values are reached at the end of the transition
       callback(...toValues);
     }
   }
 
-  window.requestAnimationFrame(step);
+  frameId = window.requestAnimationFrame(step);
+
+  return () => {
+    canceled = true;
+    window.cancelAnimationFrame(frameId);
+  };
 };
 
 // https://github.com/lodash/lodash/blob/es/chunk.js
