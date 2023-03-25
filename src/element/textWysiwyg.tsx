@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, VERTICAL_ALIGN } from "../constants";
+import { CLASSES } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -23,17 +23,14 @@ import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
   getBoundTextElementId,
-  getContainerCoords,
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
-  getTextWidth,
-  measureText,
   normalizeText,
   redrawTextBoundingBox,
-  wrapText,
-  getMaxContainerHeight,
-  getMaxContainerWidth,
+  getBoundTextMaxHeight,
+  getBoundTextMaxWidth,
+  computeBoundTextPosition,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -43,6 +40,12 @@ import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
+import {
+  getTextWidth,
+  measureText,
+  wrapText,
+  getTextHeight,
+} from "./textMeasurements";
 
 const getTransform = (
   width: number,
@@ -177,15 +180,12 @@ export const textWysiwyg = ({
           editable,
         );
         const containerDims = getContainerDims(container);
-        // using editor.style.height to get the accurate height of text editor
-        const editorHeight = Number(editable.style.height.slice(0, -2));
-        if (editorHeight > 0) {
-          textElementHeight = editorHeight;
-        }
-        if (propertiesUpdated) {
-          // update height of the editor after properties updated
-          textElementHeight = updatedTextElement.height;
-        }
+
+        textElementHeight = getTextHeight(
+          updatedTextElement.text,
+          updatedTextElement.fontSize,
+          updatedTextElement.lineHeight,
+        );
 
         let originalContainerData;
         if (propertiesUpdated) {
@@ -203,8 +203,11 @@ export const textWysiwyg = ({
           }
         }
 
-        maxWidth = getMaxContainerWidth(container);
-        maxHeight = getMaxContainerHeight(container);
+        maxWidth = getBoundTextMaxWidth(container);
+        maxHeight = getBoundTextMaxHeight(
+          container,
+          updatedTextElement as ExcalidrawTextElementWithContainer,
+        );
 
         // autogrow container height if text exceeds
         if (!isArrowElement(container) && textElementHeight > maxHeight) {
@@ -226,22 +229,12 @@ export const textWysiwyg = ({
             element.lineHeight,
           );
           mutateElement(container, { height: containerDims.height - diff });
-        }
-        // Start pushing text upward until a diff of 30px (padding)
-        // is reached
-        else {
-          const containerCoords = getContainerCoords(container);
-
-          // vertically center align the text
-          if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
-            if (!isArrowElement(container)) {
-              coordY =
-                containerCoords.y + maxHeight / 2 - textElementHeight / 2;
-            }
-          }
-          if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-            coordY = containerCoords.y + (maxHeight - textElementHeight);
-          }
+        } else {
+          const { y } = computeBoundTextPosition(
+            container,
+            updatedTextElement as ExcalidrawTextElementWithContainer,
+          );
+          coordY = y;
         }
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
@@ -362,7 +355,7 @@ export const textWysiwyg = ({
         const wrappedText = wrapText(
           `${editable.value}${data}`,
           font,
-          getMaxContainerWidth(container),
+          getBoundTextMaxWidth(container),
         );
         const width = getTextWidth(wrappedText, font);
         editable.style.width = `${width}px`;
@@ -379,7 +372,7 @@ export const textWysiwyg = ({
         const wrappedText = wrapText(
           normalizeText(editable.value),
           font,
-          getMaxContainerWidth(container!),
+          getBoundTextMaxWidth(container!),
         );
         const { width, height } = measureText(
           wrappedText,

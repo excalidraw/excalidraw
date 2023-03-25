@@ -261,18 +261,20 @@ import throttle from "lodash.throttle";
 import { fileOpen, FileSystemHandle } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
   getBoundTextElement,
   getContainerCenter,
   getContainerDims,
   getContainerElement,
-  getDefaultLineHeight,
-  getLineHeightInPx,
   getTextBindableContainerAtPosition,
-  isMeasureTextSupported,
   isValidTextContainer,
 } from "../element/textElement";
+import {
+  getApproxMinContainerHeight,
+  getApproxMinContainerWidth,
+  isMeasureTextSupported,
+  getLineHeightInPx,
+  getDefaultLineHeight,
+} from "../element/textMeasurements";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
   normalizeLink,
@@ -2701,11 +2703,11 @@ class App extends React.Component<AppProps, AppState> {
         fontSize,
         fontFamily,
       };
-      const minWidth = getApproxMinLineWidth(
+      const minWidth = getApproxMinContainerWidth(
         getFontString(fontString),
         lineHeight,
       );
-      const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
+      const minHeight = getApproxMinContainerHeight(fontSize, lineHeight);
       const containerDims = getContainerDims(container);
       const newHeight = Math.max(containerDims.height, minHeight);
       const newWidth = Math.max(containerDims.width, minWidth);

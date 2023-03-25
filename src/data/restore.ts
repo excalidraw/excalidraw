@@ -35,7 +35,10 @@ import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import oc from "open-color";
 import { MarkOptional, Mutable } from "../utility-types";
-import { detectLineHeight, getDefaultLineHeight } from "../element/textElement";
+import {
+  detectLineHeight,
+  getDefaultLineHeight,
+} from "../element/textMeasurements";
 
 type RestoredAppState = Omit<
   AppState,

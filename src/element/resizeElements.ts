@@ -39,15 +39,16 @@ import {
 import { Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
-  getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
   getContainerElement,
   handleBindTextResize,
-  getMaxContainerWidth,
-  getApproxMinLineHeight,
+  getBoundTextMaxWidth,
 } from "./textElement";
-
+import {
+  getApproxMinContainerHeight,
+  getApproxMinContainerWidth,
+} from "./textMeasurements";
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
     return angle - 2 * Math.PI;
@@ -201,7 +202,7 @@ const measureFontSizeFromWidth = (
   if (hasContainer) {
     const container = getContainerElement(element);
     if (container) {
-      width = getMaxContainerWidth(container);
+      width = getBoundTextMaxWidth(container);
     }
   }
   const nextFontSize = element.fontSize * (nextWidth / width);
@@ -421,18 +422,18 @@ export const resizeSingleElement = (
 
       const nextFontSize = measureFontSizeFromWidth(
         boundTextElement,
-        getMaxContainerWidth(updatedElement),
+        getBoundTextMaxWidth(updatedElement),
       );
       if (nextFontSize === null) {
         return;
       }
       boundTextFontSize = nextFontSize;
     } else {
-      const minWidth = getApproxMinLineWidth(
+      const minWidth = getApproxMinContainerWidth(
         getFontString(boundTextElement),
         boundTextElement.lineHeight,
       );
-      const minHeight = getApproxMinLineHeight(
+      const minHeight = getApproxMinContainerHeight(
         boundTextElement.fontSize,
         boundTextElement.lineHeight,
       );
@@ -698,7 +699,7 @@ const resizeMultipleElements = (
       const fontSize = measureFontSizeFromWidth(
         boundTextElement ?? (element.orig as ExcalidrawTextElement),
         boundTextElement
-          ? getMaxContainerWidth(updatedElement)
+          ? getBoundTextMaxWidth(updatedElement)
           : updatedElement.width,
       );
 

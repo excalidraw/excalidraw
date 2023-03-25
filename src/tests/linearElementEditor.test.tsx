@@ -17,11 +17,8 @@ import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { queryByTestId, queryByText } from "@testing-library/react";
 import { resize, rotate } from "./utils";
-import {
-  getBoundTextElementPosition,
-  wrapText,
-  getMaxContainerWidth,
-} from "../element/textElement";
+import { getBoundTextMaxWidth } from "../element/textElement";
+import { wrapText } from "../element/textMeasurements";
 import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS } from "../constants";
 
@@ -729,7 +726,7 @@ describe("Test Linear Elements", () => {
         type: "text",
         x: 0,
         y: 0,
-        text: wrapText(text, font, getMaxContainerWidth(container)),
+        text: wrapText(text, font, getBoundTextMaxWidth(container)),
         containerId: container.id,
         width: 30,
         height: 20,
@@ -937,8 +934,9 @@ describe("Test Linear Elements", () => {
 
       expect(container.angle).toBe(0);
       expect(textElement.angle).toBe(0);
-      expect(getBoundTextElementPosition(arrow, textElement))
-        .toMatchInlineSnapshot(`
+      expect(
+        LinearElementEditor.getBoundTextElementPosition(arrow, textElement),
+      ).toMatchInlineSnapshot(`
         Object {
           "x": 75,
           "y": 60,
@@ -964,8 +962,9 @@ describe("Test Linear Elements", () => {
       rotate(container, -35, 55);
       expect(container.angle).toMatchInlineSnapshot(`1.3988061968364685`);
       expect(textElement.angle).toBe(0);
-      expect(getBoundTextElementPosition(container, textElement))
-        .toMatchInlineSnapshot(`
+      expect(
+        LinearElementEditor.getBoundTextElementPosition(container, textElement),
+      ).toMatchInlineSnapshot(`
         Object {
           "x": 21.73926141863671,
           "y": 73.31003398390868,
@@ -1002,8 +1001,9 @@ describe("Test Linear Elements", () => {
       );
       expect(container.width).toBe(70);
       expect(container.height).toBe(50);
-      expect(getBoundTextElementPosition(container, textElement))
-        .toMatchInlineSnapshot(`
+      expect(
+        LinearElementEditor.getBoundTextElementPosition(container, textElement),
+      ).toMatchInlineSnapshot(`
         Object {
           "x": 75,
           "y": 60,
@@ -1036,8 +1036,9 @@ describe("Test Linear Elements", () => {
         }
       `);
 
-      expect(getBoundTextElementPosition(container, textElement))
-        .toMatchInlineSnapshot(`
+      expect(
+        LinearElementEditor.getBoundTextElementPosition(container, textElement),
+      ).toMatchInlineSnapshot(`
         Object {
           "x": 272,
           "y": 45,
@@ -1070,8 +1071,9 @@ describe("Test Linear Elements", () => {
         arrow,
       );
       expect(container.width).toBe(40);
-      expect(getBoundTextElementPosition(container, textElement))
-        .toMatchInlineSnapshot(`
+      expect(
+        LinearElementEditor.getBoundTextElementPosition(container, textElement),
+      ).toMatchInlineSnapshot(`
         Object {
           "x": 25,
           "y": 10,
@@ -1095,8 +1097,9 @@ describe("Test Linear Elements", () => {
         }
       `);
 
-      expect(getBoundTextElementPosition(container, textElement))
-        .toMatchInlineSnapshot(`
+      expect(
+        LinearElementEditor.getBoundTextElementPosition(container, textElement),
+      ).toMatchInlineSnapshot(`
         Object {
           "x": 75,
           "y": -5,
@@ -1149,7 +1152,7 @@ describe("Test Linear Elements", () => {
       expect(rect.x).toBe(400);
       expect(rect.y).toBe(0);
       expect(
-        wrapText(textElement.originalText, font, getMaxContainerWidth(arrow)),
+        wrapText(textElement.originalText, font, getBoundTextMaxWidth(arrow)),
       ).toMatchInlineSnapshot(`
         "Online whiteboard collaboration
         made easy"
@@ -1172,7 +1175,7 @@ describe("Test Linear Elements", () => {
         false,
       );
       expect(
-        wrapText(textElement.originalText, font, getMaxContainerWidth(arrow)),
+        wrapText(textElement.originalText, font, getBoundTextMaxWidth(arrow)),
       ).toMatchInlineSnapshot(`
         "Online whiteboard 
         collaboration made 

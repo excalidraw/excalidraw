@@ -54,8 +54,8 @@ import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
   getBoundTextElement,
   getContainerElement,
-  getDefaultLineHeight,
 } from "../element/textElement";
+import { getDefaultLineHeight } from "../element/textMeasurements";
 import {
   isBoundToContainer,
   isLinearElement,

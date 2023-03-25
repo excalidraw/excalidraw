@@ -44,11 +44,11 @@ import {
   getBoundTextElement,
   getContainerCoords,
   getContainerElement,
-  getLineHeightInPx,
-  getMaxContainerHeight,
-  getMaxContainerWidth,
+  getBoundTextMaxHeight,
+  getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { getLineHeightInPx } from "../element/textMeasurements";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -280,7 +280,6 @@ const drawElementOnCanvas = (
 
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
@@ -830,14 +829,17 @@ const drawElementFromCanvas = (
       process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX &&
       hasBoundTextElement(element)
     ) {
+      const textElement = getBoundTextElement(
+        element,
+      ) as ExcalidrawTextElementWithContainer;
       const coords = getContainerCoords(element);
       context.strokeStyle = "#c92a2a";
       context.lineWidth = 3;
       context.strokeRect(
         (coords.x + renderConfig.scrollX) * window.devicePixelRatio,
         (coords.y + renderConfig.scrollY) * window.devicePixelRatio,
-        getMaxContainerWidth(element) * window.devicePixelRatio,
-        getMaxContainerHeight(element) * window.devicePixelRatio,
+        getBoundTextMaxWidth(element) * window.devicePixelRatio,
+        getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
       );
     }
   }

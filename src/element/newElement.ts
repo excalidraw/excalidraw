@@ -25,15 +25,17 @@ import {
   getBoundTextElementOffset,
   getContainerDims,
   getContainerElement,
-  measureText,
   normalizeText,
-  wrapText,
-  getMaxContainerWidth,
-  getDefaultLineHeight,
+  getBoundTextMaxWidth,
 } from "./textElement";
 import { VERTICAL_ALIGN } from "../constants";
 import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
+import {
+  measureText,
+  wrapText,
+  getDefaultLineHeight,
+} from "./textMeasurements";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -270,7 +272,7 @@ export const refreshTextDimensions = (
     text = wrapText(
       text,
       getFontString(textElement),
-      getMaxContainerWidth(container),
+      getBoundTextMaxWidth(container),
     );
   }
   const dimensions = getAdjustedDimensions(textElement, text);

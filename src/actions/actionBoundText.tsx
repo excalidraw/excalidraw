@@ -4,9 +4,9 @@ import { mutateElement } from "../element/mutateElement";
 import {
   computeContainerDimensionForBoundText,
   getBoundTextElement,
-  measureText,
   redrawTextBoundingBox,
 } from "../element/textElement";
+import { measureText } from "../element/textMeasurements";
 import {
   getOriginalContainerHeightFromCache,
   resetOriginalContainerCache,

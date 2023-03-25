@@ -12,16 +12,14 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
-import {
-  getBoundTextElement,
-  getDefaultLineHeight,
-} from "../element/textElement";
+import { getBoundTextElement } from "../element/textElement";
 import {
   hasBoundTextElement,
   canApplyRoundnessTypeToElement,
   getDefaultRoundnessTypeForElement,
 } from "../element/typeChecks";
 import { getSelectedElements } from "../scene";
+import { getDefaultLineHeight } from "../element/textMeasurements";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";

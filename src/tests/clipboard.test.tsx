@@ -3,12 +3,13 @@ import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import ExcalidrawApp from "../excalidraw-app";
 import { KEYS } from "../keys";
+
+import { getElementBounds } from "../element";
+import { NormalizedZoomValue } from "../types";
 import {
   getDefaultLineHeight,
   getLineHeightInPx,
-} from "../element/textElement";
-import { getElementBounds } from "../element";
-import { NormalizedZoomValue } from "../types";
+} from "../element/textMeasurements";
 
 const { h } = window;
 
