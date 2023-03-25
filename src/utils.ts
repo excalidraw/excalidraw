@@ -181,6 +181,70 @@ export const throttleRAF = <T extends any[]>(
   return ret;
 };
 
+/**
+ * Exponential ease-out method
+ *
+ * @see: https://github.com/kaelzhang/easing-functions
+ * @param {number} k - The value to be tweened.
+ * @returns {number} The tweened value.
+ */
+function easeOut(k: number): number {
+  return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
+}
+
+/**
+ * Compute new values based on the same ease function and trigger the
+ * callback through a requestAnimationFrame call
+ *
+ * use `opts` to define a duration and/or an easeFn
+ *
+ * for example:
+ * ```ts
+ * easeToValuesRAF([10, 20, 10], [0, 0, 0], (a, b, c) => setState(a,b, c))
+ * ```
+ *
+ * @param fromValues The initial values, must be numeric
+ * @param toValues The destination values, must also be numeric
+ * @param callback The callback receiving the values
+ * @param opts default to 250ms duration and the easeOut function
+ */
+export const easeToValuesRAF = (
+  fromValues: number[],
+  toValues: number[],
+  callback: (...values: number[]) => void,
+  opts?: { duration?: number; easeFn?: (value: number) => number },
+) => {
+  let startTime: number;
+
+  const duration = opts?.duration || 250; // default animation to 0.25 seconds
+  const easeFn = opts?.easeFn || easeOut; // default the easeFn to easeOut
+
+  function step(timestamp: number) {
+    if (startTime === undefined) {
+      startTime = timestamp;
+    }
+
+    const elapsed = timestamp - startTime;
+
+    if (elapsed < duration) {
+      // console.log(elapsed, duration, elapsed / duration);
+      const factor = easeFn(elapsed / duration);
+      const newValues = fromValues.map(
+        (fromValue, index) =>
+          (toValues[index] - fromValue) * factor + fromValue,
+      );
+
+      callback(...newValues);
+      window.requestAnimationFrame(step);
+    } else {
+      // ensure final values are reached at the end of the transition
+      callback(...toValues);
+    }
+  }
+
+  window.requestAnimationFrame(step);
+};
+
 // https://github.com/lodash/lodash/blob/es/chunk.js
 export const chunk = <T extends any>(
   array: readonly T[],

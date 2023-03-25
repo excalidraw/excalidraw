@@ -228,6 +228,7 @@ import {
   updateActiveTool,
   getShortcutKey,
   isTransparent,
+  easeToValuesRAF,
 } from "../utils";
 import {
   ContextMenu,
@@ -283,7 +284,6 @@ import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
 import {
   actionToggleHandTool,
-  easeToValuesRAF,
   zoomToFitElements,
 } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
