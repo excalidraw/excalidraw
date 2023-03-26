@@ -6,6 +6,7 @@ import {
   useExcalidrawContainer,
   useDevice,
   useExcalidrawSetAppState,
+  useExcalidrawAppState,
 } from "../components/App";
 import { KEYS } from "../keys";
 import "./Dialog.scss";
@@ -33,6 +34,7 @@ export const Dialog = (props: DialogProps) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [lastActiveElement] = useState(document.activeElement);
   const { id } = useExcalidrawContainer();
+  const { dynamicStyle } = useExcalidrawAppState(); //zsviczian
 
   useEffect(() => {
     if (!islandNode) {
@@ -90,6 +92,7 @@ export const Dialog = (props: DialogProps) => {
       onCloseRequest={onClose}
       theme={props.theme}
       closeOnClickOutside={props.closeOnClickOutside}
+      style={dynamicStyle}
     >
       <Island ref={setIslandNode}>
         <h2 id={`${id}-dialog-title`} className="Dialog__title">

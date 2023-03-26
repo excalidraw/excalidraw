@@ -222,6 +222,7 @@ export type AppState = {
   currentStrokeOptions?: any; //zsviczian
   resetCustomPen?: any; //zsviczian
   gridColor: string; //zsviczian
+  dynamicStyle: string; //zsviczian
   selectedLinearElement: LinearElementEditor | null;
 };
 

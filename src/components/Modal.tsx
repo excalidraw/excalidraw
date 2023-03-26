@@ -4,7 +4,7 @@ import React, { useState, useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { KEYS } from "../keys";
-import { useExcalidrawContainer, useDevice } from "./App";
+import { useExcalidrawContainer, useDevice, useExcalidrawAppState } from "./App";
 import { AppState } from "../types";
 import { THEME } from "../constants";
 
@@ -16,9 +16,10 @@ export const Modal: React.FC<{
   labelledBy: string;
   theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
+  style: string; //zsviczian
 }> = (props) => {
-  const { theme = THEME.LIGHT, closeOnClickOutside = true } = props;
-  const modalRoot = useBodyRoot(theme);
+  const { theme = THEME.LIGHT, closeOnClickOutside = true , style} = props; //zsviczian
+  const modalRoot = useBodyRoot(theme,style); //zsviczian
 
   if (!modalRoot) {
     return null;
@@ -57,7 +58,7 @@ export const Modal: React.FC<{
   );
 };
 
-const useBodyRoot = (theme: AppState["theme"]) => {
+const useBodyRoot = (theme: AppState["theme"], style: string) => {
   const [div, setDiv] = useState<HTMLDivElement | null>(null);
 
   const device = useDevice();
@@ -79,6 +80,7 @@ const useBodyRoot = (theme: AppState["theme"]) => {
     const div = document.createElement("div");
 
     div.classList.add("excalidraw", "excalidraw-modal-container");
+    div.setAttribute("style",style); //zsviczian
     div.classList.toggle("excalidraw--mobile", isMobileRef.current);
 
     if (isDarkTheme) {
