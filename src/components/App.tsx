@@ -592,10 +592,11 @@ class App extends React.Component<AppProps, AppState> {
           const FRAME_NAME_EDIT_PADDING = 6;
 
           const reset = () => {
-            f.name?.trim() === "" &&
+            if (f.name?.trim() === "") {
               mutateElement(f, {
                 name: null,
               });
+            }
 
             this.setState({
               editingFrame: null,
@@ -654,6 +655,14 @@ class App extends React.Component<AppProps, AppState> {
                     });
                   }}
                   onBlur={(event) => reset()}
+                  onKeyDown={(event) => {
+                    // for some inexplicable reason, `onBlur` triggered on ESC
+                    // does not reset `state.editingFrame` despite being called,
+                    // and we need to reset it here as well
+                    if (event.key === KEYS.ESCAPE) {
+                      reset();
+                    }
+                  }}
                   onKeyUp={(event) => {
                     if (event.key === KEYS.ENTER) {
                       reset();
