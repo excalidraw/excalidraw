@@ -45,6 +45,7 @@ export const actionUnbindText = register({
         const { width, height } = measureText(
           boundTextElement.originalText,
           getFontString(boundTextElement),
+          boundTextElement.lineHeight,
         );
         const originalContainerHeight = getOriginalContainerHeightFromCache(
           element.id,
