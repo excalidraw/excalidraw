@@ -881,7 +881,21 @@ export const renderElement = (
 
         context.lineWidth = 1 / renderConfig.zoom.value;
         context.strokeStyle = FRAME_STYLE.strokeColor;
-        context.strokeRect(offset, offset, element.width, element.height);
+
+        if (FRAME_STYLE.radius && context.roundRect) {
+          context.beginPath();
+          context.roundRect(
+            offset,
+            offset,
+            element.width,
+            element.height,
+            FRAME_STYLE.radius / renderConfig.zoom.value,
+          );
+          context.stroke();
+          context.closePath();
+        } else {
+          context.strokeRect(offset, offset, element.width, element.height);
+        }
 
         context.restore();
       }

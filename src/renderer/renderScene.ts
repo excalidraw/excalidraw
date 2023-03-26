@@ -84,6 +84,8 @@ const strokeRectWithRotation = (
   cy: number,
   angle: number,
   fill: boolean = false,
+  /** should account for zoom */
+  radius: number = 0,
 ) => {
   context.save();
   context.translate(cx, cy);
@@ -91,7 +93,14 @@ const strokeRectWithRotation = (
   if (fill) {
     context.fillRect(x - cx, y - cy, width, height);
   }
-  context.strokeRect(x - cx, y - cy, width, height);
+  if (radius && context.roundRect) {
+    context.beginPath();
+    context.roundRect(x - cx, y - cy, width, height, radius);
+    context.stroke();
+    context.closePath();
+  } else {
+    context.strokeRect(x - cx, y - cy, width, height);
+  }
   context.restore();
 };
 
@@ -1199,6 +1208,8 @@ const renderFrameHighlight = (
     x1 + width / 2,
     y1 + height / 2,
     frame.angle,
+    false,
+    FRAME_STYLE.radius / renderConfig.zoom.value,
   );
   context.restore();
 };
