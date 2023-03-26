@@ -443,8 +443,6 @@ export const _renderScene = ({
       }),
     );
 
-    const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
-
     const groupsToBeAddedToFrame = new Set<string>();
 
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
@@ -458,7 +456,7 @@ export const _renderScene = ({
 
         if (
           frameId &&
-          ((renderConfig.isExporting && onlyExportingSingleFrame) ||
+          ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
             (!renderConfig.isExporting && appState.shouldRenderFrames))
         ) {
           const containgFrame = getContainingFrame(element);
