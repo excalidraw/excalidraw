@@ -865,7 +865,7 @@ export const renderElement = (
       break;
     }
     case "frame": {
-      if (!renderConfig.isExporting && appState.shouldRenderFrame) {
+      if (!renderConfig.isExporting && appState.shouldRenderFrames) {
         context.save();
         context.translate(
           element.x + renderConfig.scrollX,

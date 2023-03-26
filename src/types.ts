@@ -110,7 +110,7 @@ export type AppState = {
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
   frameToHighlight: NonDeleted<ExcalidrawFrameElement> | null;
-  shouldRenderFrame: boolean;
+  shouldRenderFrames: boolean;
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   // element being edited, but not necessarily added to elements array yet

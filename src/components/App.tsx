@@ -575,7 +575,7 @@ class App extends React.Component<AppProps, AppState> {
   private renderFrameNames = () => {
     const isDarkTheme = this.state.theme === "dark";
 
-    return this.state.shouldRenderFrame
+    return this.state.shouldRenderFrames
       ? this.scene.getNonDeletedFrames().map((f, index) => {
           const { x, y } = sceneCoordsToViewportCoords(
             { sceneX: f.x, sceneY: f.y },
@@ -2003,7 +2003,7 @@ class App extends React.Component<AppProps, AppState> {
   toggleFrameRendering = () => {
     this.setState((prevState) => {
       return {
-        shouldRenderFrame: !prevState.shouldRenderFrame,
+        shouldRenderFrames: !prevState.shouldRenderFrames,
       };
     });
   };
@@ -2732,7 +2732,7 @@ class App extends React.Component<AppProps, AppState> {
     ).filter((element) => {
       // hitting a frame's element from outside the frame is not considered a hit
       const containingFrame = getContainingFrame(element);
-      return containingFrame && this.state.shouldRenderFrame
+      return containingFrame && this.state.shouldRenderFrames
         ? isCursorInFrame({ x, y }, containingFrame)
         : true;
     });

@@ -459,7 +459,7 @@ export const _renderScene = ({
         if (
           frameId &&
           ((renderConfig.isExporting && onlyExportingSingleFrame) ||
-            (!renderConfig.isExporting && appState.shouldRenderFrame))
+            (!renderConfig.isExporting && appState.shouldRenderFrames))
         ) {
           const containgFrame = getContainingFrame(element);
 

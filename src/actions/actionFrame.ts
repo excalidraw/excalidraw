@@ -102,13 +102,13 @@ export const actionToggleFrameRendering = register({
       elements,
       appState: {
         ...appState,
-        shouldRenderFrame: !appState.shouldRenderFrame,
+        shouldRenderFrames: !appState.shouldRenderFrames,
       },
       commitToHistory: false,
     };
   },
   contextItemLabel: "labels.toggleFrameRendering",
-  checked: (appState: AppState) => appState.shouldRenderFrame,
+  checked: (appState: AppState) => appState.shouldRenderFrames,
   // keyTest: (event) =>
   //   event.key.toLocaleLowerCase() === KEYS.F &&
   //   event[KEYS.CTRL_OR_CMD] &&
