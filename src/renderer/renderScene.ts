@@ -141,9 +141,10 @@ const strokeGrid = (
   offsetY: number,
   width: number,
   height: number,
+  color: string,
 ) => {
   context.save();
-  context.strokeStyle = "rgba(128,128,128,0.1)"; //zsviczian
+  context.strokeStyle = color; //zsviczian
   context.beginPath();
   for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
     context.moveTo(x, offsetY - gridSize);
@@ -391,6 +392,7 @@ export const _renderScene = ({
           (renderConfig.scrollY % appState.gridSize),
         normalizedCanvasWidth / renderConfig.zoom.value,
         normalizedCanvasHeight / renderConfig.zoom.value,
+        appState.gridColor,
       );
     }
 

@@ -286,12 +286,12 @@ import { ImportedDataState } from "../data/types"; //zsviczian
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
-export let showFourthFont: boolean = false;
 import { actionToggleHandTool } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionCreateContainerFromText } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
+export let showFourthFont: boolean = false;
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -1907,20 +1907,20 @@ class App extends React.Component<AppProps, AppState> {
   //zsviczian
   startLineEditor = (
     el: ExcalidrawLinearElement,
-    selectedPointsIndices: number[]|null = null,
+    selectedPointsIndices: number[] | null = null,
   ) => {
-    if(!el || !isLinearElement(el)) {
+    if (!el || !isLinearElement(el)) {
       return;
     }
     const editingLinearElement = new LinearElementEditor(el, this.scene);
     this.setState({
       selectedLinearElement: editingLinearElement,
-      editingLinearElement:{
+      editingLinearElement: {
         ...editingLinearElement,
-        selectedPointsIndices
-      }
+        selectedPointsIndices,
+      },
     });
-  }
+  };
 
   //zsviczian
   updateContainerSize = withBatchedUpdates(
@@ -4429,7 +4429,8 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin,
       this.scene,
     );
-    if(strokeOptions?.highlighter) { //zsviczian
+    if (strokeOptions?.highlighter) {
+      //zsviczian
       this.scene.replaceAllElements([
         element,
         ...this.scene.getElementsIncludingDeleted(),
