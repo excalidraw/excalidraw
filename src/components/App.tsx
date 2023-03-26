@@ -77,6 +77,7 @@ import {
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   THEME,
+  THEME_FILTER,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
   ZOOM_STEP,
@@ -572,6 +573,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private renderFrameNames = () => {
+
+    const isDarkTheme = this.state.theme === "dark";
+
     return this.state.shouldRenderFrame
       ? this.scene.getNonDeletedFrames().map((f, index) => {
           const { x, y } = sceneCoordsToViewportCoords(
@@ -585,7 +589,7 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           const FRAME_NAME_GAP = 20;
-          const FRAME_NAME_EDIT_PADDING = 3;
+          const FRAME_NAME_EDIT_PADDING = 6;
 
           const reset = () => {
             f.name?.trim() === "" &&
@@ -617,10 +621,13 @@ class App extends React.Component<AppProps, AppState> {
                 }px`,
                 zIndex: 2,
                 fontSize: "14px",
-                color: "#3D3D3D",
+                color: isDarkTheme
+                  ? "var(--color-gray-40)"
+                  : "var(--color-gray-80)",
                 width: "max-content",
                 maxWidth: `${xRight - x + FRAME_NAME_EDIT_PADDING * 2}px`,
-                overflow: "hidden",
+                overflow:
+                  f.id === this.state.editingFrame ? "visible" : "hidden",
                 whiteSpace: "nowrap",
                 textOverflow: "ellipsis",
               }}
@@ -653,15 +660,18 @@ class App extends React.Component<AppProps, AppState> {
                     }
                   }}
                   style={{
+                    background: this.state.viewBackgroundColor,
+                    filter: isDarkTheme ? THEME_FILTER : "none",
                     zIndex: 2,
                     border: "none",
                     display: "block",
-                    padding: `0 ${FRAME_NAME_EDIT_PADDING}px`,
-                    borderRadius: "2px",
-                    boxShadow: "inset 0 0 0 2px var(--color-primary)",
+                    padding: `${FRAME_NAME_EDIT_PADDING}px`,
+                    borderRadius: 4,
+                    boxShadow: "inset 0 0 0 1px var(--color-primary)",
                     fontFamily: "Assistant",
                     fontSize: "14px",
-                    color: "#3D3D3D",
+                    transform: `translateY(-${FRAME_NAME_EDIT_PADDING}px)`,
+                    color: "var(--color-gray-80)",
                     overflow: "hidden",
                     maxWidth: `${Math.min(
                       xRight - x - FRAME_NAME_EDIT_PADDING,
