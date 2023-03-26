@@ -237,8 +237,8 @@ export const zoomToFitElements = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   zoomToSelection: boolean,
-  maxZoom: number = 1,
-  margin: number = 0,
+  maxZoom: number = 1, //zsviczian
+  margin: number = 0, //zsviczian
 ) => {
   const nonDeletedElements = getNonDeletedElements(elements);
   const selectedElements = getSelectedElements(nonDeletedElements, appState);

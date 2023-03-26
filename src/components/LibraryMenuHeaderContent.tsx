@@ -189,7 +189,7 @@ export const LibraryMenuHeader: React.FC<{
         source: "https://excalidraw.com",
         libraryItems
       }, null, "\t")),
-      "my-obsidian-library.excalidrawlib",
+      "my-obsidian-library.excalidrawlib", //zsviczian
     );/*
     saveLibraryAsJSON(libraryItems)
       .catch(muteFSAbortError)

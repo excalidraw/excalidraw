@@ -234,6 +234,7 @@ export {
   intersectElementWithLine, //zsviczian
   determineFocusDistance, //zsviczian
   measureText, //zsviczian
+  getDefaultLineHeight, //zsviczian
   wrapText, //zsviczian
   getFontString, //zsviczian
   getMaxContainerWidth, //zsviczian
