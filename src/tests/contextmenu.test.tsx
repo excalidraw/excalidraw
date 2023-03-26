@@ -88,7 +88,6 @@ describe("contextMenu element", () => {
       "zenMode",
       "viewMode",
       "stats",
-      // "toggleFrameRendering",
     ];
 
     expect(contextMenu).not.toBeNull();
