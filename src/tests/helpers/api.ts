@@ -182,12 +182,14 @@ export class API {
         });
         break;
       case "text":
+        const fontSize = rest.fontSize ?? appState.currentItemFontSize;
+        const fontFamily = rest.fontFamily ?? appState.currentItemFontFamily;
         element = newTextElement({
           ...base,
           text: rest.text || "test",
-          rawText: rest.rawText || "test",
-          fontSize: rest.fontSize ?? appState.currentItemFontSize,
-          fontFamily: rest.fontFamily ?? appState.currentItemFontFamily,
+          rawText: rest.rawText || "test", //zsviczian
+          fontSize,
+          fontFamily,
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
           containerId: rest.containerId ?? undefined,
