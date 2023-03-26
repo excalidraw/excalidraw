@@ -102,6 +102,7 @@ export const getDefaultAppState = (): Omit<
     customPens: [], //zsviczian
     currentStrokeOptions: null, //zsviczian
     resetCustomPen: null, //zsviczian
+    gridColor: "#E6E6E6", //zsviczian
     selectedLinearElement: null,
   };
 };
@@ -205,6 +206,7 @@ const APP_STATE_STORAGE_CONF = (<
   customPens: { browser: false, export: false, server: false }, //zsviczian
   currentStrokeOptions: { browser: false, export: false, server: false }, //zsviczian
   resetCustomPen: { browser: false, export: false, server: false }, //zsviczian
+  gridColor: { browser: false, export: false, server: false }, //zsviczian
   selectedLinearElement: { browser: true, export: false, server: false },
 });
 

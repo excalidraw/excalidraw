@@ -90,7 +90,7 @@ export const redrawTextBoundingBox = (
         nextHeight = computeContainerDimensionForBoundText(
           metrics.height,
           container.type,
-          container.customData?.legacyTextWrap
+          container.customData?.legacyTextWrap, //zsviczian
         );
         mutateElement(container, { height: nextHeight });
         maxContainerHeight = getMaxContainerHeight(container);
@@ -195,7 +195,7 @@ export const handleBindTextResize = (
       containerHeight = computeContainerDimensionForBoundText(
         nextHeight,
         container.type,
-        container.customData?.legacyTextWrap
+        container.customData?.legacyTextWrap, //zsviczian
       );
 
       const diff = containerHeight - containerDims.height;
@@ -326,6 +326,10 @@ export const getTextHeight = (text: string, font: FontString) => {
 };
 
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
+  if (!maxWidth) {
+    return text;
+  }
+
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
   const spaceWidth = getLineWidth(" ", font);
@@ -749,13 +753,15 @@ export const computeContainerDimensionForBoundText = (
   dimension = Math.ceil(dimension);
   const padding = BOUND_TEXT_PADDING * 2;
 
-  if (containerType === "ellipse" && !legacy) { //zsviczian
+  if (containerType === "ellipse" && !legacy) {
+    //zsviczian
     return Math.round(((dimension + padding) / Math.sqrt(2)) * 2);
   }
   if (containerType === "arrow") {
     return dimension + padding * 8;
   }
-  if (containerType === "diamond" && !legacy) {//zsviczian
+  if (containerType === "diamond" && !legacy) {
+    //zsviczian
     return 2 * (dimension + padding);
   }
   return dimension + padding;

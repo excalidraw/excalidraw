@@ -789,7 +789,7 @@ export const findFocusPointForEllipse = (
   const n = (-m * px - 1) / py;
 
   const x = -(a ** 2 * m) / (n ** 2 * b ** 2 + m ** 2 * a ** 2);
-  return GA.point(x, (-m * x - 1) / n);
+  return GA.point(x, (-m * x - 1) / (n === 0 ? 0.0001 : n)); //zsviczian https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/1054
 };
 
 export const findFocusPointForRectangulars = (

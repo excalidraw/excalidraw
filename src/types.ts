@@ -220,7 +220,8 @@ export type AppState = {
   pinnedScripts?: string[]; //zsviczian
   customPens?: any[]; //zsviczian
   currentStrokeOptions?: any; //zsviczian
-  resetCustomPen?: any //zsviczian
+  resetCustomPen?: any; //zsviczian
+  gridColor: string; //zsviczian
   selectedLinearElement: LinearElementEditor | null;
 };
 

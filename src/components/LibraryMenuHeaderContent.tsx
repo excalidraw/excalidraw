@@ -175,7 +175,7 @@ export const LibraryMenuHeader: React.FC<{
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
-  }
+  };
 
   const onLibraryExport = async () => {
     const libraryItems = itemsSelected
