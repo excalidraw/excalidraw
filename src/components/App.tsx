@@ -573,7 +573,6 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private renderFrameNames = () => {
-
     const isDarkTheme = this.state.theme === "dark";
 
     return this.state.shouldRenderFrame
@@ -631,6 +630,9 @@ class App extends React.Component<AppProps, AppState> {
                   f.id === this.state.editingFrame ? "visible" : "hidden",
                 whiteSpace: "nowrap",
                 textOverflow: "ellipsis",
+                // disable all interaction (e.g. cursor change) when in view
+                // mode
+                pointerEvents: this.state.viewModeEnabled ? "none" : "all",
               }}
               onPointerDown={(event) => {
                 this.handleCanvasPointerDown(event as any);

@@ -522,6 +522,11 @@ export type ExcalidrawImperativeAPI = {
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
   toggleMenu: InstanceType<typeof App>["toggleMenu"];
+  /**
+   * Disables rendering of frames (including element clipping), but currently
+   * the frames are still interactive in edit mode. As such, this API should be
+   * used in conjunction with view mode (props.viewModeEnabled).
+   */
   toggleFrameRendering: InstanceType<typeof App>["toggleFrameRendering"];
 };
 
