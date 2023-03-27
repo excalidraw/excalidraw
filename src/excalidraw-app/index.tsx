@@ -642,7 +642,17 @@ const ExcalidrawWrapper = () => {
         //   );
         // }}
       >
+        <AppMainMenu
+          setCollabDialogShown={setCollabDialogShown}
+          isCollaborating={isCollaborating}
+        />
+        <AppWelcomeScreen setCollabDialogShown={setCollabDialogShown} />
         <AppFooter />
+        {isCollaborating && isOffline && (
+          <div className="collab-offline-warning">
+            {t("alerts.collabOfflineWarning")}
+          </div>
+        )}
       </Excalidraw>
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (

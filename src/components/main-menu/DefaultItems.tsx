@@ -14,6 +14,7 @@ import {
   save,
   SunIcon,
   TrashIcon,
+  usersIcon,
 } from "../icons";
 import { GithubIcon } from "../icons";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
@@ -30,6 +31,7 @@ import "./DefaultItems.scss";
 import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { jotaiScope } from "../../jotai";
+import clsx from "clsx";
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -193,18 +195,16 @@ export const Export = () => {
   const { t } = useI18n();
   const setAppState = useExcalidrawSetAppState();
   return (
-    <>
-      <DropdownMenuItem
-        icon={ExportIcon}
-        onSelect={() => {
-          setAppState({ openDialog: "jsonExport" });
-        }}
-        data-testid="json-export-button"
-        aria-label={t("buttons.export")}
-      >
-        {t("buttons.export")}
-      </DropdownMenuItem>
-    </>
+    <DropdownMenuItem
+      icon={ExportIcon}
+      onSelect={() => {
+        setAppState({ openDialog: "jsonExport" });
+      }}
+      data-testid="json-export-button"
+      aria-label={t("buttons.export")}
+    >
+      {t("buttons.export")}
+    </DropdownMenuItem>
   );
 };
 Export.displayName = "Export";

@@ -453,7 +453,7 @@
   "welcomeScreen": {
     "app": {
       "center_heading": "Rysunki i dane są zapisywane lokalnie w Twojej przeglądarce.",
-      "menuHint": "Export, preferences, languages, ..."
+      "menuHint": "Zapisywanie, preferencje i więcej..."
     },
     "defaults": {
       "menuHint": "Eksporty, preferencje i więcej...",

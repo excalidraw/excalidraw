@@ -1,7 +1,10 @@
 import React from "react";
 import { MainMenu } from "../../packages/excalidraw/index";
 
-export const AppMainMenu: React.FC<{}> = React.memo((props) => {
+export const AppMainMenu: React.FC<{
+  setCollabDialogShown: (toggle: boolean) => any;
+  isCollaborating: boolean;
+}> = React.memo((props) => {
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
