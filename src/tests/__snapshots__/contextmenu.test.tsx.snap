@@ -138,6 +138,15 @@ Object {
         },
       },
       Object {
+        "contextItemLabel": "labels.createContainerFromText",
+        "name": "createContainerFromText",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
@@ -4683,6 +4692,15 @@ Object {
         },
       },
       Object {
+        "contextItemLabel": "labels.createContainerFromText",
+        "name": "createContainerFromText",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
@@ -5245,6 +5263,15 @@ Object {
       Object {
         "contextItemLabel": "labels.bindText",
         "name": "bindText",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.createContainerFromText",
+        "name": "createContainerFromText",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": Object {
@@ -6127,6 +6154,15 @@ Object {
         },
       },
       Object {
+        "contextItemLabel": "labels.createContainerFromText",
+        "name": "createContainerFromText",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
@@ -6480,6 +6516,15 @@ Object {
       Object {
         "contextItemLabel": "labels.bindText",
         "name": "bindText",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "element",
+        },
+      },
+      Object {
+        "contextItemLabel": "labels.createContainerFromText",
+        "name": "createContainerFromText",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": Object {

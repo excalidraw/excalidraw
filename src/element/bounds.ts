@@ -24,6 +24,7 @@ import { rescalePoints } from "../points";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { viewportCoordsToSceneCoords } from "../utils";
+import { Mutable } from "../utility-types";
 
 // x and y position of top left corner, x and y position of bottom right corner
 export type Bounds = readonly [number, number, number, number];

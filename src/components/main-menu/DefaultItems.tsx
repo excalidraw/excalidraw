@@ -1,5 +1,5 @@
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
-import { t } from "../../i18n";
+import { useI18n } from "../../i18n";
 import {
   useExcalidrawAppState,
   useExcalidrawSetAppState,
@@ -31,11 +31,10 @@ import "./DefaultItems.scss";
 import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
+import { jotaiScope } from "../../jotai";
 
 export const LoadScene = () => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
 
   if (!actionManager.isActionEnabled(actionLoadScene)) {
@@ -57,9 +56,7 @@ export const LoadScene = () => {
 LoadScene.displayName = "LoadScene";
 
 export const SaveToActiveFile = () => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
 
   if (!actionManager.isActionEnabled(actionSaveToActiveFile)) {
@@ -80,9 +77,7 @@ SaveToActiveFile.displayName = "SaveToActiveFile";
 
 export const SaveAsImage = () => {
   const setAppState = useExcalidrawSetAppState();
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
   return (
     <DropdownMenuItem
       icon={ExportImageIcon}
@@ -98,9 +93,7 @@ export const SaveAsImage = () => {
 SaveAsImage.displayName = "SaveAsImage";
 
 export const Help = () => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
 
   const actionManager = useExcalidrawActionManager();
 
@@ -119,10 +112,12 @@ export const Help = () => {
 Help.displayName = "Help";
 
 export const ClearCanvas = () => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
-  const setActiveConfirmDialog = useSetAtom(activeConfirmDialogAtom);
+  const { t } = useI18n();
+
+  const setActiveConfirmDialog = useSetAtom(
+    activeConfirmDialogAtom,
+    jotaiScope,
+  );
   const actionManager = useExcalidrawActionManager();
 
   if (!actionManager.isActionEnabled(actionClearCanvas)) {
@@ -143,6 +138,7 @@ export const ClearCanvas = () => {
 ClearCanvas.displayName = "ClearCanvas";
 
 export const ToggleTheme = () => {
+  const { t } = useI18n();
   const appState = useExcalidrawAppState();
   const actionManager = useExcalidrawActionManager();
 
@@ -175,6 +171,7 @@ export const ToggleTheme = () => {
 ToggleTheme.displayName = "ToggleTheme";
 
 export const ChangeCanvasBackground = () => {
+  const { t } = useI18n();
   const appState = useExcalidrawAppState();
   const actionManager = useExcalidrawActionManager();
 
@@ -195,9 +192,7 @@ export const ChangeCanvasBackground = () => {
 ChangeCanvasBackground.displayName = "ChangeCanvasBackground";
 
 export const Export = () => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
   const setAppState = useExcalidrawSetAppState();
   return (
     <DropdownMenuItem
@@ -248,9 +243,7 @@ export const LiveCollaborationTrigger = ({
   onSelect: () => void;
   isCollaborating: boolean;
 }) => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
   return (
     <DropdownMenuItem
       data-testid="collab-button"

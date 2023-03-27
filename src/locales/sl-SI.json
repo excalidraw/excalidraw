@@ -192,7 +192,8 @@
     "invalidSceneUrl": "S priloženega URL-ja ni bilo mogoče uvoziti scene. Je napačno oblikovana ali pa ne vsebuje veljavnih podatkov Excalidraw JSON.",
     "resetLibrary": "To bo počistilo vašo knjižnico. Ali ste prepričani?",
     "removeItemsFromsLibrary": "Izbriši elemente ({{count}}) iz knjižnice?",
-    "invalidEncryptionKey": "Ključ za šifriranje mora vsebovati 22 znakov. Sodelovanje v živo je onemogočeno."
+    "invalidEncryptionKey": "Ključ za šifriranje mora vsebovati 22 znakov. Sodelovanje v živo je onemogočeno.",
+    "collabOfflineWarning": "Internetna povezava ni na voljo.\nVaše spremembe ne bodo shranjene!"
   },
   "errors": {
     "unsupportedFileType": "Nepodprt tip datoteke.",
@@ -219,7 +220,8 @@
     "lock": "Ohrani izbrano orodje aktivno po risanju",
     "penMode": "Način peresa - prepreči dotik",
     "link": "Dodaj/posodobi povezavo za izbrano obliko",
-    "eraser": "Radirka"
+    "eraser": "Radirka",
+    "hand": "Roka (orodje za premikanje)"
   },
   "headings": {
     "canvasActions": "Dejanja za platno",
@@ -227,7 +229,7 @@
     "shapes": "Oblike"
   },
   "hints": {
-    "canvasPanning": "Za premik platna med vlečenjem držite kolesce miške ali preslednico",
+    "canvasPanning": "Za premikanje platna med vlečenjem držite kolesce miške ali preslednico ali uporabite orodje roka",
     "linearElement": "Kliknite za začetek več točk, povlecite za posamezno črto",
     "freeDraw": "Kliknite in povlecite, spustite, ko končate",
     "text": "Namig: besedilo lahko dodate tudi z dvoklikom kjer koli z orodjem za izbiro",
@@ -245,7 +247,8 @@
     "publishLibrary": "Objavi svojo knjižnico",
     "bindTextToElement": "Pritisnite tipko Enter za dodajanje besedila",
     "deepBoxSelect": "Držite tipko CtrlOrCmd za globoko izbiro in preprečitev vlečenja",
-    "eraserRevert": "Pridržite tipko Alt, da razveljavite elemente, označene za brisanje"
+    "eraserRevert": "Pridržite tipko Alt, da razveljavite elemente, označene za brisanje",
+    "firefox_clipboard_write": "To funkcijo lahko verjetno omogočite z nastavitvijo zastavice \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Če želite spremeniti zastavice brskalnika v Firefoxu, obiščite stran \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Predogleda ni bilo mogoče prikazati",
