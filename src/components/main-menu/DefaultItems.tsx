@@ -14,8 +14,9 @@ import {
   save,
   SunIcon,
   TrashIcon,
+  usersIcon,
 } from "../icons";
-import { GithubIcon } from "../icons";
+import { GithubIcon, DiscordIcon, TwitterIcon } from "../icons";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
 import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
 import {
@@ -27,6 +28,7 @@ import {
 } from "../../actions";
 
 import "./DefaultItems.scss";
+import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { jotaiScope } from "../../jotai";
@@ -193,18 +195,16 @@ export const Export = () => {
   const { t } = useI18n();
   const setAppState = useExcalidrawSetAppState();
   return (
-    <>
-      <DropdownMenuItem
-        icon={ExportIcon}
-        onSelect={() => {
-          setAppState({ openDialog: "jsonExport" });
-        }}
-        data-testid="json-export-button"
-        aria-label={t("buttons.export")}
-      >
-        {t("buttons.export")}
-      </DropdownMenuItem>
-    </>
+    <DropdownMenuItem
+      icon={ExportIcon}
+      onSelect={() => {
+        setAppState({ openDialog: "jsonExport" });
+      }}
+      data-testid="json-export-button"
+      aria-label={t("buttons.export")}
+    >
+      {t("buttons.export")}
+    </DropdownMenuItem>
   );
 };
 Export.displayName = "Export";
@@ -213,11 +213,49 @@ export const Socials = () => (
   <>
     <DropdownMenuItemLink
       icon={GithubIcon}
-      href="https://github.com/szymonwilczek"
+      href="https://github.com/excalidraw/excalidraw"
       aria-label="GitHub"
     >
       GitHub
     </DropdownMenuItemLink>
+    <DropdownMenuItemLink
+      icon={DiscordIcon}
+      href="https://discord.gg/UexuTaE"
+      aria-label="Discord"
+    >
+      Discord
+    </DropdownMenuItemLink>
+    <DropdownMenuItemLink
+      icon={TwitterIcon}
+      href="https://twitter.com/excalidraw"
+      aria-label="Twitter"
+    >
+      Twitter
+    </DropdownMenuItemLink>
   </>
 );
 Socials.displayName = "Socials";
+
+export const LiveCollaborationTrigger = ({
+  onSelect,
+  isCollaborating,
+}: {
+  onSelect: () => void;
+  isCollaborating: boolean;
+}) => {
+  const { t } = useI18n();
+  return (
+    <DropdownMenuItem
+      data-testid="collab-button"
+      icon={usersIcon}
+      className={clsx({
+        "active-collab": isCollaborating,
+      })}
+      onSelect={onSelect}
+    >
+      {t("labels.liveCollaboration")}
+    </DropdownMenuItem>
+  );
+};
+
+LiveCollaborationTrigger.displayName = "LiveCollaborationTrigger";

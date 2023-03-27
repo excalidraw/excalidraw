@@ -67,6 +67,7 @@ import {
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
 import { restore, restoreAppState, RestoredDataState } from "../data/restore";
+import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
@@ -620,6 +621,22 @@ const ExcalidrawWrapper = () => {
             toggleTheme: true,
             export: {
               onExportToBackend,
+              renderCustomUI: (elements, appState, files) => {
+                return (
+                  <ExportToExcalidrawPlus
+                    elements={elements}
+                    appState={appState}
+                    files={files}
+                    onError={(error) => {
+                      excalidrawAPI?.updateScene({
+                        appState: {
+                          errorMessage: error.message,
+                        },
+                      });
+                    }}
+                  />
+                );
+              },
             },
           },
         }}
@@ -630,19 +647,29 @@ const ExcalidrawWrapper = () => {
         onLibraryChange={onLibraryChange}
         autoFocus={true}
         theme={theme}
-        // renderTopRightUI={(isMobile) => {
-        //   if (isMobile) {
-        //     return null;
-        //   }
-        //   return (
-        //     <LiveCollaborationTrigger
-        //       isCollaborating={isCollaborating}
-        //       onSelect={() => setCollabDialogShown(true)}
-        //     />
-        //   );
-        // }}
+        renderTopRightUI={(isMobile) => {
+          if (isMobile) {
+            return null;
+          }
+          return (
+            <LiveCollaborationTrigger
+              isCollaborating={isCollaborating}
+              onSelect={() => setCollabDialogShown(true)}
+            />
+          );
+        }}
       >
+        <AppMainMenu
+          setCollabDialogShown={setCollabDialogShown}
+          isCollaborating={isCollaborating}
+        />
+        <AppWelcomeScreen setCollabDialogShown={setCollabDialogShown} />
         <AppFooter />
+        {isCollaborating && isOffline && (
+          <div className="collab-offline-warning">
+            {t("alerts.collabOfflineWarning")}
+          </div>
+        )}
       </Excalidraw>
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (

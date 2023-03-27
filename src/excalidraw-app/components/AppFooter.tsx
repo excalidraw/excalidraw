@@ -1,5 +1,7 @@
 import React from "react";
 import { Footer } from "../../packages/excalidraw/index";
+import { EncryptedIcon } from "./EncryptedIcon";
+import { ExcalidrawPlusAppLink } from "./ExcalidrawPlusAppLink";
 
 export const AppFooter = React.memo(() => {
   return (
@@ -10,7 +12,10 @@ export const AppFooter = React.memo(() => {
           gap: ".5rem",
           alignItems: "center",
         }}
-      ></div>
+      >
+        <ExcalidrawPlusAppLink />
+        <EncryptedIcon />
+      </div>
     </Footer>
   );
 });
