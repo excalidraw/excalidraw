@@ -1,7 +1,12 @@
 import React from "react";
 import { getCommonBounds } from "../element/bounds";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import { mutateElement } from "../element/mutateElement";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { t } from "../i18n";
+import { KEYS } from "../keys";
 import { getTargetElements } from "../scene";
 import { AppState, ExcalidrawProps } from "../types";
 import { CloseIcon } from "./icons";
@@ -19,9 +24,45 @@ export const Stats = (props: {
   const selectedElements = getTargetElements(props.elements, props.appState);
   const selectedBoundingBox = getCommonBounds(selectedElements);
 
+  const stats =
+    selectedElements.length === 1
+      ? [
+          {
+            label: "X",
+            value: Math.round(selectedBoundingBox[0]),
+            element: selectedElements[0],
+            property: "x",
+          },
+          {
+            label: "Y",
+            value: Math.round(selectedBoundingBox[1]),
+            element: selectedElements[0],
+            property: "y",
+          },
+          {
+            label: "W",
+            value: Math.round(selectedBoundingBox[2] - selectedBoundingBox[0]),
+            element: selectedElements[0],
+            property: "width",
+          },
+          {
+            label: "H",
+            value: Math.round(selectedBoundingBox[3] - selectedBoundingBox[1]),
+            element: selectedElements[0],
+            property: "height",
+          },
+          {
+            label: "A",
+            value: selectedElements[0].angle,
+            element: selectedElements[0],
+            property: "angle",
+          },
+        ]
+      : [];
+
   return (
     <div className="Stats">
-      <Island>
+      <Island padding={3}>
         <div className="section">
           <div className="close" onClick={props.onClose}>
             {CloseIcon}
@@ -54,75 +95,79 @@ export const Stats = (props: {
         </div>
 
         {selectedElements.length > 0 && (
-          <>
-            <div className="divider"></div>
+          <div className="section">
+            <h3>{t("stats.elementStats")}</h3>
 
-            <div className="section">
-              <h3>{t("stats.elementStats")}</h3>
+            <div className="sectionContent">
+              {selectedElements.length === 1 && (
+                <div className="elementType">
+                  {t(`element.${selectedElements[0].type}`)}
+                </div>
+              )}
 
-              <table>
-                <tbody>
-                  {selectedElements.length === 1 && (
-                    <tr>
-                      <th colSpan={2}>
-                        {t(`element.${selectedElements[0].type}`)}
-                      </th>
-                    </tr>
-                  )}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, 1fr)",
+                  gap: "4px 8px",
+                }}
+              >
+                {stats.map((statsItem) => (
+                  <label
+                    className="color-input-container"
+                    key={statsItem.property}
+                  >
+                    <div
+                      className="color-picker-hash"
+                      style={{
+                        width: "30px",
+                      }}
+                    >
+                      {statsItem.label}
+                    </div>
+                    <input
+                      id={statsItem.label}
+                      defaultValue={statsItem.value}
+                      className="color-picker-input"
+                      style={{
+                        width: "55px",
+                      }}
+                      autoComplete="off"
+                      spellCheck="false"
+                      onKeyDown={(event) => {
+                        const value = Number(event.target.value);
 
-                  {selectedElements.length > 1 && (
-                    <>
-                      <tr>
-                        <th colSpan={2}>{t("stats.selected")}</th>
-                      </tr>
-                      <tr>
-                        <td>{t("stats.elements")}</td>
-                        <td>{selectedElements.length}</td>
-                      </tr>
-                    </>
-                  )}
-                  {selectedElements.length > 0 && (
-                    <>
-                      <tr>
-                        <td>{"x"}</td>
-                        <td>{Math.round(selectedBoundingBox[0])}</td>
-                      </tr>
-                      <tr>
-                        <td>{"y"}</td>
-                        <td>{Math.round(selectedBoundingBox[1])}</td>
-                      </tr>
-                      <tr>
-                        <td>{t("stats.width")}</td>
-                        <td>
-                          {Math.round(
-                            selectedBoundingBox[2] - selectedBoundingBox[0],
-                          )}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>{t("stats.height")}</td>
-                        <td>
-                          {Math.round(
-                            selectedBoundingBox[3] - selectedBoundingBox[1],
-                          )}
-                        </td>
-                      </tr>
-                    </>
-                  )}
-                  {selectedElements.length === 1 && (
-                    <tr>
-                      <td>{t("stats.angle")}</td>
-                      <td>
-                        {`${Math.round(
-                          (selectedElements[0].angle * 180) / Math.PI,
-                        )}°`}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                        if (event.key === KEYS.ENTER) {
+                          if (!isNaN(value)) {
+                            mutateElement(statsItem.element, {
+                              [statsItem.property]: value,
+                            });
+                          }
+
+                          event.target.value = statsItem.element[
+                            statsItem.property as keyof ExcalidrawElement
+                          ] as string;
+                        }
+                      }}
+                      onBlur={(event) => {
+                        const value = Number(event.target.value);
+
+                        if (!isNaN(value)) {
+                          mutateElement(statsItem.element, {
+                            [statsItem.property]: value,
+                          });
+                        }
+
+                        event.target.value = statsItem.element[
+                          statsItem.property as keyof ExcalidrawElement
+                        ] as string;
+                      }}
+                    ></input>
+                  </label>
+                ))}
+              </div>
             </div>
-          </>
+          </div>
         )}
       </Island>
     </div>

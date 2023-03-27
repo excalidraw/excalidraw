@@ -9,8 +9,33 @@
     z-index: 10;
     pointer-events: all;
 
-    .section {
-      padding: 12px;
+    .sectionContent {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .elementType {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .statsItem {
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      // margin-right: 8px;
+
+      .label {
+        margin-right: 4px;
+        width: 10px;
+      }
+
+      .input {
+        width: 55px;
+      }
     }
 
     h3 {
