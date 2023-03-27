@@ -26,6 +26,7 @@
     "@testing-library/react": "12.1.5",
     "@tldraw/vec": "1.7.1",
     "browser-fs-access": "0.29.1",
+    "canvas": "2.11.0",
     "clsx": "1.1.1",
     "cross-env": "7.0.3",
     "fake-indexeddb": "3.1.7",
