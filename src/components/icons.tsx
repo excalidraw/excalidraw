@@ -71,18 +71,6 @@ const modifiedTablerIconProps: Opts = {
 
 // -----------------------------------------------------------------------------
 
-// tabler-icons: present
-export const PlusPromoIcon = createIcon(
-  <g strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <rect x={3} y={8} width={18} height={4} rx={1} />
-    <line x1={12} y1={8} x2={12} y2={21} />
-    <path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" />
-    <path d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5" />
-  </g>,
-  tablerIconProps,
-);
-
 // tabler-icons: book
 export const LibraryIcon = createIcon(
   <g strokeWidth="1.5">
@@ -93,16 +81,6 @@ export const LibraryIcon = createIcon(
     <line x1="12" y1="6" x2="12" y2="19" />
     <line x1="21" y1="6" x2="21" y2="19" />
   </g>,
-  tablerIconProps,
-);
-
-// tabler-icons: plus
-export const PlusIcon = createIcon(
-  <svg strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <line x1="12" y1="5" x2="12" y2="19" />
-    <line x1="5" y1="12" x2="19" y2="12" />
-  </svg>,
   tablerIconProps,
 );
 

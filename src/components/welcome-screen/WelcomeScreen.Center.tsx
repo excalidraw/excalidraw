@@ -1,13 +1,13 @@
 import { actionLoadScene, actionShortcuts } from "../../actions";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
-import { t, useI18n } from "../../i18n";
+import { t } from "../../i18n";
 import {
   useDevice,
   useExcalidrawActionManager,
   useExcalidrawAppState,
 } from "../App";
 import { useTunnels } from "../context/tunnels";
-import { ExcalLogo, HelpIcon, LoadIcon, usersIcon } from "../icons";
+import { ExcalLogo, HelpIcon, LoadIcon } from "../icons";
 
 const WelcomeScreenMenuItemContent = ({
   icon,
@@ -112,7 +112,7 @@ Center.displayName = "Center";
 const Logo = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className="welcome-screen-center__logo virgil welcome-screen-decor">
-      {children || <>{ExcalLogo} Excalidraw</>}
+      {children || <>{ExcalLogo} Tablica profesora</>}
     </div>
   );
 };
@@ -167,21 +167,6 @@ const MenuItemLoadScene = () => {
 };
 MenuItemLoadScene.displayName = "MenuItemLoadScene";
 
-const MenuItemLiveCollaborationTrigger = ({
-  onSelect,
-}: {
-  onSelect: () => any;
-}) => {
-  const { t } = useI18n();
-  return (
-    <WelcomeScreenMenuItem shortcut={null} onSelect={onSelect} icon={usersIcon}>
-      {t("labels.liveCollaboration")}
-    </WelcomeScreenMenuItem>
-  );
-};
-MenuItemLiveCollaborationTrigger.displayName =
-  "MenuItemLiveCollaborationTrigger";
-
 // -----------------------------------------------------------------------------
 
 Center.Logo = Logo;
@@ -191,6 +176,5 @@ Center.MenuItem = WelcomeScreenMenuItem;
 Center.MenuItemLink = WelcomeScreenMenuItemLink;
 Center.MenuItemHelp = MenuItemHelp;
 Center.MenuItemLoadScene = MenuItemLoadScene;
-Center.MenuItemLiveCollaborationTrigger = MenuItemLiveCollaborationTrigger;
 
 export { Center };
