@@ -509,10 +509,10 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         <MainMenu.DefaultItems.SaveAsImage />
         <MainMenu.DefaultItems.Export />
         <MainMenu.Separator />
-        <MainMenu.DefaultItems.LiveCollaborationTrigger
+        {/* <MainMenu.DefaultItems.LiveCollaborationTrigger
           isCollaborating={isCollaborating}
           onSelect={() => window.alert("You clicked on collab button")}
-        />
+        /> */}
         <MainMenu.Group title="Excalidraw links">
           <MainMenu.DefaultItems.Socials />
         </MainMenu.Group>

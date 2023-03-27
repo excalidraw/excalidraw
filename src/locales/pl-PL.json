@@ -130,7 +130,7 @@
   },
   "library": {
     "noItems": "",
-    "hint_emptyLibrary": "",
+    "hint_emptyLibrary": "Zaznacz element z tablicy aby go tu dodać lub zainstaluj gotowy moduł z biblioteki poniżej.",
     "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
@@ -229,7 +229,7 @@
     "shapes": "Kształty"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Użyj narzędzia Ruszaj, żeby przesuwać się po tablicy, albo zrób to scrollem.",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
@@ -247,7 +247,7 @@
     "publishLibrary": "Opublikuj własną bibliotekę",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": "",
+    "eraserRevert": "Przytrzymaj Alt żeby przywrócić zmiany z zaznaczonego wymazania.",
     "firefox_clipboard_write": ""
   },
   "canvasError": {

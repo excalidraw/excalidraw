@@ -6,7 +6,6 @@ import { exportToSvg } from "../scene/export";
 import { LibraryItem } from "../types";
 import "./LibraryUnit.scss";
 import { CheckboxItem } from "./CheckboxItem";
-import { PlusIcon } from "./icons";
 
 export const LibraryUnit = ({
   id,
@@ -55,9 +54,7 @@ export const LibraryUnit = ({
 
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = useDevice().isMobile;
-  const adder = isPending && (
-    <div className="library-unit__adder">{PlusIcon}</div>
-  );
+  const adder = isPending;
 
   return (
     <div
