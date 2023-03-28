@@ -44,6 +44,7 @@ export type ExportType =
   | "clipboard"
   | "clipboard-svg"
   | "backend"
+  | "pdf"
   | "svg";
 
 export type ScrollBars = {

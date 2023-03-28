@@ -92,6 +92,23 @@ export const SaveAsImage = () => {
 };
 SaveAsImage.displayName = "SaveAsImage";
 
+export const SaveAsPDF = () => {
+  const setAppState = useExcalidrawSetAppState();
+  const { t } = useI18n();
+  return (
+    <DropdownMenuItem
+      icon={ExportImageIcon}
+      data-testid="image-export-button"
+      onSelect={() => setAppState({ openDialog: "imageExport" })}
+      shortcut={getShortcutFromShortcutName("imageExport")}
+      aria-label={t("buttons.exportImage")}
+    >
+      {t("buttons.exportImage")}
+    </DropdownMenuItem>
+  );
+};
+SaveAsPDF.displayName = "SaveAsPDF";
+
 export const Help = () => {
   const { t } = useI18n();
 

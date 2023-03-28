@@ -15,6 +15,7 @@ import { CheckboxItem } from "./CheckboxItem";
 import { DEFAULT_EXPORT_PADDING, isFirefox } from "../constants";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { ActionManager } from "../actions/manager";
+import { jsPDF } from "jspdf";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -116,6 +117,8 @@ const ImageExportModal = ({
         console.error(error);
         setRenderError(error);
       });
+
+    console.log(appState.exportWithDarkMode);
   }, [
     appState,
     files,
@@ -124,6 +127,64 @@ const ImageExportModal = ({
     exportPadding,
     viewBackgroundColor,
   ]);
+
+  const exportToPdf = async () => {
+    const previewNode = previewRef.current;
+    if (!previewNode) {
+      return;
+    }
+    exportToCanvas(exportedElements, appState, files, {
+      exportBackground,
+      viewBackgroundColor,
+      exportPadding,
+    })
+      .then((canvas) => {
+        setRenderError(null);
+        // if converting to blob fails, there's some problem that will
+        // likely prevent preview and export (e.g. canvas too big)
+        return canvasToBlob(canvas).then(async () => {
+          console.log(viewBackgroundColor);
+          previewNode.replaceChildren(canvas);
+          //create pdf to fit the canvas and resize the canvas about 0.7
+          const pdf = new jsPDF({
+            orientation: "p",
+            unit: "px",
+            format: [canvas.width * 0.7, canvas.height * 0.7],
+          });
+
+          if (appState.exportWithDarkMode === true) {
+            console.log("chuj");
+
+            pdf.setFillColor(viewBackgroundColor.toString());
+          } else {
+            console.log("essa");
+            console.log(exportBackground);
+            //revert background color to white
+
+            pdf.setFillColor("#ffffff");
+          }
+
+          pdf.rect(
+            0,
+            0,
+            pdf.internal.pageSize.width,
+            pdf.internal.pageSize.height,
+            "F",
+          );
+
+          const imgData = canvas.toDataURL("image/jpeg", 1.5);
+          //scale the canvas to fit the page
+          const width = pdf.internal.pageSize.width;
+          const height = (canvas.height * width) / canvas.width;
+          pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+          pdf.save("download.pdf");
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        setRenderError(error);
+      });
+  };
 
   return (
     <div className="ExportDialog">
@@ -190,6 +251,15 @@ const ImageExportModal = ({
         >
           SVG
         </ExportButton>
+        <ExportButton
+          color="gray"
+          title={t("buttons.exportToPdf")}
+          aria-label={t("buttons.exportToPdf")}
+          onClick={() => exportToPdf()}
+        >
+          PDF
+        </ExportButton>
+
         {/* firefox supports clipboard API under a flag,
             so let's throw and tell people what they can do */}
         {(probablySupportsClipboardBlob || isFirefox) && (
