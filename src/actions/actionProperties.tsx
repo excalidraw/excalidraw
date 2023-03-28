@@ -54,6 +54,7 @@ import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
   getBoundTextElement,
   getContainerElement,
+  getDefaultLineHeight,
 } from "../element/textElement";
 import {
   isBoundToContainer,
@@ -638,6 +639,7 @@ export const actionChangeFontFamily = register({
               oldElement,
               {
                 fontFamily: value,
+                lineHeight: getDefaultLineHeight(value),
               },
             );
             redrawTextBoundingBox(newElement, getContainerElement(oldElement));

@@ -229,6 +229,7 @@ import {
   updateActiveTool,
   getShortcutKey,
   isTransparent,
+  easeToValuesRAF,
 } from "../utils";
 import {
   ContextMenu,
@@ -260,13 +261,14 @@ import throttle from "lodash.throttle";
 import { fileOpen, FileSystemHandle } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
-  getApproxLineHeight,
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
   getContainerCenter,
   getContainerDims,
   getContainerElement,
+  getDefaultLineHeight,
+  getLineHeightInPx,
   getTextBindableContainerAtPosition,
   isMeasureTextSupported,
   isValidTextContainer,
@@ -283,7 +285,10 @@ import {
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
-import { actionToggleHandTool } from "../actions/actionCanvas";
+import {
+  actionToggleHandTool,
+  zoomToFitElements,
+} from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionCreateContainerFromText } from "../actions/actionBoundText";
@@ -1731,12 +1736,14 @@ class App extends React.Component<AppProps, AppState> {
       (acc: ExcalidrawTextElement[], line, idx) => {
         const text = line.trim();
 
+        const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
         if (text.length) {
           const element = newTextElement({
             ...textElementProps,
             x,
             y: currentY,
             text,
+            lineHeight,
           });
           acc.push(element);
           currentY += element.height + LINE_GAP;
@@ -1745,14 +1752,9 @@ class App extends React.Component<AppProps, AppState> {
           // add paragraph only if previous line was not empty, IOW don't add
           // more than one empty line
           if (prevLine) {
-            const defaultLineHeight = getApproxLineHeight(
-              getFontString({
-                fontSize: textElementProps.fontSize,
-                fontFamily: textElementProps.fontFamily,
-              }),
-            );
-
-            currentY += defaultLineHeight + LINE_GAP;
+            currentY +=
+              getLineHeightInPx(textElementProps.fontSize, lineHeight) +
+              LINE_GAP;
           }
         }
 
@@ -1845,18 +1847,89 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.executeAction(actionToggleHandTool);
   };
 
+  /**
+   * Zooms on canvas viewport center
+   */
+  zoomCanvas = (
+    /** decimal fraction between 0.1 (10% zoom) and 30 (3000% zoom) */
+    value: number,
+  ) => {
+    this.setState({
+      ...getStateForZoom(
+        {
+          viewportX: this.state.width / 2 + this.state.offsetLeft,
+          viewportY: this.state.height / 2 + this.state.offsetTop,
+          nextZoom: getNormalizedZoom(value),
+        },
+        this.state,
+      ),
+    });
+  };
+
+  private cancelInProgresAnimation: (() => void) | null = null;
+
   scrollToContent = (
     target:
       | ExcalidrawElement
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
+    opts?: { fitToContent?: boolean; animate?: boolean; duration?: number },
   ) => {
-    this.setState({
-      ...calculateScrollCenter(
-        Array.isArray(target) ? target : [target],
-        this.state,
-        this.canvas,
-      ),
-    });
+    this.cancelInProgresAnimation?.();
+
+    // convert provided target into ExcalidrawElement[] if necessary
+    const targets = Array.isArray(target) ? target : [target];
+
+    let zoom = this.state.zoom;
+    let scrollX = this.state.scrollX;
+    let scrollY = this.state.scrollY;
+
+    if (opts?.fitToContent) {
+      // compute an appropriate viewport location (scroll X, Y) and zoom level
+      // that fit the target elements on the scene
+      const { appState } = zoomToFitElements(targets, this.state, false);
+      zoom = appState.zoom;
+      scrollX = appState.scrollX;
+      scrollY = appState.scrollY;
+    } else {
+      // compute only the viewport location, without any zoom adjustment
+      const scroll = calculateScrollCenter(targets, this.state, this.canvas);
+      scrollX = scroll.scrollX;
+      scrollY = scroll.scrollY;
+    }
+
+    // when animating, we use RequestAnimationFrame to prevent the animation
+    // from slowing down other processes
+    if (opts?.animate) {
+      const origScrollX = this.state.scrollX;
+      const origScrollY = this.state.scrollY;
+
+      // zoom animation could become problematic on scenes with large number
+      // of elements, setting it to its final value to improve user experience.
+      //
+      // using zoomCanvas() to zoom on current viewport center
+      this.zoomCanvas(zoom.value);
+
+      const cancel = easeToValuesRAF(
+        [origScrollX, origScrollY],
+        [scrollX, scrollY],
+        (scrollX, scrollY) => this.setState({ scrollX, scrollY }),
+        { duration: opts?.duration ?? 500 },
+      );
+      this.cancelInProgresAnimation = () => {
+        cancel();
+        this.cancelInProgresAnimation = null;
+      };
+    } else {
+      this.setState({ scrollX, scrollY, zoom });
+    }
+  };
+
+  /** use when changing scrollX/scrollY/zoom based on user interaction */
+  private translateCanvas: React.Component<any, AppState>["setState"] = (
+    state,
+  ) => {
+    this.cancelInProgresAnimation?.();
+    this.setState(state);
   };
 
   setToast = (
@@ -2057,9 +2130,13 @@ class App extends React.Component<AppProps, AppState> {
           offset = -offset;
         }
         if (event.shiftKey) {
-          this.setState((state) => ({ scrollX: state.scrollX + offset }));
+          this.translateCanvas((state) => ({
+            scrollX: state.scrollX + offset,
+          }));
         } else {
-          this.setState((state) => ({ scrollY: state.scrollY + offset }));
+          this.translateCanvas((state) => ({
+            scrollY: state.scrollY + offset,
+          }));
         }
       }
 
@@ -2607,6 +2684,13 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
 
+    const fontFamily =
+      existingTextElement?.fontFamily || this.state.currentItemFontFamily;
+
+    const lineHeight =
+      existingTextElement?.lineHeight || getDefaultLineHeight(fontFamily);
+    const fontSize = this.state.currentItemFontSize;
+
     if (
       !existingTextElement &&
       shouldBindToContainer &&
@@ -2614,11 +2698,14 @@ class App extends React.Component<AppProps, AppState> {
       !isArrowElement(container)
     ) {
       const fontString = {
-        fontSize: this.state.currentItemFontSize,
-        fontFamily: this.state.currentItemFontFamily,
+        fontSize,
+        fontFamily,
       };
-      const minWidth = getApproxMinLineWidth(getFontString(fontString));
-      const minHeight = getApproxMinLineHeight(getFontString(fontString));
+      const minWidth = getApproxMinLineWidth(
+        getFontString(fontString),
+        lineHeight,
+      );
+      const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
       const containerDims = getContainerDims(container);
       const newHeight = Math.max(containerDims.height, minHeight);
       const newWidth = Math.max(containerDims.width, minWidth);
@@ -2652,8 +2739,8 @@ class App extends React.Component<AppProps, AppState> {
           opacity: this.state.currentItemOpacity,
           roundness: null,
           text: "",
-          fontSize: this.state.currentItemFontSize,
-          fontFamily: this.state.currentItemFontFamily,
+          fontSize,
+          fontFamily,
           textAlign: parentCenterPosition
             ? "center"
             : this.state.currentItemTextAlign,
@@ -2663,6 +2750,7 @@ class App extends React.Component<AppProps, AppState> {
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
           locked: false,
+          lineHeight,
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {
@@ -2929,12 +3017,12 @@ class App extends React.Component<AppProps, AppState> {
           state,
         );
 
-        return {
+        this.translateCanvas({
           zoom: zoomState.zoom,
           scrollX: zoomState.scrollX + deltaX / nextZoom,
           scrollY: zoomState.scrollY + deltaY / nextZoom,
           shouldCacheIgnoreZoom: true,
-        };
+        });
       });
       this.resetShouldCacheIgnoreZoomDebounced();
     } else {
@@ -3710,7 +3798,7 @@ class App extends React.Component<AppProps, AppState> {
         window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
       }
 
-      this.setState({
+      this.translateCanvas({
         scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
         scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
       });
@@ -4856,7 +4944,7 @@ class App extends React.Component<AppProps, AppState> {
     if (pointerDownState.scrollbars.isOverHorizontal) {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
-      this.setState({
+      this.translateCanvas({
         scrollX: this.state.scrollX - dx / this.state.zoom.value,
       });
       pointerDownState.lastCoords.x = x;
@@ -4866,7 +4954,7 @@ class App extends React.Component<AppProps, AppState> {
     if (pointerDownState.scrollbars.isOverVertical) {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
-      this.setState({
+      this.translateCanvas({
         scrollY: this.state.scrollY - dy / this.state.zoom.value,
       });
       pointerDownState.lastCoords.y = y;
@@ -6295,7 +6383,7 @@ class App extends React.Component<AppProps, AppState> {
         // reduced amplification for small deltas (small movements on a trackpad)
         Math.min(1, absDelta / 20);
 
-      this.setState((state) => ({
+      this.translateCanvas((state) => ({
         ...getStateForZoom(
           {
             viewportX: cursorX,
@@ -6312,14 +6400,14 @@ class App extends React.Component<AppProps, AppState> {
 
     // scroll horizontally when shift pressed
     if (event.shiftKey) {
-      this.setState(({ zoom, scrollX }) => ({
+      this.translateCanvas(({ zoom, scrollX }) => ({
         // on Mac, shift+wheel tends to result in deltaX
         scrollX: scrollX - (deltaY || deltaX) / zoom.value,
       }));
       return;
     }
 
-    this.setState(({ zoom, scrollX, scrollY }) => ({
+    this.translateCanvas(({ zoom, scrollX, scrollY }) => ({
       scrollX: scrollX - deltaX / zoom.value,
       scrollY: scrollY - deltaY / zoom.value,
     }));
