@@ -322,7 +322,7 @@ export const measureBaseline = (
   span.style.height = "1px";
   container.appendChild(span);
   const baseline = span.offsetTop + span.offsetHeight;
-  //document.body.removeChild(container);
+  document.body.removeChild(container);
   return baseline;
 };
 
