@@ -34,6 +34,7 @@ import {
   wrapText,
   getMaxContainerHeight,
   getMaxContainerWidth,
+  measureBaseline,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -269,6 +270,17 @@ export const textWysiwyg = ({
       } else {
         textElementWidth += 0.5;
       }
+      const baseline = measureBaseline(
+        updatedTextElement.text,
+        getFontString(updatedTextElement),
+        updatedTextElement.lineHeight,
+        !!container,
+      );
+
+      const offset =
+        (updatedTextElement.height - baseline - 10) * appState.zoom.value;
+
+      const top = viewportY + offset;
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
@@ -279,7 +291,7 @@ export const textWysiwyg = ({
         width: `${textElementWidth}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
-        top: `${viewportY}px`,
+        top: `${top}px`,
         transform: getTransform(
           textElementWidth,
           textElementHeight,

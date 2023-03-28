@@ -200,6 +200,16 @@ const drawImagePlaceholder = (
     size,
   );
 };
+//@ts-ignore
+const drawLine = (x, y, width, height, stroke, context) => {
+  context.lineWidth = "2";
+  context.strokeStyle = stroke;
+  context.beginPath();
+  context.moveTo(x, y);
+  context.lineTo(x + width, y);
+  context.closePath();
+  context.stroke();
+};
 
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
@@ -274,6 +284,29 @@ const drawElementOnCanvas = (
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
         context.font = getFontString(element);
+        context.textBaseline = "alphabetic";
+        const metrics = context.measureText(element.text);
+
+        // drawLine(0, 0, metrics.width, element.height, "green", context);
+
+        // drawLine(
+        //   0,
+        //   -metrics.actualBoundingBoxAscent,
+        //   metrics.width,
+        //   element.height,
+        //   "magenta",
+        //   context,
+        // );
+
+        // drawLine(
+        //   0,
+        //   metrics.actualBoundingBoxDescent,
+        //   metrics.width,
+        //   element.height,
+        //   "magenta",
+        //   context,
+        // );
+
         context.fillStyle = element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
@@ -286,18 +319,17 @@ const drawElementOnCanvas = (
             : element.textAlign === "right"
             ? element.width
             : 0;
-        context.textBaseline = "bottom";
-
         const lineHeightPx = getLineHeightInPx(
           element.fontSize,
           element.lineHeight,
         );
+        const verticalOffset = 10;
 
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],
             horizontalOffset,
-            (index + 1) * lineHeightPx,
+            (index + 1) * lineHeightPx - verticalOffset,
           );
         }
         context.restore();

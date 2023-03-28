@@ -289,6 +289,43 @@ export const measureText = (
   return { width, height };
 };
 
+export const measureBaseline = (
+  text: string,
+  font: FontString,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
+  wrapInContainer?: boolean,
+) => {
+  const container = document.createElement("div");
+  container.style.position = "absolute";
+  container.style.whiteSpace = "pre";
+  container.style.font = font;
+  container.style.minHeight = "1em";
+
+  if (wrapInContainer) {
+    container.style.overflow = "hidden";
+    container.style.wordBreak = "break-word";
+    container.style.whiteSpace = "pre-wrap";
+  }
+
+  //@ts-ignore
+  container.style.lineHeight = lineHeight;
+
+  container.innerText = text;
+
+  // Baseline is important for positioning text on canvas
+  document.body.appendChild(container);
+
+  const span = document.createElement("span");
+  span.style.display = "inline-block";
+  span.style.overflow = "hidden";
+  span.style.width = "1px";
+  span.style.height = "1px";
+  container.appendChild(span);
+  const baseline = span.offsetTop + span.offsetHeight;
+  //document.body.removeChild(container);
+  return baseline;
+};
+
 /**
  * To get unitless line-height (if unknown) we can calculate it by dividing
  * height-per-line by fontSize.
