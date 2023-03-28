@@ -5,6 +5,9 @@ export const trackEvent = (
   value?: number,
 ) => {
   try {
+    // Uncomment the next line to track locally
+    // console.log("Track Event", { category, action, label, value });
+
     if (
       typeof process === "undefined" ||
       typeof window === "undefined" ||
@@ -12,9 +15,6 @@ export const trackEvent = (
     ) {
       return;
     }
-
-    // Uncomment the next line to track locally
-    // console.log("Track Event", { category, action, label, value });
 
     if (process.env?.REACT_APP_GOOGLE_ANALYTICS_ID && window.gtag) {
       window.gtag("event", action, {
