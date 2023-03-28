@@ -177,7 +177,16 @@ const ImageExportModal = ({
           const width = pdf.internal.pageSize.width;
           const height = (canvas.height * width) / canvas.width;
           pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-          pdf.save("download.pdf");
+          //get current date and time
+          const date = new Date();
+          const year = date.getFullYear();
+          const month = date.getMonth() + 1;
+          const day = date.getDate();
+          const hour = date.getHours();
+          const minute = date.getMinutes();
+
+          //save pdf
+          pdf.save(`tablica-${day}/${month}/${year}-${hour}:${minute}.pdf`);
         });
       })
       .catch((error) => {
