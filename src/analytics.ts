@@ -6,8 +6,9 @@ export const trackEvent = (
 ) => {
   try {
     if (
-      (typeof process !== "undefined" && process.env?.JEST_WORKER_ID) ||
-      typeof window === "undefined"
+      typeof process === "undefined" ||
+      typeof window === "undefined" ||
+      process.env?.JEST_WORKER_ID
     ) {
       return;
     }
@@ -28,6 +29,6 @@ export const trackEvent = (
       window._paq.push(["trackEvent", category, action, label, value]);
     }
   } catch (error) {
-    console.error("error logging to ga", error);
+    console.error("error during analytics", error);
   }
 };
