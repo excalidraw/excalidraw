@@ -45,6 +45,7 @@ export const actionUnbindText = register({
         const { width, height } = measureText(
           boundTextElement.originalText,
           getFontString(boundTextElement),
+          boundTextElement.lineHeight,
         );
         const originalContainerHeight = getOriginalContainerHeightFromCache(
           element.id,
@@ -239,15 +240,23 @@ export const actionCreateContainerFromText = register({
           linearElementIds.includes(ele.id),
         ) as ExcalidrawLinearElement[];
         linearElements.forEach((ele) => {
-          let startBinding = null;
-          let endBinding = null;
-          if (ele.startBinding) {
-            startBinding = { ...ele.startBinding, elementId: container.id };
+          let startBinding = ele.startBinding;
+          let endBinding = ele.endBinding;
+
+          if (startBinding?.elementId === textElement.id) {
+            startBinding = {
+              ...startBinding,
+              elementId: container.id,
+            };
           }
-          if (ele.endBinding) {
-            endBinding = { ...ele.endBinding, elementId: container.id };
+
+          if (endBinding?.elementId === textElement.id) {
+            endBinding = { ...endBinding, elementId: container.id };
           }
-          mutateElement(ele, { startBinding, endBinding });
+
+          if (startBinding || endBinding) {
+            mutateElement(ele, { startBinding, endBinding });
+          }
         });
       }
 
