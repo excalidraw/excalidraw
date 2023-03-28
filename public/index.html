@@ -183,19 +183,6 @@
       })();
     </script>
     <!-- End Matomo Code -->
-    <% } %> <% if (process.env.REACT_APP_CDN_MATOMO_TAG_MANAGER_URL) { %>
-    <!-- Matomo Tag Manager -->
-    <script>
-      var _mtm = (window._mtm = window._mtm || []);
-      _mtm.push({ "mtm.startTime": new Date().getTime(), event: "mtm.Start" });
-      var d = document,
-        g = d.createElement("script"),
-        s = d.getElementsByTagName("script")[0];
-      g.async = true;
-      g.src = "%REACT_APP_CDN_MATOMO_TAG_MANAGER_URL%";
-      s.parentNode.insertBefore(g, s);
-    </script>
-    <!-- End Matomo Tag Manager -->
     <% } %> <% } %>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
