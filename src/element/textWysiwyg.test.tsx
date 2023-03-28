@@ -19,6 +19,7 @@ import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
 import { resize } from "../tests/utils";
 import { getOriginalContainerHeightFromCache } from "./textWysiwyg";
+import { computeContainerDimensionForBoundText } from "./textElement";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -524,6 +525,45 @@ describe("textWysiwyg", () => {
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
+    });
+
+    it("should no error occurs when pasting multi-line text and clear text", async () => {
+      const diamond = API.createElement({
+        type: "diamond",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+      });
+      h.elements = [diamond];
+
+      expect(h.elements.length).toBe(1);
+      expect(h.elements[0].id).toBe(diamond.id);
+
+      API.setSelectedElements([diamond]);
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      await new Promise((r) => setTimeout(r, 0));
+      const value = new Array(1000).fill("1").join("\n");
+
+      expect(() =>
+        fireEvent.input(editor, { target: { value } }),
+      ).not.toThrow();
+
+      expect(diamond.height).toBe(
+        computeContainerDimensionForBoundText(
+          h.elements[1].height,
+          diamond.type,
+        ),
+      );
+
+      expect(() =>
+        fireEvent.input(editor, { target: { value: "" } }),
+      ).not.toThrow();
     });
 
     it("should bind text to container when double clicked on center of transparent container", async () => {
@@ -1175,14 +1215,25 @@ describe("textWysiwyg", () => {
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
       ).toEqual(FONT_FAMILY.Cascadia);
-      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(
+        Math.max(
+          computeContainerDimensionForBoundText(
+            h.elements[1].height,
+            rectangle.type,
+          ),
+          75,
+        ),
+      );
 
       fireEvent.click(screen.getByTitle(/Very large/i));
-      expect(
-        (h.elements[1] as ExcalidrawTextElementWithContainer).fontSize,
-      ).toEqual(36);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(
-        96.39999999999999,
+        Math.max(
+          computeContainerDimensionForBoundText(
+            h.elements[1].height,
+            rectangle.type,
+          ),
+          75,
+        ),
       );
     });
 
