@@ -146,9 +146,10 @@
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
     </script>
-    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %> <% if
-    (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
+    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
+
     <!-- LEGACY GOOGLE ANALYTICS -->
+    <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=%REACT_APP_GOOGLE_ANALYTICS_ID%"
@@ -161,10 +162,13 @@
       gtag("js", new Date());
       gtag("config", "%REACT_APP_GOOGLE_ANALYTICS_ID%");
     </script>
-    <% } %> <% if (process.env.REACT_APP_MATOMO_URL &&
+    <% } %>
+    <!-- end LEGACY GOOGLE ANALYTICS -->
+
+    <!-- Matomo -->
+    <% if (process.env.REACT_APP_MATOMO_URL &&
     process.env.REACT_APP_MATOMO_SITE_ID &&
     process.env.REACT_APP_CDN_MATOMO_TRACKER_URL) { %>
-    <!-- Matomo -->
     <script>
       var _paq = (window._paq = window._paq || []);
       /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
@@ -182,8 +186,10 @@
         s.parentNode.insertBefore(g, s);
       })();
     </script>
-    <!-- End Matomo Code -->
-    <% } %> <% } %>
+    <% } %>
+    <!-- end Matomo analytics -->
+
+    <% } %>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
     <style>
