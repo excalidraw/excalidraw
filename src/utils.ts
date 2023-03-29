@@ -689,11 +689,7 @@ export const arrayToMapWithIndex = <T extends { id: string }>(
     return acc;
   }, new Map<string, [element: T, index: number]>());
 
-export const isTestEnv = () =>
-  typeof process !== "undefined" && process.env?.NODE_ENV === "test";
-
-export const isProdEnv = () =>
-  typeof process !== "undefined" && process.env?.NODE_ENV === "production";
+export const isTestEnv = () => process.env.NODE_ENV === "test";
 
 export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
   return new CustomEvent(name, {
