@@ -1218,6 +1218,9 @@ describe("textWysiwyg", () => {
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
 
       fireEvent.click(screen.getByTitle(/Very large/i));
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).fontSize,
+      ).toEqual(36);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(97);
     });
 
