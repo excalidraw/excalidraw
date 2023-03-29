@@ -527,7 +527,7 @@ describe("textWysiwyg", () => {
       ]);
     });
 
-    it("should compute the container height correctly when height is updated while editing the text", async () => {
+    it("should compute the container height correctly and not throw error when height is updated while editing the text", async () => {
       const diamond = API.createElement({
         type: "diamond",
         x: 10,

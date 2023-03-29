@@ -209,7 +209,6 @@ export const textWysiwyg = ({
 
         // autogrow container height if text exceeds
         if (!isArrowElement(container) && textElementHeight > maxHeight) {
-          // compute container height by textElementHeight
           const targetContainerHeight = computeContainerDimensionForBoundText(
             textElementHeight,
             container.type,
