@@ -887,11 +887,8 @@ const DEFAULT_LINE_HEIGHT = {
 };
 
 export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
-  if (fontFamily) {
-    return (
-      DEFAULT_LINE_HEIGHT[fontFamily] ||
-      DEFAULT_LINE_HEIGHT[DEFAULT_FONT_FAMILY]
-    );
+  if (fontFamily in DEFAULT_LINE_HEIGHT) {
+    return DEFAULT_LINE_HEIGHT[fontFamily];
   }
   return DEFAULT_LINE_HEIGHT[DEFAULT_FONT_FAMILY];
 };
