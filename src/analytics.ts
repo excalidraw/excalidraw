@@ -8,15 +8,11 @@ export const trackEvent = (
     // Uncomment the next line to track locally
     // console.log("Track Event", { category, action, label, value });
 
-    if (
-      typeof process === "undefined" ||
-      typeof window === "undefined" ||
-      process.env?.JEST_WORKER_ID
-    ) {
+    if (typeof window === "undefined" || process.env.JEST_WORKER_ID) {
       return;
     }
 
-    if (process.env?.REACT_APP_GOOGLE_ANALYTICS_ID && window.gtag) {
+    if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID && window.gtag) {
       window.gtag("event", action, {
         event_category: category,
         event_label: label,
