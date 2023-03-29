@@ -527,7 +527,7 @@ describe("textWysiwyg", () => {
       ]);
     });
 
-    it("should no error occurs when pasting multi-line text and clear text", async () => {
+    it("should compute the container height correctly when height is updated while editing the text", async () => {
       const diamond = API.createElement({
         type: "diamond",
         x: 10,
@@ -1215,26 +1215,10 @@ describe("textWysiwyg", () => {
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
       ).toEqual(FONT_FAMILY.Cascadia);
-      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(
-        Math.max(
-          computeContainerDimensionForBoundText(
-            h.elements[1].height,
-            rectangle.type,
-          ),
-          75,
-        ),
-      );
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
 
       fireEvent.click(screen.getByTitle(/Very large/i));
-      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(
-        Math.max(
-          computeContainerDimensionForBoundText(
-            h.elements[1].height,
-            rectangle.type,
-          ),
-          75,
-        ),
-      );
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(97);
     });
 
     it("should update line height when font family updated", async () => {

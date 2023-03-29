@@ -214,6 +214,7 @@ export const textWysiwyg = ({
             textElementHeight,
             container.type,
           );
+
           mutateElement(container, { height: targetContainerHeight });
           return;
         } else if (
