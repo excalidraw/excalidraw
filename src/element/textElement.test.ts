@@ -332,7 +332,8 @@ describe("Test getDefaultLineHeight", () => {
     //@ts-ignore
     expect(getDefaultLineHeight()).toBe(1.25);
   });
-  it("should return line height using default font family when passing a unknown font", () => {
+
+  it("should return line height using default font family when passing an unknown font", () => {
     const UNKNOWN_FONT = -1;
     expect(getDefaultLineHeight(UNKNOWN_FONT)).toBe(1.25);
   });
