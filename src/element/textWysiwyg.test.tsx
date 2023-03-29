@@ -550,20 +550,19 @@ describe("textWysiwyg", () => {
       await new Promise((r) => setTimeout(r, 0));
       const value = new Array(1000).fill("1").join("\n");
 
+      // Pasting large text to simulate height increase
       expect(() =>
         fireEvent.input(editor, { target: { value } }),
       ).not.toThrow();
 
-      expect(diamond.height).toBe(
-        computeContainerDimensionForBoundText(
-          h.elements[1].height,
-          diamond.type,
-        ),
-      );
+      expect(diamond.height).toBe(50020);
 
+      // Clearing text to simulate height decrease
       expect(() =>
         fireEvent.input(editor, { target: { value: "" } }),
       ).not.toThrow();
+
+      expect(diamond.height).toBe(70);
     });
 
     it("should bind text to container when double clicked on center of transparent container", async () => {
