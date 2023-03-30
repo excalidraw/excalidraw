@@ -209,9 +209,9 @@
     "brave_measure_text_error": {
       "start": "",
       "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
+      "setting_enabled": "設定が有効化されました",
       "break": "",
-      "text_elements": "",
+      "text_elements": "テキスト要素",
       "in_your_drawings": "",
       "strongly_recommend": "",
       "steps": "",
@@ -219,7 +219,7 @@
       "disable_setting": "",
       "issue": "",
       "write": "",
-      "discord": ""
+      "discord": "Discord"
     }
   },
   "toolBar": {
