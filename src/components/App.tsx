@@ -1348,13 +1348,14 @@ class App extends React.Component<AppProps, AppState> {
             return false;
           }
         }
+        return true;
         // don't render text element that's being currently edited (it's
         // rendered on remote only)
-        return (
-          !this.state.editingElement ||
-          this.state.editingElement.type !== "text" ||
-          element.id !== this.state.editingElement.id
-        );
+        // return (
+        //   !this.state.editingElement ||
+        //   this.state.editingElement.type !== "text" ||
+        //   element.id !== this.state.editingElement.id
+        // );
       });
 
     const selectionColor = getComputedStyle(
