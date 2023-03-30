@@ -275,6 +275,8 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
+        //context.fillStyle = "pink";
+        //context.fillRect(0, 0, context.canvas.width, context.canvas.height);
         const rtl = isRTL(element.text);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {
@@ -285,8 +287,6 @@ const drawElementOnCanvas = (
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
         context.font = getFontString(element);
-        context.textBaseline = "alphabetic";
-        const metrics = context.measureText(element.text);
 
         // drawLine(0, 0, metrics.width, element.height, "green", context);
 
@@ -324,7 +324,7 @@ const drawElementOnCanvas = (
           element.fontSize,
           element.lineHeight,
         );
-        const verticalOffset = 10;
+        const verticalOffset = 8;
 
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
