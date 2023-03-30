@@ -1,5 +1,5 @@
 import { FontFamilyValues } from "../element/types";
-import { FontFamilyLaiIcon } from "./font-icon";
+import { FontFamilyLaiIcon, FontFamilyLXIcon } from "./font-icon";
 export const COYOTE_CUSTOM_FONT_FAMILY = {
   XiaolaiSC: 44,
   LXGWWenKai: 55,
@@ -27,6 +27,6 @@ export const appendFontFamilyOptions = (
     {
       value: COYOTE_CUSTOM_FONT_FAMILY.LXGWWenKai,
       text: "霞鹜文楷",
-      icon: FontFamilyLaiIcon,
+      icon: FontFamilyLXIcon,
     },
   ]);
