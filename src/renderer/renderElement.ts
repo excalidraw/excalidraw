@@ -263,8 +263,6 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
-        //context.fillStyle = "pink";
-        //context.fillRect(0, 0, context.canvas.width, context.canvas.height);
         const rtl = isRTL(element.text);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {

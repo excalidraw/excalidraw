@@ -272,10 +272,6 @@ export const textWysiwyg = ({
         textElementWidth += 0.5;
       }
 
-      let verticalOffset = 0;
-      if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
-        //verticalOffset = getBoundTextElementOffset(element);
-      }
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
@@ -286,7 +282,7 @@ export const textWysiwyg = ({
         width: `${textElementWidth}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
-        top: `${viewportY + verticalOffset}px`,
+        top: `${viewportY}px`,
         transform: getTransform(
           textElementWidth,
           textElementHeight,
