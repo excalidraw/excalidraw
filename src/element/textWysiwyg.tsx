@@ -272,17 +272,8 @@ export const textWysiwyg = ({
       } else {
         textElementWidth += 0.5;
       }
-      const baseline = measureBaseline(
-        updatedTextElement.text,
-        getFontString(updatedTextElement),
-        updatedTextElement.lineHeight,
-        !!container,
-      );
 
-      const offset =
-        (updatedTextElement.height - baseline - 8) * appState.zoom.value;
-
-      const top = viewportY + offset;
+      const top = viewportY;
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;

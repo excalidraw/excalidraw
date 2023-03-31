@@ -34,7 +34,6 @@ import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
-  FONT_FAMILY,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
@@ -47,6 +46,7 @@ import {
   getLineHeightInPx,
   getMaxContainerHeight,
   getMaxContainerWidth,
+  measureBaseline,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -307,6 +307,13 @@ const drawElementOnCanvas = (
         //   "magenta",
         //   context,
         // );
+        const container = getContainerElement(element);
+        const baseline = measureBaseline(
+          element.text,
+          getFontString(element),
+          element.lineHeight,
+          !!container,
+        );
 
         context.fillStyle = element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
@@ -324,7 +331,7 @@ const drawElementOnCanvas = (
           element.fontSize,
           element.lineHeight,
         );
-        const verticalOffset = 8;
+        const verticalOffset = element.height - baseline;
 
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
