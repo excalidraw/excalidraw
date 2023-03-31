@@ -30,7 +30,6 @@ import {
   wrapText,
   getMaxContainerWidth,
   getDefaultLineHeight,
-  measureBaseline,
 } from "./textElement";
 import { VERTICAL_ALIGN } from "../constants";
 import { isArrowElement } from "./typeChecks";

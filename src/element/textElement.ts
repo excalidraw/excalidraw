@@ -305,7 +305,6 @@ export const measureBaseline = (
   container.style.whiteSpace = "pre";
   container.style.font = font;
   container.style.minHeight = "1em";
-  console.log("HEYYY you are here!!");
   if (wrapInContainer) {
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
