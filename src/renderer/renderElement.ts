@@ -48,6 +48,7 @@ import {
   getMaxContainerWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import _hasCustomDataProperty from "../_hasCustomDataProperty";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -558,6 +559,27 @@ const generateElementShape = (
             if (arrowhead === "dot") {
               const [x, y, r] = arrowheadPoints;
 
+              const customDotWidth = _hasCustomDataProperty(
+                element,
+                "BINDING_DOT_WIDTH",
+              );
+
+              if (customDotWidth) {
+                return [
+                  // third arg = diameter
+                  generator.circle(
+                    x,
+                    y,
+                    customDotWidth ? element!.customData!.BINDING_DOT_WIDTH : 1,
+                    {
+                      ...options,
+                      fill: element.strokeColor,
+                      fillStyle: "solid",
+                      stroke: "none",
+                    },
+                  ),
+                ];
+              }
               return [
                 generator.circle(x, y, r, {
                   ...options,
