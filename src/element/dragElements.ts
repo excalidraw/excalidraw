@@ -6,6 +6,20 @@ import { NonDeletedExcalidrawElement } from "./types";
 import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
+import _hasCustomDataProperty from "../_hasCustomDataProperty";
+
+const _isElementDraggable = (
+  selectedElements: NonDeletedExcalidrawElement[],
+) => {
+  if (!selectedElements.length) {
+    return;
+  }
+
+  // not draggable if measure element is in the selection
+  return selectedElements.every(
+    (ele) => !_hasCustomDataProperty(ele, "MEASURE_ELEMENT"),
+  );
+};
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -17,6 +31,10 @@ export const dragSelectedElements = (
   distanceY: number = 0,
   appState: AppState,
 ) => {
+  if (!_isElementDraggable(selectedElements)) {
+    return;
+  }
+  debugger;
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
   selectedElements.forEach((element) => {
