@@ -261,7 +261,7 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "Publiceer je eigen bibliotheek",
-    "bindTextToElement": "",
+    "bindTextToElement": "Druk op enter om tekst toe te voegen",
     "deepBoxSelect": "",
     "eraserRevert": "",
     "firefox_clipboard_write": ""
@@ -472,9 +472,9 @@
       "menuHint": ""
     },
     "defaults": {
-      "menuHint": "",
+      "menuHint": "Exporteren, voorkeuren en meer...",
       "center_heading": "Diagrammen. Eenvoudig. Gemaakt.",
-      "toolbarHint": "",
+      "toolbarHint": "Kies een tool & begin met tekenen!",
       "helpHint": "Snelkoppelingen en hulp"
     }
   }
