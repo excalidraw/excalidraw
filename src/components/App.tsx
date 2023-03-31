@@ -559,6 +559,31 @@ class App extends React.Component<AppProps, AppState> {
     );
     const { renderTopRightUI, renderCustomStats } = this.props;
 
+    //@ts-ignore
+    const api: ExcalidrawImperativeAPI = {
+      ready: true,
+      updateScene: this.updateScene,
+      updateLibrary: this.library.updateLibrary,
+      addFiles: this.addFiles,
+      resetScene: this.resetScene,
+      getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
+      history: {
+        clear: this.resetHistory,
+      },
+      scrollToContent: this.scrollToContent,
+      getSceneElements: this.getSceneElements,
+      getAppState: () => this.state,
+      getFiles: () => this.files,
+      refresh: this.refresh,
+      setToast: this.setToast,
+      id: this.id,
+      setActiveTool: this.setActiveTool,
+      setCursor: this.setCursor,
+      resetCursor: this.resetCursor,
+      toggleMenu: this.toggleMenu,
+    };
+    //@ts-ignore
+    window.exc = api;
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -4575,7 +4600,6 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.selectedLinearElement) {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
-
         if (
           LinearElementEditor.shouldAddMidpoint(
             this.state.selectedLinearElement,
