@@ -517,6 +517,11 @@ export const _renderScene = ({
         );
       }
 
+      // checks if multi selection includes an MJ4D  tool
+      const isMeasureTypeIncludedInSelection = elements.every((el) =>
+        _hasCustomDataProperty(el, "MEASURE_ELEMENT"),
+      );
+
       if (showBoundingBox) {
         const selections = elements.reduce((acc, element) => {
           const selectionColors = [];
@@ -610,7 +615,11 @@ export const _renderScene = ({
             );
           }
         }
-      } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
+      } else if (
+        locallySelectedElements.length > 1 &&
+        !appState.isRotating &&
+        isMeasureTypeIncludedInSelection
+      ) {
         const dashedLinePadding =
           (DEFAULT_SPACING * 2) / renderConfig.zoom.value;
         context.fillStyle = oc.white;
@@ -620,6 +629,8 @@ export const _renderScene = ({
         const lineWidth = context.lineWidth;
         context.lineWidth = 1 / renderConfig.zoom.value;
         context.strokeStyle = selectionColor;
+
+        // The bounding box that surrounds multiple element selections
         strokeRectWithRotation(
           context,
           x1 - dashedLinePadding,
@@ -640,8 +651,8 @@ export const _renderScene = ({
           OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
         );
 
-        // if the group selected is of type "ellipse", dont show the resize handles
         if (locallySelectedElements.some((element) => !element.locked)) {
+          // transform handles for multi selection
           renderTransformHandles(context, renderConfig, transformHandles, 0);
         }
       }
