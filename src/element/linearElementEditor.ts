@@ -484,7 +484,11 @@ export class LinearElementEditor {
       LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
 
     const existingSegmentMidpointHitCoords =
-      linearElementEditor.segmentMidPointHoveredCoords;
+      !_hasCustomDataProperty(element, "MEASURE_ELEMENT") &&
+      linearElementEditor.segmentMidPointHoveredCoords
+        ? linearElementEditor.segmentMidPointHoveredCoords
+        : null;
+
     if (existingSegmentMidpointHitCoords) {
       const distance = distance2d(
         existingSegmentMidpointHitCoords[0],
