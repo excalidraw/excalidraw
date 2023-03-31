@@ -60,6 +60,7 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
+import _hasCustomDataProperty from "../_hasCustomDataProperty";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -256,15 +257,18 @@ const renderLinearPointHandles = (
         );
       }
     } else if (appState.editingLinearElement || points.length === 2) {
-      renderSingleLinearPoint(
-        context,
-        appState,
-        renderConfig,
-        segmentMidPoint,
-        POINT_HANDLE_SIZE / 2,
-        false,
-        true,
-      );
+      // disables midpoint for line
+      if (!_hasCustomDataProperty(element, "MEASURE_ELEMENT")) {
+        renderSingleLinearPoint(
+          context,
+          appState,
+          renderConfig,
+          segmentMidPoint,
+          POINT_HANDLE_SIZE / 2,
+          false,
+          true,
+        );
+      }
     }
   });
 
