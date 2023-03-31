@@ -2,6 +2,7 @@ import { ExcalidrawElement } from "./element/types";
 
 enum MJ4D_CUSTOMDATA_TYPES {
   MEASURE_ELEMENT,
+  BINDING_DOT_WIDTH,
 }
 
 export default function _hasCustomDataProperty(
@@ -10,7 +11,6 @@ export default function _hasCustomDataProperty(
 ) {
   if (element && element.customData && element.customData[property]) {
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
