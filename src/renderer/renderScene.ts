@@ -548,17 +548,20 @@ export const _renderScene = ({
             const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
               getElementAbsoluteCoords(element, true);
 
-            acc.push({
-              angle: element.angle,
-              elementX1,
-              elementY1,
-              elementX2,
-              elementY2,
-              selectionColors,
-              dashed: !!renderConfig.remoteSelectedElementIds[element.id],
-              cx,
-              cy,
-            });
+            // DONT INCLUDE CUSTOM ELEMENTS IN GROUP SELECTIONS & RENDER THEIR SELECTION BORDER
+            if (!_hasCustomDataProperty(element, "MEASURE_ELEMENT")) {
+              acc.push({
+                angle: element.angle,
+                elementX1,
+                elementY1,
+                elementX2,
+                elementY2,
+                selectionColors,
+                dashed: !!renderConfig.remoteSelectedElementIds[element.id],
+                cx,
+                cy,
+              });
+            }
           }
 
           return acc;
