@@ -512,6 +512,12 @@ export const _renderScene = ({
           locallySelectedElements[0] as ExcalidrawLinearElement,
         );
       }
+
+      // checks if multi selection includes an MJ4D  tool
+      const isMeasureTypeIncludedInSelection = elements.every(
+        (el) => el.type !== "ellipse",
+      );
+
       if (showBoundingBox) {
         const selections = elements.reduce((acc, element) => {
           const selectionColors = [];
@@ -537,18 +543,22 @@ export const _renderScene = ({
           if (selectionColors.length) {
             const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
               getElementAbsoluteCoords(element, true);
-            acc.push({
-              angle: element.angle,
-              elementX1,
-              elementY1,
-              elementX2,
-              elementY2,
-              selectionColors,
-              dashed: !!renderConfig.remoteSelectedElementIds[element.id],
-              cx,
-              cy,
-            });
+
+            if (element.type !== "ellipse") {
+              acc.push({
+                angle: element.angle,
+                elementX1,
+                elementY1,
+                elementX2,
+                elementY2,
+                selectionColors,
+                dashed: !!renderConfig.remoteSelectedElementIds[element.id],
+                cx,
+                cy,
+              });
+            }
           }
+
           return acc;
         }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; dashed?: boolean; cx: number; cy: number }[]);
 
@@ -578,9 +588,9 @@ export const _renderScene = ({
           addSelectionForGroupId(appState.editingGroupId);
         }
 
-        selections.forEach((selection) =>
-          renderSelectionBorder(context, renderConfig, selection),
-        );
+        selections.forEach((selection) => {
+          renderSelectionBorder(context, renderConfig, selection);
+        });
       }
       // Paint resize transformHandles
       context.save();
@@ -594,14 +604,20 @@ export const _renderScene = ({
           "mouse", // when we render we don't know which pointer type so use mouse
         );
         if (!appState.viewModeEnabled && showBoundingBox) {
-          renderTransformHandles(
-            context,
-            renderConfig,
-            transformHandles,
-            locallySelectedElements[0].angle,
-          );
+          if (locallySelectedElements[0].type !== "ellipse") {
+            renderTransformHandles(
+              context,
+              renderConfig,
+              transformHandles,
+              locallySelectedElements[0].angle,
+            );
+          }
         }
-      } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
+      } else if (
+        locallySelectedElements.length > 1 &&
+        !appState.isRotating &&
+        isMeasureTypeIncludedInSelection
+      ) {
         const dashedLinePadding =
           (DEFAULT_SPACING * 2) / renderConfig.zoom.value;
         context.fillStyle = oc.white;
@@ -630,7 +646,12 @@ export const _renderScene = ({
           "mouse",
           OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
         );
-        if (locallySelectedElements.some((element) => !element.locked)) {
+
+        // if the group selected is of type "ellipse", dont show the resize handles
+        if (
+          locallySelectedElements.some((element) => !element.locked) &&
+          locallySelectedElements.every((element) => element.type !== "ellipse")
+        ) {
           renderTransformHandles(context, renderConfig, transformHandles, 0);
         }
       }
