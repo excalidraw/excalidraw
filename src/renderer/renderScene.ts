@@ -517,11 +517,6 @@ export const _renderScene = ({
         );
       }
 
-      // checks if multi selection includes an MJ4D  tool
-      const isMeasureTypeIncludedInSelection = elements.every(
-        (el) => el.type !== "ellipse",
-      );
-
       if (showBoundingBox) {
         const selections = elements.reduce((acc, element) => {
           const selectionColors = [];
@@ -548,19 +543,17 @@ export const _renderScene = ({
             const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
               getElementAbsoluteCoords(element, true);
 
-            if (element.type !== "ellipse") {
-              acc.push({
-                angle: element.angle,
-                elementX1,
-                elementY1,
-                elementX2,
-                elementY2,
-                selectionColors,
-                dashed: !!renderConfig.remoteSelectedElementIds[element.id],
-                cx,
-                cy,
-              });
-            }
+            acc.push({
+              angle: element.angle,
+              elementX1,
+              elementY1,
+              elementX2,
+              elementY2,
+              selectionColors,
+              dashed: !!renderConfig.remoteSelectedElementIds[element.id],
+              cx,
+              cy,
+            });
           }
 
           return acc;
@@ -617,11 +610,7 @@ export const _renderScene = ({
             );
           }
         }
-      } else if (
-        locallySelectedElements.length > 1 &&
-        !appState.isRotating &&
-        isMeasureTypeIncludedInSelection
-      ) {
+      } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
         const dashedLinePadding =
           (DEFAULT_SPACING * 2) / renderConfig.zoom.value;
         context.fillStyle = oc.white;
@@ -652,10 +641,7 @@ export const _renderScene = ({
         );
 
         // if the group selected is of type "ellipse", dont show the resize handles
-        if (
-          locallySelectedElements.some((element) => !element.locked) &&
-          locallySelectedElements.every((element) => element.type !== "ellipse")
-        ) {
+        if (locallySelectedElements.some((element) => !element.locked)) {
           renderTransformHandles(context, renderConfig, transformHandles, 0);
         }
       }
