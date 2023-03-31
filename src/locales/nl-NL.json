@@ -207,19 +207,19 @@
     "collabSaveFailed": "Kan niet opslaan in de backend database. Als de problemen blijven bestaan, moet u het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
     "collabSaveFailed_sizeExceeded": "Kan de backend database niet opslaan, het canvas lijkt te groot te zijn. U moet het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
     "brave_measure_text_error": {
-      "start": "",
+      "start": "Het ziet er uit dat u de Brave browser gebruikt met de",
       "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
+      "setting_enabled": "instelling ingeschakeld",
+      "break": "Dit kan leiden tot het breken van de",
+      "text_elements": "Tekst Elementen",
+      "in_your_drawings": "in je tekeningen",
+      "strongly_recommend": "We raden u ten zeerste aan deze instelling uit te schakelen. U kunt dit volgen",
+      "steps": "deze stappen",
+      "how": "over hoe dit te doen",
+      "disable_setting": " Indien het uitschakelen van deze instelling de weergave van tekst elementen niet wijzigt, open dan een",
+      "issue": "probleem",
       "write": "",
-      "discord": ""
+      "discord": "Discord"
     }
   },
   "toolBar": {
@@ -235,7 +235,7 @@
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen",
     "penMode": "Pen modus - Blokkeer aanraken",
-    "link": "",
+    "link": "Link toevoegen / bijwerken voor een geselecteerde vorm",
     "eraser": "Gum",
     "hand": ""
   },
@@ -245,7 +245,7 @@
     "shapes": "Vormen"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Om de canvas te verplaatsen, houd muiswiel of spatiebalk ingedrukt tijdens slepen, of gebruik het handgereedschap",
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
