@@ -518,8 +518,8 @@ export const _renderScene = ({
       }
 
       // checks if multi selection includes an MJ4D  tool
-      const isMeasureTypeIncludedInSelection = elements.every((el) =>
-        _hasCustomDataProperty(el, "MEASURE_ELEMENT"),
+      const isMeasureTypeIncludedInSelection = locallySelectedElements.some(
+        (el) => _hasCustomDataProperty(el, "MEASURE_ELEMENT"),
       );
 
       if (showBoundingBox) {
@@ -619,7 +619,7 @@ export const _renderScene = ({
       } else if (
         locallySelectedElements.length > 1 &&
         !appState.isRotating &&
-        isMeasureTypeIncludedInSelection
+        !isMeasureTypeIncludedInSelection
       ) {
         const dashedLinePadding =
           (DEFAULT_SPACING * 2) / renderConfig.zoom.value;
