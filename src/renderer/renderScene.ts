@@ -60,7 +60,10 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
-import _hasCustomDataProperty from "../_hasCustomDataProperty";
+import {
+  _hasCustomDataProperty,
+  _isMeasureIncludedInSelection,
+} from "../_hasCustomDataProperty";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -518,8 +521,8 @@ export const _renderScene = ({
       }
 
       // checks if multi selection includes an MJ4D  tool
-      const isMeasureTypeIncludedInSelection = locallySelectedElements.some(
-        (el) => _hasCustomDataProperty(el, "MEASURE_ELEMENT"),
+      const isMeasureIncludedInSelection = _isMeasureIncludedInSelection(
+        locallySelectedElements,
       );
 
       if (showBoundingBox) {
@@ -619,7 +622,7 @@ export const _renderScene = ({
       } else if (
         locallySelectedElements.length > 1 &&
         !appState.isRotating &&
-        !isMeasureTypeIncludedInSelection
+        !isMeasureIncludedInSelection
       ) {
         const dashedLinePadding =
           (DEFAULT_SPACING * 2) / renderConfig.zoom.value;

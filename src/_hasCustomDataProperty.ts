@@ -1,11 +1,14 @@
-import { ExcalidrawElement } from "./element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "./element/types";
 
 enum MJ4D_CUSTOMDATA_TYPES {
   MEASURE_ELEMENT,
   BINDING_DOT_WIDTH,
 }
 
-export default function _hasCustomDataProperty(
+export function _hasCustomDataProperty(
   element: ExcalidrawElement,
   property: keyof typeof MJ4D_CUSTOMDATA_TYPES,
 ) {
@@ -13,4 +16,10 @@ export default function _hasCustomDataProperty(
     return true;
   }
   return false;
+}
+
+export function _isMeasureIncludedInSelection(
+  elements: NonDeletedExcalidrawElement[],
+) {
+  return elements.some((el) => _hasCustomDataProperty(el, "MEASURE_ELEMENT"));
 }

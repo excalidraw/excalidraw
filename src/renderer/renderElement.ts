@@ -48,7 +48,7 @@ import {
   getMaxContainerWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import _hasCustomDataProperty from "../_hasCustomDataProperty";
+import { _hasCustomDataProperty } from "../_hasCustomDataProperty";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original

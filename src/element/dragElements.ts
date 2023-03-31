@@ -6,7 +6,7 @@ import { NonDeletedExcalidrawElement } from "./types";
 import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
-import _hasCustomDataProperty from "../_hasCustomDataProperty";
+import { _hasCustomDataProperty } from "../_hasCustomDataProperty";
 
 const _isElementDraggable = (
   selectedElements: NonDeletedExcalidrawElement[],
@@ -14,7 +14,6 @@ const _isElementDraggable = (
   if (!selectedElements.length) {
     return;
   }
-
   // not draggable if measure element is in the selection
   return selectedElements.every(
     (ele) => !_hasCustomDataProperty(ele, "MEASURE_ELEMENT"),
