@@ -19,7 +19,9 @@ export function _hasCustomDataProperty(
 }
 
 export function _isMeasureIncludedInSelection(
-  elements: NonDeletedExcalidrawElement[],
+  elements:
+    | NonDeletedExcalidrawElement[]
+    | readonly NonDeletedExcalidrawElement[],
 ) {
   return elements.some((el) => _hasCustomDataProperty(el, "MEASURE_ELEMENT"));
 }
