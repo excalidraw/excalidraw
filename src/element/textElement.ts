@@ -58,6 +58,7 @@ export const redrawTextBoundingBox = (
     text: textElement.text,
     width: textElement.width,
     height: textElement.height,
+    baseline: textElement.baseline,
   };
 
   boundTextUpdates.text = textElement.text;
@@ -78,6 +79,7 @@ export const redrawTextBoundingBox = (
 
   boundTextUpdates.width = metrics.width;
   boundTextUpdates.height = metrics.height;
+  boundTextUpdates.baseline = metrics.baseline;
 
   if (container) {
     if (isArrowElement(container)) {
@@ -183,6 +185,7 @@ export const handleBindTextResize = (
     const maxWidth = getMaxContainerWidth(container);
     const maxHeight = getMaxContainerHeight(container);
     let containerHeight = containerDims.height;
+    let nextBaseLine = textElement.baseline;
     if (transformHandleType !== "n" && transformHandleType !== "s") {
       if (text) {
         text = wrapText(
@@ -191,13 +194,14 @@ export const handleBindTextResize = (
           maxWidth,
         );
       }
-      const dimensions = measureText(
+      const metrics = measureText(
         text,
         getFontString(textElement),
         textElement.lineHeight,
       );
-      nextHeight = dimensions.height;
-      nextWidth = dimensions.width;
+      nextHeight = metrics.height;
+      nextWidth = metrics.width;
+      nextBaseLine = metrics.baseline;
     }
     // increase height in case text element height exceeds
     if (nextHeight > maxHeight) {
@@ -225,6 +229,7 @@ export const handleBindTextResize = (
       text,
       width: nextWidth,
       height: nextHeight,
+      baseline: nextBaseLine,
     });
 
     if (!isArrowElement(container)) {
@@ -285,8 +290,8 @@ export const measureText = (
   const fontSize = parseFloat(font);
   const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
-
-  return { width, height };
+  const baseline = measureBaseline(text, font, lineHeight);
+  return { width, height, baseline };
 };
 
 export const measureBaseline = (
@@ -300,7 +305,7 @@ export const measureBaseline = (
   container.style.whiteSpace = "pre";
   container.style.font = font;
   container.style.minHeight = "1em";
-
+  console.log("HEYYY you are here!!");
   if (wrapInContainer) {
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";

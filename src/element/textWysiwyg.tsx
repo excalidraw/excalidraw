@@ -34,7 +34,6 @@ import {
   wrapText,
   getMaxContainerHeight,
   getMaxContainerWidth,
-  measureBaseline,
   computeContainerDimensionForBoundText,
 } from "./textElement";
 import {
@@ -273,7 +272,10 @@ export const textWysiwyg = ({
         textElementWidth += 0.5;
       }
 
-      const top = viewportY;
+      let verticalOffset = 0;
+      if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+        //verticalOffset = getBoundTextElementOffset(element);
+      }
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
@@ -284,7 +286,7 @@ export const textWysiwyg = ({
         width: `${textElementWidth}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
-        top: `${top}px`,
+        top: `${viewportY + verticalOffset}px`,
         transform: getTransform(
           textElementWidth,
           textElementHeight,
@@ -295,8 +297,7 @@ export const textWysiwyg = ({
         ),
         textAlign,
         verticalAlign,
-        // color: updatedTextElement.strokeColor,
-        color: "red",
+        color: updatedTextElement.strokeColor,
         opacity: updatedTextElement.opacity / 100,
         filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,

@@ -30,6 +30,7 @@ import {
   wrapText,
   getMaxContainerWidth,
   getDefaultLineHeight,
+  measureBaseline,
 } from "./textElement";
 import { VERTICAL_ALIGN } from "../constants";
 import { isArrowElement } from "./typeChecks";
@@ -145,6 +146,7 @@ export const newTextElement = (
   const text = normalizeText(opts.text);
   const metrics = measureText(text, getFontString(opts), lineHeight);
   const offsets = getTextElementPositionOffsets(opts, metrics);
+
   const textElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
@@ -157,6 +159,7 @@ export const newTextElement = (
       y: opts.y - offsets.y,
       width: metrics.width,
       height: metrics.height,
+      baseline: metrics.baseline,
       containerId: opts.containerId || null,
       originalText: text,
       lineHeight,
@@ -174,14 +177,15 @@ const getAdjustedDimensions = (
   y: number;
   width: number;
   height: number;
+  baseline: number;
 } => {
   const container = getContainerElement(element);
 
-  const { width: nextWidth, height: nextHeight } = measureText(
-    nextText,
-    getFontString(element),
-    element.lineHeight,
-  );
+  const {
+    width: nextWidth,
+    height: nextHeight,
+    baseline: nextBaseline,
+  } = measureText(nextText, getFontString(element), element.lineHeight);
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;
@@ -256,6 +260,7 @@ const getAdjustedDimensions = (
   return {
     width: nextWidth,
     height: nextHeight,
+    baseline: nextBaseline,
     x: Number.isFinite(x) ? x : element.x,
     y: Number.isFinite(y) ? y : element.y,
   };

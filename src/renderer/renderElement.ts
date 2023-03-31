@@ -46,7 +46,6 @@ import {
   getLineHeightInPx,
   getMaxContainerHeight,
   getMaxContainerWidth,
-  measureBaseline,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -201,17 +200,6 @@ const drawImagePlaceholder = (
     size,
   );
 };
-//@ts-ignore
-const drawLine = (x, y, width, height, stroke, context) => {
-  context.lineWidth = "2";
-  context.strokeStyle = stroke;
-  context.beginPath();
-  context.moveTo(x, y);
-  context.lineTo(x + width, y);
-  context.closePath();
-  context.stroke();
-};
-
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -288,33 +276,6 @@ const drawElementOnCanvas = (
         context.save();
         context.font = getFontString(element);
 
-        // drawLine(0, 0, metrics.width, element.height, "green", context);
-
-        // drawLine(
-        //   0,
-        //   -metrics.actualBoundingBoxAscent,
-        //   metrics.width,
-        //   element.height,
-        //   "magenta",
-        //   context,
-        // );
-
-        // drawLine(
-        //   0,
-        //   metrics.actualBoundingBoxDescent,
-        //   metrics.width,
-        //   element.height,
-        //   "magenta",
-        //   context,
-        // );
-        const container = getContainerElement(element);
-        const baseline = measureBaseline(
-          element.text,
-          getFontString(element),
-          element.lineHeight,
-          !!container,
-        );
-
         context.fillStyle = element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
@@ -331,7 +292,7 @@ const drawElementOnCanvas = (
           element.fontSize,
           element.lineHeight,
         );
-        const verticalOffset = element.height - baseline;
+        const verticalOffset = element.height - element.baseline;
 
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
