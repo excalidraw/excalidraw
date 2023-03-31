@@ -311,8 +311,7 @@ export const measureBaseline = (
     container.style.whiteSpace = "pre-wrap";
   }
 
-  //@ts-ignore
-  container.style.lineHeight = lineHeight;
+  container.style.lineHeight = String(lineHeight);
 
   container.innerText = text;
 

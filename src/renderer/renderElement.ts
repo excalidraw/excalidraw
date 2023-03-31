@@ -273,7 +273,6 @@ const drawElementOnCanvas = (
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
         context.font = getFontString(element);
-
         context.fillStyle = element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 

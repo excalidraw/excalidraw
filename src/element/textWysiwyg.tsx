@@ -271,7 +271,6 @@ export const textWysiwyg = ({
       } else {
         textElementWidth += 0.5;
       }
-
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
