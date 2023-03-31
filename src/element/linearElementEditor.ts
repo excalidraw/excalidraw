@@ -42,6 +42,7 @@ import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { getShapeForElement } from "../renderer/renderElement";
 import { DRAGGING_THRESHOLD } from "../constants";
 import { Mutable } from "../utility-types";
+import { _hasCustomDataProperty } from "../_hasCustomDataProperty";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -1136,7 +1137,7 @@ export class LinearElementEditor {
       linearElementEditor.elementId,
     );
 
-    if (!element) {
+    if (!element || _hasCustomDataProperty(element, "MEASURE_ELEMENT")) {
       return false;
     }
 
