@@ -548,7 +548,7 @@ export const _renderScene = ({
             const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
               getElementAbsoluteCoords(element, true);
 
-            // DONT INCLUDE CUSTOM ELEMENTS IN GROUP SELECTIONS & RENDER THEIR SELECTION BORDER
+            // DONT SHOW CUSTOM ELEMENTS AS PART OF GROUP
             if (!_hasCustomDataProperty(element, "MEASURE_ELEMENT")) {
               acc.push({
                 angle: element.angle,
@@ -609,14 +609,12 @@ export const _renderScene = ({
           "mouse", // when we render we don't know which pointer type so use mouse
         );
         if (!appState.viewModeEnabled && showBoundingBox) {
-          if (locallySelectedElements[0].type !== "ellipse") {
-            renderTransformHandles(
-              context,
-              renderConfig,
-              transformHandles,
-              locallySelectedElements[0].angle,
-            );
-          }
+          renderTransformHandles(
+            context,
+            renderConfig,
+            transformHandles,
+            locallySelectedElements[0].angle,
+          );
         }
       } else if (
         locallySelectedElements.length > 1 &&
