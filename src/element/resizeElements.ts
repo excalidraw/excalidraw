@@ -47,6 +47,7 @@ import {
   getMaxContainerWidth,
   getApproxMinLineHeight,
 } from "./textElement";
+import { _isMeasureIncludedInSelection } from "../_hasCustomDataProperty";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -126,15 +127,19 @@ export const transformElements = (
       transformHandleType === "sw" ||
       transformHandleType === "se"
     ) {
-      resizeMultipleElements(
-        pointerDownState,
-        selectedElements,
-        transformHandleType,
-        shouldResizeFromCenter,
-        pointerX,
-        pointerY,
-      );
-      return true;
+      const includesMeasure = _isMeasureIncludedInSelection(selectedElements);
+
+      if (!includesMeasure) {
+        resizeMultipleElements(
+          pointerDownState,
+          selectedElements,
+          transformHandleType,
+          shouldResizeFromCenter,
+          pointerX,
+          pointerY,
+        );
+        return true;
+      }
     }
   }
   return false;
