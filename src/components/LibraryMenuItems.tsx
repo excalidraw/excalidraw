@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { serializeLibraryAsJSON } from "../data/json";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
@@ -195,19 +195,24 @@ const LibraryMenuItems = ({
     searchedItems.length ? searchedItems : libraryItems
   ).filter((item) => item.status === "published");
 
-  const searchForItems = (value: string) => {
-    const searchResults = libraryItems.filter((item) => {
-      if (!item.name) return false;
-      //remove special characters from item's name
-      const trimmedName = item.name
-        .trim()
-        .replace(/\s+/g, " ")
-        .replace(/[^a-zA-Z0-9 ]/g, " ")
-        .toLowerCase();
-      return trimmedName.includes(value.toLowerCase());
-    });
-    setSearchedItems(searchResults);
-  };
+  const searchForItems = useCallback(
+    (value: string) => {
+      const searchResults = libraryItems.filter((item) => {
+        if (!item.name) {
+          return false;
+        }
+        //remove special characters from item's name
+        const trimmedName = item.name
+          .trim()
+          .replace(/\s+/g, " ")
+          .replace(/[^a-zA-Z0-9 ]/g, " ")
+          .toLowerCase();
+        return trimmedName.includes(value.toLowerCase());
+      });
+      setSearchedItems(searchResults);
+    },
+    [libraryItems],
+  );
 
   useEffect(() => {
     if (searchValue && searchValue.trim().length) {
@@ -215,7 +220,7 @@ const LibraryMenuItems = ({
     } else {
       setSearchedItems([]);
     }
-  }, [searchValue]);
+  }, [searchValue, searchForItems]);
 
   const showBtn =
     !libraryItems.length &&
