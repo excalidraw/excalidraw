@@ -198,14 +198,13 @@ const LibraryMenuItems = ({
   const searchForItems = (value: string) => {
     const searchResults = libraryItems.filter((item) => {
       if (!item.name) return false;
-      //remote special characters from item's name
-      let trimmedName = item.name
+      //remove special characters from item's name
+      const trimmedName = item.name
         .trim()
         .replace(/\s+/g, " ")
         .replace(/[^a-zA-Z0-9 ]/g, " ")
         .toLowerCase();
-      //improve search mechanism to search in tags
-      return trimmedName.includes(searchValue.toLowerCase());
+      return trimmedName.includes(value.toLowerCase());
     });
     setSearchedItems(searchResults);
   };
@@ -245,8 +244,12 @@ const LibraryMenuItems = ({
         }}
       >
         <>
-          <input type="text" onChange={(e) => setSearchValue(e.target.value)} />
-
+          <input
+            type="text"
+            placeholder="Search by items..."
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="library-menu-items-container__search"
+          />
           <div>
             {(pendingElements.length > 0 ||
               unpublishedItems.length > 0 ||
