@@ -5371,6 +5371,10 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): (event: PointerEvent) => void {
     return withBatchedUpdates((childEvent: PointerEvent) => {
+      if (pointerDownState.eventListeners.onMove) {
+        pointerDownState.eventListeners.onMove.flush();
+      }
+
       const {
         draggingElement,
         resizingElement,
@@ -5463,10 +5467,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       lastPointerUp = null;
-
-      if (pointerDownState.eventListeners.onMove) {
-        pointerDownState.eventListeners.onMove.flush();
-      }
 
       window.removeEventListener(
         EVENT.POINTER_MOVE,
