@@ -197,7 +197,13 @@ export const actionSaveFileToDisk = register({
       } else {
         console.warn(error);
       }
-      return { commitToHistory: false };
+      return {
+        commitToHistory: false,
+        appState: {
+          ...appState,
+          errorMessage: "File editing is disabled.",
+        },
+      };
     }
   },
   keyTest: (event) =>
