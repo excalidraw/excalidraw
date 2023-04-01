@@ -61,7 +61,7 @@
     display: flex;
     align-items: center;
     color: var(--icon-fill-color);
-    font-family: var(--ui-font);
+    font-family: $ui-font;
     margin: 0 0.8em;
     text-overflow: ellipsis;
 
@@ -146,7 +146,7 @@
     right: 3px;
     font-size: 0.625rem;
     color: var(--keybinding-color);
-    font-family: var(--ui-font);
+    font-family: $ui-font;
     user-select: none;
   }
 

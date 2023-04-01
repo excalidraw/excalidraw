@@ -8,9 +8,7 @@
 }
 
 .excalidraw {
-  --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
-    Roboto, Helvetica, Arial, sans-serif;
-  font-family: var(--ui-font);
+  font-family: $ui-font;
 
   position: relative;
   overflow: hidden;
@@ -433,7 +431,7 @@
   }
 
   .reset-zoom-button {
-    font-family: var(--ui-font);
+    font-family: $ui-font;
   }
 
   .finalize-button {

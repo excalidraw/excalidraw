@@ -97,7 +97,11 @@
 $theme-filter: "invert(93%) hue-rotate(180deg)";
 $right-sidebar-width: "302px";
 
+$ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
+  Roboto, Helvetica, Arial, sans-serif;
+
 :export {
   themeFilter: unquote($theme-filter);
   rightSidebarWidth: unquote($right-sidebar-width);
+  uiFont: $ui-font;
 }
