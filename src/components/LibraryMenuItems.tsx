@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { serializeLibraryAsJSON } from "../data/json";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
@@ -38,6 +38,8 @@ const LibraryMenuItems = ({
   theme: AppState["theme"];
   id: string;
 }) => {
+  const [searchedItems, setSearchedItems] = useState<LibraryItems>([]);
+  const [searchValue, setSearchValue] = useState("");
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
   >(null);
@@ -186,12 +188,35 @@ const LibraryMenuItems = ({
     });
   };
 
-  const unpublishedItems = libraryItems.filter(
-    (item) => item.status !== "published",
-  );
-  const publishedItems = libraryItems.filter(
-    (item) => item.status === "published",
-  );
+  const unpublishedItems = (
+    searchedItems.length ? searchedItems : libraryItems
+  ).filter((item) => item.status !== "published");
+  const publishedItems = (
+    searchedItems.length ? searchedItems : libraryItems
+  ).filter((item) => item.status === "published");
+
+  const searchForItems = (value: string) => {
+    const searchResults = libraryItems.filter((item) => {
+      if (!item.name) return false;
+      //remote special characters from item's name
+      let trimmedName = item.name
+        .trim()
+        .replace(/\s+/g, " ")
+        .replace(/[^a-zA-Z0-9 ]/g, " ")
+        .toLowerCase();
+      //improve search mechanism to search in tags
+      return trimmedName.includes(searchValue.toLowerCase());
+    });
+    setSearchedItems(searchResults);
+  };
+
+  useEffect(() => {
+    if (searchValue && searchValue.trim().length) {
+      searchForItems(searchValue);
+    } else {
+      setSearchedItems([]);
+    }
+  }, [searchValue]);
 
   const showBtn =
     !libraryItems.length &&
@@ -220,6 +245,8 @@ const LibraryMenuItems = ({
         }}
       >
         <>
+          <input type="text" onChange={(e) => setSearchValue(e.target.value)} />
+
           <div>
             {(pendingElements.length > 0 ||
               unpublishedItems.length > 0 ||
