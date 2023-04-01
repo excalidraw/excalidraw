@@ -207,7 +207,7 @@
     "collabSaveFailed": "Ezin izan da backend datu-basean gorde. Arazoak jarraitzen badu, zure fitxategia lokalean gorde beharko zenuke zure lana ez duzula galtzen ziurtatzeko.",
     "collabSaveFailed_sizeExceeded": "Ezin izan da backend datu-basean gorde, ohiala handiegia dela dirudi. Fitxategia lokalean gorde beharko zenuke zure lana galtzen ez duzula ziurtatzeko.",
     "brave_measure_text_error": {
-      "start": "",
+      "start": "Brave nabigatzailea erabiltzen ari zarela dirudi",
       "aggressive_block_fingerprint": "",
       "setting_enabled": "",
       "break": "",
