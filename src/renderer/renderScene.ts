@@ -1340,7 +1340,7 @@ const renderLinkIcon = (
   }
 };
 
-const isVisibleElement = (
+export const isVisibleElement = (
   element: ExcalidrawElement,
   canvasWidth: number,
   canvasHeight: number,

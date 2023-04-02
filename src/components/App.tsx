@@ -183,7 +183,7 @@ import {
   KEYS,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
-import { renderScene } from "../renderer/renderScene";
+import { isVisibleElement, renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
@@ -646,6 +646,25 @@ class App extends React.Component<AppProps, AppState> {
     const isDarkTheme = this.state.theme === "dark";
 
     return this.scene.getNonDeletedFrames().map((f, index) => {
+      if (
+        !this.canvas ||
+        !isVisibleElement(
+          f,
+          this.canvas.width / window.devicePixelRatio,
+          this.canvas.height / window.devicePixelRatio,
+          {
+            offsetLeft: this.state.offsetLeft,
+            offsetTop: this.state.offsetTop,
+            scrollX: this.state.scrollX,
+            scrollY: this.state.scrollY,
+            zoom: this.state.zoom,
+          },
+        )
+      ) {
+        // if frame not visible, don't render its name
+        return null;
+      }
+
       const { x: x1, y: y1 } = sceneCoordsToViewportCoords(
         { sceneX: f.x, sceneY: f.y },
         this.state,
