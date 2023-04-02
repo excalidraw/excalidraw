@@ -635,137 +635,138 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private renderFrameNames = () => {
+    if (!this.state.shouldRenderFrames) {
+      return null;
+    }
+
     const isDarkTheme = this.state.theme === "dark";
 
-    return this.state.shouldRenderFrames
-      ? this.scene.getNonDeletedFrames().map((f, index) => {
-          const { x, y } = sceneCoordsToViewportCoords(
-            { sceneX: f.x, sceneY: f.y },
-            this.state,
-          );
+    return this.scene.getNonDeletedFrames().map((f, index) => {
+      const { x, y } = sceneCoordsToViewportCoords(
+        { sceneX: f.x, sceneY: f.y },
+        this.state,
+      );
 
-          const { x: xRight } = sceneCoordsToViewportCoords(
-            { sceneX: f.x + f.width, sceneY: f.y + f.height },
-            this.state,
-          );
+      const { x: xRight } = sceneCoordsToViewportCoords(
+        { sceneX: f.x + f.width, sceneY: f.y + f.height },
+        this.state,
+      );
 
-          const FRAME_NAME_GAP = 20;
-          const FRAME_NAME_EDIT_PADDING = 6;
+      const FRAME_NAME_GAP = 20;
+      const FRAME_NAME_EDIT_PADDING = 6;
 
-          const reset = () => {
-            if (f.name?.trim() === "") {
+      const reset = () => {
+        if (f.name?.trim() === "") {
+          mutateElement(f, { name: null });
+        }
+
+        this.setState({ editingFrame: null });
+      };
+
+      let frameNameJSX;
+
+      if (f.id === this.state.editingFrame) {
+        const frameNameInEdit = f.name == null ? `Frame ${index + 1}` : f.name;
+
+        frameNameJSX = (
+          <input
+            autoFocus
+            value={frameNameInEdit}
+            onChange={(e) => {
               mutateElement(f, {
-                name: null,
+                name: e.target.value,
               });
-            }
+            }}
+            onBlur={() => reset()}
+            onKeyDown={(event) => {
+              // for some inexplicable reason, `onBlur` triggered on ESC
+              // does not reset `state.editingFrame` despite being called,
+              // and we need to reset it here as well
+              if (event.key === KEYS.ESCAPE) {
+                reset();
+              }
+            }}
+            onKeyUp={(event) => {
+              if (event.key === KEYS.ENTER) {
+                reset();
+              }
+            }}
+            style={{
+              background: this.state.viewBackgroundColor,
+              filter: isDarkTheme ? THEME_FILTER : "none",
+              zIndex: 2,
+              border: "none",
+              display: "block",
+              padding: `${FRAME_NAME_EDIT_PADDING}px`,
+              borderRadius: 4,
+              boxShadow: "inset 0 0 0 1px var(--color-primary)",
+              fontFamily: "Assistant",
+              fontSize: "14px",
+              transform: `translateY(-${FRAME_NAME_EDIT_PADDING}px)`,
+              color: "var(--color-gray-80)",
+              overflow: "hidden",
+              maxWidth: `${Math.min(
+                xRight - x - FRAME_NAME_EDIT_PADDING,
+                document.body.clientWidth - x - FRAME_NAME_EDIT_PADDING,
+              )}px`,
+            }}
+            size={frameNameInEdit.length + 1 || 1}
+            dir="auto"
+            autoComplete="off"
+            autoCapitalize="off"
+            autoCorrect="off"
+          />
+        );
+      } else {
+        frameNameJSX =
+          f.name == null || f.name.trim() === ""
+            ? `Frame ${index + 1}`
+            : f.name.trim();
+      }
 
+      return (
+        <div
+          id={f.id}
+          key={f.id}
+          style={{
+            position: "absolute",
+            top: `${y - FRAME_NAME_GAP - this.state.offsetTop}px`,
+            left: `${
+              x -
+              this.state.offsetLeft -
+              (this.state.editingFrame === f.id ? FRAME_NAME_EDIT_PADDING : 0)
+            }px`,
+            zIndex: 2,
+            fontSize: "14px",
+            color: isDarkTheme
+              ? "var(--color-gray-40)"
+              : "var(--color-gray-80)",
+            width: "max-content",
+            maxWidth: `${xRight - x + FRAME_NAME_EDIT_PADDING * 2}px`,
+            overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+            // disable all interaction (e.g. cursor change) when in view
+            // mode
+            pointerEvents: this.state.viewModeEnabled ? "none" : "all",
+          }}
+          onPointerDown={(event) => {
+            this.handleCanvasPointerDown(event as any);
+          }}
+          onWheel={(event) => this.handleWheel(event)}
+          onContextMenu={(event: React.PointerEvent<HTMLDivElement>) => {
+            this.handleCanvasContextMenu(event);
+          }}
+          onDoubleClick={() => {
             this.setState({
-              editingFrame: null,
+              editingFrame: f.id,
             });
-          };
-
-          const frameNameInEdit =
-            f.name === null ? `Frame ${index + 1}` : f.name;
-
-          return (
-            <div
-              id={f.id}
-              key={f.id}
-              style={{
-                position: "absolute",
-                top: `${y - FRAME_NAME_GAP - this.state.offsetTop}px`,
-                left: `${
-                  x -
-                  this.state.offsetLeft -
-                  (this.state.editingFrame === f.id
-                    ? FRAME_NAME_EDIT_PADDING
-                    : 0)
-                }px`,
-                zIndex: 2,
-                fontSize: "14px",
-                color: isDarkTheme
-                  ? "var(--color-gray-40)"
-                  : "var(--color-gray-80)",
-                width: "max-content",
-                maxWidth: `${xRight - x + FRAME_NAME_EDIT_PADDING * 2}px`,
-                overflow:
-                  f.id === this.state.editingFrame ? "visible" : "hidden",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-                // disable all interaction (e.g. cursor change) when in view
-                // mode
-                pointerEvents: this.state.viewModeEnabled ? "none" : "all",
-              }}
-              onPointerDown={(event) => {
-                this.handleCanvasPointerDown(event as any);
-              }}
-              onWheel={(event) => this.handleWheel(event)}
-              onContextMenu={(event: React.PointerEvent<HTMLDivElement>) => {
-                this.handleCanvasContextMenu(event);
-              }}
-              onDoubleClick={() => {
-                this.setState({
-                  editingFrame: f.id,
-                });
-              }}
-            >
-              {f.id === this.state.editingFrame ? (
-                <input
-                  autoFocus
-                  value={frameNameInEdit}
-                  onChange={(e) => {
-                    mutateElement(f, {
-                      name: e.target.value,
-                    });
-                  }}
-                  onBlur={(event) => reset()}
-                  onKeyDown={(event) => {
-                    // for some inexplicable reason, `onBlur` triggered on ESC
-                    // does not reset `state.editingFrame` despite being called,
-                    // and we need to reset it here as well
-                    if (event.key === KEYS.ESCAPE) {
-                      reset();
-                    }
-                  }}
-                  onKeyUp={(event) => {
-                    if (event.key === KEYS.ENTER) {
-                      reset();
-                    }
-                  }}
-                  style={{
-                    background: this.state.viewBackgroundColor,
-                    filter: isDarkTheme ? THEME_FILTER : "none",
-                    zIndex: 2,
-                    border: "none",
-                    display: "block",
-                    padding: `${FRAME_NAME_EDIT_PADDING}px`,
-                    borderRadius: 4,
-                    boxShadow: "inset 0 0 0 1px var(--color-primary)",
-                    fontFamily: "Assistant",
-                    fontSize: "14px",
-                    transform: `translateY(-${FRAME_NAME_EDIT_PADDING}px)`,
-                    color: "var(--color-gray-80)",
-                    overflow: "hidden",
-                    maxWidth: `${Math.min(
-                      xRight - x - FRAME_NAME_EDIT_PADDING,
-                      document.body.clientWidth - x - FRAME_NAME_EDIT_PADDING,
-                    )}px`,
-                  }}
-                  size={frameNameInEdit.length + 1 || 1}
-                  dir="auto"
-                  autoComplete="off"
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                />
-              ) : f.name === null || f.name.trim() === "" ? (
-                `Frame ${index + 1}`
-              ) : (
-                f.name.trim()
-              )}
-            </div>
-          );
-        })
-      : null;
+          }}
+        >
+          {frameNameJSX}
+        </div>
+      );
+    });
   };
 
   public render() {
