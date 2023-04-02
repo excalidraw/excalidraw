@@ -538,3 +538,22 @@ export type Device = Readonly<{
   isTouchScreen: boolean;
   canDeviceFitSidebar: boolean;
 }>;
+
+type FrameNameBounds = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  angle: number;
+};
+
+export type FrameNameBoundsCache = {
+  get: (frameElement: ExcalidrawFrameElement) => FrameNameBounds | null;
+  _cache: Map<
+    string,
+    FrameNameBounds & {
+      zoom: AppState["zoom"]["value"];
+      versionNonce: ExcalidrawFrameElement["versionNonce"];
+    }
+  >;
+};

@@ -35,13 +35,13 @@ import {
   getRectangleBoxAbsoluteCoords,
   RectangleBox,
 } from "./bounds";
-import { Point } from "../types";
+import { FrameNameBoundsCache, Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
 import { hasBoundTextElement, isImageElement } from "./typeChecks";
 import { isTextElement } from ".";
-import { isTransparent, viewportCoordsToSceneCoords } from "../utils";
+import { isTransparent } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
 import { getBoundTextElement } from "./textElement";
 import { Mutable } from "../utility-types";
@@ -67,6 +67,7 @@ const isElementDraggableFromInside = (
 export const hitTest = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
+  frameNameBoundsCache: FrameNameBoundsCache,
   x: number,
   y: number,
 ): boolean => {
@@ -82,23 +83,35 @@ export const hitTest = (
       element,
       point,
       threshold,
-      appState,
+      frameNameBoundsCache,
     );
   }
 
   const boundTextElement = getBoundTextElement(element);
   if (boundTextElement) {
-    const isHittingBoundTextElement = hitTest(boundTextElement, appState, x, y);
+    const isHittingBoundTextElement = hitTest(
+      boundTextElement,
+      appState,
+      frameNameBoundsCache,
+      x,
+      y,
+    );
     if (isHittingBoundTextElement) {
       return true;
     }
   }
-  return isHittingElementNotConsideringBoundingBox(element, appState, point);
+  return isHittingElementNotConsideringBoundingBox(
+    element,
+    appState,
+    frameNameBoundsCache,
+    point,
+  );
 };
 
 export const isHittingElementBoundingBoxWithoutHittingElement = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
+  frameNameBoundsCache: FrameNameBoundsCache,
   x: number,
   y: number,
 ): boolean => {
@@ -107,19 +120,33 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
   // So that bound text element hit is considered within bounding box of container even if its outside actual bounding box of element
   // eg for linear elements text can be outside the element bounding box
   const boundTextElement = getBoundTextElement(element);
-  if (boundTextElement && hitTest(boundTextElement, appState, x, y)) {
+  if (
+    boundTextElement &&
+    hitTest(boundTextElement, appState, frameNameBoundsCache, x, y)
+  ) {
     return false;
   }
 
   return (
-    !isHittingElementNotConsideringBoundingBox(element, appState, [x, y]) &&
-    isPointHittingElementBoundingBox(element, [x, y], threshold, appState)
+    !isHittingElementNotConsideringBoundingBox(
+      element,
+      appState,
+      frameNameBoundsCache,
+      [x, y],
+    ) &&
+    isPointHittingElementBoundingBox(
+      element,
+      [x, y],
+      threshold,
+      frameNameBoundsCache,
+    )
   );
 };
 
 export const isHittingElementNotConsideringBoundingBox = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
+  frameNameBoundsCache: FrameNameBoundsCache | null,
   point: Point,
 ): boolean => {
   const threshold = 10 / appState.zoom.value;
@@ -133,7 +160,7 @@ export const isHittingElementNotConsideringBoundingBox = (
     point,
     threshold,
     check,
-    appState,
+    frameNameBoundsCache,
   });
 };
 
@@ -146,7 +173,7 @@ export const isPointHittingElementBoundingBox = (
   element: NonDeleted<ExcalidrawElement>,
   [x, y]: Point,
   threshold: number,
-  appState: AppState,
+  frameNameBoundsCache: FrameNameBoundsCache | null,
 ) => {
   // frames needs be checked differently so as to be able to drag it
   // by its frame, whether it has been selected or not
@@ -158,7 +185,7 @@ export const isPointHittingElementBoundingBox = (
       point: [x, y],
       threshold,
       check: isInsideCheck,
-      appState,
+      frameNameBoundsCache,
     });
   }
 
@@ -189,7 +216,13 @@ export const bindingBorderTest = (
   const threshold = maxBindingGap(element, element.width, element.height);
   const check = isOutsideCheck;
   const point: Point = [x, y];
-  return hitTestPointAgainstElement({ element, point, threshold, check });
+  return hitTestPointAgainstElement({
+    element,
+    point,
+    threshold,
+    check,
+    frameNameBoundsCache: null,
+  });
 };
 
 export const maxBindingGap = (
@@ -209,7 +242,7 @@ type HitTestArgs = {
   point: Point;
   threshold: number;
   check: (distance: number, threshold: number) => boolean;
-  appState?: AppState;
+  frameNameBoundsCache: FrameNameBoundsCache | null;
 };
 
 const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
@@ -252,33 +285,11 @@ const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
         return true;
       }
 
-      // check top distance
-      const frameNameDiv = document.getElementById(
-        args.element.id,
-      ) as HTMLDivElement;
+      const frameNameBounds = args.frameNameBoundsCache?.get(args.element);
 
-      if (frameNameDiv && args.appState) {
-        const box = frameNameDiv.getBoundingClientRect();
-        const boxSceneTopLeft = viewportCoordsToSceneCoords(
-          { clientX: box.x, clientY: box.y },
-          args.appState,
-        );
-        const boxSceneBottomRight = viewportCoordsToSceneCoords(
-          { clientX: box.right, clientY: box.bottom },
-          args.appState,
-        );
-
+      if (frameNameBounds) {
         return args.check(
-          distanceToRectangleBox(
-            {
-              x: boxSceneTopLeft.x,
-              y: boxSceneTopLeft.y,
-              width: boxSceneBottomRight.x - boxSceneTopLeft.x,
-              height: boxSceneBottomRight.y - boxSceneTopLeft.y,
-              angle: 0,
-            },
-            args.point,
-          ),
+          distanceToRectangleBox(frameNameBounds, args.point),
           args.threshold,
         );
       }

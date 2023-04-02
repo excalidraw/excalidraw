@@ -213,6 +213,7 @@ import {
   PointerDownState,
   SceneData,
   Device,
+  FrameNameBoundsCache,
 } from "../types";
 import {
   debounce,
@@ -584,6 +585,54 @@ class App extends React.Component<AppProps, AppState> {
       </canvas>
     );
   }
+
+  frameNameBoundsCache: FrameNameBoundsCache = {
+    get: (frameElement) => {
+      let bounds = this.frameNameBoundsCache._cache.get(frameElement.id);
+      if (
+        !bounds ||
+        bounds.zoom !== this.state.zoom.value ||
+        bounds.versionNonce !== frameElement.versionNonce
+      ) {
+        const frameNameDiv = document.getElementById(
+          frameElement.id,
+        ) as HTMLDivElement;
+
+        if (frameNameDiv) {
+          const box = frameNameDiv.getBoundingClientRect();
+          const boxSceneTopLeft = viewportCoordsToSceneCoords(
+            { clientX: box.x, clientY: box.y },
+            this.state,
+          );
+          const boxSceneBottomRight = viewportCoordsToSceneCoords(
+            { clientX: box.right, clientY: box.bottom },
+            this.state,
+          );
+
+          bounds = {
+            x: boxSceneTopLeft.x,
+            y: boxSceneTopLeft.y,
+            width: boxSceneBottomRight.x - boxSceneTopLeft.x,
+            height: boxSceneBottomRight.y - boxSceneTopLeft.y,
+            angle: 0,
+            zoom: this.state.zoom.value,
+            versionNonce: frameElement.versionNonce,
+          };
+
+          this.frameNameBoundsCache._cache.set(frameElement.id, bounds);
+
+          return bounds;
+        }
+        return null;
+      }
+
+      return bounds;
+    },
+    /**
+     * @private
+     */
+    _cache: new Map(),
+  };
 
   private renderFrameNames = () => {
     const isDarkTheme = this.state.theme === "dark";
@@ -2805,6 +2854,7 @@ class App extends React.Component<AppProps, AppState> {
       return isHittingElementBoundingBoxWithoutHittingElement(
         elementWithHighestZIndex,
         this.state,
+        this.frameNameBoundsCache,
         x,
         y,
       )
@@ -2836,7 +2886,7 @@ class App extends React.Component<AppProps, AppState> {
             );
 
     return getElementsAtPosition(elements, (element) =>
-      hitTest(element, this.state, x, y),
+      hitTest(element, this.state, this.frameNameBoundsCache, x, y),
     ).filter((element) => {
       // hitting a frame's element from outside the frame is not considered a hit
       const containingFrame = getContainingFrame(element);
@@ -3080,10 +3130,12 @@ class App extends React.Component<AppProps, AppState> {
         if (
           hasBoundTextElement(container) ||
           !isTransparent(container.backgroundColor) ||
-          isHittingElementNotConsideringBoundingBox(container, this.state, [
-            sceneX,
-            sceneY,
-          ])
+          isHittingElementNotConsideringBoundingBox(
+            container,
+            this.state,
+            this.frameNameBoundsCache,
+            [sceneX, sceneY],
+          )
         ) {
           const midPoint = getContainerCenter(container, this.state);
 
@@ -3646,10 +3698,12 @@ class App extends React.Component<AppProps, AppState> {
       let hoverPointIndex = -1;
       let segmentMidPointHoveredCoords = null;
       if (
-        isHittingElementNotConsideringBoundingBox(element, this.state, [
-          scenePointerX,
-          scenePointerY,
-        ])
+        isHittingElementNotConsideringBoundingBox(
+          element,
+          this.state,
+          this.frameNameBoundsCache,
+          [scenePointerX, scenePointerY],
+        )
       ) {
         hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
           element,
@@ -3674,6 +3728,7 @@ class App extends React.Component<AppProps, AppState> {
         isHittingElementBoundingBoxWithoutHittingElement(
           element,
           this.state,
+          this.frameNameBoundsCache,
           scenePointerX,
           scenePointerY,
         )
@@ -3681,7 +3736,13 @@ class App extends React.Component<AppProps, AppState> {
         setCursor(this.canvas, CURSOR_TYPE.MOVE);
       } else if (
         boundTextElement &&
-        hitTest(boundTextElement, this.state, scenePointerX, scenePointerY)
+        hitTest(
+          boundTextElement,
+          this.state,
+          this.frameNameBoundsCache,
+          scenePointerX,
+          scenePointerY,
+        )
       ) {
         setCursor(this.canvas, CURSOR_TYPE.MOVE);
       }
@@ -6020,6 +6081,7 @@ class App extends React.Component<AppProps, AppState> {
           isHittingElementBoundingBoxWithoutHittingElement(
             hitElement,
             this.state,
+            this.frameNameBoundsCache,
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           )) ||

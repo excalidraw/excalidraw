@@ -343,7 +343,7 @@ export const isPointHittingLinkIcon = (
   if (
     !isMobile &&
     appState.viewModeEnabled &&
-    isPointHittingElementBoundingBox(element, [x, y], threshold, appState)
+    isPointHittingElementBoundingBox(element, [x, y], threshold, null)
   ) {
     return true;
   }
@@ -440,12 +440,7 @@ export const shouldHideLinkPopup = (
   const threshold = 15 / appState.zoom.value;
   // hitbox to prevent hiding when hovered in element bounding box
   if (
-    isPointHittingElementBoundingBox(
-      element,
-      [sceneX, sceneY],
-      threshold,
-      appState,
-    )
+    isPointHittingElementBoundingBox(element, [sceneX, sceneY], threshold, null)
   ) {
     return false;
   }
