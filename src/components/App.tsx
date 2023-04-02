@@ -586,6 +586,10 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  private getFrameNameDOMId = (frameElement: ExcalidrawElement) => {
+    return `${this.id}-frame-name-${frameElement.id}`;
+  };
+
   frameNameBoundsCache: FrameNameBoundsCache = {
     get: (frameElement) => {
       let bounds = this.frameNameBoundsCache._cache.get(frameElement.id);
@@ -595,8 +599,8 @@ class App extends React.Component<AppProps, AppState> {
         bounds.versionNonce !== frameElement.versionNonce
       ) {
         const frameNameDiv = document.getElementById(
-          frameElement.id,
-        ) as HTMLDivElement;
+          this.getFrameNameDOMId(frameElement),
+        );
 
         if (frameNameDiv) {
           const box = frameNameDiv.getBoundingClientRect();
@@ -726,7 +730,7 @@ class App extends React.Component<AppProps, AppState> {
 
       return (
         <div
-          id={f.id}
+          id={this.getFrameNameDOMId(f)}
           key={f.id}
           style={{
             position: "absolute",
