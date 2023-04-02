@@ -646,12 +646,12 @@ class App extends React.Component<AppProps, AppState> {
     const isDarkTheme = this.state.theme === "dark";
 
     return this.scene.getNonDeletedFrames().map((f, index) => {
-      const { x, y } = sceneCoordsToViewportCoords(
+      const { x: x1, y: y1 } = sceneCoordsToViewportCoords(
         { sceneX: f.x, sceneY: f.y },
         this.state,
       );
 
-      const { x: xRight } = sceneCoordsToViewportCoords(
+      const { x: x2 } = sceneCoordsToViewportCoords(
         { sceneX: f.x + f.width, sceneY: f.y + f.height },
         this.state,
       );
@@ -710,8 +710,8 @@ class App extends React.Component<AppProps, AppState> {
               color: "var(--color-gray-80)",
               overflow: "hidden",
               maxWidth: `${Math.min(
-                xRight - x - FRAME_NAME_EDIT_PADDING,
-                document.body.clientWidth - x - FRAME_NAME_EDIT_PADDING,
+                x2 - x1 - FRAME_NAME_EDIT_PADDING,
+                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING,
               )}px`,
             }}
             size={frameNameInEdit.length + 1 || 1}
@@ -734,9 +734,9 @@ class App extends React.Component<AppProps, AppState> {
           key={f.id}
           style={{
             position: "absolute",
-            top: `${y - FRAME_NAME_GAP - this.state.offsetTop}px`,
+            top: `${y1 - FRAME_NAME_GAP - this.state.offsetTop}px`,
             left: `${
-              x -
+              x1 -
               this.state.offsetLeft -
               (this.state.editingFrame === f.id ? FRAME_NAME_EDIT_PADDING : 0)
             }px`,
@@ -746,7 +746,7 @@ class App extends React.Component<AppProps, AppState> {
               ? "var(--color-gray-40)"
               : "var(--color-gray-80)",
             width: "max-content",
-            maxWidth: `${xRight - x + FRAME_NAME_EDIT_PADDING * 2}px`,
+            maxWidth: `${x2 - x1 + FRAME_NAME_EDIT_PADDING * 2}px`,
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
