@@ -9,7 +9,7 @@ import {
 import { distance2d, rotate } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
-import { AppState, Point } from "../types";
+import { Point } from "../types";
 import {
   getShapeForElement,
   generateRoughOptions,
@@ -23,13 +23,22 @@ import {
 import { rescalePoints } from "../points";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
-import { viewportCoordsToSceneCoords } from "../utils";
 import { Mutable } from "../utility-types";
+
+export type RectangleBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  angle: number;
+};
 
 // x and y position of top left corner, x and y position of bottom right corner
 export type Bounds = readonly [number, number, number, number];
 type MaybeQuadraticSolution = [number | null, number | null] | false;
 
+// Scene -> Scene coords, but in x1,x2,y1,y2 format.
+//
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
 export const getElementAbsoluteCoords = (
@@ -70,34 +79,19 @@ export const getElementAbsoluteCoords = (
   ];
 };
 
-export const getDivElementAbsoluteCoords = (
-  div: HTMLDivElement,
-  element: ExcalidrawElement,
-  appState: AppState,
-) => {
-  // TODO: translate boundingbox size to scene sizes
-  const boundingBox = div.getBoundingClientRect();
-
-  const { x: topX, y: topY } = viewportCoordsToSceneCoords(
-    { clientX: boundingBox.left, clientY: boundingBox.top - 20 },
-    appState,
-  );
-
-  const { x: bottomX, y: bottomY } = viewportCoordsToSceneCoords(
-    { clientX: boundingBox.right, clientY: boundingBox.bottom - 20 },
-    appState,
-  );
-
-  const width = Math.abs(bottomX - topX);
-  const height = Math.abs(bottomY - topY);
-
+/**
+ * Scene -> Scene coords, but in x1,x2,y1,y2 format.
+ *
+ * Rectangle here means any rectangular frame, not an excalidraw element.
+ */
+export const getRectangleBoxAbsoluteCoords = (boxSceneCoords: RectangleBox) => {
   return [
-    element.x,
-    element.y - height,
-    element.x + width,
-    element.y,
-    element.x + width / 2,
-    element.y - height / 2,
+    boxSceneCoords.x,
+    boxSceneCoords.y,
+    boxSceneCoords.x + boxSceneCoords.width,
+    boxSceneCoords.y + boxSceneCoords.height,
+    boxSceneCoords.x + boxSceneCoords.width / 2,
+    boxSceneCoords.y + boxSceneCoords.height / 2,
   ];
 };
 
@@ -661,7 +655,7 @@ export const getClosestElementBounds = (
   return getElementBounds(closestElement);
 };
 
-export interface Box {
+export interface BoundingBox {
   minX: number;
   minY: number;
   maxX: number;
@@ -674,7 +668,7 @@ export interface Box {
 
 export const getCommonBoundingBox = (
   elements: ExcalidrawElement[] | readonly NonDeleted<ExcalidrawElement>[],
-): Box => {
+): BoundingBox => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   return {
     minX,

@@ -32,8 +32,8 @@ import {
 import {
   getElementAbsoluteCoords,
   getCurvePathOps,
-  Bounds,
-  getDivElementAbsoluteCoords,
+  getRectangleBoxAbsoluteCoords,
+  RectangleBox,
 } from "./bounds";
 import { Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
@@ -41,7 +41,7 @@ import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
 import { hasBoundTextElement, isImageElement } from "./typeChecks";
 import { isTextElement } from ".";
-import { isTransparent } from "../utils";
+import { isTransparent, viewportCoordsToSceneCoords } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
 import { getBoundTextElement } from "./textElement";
 import { Mutable } from "../utility-types";
@@ -242,19 +242,47 @@ const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
       );
       return false;
     case "frame": {
+      // check distance to frame element first
+      if (
+        args.check(
+          distanceToBindableElement(args.element, args.point),
+          args.threshold,
+        )
+      ) {
+        return true;
+      }
+
       // check top distance
-      const labelDiv = document.getElementById(
+      const frameNameDiv = document.getElementById(
         args.element.id,
       ) as HTMLDivElement;
-      const disToElement = distanceToBindableElement(args.element, args.point);
-      const disToLabel =
-        labelDiv && args.appState
-          ? distanceToLabel(labelDiv, args.element, args.point, args.appState)
-          : Infinity;
-      return (
-        args.check(disToLabel, args.threshold) ||
-        args.check(disToElement, args.threshold)
-      );
+
+      if (frameNameDiv && args.appState) {
+        const box = frameNameDiv.getBoundingClientRect();
+        const boxSceneTopLeft = viewportCoordsToSceneCoords(
+          { clientX: box.x, clientY: box.y },
+          args.appState,
+        );
+        const boxSceneBottomRight = viewportCoordsToSceneCoords(
+          { clientX: box.right, clientY: box.bottom },
+          args.appState,
+        );
+
+        return args.check(
+          distanceToRectangleBox(
+            {
+              x: boxSceneTopLeft.x,
+              y: boxSceneTopLeft.y,
+              width: boxSceneBottomRight.x - boxSceneTopLeft.x,
+              height: boxSceneBottomRight.y - boxSceneTopLeft.y,
+              angle: 0,
+            },
+            args.point,
+          ),
+          args.threshold,
+        );
+      }
+      return false;
     }
   }
 };
@@ -308,18 +336,8 @@ const distanceToRectangle = (
   );
 };
 
-const distanceToLabel = (
-  label: HTMLDivElement,
-  element: ExcalidrawElement,
-  point: Point,
-  appState: AppState,
-): number => {
-  const [, pointRel, hwidth, hheight] = pointRelativeToDivElement(
-    label,
-    element,
-    point,
-    appState,
-  );
+const distanceToRectangleBox = (box: RectangleBox, point: Point): number => {
+  const [, pointRel, hwidth, hheight] = pointRelativeToDivElement(point, box);
   return Math.max(
     GAPoint.distanceToLine(pointRel, GALine.equation(0, 1, -hheight)),
     GAPoint.distanceToLine(pointRel, GALine.equation(1, 0, -hwidth)),
@@ -525,8 +543,7 @@ const pointRelativeToElement = (
 ): [GA.Point, GA.Point, number, number] => {
   const point = GAPoint.from(pointTuple);
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const elementCoords = getElementAbsoluteCoords(element);
-  const center = coordsCenter([x1, y1, x2, y2]);
+  const center = coordsCenter(x1, y1, x2, y2);
   // GA has angle orientation opposite to `rotate`
   const rotate = GATransform.rotation(center, element.angle);
   const pointRotated = GATransform.apply(rotate, point);
@@ -534,31 +551,26 @@ const pointRelativeToElement = (
   const pointRelToCenterAbs = GAPoint.abs(pointRelToCenter);
   const elementPos = GA.offset(element.x, element.y);
   const pointRelToPos = GA.sub(pointRotated, elementPos);
-  const [ax, ay, bx, by] = elementCoords;
-  const halfWidth = (bx - ax) / 2;
-  const halfHeight = (by - ay) / 2;
+  const halfWidth = (x2 - x1) / 2;
+  const halfHeight = (y2 - y1) / 2;
   return [pointRelToPos, pointRelToCenterAbs, halfWidth, halfHeight];
 };
 
 const pointRelativeToDivElement = (
-  div: HTMLDivElement,
-  element: ExcalidrawElement,
   pointTuple: Point,
-  appState: AppState,
+  rectangle: RectangleBox,
 ): [GA.Point, GA.Point, number, number] => {
   const point = GAPoint.from(pointTuple);
-  const [x1, y1, x2, y2] = getDivElementAbsoluteCoords(div, element, appState);
-  const elementCoords = getDivElementAbsoluteCoords(div, element, appState);
-  const center = coordsCenter([x1, y1, x2, y2]);
-  const rotate = GATransform.rotation(center, element.angle);
+  const [x1, y1, x2, y2] = getRectangleBoxAbsoluteCoords(rectangle);
+  const center = coordsCenter(x1, y1, x2, y2);
+  const rotate = GATransform.rotation(center, rectangle.angle);
   const pointRotated = GATransform.apply(rotate, point);
   const pointRelToCenter = GA.sub(pointRotated, GADirection.from(center));
   const pointRelToCenterAbs = GAPoint.abs(pointRelToCenter);
-  const elementPos = GA.offset(element.x, element.y);
+  const elementPos = GA.offset(rectangle.x, rectangle.y);
   const pointRelToPos = GA.sub(pointRotated, elementPos);
-  const [ax, ay, bx, by] = elementCoords;
-  const halfWidth = (bx - ax) / 2;
-  const halfHeight = (by - ay) / 2;
+  const halfWidth = (x2 - x1) / 2;
+  const halfHeight = (y2 - y1) / 2;
   return [pointRelToPos, pointRelToCenterAbs, halfWidth, halfHeight];
 };
 
@@ -580,7 +592,7 @@ const relativizationToElementCenter = (
   element: ExcalidrawElement,
 ): GA.Transform => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const center = coordsCenter([x1, y1, x2, y2]);
+  const center = coordsCenter(x1, y1, x2, y2);
   // GA has angle orientation opposite to `rotate`
   const rotate = GATransform.rotation(center, element.angle);
   const translate = GA.reverse(
@@ -589,8 +601,13 @@ const relativizationToElementCenter = (
   return GATransform.compose(rotate, translate);
 };
 
-const coordsCenter = ([ax, ay, bx, by]: Bounds): GA.Point => {
-  return GA.point((ax + bx) / 2, (ay + by) / 2);
+const coordsCenter = (
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): GA.Point => {
+  return GA.point((x1 + x2) / 2, (y1 + y2) / 2);
 };
 
 // The focus distance is the oriented ratio between the size of
@@ -639,7 +656,7 @@ export const determineFocusPoint = (
 ): Point => {
   if (focus === 0) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    const center = coordsCenter([x1, y1, x2, y2]);
+    const center = coordsCenter(x1, y1, x2, y2);
     return GAPoint.toTuple(center);
   }
   const relateToCenter = relativizationToElementCenter(element);
