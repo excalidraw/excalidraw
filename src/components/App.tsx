@@ -435,7 +435,7 @@ class App extends React.Component<AppProps, AppState> {
   public imageCache: AppClassProperties["imageCache"] = new Map();
 
   hitLinkElement?: NonDeletedExcalidrawElement;
-  lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
+  lastPointerDown: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   lastScenePointer: { x: number; y: number } | null = null;
 
@@ -750,9 +750,7 @@ class App extends React.Component<AppProps, AppState> {
             // mode
             pointerEvents: this.state.viewModeEnabled ? "none" : "all",
           }}
-          onPointerDown={(event) => {
-            this.handleCanvasPointerDown(event as any);
-          }}
+          onPointerDown={(event) => this.handleCanvasPointerDown(event)}
           onWheel={(event) => this.handleWheel(event)}
           onContextMenu={(event: React.PointerEvent<HTMLDivElement>) => {
             this.handleCanvasContextMenu(event);
@@ -3777,7 +3775,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
   private handleCanvasPointerDown = (
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
   ) => {
     // since contextMenu options are potentially evaluated on each render,
     // and an contextMenu action may depend on selection state, we must
@@ -4060,7 +4058,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
   ): void => {
     // deal with opening context menu on touch devices
     if (event.pointerType === "touch") {
@@ -4091,7 +4089,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private maybeCleanupAfterMissingPointerUp(
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
   ): void {
     if (lastPointerUp !== null) {
       // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
@@ -4103,7 +4101,7 @@ class App extends React.Component<AppProps, AppState> {
 
   // Returns whether the event is a panning
   private handleCanvasPanUsingWheelOrSpaceDrag = (
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
   ): boolean => {
     if (
       !(
@@ -4200,7 +4198,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private updateGestureOnPointerDown(
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
   ): void {
     gesture.pointers.set(event.pointerId, {
       x: event.clientX,
@@ -4217,9 +4215,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private initialPointerDownState(
-    event:
-      | React.PointerEvent<HTMLCanvasElement>
-      | React.PointerEvent<HTMLDivElement>,
+    event: React.PointerEvent<HTMLElement>,
   ): PointerDownState {
     const origin = viewportCoordsToSceneCoords(event, this.state);
     const selectedElements = getSelectedElements(
@@ -4284,7 +4280,7 @@ class App extends React.Component<AppProps, AppState> {
 
   // Returns whether the event is a dragging a scrollbar
   private handleDraggingScrollBar(
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): boolean {
     if (
@@ -4338,7 +4334,7 @@ class App extends React.Component<AppProps, AppState> {
    * @returns whether the pointer event has been completely handled
    */
   private handleSelectionOnPointerDown = (
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
     if (this.state.activeTool.type === "selection") {
@@ -4582,7 +4578,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private handleTextOnPointerDown = (
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): void => {
     // if we're currently still editing text, clicking outside
@@ -4626,7 +4622,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleFreeDrawElementOnPointerDown = (
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
     elementType: ExcalidrawFreeDrawElement["type"],
     pointerDownState: PointerDownState,
   ) => {
@@ -4722,7 +4718,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleLinearElementOnPointerDown = (
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
     elementType: ExcalidrawLinearElement["type"],
     pointerDownState: PointerDownState,
   ): void => {
@@ -6566,7 +6562,7 @@ class App extends React.Component<AppProps, AppState> {
   }, IMAGE_RENDER_TIMEOUT);
 
   private updateBindingEnabledOnPointerMove = (
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
   ) => {
     const shouldEnableBinding = shouldEnableBindingForPointerEvent(event);
     if (this.state.isBindingEnabled !== shouldEnableBinding) {
@@ -6790,9 +6786,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleCanvasContextMenu = (
-    event:
-      | React.PointerEvent<HTMLCanvasElement>
-      | React.PointerEvent<HTMLDivElement>,
+    event: React.PointerEvent<HTMLElement>,
   ) => {
     event.preventDefault();
 
