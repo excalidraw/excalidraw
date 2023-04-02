@@ -53,6 +53,7 @@ module.exports = {
     ],
   },
   optimization: {
+    sideEffects: false, //zsviczian https://github.com/storybookjs/storybook/issues/15221
     splitChunks: {
       chunks: "async",
       cacheGroups: {

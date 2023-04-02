@@ -27,3 +27,5 @@ src/packages/excalidraw/example/public/excalidraw-assets-dev
 src/packages/excalidraw/example/public/excalidraw.development.js
 src/packages/excalidraw/yarn.lock
 coverage
+src/packages/excalidraw/yarn.lock
+yarn.lock

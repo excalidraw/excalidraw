@@ -74,6 +74,7 @@ module.exports = {
     ],
   },
   optimization: {
+    sideEffects: false, //zsviczian https://github.com/storybookjs/storybook/issues/15221
     minimize: true,
     minimizer: [
       new TerserPlugin({
