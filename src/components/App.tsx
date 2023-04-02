@@ -4061,20 +4061,19 @@ class App extends React.Component<AppProps, AppState> {
       ).filter(
         (element) => element.type === "frame",
       ) as ExcalidrawFrameElement[];
-      selectedFrames.forEach((frame) => {
-        this.scene.replaceAllElements(
-          replaceAllElementsInFrame(
-            this.scene.getElementsIncludingDeleted(),
-            getElementsInResizingFrame(
-              this.scene.getNonDeletedElements(),
-              frame,
-              this.state,
-            ),
+      for (const frame of selectedFrames) {
+        replaceAllElementsInFrame(
+          this.scene.getElementsIncludingDeleted(),
+          getElementsInResizingFrame(
+            this.scene.getNonDeletedElements(),
             frame,
             this.state,
           ),
+          frame,
+          this.state,
         );
-      });
+      }
+      this.scene.informMutation();
     }
 
     this.removePointer(event);

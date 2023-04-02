@@ -31,7 +31,7 @@ export const bindElementsToFramesAfterDuplication = (
     ExcalidrawElement
   >;
 
-  oldElements.forEach((element) => {
+  for (const element of oldElements) {
     if (element.frameId) {
       // use its frameId to get the new frameId
       const nextElementId = oldIdToDuplicatedId.get(element.id);
@@ -39,13 +39,17 @@ export const bindElementsToFramesAfterDuplication = (
       if (nextElementId) {
         const nextElement = nextElementMap.get(nextElementId);
         if (nextElement) {
-          mutateElement(nextElement, {
-            frameId: nextFrameId ?? element.frameId,
-          });
+          mutateElement(
+            nextElement,
+            {
+              frameId: nextFrameId ?? element.frameId,
+            },
+            false,
+          );
         }
       }
     }
-  });
+  }
 };
 
 // --------------------------- Frame Geometry ---------------------------------
@@ -312,14 +316,14 @@ export const getFrameElementsMapFromElements = (
     ExcalidrawFrameElement["id"],
     ExcalidrawElement[]
   >();
-  elements.forEach((element) => {
+  for (const element of elements) {
     if (element.frameId) {
       frameElementsMap.set(element.frameId, [
         ...(frameElementsMap.get(element.frameId) ?? []),
         element,
       ]);
     }
-  });
+  }
 
   return frameElementsMap;
 };
@@ -338,7 +342,7 @@ export const getAllFrameElementsMapFromAppState = (
 
   const selectedElements = arrayToMap(getSelectedElements(elements, appState));
 
-  elements.forEach((element) => {
+  for (const element of elements) {
     if (isFrameElement(element)) {
       frameElementsMap.set(element.id, {
         frameSelected: selectedElements.has(element.id),
@@ -356,7 +360,7 @@ export const getAllFrameElementsMapFromAppState = (
           : getElementsInFrame(elements, element.frameId),
       });
     }
-  });
+  }
 
   return frameElementsMap;
 };
@@ -367,7 +371,7 @@ export const getElementsToUpdateForFrame = (
 ): NonDeletedExcalidrawElement[] => {
   const elementsToUpdate: NonDeletedExcalidrawElement[] = [];
 
-  selectedElements.forEach((element) => {
+  for (const element of selectedElements) {
     if (predicate(element)) {
       elementsToUpdate.push(element);
       // since adding elements to a frame will alter the z-indexes
@@ -378,7 +382,7 @@ export const getElementsToUpdateForFrame = (
         elementsToUpdate.push(textElement);
       }
     }
-  });
+  }
 
   return elementsToUpdate;
 };
@@ -413,7 +417,7 @@ export const getElementsInResizingFrame = (
     ),
   );
 
-  elementsNotCompletelyInFrame.forEach((element) => {
+  for (const element of elementsNotCompletelyInFrame) {
     if (!FrameGeometry.isElementIntersectingFrame(element, frame)) {
       if (element.groupIds.length === 0) {
         nextElementsInFrame.delete(element);
@@ -421,33 +425,35 @@ export const getElementsInResizingFrame = (
     } else if (element.groupIds.length > 0) {
       // group element intersects with the frame, we should keep the groups
       // that this element is part of
-      element.groupIds.forEach((id) => groupsToKeep.add(id));
+      for (const id of element.groupIds) {
+        groupsToKeep.add(id);
+      }
     }
-  });
+  }
 
-  elementsNotCompletelyInFrame.forEach((element) => {
+  for (const element of elementsNotCompletelyInFrame) {
     if (element.groupIds.length > 0) {
       let shouldRemoveElement = true;
 
-      element.groupIds.forEach((id) => {
+      for (const id of element.groupIds) {
         if (groupsToKeep.has(id)) {
           shouldRemoveElement = false;
         }
-      });
+      }
 
       if (shouldRemoveElement) {
         nextElementsInFrame.delete(element);
       }
     }
-  });
+  }
 
   const individualElementsCompletelyInFrame = Array.from(
     elementsCompletelyInFrame,
   ).filter((element) => element.groupIds.length === 0);
 
-  individualElementsCompletelyInFrame.forEach((element) =>
-    nextElementsInFrame.add(element),
-  );
+  for (const element of individualElementsCompletelyInFrame) {
+    nextElementsInFrame.add(element);
+  }
 
   const newGroupElementsCompletelyInFrame = Array.from(
     elementsCompletelyInFrame,
@@ -459,17 +465,17 @@ export const getElementsInResizingFrame = (
   );
 
   // new group elements
-  Object.entries(groupIds).forEach(([id, isSelected]) => {
+  for (const [id, isSelected] of Object.entries(groupIds)) {
     if (isSelected) {
       const elementsInGroup = getElementsInGroup(allElements, id);
 
       if (elementsAreInFrameBounds(elementsInGroup, frame)) {
-        elementsInGroup.forEach((element) => {
+        for (const element of elementsInGroup) {
           nextElementsInFrame.add(element);
-        });
+        }
       }
     }
-  });
+  }
 
   return [...nextElementsInFrame];
 };
@@ -498,17 +504,17 @@ export const getElementsInNewFrame = (
 
   const groupIds = selectGroupsFromGivenElements(groupElements, appState);
 
-  Object.entries(groupIds).forEach(([id, isSelected]) => {
+  for (const [id, isSelected] of Object.entries(groupIds)) {
     if (isSelected) {
       const elementsInGroup = getElementsInGroup(allElements, id);
 
       if (elementsAreInFrameBounds(elementsInGroup, frame)) {
-        elementsInGroup.forEach((element) => {
+        for (const element of elementsInGroup) {
           elementsToBeAddedSet.add(element);
-        });
+        }
       }
     }
-  });
+  }
 
   return [...elementsToBeAddedSet];
 };
@@ -530,25 +536,29 @@ export const addElementsToFrame = (
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameElement,
 ) => {
-  const _elementsToAdd = new Set<ExcalidrawElement>();
+  const _elementsToAdd: ExcalidrawElement[] = [];
 
-  elementsToAdd.forEach((element) => {
-    _elementsToAdd.add(element);
+  for (const element of elementsToAdd) {
+    _elementsToAdd.push(element);
 
     const boundTextElement = getBoundTextElement(element);
     if (boundTextElement) {
-      _elementsToAdd.add(boundTextElement);
+      _elementsToAdd.push(boundTextElement);
     }
-  });
+  }
 
-  let nextElements = [...allElements];
+  let nextElements = allElements.slice();
 
-  Array.from(_elementsToAdd).forEach((element) => {
+  for (const element of _elementsToAdd) {
     // only necessary if the element is not already in the frame
     if (element.frameId !== frame.id) {
-      mutateElement(element, {
-        frameId: frame.id,
-      });
+      mutateElement(
+        element,
+        {
+          frameId: frame.id,
+        },
+        false,
+      );
 
       const frameIndex = findIndex(nextElements, (e) => e.id === frame.id);
       const elementIndex = findIndex(nextElements, (e) => e.id === element.id);
@@ -569,7 +579,7 @@ export const addElementsToFrame = (
         ];
       }
     }
-  });
+  }
 
   return nextElements;
 };
@@ -579,22 +589,27 @@ export const removeElementsFromFrame = (
   elementsToRemove: NonDeletedExcalidrawElement[],
   appState: AppState,
 ) => {
-  const _elementsToRemove = new Set<ExcalidrawElement>();
+  const _elementsToRemove: ExcalidrawElement[] = [];
 
-  elementsToRemove.forEach((element) => {
+  for (const element of elementsToRemove) {
     if (element.frameId) {
-      _elementsToRemove.add(element);
+      _elementsToRemove.push(element);
       const boundTextElement = getBoundTextElement(element);
       if (boundTextElement) {
-        _elementsToRemove.add(boundTextElement);
+        _elementsToRemove.push(boundTextElement);
       }
     }
-  });
-  _elementsToRemove.forEach((element) => {
-    mutateElement(element, {
-      frameId: null,
-    });
-  });
+  }
+
+  for (const element of _elementsToRemove) {
+    mutateElement(
+      element,
+      {
+        frameId: null,
+      },
+      false,
+    );
+  }
 
   const nextElements = moveOneRight(
     allElements,
