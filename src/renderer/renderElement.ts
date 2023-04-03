@@ -30,7 +30,7 @@ import { RenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
-import { AppState, BinaryFiles, Zoom } from "../types";
+import { AppState, BinaryFiles, NormalizedZoomValue, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
@@ -101,6 +101,8 @@ const generateElementCanvas = (
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
   const padding = getCanvasPadding(element);
+  const sizelimit = 16777216; // 2^24
+  let zoomValue = zoom.value;
 
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
@@ -108,38 +110,65 @@ const generateElementCanvas = (
   if (isLinearElement(element) || isFreeDrawElement(element)) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
-    canvas.width =
-      distance(x1, x2) * window.devicePixelRatio * zoom.value +
-      padding * zoom.value * 2;
-    canvas.height =
-      distance(y1, y2) * window.devicePixelRatio * zoom.value +
-      padding * zoom.value * 2;
+    let width =
+      distance(x1, x2) * window.devicePixelRatio * zoomValue +
+      padding * zoomValue * 2;
+    let height =
+      distance(y1, y2) * window.devicePixelRatio * zoomValue +
+      padding * zoomValue * 2;
+    
+    const size = width * height;
+    if (size > sizelimit) {
+      zoomValue = Math.sqrt(sizelimit / size) as NormalizedZoomValue;
+      width =
+        distance(x1, x2) * window.devicePixelRatio * zoomValue +
+        padding * zoomValue * 2;
+      height =
+        distance(y1, y2) * window.devicePixelRatio * zoomValue +
+        padding * zoomValue * 2;
+    }
+
+    canvas.width = width;
+    canvas.height = height;
 
     canvasOffsetX =
       element.x > x1
-        ? distance(element.x, x1) * window.devicePixelRatio * zoom.value
+        ? distance(element.x, x1) * window.devicePixelRatio * zoomValue
         : 0;
 
     canvasOffsetY =
       element.y > y1
-        ? distance(element.y, y1) * window.devicePixelRatio * zoom.value
+        ? distance(element.y, y1) * window.devicePixelRatio * zoomValue
         : 0;
 
     context.translate(canvasOffsetX, canvasOffsetY);
   } else {
-    canvas.width =
-      element.width * window.devicePixelRatio * zoom.value +
-      padding * zoom.value * 2;
-    canvas.height =
-      element.height * window.devicePixelRatio * zoom.value +
-      padding * zoom.value * 2;
+    let width =
+      element.width * window.devicePixelRatio * zoomValue +
+      padding * zoomValue * 2;
+    let height =
+      element.height * window.devicePixelRatio * zoomValue +
+      padding * zoomValue * 2;
+
+    const size = width * height;
+    if (size > sizelimit) {
+      zoomValue = Math.sqrt(sizelimit / size) as NormalizedZoomValue;
+      width =
+        element.width * window.devicePixelRatio * zoomValue +
+        padding * zoomValue * 2;
+      height =
+        element.height * window.devicePixelRatio * zoomValue +
+        padding * zoomValue * 2;
+    }
+    canvas.width = width;
+    canvas.height = height;
   }
 
   context.save();
-  context.translate(padding * zoom.value, padding * zoom.value);
+  context.translate(padding * zoomValue, padding * zoomValue);
   context.scale(
-    window.devicePixelRatio * zoom.value,
-    window.devicePixelRatio * zoom.value,
+    window.devicePixelRatio * zoomValue,
+    window.devicePixelRatio * zoomValue,
   );
 
   const rc = rough.canvas(canvas);
@@ -156,7 +185,7 @@ const generateElementCanvas = (
     element,
     canvas,
     theme: renderConfig.theme,
-    canvasZoom: zoom.value,
+    canvasZoom: zoomValue,
     canvasOffsetX,
     canvasOffsetY,
     boundTextElementVersion: getBoundTextElement(element)?.version || null,
@@ -685,7 +714,6 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.theme !== renderConfig.theme ||
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion
   ) {
-    console.log(element, element.width, element.height, zoom.value, renderConfig);
     const elementWithCanvas = generateElementCanvas(
       element,
       zoom,
