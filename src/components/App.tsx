@@ -1361,7 +1361,8 @@ class App extends React.Component<AppProps, AppState> {
       document.querySelector(".excalidraw")!,
     ).getPropertyValue("--color-selection");
 
-    if(!this.state.shouldCacheIgnoreZoom) console.log(`renderScene`);
+    const now = Date.now();
+    if(!this.state.shouldCacheIgnoreZoom) console.log(`renderScene`,now);
     renderScene(
       {
         elements: renderingElements,
@@ -1399,7 +1400,7 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({ scrolledOutside });
           }
           this.scheduleImageRefresh();
-          if(!this.state.shouldCacheIgnoreZoom) setTimeout(()=>console.log(`after renderScene`));
+          if(!this.state.shouldCacheIgnoreZoom) setTimeout(()=>console.log(`after renderScene`,now));
         },
       },
       THROTTLE_NEXT_RENDER && window.EXCALIDRAW_THROTTLE_RENDER === true,
