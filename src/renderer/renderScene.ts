@@ -410,9 +410,7 @@ export const _renderScene = ({
     let i = 0;
     visibleElements.forEach((element) => {
       try {
-        if(!appState.shouldCacheIgnoreZoom) console.log(`element ${++i}: ${element} of ${visibleElements.length}`);
         renderElement(element, rc, context, renderConfig, appState);
-        if(!appState.shouldCacheIgnoreZoom) console.log(`rendered`);
         // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
         // ShapeCache returns empty hence making sure that we get the
         // correct element from visible elements
@@ -477,7 +475,7 @@ export const _renderScene = ({
         locallySelectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
       );
     }
-
+    if(!appState.shouldCacheIgnoreZoom) console.log(`checkpoint 1`);
     if (
       appState.selectedLinearElement &&
       appState.selectedLinearElement.hoverPointIndex >= 0
@@ -639,10 +637,10 @@ export const _renderScene = ({
       }
       context.restore();
     }
-
+    if(!appState.shouldCacheIgnoreZoom) console.log(`checkpoint 2`);
     // Reset zoom
     context.restore();
-
+    if(!appState.shouldCacheIgnoreZoom) console.log(`checkpoint 3`);
     // Paint remote pointers
     for (const clientId in renderConfig.remotePointerViewportCoords) {
       let { x, y } = renderConfig.remotePointerViewportCoords[clientId];
@@ -790,8 +788,9 @@ export const _renderScene = ({
       });
       context.restore();
     }
-
+    if(!appState.shouldCacheIgnoreZoom) console.log(`checkpoint 4`);
     context.restore();
+    if(!appState.shouldCacheIgnoreZoom) console.log(`checkpoint 5`);
     return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
   };
 
