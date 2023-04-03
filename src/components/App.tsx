@@ -1396,12 +1396,12 @@ class App extends React.Component<AppProps, AppState> {
             isTextElement(this.state.editingElement)
               ? false
               : !atLeastOneVisibleElement && renderingElements.length > 0;
-          if(!this.state.shouldCacheIgnoreZoom) console.log(`callback 3`);
+          if(!this.state.shouldCacheIgnoreZoom) console.log(`callback 3`, scrolledOutside, this.state.scrolledOutside);
           if (this.state.scrolledOutside !== scrolledOutside) {
             this.setState({ scrolledOutside });
           }
           if(!this.state.shouldCacheIgnoreZoom) console.log(`callback 4`);
-          this.scheduleImageRefresh();
+          //this.scheduleImageRefresh();
           if(!this.state.shouldCacheIgnoreZoom) console.log(`callback 5`);
         },
       },
