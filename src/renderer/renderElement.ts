@@ -422,6 +422,11 @@ const generateElementShape = (
   // `null` indicates no rc shape applicable for this element type
   // (= do not generate anything)
   if (shape === undefined) {
+    const prevElementWithCanvas = elementWithCanvasCache.get(element);
+    if(prevElementWithCanvas?.canvas) {
+      prevElementWithCanvas.canvas.width = 0;
+      prevElementWithCanvas.canvas.height = 0;
+    }
     elementWithCanvasCache.delete(element);
 
     switch (element.type) {
@@ -685,7 +690,10 @@ const generateElementWithCanvas = (
       zoom,
       renderConfig,
     );
-
+    if(prevElementWithCanvas?.canvas) {
+      prevElementWithCanvas.canvas.width = 0;
+      prevElementWithCanvas.canvas.height = 0;
+    }
     elementWithCanvasCache.set(element, elementWithCanvas);
 
     return elementWithCanvas;
