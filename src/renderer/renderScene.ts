@@ -805,6 +805,7 @@ const renderSceneThrottled = throttleRAF(
     callback?: (data: ReturnType<typeof _renderScene>) => void;
   }) => {
     const ret = _renderScene(config);
+    if(!config.appState.shouldCacheIgnoreZoom) console.log(`renderScene 2 throttled`, config.callback)
     config.callback?.(ret);
   },
   { trailing: true },
