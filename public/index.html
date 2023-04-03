@@ -78,7 +78,7 @@
       }
     </style>
     <!------------------------------------------------------------------------->
-
+    <% if (process.env.NODE_ENV !== "development" ) { %>
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -97,6 +97,7 @@
         window.location.href = "https://app.excalidraw.com";
       }
     </script>
+    <% } %>
 
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
