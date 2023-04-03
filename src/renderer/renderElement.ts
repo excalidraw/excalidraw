@@ -685,7 +685,7 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.theme !== renderConfig.theme ||
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion
   ) {
-    console.log(element.width, element.height, zoom.value, renderConfig);
+    console.log(element, element.width, element.height, zoom.value, renderConfig);
     const elementWithCanvas = generateElementCanvas(
       element,
       zoom,
