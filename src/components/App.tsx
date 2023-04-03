@@ -1403,7 +1403,7 @@ class App extends React.Component<AppProps, AppState> {
           if(!this.state.shouldCacheIgnoreZoom) setTimeout(()=>console.log(`after renderScene`,now));
         },
       },
-      THROTTLE_NEXT_RENDER && window.EXCALIDRAW_THROTTLE_RENDER === true,
+      true || THROTTLE_NEXT_RENDER && window.EXCALIDRAW_THROTTLE_RENDER === true,
     );
 
     if (!THROTTLE_NEXT_RENDER) {
