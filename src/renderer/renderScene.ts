@@ -427,7 +427,7 @@ export const _renderScene = ({
         console.error(error);
       }
     });
-    if(!appState.shouldCacheIgnoreZoom) console.log(`rendered all elements`);
+
     if (editingLinearElement) {
       renderLinearPointHandles(
         context,
@@ -475,7 +475,7 @@ export const _renderScene = ({
         locallySelectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
       );
     }
-    if(!appState.shouldCacheIgnoreZoom) console.log(`checkpoint 1`);
+
     if (
       appState.selectedLinearElement &&
       appState.selectedLinearElement.hoverPointIndex >= 0
@@ -637,10 +637,8 @@ export const _renderScene = ({
       }
       context.restore();
     }
-    if(!appState.shouldCacheIgnoreZoom) console.log(`checkpoint 2`);
     // Reset zoom
     context.restore();
-    if(!appState.shouldCacheIgnoreZoom) console.log(`checkpoint 3`);
     // Paint remote pointers
     for (const clientId in renderConfig.remotePointerViewportCoords) {
       let { x, y } = renderConfig.remotePointerViewportCoords[clientId];
@@ -788,9 +786,7 @@ export const _renderScene = ({
       });
       context.restore();
     }
-    if(!appState.shouldCacheIgnoreZoom) console.log(`checkpoint 4`);
     context.restore();
-    if(!appState.shouldCacheIgnoreZoom) console.log(`checkpoint 5`);
     return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
   };
 
@@ -805,7 +801,6 @@ const renderSceneThrottled = throttleRAF(
     callback?: (data: ReturnType<typeof _renderScene>) => void;
   }) => {
     const ret = _renderScene(config);
-    if(!config.appState.shouldCacheIgnoreZoom) console.log(`renderScene 2 throttled`, config.callback)
     config.callback?.(ret);
   },
   { trailing: true },
@@ -827,12 +822,10 @@ export const renderScene = <T extends boolean = false>(
   throttle?: T,
 ): T extends true ? void : ReturnType<typeof _renderScene> => {
   if (throttle) {
-    if(!config.appState.shouldCacheIgnoreZoom) console.log(`renderScene 1 throttled`, throttle)
     renderSceneThrottled(config);
     return undefined as T extends true ? void : ReturnType<typeof _renderScene>;
   }
   const ret = _renderScene(config);
-  if(!config.appState.shouldCacheIgnoreZoom) console.log(`renderScene 1 not throttled`, config.callback)
   config.callback?.(ret);
   return ret as T extends true ? void : ReturnType<typeof _renderScene>;
 };
