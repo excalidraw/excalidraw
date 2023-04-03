@@ -329,12 +329,18 @@ export const measureBaseline = (
   let baseline = span.offsetTop + span.offsetHeight;
   const domHeight = container.offsetHeight;
 
-  // In Safari sometimes DOM height could be less than canvas height due to
-  // which text could go out of the bounding box hence shifting the baseline
-  // to make sure text is rendered correctly
   if (isSafari) {
+    // In Safari sometimes DOM height could be less than canvas height due to
+    // which text could go out of the bounding box hence shifting the baseline
+    // to make sure text is rendered correctly
     if (canvasHeight > domHeight) {
       baseline += canvasHeight - domHeight;
+    }
+    // In Safari sometimes DOM height could be more than canvas height due to
+    // which text could go out of the bounding box hence shifting the baseline
+    // to make sure text is rendered correctly
+    if (domHeight > canvasHeight) {
+      baseline -= domHeight - canvasHeight;
     }
   }
   document.body.removeChild(container);
