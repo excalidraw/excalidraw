@@ -290,8 +290,9 @@ const drawElementOnCanvas = (
           element.lineHeight,
         );
         const verticalOffset = element.height - element.baseline;
-
+        console.log(verticalOffset);
         for (let index = 0; index < lines.length; index++) {
+          console.log("FACTOR", verticalOffset);
           context.fillText(
             lines[index],
             horizontalOffset,

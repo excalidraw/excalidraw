@@ -14,6 +14,7 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
+  isSafari,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -312,6 +313,7 @@ export const measureBaseline = (
   }
 
   container.style.lineHeight = String(lineHeight);
+  const canvasHeight = getTextHeight(text, parseFloat(font), lineHeight);
 
   container.innerText = text;
 
@@ -324,7 +326,17 @@ export const measureBaseline = (
   span.style.width = "1px";
   span.style.height = "1px";
   container.appendChild(span);
-  const baseline = span.offsetTop + span.offsetHeight;
+  let baseline = span.offsetTop + span.offsetHeight;
+  const domHeight = container.offsetHeight;
+
+  // In Safari sometimes DOM height could be less than canvas height due to
+  // which text could go out of the bounding box hence shifting the baseline
+  // to make sure text is rendered correctly
+  if (isSafari) {
+    if (canvasHeight > domHeight) {
+      baseline += canvasHeight - domHeight;
+    }
+  }
   document.body.removeChild(container);
   return baseline;
 };
