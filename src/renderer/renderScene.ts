@@ -410,9 +410,9 @@ export const _renderScene = ({
     let i = 0;
     visibleElements.forEach((element) => {
       try {
-        console.log(`element ${++i}: ${element} of ${visibleElements.length}`);
+        if(!appState.shouldCacheIgnoreZoom) console.log(`element ${++i}: ${element} of ${visibleElements.length}`);
         renderElement(element, rc, context, renderConfig, appState);
-        console.log(`rendered`);
+        if(!appState.shouldCacheIgnoreZoom) console.log(`rendered`);
         // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
         // ShapeCache returns empty hence making sure that we get the
         // correct element from visible elements
@@ -429,7 +429,7 @@ export const _renderScene = ({
         console.error(error);
       }
     });
-    console.log(`rendered all elements`);
+    if(!appState.shouldCacheIgnoreZoom) console.log(`rendered all elements`);
     if (editingLinearElement) {
       renderLinearPointHandles(
         context,
