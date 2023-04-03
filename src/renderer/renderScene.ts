@@ -407,8 +407,10 @@ export const _renderScene = ({
 
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
+    let i = 0;
     visibleElements.forEach((element) => {
       try {
+        console.log(`element ${i++}: ${element} of ${visibleElements.length}`);
         renderElement(element, rc, context, renderConfig, appState);
         // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
         // ShapeCache returns empty hence making sure that we get the
