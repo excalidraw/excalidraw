@@ -423,7 +423,7 @@ const generateElementShape = (
   // (= do not generate anything)
   if (shape === undefined) {
     const prevElementWithCanvas = elementWithCanvasCache.get(element);
-    if(prevElementWithCanvas?.canvas) {
+    if (prevElementWithCanvas?.canvas) {
       prevElementWithCanvas.canvas.width = 0;
       prevElementWithCanvas.canvas.height = 0;
     }
@@ -690,7 +690,7 @@ const generateElementWithCanvas = (
       zoom,
       renderConfig,
     );
-    if(prevElementWithCanvas?.canvas) {
+    if (prevElementWithCanvas?.canvas) {
       prevElementWithCanvas.canvas.width = 0;
       prevElementWithCanvas.canvas.height = 0;
     }
