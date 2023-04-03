@@ -192,7 +192,8 @@
     "invalidSceneUrl": "Nie udało się zaimportować sceny z podanego adresu URL. Jest ona wadliwa lub nie zawiera poprawnych danych Excalidraw w formacie JSON.",
     "resetLibrary": "To wyczyści twoją bibliotekę. Jesteś pewien?",
     "removeItemsFromsLibrary": "Usunąć {{count}} element(ów) z biblioteki?",
-    "invalidEncryptionKey": "Klucz szyfrowania musi składać się z 22 znaków. Współpraca na żywo jest wyłączona."
+    "invalidEncryptionKey": "Klucz szyfrowania musi składać się z 22 znaków. Współpraca na żywo jest wyłączona.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "Nieobsługiwany typ pliku.",
@@ -219,7 +220,8 @@
     "lock": "Zablokuj wybrane narzędzie",
     "penMode": "",
     "link": "",
-    "eraser": "Gumka"
+    "eraser": "Gumka",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -227,7 +229,7 @@
     "shapes": "Kształty"
   },
   "hints": {
-    "canvasPanning": "Aby przesunąć płótno, przytrzymaj kółko myszy lub spację podczas przeciągania",
+    "canvasPanning": "",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
@@ -245,7 +247,8 @@
     "publishLibrary": "Opublikuj własną bibliotekę",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",

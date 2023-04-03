@@ -54,6 +54,7 @@ import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
   getBoundTextElement,
   getContainerElement,
+  getDefaultLineHeight,
 } from "../element/textElement";
 import {
   isBoundToContainer,
@@ -635,6 +636,7 @@ export const actionChangeFontFamily = register({
               oldElement,
               {
                 fontFamily: value,
+                lineHeight: getDefaultLineHeight(value),
               },
             );
             redrawTextBoundingBox(newElement, getContainerElement(oldElement));
@@ -743,16 +745,19 @@ export const actionChangeTextAlign = register({
               value: "left",
               text: t("labels.left"),
               icon: TextAlignLeftIcon,
+              testId: "align-left",
             },
             {
               value: "center",
               text: t("labels.center"),
               icon: TextAlignCenterIcon,
+              testId: "align-horizontal-center",
             },
             {
               value: "right",
               text: t("labels.right"),
               icon: TextAlignRightIcon,
+              testId: "align-right",
             },
           ]}
           value={getFormValue(

@@ -34,14 +34,16 @@ function App() {
 
 Since _Excalidraw_ doesn't support server side rendering, you should render the component once the host is `mounted`.
 
+The following worfklow shows one way how to render Excalidraw on Next.js. We'll add more detailed and alternative Next.js examples, soon.
+
 ```jsx showLineNumbers
 import { useState, useEffect } from "react";
 export default function App() {
-  const [Comp, setComp] = useState(null);
+  const [Excalidraw, setExcalidraw] = useState(null);
   useEffect(() => {
-    import("@excalidraw/excalidraw").then((comp) => setComp(comp.default));
+    import("@excalidraw/excalidraw").then((comp) => setExcalidraw(comp.Excalidraw));
   }, []);
-  return <>{Comp && <Comp />}</>;
+  return <>{Excalidraw && <Excalidraw />}</>;
 }
 ```
 

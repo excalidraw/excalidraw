@@ -36,6 +36,8 @@ import {
   ColorTuple,
   Palette,
 } from "./components/ColorPicker/colorPickerUtils";
+import { Merge, ForwardRef } from "./utility-types";
+import React from "react";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -105,7 +107,7 @@ export type AppState = {
   } | null;
   showWelcomeScreen: boolean;
   isLoading: boolean;
-  errorMessage: string | null;
+  errorMessage: React.ReactNode;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;

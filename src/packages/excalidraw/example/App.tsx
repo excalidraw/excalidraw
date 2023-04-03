@@ -102,7 +102,13 @@ const COMMENT_ICON_DIMENSION = 32;
 const COMMENT_INPUT_HEIGHT = 50;
 const COMMENT_INPUT_WIDTH = 150;
 
-export default function App() {
+export interface AppProps {
+  appTitle: string;
+  useCustom: (api: ExcalidrawImperativeAPI | null, customArgs?: any[]) => void;
+  customArgs?: any[];
+}
+
+export default function App({ appTitle, useCustom, customArgs }: AppProps) {
   const appRef = useRef<any>(null);
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
@@ -129,6 +135,8 @@ export default function App() {
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
 
+  useCustom(excalidrawAPI, customArgs);
+
   useHandleLibrary({ excalidrawAPI });
 
   useEffect(() => {
@@ -136,7 +144,7 @@ export default function App() {
       return;
     }
     const fetchData = async () => {
-      const res = await fetch("/rocket.jpeg");
+      const res = await fetch("/images/rocket.jpeg");
       const imageData = await res.blob();
       const reader = new FileReader();
       reader.readAsDataURL(imageData);
@@ -172,7 +180,7 @@ export default function App() {
           />
         )}
         <button
-          onClick={() => alert("This is dummy top right UI")}
+          onClick={() => alert("This is an empty top right UI")}
           style={{ height: "2.5rem" }}
         >
           {" "}
@@ -419,7 +427,7 @@ export default function App() {
           }}
         >
           <div className="comment-avatar">
-            <img src="doremon.png" alt="doremon" />
+            <img src="images/doremon.png" alt="doremon" />
           </div>
         </div>
       );
@@ -550,7 +558,7 @@ export default function App() {
 
   return (
     <div className="App" ref={appRef}>
-      <h1> Excalidraw Example</h1>
+      <h1>{appTitle}</h1>
       {/* TODO fix type */}
       <button
         type="button"
@@ -646,15 +654,15 @@ export default function App() {
                   const collaborators = new Map();
                   collaborators.set("id1", {
                     username: "Doremon",
-                    avatarUrl: "doremon.png",
+                    avatarUrl: "images/doremon.png",
                   });
                   collaborators.set("id2", {
                     username: "Excalibot",
-                    avatarUrl: "excalibot.png",
+                    avatarUrl: "images/excalibot.png",
                   });
                   collaborators.set("id3", {
                     username: "Pika",
-                    avatarUrl: "pika.jpeg",
+                    avatarUrl: "images/pika.jpeg",
                   });
                   collaborators.set("id4", {
                     username: "fallback",
