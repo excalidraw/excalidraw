@@ -1386,19 +1386,23 @@ class App extends React.Component<AppProps, AppState> {
           renderScrollbars: !this.device.isMobile,
         },
         callback: ({ atLeastOneVisibleElement, scrollBars }) => {
+          if(!this.state.shouldCacheIgnoreZoom) console.log(`callback 1`);
           if (scrollBars) {
             currentScrollBars = scrollBars;
           }
+          if(!this.state.shouldCacheIgnoreZoom) console.log(`callback 2`);
           const scrolledOutside =
             // hide when editing text
             isTextElement(this.state.editingElement)
               ? false
               : !atLeastOneVisibleElement && renderingElements.length > 0;
+          if(!this.state.shouldCacheIgnoreZoom) console.log(`callback 3`);
           if (this.state.scrolledOutside !== scrolledOutside) {
             this.setState({ scrolledOutside });
           }
-
+          if(!this.state.shouldCacheIgnoreZoom) console.log(`callback 4`);
           this.scheduleImageRefresh();
+          if(!this.state.shouldCacheIgnoreZoom) console.log(`callback 5`);
         },
       },
       THROTTLE_NEXT_RENDER && window.EXCALIDRAW_THROTTLE_RENDER === true,
