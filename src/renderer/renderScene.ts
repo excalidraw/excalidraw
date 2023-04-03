@@ -826,10 +826,12 @@ export const renderScene = <T extends boolean = false>(
   throttle?: T,
 ): T extends true ? void : ReturnType<typeof _renderScene> => {
   if (throttle) {
+    if(!config.appState.shouldCacheIgnoreZoom) console.log(`renderScene 1 throttled`, throttle)
     renderSceneThrottled(config);
     return undefined as T extends true ? void : ReturnType<typeof _renderScene>;
   }
   const ret = _renderScene(config);
+  if(!config.appState.shouldCacheIgnoreZoom) console.log(`renderScene 1 not throttled`, config.callback)
   config.callback?.(ret);
   return ret as T extends true ? void : ReturnType<typeof _renderScene>;
 };
