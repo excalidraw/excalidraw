@@ -108,42 +108,32 @@ export const cappedElementCanvasSize = (
   if (isLinearElement(element) || isFreeDrawElement(element)) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
-    let width =
-      distance(x1, x2) * window.devicePixelRatio * zoomValue +
-      padding * zoomValue * 2;
-    let height =
-      distance(y1, y2) * window.devicePixelRatio * zoomValue +
-      padding * zoomValue * 2;
+    let width = distance(x1, x2) * window.devicePixelRatio + padding * 2;
+    let height = distance(y1, y2) * window.devicePixelRatio + padding * 2;
 
-    const size = width * height;
+    const size = width * height * zoomValue * zoomValue;
     if (size > sizelimit) {
-      zoomValue = Math.sqrt(sizelimit / size) as NormalizedZoomValue;
-      width =
-        distance(x1, x2) * window.devicePixelRatio * zoomValue +
-        padding * zoomValue * 2;
-      height =
-        distance(y1, y2) * window.devicePixelRatio * zoomValue +
-        padding * zoomValue * 2;
+      zoomValue = Math.sqrt(
+        sizelimit / (width * height),
+      ) as NormalizedZoomValue;
+      width = distance(x1, x2) * window.devicePixelRatio + padding * 2;
+      height = distance(y1, y2) * window.devicePixelRatio + padding * 2;
     }
+    width *= zoomValue;
+    height *= zoomValue;
     return { width, height, zoomValue };
   }
-  let width =
-    element.width * window.devicePixelRatio * zoomValue +
-    padding * zoomValue * 2;
-  let height =
-    element.height * window.devicePixelRatio * zoomValue +
-    padding * zoomValue * 2;
+  let width = element.width * window.devicePixelRatio + padding * 2;
+  let height = element.height * window.devicePixelRatio + padding * 2;
 
-  const size = width * height;
+  const size = width * height * zoomValue * zoomValue;
   if (size > sizelimit) {
-    zoomValue = Math.sqrt(sizelimit / size) as NormalizedZoomValue;
-    width =
-      element.width * window.devicePixelRatio * zoomValue +
-      padding * zoomValue * 2;
-    height =
-      element.height * window.devicePixelRatio * zoomValue +
-      padding * zoomValue * 2;
+    zoomValue = Math.sqrt(sizelimit / (width * height)) as NormalizedZoomValue;
+    width = element.width * window.devicePixelRatio + padding * 2;
+    height = element.height * window.devicePixelRatio + padding * 2;
   }
+  width *= zoomValue;
+  height *= zoomValue;
   return { width, height, zoomValue };
 };
 
