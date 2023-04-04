@@ -112,7 +112,7 @@ export const ColorPicker = ({
               side={isMobile && !isLandscape ? "bottom" : "right"}
               align={isMobile && !isLandscape ? "center" : "start"}
               alignOffset={-16}
-              sideOffset={isMobile ? 16 : 32}
+              sideOffset={20}
               style={{
                 zIndex: 9999,
                 backgroundColor: "var(--popup-bg-color)",
