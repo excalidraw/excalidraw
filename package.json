@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@dwelle/tunnel-rat": "0.1.1",
+    "@radix-ui/colors": "0.1.8",
     "@radix-ui/react-popover": "1.0.3",
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
