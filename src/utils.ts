@@ -140,12 +140,12 @@ export const throttleRAF = <T extends any[]>(
   const scheduleFunc = (args: T) => {
     timerId = window.requestAnimationFrame(() => {
       timerId = null;
-      console.log("start render in animation frame");
+      //console.log("start render in animation frame");
       fn(...args);
-      console.log("render done in animation frame");
+      //console.log("render done in animation frame");
       lastArgs = null;
       if (lastArgsTrailing) {
-        console.log("last args trailing", lastArgsTrailing);
+        //console.log("last args trailing", lastArgsTrailing);
         lastArgs = lastArgsTrailing;
         lastArgsTrailing = null;
         scheduleFunc(lastArgs);
