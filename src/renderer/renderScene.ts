@@ -407,7 +407,9 @@ export const _renderScene = ({
 
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
-    let i = 0;
+    const start = Date.now();
+    const showDebug = !appState.shouldCacheIgnoreZoom && (appState.zoom.value < 0.5);
+    if(showDebug) console.log("start: renderElements");
     visibleElements.forEach((element) => {
       try {
         renderElement(element, rc, context, renderConfig, appState);
@@ -427,7 +429,7 @@ export const _renderScene = ({
         console.error(error);
       }
     });
-
+    if(showDebug) console.log(`finish: renderElements ${Date.now()-start}`);
     if (editingLinearElement) {
       renderLinearPointHandles(
         context,
