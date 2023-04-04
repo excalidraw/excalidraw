@@ -185,6 +185,7 @@ export const throttleRAF = <T extends any[]>(
       timerId = null;
       if (watchdog) {
         clearTimout(watchdog);
+        watchdog = null;
       }
     }
   };
