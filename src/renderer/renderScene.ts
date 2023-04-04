@@ -417,10 +417,14 @@ export const _renderScene = ({
       console.log("start: renderElements");
     }
     console.log(
-      visibleElements.reduce((acc, el) => {
-        const { width, height } = cappedElementCanvasSize(el, appState.zoom);
-        return acc + width * height;
-      }, 0),
+      visibleElements.length,
+      appState.zoom.value,
+      Math.round(
+        visibleElements.reduce((acc, el) => {
+          const { width, height } = cappedElementCanvasSize(el, appState.zoom);
+          return acc + width * height;
+        }, 0),
+      ),
     );
     visibleElements.forEach((element) => {
       try {
