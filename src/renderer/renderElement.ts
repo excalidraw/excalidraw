@@ -158,7 +158,7 @@ const generateElementCanvas = (
   const context = canvas.getContext("2d")!;
   const padding = getCanvasPadding(element);
 
-  const {width, height, zoomValue} = calcElementCanvasSize (
+  const {width, height, zoomValue} = cappedElementCanvasSize (
     element,
     zoom,
     renderConfig,
