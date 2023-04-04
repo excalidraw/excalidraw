@@ -16,7 +16,7 @@
   .color-picker-container {
     display: grid;
     grid-template-columns: 1fr 20px 1.625rem;
-    padding: 0.5rem 2px;
+    padding: 0.250rem 0px;
     align-items: center;
 
     @include isMobile {
