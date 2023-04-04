@@ -164,7 +164,7 @@ const generateElementCanvas = (
     renderConfig,
   );
   
-  canvas.width = widht;
+  canvas.width = width;
   canvas.height = height;
 
   let canvasOffsetX = 0;
