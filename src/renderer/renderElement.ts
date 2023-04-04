@@ -30,7 +30,7 @@ import { RenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
-import { AppState, BinaryFiles, Zoom } from "../types";
+import { AppState, BinaryFiles, NormalizedZoomValue, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
@@ -93,6 +93,50 @@ export interface ExcalidrawElementWithCanvas {
   boundTextElementVersion: number | null;
 }
 
+export const cappedElementCanvasSize = (
+  element: NonDeletedExcalidrawElement,
+  zoom: Zoom,
+): {
+  width: number;
+  height: number;
+  zoomValue: NormalizedZoomValue;
+} => {
+  const sizelimit = 16777216; // 2^24
+  const padding = getCanvasPadding(element);
+  let zoomValue = zoom.value;
+
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+    let width = distance(x1, x2) * window.devicePixelRatio + padding * 2;
+    let height = distance(y1, y2) * window.devicePixelRatio + padding * 2;
+
+    const size = width * height * zoomValue * zoomValue;
+    if (size > sizelimit) {
+      zoomValue = Math.sqrt(
+        sizelimit / (width * height),
+      ) as NormalizedZoomValue;
+      width = distance(x1, x2) * window.devicePixelRatio + padding * 2;
+      height = distance(y1, y2) * window.devicePixelRatio + padding * 2;
+    }
+    width *= zoomValue;
+    height *= zoomValue;
+    return { width, height, zoomValue };
+  }
+  let width = element.width * window.devicePixelRatio + padding * 2;
+  let height = element.height * window.devicePixelRatio + padding * 2;
+
+  const size = width * height * zoomValue * zoomValue;
+  if (size > sizelimit) {
+    zoomValue = Math.sqrt(sizelimit / (width * height)) as NormalizedZoomValue;
+    width = element.width * window.devicePixelRatio + padding * 2;
+    height = element.height * window.devicePixelRatio + padding * 2;
+  }
+  width *= zoomValue;
+  height *= zoomValue;
+  return { width, height, zoomValue };
+};
+
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
@@ -102,44 +146,35 @@ const generateElementCanvas = (
   const context = canvas.getContext("2d")!;
   const padding = getCanvasPadding(element);
 
+  const { width, height, zoomValue } = cappedElementCanvasSize(element, zoom);
+
+  canvas.width = width;
+  canvas.height = height;
+
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-
-    canvas.width =
-      distance(x1, x2) * window.devicePixelRatio * zoom.value +
-      padding * zoom.value * 2;
-    canvas.height =
-      distance(y1, y2) * window.devicePixelRatio * zoom.value +
-      padding * zoom.value * 2;
+    const [x1, y1] = getElementAbsoluteCoords(element);
 
     canvasOffsetX =
       element.x > x1
-        ? distance(element.x, x1) * window.devicePixelRatio * zoom.value
+        ? distance(element.x, x1) * window.devicePixelRatio * zoomValue
         : 0;
 
     canvasOffsetY =
       element.y > y1
-        ? distance(element.y, y1) * window.devicePixelRatio * zoom.value
+        ? distance(element.y, y1) * window.devicePixelRatio * zoomValue
         : 0;
 
     context.translate(canvasOffsetX, canvasOffsetY);
-  } else {
-    canvas.width =
-      element.width * window.devicePixelRatio * zoom.value +
-      padding * zoom.value * 2;
-    canvas.height =
-      element.height * window.devicePixelRatio * zoom.value +
-      padding * zoom.value * 2;
   }
 
   context.save();
-  context.translate(padding * zoom.value, padding * zoom.value);
+  context.translate(padding * zoomValue, padding * zoomValue);
   context.scale(
-    window.devicePixelRatio * zoom.value,
-    window.devicePixelRatio * zoom.value,
+    window.devicePixelRatio * zoomValue,
+    window.devicePixelRatio * zoomValue,
   );
 
   const rc = rough.canvas(canvas);
@@ -156,7 +191,7 @@ const generateElementCanvas = (
     element,
     canvas,
     theme: renderConfig.theme,
-    canvasZoom: zoom.value,
+    canvasZoom: zoomValue,
     canvasOffsetX,
     canvasOffsetY,
     boundTextElementVersion: getBoundTextElement(element)?.version || null,
