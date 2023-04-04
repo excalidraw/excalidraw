@@ -93,19 +93,17 @@ export interface ExcalidrawElementWithCanvas {
   boundTextElementVersion: number | null;
 }
 
-const generateElementCanvas = (
+export const cappedElementCanvasSize = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
   renderConfig: RenderConfig,
-): ExcalidrawElementWithCanvas => {
-  const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d")!;
-  const padding = getCanvasPadding(element);
+): {
+  width: number;
+  height: number;
+  zoomValue: NormalizedZoomValue;
+} => {
   const sizelimit = 16777216; // 2^24
   let zoomValue = zoom.value;
-
-  let canvasOffsetX = 0;
-  let canvasOffsetY = 0;
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -127,21 +125,6 @@ const generateElementCanvas = (
         distance(y1, y2) * window.devicePixelRatio * zoomValue +
         padding * zoomValue * 2;
     }
-
-    canvas.width = width;
-    canvas.height = height;
-
-    canvasOffsetX =
-      element.x > x1
-        ? distance(element.x, x1) * window.devicePixelRatio * zoomValue
-        : 0;
-
-    canvasOffsetY =
-      element.y > y1
-        ? distance(element.y, y1) * window.devicePixelRatio * zoomValue
-        : 0;
-
-    context.translate(canvasOffsetX, canvasOffsetY);
   } else {
     let width =
       element.width * window.devicePixelRatio * zoomValue +
@@ -160,8 +143,45 @@ const generateElementCanvas = (
         element.height * window.devicePixelRatio * zoomValue +
         padding * zoomValue * 2;
     }
-    canvas.width = width;
-    canvas.height = height;
+  }
+  return {width, height, zoomValue};
+}
+
+const generateElementCanvas = (
+  element: NonDeletedExcalidrawElement,
+  zoom: Zoom,
+  renderConfig: RenderConfig,
+): ExcalidrawElementWithCanvas => {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d")!;
+  const padding = getCanvasPadding(element);
+
+  const {width, height, zoomValue} = calcElementCanvasSize (
+    element,
+    zoom,
+    renderConfig,
+  );
+  
+  canvas.width = widht;
+  canvas.height = height;
+
+  let canvasOffsetX = 0;
+  let canvasOffsetY = 0;
+
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+    canvasOffsetX =
+      element.x > x1
+        ? distance(element.x, x1) * window.devicePixelRatio * zoomValue
+        : 0;
+
+    canvasOffsetY =
+      element.y > y1
+        ? distance(element.y, y1) * window.devicePixelRatio * zoomValue
+        : 0;
+
+    context.translate(canvasOffsetX, canvasOffsetY);
   }
 
   context.save();
