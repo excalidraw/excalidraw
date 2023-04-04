@@ -148,7 +148,7 @@ export const throttleRAF = <T extends any[]>(
         scheduleFunc(lastArgs);
       }
       if (watchdog) {
-        clearTimout(watchdog);
+        clearTimeout(watchdog);
       }
     });
   };
@@ -170,7 +170,7 @@ export const throttleRAF = <T extends any[]>(
       cancelAnimationFrame(timerId);
       timerId = null;
       if (watchdog) {
-        clearTimout(watchdog);
+        clearTimeout(watchdog);
       }
     }
     if (lastArgs) {
@@ -184,7 +184,7 @@ export const throttleRAF = <T extends any[]>(
       cancelAnimationFrame(timerId);
       timerId = null;
       if (watchdog) {
-        clearTimout(watchdog);
+        clearTimeout(watchdog);
         watchdog = null;
       }
     }
