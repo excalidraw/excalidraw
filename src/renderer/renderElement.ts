@@ -126,6 +126,7 @@ export const cappedElementCanvasSize = (
         distance(y1, y2) * window.devicePixelRatio * zoomValue +
         padding * zoomValue * 2;
     }
+    return {width, height, zoomValue};
   } else {
     let width =
       element.width * window.devicePixelRatio * zoomValue +
@@ -144,8 +145,8 @@ export const cappedElementCanvasSize = (
         element.height * window.devicePixelRatio * zoomValue +
         padding * zoomValue * 2;
     }
+    return {width, height, zoomValue};
   }
-  return {width, height, zoomValue};
 }
 
 const generateElementCanvas = (
