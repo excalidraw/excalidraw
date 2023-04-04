@@ -135,7 +135,7 @@ export const throttleRAF = <T extends any[]>(
   let timerId: number | null = null;
   let lastArgs: T | null = null;
   let lastArgsTrailing: T | null = null;
-  let watchdog: NodeJS.Timeout | null = null;
+  let watchdog: number | null = null;
   
   const scheduleFunc = (args: T) => {
     timerId = window.requestAnimationFrame(() => {
@@ -189,13 +189,13 @@ export const throttleRAF = <T extends any[]>(
       }
     }
   };
-  watchdog = setTimeout(() => {
+  watchdog = window.setTimeout(() => {
     console.log("watchdog", timerId);
     if (timerId !== null) {
       cancelAnimationFrame(timerId);
       timerId = null;
     }
-  },1000);
+  }, 1000);
   return ret;
 };
 
