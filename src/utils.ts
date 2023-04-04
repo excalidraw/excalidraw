@@ -136,7 +136,7 @@ export const throttleRAF = <T extends any[]>(
   let lastArgs: T | null = null;
   let lastArgsTrailing: T | null = null;
   let watchdog: number | null = null;
-  
+
   const scheduleFunc = (args: T) => {
     timerId = window.requestAnimationFrame(() => {
       timerId = null;

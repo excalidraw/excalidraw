@@ -96,7 +96,6 @@ export interface ExcalidrawElementWithCanvas {
 export const cappedElementCanvasSize = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
-  renderConfig: RenderConfig,
 ): {
   width: number;
   height: number;
@@ -115,7 +114,7 @@ export const cappedElementCanvasSize = (
     let height =
       distance(y1, y2) * window.devicePixelRatio * zoomValue +
       padding * zoomValue * 2;
-    
+
     const size = width * height;
     if (size > sizelimit) {
       zoomValue = Math.sqrt(sizelimit / size) as NormalizedZoomValue;
@@ -126,28 +125,27 @@ export const cappedElementCanvasSize = (
         distance(y1, y2) * window.devicePixelRatio * zoomValue +
         padding * zoomValue * 2;
     }
-    return {width, height, zoomValue};
-  } else {
-    let width =
+    return { width, height, zoomValue };
+  }
+  let width =
+    element.width * window.devicePixelRatio * zoomValue +
+    padding * zoomValue * 2;
+  let height =
+    element.height * window.devicePixelRatio * zoomValue +
+    padding * zoomValue * 2;
+
+  const size = width * height;
+  if (size > sizelimit) {
+    zoomValue = Math.sqrt(sizelimit / size) as NormalizedZoomValue;
+    width =
       element.width * window.devicePixelRatio * zoomValue +
       padding * zoomValue * 2;
-    let height =
+    height =
       element.height * window.devicePixelRatio * zoomValue +
       padding * zoomValue * 2;
-
-    const size = width * height;
-    if (size > sizelimit) {
-      zoomValue = Math.sqrt(sizelimit / size) as NormalizedZoomValue;
-      width =
-        element.width * window.devicePixelRatio * zoomValue +
-        padding * zoomValue * 2;
-      height =
-        element.height * window.devicePixelRatio * zoomValue +
-        padding * zoomValue * 2;
-    }
-    return {width, height, zoomValue};
   }
-}
+  return { width, height, zoomValue };
+};
 
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
@@ -158,12 +156,8 @@ const generateElementCanvas = (
   const context = canvas.getContext("2d")!;
   const padding = getCanvasPadding(element);
 
-  const {width, height, zoomValue} = cappedElementCanvasSize (
-    element,
-    zoom,
-    renderConfig,
-  );
-  
+  const { width, height, zoomValue } = cappedElementCanvasSize(element, zoom);
+
   canvas.width = width;
   canvas.height = height;
 
@@ -171,7 +165,7 @@ const generateElementCanvas = (
   let canvasOffsetY = 0;
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const [x1, y1] = getElementAbsoluteCoords(element);
 
     canvasOffsetX =
       element.x > x1

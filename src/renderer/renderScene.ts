@@ -29,7 +29,11 @@ import {
 } from "../scene/scrollbars";
 import { getSelectedElements } from "../scene/selection";
 
-import { renderElement, renderElementToSvg } from "./renderElement";
+import {
+  cappedElementCanvasSize,
+  renderElement,
+  renderElementToSvg,
+} from "./renderElement";
 import { getClientColors } from "../clients";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -408,8 +412,16 @@ export const _renderScene = ({
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
     const start = Date.now();
-    const showDebug = !appState.shouldCacheIgnoreZoom && (appState.zoom.value < 0.5);
-    if(showDebug) console.log("start: renderElements");
+    const showDebug = false; //!appState.shouldCacheIgnoreZoom && (appState.zoom.value < 0.5);
+    if (showDebug) {
+      console.log("start: renderElements");
+    }
+    console.log(
+      visibleElements.reduce((acc, el) => {
+        const { width, height } = cappedElementCanvasSize(el, appState.zoom);
+        return acc + width * height;
+      }, 0),
+    );
     visibleElements.forEach((element) => {
       try {
         renderElement(element, rc, context, renderConfig, appState);
@@ -429,7 +441,9 @@ export const _renderScene = ({
         console.error(error);
       }
     });
-    if(showDebug) console.log(`finish: renderElements ${Date.now()-start}`);
+    if (showDebug) {
+      console.log(`finish: renderElements ${Date.now() - start}`);
+    }
     if (editingLinearElement) {
       renderLinearPointHandles(
         context,
