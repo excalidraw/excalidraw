@@ -103,6 +103,7 @@ export const cappedElementCanvasSize = (
   zoomValue: NormalizedZoomValue;
 } => {
   const sizelimit = 16777216; // 2^24
+  const padding = getCanvasPadding(element);
   let zoomValue = zoom.value;
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
