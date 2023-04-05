@@ -36,7 +36,6 @@ import {
   getMaxContainerWidth,
   computeContainerDimensionForBoundText,
   measureDOMHeight,
-  getLineHeightInPx,
   splitIntoLines,
 } from "./textElement";
 import {
@@ -279,19 +278,11 @@ export const textWysiwyg = ({
         getFontString(updatedTextElement),
         updatedTextElement.lineHeight,
       );
+
       let lineHeight = element.lineHeight;
-      if (isSafari) {
-        const lineCount = splitIntoLines(element.text).length;
-        if (domHeight > textElementHeight) {
-          lineHeight = (Math.floor(element.lineHeight * element.fontSize) /
-            element.fontSize) as ExcalidrawTextElement["lineHeight"];
-          textElementHeight =
-            getLineHeightInPx(element.fontSize, lineHeight) * lineCount;
-          mutateElement(updatedTextElement, {
-            lineHeight,
-            height: textElementHeight,
-          });
-        }
+      if (isSafari && domHeight > textElementHeight) {
+        lineHeight = (Math.floor(element.lineHeight * element.fontSize) /
+          element.fontSize) as ExcalidrawTextElement["lineHeight"];
       }
 
       // Make sure text editor height doesn't go beyond viewport
