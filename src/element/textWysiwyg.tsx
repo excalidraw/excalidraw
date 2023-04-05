@@ -297,6 +297,7 @@ export const textWysiwyg = ({
         filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
       });
+      editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
       if (isTestEnv()) {
