@@ -109,7 +109,7 @@ const cappedElementCanvasSize = (
   const elementWidth =
     isLinearElement(element) || isFreeDrawElement(element)
       ? distance(x1, x2)
-      : element.width;  
+      : element.width;
   const elementHeight =
     isLinearElement(element) || isFreeDrawElement(element)
       ? distance(y1, y2)
