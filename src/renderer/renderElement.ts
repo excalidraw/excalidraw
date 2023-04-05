@@ -104,16 +104,16 @@ const cappedElementCanvasSize = (
   const sizelimit = 16777216; // 2^24
   const padding = getCanvasPadding(element);
   let zoomValue = zoom.value;
-  
+
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const elementWidth =
-    (isLinearElement(element) || isFreeDrawElement(element))
-    ? distance(x1, x2)
-    : element.width;  
+    isLinearElement(element) || isFreeDrawElement(element)
+      ? distance(x1, x2)
+      : element.width;  
   const elementHeight =
-    (isLinearElement(element) || isFreeDrawElement(element))
-    ? distance(y1, y2)
-    : element.height;
+    isLinearElement(element) || isFreeDrawElement(element)
+      ? distance(y1, y2)
+      : element.height;
 
   let width = elementWidth * window.devicePixelRatio + padding * 2;
   let height = elementHeight * window.devicePixelRatio + padding * 2;
