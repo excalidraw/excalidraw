@@ -102,7 +102,7 @@ const cappedElementCanvasSize = (
   height: number;
   scale: NormalizedZoomValue;
 } => {
-  const sizelimit = 16777216; // 2^24
+  const sizelimit = 16777216; //iOS Safari canvas size limit
   const padding = getCanvasPadding(element);
   let scale = zoom.value;
 
