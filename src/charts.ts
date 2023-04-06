@@ -1,4 +1,8 @@
-import colors from "./colors";
+import {
+  COLOR_PALETTE,
+  DEFAULT_CHART_COLOR_INDEX,
+  getAllColorsSpecificShade,
+} from "./colors";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -158,10 +162,10 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   return result;
 };
 
-const bgColors = colors.elementBackground.slice(
-  2,
-  colors.elementBackground.length,
-);
+const bgColors = [
+  //...getAllColorsSpecificShade(2), // lighter version
+  ...getAllColorsSpecificShade(DEFAULT_CHART_COLOR_INDEX), // darker version
+];
 
 // Put all the common properties here so when the whole chart is selected
 // the properties dialog shows the correct selected values
@@ -171,7 +175,7 @@ const commonProps = {
   fontSize: DEFAULT_FONT_SIZE,
   opacity: 100,
   roughness: 1,
-  strokeColor: colors.elementStroke[0],
+  strokeColor: COLOR_PALETTE.black,
   roundness: null,
   strokeStyle: "solid",
   strokeWidth: 1,
@@ -338,7 +342,7 @@ const chartBaseElements = (
         y: y - chartHeight,
         width: chartWidth,
         height: chartHeight,
-        strokeColor: colors.elementStroke[0],
+        strokeColor: COLOR_PALETTE.black,
         fillStyle: "solid",
         opacity: 6,
       })

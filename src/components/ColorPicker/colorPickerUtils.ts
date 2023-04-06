@@ -1,28 +1,26 @@
-import oc from "open-color";
 import { ExcalidrawElement } from "../../element/types";
 import { atom } from "jotai";
-import { ColorPickerProps } from "./ColorPicker";
-
-export type PaletteKey = keyof oc | string;
-export type ColorTuple = [string, string, string, string, string];
-export type PaletteValue = string | ColorTuple;
-export type Palette = Record<PaletteKey, PaletteValue>;
+import {
+  Color,
+  ColorPaletteCustom,
+  MAX_CUSTOM_COLORS_USED_IN_CANVAS,
+} from "../../colors";
 
 export const getColorNameAndShadeFromHex = ({
   palette,
   hex,
 }: {
-  palette: Palette;
+  palette: ColorPaletteCustom;
   hex: string;
 }) => {
   for (const [colorName, colorVal] of Object.entries(palette)) {
     if (Array.isArray(colorVal)) {
       const shade = colorVal.indexOf(hex);
       if (shade > -1) {
-        return { colorName, shade };
+        return { colorName, shade } as { colorName: Color; shade: number };
       }
     } else if (colorVal === hex) {
-      return { colorName, shade: -1 };
+      return { colorName, shade: -1 } as { colorName: Color; shade: number };
     }
   }
   return null;
@@ -34,59 +32,12 @@ export const colorPickerHotkeyBindings = [
   ["z", "x", "c", "v", "b"],
 ].flat();
 
-export const ocPalette: Palette = {};
-for (const [key, value] of Object.entries({
-  transparent: "transparent",
-  ...oc,
-})) {
-  if (key === "grape") {
-    continue;
-  }
-  if (Array.isArray(value)) {
-    // @ts-ignore
-    ocPalette[key] = value.filter((_, i) => i % 2 === 0);
-  } else {
-    ocPalette[key] = value;
-  }
-}
-
-export const DEFAULT_SHADE_INDEXES: Record<ColorPickerProps["type"], number> = {
-  elementStroke: 3,
-  elementBackground: 1,
-  canvasBackground: 1,
-};
-
-export const strokeTopPicks = [
-  ocPalette.black as string,
-  ocPalette.red[DEFAULT_SHADE_INDEXES.elementStroke],
-  ocPalette.green[DEFAULT_SHADE_INDEXES.elementStroke],
-  ocPalette.blue[DEFAULT_SHADE_INDEXES.elementStroke],
-  ocPalette.orange[DEFAULT_SHADE_INDEXES.elementStroke],
-] as ColorTuple;
-export const bgTopPicks = [
-  "transparent",
-  ocPalette.red[DEFAULT_SHADE_INDEXES.elementBackground],
-  ocPalette.green[DEFAULT_SHADE_INDEXES.elementBackground],
-  ocPalette.blue[DEFAULT_SHADE_INDEXES.elementBackground],
-  ocPalette.orange[DEFAULT_SHADE_INDEXES.elementBackground],
-] as ColorTuple;
-export const canvasTopPicks = [
-  "white",
-  ocPalette.gray[0],
-  "gray",
-  ocPalette.blue[0],
-  ocPalette.yellow[0],
-];
-
-export const MAX_CUSTOM_COLORS = 5;
-export const COLOR_PER_ROW = 5;
-
 export const isCustomColor = ({
   color,
   palette,
 }: {
   color: string | null;
-  palette: Palette;
+  palette: ColorPaletteCustom;
 }) => {
   if (!color) {
     return false;
@@ -98,7 +49,7 @@ export const isCustomColor = ({
 export const getMostUsedCustomColors = (
   elements: readonly ExcalidrawElement[],
   type: "elementBackground" | "elementStroke",
-  palette: Palette,
+  palette: ColorPaletteCustom,
 ) => {
   const elementColorTypeMap = {
     elementBackground: "backgroundColor",
@@ -130,7 +81,7 @@ export const getMostUsedCustomColors = (
   return [...colorCountMap.entries()]
     .sort((a, b) => b[1] - a[1])
     .map((c) => c[0])
-    .slice(0, MAX_CUSTOM_COLORS);
+    .slice(0, MAX_CUSTOM_COLORS_USED_IN_CANVAS);
 };
 
 export type ActiveColorPickerSectionAtomType =
@@ -167,6 +118,7 @@ export const getContrastYIQ = (bgHex: string, isCustomColor: boolean) => {
     }
   }
 
+  // TODO: ? is this wanted?
   if (bgHex === "transparent") {
     return "black";
   }

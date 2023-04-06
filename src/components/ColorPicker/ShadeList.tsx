@@ -2,17 +2,17 @@ import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
 import {
-  Palette,
   activeColorPickerSectionAtom,
   getColorNameAndShadeFromHex,
 } from "./colorPickerUtils";
 import HotkeyLabel from "./HotkeyLabel";
 import { t } from "../../i18n";
+import { ColorPaletteCustom } from "../../colors";
 
 interface ShadeListProps {
   hex: string | null;
   onChange: (color: string) => void;
-  palette: Palette;
+  palette: ColorPaletteCustom;
 }
 
 export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {

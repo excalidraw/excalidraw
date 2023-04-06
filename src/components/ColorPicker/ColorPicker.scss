@@ -45,6 +45,20 @@
     font-family: inherit;
     box-sizing: border-box;
 
+    &:hover {
+      &::after {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        box-shadow: 0 0 0 1px var(--color-gray-30);
+        border-radius: calc(var(--radius) + 1px);
+        filter: var(--theme-filter);
+      }
+    }
+
     &.active {
       .color-picker__button-outline {
         position: absolute;
@@ -53,6 +67,7 @@
         right: -2px;
         bottom: -2px;
         box-shadow: 0 0 0 1px var(--color-primary-darkest);
+        z-index: 1; // due hover state so this has preference
         border-radius: calc(var(--radius) + 1px);
         filter: var(--theme-filter);
       }
@@ -100,7 +115,7 @@
     }
 
     &.active-color {
-      border-radius: 30%;
+      border-radius:  calc(var(--radius) + 1px);
       width: 1.625rem;
       height: 1.625rem;
     }

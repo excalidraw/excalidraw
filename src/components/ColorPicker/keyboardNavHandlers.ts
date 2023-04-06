@@ -1,6 +1,10 @@
 import {
-  COLOR_PER_ROW,
-  Palette,
+  Color,
+  ColorPalette,
+  ColorPaletteCustom,
+  COLORS_PER_ROW,
+} from "../../colors";
+import {
   ActiveColorPickerSectionAtomType,
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromHex,
@@ -11,7 +15,7 @@ const arrowHandler = (
   currentIndex: number,
   length: number,
 ) => {
-  const rows = Math.ceil(length / COLOR_PER_ROW);
+  const rows = Math.ceil(length / COLORS_PER_ROW);
 
   switch (eventKey) {
     case "ArrowLeft": {
@@ -22,13 +26,13 @@ const arrowHandler = (
       return (currentIndex + 1) % length;
     }
     case "ArrowDown": {
-      const nextIndex = currentIndex + COLOR_PER_ROW;
-      return nextIndex >= length ? currentIndex % COLOR_PER_ROW : nextIndex;
+      const nextIndex = currentIndex + COLORS_PER_ROW;
+      return nextIndex >= length ? currentIndex % COLORS_PER_ROW : nextIndex;
     }
     case "ArrowUp": {
-      const prevIndex = currentIndex - COLOR_PER_ROW;
+      const prevIndex = currentIndex - COLORS_PER_ROW;
       const newIndex =
-        prevIndex < 0 ? COLOR_PER_ROW * rows + prevIndex : prevIndex;
+        prevIndex < 0 ? COLORS_PER_ROW * rows + prevIndex : prevIndex;
       return newIndex >= length ? undefined : newIndex;
     }
   }
@@ -36,12 +40,9 @@ const arrowHandler = (
 
 interface HotkeyHandlerProps {
   e: React.KeyboardEvent;
-  colorObj: {
-    colorName: string;
-    shade: number;
-  } | null;
+  colorObj: { colorName: Color; shade: number } | null;
   onChange: (color: string) => void;
-  palette: Palette;
+  palette: ColorPaletteCustom;
   customColors: string[];
   setActiveColorPickerSection: (
     update: React.SetStateAction<ActiveColorPickerSectionAtomType>,
@@ -80,7 +81,7 @@ const hotkeyHandler = ({
 
   if (colorPickerHotkeyBindings.includes(e.key)) {
     const index = colorPickerHotkeyBindings.indexOf(e.key);
-    const paletteKey = Object.keys(palette)[index];
+    const paletteKey = Object.keys(palette)[index] as keyof ColorPalette;
     const paletteValue = palette[paletteKey];
     const r = Array.isArray(paletteValue)
       ? paletteValue[activeShade]
@@ -93,7 +94,7 @@ const hotkeyHandler = ({
 interface ColorPickerKeyNavHandlerProps {
   e: React.KeyboardEvent;
   activeColorPickerSection: ActiveColorPickerSectionAtomType;
-  palette: Palette;
+  palette: ColorPaletteCustom;
   hex: string | null;
   onChange: (color: string) => void;
   customColors: string[];
@@ -154,7 +155,7 @@ export const colorPickerKeyNavHandler = ({
       activeColorPickerSection === "custom" ||
       activeColorPickerSection === "hex"
     ) {
-      const keys = Object.keys(palette);
+      const keys = Object.keys(palette) as (keyof ColorPalette)[];
       const firstColor = palette[keys[0]];
 
       onChange(
@@ -181,7 +182,7 @@ export const colorPickerKeyNavHandler = ({
   if (activeColorPickerSection === "shades") {
     if (colorObj) {
       const { shade } = colorObj;
-      const newShade = arrowHandler(e.key, shade, COLOR_PER_ROW);
+      const newShade = arrowHandler(e.key, shade, COLORS_PER_ROW);
 
       if (newShade !== undefined) {
         onChange(palette[colorObj.colorName][newShade]);
@@ -192,7 +193,7 @@ export const colorPickerKeyNavHandler = ({
   if (activeColorPickerSection === "baseColors") {
     if (colorObj) {
       const { colorName } = colorObj;
-      const colorNames = Object.keys(palette);
+      const colorNames = Object.keys(palette) as (keyof ColorPalette)[];
       const indexOfColorName = colorNames.indexOf(colorName);
 
       const newColorIndex = arrowHandler(

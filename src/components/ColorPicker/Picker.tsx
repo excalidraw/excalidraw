@@ -12,23 +12,26 @@ import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
 import PickerHeading from "./PickerHeading";
 import {
   ColorPickerType,
-  DEFAULT_SHADE_INDEXES,
-  Palette,
   activeColorPickerSectionAtom,
   getColorNameAndShadeFromHex,
   getMostUsedCustomColors,
   isCustomColor,
 } from "./colorPickerUtils";
+import {
+  ColorPaletteCustom,
+  DEFAULT_CANVAS_BACKGROUND_INDEX,
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
+  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
+} from "../../colors";
 
 interface PickerProps {
-  colors: string[];
   color: string | null;
   onChange: (color: string) => void;
   label: string;
   showInput: boolean;
   type: ColorPickerType;
   elements: readonly ExcalidrawElement[];
-  palette: Palette;
+  palette: ColorPaletteCustom;
   updateData: (formData?: any) => void;
 }
 
@@ -84,10 +87,24 @@ export const Picker = ({
     customColors,
   ]);
 
-  const initialShade =
-    colorObj && colorObj.shade >= 0
-      ? colorObj.shade
-      : DEFAULT_SHADE_INDEXES[type];
+  // default to stroke color shade
+  let initialShade = DEFAULT_ELEMENT_STROKE_COLOR_INDEX;
+
+  if (colorObj && colorObj.shade >= 0) {
+    initialShade = colorObj.shade;
+  }
+
+  if (type === "elementBackground") {
+    initialShade = DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX;
+  }
+
+  if (type === "elementStroke") {
+    initialShade = DEFAULT_ELEMENT_STROKE_COLOR_INDEX;
+  }
+
+  if (type === "canvasBackground") {
+    initialShade = DEFAULT_CANVAS_BACKGROUND_INDEX;
+  }
 
   const [activeShade, setActiveShade] = useState(initialShade);
 

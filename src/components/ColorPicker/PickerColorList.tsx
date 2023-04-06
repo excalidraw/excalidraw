@@ -2,15 +2,15 @@ import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
 import {
-  Palette,
   activeColorPickerSectionAtom,
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromHex,
 } from "./colorPickerUtils";
 import HotkeyLabel from "./HotkeyLabel";
+import { ColorPaletteCustom } from "../../colors";
 
 interface PickerColorListProps {
-  palette: Palette;
+  palette: ColorPaletteCustom;
   color: string | null;
   onChange: (color: string) => void;
   label: string;

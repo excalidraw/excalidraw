@@ -19,6 +19,10 @@ import {
   isEraserActive,
   isHandToolActive,
 } from "../appState";
+import {
+  DEFAULT_CANVAS_BACKGROUND_COLOR_PALETTE,
+  DEFAULT_CANVAS_BACKGROUND_PICKS,
+} from "../colors";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -39,20 +43,11 @@ export const actionChangeViewBackgroundColor = register({
     // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
       <ColorPicker
-        palette={appProps.colorPalette?.canvasBackground}
-        topPicks={appProps.colorPalette?.topPicks?.canvasBackground}
-        // TODO color picker redesign
-        // test with uneven number of colors
-        // palette={{
-        //   red: ["#ff0000", "#ff3333", "#ff6666", "#ff9919", "#ffcccc"],
-        //   green: ["#00ff00", "#33ff33", "#66ff66", "#99ff99", "#ccffcc"],
-        //   blue: ["#0000ff", "#3333ff", "#6666ff", "#9999ff", "#ccccff"],
-        //   yellow: ["#ffff00", "#ffff33", "#ffff66", "#ffff99", "#ffffcc"],
-        //   orange: ["#ff9900", "#ff9933", "#ff9966", "#ff9999", "#ff99cc"],
-        //   purple: ["#9900ff", "#9933ff", "#9966ff", "#9999f2", "#99ccff"],
-        //   pink: ["#ff00ff", "#ff33ff", "#ff66ff", "#ff99ff", "#ffccff"],
-        // }}
-        // topPicks={["#ff0000", "#ff3333", "#ff6666", "#ff9919", "#ffcccc"]}
+        // ALLOW once we allow customizing the palette
+        //palette={appProps.colorPalette?.canvasBackground}
+        //topPicks={appProps.colorPalette?.topPicks?.canvasBackground}
+        palette={DEFAULT_CANVAS_BACKGROUND_COLOR_PALETTE}
+        topPicks={DEFAULT_CANVAS_BACKGROUND_PICKS}
         label={t("labels.canvasBackground")}
         type="canvasBackground"
         color={appState.viewBackgroundColor}

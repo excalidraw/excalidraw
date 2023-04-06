@@ -1,10 +1,10 @@
 import clsx from "clsx";
+import { ColorPickerType } from "./colorPickerUtils";
 import {
-  bgTopPicks,
-  strokeTopPicks,
-  canvasTopPicks,
-  ColorPickerType,
-} from "./colorPickerUtils";
+  DEFAULT_CANVAS_BACKGROUND_PICKS,
+  DEFAULT_ELEMENT_BACKGROUND_PICKS,
+  DEFAULT_ELEMENT_STROKE_PICKS,
+} from "../../colors";
 
 interface TopPicksProps {
   onChange: (color: string) => void;
@@ -19,17 +19,33 @@ export const TopPicks = ({
   activeColor,
   topPicks,
 }: TopPicksProps) => {
-  const colors = topPicks
-    ? topPicks
-    : type === "elementStroke"
-    ? strokeTopPicks
-    : type === "elementBackground"
-    ? bgTopPicks
-    : canvasTopPicks;
+  let colors;
+  if (type === "elementStroke") {
+    colors = DEFAULT_ELEMENT_STROKE_PICKS;
+  }
+
+  if (type === "elementBackground") {
+    colors = DEFAULT_ELEMENT_BACKGROUND_PICKS;
+  }
+
+  if (type === "canvasBackground") {
+    colors = DEFAULT_CANVAS_BACKGROUND_PICKS;
+  }
+
+  // this one can overwrite defaults
+  if (topPicks) {
+    colors = topPicks;
+  }
+
+  if (!colors) {
+    console.error("Invalid type for TopPicks");
+    return null;
+  }
+  // TODO: add here the shades logic
 
   return (
     <div className="color-picker__top-picks">
-      {colors.map((color) => (
+      {colors.map((color: string) => (
         <button
           className={clsx("color-picker__button", {
             active: color === activeColor,

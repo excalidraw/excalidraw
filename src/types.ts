@@ -31,13 +31,10 @@ import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
-import {
-  ColorPickerType,
-  ColorTuple,
-  Palette,
-} from "./components/ColorPicker/colorPickerUtils";
+import { ColorPickerType } from "./components/ColorPicker/colorPickerUtils";
 import { Merge, ForwardRef } from "./utility-types";
 import React from "react";
+import { ColorPalette, ColorTuple } from "./colors";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -283,7 +280,7 @@ export type ExcalidrawInitialDataState = Merge<
   }
 >;
 
-type PaletteOptions = Record<ColorPickerType, Palette>;
+type PaletteOptions = Record<ColorPickerType, ColorPalette>;
 type TopPicks = Partial<Record<ColorPickerType, ColorTuple>>;
 type TopPickOptions = Record<"topPicks", TopPicks>;
 

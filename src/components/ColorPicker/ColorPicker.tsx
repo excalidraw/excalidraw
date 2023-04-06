@@ -1,7 +1,6 @@
 import { isTransparent } from "../../utils";
 
 import "./ColorPicker.scss";
-import colors from "../../colors";
 import { ExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
 
@@ -14,11 +13,9 @@ import { useAtom } from "jotai";
 import {
   activeColorPickerSectionAtom,
   ColorPickerType,
-  ColorTuple,
-  ocPalette,
-  Palette,
 } from "./colorPickerUtils";
 import { useDevice, useExcalidrawContainer } from "../App";
+import { ColorTuple, COLOR_PALETTE, ColorPaletteCustom } from "../../colors";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -48,7 +45,7 @@ export interface ColorPickerProps {
   label: string;
   elements: readonly ExcalidrawElement[];
   appState: AppState;
-  palette?: Palette;
+  palette?: ColorPaletteCustom;
   topPicks?: ColorTuple;
   updateData: (formData?: any) => void;
 }
@@ -59,7 +56,7 @@ export const ColorPicker = ({
   onChange,
   label,
   elements,
-  palette = ocPalette,
+  palette = COLOR_PALETTE,
   topPicks,
   updateData,
   appState,
@@ -125,7 +122,6 @@ export const ColorPicker = ({
             >
               <Picker
                 palette={palette}
-                colors={colors[type]}
                 color={color || null}
                 onChange={(changedColor) => {
                   onChange(changedColor);
