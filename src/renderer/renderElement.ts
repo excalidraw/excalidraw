@@ -34,6 +34,7 @@ import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
+  isSafari,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
@@ -285,10 +286,13 @@ const drawElementOnCanvas = (
             : element.textAlign === "right"
             ? element.width
             : 0;
-        const lineHeightPx = getLineHeightInPx(
+        let lineHeightPx = getLineHeightInPx(
           element.fontSize,
           element.lineHeight,
         );
+        if (isSafari) {
+          lineHeightPx = element.height / lines.length;
+        }
         const verticalOffset = element.height - element.baseline;
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
