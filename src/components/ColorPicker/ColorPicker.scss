@@ -16,7 +16,7 @@
   .color-picker-container {
     display: grid;
     grid-template-columns: 1fr 20px 1.625rem;
-    padding: 0.250rem 0px;
+    padding: 0.25rem 0px;
     align-items: center;
 
     @include isMobile {
@@ -115,7 +115,7 @@
     }
 
     &.active-color {
-      border-radius:  calc(var(--radius) + 1px);
+      border-radius: calc(var(--radius) + 1px);
       width: 1.625rem;
       height: 1.625rem;
     }
