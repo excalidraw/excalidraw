@@ -48,6 +48,7 @@ import {
   getMaxContainerWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { getNormalizedZoom } from "../scene";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -99,11 +100,11 @@ const cappedElementCanvasSize = (
 ): {
   width: number;
   height: number;
-  zoomValue: NormalizedZoomValue;
+  scale: NormalizedZoomValue;
 } => {
   const sizelimit = 16777216; // 2^24
   const padding = getCanvasPadding(element);
-  let zoomValue = zoom.value;
+  let scale = zoom.value;
 
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const elementWidth =
@@ -118,15 +119,13 @@ const cappedElementCanvasSize = (
   let width = elementWidth * window.devicePixelRatio + padding * 2;
   let height = elementHeight * window.devicePixelRatio + padding * 2;
 
-  const size = width * height * zoomValue * zoomValue;
+  const size = width * height * scale * scale;
   if (size > sizelimit) {
-    zoomValue = Math.sqrt(sizelimit / (width * height)) as NormalizedZoomValue;
-    width = elementWidth * window.devicePixelRatio + padding * 2;
-    height = elementHeight * window.devicePixelRatio + padding * 2;
+    scale = getNormalizedZoom(Math.sqrt(sizelimit / (width * height)));
   }
-  width *= zoomValue;
-  height *= zoomValue;
-  return { width, height, zoomValue };
+  width = Math.floor(width * scale);
+  height = Math.floor(height * scale);
+  return { width, height, scale };
 };
 
 const generateElementCanvas = (
@@ -138,7 +137,7 @@ const generateElementCanvas = (
   const context = canvas.getContext("2d")!;
   const padding = getCanvasPadding(element);
 
-  const { width, height, zoomValue } = cappedElementCanvasSize(element, zoom);
+  const { width, height, scale } = cappedElementCanvasSize(element, zoom);
 
   canvas.width = width;
   canvas.height = height;
@@ -151,22 +150,22 @@ const generateElementCanvas = (
 
     canvasOffsetX =
       element.x > x1
-        ? distance(element.x, x1) * window.devicePixelRatio * zoomValue
+        ? distance(element.x, x1) * window.devicePixelRatio * scale
         : 0;
 
     canvasOffsetY =
       element.y > y1
-        ? distance(element.y, y1) * window.devicePixelRatio * zoomValue
+        ? distance(element.y, y1) * window.devicePixelRatio * scale
         : 0;
 
     context.translate(canvasOffsetX, canvasOffsetY);
   }
 
   context.save();
-  context.translate(padding * zoomValue, padding * zoomValue);
+  context.translate(padding * scale, padding * scale);
   context.scale(
-    window.devicePixelRatio * zoomValue,
-    window.devicePixelRatio * zoomValue,
+    window.devicePixelRatio * scale,
+    window.devicePixelRatio * scale,
   );
 
   const rc = rough.canvas(canvas);
@@ -183,7 +182,7 @@ const generateElementCanvas = (
     element,
     canvas,
     theme: renderConfig.theme,
-    canvasZoom: zoomValue,
+    canvasZoom: scale,
     canvasOffsetX,
     canvasOffsetY,
     boundTextElementVersion: getBoundTextElement(element)?.version || null,
