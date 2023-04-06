@@ -1,4 +1,10 @@
 import { AppState } from "../../src/types";
+import {
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_PICKS,
+  DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
+  DEFAULT_ELEMENT_STROKE_PICKS,
+} from "../colors";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
@@ -228,8 +234,8 @@ export const actionChangeStrokeColor = register({
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
-        topPicks={appProps.colorPalette?.topPicks?.elementStroke}
-        palette={appProps.colorPalette?.elementStroke}
+        topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
+        palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
         type="elementStroke"
         label={t("labels.stroke")}
         color={getFormValue(
@@ -270,8 +276,8 @@ export const actionChangeBackgroundColor = register({
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
-        topPicks={appProps.colorPalette?.topPicks?.elementBackground}
-        palette={appProps.colorPalette?.elementBackground}
+        topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
+        palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
         type="elementBackground"
         label={t("labels.background")}
         color={getFormValue(

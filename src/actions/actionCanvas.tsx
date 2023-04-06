@@ -44,8 +44,8 @@ export const actionChangeViewBackgroundColor = register({
     return (
       <ColorPicker
         // ALLOW once we allow customizing the palette
-        //palette={appProps.colorPalette?.canvasBackground}
-        //topPicks={appProps.colorPalette?.topPicks?.canvasBackground}
+        // palette={appProps.colorPalette?.canvasBackground}
+        // topPicks={appProps.colorPalette?.topPicks?.canvasBackground}
         palette={DEFAULT_CANVAS_BACKGROUND_COLOR_PALETTE}
         topPicks={DEFAULT_CANVAS_BACKGROUND_PICKS}
         label={t("labels.canvasBackground")}
