@@ -43,7 +43,7 @@ exports[`<Excalidraw/> <MainMenu/> should render main menu with host menu items 
       <button
         style="height: 2rem;"
       >
-
+         
         custom menu item
       </button>
     </div>
@@ -116,7 +116,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
 >
   <div
     class="Island dropdown-menu-container"
-    style="--padding: 2; z-index: 1;"
+    style="--padding: 2; z-index: 2;"
   >
     <button
       aria-label="Open"
@@ -524,38 +524,84 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
       <div
         style="padding: 0px 0.625rem;"
       >
-        <div
-          style="position: relative;"
-        >
-          <div>
+        <div>
+          <div
+            aria-modal="true"
+            class="color-picker-container"
+            role="dialog"
+          >
             <div
-              class="color-picker-control-container"
+              class="color-picker__top-picks"
             >
-              <div
-                class="color-picker-label-swatch-container"
-              >
-                <button
-                  aria-label="Canvas background"
-                  class="color-picker-label-swatch"
-                  style="--swatch-color: #ffffff;"
-                />
-              </div>
-              <label
-                class="color-input-container"
+              <button
+                class="color-picker__button active"
+                style="--swatch-color: #ffffff;"
+                title="#ffffff"
+                type="button"
               >
                 <div
-                  class="color-picker-hash"
-                >
-                  #
-                </div>
-                <input
-                  aria-label="Canvas background"
-                  class="color-picker-input"
-                  spellcheck="false"
-                  value="ffffff"
+                  class="color-picker__button-outline"
                 />
-              </label>
+              </button>
+              <button
+                class="color-picker__button"
+                style="--swatch-color: #f1f3f5;"
+                title="#f1f3f5"
+                type="button"
+              >
+                <div
+                  class="color-picker__button-outline"
+                />
+              </button>
+              <button
+                class="color-picker__button"
+                style="--swatch-color: #dee2e6;"
+                title="#dee2e6"
+                type="button"
+              >
+                <div
+                  class="color-picker__button-outline"
+                />
+              </button>
+              <button
+                class="color-picker__button"
+                style="--swatch-color: #d0ebff;"
+                title="#d0ebff"
+                type="button"
+              >
+                <div
+                  class="color-picker__button-outline"
+                />
+              </button>
+              <button
+                class="color-picker__button"
+                style="--swatch-color: #fff3bf;"
+                title="#fff3bf"
+                type="button"
+              >
+                <div
+                  class="color-picker__button-outline"
+                />
+              </button>
             </div>
+            <div
+              style="width: 1px; height: 100%; margin: 0px auto;"
+            />
+            <button
+              aria-controls="radix-:r0:"
+              aria-expanded="false"
+              aria-haspopup="dialog"
+              aria-label="Canvas background"
+              class="color-picker__button active-color"
+              data-state="closed"
+              style="--swatch-color: #ffffff;"
+              title="Show background color picker"
+              type="button"
+            >
+              <div
+                class="color-picker__button-outline"
+              />
+            </button>
           </div>
         </div>
       </div>
