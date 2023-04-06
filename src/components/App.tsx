@@ -288,6 +288,7 @@ import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionCreateContainerFromText } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
+import { Stats } from "./Stats";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -645,6 +646,17 @@ class App extends React.Component<AppProps, AppState> {
                         top={this.state.contextMenu.top}
                         left={this.state.contextMenu.left}
                         actionManager={this.actionManager}
+                      />
+                    )}
+                    {this.state.showStats && (
+                      <Stats
+                        appState={this.state}
+                        setAppState={this.setState}
+                        scene={this.scene}
+                        onClose={() => {
+                          this.actionManager.executeAction(actionToggleStats);
+                        }}
+                        renderCustomStats={renderCustomStats}
                       />
                     )}
                     <main>{this.renderCanvas()}</main>

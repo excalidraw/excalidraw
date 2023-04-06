@@ -35,8 +35,6 @@ import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
 import { useDevice } from "../components/App";
-import { Stats } from "./Stats";
-import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
 import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
@@ -438,17 +436,6 @@ const LayerUI = ({
               showExitZenModeBtn={showExitZenModeBtn}
               renderWelcomeScreen={renderWelcomeScreen}
             />
-            {appState.showStats && (
-              <Stats
-                appState={appState}
-                setAppState={setAppState}
-                elements={elements}
-                onClose={() => {
-                  actionManager.executeAction(actionToggleStats);
-                }}
-                renderCustomStats={renderCustomStats}
-              />
-            )}
             {appState.scrolledOutside && (
               <button
                 className="scroll-back-to-content"

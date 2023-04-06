@@ -1,27 +1,28 @@
 import React from "react";
 import { getCommonBounds } from "../element/bounds";
 import { mutateElement } from "../element/mutateElement";
-import {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
+import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { getTargetElements } from "../scene";
+import Scene from "../scene/Scene";
 import { AppState, ExcalidrawProps } from "../types";
 import { CloseIcon } from "./icons";
 import { Island } from "./Island";
 import "./Stats.scss";
 
-export const Stats = (props: {
+interface StatsProps {
   appState: AppState;
+  scene: Scene;
   setAppState: React.Component<any, AppState>["setState"];
-  elements: readonly NonDeletedExcalidrawElement[];
   onClose: () => void;
   renderCustomStats: ExcalidrawProps["renderCustomStats"];
-}) => {
-  const boundingBox = getCommonBounds(props.elements);
-  const selectedElements = getTargetElements(props.elements, props.appState);
+}
+
+export const Stats = (props: StatsProps) => {
+  const elements = props.scene.getNonDeletedElements();
+  const boundingBox = getCommonBounds(elements);
+  const selectedElements = getTargetElements(elements, props.appState);
   const selectedBoundingBox = getCommonBounds(selectedElements);
 
   const stats =
@@ -75,7 +76,7 @@ export const Stats = (props: {
               </tr>
               <tr>
                 <td>{t("stats.elements")}</td>
-                <td>{props.elements.length}</td>
+                <td>{elements.length}</td>
               </tr>
               <tr>
                 <td>{t("stats.width")}</td>
@@ -89,7 +90,7 @@ export const Stats = (props: {
                   {Math.round(boundingBox[3]) - Math.round(boundingBox[1])}
                 </td>
               </tr>
-              {props.renderCustomStats?.(props.elements, props.appState)}
+              {props.renderCustomStats?.(elements, props.appState)}
             </tbody>
           </table>
         </div>
@@ -127,6 +128,7 @@ export const Stats = (props: {
                     </div>
                     <input
                       id={statsItem.label}
+                      key={statsItem.value}
                       defaultValue={statsItem.value}
                       className="color-picker-input"
                       style={{
