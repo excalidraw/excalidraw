@@ -43,7 +43,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onPointerDown,
     onScrollChange,
     children,
-    colorPalette,
+    //colorPalette,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -116,7 +116,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
           renderSidebar={renderSidebar}
-          colorPalette={colorPalette}
+          //colorPalette={colorPalette}
         >
           {children}
         </App>
