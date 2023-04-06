@@ -4,7 +4,7 @@ import { Merge } from "./utility-types";
 export type Color = keyof oc | "transparent";
 export type ColorTuple = [string, string, string, string, string];
 export type ColorPalette = Merge<
-  Record<Color, ColorTuple>,
+  Record<Color | "slate", ColorTuple>,
   { black: string; white: string; transparent: string }
 >;
 // used general type instead of specific type (ColorPalette) to support custom colors
@@ -43,7 +43,7 @@ export const COLOR_PALETTE = {
   transparent: "transparent",
   black: oc.black,
   white: oc.white,
-  // avail colors scheme
+  // avail colors scheme (open colors)
   red: getSpecificColorShades("red", DEFAULT_PALETTE_SHADE_INDEXES),
   pink: getSpecificColorShades("pink", DEFAULT_PALETTE_SHADE_INDEXES),
   grape: getSpecificColorShades("grape", DEFAULT_PALETTE_SHADE_INDEXES),
@@ -57,6 +57,9 @@ export const COLOR_PALETTE = {
   lime: getSpecificColorShades("lime", DEFAULT_PALETTE_SHADE_INDEXES),
   yellow: getSpecificColorShades("yellow", DEFAULT_PALETTE_SHADE_INDEXES),
   orange: getSpecificColorShades("orange", DEFAULT_PALETTE_SHADE_INDEXES),
+
+  // radix colors 3,5,7,9,11
+  slate: ["#f1f3f5", "#e6e8eb", "#d7dbdf", "#889096", "#687076"],
 } as ColorPalette;
 
 const getCommonColorsForPalette = () => ({
@@ -119,25 +122,25 @@ export const DEFAULT_CANVAS_BACKGROUND_PICKS = [
   COLOR_PALETTE.yellow[DEFAULT_CANVAS_BACKGROUND_INDEX],
 ] as ColorTuple;
 
-// ORDER matters for positioning in pallete (5x3 grid)s
-export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
-  transparent: COLOR_PALETTE.transparent,
-  white: COLOR_PALETTE.white,
-  gray2: COLOR_PALETTE.gray[2],
-  grayDefault: COLOR_PALETTE.gray[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
-  black: COLOR_PALETTE.black,
-
-  ...getCommonColorsForPalette(),
-};
-
 export const DEFAULT_ELEMENT_STROKE_COLOR_PALETTE = {
   // 1st row
   transparent: COLOR_PALETTE.transparent,
   white: COLOR_PALETTE.white,
-  gray2: COLOR_PALETTE.gray[2],
-  grayDefault: COLOR_PALETTE.gray[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
+  slate: COLOR_PALETTE.slate,
+  gray: COLOR_PALETTE.gray,
   black: COLOR_PALETTE.black,
   // rest
+  ...getCommonColorsForPalette(),
+};
+
+// ORDER matters for positioning in pallete (5x3 grid)s
+export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
+  transparent: COLOR_PALETTE.transparent,
+  white: COLOR_PALETTE.white,
+  slate: COLOR_PALETTE.slate,
+  gray: COLOR_PALETTE.gray,
+  black: COLOR_PALETTE.black,
+
   ...getCommonColorsForPalette(),
 };
 
