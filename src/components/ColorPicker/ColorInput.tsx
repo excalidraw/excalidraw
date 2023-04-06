@@ -70,7 +70,8 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
           e.stopPropagation();
         }}
       />
-      <div
+      {/* COMMENTING OUT IN CASE WE WILL NEED TO REINTRODUCE LATER */}
+      {/* <div
         style={{
           width: "1px",
           height: "1.25rem",
@@ -86,7 +87,7 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
         })}
       >
         <div className="color-picker__button-border" />
-      </div>
+      </div> */}
     </label>
   );
 };
