@@ -19,7 +19,7 @@ export const DEFAULT_CHART_COLOR_INDEX = 4;
 export const DEFAULT_ELEMENT_STROKE_COLOR_INDEX = 4;
 export const DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX = 2;
 export const DEFAULT_CANVAS_BACKGROUND_INDEX = 0;
-export const DEFAULT_PALETTE_SHADE_INDEXES = [1, 3, 5, 7, 8] as [
+export const DEFAULT_PALETTE_SHADE_INDEXES = [1, 3, 5, 7, 9] as [
   number,
   number,
   number,
