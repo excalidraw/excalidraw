@@ -38,7 +38,7 @@ import { MarkOptional, Mutable } from "../utility-types";
 import {
   detectLineHeight,
   getDefaultLineHeight,
-  measureBaseline,
+  getDOMMetrics,
 } from "../element/textElement";
 
 type RestoredAppState = Omit<
@@ -174,6 +174,7 @@ const restoreElement = (
         fontFamily = getFontFamilyByName(_fontFamily);
       }
       const text = element.text ?? "";
+
       // line-height might not be specified either when creating elements
       // programmatically, or when importing old diagrams.
       // For the latter we want to detect the original line height which
@@ -187,6 +188,11 @@ const restoreElement = (
           : // no element height likely means programmatic use, so default
             // to a fixed line height
             getDefaultLineHeight(element.fontFamily));
+      const { baseline } = getDOMMetrics(
+        element.text,
+        getFontString(element),
+        lineHeight,
+      );
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
@@ -197,11 +203,7 @@ const restoreElement = (
         originalText: element.originalText || text,
 
         lineHeight,
-        baseline: measureBaseline(
-          element.text,
-          getFontString(element),
-          lineHeight,
-        ),
+        baseline,
       });
 
       if (refreshDimensions) {

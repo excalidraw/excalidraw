@@ -35,7 +35,7 @@ import {
   getMaxContainerHeight,
   getMaxContainerWidth,
   computeContainerDimensionForBoundText,
-  measureDOMHeight,
+  getDOMMetrics,
   splitIntoLines,
 } from "./textElement";
 import {
@@ -273,7 +273,7 @@ export const textWysiwyg = ({
       } else {
         textElementWidth += 0.5;
       }
-      const domHeight = measureDOMHeight(
+      const { height: domHeight } = getDOMMetrics(
         updatedTextElement.text,
         getFontString(updatedTextElement),
         updatedTextElement.lineHeight,

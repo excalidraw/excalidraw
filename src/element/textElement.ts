@@ -291,11 +291,11 @@ export const measureText = (
   const fontSize = parseFloat(font);
   const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
-  const baseline = measureBaseline(text, font, lineHeight);
+  const { baseline } = getDOMMetrics(text, font, lineHeight);
   return { width, height, baseline };
 };
 
-export const measureBaseline = (
+export const getDOMMetrics = (
   text: string,
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
@@ -327,61 +327,26 @@ export const measureBaseline = (
   span.style.height = "1px";
   container.appendChild(span);
   let baseline = span.offsetTop + span.offsetHeight;
-  const domHeight = container.offsetHeight;
+  const height = container.offsetHeight;
 
   if (isSafari) {
     // In Safari sometimes DOM height could be less than canvas height due to
     // which text could go out of the bounding box hence shifting the baseline
     // to make sure text is rendered correctly
-    if (canvasHeight > domHeight) {
-      baseline += canvasHeight - domHeight;
+    if (canvasHeight > height) {
+      baseline += canvasHeight - height;
     }
     // In Safari sometimes DOM height could be more than canvas height due to
     // which text could go out of the bounding box hence shifting the baseline
     // to make sure text is rendered correctly
-    if (domHeight > canvasHeight) {
-      baseline -= domHeight - canvasHeight;
+    if (height > canvasHeight) {
+      baseline -= height - canvasHeight;
     }
   }
   document.body.removeChild(container);
-  return baseline;
+  return { baseline, height };
 };
 
-export const measureDOMHeight = (
-  text: string,
-  font: FontString,
-  lineHeight: ExcalidrawTextElement["lineHeight"],
-  wrapInContainer?: boolean,
-) => {
-  const container = document.createElement("div");
-  container.style.position = "absolute";
-  container.style.whiteSpace = "pre";
-  container.style.font = font;
-  container.style.minHeight = "1em";
-  if (wrapInContainer) {
-    container.style.overflow = "hidden";
-    container.style.wordBreak = "break-word";
-    container.style.whiteSpace = "pre-wrap";
-  }
-
-  container.style.lineHeight = String(lineHeight);
-
-  container.innerText = text;
-
-  // Baseline is important for positioning text on canvas
-  document.body.appendChild(container);
-
-  const span = document.createElement("span");
-  span.style.display = "inline-block";
-  span.style.overflow = "hidden";
-  span.style.width = "1px";
-  span.style.height = "1px";
-  container.appendChild(span);
-  const domHeight = container.offsetHeight;
-
-  document.body.removeChild(container);
-  return domHeight;
-};
 /**
  * To get unitless line-height (if unknown) we can calculate it by dividing
  * height-per-line by fontSize.
