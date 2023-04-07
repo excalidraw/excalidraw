@@ -122,7 +122,7 @@ const cappedElementCanvasSize = (
 
   //recalculate scale to ensure width and height are within
   //the allowed maximums
-  if (width > widthHeightLimit || height > widthHeightLimit) {
+  if (width * scale > widthHeightLimit || height * scale > widthHeightLimit) {
     scale = getNormalizedZoom(
       Math.min(widthHeightLimit / width, widthHeightLimit / height),
     );
