@@ -35,6 +35,8 @@ import {
   getMaxContainerHeight,
   getMaxContainerWidth,
   computeContainerDimensionForBoundText,
+  getDOMMetrics,
+  splitIntoLines,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -44,7 +46,6 @@ import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
-import { splitIntoLines } from "./textElement";
 
 const getTransform = (
   width: number,
@@ -272,13 +273,16 @@ export const textWysiwyg = ({
       } else {
         textElementWidth += 0.5;
       }
+      const { height: domHeight } = getDOMMetrics(
+        updatedTextElement.text,
+        getFontString(updatedTextElement),
+        updatedTextElement.lineHeight,
+      );
 
       let lineHeight = element.lineHeight;
-      if (isSafari) {
-        //@ts-ignore
-        lineHeight = `${
-          element.height / splitIntoLines(element.text).length
-        }px`;
+      if (isSafari && domHeight > textElementHeight) {
+        lineHeight = (Math.floor(element.lineHeight * element.fontSize) /
+          element.fontSize) as ExcalidrawTextElement["lineHeight"];
       }
 
       // Make sure text editor height doesn't go beyond viewport

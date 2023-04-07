@@ -289,13 +289,10 @@ export const measureText = (
     .map((x) => x || " ")
     .join("\n");
   const fontSize = parseFloat(font);
-  let height = getTextHeight(text, fontSize, lineHeight);
+  const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
-  const domMetrics = getDOMMetrics(text, font, lineHeight);
-  if (isSafari) {
-    height = domMetrics.height;
-  }
-  return { width, height, baseline: domMetrics.baseline };
+  const { baseline } = getDOMMetrics(text, font, lineHeight);
+  return { width, height, baseline };
 };
 
 export const getDOMMetrics = (
@@ -316,6 +313,7 @@ export const getDOMMetrics = (
   }
 
   container.style.lineHeight = String(lineHeight);
+  const canvasHeight = getTextHeight(text, parseFloat(font), lineHeight);
 
   container.innerText = text;
 
@@ -328,9 +326,23 @@ export const getDOMMetrics = (
   span.style.width = "1px";
   span.style.height = "1px";
   container.appendChild(span);
-  const baseline = span.offsetTop + span.offsetHeight;
+  let baseline = span.offsetTop + span.offsetHeight;
   const height = container.offsetHeight;
 
+  if (isSafari) {
+    // In Safari sometimes DOM height could be less than canvas height due to
+    // which text could go out of the bounding box hence shifting the baseline
+    // to make sure text is rendered correctly
+    if (canvasHeight > height) {
+      baseline += canvasHeight - height;
+    }
+    // In Safari sometimes DOM height could be more than canvas height due to
+    // which text could go out of the bounding box hence shifting the baseline
+    // to make sure text is rendered correctly
+    if (height > canvasHeight) {
+      baseline -= height - canvasHeight;
+    }
+  }
   document.body.removeChild(container);
   return { baseline, height };
 };
