@@ -260,16 +260,20 @@ export const actionCreateContainerFromText = register({
             }
 
             if (startBinding || endBinding) {
-              mutateElement(ele, { startBinding, endBinding });
+              mutateElement(ele, { startBinding, endBinding }, false);
             }
           });
         }
 
-        mutateElement(textElement, {
-          containerId: container.id,
-          verticalAlign: VERTICAL_ALIGN.MIDDLE,
-          boundElements: null,
-        });
+        mutateElement(
+          textElement,
+          {
+            containerId: container.id,
+            verticalAlign: VERTICAL_ALIGN.MIDDLE,
+            boundElements: null,
+          },
+          false,
+        );
         redrawTextBoundingBox(textElement, container);
 
         updatedElements = pushContainerBelowText(
