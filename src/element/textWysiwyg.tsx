@@ -37,6 +37,7 @@ import {
   computeContainerDimensionForBoundText,
   getDOMMetrics,
   splitIntoLines,
+  detectLineHeight,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -280,30 +281,31 @@ export const textWysiwyg = ({
       );
 
       let lineHeight = element.lineHeight;
-      if (isSafari && domHeight > textElementHeight) {
-        lineHeight = (Math.floor(element.lineHeight * element.fontSize) /
-          element.fontSize) as ExcalidrawTextElement["lineHeight"];
+      const fontSize = Math.floor(updatedTextElement.fontSize);
+
+      if (isSafari) {
+        //@ts-ignore
+        lineHeight =
+          updatedTextElement.height /
+          splitIntoLines(updatedTextElement.text).length /
+          fontSize;
       }
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
       Object.assign(editable.style, {
-        font: getFontString(updatedTextElement),
+        font: getFontString({
+          fontSize,
+          fontFamily: updatedTextElement.fontFamily,
+        }),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight,
         width: `${textElementWidth}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
-        transform: getTransform(
-          textElementWidth,
-          textElementHeight,
-          getTextElementAngle(updatedTextElement),
-          appState,
-          maxWidth,
-          editorMaxHeight,
-        ),
+        transform: `scale(${updatedTextElement.fontSize / fontSize})`,
         textAlign,
         verticalAlign,
         color: updatedTextElement.strokeColor,
