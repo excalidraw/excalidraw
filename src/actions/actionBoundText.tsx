@@ -216,10 +216,10 @@ export const actionCreateContainerFromText = register({
           roundness:
             appState.currentItemRoundness === "round"
               ? {
-                type: isUsingAdaptiveRadius("rectangle")
-                  ? ROUNDNESS.ADAPTIVE_RADIUS
-                  : ROUNDNESS.PROPORTIONAL_RADIUS,
-              }
+                  type: isUsingAdaptiveRadius("rectangle")
+                    ? ROUNDNESS.ADAPTIVE_RADIUS
+                    : ROUNDNESS.PROPORTIONAL_RADIUS,
+                }
               : null,
           opacity: 100,
           locked: false,
