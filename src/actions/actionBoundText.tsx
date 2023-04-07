@@ -23,6 +23,7 @@ import {
   ExcalidrawTextElement,
 } from "../element/types";
 import { getSelectedElements } from "../scene";
+import { AppState } from "../types";
 import { getFontString } from "../utils";
 import { register } from "./register";
 
@@ -185,8 +186,8 @@ export const actionCreateContainerFromText = register({
   trackEvent: { category: "element" },
   predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
-    const areTextElements = selectedElements.every(el => isTextElement(el)) 
-    return selectedElements.length > 0 && areTextElements
+    const areTextElements = selectedElements.every((el) => isTextElement(el));
+    return selectedElements.length > 0 && areTextElements;
   },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(
@@ -195,8 +196,8 @@ export const actionCreateContainerFromText = register({
     );
     let updatedElements = elements.slice();
     let updatedAppState = appState;
-    let containerIds:any = {};
-  
+    const containerIds: AppState["selectedElementIds"] = {};
+
     for (const textElement of selectedElements) {
       if (isTextElement(textElement)) {
         const container = newElement({
@@ -215,10 +216,10 @@ export const actionCreateContainerFromText = register({
           roundness:
             appState.currentItemRoundness === "round"
               ? {
-                  type: isUsingAdaptiveRadius("rectangle")
-                    ? ROUNDNESS.ADAPTIVE_RADIUS
-                    : ROUNDNESS.PROPORTIONAL_RADIUS,
-                }
+                type: isUsingAdaptiveRadius("rectangle")
+                  ? ROUNDNESS.ADAPTIVE_RADIUS
+                  : ROUNDNESS.PROPORTIONAL_RADIUS,
+              }
               : null,
           opacity: 100,
           locked: false,
@@ -234,7 +235,7 @@ export const actionCreateContainerFromText = register({
           ),
           groupIds: textElement.groupIds,
         });
-  
+
         // update bindings
         if (textElement.boundElements?.length) {
           const linearElementIds = textElement.boundElements
@@ -246,47 +247,47 @@ export const actionCreateContainerFromText = register({
           linearElements.forEach((ele) => {
             let startBinding = ele.startBinding;
             let endBinding = ele.endBinding;
-  
+
             if (startBinding?.elementId === textElement.id) {
               startBinding = {
                 ...startBinding,
                 elementId: container.id,
               };
             }
-  
+
             if (endBinding?.elementId === textElement.id) {
               endBinding = { ...endBinding, elementId: container.id };
             }
-  
+
             if (startBinding || endBinding) {
               mutateElement(ele, { startBinding, endBinding });
             }
           });
         }
-  
+
         mutateElement(textElement, {
           containerId: container.id,
           verticalAlign: VERTICAL_ALIGN.MIDDLE,
           boundElements: null,
         });
         redrawTextBoundingBox(textElement, container);
-  
+
         updatedElements = pushContainerBelowText(
           [...updatedElements, container],
           container,
           textElement,
-        )
+        );
         containerIds[container.id] = true;
       }
     }
-  
+
     if (Object.keys(containerIds).length > 0) {
       updatedAppState = {
         ...appState,
         selectedElementIds: containerIds,
       };
     }
-  
+
     return {
       elements: updatedElements,
       appState: updatedAppState,
