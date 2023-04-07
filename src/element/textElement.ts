@@ -313,7 +313,6 @@ export const getDOMMetrics = (
   }
 
   container.style.lineHeight = String(lineHeight);
-  const canvasHeight = getTextHeight(text, parseFloat(font), lineHeight);
 
   container.innerText = text;
 
@@ -330,6 +329,8 @@ export const getDOMMetrics = (
   const height = container.offsetHeight;
 
   if (isSafari) {
+    const canvasHeight = getTextHeight(text, parseFloat(font), lineHeight);
+
     // In Safari sometimes DOM height could be less than canvas height due to
     // which text could go out of the bounding box hence shifting the baseline
     // to make sure text is rendered correctly

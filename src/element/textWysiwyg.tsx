@@ -36,7 +36,6 @@ import {
   getMaxContainerWidth,
   computeContainerDimensionForBoundText,
   getDOMMetrics,
-  splitIntoLines,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
