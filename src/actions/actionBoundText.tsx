@@ -194,8 +194,7 @@ export const actionCreateContainerFromText = register({
       getNonDeletedElements(elements),
       appState,
     );
-    let updatedElements = elements.slice();
-    let updatedAppState = appState;
+    let updatedElements: readonly ExcalidrawElement[] = elements.slice();
     const containerIds: AppState["selectedElementIds"] = {};
 
     for (const textElement of selectedElements) {
@@ -285,16 +284,12 @@ export const actionCreateContainerFromText = register({
       }
     }
 
-    if (Object.keys(containerIds).length > 0) {
-      updatedAppState = {
-        ...appState,
-        selectedElementIds: containerIds,
-      };
-    }
-
     return {
       elements: updatedElements,
-      appState: updatedAppState,
+      appState: {
+        ...appState,
+        selectedElementIds: containerIds,
+      },
       commitToHistory: true,
     };
   },
