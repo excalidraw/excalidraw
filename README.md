@@ -17,7 +17,7 @@
     An open source virtual hand-drawn style whiteboard. </br>
     Collaborative and end-to-end encrypted. </br>
   <br />
-  </h3>
+  </h2>
 </div>
 
 <br />

@@ -3,7 +3,6 @@ import fallbackMathJaxLangData from "./locales/en.json";
 import { FONT_FAMILY, SVG_NS } from "../../../../constants";
 import { getFontString, getFontFamilyString, isRTL } from "../../../../utils";
 import {
-  getApproxLineHeight,
   getBoundTextElement,
   getContainerElement,
   getMaxContainerWidth,
@@ -555,6 +554,7 @@ const getCacheKey = (
 const measureMarkup = (
   markup: Array<string | Element>,
   fontSize: number,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
   mathProps: MathProps,
   isMathJaxLoaded: boolean,
   maxWidth?: number | null,
@@ -567,11 +567,10 @@ const measureMarkup = (
   container.style.minHeight = "1em";
 
   if (maxWidth) {
-    const lineHeight = getApproxLineHeight(font);
     container.style.maxWidth = `${String(maxWidth)}px`;
     container.style.overflow = "hidden";
     container.style.wordBreak = "break-word";
-    container.style.lineHeight = `${String(lineHeight)}px`;
+    container.style.lineHeight = `${String(lineHeight)}`;
     container.style.whiteSpace = "pre-wrap";
   }
   document.body.appendChild(container);
@@ -635,7 +634,7 @@ const measureMarkup = (
         const constrainedText = maxWidth
           ? wrapText(text, font, maxWidth)
           : text;
-        const textMetrics = measureText(constrainedText, font);
+        const textMetrics = measureText(constrainedText, font, lineHeight);
         childMetrics.push({
           x: nextX,
           y: baseline,
@@ -656,6 +655,7 @@ const measureMarkup = (
 const getMetrics = (
   markup: string[][],
   fontSize: number,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
   mathProps: MathProps,
   isMathJaxLoaded: boolean,
   maxWidth?: number | null,
@@ -699,6 +699,7 @@ const getMetrics = (
     const { width, height, baseline, childMetrics } = measureMarkup(
       lineMarkup,
       fontSize,
+      lineHeight,
       mathProps,
       isMathJaxLoaded,
       maxWidth,
@@ -725,6 +726,7 @@ const getMetrics = (
 const renderMath = (
   text: string,
   fontSize: number,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
   textAlign: string,
   mathProps: MathProps,
   isMathJaxLoaded: boolean,
@@ -743,7 +745,13 @@ const renderMath = (
     isMathJaxLoaded ? getMathNewline(mathProps) : "\n",
   );
   const { markup, aria } = markupText(text, mathProps, isMathJaxLoaded);
-  const metrics = getMetrics(markup, fontSize, mathProps, isMathJaxLoaded);
+  const metrics = getMetrics(
+    markup,
+    fontSize,
+    lineHeight,
+    mathProps,
+    isMathJaxLoaded,
+  );
   const width = parentWidth ?? metrics.imageMetrics.width;
 
   let y = 0;
@@ -799,13 +807,20 @@ const renderMath = (
 const getImageMetrics = (
   text: string,
   fontSize: number,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
   mathProps: MathProps,
   isMathJaxLoaded: boolean,
   maxWidth?: number | null,
 ) => {
   const markup = markupText(text, mathProps, isMathJaxLoaded).markup;
-  return getMetrics(markup, fontSize, mathProps, isMathJaxLoaded, maxWidth)
-    .imageMetrics;
+  return getMetrics(
+    markup,
+    fontSize,
+    lineHeight,
+    mathProps,
+    isMathJaxLoaded,
+    maxWidth,
+  ).imageMetrics;
 };
 
 const getSelectedMathElements = (
@@ -877,10 +892,17 @@ const measureMathElement = function (element, next) {
     return { width, height };
   }
   const fontSize = next?.fontSize ?? element.fontSize;
+  const lineHeight = element.lineHeight;
   const text = next?.text ?? element.text;
   const customData = next?.customData ?? element.customData;
   const mathProps = getMathProps.ensureMathProps(customData);
-  const metrics = getImageMetrics(text, fontSize, mathProps, isMathJaxLoaded);
+  const metrics = getImageMetrics(
+    text,
+    fontSize,
+    lineHeight,
+    mathProps,
+    isMathJaxLoaded,
+  );
   const { width, height } = metrics;
   return { width, height };
 } as SubtypeMethods["measureText"];
@@ -891,6 +913,7 @@ const renderMathElement = function (element, context, renderCb) {
   const _element = element as NonDeleted<ExcalidrawMathElement>;
   const text = _element.text;
   const fontSize = _element.fontSize;
+  const lineHeight = _element.lineHeight;
   const strokeColor = _element.strokeColor;
   const textAlign = _element.textAlign;
   const opacity = _element.opacity / 100;
@@ -1005,6 +1028,7 @@ const renderMathElement = function (element, context, renderCb) {
   element.customData!.ariaLabel = renderMath(
     text,
     fontSize,
+    lineHeight,
     textAlign,
     mathProps,
     isMathJaxLoaded,
@@ -1023,6 +1047,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   const mathProps = getMathProps.ensureMathProps(_element.customData);
   const text = _element.text;
   const fontSize = _element.fontSize;
+  const lineHeight = _element.lineHeight;
   const strokeColor = _element.strokeColor;
   const textAlign = _element.textAlign;
   const opacity = _element.opacity / 100;
@@ -1078,6 +1103,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   const { width, height } = getImageMetrics(
     text,
     fontSize,
+    lineHeight,
     mathProps,
     isMathJaxLoaded,
     parentWidth,
@@ -1140,6 +1166,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   element.customData!.ariaLabel = renderMath(
     text,
     fontSize,
+    lineHeight,
     textAlign,
     mathProps,
     isMathJaxLoaded,
@@ -1164,6 +1191,7 @@ const wrapMathElement = function (element, containerWidth, next) {
   const isMathJaxLoaded = mathJaxLoaded;
   const fontSize =
     next?.fontSize !== undefined ? next.fontSize : element.fontSize;
+  const lineHeight = element.lineHeight;
   const text = next?.text !== undefined ? next.text : element.originalText;
   const customData = next?.customData ?? element.customData;
   const mathProps = getMathProps.ensureMathProps(customData);
@@ -1178,7 +1206,13 @@ const wrapMathElement = function (element, containerWidth, next) {
   const maxWidth = containerWidth;
 
   const markup = markupText(text, mathProps, isMathJaxLoaded).markup;
-  const metrics = getMetrics(markup, fontSize, mathProps, isMathJaxLoaded);
+  const metrics = getMetrics(
+    markup,
+    fontSize,
+    lineHeight,
+    mathProps,
+    isMathJaxLoaded,
+  );
 
   const lines = consumeMathNewlines(text, mathProps, isMathJaxLoaded).split(
     isMathJaxLoaded ? getMathNewline(mathProps) : "\n",

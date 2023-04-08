@@ -163,7 +163,8 @@ const measureTest2: SubtypeMethods["measureText"] = function (element, next) {
     : next?.fontSize ?? element.fontSize;
   const fontFamily = element.fontFamily;
   const fontString = getFontString({ fontSize, fontFamily });
-  const metrics = textElementUtils.measureText(text, fontString);
+  const lineHeight = element.lineHeight;
+  const metrics = textElementUtils.measureText(text, fontString, lineHeight);
   const width = Math.max(metrics.width - 10, 0);
   const height = Math.max(metrics.height - 5, 0);
   return { width, height, baseline: 1 };
@@ -410,11 +411,7 @@ describe("subtypes", () => {
       }),
     ];
     await render(<ExcalidrawApp />, { localStorageData: { elements } });
-    const mockMeasureText = (
-      text: string,
-      font: FontString,
-      maxWidth?: number | null,
-    ) => {
+    const mockMeasureText = (text: string, font: FontString) => {
       if (text === testString) {
         let multiplier = 1;
         if (font.includes(`${DBFONTSIZE}`)) {
@@ -423,9 +420,7 @@ describe("subtypes", () => {
         if (font.includes(`${TRFONTSIZE}`)) {
           multiplier = 3;
         }
-        const width = maxWidth
-          ? Math.min(multiplier * TWIDTH, maxWidth)
-          : multiplier * TWIDTH;
+        const width = multiplier * TWIDTH;
         const height = multiplier * THEIGHT;
         const baseline = multiplier * TBASELINE;
         return { width, height, baseline };

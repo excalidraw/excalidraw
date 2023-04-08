@@ -225,7 +225,12 @@ export type SubtypeMethods = {
   measureText: (
     element: Pick<
       ExcalidrawTextElement,
-      "subtype" | "customData" | "fontSize" | "fontFamily" | "text"
+      | "subtype"
+      | "customData"
+      | "fontSize"
+      | "fontFamily"
+      | "text"
+      | "lineHeight"
     >,
     next?: {
       fontSize?: number;
@@ -247,7 +252,12 @@ export type SubtypeMethods = {
   wrapText: (
     element: Pick<
       ExcalidrawTextElement,
-      "subtype" | "customData" | "fontSize" | "fontFamily" | "originalText"
+      | "subtype"
+      | "customData"
+      | "fontSize"
+      | "fontFamily"
+      | "originalText"
+      | "lineHeight"
     >,
     containerWidth: number,
     next?: {
