@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useEffect } from "react";
+import React, { useLayoutEffect, useRef, useEffect, useState } from "react";
 import "./Popover.scss";
 import { unstable_batchedUpdates } from "react-dom";
 import { queryFocusableElements } from "../utils";
@@ -30,6 +30,9 @@ export const Popover = ({
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const container = popoverRef.current;
+
+  const [leftPosition, setLeftPosition] = useState(`${left}px`);
+  const [topPosition, setTopPosition] = useState(`${top}px`);
 
   useEffect(() => {
     if (!container) {
@@ -73,9 +76,11 @@ export const Popover = ({
       //Position correctly when clicked on rightmost part or the bottom part of viewport
       if (x + width - offsetLeft > viewportWidth) {
         element.style.left = `${viewportWidth - width - 10}px`;
+        setLeftPosition(`${viewportWidth - width - 10}px`);
       }
       if (y + height - offsetTop > viewportHeight) {
         element.style.top = `${viewportHeight - height}px`;
+        setTopPosition(`${viewportHeight - height}px`);
       }
 
       //Resize to fit viewport on smaller screens
@@ -105,7 +110,11 @@ export const Popover = ({
   }, [onCloseRequest]);
 
   return (
-    <div className="popover" style={{ top, left }} ref={popoverRef}>
+    <div
+      className="popover"
+      style={{ top: topPosition, left: leftPosition }}
+      ref={popoverRef}
+    >
       {children}
     </div>
   );
