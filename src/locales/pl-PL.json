@@ -121,10 +121,10 @@
       "exit": ""
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Zablokuj",
+      "unlock": "Odblokuj",
+      "lockAll": "Zablokuj wszystko",
+      "unlockAll": "Odblokuj wszystko"
     },
     "statusPublished": "Opublikowano",
     "sidebarLock": "Panel boczny zawsze otwarty"
@@ -333,7 +333,7 @@
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
     "zoomToSelection": "Przybliż do zaznaczenia",
     "toggleElementLock": "",
-    "movePageUpDown": "",
+    "movePageUpDown": "Przesuń stronę w górę/w dół",
     "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
