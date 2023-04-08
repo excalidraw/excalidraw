@@ -41,7 +41,7 @@ export const isSomeElementSelected = (
 export const getCommonAttributeOfSelectedElements = <T>(
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  getAttribute: (element: ExcalidrawElement) => T,
+  getAttribute: (element: ExcalidrawElement) => T | null,
 ): T | null => {
   const attributes = Array.from(
     new Set(
@@ -50,7 +50,8 @@ export const getCommonAttributeOfSelectedElements = <T>(
       ),
     ),
   );
-  return attributes.length === 1 ? attributes[0] : null;
+  const nonNullableAttributes = attributes.filter((item) => item !== null);
+  return nonNullableAttributes.length === 1 ? nonNullableAttributes[0] : null;
 };
 
 export const getSelectedElements = (
