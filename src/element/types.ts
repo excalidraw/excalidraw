@@ -8,7 +8,7 @@ import {
 } from "../constants";
 import { MarkNonNullable, ValueOf } from "../utility-types";
 
-export type ChartType = "bar" | "line";
+export type ChartType = "bar" | "line" | "table";
 export type FillStyle = "hachure" | "cross-hatch" | "solid";
 export type FontFamilyKeys = keyof typeof FONT_FAMILY;
 export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];

@@ -19,7 +19,8 @@ const GRID_OPACITY = 50;
 export interface Spreadsheet {
   title: string | null;
   labels: string[] | null;
-  values: number[];
+  values: number[] | null;
+  cells?: string[][];
 }
 
 export const NOT_SPREADSHEET = "NOT_SPREADSHEET";
@@ -49,8 +50,16 @@ const isNumericColumn = (lines: string[][], columnIndex: number) =>
 export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const numCols = cells[0].length;
 
-  if (numCols > 2) {
-    return { type: NOT_SPREADSHEET, reason: "More than 2 columns" };
+  if (numCols > 2 && cells.length > 1) {
+    return {
+      type: VALID_SPREADSHEET,
+      spreadsheet: {
+        title: null,
+        labels: null,
+        values: null,
+        cells,
+      },
+    };
   }
 
   if (numCols === 1) {
@@ -73,6 +82,7 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
         title: hasHeader ? cells[0][0] : null,
         labels: null,
         values: values as number[],
+        cells,
       },
     };
   }
@@ -100,6 +110,7 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
       title: hasHeader ? cells[0][valueColumnIndex] : null,
       labels: rows.map((row) => row[labelColumnIndex]),
       values: rows.map((row) => tryParseNumber(row[valueColumnIndex])!),
+      cells,
     },
   };
 };
@@ -127,7 +138,7 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
     .map((line) => line.trim().split("\t"));
 
   // Check for comma separated files
-  if (lines.length && lines[0].length !== 2) {
+  if (lines.length && lines[0][0].includes(",")) {
     lines = text
       .trim()
       .split("\n")
@@ -181,7 +192,7 @@ const commonProps = {
 
 const getChartDimentions = (spreadsheet: Spreadsheet) => {
   const chartWidth =
-    (BAR_WIDTH + BAR_GAP) * spreadsheet.values.length + BAR_GAP;
+    (BAR_WIDTH + BAR_GAP) * spreadsheet.values!.length + BAR_GAP;
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
   return { chartWidth, chartHeight };
 };
@@ -235,7 +246,7 @@ const chartYLabels = (
     ...commonProps,
     x: x - BAR_GAP,
     y: y - BAR_HEIGHT - minYLabel.height / 2,
-    text: Math.max(...spreadsheet.values).toLocaleString(),
+    text: Math.max(...spreadsheet.values!).toLocaleString(),
     textAlign: "right",
   });
 
@@ -358,11 +369,11 @@ const chartTypeBar = (
   x: number,
   y: number,
 ): ChartElements => {
-  const max = Math.max(...spreadsheet.values);
+  const max = Math.max(...spreadsheet.values!);
   const groupId = randomId();
   const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
 
-  const bars = spreadsheet.values.map((value, index) => {
+  const bars = spreadsheet.values!.map((value, index) => {
     const barHeight = (value / max) * BAR_HEIGHT;
     return newElement({
       backgroundColor,
@@ -394,13 +405,13 @@ const chartTypeLine = (
   x: number,
   y: number,
 ): ChartElements => {
-  const max = Math.max(...spreadsheet.values);
+  const max = Math.max(...spreadsheet.values!);
   const groupId = randomId();
   const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
 
   let index = 0;
   const points = [];
-  for (const value of spreadsheet.values) {
+  for (const value of spreadsheet.values!) {
     const cx = index * (BAR_WIDTH + BAR_GAP);
     const cy = -(value / max) * BAR_HEIGHT;
     points.push([cx, cy]);
@@ -427,7 +438,7 @@ const chartTypeLine = (
     points: points as any,
   });
 
-  const dots = spreadsheet.values.map((value, index) => {
+  const dots = spreadsheet.values!.map((value, index) => {
     const cx = index * (BAR_WIDTH + BAR_GAP) + BAR_GAP / 2;
     const cy = -(value / max) * BAR_HEIGHT + BAR_GAP / 2;
     return newElement({
@@ -444,7 +455,7 @@ const chartTypeLine = (
     });
   });
 
-  const lines = spreadsheet.values.map((value, index) => {
+  const lines = spreadsheet.values!.map((value, index) => {
     const cx = index * (BAR_WIDTH + BAR_GAP) + BAR_GAP / 2;
     const cy = (value / max) * BAR_HEIGHT + BAR_GAP / 2 + BAR_GAP;
     return newLinearElement({
@@ -481,14 +492,89 @@ const chartTypeLine = (
   ];
 };
 
+const table = (
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+): ChartElements => {
+  const groupId = randomId();
+  const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+
+  const numberOfColumns = spreadsheet.cells![0].length + 1;
+  const numberOfRows = spreadsheet.cells!.length + 1;
+  const cellHeight = commonProps.fontSize * 2;
+  const cellWidth =
+    Math.max(...spreadsheet.cells!.flat().map((element) => element.length)) *
+    commonProps.fontSize;
+
+  const columns = new Array(numberOfColumns).fill(true).map((_, i) =>
+    newLinearElement({
+      backgroundColor,
+      groupIds: [groupId],
+      ...commonProps,
+      type: "line",
+      x: x + i * cellWidth,
+      y,
+      startArrowhead: null,
+      endArrowhead: null,
+      strokeWidth: 2,
+      height: cellHeight * (numberOfRows - 1),
+      points: [
+        [0, 0],
+        [0, cellHeight * (numberOfRows - 1)],
+      ],
+    }),
+  );
+
+  const rows = new Array(numberOfRows).fill(true).map((_, i) =>
+    newLinearElement({
+      backgroundColor,
+      groupIds: [groupId],
+      ...commonProps,
+      type: "line",
+      x,
+      y: y + i * cellHeight,
+      startArrowhead: null,
+      endArrowhead: null,
+      strokeWidth: 2,
+      width: cellWidth * (numberOfColumns - 1),
+      points: [
+        [0, 0],
+        [cellWidth * (numberOfColumns - 1), 0],
+      ],
+    }),
+  );
+
+  const cellsContent = spreadsheet
+    .cells!.map((rows, i) =>
+      rows.map((content, j) =>
+        newTextElement({
+          ...commonProps,
+          groupIds: [groupId],
+          text: content,
+          x: x + j * cellWidth + cellWidth / 2,
+          y: y + i * cellHeight + cellHeight / 2,
+          roundness: null,
+          strokeStyle: "solid",
+          textAlign: "center",
+          backgroundColor,
+        }),
+      ),
+    )
+    .flat();
+
+  return [...columns, ...rows, ...cellsContent];
+};
+
 export const renderSpreadsheet = (
   chartType: string,
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
 ): ChartElements => {
-  if (chartType === "line") {
-    return chartTypeLine(spreadsheet, x, y);
-  }
-  return chartTypeBar(spreadsheet, x, y);
+  return chartType === "line"
+    ? chartTypeLine(spreadsheet, x, y)
+    : chartType === "bar"
+    ? chartTypeBar(spreadsheet, x, y)
+    : table(spreadsheet, x, y);
 };
