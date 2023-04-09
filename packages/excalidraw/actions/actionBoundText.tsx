@@ -29,10 +29,11 @@ import {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
 } from "../element/types";
-import { AppState } from "../types";
+import { AppClassProperties, AppState, ExcalidrawProps } from "../types";
 import { Mutable } from "../utility-types";
 import { getFontString } from "../utils";
 import { register } from "./register";
+import { CODES } from "../keys";
 
 export const actionUnbindText = register({
   name: "unbindText",
@@ -88,39 +89,46 @@ export const actionUnbindText = register({
       commitToHistory: true,
     };
   },
+  keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.B,
 });
+
+const checkIfBindTextPossible = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  app: AppClassProperties,
+) => {
+  const selectedElements = app.scene.getSelectedElements(appState);
+
+  if (selectedElements.length === 2) {
+    const textElement =
+      isTextElement(selectedElements[0]) || isTextElement(selectedElements[1]);
+
+    let bindingContainer;
+    if (isTextBindableContainer(selectedElements[0])) {
+      bindingContainer = selectedElements[0];
+    } else if (isTextBindableContainer(selectedElements[1])) {
+      bindingContainer = selectedElements[1];
+    }
+    if (
+      textElement &&
+      bindingContainer &&
+      getBoundTextElement(
+        bindingContainer,
+        app.scene.getNonDeletedElementsMap(),
+      ) === null
+    ) {
+      return true;
+    }
+  }
+  return false;
+};
 
 export const actionBindText = register({
   name: "bindText",
   contextItemLabel: "labels.bindText",
   trackEvent: { category: "element" },
-  predicate: (elements, appState, _, app) => {
-    const selectedElements = app.scene.getSelectedElements(appState);
-
-    if (selectedElements.length === 2) {
-      const textElement =
-        isTextElement(selectedElements[0]) ||
-        isTextElement(selectedElements[1]);
-
-      let bindingContainer;
-      if (isTextBindableContainer(selectedElements[0])) {
-        bindingContainer = selectedElements[0];
-      } else if (isTextBindableContainer(selectedElements[1])) {
-        bindingContainer = selectedElements[1];
-      }
-      if (
-        textElement &&
-        bindingContainer &&
-        getBoundTextElement(
-          bindingContainer,
-          app.scene.getNonDeletedElementsMap(),
-        ) === null
-      ) {
-        return true;
-      }
-    }
-    return false;
-  },
+  predicate: (elements, appState, _, app) =>
+    checkIfBindTextPossible(elements, appState, app),
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
 
@@ -164,6 +172,11 @@ export const actionBindText = register({
       commitToHistory: true,
     };
   },
+  keyTest: (event, appState, elements, app) =>
+    event.altKey &&
+    event.code === CODES.B &&
+    !event.shiftKey &&
+    checkIfBindTextPossible(elements, appState, app),
 });
 
 const pushTextAboveContainer = (
@@ -318,4 +331,9 @@ export const actionWrapTextInContainer = register({
       commitToHistory: true,
     };
   },
+  keyTest: (event, appState, elements, app) =>
+    event.altKey &&
+    event.code === CODES.B &&
+    !event.shiftKey &&
+    app.scene.getSelectedElements(appState).length === 1,
 });
