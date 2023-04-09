@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
 
-import { RoughCanvas } from "roughjs/bin/canvas";
-import rough from "roughjs/bin/rough";
+import { RoughCanvas } from "@excalidraw/roughjs/bin/canvas";
+import rough from "@excalidraw/roughjs/bin/rough";
 import clsx from "clsx";
 import { nanoid } from "nanoid";
 

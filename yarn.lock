@@ -1484,6 +1484,15 @@
   resolved "https://registry.yarnpkg.com/@excalidraw/prettier-config/-/prettier-config-1.0.2.tgz#b7c061c99cee2f78b9ca470ea1fbd602683bba65"
   integrity sha512-rFIq8+A8WvkEzBsF++Rw6gzxE+hU3ZNkdg8foI+Upz2y/rOC/gUpWJaggPbCkoH3nlREVU59axQjZ1+F6ePRGg==
 
+"@excalidraw/roughjs@4.5.3":
+  version "4.5.3"
+  resolved "https://registry.yarnpkg.com/@excalidraw/roughjs/-/roughjs-4.5.3.tgz#7d91897bfd1aaeb19a48d5272bd4776cb19f015b"
+  integrity sha512-X9HPfNjPLNHt+gN7t1LN7nN4h4o8M2EWuN/Y4YgG0ODsDZn51gRBeIPuhSo2hsDgLeTQHnkrmpPTm4XeeQVtoA==
+  dependencies:
+    path-data-parser "^0.1.0"
+    points-on-curve "^0.2.0"
+    points-on-path "^0.2.1"
+
 "@firebase/analytics-types@0.4.0":
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/@firebase/analytics-types/-/analytics-types-0.4.0.tgz#d6716f9fa36a6e340bc0ecfe68af325aa6f60508"

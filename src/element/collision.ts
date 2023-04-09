@@ -30,7 +30,7 @@ import {
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
 import { Point } from "../types";
-import { Drawable } from "roughjs/bin/core";
+import { Drawable } from "@excalidraw/roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
 import { hasBoundTextElement, isImageElement } from "./typeChecks";

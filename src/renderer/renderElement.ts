@@ -21,15 +21,15 @@ import {
   getElementAbsoluteCoords,
   getArrowheadPoints,
 } from "../element/bounds";
-import { RoughCanvas } from "roughjs/bin/canvas";
-import { Drawable, Options } from "roughjs/bin/core";
-import { RoughSVG } from "roughjs/bin/svg";
-import { RoughGenerator } from "roughjs/bin/generator";
+import { RoughCanvas } from "@excalidraw/roughjs/bin/canvas";
+import { Drawable, Options } from "@excalidraw/roughjs/bin/core";
+import { RoughSVG } from "@excalidraw/roughjs/bin/svg";
+import { RoughGenerator } from "@excalidraw/roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
-import rough from "roughjs/bin/rough";
+import rough from "@excalidraw/roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {

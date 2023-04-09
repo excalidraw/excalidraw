@@ -1,4 +1,4 @@
-import rough from "roughjs/bin/rough";
+import rough from "@excalidraw/roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
