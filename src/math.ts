@@ -472,3 +472,11 @@ export const isRightAngle = (angle: number) => {
   // angle, which we can check with modulo after rounding.
   return Math.round((angle / Math.PI) * 10000) % 5000 === 0;
 };
+
+export const radianToDegree = (r: number) => {
+  return (r * 180) / Math.PI;
+};
+
+export const degreeToRadian = (d: number) => {
+  return (d / 180) * Math.PI;
+};

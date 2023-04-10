@@ -5,6 +5,7 @@ import {
 } from "../element/types";
 import { getNonDeletedElements, isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { nanoid } from "nanoid";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -56,6 +57,7 @@ class Scene {
   private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
   private elements: readonly ExcalidrawElement[] = [];
   private elementsMap = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
+  version: string = nanoid();
 
   getElementsIncludingDeleted() {
     return this.elements;
@@ -120,6 +122,10 @@ class Scene {
   }
 
   informMutation() {
+    // we update the version of the scene when we want to inform callbacks of
+    // changes to the scene
+    this.version = nanoid();
+
     for (const callback of Array.from(this.callbacks)) {
       callback();
     }

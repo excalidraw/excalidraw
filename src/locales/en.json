@@ -245,7 +245,7 @@
     "ellipse": "Ellipse",
     "arrow": "Arrow",
     "line": "Line",
-    "freeDraw": "Freedraw",
+    "freedraw": "Freedraw",
     "text": "Text",
     "image": "Image",
     "group": "Group"

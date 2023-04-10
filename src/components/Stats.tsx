@@ -1,16 +1,23 @@
-import React from "react";
+import { nanoid } from "nanoid";
+import React, { useEffect, useMemo, useState } from "react";
 import { getCommonBounds } from "../element/bounds";
 import { mutateElement } from "../element/mutateElement";
-import { ExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
+import { degreeToRadian, radianToDegree } from "../math";
 import { getTargetElements } from "../scene";
 import Scene from "../scene/Scene";
 import { AppState, ExcalidrawProps } from "../types";
 import { CloseIcon } from "./icons";
 import { Island } from "./Island";
 import "./Stats.scss";
+import { throttle } from "lodash";
 
+const STATS_TIMEOUT = 50;
 interface StatsProps {
   appState: AppState;
   scene: Scene;
@@ -19,47 +26,113 @@ interface StatsProps {
   renderCustomStats: ExcalidrawProps["renderCustomStats"];
 }
 
+type ElementStatItem = {
+  label: string;
+  value: number;
+  element: NonDeletedExcalidrawElement;
+  version: string;
+  property: "x" | "y" | "width" | "height" | "angle";
+};
+
 export const Stats = (props: StatsProps) => {
   const elements = props.scene.getNonDeletedElements();
-  const boundingBox = getCommonBounds(elements);
   const selectedElements = getTargetElements(elements, props.appState);
-  const selectedBoundingBox = getCommonBounds(selectedElements);
 
-  const stats =
-    selectedElements.length === 1
-      ? [
-          {
-            label: "X",
-            value: Math.round(selectedBoundingBox[0]),
-            element: selectedElements[0],
-            property: "x",
-          },
-          {
-            label: "Y",
-            value: Math.round(selectedBoundingBox[1]),
-            element: selectedElements[0],
-            property: "y",
-          },
-          {
-            label: "W",
-            value: Math.round(selectedBoundingBox[2] - selectedBoundingBox[0]),
-            element: selectedElements[0],
-            property: "width",
-          },
-          {
-            label: "H",
-            value: Math.round(selectedBoundingBox[3] - selectedBoundingBox[1]),
-            element: selectedElements[0],
-            property: "height",
-          },
-          {
-            label: "A",
-            value: selectedElements[0].angle,
-            element: selectedElements[0],
-            property: "angle",
-          },
-        ]
-      : [];
+  const singleElement =
+    selectedElements.length === 1 ? selectedElements[0] : null;
+
+  const [sceneDimension, setSceneDimension] = useState<{
+    width: number;
+    height: number;
+  }>({
+    width: 0,
+    height: 0,
+  });
+
+  const throttledSetSceneDimension = useMemo(
+    () =>
+      throttle((elements: readonly NonDeletedExcalidrawElement[]) => {
+        const boundingBox = getCommonBounds(elements);
+        setSceneDimension({
+          width: Math.round(boundingBox[2]) - Math.round(boundingBox[0]),
+          height: Math.round(boundingBox[3]) - Math.round(boundingBox[1]),
+        });
+      }, STATS_TIMEOUT),
+    [],
+  );
+
+  useEffect(() => {
+    throttledSetSceneDimension(elements);
+  }, [props.scene.version, elements, throttledSetSceneDimension]);
+
+  useEffect(
+    () => () => throttledSetSceneDimension.cancel(),
+    [throttledSetSceneDimension],
+  );
+
+  const [elementStats, setElementStats] = useState<ElementStatItem[]>([]);
+
+  const throttledSetElementStats = useMemo(
+    () =>
+      throttle((element: NonDeletedExcalidrawElement | null) => {
+        const stats: ElementStatItem[] = element
+          ? [
+              {
+                label: "X",
+                value: Math.round(element.x),
+                element,
+                property: "x",
+                version: nanoid(),
+              },
+              {
+                label: "Y",
+                value: Math.round(element.y),
+                element,
+                property: "y",
+                version: nanoid(),
+              },
+              {
+                label: "W",
+                value: Math.round(element.width),
+                element,
+                property: "width",
+                version: nanoid(),
+              },
+              {
+                label: "H",
+                value: Math.round(element.height),
+                element,
+                property: "height",
+                version: nanoid(),
+              },
+              {
+                label: "A",
+                value: Math.round(radianToDegree(element.angle) * 100) / 100,
+                element,
+                property: "angle",
+                version: nanoid(),
+              },
+            ]
+          : [];
+
+        setElementStats(stats);
+      }, STATS_TIMEOUT),
+    [],
+  );
+
+  useEffect(() => {
+    throttledSetElementStats(singleElement);
+  }, [
+    singleElement,
+    singleElement?.version,
+    singleElement?.versionNonce,
+    throttledSetElementStats,
+  ]);
+
+  useEffect(
+    () => () => throttledSetElementStats.cancel(),
+    [throttledSetElementStats],
+  );
 
   return (
     <div className="Stats">
@@ -80,31 +153,30 @@ export const Stats = (props: StatsProps) => {
               </tr>
               <tr>
                 <td>{t("stats.width")}</td>
-                <td>
-                  {Math.round(boundingBox[2]) - Math.round(boundingBox[0])}
-                </td>
+                <td>{sceneDimension.width}</td>
               </tr>
               <tr>
                 <td>{t("stats.height")}</td>
-                <td>
-                  {Math.round(boundingBox[3]) - Math.round(boundingBox[1])}
-                </td>
+                <td>{sceneDimension.height}</td>
               </tr>
               {props.renderCustomStats?.(elements, props.appState)}
             </tbody>
           </table>
         </div>
 
-        {selectedElements.length > 0 && (
-          <div className="section">
+        {singleElement && (
+          <div
+            className="section"
+            style={{
+              marginTop: 12,
+            }}
+          >
             <h3>{t("stats.elementStats")}</h3>
 
             <div className="sectionContent">
-              {selectedElements.length === 1 && (
-                <div className="elementType">
-                  {t(`element.${selectedElements[0].type}`)}
-                </div>
-              )}
+              <div className="elementType">
+                {t(`element.${singleElement.type}`)}
+              </div>
 
               <div
                 style={{
@@ -113,33 +185,64 @@ export const Stats = (props: StatsProps) => {
                   gap: "4px 8px",
                 }}
               >
-                {stats.map((statsItem) => (
-                  <label
-                    className="color-input-container"
-                    key={statsItem.property}
-                  >
-                    <div
-                      className="color-picker-hash"
-                      style={{
-                        width: "30px",
-                      }}
+                {elementStats.map((statsItem) => {
+                  return (
+                    <label
+                      className="color-input-container"
+                      key={statsItem.property}
                     >
-                      {statsItem.label}
-                    </div>
-                    <input
-                      id={statsItem.label}
-                      key={statsItem.value}
-                      defaultValue={statsItem.value}
-                      className="color-picker-input"
-                      style={{
-                        width: "55px",
-                      }}
-                      autoComplete="off"
-                      spellCheck="false"
-                      onKeyDown={(event) => {
-                        const value = Number(event.target.value);
+                      <div
+                        className="color-picker-hash"
+                        style={{
+                          width: "30px",
+                        }}
+                      >
+                        {statsItem.label}
+                      </div>
+                      <input
+                        id={statsItem.label}
+                        key={statsItem.version}
+                        defaultValue={statsItem.value}
+                        className="color-picker-input"
+                        style={{
+                          width: "55px",
+                        }}
+                        autoComplete="off"
+                        spellCheck="false"
+                        onKeyDown={(event) => {
+                          let value = Number(event.target.value);
 
-                        if (event.key === KEYS.ENTER) {
+                          if (isNaN(value)) {
+                            return;
+                          }
+
+                          value =
+                            statsItem.property === "angle"
+                              ? degreeToRadian(value)
+                              : value;
+
+                          if (event.key === KEYS.ENTER) {
+                            mutateElement(statsItem.element, {
+                              [statsItem.property]: value,
+                            });
+
+                            event.target.value = statsItem.element[
+                              statsItem.property as keyof ExcalidrawElement
+                            ] as string;
+                          }
+                        }}
+                        onBlur={(event) => {
+                          let value = Number(event.target.value);
+
+                          if (isNaN(value)) {
+                            return;
+                          }
+
+                          value =
+                            statsItem.property === "angle"
+                              ? degreeToRadian(value)
+                              : value;
+
                           if (!isNaN(value)) {
                             mutateElement(statsItem.element, {
                               [statsItem.property]: value,
@@ -149,24 +252,11 @@ export const Stats = (props: StatsProps) => {
                           event.target.value = statsItem.element[
                             statsItem.property as keyof ExcalidrawElement
                           ] as string;
-                        }
-                      }}
-                      onBlur={(event) => {
-                        const value = Number(event.target.value);
-
-                        if (!isNaN(value)) {
-                          mutateElement(statsItem.element, {
-                            [statsItem.property]: value,
-                          });
-                        }
-
-                        event.target.value = statsItem.element[
-                          statsItem.property as keyof ExcalidrawElement
-                        ] as string;
-                      }}
-                    ></input>
-                  </label>
-                ))}
+                        }}
+                      ></input>
+                    </label>
+                  );
+                })}
               </div>
             </div>
           </div>
