@@ -3062,7 +3062,11 @@ class App extends React.Component<AppProps, AppState> {
       this.state.editingLinearElement &&
       !this.state.editingLinearElement.isDragging
     ) {
-      console.log("handlePointerMove", "editingLinearElement", this.state.multiElement?.id );
+      console.log(
+        "handlePointerMove",
+        "editingLinearElement",
+        this.state.multiElement?.id,
+      );
       const editingLinearElement = LinearElementEditor.handlePointerMove(
         event,
         scenePointerX,
@@ -3118,7 +3122,9 @@ class App extends React.Component<AppProps, AppState> {
       setCursorForShape(this.canvas, this.state);
 
       if (lastPoint === lastCommittedPoint) {
-        console.log("handleCanvasPointerMove, lastPoint === lastCommittedPoint");
+        console.log(
+          "handleCanvasPointerMove, lastPoint === lastCommittedPoint",
+        );
         // if we haven't yet created a temp point and we're beyond commit-zone
         // threshold, add a point
         if (
@@ -3147,13 +3153,17 @@ class App extends React.Component<AppProps, AppState> {
           lastCommittedPoint[1],
         ) < LINE_CONFIRM_THRESHOLD
       ) {
-        console.log("handleCanvasPointerMove, lastPoint !== lastCommittedPoint, points.length>2, remove last point");
+        console.log(
+          "handleCanvasPointerMove, lastPoint !== lastCommittedPoint, points.length>2, remove last point",
+        );
         setCursor(this.canvas, CURSOR_TYPE.POINTER);
         mutateElement(multiElement, {
           points: points.slice(0, -1),
         });
       } else {
-        console.log("handleCanvasPointerMove, lastPoint !== lastCommittedPoint, points.length<=2");
+        console.log(
+          "handleCanvasPointerMove, lastPoint !== lastCommittedPoint, points.length<=2",
+        );
         const [gridX, gridY] = getGridPoint(
           scenePointerX,
           scenePointerY,
@@ -3595,7 +3605,10 @@ class App extends React.Component<AppProps, AppState> {
       this.state.activeTool.type === "arrow" ||
       this.state.activeTool.type === "line"
     ) {
-      console.log("handleLinearElementOnPointerDown",this.state.multiElement?.id);
+      console.log(
+        "handleLinearElementOnPointerDown",
+        this.state.multiElement?.id,
+      );
       this.handleLinearElementOnPointerDown(
         event,
         this.state.activeTool.type,
@@ -3627,7 +3640,10 @@ class App extends React.Component<AppProps, AppState> {
         y,
       });
     } else if (this.state.activeTool.type === "freedraw") {
-      console.log("handleFreeDrawElementOnPointerDown",this.state.multiElement?.id);
+      console.log(
+        "handleFreeDrawElementOnPointerDown",
+        this.state.multiElement?.id,
+      );
       this.handleFreeDrawElementOnPointerDown(
         event,
         this.state.activeTool.type,
