@@ -125,34 +125,14 @@
     />
 
     <link rel="stylesheet" href="fonts.css" type="text/css" />
-    <% if (process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD==="true" ) { %>
-    <script>
-      {
-        const _WebSocket = window.WebSocket;
-        window.WebSocket = function (url) {
-          if (/ws:\/\/localhost:.+?\/sockjs-node/.test(url)) {
-            console.info(
-              "[!!!] Live reload is disabled via process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD [!!!]",
-            );
-          } else {
-            return new _WebSocket(url);
-          }
-        };
-      }
-    </script>
-    <% } %>
     <script>
       window.EXCALIDRAW_ASSET_PATH = "/";
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
     </script>
-    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
-
-    <!-- LEGACY GOOGLE ANALYTICS -->
-    <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
     <script
       async
-      src="https://www.googletagmanager.com/gtag/js?id=%REACT_APP_GOOGLE_ANALYTICS_ID%"
+      src="https://www.googletagmanager.com/gtag/js?id="
     ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -160,36 +140,29 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-      gtag("config", "%REACT_APP_GOOGLE_ANALYTICS_ID%");
+      gtag("config", "");
     </script>
-    <% } %>
     <!-- end LEGACY GOOGLE ANALYTICS -->
 
     <!-- Matomo -->
-    <% if (process.env.REACT_APP_MATOMO_URL &&
-    process.env.REACT_APP_MATOMO_SITE_ID &&
-    process.env.REACT_APP_CDN_MATOMO_TRACKER_URL) { %>
     <script>
       var _paq = (window._paq = window._paq || []);
       /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
       _paq.push(["trackPageView"]);
       _paq.push(["enableLinkTracking"]);
       (function () {
-        var u = "%REACT_APP_MATOMO_URL%";
+        var u = "";
         _paq.push(["setTrackerUrl", u + "matomo.php"]);
-        _paq.push(["setSiteId", "%REACT_APP_MATOMO_SITE_ID%"]);
+        _paq.push(["setSiteId", ""]);
         var d = document,
           g = d.createElement("script"),
           s = d.getElementsByTagName("script")[0];
         g.async = true;
-        g.src = "%REACT_APP_CDN_MATOMO_TRACKER_URL%";
+        g.src = "";
         s.parentNode.insertBefore(g, s);
       })();
     </script>
-    <% } %>
     <!-- end Matomo analytics -->
-
-    <% } %>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
     <style>
