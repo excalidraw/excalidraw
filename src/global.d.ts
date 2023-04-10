@@ -38,13 +38,42 @@ interface CanvasRenderingContext2D {
   ) => void;
 }
 
-// https://github.com/facebook/create-react-app/blob/ddcb7d5/packages/react-scripts/lib/react-app.d.ts
+// https://vitejs.dev/guide/env-and-mode.html
+// https://www.npmjs.com/package/vite-plugin-environment
 declare namespace NodeJS {
   interface ProcessEnv {
-    readonly REACT_APP_BACKEND_V2_GET_URL: string;
-    readonly REACT_APP_BACKEND_V2_POST_URL: string;
-    readonly REACT_APP_PORTAL_URL: string;
-    readonly REACT_APP_FIREBASE_CONFIG: string;
+    VITE_BACKEND_V2_GET_URL: string;
+    VITE_BACKEND_V2_POST_URL: string;
+
+    VITE_LIBRARY_URL: string;
+    VITE_LIBRARY_BACKEND: string;
+
+    // collaboration WebSocket server (https: string
+    VITE_WS_SERVER_URL: string;
+
+    // set this only if using the collaboration workflow we use on excalidraw.com
+    VITE_PORTAL_URL: string;
+
+    VITE_FIREBASE_CONFIG: string;
+
+    // whether to enable Service Workers in development
+    VITE_DEV_ENABLE_SW: string;
+    // whether to disable live reload / HMR. Usuaully what you want to do when
+    // debugging Service Workers.
+    VITE_DEV_DISABLE_LIVE_RELOAD: string;
+
+    FAST_REFRESH: string;
+
+    // MATOMO
+    VITE_MATOMO_URL: string;
+    VITE_CDN_MATOMO_TRACKER_URL: string;
+    VITE_MATOMO_SITE_ID: string;
+
+    //Debug flags
+
+    // To enable bounding box for text containers
+    VITE_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX: string;
+    VITE_DISABLE_SENTRY: string;
   }
 }
 
