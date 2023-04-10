@@ -91,6 +91,7 @@
     "rewire": "6.0.0",
     "typescript": "4.9.4",
     "vite": "4.2.1",
+    "vite-plugin-ejs": "1.6.4",
     "vite-plugin-env-compatible": "1.1.1",
     "vite-plugin-svgr": "2.4.0",
     "vite-tsconfig-paths": "4.0.8"

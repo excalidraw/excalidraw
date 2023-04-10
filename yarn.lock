@@ -5167,6 +5167,13 @@ ejs@^3.1.6:
   dependencies:
     jake "^10.8.5"
 
+ejs@^3.1.8:
+  version "3.1.9"
+  resolved "https://registry.yarnpkg.com/ejs/-/ejs-3.1.9.tgz#03c9e8777fe12686a9effcef22303ca3d8eeb361"
+  integrity sha512-rC+QVNMJWv+MtPgkt0y+0rVEIdbtxVADApW9JXrUVlzHetgcyczP/E7DJmWJ4fJCZF2cPcBk0laWO9ZHMG3DmQ==
+  dependencies:
+    jake "^10.8.5"
+
 electron-to-chromium@^1.4.251:
   version "1.4.284"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.284.tgz#61046d1e4cab3a25238f6bf7413795270f125592"
@@ -10949,6 +10956,13 @@ vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
+
+vite-plugin-ejs@1.6.4:
+  version "1.6.4"
+  resolved "https://registry.yarnpkg.com/vite-plugin-ejs/-/vite-plugin-ejs-1.6.4.tgz#aa30820d8235774e717d902754a552480cf7758b"
+  integrity sha512-23p1RS4PiA0veXY5/gHZ60pl3pPvd8NEqdBsDgxNK8nM1rjFFDcVb0paNmuipzCgNP/Y0f/Id22M7Il4kvZ2jA==
+  dependencies:
+    ejs "^3.1.8"
 
 vite-plugin-env-compatible@1.1.1:
   version "1.1.1"
