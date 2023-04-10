@@ -330,18 +330,16 @@ export const getDOMMetrics = (
 
   if (isSafari) {
     const canvasHeight = getTextHeight(text, parseFloat(font), lineHeight);
-
-    // In Safari sometimes DOM height could be less than canvas height due to
-    // which text could go out of the bounding box hence shifting the baseline
-    // to make sure text is rendered correctly
+    const fontSize = parseFloat(font);
+    // In Safari the font size gets rounded off when rendering hence calculating the safari height and shifting the baseline if it differs
+    // from the actual canvas height
+    const domHeight = getTextHeight(text, Math.round(fontSize), lineHeight);
     if (canvasHeight > height) {
-      baseline += canvasHeight - height;
+      baseline += canvasHeight - domHeight;
     }
-    // In Safari sometimes DOM height could be more than canvas height due to
-    // which text could go out of the bounding box hence shifting the baseline
-    // to make sure text is rendered correctly
+
     if (height > canvasHeight) {
-      baseline -= height - canvasHeight;
+      baseline -= domHeight - canvasHeight;
     }
   }
   document.body.removeChild(container);

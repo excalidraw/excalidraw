@@ -35,7 +35,7 @@ import {
   getMaxContainerHeight,
   getMaxContainerWidth,
   computeContainerDimensionForBoundText,
-  getDOMMetrics,
+  detectLineHeight,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -272,19 +272,15 @@ export const textWysiwyg = ({
       } else {
         textElementWidth += 0.5;
       }
-      const { height: domHeight } = getDOMMetrics(
-        updatedTextElement.text,
-        getFontString(updatedTextElement),
-        updatedTextElement.lineHeight,
-      );
 
-      let lineHeight = element.lineHeight;
-      // In Safari sometimes DOM height could be more than canvas height due to
-      // which text could go out of the bounding box hence reducing the line
-      // height to render the text correctly
-      if (isSafari && domHeight > textElementHeight) {
-        lineHeight = (Math.floor(element.lineHeight * element.fontSize) /
-          element.fontSize) as ExcalidrawTextElement["lineHeight"];
+      let lineHeight = updatedTextElement.lineHeight;
+
+      // In Safari the font size gets rounded off when rendering hence calculating the line height by rounding off font size
+      if (isSafari) {
+        lineHeight = detectLineHeight({
+          ...updatedTextElement,
+          fontSize: Math.round(updatedTextElement.fontSize),
+        });
       }
 
       // Make sure text editor height doesn't go beyond viewport
