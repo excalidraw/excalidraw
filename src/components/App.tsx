@@ -3523,19 +3523,22 @@ class App extends React.Component<AppProps, AppState> {
       this.state.draggingElement.type === "freedraw"
     ) {
       const element = this.state.draggingElement;
-      this.setState((prevState) => {
-        return {
+      this.updateScene({
+        elements: this.scene
+          .getElementsIncludingDeleted()
+          .filter((el) => el.id !== element.id),
+        appState: {
           draggingElement: null,
           editingElement: null,
           startBoundElement: null,
           suggestedBindings: [],
-          selectedElementIds: Object.keys(prevState.selectedElementIds)
+          selectedElementIds: Object.keys(this.state.selectedElementIds)
             .filter((key) => key !== element.id)
             .reduce((obj: { [id: string]: boolean }, key) => {
-              obj[key] = prevState.selectedElementIds[key];
+              obj[key] = this.state.selectedElementIds[key];
               return obj;
             }, {}),
-        };
+        },
       });
       return;
     }
