@@ -37,6 +37,7 @@ import {
   TextAlignLeftIcon,
   TextAlignCenterIcon,
   TextAlignRightIcon,
+  FillZigZagIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -305,40 +306,55 @@ export const actionChangeFillStyle = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.fill")}</legend>
-      <ButtonIconSelect
-        options={[
-          {
-            value: "hachure",
-            text: t("labels.hachure"),
-            icon: FillHachureIcon,
-          },
-          {
-            value: "cross-hatch",
-            text: t("labels.crossHatch"),
-            icon: FillCrossHatchIcon,
-          },
-          {
-            value: "solid",
-            text: t("labels.solid"),
-            icon: FillSolidIcon,
-          },
-        ]}
-        group="fill"
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => element.fillStyle,
-          appState.currentItemFillStyle,
-        )}
-        onChange={(value) => {
-          updateData(value);
-        }}
-      />
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    const allElementsZigZag = selectedElements.every(
+      (el) => el.fillStyle === "zigzag",
+    );
+
+    return (
+      <fieldset>
+        <legend>{t("labels.fill")}</legend>
+        <ButtonIconSelect
+          type="button"
+          options={[
+            {
+              value: "hachure",
+              text: t("labels.hachure"),
+              icon: allElementsZigZag ? FillZigZagIcon : FillHachureIcon,
+              active: allElementsZigZag ? true : undefined,
+            },
+            {
+              value: "cross-hatch",
+              text: t("labels.crossHatch"),
+              icon: FillCrossHatchIcon,
+            },
+            {
+              value: "solid",
+              text: t("labels.solid"),
+              icon: FillSolidIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => element.fillStyle,
+            appState.currentItemFillStyle,
+          )}
+          onClick={(value, event) => {
+            const nextValue =
+              event.altKey &&
+              value === "hachure" &&
+              selectedElements.every((el) => el.fillStyle === "hachure")
+                ? "zigzag"
+                : value;
+
+            updateData(nextValue);
+          }}
+        />
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeStrokeWidth = register({
