@@ -279,6 +279,9 @@ export const textWysiwyg = ({
       );
 
       let lineHeight = element.lineHeight;
+      // In Safari sometimes DOM height could be more than canvas height due to
+      // which text could go out of the bounding box hence reducing the line
+      // height to render the text correctly
       if (isSafari && domHeight > textElementHeight) {
         lineHeight = (Math.floor(element.lineHeight * element.fontSize) /
           element.fontSize) as ExcalidrawTextElement["lineHeight"];

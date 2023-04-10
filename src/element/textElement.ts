@@ -367,9 +367,7 @@ export const getLineHeightInPx = (
   fontSize: ExcalidrawTextElement["fontSize"],
   lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
-  const res = fontSize * lineHeight;
-
-  return res;
+  return fontSize * lineHeight;
 };
 
 // FIXME rename to getApproxMinContainerHeight
