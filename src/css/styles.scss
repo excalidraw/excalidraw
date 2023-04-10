@@ -155,6 +155,9 @@
     margin: 1px;
   }
 
+  .welcome-screen-menu-item:focus-visible,
+  .dropdown-menu-item:focus-visible,
+  button:focus-visible,
   .buttonList label:focus-within,
   input:focus-visible {
     outline: transparent;
