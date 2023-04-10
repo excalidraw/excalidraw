@@ -3514,9 +3514,16 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ contextMenu: null });
     }
 
-    if(this.state.draggingElement) {
-      console.log("dragging element");
+    // if dragging element and pointer down, this is indicates
+    // a second finger on the screen 
+    if (
+      event.pointerType === "touch" &&
+      this.state.draggingElement &&
+      this.state.draggingElement.type === "freedraw"
+    ) {
+      return;
     }
+
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)
@@ -4815,7 +4822,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (draggingElement.type === "freedraw") { 
+      if (draggingElement.type === "freedraw") {
         const points = draggingElement.points;
         const dx = pointerCoords.x - draggingElement.x;
         const dy = pointerCoords.y - draggingElement.y;
