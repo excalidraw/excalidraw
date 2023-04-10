@@ -265,6 +265,9 @@ export const refreshTextDimensions = (
   textElement: ExcalidrawTextElement,
   text = textElement.text,
 ) => {
+  if (textElement.isDeleted) {
+    return;
+  }
   const container = getContainerElement(textElement);
   if (container) {
     text = wrapText(
