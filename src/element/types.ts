@@ -131,6 +131,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     fontSize: number;
     fontFamily: FontFamilyValues;
     text: string;
+    baseline: number;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
