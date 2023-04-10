@@ -3514,6 +3514,9 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ contextMenu: null });
     }
 
+    if(this.state.draggingElement) {
+      console.log("dragging element");
+    }
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)
