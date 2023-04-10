@@ -4355,6 +4355,7 @@ class App extends React.Component<AppProps, AppState> {
   ): void => {
     if (this.state.multiElement) {
       const { multiElement } = this.state;
+
       // finalize if completing a loop
       if (
         multiElement.type === "line" &&
