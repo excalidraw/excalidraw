@@ -12,7 +12,7 @@ export const trackEvent = (
       return;
     }
 
-    if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID && window.gtag) {
+    if (process.env.VITE_GOOGLE_ANALYTICS_ID && window.gtag) {
       window.gtag("event", action, {
         event_category: category,
         event_label: label,

@@ -865,7 +865,7 @@ const drawElementFromCanvas = (
     );
 
     if (
-      process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX &&
+      process.env.VITE_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX &&
       hasBoundTextElement(element)
     ) {
       const coords = getContainerCoords(element);
