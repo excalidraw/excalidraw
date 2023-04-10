@@ -38,7 +38,7 @@ import { MarkOptional, Mutable } from "../utility-types";
 import {
   detectLineHeight,
   getDefaultLineHeight,
-  getDOMMetrics,
+  measureBaseline,
 } from "../element/textElement";
 
 type RestoredAppState = Omit<
@@ -188,7 +188,7 @@ const restoreElement = (
           : // no element height likely means programmatic use, so default
             // to a fixed line height
             getDefaultLineHeight(element.fontFamily));
-      const { baseline } = getDOMMetrics(
+      const baseline = measureBaseline(
         element.text,
         getFontString(element),
         lineHeight,

@@ -291,11 +291,11 @@ export const measureText = (
   const fontSize = parseFloat(font);
   const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
-  const { baseline } = getDOMMetrics(text, font, lineHeight);
+  const baseline = measureBaseline(text, font, lineHeight);
   return { width, height, baseline };
 };
 
-export const getDOMMetrics = (
+export const measureBaseline = (
   text: string,
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
@@ -343,7 +343,7 @@ export const getDOMMetrics = (
     }
   }
   document.body.removeChild(container);
-  return { baseline, height };
+  return baseline;
 };
 
 /**
