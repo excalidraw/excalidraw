@@ -23,6 +23,7 @@ import {
   ExcalidrawTextElement,
 } from "../element/types";
 import { getSelectedElements } from "../scene";
+import { AppState } from "../types";
 import { getFontString } from "../utils";
 import { register } from "./register";
 
@@ -185,107 +186,110 @@ export const actionCreateContainerFromText = register({
   trackEvent: { category: "element" },
   predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
-    return selectedElements.length === 1 && isTextElement(selectedElements[0]);
+    const areTextElements = selectedElements.every((el) => isTextElement(el));
+    return selectedElements.length > 0 && areTextElements;
   },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
     );
-    const updatedElements = elements.slice();
-    if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
-      const textElement = selectedElements[0];
-      const container = newElement({
-        type: "rectangle",
-        backgroundColor: appState.currentItemBackgroundColor,
-        boundElements: [
-          ...(textElement.boundElements || []),
-          { id: textElement.id, type: "text" },
-        ],
-        angle: textElement.angle,
-        fillStyle: appState.currentItemFillStyle,
-        strokeColor: appState.currentItemStrokeColor,
-        roughness: appState.currentItemRoughness,
-        strokeWidth: appState.currentItemStrokeWidth,
-        strokeStyle: appState.currentItemStrokeStyle,
-        roundness:
-          appState.currentItemRoundness === "round"
-            ? {
-                type: isUsingAdaptiveRadius("rectangle")
-                  ? ROUNDNESS.ADAPTIVE_RADIUS
-                  : ROUNDNESS.PROPORTIONAL_RADIUS,
-              }
-            : null,
-        opacity: 100,
-        locked: false,
-        x: textElement.x - BOUND_TEXT_PADDING,
-        y: textElement.y - BOUND_TEXT_PADDING,
-        width: computeContainerDimensionForBoundText(
-          textElement.width,
-          "rectangle",
-        ),
-        height: computeContainerDimensionForBoundText(
-          textElement.height,
-          "rectangle",
-        ),
-        groupIds: textElement.groupIds,
-      });
+    let updatedElements: readonly ExcalidrawElement[] = elements.slice();
+    const containerIds: AppState["selectedElementIds"] = {};
 
-      // update bindings
-      if (textElement.boundElements?.length) {
-        const linearElementIds = textElement.boundElements
-          .filter((ele) => ele.type === "arrow")
-          .map((el) => el.id);
-        const linearElements = updatedElements.filter((ele) =>
-          linearElementIds.includes(ele.id),
-        ) as ExcalidrawLinearElement[];
-        linearElements.forEach((ele) => {
-          let startBinding = ele.startBinding;
-          let endBinding = ele.endBinding;
-
-          if (startBinding?.elementId === textElement.id) {
-            startBinding = {
-              ...startBinding,
-              elementId: container.id,
-            };
-          }
-
-          if (endBinding?.elementId === textElement.id) {
-            endBinding = { ...endBinding, elementId: container.id };
-          }
-
-          if (startBinding || endBinding) {
-            mutateElement(ele, { startBinding, endBinding });
-          }
+    for (const textElement of selectedElements) {
+      if (isTextElement(textElement)) {
+        const container = newElement({
+          type: "rectangle",
+          backgroundColor: appState.currentItemBackgroundColor,
+          boundElements: [
+            ...(textElement.boundElements || []),
+            { id: textElement.id, type: "text" },
+          ],
+          angle: textElement.angle,
+          fillStyle: appState.currentItemFillStyle,
+          strokeColor: appState.currentItemStrokeColor,
+          roughness: appState.currentItemRoughness,
+          strokeWidth: appState.currentItemStrokeWidth,
+          strokeStyle: appState.currentItemStrokeStyle,
+          roundness:
+            appState.currentItemRoundness === "round"
+              ? {
+                  type: isUsingAdaptiveRadius("rectangle")
+                    ? ROUNDNESS.ADAPTIVE_RADIUS
+                    : ROUNDNESS.PROPORTIONAL_RADIUS,
+                }
+              : null,
+          opacity: 100,
+          locked: false,
+          x: textElement.x - BOUND_TEXT_PADDING,
+          y: textElement.y - BOUND_TEXT_PADDING,
+          width: computeContainerDimensionForBoundText(
+            textElement.width,
+            "rectangle",
+          ),
+          height: computeContainerDimensionForBoundText(
+            textElement.height,
+            "rectangle",
+          ),
+          groupIds: textElement.groupIds,
         });
-      }
 
-      mutateElement(textElement, {
-        containerId: container.id,
-        verticalAlign: VERTICAL_ALIGN.MIDDLE,
-        boundElements: null,
-      });
-      redrawTextBoundingBox(textElement, container);
+        // update bindings
+        if (textElement.boundElements?.length) {
+          const linearElementIds = textElement.boundElements
+            .filter((ele) => ele.type === "arrow")
+            .map((el) => el.id);
+          const linearElements = updatedElements.filter((ele) =>
+            linearElementIds.includes(ele.id),
+          ) as ExcalidrawLinearElement[];
+          linearElements.forEach((ele) => {
+            let startBinding = ele.startBinding;
+            let endBinding = ele.endBinding;
 
-      return {
-        elements: pushContainerBelowText(
-          [...elements, container],
+            if (startBinding?.elementId === textElement.id) {
+              startBinding = {
+                ...startBinding,
+                elementId: container.id,
+              };
+            }
+
+            if (endBinding?.elementId === textElement.id) {
+              endBinding = { ...endBinding, elementId: container.id };
+            }
+
+            if (startBinding || endBinding) {
+              mutateElement(ele, { startBinding, endBinding }, false);
+            }
+          });
+        }
+
+        mutateElement(
+          textElement,
+          {
+            containerId: container.id,
+            verticalAlign: VERTICAL_ALIGN.MIDDLE,
+            boundElements: null,
+          },
+          false,
+        );
+        redrawTextBoundingBox(textElement, container);
+
+        updatedElements = pushContainerBelowText(
+          [...updatedElements, container],
           container,
           textElement,
-        ),
-        appState: {
-          ...appState,
-          selectedElementIds: {
-            [container.id]: true,
-            [textElement.id]: false,
-          },
-        },
-        commitToHistory: true,
-      };
+        );
+        containerIds[container.id] = true;
+      }
     }
+
     return {
       elements: updatedElements,
-      appState,
+      appState: {
+        ...appState,
+        selectedElementIds: containerIds,
+      },
       commitToHistory: true,
     };
   },

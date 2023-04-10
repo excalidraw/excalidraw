@@ -34,6 +34,7 @@ import {
   wrapText,
   getMaxContainerHeight,
   getMaxContainerWidth,
+  computeContainerDimensionForBoundText,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -208,11 +209,12 @@ export const textWysiwyg = ({
 
         // autogrow container height if text exceeds
         if (!isArrowElement(container) && textElementHeight > maxHeight) {
-          const diff = Math.min(
-            textElementHeight - maxHeight,
-            element.lineHeight,
+          const targetContainerHeight = computeContainerDimensionForBoundText(
+            textElementHeight,
+            container.type,
           );
-          mutateElement(container, { height: containerDims.height + diff });
+
+          mutateElement(container, { height: targetContainerHeight });
           return;
         } else if (
           // autoshrink container height until original container height
@@ -221,11 +223,11 @@ export const textWysiwyg = ({
           containerDims.height > originalContainerData.height &&
           textElementHeight < maxHeight
         ) {
-          const diff = Math.min(
-            maxHeight - textElementHeight,
-            element.lineHeight,
+          const targetContainerHeight = computeContainerDimensionForBoundText(
+            textElementHeight,
+            container.type,
           );
-          mutateElement(container, { height: containerDims.height - diff });
+          mutateElement(container, { height: targetContainerHeight });
         }
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
@@ -295,6 +297,7 @@ export const textWysiwyg = ({
         filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
       });
+      editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
       if (isTestEnv()) {
