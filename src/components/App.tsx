@@ -3512,7 +3512,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       const element = this.state.draggingElement;
       this.updateScene({
-        ...(element.points.length > 3
+        ...(element.points.length < 3
           ? {
               elements: this.scene
                 .getElementsIncludingDeleted()
