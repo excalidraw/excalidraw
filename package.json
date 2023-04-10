@@ -134,6 +134,7 @@
     "test": "yarn test:app",
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
+    "build:preview": "yarn build && vite preview --port 5000",
     "release": "node scripts/release.js"
   }
 }

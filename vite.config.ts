@@ -7,7 +7,7 @@ import { ViteEjsPlugin } from "vite-plugin-ejs";
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
-    outDir: 'build',
+    outDir: "build",
   },
   plugins: [
     react(),
