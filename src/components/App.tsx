@@ -4812,7 +4812,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (draggingElement.type === "freedraw") {
+      if (draggingElement.type === "freedraw") { 
         const points = draggingElement.points;
         const dx = pointerCoords.x - draggingElement.x;
         const dy = pointerCoords.y - draggingElement.y;
@@ -4822,6 +4822,7 @@ class App extends React.Component<AppProps, AppState> {
           lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
 
         if (!discardPoint) {
+          console.log("freedraw pointer move", event);
           const pressures = draggingElement.simulatePressure
             ? draggingElement.pressures
             : [...draggingElement.pressures, event.pressure];
