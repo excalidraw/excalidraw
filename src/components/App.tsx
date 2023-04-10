@@ -3502,7 +3502,9 @@ class App extends React.Component<AppProps, AppState> {
 
     // if dragging element is freedraw and another pointerdown event occurs
     // a second finger is on the screen
-    // discard the freedraw element
+    // discard the freedraw element if it is very short because it is likely
+    // just a spike, otherwise finalize the freedraw element when the second
+    // finger is lifted
     if (
       event.pointerType === "touch" &&
       this.state.draggingElement &&
@@ -3510,9 +3512,13 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       const element = this.state.draggingElement;
       this.updateScene({
-        elements: this.scene
-          .getElementsIncludingDeleted()
-          .filter((el) => el.id !== element.id),
+        ...(element.points.length > 3
+          ? {
+              elements: this.scene
+                .getElementsIncludingDeleted()
+                .filter((el) => el.id !== element.id),
+            }
+          : {}),
         appState: {
           draggingElement: null,
           editingElement: null,
