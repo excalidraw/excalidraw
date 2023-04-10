@@ -3514,13 +3514,29 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ contextMenu: null });
     }
 
-    // if dragging element and pointer down, this is indicates
-    // a second finger on the screen 
+    // if dragging element is freedraw and another pointerdown event occurs
+    // a second finger is on the screen
+    // discard the freedraw element
     if (
       event.pointerType === "touch" &&
       this.state.draggingElement &&
       this.state.draggingElement.type === "freedraw"
     ) {
+      const element = this.state.draggingElement;
+      this.setState((prevState) => {
+        return {
+          draggingElement: null,
+          editingElement: null,
+          startBoundElement: null,
+          suggestedBindings: [],
+          selectedElementIds: Object.keys(prevState.selectedElementIds)
+            .filter((key) => key !== element.id)
+            .reduce((obj: { [id: string]: boolean }, key) => {
+              obj[key] = prevState.selectedElementIds[key];
+              return obj;
+            }, {}),
+        };
+      });
       return;
     }
 
