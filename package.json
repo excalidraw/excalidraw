@@ -77,6 +77,7 @@
     "@types/react-dom": "18.0.6",
     "@types/resize-observer-browser": "0.1.7",
     "@types/socket.io-client": "1.4.36",
+    "@vitejs/plugin-react": "3.1.0",
     "chai": "4.3.6",
     "dotenv": "16.0.1",
     "eslint-config-prettier": "8.5.0",
@@ -88,7 +89,10 @@
     "pepjs": "0.5.3",
     "prettier": "2.6.2",
     "rewire": "6.0.0",
-    "typescript": "4.9.4"
+    "typescript": "4.9.4",
+    "vite": "4.2.1",
+    "vite-plugin-svgr": "2.4.0",
+    "vite-tsconfig-paths": "4.0.8"
   },
   "engines": {
     "node": ">=14.0.0"
