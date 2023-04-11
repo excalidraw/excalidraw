@@ -30,6 +30,7 @@ import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
+import { KEYS } from "../../../keys";
 
 declare global {
   interface Window {
@@ -507,7 +508,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         }}
         onBlur={saveComment}
         onKeyDown={(event) => {
-          if (!event.shiftKey && event.key === "Enter") {
+          if (!event.shiftKey && event.key === KEYS.ENTER) {
             event.preventDefault();
             saveComment();
           }

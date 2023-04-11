@@ -3,6 +3,7 @@ import { getColor } from "./ColorPicker";
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import { KEYS } from "../../keys";
 
 interface ColorInputProps {
   color: string | null;
@@ -61,10 +62,10 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
         onKeyDown={(e) => {
-          if (e.key === "Tab") {
+          if (e.key === KEYS.TAB) {
             return;
           }
-          if (e.key === "Escape") {
+          if (e.key === KEYS.ESCAPE) {
             divRef.current?.focus();
           }
           e.stopPropagation();

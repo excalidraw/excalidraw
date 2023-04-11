@@ -4,6 +4,7 @@ import {
   ColorPaletteCustom,
   COLORS_PER_ROW,
 } from "../../colors";
+import { KEYS } from "../../keys";
 import {
   ActiveColorPickerSectionAtomType,
   colorPickerHotkeyBindings,
@@ -116,14 +117,14 @@ export const colorPickerKeyNavHandler = ({
   updateData,
   activeShade,
 }: ColorPickerKeyNavHandlerProps) => {
-  if (e.key === "Escape" || !hex) {
+  if (e.key === KEYS.ESCAPE || !hex) {
     updateData({ openPopup: null });
     return;
   }
 
   const colorObj = getColorNameAndShadeFromHex({ hex, palette });
 
-  if (e.key === "Tab") {
+  if (e.key === KEYS.TAB) {
     const sectionsMap: Record<
       NonNullable<ActiveColorPickerSectionAtomType>,
       boolean

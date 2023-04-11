@@ -17,6 +17,7 @@ import { trackEvent } from "../../analytics";
 import { getFrame } from "../../utils";
 import DialogActionButton from "../../components/DialogActionButton";
 import { useI18n } from "../../i18n";
+import { KEYS } from "../../keys";
 
 const getShareIcon = () => {
   const navigator = window.navigator as any;
@@ -148,7 +149,9 @@ const RoomDialog = ({
                 value={username.trim() || ""}
                 className="RoomDialog-username TextInput"
                 onChange={(event) => onUsernameChange(event.target.value)}
-                onKeyPress={(event) => event.key === "Enter" && handleClose()}
+                onKeyPress={(event) =>
+                  event.key === KEYS.ENTER && handleClose()
+                }
               />
             </div>
             <p>
