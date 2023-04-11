@@ -372,9 +372,11 @@ function App() {
   return (
     <div style={{ height: "500px" }}>
       <Excalidraw>
-        <button style={{ position: "absolute", zIndex: 10, height: "2rem" }} onClick={() => window.alert(t('labels.madeWithExcalidraw'))}>
+        <button
+          style={{ position: "absolute", zIndex: 10, height: "2rem" }}
+          onClick={() => window.alert(t("labels.madeWithExcalidraw"))}
+        >
           {t("buttons.confirm")}
-          
         </button>
       </Excalidraw>
     </div>
