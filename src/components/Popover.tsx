@@ -29,12 +29,14 @@ export const Popover = ({
 }: Props) => {
   const popoverRef = useRef<HTMLDivElement>(null);
 
-  const container = popoverRef.current;
-
   useEffect(() => {
+    const container = popoverRef.current;
+
     if (!container) {
       return;
     }
+
+    container.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === KEYS.TAB) {
@@ -44,15 +46,23 @@ export const Popover = ({
           (element) => element === activeElement,
         );
 
-        if (currentIndex === 0 && event.shiftKey) {
-          focusableElements[focusableElements.length - 1].focus();
+        if (activeElement === container) {
+          if (event.shiftKey) {
+            focusableElements[focusableElements.length - 1]?.focus();
+          } else {
+            focusableElements[0].focus();
+          }
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        } else if (currentIndex === 0 && event.shiftKey) {
+          focusableElements[focusableElements.length - 1]?.focus();
           event.preventDefault();
           event.stopImmediatePropagation();
         } else if (
           currentIndex === focusableElements.length - 1 &&
           !event.shiftKey
         ) {
-          focusableElements[0].focus();
+          focusableElements[0]?.focus();
           event.preventDefault();
           event.stopImmediatePropagation();
         }
@@ -62,7 +72,7 @@ export const Popover = ({
     container.addEventListener("keydown", handleKeyDown);
 
     return () => container.removeEventListener("keydown", handleKeyDown);
-  }, [container]);
+  }, []);
 
   const lastInitializedPosRef = useRef<{ top: number; left: number } | null>(
     null,
@@ -129,7 +139,7 @@ export const Popover = ({
   }, [onCloseRequest]);
 
   return (
-    <div className="popover" ref={popoverRef}>
+    <div className="popover" ref={popoverRef} tabIndex={-1}>
       {children}
     </div>
   );
