@@ -366,19 +366,18 @@ List of supported language codes. You can pass any of these to `Excalidraw`'s [`
 
 A hook that returns the current language code and translation helper function. You can use this to translate strings in the components you render as children of `<Excalidraw>`.
 
-```jsx
-import { Excalidraw, useI18n } from "@excalidraw/excalidraw";
-
-const SomeComponent = () => {
+```jsx live
+function App() {
   const { t } = useI18n();
-  return <button>{t("buttons.confirm")}</button>;
-};
-
-export default App = () => {
   return (
-    <Excalidraw>
-      <SomeComponent />
-    </Excalidraw>
+    <div style={{ height: "500px" }}>
+      <Excalidraw>
+        <button style={{ position: "absolute", zIndex: 10, height: "2rem" }} onClick={() => window.alert(t('labels.madeWithExcalidraw'))}>
+          {t("buttons.confirm")}
+          
+        </button>
+      </Excalidraw>
+    </div>
   );
-};
+}
 ```
