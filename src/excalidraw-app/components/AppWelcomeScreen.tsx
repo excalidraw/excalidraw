@@ -1,12 +1,13 @@
 import React from "react";
 import { PlusPromoIcon } from "../../components/icons";
-import { t } from "../../i18n";
+import { useI18n } from "../../i18n";
 import { WelcomeScreen } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 export const AppWelcomeScreen: React.FC<{
   setCollabDialogShown: (toggle: boolean) => any;
 }> = React.memo((props) => {
+  const { t } = useI18n();
   let headingContent;
 
   if (isExcalidrawPlusSignedUser) {

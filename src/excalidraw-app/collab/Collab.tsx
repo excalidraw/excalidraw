@@ -70,7 +70,7 @@ import { decryptData } from "../../data/encryption";
 import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
-import { jotaiStore } from "../../jotai";
+import { appJotaiStore } from "../app-jotai";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
@@ -167,7 +167,7 @@ class Collab extends PureComponent<Props, CollabState> {
       setUsername: this.setUsername,
     };
 
-    jotaiStore.set(collabAPIAtom, collabAPI);
+    appJotaiStore.set(collabAPIAtom, collabAPI);
     this.onOfflineStatusToggle();
 
     if (
@@ -185,7 +185,7 @@ class Collab extends PureComponent<Props, CollabState> {
   }
 
   onOfflineStatusToggle = () => {
-    jotaiStore.set(isOfflineAtom, !window.navigator.onLine);
+    appJotaiStore.set(isOfflineAtom, !window.navigator.onLine);
   };
 
   componentWillUnmount() {
@@ -208,10 +208,10 @@ class Collab extends PureComponent<Props, CollabState> {
     }
   }
 
-  isCollaborating = () => jotaiStore.get(isCollaboratingAtom)!;
+  isCollaborating = () => appJotaiStore.get(isCollaboratingAtom)!;
 
   private setIsCollaborating = (isCollaborating: boolean) => {
-    jotaiStore.set(isCollaboratingAtom, isCollaborating);
+    appJotaiStore.set(isCollaboratingAtom, isCollaborating);
   };
 
   private onUnload = () => {
@@ -804,7 +804,7 @@ class Collab extends PureComponent<Props, CollabState> {
   );
 
   handleClose = () => {
-    jotaiStore.set(collabDialogShownAtom, false);
+    appJotaiStore.set(collabDialogShownAtom, false);
   };
 
   setUsername = (username: string) => {
@@ -838,10 +838,9 @@ class Collab extends PureComponent<Props, CollabState> {
           />
         )}
         {errorMessage && (
-          <ErrorDialog
-            message={errorMessage}
-            onClose={() => this.setState({ errorMessage: "" })}
-          />
+          <ErrorDialog onClose={() => this.setState({ errorMessage: "" })}>
+            {errorMessage}
+          </ErrorDialog>
         )}
       </>
     );

@@ -17,7 +17,7 @@
     An open source virtual hand-drawn style whiteboard. </br>
     Collaborative and end-to-end encrypted. </br>
   <br />
-  </h3>
+  </h2>
 </div>
 
 <br />
@@ -70,7 +70,7 @@ The Excalidraw editor (npm package) supports:
 
 ## Excalidraw.com
 
-The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/maielo/new-readme/src/excalidraw-app) is part of this repository as well, and the app features:
+The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/master/src/excalidraw-app) is part of this repository as well, and the app features:
 
 - 📡&nbsp;PWA support (works offline).
 - 🤼&nbsp;Real-time collaboration.
