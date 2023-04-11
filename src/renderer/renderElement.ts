@@ -7,7 +7,6 @@ import {
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
-  ExcalidrawTextContainer,
 } from "../element/types";
 import {
   isTextElement,
