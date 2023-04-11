@@ -10,8 +10,6 @@ import {
   NonDeleted,
   GroupId,
   ExcalidrawBindableElement,
-  ExcalidrawTextContainer,
-  ExcalidrawTextElementWithContainer,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -61,16 +59,7 @@ import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
-import {
-  hasBoundTextElement,
-  isBoundToContainer,
-  isLinearElement,
-  isTextElement,
-} from "../element/typeChecks";
-import {
-  getBoundTextElement,
-  getBoundTextElementId,
-} from "../element/textElement";
+import { isLinearElement } from "../element/typeChecks";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
