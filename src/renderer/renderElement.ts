@@ -15,7 +15,6 @@ import {
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
-  isBoundToContainer,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -888,7 +887,6 @@ export const renderElement = (
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
   appState: AppState,
-  sceneElements: readonly NonDeletedExcalidrawElement[],
 ) => {
   const generator = rc.generator;
   switch (element.type) {
@@ -953,8 +951,8 @@ export const renderElement = (
         const cy = (y1 + y2) / 2 + renderConfig.scrollY;
         let shiftX = (x2 - x1) / 2 - (element.x - x1);
         let shiftY = (y2 - y1) / 2 - (element.y - y1);
-        if (isBoundToContainer(element)) {
-          const container = getContainerElement(element, sceneElements);
+        if (isTextElement(element)) {
+          const container = getContainerElement(element);
           if (isArrowElement(container)) {
             const boundTextCoords =
               LinearElementEditor.getBoundTextElementPosition(
@@ -971,7 +969,7 @@ export const renderElement = (
         if (shouldResetImageFilter(element, renderConfig)) {
           context.filter = "none";
         }
-        const boundTextElement = getBoundTextElement(element, sceneElements);
+        const boundTextElement = getBoundTextElement(element);
 
         if (isArrowElement(element) && boundTextElement) {
           const tempCanvas = document.createElement("canvas");
@@ -1110,7 +1108,6 @@ export const renderElementToSvg = (
   files: BinaryFiles,
   offsetX: number,
   offsetY: number,
-  sceneElements: NonDeletedExcalidrawElement[],
   exportWithDarkMode?: boolean,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -1177,7 +1174,7 @@ export const renderElementToSvg = (
     }
     case "line":
     case "arrow": {
-      const boundText = getBoundTextElement(element, sceneElements);
+      const boundText = getBoundTextElement(element);
       const maskPath = svgRoot.ownerDocument!.createElementNS(SVG_NS, "mask");
       if (boundText) {
         maskPath.setAttribute("id", `mask-${element.id}`);

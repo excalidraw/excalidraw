@@ -409,7 +409,7 @@ export const _renderScene = ({
       undefined;
     visibleElements.forEach((element) => {
       try {
-        renderElement(element, rc, context, renderConfig, appState, elements);
+        renderElement(element, rc, context, renderConfig, appState);
         // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
         // ShapeCache returns empty hence making sure that we get the
         // correct element from visible elements
@@ -445,7 +445,6 @@ export const _renderScene = ({
           context,
           renderConfig,
           appState,
-          elements,
         );
       } catch (error: any) {
         console.error(error);
@@ -1146,21 +1145,21 @@ export const renderSceneToSvg = (
     return;
   }
   // render elements
-  const visibleElements = elements.filter((ele) => !ele.isDeleted);
-  visibleElements.forEach((element, index) => {
-    try {
-      renderElementToSvg(
-        element,
-        rsvg,
-        svgRoot,
-        files,
-        element.x + offsetX,
-        element.y + offsetY,
-        visibleElements,
-        exportWithDarkMode,
-      );
-    } catch (error: any) {
-      console.error(error);
+  elements.forEach((element, index) => {
+    if (!element.isDeleted) {
+      try {
+        renderElementToSvg(
+          element,
+          rsvg,
+          svgRoot,
+          files,
+          element.x + offsetX,
+          element.y + offsetY,
+          exportWithDarkMode,
+        );
+      } catch (error: any) {
+        console.error(error);
+      }
     }
   });
 };
