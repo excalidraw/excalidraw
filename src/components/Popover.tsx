@@ -81,8 +81,8 @@ export const Popover = ({
   // ensure the popover doesn't overflow the viewport
   useLayoutEffect(() => {
     if (fitInViewport && popoverRef.current && top != null && left != null) {
-      const element = popoverRef.current;
-      const { x, y, width, height } = element.getBoundingClientRect();
+      const container = popoverRef.current;
+      const { x, y, width, height } = container.getBoundingClientRect();
 
       // hack for StrictMode so this effect only runs once for
       // the same top/left position, otherwise
@@ -97,23 +97,23 @@ export const Popover = ({
       lastInitializedPosRef.current = { top, left };
 
       if (width >= viewportWidth) {
-        element.style.width = `${viewportWidth}px`;
-        element.style.left = "0px";
-        element.style.overflowX = "scroll";
+        container.style.width = `${viewportWidth}px`;
+        container.style.left = "0px";
+        container.style.overflowX = "scroll";
       } else if (x + width - offsetLeft > viewportWidth) {
-        element.style.left = `${viewportWidth - width - 10}px`;
+        container.style.left = `${viewportWidth - width - 10}px`;
       } else {
-        element.style.left = `${left}px`;
+        container.style.left = `${left}px`;
       }
 
       if (height >= viewportHeight) {
-        element.style.height = `${viewportHeight - 20}px`;
-        element.style.top = "10px";
-        element.style.overflowY = "scroll";
+        container.style.height = `${viewportHeight - 20}px`;
+        container.style.top = "10px";
+        container.style.overflowY = "scroll";
       } else if (y + height - offsetTop > viewportHeight) {
-        element.style.top = `${viewportHeight - height}px`;
+        container.style.top = `${viewportHeight - height}px`;
       } else {
-        element.style.top = `${top}px`;
+        container.style.top = `${top}px`;
       }
     }
   }, [
