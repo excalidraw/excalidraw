@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useEffect, useState } from "react";
+import React, { useLayoutEffect, useRef, useEffect } from "react";
 import "./Popover.scss";
 import { unstable_batchedUpdates } from "react-dom";
 import { queryFocusableElements } from "../utils";
@@ -30,9 +30,6 @@ export const Popover = ({
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const container = popoverRef.current;
-
-  const [leftPosition, setLeftPosition] = useState(`${left}px`);
-  const [topPosition, setTopPosition] = useState(`${top}px`);
 
   useEffect(() => {
     if (!container) {
@@ -67,35 +64,57 @@ export const Popover = ({
     return () => container.removeEventListener("keydown", handleKeyDown);
   }, [container]);
 
+  const lastInitializedPosRef = useRef<{ top: number; left: number } | null>(
+    null,
+  );
+
   // ensure the popover doesn't overflow the viewport
   useLayoutEffect(() => {
-    if (fitInViewport && popoverRef.current) {
+    if (fitInViewport && popoverRef.current && top != null && left != null) {
       const element = popoverRef.current;
       const { x, y, width, height } = element.getBoundingClientRect();
 
-      //Position correctly when clicked on rightmost part or the bottom part of viewport
-      if (x + width - offsetLeft > viewportWidth) {
-        element.style.left = `${viewportWidth - width - 10}px`;
-        setLeftPosition(`${viewportWidth - width - 10}px`);
+      // hack for StrictMode so this effect only runs once for
+      // the same top/left position, otherwise
+      // we'd potentically reposition twice (once for viewport overflow)
+      // and once for top/left position afterwards
+      if (
+        lastInitializedPosRef.current?.top === top &&
+        lastInitializedPosRef.current?.left === left
+      ) {
+        return;
       }
-      if (y + height - offsetTop > viewportHeight) {
-        element.style.top = `${viewportHeight - height}px`;
-        setTopPosition(`${viewportHeight - height}px`);
-      }
+      lastInitializedPosRef.current = { top, left };
 
-      //Resize to fit viewport on smaller screens
-      if (height >= viewportHeight) {
-        element.style.height = `${viewportHeight - 20}px`;
-        element.style.top = "10px";
-        element.style.overflowY = "scroll";
-      }
       if (width >= viewportWidth) {
         element.style.width = `${viewportWidth}px`;
         element.style.left = "0px";
         element.style.overflowX = "scroll";
+      } else if (x + width - offsetLeft > viewportWidth) {
+        element.style.left = `${viewportWidth - width - 10}px`;
+      } else {
+        element.style.left = `${left}px`;
+      }
+
+      if (height >= viewportHeight) {
+        element.style.height = `${viewportHeight - 20}px`;
+        element.style.top = "10px";
+        element.style.overflowY = "scroll";
+      } else if (y + height - offsetTop > viewportHeight) {
+        element.style.top = `${viewportHeight - height}px`;
+      } else {
+        element.style.top = `${top}px`;
       }
     }
-  }, [fitInViewport, viewportWidth, viewportHeight, offsetLeft, offsetTop]);
+  }, [
+    top,
+    left,
+    fitInViewport,
+    viewportWidth,
+    viewportHeight,
+    offsetLeft,
+    offsetTop,
+  ]);
 
   useEffect(() => {
     if (onCloseRequest) {
@@ -110,11 +129,7 @@ export const Popover = ({
   }, [onCloseRequest]);
 
   return (
-    <div
-      className="popover"
-      style={{ top: topPosition, left: leftPosition }}
-      ref={popoverRef}
-    >
+    <div className="popover" ref={popoverRef}>
       {children}
     </div>
   );
