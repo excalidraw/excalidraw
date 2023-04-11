@@ -1,4 +1,5 @@
 import { AppState } from "../../src/types";
+import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
@@ -37,6 +38,7 @@ import {
   TextAlignLeftIcon,
   TextAlignCenterIcon,
   TextAlignRightIcon,
+  FillZigZagIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -54,6 +56,7 @@ import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
   getBoundTextElement,
   getContainerElement,
+  getDefaultLineHeight,
 } from "../element/textElement";
 import {
   isBoundToContainer,
@@ -293,7 +296,12 @@ export const actionChangeBackgroundColor = register({
 export const actionChangeFillStyle = register({
   name: "changeFillStyle",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
+    trackEvent(
+      "element",
+      "changeFillStyle",
+      `${value} (${app.device.isMobile ? "mobile" : "desktop"})`,
+    );
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -304,40 +312,55 @@ export const actionChangeFillStyle = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.fill")}</legend>
-      <ButtonIconSelect
-        options={[
-          {
-            value: "hachure",
-            text: t("labels.hachure"),
-            icon: FillHachureIcon,
-          },
-          {
-            value: "cross-hatch",
-            text: t("labels.crossHatch"),
-            icon: FillCrossHatchIcon,
-          },
-          {
-            value: "solid",
-            text: t("labels.solid"),
-            icon: FillSolidIcon,
-          },
-        ]}
-        group="fill"
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => element.fillStyle,
-          appState.currentItemFillStyle,
-        )}
-        onChange={(value) => {
-          updateData(value);
-        }}
-      />
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    const allElementsZigZag = selectedElements.every(
+      (el) => el.fillStyle === "zigzag",
+    );
+
+    return (
+      <fieldset>
+        <legend>{t("labels.fill")}</legend>
+        <ButtonIconSelect
+          type="button"
+          options={[
+            {
+              value: "hachure",
+              text: t("labels.hachure"),
+              icon: allElementsZigZag ? FillZigZagIcon : FillHachureIcon,
+              active: allElementsZigZag ? true : undefined,
+            },
+            {
+              value: "cross-hatch",
+              text: t("labels.crossHatch"),
+              icon: FillCrossHatchIcon,
+            },
+            {
+              value: "solid",
+              text: t("labels.solid"),
+              icon: FillSolidIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => element.fillStyle,
+            appState.currentItemFillStyle,
+          )}
+          onClick={(value, event) => {
+            const nextValue =
+              event.altKey &&
+              value === "hachure" &&
+              selectedElements.every((el) => el.fillStyle === "hachure")
+                ? "zigzag"
+                : value;
+
+            updateData(nextValue);
+          }}
+        />
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeStrokeWidth = register({
@@ -637,6 +660,7 @@ export const actionChangeFontFamily = register({
               oldElement,
               {
                 fontFamily: value,
+                lineHeight: getDefaultLineHeight(value),
               },
             );
             redrawTextBoundingBox(newElement, getContainerElement(oldElement));
@@ -745,16 +769,19 @@ export const actionChangeTextAlign = register({
               value: "left",
               text: t("labels.left"),
               icon: TextAlignLeftIcon,
+              testId: "align-left",
             },
             {
               value: "center",
               text: t("labels.center"),
               icon: TextAlignCenterIcon,
+              testId: "align-horizontal-center",
             },
             {
               value: "right",
               text: t("labels.right"),
               icon: TextAlignRightIcon,
+              testId: "align-right",
             },
           ]}
           value={getFormValue(

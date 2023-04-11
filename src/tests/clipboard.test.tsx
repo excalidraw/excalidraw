@@ -3,8 +3,10 @@ import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import ExcalidrawApp from "../excalidraw-app";
 import { KEYS } from "../keys";
-import { getApproxLineHeight } from "../element/textElement";
-import { getFontString } from "../utils";
+import {
+  getDefaultLineHeight,
+  getLineHeightInPx,
+} from "../element/textElement";
 import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";
 
@@ -118,12 +120,10 @@ describe("paste text as single lines", () => {
 
   it("should space items correctly", async () => {
     const text = "hkhkjhki\njgkjhffjh\njgkjhffjh";
-    const lineHeight =
-      getApproxLineHeight(
-        getFontString({
-          fontSize: h.app.state.currentItemFontSize,
-          fontFamily: h.app.state.currentItemFontFamily,
-        }),
+    const lineHeightPx =
+      getLineHeightInPx(
+        h.app.state.currentItemFontSize,
+        getDefaultLineHeight(h.state.currentItemFontFamily),
       ) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
@@ -135,19 +135,17 @@ describe("paste text as single lines", () => {
       for (let i = 1; i < h.elements.length; i++) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [fx, elY] = getElementBounds(h.elements[i]);
-        expect(elY).toEqual(firstElY + lineHeight * i);
+        expect(elY).toEqual(firstElY + lineHeightPx * i);
       }
     });
   });
 
   it("should leave a space for blank new lines", async () => {
     const text = "hkhkjhki\n\njgkjhffjh";
-    const lineHeight =
-      getApproxLineHeight(
-        getFontString({
-          fontSize: h.app.state.currentItemFontSize,
-          fontFamily: h.app.state.currentItemFontFamily,
-        }),
+    const lineHeightPx =
+      getLineHeightInPx(
+        h.app.state.currentItemFontSize,
+        getDefaultLineHeight(h.state.currentItemFontFamily),
       ) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
@@ -158,7 +156,7 @@ describe("paste text as single lines", () => {
       const [fx, firstElY] = getElementBounds(h.elements[0]);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [lx, lastElY] = getElementBounds(h.elements[1]);
-      expect(lastElY).toEqual(firstElY + lineHeight * 2);
+      expect(lastElY).toEqual(firstElY + lineHeightPx * 2);
     });
   });
 });
@@ -179,6 +177,76 @@ describe("paste text as a single element", () => {
     await waitFor(async () => {
       await sleep(50);
       expect(h.elements.length).toEqual(0);
+    });
+  });
+});
+
+describe("Paste bound text container", () => {
+  const container = {
+    type: "ellipse",
+    id: "container-id",
+    x: 554.984375,
+    y: 196.0234375,
+    width: 166,
+    height: 187.01953125,
+    roundness: { type: 2 },
+    boundElements: [{ type: "text", id: "text-id" }],
+  };
+  const textElement = {
+    type: "text",
+    id: "text-id",
+    x: 560.51171875,
+    y: 202.033203125,
+    width: 154,
+    height: 175,
+    fontSize: 20,
+    fontFamily: 1,
+    text: "Excalidraw is a\nvirtual \nopensource \nwhiteboard for \nsketching \nhand-drawn like\ndiagrams",
+    baseline: 168,
+    textAlign: "center",
+    verticalAlign: "middle",
+    containerId: container.id,
+    originalText:
+      "Excalidraw is a virtual opensource whiteboard for sketching hand-drawn like diagrams",
+  };
+
+  it("should fix ellipse bounding box", async () => {
+    const data = JSON.stringify({
+      type: "excalidraw/clipboard",
+      elements: [container, textElement],
+    });
+    setClipboardText(data);
+    pasteWithCtrlCmdShiftV();
+
+    await waitFor(async () => {
+      await sleep(1);
+      expect(h.elements.length).toEqual(2);
+      const container = h.elements[0];
+      expect(container.height).toBe(368);
+      expect(container.width).toBe(166);
+    });
+  });
+
+  it("should fix diamond bounding box", async () => {
+    const data = JSON.stringify({
+      type: "excalidraw/clipboard",
+      elements: [
+        {
+          ...container,
+          type: "diamond",
+        },
+        textElement,
+      ],
+    });
+    setClipboardText(data);
+    pasteWithCtrlCmdShiftV();
+
+    await waitFor(async () => {
+      await sleep(1);
+      expect(h.elements.length).toEqual(2);
+      const container = h.elements[0];
+      expect(container.height).toBe(770);
+      expect(container.width).toBe(166);
     });
   });
 });

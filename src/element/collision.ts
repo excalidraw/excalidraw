@@ -38,6 +38,7 @@ import { isTextElement } from ".";
 import { isTransparent } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
 import { getBoundTextElement } from "./textElement";
+import { Mutable } from "../utility-types";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -785,7 +786,12 @@ export const findFocusPointForEllipse = (
       orientation * py * Math.sqrt(Math.max(0, squares - a ** 2 * b ** 2))) /
     squares;
 
-  const n = (-m * px - 1) / py;
+  let n = (-m * px - 1) / py;
+
+  if (n === 0) {
+    // if zero {-0, 0}, fall back to a same-sign value in the similar range
+    n = (Object.is(n, -0) ? -1 : 1) * 0.01;
+  }
 
   const x = -(a ** 2 * m) / (n ** 2 * b ** 2 + m ** 2 * a ** 2);
   return GA.point(x, (-m * x - 1) / n);

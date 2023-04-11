@@ -75,15 +75,17 @@ import { loadFilesFromFirebase } from "./data/firebase";
 import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
-import { atom, Provider, useAtom, useAtomValue } from "jotai";
-import { jotaiStore, useAtomWithInitialValue } from "../jotai";
 import { reconcileElements } from "./collab/reconciliation";
 import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 import { AppFooter } from "./components/AppFooter";
+import { atom, Provider, useAtom, useAtomValue } from "jotai";
+import { useAtomWithInitialValue } from "../jotai";
+import { appJotaiStore } from "./app-jotai";
 
 import "./index.scss";
+import { ResolutionType } from "../utility-types";
 
 polyfill();
 
@@ -226,15 +228,15 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
-const currentLangCode = languageDetector.detect() || defaultLang.code;
-
-export const langCodeAtom = atom(
-  Array.isArray(currentLangCode) ? currentLangCode[0] : currentLangCode,
+const detectedLangCode = languageDetector.detect() || defaultLang.code;
+export const appLangCodeAtom = atom(
+  Array.isArray(detectedLangCode) ? detectedLangCode[0] : detectedLangCode,
 );
 
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [langCode, setLangCode] = useAtom(langCodeAtom);
+  const [langCode, setLangCode] = useAtom(appLangCodeAtom);
+
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -671,10 +673,9 @@ const ExcalidrawWrapper = () => {
       </Excalidraw>
       {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
-        <ErrorDialog
-          message={errorMessage}
-          onClose={() => setErrorMessage("")}
-        />
+        <ErrorDialog onClose={() => setErrorMessage("")}>
+          {errorMessage}
+        </ErrorDialog>
       )}
     </div>
   );
@@ -683,7 +684,7 @@ const ExcalidrawWrapper = () => {
 const ExcalidrawApp = () => {
   return (
     <TopErrorBoundary>
-      <Provider unstable_createStore={() => jotaiStore}>
+      <Provider unstable_createStore={() => appJotaiStore}>
         <ExcalidrawWrapper />
       </Provider>
     </TopErrorBoundary>
