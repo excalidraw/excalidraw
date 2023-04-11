@@ -82,7 +82,7 @@ export const Popover = ({
   useLayoutEffect(() => {
     if (fitInViewport && popoverRef.current && top != null && left != null) {
       const container = popoverRef.current;
-      const { x, y, width, height } = container.getBoundingClientRect();
+      const { width, height } = container.getBoundingClientRect();
 
       // hack for StrictMode so this effect only runs once for
       // the same top/left position, otherwise
@@ -100,7 +100,7 @@ export const Popover = ({
         container.style.width = `${viewportWidth}px`;
         container.style.left = "0px";
         container.style.overflowX = "scroll";
-      } else if (x + width - offsetLeft > viewportWidth) {
+      } else if (left + width - offsetLeft > viewportWidth) {
         container.style.left = `${viewportWidth - width - 10}px`;
       } else {
         container.style.left = `${left}px`;
@@ -110,7 +110,7 @@ export const Popover = ({
         container.style.height = `${viewportHeight - 20}px`;
         container.style.top = "10px";
         container.style.overflowY = "scroll";
-      } else if (y + height - offsetTop > viewportHeight) {
+      } else if (top + height - offsetTop > viewportHeight) {
         container.style.top = `${viewportHeight - height}px`;
       } else {
         container.style.top = `${top}px`;
