@@ -625,12 +625,23 @@ export const getBoundTextElementId = (container: ExcalidrawElement | null) => {
     : null;
 };
 
-export const getBoundTextElement = (element: ExcalidrawElement | null) => {
+export const getBoundTextElement = (
+  element: ExcalidrawElement | null,
+
+  sceneElements?: readonly NonDeletedExcalidrawElement[],
+) => {
   if (!element) {
     return null;
   }
   const boundTextElementId = getBoundTextElementId(element);
   if (boundTextElementId) {
+    if (sceneElements) {
+      return (
+        (sceneElements.find(
+          (ele) => ele.id === boundTextElementId,
+        ) as ExcalidrawTextElementWithContainer) || null
+      );
+    }
     return (
       (Scene.getScene(element)?.getElement(
         boundTextElementId,
@@ -646,11 +657,18 @@ export const getContainerElement = (
         containerId: ExcalidrawElement["id"] | null;
       })
     | null,
+  sceneElements?: readonly NonDeletedExcalidrawElement[],
 ) => {
   if (!element) {
     return null;
   }
+
   if (element.containerId) {
+    if (sceneElements) {
+      return (
+        sceneElements.find((ele) => ele.id === element.containerId) || null
+      );
+    }
     return Scene.getScene(element)?.getElement(element.containerId) || null;
   }
   return null;

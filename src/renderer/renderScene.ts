@@ -10,6 +10,8 @@ import {
   NonDeleted,
   GroupId,
   ExcalidrawBindableElement,
+  ExcalidrawTextContainer,
+  ExcalidrawTextElementWithContainer,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -59,7 +61,16 @@ import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
-import { isLinearElement } from "../element/typeChecks";
+import {
+  hasBoundTextElement,
+  isBoundToContainer,
+  isLinearElement,
+  isTextElement,
+} from "../element/typeChecks";
+import {
+  getBoundTextElement,
+  getBoundTextElementId,
+} from "../element/textElement";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -409,7 +420,7 @@ export const _renderScene = ({
       undefined;
     visibleElements.forEach((element) => {
       try {
-        renderElement(element, rc, context, renderConfig, appState);
+        renderElement(element, rc, context, renderConfig, appState, elements);
         // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
         // ShapeCache returns empty hence making sure that we get the
         // correct element from visible elements
@@ -445,6 +456,7 @@ export const _renderScene = ({
           context,
           renderConfig,
           appState,
+          elements,
         );
       } catch (error: any) {
         console.error(error);
@@ -1145,21 +1157,21 @@ export const renderSceneToSvg = (
     return;
   }
   // render elements
-  elements.forEach((element, index) => {
-    if (!element.isDeleted) {
-      try {
-        renderElementToSvg(
-          element,
-          rsvg,
-          svgRoot,
-          files,
-          element.x + offsetX,
-          element.y + offsetY,
-          exportWithDarkMode,
-        );
-      } catch (error: any) {
-        console.error(error);
-      }
+  const visibleElements = elements.filter((ele) => !ele.isDeleted);
+  visibleElements.forEach((element, index) => {
+    try {
+      renderElementToSvg(
+        element,
+        rsvg,
+        svgRoot,
+        files,
+        element.x + offsetX,
+        element.y + offsetY,
+        visibleElements,
+        exportWithDarkMode,
+      );
+    } catch (error: any) {
+      console.error(error);
     }
   });
 };
