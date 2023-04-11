@@ -627,7 +627,7 @@ export const getBoundTextElementId = (container: ExcalidrawElement | null) => {
 
 export const getBoundTextElement = (
   element: ExcalidrawElement | null,
-
+  // only passed for export methods as scene cannot be used
   sceneElements?: readonly NonDeletedExcalidrawElement[],
 ) => {
   if (!element) {
@@ -657,6 +657,7 @@ export const getContainerElement = (
         containerId: ExcalidrawElement["id"] | null;
       })
     | null,
+  // only passed for export methods as scene cannot be used
   sceneElements?: readonly NonDeletedExcalidrawElement[],
 ) => {
   if (!element) {
