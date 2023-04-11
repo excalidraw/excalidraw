@@ -246,7 +246,6 @@ const drawImagePlaceholder = (
     size,
   );
 };
-
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -338,18 +337,16 @@ const drawElementOnCanvas = (
             : element.textAlign === "right"
             ? element.width
             : 0;
-        context.textBaseline = "bottom";
-
         const lineHeightPx = getLineHeightInPx(
           element.fontSize,
           element.lineHeight,
         );
-
+        const verticalOffset = element.height - element.baseline;
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],
             horizontalOffset,
-            (index + 1) * lineHeightPx,
+            (index + 1) * lineHeightPx - verticalOffset,
           );
         }
         context.restore();

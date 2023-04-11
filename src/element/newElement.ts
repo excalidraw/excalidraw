@@ -184,6 +184,7 @@ export const newTextElement = (
     },
   );
   const offsets = getTextElementPositionOffsets(opts, metrics);
+
   const textElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
@@ -196,6 +197,7 @@ export const newTextElement = (
       y: opts.y - offsets.y,
       width: metrics.width,
       height: metrics.height,
+      baseline: metrics.baseline,
       containerId: opts.containerId || null,
       originalText: text,
       lineHeight,
@@ -213,10 +215,15 @@ const getAdjustedDimensions = (
   y: number;
   width: number;
   height: number;
+  baseline: number;
 } => {
   const container = getContainerElement(element);
 
-  const { width: nextWidth, height: nextHeight } = measureTextElement(element, {
+  const {
+    width: nextWidth,
+    height: nextHeight,
+    baseline: nextBaseline,
+  } = measureTextElement(element, {
     text: nextText,
   });
   const { textAlign, verticalAlign } = element;
@@ -289,6 +296,7 @@ const getAdjustedDimensions = (
   return {
     width: nextWidth,
     height: nextHeight,
+    baseline: nextBaseline,
     x: Number.isFinite(x) ? x : element.x,
     y: Number.isFinite(y) ? y : element.y,
   };
@@ -298,6 +306,9 @@ export const refreshTextDimensions = (
   textElement: ExcalidrawTextElement,
   text = textElement.text,
 ) => {
+  if (textElement.isDeleted) {
+    return;
+  }
   const container = getContainerElement(textElement);
   if (container) {
     text = wrapTextElement(textElement, getMaxContainerWidth(container), {

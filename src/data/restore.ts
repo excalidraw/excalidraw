@@ -36,7 +36,11 @@ import { arrayToMap } from "../utils";
 import { isValidSubtype } from "../subtypes";
 import oc from "open-color";
 import { MarkOptional, Mutable } from "../utility-types";
-import { detectLineHeight, getDefaultLineHeight } from "../element/textElement";
+import {
+  detectLineHeight,
+  getDefaultLineHeight,
+  measureTextElement,
+} from "../element/textElement";
 
 type RestoredAppState = Omit<
   AppState,
@@ -176,6 +180,20 @@ const restoreElement = (
       }
       const text = element.text ?? "";
 
+      // line-height might not be specified either when creating elements
+      // programmatically, or when importing old diagrams.
+      // For the latter we want to detect the original line height which
+      // will likely differ from our per-font fixed line height we now use,
+      // to maintain backward compatibility.
+      const lineHeight =
+        element.lineHeight ||
+        (element.height
+          ? // detect line-height from current element height and font-size
+            detectLineHeight(element)
+          : // no element height likely means programmatic use, so default
+            // to a fixed line height
+            getDefaultLineHeight(element.fontFamily));
+      const baseline = measureTextElement(element, { text }).baseline;
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
@@ -184,19 +202,9 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || text,
-        // line-height might not be specified either when creating elements
-        // programmatically, or when importing old diagrams.
-        // For the latter we want to detect the original line height which
-        // will likely differ from our per-font fixed line height we now use,
-        // to maintain backward compatibility.
-        lineHeight:
-          element.lineHeight ||
-          (element.height
-            ? // detect line-height from current element height and font-size
-              detectLineHeight(element)
-            : // no element height likely means programmatic use, so default
-              // to a fixed line height
-              getDefaultLineHeight(element.fontFamily)),
+
+        lineHeight,
+        baseline,
       });
 
       if (refreshDimensions) {

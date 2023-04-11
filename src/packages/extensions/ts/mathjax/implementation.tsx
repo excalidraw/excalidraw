@@ -5,6 +5,7 @@ import { getFontString, getFontFamilyString, isRTL } from "../../../../utils";
 import {
   getBoundTextElement,
   getContainerElement,
+  getDefaultLineHeight,
   getMaxContainerWidth,
   getTextWidth,
   measureText,
@@ -859,7 +860,7 @@ const ensureMathElement = (element: Partial<ExcalidrawElement>) => {
 const cleanMathElementUpdate = function (updates) {
   const oldUpdates = {};
   for (const key in updates) {
-    if (key !== "fontFamily") {
+    if (key !== "fontFamily" && key !== "lineHeight") {
       (oldUpdates as any)[key] = (updates as any)[key];
     }
     if (key === "customData") {
@@ -874,6 +875,7 @@ const cleanMathElementUpdate = function (updates) {
     }
   }
   (updates as any).fontFamily = FONT_FAMILY_MATH;
+  (updates as any).lineHeight = getDefaultLineHeight(FONT_FAMILY_MATH);
   return oldUpdates;
 } as SubtypeMethods["clean"];
 
@@ -888,8 +890,8 @@ const measureMathElement = function (element, next) {
   ensureMathElement(element);
   const isMathJaxLoaded = mathJaxLoaded;
   if (!isMathJaxLoaded && isMathElement(element as ExcalidrawElement)) {
-    const { width, height } = element as ExcalidrawMathElement;
-    return { width, height };
+    const { width, height, baseline } = element as ExcalidrawMathElement;
+    return { width, height, baseline };
   }
   const fontSize = next?.fontSize ?? element.fontSize;
   const lineHeight = element.lineHeight;
@@ -903,8 +905,7 @@ const measureMathElement = function (element, next) {
     mathProps,
     isMathJaxLoaded,
   );
-  const { width, height } = metrics;
-  return { width, height };
+  return metrics;
 } as SubtypeMethods["measureText"];
 
 const renderMathElement = function (element, context, renderCb) {

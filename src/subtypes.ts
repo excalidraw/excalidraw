@@ -237,7 +237,7 @@ export type SubtypeMethods = {
       text?: string;
       customData?: ExcalidrawElement["customData"];
     },
-  ) => { width: number; height: number };
+  ) => { width: number; height: number; baseline: number };
   render: (
     element: NonDeleted<ExcalidrawElement>,
     context: CanvasRenderingContext2D,
