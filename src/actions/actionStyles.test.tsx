@@ -1,9 +1,14 @@
 import ExcalidrawApp from "../excalidraw-app";
-import { t } from "../i18n";
 import { CODES } from "../keys";
 import { API } from "../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
-import { fireEvent, render, screen, togglePopover } from "../tests/test-utils";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  togglePopover,
+} from "../tests/test-utils";
 import { copiedStyles } from "./actionStyles";
 
 const { h } = window;
@@ -14,7 +19,14 @@ describe("actionStyles", () => {
   beforeEach(async () => {
     await render(<ExcalidrawApp />);
   });
-  it("should copy & paste styles via keyboard", () => {
+
+  afterEach(async () => {
+    // https://github.com/floating-ui/floating-ui/issues/1908#issuecomment-1301553793
+    // affects node v16+
+    await act(async () => {});
+  });
+
+  it("should copy & paste styles via keyboard", async () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);
     mouse.up(20, 20);
