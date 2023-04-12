@@ -113,9 +113,12 @@ export const ColorPicker = ({
               style={{
                 zIndex: 9999,
                 backgroundColor: "var(--popup-bg-color)",
-                maxWidth: "184px",
+                maxWidth: "208px",
+                maxHeight: window.innerHeight,
                 padding: "12px",
                 borderRadius: "8px",
+                boxSizing: "border-box",
+                overflowY: "auto",
                 boxShadow:
                   "0px 7px 14px rgba(0, 0, 0, 0.05), 0px 0px 3.12708px rgba(0, 0, 0, 0.0798), 0px 0px 0.931014px rgba(0, 0, 0, 0.1702)",
               }}
