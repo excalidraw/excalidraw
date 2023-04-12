@@ -2466,13 +2466,13 @@
     "@rollup/pluginutils" "^3.1.0"
     magic-string "^0.25.7"
 
-"@rollup/plugin-replace@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@rollup/plugin-replace/-/plugin-replace-4.0.0.tgz#e34c457d6a285f0213359740b43f39d969b38a67"
-  integrity sha512-+rumQFiaNac9y64OHtkHGmdjm7us9bo1PlbgQfdihQtuNxzjpaB064HbRnewUOggLQxVCCyINfStkgmBeQpv1g==
+"@rollup/plugin-replace@^5.0.1":
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/@rollup/plugin-replace/-/plugin-replace-5.0.2.tgz#45f53501b16311feded2485e98419acb8448c61d"
+  integrity sha512-M9YXNekv/C/iHHK+cvORzfRYfPbq0RDD8r0G+bMiTXjNGKulPnCT9O3Ss46WfhI6ZOCgApOP7xAdmCQJ+U2LAA==
   dependencies:
-    "@rollup/pluginutils" "^3.1.0"
-    magic-string "^0.25.7"
+    "@rollup/pluginutils" "^5.0.1"
+    magic-string "^0.27.0"
 
 "@rollup/pluginutils@^3.1.0":
   version "3.1.0"
@@ -2483,7 +2483,7 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
-"@rollup/pluginutils@^5.0.2":
+"@rollup/pluginutils@^5.0.1", "@rollup/pluginutils@^5.0.2":
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/@rollup/pluginutils/-/pluginutils-5.0.2.tgz#012b8f53c71e4f6f9cb317e311df1404f56e7a33"
   integrity sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==
@@ -5871,7 +5871,7 @@ fast-diff@^1.1.2:
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.2.0.tgz#73ee11982d86caaf7959828d519cfe927fac5f03"
   integrity sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==
 
-fast-glob@^3.2.11, fast-glob@^3.2.12, fast-glob@^3.2.9:
+fast-glob@^3.2.12, fast-glob@^3.2.9:
   version "3.2.12"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.2.12.tgz#7f39ec99c2e6ab030337142da9e0c18f37afae80"
   integrity sha512-DVj4CQIYYow0BlaelwK1pHl5n5cRSJfM60UA0zK891sVInoPri2Ekj7+e1CT3/3qxXenpI+nBBmQAcJPJgaj4w==
@@ -9828,14 +9828,14 @@ rollup-plugin-terser@^7.0.0:
     serialize-javascript "^4.0.0"
     terser "^5.0.0"
 
-rollup@^2.43.1, rollup@^2.79.0:
+rollup@^2.43.1:
   version "2.79.1"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.79.1.tgz#bedee8faef7c9f93a2647ac0108748f497f081c7"
   integrity sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==
   optionalDependencies:
     fsevents "~2.3.2"
 
-rollup@^3.18.0:
+rollup@^3.18.0, rollup@^3.7.2:
   version "3.20.2"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-3.20.2.tgz#f798c600317f216de2e4ad9f4d9ab30a89b690ff"
   integrity sha512-3zwkBQl7Ai7MFYQE0y1MeQ15+9jsi7XxfrqwTb/9EK8D9C9+//EBR4M+CuA1KODRaNbFez/lWxA5vhEGZp4MUg==
@@ -10982,16 +10982,16 @@ vite-plugin-env-compatible@1.1.1:
   resolved "https://registry.yarnpkg.com/vite-plugin-env-compatible/-/vite-plugin-env-compatible-1.1.1.tgz#2e11b059a5f3e8fc609d6a4bba84ca497081ee20"
   integrity sha512-4lqhBWhOzP+SaCPoCVdmpM5cXzjKQV5jgFauxea488oOeElXo/kw6bXkMIooZhrh9q7gclTl8en6N9NmnqUwRQ==
 
-vite-plugin-pwa@0.13.7:
-  version "0.13.3"
-  resolved "https://registry.yarnpkg.com/vite-plugin-pwa/-/vite-plugin-pwa-0.13.3.tgz#555916ae9c6bcdd1a04db909894f67d860c3bdc6"
-  integrity sha512-cjWXpZ7slAY14OKz7M8XdgTIi9wjf6OD6NkhiMAc+ogxnbUrecUwLdRtfGPCPsN2ftut5gaN1jTghb11p6IQAA==
+vite-plugin-pwa@0.14.7:
+  version "0.14.7"
+  resolved "https://registry.yarnpkg.com/vite-plugin-pwa/-/vite-plugin-pwa-0.14.7.tgz#56844ff767d54256f45f49f91bfdff9dd1ea7685"
+  integrity sha512-dNJaf0fYOWncmjxv9HiSa2xrSjipjff7IkYE5oIUJ2x5HKu3cXgA8LRgzOwTc5MhwyFYRSU0xyN0Phbx3NsQYw==
   dependencies:
-    "@rollup/plugin-replace" "^4.0.0"
+    "@rollup/plugin-replace" "^5.0.1"
     debug "^4.3.4"
-    fast-glob "^3.2.11"
+    fast-glob "^3.2.12"
     pretty-bytes "^6.0.0"
-    rollup "^2.79.0"
+    rollup "^3.7.2"
     workbox-build "^6.5.4"
     workbox-window "^6.5.4"
 
