@@ -8,6 +8,7 @@ import {
 } from "./colorPickerUtils";
 import HotkeyLabel from "./HotkeyLabel";
 import { ColorPaletteCustom } from "../../colors";
+import { t } from "../../i18n";
 
 interface PickerColorListProps {
   palette: ColorPaletteCustom;
@@ -46,6 +47,9 @@ const PickerColorList = ({
         const color =
           (Array.isArray(value) ? value[activeShade] : value) || "transparent";
 
+        const keybinding = colorPickerHotkeyBindings[index];
+        const label = t(`colors.${key}`);
+
         return (
           <button
             ref={colorObj?.colorName === key ? btnRef : undefined}
@@ -62,16 +66,14 @@ const PickerColorList = ({
               onChange(color);
               setActiveColorPickerSection("baseColors");
             }}
-            title={`${label} — ${key}`}
-            aria-label={label}
+            title={`${label} — ${keybinding}`}
+            aria-label={`${label} — ${keybinding}`}
             style={color ? { "--swatch-color": color } : undefined}
+            data-testid={`color-${key}`}
             key={key}
           >
             <div className="color-picker__button-outline" />
-            <HotkeyLabel
-              color={color}
-              keyLabel={colorPickerHotkeyBindings[index]}
-            />
+            <HotkeyLabel color={color} keyLabel={keybinding} />
           </button>
         );
       })}

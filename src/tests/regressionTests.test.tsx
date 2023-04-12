@@ -161,9 +161,10 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     UI.clickLabeledElement("Background");
+    UI.clickOnTestId("color-red");
     UI.clickLabeledElement(t("colors.fa5252"));
     UI.clickLabeledElement("Stroke");
-    UI.clickLabeledElement(t("colors.5f3dc4"));
+    UI.clickOnTestId("color-blue");
     expect(API.getSelectedElement().backgroundColor).toBe("#fa5252");
     expect(API.getSelectedElement().strokeColor).toBe("#5f3dc4");
   });
@@ -989,7 +990,7 @@ describe("regression tests", () => {
       // change background color since default is transparent
       // and transparent elements can't be selected by clicking inside of them
       UI.clickLabeledElement("Background");
-      UI.clickLabeledElement(t("colors.fa5252"));
+      UI.clickOnTestId("color-red");
       mouse.down();
       mouse.up(1000, 1000);
 
@@ -1088,7 +1089,7 @@ describe("regression tests", () => {
     assertSelectedElements(rect3);
   });
 
-  it("should show fill icons when element has non transparent background", () => {
+  it("should show fill icons when element has non transparent background", async () => {
     UI.clickTool("rectangle");
     expect(screen.queryByText(/fill/i)).not.toBeNull();
     mouse.down();
@@ -1096,7 +1097,7 @@ describe("regression tests", () => {
     expect(screen.queryByText(/fill/i)).toBeNull();
 
     UI.clickLabeledElement("Background");
-    UI.clickLabeledElement(t("colors.fa5252"));
+    UI.clickOnTestId("color-red");
     // select rectangle
     mouse.reset();
     mouse.click();

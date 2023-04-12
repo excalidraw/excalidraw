@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getColor } from "./ColorPicker";
-import clsx from "clsx";
 import { useAtom } from "jotai";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 import { KEYS } from "../../keys";
