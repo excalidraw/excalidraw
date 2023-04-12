@@ -93,6 +93,7 @@
     "vite": "4.2.1",
     "vite-plugin-ejs": "1.6.4",
     "vite-plugin-env-compatible": "1.1.1",
+    "vite-plugin-pwa": "0.13.7",
     "vite-plugin-svgr": "2.4.0",
     "vite-tsconfig-paths": "4.0.8"
   },
