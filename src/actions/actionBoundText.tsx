@@ -10,6 +10,7 @@ import {
 import {
   getOriginalContainerHeightFromCache,
   resetOriginalContainerCache,
+  updateOriginalContainerCache,
 } from "../element/textWysiwyg";
 import {
   hasBoundTextElement,
@@ -52,7 +53,6 @@ export const actionUnbindText = register({
           element.id,
         );
         resetOriginalContainerCache(element.id);
-
         mutateElement(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
           width,
@@ -135,7 +135,9 @@ export const actionBindText = register({
         id: textElement.id,
       }),
     });
-    redrawTextBoundingBox(textElement, container);
+    updateOriginalContainerCache(container.id, container.height);
+
+    redrawTextBoundingBox(textElement, container, false);
 
     return {
       elements: pushTextAboveContainer(elements, container, textElement),
