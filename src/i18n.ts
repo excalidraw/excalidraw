@@ -137,7 +137,13 @@ export const t = (
     findPartsForData(currentLangData, parts) ||
     findPartsForData(fallbackLangData, parts);
   if (translation === undefined) {
-    throw new Error(`Can't find translation for ${path}`);
+    const errorMessage = `Can't find translation for ${path}`;
+    // in production, don't blow up the app on a missing translation key
+    if (process.env.NODE_ENV === "production") {
+      console.warn(errorMessage);
+      return "";
+    }
+    throw new Error(errorMessage);
   }
 
   if (replacement) {
