@@ -2,6 +2,7 @@ import { BOUND_TEXT_PADDING, ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { getNonDeletedElements, isTextElement, newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import {
+  computeBoundTextPosition,
   computeContainerDimensionForBoundText,
   getBoundTextElement,
   measureText,
@@ -52,13 +53,15 @@ export const actionUnbindText = register({
           element.id,
         );
         resetOriginalContainerCache(element.id);
-
+        const { x, y } = computeBoundTextPosition(element, boundTextElement);
         mutateElement(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
           width,
           height,
           baseline,
           text: boundTextElement.originalText,
+          x,
+          y,
         });
         mutateElement(element, {
           boundElements: element.boundElements?.filter(
