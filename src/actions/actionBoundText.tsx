@@ -34,6 +34,7 @@ export const actionUnbindText = register({
   trackEvent: { category: "element" },
   predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
+
     return selectedElements.some((element) => hasBoundTextElement(element));
   },
   perform: (elements, appState) => {
