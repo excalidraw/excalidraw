@@ -3748,7 +3748,7 @@ Object {
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
-  "currentItemBackgroundColor": "transparent",
+  "currentItemBackgroundColor": "#ff6b6b",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -3757,7 +3757,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemRoundness": "round",
   "currentItemStartArrowhead": null,
-  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeColor": "#1864ab",
   "currentItemStrokeStyle": "solid",
   "currentItemStrokeWidth": 1,
   "currentItemTextAlign": "left",
@@ -3786,7 +3786,7 @@ Object {
   "offsetTop": 0,
   "openDialog": null,
   "openMenu": null,
-  "openPopup": "elementBackground",
+  "openPopup": "elementStroke",
   "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
@@ -3827,7 +3827,7 @@ Object {
 exports[`regression tests change the properties of a shape: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
-  "backgroundColor": "transparent",
+  "backgroundColor": "#ff6b6b",
   "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -3842,13 +3842,13 @@ Object {
     "type": 3,
   },
   "seed": 337897,
-  "strokeColor": "#000000",
+  "strokeColor": "#1864ab",
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
   "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
+  "version": 5,
+  "versionNonce": 401146281,
   "width": 10,
   "x": 10,
   "y": 10,
@@ -3913,13 +3913,139 @@ Object {
         },
       ],
     },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "#fcc419",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 3,
+          "versionNonce": 449462985,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "#ff6b6b",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 4,
+          "versionNonce": 453191,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "#ff6b6b",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 337897,
+          "strokeColor": "#1864ab",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 5,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
   ],
 }
 `;
 
 exports[`regression tests change the properties of a shape: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `10`;
+exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests click on an element and drag it: [dragged] appState 1`] = `
 Object {
@@ -9882,12 +10008,12 @@ Object {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
-    "type": "rectangle",
+    "type": "selection",
   },
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
-  "currentItemBackgroundColor": "transparent",
+  "currentItemBackgroundColor": "#ff6b6b",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -9934,12 +10060,20 @@ Object {
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": Object {
+    "id0": true,
+    "id2": true,
+  },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {},
+  "selectedElementIds": Object {
+    "id0": true,
+    "id1": true,
+    "id2": true,
+    "id3": true,
+  },
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -9961,6 +10095,68 @@ Object {
 }
 `;
 
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "#ff6b6b",
+  "boundElements": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 1000,
+  "id": "id0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": Object {
+    "type": 3,
+  },
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 1000,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] element 1 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "#ff6b6b",
+  "boundElements": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 1000,
+  "id": "id1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": Object {
+    "type": 2,
+  },
+  "seed": 449462985,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "ellipse",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": 453191,
+  "width": 1000,
+  "x": 500,
+  "y": 500,
+}
+`;
+
 exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -9977,13 +10173,125 @@ Object {
       },
       "elements": Array [],
     },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "#ff6b6b",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 1000,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 1000,
+          "x": 0,
+          "y": 0,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "#ff6b6b",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 1000,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 1000,
+          "x": 0,
+          "y": 0,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "#ff6b6b",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 1000,
+          "id": "id1",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 2,
+          },
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "ellipse",
+          "updated": 1,
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 1000,
+          "x": 500,
+          "y": 500,
+        },
+      ],
+    },
   ],
 }
 `;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of elements 1`] = `0`;
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `7`;
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] appState 1`] = `
 Object {
@@ -15607,7 +15915,7 @@ Object {
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
-  "currentItemBackgroundColor": "transparent",
+  "currentItemBackgroundColor": "#ff6b6b",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -15661,6 +15969,7 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id0": true,
+    "id1": true,
   },
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
@@ -15686,7 +15995,7 @@ Object {
 exports[`regression tests should show fill icons when element has non transparent background: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
-  "backgroundColor": "transparent",
+  "backgroundColor": "#ff6b6b",
   "boundElements": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -15706,8 +16015,8 @@ Object {
   "strokeWidth": 1,
   "type": "rectangle",
   "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
+  "version": 3,
+  "versionNonce": 449462985,
   "width": 10,
   "x": 0,
   "y": 0,
@@ -15772,13 +16081,55 @@ Object {
         },
       ],
     },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "#ff6b6b",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 3,
+          "versionNonce": 449462985,
+          "width": 10,
+          "x": 0,
+          "y": 0,
+        },
+      ],
+    },
   ],
 }
 `;
 
 exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of renders 1`] = `10`;
+exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] appState 1`] = `
 Object {

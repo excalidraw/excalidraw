@@ -9,6 +9,7 @@ import {
   queryByText,
   queryAllByText,
   waitFor,
+  togglePopover,
 } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
@@ -303,10 +304,10 @@ describe("contextMenu element", () => {
     mouse.up(20, 20);
 
     // Change some styles of second rectangle
-    UI.clickLabeledElement("Stroke");
-    UI.clickLabeledElement(t("colors.c92a2a"));
-    UI.clickLabeledElement("Background");
-    UI.clickLabeledElement(t("colors.e64980"));
+    togglePopover("Stroke");
+    UI.clickOnTestId("color-red");
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
     // Fill style
     fireEvent.click(screen.getByTitle("Cross-hatch"));
     // Stroke width
@@ -345,7 +346,7 @@ describe("contextMenu element", () => {
     const firstRect = API.getSelectedElement();
     expect(firstRect.id).toBe(h.elements[0].id);
     expect(firstRect.strokeColor).toBe("#c92a2a");
-    expect(firstRect.backgroundColor).toBe("#e64980");
+    expect(firstRect.backgroundColor).toBe("#339af0");
     expect(firstRect.fillStyle).toBe("cross-hatch");
     expect(firstRect.strokeWidth).toBe(2); // Bold: 2
     expect(firstRect.strokeStyle).toBe("dotted");

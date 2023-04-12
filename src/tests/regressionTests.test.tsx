@@ -12,6 +12,7 @@ import {
   fireEvent,
   render,
   screen,
+  togglePopover,
   waitFor,
 } from "./test-utils";
 import { defaultLang } from "../i18n";
@@ -42,7 +43,6 @@ const checkpoint = (name: string) => {
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
   );
 };
-
 beforeEach(async () => {
   // Unmount ReactDOM from root
   ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -159,14 +159,14 @@ describe("regression tests", () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);
     mouse.up(10, 10);
-
-    UI.clickLabeledElement("Background");
+    togglePopover("Background");
+    UI.clickOnTestId("color-yellow");
     UI.clickOnTestId("color-red");
-    UI.clickLabeledElement(t("colors.fa5252"));
-    UI.clickLabeledElement("Stroke");
+
+    togglePopover("Stroke");
     UI.clickOnTestId("color-blue");
-    expect(API.getSelectedElement().backgroundColor).toBe("#fa5252");
-    expect(API.getSelectedElement().strokeColor).toBe("#5f3dc4");
+    expect(API.getSelectedElement().backgroundColor).toBe("#ff6b6b");
+    expect(API.getSelectedElement().strokeColor).toBe("#1864ab");
   });
 
   it("click on an element and drag it", () => {
@@ -989,7 +989,7 @@ describe("regression tests", () => {
       UI.clickTool("rectangle");
       // change background color since default is transparent
       // and transparent elements can't be selected by clicking inside of them
-      UI.clickLabeledElement("Background");
+      togglePopover("Background");
       UI.clickOnTestId("color-red");
       mouse.down();
       mouse.up(1000, 1000);
@@ -1095,8 +1095,7 @@ describe("regression tests", () => {
     mouse.down();
     mouse.up(10, 10);
     expect(screen.queryByText(/fill/i)).toBeNull();
-
-    UI.clickLabeledElement("Background");
+    togglePopover("Background");
     UI.clickOnTestId("color-red");
     // select rectangle
     mouse.reset();

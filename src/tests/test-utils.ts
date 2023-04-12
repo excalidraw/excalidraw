@@ -16,6 +16,7 @@ import { STORAGE_KEYS } from "../excalidraw-app/app_constants";
 import { SceneData } from "../types";
 import { getSelectedElements } from "../scene/selection";
 import { ExcalidrawElement } from "../element/types";
+import { UI } from "./helpers/ui";
 
 const customQueries = {
   ...queries,
@@ -189,4 +190,20 @@ export const assertSelectedElements = (
 export const toggleMenu = (container: HTMLElement) => {
   // open menu
   fireEvent.click(container.querySelector(".dropdown-menu-button")!);
+};
+
+export const togglePopover = (label: string) => {
+  // Needed for radix-ui/react-popover as tests fail due to resize observer not being present
+  (global as any).ResizeObserver = class ResizeObserver {
+    constructor(cb: any) {
+      (this as any).cb = cb;
+    }
+
+    observe() {}
+
+    unobserve() {}
+    disconnect() {}
+  };
+
+  UI.clickLabeledElement(label);
 };
