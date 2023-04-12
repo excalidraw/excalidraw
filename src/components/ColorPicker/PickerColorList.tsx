@@ -48,7 +48,7 @@ const PickerColorList = ({
           (Array.isArray(value) ? value[activeShade] : value) || "transparent";
 
         const keybinding = colorPickerHotkeyBindings[index];
-        const label = t(`colors.${key}`);
+        const label = t(`colors.${key.replace(/\d+/, "")}`);
 
         return (
           <button
