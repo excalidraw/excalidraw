@@ -3607,6 +3607,14 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    if (
+      event.pointerType === "touch" &&
+      this.state.draggingElement &&
+      this.state.draggingElement.type === "freedraw"
+    ) {
+      return;
+    }
+
     const allowOnPointerDown =
       !this.state.penMode ||
       event.pointerType !== "touch" ||
