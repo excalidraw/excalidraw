@@ -3500,17 +3500,18 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ contextMenu: null });
     }
 
+    this.updateGestureOnPointerDown(event);
+
     // if dragging element is freedraw and another pointerdown event occurs
     // a second finger is on the screen
     // discard the freedraw element if it is very short because it is likely
     // just a spike, otherwise finalize the freedraw element when the second
     // finger is lifted
-    this.updateGestureOnPointerDown(event);
-    const isSecondTouchFreedraw =
+    if (
       event.pointerType === "touch" &&
       this.state.draggingElement &&
-      this.state.draggingElement.type === "freedraw";
-    if (isSecondTouchFreedraw) {
+      this.state.draggingElement.type === "freedraw"
+    ) {
       const element = this.state.draggingElement as ExcalidrawFreeDrawElement;
       this.updateScene({
         ...(element.points.length < 10
