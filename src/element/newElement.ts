@@ -31,9 +31,16 @@ import {
   getMaxContainerWidth,
   getDefaultLineHeight,
 } from "./textElement";
-import { VERTICAL_ALIGN } from "../constants";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  DEFAULT_TEXT_ALIGN,
+  DEFAULT_VERTICAL_ALIGN,
+  VERTICAL_ALIGN,
+} from "../constants";
 import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
+import oc from "open-color";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -46,6 +53,15 @@ type ElementConstructorOpts = MarkOptional<
   | "version"
   | "versionNonce"
   | "link"
+  | "strokeStyle"
+  | "fillStyle"
+  | "strokeColor"
+  | "backgroundColor"
+  | "roughness"
+  | "strokeWidth"
+  | "roundness"
+  | "locked"
+  | "opacity"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -53,13 +69,13 @@ const _newElementBase = <T extends ExcalidrawElement>(
   {
     x,
     y,
-    strokeColor,
-    backgroundColor,
-    fillStyle,
-    strokeWidth,
-    strokeStyle,
-    roughness,
-    opacity,
+    strokeColor = oc.black,
+    backgroundColor = "transparent",
+    fillStyle = "hachure",
+    strokeWidth = 1,
+    strokeStyle = "solid",
+    roughness = 1,
+    opacity = 100,
     width = 0,
     height = 0,
     angle = 0,
@@ -67,7 +83,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     roundness = null,
     boundElements = null,
     link = null,
-    locked,
+    locked = false,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
@@ -133,27 +149,39 @@ const getTextElementPositionOffsets = (
 export const newTextElement = (
   opts: {
     text: string;
-    fontSize: number;
-    fontFamily: FontFamilyValues;
-    textAlign: TextAlign;
-    verticalAlign: VerticalAlign;
+    fontSize?: number;
+    fontFamily?: FontFamilyValues;
+    textAlign?: TextAlign;
+    verticalAlign?: VerticalAlign;
     containerId?: ExcalidrawTextContainer["id"];
     lineHeight?: ExcalidrawTextElement["lineHeight"];
+    strokeWidth?: ExcalidrawTextElement["strokeWidth"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const lineHeight = opts.lineHeight || getDefaultLineHeight(opts.fontFamily);
+  const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
+  const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
+  const lineHeight = opts.lineHeight || getDefaultLineHeight(fontFamily);
   const text = normalizeText(opts.text);
-  const metrics = measureText(text, getFontString(opts), lineHeight);
-  const offsets = getTextElementPositionOffsets(opts, metrics);
+  const metrics = measureText(
+    text,
+    getFontString({ fontFamily, fontSize }),
+    lineHeight,
+  );
+  const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
+  const verticalAlign = opts.verticalAlign || DEFAULT_VERTICAL_ALIGN;
+  const offsets = getTextElementPositionOffsets(
+    { textAlign, verticalAlign },
+    metrics,
+  );
 
   const textElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
       text,
-      fontSize: opts.fontSize,
-      fontFamily: opts.fontFamily,
-      textAlign: opts.textAlign,
-      verticalAlign: opts.verticalAlign,
+      fontSize,
+      fontFamily,
+      textAlign,
+      verticalAlign,
       x: opts.x - offsets.x,
       y: opts.y - offsets.y,
       width: metrics.width,

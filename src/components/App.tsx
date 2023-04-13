@@ -2737,7 +2737,6 @@ class App extends React.Component<AppProps, AppState> {
           strokeStyle: this.state.currentItemStrokeStyle,
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
-          roundness: null,
           text: "",
           fontSize,
           fontFamily,
@@ -2749,7 +2748,6 @@ class App extends React.Component<AppProps, AppState> {
             : DEFAULT_VERTICAL_ALIGN,
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
-          locked: false,
           lineHeight,
         });
 
