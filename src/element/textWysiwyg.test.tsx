@@ -740,6 +740,45 @@ describe("textWysiwyg", () => {
       expect(rectangle.boundElements).toBe(null);
     });
 
+    it("should bind text to container when triggered via context menu", async () => {
+      expect(h.elements.length).toBe(1);
+      expect(h.elements[0].id).toBe(rectangle.id);
+
+      UI.clickTool("text");
+      mouse.clickAt(20, 30);
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      fireEvent.change(editor, {
+        target: {
+          value: "Excalidraw is an opensource virtual collaborative whiteboard",
+        },
+      });
+
+      editor.dispatchEvent(new Event("input"));
+      await new Promise((cb) => setTimeout(cb, 0));
+      expect(h.elements.length).toBe(2);
+      expect(h.elements[1].type).toBe("text");
+
+      API.setSelectedElements([h.elements[0], h.elements[1]]);
+      fireEvent.contextMenu(GlobalTestState.canvas, {
+        button: 2,
+        clientX: 20,
+        clientY: 30,
+      });
+      const contextMenu = document.querySelector(".context-menu");
+      fireEvent.click(
+        queryByText(contextMenu as HTMLElement, "Bind text to the container")!,
+      );
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: h.elements[1].id, type: "text" },
+      ]);
+      expect(text.containerId).toBe(rectangle.id);
+      expect(text.verticalAlign).toBe(VERTICAL_ALIGN.MIDDLE);
+    });
+
     it("should update font family correctly on undo/redo by selecting bounded text when font family was updated", async () => {
       expect(h.elements.length).toBe(1);
 
