@@ -33,6 +33,10 @@ For more details refer to the [docs](https://docs.excalidraw.com)
 
 - The optional parameter `refreshDimensions` in [`restoreElements`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils/restore#restoreelements) has been removed and can be enabled via `opts`
 
+### Fixes
+
+- Exporting labelled arrows via export utils [#6443](https://github.com/excalidraw/excalidraw/pull/6443)
+
 ## 0.14.2 (2023-02-01)
 
 ### Features
