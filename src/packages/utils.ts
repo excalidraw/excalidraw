@@ -5,7 +5,6 @@ import {
 import { getDefaultAppState } from "../appState";
 import { AppState, BinaryFiles } from "../types";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
-import { getNonDeletedElements } from "../element";
 import { restore } from "../data/restore";
 import { MIME_TYPES } from "../constants";
 import { encodePngMetadata } from "../data/image";
@@ -15,6 +14,7 @@ import {
   copyTextToSystemClipboard,
   copyToClipboard,
 } from "../clipboard";
+import Scene from "../scene/Scene";
 
 export { MIME_TYPES };
 
@@ -44,9 +44,17 @@ export const exportToCanvas = ({
     null,
     null,
   );
+  // The helper methods getContainerElement and getBoundTextElement are
+  // dependent on Scene which will not be available
+  // when these pure utils are called outside Excalidraw or even if called
+  // from inside Excalidraw when Scene isn't available eg when using library items from store, as a result the element cannot be extracted
+  // hence initailizing a new scene with the elements
+  // so its always available to helper methods
+  const scene = new Scene();
+  scene.replaceAllElements(restoredElements);
   const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
-    getNonDeletedElements(restoredElements),
+    scene.getNonDeletedElements(),
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
     { exportBackground, exportPadding, viewBackgroundColor },
@@ -114,8 +122,18 @@ export const exportToBlob = async (
     };
   }
 
-  const canvas = await exportToCanvas(opts);
-
+  // The helper methods getContainerElement and getBoundTextElement are
+  // dependent on Scene which will not be available
+  // when these pure utils are called outside Excalidraw or even if called
+  // from inside Excalidraw when Scene isn't available eg when using library items from store, as a result the element cannot be extracted
+  // hence initailizing a new scene with the elements
+  // so its always available to helper methods
+  const scene = new Scene();
+  scene.replaceAllElements(opts.elements);
+  const canvas = await exportToCanvas({
+    ...opts,
+    elements: scene.getNonDeletedElements(),
+  });
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 
   return new Promise((resolve, reject) => {
@@ -132,7 +150,7 @@ export const exportToBlob = async (
           blob = await encodePngMetadata({
             blob,
             metadata: serializeAsJSON(
-              opts.elements,
+              scene.getNonDeletedElements(),
               opts.appState,
               opts.files || {},
               "local",
@@ -160,8 +178,16 @@ export const exportToSvg = async ({
     null,
     null,
   );
+  // The helper methods getContainerElement and getBoundTextElement are
+  // dependent on Scene which will not be available
+  // when these pure utils are called outside Excalidraw or even if called
+  // from inside Excalidraw when Scene isn't available eg when using library items from store, as a result the element cannot be extracted
+  // hence initailizing a new scene with the elements
+  // so its always available to helper methods
+  const scene = new Scene();
+  scene.replaceAllElements(restoredElements);
   return _exportToSvg(
-    getNonDeletedElements(restoredElements),
+    scene.getNonDeletedElements(),
     {
       ...restoredAppState,
       exportPadding,
@@ -177,6 +203,14 @@ export const exportToClipboard = async (
     type: "png" | "svg" | "json";
   },
 ) => {
+  // The helper methods getContainerElement and getBoundTextElement are
+  // dependent on Scene which will not be available
+  // when these pure utils are called outside Excalidraw or even if called
+  // from inside Excalidraw when Scene isn't available eg when using library items from store, as a result the element cannot be extracted
+  // hence initailizing a new scene with the elements
+  // so its always available to helper methods
+  const scene = new Scene();
+  scene.replaceAllElements(opts.elements);
   if (opts.type === "svg") {
     const svg = await exportToSvg(opts);
     await copyTextToSystemClipboard(svg.outerHTML);
@@ -191,7 +225,7 @@ export const exportToClipboard = async (
       ...getDefaultAppState(),
       ...opts.appState,
     };
-    await copyToClipboard(opts.elements, appState, opts.files);
+    await copyToClipboard(scene.getNonDeletedElements(), appState, opts.files);
   } else {
     throw new Error("Invalid export type");
   }
