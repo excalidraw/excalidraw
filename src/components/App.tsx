@@ -3542,11 +3542,6 @@ class App extends React.Component<AppProps, AppState> {
       selection.removeAllRanges();
     }
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
-    this.maybeCleanupAfterMissingPointerUp(event);
-
-    if (isSecondTouchFreedraw) {
-      return;
-    }
 
     //fires only once, if pen is detected, penMode is enabled
     //the user can disable this by toggling the penMode button
@@ -3578,6 +3573,12 @@ class App extends React.Component<AppProps, AppState> {
     this.savePointer(event.clientX, event.clientY, "down");
 
     this.updateGestureOnPointerDown(event);
+
+    if (isSecondTouchFreedraw) {
+      return;
+    }
+
+    this.maybeCleanupAfterMissingPointerUp(event);
 
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
