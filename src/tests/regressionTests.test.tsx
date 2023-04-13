@@ -17,7 +17,6 @@ import {
 } from "./test-utils";
 import { defaultLang } from "../i18n";
 import { FONT_FAMILY } from "../constants";
-import { t } from "../i18n";
 
 const { h } = window;
 
