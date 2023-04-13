@@ -3505,6 +3505,7 @@ class App extends React.Component<AppProps, AppState> {
     // discard the freedraw element if it is very short because it is likely
     // just a spike, otherwise finalize the freedraw element when the second
     // finger is lifted
+    this.updateGestureOnPointerDown(event);
     const isSecondTouchFreedraw =
       event.pointerType === "touch" &&
       this.state.draggingElement &&
@@ -3532,6 +3533,7 @@ class App extends React.Component<AppProps, AppState> {
             }, {}),
         },
       });
+      return;
     }
 
     // remove any active selection when we start to interact with canvas
@@ -3542,6 +3544,7 @@ class App extends React.Component<AppProps, AppState> {
       selection.removeAllRanges();
     }
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
+    this.maybeCleanupAfterMissingPointerUp(event);
 
     //fires only once, if pen is detected, penMode is enabled
     //the user can disable this by toggling the penMode button
@@ -3571,14 +3574,6 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton: "down",
     });
     this.savePointer(event.clientX, event.clientY, "down");
-
-    this.updateGestureOnPointerDown(event);
-
-    if (isSecondTouchFreedraw) {
-      return;
-    }
-
-    this.maybeCleanupAfterMissingPointerUp(event);
 
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
