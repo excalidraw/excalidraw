@@ -3532,7 +3532,6 @@ class App extends React.Component<AppProps, AppState> {
             }, {}),
         },
       });
-      return;
     }
 
     // remove any active selection when we start to interact with canvas
