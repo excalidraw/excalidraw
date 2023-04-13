@@ -3541,6 +3541,9 @@ class App extends React.Component<AppProps, AppState> {
     if (selection?.anchorNode) {
       selection.removeAllRanges();
     }
+    if (isSecondTouchFreedraw) {
+      return;
+    }
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
     this.maybeCleanupAfterMissingPointerUp(event);
 
@@ -3574,10 +3577,6 @@ class App extends React.Component<AppProps, AppState> {
     this.savePointer(event.clientX, event.clientY, "down");
 
     this.updateGestureOnPointerDown(event);
-
-    if (isSecondTouchFreedraw) {
-      return;
-    }
 
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
