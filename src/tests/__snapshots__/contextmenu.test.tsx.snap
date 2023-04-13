@@ -2450,7 +2450,7 @@ Object {
   "offsetTop": 10,
   "openDialog": null,
   "openMenu": null,
-  "openPopup": "elementBackground",
+  "openPopup": null,
   "openSidebar": null,
   "pasteDialog": Object {
     "data": null,
@@ -3246,7 +3246,7 @@ Object {
 
 exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `31`;
+exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `32`;
 
 exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] appState 1`] = `
 Object {

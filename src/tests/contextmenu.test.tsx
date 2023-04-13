@@ -320,13 +320,20 @@ describe("contextMenu element", () => {
       target: { value: "60" },
     });
 
+    // closing the background popover as this blocks
+    // context menu from rendering after we started focussing
+    // the popover once rendered :/
+    togglePopover("Background");
+
     mouse.reset();
+
     // Copy styles of second rectangle
     fireEvent.contextMenu(GlobalTestState.canvas, {
       button: 2,
       clientX: 40,
       clientY: 40,
     });
+
     let contextMenu = UI.queryContextMenu();
     fireEvent.click(queryByText(contextMenu as HTMLElement, "Copy styles")!);
     const secondRect = JSON.parse(copiedStyles)[0];
