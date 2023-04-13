@@ -44,6 +44,12 @@ export const exportToCanvas = ({
     null,
     null,
   );
+  // The helper methods getContainerElement and getBoundTextElement are
+  // dependent on Scene which will not be available
+  // when these pure utils are called outside Excalidraw or even if called
+  // from inside Excalidraw when Scene isn't available eg when using library items from store, as a result the element cannot be extracted
+  // hence initailizing a new scene with the elements
+  // so its always available to helper methods
   const scene = new Scene();
   scene.replaceAllElements(restoredElements);
   const { exportBackground, viewBackgroundColor } = restoredAppState;
@@ -116,6 +122,12 @@ export const exportToBlob = async (
     };
   }
 
+  // The helper methods getContainerElement and getBoundTextElement are
+  // dependent on Scene which will not be available
+  // when these pure utils are called outside Excalidraw or even if called
+  // from inside Excalidraw when Scene isn't available eg when using library items from store, as a result the element cannot be extracted
+  // hence initailizing a new scene with the elements
+  // so its always available to helper methods
   const scene = new Scene();
   scene.replaceAllElements(opts.elements);
   const canvas = await exportToCanvas({
@@ -166,6 +178,12 @@ export const exportToSvg = async ({
     null,
     null,
   );
+  // The helper methods getContainerElement and getBoundTextElement are
+  // dependent on Scene which will not be available
+  // when these pure utils are called outside Excalidraw or even if called
+  // from inside Excalidraw when Scene isn't available eg when using library items from store, as a result the element cannot be extracted
+  // hence initailizing a new scene with the elements
+  // so its always available to helper methods
   const scene = new Scene();
   scene.replaceAllElements(restoredElements);
   return _exportToSvg(
@@ -185,6 +203,12 @@ export const exportToClipboard = async (
     type: "png" | "svg" | "json";
   },
 ) => {
+  // The helper methods getContainerElement and getBoundTextElement are
+  // dependent on Scene which will not be available
+  // when these pure utils are called outside Excalidraw or even if called
+  // from inside Excalidraw when Scene isn't available eg when using library items from store, as a result the element cannot be extracted
+  // hence initailizing a new scene with the elements
+  // so its always available to helper methods
   const scene = new Scene();
   scene.replaceAllElements(opts.elements);
   if (opts.type === "svg") {
