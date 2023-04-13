@@ -3505,12 +3505,12 @@ class App extends React.Component<AppProps, AppState> {
     // discard the freedraw element if it is very short because it is likely
     // just a spike, otherwise finalize the freedraw element when the second
     // finger is lifted
-    if (
+    const isSecondTouchFreedraw =
       event.pointerType === "touch" &&
       this.state.draggingElement &&
-      this.state.draggingElement.type === "freedraw"
-    ) {
-      const element = this.state.draggingElement;
+      this.state.draggingElement.type === "freedraw";
+    if (isSecondTouchFreedraw) {
+      const element = this.state.draggingElement as ExcalidrawFreeDrawElement;
       this.updateScene({
         ...(element.points.length < 10
           ? {
@@ -3575,6 +3575,10 @@ class App extends React.Component<AppProps, AppState> {
 
     this.updateGestureOnPointerDown(event);
 
+    if (isSecondTouchFreedraw) {
+      return;
+    }
+
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
     }
@@ -3604,14 +3608,6 @@ class App extends React.Component<AppProps, AppState> {
     this.updateBindingEnabledOnPointerMove(event);
 
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
-      return;
-    }
-
-    if (
-      event.pointerType === "touch" &&
-      this.state.draggingElement &&
-      this.state.draggingElement.type === "freedraw"
-    ) {
       return;
     }
 
