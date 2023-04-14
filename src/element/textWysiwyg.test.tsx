@@ -19,7 +19,6 @@ import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
 import { resize } from "../tests/utils";
 import { getOriginalContainerHeightFromCache } from "./textWysiwyg";
-import { actionBindText } from "../actions/actionBoundText";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -778,6 +777,13 @@ describe("textWysiwyg", () => {
       ]);
       expect(text.containerId).toBe(rectangle.id);
       expect(text.verticalAlign).toBe(VERTICAL_ALIGN.MIDDLE);
+      expect(text.textAlign).toBe(TEXT_ALIGN.CENTER);
+      expect(text.x).toBe(
+        h.elements[0].x + h.elements[0].width / 2 - text.width / 2,
+      );
+      expect(text.y).toBe(
+        h.elements[0].y + h.elements[0].height / 2 - text.height / 2,
+      );
     });
 
     it("should update font family correctly on undo/redo by selecting bounded text when font family was updated", async () => {
@@ -1503,37 +1509,6 @@ describe("textWysiwyg", () => {
           textAlign: TEXT_ALIGN.LEFT,
           boundElements: null,
         }),
-      );
-    });
-
-    it("should text be centered when binding to a rectangle", async () => {
-      const rectangle1 = API.createElement({
-        type: "rectangle",
-        id: "rectangle1",
-        width: 100,
-        height: 100,
-      });
-
-      const text1 = API.createElement({
-        type: "text",
-        id: "text1",
-        text: "Snorf",
-      });
-
-      h.elements = [rectangle1, text1];
-
-      API.setSelectedElements([rectangle1, text1]);
-
-      expect(h.state.selectedElementIds[(rectangle1.id, text1.id)]).toBe(true);
-
-      h.app.actionManager.executeAction(actionBindText);
-
-      const container = h.elements.at(-2)!;
-
-      expect(container.type).toBe("rectangle");
-      expect(text1.x).toBe(container.x + container.width / 2 - text1.width / 2);
-      expect(text1.y).toBe(
-        container.y + container.height / 2 - text1.height / 2,
       );
     });
   });
