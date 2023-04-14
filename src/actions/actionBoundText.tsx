@@ -5,7 +5,7 @@ import {
   computeBoundTextPosition,
   computeContainerDimensionForBoundText,
   getBoundTextElement,
-  measureText,
+  measureTextElement,
   redrawTextBoundingBox,
 } from "../element/textElement";
 import {
@@ -25,7 +25,6 @@ import {
 } from "../element/types";
 import { getSelectedElements } from "../scene";
 import { AppState } from "../types";
-import { getFontString } from "../utils";
 import { register } from "./register";
 
 export const actionUnbindText = register({
@@ -45,10 +44,11 @@ export const actionUnbindText = register({
     selectedElements.forEach((element) => {
       const boundTextElement = getBoundTextElement(element);
       if (boundTextElement) {
-        const { width, height, baseline } = measureText(
-          boundTextElement.originalText,
-          getFontString(boundTextElement),
-          boundTextElement.lineHeight,
+        const { width, height, baseline } = measureTextElement(
+          boundTextElement,
+          {
+            text: boundTextElement.originalText,
+          },
         );
         const originalContainerHeight = getOriginalContainerHeightFromCache(
           element.id,

@@ -31,14 +31,14 @@ import {
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
-import { getFontString, getUpdatedTimestamp, updateActiveTool } from "../utils";
+import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import oc from "open-color";
 import { MarkOptional, Mutable } from "../utility-types";
 import {
   detectLineHeight,
   getDefaultLineHeight,
-  measureBaseline,
+  measureTextElement,
 } from "../element/textElement";
 
 type RestoredAppState = Omit<
@@ -80,7 +80,8 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 };
 
 const restoreElementWithProperties = <
-  T extends Required<Omit<ExcalidrawElement, "customData">> & {
+  T extends Required<Omit<ExcalidrawElement, "subtype" | "customData">> & {
+    subtype?: ExcalidrawElement["subtype"];
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
@@ -143,6 +144,9 @@ const restoreElementWithProperties = <
     locked: element.locked ?? false,
   };
 
+  if ("subtype" in element) {
+    base.subtype = element.subtype;
+  }
   if ("customData" in element) {
     base.customData = element.customData;
   }
@@ -188,11 +192,7 @@ const restoreElement = (
           : // no element height likely means programmatic use, so default
             // to a fixed line height
             getDefaultLineHeight(element.fontFamily));
-      const baseline = measureBaseline(
-        element.text,
-        getFontString(element),
-        lineHeight,
-      );
+      const baseline = measureTextElement(element, { text }).baseline;
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,

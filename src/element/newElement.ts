@@ -13,7 +13,7 @@ import {
   FontFamilyValues,
   ExcalidrawTextContainer,
 } from "../element/types";
-import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
+import { getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
@@ -25,9 +25,9 @@ import {
   getBoundTextElementOffset,
   getContainerDims,
   getContainerElement,
-  measureText,
+  measureTextElement,
   normalizeText,
-  wrapText,
+  wrapTextElement,
   getMaxContainerWidth,
   getDefaultLineHeight,
 } from "./textElement";
@@ -46,6 +46,8 @@ type ElementConstructorOpts = MarkOptional<
   | "version"
   | "versionNonce"
   | "link"
+  | "subtype"
+  | "customData"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -143,7 +145,13 @@ export const newTextElement = (
 ): NonDeleted<ExcalidrawTextElement> => {
   const lineHeight = opts.lineHeight || getDefaultLineHeight(opts.fontFamily);
   const text = normalizeText(opts.text);
-  const metrics = measureText(text, getFontString(opts), lineHeight);
+  const metrics = measureTextElement(
+    { ...opts, lineHeight },
+    {
+      text,
+      customData: opts.customData,
+    },
+  );
   const offsets = getTextElementPositionOffsets(opts, metrics);
 
   const textElement = newElementWith(
@@ -184,7 +192,9 @@ const getAdjustedDimensions = (
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureText(nextText, getFontString(element), element.lineHeight);
+  } = measureTextElement(element, {
+    text: nextText,
+  });
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;
@@ -193,11 +203,7 @@ const getAdjustedDimensions = (
     verticalAlign === VERTICAL_ALIGN.MIDDLE &&
     !element.containerId
   ) {
-    const prevMetrics = measureText(
-      element.text,
-      getFontString(element),
-      element.lineHeight,
-    );
+    const prevMetrics = measureTextElement(element);
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
       height: nextHeight - prevMetrics.height,
@@ -274,11 +280,9 @@ export const refreshTextDimensions = (
   }
   const container = getContainerElement(textElement);
   if (container) {
-    text = wrapText(
+    text = wrapTextElement(textElement, getMaxContainerWidth(container), {
       text,
-      getFontString(textElement),
-      getMaxContainerWidth(container),
-    );
+    });
   }
   const dimensions = getAdjustedDimensions(textElement, text);
   return { text, ...dimensions };

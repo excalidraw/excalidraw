@@ -1,3 +1,4 @@
+import { getSubtypeMethods, SubtypeMethods } from "../subtypes";
 import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
@@ -34,6 +35,30 @@ import {
 } from "./textWysiwyg";
 import { ExtractSetType } from "../utility-types";
 
+export const measureTextElement = function (element, next) {
+  const map = getSubtypeMethods(element.subtype);
+  if (map?.measureText) {
+    return map.measureText(element, next);
+  }
+
+  const fontSize = next?.fontSize ?? element.fontSize;
+  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
+  const text = next?.text ?? element.text;
+  return measureText(text, font, element.lineHeight);
+} as SubtypeMethods["measureText"];
+
+export const wrapTextElement = function (element, containerWidth, next) {
+  const map = getSubtypeMethods(element.subtype);
+  if (map?.wrapText) {
+    return map.wrapText(element, containerWidth, next);
+  }
+
+  const fontSize = next?.fontSize ?? element.fontSize;
+  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
+  const text = next?.text ?? element.originalText;
+  return wrapText(text, font, containerWidth);
+} as SubtypeMethods["wrapText"];
+
 export const normalizeText = (text: string) => {
   return (
     text
@@ -66,22 +91,24 @@ export const redrawTextBoundingBox = (
 
   if (container) {
     maxWidth = getMaxContainerWidth(container);
-    boundTextUpdates.text = wrapText(
-      textElement.originalText,
-      getFontString(textElement),
-      maxWidth,
-    );
+    boundTextUpdates.text = wrapTextElement(textElement, maxWidth);
   }
-  const metrics = measureText(
-    boundTextUpdates.text,
-    getFontString(textElement),
-    textElement.lineHeight,
-  );
+  const metrics = measureTextElement(textElement, {
+    text: boundTextUpdates.text,
+  });
 
   boundTextUpdates.width = metrics.width;
   boundTextUpdates.height = metrics.height;
   boundTextUpdates.baseline = metrics.baseline;
 
+  // Maintain coordX for non left-aligned text in case the width has changed
+  if (!container) {
+    if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
+      boundTextUpdates.x += textElement.width - metrics.width;
+    } else if (textElement.textAlign === TEXT_ALIGN.CENTER) {
+      boundTextUpdates.x += textElement.width / 2 - metrics.width / 2;
+    }
+  }
   if (container) {
     if (isArrowElement(container)) {
       const centerX = textElement.x + textElement.width / 2;
@@ -189,17 +216,9 @@ export const handleBindTextResize = (
     let nextBaseLine = textElement.baseline;
     if (transformHandleType !== "n" && transformHandleType !== "s") {
       if (text) {
-        text = wrapText(
-          textElement.originalText,
-          getFontString(textElement),
-          maxWidth,
-        );
+        text = wrapTextElement(textElement, maxWidth);
       }
-      const metrics = measureText(
-        text,
-        getFontString(textElement),
-        textElement.lineHeight,
-      );
+      const metrics = measureTextElement(textElement, { text });
       nextHeight = metrics.height;
       nextWidth = metrics.width;
       nextBaseLine = metrics.baseline;
