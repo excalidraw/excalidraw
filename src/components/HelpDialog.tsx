@@ -165,11 +165,12 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[KEYS.E, KEYS["0"]]}
             />
             <Shortcut
-              label={t("helpDialog.editSelectedShape")}
-              shortcuts={[
-                getShortcutKey("CtrlOrCmd+Enter"),
-                getShortcutKey(`CtrlOrCmd + ${t("helpDialog.doubleClick")}`),
-              ]}
+              label={t("helpDialog.editLineArrowPoints")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+Enter")]}
+            />
+            <Shortcut
+              label={t("helpDialog.editText")}
+              shortcuts={[getShortcutKey("Enter")]}
             />
             <Shortcut
               label={t("helpDialog.textNewLine")}
