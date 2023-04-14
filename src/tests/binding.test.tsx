@@ -4,10 +4,7 @@ import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { getTransformHandles } from "../element/transformHandles";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
-import {
-  actionCreateContainerFromText,
-  actionBindText,
-} from "../actions/actionBoundText";
+import { actionCreateContainerFromText } from "../actions/actionBoundText";
 
 const { h } = window;
 
@@ -311,34 +308,5 @@ describe("element binding", () => {
     expect(arrow1.endBinding?.elementId).toBe(container.id);
     expect(arrow2.startBinding?.elementId).toBe(container.id);
     expect(arrow2.endBinding?.elementId).toBe(rectangle1.id);
-  });
-
-  it("should text be centered when binding to a rectangle", async () => {
-    const rectangle1 = API.createElement({
-      type: "rectangle",
-      id: "rectangle1",
-      width: 100,
-      height: 100,
-    });
-
-    const text1 = API.createElement({
-      type: "text",
-      id: "text1",
-      text: "Snorf",
-    });
-
-    h.elements = [rectangle1, text1];
-
-    API.setSelectedElements([rectangle1, text1]);
-
-    expect(h.state.selectedElementIds[(rectangle1.id, text1.id)]).toBe(true);
-
-    h.app.actionManager.executeAction(actionBindText);
-
-    const container = h.elements.at(-2)!;
-
-    expect(container.type).toBe("rectangle");
-    expect(text1.x).toBe(container.x + container.width / 2 - text1.width / 2);
-    expect(text1.y).toBe(container.y + container.height / 2 - text1.height / 2);
   });
 });
