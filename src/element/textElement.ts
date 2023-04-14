@@ -264,10 +264,16 @@ export const handleBindTextResize = (
   }
 };
 
-const computeBoundTextPosition = (
+export const computeBoundTextPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
+  if (isArrowElement(container)) {
+    return LinearElementEditor.getBoundTextElementPosition(
+      container,
+      boundTextElement,
+    );
+  }
   const containerCoords = getContainerCoords(container);
   const maxContainerHeight = getMaxContainerHeight(container);
   const maxContainerWidth = getMaxContainerWidth(container);
