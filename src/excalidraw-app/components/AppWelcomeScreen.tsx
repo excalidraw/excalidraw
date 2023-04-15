@@ -18,7 +18,7 @@ export const AppWelcomeScreen: React.FC<{
           return (
             <a
               style={{ pointerEvents: "all" }}
-              href={`${process.env.VITE_PLUS_APP}?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenSignedInUser`}
+              href={`${process.env.REACT_APP_PLUS_APP}?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenSignedInUser`}
               key={idx}
             >
               Excalidraw+

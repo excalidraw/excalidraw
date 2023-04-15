@@ -6,7 +6,8 @@ const SentryEnvHostnameMap: { [key: string]: string } = {
   "vercel.app": "staging",
 };
 
-const REACT_APP_DISABLE_SENTRY = process.env.VITE_DISABLE_SENTRY === "true";
+const REACT_APP_DISABLE_SENTRY =
+  process.env.REACT_APP_DISABLE_SENTRY === "true";
 
 // Disable Sentry locally or inside the Docker to avoid noise/respect privacy
 const onlineEnv =
@@ -20,7 +21,7 @@ Sentry.init({
     ? "https://7bfc596a5bf945eda6b660d3015a5460@sentry.io/5179260"
     : undefined,
   environment: onlineEnv ? SentryEnvHostnameMap[onlineEnv] : undefined,
-  release: process.env.VITE_GIT_SHA,
+  release: process.env.REACT_APP_GIT_SHA,
   ignoreErrors: [
     "undefined is not an object (evaluating 'window.__pad.performLoop')", // Only happens on Safari, but spams our servers. Doesn't break anything
   ],

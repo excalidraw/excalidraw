@@ -119,14 +119,14 @@
     />
 
     <link rel="stylesheet" href="/fonts.css" type="text/css" />
-    <% if (process.env.VITE_DEV_DISABLE_LIVE_RELOAD==="true" ) { %>
+    <% if (process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD==="true" ) { %>
     <script>
       {
         const _WebSocket = window.WebSocket;
         window.WebSocket = function (url) {
           if (/ws:\/\/localhost:.+?\/sockjs-node/.test(url)) {
             console.info(
-              "[!!!] Live reload is disabled via process.env.VITE_DEV_DISABLE_LIVE_RELOAD [!!!]",
+              "[!!!] Live reload is disabled via process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD [!!!]",
             );
           } else {
             return new _WebSocket(url);
@@ -140,10 +140,10 @@
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
     </script>
-    <% if (process.env.VITE_DISABLE_TRACKING !== 'true') { %>
+    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
 
     <!-- LEGACY GOOGLE ANALYTICS -->
-    <% if (process.env.VITE_GOOGLE_ANALYTICS_ID) { %>
+    <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=%REACT_APP_GOOGLE_ANALYTICS_ID%"
@@ -160,9 +160,9 @@
     <!-- end LEGACY GOOGLE ANALYTICS -->
 
     <!-- Matomo -->
-    <% if (process.env.VITE_MATOMO_URL &&
-    process.env.VITE_MATOMO_SITE_ID &&
-    process.env.VITE_CDN_MATOMO_TRACKER_URL) { %>
+    <% if (process.env.REACT_APP_MATOMO_URL &&
+    process.env.REACT_APP_MATOMO_SITE_ID &&
+    process.env.REACT_APP_CDN_MATOMO_TRACKER_URL) { %>
     <script>
       var _paq = (window._paq = window._paq || []);
       /* tracker methods like "setCustomDimension" should be called before "trackPageView" */

@@ -94,8 +94,7 @@
     "vite-plugin-ejs": "1.6.4",
     "vite-plugin-env-compatible": "1.1.1",
     "vite-plugin-pwa": "0.14.7",
-    "vite-plugin-svgr": "2.4.0",
-    "vite-tsconfig-paths": "4.0.8"
+    "vite-plugin-svgr": "2.4.0"
   },
   "engines": {
     "node": ">=14.0.0"
@@ -112,8 +111,8 @@
   "private": true,
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
-    "build:app:docker": "cross-env VITE_DISABLE_SENTRY=true VITE_DISABLE_TRACKING=true vite build",
-    "build:app": "cross-env VITE_GIT_SHA=$VERCEL_GIT_COMMIT_SHA vite build",
+    "build:app:docker": "cross-env REACT_APP_DISABLE_SENTRY=true REACT_APP_DISABLE_TRACKING=true vite build",
+    "build:app": "cross-env REACT_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA vite build",
     "build:version": "node ./scripts/build-version.js",
     "build": "yarn build:app && yarn build:version",
     "fix:code": "yarn test:code --fix",

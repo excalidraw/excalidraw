@@ -13,7 +13,7 @@ export default defineConfig({
   plugins: [
     react(),
     svgrPlugin(),
-    envCompatible(),
+    envCompatible({ prefix: "REACT_APP" }),
     // This is needed in order to use the same env API format that CRA uses with the EJS templating
     // Vite by default uses import.meta.env
     ViteEjsPlugin((config) => {
