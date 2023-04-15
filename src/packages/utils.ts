@@ -15,6 +15,23 @@ import {
   copyToClipboard,
 } from "../clipboard";
 import Scene from "../scene/Scene";
+import { duplicateElements } from "../element/newElement";
+
+// getContainerElement and getBoundTextElement and potentially other helpers
+// depend on `Scene` which will not be available when these pure utils are
+// called outside initialized Excalidraw editor instance or even if called
+// from inside Excalidraw if the elements were never cached by Scene (e.g.
+// for library elements).
+//
+// As such, before passing the elements down, we need to initialize a custom
+// Scene instance and assign them to it.
+//
+// FIXME This is a super hacky workaround and we'll need to rewrite this soon.
+const passElementsSafely = (elements: readonly ExcalidrawElement[]) => {
+  const scene = new Scene();
+  scene.replaceAllElements(duplicateElements(elements));
+  return scene.getNonDeletedElements();
+};
 
 export { MIME_TYPES };
 
@@ -44,17 +61,9 @@ export const exportToCanvas = ({
     null,
     null,
   );
-  // The helper methods getContainerElement and getBoundTextElement are
-  // dependent on Scene which will not be available
-  // when these pure utils are called outside Excalidraw or even if called
-  // from inside Excalidraw when Scene isn't available eg when using library items from store, as a result the element cannot be extracted
-  // hence initailizing a new scene with the elements
-  // so its always available to helper methods
-  const scene = new Scene();
-  scene.replaceAllElements(restoredElements);
   const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
-    scene.getNonDeletedElements(),
+    passElementsSafely(restoredElements),
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
     { exportBackground, exportPadding, viewBackgroundColor },
@@ -122,17 +131,9 @@ export const exportToBlob = async (
     };
   }
 
-  // The helper methods getContainerElement and getBoundTextElement are
-  // dependent on Scene which will not be available
-  // when these pure utils are called outside Excalidraw or even if called
-  // from inside Excalidraw when Scene isn't available eg when using library items from store, as a result the element cannot be extracted
-  // hence initailizing a new scene with the elements
-  // so its always available to helper methods
-  const scene = new Scene();
-  scene.replaceAllElements(opts.elements);
   const canvas = await exportToCanvas({
     ...opts,
-    elements: scene.getNonDeletedElements(),
+    elements: passElementsSafely(opts.elements),
   });
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 
@@ -150,7 +151,10 @@ export const exportToBlob = async (
           blob = await encodePngMetadata({
             blob,
             metadata: serializeAsJSON(
-              scene.getNonDeletedElements(),
+              // NOTE as long as we're using the Scene hack, we need to ensure
+              // we pass the original, uncloned elements when serializing
+              // so that we keep ids stable
+              opts.elements,
               opts.appState,
               opts.files || {},
               "local",
@@ -178,21 +182,24 @@ export const exportToSvg = async ({
     null,
     null,
   );
-  // The helper methods getContainerElement and getBoundTextElement are
-  // dependent on Scene which will not be available
-  // when these pure utils are called outside Excalidraw or even if called
-  // from inside Excalidraw when Scene isn't available eg when using library items from store, as a result the element cannot be extracted
-  // hence initailizing a new scene with the elements
-  // so its always available to helper methods
-  const scene = new Scene();
-  scene.replaceAllElements(restoredElements);
+
+  const exportAppState = {
+    ...restoredAppState,
+    exportPadding,
+  };
+
   return _exportToSvg(
-    scene.getNonDeletedElements(),
-    {
-      ...restoredAppState,
-      exportPadding,
-    },
+    passElementsSafely(restoredElements),
+    exportAppState,
     files,
+    {
+      // NOTE as long as we're using the Scene hack, we need to ensure
+      // we pass the original, uncloned elements when serializing
+      // so that we keep ids stable. Hence adding the serializeAsJSON helper
+      // support into the downstream exportToSvg function.
+      serializeAsJSON: () =>
+        serializeAsJSON(restoredElements, exportAppState, files || {}, "local"),
+    },
   );
 };
 
@@ -203,14 +210,6 @@ export const exportToClipboard = async (
     type: "png" | "svg" | "json";
   },
 ) => {
-  // The helper methods getContainerElement and getBoundTextElement are
-  // dependent on Scene which will not be available
-  // when these pure utils are called outside Excalidraw or even if called
-  // from inside Excalidraw when Scene isn't available eg when using library items from store, as a result the element cannot be extracted
-  // hence initailizing a new scene with the elements
-  // so its always available to helper methods
-  const scene = new Scene();
-  scene.replaceAllElements(opts.elements);
   if (opts.type === "svg") {
     const svg = await exportToSvg(opts);
     await copyTextToSystemClipboard(svg.outerHTML);
@@ -225,7 +224,7 @@ export const exportToClipboard = async (
       ...getDefaultAppState(),
       ...opts.appState,
     };
-    await copyToClipboard(scene.getNonDeletedElements(), appState, opts.files);
+    await copyToClipboard(opts.elements, appState, opts.files);
   } else {
     throw new Error("Invalid export type");
   }
