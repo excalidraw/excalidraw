@@ -69,6 +69,7 @@ export type ActionName =
   | "finalize"
   | "changeProjectName"
   | "changeExportBackground"
+  | "changeExportPadding"
   | "changeExportEmbedScene"
   | "changeExportScale"
   | "saveToActiveFile"

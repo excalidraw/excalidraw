@@ -64,7 +64,6 @@ const ImageExportModal = ({
   elements,
   appState,
   files,
-  exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
   onExportToPng,
   onExportToSvg,
@@ -73,7 +72,6 @@ const ImageExportModal = ({
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles;
-  exportPadding?: number;
   actionManager: ActionManager;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
@@ -102,7 +100,7 @@ const ImageExportModal = ({
     exportToCanvas(exportedElements, appState, files, {
       exportBackground,
       viewBackgroundColor,
-      exportPadding,
+      exportPadding: appState.exportPadding,
     })
       .then((canvas) => {
         setRenderError(null);
@@ -121,7 +119,6 @@ const ImageExportModal = ({
     files,
     exportedElements,
     exportBackground,
-    exportPadding,
     viewBackgroundColor,
   ]);
 
@@ -140,8 +137,10 @@ const ImageExportModal = ({
             // dunno why this is needed, but when the items wrap it creates
             // an overflow
             overflow: "hidden",
+            gap: ".6rem",
           }}
         >
+          {actionManager.renderAction("changeExportPadding")}
           {actionManager.renderAction("changeExportBackground")}
           {someElementIsSelected && (
             <CheckboxItem
@@ -212,7 +211,6 @@ export const ImageExportDialog = ({
   appState,
   setAppState,
   files,
-  exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
   onExportToPng,
   onExportToSvg,
@@ -222,7 +220,6 @@ export const ImageExportDialog = ({
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles;
-  exportPadding?: number;
   actionManager: ActionManager;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
@@ -240,7 +237,6 @@ export const ImageExportDialog = ({
             elements={elements}
             appState={appState}
             files={files}
-            exportPadding={exportPadding}
             actionManager={actionManager}
             onExportToPng={onExportToPng}
             onExportToSvg={onExportToSvg}

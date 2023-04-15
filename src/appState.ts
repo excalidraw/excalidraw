@@ -1,5 +1,6 @@
 import oc from "open-color";
 import {
+  DEFAULT_EXPORT_PADDING,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
@@ -54,6 +55,7 @@ export const getDefaultAppState = (): Omit<
     exportScale: defaultExportScale,
     exportEmbedScene: false,
     exportWithDarkMode: false,
+    exportPadding: DEFAULT_EXPORT_PADDING,
     fileHandle: null,
     gridSize: null,
     isBindingEnabled: true,
@@ -144,6 +146,7 @@ const APP_STATE_STORAGE_CONF = (<
   exportBackground: { browser: true, export: false, server: false },
   exportEmbedScene: { browser: true, export: false, server: false },
   exportScale: { browser: true, export: false, server: false },
+  exportPadding: { browser: true, export: false, server: false },
   exportWithDarkMode: { browser: true, export: false, server: false },
   fileHandle: { browser: false, export: false, server: false },
   gridSize: { browser: true, export: true, server: true },
