@@ -440,6 +440,29 @@ export const deepCopyElement = <T extends ExcalidrawElement>(
 };
 
 /**
+ * utility wrapper to generate new id. In test env it reuses the old + postfix
+ * for test assertions.
+ */
+const regenerateId = (
+  /** supply null if no previous id exists */
+  previousId: string | null,
+) => {
+  if (isTestEnv() && previousId) {
+    let nextId = `${previousId}_copy`;
+    // `window.h` may not be defined in some unit tests
+    if (
+      window.h?.app
+        ?.getSceneElementsIncludingDeleted()
+        .find((el) => el.id === nextId)
+    ) {
+      nextId += "_copy";
+    }
+    return nextId;
+  }
+  return randomId();
+};
+
+/**
  * Duplicate an element, often used in the alt-drag operation.
  * Note that this method has gotten a bit complicated since the
  * introduction of gruoping/ungrouping elements.
@@ -461,19 +484,7 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
 ): Readonly<TElement> => {
   let copy = deepCopyElement(element);
 
-  if (isTestEnv()) {
-    copy.id = `${copy.id}_copy`;
-    // `window.h` may not be defined in some unit tests
-    if (
-      window.h?.app
-        ?.getSceneElementsIncludingDeleted()
-        .find((el) => el.id === copy.id)
-    ) {
-      copy.id += "_copy";
-    }
-  } else {
-    copy.id = randomId();
-  }
+  copy.id = regenerateId(copy.id);
   copy.boundElements = null;
   copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();
@@ -482,7 +493,7 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
     editingGroupId,
     (groupId) => {
       if (!groupIdMapForOperation.has(groupId)) {
-        groupIdMapForOperation.set(groupId, randomId());
+        groupIdMapForOperation.set(groupId, regenerateId(groupId));
       }
       return groupIdMapForOperation.get(groupId)!;
     },
@@ -520,7 +531,7 @@ export const duplicateElements = (elements: readonly ExcalidrawElement[]) => {
     // if we haven't migrated the element id, but an old element with the same
     // id exists, generate a new id for it and return it
     if (origElementsMap.has(id)) {
-      const newId = randomId();
+      const newId = regenerateId(id);
       elementNewIdsMap.set(id, newId);
       return newId;
     }
@@ -538,7 +549,7 @@ export const duplicateElements = (elements: readonly ExcalidrawElement[]) => {
     if (clonedElement.groupIds) {
       clonedElement.groupIds = clonedElement.groupIds.map((groupId) => {
         if (!groupNewIdsMap.has(groupId)) {
-          groupNewIdsMap.set(groupId, randomId());
+          groupNewIdsMap.set(groupId, regenerateId(groupId));
         }
         return groupNewIdsMap.get(groupId)!;
       });
