@@ -3500,6 +3500,43 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ contextMenu: null });
     }
 
+    this.updateGestureOnPointerDown(event);
+
+    // if dragging element is freedraw and another pointerdown event occurs
+    // a second finger is on the screen
+    // discard the freedraw element if it is very short because it is likely
+    // just a spike, otherwise finalize the freedraw element when the second
+    // finger is lifted
+    if (
+      event.pointerType === "touch" &&
+      this.state.draggingElement &&
+      this.state.draggingElement.type === "freedraw"
+    ) {
+      const element = this.state.draggingElement as ExcalidrawFreeDrawElement;
+      this.updateScene({
+        ...(element.points.length < 10
+          ? {
+              elements: this.scene
+                .getElementsIncludingDeleted()
+                .filter((el) => el.id !== element.id),
+            }
+          : {}),
+        appState: {
+          draggingElement: null,
+          editingElement: null,
+          startBoundElement: null,
+          suggestedBindings: [],
+          selectedElementIds: Object.keys(this.state.selectedElementIds)
+            .filter((key) => key !== element.id)
+            .reduce((obj: { [id: string]: boolean }, key) => {
+              obj[key] = this.state.selectedElementIds[key];
+              return obj;
+            }, {}),
+        },
+      });
+      return;
+    }
+
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)
@@ -3538,8 +3575,6 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton: "down",
     });
     this.savePointer(event.clientX, event.clientY, "down");
-
-    this.updateGestureOnPointerDown(event);
 
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
