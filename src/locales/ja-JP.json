@@ -110,6 +110,7 @@
     "increaseFontSize": "フォントサイズを拡大",
     "unbindText": "テキストのバインド解除",
     "bindText": "テキストをコンテナにバインド",
+    "createContainerFromText": "",
     "link": {
       "edit": "リンクを編集",
       "create": "リンクを作成",
@@ -204,7 +205,22 @@
     "cannotResolveCollabServer": "コラボレーションサーバに接続できませんでした。ページを再読み込みして、もう一度お試しください。",
     "importLibraryError": "ライブラリを読み込めませんでした。",
     "collabSaveFailed": "バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
-    "collabSaveFailed_sizeExceeded": "キャンバスが大きすぎるため、バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。"
+    "collabSaveFailed_sizeExceeded": "キャンバスが大きすぎるため、バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "設定が有効化されました",
+      "break": "",
+      "text_elements": "テキスト要素",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "選択",
@@ -303,7 +319,8 @@
     "doubleClick": "ダブルクリック",
     "drag": "ドラッグ",
     "editor": "エディタ",
-    "editSelectedShape": "選択した図形の編集 (テキスト/矢印/線)",
+    "editLineArrowPoints": "",
+    "editText": "テキストの編集 / ラベルの追加",
     "github": "不具合報告はこちら",
     "howto": "ヘルプ・マニュアル",
     "or": "または",

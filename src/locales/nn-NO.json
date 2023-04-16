@@ -110,6 +110,7 @@
     "increaseFontSize": "Gjer skriftstorleik større",
     "unbindText": "Avbind tekst",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "Rediger lenke",
       "create": "Lag lenke",
@@ -204,7 +205,22 @@
     "cannotResolveCollabServer": "Kunne ikkje kople til samarbeidsserveren. Ver vennleg å oppdatere inn sida og prøv på nytt.",
     "importLibraryError": "",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "Vel",
@@ -303,7 +319,8 @@
     "doubleClick": "dobbelklikk",
     "drag": "drag",
     "editor": "Redigering",
-    "editSelectedShape": "Rediger valt form (tekst/pil/linje)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Funne eit problem? Send inn",
     "howto": "Følg vegleiinga vår",
     "or": "eller",

@@ -110,6 +110,7 @@
     "increaseFontSize": "எழுத்துரு அளவை அதிகரி",
     "unbindText": "உரையைப் பிணைவவிழ்",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "தொடுப்பைத் திருத்து",
       "create": "தொடுப்பைப் படை",
@@ -204,7 +205,22 @@
     "cannotResolveCollabServer": "",
     "importLibraryError": "நூலகத்தை ஏற்ற முடியவில்லை",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "தெரிவு",
@@ -303,7 +319,8 @@
     "doubleClick": "இரு-சொடுக்கு",
     "drag": "பிடித்திழு",
     "editor": "திருத்தி",
-    "editSelectedShape": "தேர்ந்த வடிவத்தைத் திருத்து (உரை/அம்பு/வரி)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "சிக்கலைக் கண்டீரா? சமர்ப்பி",
     "howto": "எங்கள் கையேடுகளைப் பின்பற்றுக",
     "or": "அ",

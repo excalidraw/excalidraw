@@ -110,6 +110,7 @@
     "increaseFontSize": "Kasvata kirjasinkokoa",
     "unbindText": "Irroita teksti",
     "bindText": "Kiinnitä teksti säiliöön",
+    "createContainerFromText": "",
     "link": {
       "edit": "Muokkaa linkkiä",
       "create": "Luo linkki",
@@ -204,7 +205,22 @@
     "cannotResolveCollabServer": "Yhteyden muodostaminen collab-palvelimeen epäonnistui. Virkistä sivu ja yritä uudelleen.",
     "importLibraryError": "Kokoelman lataaminen epäonnistui",
     "collabSaveFailed": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi.",
-    "collabSaveFailed_sizeExceeded": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi."
+    "collabSaveFailed_sizeExceeded": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi.",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "Valinta",
@@ -303,7 +319,8 @@
     "doubleClick": "kaksoisnapsautus",
     "drag": "vedä",
     "editor": "Muokkausohjelma",
-    "editSelectedShape": "Muokkaa valittua muotoa (teksti/nuoli/viiva)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Löysitkö ongelman? Kerro meille",
     "howto": "Seuraa oppaitamme",
     "or": "tai",

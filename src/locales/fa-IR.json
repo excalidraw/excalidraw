@@ -110,6 +110,7 @@
     "increaseFontSize": "افزایش دادن اندازه فونت",
     "unbindText": "بازکردن نوشته",
     "bindText": "بستن نوشته",
+    "createContainerFromText": "",
     "link": {
       "edit": "ویرایش لینک",
       "create": "ایجاد پیوند",
@@ -204,7 +205,22 @@
     "cannotResolveCollabServer": "به سرور collab متصل نشد. لطفا صفحه را مجددا بارگذاری کنید و دوباره تلاش کنید.",
     "importLibraryError": "داده‌ها بارگذاری نشدند",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "گزینش",
@@ -303,7 +319,8 @@
     "doubleClick": "دابل کلیک",
     "drag": "کشیدن",
     "editor": "ویرایشگر",
-    "editSelectedShape": "ویرایش شکل انتخاب شده (متن/فلش/خط)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "اشکالی می بینید؟ گزارش دهید",
     "howto": "راهنمای ما را دنبال کنید",
     "or": "یا",
