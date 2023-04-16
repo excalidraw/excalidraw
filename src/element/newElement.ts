@@ -588,13 +588,3 @@ export const duplicateElements = (elements: readonly ExcalidrawElement[]) => {
 
   return clonedElements;
 };
-
-// @ts-ignore
-window.wrapSelected = (...args) => {
-  const id = args[0];
-  const value = args.length === 2 ? args[1] : id;
-  if (window.h.state.selectedElementIds[id]) {
-    return `(${value})`;
-  }
-  return value;
-};
