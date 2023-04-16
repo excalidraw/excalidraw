@@ -46,6 +46,7 @@ describe("duplicating single elements", () => {
 
     assertCloneObjects(element, copy);
 
+    // assert we clone the object's prototype
     // @ts-ignore
     expect(copy.__proto__).toEqual({ hello: "world" });
     expect(copy.hasOwnProperty("hello")).toBe(false);

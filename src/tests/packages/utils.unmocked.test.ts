@@ -3,6 +3,10 @@ import { ImportedDataState } from "../../data/types";
 import * as utils from "../../packages/utils";
 import { API } from "../helpers/api";
 
+// NOTE this test file is using the actual API, unmocked. Hence splitting it
+// from the other test file, because I couldn't figure out how to test
+// mocked and unmocked API in the same file.
+
 describe("embedding scene data", () => {
   describe("exportToSvg", () => {
     it("embedding scene data shouldn't modify them", async () => {
