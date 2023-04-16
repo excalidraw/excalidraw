@@ -110,6 +110,7 @@
     "increaseFontSize": "Aumentar el tamaño de letra",
     "unbindText": "Desvincular texto",
     "bindText": "Vincular texto al contenedor",
+    "createContainerFromText": "Envolver el texto en un contenedor",
     "link": {
       "edit": "Editar enlace",
       "create": "Crear enlace",
@@ -204,7 +205,22 @@
     "cannotResolveCollabServer": "No se pudo conectar al servidor colaborador. Por favor, vuelva a cargar la página y vuelva a intentarlo.",
     "importLibraryError": "No se pudo cargar la librería",
     "collabSaveFailed": "No se pudo guardar en la base de datos del backend. Si los problemas persisten, debería guardar su archivo localmente para asegurarse de que no pierde su trabajo.",
-    "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Debería guardar el archivo localmente para asegurarse de que no pierde su trabajo."
+    "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Debería guardar el archivo localmente para asegurarse de que no pierde su trabajo.",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "ajuste activado",
+      "break": "Esto podría resultar en romper los",
+      "text_elements": "Elementos de texto",
+      "in_your_drawings": "en tus dibujos",
+      "strongly_recommend": "Recomendamos desactivar esta configuración. Puedes seguir",
+      "steps": "estos pasos",
+      "how": "sobre cómo hacerlo",
+      "disable_setting": " Si deshabilitar esta opción no arregla la visualización de elementos de texto, por favor abre un",
+      "issue": "issue",
+      "write": "en GitHub, o escríbenos en",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Selección",
@@ -303,7 +319,8 @@
     "doubleClick": "doble clic",
     "drag": "arrastrar",
     "editor": "Editor",
-    "editSelectedShape": "Editar la forma seleccionada (texto/flecha/línea)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "¿Ha encontrado un problema? Envíelo",
     "howto": "Siga nuestras guías",
     "or": "o",
