@@ -320,6 +320,48 @@ describe("duplicating multiple elements", () => {
   });
 
   describe("should duplicate all group ids", () => {
-    // TOOD
+    it("should regenerate all group ids and keep them consistent across elements", () => {
+      const rectangle1 = API.createElement({
+        type: "rectangle",
+        groupIds: ["g1"],
+      });
+      const rectangle2 = API.createElement({
+        type: "rectangle",
+        groupIds: ["g2", "g1"],
+      });
+      const rectangle3 = API.createElement({
+        type: "rectangle",
+        groupIds: ["g2", "g1"],
+      });
+
+      const origElements = [rectangle1, rectangle2, rectangle3] as const;
+      const clonedElements = duplicateElements(
+        origElements,
+      ) as any as typeof origElements;
+      const [clonedRectangle1, clonedRectangle2, clonedRectangle3] =
+        clonedElements;
+
+      expect(rectangle1.groupIds[0]).not.toBe(clonedRectangle1.groupIds[0]);
+      expect(rectangle2.groupIds[0]).not.toBe(clonedRectangle2.groupIds[0]);
+      expect(rectangle2.groupIds[1]).not.toBe(clonedRectangle2.groupIds[1]);
+
+      expect(clonedRectangle1.groupIds[0]).toBe(clonedRectangle2.groupIds[1]);
+      expect(clonedRectangle2.groupIds[0]).toBe(clonedRectangle3.groupIds[0]);
+      expect(clonedRectangle2.groupIds[1]).toBe(clonedRectangle3.groupIds[1]);
+    });
+
+    it("should keep and regenerate ids of groups even if invalid", () => {
+      // lone element shouldn't be able to be grouped with itself,
+      // but hard to check against in a performant way so we ignore it
+      const rectangle1 = API.createElement({
+        type: "rectangle",
+        groupIds: ["g1"],
+      });
+
+      const [clonedRectangle1] = duplicateElements([rectangle1]);
+
+      expect(typeof clonedRectangle1.groupIds[0]).toBe("string");
+      expect(rectangle1.groupIds[0]).not.toBe(clonedRectangle1.groupIds[0]);
+    });
   });
 });
