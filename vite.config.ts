@@ -17,11 +17,13 @@ export default defineConfig({
     // This is needed in order to use the same env API format that CRA uses with the EJS templating
     // Vite by default uses import.meta.env
     ViteEjsPlugin((config) => {
-      const envs = loadEnv(config.mode, "./");
+      const esmEnvironment = loadEnv(config.mode, "./");
       const templatingEnvs = {
         process: {
+          // Allow EJS templating to build upon environment variables at build time
           env: {
-            ...envs,
+            ...process.env,
+            ...esmEnvironment,
           },
         },
       };
