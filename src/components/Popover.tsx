@@ -36,7 +36,13 @@ export const Popover = ({
       return;
     }
 
-    container.focus();
+    // focus popover only if the caller didn't focus on something else nested
+    // within the popover, which should take precedence. Fixes cases
+    // like color picker listening to keydown events on containers nested
+    // in the popover.
+    if (!container.contains(document.activeElement)) {
+      container.focus();
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === KEYS.TAB) {
