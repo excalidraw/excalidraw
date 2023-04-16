@@ -127,7 +127,11 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
+import {
+  deepCopyElement,
+  duplicateElements,
+  newFreeDrawElement,
+} from "../element/newElement";
 import {
   hasBoundTextElement,
   isArrowElement,
@@ -1625,35 +1629,22 @@ class App extends React.Component<AppProps, AppState> {
 
     const dx = x - elementsCenterX;
     const dy = y - elementsCenterY;
-    const groupIdMap = new Map();
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.state.gridSize);
 
-    const oldIdToDuplicatedId = new Map();
-    const newElements = elements.map((element) => {
-      const newElement = duplicateElement(
-        this.state.editingGroupId,
-        groupIdMap,
-        element,
-        {
+    const newElements = duplicateElements(
+      elements.map((element) => {
+        return newElementWith(element, {
           x: element.x + gridX - minX,
           y: element.y + gridY - minY,
-        },
-      );
-      oldIdToDuplicatedId.set(element.id, newElement.id);
-      return newElement;
-    });
+        });
+      }),
+    );
 
-    bindTextToShapeAfterDuplication(newElements, elements, oldIdToDuplicatedId);
     const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
     ];
-    fixBindingsAfterDuplication(nextElements, elements, oldIdToDuplicatedId);
-
-    if (opts.files) {
-      this.files = { ...this.files, ...opts.files };
-    }
 
     this.scene.replaceAllElements(nextElements);
 
@@ -1663,6 +1654,10 @@ class App extends React.Component<AppProps, AppState> {
         redrawTextBoundingBox(newElement, container);
       }
     });
+
+    if (opts.files) {
+      this.files = { ...this.files, ...opts.files };
+    }
 
     this.history.resumeRecording();
 

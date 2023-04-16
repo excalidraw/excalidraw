@@ -72,6 +72,100 @@ describe("library", () => {
     });
   });
 
+  it("should regenerate ids but retain bindings on library insert", async () => {
+    const rectangle = API.createElement({
+      id: "rectangle1",
+      type: "rectangle",
+      boundElements: [
+        { type: "text", id: "text1" },
+        { type: "arrow", id: "arrow1" },
+      ],
+    });
+    const text = API.createElement({
+      id: "text1",
+      type: "text",
+      text: "ola",
+      containerId: "rectangle1",
+    });
+    const arrow = API.createElement({
+      id: "arrow1",
+      type: "arrow",
+      endBinding: { elementId: "rectangle1", focus: -1, gap: 0 },
+    });
+
+    await API.drop(
+      new Blob(
+        [
+          serializeLibraryAsJSON([
+            {
+              id: "item1",
+              status: "published",
+              elements: [rectangle, text, arrow],
+              created: 1,
+            },
+          ]),
+        ],
+        {
+          type: MIME_TYPES.excalidrawlib,
+        },
+      ),
+    );
+
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          id: "rectangle1_copy",
+          boundElements: expect.arrayContaining([
+            { type: "text", id: "text1_copy" },
+            { type: "arrow", id: "arrow1_copy" },
+          ]),
+        }),
+        expect.objectContaining({
+          id: "text1_copy",
+          containerId: "rectangle1_copy",
+        }),
+        expect.objectContaining({
+          id: "arrow1_copy",
+          endBinding: expect.objectContaining({ elementId: "rectangle1_copy" }),
+        }),
+      ]);
+    });
+  });
+
+  it("should fix duplicate ids between items on insert", async () => {
+    // note, we're not testing for duplicate group ids and such because
+    // deduplication of that happens upstream in the library component
+    // which would be very hard to orchestrate in this test
+
+    const elem1 = API.createElement({
+      id: "elem1",
+      type: "rectangle",
+    });
+    const item1: LibraryItem = {
+      id: "item1",
+      status: "published",
+      elements: [elem1],
+      created: 1,
+    };
+
+    await API.drop(
+      new Blob([serializeLibraryAsJSON([item1, item1])], {
+        type: MIME_TYPES.excalidrawlib,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          id: "elem1_copy",
+        }),
+        expect.objectContaining({
+          id: expect.not.stringMatching(/^(elem1_copy|elem1)$/),
+        }),
+      ]);
+    });
+  });
+
   it("inserting library item should revert to selection tool", async () => {
     UI.clickTool("rectangle");
     expect(h.elements).toEqual([]);

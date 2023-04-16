@@ -211,7 +211,10 @@ export class API {
           type,
           startArrowhead: null,
           endArrowhead: null,
-          points: rest.points ?? [],
+          points: rest.points ?? [
+            [0, 0],
+            [100, 100],
+          ],
         });
         break;
       case "image":
