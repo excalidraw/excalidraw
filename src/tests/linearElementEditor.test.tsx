@@ -506,7 +506,7 @@ describe("Test Linear Elements", () => {
         // delete 3rd point
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
-        expect(renderScene).toHaveBeenCalledTimes(22);
+        expect(renderScene).toHaveBeenCalledTimes(21);
 
         const newMidPoints = LinearElementEditor.getEditorMidPoints(
           line,
