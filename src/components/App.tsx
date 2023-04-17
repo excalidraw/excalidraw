@@ -2143,10 +2143,6 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
-        this.setState({ isBindingEnabled: false });
-      }
-
       if (isArrowKey(event.key)) {
         const step =
           (this.state.gridSize &&
