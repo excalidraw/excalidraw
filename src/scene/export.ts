@@ -106,6 +106,9 @@ export const exportToSvg = async (
     exportEmbedScene?: boolean;
   },
   files: BinaryFiles | null,
+  opts?: {
+    serializeAsJSON?: () => string;
+  },
 ): Promise<SVGSVGElement> => {
   const {
     exportPadding = DEFAULT_EXPORT_PADDING,
@@ -120,7 +123,9 @@ export const exportToSvg = async (
       metadata = await (
         await import(/* webpackChunkName: "image" */ "../../src/data/image")
       ).encodeSvgMetadata({
-        text: serializeAsJSON(elements, appState, files || {}, "local"),
+        text: opts?.serializeAsJSON
+          ? opts?.serializeAsJSON?.()
+          : serializeAsJSON(elements, appState, files || {}, "local"),
       });
     } catch (error: any) {
       console.error(error);
