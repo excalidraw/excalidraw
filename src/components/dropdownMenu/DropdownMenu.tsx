@@ -24,10 +24,11 @@ const DropdownMenu = ({
 }) => {
   const MenuTriggerComp = getMenuTriggerComponent(children);
   const MenuContentComp = getMenuContentComponent(children);
+
   return (
     <DropdownMenuPrimitive.Root open={open}>
       {MenuTriggerComp}
-      {open && MenuContentComp}
+      {MenuContentComp}
     </DropdownMenuPrimitive.Root>
   );
 };

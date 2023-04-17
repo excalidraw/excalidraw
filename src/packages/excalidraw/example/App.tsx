@@ -506,6 +506,16 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
   const renderMenu = () => {
     return (
       <MainMenu>
+        <MainMenu.Sub>
+          <MainMenu.Sub.Trigger>Trigger</MainMenu.Sub.Trigger>
+          <MainMenu.Sub.Content>
+            <MainMenu.Sub.Item
+              onSelect={() => window.alert("You clicked on sub item")}
+            >
+              Sub item
+            </MainMenu.Sub.Item>
+          </MainMenu.Sub.Content>
+        </MainMenu.Sub>
         <MainMenu.DefaultItems.SaveAsImage />
         <MainMenu.DefaultItems.Export />
         <MainMenu.Separator />

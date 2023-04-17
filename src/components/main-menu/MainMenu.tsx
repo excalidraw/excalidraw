@@ -14,6 +14,7 @@ import { HamburgerMenuIcon } from "../icons";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { composeEventHandlers } from "../../utils";
 import { useTunnels } from "../context/tunnels";
+import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
 
 const MainMenu = Object.assign(
   withInternalFallback(
@@ -77,6 +78,7 @@ const MainMenu = Object.assign(
     ItemCustom: DropdownMenu.ItemCustom,
     Group: DropdownMenu.Group,
     Separator: DropdownMenu.Separator,
+    Sub: DropdownMenuSub,
     DefaultItems,
   },
 );
