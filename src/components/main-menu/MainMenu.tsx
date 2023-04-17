@@ -15,8 +15,6 @@ import { withInternalFallback } from "../hoc/withInternalFallback";
 import { composeEventHandlers } from "../../utils";
 import { useTunnels } from "../context/tunnels";
 
-import * as DropdownMenuRadix from "@radix-ui/react-dropdown-menu";
-
 const MainMenu = Object.assign(
   withInternalFallback(
     "MainMenu",
@@ -40,7 +38,7 @@ const MainMenu = Object.assign(
 
       return (
         <mainMenuTunnel.In>
-          <DropdownMenuRadix.Root open={appState.openMenu === "canvas"}>
+          <DropdownMenu open={appState.openMenu === "canvas"}>
             <DropdownMenu.Trigger
               onToggle={() => {
                 setAppState({
@@ -67,7 +65,7 @@ const MainMenu = Object.assign(
                 </fieldset>
               )}
             </DropdownMenu.Content>
-          </DropdownMenuRadix.Root>
+          </DropdownMenu>
         </mainMenuTunnel.In>
       );
     },
