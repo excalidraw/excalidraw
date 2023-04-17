@@ -7,6 +7,8 @@ import Stack from "../Stack";
 import React from "react";
 import { DropdownMenuContentPropsContext } from "./common";
 
+import * as DropdownMenuRadix from "@radix-ui/react-dropdown-menu";
+
 const MenuContent = ({
   children,
   onClickOutside,
@@ -34,7 +36,7 @@ const MenuContent = ({
 
   return (
     <DropdownMenuContentPropsContext.Provider value={{ onSelect }}>
-      <div
+      <DropdownMenuRadix.Content
         ref={menuRef}
         className={classNames}
         style={style}
@@ -53,7 +55,7 @@ const MenuContent = ({
             {children}
           </Island>
         )}
-      </div>
+      </DropdownMenuRadix.Content>
     </DropdownMenuContentPropsContext.Provider>
   );
 };
