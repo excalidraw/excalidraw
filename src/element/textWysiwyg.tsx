@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, VERTICAL_ALIGN } from "../constants";
+import { CLASSES, isSafari, VERTICAL_ALIGN } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -34,6 +34,8 @@ import {
   wrapText,
   getMaxContainerHeight,
   getMaxContainerWidth,
+  computeContainerDimensionForBoundText,
+  detectLineHeight,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -208,11 +210,12 @@ export const textWysiwyg = ({
 
         // autogrow container height if text exceeds
         if (!isArrowElement(container) && textElementHeight > maxHeight) {
-          const diff = Math.min(
-            textElementHeight - maxHeight,
-            element.lineHeight,
+          const targetContainerHeight = computeContainerDimensionForBoundText(
+            textElementHeight,
+            container.type,
           );
-          mutateElement(container, { height: containerDims.height + diff });
+
+          mutateElement(container, { height: targetContainerHeight });
           return;
         } else if (
           // autoshrink container height until original container height
@@ -221,11 +224,11 @@ export const textWysiwyg = ({
           containerDims.height > originalContainerData.height &&
           textElementHeight < maxHeight
         ) {
-          const diff = Math.min(
-            maxHeight - textElementHeight,
-            element.lineHeight,
+          const targetContainerHeight = computeContainerDimensionForBoundText(
+            textElementHeight,
+            container.type,
           );
-          mutateElement(container, { height: containerDims.height - diff });
+          mutateElement(container, { height: targetContainerHeight });
         }
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
@@ -269,13 +272,24 @@ export const textWysiwyg = ({
       } else {
         textElementWidth += 0.5;
       }
+
+      let lineHeight = updatedTextElement.lineHeight;
+
+      // In Safari the font size gets rounded off when rendering hence calculating the line height by rounding off font size
+      if (isSafari) {
+        lineHeight = detectLineHeight({
+          ...updatedTextElement,
+          fontSize: Math.round(updatedTextElement.fontSize),
+        });
+      }
+
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
       Object.assign(editable.style, {
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
-        lineHeight: element.lineHeight,
+        lineHeight,
         width: `${textElementWidth}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
@@ -295,6 +309,7 @@ export const textWysiwyg = ({
         filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
       });
+      editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
       if (isTestEnv()) {

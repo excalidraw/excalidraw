@@ -110,6 +110,7 @@
     "increaseFontSize": "Aumenta la dimensione dei caratteri",
     "unbindText": "Scollega testo",
     "bindText": "Associa il testo al container",
+    "createContainerFromText": "",
     "link": {
       "edit": "Modifica link",
       "create": "Crea link",
@@ -204,7 +205,22 @@
     "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova.",
     "importLibraryError": "Impossibile caricare la libreria",
     "collabSaveFailed": "Impossibile salvare nel database di backend. Se i problemi persistono, dovresti salvare il tuo file localmente per assicurarti di non perdere il tuo lavoro.",
-    "collabSaveFailed_sizeExceeded": "Impossibile salvare nel database di backend, la tela sembra essere troppo grande. Dovresti salvare il file localmente per assicurarti di non perdere il tuo lavoro."
+    "collabSaveFailed_sizeExceeded": "Impossibile salvare nel database di backend, la tela sembra essere troppo grande. Dovresti salvare il file localmente per assicurarti di non perdere il tuo lavoro.",
+    "brave_measure_text_error": {
+      "start": "Sembra che tu stia usando il browser Brave con il",
+      "aggressive_block_fingerprint": "Blocco Aggressivamente Impronte Digitali",
+      "setting_enabled": "impostazioni abilitate",
+      "break": "Questo potrebbe portare a rompere gli",
+      "text_elements": "Elementi Di Testo",
+      "in_your_drawings": "nei tuoi disegni",
+      "strongly_recommend": "Si consiglia vivamente di disabilitare questa impostazione. È possibile seguire",
+      "steps": "questi passaggi",
+      "how": "su come fare",
+      "disable_setting": " Se la disabilitazione di questa impostazione non corregge la visualizzazione degli elementi di testo, apri un",
+      "issue": "problema",
+      "write": "sul nostro GitHub, o scrivici su",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Selezione",
@@ -303,7 +319,8 @@
     "doubleClick": "doppio-click",
     "drag": "trascina",
     "editor": "Editor",
-    "editSelectedShape": "Modifica la forma selezionata (testo/freccia/linea)",
+    "editLineArrowPoints": "",
+    "editText": "Modifica testo / aggiungi etichetta",
     "github": "Trovato un problema? Segnalalo",
     "howto": "Segui le nostre guide",
     "or": "oppure",

@@ -110,6 +110,7 @@
     "increaseFontSize": "Aumentar o tamanho do tipo de letra",
     "unbindText": "Desvincular texto",
     "bindText": "Ligar texto ao recipiente",
+    "createContainerFromText": "Envolver texto num recipiente",
     "link": {
       "edit": "Editar ligação",
       "create": "Criar ligação",
@@ -204,7 +205,22 @@
     "cannotResolveCollabServer": "Não foi possível fazer a ligação ao servidor colaborativo. Por favor, volte a carregar a página e tente novamente.",
     "importLibraryError": "Não foi possível carregar a biblioteca",
     "collabSaveFailed": "Não foi possível guardar na base de dados de backend. Se os problemas persistirem, guarde o ficheiro localmente para garantir que não perde o seu trabalho.",
-    "collabSaveFailed_sizeExceeded": "Não foi possível guardar na base de dados de backend, o ecrã parece estar muito grande. Deve guardar o ficheiro localmente para garantir que não perde o seu trabalho."
+    "collabSaveFailed_sizeExceeded": "Não foi possível guardar na base de dados de backend, o ecrã parece estar muito grande. Deve guardar o ficheiro localmente para garantir que não perde o seu trabalho.",
+    "brave_measure_text_error": {
+      "start": "Parece que está a usar o navegador Brave com o",
+      "aggressive_block_fingerprint": "Bloqueio Agressivo via Impressão Digital",
+      "setting_enabled": "activo",
+      "break": "Isso pode desconfigurar os",
+      "text_elements": "Elementos de Texto",
+      "in_your_drawings": "nos seus desenhos",
+      "strongly_recommend": "Recomendamos fortemente a desactivação desta configuração. Pode seguir",
+      "steps": "os seguintes passos",
+      "how": "para saber como o fazer",
+      "disable_setting": " Se desactivar esta configuração não consertar a exibição de elementos de texto, por favor, abra um",
+      "issue": "problema",
+      "write": "no nosso GitHub ou então escreva-nos no",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Seleção",
@@ -303,7 +319,8 @@
     "doubleClick": "clique duplo",
     "drag": "arrastar",
     "editor": "Editor",
-    "editSelectedShape": "Editar forma selecionada (texto/seta/linha)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Encontrou algum problema? Informe-nos",
     "howto": "Siga os nossos guias",
     "or": "ou",

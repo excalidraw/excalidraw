@@ -13865,7 +13865,7 @@ Object {
   "fillStyle": "hachure",
   "frameId": null,
   "groupIds": Array [
-    "id6",
+    "id4_copy",
   ],
   "height": 10,
   "id": "id0_copy",
@@ -13899,7 +13899,7 @@ Object {
   "fillStyle": "hachure",
   "frameId": null,
   "groupIds": Array [
-    "id6",
+    "id4_copy",
   ],
   "height": 10,
   "id": "id1_copy",
@@ -13933,7 +13933,7 @@ Object {
   "fillStyle": "hachure",
   "frameId": null,
   "groupIds": Array [
-    "id6",
+    "id4_copy",
   ],
   "height": 10,
   "id": "id2_copy",
@@ -14430,7 +14430,7 @@ Object {
           "fillStyle": "hachure",
           "frameId": null,
           "groupIds": Array [
-            "id6",
+            "id4_copy",
           ],
           "height": 10,
           "id": "id0_copy",
@@ -14461,7 +14461,7 @@ Object {
           "fillStyle": "hachure",
           "frameId": null,
           "groupIds": Array [
-            "id6",
+            "id4_copy",
           ],
           "height": 10,
           "id": "id1_copy",
@@ -14492,7 +14492,7 @@ Object {
           "fillStyle": "hachure",
           "frameId": null,
           "groupIds": Array [
-            "id6",
+            "id4_copy",
           ],
           "height": 10,
           "id": "id2_copy",
