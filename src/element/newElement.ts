@@ -13,7 +13,12 @@ import {
   FontFamilyValues,
   ExcalidrawTextContainer,
 } from "../element/types";
-import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
+import {
+  arrayToMap,
+  getFontString,
+  getUpdatedTimestamp,
+  isTestEnv,
+} from "../utils";
 import { randomInteger, randomId, obsidianId } from "../random"; //zsviczian
 import { mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
@@ -368,16 +373,24 @@ export const newImageElement = (
   };
 };
 
-// Simplified deep clone for the purpose of cloning ExcalidrawElement only
-// (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)
+// Simplified deep clone for the purpose of cloning ExcalidrawElement.
+//
+// Only clones plain objects and arrays. Doesn't clone Date, RegExp, Map, Set,
+// Typed arrays and other non-null objects.
 //
 // Adapted from https://github.com/lukeed/klona
-export const deepCopyElement = (val: any, depth: number = 0) => {
+//
+// The reason for `deepCopyElement()` wrapper is type safety (only allow
+// passing ExcalidrawElement as the top-level argument).
+const _deepCopyElement = (val: any, depth: number = 0) => {
+  // only clone non-primitives
   if (val == null || typeof val !== "object") {
     return val;
   }
 
-  if (Object.prototype.toString.call(val) === "[object Object]") {
+  const objectType = Object.prototype.toString.call(val);
+
+  if (objectType === "[object Object]") {
     const tmp =
       typeof val.constructor === "function"
         ? Object.create(Object.getPrototypeOf(val))
@@ -389,7 +402,7 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
         if (depth === 0 && (key === "shape" || key === "canvas")) {
           continue;
         }
-        tmp[key] = deepCopyElement(val[key], depth + 1);
+        tmp[key] = _deepCopyElement(val[key], depth + 1);
       }
     }
     return tmp;
@@ -399,12 +412,65 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
     let k = val.length;
     const arr = new Array(k);
     while (k--) {
-      arr[k] = deepCopyElement(val[k], depth + 1);
+      arr[k] = _deepCopyElement(val[k], depth + 1);
     }
     return arr;
   }
 
+  // we're not cloning non-array & non-plain-object objects because we
+  // don't support them on excalidraw elements yet. If we do, we need to make
+  // sure we start cloning them, so let's warn about it.
+  if (process.env.NODE_ENV === "development") {
+    if (
+      objectType !== "[object Object]" &&
+      objectType !== "[object Array]" &&
+      objectType.startsWith("[object ")
+    ) {
+      console.warn(
+        `_deepCloneElement: unexpected object type ${objectType}. This value will not be cloned!`,
+      );
+    }
+  }
+
   return val;
+};
+
+/**
+ * Clones ExcalidrawElement data structure. Does not regenerate id, nonce, or
+ * any value. The purpose is to to break object references for immutability
+ * reasons, whenever we want to keep the original element, but ensure it's not
+ * mutated.
+ *
+ * Only clones plain objects and arrays. Doesn't clone Date, RegExp, Map, Set,
+ * Typed arrays and other non-null objects.
+ */
+export const deepCopyElement = <T extends ExcalidrawElement>(
+  val: T,
+): Mutable<T> => {
+  return _deepCopyElement(val);
+};
+
+/**
+ * utility wrapper to generate new id. In test env it reuses the old + postfix
+ * for test assertions.
+ */
+const regenerateId = (
+  /** supply null if no previous id exists */
+  previousId: string | null,
+) => {
+  if (isTestEnv() && previousId) {
+    let nextId = `${previousId}_copy`;
+    // `window.h` may not be defined in some unit tests
+    if (
+      window.h?.app
+        ?.getSceneElementsIncludingDeleted()
+        .find((el) => el.id === nextId)
+    ) {
+      nextId += "_copy";
+    }
+    return nextId;
+  }
+  return randomId();
 };
 
 /**
@@ -421,27 +487,15 @@ export const deepCopyElement = (val: any, depth: number = 0) => {
  * @param element Element to duplicate
  * @param overrides Any element properties to override
  */
-export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
+export const duplicateElement = <TElement extends ExcalidrawElement>(
   editingGroupId: AppState["editingGroupId"],
   groupIdMapForOperation: Map<GroupId, GroupId>,
   element: TElement,
   overrides?: Partial<TElement>,
-): TElement => {
-  let copy: TElement = deepCopyElement(element);
+): Readonly<TElement> => {
+  let copy = deepCopyElement(element);
 
-  if (isTestEnv()) {
-    copy.id = `${copy.id}_copy`;
-    // `window.h` may not be defined in some unit tests
-    if (
-      window.h?.app
-        ?.getSceneElementsIncludingDeleted()
-        .find((el) => el.id === copy.id)
-    ) {
-      copy.id += "_copy";
-    }
-  } else {
-    copy.id = copy.type === "text" ? obsidianId() : randomId(); //zsviczian
-  }
+  copy.id = copy.type === "text" ? obsidianId() : regenerateId(copy.id); //zsviczian
   copy.boundElements = null;
   copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();
@@ -450,7 +504,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
     editingGroupId,
     (groupId) => {
       if (!groupIdMapForOperation.has(groupId)) {
-        groupIdMapForOperation.set(groupId, randomId());
+        groupIdMapForOperation.set(groupId, regenerateId(groupId));
       }
       return groupIdMapForOperation.get(groupId)!;
     },
@@ -459,4 +513,103 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
     copy = Object.assign(copy, overrides);
   }
   return copy;
+};
+
+/**
+ * Clones elements, regenerating their ids (including bindings) and group ids.
+ *
+ * If bindings don't exist in the elements array, they are removed. Therefore,
+ * it's advised to supply the whole elements array, or sets of elements that
+ * are encapsulated (such as library items), if the purpose is to retain
+ * bindings to the cloned elements intact.
+ */
+export const duplicateElements = (elements: readonly ExcalidrawElement[]) => {
+  const clonedElements: ExcalidrawElement[] = [];
+
+  const origElementsMap = arrayToMap(elements);
+
+  // used for for migrating old ids to new ids
+  const elementNewIdsMap = new Map<
+    /* orig */ ExcalidrawElement["id"],
+    /* new */ ExcalidrawElement["id"]
+  >();
+
+  const maybeGetNewId = (id: ExcalidrawElement["id"]) => {
+    // if we've already migrated the element id, return the new one directly
+    if (elementNewIdsMap.has(id)) {
+      return elementNewIdsMap.get(id)!;
+    }
+    // if we haven't migrated the element id, but an old element with the same
+    // id exists, generate a new id for it and return it
+    if (origElementsMap.has(id)) {
+      const newId = regenerateId(id);
+      elementNewIdsMap.set(id, newId);
+      return newId;
+    }
+    // if old element doesn't exist, return null to mark it for removal
+    return null;
+  };
+
+  const groupNewIdsMap = new Map</* orig */ GroupId, /* new */ GroupId>();
+
+  for (const element of elements) {
+    const clonedElement: Mutable<ExcalidrawElement> = _deepCopyElement(element);
+
+    clonedElement.id = maybeGetNewId(element.id)!;
+
+    if (clonedElement.groupIds) {
+      clonedElement.groupIds = clonedElement.groupIds.map((groupId) => {
+        if (!groupNewIdsMap.has(groupId)) {
+          groupNewIdsMap.set(groupId, regenerateId(groupId));
+        }
+        return groupNewIdsMap.get(groupId)!;
+      });
+    }
+
+    if ("containerId" in clonedElement && clonedElement.containerId) {
+      const newContainerId = maybeGetNewId(clonedElement.containerId);
+      clonedElement.containerId = newContainerId;
+    }
+
+    if ("boundElements" in clonedElement && clonedElement.boundElements) {
+      clonedElement.boundElements = clonedElement.boundElements.reduce(
+        (
+          acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
+          binding,
+        ) => {
+          const newBindingId = maybeGetNewId(binding.id);
+          if (newBindingId) {
+            acc.push({ ...binding, id: newBindingId });
+          }
+          return acc;
+        },
+        [],
+      );
+    }
+
+    if ("endBinding" in clonedElement && clonedElement.endBinding) {
+      const newEndBindingId = maybeGetNewId(clonedElement.endBinding.elementId);
+      clonedElement.endBinding = newEndBindingId
+        ? {
+            ...clonedElement.endBinding,
+            elementId: newEndBindingId,
+          }
+        : null;
+    }
+    if ("startBinding" in clonedElement && clonedElement.startBinding) {
+      const newEndBindingId = maybeGetNewId(
+        clonedElement.startBinding.elementId,
+      );
+      clonedElement.startBinding = newEndBindingId
+        ? {
+            ...clonedElement.startBinding,
+            elementId: newEndBindingId,
+          }
+        : null;
+    }
+
+    clonedElements.push(clonedElement);
+  }
+
+  return clonedElements;
 };
