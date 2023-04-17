@@ -382,8 +382,8 @@
   },
   "publishSuccessDialog": {
     "title": "라이브러리 제출됨",
-    "content": "{{authorName}}님 감사합니다. 당신의 라이브러리가 심사를 위해 제출되었습니다. 진행 상황을 다음의 링크에서 확인할 수 있습니다.",
-    "link": "여기"
+    "content": "{{authorName}}님 감사합니다. 당신의 라이브러리가 심사를 위해 제출되었습니다. 진행 상황을",
+    "link": "여기에서 확인하실 수 있습니다."
   },
   "confirmDialog": {
     "resetLibrary": "라이브러리 리셋",
