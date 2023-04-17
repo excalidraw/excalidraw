@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useDevice, useExcalidrawAppState } from "../App";
-import * as DropdownMenuRadix from "@radix-ui/react-dropdown-menu";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 
 const MenuTrigger = ({
   className = "",
@@ -22,7 +22,7 @@ const MenuTrigger = ({
     },
   ).trim();
   return (
-    <DropdownMenuRadix.Trigger
+    <DropdownMenuPrimitive.Trigger
       data-prevent-outside-click
       className={classNames}
       onClick={onToggle}
@@ -30,7 +30,7 @@ const MenuTrigger = ({
       data-testid="dropdown-menu-button"
     >
       {children}
-    </DropdownMenuRadix.Trigger>
+    </DropdownMenuPrimitive.Trigger>
   );
 };
 

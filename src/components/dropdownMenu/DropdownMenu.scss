@@ -1,10 +1,12 @@
 @import "../../css/variables.module";
 
 .excalidraw {
+  [data-radix-popper-content-wrapper] {
+    z-index: 1 !important;
+  }
+
   .dropdown-menu {
     position: absolute;
-    top: 100%;
-    margin-top: 0.25rem;
 
     &--mobile {
       bottom: 55px;

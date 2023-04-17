@@ -13,7 +13,7 @@ import {
 
 import "./DropdownMenu.scss";
 
-import * as DropdownMenuRadix from "@radix-ui/react-dropdown-menu";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 
 const DropdownMenu = ({
   children,
@@ -25,10 +25,10 @@ const DropdownMenu = ({
   const MenuTriggerComp = getMenuTriggerComponent(children);
   const MenuContentComp = getMenuContentComponent(children);
   return (
-    <DropdownMenuRadix.Root open={open}>
+    <DropdownMenuPrimitive.Root open={open}>
       {MenuTriggerComp}
       {open && MenuContentComp}
-    </DropdownMenuRadix.Root>
+    </DropdownMenuPrimitive.Root>
   );
 };
 

@@ -7,7 +7,7 @@ import Stack from "../Stack";
 import React from "react";
 import { DropdownMenuContentPropsContext } from "./common";
 
-import * as DropdownMenuRadix from "@radix-ui/react-dropdown-menu";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 
 const MenuContent = ({
   children,
@@ -36,11 +36,14 @@ const MenuContent = ({
 
   return (
     <DropdownMenuContentPropsContext.Provider value={{ onSelect }}>
-      <DropdownMenuRadix.Content
+      <DropdownMenuPrimitive.Content
         ref={menuRef}
         className={classNames}
         style={style}
         data-testid="dropdown-menu"
+        side="bottom"
+        sideOffset={4}
+        align="start"
       >
         {/* the zIndex ensures this menu has higher stacking order,
     see https://github.com/excalidraw/excalidraw/pull/1445 */}
@@ -55,7 +58,7 @@ const MenuContent = ({
             {children}
           </Island>
         )}
-      </DropdownMenuRadix.Content>
+      </DropdownMenuPrimitive.Content>
     </DropdownMenuContentPropsContext.Provider>
   );
 };
