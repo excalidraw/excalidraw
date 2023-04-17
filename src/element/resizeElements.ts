@@ -20,6 +20,7 @@ import {
   getCommonBounds,
   getResizedElementAbsoluteCoords,
   getCommonBoundingBox,
+  getElementPointsCoords,
 } from "./bounds";
 import {
   isArrowElement,
@@ -718,6 +719,35 @@ export const resizeMultipleElements = (
       const textMeasurements = measureFontSizeFromWH(element, width, height);
       update.fontSize = textMeasurements?.size ?? element.fontSize;
       update.baseline = textMeasurements?.baseline ?? element.baseline;
+    }
+
+    // TODO remove this after solving the issue with changing bounds of linear
+    // elements with roughness > 0
+    if (isLinearElement(element) && (isFlippedByX || isFlippedByY)) {
+      const origBounds = getElementPointsCoords(element, element.points);
+      const newBounds = getElementPointsCoords(
+        { ...element, x, y },
+        rescaledPoints.points!,
+      );
+      const origXY = [element.x, element.y];
+      const newXY = [x, y];
+
+      const calculateCorrenction = (axis: "x" | "y") => {
+        const i = axis === "x" ? 0 : 1;
+        const delta1 =
+          newBounds[i + 2] - newXY[i] - (origXY[i] - origBounds[i]) * scale;
+        const delta2 =
+          (origBounds[i + 2] - origXY[i]) * scale - (newXY[i] - newBounds[i]);
+        return (delta1 + delta2) / 2;
+      };
+
+      if (isFlippedByX) {
+        update.x -= calculateCorrenction("x");
+      }
+
+      if (isFlippedByY) {
+        update.y -= calculateCorrenction("y");
+      }
     }
 
     updateBoundElements(latestElement, { newSize: { width, height } });
