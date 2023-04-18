@@ -1,7 +1,13 @@
-import { BOUND_TEXT_PADDING, ROUNDNESS, VERTICAL_ALIGN } from "../constants";
+import {
+  BOUND_TEXT_PADDING,
+  ROUNDNESS,
+  VERTICAL_ALIGN,
+  TEXT_ALIGN,
+} from "../constants";
 import { getNonDeletedElements, isTextElement, newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import {
+  computeBoundTextPosition,
   computeContainerDimensionForBoundText,
   getBoundTextElement,
   measureText,
@@ -34,6 +40,7 @@ export const actionUnbindText = register({
   trackEvent: { category: "element" },
   predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
+
     return selectedElements.some((element) => hasBoundTextElement(element));
   },
   perform: (elements, appState) => {
@@ -53,12 +60,15 @@ export const actionUnbindText = register({
           element.id,
         );
         resetOriginalContainerCache(element.id);
+        const { x, y } = computeBoundTextPosition(element, boundTextElement);
         mutateElement(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
           width,
           height,
           baseline,
           text: boundTextElement.originalText,
+          x,
+          y,
         });
         mutateElement(element, {
           boundElements: element.boundElements?.filter(
@@ -128,6 +138,7 @@ export const actionBindText = register({
     mutateElement(textElement, {
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
+      textAlign: TEXT_ALIGN.CENTER,
     });
     mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
@@ -137,6 +148,8 @@ export const actionBindText = register({
     });
     const originalContainerHeight = container.height;
     redrawTextBoundingBox(textElement, container);
+    // overwritting the cache with original container height so
+    // it can be restored when unbind
     updateOriginalContainerCache(container.id, originalContainerHeight);
 
     return {

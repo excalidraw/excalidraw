@@ -102,8 +102,6 @@ export const redrawTextBoundingBox = (
         );
         mutateElement(container, { height: nextHeight });
         maxContainerHeight = getMaxContainerHeight(container);
-        // overwritting the cache with original container height so
-        // it can be restored when unbind
         updateOriginalContainerCache(container.id, nextHeight);
       }
       const updatedTextElement = {
@@ -247,10 +245,16 @@ export const handleBindTextResize = (
   }
 };
 
-const computeBoundTextPosition = (
+export const computeBoundTextPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
+  if (isArrowElement(container)) {
+    return LinearElementEditor.getBoundTextElementPosition(
+      container,
+      boundTextElement,
+    );
+  }
   const containerCoords = getContainerCoords(container);
   const maxContainerHeight = getMaxContainerHeight(container);
   const maxContainerWidth = getMaxContainerWidth(container);
