@@ -1,10 +1,5 @@
 import colors from "./colors";
-import {
-  DEFAULT_FONT_FAMILY,
-  DEFAULT_FONT_SIZE,
-  ENV,
-  VERTICAL_ALIGN,
-} from "./constants";
+import { DEFAULT_FONT_SIZE, ENV } from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
 import { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
@@ -166,17 +161,7 @@ const bgColors = colors.elementBackground.slice(
 // Put all the common properties here so when the whole chart is selected
 // the properties dialog shows the correct selected values
 const commonProps = {
-  fillStyle: "hachure",
-  fontFamily: DEFAULT_FONT_FAMILY,
-  fontSize: DEFAULT_FONT_SIZE,
-  opacity: 100,
-  roughness: 1,
   strokeColor: colors.elementStroke[0],
-  roundness: null,
-  strokeStyle: "solid",
-  strokeWidth: 1,
-  verticalAlign: VERTICAL_ALIGN.MIDDLE,
-  locked: false,
 } as const;
 
 const getChartDimentions = (spreadsheet: Spreadsheet) => {
@@ -323,7 +308,6 @@ const chartBaseElements = (
         x: x + chartWidth / 2,
         y: y - BAR_HEIGHT - BAR_GAP * 2 - DEFAULT_FONT_SIZE,
         roundness: null,
-        strokeStyle: "solid",
         textAlign: "center",
       })
     : null;
