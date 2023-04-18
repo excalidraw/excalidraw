@@ -6,8 +6,7 @@ import { NonDeletedExcalidrawElement } from "./types";
 import { AppState, PointerDownState, Zoom } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
-import { Snaps } from "../snapping";
-import * as Snapping from "./snapping";
+import { Snaps, snapProject } from "../snapping";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -75,7 +74,7 @@ const updateElementCoords = (
     y: originalElement.y,
   };
 
-  const projection = Snapping.project({
+  const projection = snapProject({
     origin,
     offset,
     snaps,
