@@ -196,8 +196,8 @@ const pushContainerBelowText = (
   return updatedElements;
 };
 
-export const actionCreateContainerFromText = register({
-  name: "createContainerFromText",
+export const actionWrapTextInContainer = register({
+  name: "wrapTextInContainer",
   contextItemLabel: "labels.createContainerFromText",
   trackEvent: { category: "element" },
   predicate: (elements, appState) => {
@@ -286,6 +286,7 @@ export const actionCreateContainerFromText = register({
             containerId: container.id,
             verticalAlign: VERTICAL_ALIGN.MIDDLE,
             boundElements: null,
+            textAlign: TEXT_ALIGN.CENTER,
           },
           false,
         );
