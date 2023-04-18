@@ -11,6 +11,12 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## Unreleased
+
+### Docs
+
+- Fix docs link in readme [#6486](https://github.com/excalidraw/excalidraw/pull/6486)
+
 ## 0.15.1 (2023-04-18)
 
 ### Docs
