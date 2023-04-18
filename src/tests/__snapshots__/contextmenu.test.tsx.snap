@@ -120,7 +120,7 @@ Object {
         },
       },
       Object {
-        "contextItemLabel": "labels.wrapTextInContainer",
+        "contextItemLabel": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -4517,7 +4517,7 @@ Object {
         },
       },
       Object {
-        "contextItemLabel": "labels.wrapTextInContainer",
+        "contextItemLabel": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -5067,7 +5067,7 @@ Object {
         },
       },
       Object {
-        "contextItemLabel": "labels.wrapTextInContainer",
+        "contextItemLabel": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -5916,7 +5916,7 @@ Object {
         },
       },
       Object {
-        "contextItemLabel": "labels.wrapTextInContainer",
+        "contextItemLabel": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -6262,7 +6262,7 @@ Object {
         },
       },
       Object {
-        "contextItemLabel": "labels.wrapTextInContainer",
+        "contextItemLabel": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
