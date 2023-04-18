@@ -71,6 +71,15 @@ const modifiedTablerIconProps: Opts = {
 
 // -----------------------------------------------------------------------------
 
+//tabler-icons: chevron-right
+export const ChevronRight = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <polyline points="9 6 15 12 9 18" />
+  </g>,
+  tablerIconProps,
+);
+
 // tabler-icons: present
 export const PlusPromoIcon = createIcon(
   <g strokeWidth="1.5">

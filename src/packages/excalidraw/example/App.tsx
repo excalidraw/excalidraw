@@ -574,13 +574,33 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         </MainMenu.Group>
         {/* <MainMenu.Separator /> */}
         <MainMenu.Sub>
-          <MainMenu.Sub.Trigger>Another submenu trigger</MainMenu.Sub.Trigger>
-          <MainMenu.Sub.Content>
+          <MainMenu.Sub.Trigger className="custom-classname">
+            Another submenu trigger
+          </MainMenu.Sub.Trigger>
+          <MainMenu.Sub.Content className="custom-classname-for-content">
             <MainMenu.Sub.Item
+              title="Sub item"
               onSelect={() => window.alert("You clicked on sub item")}
             >
               Sub item
             </MainMenu.Sub.Item>
+          </MainMenu.Sub.Content>
+        </MainMenu.Sub>
+        <MainMenu.Sub>
+          <MainMenu.Sub.Trigger>Trigger me</MainMenu.Sub.Trigger>
+          <MainMenu.Sub.Content>
+            <MainMenu.Sub>
+              <MainMenu.Sub.Trigger>Trigger me inside</MainMenu.Sub.Trigger>
+              <MainMenu.Sub.Content>
+                <MainMenu.Sub.Item
+                  onSelect={() => {
+                    alert("wow, nested submenus!");
+                  }}
+                >
+                  Item wow
+                </MainMenu.Sub.Item>
+              </MainMenu.Sub.Content>
+            </MainMenu.Sub>
           </MainMenu.Sub.Content>
         </MainMenu.Sub>
         <MainMenu.ItemCustom>

@@ -9,6 +9,19 @@
     // position: absolute;
     max-width: 250px;
 
+    &__submenu-trigger {
+      &[aria-expanded="true"] {
+        .dropdown-menu-item {
+          background-color: var(--button-hover-bg);
+        }
+      }
+    }
+
+    &__submenu-trigger-icon {
+      margin-left: auto;
+      opacity: 0.5;
+    }
+
     .radix-menuitem {
       &:focus-visible {
         outline: none;
