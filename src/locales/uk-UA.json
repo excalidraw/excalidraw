@@ -72,7 +72,7 @@
     "layers": "Шари",
     "actions": "Дії",
     "language": "Мова",
-    "liveCollaboration": "",
+    "liveCollaboration": "Спільна робота у режимі реального часу...",
     "duplicateSelection": "Дублювати",
     "untitled": "Без назви",
     "name": "Ім’я",
@@ -110,6 +110,7 @@
     "increaseFontSize": "Збільшити розмір шрифту",
     "unbindText": "Відв'язати текст",
     "bindText": "Прив’язати текст до контейнера",
+    "createContainerFromText": "",
     "link": {
       "edit": "Редагування посилання",
       "create": "Створити посилання",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Не вдалося імпортувати сцену з наданого URL. Він або недоформований, або не містить дійсних даних Excalidraw JSON.",
     "resetLibrary": "Це призведе до очищення бібліотеки. Ви впевнені?",
     "removeItemsFromsLibrary": "Видалити {{count}} елемент(ів) з бібліотеки?",
-    "invalidEncryptionKey": "Ключ шифрування повинен бути довжиною до 22 символів. Спільну роботу вимкнено."
+    "invalidEncryptionKey": "Ключ шифрування повинен бути довжиною до 22 символів. Спільну роботу вимкнено.",
+    "collabOfflineWarning": "Немає підключення до Інтернету.\nВаші зміни не будуть збережені!"
   },
   "errors": {
     "unsupportedFileType": "Непідтримуваний тип файлу.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Не вдалося приєднатися до сервера. Перезавантажте сторінку та повторіть спробу.",
     "importLibraryError": "Не вдалося завантажити бібліотеку",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "Виділення",
@@ -302,7 +319,8 @@
     "doubleClick": "подвійний клік",
     "drag": "перетягнути",
     "editor": "Редактор",
-    "editSelectedShape": "Змінити вибрану фігуру (текст/стрілку/рядок)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Знайшли помилку? Повідомте",
     "howto": "Дотримуйтесь наших інструкцій",
     "or": "або",
@@ -457,8 +475,8 @@
     "defaults": {
       "menuHint": "",
       "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "toolbarHint": "Оберіть інструмент і почніть малювати!",
+      "helpHint": "Гарячі клавіші і допомога"
     }
   }
 }

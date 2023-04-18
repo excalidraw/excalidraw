@@ -292,6 +292,7 @@ Object {
   "height": 100,
   "id": "id-text01",
   "isDeleted": false,
+  "lineHeight": 1.25,
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -312,8 +313,8 @@ Object {
   "versionNonce": 0,
   "verticalAlign": "middle",
   "width": 100,
-  "x": -0.5,
-  "y": 0,
+  "x": -20,
+  "y": -8.75,
 }
 `;
 
@@ -331,6 +332,7 @@ Object {
   "height": 100,
   "id": "id-text01",
   "isDeleted": false,
+  "lineHeight": 1.25,
   "link": null,
   "locked": false,
   "opacity": 100,

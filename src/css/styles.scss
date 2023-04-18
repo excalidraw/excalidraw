@@ -155,6 +155,9 @@
     margin: 1px;
   }
 
+  .welcome-screen-menu-item:focus-visible,
+  .dropdown-menu-item:focus-visible,
+  button:focus-visible,
   .buttonList label:focus-within,
   input:focus-visible {
     outline: transparent;
@@ -530,6 +533,7 @@
   // (doesn't work in Firefox)
   ::-webkit-scrollbar {
     width: 3px;
+    height: 3px;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -567,8 +571,8 @@
   }
 
   .App-toolbar--mobile {
-    overflow-x: hidden;
-    max-width: 100vw;
+    overflow-x: auto;
+    max-width: 90vw;
 
     .ToolIcon__keybinding {
       display: none;

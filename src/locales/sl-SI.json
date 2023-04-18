@@ -110,6 +110,7 @@
     "increaseFontSize": "Povečaj velikost pisave",
     "unbindText": "Veži besedilo",
     "bindText": "Veži besedilo na element",
+    "createContainerFromText": "Zavij besedilo v vsebnik",
     "link": {
       "edit": "Uredi povezavo",
       "create": "Ustvari povezavo",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "S priloženega URL-ja ni bilo mogoče uvoziti scene. Je napačno oblikovana ali pa ne vsebuje veljavnih podatkov Excalidraw JSON.",
     "resetLibrary": "To bo počistilo vašo knjižnico. Ali ste prepričani?",
     "removeItemsFromsLibrary": "Izbriši elemente ({{count}}) iz knjižnice?",
-    "invalidEncryptionKey": "Ključ za šifriranje mora vsebovati 22 znakov. Sodelovanje v živo je onemogočeno."
+    "invalidEncryptionKey": "Ključ za šifriranje mora vsebovati 22 znakov. Sodelovanje v živo je onemogočeno.",
+    "collabOfflineWarning": "Internetna povezava ni na voljo.\nVaše spremembe ne bodo shranjene!"
   },
   "errors": {
     "unsupportedFileType": "Nepodprt tip datoteke.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Povezave s strežnikom za sodelovanje ni bilo mogoče vzpostaviti. Ponovno naložite stran in poskusite znova.",
     "importLibraryError": "Nalaganje knjižnice ni uspelo",
     "collabSaveFailed": "Ni bilo mogoče shraniti v zaledno bazo podatkov. Če se težave nadaljujejo, shranite datoteko lokalno, da ne boste izgubili svojega dela.",
-    "collabSaveFailed_sizeExceeded": "Ni bilo mogoče shraniti v zaledno bazo podatkov, zdi se, da je platno preveliko. Datoteko shranite lokalno, da ne izgubite svojega dela."
+    "collabSaveFailed_sizeExceeded": "Ni bilo mogoče shraniti v zaledno bazo podatkov, zdi se, da je platno preveliko. Datoteko shranite lokalno, da ne izgubite svojega dela.",
+    "brave_measure_text_error": {
+      "start": "Videti je, da uporabljate brskalnik Brave z omogočeno nastavitvijo",
+      "aggressive_block_fingerprint": "Agresivno blokiranje prstnih odtisov",
+      "setting_enabled": " ",
+      "break": "To bi lahko povzročilo motnje v obnašanju",
+      "text_elements": "besedilnih elementov",
+      "in_your_drawings": "v vaših risbah",
+      "strongly_recommend": "Močno priporočamo, da onemogočite to nastavitev. Sledite",
+      "steps": "tem korakom,",
+      "how": "kako to storiti",
+      "disable_setting": " Če onemogočanje te nastavitve ne popravi prikaza besedilnih elementov, odprite",
+      "issue": "vprašanje",
+      "write": "na našem GitHubu ali nam pišite na",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Izbor",
@@ -302,7 +319,8 @@
     "doubleClick": "dvojni klik",
     "drag": "vleci",
     "editor": "Urejevalnik",
-    "editSelectedShape": "Uredi izbrano obliko (besedilo/puščica/črta)",
+    "editLineArrowPoints": "Uredi črto/točke puščice",
+    "editText": "Uredi besedilo / dodaj oznako",
     "github": "Ste našli težavo? Pošljite",
     "howto": "Sledite našim vodičem",
     "or": "ali",

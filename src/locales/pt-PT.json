@@ -110,6 +110,7 @@
     "increaseFontSize": "Aumentar o tamanho do tipo de letra",
     "unbindText": "Desvincular texto",
     "bindText": "Ligar texto ao recipiente",
+    "createContainerFromText": "Envolver texto num recipiente",
     "link": {
       "edit": "Editar ligação",
       "create": "Criar ligação",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Não foi possível importar a cena a partir do URL fornecido. Ou está mal formado ou não contém dados JSON do Excalidraw válidos.",
     "resetLibrary": "Isto irá limpar a sua biblioteca. Tem a certeza?",
     "removeItemsFromsLibrary": "Apagar {{count}} item(ns) da biblioteca?",
-    "invalidEncryptionKey": "Chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desativada."
+    "invalidEncryptionKey": "Chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desativada.",
+    "collabOfflineWarning": "Sem ligação à internet disponível.\nAs suas alterações não serão salvas!"
   },
   "errors": {
     "unsupportedFileType": "Tipo de ficheiro não suportado.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Não foi possível fazer a ligação ao servidor colaborativo. Por favor, volte a carregar a página e tente novamente.",
     "importLibraryError": "Não foi possível carregar a biblioteca",
     "collabSaveFailed": "Não foi possível guardar na base de dados de backend. Se os problemas persistirem, guarde o ficheiro localmente para garantir que não perde o seu trabalho.",
-    "collabSaveFailed_sizeExceeded": "Não foi possível guardar na base de dados de backend, o ecrã parece estar muito grande. Deve guardar o ficheiro localmente para garantir que não perde o seu trabalho."
+    "collabSaveFailed_sizeExceeded": "Não foi possível guardar na base de dados de backend, o ecrã parece estar muito grande. Deve guardar o ficheiro localmente para garantir que não perde o seu trabalho.",
+    "brave_measure_text_error": {
+      "start": "Parece que está a usar o navegador Brave com o",
+      "aggressive_block_fingerprint": "Bloqueio Agressivo via Impressão Digital",
+      "setting_enabled": "activo",
+      "break": "Isso pode desconfigurar os",
+      "text_elements": "Elementos de Texto",
+      "in_your_drawings": "nos seus desenhos",
+      "strongly_recommend": "Recomendamos fortemente a desactivação desta configuração. Pode seguir",
+      "steps": "os seguintes passos",
+      "how": "para saber como o fazer",
+      "disable_setting": " Se desactivar esta configuração não consertar a exibição de elementos de texto, por favor, abra um",
+      "issue": "problema",
+      "write": "no nosso GitHub ou então escreva-nos no",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Seleção",
@@ -220,7 +237,7 @@
     "penMode": "Modo caneta - impedir toque",
     "link": "Acrescentar/ Adicionar ligação para uma forma seleccionada",
     "eraser": "Borracha",
-    "hand": ""
+    "hand": "Mão (ferramenta de movimento da tela)"
   },
   "headings": {
     "canvasActions": "Ações da área de desenho",
@@ -228,7 +245,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Para mover a tela, carregue na roda do rato ou na barra de espaço enquanto arrasta, ou use a ferramenta da mão",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "freeDraw": "Clique e arraste, large quando terminar",
     "text": "Dica: também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
@@ -247,7 +264,7 @@
     "bindTextToElement": "Carregue Enter para acrescentar texto",
     "deepBoxSelect": "Mantenha a tecla CtrlOrCmd carregada para selecção profunda, impedindo o arrastamento",
     "eraserRevert": "Carregue também em Alt para reverter os elementos marcados para serem apagados",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Esta função pode provavelmente ser ativada definindo a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar uma pré-visualização",
@@ -302,7 +319,8 @@
     "doubleClick": "clique duplo",
     "drag": "arrastar",
     "editor": "Editor",
-    "editSelectedShape": "Editar forma selecionada (texto/seta/linha)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Encontrou algum problema? Informe-nos",
     "howto": "Siga os nossos guias",
     "or": "ou",

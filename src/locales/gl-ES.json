@@ -110,6 +110,7 @@
     "increaseFontSize": "Aumentar o tamaño da fonte",
     "unbindText": "Desvincular texto",
     "bindText": "Ligar o texto ao contedor",
+    "createContainerFromText": "Envolver o texto nun contedor",
     "link": {
       "edit": "Editar ligazón",
       "create": "Crear ligazón",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Non se puido importar a escena dende a URL proporcionada. Ou ben está malformada ou non contén un JSON con información válida para Excalidraw.",
     "resetLibrary": "Isto limpará a súa biblioteca. Está seguro?",
     "removeItemsFromsLibrary": "Eliminar {{count}} elemento(s) da biblioteca?",
-    "invalidEncryptionKey": "A clave de cifrado debe ter 22 caracteres. A colaboración en directo está desactivada."
+    "invalidEncryptionKey": "A clave de cifrado debe ter 22 caracteres. A colaboración en directo está desactivada.",
+    "collabOfflineWarning": "Non hai conexión a Internet dispoñible.\nOs teus cambios non serán gardados!"
   },
   "errors": {
     "unsupportedFileType": "Tipo de ficheiro non soportado.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Non se puido conectar ao servidor de colaboración. Por favor recargue a páxina e probe de novo.",
     "importLibraryError": "Non se puido cargar a biblioteca",
     "collabSaveFailed": "Non se puido gardar na base de datos. Se o problema persiste, deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
-    "collabSaveFailed_sizeExceeded": "Non se puido gardar na base de datos, o lenzo semella demasiado grande. Deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo."
+    "collabSaveFailed_sizeExceeded": "Non se puido gardar na base de datos, o lenzo semella demasiado grande. Deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
+    "brave_measure_text_error": {
+      "start": "Semella que estás usando o navegador Brave coa opción",
+      "aggressive_block_fingerprint": "Aggressively Block Fingerprinting",
+      "setting_enabled": "activada",
+      "break": "Isto podería provocar unha ruptura dos",
+      "text_elements": "Elementos de Texto",
+      "in_your_drawings": "nos seus debuxos",
+      "strongly_recommend": "Recomendámoslle encarecidamente que desactive esa opción. Pode seguir",
+      "steps": "estes pasos",
+      "how": "sobre como facelo",
+      "disable_setting": " Se ao desactivar esta opción non se arranxa o problema ao mostrar os elementos de texto, por favor abra unha",
+      "issue": "issue",
+      "write": "no noso GitHub, ou escríbenos ao",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Selección",
@@ -302,7 +319,8 @@
     "doubleClick": "dobre-clic",
     "drag": "arrastrar",
     "editor": "Editor",
-    "editSelectedShape": "Editar a forma seleccionada (texto/frecha/liña)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Encontrou un problema? Envíeo",
     "howto": "Sigue as nosas normas",
     "or": "ou",

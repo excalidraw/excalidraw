@@ -41,16 +41,16 @@ import {
 import { Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
-  getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
-  getBoundTextElementOffset,
   getContainerElement,
   handleBindTextResize,
+  getMaxContainerWidth,
+  getApproxMinLineHeight,
   measureText,
+  getMaxContainerHeight,
 } from "./textElement";
-import { getMaxContainerWidth } from "./newElement";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -197,7 +197,7 @@ const rescalePointsInElement = (
 
 const MIN_FONT_SIZE = 1;
 
-const measureFontSizeFromWH = (
+const measureFontSizeFromWidth = (
   element: NonDeleted<ExcalidrawTextElement>,
   nextWidth: number,
   nextHeight: number,
@@ -219,7 +219,7 @@ const measureFontSizeFromWH = (
   const metrics = measureText(
     element.text,
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
-    element.containerId ? width : null,
+    element.lineHeight,
   );
   return {
     size: nextFontSize,
@@ -295,8 +295,8 @@ const resizeSingleTextElement = (
   if (scale > 0) {
     const nextWidth = element.width * scale;
     const nextHeight = element.height * scale;
-    const nextFont = measureFontSizeFromWH(element, nextWidth, nextHeight);
-    if (nextFont === null) {
+    const metrics = measureFontSizeFromWidth(element, nextWidth, nextHeight);
+    if (metrics === null) {
       return;
     }
     const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
@@ -320,10 +320,10 @@ const resizeSingleTextElement = (
       deltaY2,
     );
     mutateElement(element, {
-      fontSize: nextFont.size,
+      fontSize: metrics.size,
       width: nextWidth,
       height: nextHeight,
-      baseline: nextFont.baseline,
+      baseline: metrics.baseline,
       x: nextElementX,
       y: nextElementY,
     });
@@ -432,12 +432,16 @@ export const resizeSingleElement = (
       };
     }
     if (shouldMaintainAspectRatio) {
-      const boundTextElementPadding =
-        getBoundTextElementOffset(boundTextElement);
-      const nextFont = measureFontSizeFromWH(
+      const updatedElement = {
+        ...element,
+        width: eleNewWidth,
+        height: eleNewHeight,
+      };
+
+      const nextFont = measureFontSizeFromWidth(
         boundTextElement,
-        eleNewWidth - boundTextElementPadding * 2,
-        eleNewHeight - boundTextElementPadding * 2,
+        getMaxContainerWidth(updatedElement),
+        getMaxContainerHeight(updatedElement),
       );
       if (nextFont === null) {
         return;
@@ -447,8 +451,14 @@ export const resizeSingleElement = (
         baseline: nextFont.baseline,
       };
     } else {
-      const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
-      const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
+      const minWidth = getApproxMinLineWidth(
+        getFontString(boundTextElement),
+        boundTextElement.lineHeight,
+      );
+      const minHeight = getApproxMinLineHeight(
+        boundTextElement.fontSize,
+        boundTextElement.lineHeight,
+      );
       eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
       eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
     }
@@ -581,8 +591,11 @@ export const resizeSingleElement = (
     });
 
     mutateElement(element, resizedElement);
-    if (boundTextElement && boundTextFont) {
-      mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
+    if (boundTextElement && boundTextFont != null) {
+      mutateElement(boundTextElement, {
+        fontSize: boundTextFont.fontSize,
+        baseline: boundTextFont.baseline,
+      });
     }
     handleBindTextResize(element, transformHandleDirection);
   }
@@ -716,9 +729,9 @@ export const resizeMultipleElements = (
     }
 
     if (isTextElement(element)) {
-      const textMeasurements = measureFontSizeFromWH(element, width, height);
-      update.fontSize = textMeasurements?.size ?? element.fontSize;
-      update.baseline = textMeasurements?.baseline ?? element.baseline;
+      const metrics = measureFontSizeFromWidth(element, width, height);
+      update.fontSize = metrics?.size ?? element.fontSize;
+      update.baseline = metrics?.baseline ?? element.baseline;
     }
 
     // TODO remove this after solving the issue with changing bounds of linear

@@ -110,6 +110,7 @@
     "increaseFontSize": "放大文字",
     "unbindText": "取消綁定文字",
     "bindText": "結合文字至容器",
+    "createContainerFromText": "將文字包於容器中",
     "link": {
       "edit": "編輯連結",
       "create": "建立連結",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "無法由提供的 URL 匯入場景。可能是發生異常，或未包含有效的 Excalidraw JSON 資料。",
     "resetLibrary": "這會清除您的資料庫，是否確定？",
     "removeItemsFromsLibrary": "從資料庫刪除 {{count}} 項？",
-    "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。"
+    "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。",
+    "collabOfflineWarning": "沒有可用的網路連線。\n變更無法儲存！"
   },
   "errors": {
     "unsupportedFileType": "不支援的檔案類型。",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "無法連結至 collab 伺服器。請重新整理後再試一次。",
     "importLibraryError": "無法載入資料庫",
     "collabSaveFailed": "無法儲存至後端資料庫。若此問題持續發生，請將檔案儲存於本機以確保資料不會遺失。",
-    "collabSaveFailed_sizeExceeded": "無法儲存至後端資料庫，可能的原因為畫布尺寸過大。請將檔案儲存於本機以確保資料不會遺失。"
+    "collabSaveFailed_sizeExceeded": "無法儲存至後端資料庫，可能的原因為畫布尺寸過大。請將檔案儲存於本機以確保資料不會遺失。",
+    "brave_measure_text_error": {
+      "start": "您似乎正在使用 Brave 瀏覽器並且將",
+      "aggressive_block_fingerprint": "\"Aggressively Block Fingerprinting\" 設定",
+      "setting_enabled": "設為開啟",
+      "break": "這可能導致破壞",
+      "text_elements": "文字元素",
+      "in_your_drawings": "在您的繪圖中",
+      "strongly_recommend": "我們強烈建議您關掉此設定。您可以參考",
+      "steps": "這些步驟",
+      "how": "來變更",
+      "disable_setting": " 若關閉此設定無法修正文字元素的顯示問題，請回報",
+      "issue": "問題",
+      "write": "至我們的 GitHub，或反應在我們的",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "選取",
@@ -302,7 +319,8 @@
     "doubleClick": "雙擊",
     "drag": "拖曳",
     "editor": "編輯器",
-    "editSelectedShape": "編輯選定的形狀（文字/箭號/線條）",
+    "editLineArrowPoints": "編輯線/箭頭控制點",
+    "editText": "編輯文字/增加標籤",
     "github": "發現異常？回報問題",
     "howto": "參照我們的說明",
     "or": "或",

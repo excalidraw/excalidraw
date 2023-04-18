@@ -110,6 +110,7 @@
     "increaseFontSize": "تكبير حجم الخط",
     "unbindText": "فك ربط النص",
     "bindText": "ربط النص بالحاوية",
+    "createContainerFromText": "",
     "link": {
       "edit": "تعديل الرابط",
       "create": "إنشاء رابط",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "تعذر استيراد المشهد من عنوان URL المتوفر. إما أنها مشوهة، أو لا تحتوي على بيانات Excalidraw JSON صالحة.",
     "resetLibrary": "هذا سوف يمسح مكتبتك. هل أنت متأكد؟",
     "removeItemsFromsLibrary": "حذف {{count}} عنصر (عناصر) من المكتبة؟",
-    "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل."
+    "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "نوع الملف غير مدعوم.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "تعذر الاتصال بخادم التعاون. الرجاء إعادة تحميل الصفحة والمحاولة مرة أخرى.",
     "importLibraryError": "تعذر تحميل المكتبة",
     "collabSaveFailed": "تعذر الحفظ في قاعدة البيانات. إذا استمرت المشاكل، يفضل أن تحفظ ملفك محليا كي لا تفقد عملك.",
-    "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك."
+    "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك.",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "تحديد",
@@ -302,7 +319,8 @@
     "doubleClick": "انقر مرتين",
     "drag": "اسحب",
     "editor": "المحرر",
-    "editSelectedShape": "تعديل الشكل المحدد (النص/السهم/الخط)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "عثرت على مشكلة؟ إرسال",
     "howto": "اتبع التعليمات",
     "or": "أو",

@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "ஒட்டு",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "அலங்காரமின்றி ஒட்டு",
     "pasteCharts": "விளக்கப்படங்களை ஒட்டு",
     "selectAll": "எல்லாம் தேர்ந்தெடு",
     "multiSelect": "உறுப்பைத் தெரிவில் சேர்",
@@ -54,7 +54,7 @@
     "veryLarge": "மிகப் பெரிய",
     "solid": "திடமான",
     "hachure": "மலைக்குறிக்கோடு",
-    "crossHatch": "",
+    "crossHatch": "குறுக்குகதவு",
     "thin": "மெல்லிய",
     "bold": "பட்டை",
     "left": "இடது",
@@ -72,7 +72,7 @@
     "layers": "அடுக்குகள்",
     "actions": "செயல்கள்",
     "language": "மொழி",
-    "liveCollaboration": "",
+    "liveCollaboration": "நேரடி கூட்டுப்பணி...",
     "duplicateSelection": "நகலாக்கு",
     "untitled": "தலைப்பற்றது",
     "name": "பெயர்",
@@ -110,13 +110,14 @@
     "increaseFontSize": "எழுத்துரு அளவை அதிகரி",
     "unbindText": "உரையைப் பிணைவவிழ்",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "தொடுப்பைத் திருத்து",
       "create": "தொடுப்பைப் படை",
       "label": "தொடுப்பு"
     },
     "lineEditor": {
-      "edit": "",
+      "edit": "தொடுப்பைத் திருத்து",
       "exit": ""
     },
     "elementLock": {
@@ -137,7 +138,7 @@
     "clearReset": "கித்தானை அகரமாக்கு",
     "exportJSON": "கோப்புக்கு ஏற்றுமதிசெய்",
     "exportImage": "",
-    "export": "",
+    "export": "இதில் சேமி...",
     "exportToPng": "PNGக்கு ஏற்றுமதிசெய்",
     "exportToSvg": "SVGக்கு ஏற்றுமதிசெய்",
     "copyToClipboard": "நகலகத்திற்கு நகலெடு",
@@ -145,7 +146,7 @@
     "scale": "அளவு",
     "save": "தற்போதைய கோப்புக்குச் சேமி",
     "saveAs": "இப்படி சேமி",
-    "load": "",
+    "load": "திற",
     "getShareableLink": "பகிரக்கூடிய தொடுப்பைப் பெறு",
     "close": "மூடு",
     "selectLanguage": "மொழியைத் தேர்ந்தெடு",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "வழங்கப்பட்ட உரலியிலிருந்து காட்சியை இறக்கவியலா. இது தவறான வடிவத்தில் உள்ளது, அ செல்லத்தக்க எக்ஸ்கேலிட்ரா JSON தரவைக் கொண்டில்லை.",
     "resetLibrary": "இது உங்கள் நுலகத்தைத் துடைக்கும். நீங்கள் உறுதியா?",
     "removeItemsFromsLibrary": "{{count}} உருப்படி(கள்)-ஐ உம் நூலகத்திலிருந்து அழிக்கவா?",
-    "invalidEncryptionKey": "மறையாக்க விசை 22 வரியுருக்கள் கொண்டிருக்கவேண்டும். நேரடி கூட்டுப்பணி முடக்கப்பட்டது."
+    "invalidEncryptionKey": "மறையாக்க விசை 22 வரியுருக்கள் கொண்டிருக்கவேண்டும். நேரடி கூட்டுப்பணி முடக்கப்பட்டது.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "ஆதரிக்கப்படா கோப்பு வகை.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "",
     "importLibraryError": "நூலகத்தை ஏற்ற முடியவில்லை",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "தெரிவு",
@@ -302,7 +319,8 @@
     "doubleClick": "இரு-சொடுக்கு",
     "drag": "பிடித்திழு",
     "editor": "திருத்தி",
-    "editSelectedShape": "தேர்ந்த வடிவத்தைத் திருத்து (உரை/அம்பு/வரி)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "சிக்கலைக் கண்டீரா? சமர்ப்பி",
     "howto": "எங்கள் கையேடுகளைப் பின்பற்றுக",
     "or": "அ",
@@ -456,9 +474,9 @@
     },
     "defaults": {
       "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "center_heading": "எளிமையாக வரைபடங்கள் உருவாக்க!",
+      "toolbarHint": "கருவியைத் தேர்ந்தெடு & வரை!",
+      "helpHint": "குறுக்குவழிகள் & உதவி"
     }
   }
 }

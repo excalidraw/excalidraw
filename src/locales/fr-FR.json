@@ -110,6 +110,7 @@
     "increaseFontSize": "Augmenter la taille de la police",
     "unbindText": "Dissocier le texte",
     "bindText": "Associer le texte au conteneur",
+    "createContainerFromText": "Encadrer le texte dans un conteneur",
     "link": {
       "edit": "Modifier le lien",
       "create": "Ajouter un lien",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Impossible d'importer la scène depuis l'URL fournie. Elle est soit incorrecte, soit ne contient pas de données JSON Excalidraw valides.",
     "resetLibrary": "Cela va effacer votre bibliothèque. Êtes-vous sûr·e ?",
     "removeItemsFromsLibrary": "Supprimer {{count}} élément(s) de la bibliothèque ?",
-    "invalidEncryptionKey": "La clé de chiffrement doit comporter 22 caractères. La collaboration en direct est désactivée."
+    "invalidEncryptionKey": "La clé de chiffrement doit comporter 22 caractères. La collaboration en direct est désactivée.",
+    "collabOfflineWarning": "Aucune connexion internet disponible.\nVos modifications ne seront pas enregistrées !"
   },
   "errors": {
     "unsupportedFileType": "Type de fichier non supporté.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Impossible de se connecter au serveur collaboratif. Veuillez recharger la page et réessayer.",
     "importLibraryError": "Impossible de charger la bibliothèque",
     "collabSaveFailed": "Impossible d'enregistrer dans la base de données en arrière-plan. Si des problèmes persistent, vous devriez enregistrer votre fichier localement pour vous assurer de ne pas perdre votre travail.",
-    "collabSaveFailed_sizeExceeded": "Impossible d'enregistrer dans la base de données en arrière-plan, le tableau semble trop grand. Vous devriez enregistrer le fichier localement pour vous assurer de ne pas perdre votre travail."
+    "collabSaveFailed_sizeExceeded": "Impossible d'enregistrer dans la base de données en arrière-plan, le tableau semble trop grand. Vous devriez enregistrer le fichier localement pour vous assurer de ne pas perdre votre travail.",
+    "brave_measure_text_error": {
+      "start": "Il semble que vous utilisiez le navigateur Brave avec le",
+      "aggressive_block_fingerprint": "blocage d'empreinte agressif",
+      "setting_enabled": "activé",
+      "break": "Ceci pourrait avoir pour conséquence de « casser » les",
+      "text_elements": "éléments texte",
+      "in_your_drawings": "dans vos dessins",
+      "strongly_recommend": "Nous recommandons fortement de désactiver ce paramètre. Vous pouvez suivre",
+      "steps": "ces étapes",
+      "how": "sur la manière de procéder",
+      "disable_setting": " Si la désactivation de ce paramètre ne résout pas l'affichage des éléments texte, veuillez ouvrir un",
+      "issue": "ticket",
+      "write": "sur notre GitHub, ou nous écrire sur",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Sélection",
@@ -302,7 +319,8 @@
     "doubleClick": "double-clic",
     "drag": "glisser",
     "editor": "Éditeur",
-    "editSelectedShape": "Modifier la forme sélectionnée (texte/flèche/ligne)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Problème trouvé ? Soumettre",
     "howto": "Suivez nos guides",
     "or": "ou",

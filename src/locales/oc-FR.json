@@ -110,6 +110,7 @@
     "increaseFontSize": "Aumentar talha polissa",
     "unbindText": "Dessociar lo tèxte",
     "bindText": "Ligar lo tèxt al contenidor",
+    "createContainerFromText": "",
     "link": {
       "edit": "Modificar lo ligam",
       "create": "Crear un ligam",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Importacion impossibla de la scèna a partir de l’URL provesida. Es siá mal formatada o siá conten pas cap de donada JSON Excalidraw valida.",
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. O volètz vertadièrament ?",
     "removeItemsFromsLibrary": "Suprimir {{count}} element(s) de la bibliotèca ?",
-    "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada."
+    "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada.",
+    "collabOfflineWarning": "Cap de connexion pas disponibla.\nVòstras modificacions seràn pas salvadas !"
   },
   "errors": {
     "unsupportedFileType": "Tipe de fichièr pas pres en carga.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar.",
     "importLibraryError": "Impossible de cargar la bibliotèca",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "Seleccion",
@@ -220,7 +237,7 @@
     "penMode": "Mòde estilo - empachar lo contact",
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
     "eraser": "Goma",
-    "hand": ""
+    "hand": "Man (aisina de desplaçament de la vista)"
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -239,7 +256,7 @@
     "resize": "Podètz servar las proporcions en mantenent la tòca MAJ pendent lo redimensionament,\nmantenètz la tòca ALT per redimensionar a partir del centre",
     "resizeImage": "Podètz retalhar liurament en quichant CTRL,\nquichatz ALT per retalhar a partir del centre",
     "rotate": "Podètz restrénger los angles en mantenent MAJ pendent la rotacion",
-    "lineEditor_info": "",
+    "lineEditor_info": "Tenètz quichat Ctrl o Cmd e doble clic o quichatz Ctrl o Cmd + Entrada per modificar los ponches",
     "lineEditor_pointSelected": "Quichar Suprimir per tirar lo(s) punt(s),\nCtrlOCmd+D per duplicar, o lisatz per desplaçar",
     "lineEditor_nothingSelected": "Seleccionar un punt d’editar (manténer Maj. per ne seleccionar mantun),\no manténer Alt e clicar per n’apondre de novèls",
     "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament",
@@ -302,7 +319,8 @@
     "doubleClick": "doble clic",
     "drag": "lisar",
     "editor": "Editor",
-    "editSelectedShape": "Modificar la fòrma seleccionada (tèxt/sageta/linha)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Problèma trobat ? Senhalatz-lo",
     "howto": "Seguissètz nòstras guidas",
     "or": "o",
@@ -316,8 +334,8 @@
     "zoomToFit": "Zoomar per veire totes los elements",
     "zoomToSelection": "Zoomar la seleccion",
     "toggleElementLock": "Verrolhar/Desverrolhar la seleccion",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Desplaçar la pagina ennaut/enbàs",
+    "movePageLeftRight": "Desplaçar la pagina a esquèrra/drecha"
   },
   "clearCanvasDialog": {
     "title": "Escafar canabàs"

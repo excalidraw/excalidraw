@@ -110,6 +110,7 @@
     "increaseFontSize": "افزایش دادن اندازه فونت",
     "unbindText": "بازکردن نوشته",
     "bindText": "بستن نوشته",
+    "createContainerFromText": "",
     "link": {
       "edit": "ویرایش لینک",
       "create": "ایجاد پیوند",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "بوم نقاشی از آدرس ارائه شده وارد نشد. این یا نادرست است، یا حاوی داده Excalidraw JSON معتبر نیست.",
     "resetLibrary": "ین کار کل صفحه را پاک میکند. آیا مطمئنید?",
     "removeItemsFromsLibrary": "حذف {{count}} آیتم(ها) از کتابخانه?",
-    "invalidEncryptionKey": "کلید رمزگذاری باید 22 کاراکتر باشد. همکاری زنده غیرفعال است."
+    "invalidEncryptionKey": "کلید رمزگذاری باید 22 کاراکتر باشد. همکاری زنده غیرفعال است.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "نوع فایل پشتیبانی نشده.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "به سرور collab متصل نشد. لطفا صفحه را مجددا بارگذاری کنید و دوباره تلاش کنید.",
     "importLibraryError": "داده‌ها بارگذاری نشدند",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "گزینش",
@@ -302,7 +319,8 @@
     "doubleClick": "دابل کلیک",
     "drag": "کشیدن",
     "editor": "ویرایشگر",
-    "editSelectedShape": "ویرایش شکل انتخاب شده (متن/فلش/خط)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "اشکالی می بینید؟ گزارش دهید",
     "howto": "راهنمای ما را دنبال کنید",
     "or": "یا",

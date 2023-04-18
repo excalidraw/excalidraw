@@ -5,13 +5,13 @@ import { Dialog } from "./Dialog";
 import { useExcalidrawContainer } from "./App";
 
 export const ErrorDialog = ({
-  message,
+  children,
   onClose,
 }: {
-  message: string;
+  children?: React.ReactNode;
   onClose?: () => void;
 }) => {
-  const [modalIsShown, setModalIsShown] = useState(!!message);
+  const [modalIsShown, setModalIsShown] = useState(!!children);
   const { container: excalidrawContainer } = useExcalidrawContainer();
 
   const handleClose = React.useCallback(() => {
@@ -32,7 +32,7 @@ export const ErrorDialog = ({
           onCloseRequest={handleClose}
           title={t("errorDialog.title")}
         >
-          <div style={{ whiteSpace: "pre-wrap" }}>{message}</div>
+          <div style={{ whiteSpace: "pre-wrap" }}>{children}</div>
         </Dialog>
       )}
     </>

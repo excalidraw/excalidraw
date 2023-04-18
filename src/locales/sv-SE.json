@@ -110,6 +110,7 @@
     "increaseFontSize": "Öka fontstorleken",
     "unbindText": "Koppla bort text",
     "bindText": "Bind texten till behållaren",
+    "createContainerFromText": "Radbryt text i en avgränsad yta",
     "link": {
       "edit": "Redigera länk",
       "create": "Skapa länk",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Det gick inte att importera skiss från den angivna webbadressen. Antingen har den fel format, eller så innehåller den ingen giltig Excalidraw JSON data.",
     "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?",
     "removeItemsFromsLibrary": "Ta bort {{count}} objekt från biblioteket?",
-    "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat."
+    "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat.",
+    "collabOfflineWarning": "Ingen internetanslutning tillgänglig.\nDina ändringar kommer inte att sparas!"
   },
   "errors": {
     "unsupportedFileType": "Filtypen stöds inte.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen.",
     "importLibraryError": "Kunde inte ladda bibliotek",
     "collabSaveFailed": "Det gick inte att spara i backend-databasen. Om problemen kvarstår bör du spara filen lokalt för att se till att du inte förlorar ditt arbete.",
-    "collabSaveFailed_sizeExceeded": "Det gick inte att spara till backend-databasen, whiteboarden verkar vara för stor. Du bör spara filen lokalt för att du inte ska förlora ditt arbete."
+    "collabSaveFailed_sizeExceeded": "Det gick inte att spara till backend-databasen, whiteboarden verkar vara för stor. Du bör spara filen lokalt för att du inte ska förlora ditt arbete.",
+    "brave_measure_text_error": {
+      "start": "Det ser ut som att du använder webbläsaren Brave med",
+      "aggressive_block_fingerprint": "Blockera \"Fingerprinting\" aggressivt",
+      "setting_enabled": "inställningen aktiverad",
+      "break": "Detta kan resultera i att ha sönder",
+      "text_elements": "Textelement",
+      "in_your_drawings": "i dina skisser",
+      "strongly_recommend": "Vi rekommenderar starkt att inaktivera denna inställning. Du kan följa",
+      "steps": "dessa steg",
+      "how": "om hur man gör det",
+      "disable_setting": " Om inaktivering av den här inställningen inte åtgärdar visningen av textelement, vänligen skapa ett",
+      "issue": "ärende",
+      "write": "på vår GitHub, eller skriv till oss på",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Markering",
@@ -302,7 +319,8 @@
     "doubleClick": "dubbelklicka",
     "drag": "dra",
     "editor": "Redigerare",
-    "editSelectedShape": "Redigera markerad form (text/pil/linje)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Hittat ett problem? Rapportera",
     "howto": "Följ våra guider",
     "or": "eller",
