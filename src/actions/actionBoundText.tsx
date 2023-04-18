@@ -16,6 +16,7 @@ import {
 import {
   getOriginalContainerHeightFromCache,
   resetOriginalContainerCache,
+  updateOriginalContainerCache,
 } from "../element/textWysiwyg";
 import {
   hasBoundTextElement,
@@ -145,7 +146,11 @@ export const actionBindText = register({
         id: textElement.id,
       }),
     });
+    const originalContainerHeight = container.height;
     redrawTextBoundingBox(textElement, container);
+    // overwritting the cache with original container height so
+    // it can be restored when unbind
+    updateOriginalContainerCache(container.id, originalContainerHeight);
 
     return {
       elements: pushTextAboveContainer(elements, container, textElement),
