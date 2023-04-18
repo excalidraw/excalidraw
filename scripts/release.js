@@ -17,8 +17,6 @@ const publish = () => {
 };
 
 const release = () => {
-  console.info("Note for stable readme removed");
-
   publish();
   console.info(`Published ${pkg.version}!`);
 };
