@@ -1,24 +1,25 @@
+import { queryByText } from "@testing-library/react";
 import ReactDOM from "react-dom";
+import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import ExcalidrawApp from "../excalidraw-app";
-import { GlobalTestState, render, screen } from "../tests/test-utils";
-import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { CODES, KEYS } from "../keys";
+import { API } from "../tests/helpers/api";
+import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import {
   fireEvent,
+  GlobalTestState,
   mockBoundingClientRect,
+  render,
   restoreOriginalGetBoundingClientRect,
+  screen,
 } from "../tests/test-utils";
-import { queryByText } from "@testing-library/react";
-
-import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
+import { resize } from "../tests/utils";
+import { mutateElement } from "./mutateElement";
+import { getOriginalContainerHeightFromCache } from "./textWysiwyg";
 import {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
 } from "./types";
-import { API } from "../tests/helpers/api";
-import { mutateElement } from "./mutateElement";
-import { resize } from "../tests/utils";
-import { getOriginalContainerHeightFromCache } from "./textWysiwyg";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -803,7 +804,7 @@ describe("textWysiwyg", () => {
       await new Promise((r) => setTimeout(r, 0));
       fireEvent.change(editor, { target: { value: "Hello World!" } });
       editor.blur();
-      expect(text.fontFamily).toEqual(FONT_FAMILY.Virgil);
+      expect(text.fontFamily).toEqual(FONT_FAMILY.Virgil.id);
       UI.clickTool("text");
 
       mouse.clickAt(
@@ -822,7 +823,7 @@ describe("textWysiwyg", () => {
       editor.blur();
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Cascadia);
+      ).toEqual(FONT_FAMILY.Cascadia.id);
 
       //undo
       Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -830,7 +831,7 @@ describe("textWysiwyg", () => {
       });
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Virgil);
+      ).toEqual(FONT_FAMILY.Virgil.id);
 
       //redo
       Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
@@ -838,7 +839,7 @@ describe("textWysiwyg", () => {
       });
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Cascadia);
+      ).toEqual(FONT_FAMILY.Cascadia.id);
     });
 
     it("should wrap text and vertcially center align once text submitted", async () => {
@@ -1258,7 +1259,7 @@ describe("textWysiwyg", () => {
 
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Cascadia);
+      ).toEqual(FONT_FAMILY.Cascadia.id);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
 
       fireEvent.click(screen.getByTitle(/Very large/i));
@@ -1289,7 +1290,7 @@ describe("textWysiwyg", () => {
       fireEvent.click(screen.getByTitle(/code/i));
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Cascadia);
+      ).toEqual(FONT_FAMILY.Cascadia.id);
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
       ).toEqual(1.2);
@@ -1297,7 +1298,7 @@ describe("textWysiwyg", () => {
       fireEvent.click(screen.getByTitle(/normal/i));
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Helvetica);
+      ).toEqual(FONT_FAMILY.Helvetica.id);
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
       ).toEqual(1.15);
