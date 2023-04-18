@@ -1,14 +1,3 @@
-import { getFontString, arrayToMap, isTestEnv } from "../utils";
-import {
-  ExcalidrawElement,
-  ExcalidrawTextContainer,
-  ExcalidrawTextElement,
-  ExcalidrawTextElementWithContainer,
-  FontFamilyValues,
-  FontString,
-  NonDeletedExcalidrawElement,
-} from "./types";
-import { mutateElement } from "./mutateElement";
 import {
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_FAMILY,
@@ -18,21 +7,35 @@ import {
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MaybeTransformHandleType } from "./transformHandles";
-import Scene from "../scene/Scene";
-import { isTextElement } from ".";
-import { isBoundToContainer, isArrowElement } from "./typeChecks";
-import { LinearElementEditor } from "./linearElementEditor";
-import { AppState } from "../types";
-import { isTextBindableContainer } from "./typeChecks";
 import { getElementAbsoluteCoords } from "../element";
 import { getSelectedElements } from "../scene";
+import Scene from "../scene/Scene";
+import { AppState } from "../types";
+import { ExtractSetType } from "../utility-types";
+import { arrayToMap, getFontString, isTestEnv } from "../utils";
+import { isTextElement } from "./";
 import { isHittingElementNotConsideringBoundingBox } from "./collision";
+import { LinearElementEditor } from "./linearElementEditor";
+import { mutateElement } from "./mutateElement";
 import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./textWysiwyg";
-import { ExtractSetType } from "../utility-types";
+import { MaybeTransformHandleType } from "./transformHandles";
+import {
+  isArrowElement,
+  isBoundToContainer,
+  isTextBindableContainer,
+} from "./typeChecks";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextContainer,
+  ExcalidrawTextElement,
+  ExcalidrawTextElementWithContainer,
+  FontFamilyValues,
+  FontString,
+  NonDeletedExcalidrawElement,
+} from "./types";
 
 export const normalizeText = (text: string) => {
   return (
@@ -941,12 +944,12 @@ export const isMeasureTextSupported = () => {
 const DEFAULT_LINE_HEIGHT = {
   // ~1.25 is the average for Virgil in WebKit and Blink.
   // Gecko (FF) uses ~1.28.
-  [FONT_FAMILY.Virgil]: 1.25 as ExcalidrawTextElement["lineHeight"],
+  [FONT_FAMILY.Virgil.id]: 1.25 as ExcalidrawTextElement["lineHeight"],
   // ~1.15 is the average for Virgil in WebKit and Blink.
   // Gecko if all over the place.
-  [FONT_FAMILY.Helvetica]: 1.15 as ExcalidrawTextElement["lineHeight"],
+  [FONT_FAMILY.Helvetica.id]: 1.15 as ExcalidrawTextElement["lineHeight"],
   // ~1.2 is the average for Virgil in WebKit and Blink, and kinda Gecko too
-  [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
+  [FONT_FAMILY.Cascadia.id]: 1.2 as ExcalidrawTextElement["lineHeight"],
 };
 
 export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {

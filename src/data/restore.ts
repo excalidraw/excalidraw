@@ -1,3 +1,27 @@
+import oc from "open-color";
+import { getDefaultAppState } from "../appState";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_TEXT_ALIGN,
+  DEFAULT_VERTICAL_ALIGN,
+  FONT_FAMILY,
+  PRECEDING_ELEMENT_KEY,
+  ROUNDNESS,
+} from "../constants";
+import {
+  getNonDeletedElements,
+  getNormalizedDimensions,
+  isInvisiblySmallElement,
+  refreshTextDimensions,
+} from "../element";
+import { LinearElementEditor } from "../element/linearElementEditor";
+import { bumpVersion } from "../element/mutateElement";
+import {
+  detectLineHeight,
+  getDefaultLineHeight,
+  measureBaseline,
+} from "../element/textElement";
+import { isTextElement, isUsingAdaptiveRadius } from "../element/typeChecks";
 import {
   ExcalidrawElement,
   ExcalidrawSelectionElement,
@@ -5,41 +29,21 @@ import {
   FontFamilyValues,
   StrokeRoundness,
 } from "../element/types";
+import { randomId } from "../random";
 import {
   AppState,
   BinaryFiles,
   LibraryItem,
   NormalizedZoomValue,
 } from "../types";
-import { ImportedDataState, LegacyAppState } from "./types";
-import {
-  getNonDeletedElements,
-  getNormalizedDimensions,
-  isInvisiblySmallElement,
-  refreshTextDimensions,
-} from "../element";
-import { isTextElement, isUsingAdaptiveRadius } from "../element/typeChecks";
-import { randomId } from "../random";
-import {
-  DEFAULT_FONT_FAMILY,
-  DEFAULT_TEXT_ALIGN,
-  DEFAULT_VERTICAL_ALIGN,
-  PRECEDING_ELEMENT_KEY,
-  FONT_FAMILY,
-  ROUNDNESS,
-} from "../constants";
-import { getDefaultAppState } from "../appState";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { bumpVersion } from "../element/mutateElement";
-import { getFontString, getUpdatedTimestamp, updateActiveTool } from "../utils";
-import { arrayToMap } from "../utils";
-import oc from "open-color";
 import { MarkOptional, Mutable } from "../utility-types";
 import {
-  detectLineHeight,
-  getDefaultLineHeight,
-  measureBaseline,
-} from "../element/textElement";
+  arrayToMap,
+  getFontString,
+  getUpdatedTimestamp,
+  updateActiveTool,
+} from "../utils";
+import { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
   AppState,
@@ -72,9 +76,8 @@ export type RestoredDataState = {
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   if (Object.keys(FONT_FAMILY).includes(fontFamilyName)) {
-    return FONT_FAMILY[
-      fontFamilyName as keyof typeof FONT_FAMILY
-    ] as FontFamilyValues;
+    return FONT_FAMILY[fontFamilyName as keyof typeof FONT_FAMILY]
+      .id as FontFamilyValues;
   }
   return DEFAULT_FONT_FAMILY;
 };

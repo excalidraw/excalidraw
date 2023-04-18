@@ -2,13 +2,13 @@ import { BOUND_TEXT_PADDING, FONT_FAMILY } from "../constants";
 import { API } from "../tests/helpers/api";
 import {
   computeContainerDimensionForBoundText,
-  getContainerCoords,
-  getMaxContainerWidth,
-  getMaxContainerHeight,
-  wrapText,
   detectLineHeight,
-  getLineHeightInPx,
+  getContainerCoords,
   getDefaultLineHeight,
+  getLineHeightInPx,
+  getMaxContainerHeight,
+  getMaxContainerWidth,
+  wrapText,
 } from "./textElement";
 import { FontString } from "./types";
 
@@ -339,6 +339,6 @@ describe("Test getDefaultLineHeight", () => {
   });
 
   it("should return correct line height", () => {
-    expect(getDefaultLineHeight(FONT_FAMILY.Cascadia)).toBe(1.2);
+    expect(getDefaultLineHeight(FONT_FAMILY.Cascadia.id)).toBe(1.2);
   });
 });
