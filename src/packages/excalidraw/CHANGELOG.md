@@ -11,11 +11,17 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
+## 0.15.1 (2023-04-18)
 
 ### Docs
 
 - Add the readme back to the package which was mistakenly removed [#6484](https://github.com/excalidraw/excalidraw/pull/6484)
+
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
 
 ## 0.15.0 (2023-04-18)
 
