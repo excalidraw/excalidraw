@@ -196,9 +196,9 @@ const pushContainerBelowText = (
   return updatedElements;
 };
 
-export const actionCreateContainerFromText = register({
-  name: "createContainerFromText",
-  contextItemLabel: "labels.createContainerFromText",
+export const actionWrapTextInContainer = register({
+  name: "wrapTextInContainer",
+  contextItemLabel: "labels.wrapTextInContainer",
   trackEvent: { category: "element" },
   predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
