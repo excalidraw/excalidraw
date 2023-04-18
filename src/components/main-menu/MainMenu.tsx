@@ -50,6 +50,8 @@ const MainMenu = Object.assign(
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
+              sideOffset={device.isMobile ? 20 : undefined}
+              className="mainmenu-content"
               onClickOutside={onClickOutside}
               onSelect={composeEventHandlers(onSelect, () => {
                 setAppState({ openMenu: null });

@@ -369,6 +369,16 @@ export const ColorPicker = ({
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
   const coords = pickerButton.current?.getBoundingClientRect();
+  const mainmenuContentCoords = document
+    .querySelector(".mainmenu-content")
+    ?.getBoundingClientRect();
+
+  const top =
+    coords && mainmenuContentCoords && coords.top - mainmenuContentCoords.top;
+  const left =
+    coords &&
+    mainmenuContentCoords &&
+    coords.right - mainmenuContentCoords.left;
 
   return (
     <div>
@@ -396,8 +406,8 @@ export const ColorPicker = ({
             className="color-picker-popover-container"
             style={{
               position: "fixed",
-              top: coords?.top,
-              left: coords?.right,
+              top,
+              left,
               zIndex: 1,
             }}
           >

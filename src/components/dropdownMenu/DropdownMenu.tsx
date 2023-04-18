@@ -26,7 +26,7 @@ const DropdownMenu = ({
   const MenuContentComp = getMenuContentComponent(children);
 
   return (
-    <DropdownMenuPrimitive.Root open={open}>
+    <DropdownMenuPrimitive.Root open={open} modal={false}>
       {MenuTriggerComp}
       {MenuContentComp}
     </DropdownMenuPrimitive.Root>

@@ -15,6 +15,7 @@ const MenuContent = ({
   className = "",
   onSelect,
   style,
+  sideOffset,
 }: {
   children?: React.ReactNode;
   onClickOutside?: () => void;
@@ -24,6 +25,7 @@ const MenuContent = ({
    */
   onSelect?: (event: Event) => void;
   style?: React.CSSProperties;
+  sideOffset?: number;
 }) => {
   const device = useDevice();
   const menuRef = useOutsideClickHook(() => {
@@ -42,7 +44,7 @@ const MenuContent = ({
         style={style}
         data-testid="dropdown-menu"
         side="bottom"
-        sideOffset={4}
+        sideOffset={sideOffset ?? 4}
         align="start"
       >
         {/* the zIndex ensures this menu has higher stacking order,

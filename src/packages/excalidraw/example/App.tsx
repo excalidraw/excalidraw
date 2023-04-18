@@ -526,7 +526,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               </svg>
             }
           >
-            Trigger
+            Submenu trigger
           </MainMenu.Sub.Trigger>
           <MainMenu.Sub.Content>
             <MainMenu.Sub.Item
@@ -574,7 +574,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         </MainMenu.Group>
         {/* <MainMenu.Separator /> */}
         <MainMenu.Sub>
-          <MainMenu.Sub.Trigger>Trigger</MainMenu.Sub.Trigger>
+          <MainMenu.Sub.Trigger>Another submenu trigger</MainMenu.Sub.Trigger>
           <MainMenu.Sub.Content>
             <MainMenu.Sub.Item
               onSelect={() => window.alert("You clicked on sub item")}
