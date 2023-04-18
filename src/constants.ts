@@ -95,7 +95,7 @@ export const FONT_FAMILY = {
   Cascadia: {
     id: 3,
     fallback:
-      "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace, Segoe UI Emoji",
+      "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace",
   },
 };
 
