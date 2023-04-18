@@ -102,6 +102,8 @@ export const redrawTextBoundingBox = (
         );
         mutateElement(container, { height: nextHeight });
         maxContainerHeight = getMaxContainerHeight(container);
+        // overwritting the cache with original container height so
+        // it can be restored when unbind
         updateOriginalContainerCache(container.id, nextHeight);
       }
       const updatedTextElement = {
