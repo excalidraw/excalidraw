@@ -339,3 +339,47 @@ The `device` has the following `attributes`
 | `isMobile` | `boolean` | Set to `true` when the device is `mobile` |
 | `isTouchScreen` | `boolean` | Set to `true` for `touch` devices |
 | `canDeviceFitSidebar` | `boolean` | Implies whether there is enough space to fit the `sidebar` |
+
+### i18n
+
+To help with localization, we export the following.
+
+| name | type |
+| --- | --- |
+| `defaultLang` | `string` |
+| `languages` | [`Language[]`](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L15) |
+| `useI18n` | [`() => { langCode, t }`](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L15) |
+
+```js
+import { defaultLang, languages, useI18n } from "@excalidraw/excalidraw";
+```
+
+#### defaultLang
+
+Default language code, `en`.
+
+#### languages
+
+List of supported language codes. You can pass any of these to `Excalidraw`'s [`langCode` prop](/docs/@excalidraw/excalidraw/api/props/#langcode).
+
+#### useI18n
+
+A hook that returns the current language code and translation helper function. You can use this to translate strings in the components you render as children of `<Excalidraw>`.
+
+```jsx live
+function App() {
+  const { t } = useI18n();
+  return (
+    <div style={{ height: "500px" }}>
+      <Excalidraw>
+        <button
+          style={{ position: "absolute", zIndex: 10, height: "2rem" }}
+          onClick={() => window.alert(t("labels.madeWithExcalidraw"))}
+        >
+          {t("buttons.confirm")}
+        </button>
+      </Excalidraw>
+    </div>
+  );
+}
+```
