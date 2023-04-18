@@ -51,7 +51,6 @@ export const splitIntoLines = (text: string) => {
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
-  shouldUpdateOriginalContainerCache = true,
 ) => {
   let maxWidth = undefined;
   const boundTextUpdates = {
@@ -103,9 +102,7 @@ export const redrawTextBoundingBox = (
         );
         mutateElement(container, { height: nextHeight });
         maxContainerHeight = getMaxContainerHeight(container);
-        if (shouldUpdateOriginalContainerCache) {
-          updateOriginalContainerCache(container.id, nextHeight);
-        }
+        updateOriginalContainerCache(container.id, nextHeight);
       }
       const updatedTextElement = {
         ...textElement,

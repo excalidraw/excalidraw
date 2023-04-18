@@ -135,9 +135,9 @@ export const actionBindText = register({
         id: textElement.id,
       }),
     });
-    updateOriginalContainerCache(container.id, container.height);
-
-    redrawTextBoundingBox(textElement, container, false);
+    const originalContainerHeight = container.height;
+    redrawTextBoundingBox(textElement, container);
+    updateOriginalContainerCache(container.id, originalContainerHeight);
 
     return {
       elements: pushTextAboveContainer(elements, container, textElement),
