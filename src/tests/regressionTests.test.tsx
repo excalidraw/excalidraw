@@ -1,7 +1,9 @@
 import ReactDOM from "react-dom";
+import { FONT_FAMILY } from "../constants";
 import { ExcalidrawElement } from "../element/types";
-import { CODES, KEYS } from "../keys";
 import ExcalidrawApp from "../excalidraw-app";
+import { defaultLang, t } from "../i18n";
+import { CODES, KEYS } from "../keys";
 import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
 import { setDateTimeForTests } from "../utils";
@@ -14,9 +16,6 @@ import {
   screen,
   waitFor,
 } from "./test-utils";
-import { defaultLang } from "../i18n";
-import { FONT_FAMILY } from "../constants";
-import { t } from "../i18n";
 
 const { h } = window;
 
@@ -664,9 +663,9 @@ describe("regression tests", () => {
 
   it("updates fontSize & fontFamily appState", () => {
     UI.clickTool("text");
-    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Virgil);
+    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Virgil.id);
     fireEvent.click(screen.getByTitle(/code/i));
-    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Cascadia);
+    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Cascadia.id);
   });
 
   it("deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element", () => {
