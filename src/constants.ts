@@ -107,7 +107,7 @@ export const THEME = {
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
 export const DEFAULT_FONT_SIZE = 20;
-export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil["id"];
+export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil.id;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
