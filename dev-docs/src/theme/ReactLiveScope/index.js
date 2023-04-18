@@ -24,6 +24,7 @@ const ExcalidrawScope = {
   Sidebar: ExcalidrawComp.Sidebar,
   exportToCanvas: ExcalidrawComp.exportToCanvas,
   initialData,
+  useI18n: ExcalidrawComp.useI18n,
 };
 
 export default ExcalidrawScope;

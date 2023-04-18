@@ -31,9 +31,28 @@ You can pass `null` / `undefined` if not applicable.
 restoreElements(
   elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ImportedDataState["elements"]</a>,<br/>&nbsp;
   localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>,<br/>&nbsp;
-  refreshDimensions?: boolean<br/>
+  opts: &#123; refreshDimensions?: boolean, repairBindings?: boolean }<br/>
 )
 </pre>
+
+| Prop | Type | Description |
+| ---- | ---- | ---- |
+| `elements` | <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ImportedDataState["elements"]</a> | The `elements` to be restored |
+| [`localElements`](#localelements) | <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> &#124; null &#124; undefined |  When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`. |
+| [`opts`](#opts) | `Object` | The extra optional parameter to configure restored elements
+
+#### localElements
+
+When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`.  
+Use this when you `import` elements which may already be present in the scene to ensure that you do not disregard the newly imported elements if you're using element version to detect the update
+
+#### opts
+The extra optional parameter to configure restored elements. It has the following attributes
+
+| Prop | Type | Description|
+| --- | --- | ------|
+| `refreshDimensions` | `boolean` | Indicates whether we should also `recalculate` text element dimensions. Since this is a potentially costly operation, you may want to disable it if you restore elements in tight loops, such as during collaboration. |
+| `repairBindings` |`boolean` | Indicates whether the `bindings` for the elements should be repaired. This is to make sure there are no containers with non existent bound text element id and no bound text elements with non existent container id. |
 
 **_How to use_**
 
@@ -42,9 +61,6 @@ import { restoreElements } from "@excalidraw/excalidraw";
 ```
 
 This function will make sure all properties of element is correctly set and if any attribute is missing, it will be set to its default value.
-
-When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`.  
-Use this when you import elements which may already be present in the scene to ensure that you do not disregard the newly imported elements if you're using element version to detect the updates.
 
 Parameter `refreshDimensions` indicates whether we should also `recalculate` text element dimensions. Defaults to `false`. Since this is a potentially costly operation, you may want to disable it if you restore elements in tight loops, such as during collaboration.
 
@@ -56,7 +72,9 @@ Parameter `refreshDimensions` indicates whether we should also `recalculate` tex
 restore(
   data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L34">ImportedDataState</a>,<br/>&nbsp;
   localAppState: Partial&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>> | null | undefined,<br/>&nbsp;
-  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null | undefined<br/>): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L4">DataState</a>
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null | undefined<br/>): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L4">DataState</a><br/>
+  opts: &#123; refreshDimensions?: boolean, repairBindings?: boolean }<br/>
+
 )
 </pre>
 
