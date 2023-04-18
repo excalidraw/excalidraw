@@ -32,6 +32,7 @@ import {
   getDefaultLineHeight,
 } from "./textElement";
 import {
+  DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
@@ -40,7 +41,6 @@ import {
 } from "../constants";
 import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
-import oc from "open-color";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -69,13 +69,13 @@ const _newElementBase = <T extends ExcalidrawElement>(
   {
     x,
     y,
-    strokeColor = oc.black,
-    backgroundColor = "transparent",
-    fillStyle = "hachure",
-    strokeWidth = 1,
-    strokeStyle = "solid",
-    roughness = 1,
-    opacity = 100,
+    strokeColor = DEFAULT_ELEMENT_PROPS.strokeColor,
+    backgroundColor = DEFAULT_ELEMENT_PROPS.backgroundColor,
+    fillStyle = DEFAULT_ELEMENT_PROPS.fillStyle,
+    strokeWidth = DEFAULT_ELEMENT_PROPS.strokeWidth,
+    strokeStyle = DEFAULT_ELEMENT_PROPS.strokeStyle,
+    roughness = DEFAULT_ELEMENT_PROPS.roughness,
+    opacity = DEFAULT_ELEMENT_PROPS.opacity,
     width = 0,
     height = 0,
     angle = 0,
@@ -83,7 +83,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     roundness = null,
     boundElements = null,
     link = null,
-    locked = false,
+    locked = DEFAULT_ELEMENT_PROPS.locked,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
