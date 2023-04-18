@@ -8,19 +8,24 @@ const DropdownMenuSubTrigger = ({
   icon,
   shortcut,
   className,
+  ...rest
 }: {
   children: React.ReactNode;
   icon?: JSX.Element;
   shortcut?: string;
   className?: string;
-}) => {
+} & React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <DropdownMenuPrimitive.SubTrigger
-      className={getDropdownMenuItemClassName(className)}
-    >
-      <MenuItemContent icon={icon} shortcut={shortcut}>
-        {children}
-      </MenuItemContent>
+    <DropdownMenuPrimitive.SubTrigger className="radix-menuitem">
+      <div
+        {...rest}
+        className={getDropdownMenuItemClassName(className)}
+        title={rest.title ?? rest["aria-label"]}
+      >
+        <MenuItemContent icon={icon} shortcut={shortcut}>
+          {children}
+        </MenuItemContent>
+      </div>
     </DropdownMenuPrimitive.SubTrigger>
   );
 };

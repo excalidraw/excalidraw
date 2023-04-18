@@ -8,6 +8,12 @@
   .dropdown-menu {
     position: absolute;
 
+    .radix-menuitem {
+      &:focus-visible {
+        outline: none;
+      }
+    }
+
     &--mobile {
       bottom: 55px;
       top: auto;
