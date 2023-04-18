@@ -1,14 +1,7 @@
-import { nanoid } from "nanoid";
 import React, { useEffect, useMemo, useState } from "react";
 import { getCommonBounds } from "../element/bounds";
-import { mutateElement } from "../element/mutateElement";
-import {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
+import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import { KEYS } from "../keys";
-import { degreeToRadian, radianToDegree } from "../math";
 import { getTargetElements } from "../scene";
 import Scene from "../scene/Scene";
 import { AppState, ExcalidrawProps } from "../types";
@@ -16,6 +9,7 @@ import { CloseIcon } from "./icons";
 import { Island } from "./Island";
 import "./Stats.scss";
 import { throttle } from "lodash";
+import DragInput from "./DragInput";
 
 const STATS_TIMEOUT = 50;
 interface StatsProps {
@@ -28,9 +22,6 @@ interface StatsProps {
 
 type ElementStatItem = {
   label: string;
-  value: number;
-  element: NonDeletedExcalidrawElement;
-  version: string;
   property: "x" | "y" | "width" | "height" | "angle";
 };
 
@@ -68,70 +59,6 @@ export const Stats = (props: StatsProps) => {
   useEffect(
     () => () => throttledSetSceneDimension.cancel(),
     [throttledSetSceneDimension],
-  );
-
-  const [elementStats, setElementStats] = useState<ElementStatItem[]>([]);
-
-  const throttledSetElementStats = useMemo(
-    () =>
-      throttle((element: NonDeletedExcalidrawElement | null) => {
-        const stats: ElementStatItem[] = element
-          ? [
-              {
-                label: "X",
-                value: Math.round(element.x),
-                element,
-                property: "x",
-                version: nanoid(),
-              },
-              {
-                label: "Y",
-                value: Math.round(element.y),
-                element,
-                property: "y",
-                version: nanoid(),
-              },
-              {
-                label: "W",
-                value: Math.round(element.width),
-                element,
-                property: "width",
-                version: nanoid(),
-              },
-              {
-                label: "H",
-                value: Math.round(element.height),
-                element,
-                property: "height",
-                version: nanoid(),
-              },
-              {
-                label: "A",
-                value: Math.round(radianToDegree(element.angle) * 100) / 100,
-                element,
-                property: "angle",
-                version: nanoid(),
-              },
-            ]
-          : [];
-
-        setElementStats(stats);
-      }, STATS_TIMEOUT),
-    [],
-  );
-
-  useEffect(() => {
-    throttledSetElementStats(singleElement);
-  }, [
-    singleElement,
-    singleElement?.version,
-    singleElement?.versionNonce,
-    throttledSetElementStats,
-  ]);
-
-  useEffect(
-    () => () => throttledSetElementStats.cancel(),
-    [throttledSetElementStats],
   );
 
   return (
@@ -185,78 +112,38 @@ export const Stats = (props: StatsProps) => {
                   gap: "4px 8px",
                 }}
               >
-                {elementStats.map((statsItem) => {
-                  return (
-                    <label
-                      className="color-input-container"
-                      key={statsItem.property}
-                    >
-                      <div
-                        className="color-picker-hash"
-                        style={{
-                          width: "30px",
-                        }}
-                      >
-                        {statsItem.label}
-                      </div>
-                      <input
-                        id={statsItem.label}
-                        key={statsItem.version}
-                        defaultValue={statsItem.value}
-                        className="color-picker-input"
-                        style={{
-                          width: "55px",
-                        }}
-                        autoComplete="off"
-                        spellCheck="false"
-                        onKeyDown={(event) => {
-                          let value = Number(event.target.value);
-
-                          if (isNaN(value)) {
-                            return;
-                          }
-
-                          value =
-                            statsItem.property === "angle"
-                              ? degreeToRadian(value)
-                              : value;
-
-                          if (event.key === KEYS.ENTER) {
-                            mutateElement(statsItem.element, {
-                              [statsItem.property]: value,
-                            });
-
-                            event.target.value = statsItem.element[
-                              statsItem.property as keyof ExcalidrawElement
-                            ] as string;
-                          }
-                        }}
-                        onBlur={(event) => {
-                          let value = Number(event.target.value);
-
-                          if (isNaN(value)) {
-                            return;
-                          }
-
-                          value =
-                            statsItem.property === "angle"
-                              ? degreeToRadian(value)
-                              : value;
-
-                          if (!isNaN(value)) {
-                            mutateElement(statsItem.element, {
-                              [statsItem.property]: value,
-                            });
-                          }
-
-                          event.target.value = statsItem.element[
-                            statsItem.property as keyof ExcalidrawElement
-                          ] as string;
-                        }}
-                      ></input>
-                    </label>
-                  );
-                })}
+                {(
+                  [
+                    {
+                      label: "X",
+                      property: "x",
+                    },
+                    {
+                      label: "Y",
+                      property: "y",
+                    },
+                    {
+                      label: "W",
+                      property: "width",
+                    },
+                    {
+                      label: "H",
+                      property: "height",
+                    },
+                    {
+                      label: "A",
+                      property: "angle",
+                    },
+                  ] as ElementStatItem[]
+                ).map((statsItem) => (
+                  <DragInput
+                    key={statsItem.label}
+                    label={statsItem.label}
+                    property={statsItem.property}
+                    element={singleElement}
+                    zoom={props.appState.zoom}
+                  />
+                ))}
               </div>
             </div>
           </div>
