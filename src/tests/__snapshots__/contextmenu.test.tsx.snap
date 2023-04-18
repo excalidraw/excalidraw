@@ -121,7 +121,7 @@ Object {
       },
       Object {
         "contextItemLabel": "labels.createContainerFromText",
-        "name": "createContainerFromText",
+        "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": Object {
@@ -4518,7 +4518,7 @@ Object {
       },
       Object {
         "contextItemLabel": "labels.createContainerFromText",
-        "name": "createContainerFromText",
+        "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": Object {
@@ -5068,7 +5068,7 @@ Object {
       },
       Object {
         "contextItemLabel": "labels.createContainerFromText",
-        "name": "createContainerFromText",
+        "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": Object {
@@ -5917,7 +5917,7 @@ Object {
       },
       Object {
         "contextItemLabel": "labels.createContainerFromText",
-        "name": "createContainerFromText",
+        "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": Object {
@@ -6263,7 +6263,7 @@ Object {
       },
       Object {
         "contextItemLabel": "labels.createContainerFromText",
-        "name": "createContainerFromText",
+        "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": Object {
