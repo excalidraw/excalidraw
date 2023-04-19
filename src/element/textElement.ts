@@ -456,7 +456,6 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     currentLine = "";
     currentLineWidthTillNow = 0;
   };
-
   originalLines.forEach((originalLine) => {
     const currentLineWidth = getTextWidth(originalLine, font);
 
@@ -487,6 +486,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
       else if (currentWordWidth > maxWidth) {
         // push current line since the current word exceeds the max width
         // so will be appended in next line
+
         push(currentLine);
 
         resetParams();
@@ -507,15 +507,15 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
             currentLine += currentChar;
           }
         }
-
         // push current line if appending space exceeds max width
         if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
           push(currentLine);
           resetParams();
-        } else {
           // space needs to be appended before next word
           // as currentLine contains chars which couldn't be appended
-          // to previous line
+          // to previous line unless the line ends with hyphen to sync
+          // with css word-wrap
+        } else if (!currentLine.endsWith("-")) {
           currentLine += " ";
           currentLineWidthTillNow += spaceWidth;
         }
@@ -535,6 +535,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           index++;
 
           // if word ends with "-" then we don't need to add space
+          // to sync with css word-wrap
           const shouldAppendSpace = !word.endsWith("-");
           currentLine += word;
 

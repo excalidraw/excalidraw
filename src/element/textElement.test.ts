@@ -185,24 +185,15 @@ now`,
   });
 
   it("should wrap the text correctly when text contains hyphen", () => {
-    const text =
-      "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range of other projects.";
+    let text =
+      "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range-of other projects";
     const res = wrapText(text, font, 110);
     expect(res).toBe(
-      `Wikipedia 
-is hosted 
-by 
-Wikimedia-
-Foundation,
-a non-
-profit 
-organizati
-on that 
-also hosts
-a range of
-other 
-projects.`,
+      `Wikipedia \nis hosted \nby \nWikimedia-\nFoundation,\na non-\nprofit \norganizati\non that \nalso hosts\na range-of\nother \nprojects`,
     );
+
+    text = "Hello thereusing-now";
+    expect(wrapText(text, font, 100)).toEqual("Hello \nthereusin\ng-now");
   });
 });
 
