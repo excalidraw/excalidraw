@@ -314,9 +314,9 @@ export const actionChangeFillStyle = register({
   },
   PanelComponent: ({ elements, appState, updateData }) => {
     const selectedElements = getSelectedElements(elements, appState);
-    const allElementsZigZag = selectedElements.every(
-      (el) => el.fillStyle === "zigzag",
-    );
+    const allElementsZigZag =
+      selectedElements.length > 0 &&
+      selectedElements.every((el) => el.fillStyle === "zigzag");
 
     return (
       <fieldset>
