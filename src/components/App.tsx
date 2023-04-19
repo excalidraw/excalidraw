@@ -295,7 +295,7 @@ import {
 } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
-import { actionCreateContainerFromText } from "../actions/actionBoundText";
+import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 
 const deviceContextInitialValue = {
@@ -2732,7 +2732,6 @@ class App extends React.Component<AppProps, AppState> {
           strokeStyle: this.state.currentItemStrokeStyle,
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
-          roundness: null,
           text: "",
           fontSize,
           fontFamily,
@@ -2744,7 +2743,6 @@ class App extends React.Component<AppProps, AppState> {
             : DEFAULT_VERTICAL_ALIGN,
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
-          locked: false,
           lineHeight,
         });
 
@@ -6366,7 +6364,7 @@ class App extends React.Component<AppProps, AppState> {
       actionGroup,
       actionUnbindText,
       actionBindText,
-      actionCreateContainerFromText,
+      actionWrapTextInContainer,
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,
