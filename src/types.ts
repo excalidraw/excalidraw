@@ -171,6 +171,7 @@ export type AppState = {
 
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
+  selectedElementsAreBeingDragged: boolean;
   previousSelectedElementIds: { [id: string]: boolean };
   shouldCacheIgnoreZoom: boolean;
   toast: { message: string; closable?: boolean; duration?: number } | null;
