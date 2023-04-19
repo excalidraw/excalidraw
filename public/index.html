@@ -79,6 +79,7 @@
     </style>
     <!------------------------------------------------------------------------->
 
+    <% if (process.env.NODE_ENV === "production") { %>
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -97,6 +98,7 @@
         window.location.href = "https://app.excalidraw.com";
       }
     </script>
+    <% } %>
 
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
@@ -146,8 +148,10 @@
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
     </script>
-    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true' &&
-    process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
+    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
+
+    <!-- LEGACY GOOGLE ANALYTICS -->
+    <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=%REACT_APP_GOOGLE_ANALYTICS_ID%"
@@ -160,6 +164,33 @@
       gtag("js", new Date());
       gtag("config", "%REACT_APP_GOOGLE_ANALYTICS_ID%");
     </script>
+    <% } %>
+    <!-- end LEGACY GOOGLE ANALYTICS -->
+
+    <!-- Matomo -->
+    <% if (process.env.REACT_APP_MATOMO_URL &&
+    process.env.REACT_APP_MATOMO_SITE_ID &&
+    process.env.REACT_APP_CDN_MATOMO_TRACKER_URL) { %>
+    <script>
+      var _paq = (window._paq = window._paq || []);
+      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(["trackPageView"]);
+      _paq.push(["enableLinkTracking"]);
+      (function () {
+        var u = "%REACT_APP_MATOMO_URL%";
+        _paq.push(["setTrackerUrl", u + "matomo.php"]);
+        _paq.push(["setSiteId", "%REACT_APP_MATOMO_SITE_ID%"]);
+        var d = document,
+          g = d.createElement("script"),
+          s = d.getElementsByTagName("script")[0];
+        g.async = true;
+        g.src = "%REACT_APP_CDN_MATOMO_TRACKER_URL%";
+        s.parentNode.insertBefore(g, s);
+      })();
+    </script>
+    <% } %>
+    <!-- end Matomo analytics -->
+
     <% } %>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->

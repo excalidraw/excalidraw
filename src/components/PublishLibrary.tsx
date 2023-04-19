@@ -1,11 +1,11 @@
-import { ReactNode, useCallback, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import OpenColor from "open-color";
 
 import { Dialog } from "./Dialog";
 import { t } from "../i18n";
 
 import { AppState, LibraryItems, LibraryItem } from "../types";
-import { exportToCanvas } from "../packages/utils";
+import { exportToCanvas, exportToSvg } from "../packages/utils";
 import {
   EXPORT_DATA_TYPES,
   EXPORT_SOURCE,
@@ -13,12 +13,13 @@ import {
   VERSIONS,
 } from "../constants";
 import { ExportedLibraryData } from "../data/types";
-
-import "./PublishLibrary.scss";
-import SingleLibraryItem from "./SingleLibraryItem";
 import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { chunk } from "../utils";
 import DialogActionButton from "./DialogActionButton";
+import { CloseIcon } from "./icons";
+import { ToolButton } from "./ToolButton";
+
+import "./PublishLibrary.scss";
 
 interface PublishLibraryDataParams {
   authorName: string;
@@ -123,6 +124,99 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
       outputType: MIME_TYPES.jpg,
       maxWidthOrHeight: 5000,
     },
+  );
+};
+
+const SingleLibraryItem = ({
+  libItem,
+  appState,
+  index,
+  onChange,
+  onRemove,
+}: {
+  libItem: LibraryItem;
+  appState: AppState;
+  index: number;
+  onChange: (val: string, index: number) => void;
+  onRemove: (id: string) => void;
+}) => {
+  const svgRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const node = svgRef.current;
+    if (!node) {
+      return;
+    }
+    (async () => {
+      const svg = await exportToSvg({
+        elements: libItem.elements,
+        appState: {
+          ...appState,
+          viewBackgroundColor: OpenColor.white,
+          exportBackground: true,
+        },
+        files: null,
+      });
+      node.innerHTML = svg.outerHTML;
+    })();
+  }, [libItem.elements, appState]);
+
+  return (
+    <div className="single-library-item">
+      {libItem.status === "published" && (
+        <span className="single-library-item-status">
+          {t("labels.statusPublished")}
+        </span>
+      )}
+      <div ref={svgRef} className="single-library-item__svg" />
+      <ToolButton
+        aria-label={t("buttons.remove")}
+        type="button"
+        icon={CloseIcon}
+        className="single-library-item--remove"
+        onClick={onRemove.bind(null, libItem.id)}
+        title={t("buttons.remove")}
+      />
+      <div
+        style={{
+          display: "flex",
+          margin: "0.8rem 0",
+          width: "100%",
+          fontSize: "14px",
+          fontWeight: 500,
+          flexDirection: "column",
+        }}
+      >
+        <label
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            flexDirection: "column",
+          }}
+        >
+          <div style={{ padding: "0.5em 0" }}>
+            <span style={{ fontWeight: 500, color: OpenColor.gray[6] }}>
+              {t("publishDialog.itemName")}
+            </span>
+            <span aria-hidden="true" className="required">
+              *
+            </span>
+          </div>
+          <input
+            type="text"
+            ref={inputRef}
+            style={{ width: "80%", padding: "0.2rem" }}
+            defaultValue={libItem.name}
+            placeholder="Item name"
+            onChange={(event) => {
+              onChange(event.target.value, index);
+            }}
+          />
+        </label>
+        <span className="error">{libItem.error}</span>
+      </div>
+    </div>
   );
 };
 

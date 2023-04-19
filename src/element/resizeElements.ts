@@ -39,13 +39,15 @@ import {
 import { Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
-  getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
   getContainerElement,
   handleBindTextResize,
   getMaxContainerWidth,
+  getApproxMinLineHeight,
+  measureText,
+  getMaxContainerHeight,
 } from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
@@ -193,7 +195,8 @@ const MIN_FONT_SIZE = 1;
 const measureFontSizeFromWidth = (
   element: NonDeleted<ExcalidrawTextElement>,
   nextWidth: number,
-): number | null => {
+  nextHeight: number,
+): { size: number; baseline: number } | null => {
   // We only use width to scale font on resize
   let width = element.width;
 
@@ -208,8 +211,15 @@ const measureFontSizeFromWidth = (
   if (nextFontSize < MIN_FONT_SIZE) {
     return null;
   }
-
-  return nextFontSize;
+  const metrics = measureText(
+    element.text,
+    getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
+    element.lineHeight,
+  );
+  return {
+    size: nextFontSize,
+    baseline: metrics.baseline + (nextHeight - metrics.height),
+  };
 };
 
 const getSidesForTransformHandle = (
@@ -280,8 +290,8 @@ const resizeSingleTextElement = (
   if (scale > 0) {
     const nextWidth = element.width * scale;
     const nextHeight = element.height * scale;
-    const nextFontSize = measureFontSizeFromWidth(element, nextWidth);
-    if (nextFontSize === null) {
+    const metrics = measureFontSizeFromWidth(element, nextWidth, nextHeight);
+    if (metrics === null) {
       return;
     }
     const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
@@ -305,9 +315,10 @@ const resizeSingleTextElement = (
       deltaY2,
     );
     mutateElement(element, {
-      fontSize: nextFontSize,
+      fontSize: metrics.size,
       width: nextWidth,
       height: nextHeight,
+      baseline: metrics.baseline,
       x: nextElementX,
       y: nextElementY,
     });
@@ -360,7 +371,7 @@ export const resizeSingleElement = (
   let scaleX = atStartBoundsWidth / boundsCurrentWidth;
   let scaleY = atStartBoundsHeight / boundsCurrentHeight;
 
-  let boundTextFont: { fontSize?: number } = {};
+  let boundTextFont: { fontSize?: number; baseline?: number } = {};
   const boundTextElement = getBoundTextElement(element);
 
   if (transformHandleDirection.includes("e")) {
@@ -412,6 +423,7 @@ export const resizeSingleElement = (
     if (stateOfBoundTextElementAtResize) {
       boundTextFont = {
         fontSize: stateOfBoundTextElementAtResize.fontSize,
+        baseline: stateOfBoundTextElementAtResize.baseline,
       };
     }
     if (shouldMaintainAspectRatio) {
@@ -421,19 +433,27 @@ export const resizeSingleElement = (
         height: eleNewHeight,
       };
 
-      const nextFontSize = measureFontSizeFromWidth(
+      const nextFont = measureFontSizeFromWidth(
         boundTextElement,
         getMaxContainerWidth(updatedElement),
+        getMaxContainerHeight(updatedElement),
       );
-      if (nextFontSize === null) {
+      if (nextFont === null) {
         return;
       }
       boundTextFont = {
-        fontSize: nextFontSize,
+        fontSize: nextFont.size,
+        baseline: nextFont.baseline,
       };
     } else {
-      const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
-      const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
+      const minWidth = getApproxMinLineWidth(
+        getFontString(boundTextElement),
+        boundTextElement.lineHeight,
+      );
+      const minHeight = getApproxMinLineHeight(
+        boundTextElement.fontSize,
+        boundTextElement.lineHeight,
+      );
       eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
       eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
     }
@@ -566,8 +586,11 @@ export const resizeSingleElement = (
     });
 
     mutateElement(element, resizedElement);
-    if (boundTextElement && boundTextFont) {
-      mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
+    if (boundTextElement && boundTextFont != null) {
+      mutateElement(boundTextElement, {
+        fontSize: boundTextFont.fontSize,
+        baseline: boundTextFont.baseline,
+      });
     }
     handleBindTextResize(element, transformHandleDirection);
   }
@@ -673,6 +696,7 @@ const resizeMultipleElements = (
       y: number;
       points?: Point[];
       fontSize?: number;
+      baseline?: number;
     } = {
       width,
       height,
@@ -681,7 +705,7 @@ const resizeMultipleElements = (
       ...rescaledPoints,
     };
 
-    let boundTextUpdates: { fontSize: number } | null = null;
+    let boundTextUpdates: { fontSize: number; baseline: number } | null = null;
 
     const boundTextElement = getBoundTextElement(element.latest);
 
@@ -691,24 +715,29 @@ const resizeMultipleElements = (
         width,
         height,
       };
-      const fontSize = measureFontSizeFromWidth(
+      const metrics = measureFontSizeFromWidth(
         boundTextElement ?? (element.orig as ExcalidrawTextElement),
         boundTextElement
           ? getMaxContainerWidth(updatedElement)
           : updatedElement.width,
+        boundTextElement
+          ? getMaxContainerHeight(updatedElement)
+          : updatedElement.height,
       );
 
-      if (!fontSize) {
+      if (!metrics) {
         return;
       }
 
       if (isTextElement(element.orig)) {
-        update.fontSize = fontSize;
+        update.fontSize = metrics.size;
+        update.baseline = metrics.baseline;
       }
 
       if (boundTextElement) {
         boundTextUpdates = {
-          fontSize,
+          fontSize: metrics.size,
+          baseline: metrics.baseline,
         };
       }
     }

@@ -23,7 +23,7 @@ import {
   getMaxContainerWidth,
 } from "../element/textElement";
 import * as textElementUtils from "../element/textElement";
-import { ROUNDNESS } from "../constants";
+import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 
 const renderScene = jest.spyOn(Renderer, "renderScene");
 
@@ -1031,7 +1031,7 @@ describe("Test Linear Elements", () => {
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
         Object {
-          "height": 128,
+          "height": 130,
           "width": 367,
         }
       `);
@@ -1040,7 +1040,7 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
         Object {
           "x": 272,
-          "y": 46,
+          "y": 45,
         }
       `);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
@@ -1052,11 +1052,11 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
         Array [
           20,
-          36,
+          35,
           502,
-          94,
+          95,
           205.9061448421403,
-          53,
+          52.5,
         ]
       `);
     });
@@ -1090,7 +1090,7 @@ describe("Test Linear Elements", () => {
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
         Object {
-          "height": 128,
+          "height": 130,
           "width": 340,
         }
       `);
@@ -1099,7 +1099,7 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
         Object {
           "x": 75,
-          "y": -4,
+          "y": -5,
         }
       `);
       expect(textElement.text).toMatchInlineSnapshot(`
@@ -1190,6 +1190,63 @@ describe("Test Linear Elements", () => {
       expect(queryByTestId(container, "align-left")).toBeNull();
       expect(queryByTestId(container, "align-horizontal-center")).toBeNull();
       expect(queryByTestId(container, "align-right")).toBeNull();
+    });
+
+    it("should update label coords when a label binded via context menu is unbinded", async () => {
+      createTwoPointerLinearElement("arrow");
+      const text = API.createElement({
+        type: "text",
+        text: "Hello Excalidraw",
+      });
+      expect(text.x).toBe(0);
+      expect(text.y).toBe(0);
+
+      h.elements = [h.elements[0], text];
+
+      const container = h.elements[0];
+      API.setSelectedElements([container, text]);
+      fireEvent.contextMenu(GlobalTestState.canvas, {
+        button: 2,
+        clientX: 20,
+        clientY: 30,
+      });
+      let contextMenu = document.querySelector(".context-menu");
+
+      fireEvent.click(
+        queryByText(contextMenu as HTMLElement, "Bind text to the container")!,
+      );
+      expect(container.boundElements).toStrictEqual([
+        { id: h.elements[1].id, type: "text" },
+      ]);
+      expect(text.containerId).toBe(container.id);
+      expect(text.verticalAlign).toBe(VERTICAL_ALIGN.MIDDLE);
+
+      mouse.reset();
+      mouse.clickAt(
+        container.x + container.width / 2,
+        container.y + container.height / 2,
+      );
+      mouse.down();
+      mouse.up();
+      API.setSelectedElements([h.elements[0], h.elements[1]]);
+
+      fireEvent.contextMenu(GlobalTestState.canvas, {
+        button: 2,
+        clientX: 20,
+        clientY: 30,
+      });
+      contextMenu = document.querySelector(".context-menu");
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Unbind text")!);
+      expect(container.boundElements).toEqual([]);
+      expect(text).toEqual(
+        expect.objectContaining({
+          containerId: null,
+          width: 160,
+          height: 25,
+          x: -40,
+          y: 7.5,
+        }),
+      );
     });
   });
 });
