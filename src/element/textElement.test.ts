@@ -9,6 +9,7 @@ import {
   detectLineHeight,
   getLineHeightInPx,
   getDefaultLineHeight,
+  parseTokens,
 } from "./textElement";
 import { FontString } from "./types";
 
@@ -194,6 +195,44 @@ now`,
 
     text = "Hello thereusing-now";
     expect(wrapText(text, font, 100)).toEqual("Hello \nthereusin\ng-now");
+  });
+});
+
+describe("Test parseTokens", () => {
+  it("should split into tokens correctly", () => {
+    let text = "Excalidraw is a virtual collaborative whiteboard";
+    expect(parseTokens(text)).toEqual([
+      "Excalidraw",
+      "is",
+      "a",
+      "virtual",
+      "collaborative",
+      "whiteboard",
+    ]);
+
+    text =
+      "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range-of other projects";
+    expect(parseTokens(text)).toEqual([
+      "Wikipedia",
+      "is",
+      "hosted",
+      "by",
+      "Wikimedia-",
+      "",
+      "Foundation,",
+      "a",
+      "non-",
+      "profit",
+      "organization",
+      "that",
+      "also",
+      "hosts",
+      "a",
+      "range-",
+      "of",
+      "other",
+      "projects",
+    ]);
   });
 });
 

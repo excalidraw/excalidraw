@@ -419,16 +419,22 @@ export const getTextHeight = (
   return getLineHeightInPx(fontSize, lineHeight) * lineCount;
 };
 
-const splitTextByToken = (text: string, token: string) => {
+export const parseTokens = (text: string) => {
+  // Splitting words containing "-" as those are treated as separate words
+  // by css wrapping algorithm eg non-profit => non-, profit
   const words = text.split("-");
   if (words.length > 1) {
+    // non-proft org => ['non-', 'profit org']
     words.forEach((word, index) => {
       if (index !== words.length - 1) {
         words[index] = word += "-";
       }
     });
   }
-  return words.join(" ");
+  // Joining the words with space and splitting them again with space to get the
+  // final list of tokens
+  // ['non-', 'profit org'] =>,'non- proft org' => ['non-','profit','org']
+  return words.join(" ").split(" ");
 };
 
 export const wrapText = (text: string, font: FontString, maxWidth: number) => {
@@ -465,10 +471,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
       return; // continue
     }
 
-    // Splitting words containing "-" as those are treated as separate words
-    // by css wrapping algorithm eg non-profit => non-, profit
-    const wordsSplitByHyphen = splitTextByToken(originalLine, "-");
-    const words = wordsSplitByHyphen.split(" ");
+    const words = parseTokens(originalLine);
     resetParams();
 
     let index = 0;
