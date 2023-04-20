@@ -2744,6 +2744,7 @@ class App extends React.Component<AppProps, AppState> {
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
           lineHeight,
+          angle: container?.angle ?? 0,
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {
