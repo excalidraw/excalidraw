@@ -124,7 +124,7 @@ export type ActionName =
   | "toggleLinearEditor"
   | "toggleEraserTool"
   | "toggleHandTool"
-  | "createContainerFromText";
+  | "wrapTextInContainer";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

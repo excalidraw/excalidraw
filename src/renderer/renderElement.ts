@@ -89,6 +89,7 @@ export interface ExcalidrawElementWithCanvas {
   canvas: HTMLCanvasElement;
   theme: RenderConfig["theme"];
   scale: number;
+  zoomValue: RenderConfig["zoom"]["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
   boundTextElementVersion: number | null;
@@ -203,6 +204,7 @@ const generateElementCanvas = (
     canvas,
     theme: renderConfig.theme,
     scale,
+    zoomValue: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
     boundTextElementVersion: getBoundTextElement(element)?.version || null,
@@ -719,7 +721,7 @@ const generateElementWithCanvas = (
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
-    prevElementWithCanvas.scale !== zoom.value &&
+    prevElementWithCanvas.zoomValue !== zoom.value &&
     !renderConfig?.shouldCacheIgnoreZoom;
   const boundTextElementVersion = getBoundTextElement(element)?.version || null;
 
@@ -869,7 +871,8 @@ const drawElementFromCanvas = (
     );
 
     if (
-      process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX &&
+      process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
+        "true" &&
       hasBoundTextElement(element)
     ) {
       const coords = getContainerCoords(element);

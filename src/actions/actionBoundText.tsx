@@ -1,4 +1,9 @@
-import { BOUND_TEXT_PADDING, ROUNDNESS, VERTICAL_ALIGN } from "../constants";
+import {
+  BOUND_TEXT_PADDING,
+  ROUNDNESS,
+  VERTICAL_ALIGN,
+  TEXT_ALIGN,
+} from "../constants";
 import { getNonDeletedElements, isTextElement, newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import {
@@ -11,6 +16,7 @@ import {
 import {
   getOriginalContainerHeightFromCache,
   resetOriginalContainerCache,
+  updateOriginalContainerCache,
 } from "../element/textWysiwyg";
 import {
   hasBoundTextElement,
@@ -132,6 +138,7 @@ export const actionBindText = register({
     mutateElement(textElement, {
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
+      textAlign: TEXT_ALIGN.CENTER,
     });
     mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
@@ -139,7 +146,11 @@ export const actionBindText = register({
         id: textElement.id,
       }),
     });
+    const originalContainerHeight = container.height;
     redrawTextBoundingBox(textElement, container);
+    // overwritting the cache with original container height so
+    // it can be restored when unbind
+    updateOriginalContainerCache(container.id, originalContainerHeight);
 
     return {
       elements: pushTextAboveContainer(elements, container, textElement),
@@ -185,8 +196,8 @@ const pushContainerBelowText = (
   return updatedElements;
 };
 
-export const actionCreateContainerFromText = register({
-  name: "createContainerFromText",
+export const actionWrapTextInContainer = register({
+  name: "wrapTextInContainer",
   contextItemLabel: "labels.createContainerFromText",
   trackEvent: { category: "element" },
   predicate: (elements, appState) => {
@@ -275,6 +286,7 @@ export const actionCreateContainerFromText = register({
             containerId: container.id,
             verticalAlign: VERTICAL_ALIGN.MIDDLE,
             boundElements: null,
+            textAlign: TEXT_ALIGN.CENTER,
           },
           false,
         );

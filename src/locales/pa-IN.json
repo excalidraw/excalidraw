@@ -110,6 +110,7 @@
     "increaseFontSize": "ਫੌਂਟ ਦਾ ਅਕਾਰ ਵਧਾਓ",
     "unbindText": "",
     "bindText": "ਪਾਠ ਨੂੰ ਕੰਟੇਨਰ ਨਾਲ ਬੰਨ੍ਹੋ",
+    "createContainerFromText": "",
     "link": {
       "edit": "ਕੜੀ ਸੋਧੋ",
       "create": "ਕੜੀ ਬਣਾਓ",
@@ -204,7 +205,22 @@
     "cannotResolveCollabServer": "",
     "importLibraryError": "",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
@@ -303,7 +319,8 @@
     "doubleClick": "ਡਬਲ-ਕਲਿੱਕ",
     "drag": "ਘਸੀਟੋ",
     "editor": "ਸੋਧਕ",
-    "editSelectedShape": "ਚੁਣਿਆ ਰੂਪ ਸੋਧੋ (ਪਾਠ/ਤੀਰ/ਲਾਈਨ)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "ਕੋਈ ਸਮੱਸਿਆ ਲੱਭੀ? ਜਮ੍ਹਾਂ ਕਰਵਾਓ",
     "howto": "ਸਾਡੀਆਂ ਗਾਈਡਾਂ ਦੀ ਪਾਲਣਾ ਕਰੋ",
     "or": "ਜਾਂ",
