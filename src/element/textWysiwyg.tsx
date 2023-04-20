@@ -590,7 +590,6 @@ export const textWysiwyg = ({
           ),
         });
       }
-
       redrawTextBoundingBox(updateElement, container);
     }
 
