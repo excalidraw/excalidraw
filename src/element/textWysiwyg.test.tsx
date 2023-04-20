@@ -529,11 +529,8 @@ describe("textWysiwyg", () => {
     it("should set the text element angle to same as container angle when binding to rotated container", async () => {
       const rectangle = API.createElement({
         type: "rectangle",
-        x: 10,
-        y: 20,
         width: 90,
         height: 75,
-        backgroundColor: "red",
         angle: 45,
       });
       h.elements = [rectangle];
