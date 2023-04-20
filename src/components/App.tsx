@@ -5743,7 +5743,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const imageFile = await fileOpen({
         description: "Image",
-        extensions: ["jpg", "png", "svg", "gif"],
+        extensions: ["jpg", "png", "svg", "gif", "avif", "jfif", "webp", "bmp"],
       });
 
       const imageElement = this.createImageElement({

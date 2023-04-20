@@ -118,6 +118,8 @@ export const MIME_TYPES = {
   webp: "image/webp",
   bmp: "image/bmp",
   ico: "image/x-icon",
+  avif: "image/avif",
+  jfif: "image/jfif",
   binary: "application/octet-stream",
 } as const;
 
@@ -195,6 +197,8 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
   MIME_TYPES.svg,
   MIME_TYPES.gif,
   MIME_TYPES.webp,
+  MIME_TYPES.avif,
+  MIME_TYPES.jfif,
   MIME_TYPES.bmp,
   MIME_TYPES.ico,
 ] as const;

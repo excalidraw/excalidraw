@@ -11,6 +11,10 @@ import { debounce } from "../utils";
 type FILE_EXTENSION =
   | "gif"
   | "jpg"
+  | "avif"
+  | "jfif"
+  | "webp"
+  | "bmp"
   | "png"
   | "excalidraw.png"
   | "svg"
