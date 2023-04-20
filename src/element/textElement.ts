@@ -384,7 +384,7 @@ export const getApproxMinLineHeight = (
 
 let canvas: HTMLCanvasElement | undefined;
 
-const getLineWidth = (text: string, font: FontString) => {
+export const getLineWidth = (text: string, font: FontString) => {
   if (!canvas) {
     canvas = document.createElement("canvas");
   }
@@ -444,10 +444,9 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   if (!Number.isFinite(maxWidth) || maxWidth < 0) {
     return text;
   }
-
+  console.log("TEXT =", text, maxWidth);
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
-  const spaceWidth = getLineWidth(" ", font);
 
   let currentLine = "";
   let currentLineWidthTillNow = 0;
@@ -463,7 +462,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     currentLineWidthTillNow = 0;
   };
   originalLines.forEach((originalLine) => {
-    const currentLineWidth = getTextWidth(originalLine, font);
+    const currentLineWidth = getLineWidth(originalLine, font);
 
     // Push the line if its <= maxWidth
     if (currentLineWidth <= maxWidth) {
@@ -472,6 +471,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     }
 
     const words = parseTokens(originalLine);
+    console.log(words, "words");
     resetParams();
 
     let index = 0;
@@ -511,23 +511,25 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           }
         }
         // push current line if appending space exceeds max width
-        if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
+        if (currentLineWidthTillNow >= maxWidth) {
           push(currentLine);
           resetParams();
           // space needs to be appended before next word
           // as currentLine contains chars which couldn't be appended
           // to previous line unless the line ends with hyphen to sync
           // with css word-wrap
-        } else if (!currentLine.endsWith("-")) {
+        } else if (!currentLine.endsWith("-") && index < words.length) {
           currentLine += " ";
-          currentLineWidthTillNow += spaceWidth;
         }
         index++;
       } else {
         // Start appending words in a line till max width reached
         while (currentLineWidthTillNow < maxWidth && index < words.length) {
           const word = words[index];
-          currentLineWidthTillNow = getLineWidth(currentLine + word, font);
+          currentLineWidthTillNow = getLineWidth(
+            `${currentLine + word}`.trimEnd(),
+            font,
+          );
 
           if (currentLineWidthTillNow > maxWidth) {
             push(currentLine);
@@ -535,36 +537,44 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
 
             break;
           }
-          index++;
 
           // if word ends with "-" then we don't need to add space
           // to sync with css word-wrap
           const shouldAppendSpace = !word.endsWith("-");
           currentLine += word;
 
-          if (shouldAppendSpace) {
+          if (shouldAppendSpace && index < words.length) {
             currentLine += " ";
           }
+          console.log("currentLine", currentLine, currentLine.length, index);
+          index++;
 
           // Push the word if appending space exceeds max width
-          if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
-            if (shouldAppendSpace) {
-              lines.push(currentLine.slice(0, -1));
-            } else {
-              lines.push(currentLine);
-            }
+          if (currentLineWidthTillNow >= maxWidth) {
+            // if (
+            //   currentLineWidthTillNow + spaceWidth === maxWidth &&
+            //   index < words.length &&
+            //   words[index] === ""
+            // ) {
+            //   currentLine += " ";
+            //   index++;
+            // }
+
+            lines.push(currentLine);
             resetParams();
             break;
           }
         }
       }
     }
+    console.log("currentLine", currentLine);
     if (currentLine.slice(-1) === " ") {
       // only remove last trailing space which we have added when joining words
       currentLine = currentLine.slice(0, -1);
       push(currentLine);
     }
   });
+  console.log("TEXT Words", lines);
   return lines.join("\n");
 };
 
