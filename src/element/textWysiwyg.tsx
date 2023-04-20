@@ -27,7 +27,6 @@ import {
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
-  getTextWidth,
   measureText,
   normalizeText,
   redrawTextBoundingBox,

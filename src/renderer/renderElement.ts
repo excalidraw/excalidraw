@@ -42,7 +42,6 @@ import {
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
   getBoundTextElement,
-  getBoundTextElementOffset,
   getContainerCoords,
   getContainerElement,
   getLineHeightInPx,
@@ -51,7 +50,6 @@ import {
   getMaxContainerWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import heILJsonE0bd304682986695208c from "../packages/excalidraw/dist/excalidraw-assets-dev/locales/he-IL-json-e0bd304682986695208c";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
