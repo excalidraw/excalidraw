@@ -217,7 +217,12 @@ const getAdjustedDimensions = (
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureText(nextText, getFontString(element), element.lineHeight);
+  } = measureText(
+    nextText,
+    getFontString(element),
+    element.lineHeight,
+    container ? getMaxContainerWidth(container) : null,
+  );
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;

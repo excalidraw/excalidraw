@@ -76,6 +76,7 @@ export const redrawTextBoundingBox = (
     boundTextUpdates.text,
     getFontString(textElement),
     textElement.lineHeight,
+    maxWidth,
   );
 
   boundTextUpdates.width = metrics.width;
@@ -199,6 +200,7 @@ export const handleBindTextResize = (
         text,
         getFontString(textElement),
         textElement.lineHeight,
+        maxWidth,
       );
       nextHeight = metrics.height;
       nextWidth = metrics.width;
@@ -287,6 +289,7 @@ export const measureText = (
   text: string,
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
+  maxWidth?: number | null,
 ) => {
   text = text
     .split("\n")
@@ -296,7 +299,10 @@ export const measureText = (
     .join("\n");
   const fontSize = parseFloat(font);
   const height = getTextHeight(text, fontSize, lineHeight);
-  const width = getTextWidth(text, font);
+  let width = getTextWidth(text, font);
+  if (maxWidth) {
+    width = Math.min(width, maxWidth);
+  }
   const baseline = measureBaseline(text, font, lineHeight);
   return { width, height, baseline };
 };
@@ -444,7 +450,6 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   if (!Number.isFinite(maxWidth) || maxWidth < 0) {
     return text;
   }
-  console.log("TEXT =", text, maxWidth);
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
 
@@ -471,7 +476,6 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     }
 
     const words = parseTokens(originalLine);
-    console.log(words, "words");
     resetParams();
 
     let index = 0;
@@ -546,20 +550,10 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           if (shouldAppendSpace && index < words.length) {
             currentLine += " ";
           }
-          console.log("currentLine", currentLine, currentLine.length, index);
           index++;
 
           // Push the word if appending space exceeds max width
           if (currentLineWidthTillNow >= maxWidth) {
-            // if (
-            //   currentLineWidthTillNow + spaceWidth === maxWidth &&
-            //   index < words.length &&
-            //   words[index] === ""
-            // ) {
-            //   currentLine += " ";
-            //   index++;
-            // }
-
             lines.push(currentLine);
             resetParams();
             break;
@@ -567,14 +561,12 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
         }
       }
     }
-    console.log("currentLine", currentLine);
     if (currentLine.slice(-1) === " ") {
       // only remove last trailing space which we have added when joining words
       currentLine = currentLine.slice(0, -1);
       push(currentLine);
     }
   });
-  console.log("TEXT Words", lines);
   return lines.join("\n");
 };
 

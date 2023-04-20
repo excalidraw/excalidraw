@@ -328,10 +328,6 @@ const drawElementOnCanvas = (
         context.fillStyle = element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
-        context.fillStyle = "yellow";
-        context.fillRect(0, 0, element.width, element.height);
-        context.fillStyle = element.strokeColor;
-
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const horizontalOffset =
@@ -345,19 +341,12 @@ const drawElementOnCanvas = (
           element.lineHeight,
         );
         const container = getContainerElement(element);
-        if (container) {
-          console.log(
-            "Element width = ",
-            element.width,
-            getMaxContainerWidth(container),
-          );
-        }
+
         const verticalOffset = element.height - element.baseline;
         for (let index = 0; index < lines.length; index++) {
           const trailingSpacesWidth =
             getLineWidth(lines[index], font) -
             getLineWidth(lines[index].trimEnd(), font);
-          console.log(trailingSpacesWidth, "width");
           const maxWidth = container
             ? getMaxContainerWidth(container)
             : element.width;
@@ -365,11 +354,13 @@ const drawElementOnCanvas = (
             maxWidth - getLineWidth(lines[index].trimEnd(), font);
           let spacesOffset = 0;
           if (element.textAlign === TEXT_ALIGN.CENTER) {
-            spacesOffset = -trailingSpacesWidth / 2;
+            spacesOffset = -Math.min(
+              trailingSpacesWidth / 2,
+              availableWidth / 2,
+            );
           } else if (element.textAlign === TEXT_ALIGN.RIGHT) {
             spacesOffset = -Math.min(availableWidth, trailingSpacesWidth);
           }
-          console.log(spacesOffset, "spacesOffset", trailingSpacesWidth);
           context.fillText(
             lines[index].trimEnd(),
             horizontalOffset + spacesOffset,

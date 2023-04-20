@@ -379,7 +379,12 @@ export const textWysiwyg = ({
           font,
           getMaxContainerWidth(container),
         );
-        const width = getTextWidth(wrappedText, font);
+        const { width } = measureText(
+          wrappedText,
+          font,
+          element.lineHeight,
+          getMaxContainerWidth(container),
+        );
         editable.style.width = `${width}px`;
       }
     };
@@ -400,6 +405,7 @@ export const textWysiwyg = ({
           wrappedText,
           font,
           updatedTextElement.lineHeight,
+          getMaxContainerWidth(container!),
         );
         editable.style.width = `${width}px`;
         editable.style.height = `${height}px`;
