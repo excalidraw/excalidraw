@@ -11,11 +11,25 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
+## 0.15.2 (2023-04-20)
 
 ### Docs
 
 - Fix docs link in readme [#6486](https://github.com/excalidraw/excalidraw/pull/6486)
+
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Fixes
+
+- Rotate the text element when binding to a rotated container [#6477](https://github.com/excalidraw/excalidraw/pull/6477)
+
+- Support breaking words containing hyphen - [#6014](https://github.com/excalidraw/excalidraw/pull/6014)
+
+- Incorrect background fill button active state [#6491](https://github.com/excalidraw/excalidraw/pull/6491)
+
+---
 
 ## 0.15.1 (2023-04-18)
 
