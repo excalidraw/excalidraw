@@ -9,6 +9,7 @@ import {
   detectLineHeight,
   getLineHeightInPx,
   getDefaultLineHeight,
+  parseTokens,
 } from "./textElement";
 import { FontString } from "./types";
 
@@ -182,6 +183,56 @@ now`,
     expect(wrapText(text, font, NaN)).toEqual(text);
     expect(wrapText(text, font, -1)).toEqual(text);
     expect(wrapText(text, font, Infinity)).toEqual(text);
+  });
+
+  it("should wrap the text correctly when text contains hyphen", () => {
+    let text =
+      "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range-of other projects";
+    const res = wrapText(text, font, 110);
+    expect(res).toBe(
+      `Wikipedia \nis hosted \nby \nWikimedia-\nFoundation,\na non-\nprofit \norganizati\non that \nalso hosts\na range-of\nother \nprojects`,
+    );
+
+    text = "Hello thereusing-now";
+    expect(wrapText(text, font, 100)).toEqual("Hello \nthereusin\ng-now");
+  });
+});
+
+describe("Test parseTokens", () => {
+  it("should split into tokens correctly", () => {
+    let text = "Excalidraw is a virtual collaborative whiteboard";
+    expect(parseTokens(text)).toEqual([
+      "Excalidraw",
+      "is",
+      "a",
+      "virtual",
+      "collaborative",
+      "whiteboard",
+    ]);
+
+    text =
+      "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range-of other projects";
+    expect(parseTokens(text)).toEqual([
+      "Wikipedia",
+      "is",
+      "hosted",
+      "by",
+      "Wikimedia-",
+      "",
+      "Foundation,",
+      "a",
+      "non-",
+      "profit",
+      "organization",
+      "that",
+      "also",
+      "hosts",
+      "a",
+      "range-",
+      "of",
+      "other",
+      "projects",
+    ]);
   });
 });
 
