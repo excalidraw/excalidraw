@@ -110,6 +110,7 @@
     "increaseFontSize": "Збільшити розмір шрифту",
     "unbindText": "Відв'язати текст",
     "bindText": "Прив’язати текст до контейнера",
+    "createContainerFromText": "",
     "link": {
       "edit": "Редагування посилання",
       "create": "Створити посилання",
@@ -204,7 +205,22 @@
     "cannotResolveCollabServer": "Не вдалося приєднатися до сервера. Перезавантажте сторінку та повторіть спробу.",
     "importLibraryError": "Не вдалося завантажити бібліотеку",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "Виділення",
@@ -303,7 +319,8 @@
     "doubleClick": "подвійний клік",
     "drag": "перетягнути",
     "editor": "Редактор",
-    "editSelectedShape": "Змінити вибрану фігуру (текст/стрілку/рядок)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Знайшли помилку? Повідомте",
     "howto": "Дотримуйтесь наших інструкцій",
     "or": "або",

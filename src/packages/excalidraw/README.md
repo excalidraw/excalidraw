@@ -38,8 +38,8 @@ Excalidraw takes _100%_ of `width` and `height` of the containing block so make 
 
 ## Integration
 
-Head over to the [docs](https://docs.excalidraw.com/docs/package/integration)
+Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/integration)
 
 ## API
 
-Head over to the [docs](https://docs.excalidraw.com/docs/package/api)
+Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api)

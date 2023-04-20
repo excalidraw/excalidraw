@@ -369,6 +369,9 @@ export const restoreElements = (
   localElements: readonly ExcalidrawElement[] | null | undefined,
   opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,
 ): ExcalidrawElement[] => {
+  // used to detect duplicate top-level element ids
+  const existingIds = new Set<string>();
+
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
   const restoredElements = (elements || []).reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
@@ -383,6 +386,10 @@ export const restoreElements = (
         if (localElement && localElement.version > migratedElement.version) {
           migratedElement = bumpVersion(migratedElement, localElement.version);
         }
+        if (existingIds.has(migratedElement.id)) {
+          migratedElement = { ...migratedElement, id: randomId() };
+        }
+        existingIds.add(migratedElement.id);
         elements.push(migratedElement);
       }
     }

@@ -4,7 +4,6 @@ import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { exportToCanvas } from "../scene/export";
 import { AppState, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
 import { clipboard } from "./icons";
@@ -15,6 +14,7 @@ import { CheckboxItem } from "./CheckboxItem";
 import { DEFAULT_EXPORT_PADDING, isFirefox } from "../constants";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { ActionManager } from "../actions/manager";
+import { exportToCanvas } from "../packages/utils";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -83,7 +83,6 @@ const ImageExportModal = ({
   const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
-  const { exportBackground, viewBackgroundColor } = appState;
   const [renderError, setRenderError] = useState<Error | null>(null);
 
   const exportedElements = exportSelected
@@ -99,10 +98,16 @@ const ImageExportModal = ({
     if (!previewNode) {
       return;
     }
-    exportToCanvas(exportedElements, appState, files, {
-      exportBackground,
-      viewBackgroundColor,
+    const maxWidth = previewNode.offsetWidth;
+    if (!maxWidth) {
+      return;
+    }
+    exportToCanvas({
+      elements: exportedElements,
+      appState,
+      files,
       exportPadding,
+      maxWidthOrHeight: maxWidth,
     })
       .then((canvas) => {
         setRenderError(null);
@@ -116,14 +121,7 @@ const ImageExportModal = ({
         console.error(error);
         setRenderError(error);
       });
-  }, [
-    appState,
-    files,
-    exportedElements,
-    exportBackground,
-    exportPadding,
-    viewBackgroundColor,
-  ]);
+  }, [appState, files, exportedElements, exportPadding]);
 
   return (
     <div className="ExportDialog">
