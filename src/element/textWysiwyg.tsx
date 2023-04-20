@@ -569,10 +569,6 @@ export const textWysiwyg = ({
     const container = getContainerElement(updateElement);
 
     if (container) {
-      // update the child to take the angle of the parent
-      mutateElement(updateElement, {
-        angle: container.angle,
-      });
       text = updateElement.text;
       if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);

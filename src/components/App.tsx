@@ -2746,6 +2746,7 @@ class App extends React.Component<AppProps, AppState> {
           groupIds: container?.groupIds ?? [],
           locked: false,
           lineHeight,
+          angle: container?.angle ?? 0,
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {
