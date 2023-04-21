@@ -151,6 +151,7 @@ export const textWysiwyg = ({
       return;
     }
     const { textAlign, verticalAlign } = updatedTextElement;
+
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
