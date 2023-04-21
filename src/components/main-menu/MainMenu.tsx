@@ -33,9 +33,7 @@ const MainMenu = Object.assign(
       const device = useDevice();
       const appState = useExcalidrawAppState();
       const setAppState = useExcalidrawSetAppState();
-      const onClickOutside = device.isMobile
-        ? undefined
-        : () => setAppState({ openMenu: null });
+      const onClickOutside = () => setAppState({ openMenu: null });
 
       return (
         <mainMenuTunnel.In>
@@ -50,6 +48,11 @@ const MainMenu = Object.assign(
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
+              collisionBoundary={
+                device.isMobile
+                  ? document.querySelector(".App-bottom-bar")
+                  : undefined
+              }
               sideOffset={device.isMobile ? 20 : undefined}
               className="mainmenu-content"
               onClickOutside={onClickOutside}

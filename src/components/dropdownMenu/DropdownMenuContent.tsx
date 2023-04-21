@@ -16,6 +16,7 @@ const MenuContent = ({
   onSelect,
   style,
   sideOffset,
+  collisionBoundary,
 }: {
   children?: React.ReactNode;
   onClickOutside?: () => void;
@@ -26,6 +27,7 @@ const MenuContent = ({
   onSelect?: (event: Event) => void;
   style?: React.CSSProperties;
   sideOffset?: number;
+  collisionBoundary?: Element | Element[] | null | undefined;
 }) => {
   const device = useDevice();
   const menuRef = useOutsideClickHook(() => {
@@ -39,6 +41,7 @@ const MenuContent = ({
   return (
     <DropdownMenuContentPropsContext.Provider value={{ onSelect }}>
       <DropdownMenuPrimitive.Content
+        collisionBoundary={collisionBoundary}
         ref={menuRef}
         className={classNames}
         style={style}

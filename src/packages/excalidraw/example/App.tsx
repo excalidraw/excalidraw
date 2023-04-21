@@ -587,8 +587,8 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
           </MainMenu.Sub.Content>
         </MainMenu.Sub>
         <MainMenu.Sub>
-          <MainMenu.Sub.Trigger>Trigger me</MainMenu.Sub.Trigger>
-          <MainMenu.Sub.Content>
+          <MainMenu.Sub.Trigger>Trigger me with offset</MainMenu.Sub.Trigger>
+          <MainMenu.Sub.Content sideOffset={-80}>
             <MainMenu.Sub>
               <MainMenu.Sub.Trigger>Trigger me inside</MainMenu.Sub.Trigger>
               <MainMenu.Sub.Content>
