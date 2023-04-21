@@ -587,7 +587,7 @@ export const _renderScene = ({
       context.save();
       context.translate(renderConfig.scrollX, renderConfig.scrollY);
 
-      if (appState.draggingElement) {
+      if (appState.draggingElement && locallySelectedElements.length > 0) {
         renderSnap(
           {
             renderConfig,
