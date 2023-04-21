@@ -122,6 +122,7 @@ export const textWysiwyg = ({
   excalidrawContainer: HTMLDivElement | null;
   app: App;
 }) => {
+  console.log("textWysiwyg()", element);
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
@@ -355,6 +356,7 @@ export const textWysiwyg = ({
     overflowWrap: "break-word",
     boxSizing: "content-box",
   });
+  console.log("1. call updateWysiwygStyle from textWysiwyg();")
   updateWysiwygStyle();
 
   if (onChange) {
@@ -412,10 +414,12 @@ export const textWysiwyg = ({
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomIn);
+      console.log("2. call updatedWysiwygStyle onkeydown !event.shitKey, zoomIn");
       updateWysiwygStyle();
     } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomOut);
+      console.log("3. call updatedWysiwygStyle onkeydown !event.shitKey, zoomOut");
       updateWysiwygStyle();
     } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
@@ -675,6 +679,7 @@ export const textWysiwyg = ({
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
+    console.log("4. call updatedWysiwygStyle unbindUpdate");
     updateWysiwygStyle();
     const isColorPickerActive = !!document.activeElement?.closest(
       ".color-picker-input",
@@ -698,6 +703,7 @@ export const textWysiwyg = ({
   let observer: ResizeObserver | null = null;
   if (canvas && "ResizeObserver" in window) {
     observer = new window.ResizeObserver(() => {
+      console.log("5. call updatedWysiwygStyle resize observer");
       updateWysiwygStyle();
     });
     observer.observe(canvas);
