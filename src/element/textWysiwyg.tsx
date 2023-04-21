@@ -644,9 +644,10 @@ export const textWysiwyg = ({
       target instanceof HTMLInputElement &&
       target.closest(".color-picker-input") &&
       isWritableElement(target);
-
+    
+    console.log("#8 setTimeout(); bindBlurEvent(); before editable.onblur=handleSubmit", event);
     setTimeout(() => {
-      console.log("#8 setTimeout(); bindBlurEvent(); before editable.onblur=handleSubmit", event);
+      console.log("#9 timeout(); bindBlurEvent(); before editable.onblur=handleSubmit", event);
       editable.onblur = handleSubmit;
       if (target && isTargetColorPicker) {
         target.onblur = () => {
@@ -677,14 +678,14 @@ export const textWysiwyg = ({
       window.addEventListener("pointerup", bindBlurEvent);
       // handle edge-case where pointerup doesn't fire e.g. due to user
       // alt-tabbing away
-      console.log("#9 onPointerDown(); before addEventListner('blur', handleSubmit) - edge-case where pointerup doesn't fire e.g. due to user alt-tabbing away", event);
+      console.log("#10 onPointerDown(); before addEventListner('blur', handleSubmit) - edge-case where pointerup doesn't fire e.g. due to user alt-tabbing away", event);
       window.addEventListener("blur", handleSubmit);
     }
   };
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
-    console.log("#10 unbindUpdate() callback; before updatedWysiwygStyle()", element);
+    console.log("#11 unbindUpdate() callback; before updatedWysiwygStyle()", element);
     console.trace();
     updateWysiwygStyle();
     const isColorPickerActive = !!document.activeElement?.closest(
@@ -701,7 +702,9 @@ export const textWysiwyg = ({
 
   // select on init (focusing is done separately inside the bindBlurEvent()
   // because we need it to happen *after* the blur event from `pointerdown`)
+  console.log("#12 editable.select(); textWysiwyg()");
   editable.select();
+  console.log("#13 editable.select(); textWysiwyg()");
   bindBlurEvent();
 
   // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
@@ -709,14 +712,17 @@ export const textWysiwyg = ({
   let observer: ResizeObserver | null = null;
   if (canvas && "ResizeObserver" in window) {
     observer = new window.ResizeObserver(() => {
-      console.log("#11 window.ResizeObserver(); before updatedWysiwygStyle()");
+      console.log("#13 observer observe; before updatedWysiwygStyle()");
       updateWysiwygStyle();
     });
+    console.log("#14 before add observer");
     observer.observe(canvas);
   } else {
+    console.log("#15 before add resize event listner");
     window.addEventListener("resize", updateWysiwygStyle);
   }
 
+  console.log("#16 before add event listners: pointerdown, wheel");
   window.addEventListener("pointerdown", onPointerDown);
   window.addEventListener("wheel", stopEvent, {
     passive: false,
