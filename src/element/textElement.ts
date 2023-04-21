@@ -300,6 +300,10 @@ export const measureText = (
   const fontSize = parseFloat(font);
   const height = getTextHeight(text, fontSize, lineHeight);
   let width = getTextWidth(text, font);
+  // Since we now preserve trailing whitespaces so if the text has
+  // trailing whitespaces, it will be considered in the width and thus width
+  // computed might be much higher than the allowed max width
+  // by the container hence making sure the width never goes beyond the max width.
   if (maxWidth) {
     width = Math.min(width, maxWidth);
   }
