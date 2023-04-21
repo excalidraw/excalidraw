@@ -60,6 +60,7 @@ import {
   ENV,
   EVENT,
   GRID_SIZE,
+  IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
   isAndroid,
   isBrave,
@@ -5743,7 +5744,9 @@ class App extends React.Component<AppProps, AppState> {
 
       const imageFile = await fileOpen({
         description: "Image",
-        extensions: ["jpg", "png", "svg", "gif"],
+        extensions: Object.keys(
+          IMAGE_MIME_TYPES,
+        ) as (keyof typeof IMAGE_MIME_TYPES)[],
       });
 
       const imageElement = this.createImageElement({
