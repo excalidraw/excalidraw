@@ -49,18 +49,7 @@ describe("Test wrapText", () => {
       {
         desc: "break all characters when width of each character is less than container width",
         width: 25,
-        res: `H
-e
-l
-l
-o
-w
-h
-a
-t
-s
-u
-p`,
+        res: `H\ne\nl\nl\no \nw\nh\na\nt\ns \nu\np`,
       },
       {
         desc: "break words as per the width",
@@ -90,8 +79,7 @@ up`,
   });
 
   describe("When text contain new lines", () => {
-    const text = `Hello
-whats up`;
+    const text = "Hello\nwhats up";
     [
       {
         desc: "break all words when width of each word is less than container width",
@@ -101,18 +89,7 @@ whats up`;
       {
         desc: "break all characters when width of each character is less than container width",
         width: 25,
-        res: `H
-e
-l
-l
-o
-w
-h
-a
-t
-s
-u
-p`,
+        res: `H\ne\nl\nl\no\nw\nh\na\nt\ns \nu\np`,
       },
       {
         desc: "break words as per the width",
@@ -149,13 +126,7 @@ whats up`,
         desc: "fit characters of long string as per container width and break words as per the width",
 
         width: 130,
-        res: `hellolongte
-xtthisiswha
-tsupwithyou
-Iamtypinggg
-ggandtyping
-gg break it
-now`,
+        res: `hellolongte\nxtthisiswha\ntsupwithyou\nIamtypinggg\nggandtyping\ngg break it \nnow`,
       },
       {
         desc: "fit the long text when container width is greater than text length and move the rest to next line",
@@ -190,7 +161,7 @@ now`,
       "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range-of other projects";
     const res = wrapText(text, font, 110);
     expect(res).toBe(
-      `Wikipedia \nis hosted \nby \nWikimedia-\nFoundation,\na non-\nprofit \norganizati\non that \nalso hosts\na range-of\nother \nprojects`,
+      `Wikipedia \nis hosted \nby \nWikimedia- \nFoundation,\na non-\nprofit \norganizati\non that \nalso hosts \na range-of \nother \nprojects`,
     );
 
     text = "Hello thereusing-now";
