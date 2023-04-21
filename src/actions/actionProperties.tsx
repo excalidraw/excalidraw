@@ -87,7 +87,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import { arrayToMap } from "../utils";
+import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
@@ -348,9 +348,9 @@ export const actionChangeFillStyle = register({
   },
   PanelComponent: ({ elements, appState, updateData }) => {
     const selectedElements = getSelectedElements(elements, appState);
-    const allElementsZigZag = selectedElements.every(
-      (el) => el.fillStyle === "zigzag",
-    );
+    const allElementsZigZag =
+      selectedElements.length > 0 &&
+      selectedElements.every((el) => el.fillStyle === "zigzag");
 
     return (
       <fieldset>
@@ -360,7 +360,9 @@ export const actionChangeFillStyle = register({
           options={[
             {
               value: "hachure",
-              text: t("labels.hachure"),
+              text: `${
+                allElementsZigZag ? t("labels.zigzag") : t("labels.hachure")
+              } (${getShortcutKey("Alt-Click")})`,
               icon: allElementsZigZag ? FillZigZagIcon : FillHachureIcon,
               active: allElementsZigZag ? true : undefined,
             },
