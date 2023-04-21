@@ -632,8 +632,17 @@ export const resizeMultipleElements = (
     [],
   );
 
+  // getCommonBoundingBox() uses getBoundTextElement() which returns null for
+  // original elements from pointerDownState, so we have to find and add these
+  // bound text elements manually
+  const boundTextElements = targetElements
+    .map(({ orig }) => getBoundTextElementId(orig))
+    .filter((id): id is string => typeof id === "string")
+    .map((id) => pointerDownState.originalElements.get(id) ?? null)
+    .filter(isBoundToContainer);
+
   const { minX, minY, maxX, maxY, midX, midY } = getCommonBoundingBox(
-    targetElements.map(({ orig }) => orig),
+    targetElements.map(({ orig }) => orig).concat(boundTextElements),
   );
   const direction = transformHandleType;
 
