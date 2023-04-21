@@ -428,6 +428,7 @@ export const textWysiwyg = ({
     } else if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       submittedViaKeyboard = true;
+      console.log("1. handleSubmit editable.onkeydown ESCAPE" ,event);
       handleSubmit();
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
@@ -435,6 +436,7 @@ export const textWysiwyg = ({
         return;
       }
       submittedViaKeyboard = true;
+      console.log("2. handleSubmit editable.onkeydown submittedViaKeyboard" ,event);
       handleSubmit();
     } else if (
       event.key === KEYS.TAB ||
@@ -643,6 +645,7 @@ export const textWysiwyg = ({
       isWritableElement(target);
 
     setTimeout(() => {
+      console.log("3. setTimeout, bindBlurEvent editable.onblur=handleSubmit", event);
       editable.onblur = handleSubmit;
       if (target && isTargetColorPicker) {
         target.onblur = () => {
@@ -673,6 +676,7 @@ export const textWysiwyg = ({
       window.addEventListener("pointerup", bindBlurEvent);
       // handle edge-case where pointerup doesn't fire e.g. due to user
       // alt-tabbing away
+      console.log("4. onPointerDown addEventListner(blur) handleSubmit - edge-case where pointerup doesn't fire e.g. due to user alt-tabbing away", event);
       window.addEventListener("blur", handleSubmit);
     }
   };
