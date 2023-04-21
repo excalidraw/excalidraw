@@ -122,7 +122,7 @@ export const textWysiwyg = ({
   excalidrawContainer: HTMLDivElement | null;
   app: App;
 }) => {
-  console.log("textWysiwyg()", element);
+  console.log({location: "textWysiwyg()", element});
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
@@ -152,7 +152,7 @@ export const textWysiwyg = ({
       return;
     }
     const { textAlign, verticalAlign } = updatedTextElement;
-    console.log("updateWysiwygStyle()",updatedTextElement);
+    console.log({location: "updateWysiwygStyle()", updatedTextElement});
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
@@ -356,7 +356,7 @@ export const textWysiwyg = ({
     overflowWrap: "break-word",
     boxSizing: "content-box",
   });
-  console.log("1. call updateWysiwygStyle from textWysiwyg();")
+  console.log({location: "1. before updateWysiwygStyle() call in textWysiwyg();"})
   updateWysiwygStyle();
 
   if (onChange) {
@@ -414,12 +414,12 @@ export const textWysiwyg = ({
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomIn);
-      console.log("2. call updatedWysiwygStyle onkeydown !event.shitKey, zoomIn");
+      console.log({location: "2. before updateWysiwygStyle(); onkeydown !event.shitKey, zoomIn", event});
       updateWysiwygStyle();
     } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomOut);
-      console.log("3. call updatedWysiwygStyle onkeydown !event.shitKey, zoomOut");
+      console.log({location: "2. before updateWysiwygStyle(); onkeydown !event.shitKey, zoomOut", event});
       updateWysiwygStyle();
     } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
@@ -428,7 +428,7 @@ export const textWysiwyg = ({
     } else if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       submittedViaKeyboard = true;
-      console.log("1. handleSubmit editable.onkeydown ESCAPE" ,event);
+      console.log({location: "1. before handleSubmit(); ESCAPE", event});
       handleSubmit();
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
@@ -436,7 +436,7 @@ export const textWysiwyg = ({
         return;
       }
       submittedViaKeyboard = true;
-      console.log("2. handleSubmit editable.onkeydown submittedViaKeyboard" ,event);
+      console.log({location: "2. before handleSubmit(); submittedViaKeyboard === true", event});
       handleSubmit();
     } else if (
       event.key === KEYS.TAB ||
@@ -645,7 +645,7 @@ export const textWysiwyg = ({
       isWritableElement(target);
 
     setTimeout(() => {
-      console.log("3. setTimeout, bindBlurEvent editable.onblur=handleSubmit", event);
+      console.log({loction: "setTimeout(); bindBlurEvent(); before editable.onblur=handleSubmit", event});
       editable.onblur = handleSubmit;
       if (target && isTargetColorPicker) {
         target.onblur = () => {
@@ -676,14 +676,14 @@ export const textWysiwyg = ({
       window.addEventListener("pointerup", bindBlurEvent);
       // handle edge-case where pointerup doesn't fire e.g. due to user
       // alt-tabbing away
-      console.log("4. onPointerDown addEventListner(blur) handleSubmit - edge-case where pointerup doesn't fire e.g. due to user alt-tabbing away", event);
+      console.log({location: "onPointerDown(); before addEventListner('blur', handleSubmit) - edge-case where pointerup doesn't fire e.g. due to user alt-tabbing away", event);
       window.addEventListener("blur", handleSubmit);
     }
   };
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
-    console.log("4. call updatedWysiwygStyle unbindUpdate");
+    console.log({location: "unbindUpdate() callback; before updatedWysiwygStyle()", element});
     updateWysiwygStyle();
     const isColorPickerActive = !!document.activeElement?.closest(
       ".color-picker-input",
@@ -700,14 +700,14 @@ export const textWysiwyg = ({
   // select on init (focusing is done separately inside the bindBlurEvent()
   // because we need it to happen *after* the blur event from `pointerdown`)
   editable.select();
-  setTimeout(bindBlurEvent,50); //delay to address #6469
+  bindBlurEvent();
 
   // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
   // is preferred so we catch changes from host, where window may not resize.
   let observer: ResizeObserver | null = null;
   if (canvas && "ResizeObserver" in window) {
     observer = new window.ResizeObserver(() => {
-      console.log("5. call updatedWysiwygStyle resize observer");
+      console.log({location: "window.ResizeObserver(); before updatedWysiwygStyle()"});
       updateWysiwygStyle();
     });
     observer.observe(canvas);
