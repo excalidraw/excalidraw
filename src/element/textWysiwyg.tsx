@@ -676,7 +676,7 @@ export const textWysiwyg = ({
       window.addEventListener("pointerup", bindBlurEvent);
       // handle edge-case where pointerup doesn't fire e.g. due to user
       // alt-tabbing away
-      console.log({location: "onPointerDown(); before addEventListner('blur', handleSubmit) - edge-case where pointerup doesn't fire e.g. due to user alt-tabbing away", event);
+      console.log({location: "onPointerDown(); before addEventListner('blur', handleSubmit) - edge-case where pointerup doesn't fire e.g. due to user alt-tabbing away", event});
       window.addEventListener("blur", handleSubmit);
     }
   };
