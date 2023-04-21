@@ -700,7 +700,7 @@ export const textWysiwyg = ({
   // select on init (focusing is done separately inside the bindBlurEvent()
   // because we need it to happen *after* the blur event from `pointerdown`)
   editable.select();
-  setTimeout(()=>bindBlurEvent());
+  setTimeout(bindBlurEvent,50); //delay to address #6469
 
   // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
   // is preferred so we catch changes from host, where window may not resize.
