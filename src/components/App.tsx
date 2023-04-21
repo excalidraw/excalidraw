@@ -3466,10 +3466,6 @@ class App extends React.Component<AppProps, AppState> {
     // pointerDown event, ends with a pointerUp event (or another pointerDown)
     const pointerDownState = this.initialPointerDownState(event);
 
-    this.setState({
-      selectedElementsAreBeingDragged: false,
-    });
-
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
       return;
     }
@@ -3576,11 +3572,6 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.lastPointerUp = event;
-
-    this.setState({
-      selectedElementsAreBeingDragged: false,
-    });
-
     if (this.device.isTouchScreen) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
@@ -4604,9 +4595,6 @@ class App extends React.Component<AppProps, AppState> {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
         pointerDownState.drag.hasOccurred = true;
-        this.setState({
-          selectedElementsAreBeingDragged: true,
-        });
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
         if (selectedElements.length > 0 && !pointerDownState.withCmdOrCtrl) {
@@ -4735,9 +4723,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else if (isLinearElement(draggingElement)) {
         pointerDownState.drag.hasOccurred = true;
-        this.setState({
-          selectedElementsAreBeingDragged: true,
-        });
         const points = draggingElement.points;
         let dx = gridX - draggingElement.x;
         let dy = gridY - draggingElement.y;
