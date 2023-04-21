@@ -153,6 +153,7 @@ export const textWysiwyg = ({
     }
     const { textAlign, verticalAlign } = updatedTextElement;
     console.log("#2 updateWysiwygStyle()", updatedTextElement);
+    console.trace();
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
@@ -684,6 +685,7 @@ export const textWysiwyg = ({
   // handle updates of textElement properties of editing element
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
     console.log("#10 unbindUpdate() callback; before updatedWysiwygStyle()", element);
+    console.trace();
     updateWysiwygStyle();
     const isColorPickerActive = !!document.activeElement?.closest(
       ".color-picker-input",
