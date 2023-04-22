@@ -108,20 +108,30 @@ export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 
 export const GRID_SIZE = 20; // TODO make it configurable?
 
-export const MIME_TYPES = {
-  excalidraw: "application/vnd.excalidraw+json",
-  excalidrawlib: "application/vnd.excalidrawlib+json",
-  json: "application/json",
+export const IMAGE_MIME_TYPES = {
   svg: "image/svg+xml",
-  "excalidraw.svg": "image/svg+xml",
   png: "image/png",
-  "excalidraw.png": "image/png",
   jpg: "image/jpeg",
   gif: "image/gif",
   webp: "image/webp",
   bmp: "image/bmp",
   ico: "image/x-icon",
+  avif: "image/avif",
+  jfif: "image/jfif",
+} as const;
+
+export const MIME_TYPES = {
+  json: "application/json",
+  // excalidraw data
+  excalidraw: "application/vnd.excalidraw+json",
+  excalidrawlib: "application/vnd.excalidrawlib+json",
+  // image-encoded excalidraw data
+  "excalidraw.svg": "image/svg+xml",
+  "excalidraw.png": "image/png",
+  // binary
   binary: "application/octet-stream",
+  // image
+  ...IMAGE_MIME_TYPES,
 } as const;
 
 export const EXPORT_DATA_TYPES = {
@@ -192,17 +202,7 @@ export const DEFAULT_EXPORT_PADDING = 10; // px
 
 export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 
-export const ALLOWED_IMAGE_MIME_TYPES = [
-  MIME_TYPES.png,
-  MIME_TYPES.jpg,
-  MIME_TYPES.svg,
-  MIME_TYPES.gif,
-  MIME_TYPES.webp,
-  MIME_TYPES.bmp,
-  MIME_TYPES.ico,
-] as const;
-
-export const MAX_ALLOWED_FILE_BYTES = 20 * 1024 * 1024; //zsviczian
+export const MAX_ALLOWED_FILE_BYTES = 20 * 1024 * 1024;
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
