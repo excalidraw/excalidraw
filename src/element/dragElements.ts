@@ -11,7 +11,11 @@ import { Snaps, snapProject } from "../snapping";
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
   selectedElements: NonDeletedExcalidrawElement[],
-  dragOffset: { x: number; y: number },
+  offset: {
+    // relative to the last pointer position
+    relative: { x: number; y: number };
+    total: { x: number; y: number };
+  },
   lockDirection: boolean = false,
   appState: AppState,
   snaps: Snaps | null = null,
@@ -21,7 +25,7 @@ export const dragSelectedElements = (
       lockDirection,
       pointerDownState,
       element,
-      dragOffset,
+      offset,
       appState.zoom,
       snaps,
     );
@@ -40,7 +44,7 @@ export const dragSelectedElements = (
           lockDirection,
           pointerDownState,
           textElement,
-          dragOffset,
+          offset,
           appState.zoom,
           snaps,
         );
@@ -56,12 +60,16 @@ const updateElementCoords = (
   lockDirection: boolean,
   pointerDownState: PointerDownState,
   element: NonDeletedExcalidrawElement,
-  offset: { x: number; y: number },
+  offset: {
+    // relative to the last pointer position
+    relative: { x: number; y: number };
+    total: { x: number; y: number };
+  },
   zoom: Zoom,
   snaps: Snaps | null = null,
 ) => {
-  const distanceX = Math.abs(offset.x);
-  const distanceY = Math.abs(offset.y);
+  const distanceX = Math.abs(offset.total.x);
+  const distanceY = Math.abs(offset.total.y);
 
   const lockX = lockDirection && distanceX < distanceY;
   const lockY = lockDirection && distanceX > distanceY;

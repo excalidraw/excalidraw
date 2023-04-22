@@ -6,6 +6,7 @@ import {
 import * as GA from "./ga";
 import * as GALines from "./galines";
 import * as GAPoints from "./gapoints";
+import * as GADirections from "./gadirections";
 import { getMaximumGroups } from "./groups";
 import { getSelectedElements } from "./scene";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
@@ -185,7 +186,10 @@ const getLineExtremities = (
 export interface ProjectionOptions {
   zoom: Zoom;
   origin: { x: number; y: number };
-  offset: { x: number; y: number };
+  offset: {
+    total: { x: number; y: number };
+    relative: { x: number; y: number };
+  };
   snaps: Snaps | null;
 }
 
@@ -197,10 +201,14 @@ export const snapProject = ({
 }: ProjectionOptions) => {
   if (!snaps) {
     return GAPoints.toObject(
-      GA.add(GA.point(origin.x, origin.y), GA.offset(offset.x, offset.y)),
+      GA.add(
+        GA.point(origin.x, origin.y),
+        GA.offset(offset.total.x, offset.total.y),
+      ),
     );
   }
 
+  const mouseOffset = GA.offset(offset.relative.x, offset.relative.y);
   let totalOffset = GA.offset(0, 0);
 
   for (const snap of keepOnlyClosestPoints(snaps)) {
@@ -219,13 +227,19 @@ export const snapProject = ({
     }
 
     const snapOffset = GA.sub(snapReferencePoint, snapProjection);
+
+    // When attraction are opposite, ignore it
+    if (!GADirections.hasSameSign(GA.mul(snapOffset, -1), mouseOffset)) {
+      continue;
+    }
+
     totalOffset = GA.sub(totalOffset, snapOffset);
   }
 
   return GAPoints.toObject(
     GA.add(
       GA.point(origin.x, origin.y),
-      GA.add(totalOffset, GA.offset(offset.x, offset.y)),
+      GA.add(totalOffset, GA.offset(offset.total.x, offset.total.y)),
     ),
   );
 };
