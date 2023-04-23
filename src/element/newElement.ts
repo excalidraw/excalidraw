@@ -387,6 +387,8 @@ export const newImageElement = (
     status: opts.status ?? "pending",
     fileId: opts.fileId ?? null,
     scale: opts.scale ?? [1, 1],
+    widthAtCreation: 0,
+    heightAtCreation: 0
   };
 };
 

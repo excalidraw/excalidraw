@@ -14,6 +14,7 @@ import {
   NonDeleted,
   ExcalidrawElement,
   ExcalidrawTextElementWithContainer,
+  ExcalidrawImageElement,
 } from "./types";
 import {
   getElementAbsoluteCoords,

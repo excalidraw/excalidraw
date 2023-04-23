@@ -5851,7 +5851,14 @@ class App extends React.Component<AppProps, AppState> {
       const x = imageElement.x + imageElement.width / 2 - width / 2;
       const y = imageElement.y + imageElement.height / 2 - height / 2;
 
-      mutateElement(imageElement, { x, y, width, height });
+      mutateElement(imageElement, { 
+        x, 
+        y, 
+        width, 
+        height,
+        widthAtCreation: width,
+        heightAtCreation: height
+      });
     }
   };
 

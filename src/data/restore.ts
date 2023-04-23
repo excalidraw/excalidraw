@@ -223,6 +223,8 @@ const restoreElement = (
         status: element.status || "pending",
         fileId: element.fileId,
         scale: element.scale || [1, 1],
+        widthAtCreation: element.widthAtCreation,
+        heightAtCreation: element.heightAtCreation
       });
     case "line":
     // @ts-ignore LEGACY type
