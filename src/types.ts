@@ -456,6 +456,7 @@ export type PointerDownState = Readonly<{
   crop: {
     handleType: MaybeTransformHandleType;
     isCropping: boolean;
+    offset: { x: number; y: number };
   }
   hit: {
     // The element the pointer is "hitting", is determined on the initial

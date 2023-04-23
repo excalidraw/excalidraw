@@ -390,7 +390,11 @@ export const newImageElement = (
     widthAtCreation: 0,
     heightAtCreation: 0,
     underlyingImageWidth: 0,
-    underlyingImageHeight: 0
+    underlyingImageHeight: 0,
+    xToPullFromImage: 0,
+    yToPullFromImage: 0,
+    wToPullFromImage: 0,
+    hToPullFromImage: 0
   };
 };
 

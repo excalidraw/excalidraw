@@ -226,7 +226,11 @@ const restoreElement = (
         widthAtCreation: element.widthAtCreation,
         heightAtCreation: element.heightAtCreation,
         underlyingImageWidth: element.underlyingImageWidth,
-        underlyingImageHeight: element.underlyingImageHeight
+        underlyingImageHeight: element.underlyingImageHeight,
+        xToPullFromImage: element.xToPullFromImage,
+        yToPullFromImage: element.yToPullFromImage,
+        wToPullFromImage: element.wToPullFromImage,
+        hToPullFromImage: element.hToPullFromImage
       });
     case "line":
     // @ts-ignore LEGACY type

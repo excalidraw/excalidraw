@@ -298,6 +298,7 @@ import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
+import { cropElement } from "../element/cropElement";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -3917,7 +3918,8 @@ class App extends React.Component<AppProps, AppState> {
       },
       crop: {
         handleType: false,
-        isCropping: false
+        isCropping: false,
+        offset: { x: 0, y: 0 },
       },
       hit: {
         element: null,
@@ -4070,6 +4072,14 @@ class App extends React.Component<AppProps, AppState> {
         }
       } if (pointerDownState.crop.handleType) {
         pointerDownState.crop.isCropping = true;
+        pointerDownState.crop.offset = tupleToCoors(
+          getResizeOffsetXY(
+            pointerDownState.resize.handleType,
+            selectedElements,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ),
+        );
         // will need to do more stuff here, probably copy a lot from
         // resize, but i'm not sure yet and i dont want to just
         // randomly copy paste
@@ -6317,9 +6327,18 @@ class App extends React.Component<AppProps, AppState> {
       return false;
     }
 
-    const elementToCrop = selectedElements[0];
+    const transformHandleType = pointerDownState.resize.handleType;
+    const pointerCoords = pointerDownState.lastCoords;
+    const [x, y] = getGridPoint(
+      pointerCoords.x - pointerDownState.crop.offset.x,
+      pointerCoords.y - pointerDownState.crop.offset.y,
+      this.state.gridSize,
+    );
 
-    console.log("cropping!");
+    const elementToCrop = selectedElements[0] as ExcalidrawImageElement;
+    const stateAtCropStart = pointerDownState.originalElements.get(elementToCrop.id)!;
+
+    cropElement(elementToCrop, transformHandleType, stateAtCropStart, x, y);
     return true;
   }
 
