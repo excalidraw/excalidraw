@@ -3915,6 +3915,10 @@ class App extends React.Component<AppProps, AppState> {
         arrowDirection: "origin",
         center: { x: (maxX + minX) / 2, y: (maxY + minY) / 2 },
       },
+      crop: {
+        handleType: false,
+        isCropping: false
+      },
       hit: {
         element: null,
         allHitElements: [],
@@ -4016,11 +4020,18 @@ class App extends React.Component<AppProps, AppState> {
             event.pointerType,
           );
         if (elementWithTransformHandleType != null) {
-          this.setState({
-            resizingElement: elementWithTransformHandleType.element,
-          });
-          pointerDownState.resize.handleType =
-            elementWithTransformHandleType.transformHandleType;
+          if (event.ctrlKey) {
+            this.setState({
+              croppingElement: elementWithTransformHandleType.element
+            })
+            pointerDownState.crop.handleType = elementWithTransformHandleType.transformHandleType
+          } else {
+            this.setState({
+              resizingElement: elementWithTransformHandleType.element,
+            });
+            pointerDownState.resize.handleType =
+              elementWithTransformHandleType.transformHandleType;
+          }
         }
       } else if (selectedElements.length > 1) {
         pointerDownState.resize.handleType = getTransformHandleTypeFromCoords(
@@ -4057,6 +4068,11 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements[0],
           );
         }
+      } if (pointerDownState.crop.handleType) {
+        pointerDownState.crop.isCropping = true;
+        // will need to do more stuff here, probably copy a lot from
+        // resize, but i'm not sure yet and i dont want to just
+        // randomly copy paste
       } else {
         if (this.state.selectedLinearElement) {
           const linearElementEditor =
@@ -4594,6 +4610,15 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
       }
+
+      if (pointerDownState.crop.isCropping) {
+        pointerDownState.lastCoords.x = pointerCoords.x;
+        pointerDownState.lastCoords.y = pointerCoords.y;
+        if (this.maybeHandleCrop(pointerDownState, event)) {
+          return true;
+        }
+      }
+
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
@@ -6277,6 +6302,26 @@ class App extends React.Component<AppProps, AppState> {
       this.maybeSuggestBindingForAll([draggingElement]);
     }
   };
+
+  private maybeHandleCrop = (
+    pointerDownState: PointerDownState,
+    event: MouseEvent | KeyboardEvent,
+  ): boolean => {
+    const selectedElements = getSelectedElements(
+      this.scene.getNonDeletedElements(),
+      this.state,
+    );
+
+    if (selectedElements.length > 1) {
+      // don't see much sense in allowing multi-crop, that would be weird
+      return false;
+    }
+
+    const elementToCrop = selectedElements[0];
+
+    console.log("cropping!");
+    return true;
+  }
 
   private maybeHandleResize = (
     pointerDownState: PointerDownState,
