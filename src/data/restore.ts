@@ -224,7 +224,9 @@ const restoreElement = (
         fileId: element.fileId,
         scale: element.scale || [1, 1],
         widthAtCreation: element.widthAtCreation,
-        heightAtCreation: element.heightAtCreation
+        heightAtCreation: element.heightAtCreation,
+        underlyingImageWidth: element.underlyingImageWidth,
+        underlyingImageHeight: element.underlyingImageHeight
       });
     case "line":
     // @ts-ignore LEGACY type

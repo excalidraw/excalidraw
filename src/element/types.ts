@@ -93,6 +93,8 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     scale: [number, number];
     widthAtCreation: number;
     heightAtCreation: number;
+    underlyingImageWidth: number;
+    underlyingImageHeight: number;
   }>;
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<

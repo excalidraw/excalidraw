@@ -5857,7 +5857,9 @@ class App extends React.Component<AppProps, AppState> {
         width, 
         height,
         widthAtCreation: width,
-        heightAtCreation: height
+        heightAtCreation: height,
+        underlyingImageWidth: image.naturalWidth,
+        underlyingImageHeight: image.naturalHeight
       });
     }
   };

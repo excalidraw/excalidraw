@@ -388,7 +388,9 @@ export const newImageElement = (
     fileId: opts.fileId ?? null,
     scale: opts.scale ?? [1, 1],
     widthAtCreation: 0,
-    heightAtCreation: 0
+    heightAtCreation: 0,
+    underlyingImageWidth: 0,
+    underlyingImageHeight: 0
   };
 };
 
