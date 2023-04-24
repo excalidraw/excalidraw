@@ -91,14 +91,22 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     status: "pending" | "saved" | "error";
     /** X and Y scale factors <-1, 1>, used for image axis flipping */
     scale: [number, number];
+
+    rescaleX: number;
+    rescaleY: number;
+
     widthAtCreation: number;
     heightAtCreation: number;
+
     underlyingImageWidth: number;
     underlyingImageHeight: number;
+
     xToPullFromImage: number;
     yToPullFromImage: number;
     wToPullFromImage: number;
     hToPullFromImage: number;
+
+    leftSideCropAmount: number;
     rightSideCropAmount: number;
   }>;
 

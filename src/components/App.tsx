@@ -3920,6 +3920,7 @@ class App extends React.Component<AppProps, AppState> {
         handleType: false,
         isCropping: false,
         offset: { x: 0, y: 0 },
+        complete: false
       },
       hit: {
         element: null,
@@ -5048,6 +5049,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         isResizing: false,
         isRotating: false,
+        isCropping: false,
         resizingElement: null,
         selectionElement: null,
         cursorButton: "up",
@@ -5069,6 +5071,7 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState.crop.handleType,
               elementState
             );
+            pointerDownState.crop.complete = true;
           }
         }
       }
@@ -5912,7 +5915,9 @@ class App extends React.Component<AppProps, AppState> {
         xToPullFromImage: 0,
         yToPullFromImage: 0,
         wToPullFromImage: image.naturalWidth,
-        hToPullFromImage: image.naturalHeight
+        hToPullFromImage: image.naturalHeight,
+        rescaleX: 1,
+        rescaleY: 1
       });
     }
   };
@@ -6335,6 +6340,9 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
+    if (pointerDownState.crop.complete) {
+      return true;
+    }
     const selectedElements = getSelectedElements(
       this.scene.getNonDeletedElements(),
       this.state,
@@ -6345,7 +6353,7 @@ class App extends React.Component<AppProps, AppState> {
       return false;
     }
 
-    const transformHandleType = pointerDownState.resize.handleType;
+    const transformHandleType = pointerDownState.crop.handleType;
     const pointerCoords = pointerDownState.lastCoords;
     const [x, y] = getGridPoint(
       pointerCoords.x - pointerDownState.crop.offset.x,
@@ -6355,9 +6363,12 @@ class App extends React.Component<AppProps, AppState> {
 
     const elementToCrop = selectedElements[0] as ExcalidrawImageElement;
     const stateAtCropStart = pointerDownState.originalElements.get(elementToCrop.id)!;
-
-    cropElement(elementToCrop, transformHandleType, stateAtCropStart, x, y);
-    return true;
+    if (transformHandleType) {
+      cropElement(elementToCrop, transformHandleType, stateAtCropStart, x, y);
+      return true;
+    }
+    
+    return false;
   }
 
   private maybeHandleResize = (

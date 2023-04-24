@@ -231,7 +231,10 @@ const restoreElement = (
         yToPullFromImage: element.yToPullFromImage,
         wToPullFromImage: element.wToPullFromImage,
         hToPullFromImage: element.hToPullFromImage,
-        rightSideCropAmount: element.rightSideCropAmount
+        leftSideCropAmount: element.leftSideCropAmount,
+        rightSideCropAmount: element.rightSideCropAmount,
+        rescaleX: element.rescaleX,
+        rescaleY: element.rescaleY,
       });
     case "line":
     // @ts-ignore LEGACY type

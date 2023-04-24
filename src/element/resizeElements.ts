@@ -578,6 +578,8 @@ export const resizeSingleElement = (
     points: rescaledPoints,
   };
 
+  updateInternalScale(element, eleNewWidth / element.width, eleNewHeight / element.height);
+
   if ("scale" in element && "scale" in stateAtResizeStart) {
     mutateElement(element, {
       scale: [
@@ -586,7 +588,7 @@ export const resizeSingleElement = (
           stateAtResizeStart.scale[0]) * stateAtResizeStart.scale[0],
         (Math.sign(newBoundsY2 - stateAtResizeStart.y) ||
           stateAtResizeStart.scale[1]) * stateAtResizeStart.scale[1],
-      ],
+      ]
     });
   }
 
@@ -601,6 +603,7 @@ export const resizeSingleElement = (
     });
 
     mutateElement(element, resizedElement);
+
     if (boundTextElement && boundTextFont != null) {
       mutateElement(boundTextElement, {
         fontSize: boundTextFont.fontSize,
@@ -612,10 +615,24 @@ export const resizeSingleElement = (
 };
 
 
+// have to keep track of the scaling on images in order to give
+// cropping the data that it needs to work
+const updateInternalScale = (
+  element: NonDeletedExcalidrawElement,
+  scaleX: number,
+  scaleY: number
+) => {
+  if ("type" in element && element.type == "image") {
+    element = element as ExcalidrawImageElement;
+  } else {
+    return;
+  }
 
-
-
-
+  mutateElement(element, {
+    rescaleX: element.rescaleX * scaleX,
+    rescaleY: element.rescaleY * scaleY
+  })
+}
 
 
 
@@ -784,6 +801,8 @@ const resizeMultipleElements = (
         };
       }
     }
+
+    updateInternalScale(element.latest, width / element.orig.width, height / element.orig.height);
 
     updateBoundElements(element.latest, { newSize: { width, height } });
 
