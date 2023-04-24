@@ -110,6 +110,7 @@
     "increaseFontSize": "Mărește dimensiunea fontului",
     "unbindText": "Deconectare text",
     "bindText": "Legare text de container",
+    "createContainerFromText": "Încadrare text într-un container",
     "link": {
       "edit": "Editare URL",
       "create": "Creare URL",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Scena nu a putut fi importată din URL-ul furnizat. Este fie incorect formată, fie nu conține date JSON Excalidraw valide.",
     "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?",
     "removeItemsFromsLibrary": "Ștergi {{count}} element(e) din bibliotecă?",
-    "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată."
+    "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată.",
+    "collabOfflineWarning": "Nu este disponibilă nicio conexiune la internet.\nModificările nu vor fi salvate!"
   },
   "errors": {
     "unsupportedFileType": "Tip de fișier neacceptat.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou.",
     "importLibraryError": "Biblioteca nu a putut fi încărcată",
     "collabSaveFailed": "Nu s-a putut salva în baza de date la nivel de server. Dacă problemele persistă, ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
-    "collabSaveFailed_sizeExceeded": "Nu s-a putut salva în baza de date la nivel de server, întrucât se pare că pânza este prea mare. Ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca."
+    "collabSaveFailed_sizeExceeded": "Nu s-a putut salva în baza de date la nivel de server, întrucât se pare că pânza este prea mare. Ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
+    "brave_measure_text_error": {
+      "start": "Se pare că folosești navigatorul Brave cu",
+      "aggressive_block_fingerprint": "setarea „Blocați amprentarea” în modul strict",
+      "setting_enabled": "activată",
+      "break": "Acest lucru ar putea duce la întreruperea",
+      "text_elements": "elementelor de text",
+      "in_your_drawings": "din desenele tale",
+      "strongly_recommend": "Recomandăm insistent dezactivarea acestei setări. Poți urma",
+      "steps": "acești pași",
+      "how": "pentru efectuarea procedurii",
+      "disable_setting": " Dacă dezactivarea acestei setări nu remediază afișarea elementelor de text, deschide",
+      "issue": "un tichet cu probleme",
+      "write": "pe pagina noastră de GitHub sau scrie-ne pe",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Selecție",
@@ -220,7 +237,7 @@
     "penMode": "Mod stilou – împiedică atingerea",
     "link": "Adăugare/actualizare URL pentru forma selectată",
     "eraser": "Radieră",
-    "hand": ""
+    "hand": "Mână (instrument de panoramare)"
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
@@ -228,7 +245,7 @@
     "shapes": "Forme"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Pentru a muta pânză, ține apăsată rotița mausului sau bara de spațiu sau folosește instrumentul în formă de mână",
     "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
@@ -247,7 +264,7 @@
     "bindTextToElement": "Apasă tasta Enter pentru a adăuga text",
     "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea",
     "eraserRevert": "Ține apăsată tasta Alt pentru a anula elementele marcate pentru ștergere",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Această caracteristică poate fi probabil activată prin setarea preferinței „dom.events.asyncClipboard.clipboardItem” ca „true”. Pentru a schimba preferințele navigatorului în Firefox, accesează pagina „about:config”."
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
@@ -302,7 +319,8 @@
     "doubleClick": "dublu clic",
     "drag": "glisare",
     "editor": "Editor",
-    "editSelectedShape": "Editează forma selectată (text/săgeată/linie)",
+    "editLineArrowPoints": "Editare puncte de săgeată/rând",
+    "editText": "Editare text/adăugare etichetă",
     "github": "Ai întâmpinat o problemă? Trimite un raport",
     "howto": "Urmărește ghidurile noastre",
     "or": "sau",

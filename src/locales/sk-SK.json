@@ -110,6 +110,7 @@
     "increaseFontSize": "Zväčšiť veľkosť písma",
     "unbindText": "Zrušiť previazanie textu",
     "bindText": "Previazať text s kontajnerom",
+    "createContainerFromText": "Zabaliť text do kontajneru",
     "link": {
       "edit": "Upraviť odkaz",
       "create": "Vytvoriť odkaz",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Nepodarilo sa načítať scénu z poskytnutej URL. Je nevalidná alebo neobsahuje žiadne validné Excalidraw JSON dáta.",
     "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?",
     "removeItemsFromsLibrary": "Odstrániť {{count}} položiek z knižnice?",
-    "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá."
+    "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá.",
+    "collabOfflineWarning": "Internetové pripojenie nie je dostupné.\nVaše zmeny nebudú uložené!"
   },
   "errors": {
     "unsupportedFileType": "Nepodporovaný typ súboru.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu.",
     "importLibraryError": "Nepodarilo sa načítať knižnicu",
     "collabSaveFailed": "Uloženie do databázy sa nepodarilo. Ak tento problém pretrváva uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
-    "collabSaveFailed_sizeExceeded": "Uloženie do databázy sa nepodarilo, pretože veľkosť plátna je príliš veľká. Uložte si váš súbor lokálne aby ste nestratili vašu prácu."
+    "collabSaveFailed_sizeExceeded": "Uloženie do databázy sa nepodarilo, pretože veľkosť plátna je príliš veľká. Uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
+    "brave_measure_text_error": {
+      "start": "Vyzerá to, že používate prehliadač Brave s",
+      "aggressive_block_fingerprint": "agresívnym blokovaním sledovania",
+      "setting_enabled": "zapnutým",
+      "break": "Toto môže znemožniť používanie",
+      "text_elements": "textových prvkov",
+      "in_your_drawings": "vo vašich kresbách",
+      "strongly_recommend": "Odporúčame vypnutie tohto nastavenia. Postupuje podľa",
+      "steps": "týchto krokov",
+      "how": "pre jeho vypnutie",
+      "disable_setting": " Ak sa vypnutím tohto nastavenia problém zobrazenia textových prvkov neodstráni, prosím vytvorte",
+      "issue": "issue",
+      "write": "na našom Github-e alebo nám to oznámte na",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Výber",
@@ -302,7 +319,8 @@
     "doubleClick": "dvojklik",
     "drag": "potiahnutie",
     "editor": "Editovanie",
-    "editSelectedShape": "Editovať zvolený tvar (text/šípka/čiara)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Objavili ste problém? Nahláste ho",
     "howto": "Postupujte podľa naších návodov",
     "or": "alebo",

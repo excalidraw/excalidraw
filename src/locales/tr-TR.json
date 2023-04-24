@@ -66,7 +66,7 @@
     "cartoonist": "Karikatürist",
     "fileTitle": "Dosya adı",
     "colorPicker": "Renk seçici",
-    "canvasColors": "Tuvallerin üzerinde kullanıldı",
+    "canvasColors": "Tuvalin üzerinde kullanıldı",
     "canvasBackground": "Tuval arka planı",
     "drawingCanvas": "Çizim tuvali",
     "layers": "Katmanlar",
@@ -110,6 +110,7 @@
     "increaseFontSize": "Yazı Tipi Boyutunu Büyült",
     "unbindText": "Metni çöz",
     "bindText": "Metni taşıyıcıya bağla",
+    "createContainerFromText": "",
     "link": {
       "edit": "Bağlantıyı düzenle",
       "create": "Bağlantı oluştur",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Verilen bağlantıdan çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
     "resetLibrary": "Bu işlem kütüphanenizi sıfırlayacak. Emin misiniz?",
     "removeItemsFromsLibrary": "{{count}} öğe(ler) kitaplıktan kaldırılsın mı?",
-    "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı."
+    "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "Desteklenmeyen dosya türü.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "İş birliği sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin.",
     "importLibraryError": "Kütüphane yüklenemedi",
     "collabSaveFailed": "Backend veritabanına kaydedilemedi. Eğer problem devam ederse, çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
-    "collabSaveFailed_sizeExceeded": "Backend veritabanına kaydedilemedi; tuval çok büyük. Çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz."
+    "collabSaveFailed_sizeExceeded": "Backend veritabanına kaydedilemedi; tuval çok büyük. Çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
+    "brave_measure_text_error": {
+      "start": "Görünüşe göre Brave gezginini",
+      "aggressive_block_fingerprint": "Agresif parmakizi bloklama",
+      "setting_enabled": "ayarları etkin şeklide kullanıyor gibisiniz",
+      "break": "Bu bir takım sorunlara yol açabilir",
+      "text_elements": "Metin elementlerinde bozulma",
+      "in_your_drawings": "çizimlerde bozulma gibi",
+      "strongly_recommend": "Bu ayarı devre dışı bırakmanızı şiddetle öneririz. Şu adımları",
+      "steps": "takip ederek",
+      "how": "nasıl yapılacağını",
+      "disable_setting": " Yapabilirsiniz. Eğer devre dışı bırakmak işe yaramazsa, lütfen",
+      "issue": "konu hakkında",
+      "write": "github'da sorun belirtin, ya da bize",
+      "discord": "Discord üzerinden iletin"
+    }
   },
   "toolBar": {
     "selection": "Seçme",
@@ -302,7 +319,8 @@
     "doubleClick": "çift-tıklama",
     "drag": "sürükle",
     "editor": "Düzenleyici",
-    "editSelectedShape": "Seçili şekli düzenle (metin/ok/çizgi)",
+    "editLineArrowPoints": "Çizgi/ok noktalarını düzenle",
+    "editText": "Etiket / metin düzenle",
     "github": "Bir hata mı buldun? Bildir",
     "howto": "Rehberlerimizi takip edin",
     "or": "veya",
@@ -452,13 +470,13 @@
     "app": {
       "center_heading": "",
       "center_heading_plus": "",
-      "menuHint": ""
+      "menuHint": "Dışa aktar, seçenekler, diller, ..."
     },
     "defaults": {
-      "menuHint": "",
+      "menuHint": "Dışa aktar, seçenekler, ve daha fazlası...",
       "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "toolbarHint": "Bir araç seçin ve çizime başlayın!",
+      "helpHint": "Kısayollar & yardım"
     }
   }
 }

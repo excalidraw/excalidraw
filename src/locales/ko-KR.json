@@ -110,6 +110,7 @@
     "increaseFontSize": "폰트 사이즈 키우기",
     "unbindText": "텍스트 분리",
     "bindText": "텍스트를 컨테이너에 결합",
+    "createContainerFromText": "텍스트를 컨테이너에 담기",
     "link": {
       "edit": "링크 수정하기",
       "create": "링크 만들기",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "제공된 URL에서 화면을 가져오는데 실패했습니다. 주소가 잘못되거나, 유효한 Excalidraw JSON 데이터를 포함하고 있지 않은 것일 수 있습니다.",
     "resetLibrary": "당신의 라이브러리를 초기화 합니다. 계속하시겠습니까?",
     "removeItemsFromsLibrary": "{{count}}개의 아이템을 라이브러리에서 삭제하시겠습니까?",
-    "invalidEncryptionKey": "암호화 키는 반드시 22글자여야 합니다. 실시간 협업이 비활성화됩니다."
+    "invalidEncryptionKey": "암호화 키는 반드시 22글자여야 합니다. 실시간 협업이 비활성화됩니다.",
+    "collabOfflineWarning": "인터넷에 연결되어 있지 않습니다.\n변경 사항들이 저장되지 않습니다!"
   },
   "errors": {
     "unsupportedFileType": "지원하지 않는 파일 형식 입니다.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "협업 서버에 접속하는데 실패했습니다. 페이지를 새로고침하고 다시 시도해보세요.",
     "importLibraryError": "라이브러리를 불러오지 못했습니다.",
     "collabSaveFailed": "데이터베이스에 저장하지 못했습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
-    "collabSaveFailed_sizeExceeded": "데이터베이스에 저장하지 못했습니다. 캔버스가 너무 큰 거 같습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요."
+    "collabSaveFailed_sizeExceeded": "데이터베이스에 저장하지 못했습니다. 캔버스가 너무 큰 거 같습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
+    "brave_measure_text_error": {
+      "start": "귀하께서는",
+      "aggressive_block_fingerprint": "강력한 지문 차단",
+      "setting_enabled": "설정이 활성화된 Brave browser를 사용하고 계신 것 같습니다",
+      "break": "이 기능으로 인해 화이트보드의",
+      "text_elements": "텍스트 요소들이",
+      "in_your_drawings": "손상될 수 있습니다",
+      "strongly_recommend": "해당 기능을 설정에서 비활성화하는 것을 강력히 권장 드립니다. 비활성화 방법에 대해서는",
+      "steps": "이 게시글을",
+      "how": "참고해주세요.",
+      "disable_setting": " 만약 이 설정을 껐음에도 텍스트 요소들이 올바르게 표시되지 않는다면, 저희",
+      "issue": "Github에 이슈를",
+      "write": "올려주시거나",
+      "discord": "Discord에 제보해주세요"
+    }
   },
   "toolBar": {
     "selection": "선택",
@@ -220,7 +237,7 @@
     "penMode": "펜 모드 - 터치 방지",
     "link": "선택한 도형에 대해서 링크를 추가/업데이트",
     "eraser": "지우개",
-    "hand": ""
+    "hand": "손 (패닝 도구)"
   },
   "headings": {
     "canvasActions": "캔버스 동작",
@@ -228,7 +245,7 @@
     "shapes": "모양"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "캔버스를 옮기려면 마우스 휠이나 스페이스바를 누르고 드래그하거나, 손 도구를 사용하기",
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
     "freeDraw": "클릭 후 드래그하세요. 완료되면 놓으세요.",
     "text": "팁: 선택 툴로 아무 곳이나 더블 클릭해 텍스트를 추가할 수도 있습니다.",
@@ -247,7 +264,7 @@
     "bindTextToElement": "Enter 키를 눌러서 텍스트 추가하기",
     "deepBoxSelect": "CtrlOrCmd 키를 눌러서 깊게 선택하고, 드래그하지 않도록 하기",
     "eraserRevert": "Alt를 눌러서 삭제하도록 지정된 요소를 되돌리기",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "이 기능은 설정에서 \"dom.events.asyncClipboard.clipboardItem\" 플래그를 \"true\"로 설정하여 활성화할 수 있습니다. Firefox에서 브라우저 플래그를 수정하려면, \"about:config\" 페이지에 접속하세요."
   },
   "canvasError": {
     "cannotShowPreview": "미리보기를 볼 수 없습니다",
@@ -302,7 +319,8 @@
     "doubleClick": "더블 클릭",
     "drag": "드래그",
     "editor": "에디터",
-    "editSelectedShape": "선택한 도형 편집하기(텍스트/화살표/라인)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "문제 제보하기",
     "howto": "가이드 참고하기",
     "or": "또는",
@@ -450,14 +468,14 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "당신의 모든 데이터는 브라우저에 저장되었습니다.",
+      "center_heading": "모든 데이터는 브라우저에 안전하게 저장됩니다.",
       "center_heading_plus": "대신 Excalidraw+로 이동하시겠습니까?",
       "menuHint": "내보내기, 설정, 언어, ..."
     },
     "defaults": {
-      "menuHint": "내보내기, 설정, 더 보기...",
-      "center_heading": "",
-      "toolbarHint": "도구 선택 & 그리기 시작",
+      "menuHint": "내보내기, 설정, 등등...",
+      "center_heading": "간단하게 만드는 다이어그램.",
+      "toolbarHint": "도구를 선택하고, 그리세요!",
       "helpHint": "단축키 & 도움말"
     }
   }

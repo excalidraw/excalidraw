@@ -110,6 +110,7 @@
     "increaseFontSize": "Sali tiddi n tsefsit",
     "unbindText": "Serreḥ iweḍris",
     "bindText": "Arez aḍris s anagbar",
+    "createContainerFromText": "",
     "link": {
       "edit": "Ẓreg aseɣwen",
       "create": "Snulfu-d aseɣwen",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Ulamek taktert n usayes seg URL i d-ittunefken. Ahat mačči d tameɣtut neɣ ur tegbir ara isefka JSON n Excalidraw.",
     "resetLibrary": "Ayagi ad isfeḍ tamkarḍit-inek•m. Tetḥeqqeḍ?",
     "removeItemsFromsLibrary": "Ad tekkseḍ {{count}} n uferdis (en) si temkarḍit?",
-    "invalidEncryptionKey": "Tasarut n uwgelhen isefk ad tesɛu 22 n yiekkilen. Amɛiwen srid yensa."
+    "invalidEncryptionKey": "Tasarut n uwgelhen isefk ad tesɛu 22 n yiekkilen. Amɛiwen srid yensa.",
+    "collabOfflineWarning": "Ulac tuqqna n internet.\nIbedilen-ik ur ttwaklasen ara!"
   },
   "errors": {
     "unsupportedFileType": "Anaw n ufaylu ur yettwasefrak ara.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Ulamek tuqqna s aqeddac n umyalel. Ma ulac uɣilif ales asali n usebter sakin eɛreḍ tikkelt-nniḍen.",
     "importLibraryError": "Ur d-ssalay ara tamkarḍit",
     "collabSaveFailed": "Ulamek asekles deg uzadur n yisefka deg ugilal. Ma ikemmel wugur, isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
-    "collabSaveFailed_sizeExceeded": "Ulamek asekles deg uzadur n yisefka deg ugilal, taɣzut n usuneɣ tettban-d temqer aṭas. Isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem."
+    "collabSaveFailed_sizeExceeded": "Ulamek asekles deg uzadur n yisefka deg ugilal, taɣzut n usuneɣ tettban-d temqer aṭas. Isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
+    "brave_measure_text_error": {
+      "start": "Ittban-d am wakken tsseqdaceḍ iminig Brave akked",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "yermed",
+      "break": "Ayagi yezmer ad d-iseglu s truẓi n",
+      "text_elements": "Iferdisen iḍrisen",
+      "in_your_drawings": "deg wunuɣen-inek",
+      "strongly_recommend": "",
+      "steps": "isurifen-agi",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "di GitHub inek neɣ aru-yaɣ-d di",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "Tafrayt",
@@ -228,7 +245,7 @@
     "shapes": "Talɣiwin"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Akken ad tesmuttiḍ taɣzut n usuneɣ, ṭṭef ṛṛuda n umumed, neɣ seqdec afecku Afus",
     "linearElement": "Ssit akken ad tebduḍ aṭas n tenqiḍin, zuɣer i yiwen n yizirig",
     "freeDraw": "Ssit yerna zuɣer, serreḥ ticki tfukeḍ",
     "text": "Tixidest: tzemreḍ daɣen ad ternuḍ aḍris s usiti snat n tikkal anida tebɣiḍ s ufecku n tefrayt",
@@ -239,7 +256,7 @@
     "resize": "Tzemreḍ ad tḥettemeḍ assaɣ s tuṭṭfa n tqeffalt SHIFT mi ara tettbeddileḍ tiddi,\nma teṭṭfeḍ ALT abeddel n tiddi ad yili si tlemmast",
     "resizeImage": "Tzemreḍ ad talseḍ tiddi s tilelli s tuṭṭfa n SHIFT,\nṭṭef ALT akken ad talseḍ tiddi si tlemmast",
     "rotate": "Tzemreḍ ad tḥettemeḍ tiɣemmar s tuṭṭfa n SHIFT di tuzzya",
-    "lineEditor_info": "",
+    "lineEditor_info": "Ssed ɣef CtrlOrCmd yerna ssit snat n tikkal neɣ ssed ɣef CtrlOrCmd + Kcem akken ad tẓergeḍ tineqqiḍin",
     "lineEditor_pointSelected": "Ssed taqeffalt kkes akken ad tekkseḍ tanqiḍ (tinqiḍin),\nCtrlOrCmd+D akken ad tsiselgeḍ, neɣ zuɣer akken ad tesmuttiḍ",
     "lineEditor_nothingSelected": "Fren tanqiḍt akken ad tẓergeḍ (ṭṭef SHIFT akken ad tferneḍ aṭas),\nneɣ ṭṭef Alt akken ad ternuḍ tinqiḍin timaynutin",
     "placeImage": "Ssit akken ad tserseḍ tugna, neɣ ssit u zuɣer akken ad tesbaduḍ tiddi-ines s ufus",
@@ -302,7 +319,8 @@
     "doubleClick": "ssit snat n tikkal",
     "drag": "zuɣer",
     "editor": "Amaẓrag",
-    "editSelectedShape": "Ẓreg talɣa yettwafernen (aḍris/taneccabt/izirig)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Tufiḍ-d ugur? Azen-aɣ-d",
     "howto": "Ḍfer imniren-nneɣ",
     "or": "neɣ",
@@ -451,11 +469,11 @@
   "welcomeScreen": {
     "app": {
       "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading_plus": "Tebɣiḍ ad tedduḍ ɣer Excalidraw+ deg umḍiq?",
+      "menuHint": "Asifeḍ, ismenyifen, tutlayin, ..."
     },
     "defaults": {
-      "menuHint": "",
+      "menuHint": "Asifeḍ, ismenyifen, d wayen-nniḍen...",
       "center_heading": "",
       "toolbarHint": "",
       "helpHint": ""

@@ -35,12 +35,12 @@
     "arrowheads": "端点",
     "arrowhead_none": "无",
     "arrowhead_arrow": "箭头",
-    "arrowhead_bar": "条",
+    "arrowhead_bar": "条状",
     "arrowhead_dot": "圆点",
     "arrowhead_triangle": "三角箭头",
     "fontSize": "字体大小",
     "fontFamily": "字体",
-    "onlySelected": "仅被选中",
+    "onlySelected": "仅选中",
     "withBackground": "背景",
     "exportEmbedScene": "包含画布数据",
     "exportEmbedScene_details": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
@@ -110,6 +110,7 @@
     "increaseFontSize": "放大字体大小",
     "unbindText": "取消文本绑定",
     "bindText": "将文本绑定到容器",
+    "createContainerFromText": "将文本包围在容器中",
     "link": {
       "edit": "编辑链接",
       "create": "新建链接",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "无法从提供的 URL 导入场景。它或者格式不正确，或者不包含有效的 Excalidraw JSON 数据。",
     "resetLibrary": "这将会清除你的素材库。你确定要这么做吗？",
     "removeItemsFromsLibrary": "确定要从素材库中删除 {{count}} 个项目吗？",
-    "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。"
+    "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。",
+    "collabOfflineWarning": "无网络连接。\n您的改动将不会被保存！"
   },
   "errors": {
     "unsupportedFileType": "不支持的文件格式。",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。",
     "importLibraryError": "无法加载素材库",
     "collabSaveFailed": "无法保存到后端数据库。如果问题持续存在，您应该保存文件到本地，以确保您的工作不会丢失。",
-    "collabSaveFailed_sizeExceeded": "无法保存到后端数据库，画布似乎过大。您应该保存文件到本地，以确保您的工作不会丢失。"
+    "collabSaveFailed_sizeExceeded": "无法保存到后端数据库，画布似乎过大。您应该保存文件到本地，以确保您的工作不会丢失。",
+    "brave_measure_text_error": {
+      "start": "看起来您正在使用 Brave 浏览器并启用了",
+      "aggressive_block_fingerprint": "积极阻止指纹识别",
+      "setting_enabled": "设置",
+      "break": "这可能会破坏绘图中的",
+      "text_elements": "文本元素",
+      "in_your_drawings": " ",
+      "strongly_recommend": "我们强烈建议禁用此设置。您可以按照",
+      "steps": "这些步骤",
+      "how": "来设置",
+      "disable_setting": " 如果禁用此设置无法修复文本元素的显示，请在 GitHub 提交一个",
+      "issue": "issue",
+      "write": "，或者通过",
+      "discord": "Discord 反馈"
+    }
   },
   "toolBar": {
     "selection": "选择",
@@ -239,7 +256,7 @@
     "resize": "您可以按住SHIFT来限制比例大小，\n按住ALT来调整中心大小",
     "resizeImage": "按住SHIFT可以自由缩放，\n按住ALT可以从中间缩放",
     "rotate": "旋转时可以按住 Shift 来约束角度",
-    "lineEditor_info": "按住 CtrlOrCmd 并双击或按 CtrlOrmd + Enter 来编辑点",
+    "lineEditor_info": "按住 CtrlOrCmd 并双击或按 CtrlOrCmd + Enter 来编辑点",
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，拖动以移动",
     "lineEditor_nothingSelected": "选择要编辑的点 (按住 SHIFT 选择多个)，\n或按住 Alt 并点击以添加新点",
     "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
@@ -247,7 +264,7 @@
     "bindTextToElement": "按下 Enter 以添加文本",
     "deepBoxSelect": "按住 CtrlOrCmd 以深度选择，并避免拖拽",
     "eraserRevert": "按住 Alt 以反选被标记删除的元素",
-    "firefox_clipboard_write": "将高级配置首选项“dom.events.asyncClipboard.lipboarditem”设置为“true”可以启用此功能。要更改 Firefox 的高级配置首选项，请前往“about:config”页面。"
+    "firefox_clipboard_write": "将高级配置首选项“dom.events.asyncClipboard.clipboardItem”设置为“true”可以启用此功能。要更改 Firefox 的高级配置首选项，请前往“about:config”页面。"
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
@@ -302,7 +319,8 @@
     "doubleClick": "双击",
     "drag": "拖动",
     "editor": "编辑器",
-    "editSelectedShape": "编辑选中的形状 (文本、箭头或线条)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "提交问题",
     "howto": "帮助文档",
     "or": "或",

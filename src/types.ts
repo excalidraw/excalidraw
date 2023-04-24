@@ -29,9 +29,11 @@ import { isOverScrollBars } from "./scene";
 import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
-import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
+import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { Snaps } from "./snapping";
+import { Merge, ForwardRef, ValueOf } from "./utility-types";
+import React from "react";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -59,7 +61,7 @@ export type DataURL = string & { _brand: "DataURL" };
 
 export type BinaryFileData = {
   mimeType:
-    | typeof ALLOWED_IMAGE_MIME_TYPES[number]
+    | ValueOf<typeof IMAGE_MIME_TYPES>
     // future user or unknown file type
     | typeof MIME_TYPES.binary;
   id: FileId;
@@ -101,7 +103,7 @@ export type AppState = {
   } | null;
   showWelcomeScreen: boolean;
   isLoading: boolean;
-  errorMessage: string | null;
+  errorMessage: React.ReactNode;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
@@ -422,7 +424,7 @@ export type AppClassProperties = {
     FileId,
     {
       image: HTMLImageElement | Promise<HTMLImageElement>;
-      mimeType: typeof ALLOWED_IMAGE_MIME_TYPES[number];
+      mimeType: ValueOf<typeof IMAGE_MIME_TYPES>;
     }
   >;
   files: BinaryFiles;

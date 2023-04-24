@@ -110,6 +110,7 @@
     "increaseFontSize": "Øk skriftstørrelse",
     "unbindText": "Avbind tekst",
     "bindText": "Bind tekst til beholderen",
+    "createContainerFromText": "La tekst flyte i en beholder",
     "link": {
       "edit": "Rediger lenke",
       "create": "Opprett lenke",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Kunne ikke importere scene fra den oppgitte URL-en. Den er enten ødelagt, eller inneholder ikke gyldig Excalidraw JSON-data.",
     "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?",
     "removeItemsFromsLibrary": "Slett {{count}} element(er) fra biblioteket?",
-    "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert."
+    "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert.",
+    "collabOfflineWarning": "Ingen Internett-tilkobling tilgjengelig.\nEndringer dine vil ikke bli lagret!"
   },
   "errors": {
     "unsupportedFileType": "Filtypen støttes ikke.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Kunne ikke koble til samarbeidsserveren. Vennligst oppdater siden og prøv på nytt.",
     "importLibraryError": "Kunne ikke laste bibliotek",
     "collabSaveFailed": "Kan ikke lagre i backend-databasen. Hvis problemer vedvarer, bør du lagre filen lokalt for å sikre at du ikke mister arbeidet.",
-    "collabSaveFailed_sizeExceeded": "Kunne ikke lagre til backend-databasen, lerretet ser ut til å være for stort. Du bør lagre filen lokalt for å sikre at du ikke mister arbeidet ditt."
+    "collabSaveFailed_sizeExceeded": "Kunne ikke lagre til backend-databasen, lerretet ser ut til å være for stort. Du bør lagre filen lokalt for å sikre at du ikke mister arbeidet ditt.",
+    "brave_measure_text_error": {
+      "start": "Ser ut som du bruker Brave nettleser med",
+      "aggressive_block_fingerprint": "Blokker fingeravtrykk aggressivt",
+      "setting_enabled": "innstilling aktivert",
+      "break": "Dette kan føre til at den bryter",
+      "text_elements": "Tekstelementer",
+      "in_your_drawings": "i tegningene dine",
+      "strongly_recommend": "Vi anbefaler på det sterkeste å deaktivere denne innstillingen. Du kan følge dette",
+      "steps": "disse trinnene",
+      "how": "om hvordan det skal gjøres",
+      "disable_setting": " Hvis deaktivering av denne innstillingen ikke fikser visningen av tekstelementer, kan du åpne en",
+      "issue": "sak",
+      "write": "på vår GitHub, eller skriv oss på",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Velg",
@@ -302,7 +319,8 @@
     "doubleClick": "dobbeltklikk",
     "drag": "dra",
     "editor": "Redigeringsvisning",
-    "editSelectedShape": "Rediger valgt figur (tekst/pil/linje)",
+    "editLineArrowPoints": "Rediger linje/pilpunkter",
+    "editText": "Rediger tekst / legg til etikett",
     "github": "Funnet et problem? Send inn",
     "howto": "Følg våre veiledninger",
     "or": "eller",

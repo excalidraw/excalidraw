@@ -110,6 +110,7 @@
     "increaseFontSize": "Palielināt fonta izmēru",
     "unbindText": "Atdalīt tekstu",
     "bindText": "Piesaistīt tekstu figūrai",
+    "createContainerFromText": "",
     "link": {
       "edit": "Rediģēt saiti",
       "create": "Izveidot saiti",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Nevarēja importēt ainu no norādītā URL. Vai nu tas ir nederīgs, vai nesatur derīgus Excalidraw JSON datus.",
     "resetLibrary": "Šī funkcija iztukšos bibliotēku. Vai turpināt?",
     "removeItemsFromsLibrary": "Vai izņemt {{count}} vienumu(s) no bibliotēkas?",
-    "invalidEncryptionKey": "Šifrēšanas atslēgai jābūt 22 simbolus garai. Tiešsaistes sadarbība ir izslēgta."
+    "invalidEncryptionKey": "Šifrēšanas atslēgai jābūt 22 simbolus garai. Tiešsaistes sadarbība ir izslēgta.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "Neatbalstīts datnes veids.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Nevarēja savienoties ar sadarbošanās serveri. Lūdzu, pārlādējiet lapu un mēģiniet vēlreiz.",
     "importLibraryError": "Nevarēja ielādēt bibliotēku",
     "collabSaveFailed": "Darbs nav saglabāts datubāzē. Ja problēma turpinās, saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu.",
-    "collabSaveFailed_sizeExceeded": "Darbs nav saglabāts datubāzē, šķiet, ka tāfele ir pārāk liela. Saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu."
+    "collabSaveFailed_sizeExceeded": "Darbs nav saglabāts datubāzē, šķiet, ka tāfele ir pārāk liela. Saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu.",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "Atlase",
@@ -302,7 +319,8 @@
     "doubleClick": "dubultklikšķis",
     "drag": "vilkt",
     "editor": "Redaktors",
-    "editSelectedShape": "Rediģēt atlasīto figūru (tekstu/bultu/līniju)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Sastapāt kļūdu? Ziņot",
     "howto": "Sekojiet mūsu instrukcijām",
     "or": "vai",

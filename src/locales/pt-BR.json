@@ -110,6 +110,7 @@
     "increaseFontSize": "Aumentar o tamanho da fonte",
     "unbindText": "Desvincular texto",
     "bindText": "Vincular texto ao contêiner",
+    "createContainerFromText": "",
     "link": {
       "edit": "Editar link",
       "create": "Criar link",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Não foi possível importar a cena da URL fornecida. Ela está incompleta ou não contém dados JSON válidos do Excalidraw.",
     "resetLibrary": "Isto limpará a sua biblioteca. Você tem certeza?",
     "removeItemsFromsLibrary": "Excluir {{count}} item(ns) da biblioteca?",
-    "invalidEncryptionKey": "A chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desabilitada."
+    "invalidEncryptionKey": "A chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desabilitada.",
+    "collabOfflineWarning": "Sem conexão com a internet disponível.\nSuas alterações não serão salvas!"
   },
   "errors": {
     "unsupportedFileType": "Tipo de arquivo não suportado.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Não foi possível conectar-se ao servidor colaborativo. Por favor, recarregue a página e tente novamente.",
     "importLibraryError": "Não foi possível carregar a biblioteca",
     "collabSaveFailed": "Não foi possível salvar no banco de dados do servidor. Se os problemas persistirem, salve o arquivo localmente para garantir que não perca o seu trabalho.",
-    "collabSaveFailed_sizeExceeded": "Não foi possível salvar no banco de dados do servidor, a tela parece ser muito grande. Se os problemas persistirem, salve o arquivo localmente para garantir que não perca o seu trabalho."
+    "collabSaveFailed_sizeExceeded": "Não foi possível salvar no banco de dados do servidor, a tela parece ser muito grande. Se os problemas persistirem, salve o arquivo localmente para garantir que não perca o seu trabalho.",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "Seleção",
@@ -220,7 +237,7 @@
     "penMode": "Modo caneta — impede o toque",
     "link": "Adicionar/Atualizar link para uma forma selecionada",
     "eraser": "Borracha",
-    "hand": ""
+    "hand": "Mão (ferramenta de rolagem)"
   },
   "headings": {
     "canvasActions": "Ações da tela",
@@ -228,7 +245,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Para mover a tela, segure a roda do mouse ou a barra de espaço enquanto arrasta ou use a ferramenta de mão",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "freeDraw": "Toque e arraste, solte quando terminar",
     "text": "Dica: você também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
@@ -247,7 +264,7 @@
     "bindTextToElement": "Pressione Enter para adicionar o texto",
     "deepBoxSelect": "Segure Ctrl/Cmd para seleção profunda e para evitar arrastar",
     "eraserRevert": "Segure a tecla Alt para inverter os elementos marcados para exclusão",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Esse recurso pode ser ativado configurando a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -302,7 +319,8 @@
     "doubleClick": "clique duplo",
     "drag": "arrastar",
     "editor": "Editor",
-    "editSelectedShape": "Editar forma selecionada (texto/seta/linha)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Encontrou algum problema? Nos informe",
     "howto": "Siga nossos guias",
     "or": "ou",
@@ -450,15 +468,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Todos os dados são salvos localmente no seu navegador.",
+      "center_heading_plus": "Você queria ir para o Excalidraw+ em vez disso?",
+      "menuHint": "Exportar, preferências, idiomas..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Exportar, preferências e mais...",
+      "center_heading": "Diagramas, Feito. Simples.",
+      "toolbarHint": "Escolha uma ferramenta e comece a desenhar!",
+      "helpHint": "Atalhos e ajuda"
     }
   }
 }

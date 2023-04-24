@@ -110,6 +110,7 @@
     "increaseFontSize": "Besarkan ukuran font",
     "unbindText": "Lepas teks",
     "bindText": "Kunci teks ke kontainer",
+    "createContainerFromText": "",
     "link": {
       "edit": "Edit tautan",
       "create": "Buat tautan",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Tidak dapat impor pemandangan dari URL. Kemungkinan URL itu rusak atau tidak berisi data JSON Excalidraw yang valid.",
     "resetLibrary": "Ini akan menghapus pustaka Anda. Anda yakin?",
     "removeItemsFromsLibrary": "Hapus {{count}} item dari pustaka?",
-    "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan."
+    "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan.",
+    "collabOfflineWarning": "Tidak ada koneksi internet.\nPerubahan tidak akan disimpan!"
   },
   "errors": {
     "unsupportedFileType": "Tipe file tidak didukung.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Tidak dapat terhubung ke server kolab. Muat ulang laman dan coba lagi.",
     "importLibraryError": "Tidak dapat memuat pustaka",
     "collabSaveFailed": "Tidak dapat menyimpan ke dalam basis data server. Jika masih berlanjut, Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
-    "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang."
+    "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
+    "brave_measure_text_error": {
+      "start": "Sepertinya kamu menggunakan browser Brave dengan",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "pengaturan diaktifkan",
+      "break": "",
+      "text_elements": "Elemen Teks",
+      "in_your_drawings": "dalam gambar anda",
+      "strongly_recommend": "Kami sangat menyarankan untuk mematikan pengaturan ini. Kamu dapat mengikuti",
+      "steps": "langkah-langkah ini",
+      "how": "dalam bagaimana melakukan itu",
+      "disable_setting": " Jika pengaturan ini dimatikan tidak mengatasi masalah tampilan dari elemen teks, silahkan buka",
+      "issue": "isu",
+      "write": "di GitHub kami, atau tulis kami di",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Pilihan",
@@ -302,7 +319,8 @@
     "doubleClick": "klik-ganda",
     "drag": "seret",
     "editor": "Editor",
-    "editSelectedShape": "Edit bentuk yang dipilih (teks/panah/garis)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Menemukan masalah? Kirimkan",
     "howto": "Ikuti panduan kami",
     "or": "atau",

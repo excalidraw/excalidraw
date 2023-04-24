@@ -5,7 +5,6 @@ import {
 import { getDefaultAppState } from "../appState";
 import { AppState, BinaryFiles } from "../types";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
-import { getNonDeletedElements } from "../element";
 import { restore } from "../data/restore";
 import { MIME_TYPES } from "../constants";
 import { encodePngMetadata } from "../data/image";
@@ -15,6 +14,24 @@ import {
   copyTextToSystemClipboard,
   copyToClipboard,
 } from "../clipboard";
+import Scene from "../scene/Scene";
+import { duplicateElements } from "../element/newElement";
+
+// getContainerElement and getBoundTextElement and potentially other helpers
+// depend on `Scene` which will not be available when these pure utils are
+// called outside initialized Excalidraw editor instance or even if called
+// from inside Excalidraw if the elements were never cached by Scene (e.g.
+// for library elements).
+//
+// As such, before passing the elements down, we need to initialize a custom
+// Scene instance and assign them to it.
+//
+// FIXME This is a super hacky workaround and we'll need to rewrite this soon.
+const passElementsSafely = (elements: readonly ExcalidrawElement[]) => {
+  const scene = new Scene();
+  scene.replaceAllElements(duplicateElements(elements));
+  return scene.getNonDeletedElements();
+};
 
 export { MIME_TYPES };
 
@@ -46,7 +63,7 @@ export const exportToCanvas = ({
   );
   const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
-    getNonDeletedElements(restoredElements),
+    passElementsSafely(restoredElements),
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
     { exportBackground, exportPadding, viewBackgroundColor },
@@ -62,7 +79,11 @@ export const exportToCanvas = ({
 
         const max = Math.max(width, height);
 
-        const scale = maxWidthOrHeight / max;
+        // if content is less then maxWidthOrHeight, fallback on supplied scale
+        const scale =
+          maxWidthOrHeight < max
+            ? maxWidthOrHeight / max
+            : appState?.exportScale ?? 1;
 
         canvas.width = width * scale;
         canvas.height = height * scale;
@@ -114,8 +135,10 @@ export const exportToBlob = async (
     };
   }
 
-  const canvas = await exportToCanvas(opts);
-
+  const canvas = await exportToCanvas({
+    ...opts,
+    elements: passElementsSafely(opts.elements),
+  });
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 
   return new Promise((resolve, reject) => {
@@ -132,6 +155,9 @@ export const exportToBlob = async (
           blob = await encodePngMetadata({
             blob,
             metadata: serializeAsJSON(
+              // NOTE as long as we're using the Scene hack, we need to ensure
+              // we pass the original, uncloned elements when serializing
+              // so that we keep ids stable
               opts.elements,
               opts.appState,
               opts.files || {},
@@ -160,13 +186,24 @@ export const exportToSvg = async ({
     null,
     null,
   );
+
+  const exportAppState = {
+    ...restoredAppState,
+    exportPadding,
+  };
+
   return _exportToSvg(
-    getNonDeletedElements(restoredElements),
-    {
-      ...restoredAppState,
-      exportPadding,
-    },
+    passElementsSafely(restoredElements),
+    exportAppState,
     files,
+    {
+      // NOTE as long as we're using the Scene hack, we need to ensure
+      // we pass the original, uncloned elements when serializing
+      // so that we keep ids stable. Hence adding the serializeAsJSON helper
+      // support into the downstream exportToSvg function.
+      serializeAsJSON: () =>
+        serializeAsJSON(restoredElements, exportAppState, files || {}, "local"),
+    },
   );
 };
 
@@ -183,15 +220,7 @@ export const exportToClipboard = async (
   } else if (opts.type === "png") {
     await copyBlobToClipboardAsPng(exportToBlob(opts));
   } else if (opts.type === "json") {
-    const appState = {
-      offsetTop: 0,
-      offsetLeft: 0,
-      width: 0,
-      height: 0,
-      ...getDefaultAppState(),
-      ...opts.appState,
-    };
-    await copyToClipboard(opts.elements, appState, opts.files);
+    await copyToClipboard(opts.elements, opts.files);
   } else {
     throw new Error("Invalid export type");
   }

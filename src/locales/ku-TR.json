@@ -110,6 +110,7 @@
     "increaseFontSize": "زایدکردنی قەبارەی فۆنت",
     "unbindText": "دەقەکە جیابکەرەوە",
     "bindText": "دەقەکە ببەستەوە بە کۆنتەینەرەکەوە",
+    "createContainerFromText": "",
     "link": {
       "edit": "دەستکاریکردنی بەستەر",
       "create": "دروستکردنی بەستەر",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "ناتوانێت دیمەنەکە هاوردە بکات لە URL ی دابینکراو. یان نادروستە، یان داتای \"ئێکسکالیدراو\" JSON ی دروستی تێدا نییە.",
     "resetLibrary": "ئەمە کتێبخانەکەت خاوێن دەکاتەوە. ئایا دڵنیایت?",
     "removeItemsFromsLibrary": "سڕینەوەی {{count}} ئایتم(ەکان) لە کتێبخانە؟",
-    "invalidEncryptionKey": "کلیلی رەمزاندن دەبێت لە 22 پیت بێت. هاوکاری ڕاستەوخۆ لە کارخراوە."
+    "invalidEncryptionKey": "کلیلی رەمزاندن دەبێت لە 22 پیت بێت. هاوکاری ڕاستەوخۆ لە کارخراوە.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "جۆری فایلی پشتگیری نەکراو.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "ناتوانێت پەیوەندی بکات بە سێرڤەری کۆلاب. تکایە لاپەڕەکە دووبارە باربکەوە و دووبارە هەوڵ بدەوە.",
     "importLibraryError": "نەیتوانی کتێبخانە بار بکات",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "دەستنیشانکردن",
@@ -302,7 +319,8 @@
     "doubleClick": "دوو گرتە",
     "drag": "راکێشان",
     "editor": "دەستکاریکەر",
-    "editSelectedShape": "دەستکاریکردنی شێوەی هەڵبژێردراو (دەق/تیر/هێڵ)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "کێشەیەکت دۆزیەوە؟ پێشکەشکردن",
     "howto": "شوێن ڕینماییەکانمان بکەوە",
     "or": "یان",

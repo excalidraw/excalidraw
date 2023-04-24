@@ -1,6 +1,7 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
-import { FontFamilyValues } from "./element/types";
+import { ExcalidrawElement, FontFamilyValues } from "./element/types";
+import oc from "open-color";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
@@ -9,6 +10,12 @@ export const isFirefox =
   "netscape" in window &&
   navigator.userAgent.indexOf("rv:") > 1 &&
   navigator.userAgent.indexOf("Gecko") > 1;
+export const isChrome = navigator.userAgent.indexOf("Chrome") !== -1;
+export const isSafari =
+  !isChrome && navigator.userAgent.indexOf("Safari") !== -1;
+// keeping function so it can be mocked in test
+export const isBrave = () =>
+  (navigator as any).brave?.isBrave?.name === "isBrave";
 
 export const APP_NAME = "Excalidraw";
 
@@ -98,20 +105,30 @@ export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 
 export const GRID_SIZE = 20; // TODO make it configurable?
 
-export const MIME_TYPES = {
-  excalidraw: "application/vnd.excalidraw+json",
-  excalidrawlib: "application/vnd.excalidrawlib+json",
-  json: "application/json",
+export const IMAGE_MIME_TYPES = {
   svg: "image/svg+xml",
-  "excalidraw.svg": "image/svg+xml",
   png: "image/png",
-  "excalidraw.png": "image/png",
   jpg: "image/jpeg",
   gif: "image/gif",
   webp: "image/webp",
   bmp: "image/bmp",
   ico: "image/x-icon",
+  avif: "image/avif",
+  jfif: "image/jfif",
+} as const;
+
+export const MIME_TYPES = {
+  json: "application/json",
+  // excalidraw data
+  excalidraw: "application/vnd.excalidraw+json",
+  excalidrawlib: "application/vnd.excalidrawlib+json",
+  // image-encoded excalidraw data
+  "excalidraw.svg": "image/svg+xml",
+  "excalidraw.png": "image/png",
+  // binary
   binary: "application/octet-stream",
+  // image
+  ...IMAGE_MIME_TYPES,
 } as const;
 
 export const EXPORT_DATA_TYPES = {
@@ -182,16 +199,6 @@ export const DEFAULT_EXPORT_PADDING = 10; // px
 
 export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 
-export const ALLOWED_IMAGE_MIME_TYPES = [
-  MIME_TYPES.png,
-  MIME_TYPES.jpg,
-  MIME_TYPES.svg,
-  MIME_TYPES.gif,
-  MIME_TYPES.webp,
-  MIME_TYPES.bmp,
-  MIME_TYPES.ico,
-] as const;
-
 export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
@@ -248,3 +255,23 @@ export const ROUNDNESS = {
 /** key containt id of precedeing elemnt id we use in reconciliation during
  * collaboration */
 export const PRECEDING_ELEMENT_KEY = "__precedingElement__";
+
+export const DEFAULT_ELEMENT_PROPS: {
+  strokeColor: ExcalidrawElement["strokeColor"];
+  backgroundColor: ExcalidrawElement["backgroundColor"];
+  fillStyle: ExcalidrawElement["fillStyle"];
+  strokeWidth: ExcalidrawElement["strokeWidth"];
+  strokeStyle: ExcalidrawElement["strokeStyle"];
+  roughness: ExcalidrawElement["roughness"];
+  opacity: ExcalidrawElement["opacity"];
+  locked: ExcalidrawElement["locked"];
+} = {
+  strokeColor: oc.black,
+  backgroundColor: "transparent",
+  fillStyle: "hachure",
+  strokeWidth: 1,
+  strokeStyle: "solid",
+  roughness: 1,
+  opacity: 100,
+  locked: false,
+};

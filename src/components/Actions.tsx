@@ -30,7 +30,10 @@ import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 import "./Actions.scss";
 import { Tooltip } from "./Tooltip";
-import { shouldAllowVerticalAlign } from "../element/textElement";
+import {
+  shouldAllowVerticalAlign,
+  suppportsHorizontalAlign,
+} from "../element/textElement";
 
 export const SelectedShapeActions = ({
   appState,
@@ -122,7 +125,8 @@ export const SelectedShapeActions = ({
 
           {renderAction("changeFontFamily")}
 
-          {renderAction("changeTextAlign")}
+          {suppportsHorizontalAlign(targetElements) &&
+            renderAction("changeTextAlign")}
         </>
       )}
 

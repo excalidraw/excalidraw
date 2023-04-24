@@ -110,6 +110,7 @@
     "increaseFontSize": "Schrift vergrößern",
     "unbindText": "Text lösen",
     "bindText": "Text an Container binden",
+    "createContainerFromText": "Text in Container einbetten",
     "link": {
       "edit": "Link bearbeiten",
       "create": "Link erstellen",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Die Szene konnte nicht von der angegebenen URL importiert werden. Sie ist entweder fehlerhaft oder enthält keine gültigen Excalidraw JSON-Daten.",
     "resetLibrary": "Dieses löscht deine Bibliothek. Bist du sicher?",
     "removeItemsFromsLibrary": "{{count}} Element(e) aus der Bibliothek löschen?",
-    "invalidEncryptionKey": "Verschlüsselungsschlüssel muss 22 Zeichen lang sein. Die Live-Zusammenarbeit ist deaktiviert."
+    "invalidEncryptionKey": "Verschlüsselungsschlüssel muss 22 Zeichen lang sein. Die Live-Zusammenarbeit ist deaktiviert.",
+    "collabOfflineWarning": "Keine Internetverbindung verfügbar.\nDeine Änderungen werden nicht gespeichert!"
   },
   "errors": {
     "unsupportedFileType": "Nicht unterstützter Dateityp.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut.",
     "importLibraryError": "Bibliothek konnte nicht geladen werden",
     "collabSaveFailed": "Keine Speicherung in der Backend-Datenbank möglich. Wenn die Probleme weiterhin bestehen, solltest Du Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
-    "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst."
+    "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
+    "brave_measure_text_error": {
+      "start": "Sieht so aus, als ob du den Brave Browser benutzt mit der",
+      "aggressive_block_fingerprint": "\"Fingerprinting aggressiv blockieren\"",
+      "setting_enabled": "Einstellung aktiviert",
+      "break": "Dies könnte zur inkorrekten Darstellung der",
+      "text_elements": "Textelemente",
+      "in_your_drawings": "in deinen Zeichnungen führen",
+      "strongly_recommend": "Wir empfehlen dringend, diese Einstellung zu deaktivieren. Du kannst",
+      "steps": "diesen Schritten entsprechend",
+      "how": "folgen",
+      "disable_setting": " Wenn die Deaktivierung dieser Einstellung nicht zu einer korrekten Textdarstellung führt, öffne bitte einen",
+      "issue": "Issue",
+      "write": "auf GitHub, oder schreibe uns auf",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Auswahl",
@@ -302,7 +319,8 @@
     "doubleClick": "doppelklicken",
     "drag": "ziehen",
     "editor": "Editor",
-    "editSelectedShape": "Ausgewählte Form bearbeiten (Text/Pfeil/Linie)",
+    "editLineArrowPoints": "Linien-/Pfeil-Punkte bearbeiten",
+    "editText": "Text bearbeiten / Label hinzufügen",
     "github": "Ein Problem gefunden? Informiere uns",
     "howto": "Folge unseren Anleitungen",
     "or": "oder",
