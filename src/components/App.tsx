@@ -1590,6 +1590,7 @@ class App extends React.Component<AppProps, AppState> {
           elements: data.elements,
           files: data.files || null,
           position: "cursor",
+          retainSeed: isPlainPaste,
         });
       } else if (data.text) {
         this.addTextFromPaste(data.text, isPlainPaste);
@@ -1603,6 +1604,7 @@ class App extends React.Component<AppProps, AppState> {
     elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
     position: { clientX: number; clientY: number } | "cursor" | "center";
+    retainSeed?: boolean;
   }) => {
     const elements = restoreElements(opts.elements, null);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
@@ -1640,6 +1642,9 @@ class App extends React.Component<AppProps, AppState> {
           y: element.y + gridY - minY,
         });
       }),
+      {
+        randomizeSeed: !opts.retainSeed,
+      },
     );
 
     const nextElements = [
