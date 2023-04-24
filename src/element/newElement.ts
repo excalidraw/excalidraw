@@ -15,7 +15,7 @@ import {
 } from "../element/types";
 import { arrayToMap, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
-import { mutateElement, newElementWith } from "./mutateElement";
+import { bumpVersion, mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
@@ -569,8 +569,16 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
  * it's advised to supply the whole elements array, or sets of elements that
  * are encapsulated (such as library items), if the purpose is to retain
  * bindings to the cloned elements intact.
+ *
+ * NOTE by default does not randomize or regenerate anything except the id.
  */
-export const duplicateElements = (elements: readonly ExcalidrawElement[]) => {
+export const duplicateElements = (
+  elements: readonly ExcalidrawElement[],
+  opts?: {
+    /** NOTE also updates version flags and `updated` */
+    randomizeSeed: boolean;
+  },
+) => {
   const clonedElements: ExcalidrawElement[] = [];
 
   const origElementsMap = arrayToMap(elements);
@@ -603,6 +611,11 @@ export const duplicateElements = (elements: readonly ExcalidrawElement[]) => {
     const clonedElement: Mutable<ExcalidrawElement> = _deepCopyElement(element);
 
     clonedElement.id = maybeGetNewId(element.id)!;
+
+    if (opts?.randomizeSeed) {
+      clonedElement.seed = randomInteger();
+      bumpVersion(clonedElement);
+    }
 
     if (clonedElement.groupIds) {
       clonedElement.groupIds = clonedElement.groupIds.map((groupId) => {
