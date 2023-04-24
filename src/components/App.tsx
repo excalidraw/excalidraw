@@ -5067,14 +5067,17 @@ class App extends React.Component<AppProps, AppState> {
         if (elementThatWasJustCropped) {
           const elementState = pointerDownState.originalElements.get(elementThatWasJustCropped.id);
           if (elementState) {
-            onElementCropped(
-              elementThatWasJustCropped,
-              pointerDownState.crop.handleType,
-              elementState
-            );
-            pointerDownState.crop.complete = true;
+            if (pointerDownState.crop.handleType) {
+              onElementCropped(
+                elementThatWasJustCropped,
+                pointerDownState.crop.handleType,
+                elementState
+              );
+            }
           }
         }
+
+        pointerDownState.crop.complete = true;
       }
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");

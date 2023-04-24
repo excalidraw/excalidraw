@@ -218,6 +218,44 @@ export const getTransformHandlesFromCoords = (
   return transformHandles;
 };
 
+export const adjustTransformHandlesForCropping = (
+  transformHandles: TransformHandles
+): TransformHandles => {
+  if (! transformHandles) {
+    return transformHandles;
+  }
+
+  let north = transformHandles.n;
+  if (north) {
+    let originalWidth = north[2];
+    let width = originalWidth * 4;
+    north[0] = north[0] - ((width - originalWidth) / 2);
+    north[2] = width;
+
+    let south = transformHandles.s;
+    if (south) {
+      south[0] = north[0];
+      south[2] = north[2];
+    }
+  }
+
+  let east = transformHandles.e;
+  if (east) {
+    let originalWidth = east[3];
+    let width = originalWidth * 4;
+    east[1] = east[1] - ((width - originalWidth) / 2);
+    east[3] = width;
+
+    let west = transformHandles.w;
+    if (west) {
+      west[1] = east[1];
+      west[3] = east[3];
+    }
+  }
+
+  return transformHandles;
+}
+
 export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: Zoom,
