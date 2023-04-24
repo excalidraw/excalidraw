@@ -384,7 +384,19 @@ export const ZoomInIcon = createIcon(
 );
 
 export const ZoomOutIcon = createIcon(
-  <path d="M5 10h10" strokeWidth="1.25" />,
+  <g strokeWidth="1.25">
+    <path d="M5 10h10" strokeWidth="1.25" />
+  </g>,
+  modifiedTablerIconProps,
+);
+
+export const CropIcon = createIcon(
+  <g strokeWidth="1.25">
+    <line x1="5" y1="5" x2="13" y2="5" />
+    <line x1="5" y1="5" x2="5" y2="13" />
+    <line x1="9" y1="17" x2="17" y2="17" />
+    <line x1="17" y1="16" x2="17" y2="9" />
+  </g>,
   modifiedTablerIconProps,
 );
 
