@@ -4024,7 +4024,13 @@ class App extends React.Component<AppProps, AppState> {
             event.pointerType,
           );
         if (elementWithTransformHandleType != null) {
-          if (this.state.croppingModeEnabled) {
+          if (elementWithTransformHandleType.transformHandleType == "rotation") {
+            this.setState({
+              resizingElement: elementWithTransformHandleType.element,
+            });
+            pointerDownState.resize.handleType =
+              elementWithTransformHandleType.transformHandleType;
+          } else if (this.state.croppingModeEnabled) {
             this.setState({
               croppingElement: elementWithTransformHandleType.element
             })
@@ -4072,19 +4078,16 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements[0],
           );
         }
-      } if (pointerDownState.crop.handleType) {
+      } else if (pointerDownState.crop.handleType) {
         pointerDownState.crop.isCropping = true;
         pointerDownState.crop.offset = tupleToCoors(
           getResizeOffsetXY(
-            pointerDownState.resize.handleType,
+            pointerDownState.crop.handleType,
             selectedElements,
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           ),
         );
-        // will need to do more stuff here, probably copy a lot from
-        // resize, but i'm not sure yet and i dont want to just
-        // randomly copy paste
       } else {
         if (this.state.selectedLinearElement) {
           const linearElementEditor =
@@ -4623,18 +4626,18 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (pointerDownState.crop.isCropping) {
-        pointerDownState.lastCoords.x = pointerCoords.x;
-        pointerDownState.lastCoords.y = pointerCoords.y;
-        if (this.maybeHandleCrop(pointerDownState, event)) {
-          return true;
-        }
-      }
-
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         if (this.maybeHandleResize(pointerDownState, event)) {
+          return true;
+        }
+      }
+
+      if (pointerDownState.crop.isCropping) {
+        pointerDownState.lastCoords.x = pointerCoords.x;
+        pointerDownState.lastCoords.y = pointerCoords.y;
+        if (this.maybeHandleCrop(pointerDownState, event)) {
           return true;
         }
       }
@@ -6345,7 +6348,7 @@ class App extends React.Component<AppProps, AppState> {
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
     if (pointerDownState.crop.complete) {
-      return true;
+      return false;
     }
     const selectedElements = getSelectedElements(
       this.scene.getNonDeletedElements(),
@@ -6383,6 +6386,7 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.getNonDeletedElements(),
       this.state,
     );
+
     const transformHandleType = pointerDownState.resize.handleType;
     this.setState({
       // TODO: rename this state field to "isScaling" to distinguish
@@ -6397,6 +6401,7 @@ class App extends React.Component<AppProps, AppState> {
       pointerCoords.y - pointerDownState.resize.offset.y,
       this.state.gridSize,
     );
+    
     if (
       transformElements(
         pointerDownState,

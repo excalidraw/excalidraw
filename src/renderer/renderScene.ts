@@ -60,6 +60,7 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
+import { isCroppingModeEnabled } from "../actions/actionCropImage";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -635,7 +636,13 @@ export const _renderScene = ({
           OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
         );
         if (locallySelectedElements.some((element) => !element.locked)) {
-          renderTransformHandles(context, renderConfig, transformHandles, 0);
+          renderTransformHandles(
+            context, 
+            renderConfig, 
+            transformHandles, 
+            0, 
+            appState.croppingModeEnabled
+          );
         }
       }
       context.restore();
@@ -841,6 +848,7 @@ const renderTransformHandles = (
   renderConfig: RenderConfig,
   transformHandles: TransformHandles,
   angle: number,
+  cropModeEnabled: boolean = false
 ): void => {
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];
@@ -852,15 +860,23 @@ const renderTransformHandles = (
       if (renderConfig.selectionColor) {
         context.strokeStyle = renderConfig.selectionColor;
       }
+
       if (key === "rotation") {
+        context.fillStyle = oc.white;
         fillCircle(context, x + width / 2, y + height / 2, width / 2);
         // prefer round corners if roundRect API is available
       } else if (context.roundRect) {
+        if (isCroppingModeEnabled()) {
+          context.fillStyle = "#228be6";
+        }
         context.beginPath();
         context.roundRect(x, y, width, height, 2 / renderConfig.zoom.value);
         context.fill();
         context.stroke();
       } else {
+        if (isCroppingModeEnabled()) {
+          context.fillStyle = "#228be6";
+        }
         strokeRectWithRotation(
           context,
           x,

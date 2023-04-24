@@ -14,13 +14,19 @@ import { isBoundToContainer } from "../element/typeChecks";
 import { updateActiveTool } from "../utils";
 import { CropIcon } from "../components/icons";
 
+let croppingModeEnabled: boolean;
+
+export const isCroppingModeEnabled = () => croppingModeEnabled;
+
 export const actionCropImage = register({
   name: "cropImage",
   trackEvent: { category: "element", action: "crop" },
   perform: (elements, appState) => {
+    croppingModeEnabled = ! appState.croppingModeEnabled;
+    
     const nextAppState = {
       ...appState,
-      croppingModeEnabled: ! appState.croppingModeEnabled
+      croppingModeEnabled: croppingModeEnabled
     }
 
     // i don't know how any of this works yet, just copied from

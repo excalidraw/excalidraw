@@ -170,12 +170,12 @@ export const getTransformHandlesFromCoords = (
 
   let adjustedHandleWidth = handleWidth;
   if (inCropMode) {
-    adjustedHandleWidth *= 4;
+    adjustedHandleWidth *= 1; //4;
   }
 
   let adjustedHandleHeight = handleHeight;
   if (inCropMode) {
-    adjustedHandleHeight *= 4;
+    adjustedHandleHeight *= 1; //;
   }
 
   if (Math.abs(width) > minimumSizeForEightHandles) {

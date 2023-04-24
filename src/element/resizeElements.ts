@@ -628,31 +628,14 @@ const updateInternalScale = (
     return;
   }
 
+  scaleX = Math.abs(scaleX);
+  scaleY = Math.abs(scaleY);
+
   mutateElement(element, {
     rescaleX: element.rescaleX * scaleX,
     rescaleY: element.rescaleY * scaleY
   })
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
