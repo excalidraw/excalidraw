@@ -4605,15 +4605,23 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           const dragOffset = {
-            x: pointerCoords.x - pointerDownState.origin.x,
-            y: pointerCoords.y - pointerDownState.origin.y,
+            // from pointer down origin
+            total: {
+              x: pointerCoords.x - pointerDownState.origin.x,
+              y: pointerCoords.y - pointerDownState.origin.y,
+            },
+            // from last pointer move
+            relative: {
+              x: pointerCoords.x - pointerDownState.lastCoords.x,
+              y: pointerCoords.y - pointerDownState.lastCoords.y,
+            },
           };
 
           const snaps = getSnaps({
             elements: [...pointerDownState.originalElements.values()],
             appState: this.state,
             event,
-            dragOffset,
+            dragOffset: dragOffset.total,
           });
           this.setState({ snaps });
 
@@ -4691,6 +4699,9 @@ class App extends React.Component<AppProps, AppState> {
             );
             this.scene.replaceAllElements(nextSceneElements);
           }
+
+          pointerDownState.lastCoords.x = pointerCoords.x;
+          pointerDownState.lastCoords.y = pointerCoords.y;
           return;
         }
       }
