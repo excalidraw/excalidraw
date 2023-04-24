@@ -160,6 +160,7 @@ export type AppState = {
   isResizing: boolean;
   isRotating: boolean;
   isCropping: boolean;
+  croppingModeEnabled: boolean;
   zoom: Zoom;
   // mobile-only
   openMenu: "canvas" | "shape" | null;

@@ -4024,7 +4024,7 @@ class App extends React.Component<AppProps, AppState> {
             event.pointerType,
           );
         if (elementWithTransformHandleType != null) {
-          if (event.ctrlKey) {
+          if (this.state.croppingModeEnabled) {
             this.setState({
               croppingElement: elementWithTransformHandleType.element
             })

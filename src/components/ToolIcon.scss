@@ -97,6 +97,22 @@
       }
     }
 
+    &.ToolIcon--activated {
+      background-color: var(--focus-highlight-color);
+
+      &:hover {
+        background-color: var(--focus-highlight-color-hover);
+      }
+
+      .ToolIcon__icon {
+        g {
+          line {
+            stroke: black;
+          }
+        }
+      }
+    }
+
     // &:hover {
     //   background-color: var(--button-gray-2);
     // }

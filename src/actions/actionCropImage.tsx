@@ -18,12 +18,17 @@ export const actionCropImage = register({
   name: "cropImage",
   trackEvent: { category: "element", action: "crop" },
   perform: (elements, appState) => {
-    console.log("Crop!");
+    const nextAppState = {
+      ...appState,
+      croppingModeEnabled: ! appState.croppingModeEnabled
+    }
 
+    // i don't know how any of this works yet, just copied from
+    // the delete button
     return {
       elements: elements,
       appState: {
-        ...appState,
+        ...nextAppState,
         activeTool: updateActiveTool(appState, { type: "selection" }),
         multiElement: null,
       },
@@ -44,6 +49,7 @@ export const actionCropImage = register({
       title={t("labels.crop")}
       aria-label={t("labels.crop")}
       onClick={() => updateData(null)}
+      activated={appState.croppingModeEnabled}
       visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
   ),
