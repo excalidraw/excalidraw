@@ -394,7 +394,8 @@ export const newImageElement = (
     xToPullFromImage: 0,
     yToPullFromImage: 0,
     wToPullFromImage: 0,
-    hToPullFromImage: 0
+    hToPullFromImage: 0,
+    rightSideCropAmount: 0
   };
 };
 

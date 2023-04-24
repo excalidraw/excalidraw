@@ -298,7 +298,7 @@ import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
-import { cropElement } from "../element/cropElement";
+import { cropElement, onElementCropped } from "../element/cropElement";
 
 const deviceContextInitialValue = {
   isSmScreen: false,
@@ -5059,6 +5059,20 @@ class App extends React.Component<AppProps, AppState> {
             : null,
       });
 
+      if (pointerDownState.crop.isCropping) {
+        const elementThatWasJustCropped = this.state.croppingElement as ExcalidrawImageElement;
+        if (elementThatWasJustCropped) {
+          const elementState = pointerDownState.originalElements.get(elementThatWasJustCropped.id);
+          if (elementState) {
+            onElementCropped(
+              elementThatWasJustCropped,
+              pointerDownState.crop.handleType,
+              elementState
+            );
+          }
+        }
+      }
+
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
       // Handle end of dragging a point of a linear element, might close a loop
@@ -5894,7 +5908,11 @@ class App extends React.Component<AppProps, AppState> {
         widthAtCreation: width,
         heightAtCreation: height,
         underlyingImageWidth: image.naturalWidth,
-        underlyingImageHeight: image.naturalHeight
+        underlyingImageHeight: image.naturalHeight,
+        xToPullFromImage: 0,
+        yToPullFromImage: 0,
+        wToPullFromImage: image.naturalWidth,
+        hToPullFromImage: image.naturalHeight
       });
     }
   };

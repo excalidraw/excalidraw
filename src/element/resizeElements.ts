@@ -326,6 +326,20 @@ const resizeSingleTextElement = (
   }
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const resizeSingleElement = (
   originalElements: PointerDownState["originalElements"],
   shouldMaintainAspectRatio: boolean,
@@ -596,6 +610,34 @@ export const resizeSingleElement = (
     handleBindTextResize(element, transformHandleDirection);
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const resizeMultipleElements = (
   pointerDownState: PointerDownState,

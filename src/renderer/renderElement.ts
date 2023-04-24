@@ -298,6 +298,10 @@ const drawElementOnCanvas = (
       if (img != null && !(img instanceof Promise)) {
         context.drawImage(
           img,
+          element.xToPullFromImage,
+          element.yToPullFromImage,
+          element.wToPullFromImage,
+          element.hToPullFromImage,
           0 /* hardcoded for the selection box*/,
           0,
           element.width,

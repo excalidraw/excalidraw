@@ -99,6 +99,7 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     yToPullFromImage: number;
     wToPullFromImage: number;
     hToPullFromImage: number;
+    rightSideCropAmount: number;
   }>;
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<
