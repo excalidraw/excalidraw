@@ -44,7 +44,6 @@ import {
   isBindingEnabled,
 } from "../element/binding";
 import {
-  adjustTransformHandlesForCropping,
   shouldShowBoundingBox,
   TransformHandles,
   TransformHandleType,
@@ -593,11 +592,12 @@ export const _renderScene = ({
           locallySelectedElements[0],
           renderConfig.zoom,
           "mouse", // when we render we don't know which pointer type so use mouse
+          appState.croppingModeEnabled
         );
         if (!appState.viewModeEnabled && showBoundingBox) {
-          if (appState.croppingModeEnabled) {
-            transformHandles = adjustTransformHandlesForCropping(transformHandles);
-          }
+          // if (appState.croppingModeEnabled) {
+          //   transformHandles = adjustTransformHandlesForCropping(transformHandles);
+          // }
           renderTransformHandles(
             context,
             renderConfig,

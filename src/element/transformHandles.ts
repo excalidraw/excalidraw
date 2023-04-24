@@ -87,6 +87,7 @@ export const getTransformHandlesFromCoords = (
   pointerType: PointerType,
   omitSides: { [T in TransformHandleType]?: boolean } = {},
   margin = 4,
+  inCropMode: boolean = false
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
   const handleWidth = size / zoom.value;
@@ -166,12 +167,23 @@ export const getTransformHandlesFromCoords = (
   // Note: we render using "mouse" size so we should also use "mouse" size for this check
   const minimumSizeForEightHandles =
     (5 * transformHandleSizes.mouse) / zoom.value;
+
+  let adjustedHandleWidth = handleWidth;
+  if (inCropMode) {
+    adjustedHandleWidth *= 4;
+  }
+
+  let adjustedHandleHeight = handleHeight;
+  if (inCropMode) {
+    adjustedHandleHeight *= 4;
+  }
+
   if (Math.abs(width) > minimumSizeForEightHandles) {
     if (!omitSides.n) {
       transformHandles.n = generateTransformHandle(
-        x1 + width / 2 - handleWidth / 2,
+        x1 + width / 2 - adjustedHandleWidth / 2,
         y1 - dashedLineMargin - handleMarginY + centeringOffset,
-        handleWidth,
+        adjustedHandleWidth,
         handleHeight,
         cx,
         cy,
@@ -180,9 +192,9 @@ export const getTransformHandlesFromCoords = (
     }
     if (!omitSides.s) {
       transformHandles.s = generateTransformHandle(
-        x1 + width / 2 - handleWidth / 2,
+        x1 + width / 2 - adjustedHandleWidth / 2,
         y2 + dashedLineMargin - centeringOffset,
-        handleWidth,
+        adjustedHandleWidth,
         handleHeight,
         cx,
         cy,
@@ -190,13 +202,14 @@ export const getTransformHandlesFromCoords = (
       );
     }
   }
+
   if (Math.abs(height) > minimumSizeForEightHandles) {
     if (!omitSides.w) {
       transformHandles.w = generateTransformHandle(
         x1 - dashedLineMargin - handleMarginX + centeringOffset,
-        y1 + height / 2 - handleHeight / 2,
+        y1 + height / 2 - adjustedHandleHeight / 2,
         handleWidth,
-        handleHeight,
+        adjustedHandleHeight,
         cx,
         cy,
         angle,
@@ -205,9 +218,9 @@ export const getTransformHandlesFromCoords = (
     if (!omitSides.e) {
       transformHandles.e = generateTransformHandle(
         x2 + dashedLineMargin - centeringOffset,
-        y1 + height / 2 - handleHeight / 2,
+        y1 + height / 2 - adjustedHandleHeight / 2,
         handleWidth,
-        handleHeight,
+        adjustedHandleHeight,
         cx,
         cy,
         angle,
@@ -218,48 +231,11 @@ export const getTransformHandlesFromCoords = (
   return transformHandles;
 };
 
-export const adjustTransformHandlesForCropping = (
-  transformHandles: TransformHandles
-): TransformHandles => {
-  if (! transformHandles) {
-    return transformHandles;
-  }
-
-  let north = transformHandles.n;
-  if (north) {
-    let originalWidth = north[2];
-    let width = originalWidth * 4;
-    north[0] = north[0] - ((width - originalWidth) / 2);
-    north[2] = width;
-
-    let south = transformHandles.s;
-    if (south) {
-      south[0] = north[0];
-      south[2] = north[2];
-    }
-  }
-
-  let east = transformHandles.e;
-  if (east) {
-    let originalWidth = east[3];
-    let width = originalWidth * 4;
-    east[1] = east[1] - ((width - originalWidth) / 2);
-    east[3] = width;
-
-    let west = transformHandles.w;
-    if (west) {
-      west[1] = east[1];
-      west[3] = east[3];
-    }
-  }
-
-  return transformHandles;
-}
-
 export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: Zoom,
   pointerType: PointerType = "mouse",
+  inCropMode: boolean = false
 ): TransformHandles => {
   // so that when locked element is selected (especially when you toggle lock
   // via keyboard) the locked element is visually distinct, indicating
@@ -298,6 +274,7 @@ export const getTransformHandles = (
     pointerType,
     omitSides,
     dashedLineMargin,
+    inCropMode
   );
 };
 

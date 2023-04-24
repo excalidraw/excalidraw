@@ -37,7 +37,7 @@ export const resizeTest = (
   }
 
   const { rotation: rotationTransformHandle, ...transformHandles } =
-    getTransformHandles(element, zoom, pointerType);
+    getTransformHandles(element, zoom, pointerType, appState.croppingModeEnabled);
 
   if (
     rotationTransformHandle &&
@@ -82,6 +82,7 @@ export const getElementWithTransformHandleType = (
       zoom,
       pointerType,
     );
+
     return transformHandleType ? { element, transformHandleType } : null;
   }, null as { element: NonDeletedExcalidrawElement; transformHandleType: MaybeTransformHandleType } | null);
 };
