@@ -2437,6 +2437,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
           {
             includeBoundTextElement: true,
+            includeElementsInFrames: true,
           },
         );
 
