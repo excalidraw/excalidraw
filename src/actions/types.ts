@@ -115,7 +115,8 @@ export type ActionName =
   | "toggleLinearEditor"
   | "toggleEraserTool"
   | "toggleHandTool"
-  | "wrapTextInContainer";
+  | "wrapTextInContainer"
+  | "cropImage";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

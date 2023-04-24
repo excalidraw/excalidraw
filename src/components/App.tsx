@@ -17,6 +17,7 @@ import {
   actionCopyStyles,
   actionCut,
   actionDeleteSelected,
+  actionCropImage,
   actionDuplicateSelection,
   actionFinalize,
   actionFlipHorizontal,
