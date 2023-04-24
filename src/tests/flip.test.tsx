@@ -1,5 +1,10 @@
 import ReactDOM from "react-dom";
-import { GlobalTestState, render, waitFor } from "./test-utils";
+import {
+  createPasteEvent,
+  GlobalTestState,
+  render,
+  waitFor,
+} from "./test-utils";
 import { UI, Pointer } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
@@ -680,19 +685,7 @@ describe("freedraw", () => {
 describe("image", () => {
   const createImage = async () => {
     const sendPasteEvent = (file?: File) => {
-      const clipboardEvent = new Event("paste", {
-        bubbles: true,
-        cancelable: true,
-        composed: true,
-      });
-
-      // set `clipboardData` properties.
-      // @ts-ignore
-      clipboardEvent.clipboardData = {
-        getData: () => window.navigator.clipboard.readText(),
-        files: [file],
-      };
-
+      const clipboardEvent = createPasteEvent("", file ? [file] : []);
       document.dispatchEvent(clipboardEvent);
     };
 
