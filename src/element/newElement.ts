@@ -33,7 +33,7 @@ import {
   measureText,
   normalizeText,
   wrapText,
-  getMaxContainerWidth,
+  getBoundTextMaxWidth,
   getDefaultLineHeight,
 } from "./textElement";
 import {
@@ -310,7 +310,7 @@ export const refreshTextDimensions = (
     text = wrapText(
       text,
       getFontString(textElement),
-      getMaxContainerWidth(container),
+      getBoundTextMaxWidth(container),
     );
   }
   const dimensions = getAdjustedDimensions(textElement, text);
