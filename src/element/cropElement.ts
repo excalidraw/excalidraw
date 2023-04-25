@@ -6,8 +6,7 @@ import { MaybeTransformHandleType, TransformHandleType } from "./transformHandle
 import { ExcalidrawElement, ExcalidrawImageElement, NonDeleted } from "./types";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 
-
-export function cropElement(    
+function cropInternal(
 	element: ExcalidrawImageElement,
 	transformHandle: TransformHandleType,
 	stateAtCropStart: NonDeleted<ExcalidrawElement>,
@@ -89,7 +88,7 @@ export function cropElement(
 
 	const newOrigin = recomputeOrigin(stateAtCropStart, transformHandle, mutatedWidth, mutatedHeight);
 
-	mutateElement(element, {
+	return {
 		x: newOrigin[0],
 		y: newOrigin[1],
 		width: mutatedWidth,
@@ -98,7 +97,26 @@ export function cropElement(
 		yToPullFromImage: yToPullFromImage,
 		wToPullFromImage: wToPullFromImage,
 		hToPullFromImage: hToPullFromImage
-	})
+	}
+}
+
+
+export function cropElement(    
+	element: ExcalidrawImageElement,
+	transformHandle: TransformHandleType,
+	stateAtCropStart: NonDeleted<ExcalidrawElement>,
+	pointerX: number,
+	pointerY: number
+) {
+	const mutation = cropInternal(
+		element,
+		transformHandle,
+		stateAtCropStart,
+		pointerX,
+		pointerY
+	)
+
+	mutateElement(element, mutation)
 
 	// resize does this, but i don't know what it does, so i'm leaving it out for now
 	// updateBoundElements(element, {
