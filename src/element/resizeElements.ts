@@ -628,6 +628,16 @@ const updateInternalScale = (
     return;
   }
 
+  // if the scales happen to be 0 (which is insanely unlikely), it will
+  // zero out the rolling multiplier and cause weird bugs with cropping.
+  // if zero is detected, just set the scales to an obnoxiously small number
+  if (scaleX == 0) {
+    scaleX = Number.EPSILON;
+  }
+  if (scaleY == 0) {
+    scaleY = Number.EPSILON;
+  }
+
   scaleX = Math.abs(scaleX);
   scaleY = Math.abs(scaleY);
 

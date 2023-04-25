@@ -233,6 +233,8 @@ const restoreElement = (
         hToPullFromImage: element.hToPullFromImage,
         leftSideCropAmount: element.leftSideCropAmount,
         rightSideCropAmount: element.rightSideCropAmount,
+        topCropAmount: element.topCropAmount,
+        bottomCropAmount: element.bottomCropAmount,
         rescaleX: element.rescaleX,
         rescaleY: element.rescaleY,
       });

@@ -60,7 +60,6 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
-import { isCroppingModeEnabled } from "../actions/actionCropImage";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -604,6 +603,7 @@ export const _renderScene = ({
             renderConfig,
             transformHandles,
             locallySelectedElements[0].angle,
+            appState.croppingModeEnabled
           );
         }
       } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
@@ -866,7 +866,7 @@ const renderTransformHandles = (
         fillCircle(context, x + width / 2, y + height / 2, width / 2);
         // prefer round corners if roundRect API is available
       } else if (context.roundRect) {
-        if (isCroppingModeEnabled()) {
+        if (cropModeEnabled) {
           context.fillStyle = "#228be6";
         }
         context.beginPath();
@@ -874,7 +874,7 @@ const renderTransformHandles = (
         context.fill();
         context.stroke();
       } else {
-        if (isCroppingModeEnabled()) {
+        if (cropModeEnabled) {
           context.fillStyle = "#228be6";
         }
         strokeRectWithRotation(

@@ -108,6 +108,8 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
 
     leftSideCropAmount: number;
     rightSideCropAmount: number;
+    topCropAmount: number;
+    bottomCropAmount: number;
   }>;
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<

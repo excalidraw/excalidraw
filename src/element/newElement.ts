@@ -397,6 +397,8 @@ export const newImageElement = (
     hToPullFromImage: 0,
     leftSideCropAmount: 0,
     rightSideCropAmount: 0,
+    topCropAmount: 0,
+    bottomCropAmount: 0,
     rescaleX: 1,
     rescaleY: 1,
   };

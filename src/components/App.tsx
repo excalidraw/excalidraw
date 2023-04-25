@@ -5054,6 +5054,7 @@ class App extends React.Component<AppProps, AppState> {
         activeTool,
         isResizing,
         isRotating,
+        isCropping
       } = this.state;
       this.setState({
         isResizing: false,
@@ -5081,11 +5082,10 @@ class App extends React.Component<AppProps, AppState> {
                 pointerDownState.crop.handleType,
                 elementState
               );
+              pointerDownState.crop.complete = true;
             }
           }
         }
-
-        pointerDownState.crop.complete = true;
       }
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
@@ -5536,7 +5536,7 @@ class App extends React.Component<AppProps, AppState> {
         this.history.resumeRecording();
       }
 
-      if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
+      if (pointerDownState.drag.hasOccurred || isResizing || isRotating || isCropping) {
         (isBindingEnabled(this.state)
           ? bindOrUnbindSelectedElements
           : unbindLinearElements)(
