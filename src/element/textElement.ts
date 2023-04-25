@@ -83,41 +83,28 @@ export const redrawTextBoundingBox = (
   boundTextUpdates.baseline = metrics.baseline;
 
   if (container) {
-    if (isArrowElement(container)) {
-      const centerX = textElement.x + textElement.width / 2;
-      const centerY = textElement.y + textElement.height / 2;
-      const diffWidth = metrics.width - textElement.width;
-      const diffHeight = metrics.height - textElement.height;
-      boundTextUpdates.x = centerY - (textElement.height + diffHeight) / 2;
-      boundTextUpdates.y = centerX - (textElement.width + diffWidth) / 2;
-    } else {
-      const containerDims = getContainerDims(container);
-      let maxContainerHeight = getBoundTextMaxHeight(
-        container,
-        textElement as ExcalidrawTextElementWithContainer,
-      );
+    const containerDims = getContainerDims(container);
+    const maxContainerHeight = getBoundTextMaxHeight(
+      container,
+      textElement as ExcalidrawTextElementWithContainer,
+    );
 
-      let nextHeight = containerDims.height;
-      if (metrics.height > maxContainerHeight) {
-        nextHeight = computeContainerDimensionForBoundText(
-          metrics.height,
-          container.type,
-        );
-        mutateElement(container, { height: nextHeight });
-        maxContainerHeight = getBoundTextMaxHeight(
-          container,
-          textElement as ExcalidrawTextElementWithContainer,
-        );
-        updateOriginalContainerCache(container.id, nextHeight);
-      }
-      const updatedTextElement = {
-        ...textElement,
-        ...boundTextUpdates,
-      } as ExcalidrawTextElementWithContainer;
-      const { x, y } = computeBoundTextPosition(container, updatedTextElement);
-      boundTextUpdates.x = x;
-      boundTextUpdates.y = y;
+    let nextHeight = containerDims.height;
+    if (metrics.height > maxContainerHeight) {
+      nextHeight = computeContainerDimensionForBoundText(
+        metrics.height,
+        container.type,
+      );
+      mutateElement(container, { height: nextHeight });
+      updateOriginalContainerCache(container.id, nextHeight);
     }
+    const updatedTextElement = {
+      ...textElement,
+      ...boundTextUpdates,
+    } as ExcalidrawTextElementWithContainer;
+    const { x, y } = computeBoundTextPosition(container, updatedTextElement);
+    boundTextUpdates.x = x;
+    boundTextUpdates.y = y;
   }
 
   mutateElement(textElement, boundTextUpdates);
