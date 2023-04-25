@@ -84,7 +84,7 @@ export const redrawTextBoundingBox = (
 
   if (container) {
     const containerDims = getContainerDims(container);
-    let maxContainerHeight = getMaxContainerHeight(container);
+    const maxContainerHeight = getMaxContainerHeight(container);
 
     let nextHeight = containerDims.height;
     if (metrics.height > maxContainerHeight) {
@@ -93,7 +93,6 @@ export const redrawTextBoundingBox = (
         container.type,
       );
       mutateElement(container, { height: nextHeight });
-      maxContainerHeight = getMaxContainerHeight(container);
       updateOriginalContainerCache(container.id, nextHeight);
     }
     const updatedTextElement = {
