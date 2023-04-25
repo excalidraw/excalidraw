@@ -369,6 +369,27 @@ describe("Test measureText", () => {
       const container = API.createElement({ type: "diamond", ...params });
       expect(getBoundTextMaxHeight(container, boundTextElement)).toBe(87);
     });
+
+    it("should return max height when container is arrow", () => {
+      const container = API.createElement({
+        type: "arrow",
+        ...params,
+      });
+      expect(getBoundTextMaxHeight(container, boundTextElement)).toBe(194);
+    });
+
+    it("should return max height when container is arrow and height is less than threshold", () => {
+      const container = API.createElement({
+        type: "arrow",
+        ...params,
+        height: 70,
+        boundElements: [{ type: "text", id: "text-id" }],
+      });
+
+      expect(getBoundTextMaxHeight(container, boundTextElement)).toBe(
+        boundTextElement.height,
+      );
+    });
   });
 });
 
