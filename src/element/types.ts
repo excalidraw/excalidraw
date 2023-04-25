@@ -106,10 +106,10 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     wToPullFromImage: number;
     hToPullFromImage: number;
 
-    leftSideCropAmount: number;
-    rightSideCropAmount: number;
-    topCropAmount: number;
-    bottomCropAmount: number;
+    westCropAmount: number;
+    eastCropAmount: number;
+    northCropAmount: number;
+    southCropAmount: number;
   }>;
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<

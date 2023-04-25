@@ -16,10 +16,10 @@ export function cropElement(
 ) {
 	const maxWidth = element.widthAtCreation * element.rescaleX;
 	const maxHeight = element.heightAtCreation * element.rescaleY;
-	const eastCropAmount = element.rightSideCropAmount * element.rescaleX;
-	const westCropAmount = element.leftSideCropAmount * element.rescaleX;
-	const northCropAmount = element.topCropAmount * element.rescaleY;
-	const southCropAmount = element.bottomCropAmount * element.rescaleY;
+	const eastCropAmount = element.eastCropAmount * element.rescaleX;
+	const westCropAmount = element.westCropAmount * element.rescaleX;
+	const northCropAmount = element.northCropAmount * element.rescaleY;
+	const southCropAmount = element.southCropAmount * element.rescaleY;
 
 	const availableSpaceToCropNorth = (maxHeight - southCropAmount) - stateAtCropStart.height;
 	const availableSpaceToCropWest = (maxWidth - eastCropAmount) - stateAtCropStart.width;
@@ -33,8 +33,6 @@ export function cropElement(
 	pointerX = rotatedPointer[0];
 	pointerY = rotatedPointer[1];
 
-	let mutatedX = element.x;
-	let mutatedY = element.y;
 	let mutatedWidth = element.width;
 	let mutatedHeight = element.height;
 	let xToPullFromImage = element.xToPullFromImage;
@@ -42,73 +40,65 @@ export function cropElement(
 	let wToPullFromImage = element.wToPullFromImage;
 	let hToPullFromImage = element.hToPullFromImage;
 
-	if (transformHandle == 'n') {
+	if (transformHandle.includes('n')) {
 		const northBound = stateAtCropStart.y - availableSpaceToCropNorth;
 		const southBound = stateAtCropStart.y + stateAtCropStart.height;
 
 		pointerY = clamp(pointerY, northBound, southBound);
 
 		const verticalMouseMovement = pointerY - stateAtCropStart.y;
-		const newHeight = stateAtCropStart.height - verticalMouseMovement;
+		mutatedHeight = stateAtCropStart.height - verticalMouseMovement;
 		const portionOfTopSideCropped = (verticalMouseMovement + northCropAmount) / maxHeight;
-		const newOrigin = recomputeOrigin(stateAtCropStart, transformHandle, element.width, newHeight);
 
-		mutateElement(element, {
-			x: newOrigin[0],
-			y: newOrigin[1],
-			height: newHeight,
-			yToPullFromImage: portionOfTopSideCropped * element.underlyingImageHeight,
-			hToPullFromImage: (newHeight / maxHeight) * element.underlyingImageHeight
-		})
-	} else if (transformHandle == 's') {
+		yToPullFromImage = portionOfTopSideCropped * element.underlyingImageHeight;
+		hToPullFromImage = (mutatedHeight / maxHeight) * element.underlyingImageHeight;
+	}
+	
+	if (transformHandle.includes('s')) {
 		const northBound = stateAtCropStart.y;
 		const southBound = stateAtCropStart.y + (maxHeight - northCropAmount);
 
 		pointerY = clamp(pointerY, northBound, southBound);
 
-		const newHeight = pointerY - stateAtCropStart.y;
-		const newOrigin = recomputeOrigin(stateAtCropStart, transformHandle, element.width, newHeight);
-
-		mutateElement(element, {
-			x: newOrigin[0],
-			y: newOrigin[1],
-			height: newHeight,
-			hToPullFromImage: (newHeight / maxHeight) * element.underlyingImageHeight
-		})
-	} else if (transformHandle == 'w') {
+		mutatedHeight = pointerY - stateAtCropStart.y;
+		hToPullFromImage = (mutatedHeight / maxHeight) * element.underlyingImageHeight;
+	}
+	
+	if (transformHandle.includes('w')) {
 		const eastBound = stateAtCropStart.x + stateAtCropStart.width;
 		const westBound = stateAtCropStart.x - availableSpaceToCropWest;
 
 		pointerX = clamp(pointerX, westBound, eastBound);
 	
 		const horizontalMouseMovement = pointerX - stateAtCropStart.x;
-		const newWidth = stateAtCropStart.width - horizontalMouseMovement;
+		mutatedWidth = stateAtCropStart.width - horizontalMouseMovement;
 		const portionOfLeftSideCropped = (horizontalMouseMovement + westCropAmount) / maxWidth;
-		const newOrigin = recomputeOrigin(stateAtCropStart, transformHandle, newWidth, element.height);
-
-		mutateElement(element, {
-			x: newOrigin[0],
-			y: newOrigin[1],
-			width: newWidth,
-			xToPullFromImage: portionOfLeftSideCropped * element.underlyingImageWidth,
-			wToPullFromImage: (newWidth / maxWidth) * element.underlyingImageWidth
-		})
-	} else if (transformHandle == 'e') {
+		xToPullFromImage = portionOfLeftSideCropped * element.underlyingImageWidth;
+		wToPullFromImage = (mutatedWidth / maxWidth) * element.underlyingImageWidth;
+	}
+	
+	if (transformHandle.includes('e')) {
 		const eastBound = stateAtCropStart.x + (maxWidth - westCropAmount);
 		const westBound = stateAtCropStart.x;
 
 		pointerX = clamp(pointerX, westBound, eastBound);
 
-		const newWidth = pointerX - stateAtCropStart.x;
-		const newOrigin = recomputeOrigin(stateAtCropStart, transformHandle, newWidth, element.height);
-
-		mutateElement(element, {
-			x: newOrigin[0],
-			y: newOrigin[1],
-			width: newWidth,
-			wToPullFromImage: (newWidth / maxWidth) * element.underlyingImageWidth
-		})
+		mutatedWidth = pointerX - stateAtCropStart.x;
+		wToPullFromImage = (mutatedWidth / maxWidth) * element.underlyingImageWidth;
 	}
+
+	const newOrigin = recomputeOrigin(stateAtCropStart, transformHandle, mutatedWidth, mutatedHeight);
+
+	mutateElement(element, {
+		x: newOrigin[0],
+		y: newOrigin[1],
+		width: mutatedWidth,
+		height: mutatedHeight,
+		xToPullFromImage: xToPullFromImage,
+		yToPullFromImage: yToPullFromImage,
+		wToPullFromImage: wToPullFromImage,
+		hToPullFromImage: hToPullFromImage
+	})
 
 	// resize does this, but i don't know what it does, so i'm leaving it out for now
 	// updateBoundElements(element, {
@@ -197,28 +187,34 @@ export function onElementCropped(
 	handleType: TransformHandleType,
 	stateAtCropStart: NonDeleted<ExcalidrawElement>
 ) {
-	let unscaledWidth = element.width / element.rescaleX;
-	let unscaledHeight = element.height / element.rescaleY;
+	const unscaledWidth = element.width / element.rescaleX;
+	const unscaledHeight = element.height / element.rescaleY;
 
-	if (handleType == 'n') {
-		let topSideCropAmount = element.heightAtCreation - unscaledHeight - element.bottomCropAmount;
-		mutateElement(element, {
-			topCropAmount: topSideCropAmount
-		})
-	} else if (handleType == 's') {
-		let bottomSideCropAmount = element.heightAtCreation - unscaledHeight - element.topCropAmount;
-		mutateElement(element, {
-			bottomCropAmount: bottomSideCropAmount
-		})
-	} else if (handleType == 'w') {
-		let leftSideCropAmount = element.widthAtCreation - unscaledWidth - element.rightSideCropAmount;
-		mutateElement(element, {
-			leftSideCropAmount: leftSideCropAmount
-		})
-	} else if (handleType == 'e') {
-		let rightSideCropAmount = element.widthAtCreation - unscaledWidth - element.leftSideCropAmount;
-		mutateElement(element, {
-			rightSideCropAmount: rightSideCropAmount
-		})
+	let topCropAmount = element.northCropAmount;
+	let botCropAmount = element.southCropAmount;
+	let leftCropAmount = element.westCropAmount;
+	let rightCropAmount = element.eastCropAmount;
+
+	if (handleType.includes('n')) {
+		topCropAmount = element.heightAtCreation - unscaledHeight - element.southCropAmount;
+	} 
+	
+	if (handleType.includes('s')) {
+		botCropAmount = element.heightAtCreation - unscaledHeight - element.northCropAmount;
+	} 
+	
+	if (handleType.includes('w')) {
+		leftCropAmount = element.widthAtCreation - unscaledWidth - element.eastCropAmount;
+	} 
+	
+	if (handleType.includes('e')) {
+		rightCropAmount = element.widthAtCreation - unscaledWidth - element.westCropAmount;
 	}
+
+	mutateElement(element, {
+		northCropAmount: topCropAmount,
+		southCropAmount: botCropAmount,
+		westCropAmount: leftCropAmount,
+		eastCropAmount: rightCropAmount
+	})
 }
