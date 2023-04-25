@@ -436,7 +436,7 @@ export const resizeSingleElement = (
       const nextFont = measureFontSizeFromWidth(
         boundTextElement,
         getMaxContainerWidth(updatedElement),
-        getMaxContainerHeight(updatedElement),
+        getMaxContainerHeight(updatedElement, boundTextElement),
       );
       if (nextFont === null) {
         return;
@@ -721,7 +721,7 @@ const resizeMultipleElements = (
           ? getMaxContainerWidth(updatedElement)
           : updatedElement.width,
         boundTextElement
-          ? getMaxContainerHeight(updatedElement)
+          ? getMaxContainerHeight(updatedElement, boundTextElement)
           : updatedElement.height,
       );
 

@@ -11,7 +11,7 @@ import {
   getDefaultLineHeight,
   parseTokens,
 } from "./textElement";
-import { FontString } from "./types";
+import { ExcalidrawTextElementWithContainer, FontString } from "./types";
 
 describe("Test wrapText", () => {
   const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
@@ -337,21 +337,37 @@ describe("Test measureText", () => {
     const params = {
       width: 178,
       height: 194,
+      id: '"container-id',
     };
+
+    const boundTextElement = API.createElement({
+      type: "text",
+      id: "text-id",
+      x: 560.51171875,
+      y: 202.033203125,
+      width: 154,
+      height: 175,
+      fontSize: 20,
+      fontFamily: 1,
+      text: "Excalidraw is a\nvirtual \nopensource \nwhiteboard for \nsketching \nhand-drawn like\ndiagrams",
+      textAlign: "center",
+      verticalAlign: "middle",
+      containerId: params.id,
+    }) as ExcalidrawTextElementWithContainer;
 
     it("should return max height when container is rectangle", () => {
       const container = API.createElement({ type: "rectangle", ...params });
-      expect(getMaxContainerHeight(container)).toBe(184);
+      expect(getMaxContainerHeight(container, boundTextElement)).toBe(184);
     });
 
     it("should return max height when container is ellipse", () => {
       const container = API.createElement({ type: "ellipse", ...params });
-      expect(getMaxContainerHeight(container)).toBe(127);
+      expect(getMaxContainerHeight(container, boundTextElement)).toBe(127);
     });
 
     it("should return max height when container is diamond", () => {
       const container = API.createElement({ type: "diamond", ...params });
-      expect(getMaxContainerHeight(container)).toBe(87);
+      expect(getMaxContainerHeight(container, boundTextElement)).toBe(87);
     });
   });
 });

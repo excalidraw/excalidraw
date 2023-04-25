@@ -868,6 +868,9 @@ const drawElementFromCanvas = (
         "true" &&
       hasBoundTextElement(element)
     ) {
+      const textElement = getBoundTextElement(
+        element,
+      ) as ExcalidrawTextElementWithContainer;
       const coords = getContainerCoords(element);
       context.strokeStyle = "#c92a2a";
       context.lineWidth = 3;
@@ -875,7 +878,7 @@ const drawElementFromCanvas = (
         (coords.x + renderConfig.scrollX) * window.devicePixelRatio,
         (coords.y + renderConfig.scrollY) * window.devicePixelRatio,
         getMaxContainerWidth(element) * window.devicePixelRatio,
-        getMaxContainerHeight(element) * window.devicePixelRatio,
+        getMaxContainerHeight(element, textElement) * window.devicePixelRatio,
       );
     }
   }
