@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isSafari, VERTICAL_ALIGN } from "../constants";
+import { CLASSES, isSafari } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -23,12 +23,10 @@ import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
   getBoundTextElementId,
-  getContainerCoords,
   getContainerDims,
   getContainerElement,
   getTextElementAngle,
   getTextWidth,
-  measureText,
   normalizeText,
   redrawTextBoundingBox,
   wrapText,
