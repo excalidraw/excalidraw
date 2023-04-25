@@ -4015,6 +4015,9 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
+    this.setState({
+      croppingModeEnabled: false
+    })
     if (this.state.activeTool.type === "selection") {
       const elements = this.scene.getNonDeletedElements();
       const selectedElements = getSelectedElements(elements, this.state);
@@ -4037,6 +4040,7 @@ class App extends React.Component<AppProps, AppState> {
               elementWithTransformHandleType.transformHandleType;
           } else if (this.state.croppingModeEnabled) {
             this.setState({
+              croppingModeEnabled: true,
               croppingElement: elementWithTransformHandleType.element
             })
             pointerDownState.crop.handleType = elementWithTransformHandleType.transformHandleType
