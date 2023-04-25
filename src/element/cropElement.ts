@@ -16,10 +16,13 @@ export function cropElement(
 ) {
 	const maxWidth = element.widthAtCreation * element.rescaleX;
 	const maxHeight = element.heightAtCreation * element.rescaleY;
-	const amountAlreadyCroppedOnRightSide = element.rightSideCropAmount * element.rescaleX;
-	const amountAlreadyCroppedOnLeftSide = element.leftSideCropAmount * element.rescaleX;
-	const amountAlreadyCroppedOnTopSide = element.topCropAmount * element.rescaleY;
-	const amountAlreadyCroppedOnBottomSide = element.bottomCropAmount * element.rescaleY;
+	const eastCropAmount = element.rightSideCropAmount * element.rescaleX;
+	const westCropAmount = element.leftSideCropAmount * element.rescaleX;
+	const northCropAmount = element.topCropAmount * element.rescaleY;
+	const southCropAmount = element.bottomCropAmount * element.rescaleY;
+
+	const availableSpaceToCropNorth = (maxHeight - southCropAmount) - stateAtCropStart.height;
+	const availableSpaceToCropWest = (maxWidth - eastCropAmount) - stateAtCropStart.width;
 
 	const rotatedPointer = rotatePoint(
 		[pointerX, pointerY], 
@@ -30,16 +33,24 @@ export function cropElement(
 	pointerX = rotatedPointer[0];
 	pointerY = rotatedPointer[1];
 
-	if (transformHandle == 'n') {
-		const maxBottomY = stateAtCropStart.y + stateAtCropStart.height;
-		const availableSpaceToCropFurtherUp = (maxHeight - amountAlreadyCroppedOnBottomSide) - stateAtCropStart.height;
-		const maxUpperY = stateAtCropStart.y - availableSpaceToCropFurtherUp;
+	let mutatedX = element.x;
+	let mutatedY = element.y;
+	let mutatedWidth = element.width;
+	let mutatedHeight = element.height;
+	let xToPullFromImage = element.xToPullFromImage;
+	let yToPullFromImage = element.yToPullFromImage;
+	let wToPullFromImage = element.wToPullFromImage;
+	let hToPullFromImage = element.hToPullFromImage;
 
-		pointerY = clamp(pointerY, maxUpperY, maxBottomY);
+	if (transformHandle == 'n') {
+		const northBound = stateAtCropStart.y - availableSpaceToCropNorth;
+		const southBound = stateAtCropStart.y + stateAtCropStart.height;
+
+		pointerY = clamp(pointerY, northBound, southBound);
 
 		const verticalMouseMovement = pointerY - stateAtCropStart.y;
 		const newHeight = stateAtCropStart.height - verticalMouseMovement;
-		const portionOfTopSideCropped = (verticalMouseMovement + amountAlreadyCroppedOnTopSide) / maxHeight;
+		const portionOfTopSideCropped = (verticalMouseMovement + northCropAmount) / maxHeight;
 		const newOrigin = recomputeOrigin(stateAtCropStart, transformHandle, element.width, newHeight);
 
 		mutateElement(element, {
@@ -50,15 +61,10 @@ export function cropElement(
 			hToPullFromImage: (newHeight / maxHeight) * element.underlyingImageHeight
 		})
 	} else if (transformHandle == 's') {
-		const bottomBound = stateAtCropStart.y + (maxHeight - amountAlreadyCroppedOnTopSide);
+		const northBound = stateAtCropStart.y;
+		const southBound = stateAtCropStart.y + (maxHeight - northCropAmount);
 
-		if (pointerY < stateAtCropStart.y) {
-			pointerY = stateAtCropStart.y;
-		}
-
-		if (pointerY > bottomBound) {
-			pointerY = bottomBound;
-		}
+		pointerY = clamp(pointerY, northBound, southBound);
 
 		const newHeight = pointerY - stateAtCropStart.y;
 		const newOrigin = recomputeOrigin(stateAtCropStart, transformHandle, element.width, newHeight);
@@ -70,21 +76,14 @@ export function cropElement(
 			hToPullFromImage: (newHeight / maxHeight) * element.underlyingImageHeight
 		})
 	} else if (transformHandle == 'w') {
-		const maxRightX = stateAtCropStart.x + stateAtCropStart.width;
-		const availableSpaceToCropFurtherLeft = (maxWidth - amountAlreadyCroppedOnRightSide) - stateAtCropStart.width;
-		const maxLeftX = stateAtCropStart.x - availableSpaceToCropFurtherLeft;
+		const eastBound = stateAtCropStart.x + stateAtCropStart.width;
+		const westBound = stateAtCropStart.x - availableSpaceToCropWest;
 
-		if (pointerX < maxLeftX) {
-			pointerX = maxLeftX;
-		}
-		
-		if (pointerX > maxRightX) {
-			pointerX = maxRightX;
-		}
+		pointerX = clamp(pointerX, westBound, eastBound);
 	
 		const horizontalMouseMovement = pointerX - stateAtCropStart.x;
 		const newWidth = stateAtCropStart.width - horizontalMouseMovement;
-		const portionOfLeftSideCropped = (horizontalMouseMovement + amountAlreadyCroppedOnLeftSide) / maxWidth;
+		const portionOfLeftSideCropped = (horizontalMouseMovement + westCropAmount) / maxWidth;
 		const newOrigin = recomputeOrigin(stateAtCropStart, transformHandle, newWidth, element.height);
 
 		mutateElement(element, {
@@ -95,15 +94,10 @@ export function cropElement(
 			wToPullFromImage: (newWidth / maxWidth) * element.underlyingImageWidth
 		})
 	} else if (transformHandle == 'e') {
-		const rightBound = stateAtCropStart.x + (maxWidth - amountAlreadyCroppedOnLeftSide);
+		const eastBound = stateAtCropStart.x + (maxWidth - westCropAmount);
+		const westBound = stateAtCropStart.x;
 
-		if (pointerX > rightBound) {
-			pointerX = rightBound;
-		}
-
-		if (pointerX < stateAtCropStart.x) {
-			pointerX = stateAtCropStart.x;
-		}
+		pointerX = clamp(pointerX, westBound, eastBound);
 
 		const newWidth = pointerX - stateAtCropStart.x;
 		const newOrigin = recomputeOrigin(stateAtCropStart, transformHandle, newWidth, element.height);
@@ -205,7 +199,7 @@ export function onElementCropped(
 ) {
 	let unscaledWidth = element.width / element.rescaleX;
 	let unscaledHeight = element.height / element.rescaleY;
-	
+
 	if (handleType == 'n') {
 		let topSideCropAmount = element.heightAtCreation - unscaledHeight - element.bottomCropAmount;
 		mutateElement(element, {
