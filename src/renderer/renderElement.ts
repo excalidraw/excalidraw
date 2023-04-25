@@ -44,8 +44,8 @@ import {
   getContainerCoords,
   getContainerElement,
   getLineHeightInPx,
-  getMaxContainerHeight,
-  getMaxContainerWidth,
+  getBoundTextMaxHeight,
+  getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -877,8 +877,8 @@ const drawElementFromCanvas = (
       context.strokeRect(
         (coords.x + renderConfig.scrollX) * window.devicePixelRatio,
         (coords.y + renderConfig.scrollY) * window.devicePixelRatio,
-        getMaxContainerWidth(element) * window.devicePixelRatio,
-        getMaxContainerHeight(element, textElement) * window.devicePixelRatio,
+        getBoundTextMaxWidth(element) * window.devicePixelRatio,
+        getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
       );
     }
   }
