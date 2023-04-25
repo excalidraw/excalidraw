@@ -268,27 +268,6 @@ const getAdjustedDimensions = (
     );
   }
 
-  // make sure container dimensions are set properly when
-  // text editor overflows beyond viewport dimensions
-  if (container) {
-    const boundTextElementPadding = getBoundTextElementOffset(element);
-
-    const containerDims = getContainerDims(container);
-    let height = containerDims.height;
-    let width = containerDims.width;
-    if (nextHeight > height - boundTextElementPadding * 2) {
-      height = nextHeight + boundTextElementPadding * 2;
-    }
-    if (nextWidth > width - boundTextElementPadding * 2) {
-      width = nextWidth + boundTextElementPadding * 2;
-    }
-    if (
-      !isArrowElement(container) &&
-      (height !== containerDims.height || width !== containerDims.width)
-    ) {
-      mutateElement(container, { height, width });
-    }
-  }
   return {
     width: nextWidth,
     height: nextHeight,
