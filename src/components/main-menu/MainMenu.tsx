@@ -16,6 +16,8 @@ import { composeEventHandlers } from "../../utils";
 import { useTunnels } from "../context/tunnels";
 import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
 
+import * as Portal from "@radix-ui/react-portal";
+
 const MainMenu = Object.assign(
   withInternalFallback(
     "MainMenu",
@@ -39,6 +41,17 @@ const MainMenu = Object.assign(
 
       return (
         <mainMenuTunnel.In>
+          {appState.openMenu === "canvas" && device.isMobile && (
+            <Portal.Root
+              style={{
+                backgroundColor: "rgba(18, 18, 18, 0.2)",
+                position: "fixed",
+                inset: "0px",
+                zIndex: "var(--zIndex-layerUI)",
+              }}
+              onClick={() => setAppState({ openMenu: null })}
+            />
+          )}
           <DropdownMenu open={appState.openMenu === "canvas"}>
             <DropdownMenu.Trigger
               onToggle={() => {
@@ -50,6 +63,7 @@ const MainMenu = Object.assign(
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
+              // style={{ zIndex: 11 }}
               sideOffset={device.isMobile ? 20 : undefined}
               className="mainmenu-content"
               onClickOutside={onClickOutside}

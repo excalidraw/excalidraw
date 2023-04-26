@@ -21,6 +21,7 @@
   "dependencies": {
     "@dwelle/tunnel-rat": "0.1.1",
     "@radix-ui/react-dropdown-menu": "2.0.4",
+    "@radix-ui/react-portal": "1.0.2",
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
     "@testing-library/jest-dom": "5.16.2",
