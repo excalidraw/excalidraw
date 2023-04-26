@@ -40,7 +40,11 @@ import { isBindingElement } from "./typeChecks";
 import { shouldRotateWithDiscreteAngle } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { getShapeForElement } from "../renderer/renderElement";
-import { DRAGGING_THRESHOLD } from "../constants";
+import {
+  BOUND_TEXT_PADDING,
+  DRAGGING_THRESHOLD,
+  VERTICAL_ALIGN,
+} from "../constants";
 import { Mutable } from "../utility-types";
 
 const editorMidPointsCache: {
@@ -1304,6 +1308,16 @@ export class LinearElementEditor {
       }
       x = midSegmentMidpoint[0] - boundTextElement.width / 2;
       y = midSegmentMidpoint[1] - boundTextElement.height / 2;
+      if (element.points.length === 2) {
+        if (boundTextElement.verticalAlign === VERTICAL_ALIGN.TOP) {
+          y =
+            midSegmentMidpoint[1] -
+            boundTextElement.height -
+            BOUND_TEXT_PADDING * 2;
+        } else if (boundTextElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
+          y = midSegmentMidpoint[1] + BOUND_TEXT_PADDING * 2;
+        }
+      }
     }
     return { x, y };
   };

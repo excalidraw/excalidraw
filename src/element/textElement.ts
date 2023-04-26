@@ -793,7 +793,11 @@ export const shouldAllowVerticalAlign = (
     const hasBoundContainer = isBoundToContainer(element);
     if (hasBoundContainer) {
       const container = getContainerElement(element);
-      if (isTextElement(element) && isArrowElement(container)) {
+      if (
+        isTextElement(element) &&
+        isArrowElement(container) &&
+        container.points.length > 2
+      ) {
         return false;
       }
       return true;
