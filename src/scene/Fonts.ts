@@ -1,5 +1,6 @@
 import { isTextElement, refreshTextDimensions } from "../element";
 import { newElementWith } from "../element/mutateElement";
+import { isBoundToContainer } from "../element/typeChecks";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { getFontString } from "../utils";
@@ -52,7 +53,7 @@ export class Fonts {
     let didUpdate = false;
 
     this.scene.mapElements((element) => {
-      if (isTextElement(element)) {
+      if (isTextElement(element) && !isBoundToContainer(element)) {
         invalidateShapeForElement(element);
         didUpdate = true;
         return newElementWith(element, {
