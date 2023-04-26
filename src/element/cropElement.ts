@@ -120,10 +120,9 @@ export function cropElement(
 
 	mutateElement(element, mutation)
 
-	// resize does this, but i don't know what it does, so i'm leaving it out for now
-	// updateBoundElements(element, {
-	// 	newSize: { width: element.width, height: element.height },
-	// });
+	updateBoundElements(element, {
+		newSize: { width: element.width, height: element.height },
+	});
 
 	return;
 }
