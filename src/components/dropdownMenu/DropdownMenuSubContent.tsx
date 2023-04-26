@@ -7,11 +7,9 @@ import clsx from "clsx";
 const DropdownMenuSubContent = ({
   children,
   className,
-  sideOffset,
 }: {
   children?: React.ReactNode;
   className?: string;
-  sideOffset?: number;
 }) => {
   const device = useDevice();
 
@@ -20,10 +18,7 @@ const DropdownMenuSubContent = ({
   }).trim();
 
   return (
-    <DropdownMenuPrimitive.SubContent
-      className={classNames}
-      sideOffset={sideOffset}
-    >
+    <DropdownMenuPrimitive.SubContent className={classNames}>
       {device.isMobile ? (
         <Stack.Col className="dropdown-menu-container">{children}</Stack.Col>
       ) : (
