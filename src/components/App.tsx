@@ -112,6 +112,7 @@ import {
   transformElements,
   updateTextElement,
   redrawTextBoundingBox,
+  getNonDeletedElements,
 } from "../element";
 import {
   bindOrUnbindLinearElement,
@@ -3606,7 +3607,12 @@ class App extends React.Component<AppProps, AppState> {
     this.clearSelectionIfNotUsingSelection();
     this.updateBindingEnabledOnPointerMove(event);
 
-    if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
+    let pointerDownHandled: boolean = this.handleSelectionOnPointerDown(event, pointerDownState);
+
+    let cropModeState: boolean = this.queryCropModeState(pointerDownState, this.state);
+    this.setState({ croppingModeEnabled: cropModeState })
+
+    if (pointerDownHandled) {
       return;
     }
 
@@ -4015,38 +4021,33 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
-    this.setState({
-      croppingModeEnabled: false
-    })
     if (this.state.activeTool.type === "selection") {
       const elements = this.scene.getNonDeletedElements();
       const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
-        const elementWithTransformHandleType =
-          getElementWithTransformHandleType(
-            elements,
-            this.state,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-            this.state.zoom,
-            event.pointerType,
-          );
+        const elementWithTransformHandleType = getElementWithTransformHandleType(
+          elements,
+          this.state,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          this.state.zoom,
+          event.pointerType,
+        );
+
         if (elementWithTransformHandleType != null) {
           if (elementWithTransformHandleType.transformHandleType == "rotation") {
             this.setState({
-              resizingElement: elementWithTransformHandleType.element,
+              resizingElement: elementWithTransformHandleType.element
             });
-            pointerDownState.resize.handleType =
-              elementWithTransformHandleType.transformHandleType;
+            pointerDownState.resize.handleType = elementWithTransformHandleType.transformHandleType;
           } else if (this.state.croppingModeEnabled) {
             this.setState({
-              croppingModeEnabled: true,
               croppingElement: elementWithTransformHandleType.element
             })
             pointerDownState.crop.handleType = elementWithTransformHandleType.transformHandleType
           } else {
             this.setState({
-              resizingElement: elementWithTransformHandleType.element,
+              resizingElement: elementWithTransformHandleType.element
             });
             pointerDownState.resize.handleType =
               elementWithTransformHandleType.transformHandleType;
@@ -6351,6 +6352,47 @@ class App extends React.Component<AppProps, AppState> {
       this.maybeSuggestBindingForAll([draggingElement]);
     }
   };
+
+  private queryCropModeState(
+    pointerDownState: PointerDownState,
+    appState: AppState
+  ): boolean {
+    if (pointerDownState.crop.isCropping) {
+      return true;
+    }
+
+    if (! appState.croppingModeEnabled) {
+      return false;
+    }
+
+    if (pointerDownState.resize.handleType == "rotation") {
+      return true; // maintain crop mode while performing a rotation
+    }
+
+    const allHitElements = pointerDownState.hit?.allHitElements;
+    if (! allHitElements) {
+      return false;
+    }
+
+    if (allHitElements.length !== 1) {
+      return false;
+    }
+
+    const hitElement = allHitElements[0];
+    if (hitElement.type !== 'image') {
+      return false;
+    }
+
+    // allow crop mode to continue on multiple selections to the same element.
+    // but, if you change selection to another element, drop cropping mode, even
+    // if that other element is an image
+    const lastElementThatHadAnActualCrop = this.state.croppingElement;
+    if (lastElementThatHadAnActualCrop?.id == hitElement.id) {
+      return true;
+    }
+
+    return false;
+  }
 
   private maybeHandleCrop = (
     pointerDownState: PointerDownState,
