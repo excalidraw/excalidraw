@@ -6,7 +6,9 @@ import { MaybeTransformHandleType, TransformHandleType } from "./transformHandle
 import { ExcalidrawElement, ExcalidrawImageElement, NonDeleted } from "./types";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 
-function cropInternal(
+// i split out these 'internal' functions so that this functionality
+// can be easily unit tested
+export function cropElementInternal(
 	element: ExcalidrawImageElement,
 	transformHandle: TransformHandleType,
 	stateAtCropStart: NonDeleted<ExcalidrawElement>,
@@ -108,7 +110,7 @@ export function cropElement(
 	pointerX: number,
 	pointerY: number
 ) {
-	const mutation = cropInternal(
+	const mutation = cropElementInternal(
 		element,
 		transformHandle,
 		stateAtCropStart,
@@ -199,8 +201,7 @@ function clamp(numberToClamp: number, minBound: number, maxBound: number) {
 	return numberToClamp;
 }
 
-
-export function onElementCropped(
+export function onElementCroppedInternal(
 	element: ExcalidrawImageElement,
 	handleType: TransformHandleType,
 	stateAtCropStart: NonDeleted<ExcalidrawElement>
@@ -229,10 +230,19 @@ export function onElementCropped(
 		rightCropAmount = element.widthAtCreation - unscaledWidth - element.westCropAmount;
 	}
 
-	mutateElement(element, {
+	return {
 		northCropAmount: topCropAmount,
 		southCropAmount: botCropAmount,
 		westCropAmount: leftCropAmount,
 		eastCropAmount: rightCropAmount
-	})
+	}
+}
+
+export function onElementCropped(
+	element: ExcalidrawImageElement,
+	handleType: TransformHandleType,
+	stateAtCropStart: NonDeleted<ExcalidrawElement>
+) {
+	const mutation = onElementCroppedInternal(element, handleType, stateAtCropStart);
+	mutateElement(element, mutation)
 }
