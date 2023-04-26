@@ -132,20 +132,22 @@ export const isSnapped = (snaps: Snaps, [x, y]: TuplePoint) =>
 export const shouldSnap = (snap: Snap, zoom: Zoom) =>
   snap.distance < SNAP_DISTANCE / zoom.value;
 
+// return the extremity coordinates for the given snapline
+// which in turn decide how long the rendered snapline will be
 export const getSnapLineCoordinates = (
   snapLine: SnapLine,
-  expansionFactor: number,
+  expansionFactor = 0,
 ) => {
   const { from, to } = getLineExtremities(
     snapLine.line,
     snapLine.points as [GA.Point, GA.Point, ...GA.Point[]],
   );
 
-  const delta = GA.mul(GA.sub(to, from), expansionFactor);
+  const expansion = GA.mul(GA.sub(to, from), expansionFactor);
 
   return {
-    from: GAPoints.toObject(GA.sub(from, delta)),
-    to: GAPoints.toObject(GA.add(to, delta)),
+    from: GAPoints.toObject(GA.sub(from, expansion)),
+    to: GAPoints.toObject(GA.add(to, expansion)),
   };
 };
 
@@ -159,6 +161,9 @@ const isSnapEnabled = ({
   (appState.objectsSnapModeEnabled && !event.metaKey) ||
   (!appState.objectsSnapModeEnabled && event.metaKey);
 
+// given a line and some points (not necessarily on the line)
+// return coordinates of the extremity projection points on the line
+// from the given points
 const getLineExtremities = (
   line: GA.Line,
   points: [GA.Point, GA.Point, ...GA.Point[]],

@@ -4,7 +4,6 @@ import { Snaps, SnapLine, getSnapLineCoordinates } from "../snapping";
 import * as GA from "../ga";
 import * as GALines from "../galines";
 
-const MAGNETISM_AXE_EXPANSION_FACTOR = 0.1;
 // handle floating point errors
 const PRECISION = 0.001;
 
@@ -42,13 +41,10 @@ const renderAxes = (
   for (const { snapLine, points } of axes) {
     context.strokeStyle = renderConfig.selectionColor ?? oc.black;
 
-    const { from, to } = getSnapLineCoordinates(
-      {
-        line: snapLine.line,
-        points: [...points, ...snapLine.points],
-      },
-      MAGNETISM_AXE_EXPANSION_FACTOR,
-    );
+    const { from, to } = getSnapLineCoordinates({
+      line: snapLine.line,
+      points: [...points, ...snapLine.points],
+    });
 
     context.beginPath();
     context.lineTo(from.x, from.y);

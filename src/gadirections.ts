@@ -1,8 +1,6 @@
 import * as GA from "./ga";
 import { Line, Direction, Point } from "./ga";
 
-import * as GAPoints from "./gapoints";
-
 /**
  * A direction is stored as an array `[0, 0, 0, 0, y, x, 0, 0]` representing
  * vector `(x, y)`.
