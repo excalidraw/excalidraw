@@ -6357,7 +6357,7 @@ class App extends React.Component<AppProps, AppState> {
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
     if (pointerDownState.crop.complete) {
-      return false;
+      return true;
     }
     const selectedElements = getSelectedElements(
       this.scene.getNonDeletedElements(),
