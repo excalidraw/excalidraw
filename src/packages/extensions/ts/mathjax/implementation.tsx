@@ -4,9 +4,9 @@ import { FONT_FAMILY, SVG_NS } from "../../../../constants";
 import { getFontString, getFontFamilyString, isRTL } from "../../../../utils";
 import {
   getBoundTextElement,
+  getBoundTextMaxWidth,
   getContainerElement,
   getDefaultLineHeight,
-  getMaxContainerWidth,
   getTextWidth,
   measureText,
   wrapText,
@@ -1018,7 +1018,7 @@ const renderMathElement = function (element, context, renderCb) {
     }
   };
   const container = getContainerElement(_element);
-  const parentWidth = container ? getMaxContainerWidth(container) : undefined;
+  const parentWidth = container ? getBoundTextMaxWidth(container) : undefined;
 
   const offsetX =
     (_element.width - (container ? parentWidth! : _element.width)) *
@@ -1095,7 +1095,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
   tempSvg.appendChild(groupNode);
 
   const container = getContainerElement(_element);
-  const parentWidth = container ? getMaxContainerWidth(container) : undefined;
+  const parentWidth = container ? getBoundTextMaxWidth(container) : undefined;
 
   const offsetX =
     (_element.width - (container ? parentWidth! : _element.width)) *

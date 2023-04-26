@@ -28,7 +28,7 @@ import {
   measureTextElement,
   normalizeText,
   wrapTextElement,
-  getMaxContainerWidth,
+  getBoundTextMaxWidth,
   getDefaultLineHeight,
 } from "./textElement";
 import {
@@ -333,7 +333,7 @@ export const refreshTextDimensions = (
   }
   const container = getContainerElement(textElement);
   if (container) {
-    text = wrapTextElement(textElement, getMaxContainerWidth(container), {
+    text = wrapTextElement(textElement, getBoundTextMaxWidth(container), {
       text,
     });
   }
