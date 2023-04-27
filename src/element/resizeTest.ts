@@ -37,7 +37,12 @@ export const resizeTest = (
   }
 
   const { rotation: rotationTransformHandle, ...transformHandles } =
-    getTransformHandles(element, zoom, pointerType, appState.croppingModeEnabled);
+    getTransformHandles(
+      element,
+      zoom,
+      pointerType,
+      appState.croppingModeEnabled,
+    );
 
   if (
     rotationTransformHandle &&

@@ -87,7 +87,7 @@ export const getTransformHandlesFromCoords = (
   pointerType: PointerType,
   omitSides: { [T in TransformHandleType]?: boolean } = {},
   margin = 4,
-  inCropMode: boolean = false
+  inCropMode: boolean = false,
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
   const handleWidth = size / zoom.value;
@@ -235,7 +235,7 @@ export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: Zoom,
   pointerType: PointerType = "mouse",
-  inCropMode: boolean = false
+  inCropMode: boolean = false,
 ): TransformHandles => {
   // so that when locked element is selected (especially when you toggle lock
   // via keyboard) the locked element is visually distinct, indicating
@@ -274,7 +274,7 @@ export const getTransformHandles = (
     pointerType,
     omitSides,
     dashedLineMargin,
-    inCropMode
+    inCropMode,
   );
 };
 

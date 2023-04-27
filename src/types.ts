@@ -459,7 +459,7 @@ export type PointerDownState = Readonly<{
     isCropping: boolean;
     offset: { x: number; y: number };
     complete: boolean;
-  }
+  };
   hit: {
     // The element the pointer is "hitting", is determined on the initial
     // pointer down event

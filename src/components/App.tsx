@@ -17,7 +17,6 @@ import {
   actionCopyStyles,
   actionCut,
   actionDeleteSelected,
-  actionCropImage,
   actionDuplicateSelection,
   actionFinalize,
   actionFlipHorizontal,
@@ -112,7 +111,6 @@ import {
   transformElements,
   updateTextElement,
   redrawTextBoundingBox,
-  getNonDeletedElements,
 } from "../element";
 import {
   bindOrUnbindLinearElement,
@@ -3321,7 +3319,7 @@ class App extends React.Component<AppProps, AppState> {
       elements.forEach((element) => {
         if (element.locked) {
           return;
-        } 
+        }
 
         idsToUpdate.push(element.id);
         if (event.altKey) {
@@ -3607,10 +3605,16 @@ class App extends React.Component<AppProps, AppState> {
     this.clearSelectionIfNotUsingSelection();
     this.updateBindingEnabledOnPointerMove(event);
 
-    let pointerDownHandled: boolean = this.handleSelectionOnPointerDown(event, pointerDownState);
+    const pointerDownHandled: boolean = this.handleSelectionOnPointerDown(
+      event,
+      pointerDownState,
+    );
 
-    let cropModeState: boolean = this.queryCropModeState(pointerDownState, this.state);
-    this.setState({ croppingModeEnabled: cropModeState })
+    const cropModeState: boolean = this.queryCropModeState(
+      pointerDownState,
+      this.state,
+    );
+    this.setState({ croppingModeEnabled: cropModeState });
 
     if (pointerDownHandled) {
       return;
@@ -3932,7 +3936,7 @@ class App extends React.Component<AppProps, AppState> {
         handleType: false,
         isCropping: false,
         offset: { x: 0, y: 0 },
-        complete: false
+        complete: false,
       },
       hit: {
         element: null,
@@ -4025,29 +4029,34 @@ class App extends React.Component<AppProps, AppState> {
       const elements = this.scene.getNonDeletedElements();
       const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
-        const elementWithTransformHandleType = getElementWithTransformHandleType(
-          elements,
-          this.state,
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          this.state.zoom,
-          event.pointerType,
-        );
+        const elementWithTransformHandleType =
+          getElementWithTransformHandleType(
+            elements,
+            this.state,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            this.state.zoom,
+            event.pointerType,
+          );
 
         if (elementWithTransformHandleType != null) {
-          if (elementWithTransformHandleType.transformHandleType == "rotation") {
+          if (
+            elementWithTransformHandleType.transformHandleType === "rotation"
+          ) {
             this.setState({
-              resizingElement: elementWithTransformHandleType.element
+              resizingElement: elementWithTransformHandleType.element,
             });
-            pointerDownState.resize.handleType = elementWithTransformHandleType.transformHandleType;
+            pointerDownState.resize.handleType =
+              elementWithTransformHandleType.transformHandleType;
           } else if (this.state.croppingModeEnabled) {
             this.setState({
-              croppingElement: elementWithTransformHandleType.element
-            })
-            pointerDownState.crop.handleType = elementWithTransformHandleType.transformHandleType
+              croppingElement: elementWithTransformHandleType.element,
+            });
+            pointerDownState.crop.handleType =
+              elementWithTransformHandleType.transformHandleType;
           } else {
             this.setState({
-              resizingElement: elementWithTransformHandleType.element
+              resizingElement: elementWithTransformHandleType.element,
             });
             pointerDownState.resize.handleType =
               elementWithTransformHandleType.transformHandleType;
@@ -5059,7 +5068,7 @@ class App extends React.Component<AppProps, AppState> {
         activeTool,
         isResizing,
         isRotating,
-        isCropping
+        isCropping,
       } = this.state;
       this.setState({
         isResizing: false,
@@ -5077,15 +5086,18 @@ class App extends React.Component<AppProps, AppState> {
       });
 
       if (pointerDownState.crop.isCropping) {
-        const elementThatWasJustCropped = this.state.croppingElement as ExcalidrawImageElement;
+        const elementThatWasJustCropped = this.state
+          .croppingElement as ExcalidrawImageElement;
         if (elementThatWasJustCropped) {
-          const elementState = pointerDownState.originalElements.get(elementThatWasJustCropped.id);
+          const elementState = pointerDownState.originalElements.get(
+            elementThatWasJustCropped.id,
+          );
           if (elementState) {
             if (pointerDownState.crop.handleType) {
               onElementCropped(
                 elementThatWasJustCropped,
                 pointerDownState.crop.handleType,
-                elementState
+                elementState,
               );
               pointerDownState.crop.complete = true;
             }
@@ -5541,7 +5553,12 @@ class App extends React.Component<AppProps, AppState> {
         this.history.resumeRecording();
       }
 
-      if (pointerDownState.drag.hasOccurred || isResizing || isRotating || isCropping) {
+      if (
+        pointerDownState.drag.hasOccurred ||
+        isResizing ||
+        isRotating ||
+        isCropping
+      ) {
         (isBindingEnabled(this.state)
           ? bindOrUnbindSelectedElements
           : unbindLinearElements)(
@@ -5920,10 +5937,10 @@ class App extends React.Component<AppProps, AppState> {
       const x = imageElement.x + imageElement.width / 2 - width / 2;
       const y = imageElement.y + imageElement.height / 2 - height / 2;
 
-      mutateElement(imageElement, { 
-        x, 
-        y, 
-        width, 
+      mutateElement(imageElement, {
+        x,
+        y,
+        width,
         height,
         widthAtCreation: width,
         heightAtCreation: height,
@@ -5934,7 +5951,7 @@ class App extends React.Component<AppProps, AppState> {
         wToPullFromImage: image.naturalWidth,
         hToPullFromImage: image.naturalHeight,
         rescaleX: 1,
-        rescaleY: 1
+        rescaleY: 1,
       });
     }
   };
@@ -6355,22 +6372,22 @@ class App extends React.Component<AppProps, AppState> {
 
   private queryCropModeState(
     pointerDownState: PointerDownState,
-    appState: AppState
+    appState: AppState,
   ): boolean {
     if (pointerDownState.crop.isCropping) {
       return true;
     }
 
-    if (! appState.croppingModeEnabled) {
+    if (!appState.croppingModeEnabled) {
       return false;
     }
 
-    if (pointerDownState.resize.handleType == "rotation") {
+    if (pointerDownState.resize.handleType === "rotation") {
       return true; // maintain crop mode while performing a rotation
     }
 
     const allHitElements = pointerDownState.hit?.allHitElements;
-    if (! allHitElements) {
+    if (!allHitElements) {
       return false;
     }
 
@@ -6379,7 +6396,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const hitElement = allHitElements[0];
-    if (hitElement.type !== 'image') {
+    if (hitElement.type !== "image") {
       return false;
     }
 
@@ -6387,7 +6404,7 @@ class App extends React.Component<AppProps, AppState> {
     // but, if you change selection to another element, drop cropping mode, even
     // if that other element is an image
     const lastElementThatHadAnActualCrop = this.state.croppingElement;
-    if (lastElementThatHadAnActualCrop?.id == hitElement.id) {
+    if (lastElementThatHadAnActualCrop?.id === hitElement.id) {
       return true;
     }
 
@@ -6420,14 +6437,16 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const elementToCrop = selectedElements[0] as ExcalidrawImageElement;
-    const stateAtCropStart = pointerDownState.originalElements.get(elementToCrop.id)!;
+    const stateAtCropStart = pointerDownState.originalElements.get(
+      elementToCrop.id,
+    )!;
     if (transformHandleType) {
       cropElement(elementToCrop, transformHandleType, stateAtCropStart, x, y);
       return true;
     }
-    
+
     return false;
-  }
+  };
 
   private maybeHandleResize = (
     pointerDownState: PointerDownState,
@@ -6452,7 +6471,7 @@ class App extends React.Component<AppProps, AppState> {
       pointerCoords.y - pointerDownState.resize.offset.y,
       this.state.gridSize,
     );
-    
+
     if (
       transformElements(
         pointerDownState,

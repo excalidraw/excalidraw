@@ -1,16 +1,8 @@
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { KEYS } from "../keys";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { register } from "./register";
 import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
-import { newElementWith } from "../element/mutateElement";
-import { getElementsInGroup } from "../groups";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { fixBindingsAfterDeletion } from "../element/binding";
-import { isBoundToContainer } from "../element/typeChecks";
 import { updateActiveTool } from "../utils";
 import { CropIcon } from "../components/icons";
 
@@ -19,21 +11,24 @@ export const actionCropImage = register({
   trackEvent: { category: "element", action: "crop" },
   perform: (elements, appState) => {
     let croppingModeEnabled = appState.croppingModeEnabled;
-    
-    const selectedElements = getSelectedElements(getNonDeletedElements(elements), appState);
-    if (selectedElements.length == 1 && selectedElements[0].type == "image") {
-      croppingModeEnabled = ! croppingModeEnabled;
+
+    const selectedElements = getSelectedElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+    if (selectedElements.length === 1 && selectedElements[0].type === "image") {
+      croppingModeEnabled = !croppingModeEnabled;
     } else {
       croppingModeEnabled = false;
     }
-    
+
     const nextAppState = {
       ...appState,
-      croppingModeEnabled: croppingModeEnabled
-    }
+      croppingModeEnabled,
+    };
 
     return {
-      elements: elements,
+      elements,
       appState: {
         ...nextAppState,
         activeTool: updateActiveTool(appState, { type: "selection" }),
@@ -48,15 +43,18 @@ export const actionCropImage = register({
   contextItemLabel: "labels.crop",
 
   keyTest: (event, appState, elements) => false,
-    
+
   PanelComponent: ({ elements, appState, updateData }) => {
     let visible = false;
 
-    const selectedElements = getSelectedElements(getNonDeletedElements(elements), appState);
-    if (selectedElements.length == 1 && selectedElements[0].type == "image") {
+    const selectedElements = getSelectedElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+    if (selectedElements.length === 1 && selectedElements[0].type === "image") {
       visible = true;
     }
-    
+
     return (
       <ToolButton
         type="button"
@@ -67,6 +65,6 @@ export const actionCropImage = register({
         activated={appState.croppingModeEnabled}
         visible={visible}
       />
-    )
+    );
   },
 });

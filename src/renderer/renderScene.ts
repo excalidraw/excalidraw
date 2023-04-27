@@ -588,11 +588,11 @@ export const _renderScene = ({
 
       if (locallySelectedElements.length === 1) {
         context.fillStyle = oc.white;
-        let transformHandles = getTransformHandles(
+        const transformHandles = getTransformHandles(
           locallySelectedElements[0],
           renderConfig.zoom,
           "mouse", // when we render we don't know which pointer type so use mouse
-          appState.croppingModeEnabled
+          appState.croppingModeEnabled,
         );
         if (!appState.viewModeEnabled && showBoundingBox) {
           // if (appState.croppingModeEnabled) {
@@ -603,7 +603,7 @@ export const _renderScene = ({
             renderConfig,
             transformHandles,
             locallySelectedElements[0].angle,
-            appState.croppingModeEnabled
+            appState.croppingModeEnabled,
           );
         }
       } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
@@ -637,11 +637,11 @@ export const _renderScene = ({
         );
         if (locallySelectedElements.some((element) => !element.locked)) {
           renderTransformHandles(
-            context, 
-            renderConfig, 
-            transformHandles, 
-            0, 
-            appState.croppingModeEnabled
+            context,
+            renderConfig,
+            transformHandles,
+            0,
+            appState.croppingModeEnabled,
           );
         }
       }
@@ -848,7 +848,7 @@ const renderTransformHandles = (
   renderConfig: RenderConfig,
   transformHandles: TransformHandles,
   angle: number,
-  cropModeEnabled: boolean = false
+  cropModeEnabled: boolean = false,
 ): void => {
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];

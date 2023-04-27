@@ -326,20 +326,6 @@ const resizeSingleTextElement = (
   }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const resizeSingleElement = (
   originalElements: PointerDownState["originalElements"],
   shouldMaintainAspectRatio: boolean,
@@ -578,7 +564,11 @@ export const resizeSingleElement = (
     points: rescaledPoints,
   };
 
-  updateInternalScale(element, eleNewWidth / element.width, eleNewHeight / element.height);
+  updateInternalScale(
+    element,
+    eleNewWidth / element.width,
+    eleNewHeight / element.height,
+  );
 
   if ("scale" in element && "scale" in stateAtResizeStart) {
     mutateElement(element, {
@@ -588,7 +578,7 @@ export const resizeSingleElement = (
           stateAtResizeStart.scale[0]) * stateAtResizeStart.scale[0],
         (Math.sign(newBoundsY2 - stateAtResizeStart.y) ||
           stateAtResizeStart.scale[1]) * stateAtResizeStart.scale[1],
-      ]
+      ],
     });
   }
 
@@ -614,15 +604,14 @@ export const resizeSingleElement = (
   }
 };
 
-
 // have to keep track of the scaling on images in order to give
 // cropping the data that it needs to work
 const updateInternalScale = (
   element: NonDeletedExcalidrawElement,
   scaleX: number,
-  scaleY: number
+  scaleY: number,
 ) => {
-  if ("type" in element && element.type == "image") {
+  if ("type" in element && element.type === "image") {
     element = element as ExcalidrawImageElement;
   } else {
     return;
@@ -631,10 +620,10 @@ const updateInternalScale = (
   // if the scales happen to be 0 (which is insanely unlikely), it will
   // zero out the rolling multiplier and cause weird bugs with cropping.
   // if zero is detected, just set the scales to an obnoxiously small number
-  if (scaleX == 0) {
+  if (scaleX === 0) {
     scaleX = Number.EPSILON;
   }
-  if (scaleY == 0) {
+  if (scaleY === 0) {
     scaleY = Number.EPSILON;
   }
 
@@ -643,11 +632,9 @@ const updateInternalScale = (
 
   mutateElement(element, {
     rescaleX: element.rescaleX * scaleX,
-    rescaleY: element.rescaleY * scaleY
-  })
-}
-
-
+    rescaleY: element.rescaleY * scaleY,
+  });
+};
 
 const resizeMultipleElements = (
   pointerDownState: PointerDownState,
@@ -795,7 +782,11 @@ const resizeMultipleElements = (
       }
     }
 
-    updateInternalScale(element.latest, width / element.orig.width, height / element.orig.height);
+    updateInternalScale(
+      element.latest,
+      width / element.orig.width,
+      height / element.orig.height,
+    );
 
     updateBoundElements(element.latest, { newSize: { width, height } });
 

@@ -114,8 +114,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
             "ToolIcon--selected": props.selected,
             "ToolIcon--plain": props.type === "icon",
           },
-          props.activated ? "ToolIcon--activated" : ""
-
+          props.activated ? "ToolIcon--activated" : "",
         )}
         data-testid={props["data-testid"]}
         hidden={props.hidden}
