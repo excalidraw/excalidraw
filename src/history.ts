@@ -2,6 +2,7 @@ import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 import { isLinearElement } from "./element/typeChecks";
 import { deepCopyElement } from "./element/newElement";
+import { Mutable } from "./utility-types";
 
 export interface HistoryEntry {
   appState: ReturnType<typeof clearAppStatePropertiesForHistory>;

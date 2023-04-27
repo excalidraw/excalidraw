@@ -60,8 +60,10 @@ import {
   ENV,
   EVENT,
   GRID_SIZE,
+  IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
   isAndroid,
+  isBrave,
   LINE_CONFIRM_THRESHOLD,
   MAX_ALLOWED_FILE_BYTES,
   MIME_TYPES,
@@ -108,6 +110,7 @@ import {
   textWysiwyg,
   transformElements,
   updateTextElement,
+  redrawTextBoundingBox,
 } from "../element";
 import {
   bindOrUnbindLinearElement,
@@ -125,7 +128,11 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
+import {
+  deepCopyElement,
+  duplicateElements,
+  newFreeDrawElement,
+} from "../element/newElement";
 import {
   hasBoundTextElement,
   isArrowElement,
@@ -226,6 +233,8 @@ import {
   setEraserCursor,
   updateActiveTool,
   getShortcutKey,
+  isTransparent,
+  easeToValuesRAF,
 } from "../utils";
 import {
   ContextMenu,
@@ -257,13 +266,16 @@ import throttle from "lodash.throttle";
 import { fileOpen, FileSystemHandle } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
-  getApproxLineHeight,
   getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
   getContainerCenter,
   getContainerDims,
+  getContainerElement,
+  getDefaultLineHeight,
+  getLineHeightInPx,
   getTextBindableContainerAtPosition,
+  isMeasureTextSupported,
   isValidTextContainer,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
@@ -278,9 +290,14 @@ import {
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
-import { actionToggleHandTool } from "../actions/actionCanvas";
+import {
+  actionToggleHandTool,
+  zoomToFitElements,
+} from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { actionWrapTextInContainer } from "../actions/actionBoundText";
+import BraveMeasureTextError from "./BraveMeasureTextError";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -430,7 +447,6 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.id = nanoid();
-
     this.library = new Library(this);
     if (excalidrawRef) {
       const readyPromise =
@@ -710,6 +726,8 @@ class App extends React.Component<AppProps, AppState> {
         const theme =
           actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
         let name = actionResult?.appState?.name ?? this.state.name;
+        const errorMessage =
+          actionResult?.appState?.errorMessage ?? this.state.errorMessage;
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
         }
@@ -725,7 +743,6 @@ class App extends React.Component<AppProps, AppState> {
         if (typeof this.props.name !== "undefined") {
           name = this.props.name;
         }
-
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
@@ -743,6 +760,7 @@ class App extends React.Component<AppProps, AppState> {
               gridSize,
               theme,
               name,
+              errorMessage,
             });
           },
           () => {
@@ -839,7 +857,7 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-    const scene = restore(initialData, null, null);
+    const scene = restore(initialData, null, null, { repairBindings: true });
     scene.appState = {
       ...scene.appState,
       theme: this.props.theme || scene.appState.theme,
@@ -871,7 +889,6 @@ class App extends React.Component<AppProps, AppState> {
         ),
       };
     }
-
     // FontFaceSet loadingdone event we listen on may not always fire
     // (looking at you Safari), so on init we manually load fonts for current
     // text elements on canvas, and rerender them once done. This also
@@ -998,6 +1015,13 @@ class App extends React.Component<AppProps, AppState> {
       this.restoreFileFromShare();
     } else {
       this.updateDOMRect(this.initializeScene);
+    }
+
+    // note that this check seems to always pass in localhost
+    if (isBrave() && !isMeasureTextSupported()) {
+      this.setState({
+        errorMessage: <BraveMeasureTextError />,
+      });
     }
   }
 
@@ -1569,6 +1593,7 @@ class App extends React.Component<AppProps, AppState> {
           elements: data.elements,
           files: data.files || null,
           position: "cursor",
+          retainSeed: isPlainPaste,
         });
       } else if (data.text) {
         this.addTextFromPaste(data.text, isPlainPaste);
@@ -1582,6 +1607,7 @@ class App extends React.Component<AppProps, AppState> {
     elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
     position: { clientX: number; clientY: number } | "cursor" | "center";
+    retainSeed?: boolean;
   }) => {
     const elements = restoreElements(opts.elements, null);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
@@ -1609,36 +1635,39 @@ class App extends React.Component<AppProps, AppState> {
 
     const dx = x - elementsCenterX;
     const dy = y - elementsCenterY;
-    const groupIdMap = new Map();
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.state.gridSize);
 
-    const oldIdToDuplicatedId = new Map();
-    const newElements = elements.map((element) => {
-      const newElement = duplicateElement(
-        this.state.editingGroupId,
-        groupIdMap,
-        element,
-        {
+    const newElements = duplicateElements(
+      elements.map((element) => {
+        return newElementWith(element, {
           x: element.x + gridX - minX,
           y: element.y + gridY - minY,
-        },
-      );
-      oldIdToDuplicatedId.set(element.id, newElement.id);
-      return newElement;
-    });
-    bindTextToShapeAfterDuplication(newElements, elements, oldIdToDuplicatedId);
+        });
+      }),
+      {
+        randomizeSeed: !opts.retainSeed,
+      },
+    );
+
     const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
     ];
-    fixBindingsAfterDuplication(nextElements, elements, oldIdToDuplicatedId);
+
+    this.scene.replaceAllElements(nextElements);
+
+    newElements.forEach((newElement) => {
+      if (isTextElement(newElement) && isBoundToContainer(newElement)) {
+        const container = getContainerElement(newElement);
+        redrawTextBoundingBox(newElement, container);
+      }
+    });
 
     if (opts.files) {
       this.files = { ...this.files, ...opts.files };
     }
 
-    this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
 
     this.setState(
@@ -1711,12 +1740,14 @@ class App extends React.Component<AppProps, AppState> {
       (acc: ExcalidrawTextElement[], line, idx) => {
         const text = line.trim();
 
+        const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
         if (text.length) {
           const element = newTextElement({
             ...textElementProps,
             x,
             y: currentY,
             text,
+            lineHeight,
           });
           acc.push(element);
           currentY += element.height + LINE_GAP;
@@ -1725,14 +1756,9 @@ class App extends React.Component<AppProps, AppState> {
           // add paragraph only if previous line was not empty, IOW don't add
           // more than one empty line
           if (prevLine) {
-            const defaultLineHeight = getApproxLineHeight(
-              getFontString({
-                fontSize: textElementProps.fontSize,
-                fontFamily: textElementProps.fontFamily,
-              }),
-            );
-
-            currentY += defaultLineHeight + LINE_GAP;
+            currentY +=
+              getLineHeightInPx(textElementProps.fontSize, lineHeight) +
+              LINE_GAP;
           }
         }
 
@@ -1825,18 +1851,89 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.executeAction(actionToggleHandTool);
   };
 
+  /**
+   * Zooms on canvas viewport center
+   */
+  zoomCanvas = (
+    /** decimal fraction between 0.1 (10% zoom) and 30 (3000% zoom) */
+    value: number,
+  ) => {
+    this.setState({
+      ...getStateForZoom(
+        {
+          viewportX: this.state.width / 2 + this.state.offsetLeft,
+          viewportY: this.state.height / 2 + this.state.offsetTop,
+          nextZoom: getNormalizedZoom(value),
+        },
+        this.state,
+      ),
+    });
+  };
+
+  private cancelInProgresAnimation: (() => void) | null = null;
+
   scrollToContent = (
     target:
       | ExcalidrawElement
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
+    opts?: { fitToContent?: boolean; animate?: boolean; duration?: number },
   ) => {
-    this.setState({
-      ...calculateScrollCenter(
-        Array.isArray(target) ? target : [target],
-        this.state,
-        this.canvas,
-      ),
-    });
+    this.cancelInProgresAnimation?.();
+
+    // convert provided target into ExcalidrawElement[] if necessary
+    const targets = Array.isArray(target) ? target : [target];
+
+    let zoom = this.state.zoom;
+    let scrollX = this.state.scrollX;
+    let scrollY = this.state.scrollY;
+
+    if (opts?.fitToContent) {
+      // compute an appropriate viewport location (scroll X, Y) and zoom level
+      // that fit the target elements on the scene
+      const { appState } = zoomToFitElements(targets, this.state, false);
+      zoom = appState.zoom;
+      scrollX = appState.scrollX;
+      scrollY = appState.scrollY;
+    } else {
+      // compute only the viewport location, without any zoom adjustment
+      const scroll = calculateScrollCenter(targets, this.state, this.canvas);
+      scrollX = scroll.scrollX;
+      scrollY = scroll.scrollY;
+    }
+
+    // when animating, we use RequestAnimationFrame to prevent the animation
+    // from slowing down other processes
+    if (opts?.animate) {
+      const origScrollX = this.state.scrollX;
+      const origScrollY = this.state.scrollY;
+
+      // zoom animation could become problematic on scenes with large number
+      // of elements, setting it to its final value to improve user experience.
+      //
+      // using zoomCanvas() to zoom on current viewport center
+      this.zoomCanvas(zoom.value);
+
+      const cancel = easeToValuesRAF(
+        [origScrollX, origScrollY],
+        [scrollX, scrollY],
+        (scrollX, scrollY) => this.setState({ scrollX, scrollY }),
+        { duration: opts?.duration ?? 500 },
+      );
+      this.cancelInProgresAnimation = () => {
+        cancel();
+        this.cancelInProgresAnimation = null;
+      };
+    } else {
+      this.setState({ scrollX, scrollY, zoom });
+    }
+  };
+
+  /** use when changing scrollX/scrollY/zoom based on user interaction */
+  private translateCanvas: React.Component<any, AppState>["setState"] = (
+    state,
+  ) => {
+    this.cancelInProgresAnimation?.();
+    this.setState(state);
   };
 
   setToast = (
@@ -2031,9 +2128,13 @@ class App extends React.Component<AppProps, AppState> {
           offset = -offset;
         }
         if (event.shiftKey) {
-          this.setState((state) => ({ scrollX: state.scrollX + offset }));
+          this.translateCanvas((state) => ({
+            scrollX: state.scrollX + offset,
+          }));
         } else {
-          this.setState((state) => ({ scrollY: state.scrollY + offset }));
+          this.translateCanvas((state) => ({
+            scrollY: state.scrollY + offset,
+          }));
         }
       }
 
@@ -2581,6 +2682,13 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
     }
 
+    const fontFamily =
+      existingTextElement?.fontFamily || this.state.currentItemFontFamily;
+
+    const lineHeight =
+      existingTextElement?.lineHeight || getDefaultLineHeight(fontFamily);
+    const fontSize = this.state.currentItemFontSize;
+
     if (
       !existingTextElement &&
       shouldBindToContainer &&
@@ -2588,11 +2696,14 @@ class App extends React.Component<AppProps, AppState> {
       !isArrowElement(container)
     ) {
       const fontString = {
-        fontSize: this.state.currentItemFontSize,
-        fontFamily: this.state.currentItemFontFamily,
+        fontSize,
+        fontFamily,
       };
-      const minWidth = getApproxMinLineWidth(getFontString(fontString));
-      const minHeight = getApproxMinLineHeight(getFontString(fontString));
+      const minWidth = getApproxMinLineWidth(
+        getFontString(fontString),
+        lineHeight,
+      );
+      const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
       const containerDims = getContainerDims(container);
       const newHeight = Math.max(containerDims.height, minHeight);
       const newWidth = Math.max(containerDims.width, minWidth);
@@ -2624,10 +2735,9 @@ class App extends React.Component<AppProps, AppState> {
           strokeStyle: this.state.currentItemStrokeStyle,
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
-          roundness: null,
           text: "",
-          fontSize: this.state.currentItemFontSize,
-          fontFamily: this.state.currentItemFontFamily,
+          fontSize,
+          fontFamily,
           textAlign: parentCenterPosition
             ? "center"
             : this.state.currentItemTextAlign,
@@ -2636,7 +2746,8 @@ class App extends React.Component<AppProps, AppState> {
             : DEFAULT_VERTICAL_ALIGN,
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
-          locked: false,
+          lineHeight,
+          angle: container?.angle ?? 0,
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {
@@ -2658,14 +2769,6 @@ class App extends React.Component<AppProps, AppState> {
           ...this.scene.getElementsIncludingDeleted(),
           element,
         ]);
-      }
-
-      // case: creating new text not centered to parent element → offset Y
-      // so that the text is centered to cursor position
-      if (!parentCenterPosition) {
-        mutateElement(element, {
-          y: element.y - element.baseline / 2,
-        });
       }
     }
 
@@ -2759,7 +2862,14 @@ class App extends React.Component<AppProps, AppState> {
         sceneY,
       );
       if (container) {
-        if (isArrowElement(container) || hasBoundTextElement(container)) {
+        if (
+          hasBoundTextElement(container) ||
+          !isTransparent(container.backgroundColor) ||
+          isHittingElementNotConsideringBoundingBox(container, this.state, [
+            sceneX,
+            sceneY,
+          ])
+        ) {
           const midPoint = getContainerCenter(container, this.state);
 
           sceneX = midPoint.x;
@@ -2904,12 +3014,12 @@ class App extends React.Component<AppProps, AppState> {
           state,
         );
 
-        return {
+        this.translateCanvas({
           zoom: zoomState.zoom,
           scrollX: zoomState.scrollX + deltaX / nextZoom,
           scrollY: zoomState.scrollY + deltaY / nextZoom,
           shouldCacheIgnoreZoom: true,
-        };
+        });
       });
       this.resetShouldCacheIgnoreZoomDebounced();
     } else {
@@ -3387,6 +3497,43 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ contextMenu: null });
     }
 
+    this.updateGestureOnPointerDown(event);
+
+    // if dragging element is freedraw and another pointerdown event occurs
+    // a second finger is on the screen
+    // discard the freedraw element if it is very short because it is likely
+    // just a spike, otherwise finalize the freedraw element when the second
+    // finger is lifted
+    if (
+      event.pointerType === "touch" &&
+      this.state.draggingElement &&
+      this.state.draggingElement.type === "freedraw"
+    ) {
+      const element = this.state.draggingElement as ExcalidrawFreeDrawElement;
+      this.updateScene({
+        ...(element.points.length < 10
+          ? {
+              elements: this.scene
+                .getElementsIncludingDeleted()
+                .filter((el) => el.id !== element.id),
+            }
+          : {}),
+        appState: {
+          draggingElement: null,
+          editingElement: null,
+          startBoundElement: null,
+          suggestedBindings: [],
+          selectedElementIds: Object.keys(this.state.selectedElementIds)
+            .filter((key) => key !== element.id)
+            .reduce((obj: { [id: string]: boolean }, key) => {
+              obj[key] = this.state.selectedElementIds[key];
+              return obj;
+            }, {}),
+        },
+      });
+      return;
+    }
+
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)
@@ -3425,8 +3572,6 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton: "down",
     });
     this.savePointer(event.clientX, event.clientY, "down");
-
-    this.updateGestureOnPointerDown(event);
 
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
@@ -3685,7 +3830,7 @@ class App extends React.Component<AppProps, AppState> {
         window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
       }
 
-      this.setState({
+      this.translateCanvas({
         scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
         scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
       });
@@ -4578,7 +4723,12 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.drag.hasOccurred = true;
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
-        if (selectedElements.length > 0 && !pointerDownState.withCmdOrCtrl) {
+        // Checking for editingElement to avoid jump while editing on mobile #6503
+        if (
+          selectedElements.length > 0 &&
+          !pointerDownState.withCmdOrCtrl &&
+          !this.state.editingElement
+        ) {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
             pointerCoords.y - pointerDownState.drag.offset.y,
@@ -4831,7 +4981,7 @@ class App extends React.Component<AppProps, AppState> {
     if (pointerDownState.scrollbars.isOverHorizontal) {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
-      this.setState({
+      this.translateCanvas({
         scrollX: this.state.scrollX - dx / this.state.zoom.value,
       });
       pointerDownState.lastCoords.x = x;
@@ -4841,7 +4991,7 @@ class App extends React.Component<AppProps, AppState> {
     if (pointerDownState.scrollbars.isOverVertical) {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
-      this.setState({
+      this.translateCanvas({
         scrollY: this.state.scrollY - dy / this.state.zoom.value,
       });
       pointerDownState.lastCoords.y = y;
@@ -5601,7 +5751,9 @@ class App extends React.Component<AppProps, AppState> {
 
       const imageFile = await fileOpen({
         description: "Image",
-        extensions: ["jpg", "png", "svg", "gif"],
+        extensions: Object.keys(
+          IMAGE_MIME_TYPES,
+        ) as (keyof typeof IMAGE_MIME_TYPES)[],
       });
 
       const imageElement = this.createImageElement({
@@ -6223,6 +6375,7 @@ class App extends React.Component<AppProps, AppState> {
       actionGroup,
       actionUnbindText,
       actionBindText,
+      actionWrapTextInContainer,
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,
@@ -6269,7 +6422,7 @@ class App extends React.Component<AppProps, AppState> {
         // reduced amplification for small deltas (small movements on a trackpad)
         Math.min(1, absDelta / 20);
 
-      this.setState((state) => ({
+      this.translateCanvas((state) => ({
         ...getStateForZoom(
           {
             viewportX: cursorX,
@@ -6286,14 +6439,14 @@ class App extends React.Component<AppProps, AppState> {
 
     // scroll horizontally when shift pressed
     if (event.shiftKey) {
-      this.setState(({ zoom, scrollX }) => ({
+      this.translateCanvas(({ zoom, scrollX }) => ({
         // on Mac, shift+wheel tends to result in deltaX
         scrollX: scrollX - (deltaY || deltaX) / zoom.value,
       }));
       return;
     }
 
-    this.setState(({ zoom, scrollX, scrollY }) => ({
+    this.translateCanvas(({ zoom, scrollX, scrollY }) => ({
       scrollX: scrollX - deltaX / zoom.value,
       scrollY: scrollY - deltaY / zoom.value,
     }));

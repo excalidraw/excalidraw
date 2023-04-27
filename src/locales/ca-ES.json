@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Enganxa",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Enganxar com a text pla",
     "pasteCharts": "Enganxa els diagrames",
     "selectAll": "Selecciona-ho tot",
     "multiSelect": "Afegeix un element a la selecció",
@@ -72,7 +72,7 @@
     "layers": "Capes",
     "actions": "Accions",
     "language": "Llengua",
-    "liveCollaboration": "",
+    "liveCollaboration": "Col·laboració en directe...",
     "duplicateSelection": "Duplica",
     "untitled": "Sense títol",
     "name": "Nom",
@@ -110,14 +110,15 @@
     "increaseFontSize": "Augmenta la mida de la lletra",
     "unbindText": "Desvincular el text",
     "bindText": "Ajusta el text al contenidor",
+    "createContainerFromText": "",
     "link": {
       "edit": "Edita l'enllaç",
       "create": "Crea un enllaç",
       "label": "Enllaç"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Editar línia",
+      "exit": "Sortir de l'editor de línia"
     },
     "elementLock": {
       "lock": "Bloca",
@@ -136,8 +137,8 @@
   "buttons": {
     "clearReset": "Neteja el llenç",
     "exportJSON": "Exporta a un fitxer",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Exporta la imatge...",
+    "export": "Guardar a...",
     "exportToPng": "Exporta a PNG",
     "exportToSvg": "Exporta a SNG",
     "copyToClipboard": "Copia al porta-retalls",
@@ -145,7 +146,7 @@
     "scale": "Escala",
     "save": "Desa al fitxer actual",
     "saveAs": "Anomena i desa",
-    "load": "",
+    "load": "Obrir",
     "getShareableLink": "Obté l'enllaç per a compartir",
     "close": "Tanca",
     "selectLanguage": "Trieu la llengua",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "No s'ha pogut importar l'escena des de l'adreça URL proporcionada. Està malformada o no conté dades Excalidraw JSON vàlides.",
     "resetLibrary": "Això buidarà la biblioteca. N'esteu segur?",
     "removeItemsFromsLibrary": "Suprimir {{count}} element(s) de la biblioteca?",
-    "invalidEncryptionKey": "La clau d'encriptació ha de tenir 22 caràcters. La col·laboració en directe està desactivada."
+    "invalidEncryptionKey": "La clau d'encriptació ha de tenir 22 caràcters. La col·laboració en directe està desactivada.",
+    "collabOfflineWarning": "Sense connexió a internet disponible.\nEls vostres canvis no seran guardats!"
   },
   "errors": {
     "unsupportedFileType": "Tipus de fitxer no suportat.",
@@ -202,8 +204,23 @@
     "invalidSVGString": "SVG no vàlid.",
     "cannotResolveCollabServer": "No ha estat possible connectar amb el servidor collab. Si us plau recarregueu la pàgina i torneu a provar.",
     "importLibraryError": "No s'ha pogut carregar la biblioteca",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed": "No s'ha pogut desar a la base de dades de fons. Si els problemes persisteixen, hauríeu de desar el fitxer localment per assegurar-vos que no perdeu el vostre treball.",
+    "collabSaveFailed_sizeExceeded": "No s'ha pogut desar a la base de dades de fons, sembla que el llenç és massa gran. Hauríeu de desar el fitxer localment per assegurar-vos que no perdeu el vostre treball.",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "Selecció",
@@ -217,10 +234,10 @@
     "text": "Text",
     "library": "Biblioteca",
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
-    "penMode": "",
+    "penMode": "Mode de llapis - evita tocar",
     "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
     "eraser": "Esborrador",
-    "hand": ""
+    "hand": "Mà (eina de desplaçament)"
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -228,7 +245,7 @@
     "shapes": "Formes"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Per moure el llenç, manteniu premuda la roda del ratolí o la barra espaiadora mentre arrossegueu o utilitzeu l'eina manual",
     "linearElement": "Feu clic per a dibuixar múltiples punts; arrossegueu per a una sola línia",
     "freeDraw": "Feu clic i arrossegueu, deixeu anar per a finalitzar",
     "text": "Consell: també podeu afegir text fent doble clic en qualsevol lloc amb l'eina de selecció",
@@ -239,7 +256,7 @@
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
     "resizeImage": "Podeu redimensionar lliurement prement MAJÚSCULA;\nper a redimensionar des del centre, premeu ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
-    "lineEditor_info": "",
+    "lineEditor_info": "Mantingueu premut Ctrl o Cmd i feu doble clic o premeu Ctrl o Cmd + Retorn per editar els punts",
     "lineEditor_pointSelected": "Premeu Suprimir per a eliminar el(s) punt(s), CtrlOrCmd+D per a duplicar-lo, o arrossegueu-lo per a moure'l",
     "lineEditor_nothingSelected": "Seleccioneu un punt per a editar-lo (premeu SHIFT si voleu\nselecció múltiple), o manteniu Alt i feu clic per a afegir més punts",
     "placeImage": "Feu clic per a col·locar la imatge o clic i arrossegar per a establir-ne la mida manualment",
@@ -247,7 +264,7 @@
     "bindTextToElement": "Premeu enter per a afegir-hi text",
     "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament",
     "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "És probable que aquesta funció es pugui activar posant la marca \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Per canviar les marques del navegador al Firefox, visiteu la pàgina \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
@@ -295,14 +312,15 @@
     "blog": "Llegiu el nostre blog",
     "click": "clic",
     "deepSelect": "Selecció profunda",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "Seleccioneu profundament dins del quadre i eviteu arrossegar",
     "curvedArrow": "Fletxa corba",
     "curvedLine": "Línia corba",
     "documentation": "Documentació",
     "doubleClick": "doble clic",
     "drag": "arrossega",
     "editor": "Editor",
-    "editSelectedShape": "Edita la forma seleccionada (text, fletxa o línia)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Hi heu trobat un problema? Informeu-ne",
     "howto": "Seguiu les nostres guies",
     "or": "o",
@@ -316,8 +334,8 @@
     "zoomToFit": "Zoom per veure tots els elements",
     "zoomToSelection": "Zoom per veure la selecció",
     "toggleElementLock": "Blocar/desblocar la selecció",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Mou la pàgina cap amunt/a baix",
+    "movePageLeftRight": "Mou la pàgina cap a l'esquerra/dreta"
   },
   "clearCanvasDialog": {
     "title": "Neteja el llenç"
@@ -399,7 +417,7 @@
     "fileSavedToFilename": "S'ha desat a {filename}",
     "canvas": "el llenç",
     "selection": "la selecció",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Fer servir {{shortcut}} per enganxar com un sol element,\no enganxeu-lo en un editor de text existent"
   },
   "colors": {
     "ffffff": "Blanc",
@@ -450,15 +468,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Totes les vostres dades es guarden localment al vostre navegador.",
+      "center_heading_plus": "Vols anar a Excalidraw+ en comptes?",
+      "menuHint": "Exportar, preferències, llenguatges..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Exportar, preferències i més...",
+      "center_heading": "Diagrames. Fer. Simple.",
+      "toolbarHint": "Selecciona una eina i comença a dibuixar!",
+      "helpHint": "Dreceres i ajuda"
     }
   }
 }

@@ -16,6 +16,7 @@ import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
 import { isEraserActive, isHandToolActive } from "./appState";
+import { ResolutionType } from "./utility-types";
 
 let mockDateTime: string | null = null;
 
@@ -178,6 +179,79 @@ export const throttleRAF = <T extends any[]>(
     }
   };
   return ret;
+};
+
+/**
+ * Exponential ease-out method
+ *
+ * @param {number} k - The value to be tweened.
+ * @returns {number} The tweened value.
+ */
+function easeOut(k: number): number {
+  return 1 - Math.pow(1 - k, 4);
+}
+
+/**
+ * Compute new values based on the same ease function and trigger the
+ * callback through a requestAnimationFrame call
+ *
+ * use `opts` to define a duration and/or an easeFn
+ *
+ * for example:
+ * ```ts
+ * easeToValuesRAF([10, 20, 10], [0, 0, 0], (a, b, c) => setState(a,b, c))
+ * ```
+ *
+ * @param fromValues The initial values, must be numeric
+ * @param toValues The destination values, must also be numeric
+ * @param callback The callback receiving the values
+ * @param opts default to 250ms duration and the easeOut function
+ */
+export const easeToValuesRAF = (
+  fromValues: number[],
+  toValues: number[],
+  callback: (...values: number[]) => void,
+  opts?: { duration?: number; easeFn?: (value: number) => number },
+) => {
+  let canceled = false;
+  let frameId = 0;
+  let startTime: number;
+
+  const duration = opts?.duration || 250; // default animation to 0.25 seconds
+  const easeFn = opts?.easeFn || easeOut; // default the easeFn to easeOut
+
+  function step(timestamp: number) {
+    if (canceled) {
+      return;
+    }
+    if (startTime === undefined) {
+      startTime = timestamp;
+    }
+
+    const elapsed = timestamp - startTime;
+
+    if (elapsed < duration) {
+      // console.log(elapsed, duration, elapsed / duration);
+      const factor = easeFn(elapsed / duration);
+      const newValues = fromValues.map(
+        (fromValue, index) =>
+          (toValues[index] - fromValue) * factor + fromValue,
+      );
+
+      callback(...newValues);
+      frameId = window.requestAnimationFrame(step);
+    } else {
+      // ensure final values are reached at the end of the transition
+      callback(...toValues);
+    }
+  }
+
+  frameId = window.requestAnimationFrame(step);
+
+  return () => {
+    canceled = true;
+    window.cancelAnimationFrame(frameId);
+  };
 };
 
 // https://github.com/lodash/lodash/blob/es/chunk.js
@@ -615,11 +689,7 @@ export const arrayToMapWithIndex = <T extends { id: string }>(
     return acc;
   }, new Map<string, [element: T, index: number]>());
 
-export const isTestEnv = () =>
-  typeof process !== "undefined" && process.env?.NODE_ENV === "test";
-
-export const isProdEnv = () =>
-  typeof process !== "undefined" && process.env?.NODE_ENV === "production";
+export const isTestEnv = () => process.env.NODE_ENV === "test";
 
 export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
   return new CustomEvent(name, {

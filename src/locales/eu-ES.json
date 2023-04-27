@@ -110,6 +110,7 @@
     "increaseFontSize": "Handitu letra tamaina",
     "unbindText": "Askatu testua",
     "bindText": "Lotu testua edukiontziari",
+    "createContainerFromText": "Bilatu testua edukiontzi batean",
     "link": {
       "edit": "Editatu esteka",
       "create": "Sortu esteka",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Ezin izan da eszena inportatu emandako URLtik. Gaizki eratuta dago edo ez du baliozko Excalidraw JSON daturik.",
     "resetLibrary": "Honek zure liburutegia garbituko du. Ziur zaude?",
     "removeItemsFromsLibrary": "Liburutegitik {{count}} elementu ezabatu?",
-    "invalidEncryptionKey": "Enkriptazio-gakoak 22 karaktere izan behar ditu. Zuzeneko lankidetza desgaituta dago."
+    "invalidEncryptionKey": "Enkriptazio-gakoak 22 karaktere izan behar ditu. Zuzeneko lankidetza desgaituta dago.",
+    "collabOfflineWarning": "Ez dago Interneteko konexiorik.\nZure aldaketak ez dira gordeko!"
   },
   "errors": {
     "unsupportedFileType": "Onartu gabeko fitxategi mota.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro.",
     "importLibraryError": "Ezin izan da liburutegia kargatu",
     "collabSaveFailed": "Ezin izan da backend datu-basean gorde. Arazoak jarraitzen badu, zure fitxategia lokalean gorde beharko zenuke zure lana ez duzula galtzen ziurtatzeko.",
-    "collabSaveFailed_sizeExceeded": "Ezin izan da backend datu-basean gorde, ohiala handiegia dela dirudi. Fitxategia lokalean gorde beharko zenuke zure lana galtzen ez duzula ziurtatzeko."
+    "collabSaveFailed_sizeExceeded": "Ezin izan da backend datu-basean gorde, ohiala handiegia dela dirudi. Fitxategia lokalean gorde beharko zenuke zure lana galtzen ez duzula ziurtatzeko.",
+    "brave_measure_text_error": {
+      "start": "Brave nabigatzailea erabiltzen ari zarela dirudi",
+      "aggressive_block_fingerprint": "Aggressively Block Fingerprinting",
+      "setting_enabled": "ezarpena gaituta",
+      "break": "Honek honen haustea eragin dezake",
+      "text_elements": "Testu-elementuak",
+      "in_your_drawings": "zure marrazkietan",
+      "strongly_recommend": "Ezarpen hau desgaitzea gomendatzen dugu. Jarrai dezakezu",
+      "steps": "urrats hauek",
+      "how": "jakiteko nola egin",
+      "disable_setting": " Ezarpen hau desgaitzeak testu-elementuen bistaratzea konpontzen ez badu, ireki",
+      "issue": "eskaera (issue) bat",
+      "write": "gure Github-en edo idatz iezaguzu",
+      "discord": "Discord-en"
+    }
   },
   "toolBar": {
     "selection": "Hautapena",
@@ -220,7 +237,7 @@
     "penMode": "Luma modua - ukipena saihestu",
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma",
-    "hand": ""
+    "hand": "Eskua (panoratze tresna)"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -228,7 +245,7 @@
     "shapes": "Formak"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Oihala mugitzeko, eutsi saguaren gurpila edo zuriune-barra arrastatzean, edo erabili esku tresna",
     "linearElement": "Egin klik hainbat puntu hasteko, arrastatu lerro bakarrerako",
     "freeDraw": "Egin klik eta arrastatu, askatu amaitutakoan",
     "text": "Aholkua: testua gehitu dezakezu edozein lekutan klik bikoitza eginez hautapen tresnarekin",
@@ -247,7 +264,7 @@
     "bindTextToElement": "Sakatu Sartu testua gehitzeko",
     "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko",
     "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Ezaugarri hau \"dom.events.asyncClipboard.clipboardItem\" marka \"true\" gisa ezarrita gaitu daiteke. Firefox-en arakatzailearen banderak aldatzeko, bisitatu \"about:config\" orrialdera."
   },
   "canvasError": {
     "cannotShowPreview": "Ezin da oihala aurreikusi",
@@ -302,7 +319,8 @@
     "doubleClick": "klik bikoitza",
     "drag": "arrastatu",
     "editor": "Editorea",
-    "editSelectedShape": "Editatu hautatutako forma (testua/gezia/lerroa)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Arazorik izan al duzu? Eman horren berri",
     "howto": "Jarraitu gure gidak",
     "or": "edo",

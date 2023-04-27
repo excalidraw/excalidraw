@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { LIBRARY_SIDEBAR } from "../constants";
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
+import { MarkOptional } from "../utility-types";
 import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibrarySidebarTabContent } from "./LibraryMenu";
 import { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";

@@ -110,6 +110,7 @@
     "increaseFontSize": "",
     "unbindText": "",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "",
       "create": "",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "",
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "",
     "importLibraryError": "",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "",
@@ -302,7 +319,8 @@
     "doubleClick": "қос шерту",
     "drag": "апару",
     "editor": "Өңдеу",
-    "editSelectedShape": "Таңдалған пішінді өңдеу (мәтін/нұсқар/сызық)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Қате таптыңыз ба? Жолдаңыз",
     "howto": "Біздің нұсқаулықтарды орындаңыз",
     "or": "немесе",

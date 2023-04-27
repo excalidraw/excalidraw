@@ -110,6 +110,7 @@
     "increaseFontSize": "লেখনীর মাত্রা বাড়ান",
     "unbindText": "",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "লিঙ্ক সংশোধন",
       "create": "লিঙ্ক তৈরী",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "সরবরাহ করা লিঙ্ক থেকে দৃশ্য লোড করা যায়নি৷ এটি হয় বিকৃত, অথবা বৈধ এক্সক্যালিড্র জেসন তথ্য নেই৷",
     "resetLibrary": "এটি আপনার সংগ্রহ পরিষ্কার করবে। আপনি কি নিশ্চিত?",
     "removeItemsFromsLibrary": "সংগ্রহ থেকে {{count}} বস্তু বিয়োগ করা হবে। আপনি কি নিশ্চিত?",
-    "invalidEncryptionKey": "অবৈধ এনক্রীপশন কী।"
+    "invalidEncryptionKey": "অবৈধ এনক্রীপশন কী।",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "অসমর্থিত ফাইল।",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "কোল্যাব সার্ভারের সাথে সংযোগ করা যায়নি। পৃষ্ঠাটি পুনরায় লোড করে আবার চেষ্টা করুন।",
     "importLibraryError": "সংগ্রহ লোড করা যায়নি",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "",
+      "break": "",
+      "text_elements": "",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": ""
+    }
   },
   "toolBar": {
     "selection": "বাছাই",
@@ -302,7 +319,8 @@
     "doubleClick": "",
     "drag": "",
     "editor": "",
-    "editSelectedShape": "",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "",
     "howto": "",
     "or": "অথবা",

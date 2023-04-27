@@ -110,6 +110,7 @@
     "increaseFontSize": "フォントサイズを拡大",
     "unbindText": "テキストのバインド解除",
     "bindText": "テキストをコンテナにバインド",
+    "createContainerFromText": "",
     "link": {
       "edit": "リンクを編集",
       "create": "リンクを作成",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "指定された URL からシーンをインポートできませんでした。不正な形式であるか、有効な Excalidraw JSON データが含まれていません。",
     "resetLibrary": "ライブラリを消去します。本当によろしいですか？",
     "removeItemsFromsLibrary": "{{count}} 個のアイテムをライブラリから削除しますか？",
-    "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。ライブコラボレーションは無効化されています。"
+    "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。ライブコラボレーションは無効化されています。",
+    "collabOfflineWarning": "インターネットに接続されていません。\n変更は保存されません！"
   },
   "errors": {
     "unsupportedFileType": "サポートされていないファイル形式です。",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "コラボレーションサーバに接続できませんでした。ページを再読み込みして、もう一度お試しください。",
     "importLibraryError": "ライブラリを読み込めませんでした。",
     "collabSaveFailed": "バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
-    "collabSaveFailed_sizeExceeded": "キャンバスが大きすぎるため、バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。"
+    "collabSaveFailed_sizeExceeded": "キャンバスが大きすぎるため、バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "設定が有効化されました",
+      "break": "",
+      "text_elements": "テキスト要素",
+      "in_your_drawings": "",
+      "strongly_recommend": "",
+      "steps": "",
+      "how": "",
+      "disable_setting": "",
+      "issue": "",
+      "write": "",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "選択",
@@ -220,7 +237,7 @@
     "penMode": "ペンモード - タッチ防止",
     "link": "選択した図形のリンクを追加/更新",
     "eraser": "消しゴム",
-    "hand": ""
+    "hand": "手 (パンニングツール)"
   },
   "headings": {
     "canvasActions": "キャンバス操作",
@@ -228,7 +245,7 @@
     "shapes": "図形"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "キャンバスを移動するには、マウスホイールまたはスペースバーを押しながらドラッグするか、手ツールを使用します",
     "linearElement": "クリックすると複数の頂点からなる曲線を開始、ドラッグすると直線",
     "freeDraw": "クリックしてドラッグします。離すと終了します",
     "text": "ヒント: 選択ツールを使用して任意の場所をダブルクリックしてテキストを追加することもできます",
@@ -302,7 +319,8 @@
     "doubleClick": "ダブルクリック",
     "drag": "ドラッグ",
     "editor": "エディタ",
-    "editSelectedShape": "選択した図形の編集 (テキスト/矢印/線)",
+    "editLineArrowPoints": "",
+    "editText": "テキストの編集 / ラベルの追加",
     "github": "不具合報告はこちら",
     "howto": "ヘルプ・マニュアル",
     "or": "または",

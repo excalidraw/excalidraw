@@ -103,13 +103,14 @@
     "share": "Compartir",
     "showStroke": "Mostrar selector de color de trazo",
     "showBackground": "Mostrar el selector de color de fondo",
-    "toggleTheme": "Alternar tema",
+    "toggleTheme": "Cambiar tema",
     "personalLib": "Biblioteca personal",
     "excalidrawLib": "Biblioteca Excalidraw",
     "decreaseFontSize": "Disminuir tamaño de letra",
     "increaseFontSize": "Aumentar el tamaño de letra",
     "unbindText": "Desvincular texto",
     "bindText": "Vincular texto al contenedor",
+    "createContainerFromText": "Envolver el texto en un contenedor",
     "link": {
       "edit": "Editar enlace",
       "create": "Crear enlace",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "No se ha podido importar la escena desde la URL proporcionada. Está mal formada, o no contiene datos de Excalidraw JSON válidos.",
     "resetLibrary": "Esto borrará tu biblioteca. ¿Estás seguro?",
     "removeItemsFromsLibrary": "¿Eliminar {{count}} elemento(s) de la biblioteca?",
-    "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada."
+    "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada.",
+    "collabOfflineWarning": "No hay conexión a internet disponible.\n¡No se guardarán los cambios!"
   },
   "errors": {
     "unsupportedFileType": "Tipo de archivo no admitido.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "No se pudo conectar al servidor colaborador. Por favor, vuelva a cargar la página y vuelva a intentarlo.",
     "importLibraryError": "No se pudo cargar la librería",
     "collabSaveFailed": "No se pudo guardar en la base de datos del backend. Si los problemas persisten, debería guardar su archivo localmente para asegurarse de que no pierde su trabajo.",
-    "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Debería guardar el archivo localmente para asegurarse de que no pierde su trabajo."
+    "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Debería guardar el archivo localmente para asegurarse de que no pierde su trabajo.",
+    "brave_measure_text_error": {
+      "start": "",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "ajuste activado",
+      "break": "Esto podría resultar en romper los",
+      "text_elements": "Elementos de texto",
+      "in_your_drawings": "en tus dibujos",
+      "strongly_recommend": "Recomendamos desactivar esta configuración. Puedes seguir",
+      "steps": "estos pasos",
+      "how": "sobre cómo hacerlo",
+      "disable_setting": " Si deshabilitar esta opción no arregla la visualización de elementos de texto, por favor abre un",
+      "issue": "issue",
+      "write": "en GitHub, o escríbenos en",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Selección",
@@ -233,7 +250,7 @@
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
     "text_selected": "Doble clic o pulse ENTER para editar el texto",
-    "text_editing": "Pulse Escape o CtrlOrCmd+ENTER para terminar de editar",
+    "text_editing": "Pulse Escape o Ctrl/Cmd + ENTER para terminar de editar",
     "linearElementMulti": "Haz clic en el último punto o presiona Escape o Enter para finalizar",
     "lockAngle": "Puedes restringir el ángulo manteniendo presionado el botón SHIFT",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
@@ -302,7 +319,8 @@
     "doubleClick": "doble clic",
     "drag": "arrastrar",
     "editor": "Editor",
-    "editSelectedShape": "Editar la forma seleccionada (texto/flecha/línea)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "¿Ha encontrado un problema? Envíelo",
     "howto": "Siga nuestras guías",
     "or": "o",
@@ -314,7 +332,7 @@
     "title": "Ayuda",
     "view": "Vista",
     "zoomToFit": "Ajustar la vista para mostrar todos los elementos",
-    "zoomToSelection": "Zoom a la selección",
+    "zoomToSelection": "Ampliar selección",
     "toggleElementLock": "Bloquear/desbloquear selección",
     "movePageUpDown": "Mover página hacia arriba/abajo",
     "movePageLeftRight": "Mover página hacia la izquierda/derecha"
@@ -326,9 +344,9 @@
     "title": "Publicar biblioteca",
     "itemName": "Nombre del artículo",
     "authorName": "Nombre del autor",
-    "githubUsername": "Nombre de usuario de Github",
+    "githubUsername": "Nombre de usuario de GitHub",
     "twitterUsername": "Nombre de usuario de Twitter",
-    "libraryName": "Nombre de la librería",
+    "libraryName": "Nombre de la biblioteca",
     "libraryDesc": "Descripción de la biblioteca",
     "website": "Sitio Web",
     "placeholder": {
@@ -336,7 +354,7 @@
       "libraryName": "Nombre de tu biblioteca",
       "libraryDesc": "Descripción de su biblioteca para ayudar a la gente a entender su uso",
       "githubHandle": "Nombre de usuario de GitHub (opcional), así podrá editar la biblioteca una vez enviada para su revisión",
-      "twitterHandle": "Nombre de usuario de Twitter (opcional), así que sabemos a quién acreditar cuando se promociona en Twitter",
+      "twitterHandle": "Nombre de usuario de Twitter (opcional), así sabemos a quién acreditar cuando se promociona en Twitter",
       "website": "Enlace a su sitio web personal o en cualquier otro lugar (opcional)"
     },
     "errors": {
@@ -458,7 +476,7 @@
       "menuHint": "Exportar, preferencias y más...",
       "center_heading": "Diagramas. Hecho. Simplemente.",
       "toolbarHint": "¡Elige una herramienta y empieza a dibujar!",
-      "helpHint": "Atajos & ayuda"
+      "helpHint": "Atajos y ayuda"
     }
   }
 }

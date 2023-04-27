@@ -18,7 +18,7 @@ export const actionCopy = register({
   perform: (elements, appState, _, app) => {
     const selectedElements = getSelectedElements(elements, appState, true);
 
-    copyToClipboard(selectedElements, appState, app.files);
+    copyToClipboard(selectedElements, app.files);
 
     return {
       commitToHistory: false,

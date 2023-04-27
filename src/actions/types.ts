@@ -6,6 +6,7 @@ import {
   ExcalidrawProps,
   BinaryFiles,
 } from "../types";
+import { MarkOptional } from "../utility-types";
 
 export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
 
@@ -113,7 +114,8 @@ export type ActionName =
   | "toggleLock"
   | "toggleLinearEditor"
   | "toggleEraserTool"
-  | "toggleHandTool";
+  | "toggleHandTool"
+  | "wrapTextInContainer";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

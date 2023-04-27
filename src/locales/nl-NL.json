@@ -110,6 +110,7 @@
     "increaseFontSize": "Letters vergroten",
     "unbindText": "Ontkoppel tekst",
     "bindText": "Koppel tekst aan de container",
+    "createContainerFromText": "",
     "link": {
       "edit": "Wijzig link",
       "create": "Maak link",
@@ -192,7 +193,8 @@
     "invalidSceneUrl": "Kan scène niet importeren vanuit de opgegeven URL. Het is onjuist of bevat geen geldige Excalidraw JSON-gegevens.",
     "resetLibrary": "Dit zal je bibliotheek wissen. Weet je het zeker?",
     "removeItemsFromsLibrary": "Verwijder {{count}} item(s) uit bibliotheek?",
-    "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld."
+    "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld.",
+    "collabOfflineWarning": "Geen internetverbinding beschikbaar.\nJe wijzigingen worden niet opgeslagen!"
   },
   "errors": {
     "unsupportedFileType": "Niet-ondersteund bestandstype.",
@@ -203,7 +205,22 @@
     "cannotResolveCollabServer": "Kan geen verbinding maken met de collab server. Herlaad de pagina en probeer het opnieuw.",
     "importLibraryError": "Kon bibliotheek niet laden",
     "collabSaveFailed": "Kan niet opslaan in de backend database. Als de problemen blijven bestaan, moet u het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
-    "collabSaveFailed_sizeExceeded": "Kan de backend database niet opslaan, het canvas lijkt te groot te zijn. U moet het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest."
+    "collabSaveFailed_sizeExceeded": "Kan de backend database niet opslaan, het canvas lijkt te groot te zijn. U moet het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
+    "brave_measure_text_error": {
+      "start": "Het ziet er uit dat u de Brave browser gebruikt met de",
+      "aggressive_block_fingerprint": "",
+      "setting_enabled": "instelling ingeschakeld",
+      "break": "Dit kan leiden tot het breken van de",
+      "text_elements": "Tekst Elementen",
+      "in_your_drawings": "in je tekeningen",
+      "strongly_recommend": "We raden u ten zeerste aan deze instelling uit te schakelen. U kunt dit volgen",
+      "steps": "deze stappen",
+      "how": "over hoe dit te doen",
+      "disable_setting": " Indien het uitschakelen van deze instelling de weergave van tekst elementen niet wijzigt, open dan een",
+      "issue": "probleem",
+      "write": "",
+      "discord": "Discord"
+    }
   },
   "toolBar": {
     "selection": "Selectie",
@@ -218,7 +235,7 @@
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen",
     "penMode": "Pen modus - Blokkeer aanraken",
-    "link": "",
+    "link": "Link toevoegen / bijwerken voor een geselecteerde vorm",
     "eraser": "Gum",
     "hand": ""
   },
@@ -228,7 +245,7 @@
     "shapes": "Vormen"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Om de canvas te verplaatsen, houd muiswiel of spatiebalk ingedrukt tijdens slepen, of gebruik het handgereedschap",
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
@@ -244,7 +261,7 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "Publiceer je eigen bibliotheek",
-    "bindTextToElement": "",
+    "bindTextToElement": "Druk op enter om tekst toe te voegen",
     "deepBoxSelect": "",
     "eraserRevert": "",
     "firefox_clipboard_write": ""
@@ -294,7 +311,7 @@
   "helpDialog": {
     "blog": "Lees onze blog",
     "click": "klik",
-    "deepSelect": "",
+    "deepSelect": "Deep selecteer",
     "deepBoxSelect": "",
     "curvedArrow": "Gebogen pijl",
     "curvedLine": "Kromme lijn",
@@ -302,7 +319,8 @@
     "doubleClick": "dubbelklikken",
     "drag": "slepen",
     "editor": "Editor",
-    "editSelectedShape": "Bewerk geselecteerde vorm (tekst/pijl/lijn)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Probleem gevonden? Verzenden",
     "howto": "Volg onze handleidingen",
     "or": "of",
@@ -363,13 +381,13 @@
     "republishWarning": ""
   },
   "publishSuccessDialog": {
-    "title": "",
+    "title": "Bibliotheek ingediend",
     "content": "",
     "link": "Hier"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Reset bibliotheek",
+    "removeItemsFromLib": "Verwijder geselecteerde items uit bibliotheek"
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent.",
@@ -391,7 +409,7 @@
     "width": "Breedte"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Toegevoegd aan bibliotheek",
     "copyStyles": "Stijlen gekopieerd.",
     "copyToClipboard": "Gekopieerd naar het klembord.",
     "copyToClipboardAsPng": "{{exportSelection}} naar klembord gekopieerd als PNG\n({{exportColorScheme}})",
@@ -455,10 +473,10 @@
       "menuHint": ""
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Exporteren, voorkeuren en meer...",
+      "center_heading": "Diagrammen. Eenvoudig. Gemaakt.",
+      "toolbarHint": "Kies een tool & begin met tekenen!",
+      "helpHint": "Snelkoppelingen en hulp"
     }
   }
 }
