@@ -20,9 +20,28 @@ export const trackEvent = (
       });
     }
 
-    // MATOMO event tracking _paq must be same as the one in index.html
-    if (window._paq) {
-      window._paq.push(["trackEvent", category, action, label, value]);
+    if (window.sa_event) {
+      try {
+        window.sa_event(action, {
+          category,
+          label,
+          value,
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (window.fathom) {
+      try {
+        window.fathom.trackEvent(action, {
+          category,
+          label,
+          value,
+        });
+      } catch (err) {
+        console.error(err);
+      }
     }
   } catch (error) {
     console.error("error during analytics", error);
