@@ -233,8 +233,8 @@ export const textWysiwyg = ({
           );
           mutateElement(container, { height: targetContainerHeight });
         }
-        // Start pushing text upward until a diff of 30px (padding)
-        // is reached
+        // update y coord as you type, not needed for arrow as we calculate
+        // position from the container element for editor and canvas when rendering labelled arrows
         else if (!isArrowElement(container)) {
           const containerCoords = getContainerCoords(container);
 
