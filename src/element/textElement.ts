@@ -98,13 +98,15 @@ export const redrawTextBoundingBox = (
       mutateElement(container, { height: nextHeight });
       updateOriginalContainerCache(container.id, nextHeight);
     }
-    const updatedTextElement = {
-      ...textElement,
-      ...boundTextUpdates,
-    } as ExcalidrawTextElementWithContainer;
-    const { x, y } = computeBoundTextPosition(container, updatedTextElement);
-    boundTextUpdates.x = x;
-    boundTextUpdates.y = y;
+    if (!isArrowElement(container)) {
+      const updatedTextElement = {
+        ...textElement,
+        ...boundTextUpdates,
+      } as ExcalidrawTextElementWithContainer;
+      const { x, y } = computeBoundTextPosition(container, updatedTextElement);
+      boundTextUpdates.x = x;
+      boundTextUpdates.y = y;
+    }
   }
 
   mutateElement(textElement, boundTextUpdates);

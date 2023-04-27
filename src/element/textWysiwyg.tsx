@@ -235,15 +235,12 @@ export const textWysiwyg = ({
         }
         // Start pushing text upward until a diff of 30px (padding)
         // is reached
-        else {
+        else if (!isArrowElement(container)) {
           const containerCoords = getContainerCoords(container);
 
           // vertically center align the text
           if (verticalAlign === VERTICAL_ALIGN.MIDDLE) {
-            if (!isArrowElement(container)) {
-              coordY =
-                containerCoords.y + maxHeight / 2 - textElementHeight / 2;
-            }
+            coordY = containerCoords.y + maxHeight / 2 - textElementHeight / 2;
           }
           if (verticalAlign === VERTICAL_ALIGN.BOTTOM) {
             coordY = containerCoords.y + (maxHeight - textElementHeight);
