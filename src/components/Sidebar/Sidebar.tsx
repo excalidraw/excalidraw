@@ -35,7 +35,7 @@ import React from "react";
 import { KEYS } from "../../keys";
 import { EVENT } from "../../constants";
 import { SidebarTrigger } from "./SidebarTrigger";
-import tunnel from "@dwelle/tunnel-rat";
+import tunnel from "tunnel-rat";
 import { useUIAppState } from "../../context/ui-appState";
 
 const useOnClickOutside = (
