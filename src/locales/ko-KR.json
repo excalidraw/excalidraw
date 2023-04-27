@@ -54,6 +54,7 @@
     "veryLarge": "매우 크게",
     "solid": "단색",
     "hachure": "평행선",
+    "zigzag": "지그재그",
     "crossHatch": "교차선",
     "thin": "얇게",
     "bold": "굵게",
@@ -256,7 +257,7 @@
     "resize": "SHIFT 키를 누르면서 조정하면 크기의 비율이 제한됩니다.\nALT를 누르면서 조정하면 중앙을 기준으로 크기를 조정합니다.",
     "resizeImage": "SHIFT를 눌러서 자유롭게 크기를 변경하거나,\nALT를 눌러서 중앙을 고정하고 크기를 변경하기",
     "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
-    "lineEditor_info": "포인트를 편집하려면 Ctrl/Cmd을 누르고 더블 클릭을 하거나 Ctrl/Cmd + Enter를 누르세요",
+    "lineEditor_info": "꼭짓점을 수정하려면 CtrlOrCmd 키를 누르고 더블 클릭을 하거나 CtrlOrCmd + Enter를 누르세요.",
     "lineEditor_pointSelected": "Delete 키로 꼭짓점을 제거하거나,\nCtrlOrCmd+D 로 복제하거나, 드래그 해서 이동시키기",
     "lineEditor_nothingSelected": "꼭짓점을 선택해서 수정하거나 (SHIFT를 눌러서 여러개 선택),\nAlt를 누르고 클릭해서 새로운 꼭짓점 추가하기",
     "placeImage": "클릭해서 이미지를 배치하거나, 클릭하고 드래그해서 사이즈를 조정하기",
@@ -319,8 +320,8 @@
     "doubleClick": "더블 클릭",
     "drag": "드래그",
     "editor": "에디터",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "직선 / 화살표 꼭짓점 수정",
+    "editText": "텍스트 수정 / 라벨 추가",
     "github": "문제 제보하기",
     "howto": "가이드 참고하기",
     "or": "또는",
@@ -382,8 +383,8 @@
   },
   "publishSuccessDialog": {
     "title": "라이브러리 제출됨",
-    "content": "{{authorName}}님 감사합니다. 당신의 라이브러리가 심사를 위해 제출되었습니다. 진행 상황을 다음의 링크에서 확인할 수 있습니다.",
-    "link": "여기"
+    "content": "{{authorName}}님 감사합니다. 당신의 라이브러리가 심사를 위해 제출되었습니다. 진행 상황을",
+    "link": "여기에서 확인하실 수 있습니다."
   },
   "confirmDialog": {
     "resetLibrary": "라이브러리 리셋",
