@@ -21,27 +21,19 @@ export const trackEvent = (
     }
 
     if (window.sa_event) {
-      try {
-        window.sa_event(action, {
-          category,
-          label,
-          value,
-        });
-      } catch (err) {
-        console.error(err);
-      }
+      window.sa_event(action, {
+        category,
+        label,
+        value,
+      });
     }
 
     if (window.fathom) {
-      try {
-        window.fathom.trackEvent(action, {
-          category,
-          label,
-          value,
-        });
-      } catch (err) {
-        console.error(err);
-      }
+      window.fathom.trackEvent(action, {
+        category,
+        label,
+        value,
+      });
     }
   } catch (error) {
     console.error("error during analytics", error);
