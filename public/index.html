@@ -150,6 +150,14 @@
     </script>
     <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
 
+    <!-- Fathom - privacy-friendly analytics -->
+    <script
+      src="https://cdn.usefathom.com/script.js"
+      data-site="VMSBUEYA"
+      defer
+    ></script>
+    <!-- / Fathom -->
+
     <!-- LEGACY GOOGLE ANALYTICS -->
     <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
     <script
@@ -166,31 +174,6 @@
     </script>
     <% } %>
     <!-- end LEGACY GOOGLE ANALYTICS -->
-
-    <!-- Matomo -->
-    <% if (process.env.REACT_APP_MATOMO_URL &&
-    process.env.REACT_APP_MATOMO_SITE_ID &&
-    process.env.REACT_APP_CDN_MATOMO_TRACKER_URL) { %>
-    <script>
-      var _paq = (window._paq = window._paq || []);
-      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-      _paq.push(["trackPageView"]);
-      _paq.push(["enableLinkTracking"]);
-      (function () {
-        var u = "%REACT_APP_MATOMO_URL%";
-        _paq.push(["setTrackerUrl", u + "matomo.php"]);
-        _paq.push(["setSiteId", "%REACT_APP_MATOMO_SITE_ID%"]);
-        var d = document,
-          g = d.createElement("script"),
-          s = d.getElementsByTagName("script")[0];
-        g.async = true;
-        g.src = "%REACT_APP_CDN_MATOMO_TRACKER_URL%";
-        s.parentNode.insertBefore(g, s);
-      })();
-    </script>
-    <% } %>
-    <!-- end Matomo analytics -->
-
     <% } %>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
@@ -244,5 +227,17 @@
       <h1 class="visually-hidden">Excalidraw</h1>
     </header>
     <div id="root"></div>
+    <!-- 100% privacy friendly analytics -->
+    <script
+      async
+      defer
+      src="https://scripts.simpleanalyticscdn.com/latest.js"
+    ></script>
+    <noscript
+      ><img
+        src="https://queue.simpleanalyticscdn.com/noscript.gif"
+        alt=""
+        referrerpolicy="no-referrer-when-downgrade"
+    /></noscript>
   </body>
 </html>
