@@ -1,9 +1,11 @@
 import fallbackLangData from "./helpers/locales/en.json";
 import {
+  SubtypeLoadedCb,
   SubtypeRecord,
   SubtypeMethods,
   SubtypePrepFn,
   addSubtypeMethods,
+  ensureSubtypesLoadedForElements,
   getSubtypeMethods,
   getSubtypeNames,
   hasAlwaysEnabledActions,
@@ -16,7 +18,12 @@ import { render } from "./test-utils";
 import { API } from "./helpers/api";
 import ExcalidrawApp from "../excalidraw-app";
 
-import { ExcalidrawElement, FontString, Theme } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  FontString,
+  Theme,
+} from "../element/types";
 import { createIcon, iconFillColor } from "../components/icons";
 import { SubtypeButton } from "../components/Subtypes";
 import { registerAuxLangData } from "../i18n";
@@ -155,6 +162,18 @@ const prepareTest1Subtype = function (
   return { actions, methods };
 } as SubtypePrepFn;
 
+let test2Loaded = false;
+
+const ensureLoadedTest2: SubtypeMethods["ensureLoaded"] = async (callback) => {
+  test2Loaded = true;
+  if (onTest2Loaded) {
+    onTest2Loaded((el) => isTextElement(el) && el.subtype === test2.subtype);
+  }
+  if (callback) {
+    callback();
+  }
+};
+
 const measureTest2: SubtypeMethods["measureText"] = function (element, next) {
   const text = next?.text ?? element.text;
   const customData = next?.customData ?? {};
@@ -165,8 +184,12 @@ const measureTest2: SubtypeMethods["measureText"] = function (element, next) {
   const fontString = getFontString({ fontSize, fontFamily });
   const lineHeight = element.lineHeight;
   const metrics = textElementUtils.measureText(text, fontString, lineHeight);
-  const width = Math.max(metrics.width - 10, 0);
-  const height = Math.max(metrics.height - 5, 0);
+  const width = test2Loaded
+    ? metrics.width * 2
+    : Math.max(metrics.width - 10, 0);
+  const height = test2Loaded
+    ? metrics.height * 2
+    : Math.max(metrics.height - 5, 0);
   return { width, height, baseline: 1 };
 };
 
@@ -185,12 +208,15 @@ const wrapTest2: SubtypeMethods["wrapText"] = function (
   return `${text.split(" ").join("\n")}\nHello world.`;
 };
 
+let onTest2Loaded: SubtypeLoadedCb | undefined;
+
 const prepareTest2Subtype = function (
   addSubtypeAction,
   addLangData,
   onSubtypeLoaded,
 ) {
   const methods = {
+    ensureLoaded: ensureLoadedTest2,
     measureText: measureTest2,
     wrapText: wrapTest2,
   } as SubtypeMethods;
@@ -200,6 +226,8 @@ const prepareTest2Subtype = function (
 
   const actions = [test2Button];
   actions.forEach((action) => addSubtypeAction(action));
+
+  onTest2Loaded = onSubtypeLoaded;
 
   return { actions, methods };
 } as SubtypePrepFn;
@@ -255,6 +283,7 @@ describe("subtype registration", () => {
     let prep2 = API.addSubtype(test2, prepareTest2Subtype);
     expect(prep2.actions).toStrictEqual([test2Button]);
     expect(prep2.methods).toStrictEqual({
+      ensureLoaded: ensureLoadedTest2,
       measureText: measureTest2,
       wrapText: wrapTest2,
     });
@@ -262,6 +291,7 @@ describe("subtype registration", () => {
     prep2 = API.addSubtype(test2, prepareNullSubtype);
     expect(prep2.actions).toBeNull();
     expect(prep2.methods).toStrictEqual({
+      ensureLoaded: ensureLoadedTest2,
       measureText: measureTest2,
       wrapText: wrapTest2,
     });
@@ -628,5 +658,30 @@ describe("subtype actions", () => {
     expect(am.isActionEnabled(TEST_DISABLE3, { elements })).toBe(true);
     h.setState({ selectedElementIds: { A: true, D: true } });
     expect(am.isActionEnabled(TEST_DISABLE3, { elements })).toBe(true);
+  });
+});
+describe("subtype loading", () => {
+  let elements: ExcalidrawElement[];
+  beforeEach(async () => {
+    const testString = "A quick brown fox jumps over the lazy dog.";
+    elements = [
+      API.createElement({
+        type: "text",
+        id: "A",
+        subtype: test2.subtype,
+        text: testString,
+      }),
+    ];
+    await render(<ExcalidrawApp />, { localStorageData: { elements } });
+  });
+  it("should redraw text bounding boxes", async () => {
+    h.setState({ selectedElementIds: { A: true } });
+    const el = h.elements[0] as ExcalidrawTextElement;
+    expect(el.width).toEqual(100);
+    expect(el.height).toEqual(100);
+    ensureSubtypesLoadedForElements(elements);
+    expect(el.width).toEqual(TWIDTH * 2);
+    expect(el.height).toEqual(THEIGHT * 2);
+    expect(el.baseline).toEqual(TBASELINE + 1);
   });
 });

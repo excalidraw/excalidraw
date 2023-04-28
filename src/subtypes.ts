@@ -14,8 +14,13 @@ import {
   registerCustomShortcuts,
 } from "./actions/shortcuts";
 import { register } from "./actions/register";
-import { hasBoundTextElement } from "./element/typeChecks";
-import { getBoundTextElement } from "./element/textElement";
+import { hasBoundTextElement, isTextElement } from "./element/typeChecks";
+import {
+  getBoundTextElement,
+  getContainerElement,
+  redrawTextBoundingBox,
+} from "./element/textElement";
+import { invalidateShapeForElement } from "./renderer/renderElement";
 
 // Use "let" instead of "const" so we can dynamically add subtypes
 let subtypeNames: readonly Subtype[] = [];
@@ -319,9 +324,8 @@ export const selectSubtype = (
 
 // Callback to re-render subtyped `ExcalidrawElement`s after completing
 // async loading of the subtype.
-export type SubtypeLoadedCb = (
-  hasSubtype: (element: ExcalidrawElement) => boolean,
-) => void;
+export type SubtypeLoadedCb = (hasSubtype: SubtypeCheckFn) => void;
+export type SubtypeCheckFn = (element: ExcalidrawElement) => boolean;
 
 // Functions to prepare subtypes for use
 export type SubtypePrepFn = (
@@ -439,4 +443,27 @@ export const ensureSubtypesLoaded = async (
   if (callback) {
     callback();
   }
+};
+
+// Call this method after finishing any async loading for
+// subtypes of ExcalidrawElement if the newly loaded code
+// would change the rendering.
+export const checkRefreshOnSubtypeLoad = (
+  hasSubtype: SubtypeCheckFn,
+  elements: readonly ExcalidrawElement[],
+) => {
+  let refreshNeeded = false;
+  getNonDeletedElements(elements).forEach((element) => {
+    // If the element is of the subtype that was just
+    // registered, update the element's dimensions, mark the
+    // element for a re-render, and indicate the scene needs a refresh.
+    if (hasSubtype(element)) {
+      invalidateShapeForElement(element);
+      if (isTextElement(element)) {
+        redrawTextBoundingBox(element, getContainerElement(element));
+      }
+      refreshNeeded = true;
+    }
+  });
+  return refreshNeeded;
 };

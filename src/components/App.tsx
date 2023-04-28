@@ -93,7 +93,6 @@ import {
   getCursorForResizingElement,
   getDragOffsetXY,
   getElementWithTransformHandleType,
-  getNonDeletedElements,
   getNormalizedDimensions,
   getResizeArrowDirection,
   getResizeOffsetXY,
@@ -246,12 +245,14 @@ import LayerUI from "./LayerUI";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
+  SubtypeLoadedCb,
   SubtypeRecord,
   SubtypePrepFn,
+  checkRefreshOnSubtypeLoad,
+  isSubtypeAction,
   prepareSubtype,
   selectSubtype,
   subtypeActionPredicate,
-  isSubtypeAction,
 } from "../subtypes";
 import {
   dataURLToFile,
@@ -516,31 +517,15 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private addSubtype(record: SubtypeRecord, subtypePrepFn: SubtypePrepFn) {
-    // Call this method after finishing any async loading for
-    // subtypes of ExcalidrawElement if the newly loaded code
-    // would change the rendering.
-    const refresh = (hasSubtype: (element: ExcalidrawElement) => boolean) => {
+    const subtypeLoadedCb: SubtypeLoadedCb = (hasSubtype) => {
       const elements = this.getSceneElementsIncludingDeleted();
-      let refreshNeeded = false;
-      getNonDeletedElements(elements).forEach((element) => {
-        // If the element is of the subtype that was just
-        // registered, update the element's dimensions, mark the
-        // element for a re-render, and mark the scene for a refresh.
-        if (hasSubtype(element)) {
-          invalidateShapeForElement(element);
-          if (isTextElement(element)) {
-            redrawTextBoundingBox(element, getContainerElement(element));
-          }
-          refreshNeeded = true;
-        }
-      });
       // If there are any elements of the just-registered subtype,
       // refresh the scene to re-render each such element.
-      if (refreshNeeded) {
+      if (checkRefreshOnSubtypeLoad(hasSubtype, elements)) {
         this.refresh();
       }
     };
-    const prep = prepareSubtype(record, subtypePrepFn, refresh);
+    const prep = prepareSubtype(record, subtypePrepFn, subtypeLoadedCb);
     if (prep.actions) {
       this.actionManager.registerAll(prep.actions);
     }

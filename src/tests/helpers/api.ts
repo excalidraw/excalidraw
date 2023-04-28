@@ -16,8 +16,10 @@ import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
 import {
+  SubtypeLoadedCb,
   SubtypePrepFn,
   SubtypeRecord,
+  checkRefreshOnSubtypeLoad,
   prepareSubtype,
   selectSubtype,
   subtypeActionPredicate,
@@ -45,7 +47,12 @@ export class API {
   }
 
   static addSubtype = (record: SubtypeRecord, subtypePrepFn: SubtypePrepFn) => {
-    const prep = prepareSubtype(record, subtypePrepFn);
+    const subtypeLoadedCb: SubtypeLoadedCb = (hasSubtype) => {
+      if (checkRefreshOnSubtypeLoad(hasSubtype, h.elements)) {
+        h.app.refresh();
+      }
+    };
+    const prep = prepareSubtype(record, subtypePrepFn, subtypeLoadedCb);
     if (prep.actions) {
       h.app.actionManager.registerAll(prep.actions);
     }
