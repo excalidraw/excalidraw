@@ -7,7 +7,7 @@
     "multiSelect": "",
     "moveCanvas": "",
     "cut": "",
-    "copy": "",
+    "copy": "Kóshirip alıw",
     "copyAsPng": "",
     "copyAsSvg": "",
     "copyText": "",
@@ -15,7 +15,7 @@
     "sendToBack": "",
     "bringToFront": "",
     "sendBackward": "",
-    "delete": "",
+    "delete": "Óshiriw",
     "copyStyles": "",
     "pasteStyles": "",
     "stroke": "",
@@ -101,7 +101,7 @@
     "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
-    "share": "",
+    "share": "Bólisiw",
     "showStroke": "",
     "showBackground": "",
     "toggleTheme": "",
@@ -115,17 +115,17 @@
     "link": {
       "edit": "",
       "create": "",
-      "label": ""
+      "label": "Silteme"
     },
     "lineEditor": {
       "edit": "",
       "exit": ""
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Qulıplaw",
+      "unlock": "Qulıptan shıǵarıw",
+      "lockAll": "Barlıǵın qulıplaw",
+      "unlockAll": "Barlıǵın qulıptan shıǵarıw"
     },
     "statusPublished": "",
     "sidebarLock": ""
@@ -147,22 +147,22 @@
     "scale": "",
     "save": "",
     "saveAs": "",
-    "load": "",
+    "load": "Ashıw",
     "getShareableLink": "",
-    "close": "",
-    "selectLanguage": "",
+    "close": "Jabıw",
+    "selectLanguage": "Tildi tańlaw",
     "scrollBackToContent": "",
     "zoomIn": "",
     "zoomOut": "",
     "resetZoom": "",
-    "menu": "",
-    "done": "",
-    "edit": "",
+    "menu": "Menyu",
+    "done": "Tayın",
+    "edit": "Ózgertiw",
     "undo": "",
     "redo": "",
     "resetLibrary": "",
     "createNewRoom": "",
-    "fullScreen": "",
+    "fullScreen": "Tolıq ekran",
     "darkMode": "",
     "lightMode": "",
     "zenMode": "",
@@ -237,7 +237,7 @@
     "lock": "",
     "penMode": "",
     "link": "",
-    "eraser": "",
+    "eraser": "Óshirgish",
     "hand": ""
   },
   "headings": {
@@ -296,7 +296,7 @@
     "shareTitle": ""
   },
   "errorDialog": {
-    "title": ""
+    "title": "Qátelik"
   },
   "exportDialog": {
     "disk_title": "",
@@ -311,7 +311,7 @@
   },
   "helpDialog": {
     "blog": "",
-    "click": "",
+    "click": "basıw",
     "deepSelect": "",
     "deepBoxSelect": "",
     "curvedArrow": "",
@@ -324,9 +324,9 @@
     "editText": "",
     "github": "",
     "howto": "",
-    "or": "",
+    "or": "yamasa",
     "preventBinding": "",
-    "tools": "",
+    "tools": "Ásbaplar",
     "shortcuts": "",
     "textFinish": "",
     "textNewLine": "",
@@ -349,7 +349,7 @@
     "twitterUsername": "",
     "libraryName": "",
     "libraryDesc": "",
-    "website": "",
+    "website": "Veb-sayt",
     "placeholder": {
       "authorName": "",
       "libraryName": "",
@@ -404,7 +404,7 @@
     "storage": "",
     "title": "",
     "total": "",
-    "version": "",
+    "version": "Versiya",
     "versionCopy": "",
     "versionNotAvailable": "",
     "width": ""
@@ -414,7 +414,7 @@
     "copyStyles": "",
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
-    "fileSaved": "",
+    "fileSaved": "Fayl saqlandı.",
     "fileSavedToFilename": "",
     "canvas": "",
     "selection": "",
@@ -424,7 +424,7 @@
     "ffffff": "",
     "f8f9fa": "",
     "f1f3f5": "",
-    "fff5f5": "",
+    "fff5f5": "Qızıl 0",
     "fff0f6": "",
     "f8f0fc": "",
     "f3f0ff": "",
@@ -439,7 +439,7 @@
     "transparent": "",
     "ced4da": "",
     "868e96": "",
-    "fa5252": "",
+    "fa5252": "Qızıl 6",
     "e64980": "",
     "be4bdb": "",
     "7950f2": "",
@@ -464,7 +464,7 @@
     "087f5b": "",
     "2b8a3e": "",
     "5c940d": "",
-    "e67700": "",
+    "e67700": "Sarı 9",
     "d9480f": ""
   },
   "welcomeScreen": {
