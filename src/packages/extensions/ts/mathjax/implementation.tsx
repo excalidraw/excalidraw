@@ -22,6 +22,7 @@ import {
 } from "../../../../element/types";
 import { newElementWith } from "../../../../element/mutateElement";
 import { getElementAbsoluteCoords } from "../../../../element/bounds";
+import Scene from "../../../../scene/Scene";
 
 // Imports for actions
 import { t, registerAuxLangData } from "../../../../i18n";
@@ -908,7 +909,7 @@ const measureMathElement = function (element, next) {
   return metrics;
 } as SubtypeMethods["measureText"];
 
-const renderMathElement = function (element, context, renderCb) {
+const renderMathElement = function (element, context) {
   ensureMathElement(element);
   const isMathJaxLoaded = mathJaxLoaded;
   const _element = element as NonDeleted<ExcalidrawMathElement>;
@@ -996,9 +997,7 @@ const renderMathElement = function (element, context, renderCb) {
               if (isMathJaxLoaded) {
                 imageCache[imgKey] = img;
               }
-              if (renderCb) {
-                renderCb();
-              }
+              Scene.getScene(element)?.informMutation();
             };
             img.src = reader.result as string;
           },

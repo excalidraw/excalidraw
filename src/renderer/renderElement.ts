@@ -257,7 +257,7 @@ const drawElementOnCanvas = (
   context.globalAlpha = element.opacity / 100;
   const map = getSubtypeMethods(element.subtype);
   if (map?.render) {
-    map.render(element, context, renderConfig.renderCb);
+    map.render(element, context);
     context.globalAlpha = 1;
     return;
   }

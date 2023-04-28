@@ -361,7 +361,6 @@ export const useExcalidrawSetAppState = () =>
 export const useExcalidrawActionManager = () =>
   useContext(ExcalidrawActionManagerContext);
 
-let refreshTimer = 0;
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
 let cursorX = 0;
@@ -1388,20 +1387,6 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton[socketId] = user.button;
     });
 
-    const refresh = () => {
-      // If a scene refresh is cued, restart the countdown.
-      // This way we are not calling this.setState({}) once per
-      // ExcalidrawElement. The countdown improves performance
-      // when there are large numbers of ExcalidrawElements
-      // executing this refresh() callback.
-      if (refreshTimer !== 0) {
-        window.clearTimeout(refreshTimer);
-      }
-      refreshTimer = window.setTimeout(() => {
-        this.refresh();
-        window.clearTimeout(refreshTimer);
-      }, 50);
-    };
     const renderingElements = this.scene
       .getNonDeletedElements()
       .filter((element) => {
@@ -1449,7 +1434,6 @@ class App extends React.Component<AppProps, AppState> {
           imageCache: this.imageCache,
           isExporting: false,
           renderScrollbars: !this.device.isMobile,
-          renderCb: refresh,
         },
         callback: ({ atLeastOneVisibleElement, scrollBars }) => {
           if (scrollBars) {

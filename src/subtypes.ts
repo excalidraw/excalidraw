@@ -241,7 +241,6 @@ export type SubtypeMethods = {
   render: (
     element: NonDeleted<ExcalidrawElement>,
     context: CanvasRenderingContext2D,
-    renderCb?: () => void,
   ) => void;
   renderSvg: (
     svgRoot: SVGElement,
