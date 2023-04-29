@@ -21,8 +21,8 @@ export const getClientColors = (clientId: string, appState: AppState) => {
 };
 
 export const getClientInitials = (userName?: string | null) => {
-  if (!userName?.trim()) {
+  if (!userName) {
     return "?";
   }
-  return userName.trim()[0].toUpperCase();
+  return userName[0].toUpperCase();
 };

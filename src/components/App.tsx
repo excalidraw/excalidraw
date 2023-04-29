@@ -210,6 +210,7 @@ import {
   PointerDownState,
   SceneData,
   Device,
+  Collaborator,
 } from "../types";
 import {
   debounce,
@@ -1985,6 +1986,18 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
+  private sanitizeCollaborators = (
+    collaborators: Map<String, Collaborator>,
+  ): void => {
+    collaborators.forEach((collaborator) => {
+      const { username } = collaborator;
+      if (username) {
+        collaborator.username =
+          typeof username === "string" ? username.trim() : "";
+      }
+    });
+  };
+
   public updateScene = withBatchedUpdates(
     <K extends keyof AppState>(sceneData: {
       elements?: SceneData["elements"];
@@ -2005,7 +2018,9 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.collaborators) {
-        this.setState({ collaborators: sceneData.collaborators });
+        const collaborators = sceneData.collaborators;
+        this.sanitizeCollaborators(collaborators);
+        this.setState({ collaborators });
       }
     },
   );
