@@ -47,6 +47,8 @@
   }
 
   .layer-ui__sidebar {
+    display: flex;
+    flex-direction: column;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -108,6 +110,34 @@
       position: relative;
       transition: box-shadow 0.5s ease-in-out;
     }
+
+    .sidebar-tabs-root {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      padding: 16px 12px;
+    }
+
+    [role="tabpanel"] {
+      flex: 1;
+      outline: none;
+
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      outline: none;
+    }
+
+    [role="tabpanel"][data-state="inactive"] {
+      display: none !important;
+    }
+
+    [role="tablist"] {
+      display: grid;
+      gap: 1rem;
+      padding: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    }
   }
 
   .layer-ui__sidebar__header {
@@ -116,7 +146,7 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 1rem;
+    padding-bottom: 16px;
     border-bottom: 1px solid var(--sidebar-border-color);
   }
 
@@ -127,28 +157,81 @@
     margin-left: auto;
   }
 
-  .sidebar-triggers {
-    display: grid;
-    padding: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-    grid-gap: 1rem;
-  }
-
   .sidebar-tab-trigger {
     width: auto !important;
     border: none !important;
-    background-color: inherit !important;
+    background-color: inherit;
 
-    &:hover svg {
-      stroke: var(--color-primary) !important;
+    &:hover:not([data-state="active"], :active) svg {
+      stroke: var(--color-primary);
       color: var(--color-primary);
     }
 
     &[data-state="active"] {
-      background-color: var(--color-primary-light) !important;
+      background-color: var(--color-primary-light);
     }
     &:active {
-      background-color: var(--color-primary-light-darker) !important;
+      background-color: var(--color-primary-light-darker);
+    }
+  }
+
+  // ---------------------------- default sidebar ------------------------------
+
+  .layer-ui__default-sidebar {
+    display: flex;
+    flex-direction: column;
+
+    .sidebar-triggers {
+      display: flex;
+      gap: 0;
+      margin-top: -3px;
+      padding: 2px;
+      border: 1px solid var(--color-gray-30);
+      border-radius: 10px;
+
+      .sidebar-tab-trigger {
+        width: 40px;
+        height: 40px;
+
+        background: initial;
+
+        &:hover {
+          background: initial;
+          color: var(--color-primary);
+        }
+
+        &[data-state="active"] {
+          background-color: var(--color-primary);
+          color: var(--color-icon-white);
+        }
+      }
+    }
+
+    .layer-ui__sidebar__header__buttons {
+      gap: 0;
+
+      .ToolIcon,
+      button {
+        background-color: initial;
+        border: 0 !important;
+        box-shadow: none !important;
+
+        &:hover {
+          background: var(--button-hover-bg, var(--island-bg-color));
+        }
+      }
+
+      .Sidebar__pin-btn {
+        border: 0;
+      }
+      .Sidebar__pin-btn--pinned {
+        background-color: initial;
+        border: 0;
+        svg {
+          stroke: var(--color-primary);
+          fill: var(--color-primary);
+        }
+      }
     }
   }
 }

@@ -312,7 +312,9 @@ const LayerUI = ({
           >
             <UserList collaborators={appState.collaborators} />
             {renderTopRightUI?.(device.isMobile, appState)}
-            {!appState.viewModeEnabled && <tunnels.DefaultSidebarTunnel.Out />}
+            {!appState.viewModeEnabled && (
+              <tunnels.DefaultSidebarTriggerTunnel.Out />
+            )}
           </div>
         </div>
       </FixedSideContainer>

@@ -4,7 +4,7 @@ import { Dialog, DialogProps } from "./Dialog";
 import "./ConfirmDialog.scss";
 import DialogActionButton from "./DialogActionButton";
 import { useSetAtom } from "jotai";
-import { isLibraryMenuOpenAtom } from "./LibraryMenuHeaderContent";
+import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
 import { jotaiScope } from "../jotai";
 

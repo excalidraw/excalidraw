@@ -10,7 +10,8 @@ type TunnelsContextValue = {
   WelcomeScreenHelpHintTunnel: Tunnel;
   WelcomeScreenCenterTunnel: Tunnel;
   FooterCenterTunnel: Tunnel;
-  DefaultSidebarTunnel: Tunnel;
+  DefaultSidebarTriggerTunnel: Tunnel;
+  DefaultSidebarTabTriggersTunnel: Tunnel;
   jotaiScope: symbol;
 };
 
@@ -27,7 +28,8 @@ export const useInitializeTunnels = () => {
       WelcomeScreenHelpHintTunnel: tunnel(),
       WelcomeScreenCenterTunnel: tunnel(),
       FooterCenterTunnel: tunnel(),
-      DefaultSidebarTunnel: tunnel(),
+      DefaultSidebarTriggerTunnel: tunnel(),
+      DefaultSidebarTabTriggersTunnel: tunnel(),
       jotaiScope: Symbol(),
     };
   }, []);

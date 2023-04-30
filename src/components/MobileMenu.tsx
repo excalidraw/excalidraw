@@ -59,8 +59,11 @@ export const MobileMenu = ({
   device,
   renderWelcomeScreen,
 }: MobileMenuProps) => {
-  const { WelcomeScreenCenterTunnel, MainMenuTunnel, DefaultSidebarTunnel } =
-    useTunnels();
+  const {
+    WelcomeScreenCenterTunnel,
+    MainMenuTunnel,
+    DefaultSidebarTriggerTunnel,
+  } = useTunnels();
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
@@ -87,7 +90,9 @@ export const MobileMenu = ({
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
                 <div className="mobile-misc-tools-container">
-                  {!appState.viewModeEnabled && <DefaultSidebarTunnel.Out />}
+                  {!appState.viewModeEnabled && (
+                    <DefaultSidebarTriggerTunnel.Out />
+                  )}
                   <PenModeButton
                     checked={appState.penMode}
                     onChange={onPenModeToggle}

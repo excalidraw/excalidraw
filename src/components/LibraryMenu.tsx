@@ -8,7 +8,7 @@ import { randomId } from "../random";
 import { LibraryItems, LibraryItem, AppState, ExcalidrawProps } from "../types";
 import LibraryMenuItems from "./LibraryMenuItems";
 import { trackEvent } from "../analytics";
-import { useAtom } from "jotai";
+import { atom, useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 import Spinner from "./Spinner";
 import {
@@ -17,13 +17,13 @@ import {
   useExcalidrawElements,
   useExcalidrawSetAppState,
 } from "./App";
-import { Sidebar } from "./Sidebar/Sidebar";
 import { getSelectedElements } from "../scene";
-import { LibraryMenuHeader } from "./LibraryMenuHeaderContent";
-import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
 import { useUIAppState } from "../context/ui-appState";
 
 import "./LibraryMenu.scss";
+import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
+
+export const isLibraryMenuOpenAtom = atom(false);
 
 const LibraryMenuWrapper = ({ children }: { children: React.ReactNode }) => {
   return <div className="layer-ui__library">{children}</div>;
@@ -115,10 +115,13 @@ export const LibraryMenuContent = ({
         theme={appState.theme}
       />
       {showBtn && (
-        <LibraryMenuBrowseButton
+        <LibraryMenuControlButtons
+          style={{ padding: "16px 12px 0 12px" }}
           id={id}
           libraryReturnUrl={libraryReturnUrl}
           theme={appState.theme}
+          selectedItems={selectedItems}
+          onSelectItems={onSelectItems}
         />
       )}
     </LibraryMenuWrapper>
@@ -127,9 +130,9 @@ export const LibraryMenuContent = ({
 
 /**
  * This component is meant to be rendered inside <Sidebar.Tab/> inside our
- * <DefaultSidebar/> component.
+ * <DefaultSidebar/> or host apps Sidebar components.
  */
-export const LibrarySidebarTabContent = () => {
+export const LibraryMenu = () => {
   const { library, id, onInsertElements } = useApp();
   const appProps = useAppProps();
   const appState = useUIAppState();
@@ -137,7 +140,6 @@ export const LibrarySidebarTabContent = () => {
   const elements = useExcalidrawElements();
 
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
-  const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
 
   const deselectItems = useCallback(() => {
     setAppState({
@@ -146,52 +148,20 @@ export const LibrarySidebarTabContent = () => {
     });
   }, [setAppState]);
 
-  const removeFromLibrary = useCallback(
-    async (libraryItems: LibraryItems) => {
-      const nextItems = libraryItems.filter(
-        (item) => !selectedItems.includes(item.id),
-      );
-      library.setLibrary(nextItems).catch(() => {
-        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
-      });
-      setSelectedItems([]);
-    },
-    [library, setAppState, selectedItems, setSelectedItems],
-  );
-
-  const resetLibrary = useCallback(() => {
-    library.resetLibrary();
-  }, [library]);
-
   return (
-    <>
-      <Sidebar.Header className="layer-ui__library-header">
-        <LibraryMenuHeader
-          appState={appState}
-          setAppState={setAppState}
-          selectedItems={selectedItems}
-          onSelectItems={setSelectedItems}
-          library={library}
-          onRemoveFromLibrary={() =>
-            removeFromLibrary(libraryItemsData.libraryItems)
-          }
-          resetLibrary={resetLibrary}
-        />
-      </Sidebar.Header>
-      <LibraryMenuContent
-        pendingElements={getSelectedElements(elements, appState, true)}
-        onInsertLibraryItems={(libraryItems) => {
-          onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
-        }}
-        onAddToLibrary={deselectItems}
-        setAppState={setAppState}
-        libraryReturnUrl={appProps.libraryReturnUrl}
-        library={library}
-        id={id}
-        appState={appState}
-        selectedItems={selectedItems}
-        onSelectItems={setSelectedItems}
-      />
-    </>
+    <LibraryMenuContent
+      pendingElements={getSelectedElements(elements, appState, true)}
+      onInsertLibraryItems={(libraryItems) => {
+        onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
+      }}
+      onAddToLibrary={deselectItems}
+      setAppState={setAppState}
+      libraryReturnUrl={appProps.libraryReturnUrl}
+      library={library}
+      id={id}
+      appState={appState}
+      selectedItems={selectedItems}
+      onSelectItems={setSelectedItems}
+    />
   );
 };

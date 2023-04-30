@@ -2,25 +2,35 @@ import clsx from "clsx";
 import { LIBRARY_SIDEBAR } from "../constants";
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
+import { t } from "../i18n";
 import { MarkOptional } from "../utility-types";
 import { composeEventHandlers } from "../utils";
 import { useExcalidrawSetAppState } from "./App";
 import { withInternalFallback } from "./hoc/withInternalFallback";
-import { LibrarySidebarTabContent } from "./LibraryMenu";
+import { LibraryMenu } from "./LibraryMenu";
 import { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
 import { Sidebar } from "./Sidebar/Sidebar";
 
 const DefaultSidebarTrigger = withInternalFallback(
   "DefaultSidebarTrigger",
   (props: SidebarTriggerProps) => {
-    const { DefaultSidebarTunnel } = useTunnels();
+    const { DefaultSidebarTriggerTunnel } = useTunnels();
     return (
-      <DefaultSidebarTunnel.In>
+      <DefaultSidebarTriggerTunnel.In>
         <Sidebar.Trigger {...props} />
-      </DefaultSidebarTunnel.In>
+      </DefaultSidebarTriggerTunnel.In>
     );
   },
 );
+
+const DefaultTabTriggers = ({ children }: { children: React.ReactNode }) => {
+  const { DefaultSidebarTabTriggersTunnel } = useTunnels();
+  return (
+    <DefaultSidebarTabTriggersTunnel.In>
+      <Sidebar.TabTriggers>{children}</Sidebar.TabTriggers>
+    </DefaultSidebarTabTriggersTunnel.In>
+  );
+};
 
 export const DefaultSidebar = Object.assign(
   withInternalFallback(
@@ -35,27 +45,40 @@ export const DefaultSidebar = Object.assign(
       const appState = useUIAppState();
       const setAppState = useExcalidrawSetAppState();
 
+      const { DefaultSidebarTabTriggersTunnel } = useTunnels();
+
       return (
         <Sidebar
           {...rest}
           name="default"
           key="default"
-          className={clsx("layer-ui__library-sidebar", className)}
+          className={clsx("layer-ui__default-sidebar", className)}
           docked={docked ?? appState.isSidebarDocked}
           onDock={composeEventHandlers(onDock, (docked) => {
             setAppState({ isSidebarDocked: docked });
           })}
         >
-          <Sidebar.Tabs>
-            <Sidebar.Tab
-              value={LIBRARY_SIDEBAR.tab}
-              style={{
-                flex: "1 1 auto",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <LibrarySidebarTabContent />
+          <Sidebar.Tabs defaultTab={LIBRARY_SIDEBAR.tab}>
+            <Sidebar.Header>
+              {rest.__fallback && (
+                <div
+                  style={{
+                    color: "var(--color-primary)",
+                    fontSize: "1.2em",
+                    fontWeight: "bold",
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    paddingRight: "1em",
+                  }}
+                >
+                  {t("toolBar.library")}
+                </div>
+              )}
+              <DefaultSidebarTabTriggersTunnel.Out />
+            </Sidebar.Header>
+            <Sidebar.Tab value={LIBRARY_SIDEBAR.tab}>
+              <LibraryMenu />
             </Sidebar.Tab>
             {children}
           </Sidebar.Tabs>
@@ -65,5 +88,6 @@ export const DefaultSidebar = Object.assign(
   ),
   {
     Trigger: DefaultSidebarTrigger,
+    TabTriggers: DefaultTabTriggers,
   },
 );

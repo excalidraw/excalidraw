@@ -219,6 +219,7 @@ const SidebarTabs = ({
 
   return (
     <RadixTabs.Root
+      className="sidebar-tabs-root"
       defaultValue={defaultTab}
       value={appState.openSidebar.tab}
       onValueChange={(tab) =>
@@ -227,7 +228,6 @@ const SidebarTabs = ({
           openSidebar: { ...state.openSidebar, name, tab },
         }))
       }
-      style={{ flex: "1 1 auto", display: "flex", flexDirection: "column" }}
       {...rest}
     >
       {children}
