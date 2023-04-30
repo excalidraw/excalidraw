@@ -32,9 +32,9 @@ import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
-import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
+import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
-import { Provider, useAtom } from "jotai";
+import { Provider, useAtomValue } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { HandButton } from "./HandButton";
@@ -338,7 +338,7 @@ const LayerUI = ({
     );
   };
 
-  const [hostSidebarCounters] = useAtom(hostSidebarCountersAtom, jotaiScope);
+  const isSidebarDocked = useAtomValue(isSidebarDockedAtom, jotaiScope);
 
   const layerUIJSX = (
     <>
@@ -415,7 +415,7 @@ const LayerUI = ({
             style={
               ((appState.openSidebar?.name === LIBRARY_SIDEBAR.name &&
                 appState.isSidebarDocked) ||
-                (appState.openSidebar && hostSidebarCounters.docked)) &&
+                (appState.openSidebar && isSidebarDocked)) &&
               device.canDeviceFitSidebar
                 ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
                 : {}

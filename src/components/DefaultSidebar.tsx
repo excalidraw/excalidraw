@@ -3,6 +3,8 @@ import { LIBRARY_SIDEBAR } from "../constants";
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
 import { MarkOptional } from "../utility-types";
+import { composeEventHandlers } from "../utils";
+import { useExcalidrawSetAppState } from "./App";
 import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibrarySidebarTabContent } from "./LibraryMenu";
 import { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
@@ -27,12 +29,11 @@ export const DefaultSidebar = Object.assign(
       children,
       className,
       onDock,
+      docked,
       ...rest
-    }: MarkOptional<
-      Omit<SidebarProps, "name" | "initialDockedState">,
-      "children"
-    >) => {
+    }: MarkOptional<Omit<SidebarProps, "name">, "children">) => {
       const appState = useUIAppState();
+      const setAppState = useExcalidrawSetAppState();
 
       return (
         <Sidebar
@@ -40,7 +41,10 @@ export const DefaultSidebar = Object.assign(
           name="default"
           key="default"
           className={clsx("layer-ui__library-sidebar", className)}
-          initialDockedState={appState.isSidebarDocked}
+          docked={docked ?? appState.isSidebarDocked}
+          onDock={composeEventHandlers(onDock, (docked) => {
+            setAppState({ isSidebarDocked: docked });
+          })}
         >
           <Sidebar.Tabs>
             <Sidebar.Tab

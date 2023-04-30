@@ -168,6 +168,8 @@ export type AppState = {
     | null;
   openSidebar: { name: string; tab?: string } | null;
   openDialog: "imageExport" | "help" | "jsonExport" | null;
+  /** whether the default Sidebar is docked. Host app sidebars need to maintain
+      their own state. */
   isSidebarDocked: boolean;
 
   lastPointerDownWith: PointerType;

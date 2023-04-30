@@ -4,8 +4,6 @@ import {
   useRef,
   useState,
   forwardRef,
-  useContext,
-  useMemo,
   useImperativeHandle,
   useCallback,
   RefObject,
@@ -35,7 +33,6 @@ import React from "react";
 import { KEYS } from "../../keys";
 import { EVENT } from "../../constants";
 import { SidebarTrigger } from "./SidebarTrigger";
-import tunnel from "tunnel-rat";
 import { useUIAppState } from "../../context/ui-appState";
 
 const useOnClickOutside = (
@@ -66,9 +63,15 @@ const useOnClickOutside = (
   }, [ref, cb]);
 };
 
-/** using a counter instead of boolean to handle race conditions where
- * the host app may render (mount/unmount) multiple different sidebar */
-export const hostSidebarCountersAtom = atom({ rendered: 0, docked: 0 });
+/**
+ * Flags whether the currently rendered Sidebar is docked or not, for use
+ * in upstream components that need to act on this (e.g. LayerUI to shift the
+ * UI). We use an atom because of potential host app sidebars (for the default
+ * sidebar we could just read from appState.isSidebarDocked).
+ *
+ * Since we can only render one Sidebar at a time, we can use a simple flag.
+ */
+export const isSidebarDockedAtom = atom(false);
 
 export const SidebarInner = forwardRef(
   (
@@ -78,61 +81,32 @@ export const SidebarInner = forwardRef(
       onClose,
       onDock,
       docked,
-      /** Undocumented, may be removed later. Generally should either be
-       * `props.docked` or `appState.isSidebarDocked`. Currently serves to
-       *  prevent unwanted animation of the shadow if initially docked. */
-      //
-      // NOTE we'll want to remove this after we sort out how to subscribe to
-      // individual appState properties
-      initialDockedState = docked,
-      dockable = true,
+      dockable = docked !== undefined,
       className,
-      __isInternal,
       ...rest
     }: SidebarProps & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">,
     ref: React.ForwardedRef<HTMLDivElement>,
   ) => {
-    const setHostSidebarCounters = useSetAtom(
-      hostSidebarCountersAtom,
-      jotaiScope,
-    );
+    if (
+      process.env.NODE_ENV === "development" &&
+      dockable &&
+      onDock === undefined
+    ) {
+      console.warn(
+        `When Sidebar's "docked" prop is set and "dockable" isn't set to false, "onDock" must be provided as you should listen to state changes and update "docked" accordingly. As such we're defaulting "dockabled" to false, otherwise the dock button will be rendered but won't do anything. Either provide "onDock" or set "dockable" to false to hide this message.`,
+      );
+    }
 
     const setAppState = useExcalidrawSetAppState();
 
-    const [isDockedFallback, setIsDockedFallback] = useState(
-      docked ?? initialDockedState ?? false,
-    );
+    const setIsSidebarDockedAtom = useSetAtom(isSidebarDockedAtom, jotaiScope);
 
     useLayoutEffect(() => {
-      if (docked === undefined) {
-        // ugly hack to get initial state out of AppState without subscribing
-        // to it as a whole (once we have granular subscriptions, we'll move
-        // to that)
-        //
-        // NOTE this means that is updated `state.isSidebarDocked` changes outside
-        // of this compoent, it won't be reflected here. Currently doesn't happen.
-        setAppState((state) => {
-          setIsDockedFallback(state.isSidebarDocked);
-          // bail from update
-          return null;
-        });
-      }
-    }, [setAppState, docked]);
-
-    useLayoutEffect(() => {
-      if (!__isInternal) {
-        setHostSidebarCounters((s) => ({
-          rendered: s.rendered + 1,
-          docked: isDockedFallback ? s.docked + 1 : s.docked,
-        }));
-        return () => {
-          setHostSidebarCounters((s) => ({
-            rendered: s.rendered - 1,
-            docked: isDockedFallback ? s.docked - 1 : s.docked,
-          }));
-        };
-      }
-    }, [__isInternal, setHostSidebarCounters, isDockedFallback]);
+      setIsSidebarDockedAtom(!!docked);
+      return () => {
+        setIsSidebarDockedAtom(false);
+      };
+    }, [setIsSidebarDockedAtom, docked]);
 
     const onCloseRef = useRef(onClose);
     onCloseRef.current = onClose;
@@ -149,34 +123,14 @@ export const SidebarInner = forwardRef(
     headerPropsRef.current.onClose = () => {
       setAppState({ openSidebar: null });
     };
-    headerPropsRef.current.onDock = (isDocked) => {
-      if (docked === undefined) {
-        setAppState({ isSidebarDocked: isDocked });
-        setIsDockedFallback(isDocked);
-      }
-      onDock?.(isDocked);
-    };
+    headerPropsRef.current.onDock = (isDocked) => onDock?.(isDocked);
     // renew the ref object if the following props change since we want to
     // rerender. We can't pass down as component props manually because
-    // the <Sidebar.Header/> can be rendered upsream.
+    // the <Sidebar.Header/> can be rendered upstream.
     headerPropsRef.current = updateObject(headerPropsRef.current, {
-      docked: docked ?? isDockedFallback,
+      docked,
       dockable,
     });
-
-    const { SidebarHeaderTunnel, SidebarTabTriggersTunnel } = useMemo(
-      () => ({
-        SidebarHeaderTunnel: tunnel(),
-        SidebarTabTriggersTunnel: tunnel(),
-      }),
-      [],
-    );
-    headerPropsRef.current.SidebarHeaderTunnel = SidebarHeaderTunnel;
-    headerPropsRef.current.SidebarTabTriggersTunnel = SidebarTabTriggersTunnel;
-
-    // if (hostSidebarCounters.rendered > 0 && __isInternal) {
-    //   return null;
-    // }
 
     const islandRef = useRef<HTMLDivElement>(null);
 
@@ -202,14 +156,14 @@ export const SidebarInner = forwardRef(
         (event) => {
           // If click on the library icon, do nothing so that LibraryButton
           // can toggle library menu
-          if ((event.target as Element).closest(".ToolIcon__library")) {
+          if ((event.target as Element).closest(".sidebar-trigger")) {
             return;
           }
-          if (!isDockedFallback || !device.canDeviceFitSidebar) {
+          if (!docked || !device.canDeviceFitSidebar) {
             closeLibrary();
           }
         },
-        [closeLibrary, isDockedFallback, device.canDeviceFitSidebar],
+        [closeLibrary, docked, device.canDeviceFitSidebar],
       ),
     );
 
@@ -217,7 +171,7 @@ export const SidebarInner = forwardRef(
       const handleKeyDown = (event: KeyboardEvent) => {
         if (
           event.key === KEYS.ESCAPE &&
-          (!isDockedFallback || !device.canDeviceFitSidebar)
+          (!docked || !device.canDeviceFitSidebar)
         ) {
           closeLibrary();
         }
@@ -226,26 +180,20 @@ export const SidebarInner = forwardRef(
       return () => {
         document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
       };
-    }, [closeLibrary, isDockedFallback, device.canDeviceFitSidebar]);
+    }, [closeLibrary, docked, device.canDeviceFitSidebar]);
 
     return (
       <Island
         {...rest}
         className={clsx(
           "layer-ui__sidebar",
-          { "layer-ui__sidebar--docked": isDockedFallback },
+          { "layer-ui__sidebar--docked": docked },
           className,
         )}
         ref={islandRef}
       >
         <SidebarPropsContext.Provider value={headerPropsRef.current}>
-          <SidebarHeaderTunnel.Out />
-          {/* render children first so that the SidebarHeader override
-              is rendered first (to remove flicker). It's then tunneled
-              above. 🐒 */}
           {children}
-          {/* default sidebar header if none provided (close + dock) */}
-          <SidebarHeader __fallback />
         </SidebarPropsContext.Provider>
       </Island>
     );
@@ -254,41 +202,35 @@ export const SidebarInner = forwardRef(
 
 const SidebarTabs = ({
   children,
+  defaultTab,
   ...rest
 }: {
   children: React.ReactNode;
+  defaultTab: string;
 } & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">) => {
-  const { SidebarTabTriggersTunnel } = useContext(SidebarPropsContext);
-
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
 
   if (!appState.openSidebar) {
     return null;
   }
-  const { name, tab } = appState.openSidebar;
 
-  if (!tab) {
-    return null;
-  }
+  const { name } = appState.openSidebar;
 
   return (
     <RadixTabs.Root
+      defaultValue={defaultTab}
       value={appState.openSidebar.tab}
-      onValueChange={(value) =>
+      onValueChange={(tab) =>
         setAppState((state) => ({
           ...state,
-          openSidebar: { ...state.openSidebar, name, tab: value },
+          openSidebar: { ...state.openSidebar, name, tab },
         }))
       }
       style={{ flex: "1 1 auto", display: "flex", flexDirection: "column" }}
       {...rest}
     >
       {children}
-      {/* For now we want to always render trigger list at the bottom. We may
-          support putting it anywhere later, but it would require some changes
-          in DefaultSidebar. */}
-      <SidebarTabTriggersTunnel.Out />
     </RadixTabs.Root>
   );
 };
@@ -300,13 +242,10 @@ const TabTriggers = ({
   React.RefAttributes<HTMLDivElement>,
   "onSelect"
 >) => {
-  const { SidebarTabTriggersTunnel } = useContext(SidebarPropsContext);
   return (
-    <SidebarTabTriggersTunnel.In>
-      <RadixTabs.List className="sidebar-triggers" {...rest}>
-        {children}
-      </RadixTabs.List>
-    </SidebarTabTriggersTunnel.In>
+    <RadixTabs.List className="sidebar-triggers" {...rest}>
+      {children}
+    </RadixTabs.List>
   );
 };
 

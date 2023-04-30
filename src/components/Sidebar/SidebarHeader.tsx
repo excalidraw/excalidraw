@@ -5,7 +5,6 @@ import { useDevice } from "../App";
 import { SidebarPropsContext } from "./common";
 import { CloseIcon, PinIcon } from "../icons";
 import { Tooltip } from "../Tooltip";
-import { withInternalFallback } from "../hoc/withInternalFallback";
 
 export const SidebarDockButton = (props: {
   checked: boolean;
@@ -41,52 +40,49 @@ export const SidebarDockButton = (props: {
   );
 };
 
-export const SidebarHeader = withInternalFallback(
-  "SidebarHeader",
-  ({
-    children,
-    className,
-  }: {
-    children?: React.ReactNode;
-    className?: string;
-  }) => {
-    const device = useDevice();
-    const props = useContext(SidebarPropsContext);
+export const SidebarHeader = ({
+  children,
+  className,
+}: {
+  children?: React.ReactNode;
+  className?: string;
+}) => {
+  const device = useDevice();
+  const props = useContext(SidebarPropsContext);
 
-    const renderDockButton = !!(device.canDeviceFitSidebar && props.dockable);
-    const renderCloseButton = !!props.onClose;
+  const renderDockButton = !!(device.canDeviceFitSidebar && props.dockable);
+  const renderCloseButton = !!props.onClose;
 
-    return (
-      <props.SidebarHeaderTunnel.In>
-        <div
-          className={clsx("layer-ui__sidebar__header", className)}
-          data-testid="sidebar-header"
-        >
-          {children}
-          {(renderDockButton || renderCloseButton) && (
-            <div className="layer-ui__sidebar__header__buttons">
-              {renderDockButton && (
-                <SidebarDockButton
-                  checked={!!props.docked}
-                  onChange={() => {
-                    props.onDock?.(!props.docked);
-                  }}
-                />
-              )}
-              {renderCloseButton && (
-                <button
-                  data-testid="sidebar-close"
-                  className="Sidebar__close-btn"
-                  onClick={props.onClose}
-                  aria-label={t("buttons.close")}
-                >
-                  {CloseIcon}
-                </button>
-              )}
-            </div>
+  return (
+    <div
+      className={clsx("layer-ui__sidebar__header", className)}
+      data-testid="sidebar-header"
+    >
+      {children}
+      {(renderDockButton || renderCloseButton) && (
+        <div className="layer-ui__sidebar__header__buttons">
+          {renderDockButton && (
+            <SidebarDockButton
+              checked={!!props.docked}
+              onChange={() => {
+                props.onDock?.(!props.docked);
+              }}
+            />
+          )}
+          {renderCloseButton && (
+            <button
+              data-testid="sidebar-close"
+              className="Sidebar__close-btn"
+              onClick={props.onClose}
+              aria-label={t("buttons.close")}
+            >
+              {CloseIcon}
+            </button>
           )}
         </div>
-      </props.SidebarHeaderTunnel.In>
-    );
-  },
-);
+      )}
+    </div>
+  );
+};
+
+SidebarHeader.displayName = "SidebarHeader";
