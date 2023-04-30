@@ -1,4 +1,5 @@
 import React from "react";
+import { AppState } from "../../types";
 
 export type SidebarName = string;
 
@@ -10,6 +11,7 @@ export type SidebarTriggerProps = {
 export type SidebarProps<P = {}> = {
   name: string;
   children: React.ReactNode;
+  onStateChange?: (openSidebar: AppState["openSidebar"]) => void;
   /**
    * Called on sidebar close (either by user action or by the editor).
    */

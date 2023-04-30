@@ -276,6 +276,16 @@ export const Sidebar = Object.assign(
   forwardRef((props: SidebarProps, ref: React.ForwardedRef<HTMLDivElement>) => {
     const appState = useExcalidrawAppState();
 
+    const { onStateChange } = props;
+
+    const refPrevOpenSidebar = useRef(appState.openSidebar);
+    useEffect(() => {
+      if (appState.openSidebar !== refPrevOpenSidebar.current) {
+        refPrevOpenSidebar.current = appState.openSidebar;
+        onStateChange?.(appState.openSidebar);
+      }
+    }, [appState.openSidebar, onStateChange]);
+
     const [mounted, setMounted] = useState(false);
     useLayoutEffect(() => {
       setMounted(true);
