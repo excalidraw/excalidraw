@@ -53,7 +53,7 @@ export const SidebarTrigger = ({ icon, children }: SidebarTriggerProps) => {
       />
       <div className="sidebar-trigger">
         {icon && <div>{icon}</div>}
-        {!device.isMobile && (
+        {!device.isMobile && children && (
           <div className="library-button__label">{children}</div>
         )}
       </div>

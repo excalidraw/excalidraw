@@ -4,7 +4,7 @@ export type SidebarName = string;
 
 export type SidebarTriggerProps = {
   icon?: JSX.Element;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export type SidebarProps<P = {}> = {
