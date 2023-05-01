@@ -186,7 +186,8 @@
       gap: 0;
       margin-top: -3px;
       padding: 2px;
-      border: 1px solid var(--color-gray-30);
+      border: 1px solid var(--sidebar-border-color);
+      background: var(--default-bg-color);
       border-radius: 10px;
 
       .sidebar-tab-trigger {

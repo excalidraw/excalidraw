@@ -35,6 +35,7 @@ import { EVENT } from "../../constants";
 import { SidebarTrigger } from "./SidebarTrigger";
 import { useUIAppState } from "../../context/ui-appState";
 
+// FIXME replace this with the implem from ColorPicker once it's merged
 const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
   cb: (event: MouseEvent) => void,
