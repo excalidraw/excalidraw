@@ -7,7 +7,7 @@ const REGEXP = /{{(.+?)}}/g;
 const getTransChildren = (
   format: string,
   props: {
-    [key: string]: React.ReactNode | React.FC;
+    [key: string]: React.ReactNode | ((el: React.ReactNode) => React.ReactNode);
   },
 ) => {
   const stack: { name: string; children: React.ReactNode[] }[] = [
@@ -87,7 +87,7 @@ const Trans = ({
   ...props
 }: {
   i18nKey: string;
-  [key: string]: React.ReactNode | React.FC<any>;
+  [key: string]: React.ReactNode | ((el: React.ReactNode) => React.ReactNode);
 }) => {
   const { t } = useI18n();
 
