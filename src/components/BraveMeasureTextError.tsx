@@ -5,7 +5,7 @@ const BraveMeasureTextError = () => {
       <p>
         <Trans
           i18nKey="errors.brave_measure_text_error.line1"
-          aggressiveBlockFingerprint={(el: any) => (
+          aggressiveBlockFingerprint={(el: React.ReactNode) => (
             <span style={{ fontWeight: 600 }}>{el}</span>
           )}
         />
@@ -13,7 +13,7 @@ const BraveMeasureTextError = () => {
       <p>
         <Trans
           i18nKey="errors.brave_measure_text_error.line2"
-          textElements={(el: any) => (
+          textElements={(el: React.ReactNode) => (
             <span style={{ fontWeight: 600 }}>{el}</span>
           )}
         />
@@ -21,7 +21,7 @@ const BraveMeasureTextError = () => {
       <p>
         <Trans
           i18nKey="errors.brave_measure_text_error.line3"
-          steps={(el: any) => (
+          steps={(el: React.ReactNode) => (
             <a href="http://docs.excalidraw.com/docs/@excalidraw/excalidraw/faq#turning-off-aggresive-block-fingerprinting-in-brave-browser">
               {el}
             </a>
@@ -31,12 +31,14 @@ const BraveMeasureTextError = () => {
       <p>
         <Trans
           i18nKey="errors.brave_measure_text_error.line4"
-          issue={(el: any) => (
+          issue={(el: React.ReactNode) => (
             <a href="https://github.com/excalidraw/excalidraw/issues/new">
               {el}
             </a>
           )}
-          discord={(el: any) => <a href="https://discord.gg/UexuTaE">{el}.</a>}
+          discord={(el: React.ReactNode) => (
+            <a href="https://discord.gg/UexuTaE">{el}.</a>
+          )}
         />
       </p>
     </div>
