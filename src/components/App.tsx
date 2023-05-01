@@ -443,7 +443,7 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
       showHyperlinkPopup: false,
-      isSidebarDocked: false,
+      defaultSidebarDockedPreference: false,
     };
 
     this.id = nanoid();
@@ -1682,7 +1682,7 @@ class App extends React.Component<AppProps, AppState> {
           openSidebar:
             this.state.openSidebar &&
             this.device.canDeviceFitSidebar &&
-            this.state.isSidebarDocked
+            this.state.defaultSidebarDockedPreference
               ? this.state.openSidebar
               : null,
           selectedElementIds: newElements.reduce(

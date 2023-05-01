@@ -10,19 +10,20 @@ import { LIBRARY_SIDEBAR } from "../../constants";
 import { SidebarTriggerProps } from "./common";
 
 import "./SidebarTrigger.scss";
+import { useAtomValue } from "jotai";
+import { isSidebarDockedAtom } from "./Sidebar";
+import { jotaiScope } from "../../jotai";
 
 export const SidebarTrigger = ({ icon, children }: SidebarTriggerProps) => {
   const device = useDevice();
   const setAppState = useExcalidrawSetAppState();
   // TODO replace with sidebar context
   const appState = useExcalidrawAppState();
+  const isSidebarDocked = useAtomValue(isSidebarDockedAtom, jotaiScope);
 
   // TODO barnabasmolnar/redesign
   // not great, toolbar jumps in a jarring manner
-  if (
-    appState.isSidebarDocked &&
-    appState.openSidebar?.name === LIBRARY_SIDEBAR.name
-  ) {
+  if (isSidebarDocked && appState.openSidebar?.name === LIBRARY_SIDEBAR.name) {
     return null;
   }
 

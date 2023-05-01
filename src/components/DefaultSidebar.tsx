@@ -40,6 +40,7 @@ export const DefaultSidebar = Object.assign(
       className,
       onDock,
       docked,
+      dockable,
       ...rest
     }: MarkOptional<Omit<SidebarProps, "name">, "children">) => {
       const appState = useUIAppState();
@@ -53,9 +54,10 @@ export const DefaultSidebar = Object.assign(
           name="default"
           key="default"
           className={clsx("layer-ui__default-sidebar", className)}
-          docked={docked ?? appState.isSidebarDocked}
+          docked={docked ?? appState.defaultSidebarDockedPreference}
+          dockable={docked == null ? dockable : false}
           onDock={composeEventHandlers(onDock, (docked) => {
-            setAppState({ isSidebarDocked: docked });
+            setAppState({ defaultSidebarDockedPreference: docked });
           })}
         >
           <Sidebar.Tabs defaultTab={LIBRARY_SIDEBAR.tab}>

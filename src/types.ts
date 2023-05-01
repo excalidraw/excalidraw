@@ -168,9 +168,13 @@ export type AppState = {
     | null;
   openSidebar: { name: string; tab?: string } | null;
   openDialog: "imageExport" | "help" | "jsonExport" | null;
-  /** whether the default Sidebar is docked. Host app sidebars need to maintain
-      their own state. */
-  isSidebarDocked: boolean;
+  /**
+   * Reflects user preference for whether the default sidebar should be docked.
+   *
+   * NOTE this is only a user preference and does not reflect the actual docked
+   * state of the sidebar, because the host apps can override this through
+   * a Sidebar prop, which is not reflected back to the appState. */
+  defaultSidebarDockedPreference: boolean;
 
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };

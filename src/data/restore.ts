@@ -27,7 +27,6 @@ import {
   PRECEDING_ELEMENT_KEY,
   FONT_FAMILY,
   ROUNDNESS,
-  LIBRARY_SIDEBAR,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -432,21 +431,15 @@ const LegacyAppStateMigrations: {
     defaultAppState: ReturnType<typeof getDefaultAppState>,
   ) => [LegacyAppState[K][1], AppState[LegacyAppState[K][1]]];
 } = {
-  isLibraryOpen: (appState, defaultAppState) => {
+  isSidebarDocked: (appState, defaultAppState) => {
     return [
-      "openSidebar",
-      "isLibraryOpen" in appState
-        ? appState.isLibraryOpen
-          ? { name: "library" }
-          : null
-        : coalesceAppStateValue("openSidebar", appState, defaultAppState),
-    ];
-  },
-  isLibraryMenuDocked: (appState, defaultAppState) => {
-    return [
-      "isSidebarDocked",
-      appState.isLibraryMenuDocked ??
-        coalesceAppStateValue("isSidebarDocked", appState, defaultAppState),
+      "defaultSidebarDockedPreference",
+      appState.isSidebarDocked ??
+        coalesceAppStateValue(
+          "defaultSidebarDockedPreference",
+          appState,
+          defaultAppState,
+        ),
     ];
   },
 };
@@ -524,10 +517,6 @@ export const restoreAppState = (
       // `string` is legacy
       typeof (appState.openSidebar as string | object) === "string"
         ? { name: appState.openSidebar as unknown as string }
-        : nextAppState.openSidebar?.name === LIBRARY_SIDEBAR.name
-        ? nextAppState.isSidebarDocked
-          ? LIBRARY_SIDEBAR
-          : null
         : nextAppState.openSidebar,
   };
 };
