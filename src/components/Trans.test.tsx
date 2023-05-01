@@ -4,9 +4,10 @@ import fallbackLangData from "../locales/en.json";
 
 import Trans from "./Trans";
 
-describe("Trans", () => {
-  it("should translate", () => {
-    (fallbackLangData as any).transtest = {
+describe("Test <Trans/>", () => {
+  it("should translate the the strings correctly", () => {
+    //@ts-ignore
+    fallbackLangData.transTest = {
       key1: "Hello {{audience}}",
       key2: "Please {{connectLinkStart}}click the button{{connectLinkEnd}} to continue.",
       key3: "Please {{connectLinkStart}}click {{location}}{{connectLinkEnd}} to continue.",
@@ -16,33 +17,39 @@ describe("Trans", () => {
     const { getByTestId } = render(
       <>
         <div data-testid="test1">
-          <Trans i18nKey="transtest.key1" audience="world" />
+          <Trans i18nKey="transTest.key1" audience="world" />
         </div>
         <div data-testid="test2">
           <Trans
-            i18nKey="transtest.key2"
-            connectLink={(el: any) => <a href="https://example.com">{el}</a>}
+            i18nKey="transTest.key2"
+            connectLink={(el: React.ReactNode) => (
+              <a href="https://example.com">{el}</a>
+            )}
           />
         </div>
         <div data-testid="test3">
           <Trans
-            i18nKey="transtest.key3"
-            connectLink={(el: any) => <a href="https://example.com">{el}</a>}
+            i18nKey="transTest.key3"
+            connectLink={(el: React.ReactNode) => (
+              <a href="https://example.com">{el}</a>
+            )}
             location="the button"
           />
         </div>
         <div data-testid="test4">
           <Trans
-            i18nKey="transtest.key4"
-            connectLink={(el: any) => <a href="https://example.com">{el}</a>}
+            i18nKey="transTest.key4"
+            connectLink={(el: React.ReactNode) => (
+              <a href="https://example.com">{el}</a>
+            )}
             location="the button"
-            bold={(el: any) => <strong>{el}</strong>}
+            bold={(el: React.ReactNode) => <strong>{el}</strong>}
           />
         </div>
       </>,
     );
 
-    expect(getByTestId("test1").innerHTML).toEqual(`Hello world`);
+    expect(getByTestId("test1").innerHTML).toEqual("Hello world");
     expect(getByTestId("test2").innerHTML).toEqual(
       `Please <a href="https://example.com">click the button</a> to continue.`,
     );

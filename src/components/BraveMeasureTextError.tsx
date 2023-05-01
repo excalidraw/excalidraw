@@ -1,4 +1,5 @@
 import Trans from "./Trans";
+
 const BraveMeasureTextError = () => {
   return (
     <div data-testid="brave-measure-text-error">

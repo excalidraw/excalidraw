@@ -4,8 +4,13 @@ import { useI18n } from "../i18n";
 
 const REGEXP = /{{(.+?)}}/g;
 
-const getTransChildren = (format: string, props: { [key: string]: any }) => {
-  const stack: { name: string; children: any[] }[] = [
+const getTransChildren = (
+  format: string,
+  props: {
+    [key: string]: React.ReactNode | React.FC;
+  },
+) => {
+  const stack: { name: string; children: React.ReactNode[] }[] = [
     {
       name: "",
       children: [],
@@ -25,7 +30,7 @@ const getTransChildren = (format: string, props: { [key: string]: any }) => {
       // If the match ends with last stack variable appended with "End"
       // This means we need to now replace the content with its actual value in prop
       // eg format = "Please {{connectLinkStart}}click the button{{connectLinkEnd}} to continue", match = "connectLinkEnd", stack last item name = "connectLink"
-      // and props.connectLink = (el: any) => <a href="https://example.com">{el}</a>
+      // and props.connectLink = (el) => <a href="https://example.com">{el}</a>
       // then its prop value will be pushed to "connectLink"'s children so on DOM when rendering it's rendered as
       // <a href="https://example.com">click the button</a>
     } else if (match === `${stack[stack.length - 1].name}End`) {
@@ -36,7 +41,9 @@ const getTransChildren = (format: string, props: { [key: string]: any }) => {
         ...item.children,
       );
       const fn = props[item.name];
-      stack[stack.length - 1].children.push(fn(itemChildren));
+      if (typeof fn === "function") {
+        stack[stack.length - 1].children.push(fn(itemChildren));
+      }
 
       // Check if the match value is present in props and set the prop value
       // as children of last stack item
@@ -44,7 +51,7 @@ const getTransChildren = (format: string, props: { [key: string]: any }) => {
       // then its prop value will be pushed to "name"'s children so it's
       // rendered on DOM as "Hello Excalidraw"
     } else if (props.hasOwnProperty(match)) {
-      stack[stack.length - 1].children.push(props[match]);
+      stack[stack.length - 1].children.push(props[match] as React.ReactNode);
 
       // Compute the actual key and set the key as the name if it's one of the props, eg for "Please {{connectLinkStart}}click the button{{connectLinkEnd}} to continue"
       // key = "connectLink" and props contain "connectLink" then it will be pushed to stack
@@ -80,14 +87,11 @@ const Trans = ({
   ...props
 }: {
   i18nKey: string;
-  [key: string]: any;
+  [key: string]: React.ReactNode | React.FC<any>;
 }) => {
   const { t } = useI18n();
 
-  return React.createElement.apply(
-    React.createElement,
-    [React.Fragment, {}].concat(getTransChildren(t(i18nKey), props)) as any,
-  );
+  return <>{getTransChildren(t(i18nKey), props)}</>;
 };
 
 export default Trans;
