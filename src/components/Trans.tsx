@@ -90,8 +90,11 @@ const Trans = ({
   [key: string]: React.ReactNode | React.FC<any>;
 }) => {
   const { t } = useI18n();
-
-  return <>{getTransChildren(t(i18nKey), props)}</>;
+  return React.createElement(
+    React.Fragment,
+    {},
+    ...getTransChildren(t(i18nKey), props),
+  );
 };
 
 export default Trans;
