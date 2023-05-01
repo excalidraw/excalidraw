@@ -37,10 +37,11 @@ const getTransChildren = (format: string, props: { [key: string]: any }) => {
       );
       const fn = props[item.name];
       stack[stack.length - 1].children.push(fn(itemChildren));
+
       // Check if the match value is present in props and set the prop value
       // as children of last stack item
       // eg format = Hello {{name}}, match = "name" and props.name = "Excalidraw"
-      // name will be populated with actual name prop value so its
+      // then its prop value will be pushed to "name"'s children so its
       // rendered on DOM as "Hello Excalidraw"
     } else if (props.hasOwnProperty(match)) {
       stack[stack.length - 1].children.push(props[match]);
