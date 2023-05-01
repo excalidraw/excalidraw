@@ -1,39 +1,43 @@
-import { t } from "../i18n";
+import Trans from "./Trans";
 const BraveMeasureTextError = () => {
   return (
     <div data-testid="brave-measure-text-error">
       <p>
-        {t("errors.brave_measure_text_error.start")} &nbsp;
-        <span style={{ fontWeight: 600 }}>
-          {t("errors.brave_measure_text_error.aggressive_block_fingerprint")}
-        </span>{" "}
-        {t("errors.brave_measure_text_error.setting_enabled")}.
+        <Trans
+          i18nKey="errors.brave_measure_text_error.line1"
+          aggressiveBlockFingerprint={(el: any) => (
+            <span style={{ fontWeight: 600 }}>{el}</span>
+          )}
+        />
         <br />
         <br />
-        {t("errors.brave_measure_text_error.break")}{" "}
-        <span style={{ fontWeight: 600 }}>
-          {t("errors.brave_measure_text_error.text_elements")}
-        </span>{" "}
-        {t("errors.brave_measure_text_error.in_your_drawings")}.
-      </p>
-      <p>
-        {t("errors.brave_measure_text_error.strongly_recommend")}{" "}
-        <a href="http://docs.excalidraw.com/docs/@excalidraw/excalidraw/faq#turning-off-aggresive-block-fingerprinting-in-brave-browser">
-          {" "}
-          {t("errors.brave_measure_text_error.steps")}
-        </a>{" "}
-        {t("errors.brave_measure_text_error.how")}.
-      </p>
-      <p>
-        {t("errors.brave_measure_text_error.disable_setting")}{" "}
-        <a href="https://github.com/excalidraw/excalidraw/issues/new">
-          {t("errors.brave_measure_text_error.issue")}
-        </a>{" "}
-        {t("errors.brave_measure_text_error.write")}{" "}
-        <a href="https://discord.gg/UexuTaE">
-          {t("errors.brave_measure_text_error.discord")}
-        </a>
-        .
+        <Trans
+          i18nKey="errors.brave_measure_text_error.line2"
+          textElements={(el: any) => (
+            <span style={{ fontWeight: 600 }}>{el}</span>
+          )}
+        />
+        <br />
+        <br />
+        <Trans
+          i18nKey="errors.brave_measure_text_error.line3"
+          steps={(el: any) => (
+            <a href="http://docs.excalidraw.com/docs/@excalidraw/excalidraw/faq#turning-off-aggresive-block-fingerprinting-in-brave-browser">
+              {el}
+            </a>
+          )}
+        />
+        <br />
+        <br />
+        <Trans
+          i18nKey="errors.brave_measure_text_error.line4"
+          issue={(el: any) => (
+            <a href="https://github.com/excalidraw/excalidraw/issues/new">
+              {el}
+            </a>
+          )}
+          discord={(el: any) => <a href="https://discord.gg/UexuTaE">{el}</a>}
+        />
       </p>
     </div>
   );
