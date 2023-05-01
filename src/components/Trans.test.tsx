@@ -9,9 +9,9 @@ describe("Test <Trans/>", () => {
     //@ts-ignore
     fallbackLangData.transTest = {
       key1: "Hello {{audience}}",
-      key2: "Please {{connectLinkStart}}click the button{{connectLinkEnd}} to continue.",
-      key3: "Please {{connectLinkStart}}click {{location}}{{connectLinkEnd}} to continue.",
-      key4: "Please {{connectLinkStart}}click {{boldStart}}{{location}}{{boldEnd}}{{connectLinkEnd}} to continue.",
+      key2: "Please <link>click the button</link> to continue.",
+      key3: "Please <link>click {{location}}</link> to continue.",
+      key4: "Please <link>click <bold>{{location}}</bold></link> to continue.",
     };
 
     const { getByTestId } = render(
@@ -22,28 +22,22 @@ describe("Test <Trans/>", () => {
         <div data-testid="test2">
           <Trans
             i18nKey="transTest.key2"
-            connectLink={(el: React.ReactNode) => (
-              <a href="https://example.com">{el}</a>
-            )}
+            link={(el) => <a href="https://example.com">{el}</a>}
           />
         </div>
         <div data-testid="test3">
           <Trans
             i18nKey="transTest.key3"
-            connectLink={(el: React.ReactNode) => (
-              <a href="https://example.com">{el}</a>
-            )}
+            link={(el) => <a href="https://example.com">{el}</a>}
             location="the button"
           />
         </div>
         <div data-testid="test4">
           <Trans
             i18nKey="transTest.key4"
-            connectLink={(el: React.ReactNode) => (
-              <a href="https://example.com">{el}</a>
-            )}
+            link={(el) => <a href="https://example.com">{el}</a>}
             location="the button"
-            bold={(el: React.ReactNode) => <strong>{el}</strong>}
+            bold={(el) => <strong>{el}</strong>}
           />
         </div>
       </>,
