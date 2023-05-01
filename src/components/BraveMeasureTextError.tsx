@@ -9,16 +9,16 @@ const BraveMeasureTextError = () => {
             <span style={{ fontWeight: 600 }}>{el}</span>
           )}
         />
-        <br />
-        <br />
+      </p>
+      <p>
         <Trans
           i18nKey="errors.brave_measure_text_error.line2"
           textElements={(el: any) => (
             <span style={{ fontWeight: 600 }}>{el}</span>
           )}
         />
-        <br />
-        <br />
+      </p>
+      <p>
         <Trans
           i18nKey="errors.brave_measure_text_error.line3"
           steps={(el: any) => (
@@ -27,8 +27,8 @@ const BraveMeasureTextError = () => {
             </a>
           )}
         />
-        <br />
-        <br />
+      </p>
+      <p>
         <Trans
           i18nKey="errors.brave_measure_text_error.line4"
           issue={(el: any) => (
@@ -36,7 +36,7 @@ const BraveMeasureTextError = () => {
               {el}
             </a>
           )}
-          discord={(el: any) => <a href="https://discord.gg/UexuTaE">{el}</a>}
+          discord={(el: any) => <a href="https://discord.gg/UexuTaE">{el}.</a>}
         />
       </p>
     </div>

@@ -26,7 +26,7 @@ const getTransChildren = (format: string, props: { [key: string]: any }) => {
       // This means we need to now replace the content with its actual value in prop
       // eg format = "Please {{connectLinkStart}}click the button{{connectLinkEnd}} to continue", match = "connectLinkEnd", stack last item name = "connectLink"
       // and props.connectLink = (el: any) => <a href="https://example.com">{el}</a>
-      // then its prop value will be pushed to "connectLink"'s children so on DOM when rendering its rendered as
+      // then its prop value will be pushed to "connectLink"'s children so on DOM when rendering it's rendered as
       // <a href="https://example.com">click the button</a>
     } else if (match === `${stack[stack.length - 1].name}End`) {
       const item = stack.pop()!;
@@ -41,12 +41,12 @@ const getTransChildren = (format: string, props: { [key: string]: any }) => {
       // Check if the match value is present in props and set the prop value
       // as children of last stack item
       // eg format = Hello {{name}}, match = "name" and props.name = "Excalidraw"
-      // then its prop value will be pushed to "name"'s children so its
+      // then its prop value will be pushed to "name"'s children so it's
       // rendered on DOM as "Hello Excalidraw"
     } else if (props.hasOwnProperty(match)) {
       stack[stack.length - 1].children.push(props[match]);
 
-      // Compute the actual key and set the key as the name if its one of the props, eg for "Please {{connectLinkStart}}click the button{{connectLinkEnd}} to continue"
+      // Compute the actual key and set the key as the name if it's one of the props, eg for "Please {{connectLinkStart}}click the button{{connectLinkEnd}} to continue"
       // key = "connectLink" and props contain "connectLink" then it will be pushed to stack
     } else if (/Start$/.test(match)) {
       const name = match.slice(0, match.length - 5);
