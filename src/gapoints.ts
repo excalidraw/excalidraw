@@ -13,7 +13,22 @@ export const from = ([x, y]: readonly [number, number]): Point => [
   0,
 ];
 
-export const toTuple = (point: Point): [number, number] => [point[5], point[4]];
+const normalizedWithSign = (a: Point): Point => {
+  const n = GA.norm(a);
+  const sign = a[6] < 0 ? -1 : 1;
+
+  if (n === 0 || n === 1) {
+    return GA.mul(a, sign);
+  }
+
+  return GA.mul(a, sign / n);
+};
+
+export const toTuple = (point: Point): [number, number] => {
+  const p = normalizedWithSign(point);
+  
+  return [p[5], p[4]];
+}
 
 export const abs = (point: Point): Point => [
   0,
