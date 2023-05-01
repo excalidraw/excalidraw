@@ -90,6 +90,8 @@ const Trans = ({
   [key: string]: React.ReactNode | React.FC<any>;
 }) => {
   const { t } = useI18n();
+
+  // This is needed to avoid unique key error in list which gets rendered from getTransChildren
   return React.createElement(
     React.Fragment,
     {},
