@@ -115,7 +115,7 @@
       display: flex;
       flex-direction: column;
       flex: 1 1 auto;
-      padding: 16px 12px;
+      padding: 1rem 0.75rem;
     }
 
     [role="tabpanel"] {
@@ -146,7 +146,7 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding-bottom: 16px;
+    padding-bottom: 1rem;
     border-bottom: 1px solid var(--sidebar-border-color);
   }
 
@@ -182,17 +182,22 @@
     flex-direction: column;
 
     .sidebar-triggers {
+      $padding: 2px;
+      $border: 1px;
       display: flex;
       gap: 0;
-      margin-top: -3px;
-      padding: 2px;
-      border: 1px solid var(--sidebar-border-color);
+      padding: $padding;
+      // offset by padding + border to vertically center the list with sibling
+      // buttons (both from top and bototm, due to flex layout)
+      margin-top: -#{$padding + $border};
+      margin-bottom: -#{$padding + $border};
+      border: $border solid var(--sidebar-border-color);
       background: var(--default-bg-color);
-      border-radius: 10px;
+      border-radius: 0.625rem;
 
       .sidebar-tab-trigger {
-        width: 40px;
-        height: 40px;
+        width: 2.5rem;
+        height: 2.5rem;
 
         background: initial;
 

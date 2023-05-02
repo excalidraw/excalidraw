@@ -69,7 +69,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 0.625rem;
   }
 
   .library-menu-browse-button {
@@ -119,7 +119,7 @@
     top: initial;
     right: 0;
     bottom: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 0.625rem;
 
     .dropdown-menu-container {
       width: 196px;
