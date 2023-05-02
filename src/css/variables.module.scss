@@ -72,7 +72,10 @@
 
   &:hover {
     background-color: var(--button-hover-bg, var(--island-bg-color));
-    border-color: var(--button-hover-border, var(--default-border-color));
+    border-color: var(
+      --button-hover-border,
+      var(--button-border, var(--default-border-color))
+    );
     color: var(--button-hover-color, inherit);
   }
 
