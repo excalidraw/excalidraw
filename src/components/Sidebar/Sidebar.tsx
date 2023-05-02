@@ -94,6 +94,7 @@ export const SidebarInner = forwardRef(
       console.warn(
         "When Sidebar's `docked` prop is set and `dockable` isn't set to false, `onDock` must be provided as you should listen to state changes and update `docked` accordingly. As such we're defaulting `dockabled` to false, otherwise the dock button will be rendered but won't do anything. Either provide `onDock` or set `dockable` to false to hide this message.",
       );
+      dockable = false;
     }
 
     const onToggleRef = useRef(onToggle);
