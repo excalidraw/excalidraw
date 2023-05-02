@@ -1,5 +1,5 @@
 import React from "react";
-import { LIBRARY_SIDEBAR } from "../../constants";
+import { DEFAULT_SIDEBAR } from "../../constants";
 import {
   DefaultSidebar,
   Excalidraw,
@@ -258,7 +258,7 @@ describe("Sidebar", () => {
       return (
         <Excalidraw
           initialData={{
-            appState: { openSidebar: { name: LIBRARY_SIDEBAR.name } },
+            appState: { openSidebar: { name: DEFAULT_SIDEBAR.name } },
           }}
         >
           <DefaultSidebar
@@ -437,7 +437,7 @@ describe("Sidebar", () => {
 
     // toggle library (= hide custom sidebar)
     // -------------------------------------------------------------------------
-    expect(window.h.app.toggleSidebar({ name: LIBRARY_SIDEBAR.name })).toBe(
+    expect(window.h.app.toggleSidebar({ name: DEFAULT_SIDEBAR.name })).toBe(
       true,
     );
 

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { LIBRARY_SIDEBAR } from "../constants";
+import { DEFAULT_SIDEBAR, LIBRARY_SIDEBAR_TAB } from "../constants";
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
 import { t } from "../i18n";
@@ -60,7 +60,7 @@ export const DefaultSidebar = Object.assign(
             setAppState({ defaultSidebarDockedPreference: docked });
           })}
         >
-          <Sidebar.Tabs defaultTab={LIBRARY_SIDEBAR.tab}>
+          <Sidebar.Tabs defaultTab={DEFAULT_SIDEBAR.defaultTab}>
             <Sidebar.Header>
               {rest.__fallback && (
                 <div
@@ -79,7 +79,7 @@ export const DefaultSidebar = Object.assign(
               )}
               <DefaultSidebarTabTriggersTunnel.Out />
             </Sidebar.Header>
-            <Sidebar.Tab value={LIBRARY_SIDEBAR.tab}>
+            <Sidebar.Tab value={LIBRARY_SIDEBAR_TAB}>
               <LibraryMenu />
             </Sidebar.Tab>
             {children}

@@ -19,7 +19,8 @@ import {
   URL_QUERY_KEYS,
   APP_NAME,
   EVENT,
-  LIBRARY_SIDEBAR,
+  DEFAULT_SIDEBAR,
+  LIBRARY_SIDEBAR_TAB,
 } from "../constants";
 
 export const libraryItemsAtom = atom<{
@@ -154,7 +155,9 @@ class Library {
     defaultStatus?: "unpublished" | "published";
   }): Promise<LibraryItems> => {
     if (openLibraryMenu) {
-      this.app.setState({ openSidebar: LIBRARY_SIDEBAR });
+      this.app.setState({
+        openSidebar: { name: DEFAULT_SIDEBAR.name, tab: LIBRARY_SIDEBAR_TAB },
+      });
     }
 
     return this.setLibrary(() => {
