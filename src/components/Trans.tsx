@@ -39,7 +39,7 @@ const getTransChildren = (
         });
       } else {
         console.warn(
-          `Trans: missed to pass in variable start/end ${match} for interpolating ${format}`,
+          `Trans: missed to pass in prop ${name} for interpolating ${format}`,
         );
       }
 
