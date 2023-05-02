@@ -211,7 +211,7 @@ import {
   SceneData,
   Device,
   SidebarName,
-  SidebarTab,
+  SidebarTabName,
 } from "../types";
 import {
   debounce,
@@ -2027,8 +2027,8 @@ class App extends React.Component<AppProps, AppState> {
     tab,
     force,
   }: {
-    name: string;
-    tab?: string;
+    name: SidebarName;
+    tab?: SidebarTabName;
     force?: boolean;
   }): boolean => {
     let nextName;

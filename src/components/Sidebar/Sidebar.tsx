@@ -16,7 +16,6 @@ import {
   SidebarProps,
   SidebarPropsContextValue,
 } from "./common";
-
 import { SidebarHeader } from "./SidebarHeader";
 import clsx from "clsx";
 import {
@@ -30,6 +29,7 @@ import { KEYS } from "../../keys";
 import { EVENT } from "../../constants";
 import { SidebarTrigger } from "./SidebarTrigger";
 import { useUIAppState } from "../../context/ui-appState";
+import { SidebarTabName } from "../../types";
 
 import "./Sidebar.scss";
 
@@ -251,16 +251,16 @@ const TabTriggers = ({
 
 const SidebarTabTrigger = ({
   children,
-  value,
+  tab,
   onSelect,
   ...rest
 }: {
   children: React.ReactNode;
-  value: string;
+  tab: SidebarTabName;
   onSelect?: React.ReactEventHandler<HTMLButtonElement> | undefined;
 } & Omit<React.RefAttributes<HTMLButtonElement>, "onSelect">) => {
   return (
-    <RadixTabs.Trigger value={value} asChild onSelect={onSelect}>
+    <RadixTabs.Trigger value={tab} asChild onSelect={onSelect}>
       <button
         type={"button"}
         className={`excalidraw-button sidebar-tab-trigger`}
@@ -270,6 +270,16 @@ const SidebarTabTrigger = ({
       </button>
     </RadixTabs.Trigger>
   );
+};
+
+const SidebarTab = ({
+  tab,
+  children,
+}: {
+  tab: SidebarTabName;
+  children: React.ReactNode;
+}) => {
+  return <RadixTabs.Content value={tab}>{children}</RadixTabs.Content>;
 };
 
 export const Sidebar = Object.assign(
@@ -317,7 +327,7 @@ export const Sidebar = Object.assign(
     TabTriggers,
     TabTrigger: SidebarTabTrigger,
     Tabs: SidebarTabs,
-    Tab: RadixTabs.Content,
+    Tab: SidebarTab,
     Trigger: SidebarTrigger,
   },
 );

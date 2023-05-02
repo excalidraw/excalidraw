@@ -83,7 +83,7 @@ export const DefaultSidebar = Object.assign(
               )}
               <DefaultSidebarTabTriggersTunnel.Out />
             </Sidebar.Header>
-            <Sidebar.Tab value={LIBRARY_SIDEBAR_TAB}>
+            <Sidebar.Tab tab={LIBRARY_SIDEBAR_TAB}>
               <LibraryMenu />
             </Sidebar.Tab>
             {children}

@@ -1,9 +1,9 @@
 import React from "react";
-import { AppState, SidebarName, SidebarTab } from "../../types";
+import { AppState, SidebarName, SidebarTabName } from "../../types";
 
 export type SidebarTriggerProps = {
   name: SidebarName;
-  tab?: SidebarTab;
+  tab?: SidebarTabName;
   icon?: JSX.Element;
   children?: React.ReactNode;
   title?: string;
