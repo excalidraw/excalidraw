@@ -189,7 +189,7 @@ describe("library menu", () => {
     const latestLibrary = await h.app.library.getLatestLibrary();
     expect(latestLibrary.length).toBe(0);
 
-    const libraryButton = container.querySelector(".library-button");
+    const libraryButton = container.querySelector(".sidebar-trigger");
 
     fireEvent.click(libraryButton!);
     fireEvent.click(container.querySelector(".Sidebar__dropdown-btn")!);

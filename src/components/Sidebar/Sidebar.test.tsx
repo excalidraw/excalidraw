@@ -1,5 +1,10 @@
 import React from "react";
-import { Excalidraw, Sidebar } from "../../packages/excalidraw/index";
+import { LIBRARY_SIDEBAR } from "../../constants";
+import {
+  DefaultSidebar,
+  Excalidraw,
+  Sidebar,
+} from "../../packages/excalidraw/index";
 import {
   act,
   fireEvent,
@@ -15,12 +20,11 @@ describe("Sidebar", () => {
     const { container } = await render(
       <Excalidraw
         initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
-        renderSidebar={() => (
-          <Sidebar name="test">
-            <div id="test-sidebar-content">42</div>
-          </Sidebar>
-        )}
-      />,
+      >
+        <Sidebar name="customSidebar">
+          <div id="test-sidebar-content">42</div>
+        </Sidebar>
+      </Excalidraw>,
     );
 
     const node = container.querySelector("#test-sidebar-content");
@@ -31,14 +35,13 @@ describe("Sidebar", () => {
     const { container } = await render(
       <Excalidraw
         initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
-        renderSidebar={() => (
-          <Sidebar name="test">
-            <Sidebar.Header>
-              <div id="test-sidebar-header-content">42</div>
-            </Sidebar.Header>
-          </Sidebar>
-        )}
-      />,
+      >
+        <Sidebar name="customSidebar">
+          <Sidebar.Header>
+            <div id="test-sidebar-header-content">42</div>
+          </Sidebar.Header>
+        </Sidebar>
+      </Excalidraw>,
     );
 
     const node = container.querySelector("#test-sidebar-header-content");
@@ -52,12 +55,11 @@ describe("Sidebar", () => {
     const { container } = await render(
       <Excalidraw
         initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
-        renderSidebar={() => (
-          <Sidebar name="test">
-            <div id="test-sidebar-content">42</div>
-          </Sidebar>
-        )}
-      />,
+      >
+        <Sidebar name="customSidebar">
+          <div id="test-sidebar-content">42</div>
+        </Sidebar>
+      </Excalidraw>,
     );
 
     await waitFor(() => {
@@ -71,18 +73,48 @@ describe("Sidebar", () => {
     });
   });
 
-  it("should always render custom sidebar with close button & close on click", async () => {
+  it("should not render <Sidebar.Header> for custom sidebars by default", async () => {
     const onClose = jest.fn();
     const CustomExcalidraw = () => {
       return (
         <Excalidraw
           initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
-          renderSidebar={() => (
-            <Sidebar name="test" className="test-sidebar" onClose={onClose}>
-              hello
-            </Sidebar>
-          )}
-        />
+        >
+          <Sidebar
+            name="customSidebar"
+            className="test-sidebar"
+            onClose={onClose}
+          >
+            hello
+          </Sidebar>
+        </Excalidraw>
+      );
+    };
+
+    const { container } = await render(<CustomExcalidraw />);
+
+    const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
+    expect(sidebar).not.toBe(null);
+    const closeButton = queryByTestId(sidebar!, "sidebar-close");
+    expect(closeButton).toBe(null);
+  });
+
+  it("<Sidebar.Header> should render close button & close on click", async () => {
+    const onClose = jest.fn();
+    const CustomExcalidraw = () => {
+      return (
+        <Excalidraw
+          initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
+        >
+          <Sidebar
+            name="customSidebar"
+            className="test-sidebar"
+            onClose={onClose}
+          >
+            <Sidebar.Header />
+            hello
+          </Sidebar>
+        </Excalidraw>
       );
     };
 
@@ -100,17 +132,49 @@ describe("Sidebar", () => {
     });
   });
 
-  it("should render custom sidebar with dock (irrespective of onDock prop)", async () => {
+  it("should render custom sidebar without dock button if onDock not supplied", async () => {
     const CustomExcalidraw = () => {
       return (
         <Excalidraw
           initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
-          renderSidebar={() => (
-            <Sidebar name="test" className="test-sidebar">
-              hello
-            </Sidebar>
-          )}
-        />
+        >
+          <Sidebar name="customSidebar" className="test-sidebar">
+            <Sidebar.Header />
+            hello
+          </Sidebar>
+        </Excalidraw>
+      );
+    };
+
+    const { container } = await render(<CustomExcalidraw />);
+
+    // should show dock button when the sidebar fits to be docked
+    // -------------------------------------------------------------------------
+
+    await withExcalidrawDimensions({ width: 1920, height: 1080 }, () => {
+      const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
+      expect(sidebar).not.toBe(null);
+      const closeButton = queryByTestId(sidebar!, "sidebar-dock");
+      expect(closeButton).toBe(null);
+    });
+  });
+
+  it("should render custom sidebar with dock button if onDock supplied", async () => {
+    const CustomExcalidraw = () => {
+      return (
+        <Excalidraw
+          initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
+        >
+          <Sidebar
+            name="customSidebar"
+            className="test-sidebar"
+            onDock={() => {}}
+            docked
+          >
+            <Sidebar.Header />
+            hello
+          </Sidebar>
+        </Excalidraw>
       );
     };
 
@@ -125,16 +189,6 @@ describe("Sidebar", () => {
       const closeButton = queryByTestId(sidebar!, "sidebar-dock");
       expect(closeButton).not.toBe(null);
     });
-
-    // should not show dock button when the sidebar does not fit to be docked
-    // -------------------------------------------------------------------------
-
-    await withExcalidrawDimensions({ width: 400, height: 1080 }, () => {
-      const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
-      expect(sidebar).not.toBe(null);
-      const closeButton = queryByTestId(sidebar!, "sidebar-dock");
-      expect(closeButton).toBe(null);
-    });
   });
 
   it("should support controlled docking", async () => {
@@ -146,17 +200,18 @@ describe("Sidebar", () => {
       return (
         <Excalidraw
           initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
-          renderSidebar={() => (
-            <Sidebar
-              name="test"
-              className="test-sidebar"
-              docked={false}
-              dockable={dockable}
-            >
-              hello
-            </Sidebar>
-          )}
-        />
+        >
+          <Sidebar
+            name="customSidebar"
+            className="test-sidebar"
+            docked={false}
+            dockable={dockable}
+            onDock={() => {}}
+          >
+            <Sidebar.Header />
+            hello
+          </Sidebar>
+        </Excalidraw>
       );
     };
 
@@ -194,7 +249,7 @@ describe("Sidebar", () => {
     });
   });
 
-  it("should support controlled docking", async () => {
+  it("DefaultSidebar docking should be fully-controlled when `docked` prop passed", async () => {
     let _setDocked: (docked?: boolean) => void = null!;
 
     const CustomExcalidraw = () => {
@@ -202,13 +257,18 @@ describe("Sidebar", () => {
       _setDocked = setDocked;
       return (
         <Excalidraw
-          initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
-          renderSidebar={() => (
-            <Sidebar name="test" className="test-sidebar" docked={docked}>
-              hello
-            </Sidebar>
-          )}
-        />
+          initialData={{
+            appState: { openSidebar: { name: LIBRARY_SIDEBAR.name } },
+          }}
+        >
+          <DefaultSidebar
+            className="test-sidebar"
+            docked={docked}
+            // onDock={() => {}}
+          >
+            hello
+          </DefaultSidebar>
+        </Excalidraw>
       );
     };
 
@@ -217,36 +277,36 @@ describe("Sidebar", () => {
     const { h } = window;
 
     await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
-      const dockButton = await waitFor(() => {
-        const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
-        expect(sidebar).not.toBe(null);
-        const dockBotton = queryByTestId(sidebar!, "sidebar-dock");
-        expect(dockBotton).not.toBe(null);
-        return dockBotton!;
-      });
-
-      const dockButtonInput = dockButton.querySelector("input")!;
-
-      // should not show dock button when `dockable` is `false`
+      // if `docked={undefined}` passed, should allow docking as normal
       // -------------------------------------------------------------------------
 
-      expect(h.state.isSidebarDocked).toBe(false);
+      {
+        expect(h.state.defaultSidebarDockedPreference).toBe(false);
 
-      fireEvent.click(dockButtonInput);
-      await waitFor(() => {
-        expect(h.state.isSidebarDocked).toBe(true);
-        expect(dockButtonInput).toBeChecked();
-      });
+        const dockButton = await waitFor(() => {
+          const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
+          expect(sidebar).not.toBe(null);
+          const dockBotton = queryByTestId(sidebar!, "sidebar-dock");
+          expect(dockBotton).not.toBe(null);
+          return dockBotton!;
+        });
 
-      fireEvent.click(dockButtonInput);
-      await waitFor(() => {
-        expect(h.state.isSidebarDocked).toBe(false);
-        expect(dockButtonInput).not.toBeChecked();
-      });
+        const dockButtonInput = dockButton.querySelector("input")!;
 
-      // shouldn't update `appState.isSidebarDocked` when the sidebar
-      // is controlled (`docked` prop is set), as host apps should handle
-      // the state themselves
+        fireEvent.click(dockButtonInput);
+        await waitFor(() => {
+          expect(h.state.defaultSidebarDockedPreference).toBe(true);
+          expect(dockButtonInput).toBeChecked();
+        });
+
+        fireEvent.click(dockButtonInput);
+        await waitFor(() => {
+          expect(h.state.defaultSidebarDockedPreference).toBe(false);
+          expect(dockButtonInput).not.toBeChecked();
+        });
+      }
+
+      // once `docked` is defined, shouldn't allow docking for DefaultSidebar
       // -------------------------------------------------------------------------
 
       act(() => {
@@ -254,48 +314,75 @@ describe("Sidebar", () => {
       });
 
       await waitFor(() => {
-        expect(dockButtonInput).toBeChecked();
-        expect(h.state.isSidebarDocked).toBe(false);
-        expect(dockButtonInput).toBeChecked();
-      });
+        const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
+        expect(sidebar).not.toBe(null);
 
-      fireEvent.click(dockButtonInput);
-      await waitFor(() => {
-        expect(h.state.isSidebarDocked).toBe(false);
-        expect(dockButtonInput).toBeChecked();
-      });
+        const dockBotton = queryByTestId(sidebar!, "sidebar-dock");
+        expect(dockBotton).toBe(null);
 
-      // the `appState.isSidebarDocked` should remain untouched when
-      // `props.docked` is set to `false`, and user toggles
-      // -------------------------------------------------------------------------
+        // defaultSidebarDockedPreference is disconnected from the actual
+        // docked state
+        expect(h.state.defaultSidebarDockedPreference).toBe(false);
+      });
 
       act(() => {
         _setDocked(false);
-        h.setState({ isSidebarDocked: true });
       });
 
       await waitFor(() => {
-        expect(h.state.isSidebarDocked).toBe(true);
-        expect(dockButtonInput).not.toBeChecked();
+        const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
+        expect(sidebar).not.toBe(null);
+
+        const dockBotton = queryByTestId(sidebar!, "sidebar-dock");
+        expect(dockBotton).toBe(null);
+
+        // defaultSidebarDockedPreference is disconnected from the actual
+        // docked state
+        expect(h.state.defaultSidebarDockedPreference).toBe(false);
       });
 
-      fireEvent.click(dockButtonInput);
-      await waitFor(() => {
-        expect(dockButtonInput).not.toBeChecked();
-        expect(h.state.isSidebarDocked).toBe(true);
-      });
+      // reverting back to `docked={undefined}` should allow docking again
+      // -----------------------------------------------------------------------
+
+      {
+        act(() => {
+          _setDocked(undefined);
+        });
+
+        expect(h.state.defaultSidebarDockedPreference).toBe(false);
+
+        const dockButton = await waitFor(() => {
+          const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
+          expect(sidebar).not.toBe(null);
+          const dockBotton = queryByTestId(sidebar!, "sidebar-dock");
+          expect(dockBotton).not.toBe(null);
+          return dockBotton!;
+        });
+
+        const dockButtonInput = dockButton.querySelector("input")!;
+
+        fireEvent.click(dockButtonInput);
+        await waitFor(() => {
+          expect(h.state.defaultSidebarDockedPreference).toBe(true);
+          expect(dockButtonInput).toBeChecked();
+        });
+
+        fireEvent.click(dockButtonInput);
+        await waitFor(() => {
+          expect(h.state.defaultSidebarDockedPreference).toBe(false);
+          expect(dockButtonInput).not.toBeChecked();
+        });
+      }
     });
   });
 
   it("should toggle sidebar using props.toggleMenu()", async () => {
     const { container } = await render(
-      <Excalidraw
-        renderSidebar={() => (
-          <Sidebar name="test">
-            <div id="test-sidebar-content">42</div>
-          </Sidebar>
-        )}
-      />,
+      <Excalidraw>
+        <Sidebar name="customSidebar">
+          <div id="test-sidebar-content">42</div>
+        </Sidebar>
+      </Excalidraw>,
     );
 
     // sidebar isn't rendered initially
@@ -307,7 +394,7 @@ describe("Sidebar", () => {
 
     // toggle sidebar on
     // -------------------------------------------------------------------------
-    // expect(window.h.app.toggleMenu("customSidebar")).toBe(true);
+    expect(window.h.app.toggleSidebar({ name: "customSidebar" })).toBe(true);
 
     await waitFor(() => {
       const node = container.querySelector("#test-sidebar-content");
@@ -316,7 +403,7 @@ describe("Sidebar", () => {
 
     // toggle sidebar off
     // -------------------------------------------------------------------------
-    // expect(window.h.app.toggleMenu("customSidebar")).toBe(false);
+    expect(window.h.app.toggleSidebar({ name: "customSidebar" })).toBe(false);
 
     await waitFor(() => {
       const node = container.querySelector("#test-sidebar-content");
@@ -325,7 +412,9 @@ describe("Sidebar", () => {
 
     // force-toggle sidebar off (=> still hidden)
     // -------------------------------------------------------------------------
-    // expect(window.h.app.toggleMenu("customSidebar", false)).toBe(false);
+    expect(
+      window.h.app.toggleSidebar({ name: "customSidebar", force: false }),
+    ).toBe(false);
 
     await waitFor(() => {
       const node = container.querySelector("#test-sidebar-content");
@@ -334,8 +423,12 @@ describe("Sidebar", () => {
 
     // force-toggle sidebar on
     // -------------------------------------------------------------------------
-    // expect(window.h.app.toggleMenu("customSidebar", true)).toBe(true);
-    // expect(window.h.app.toggleMenu("customSidebar", true)).toBe(true);
+    expect(
+      window.h.app.toggleSidebar({ name: "customSidebar", force: true }),
+    ).toBe(true);
+    expect(
+      window.h.app.toggleSidebar({ name: "customSidebar", force: true }),
+    ).toBe(true);
 
     await waitFor(() => {
       const node = container.querySelector("#test-sidebar-content");
@@ -344,7 +437,9 @@ describe("Sidebar", () => {
 
     // toggle library (= hide custom sidebar)
     // -------------------------------------------------------------------------
-    // expect(window.h.app.toggleMenu("library")).toBe(true);
+    expect(window.h.app.toggleSidebar({ name: LIBRARY_SIDEBAR.name })).toBe(
+      true,
+    );
 
     await waitFor(() => {
       const node = container.querySelector("#test-sidebar-content");
