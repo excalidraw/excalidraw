@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { serializeLibraryAsJSON } from "../data/json";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
@@ -39,6 +39,8 @@ const LibraryMenuItems = ({
   theme: AppState["theme"];
   id: string;
 }) => {
+  const [searchedItems, setSearchedItems] = useState<LibraryItems>([]);
+  const [searchValue, setSearchValue] = useState("");
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
   >(null);
@@ -194,12 +196,39 @@ const LibraryMenuItems = ({
     });
   };
 
-  const unpublishedItems = libraryItems.filter(
-    (item) => item.status !== "published",
+  const unpublishedItems = (
+    searchedItems.length ? searchedItems : libraryItems
+  ).filter((item) => item.status !== "published");
+  const publishedItems = (
+    searchedItems.length ? searchedItems : libraryItems
+  ).filter((item) => item.status === "published");
+
+  const searchForItems = useCallback(
+    (value: string) => {
+      const searchResults = libraryItems.filter((item) => {
+        if (!item.name) {
+          return false;
+        }
+        //remove special characters from item's name
+        const trimmedName = item.name
+          .trim()
+          .replace(/\s+/g, " ")
+          .replace(/[^a-zA-Z0-9 ]/g, " ")
+          .toLowerCase();
+        return trimmedName.includes(value.toLowerCase());
+      });
+      setSearchedItems(searchResults);
+    },
+    [libraryItems],
   );
-  const publishedItems = libraryItems.filter(
-    (item) => item.status === "published",
-  );
+
+  useEffect(() => {
+    if (searchValue && searchValue.trim().length) {
+      searchForItems(searchValue);
+    } else {
+      setSearchedItems([]);
+    }
+  }, [searchValue, searchForItems]);
 
   const showBtn =
     !libraryItems.length &&
@@ -228,6 +257,12 @@ const LibraryMenuItems = ({
         }}
       >
         <>
+          <input
+            type="text"
+            placeholder="Search by items..."
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="library-menu-items-container__search"
+          />
           <div>
             {(pendingElements.length > 0 ||
               unpublishedItems.length > 0 ||

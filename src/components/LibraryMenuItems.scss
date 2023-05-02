@@ -39,6 +39,11 @@
 
     position: relative;
 
+    &__search {
+      width: 90%;
+      height: 16px;
+    }
+
     &__row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
