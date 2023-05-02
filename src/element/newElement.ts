@@ -35,6 +35,8 @@ import {
   wrapText,
   getBoundTextMaxWidth,
   getDefaultLineHeight,
+  bindTextToContainer,
+  isValidTextContainer,
 } from "./textElement";
 import {
   DEFAULT_ELEMENT_PROPS,
@@ -44,10 +46,10 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { isArrowElement } from "./typeChecks";
+import { isArrowElement, isTextElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
 
-type ElementConstructorOpts = MarkOptional<
+export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
   | "width"
   | "height"
@@ -140,6 +142,7 @@ const getTextElementPositionOffsets = (
     height: number;
   },
 ) => {
+  console.log("metrics", metrics);
   return {
     x:
       opts.textAlign === "center"
@@ -642,4 +645,18 @@ export const duplicateElements = (
   }
 
   return clonedElements;
+};
+
+export const updateElementChildren = (
+  element: {
+    type: ExcalidrawElement["type"];
+  } & MarkOptional<ElementConstructorOpts, "x" | "y">,
+) => {
+  const textElement = element.children!.find((child) => child.text !== null);
+  if (isValidTextContainer(element) && textElement) {
+    //@ts-ignore
+    const elements = bindTextToContainer(element, textElement);
+    return elements;
+  }
+  return null;
 };

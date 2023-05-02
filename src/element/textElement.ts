@@ -1,6 +1,7 @@
 import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
+  ExcalidrawGenericElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -20,7 +21,7 @@ import {
 } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
-import { isTextElement } from ".";
+import { isTextElement, newElement, newTextElement } from ".";
 import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 import { AppState } from "../types";
@@ -32,7 +33,8 @@ import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./textWysiwyg";
-import { ExtractSetType } from "../utility-types";
+import { ExtractSetType, MarkOptional } from "../utility-types";
+import { ElementConstructorOpts } from "./newElement";
 
 export const normalizeText = (text: string) => {
   return (
@@ -83,20 +85,26 @@ export const redrawTextBoundingBox = (
   boundTextUpdates.baseline = metrics.baseline;
 
   if (container) {
-    const containerDims = getContainerDims(container);
     const maxContainerHeight = getBoundTextMaxHeight(
       container,
       textElement as ExcalidrawTextElementWithContainer,
     );
+    const maxContainerWidth = getBoundTextMaxWidth(container);
 
-    let nextHeight = containerDims.height;
     if (metrics.height > maxContainerHeight) {
-      nextHeight = computeContainerDimensionForBoundText(
+      const nextHeight = computeContainerDimensionForBoundText(
         metrics.height,
         container.type,
       );
       mutateElement(container, { height: nextHeight });
       updateOriginalContainerCache(container.id, nextHeight);
+    }
+    if (metrics.width > maxContainerWidth) {
+      const nextWidth = computeContainerDimensionForBoundText(
+        metrics.width,
+        container.type,
+      );
+      mutateElement(container, { width: nextWidth });
     }
     const updatedTextElement = {
       ...textElement,
@@ -864,8 +872,9 @@ const VALID_CONTAINER_TYPES = new Set([
   "arrow",
 ]);
 
-export const isValidTextContainer = (element: ExcalidrawElement) =>
-  VALID_CONTAINER_TYPES.has(element.type);
+export const isValidTextContainer = (element: {
+  type: ExcalidrawElement["type"];
+}) => VALID_CONTAINER_TYPES.has(element.type);
 
 export const computeContainerDimensionForBoundText = (
   dimension: number,
@@ -970,4 +979,35 @@ export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
     return DEFAULT_LINE_HEIGHT[fontFamily];
   }
   return DEFAULT_LINE_HEIGHT[DEFAULT_FONT_FAMILY];
+};
+
+export const bindTextToContainer = (
+  containerProps: {
+    type: ExcalidrawGenericElement["type"];
+  } & MarkOptional<ElementConstructorOpts, "x" | "y">,
+  textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
+) => {
+  const container = newElement({
+    x: 0,
+    y: 0,
+    ...containerProps,
+  });
+  const textElement: ExcalidrawTextElement = newTextElement({
+    x: 0,
+    y: 0,
+    ...textProps,
+    containerId: container.id,
+    textAlign: TEXT_ALIGN.CENTER,
+    verticalAlign: VERTICAL_ALIGN.MIDDLE,
+  });
+  mutateElement(container, {
+    boundElements: (container.boundElements || []).concat({
+      type: "text",
+      id: textElement.id,
+    }),
+  });
+
+  redrawTextBoundingBox(textElement, container);
+
+  return [container, textElement];
 };

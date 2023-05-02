@@ -1,3 +1,4 @@
+//@ts-nocheck
 import {
   ExcalidrawElement,
   ExcalidrawSelectionElement,
@@ -40,6 +41,7 @@ import {
   getDefaultLineHeight,
   measureBaseline,
 } from "../element/textElement";
+import { updateElementChildren } from "../element/newElement";
 
 type RestoredAppState = Omit<
   AppState,
@@ -194,6 +196,7 @@ const restoreElement = (
         lineHeight,
       );
       element = restoreElementWithProperties(element, {
+        type: "text",
         fontSize,
         fontFamily,
         text,
@@ -390,7 +393,16 @@ export const restoreElements = (
           migratedElement = { ...migratedElement, id: randomId() };
         }
         existingIds.add(migratedElement.id);
-        elements.push(migratedElement);
+        if (element.children?.length) {
+          const newElements = updateElementChildren(element);
+          if (newElements) {
+            elements.push(...newElements);
+          } else {
+            elements.push(migratedElement);
+          }
+        } else {
+          elements.push(migratedElement);
+        }
       }
     }
     return elements;
@@ -540,6 +552,7 @@ export const restore = (
   localElements: readonly ExcalidrawElement[] | null | undefined,
   elementsConfig?: { refreshDimensions?: boolean; repairBindings?: boolean },
 ): RestoredDataState => {
+  console.log(restoreElements(data?.elements, localElements, elementsConfig));
   return {
     elements: restoreElements(data?.elements, localElements, elementsConfig),
     appState: restoreAppState(data?.appState, localAppState || null),

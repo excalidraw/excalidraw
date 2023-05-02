@@ -6,7 +6,8 @@ import {
   THEME,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MarkNonNullable, ValueOf } from "../utility-types";
+import { MarkNonNullable, MarkOptional, ValueOf } from "../utility-types";
+import { ElementConstructorOpts } from "./newElement";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
@@ -65,6 +66,9 @@ type _ExcalidrawElementBase = Readonly<{
   link: string | null;
   locked: boolean;
   customData?: Record<string, any>;
+  children?: [
+    { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
+  ];
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
