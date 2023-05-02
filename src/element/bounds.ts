@@ -7,8 +7,8 @@ import {
   ExcalidrawTextElementWithContainer,
 } from "./types";
 import { distance2d, rotate } from "../math";
-import rough from "roughjs/bin/rough";
-import { Drawable, Op } from "roughjs/bin/core";
+import rough from "@excalidraw/roughjs/bin/rough";
+import { Drawable, Op } from "@excalidraw/roughjs/bin/core";
 import { Point } from "../types";
 import {
   getShapeForElement,

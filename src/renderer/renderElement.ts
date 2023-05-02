@@ -21,15 +21,15 @@ import {
   getElementAbsoluteCoords,
   getArrowheadPoints,
 } from "../element/bounds";
-import { RoughCanvas } from "roughjs/bin/canvas";
-import { Drawable, Options } from "roughjs/bin/core";
-import { RoughSVG } from "roughjs/bin/svg";
-import { RoughGenerator } from "roughjs/bin/generator";
+import { RoughCanvas } from "@excalidraw/roughjs/bin/canvas";
+import { Drawable, Options } from "@excalidraw/roughjs/bin/core";
+import { RoughSVG } from "@excalidraw/roughjs/bin/svg";
+import { RoughGenerator } from "@excalidraw/roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
-import rough from "roughjs/bin/rough";
+import rough from "@excalidraw/roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
@@ -388,6 +388,16 @@ export const setShapeForElement = <T extends ExcalidrawElement>(
 export const invalidateShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.delete(element);
 
+function adjustRoughness(size: number, roughness: number): number {
+  if (size >= 50) {
+    return roughness;
+  }
+  const factor = 2 + (50 - size) / 10;
+
+  // console.log({ ret: roughness / factor, roughness, factor, size });
+  return roughness / factor;
+}
+
 export const generateRoughOptions = (
   element: ExcalidrawElement,
   continuousPath = false,
@@ -414,7 +424,10 @@ export const generateRoughOptions = (
     // calculate them (and we don't want the fills to be modified)
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
-    roughness: element.roughness,
+    roughness: adjustRoughness(
+      Math.min(element.width, element.height),
+      element.roughness,
+    ),
     stroke: element.strokeColor,
     preserveVertices: continuousPath,
   };

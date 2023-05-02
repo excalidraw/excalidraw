@@ -1,5 +1,5 @@
-import { RoughCanvas } from "roughjs/bin/canvas";
-import { RoughSVG } from "roughjs/bin/svg";
+import { RoughCanvas } from "@excalidraw/roughjs/bin/canvas";
+import { RoughSVG } from "@excalidraw/roughjs/bin/svg";
 import oc from "open-color";
 
 import { AppState, BinaryFiles, Point, Zoom } from "../types";

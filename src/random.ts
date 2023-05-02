@@ -1,4 +1,4 @@
-import { Random } from "roughjs/bin/math";
+import { Random } from "@excalidraw/roughjs/bin/math";
 import { nanoid } from "nanoid";
 import { isTestEnv } from "./utils";
 

@@ -16,7 +16,7 @@ import {
   StrokeRoundness,
 } from "./element/types";
 import { SHAPES } from "./shapes";
-import { Point as RoughPoint } from "roughjs/bin/geometry";
+import { Point as RoughPoint } from "@excalidraw/roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
