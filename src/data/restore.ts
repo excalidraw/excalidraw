@@ -1,4 +1,3 @@
-//@ts-nocheck
 import {
   ExcalidrawElement,
   ExcalidrawSelectionElement,
@@ -393,7 +392,9 @@ export const restoreElements = (
           migratedElement = { ...migratedElement, id: randomId() };
         }
         existingIds.add(migratedElement.id);
+        //@ts-ignore
         if (element.children?.length) {
+          //@ts-ignore
           const newElements = updateElementChildren(element);
           if (newElements) {
             elements.push(...newElements);
@@ -552,7 +553,6 @@ export const restore = (
   localElements: readonly ExcalidrawElement[] | null | undefined,
   elementsConfig?: { refreshDimensions?: boolean; repairBindings?: boolean },
 ): RestoredDataState => {
-  console.log(restoreElements(data?.elements, localElements, elementsConfig));
   return {
     elements: restoreElements(data?.elements, localElements, elementsConfig),
     appState: restoreAppState(data?.appState, localAppState || null),

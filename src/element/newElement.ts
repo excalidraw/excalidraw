@@ -12,6 +12,7 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawTextContainer,
+  NonDeletedExcalidrawElement,
 } from "../element/types";
 import {
   arrayToMap,
@@ -48,6 +49,7 @@ import {
 } from "../constants";
 import { isArrowElement, isTextElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
+import { Children } from "react";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -647,14 +649,19 @@ export const duplicateElements = (
   return clonedElements;
 };
 
-export const updateElementChildren = (
-  element: {
-    type: ExcalidrawElement["type"];
-  } & MarkOptional<ElementConstructorOpts, "x" | "y">,
-) => {
-  const textElement = element.children!.find((child) => child.text !== null);
+export const updateElementChildren = (element: {
+  type: ExcalidrawGenericElement["type"];
+  children?: [
+    { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
+  ] &
+    MarkOptional<ElementConstructorOpts, "x" | "y">;
+}) => {
+  const textElement = element.children?.find(
+    (
+      child: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
+    ) => child.text !== null,
+  );
   if (isValidTextContainer(element) && textElement) {
-    //@ts-ignore
     const elements = bindTextToContainer(element, textElement);
     return elements;
   }

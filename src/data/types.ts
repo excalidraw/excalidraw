@@ -1,4 +1,4 @@
-import { ExcalidrawElement, ExcalidrawTextContainer } from "../element/types";
+import { ExcalidrawElement } from "../element/types";
 import {
   AppState,
   BinaryFiles,
@@ -7,8 +7,6 @@ import {
 } from "../types";
 import type { cleanAppStateForExport } from "../appState";
 import { VERSIONS } from "../constants";
-
-import { ElementConstructorOpts } from "../element/newElement";
 
 export interface ExportedDataState {
   type: string;

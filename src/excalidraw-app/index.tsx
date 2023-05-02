@@ -349,9 +349,9 @@ const ExcalidrawWrapper = () => {
         version: 2,
         source: "http://localhost:3000",
         elements: [
-          //@ts-ignore
           {
             type: "rectangle",
+            //@ts-ignore
             children: [{ text: "HELLO DAMMMMY" }],
           },
         ],
