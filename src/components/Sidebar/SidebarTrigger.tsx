@@ -48,3 +48,4 @@ export const SidebarTrigger = ({
     </label>
   );
 };
+SidebarTrigger.displayName = "SidebarTrigger";

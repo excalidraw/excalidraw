@@ -199,6 +199,7 @@ export const SidebarInner = forwardRef(
     );
   },
 );
+SidebarInner.displayName = "SidebarInner";
 
 const SidebarTabs = ({
   children,
@@ -234,8 +235,9 @@ const SidebarTabs = ({
     </RadixTabs.Root>
   );
 };
+SidebarTabs.displayName = "SidebarTabs";
 
-const TabTriggers = ({
+const SidebarTabTriggers = ({
   children,
   ...rest
 }: { children: React.ReactNode } & Omit<
@@ -248,6 +250,7 @@ const TabTriggers = ({
     </RadixTabs.List>
   );
 };
+SidebarTabTriggers.displayName = "SidebarTabTriggers";
 
 const SidebarTabTrigger = ({
   children,
@@ -271,6 +274,7 @@ const SidebarTabTrigger = ({
     </RadixTabs.Trigger>
   );
 };
+SidebarTabTrigger.displayName = "SidebarTabTrigger";
 
 const SidebarTab = ({
   tab,
@@ -281,6 +285,7 @@ const SidebarTab = ({
 }) => {
   return <RadixTabs.Content value={tab}>{children}</RadixTabs.Content>;
 };
+SidebarTab.displayName = "SidebarTab";
 
 export const Sidebar = Object.assign(
   forwardRef((props: SidebarProps, ref: React.ForwardedRef<HTMLDivElement>) => {
@@ -324,10 +329,11 @@ export const Sidebar = Object.assign(
   }),
   {
     Header: SidebarHeader,
-    TabTriggers,
+    TabTriggers: SidebarTabTriggers,
     TabTrigger: SidebarTabTrigger,
     Tabs: SidebarTabs,
     Tab: SidebarTab,
     Trigger: SidebarTrigger,
   },
 );
+Sidebar.displayName = "Sidebar";
