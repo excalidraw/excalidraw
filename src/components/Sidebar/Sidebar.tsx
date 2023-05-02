@@ -1,4 +1,4 @@
-import {
+import React, {
   useEffect,
   useLayoutEffect,
   useRef,
@@ -18,8 +18,6 @@ import {
 } from "./common";
 
 import { SidebarHeader } from "./SidebarHeader";
-
-import "./Sidebar.scss";
 import clsx from "clsx";
 import {
   useDevice,
@@ -27,13 +25,13 @@ import {
   useExcalidrawSetAppState,
 } from "../App";
 import { updateObject } from "../../utils";
-
 import * as RadixTabs from "@radix-ui/react-tabs";
-import React from "react";
 import { KEYS } from "../../keys";
 import { EVENT } from "../../constants";
 import { SidebarTrigger } from "./SidebarTrigger";
 import { useUIAppState } from "../../context/ui-appState";
+
+import "./Sidebar.scss";
 
 // FIXME replace this with the implem from ColorPicker once it's merged
 const useOnClickOutside = (
@@ -94,7 +92,7 @@ export const SidebarInner = forwardRef(
       onDock === undefined
     ) {
       console.warn(
-        `When Sidebar's "docked" prop is set and "dockable" isn't set to false, "onDock" must be provided as you should listen to state changes and update "docked" accordingly. As such we're defaulting "dockabled" to false, otherwise the dock button will be rendered but won't do anything. Either provide "onDock" or set "dockable" to false to hide this message.`,
+        "When Sidebar's `docked` prop is set and `dockable` isn't set to false, `onDock` must be provided as you should listen to state changes and update `docked` accordingly. As such we're defaulting `dockabled` to false, otherwise the dock button will be rendered but won't do anything. Either provide `onDock` or set `dockable` to false to hide this message.",
       );
     }
 
