@@ -261,7 +261,7 @@ const SidebarTabTrigger = ({
   children: React.ReactNode;
   tab: SidebarTabName;
   onSelect?: React.ReactEventHandler<HTMLButtonElement> | undefined;
-} & Omit<React.RefAttributes<HTMLButtonElement>, "onSelect">) => {
+} & Omit<React.HTMLAttributes<HTMLButtonElement>, "onSelect">) => {
   return (
     <RadixTabs.Trigger value={tab} asChild onSelect={onSelect}>
       <button
@@ -279,11 +279,16 @@ SidebarTabTrigger.displayName = "SidebarTabTrigger";
 const SidebarTab = ({
   tab,
   children,
+  ...rest
 }: {
   tab: SidebarTabName;
   children: React.ReactNode;
-}) => {
-  return <RadixTabs.Content value={tab}>{children}</RadixTabs.Content>;
+} & React.HTMLAttributes<HTMLDivElement>) => {
+  return (
+    <RadixTabs.Content {...rest} value={tab}>
+      {children}
+    </RadixTabs.Content>
+  );
 };
 SidebarTab.displayName = "SidebarTab";
 

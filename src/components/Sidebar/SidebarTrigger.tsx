@@ -16,6 +16,7 @@ export const SidebarTrigger = ({
   children,
   onToggle,
   className,
+  style,
 }: SidebarTriggerProps) => {
   const device = useDevice();
   const setAppState = useExcalidrawSetAppState();
@@ -39,7 +40,7 @@ export const SidebarTrigger = ({
         aria-label={title}
         aria-keyshortcuts="0"
       />
-      <div className={clsx("sidebar-trigger", className)}>
+      <div className={clsx("sidebar-trigger", className)} style={style}>
         {icon && <div>{icon}</div>}
         {!device.isMobile && children && (
           <div className="sidebar-trigger__label">{children}</div>

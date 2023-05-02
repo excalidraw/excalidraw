@@ -13,7 +13,10 @@ import { Sidebar } from "./Sidebar/Sidebar";
 
 const DefaultSidebarTrigger = withInternalFallback(
   "DefaultSidebarTrigger",
-  (props: Omit<SidebarTriggerProps, "name">) => {
+  (
+    props: Omit<SidebarTriggerProps, "name"> &
+      React.HTMLAttributes<HTMLDivElement>,
+  ) => {
     const { DefaultSidebarTriggerTunnel } = useTunnels();
     return (
       <DefaultSidebarTriggerTunnel.In>
@@ -28,11 +31,14 @@ const DefaultSidebarTrigger = withInternalFallback(
 );
 DefaultSidebarTrigger.displayName = "DefaultSidebarTrigger";
 
-const DefaultTabTriggers = ({ children }: { children: React.ReactNode }) => {
+const DefaultTabTriggers = ({
+  children,
+  ...rest
+}: { children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) => {
   const { DefaultSidebarTabTriggersTunnel } = useTunnels();
   return (
     <DefaultSidebarTabTriggersTunnel.In>
-      <Sidebar.TabTriggers>{children}</Sidebar.TabTriggers>
+      <Sidebar.TabTriggers {...rest}>{children}</Sidebar.TabTriggers>
     </DefaultSidebarTabTriggersTunnel.In>
   );
 };

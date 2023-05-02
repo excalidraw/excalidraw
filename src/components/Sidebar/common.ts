@@ -9,6 +9,7 @@ export type SidebarTriggerProps = {
   title?: string;
   className?: string;
   onToggle?: (open: boolean) => void;
+  style?: React.CSSProperties;
 };
 
 export type SidebarProps<P = {}> = {
