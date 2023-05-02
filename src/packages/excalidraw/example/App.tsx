@@ -494,15 +494,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
     );
   };
 
-  const renderSidebar = () => {
-    return (
-      <Sidebar name="custom">
-        <Sidebar.Header>Custom header!</Sidebar.Header>
-        Custom sidebar!
-      </Sidebar>
-    );
-  };
-
   const renderMenu = () => {
     return (
       <MainMenu>
@@ -710,7 +701,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
-            renderSidebar={renderSidebar}
           >
             {excalidrawAPI && (
               <Footer>
@@ -718,6 +708,10 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               </Footer>
             )}
             <WelcomeScreen />
+            <Sidebar name="custom">
+              <Sidebar.Header>Custom header!</Sidebar.Header>
+              Custom sidebar!
+            </Sidebar>
             {renderMenu()}
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}

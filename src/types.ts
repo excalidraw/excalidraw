@@ -173,7 +173,8 @@ export type AppState = {
    *
    * NOTE this is only a user preference and does not reflect the actual docked
    * state of the sidebar, because the host apps can override this through
-   * a Sidebar prop, which is not reflected back to the appState. */
+   * a DefaultSidebar prop, which is not reflected back to the appState.
+   */
   defaultSidebarDockedPreference: boolean;
 
   lastPointerDownWith: PointerType;
@@ -341,10 +342,6 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
-  /**
-   * Render function that renders custom <Sidebar /> component.
-   */
-  renderSidebar?: () => JSX.Element | null;
   children?: React.ReactNode;
 }
 
