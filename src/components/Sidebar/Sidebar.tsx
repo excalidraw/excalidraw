@@ -77,11 +77,11 @@ export const SidebarInner = forwardRef(
     {
       name,
       children,
-      onClose,
       onDock,
       docked,
       dockable = docked !== undefined,
       className,
+      onToggle,
       ...rest
     }: SidebarProps & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">,
     ref: React.ForwardedRef<HTMLDivElement>,
@@ -96,6 +96,16 @@ export const SidebarInner = forwardRef(
       );
     }
 
+    const onToggleRef = useRef(onToggle);
+    onToggleRef.current = onToggle;
+
+    useEffect(() => {
+      onToggleRef.current?.(true);
+      return () => {
+        onToggleRef.current?.(false);
+      };
+    }, [name]);
+
     const setAppState = useExcalidrawSetAppState();
 
     const setIsSidebarDockedAtom = useSetAtom(isSidebarDockedAtom, jotaiScope);
@@ -107,19 +117,10 @@ export const SidebarInner = forwardRef(
       };
     }, [setIsSidebarDockedAtom, docked]);
 
-    const onCloseRef = useRef(onClose);
-    onCloseRef.current = onClose;
-
-    useEffect(() => {
-      return () => {
-        onCloseRef.current?.();
-      };
-    }, []);
-
     const headerPropsRef = useRef<SidebarPropsContextValue>(
       {} as SidebarPropsContextValue,
     );
-    headerPropsRef.current.onClose = () => {
+    headerPropsRef.current.onCloseRequest = () => {
       setAppState({ openSidebar: null });
     };
     headerPropsRef.current.onDock = (isDocked) => onDock?.(isDocked);

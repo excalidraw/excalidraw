@@ -74,17 +74,12 @@ describe("Sidebar", () => {
   });
 
   it("should not render <Sidebar.Header> for custom sidebars by default", async () => {
-    const onClose = jest.fn();
     const CustomExcalidraw = () => {
       return (
         <Excalidraw
           initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
         >
-          <Sidebar
-            name="customSidebar"
-            className="test-sidebar"
-            onClose={onClose}
-          >
+          <Sidebar name="customSidebar" className="test-sidebar">
             hello
           </Sidebar>
         </Excalidraw>
@@ -99,8 +94,8 @@ describe("Sidebar", () => {
     expect(closeButton).toBe(null);
   });
 
-  it("<Sidebar.Header> should render close button & close on click", async () => {
-    const onClose = jest.fn();
+  it("<Sidebar.Header> should render close button", async () => {
+    const onToggle = jest.fn();
     const CustomExcalidraw = () => {
       return (
         <Excalidraw
@@ -109,7 +104,7 @@ describe("Sidebar", () => {
           <Sidebar
             name="customSidebar"
             className="test-sidebar"
-            onClose={onClose}
+            onToggle={onToggle}
           >
             <Sidebar.Header />
             hello
@@ -120,6 +115,9 @@ describe("Sidebar", () => {
 
     const { container } = await render(<CustomExcalidraw />);
 
+    // initial open
+    expect(onToggle).toHaveBeenCalledWith(true);
+
     const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
     expect(sidebar).not.toBe(null);
     const closeButton = queryByTestId(sidebar!, "sidebar-close")!;
@@ -128,7 +126,7 @@ describe("Sidebar", () => {
     fireEvent.click(closeButton);
     await waitFor(() => {
       expect(container.querySelector<HTMLElement>(".test-sidebar")).toBe(null);
-      expect(onClose).toHaveBeenCalled();
+      expect(onToggle).toHaveBeenCalledWith(false);
     });
   });
 

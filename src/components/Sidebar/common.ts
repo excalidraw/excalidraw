@@ -18,7 +18,7 @@ export type SidebarProps<P = {}> = {
   /**
    * Called on sidebar close (either by user action or by the editor).
    */
-  onClose?: () => void | boolean;
+  onToggle?: (open: boolean) => void;
   /** if not supplied, sidebar won't be dockable */
   onDock?: (docked: boolean) => void;
   docked?: boolean;
@@ -33,8 +33,8 @@ export type SidebarProps<P = {}> = {
 
 export type SidebarPropsContextValue = Pick<
   SidebarProps,
-  "onClose" | "onDock" | "docked" | "dockable"
->;
+  "onDock" | "docked" | "dockable"
+> & { onCloseRequest: () => void };
 
 export const SidebarPropsContext =
   React.createContext<SidebarPropsContextValue>({} as SidebarPropsContextValue);

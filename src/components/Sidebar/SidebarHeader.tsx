@@ -51,7 +51,6 @@ export const SidebarHeader = ({
   const props = useContext(SidebarPropsContext);
 
   const renderDockButton = !!(device.canDeviceFitSidebar && props.dockable);
-  const renderCloseButton = !!props.onClose;
 
   return (
     <div
@@ -59,28 +58,24 @@ export const SidebarHeader = ({
       data-testid="sidebar-header"
     >
       {children}
-      {(renderDockButton || renderCloseButton) && (
-        <div className="layer-ui__sidebar__header__buttons">
-          {renderDockButton && (
-            <SidebarDockButton
-              checked={!!props.docked}
-              onChange={() => {
-                props.onDock?.(!props.docked);
-              }}
-            />
-          )}
-          {renderCloseButton && (
-            <button
-              data-testid="sidebar-close"
-              className="Sidebar__close-btn"
-              onClick={props.onClose}
-              aria-label={t("buttons.close")}
-            >
-              {CloseIcon}
-            </button>
-          )}
-        </div>
-      )}
+      <div className="layer-ui__sidebar__header__buttons">
+        {renderDockButton && (
+          <SidebarDockButton
+            checked={!!props.docked}
+            onChange={() => {
+              props.onDock?.(!props.docked);
+            }}
+          />
+        )}
+        <button
+          data-testid="sidebar-close"
+          className="Sidebar__close-btn"
+          onClick={props.onCloseRequest}
+          aria-label={t("buttons.close")}
+        >
+          {CloseIcon}
+        </button>
+      </div>
     </div>
   );
 };
