@@ -135,7 +135,6 @@
     [role="tablist"] {
       display: grid;
       gap: 1rem;
-      padding: 1rem;
       grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
     }
   }
@@ -160,18 +159,17 @@
   .sidebar-tab-trigger {
     width: auto !important;
     border: none !important;
-    background-color: inherit;
 
-    &:hover:not([data-state="active"], :active) svg {
-      stroke: var(--color-primary);
-      color: var(--color-primary);
-    }
+    --button-bg: transparent;
+    --button-hover-bg: transparent;
+    --button-active-bg: var(--color-primary);
+    --button-hover-color: var(--color-primary);
 
     &[data-state="active"] {
-      background-color: var(--color-primary-light);
-    }
-    &:active {
-      background-color: var(--color-primary-light-darker);
+      --button-bg: var(--color-primary);
+      --button-hover-bg: var(--color-primary);
+      --button-hover-color: var(--color-icon-white);
+      color: var(--color-icon-white);
     }
   }
 
@@ -198,18 +196,6 @@
       .sidebar-tab-trigger {
         width: 2.5rem;
         height: 2.5rem;
-
-        background: initial;
-
-        &:hover {
-          background: initial;
-          color: var(--color-primary);
-        }
-
-        &[data-state="active"] {
-          background-color: var(--color-primary);
-          color: var(--color-icon-white);
-        }
       }
     }
 
