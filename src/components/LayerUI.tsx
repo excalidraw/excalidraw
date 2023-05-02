@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React from "react";
 import { ActionManager } from "../actions/manager";
-import { CLASSES, LIBRARY_SIDEBAR_WIDTH } from "../constants";
+import { CLASSES, DEFAULT_SIDEBAR, LIBRARY_SIDEBAR_WIDTH } from "../constants";
 import { exportCanvas } from "../data";
 import { isTextElement, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
@@ -9,7 +9,7 @@ import { Language, t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { ExportType } from "../scene/types";
 import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
-import { isShallowEqual, muteFSAbortError } from "../utils";
+import { capitalizeString, isShallowEqual, muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
@@ -312,9 +312,12 @@ const LayerUI = ({
           >
             <UserList collaborators={appState.collaborators} />
             {renderTopRightUI?.(device.isMobile, appState)}
-            {!appState.viewModeEnabled && (
-              <tunnels.DefaultSidebarTriggerTunnel.Out />
-            )}
+            {!appState.viewModeEnabled &&
+              // hide button when sidebar docked
+              (!isSidebarDocked ||
+                appState.openSidebar?.name !== DEFAULT_SIDEBAR.name) && (
+                <tunnels.DefaultSidebarTriggerTunnel.Out />
+              )}
           </div>
         </div>
       </FixedSideContainer>
@@ -327,9 +330,9 @@ const LayerUI = ({
         __fallback
         onDock={(docked) => {
           trackEvent(
-            "library",
-            `toggleLibraryDock (${docked ? "dock" : "undock"})`,
-            `sidebar (${device.isMobile ? "mobile" : "desktop"})`,
+            "sidebar",
+            `toggleDock (${docked ? "dock" : "undock"})`,
+            `(${device.isMobile ? "mobile" : "desktop"})`,
           );
         }}
       />
@@ -348,7 +351,20 @@ const LayerUI = ({
           tunneled away. We only render tunneled components that actually
         have defaults when host do not render anything. */}
       <DefaultMainMenu UIOptions={UIOptions} />
-      <DefaultSidebar.Trigger __fallback icon={LibraryIcon}>
+      <DefaultSidebar.Trigger
+        __fallback
+        icon={LibraryIcon}
+        title={capitalizeString(t("toolBar.library"))}
+        onToggle={(open) => {
+          if (open) {
+            trackEvent(
+              "sidebar",
+              `${DEFAULT_SIDEBAR.name} (open)`,
+              `button (${device.isMobile ? "mobile" : "desktop"})`,
+            );
+          }
+        }}
+      >
         {t("toolBar.library")}
       </DefaultSidebar.Trigger>
       {/* ------------------------------------------------------------------ */}

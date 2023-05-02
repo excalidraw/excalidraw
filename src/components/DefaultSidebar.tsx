@@ -13,11 +13,15 @@ import { Sidebar } from "./Sidebar/Sidebar";
 
 const DefaultSidebarTrigger = withInternalFallback(
   "DefaultSidebarTrigger",
-  (props: SidebarTriggerProps) => {
+  (props: Omit<SidebarTriggerProps, "name">) => {
     const { DefaultSidebarTriggerTunnel } = useTunnels();
     return (
       <DefaultSidebarTriggerTunnel.In>
-        <Sidebar.Trigger {...props} />
+        <Sidebar.Trigger
+          {...props}
+          className="default-sidebar-trigger"
+          name={DEFAULT_SIDEBAR.name}
+        />
       </DefaultSidebarTriggerTunnel.In>
     );
   },

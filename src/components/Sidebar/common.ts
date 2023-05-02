@@ -1,15 +1,18 @@
 import React from "react";
-import { AppState } from "../../types";
-
-export type SidebarName = string;
+import { AppState, SidebarName, SidebarTab } from "../../types";
 
 export type SidebarTriggerProps = {
+  name: SidebarName;
+  tab?: SidebarTab;
   icon?: JSX.Element;
   children?: React.ReactNode;
+  title?: string;
+  className?: string;
+  onToggle?: (open: boolean) => void;
 };
 
 export type SidebarProps<P = {}> = {
-  name: string;
+  name: SidebarName;
   children: React.ReactNode;
   onStateChange?: (openSidebar: AppState["openSidebar"]) => void;
   /**

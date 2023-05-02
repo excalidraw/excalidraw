@@ -210,6 +210,8 @@ import {
   PointerDownState,
   SceneData,
   Device,
+  SidebarName,
+  SidebarTab,
 } from "../types";
 import {
   debounce,

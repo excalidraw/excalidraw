@@ -94,6 +94,9 @@ export type LastActiveTool =
     }
   | null;
 
+export type SidebarName = string;
+export type SidebarTab = string;
+
 export type AppState = {
   contextMenu: {
     items: ContextMenuItems;
@@ -166,7 +169,7 @@ export type AppState = {
     | "backgroundColorPicker"
     | "strokeColorPicker"
     | null;
-  openSidebar: { name: string; tab?: string } | null;
+  openSidebar: { name: SidebarName; tab?: SidebarTab } | null;
   openDialog: "imageExport" | "help" | "jsonExport" | null;
   /**
    * Reflects user preference for whether the default sidebar should be docked.
