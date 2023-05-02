@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React from "react";
 import { ActionManager } from "../actions/manager";
-import { CLASSES, LIBRARY_SIDEBAR, LIBRARY_SIDEBAR_WIDTH } from "../constants";
+import { CLASSES, LIBRARY_SIDEBAR_WIDTH } from "../constants";
 import { exportCanvas } from "../data";
 import { isTextElement, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
@@ -322,10 +322,6 @@ const LayerUI = ({
   };
 
   const renderSidebars = () => {
-    // if (appState.openSidebar?.name !== "library") {
-    //   return null;
-    // }
-
     return (
       <DefaultSidebar
         __fallback
