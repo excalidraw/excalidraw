@@ -162,7 +162,6 @@ export type AppState = {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
-  // mobile-only
   openMenu: "canvas" | "shape" | null;
   openPopup:
     | "canvasColorPicker"
