@@ -72,7 +72,9 @@ export const isWritableElement = (
   target instanceof HTMLBRElement || // newline in wysiwyg
   target instanceof HTMLTextAreaElement ||
   (target instanceof HTMLInputElement &&
-    (target.type === "text" || target.type === "number"));
+    (target.type === "text" ||
+      target.type === "number" ||
+      target.type === "search"));
 
 export const getFontFamilyString = ({
   fontFamily,

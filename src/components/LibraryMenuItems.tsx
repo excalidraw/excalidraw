@@ -3,7 +3,7 @@ import { serializeLibraryAsJSON } from "../data/json";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
 import { AppState, ExcalidrawProps, LibraryItem, LibraryItems } from "../types";
-import { arrayToMap, chunk } from "../utils";
+import { arrayToMap, chunk, debounce } from "../utils";
 import { LibraryUnit } from "./LibraryUnit";
 import Stack from "./Stack";
 
@@ -42,6 +42,8 @@ const LibraryMenuItems = ({
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
   >(null);
+
+  const [searchText, setSeachText] = useState<string>("");
 
   const onItemSelectToggle = (
     id: LibraryItem["id"],
@@ -113,6 +115,7 @@ const LibraryMenuItems = ({
       | /* pending library item */ {
           id: null;
           elements: readonly NonDeleted<ExcalidrawElement>[];
+          name?: string;
         }
       | null;
     onClick?: () => void;
@@ -125,6 +128,7 @@ const LibraryMenuItems = ({
           isPending={!params.item?.id && !!params.item?.elements}
           onClick={params.onClick || (() => {})}
           id={params.item?.id || null}
+          name={params.item?.name}
           selected={!!params.item?.id && selectedItems.includes(params.item.id)}
           onToggle={onItemSelectToggle}
           onDrag={(id, event) => {
@@ -144,23 +148,33 @@ const LibraryMenuItems = ({
       | /* pending library item */ {
           id: null;
           elements: readonly NonDeleted<ExcalidrawElement>[];
+          name?: string;
         }
     )[],
+    searchText?: string,
   ) => {
-    const _items = items.map((item) => {
-      if (item.id) {
+    const _items = items
+      .filter((item) => {
+        if (searchText?.length) {
+          return !!item.name?.toLowerCase().includes(searchText.toLowerCase());
+        }
+
+        return true;
+      })
+      .map((item) => {
+        if (item.id) {
+          return createLibraryItemCompo({
+            item,
+            onClick: () => onInsertLibraryItems(getInsertedElements(item.id)),
+            key: item.id,
+          });
+        }
         return createLibraryItemCompo({
+          key: "__pending__item__",
           item,
-          onClick: () => onInsertLibraryItems(getInsertedElements(item.id)),
-          key: item.id,
+          onClick: () => onAddToLibrary(pendingElements),
         });
-      }
-      return createLibraryItemCompo({
-        key: "__pending__item__",
-        item,
-        onClick: () => onAddToLibrary(pendingElements),
       });
-    });
 
     // ensure we render all empty cells if no items are present
     let rows = chunk(_items, CELLS_PER_ROW);
@@ -218,6 +232,22 @@ const LibraryMenuItems = ({
           : {}
       }
     >
+      {(pendingElements.length > 0 ||
+        unpublishedItems.length > 0 ||
+        publishedItems.length > 0) && (
+        <div className="library-menu-items-container__search">
+          <input
+            type="search"
+            spellCheck={false}
+            className="library-menu-items-container__search__input"
+            autoFocus
+            placeholder={t("labels.searchPlaceholder")}
+            value={searchText}
+            aria-label={t("labels.searchPlaceholder")}
+            onChange={(event) => setSeachText(event.target.value)} // TODO: Add debounce
+          />
+        </div>
+      )}
       <Stack.Col
         className="library-menu-items-container__items"
         align="start"
@@ -265,13 +295,16 @@ const LibraryMenuItems = ({
               </div>
             </div>
           ) : (
-            renderLibrarySection([
-              // append pending library item
-              ...(pendingElements.length
-                ? [{ id: null, elements: pendingElements }]
-                : []),
-              ...unpublishedItems,
-            ])
+            renderLibrarySection(
+              [
+                // append pending library item
+                ...(pendingElements.length
+                  ? [{ id: null, elements: pendingElements }]
+                  : []),
+                ...unpublishedItems,
+              ],
+              searchText,
+            )
           )}
         </>
 
@@ -284,7 +317,7 @@ const LibraryMenuItems = ({
             </div>
           )}
           {publishedItems.length > 0 ? (
-            renderLibrarySection(publishedItems)
+            renderLibrarySection(publishedItems, searchText)
           ) : unpublishedItems.length > 0 ? (
             <div
               style={{

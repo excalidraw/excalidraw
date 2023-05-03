@@ -65,6 +65,32 @@
       }
     }
 
+    &__search {
+      padding: var(--container-padding-y) var(--container-padding-x);
+
+      &__input {
+        box-sizing: border-box;
+        width: 100%;
+        margin: 0;
+        font-size: 0.875rem;
+        font-family: inherit;
+        background-color: transparent;
+        color: var(--text-primary-color);
+        outline: none;
+        height: var(--default-button-size);
+        border: 1px solid var(--default-border-color);
+        letter-spacing: 0.4px;
+        border-radius: var(--border-radius-lg);
+    
+        padding: 0.5rem;
+        appearance: none;
+    
+        &:focus-visible {
+          box-shadow: none;
+        }
+      }
+    }
+
     .separator {
       width: 100%;
       display: flex;

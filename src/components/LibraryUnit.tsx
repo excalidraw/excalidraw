@@ -16,6 +16,7 @@ export const LibraryUnit = ({
   selected,
   onToggle,
   onDrag,
+  name,
 }: {
   id: LibraryItem["id"] | /** for pending item */ null;
   elements?: LibraryItem["elements"];
@@ -24,6 +25,7 @@ export const LibraryUnit = ({
   selected: boolean;
   onToggle: (id: string, event: React.MouseEvent) => void;
   onDrag: (id: string, event: React.DragEvent) => void;
+  name?: string;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -75,6 +77,7 @@ export const LibraryUnit = ({
         })}
         ref={ref}
         draggable={!!elements}
+        {...(name ? { title: name } : {})}
         onClick={
           !!elements || !!isPending
             ? (event) => {

@@ -105,6 +105,7 @@
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
     "toggleTheme": "Toggle theme",
+    "searchPlaceholder": "Search...",
     "personalLib": "Personal Library",
     "excalidrawLib": "Excalidraw Library",
     "decreaseFontSize": "Decrease font size",
