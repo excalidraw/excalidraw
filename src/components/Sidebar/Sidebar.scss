@@ -162,8 +162,7 @@
   }
 
   .sidebar-tab-trigger {
-    width: auto !important;
-
+    --button-width: auto;
     --button-bg: transparent;
     --button-hover-bg: transparent;
     --button-active-bg: var(--color-primary);
@@ -172,7 +171,7 @@
 
     &[data-state="active"] {
       --button-bg: var(--color-primary);
-      --button-hover-bg: var(--color-primary);
+      --button-hover-bg: var(--color-primary-darker);
       --button-hover-color: var(--color-icon-white);
       --button-border: var(--color-primary);
       color: var(--color-icon-white);
@@ -200,8 +199,9 @@
       border-radius: 0.625rem;
 
       .sidebar-tab-trigger {
-        width: 2.5rem;
-        height: 2.5rem;
+        height: var(--lg-button-size);
+        width: var(--lg-button-size);
+
         border: none;
       }
     }

@@ -75,7 +75,7 @@
   .library-menu-browse-button {
     flex: 1;
 
-    padding: 0.875rem 0;
+    height: var(--lg-button-size);
 
     display: flex;
     align-items: center;
@@ -107,17 +107,15 @@
     }
   }
 
-  .library-menu-browse-button--mobile {
-    min-height: 22px;
-    margin-left: auto;
-    a {
-      padding-right: 0;
-    }
+  &.excalidraw--mobile .library-menu-browse-button {
+    height: var(--default-button-size);
   }
 
   .layer-ui__library .dropdown-menu {
+    width: auto;
     top: initial;
     right: 0;
+    left: initial;
     bottom: 100%;
     margin-bottom: 0.625rem;
 

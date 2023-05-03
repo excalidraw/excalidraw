@@ -76,7 +76,10 @@
       --button-hover-border,
       var(--button-border, var(--default-border-color))
     );
-    color: var(--button-hover-color, inherit);
+    color: var(
+      --button-hover-color,
+      var(--button-color, var(--text-primary-color, inherit))
+    );
   }
 
   &:active {
