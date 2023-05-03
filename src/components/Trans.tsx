@@ -53,9 +53,9 @@ const getTransChildren = (
           );
         }
       } else if (tagEndMatch !== null) {
-        // The match is </tag>. This means we need to replace the content with
+        // If tag end match is found, this means we need to replace the content with
         // its actual value in prop e.g. format = "Please <link>click the
-        // button</link> to continue", match = "</link>", stack last item name =
+        // button</link> to continue", tagEndMatch is for "</link>", stack last item name =
         // "link" and props.link = (el) => <a
         // href="https://example.com">{el}</a> then its prop value will be
         // pushed to "link"'s children so on DOM when rendering it's rendered as
@@ -78,7 +78,7 @@ const getTransChildren = (
           );
         }
       } else if (keyMatch !== null) {
-        // The match is {{key}}. Check if the key is present in props and set
+        // The match is for {{key}}. Check if the key is present in props and set
         // the prop value as children of last stack item e.g. format = "Hello
         // {{name}}", key = "name" and props.name = "Excalidraw" then its prop
         // value will be pushed to "name"'s children so it's rendered on DOM as
@@ -92,8 +92,8 @@ const getTransChildren = (
           );
         }
       } else {
-        // Pushing the content on both side of the Regex to stack eg for string -
-        // "Hello {{name}} Whats up?" "Hello" and "Whats up" will be pushed
+        // If none of cases match means we just need to push the string
+        // to stack eg - "Hello {{name}} Whats up?" "Hello", "Whats up" will be pushed
         stack[stack.length - 1].children.push(match);
       }
     });
