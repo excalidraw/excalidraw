@@ -27,6 +27,7 @@ import {
   PRECEDING_ELEMENT_KEY,
   FONT_FAMILY,
   ROUNDNESS,
+  DEFAULT_SIDEBAR,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -511,12 +512,10 @@ export const restoreAppState = (
         : appState.zoom?.value
         ? appState.zoom
         : defaultAppState.zoom,
-    // when sidebar docked and user left it open in last session,
-    // keep it open. If not docked, keep it closed irrespective of last state.
     openSidebar:
-      // `string` is legacy
-      typeof (appState.openSidebar as string | object) === "string"
-        ? { name: appState.openSidebar as unknown as string }
+      // string (legacy)
+      typeof (appState.openSidebar as any as string) === "string"
+        ? { name: DEFAULT_SIDEBAR.name }
         : nextAppState.openSidebar,
   };
 };
