@@ -346,22 +346,7 @@ const ExcalidrawWrapper = () => {
 
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
-      initialStatePromiseRef.current.promise.resolve({
-        type: "excalidraw",
-        version: 2,
-        source: "http://localhost:3000",
-        elements: [
-          {
-            type: "rectangle",
-            children: [{ text: "HELLO DAMMMMY" }],
-          },
-        ],
-        appState: {
-          gridSize: null,
-          viewBackgroundColor: "#ffffff",
-        },
-        files: {},
-      });
+      initialStatePromiseRef.current.promise.resolve(data.scene);
     });
 
     const onHashChange = async (event: HashChangeEvent) => {
