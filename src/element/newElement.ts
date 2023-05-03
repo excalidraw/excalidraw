@@ -670,7 +670,6 @@ export const convertToExcalidrawElements = (
       const elements = bindTextToContainer(element, textElement);
       res.push(...elements);
     } else {
-      delete element.children;
       //@ts-ignore
       res.push(element);
     }

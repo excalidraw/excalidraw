@@ -121,8 +121,8 @@ const restoreElementWithProperties = <
     y: extra.y ?? element.y ?? 0,
     strokeColor: element.strokeColor || oc.black,
     backgroundColor: element.backgroundColor || "transparent",
-    width: element.width || 0,
-    height: element.height || 0,
+    width: element.width || 100,
+    height: element.height || 100,
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
     roundness: element.roundness
