@@ -1,6 +1,5 @@
 import oc from "open-color";
-import { unstable_batchedUpdates } from "react-dom";
-import { isEraserActive, isHandToolActive } from "./appState";
+
 import colors from "./colors";
 import {
   CURSOR_TYPE,
@@ -14,8 +13,10 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { SHAPES } from "./shapes";
 import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
+import { unstable_batchedUpdates } from "react-dom";
+import { SHAPES } from "./shapes";
+import { isEraserActive, isHandToolActive } from "./appState";
 import { ResolutionType } from "./utility-types";
 
 let mockDateTime: string | null = null;

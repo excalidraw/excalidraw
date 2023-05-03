@@ -1,7 +1,7 @@
-import oc from "open-color";
 import cssVariables from "./css/variables.module.scss";
-import { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { AppProps } from "./types";
+import { ExcalidrawElement, FontFamilyValues } from "./element/types";
+import oc from "open-color";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
