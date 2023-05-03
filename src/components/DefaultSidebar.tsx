@@ -75,7 +75,7 @@ export const DefaultSidebar = Object.assign(
             setAppState({ defaultSidebarDockedPreference: docked });
           })}
         >
-          <Sidebar.Tabs defaultTab={DEFAULT_SIDEBAR.defaultTab}>
+          <Sidebar.Tabs>
             <Sidebar.Header>
               {rest.__fallback && (
                 <div

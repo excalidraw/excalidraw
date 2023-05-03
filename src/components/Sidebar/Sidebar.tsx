@@ -204,11 +204,9 @@ SidebarInner.displayName = "SidebarInner";
 
 const SidebarTabs = ({
   children,
-  defaultTab,
   ...rest
 }: {
   children: React.ReactNode;
-  defaultTab: string;
 } & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">) => {
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
@@ -222,7 +220,6 @@ const SidebarTabs = ({
   return (
     <RadixTabs.Root
       className="sidebar-tabs-root"
-      defaultValue={defaultTab}
       value={appState.openSidebar.tab}
       onValueChange={(tab) =>
         setAppState((state) => ({

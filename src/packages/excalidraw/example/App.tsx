@@ -688,7 +688,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             )}
             <WelcomeScreen />
             <Sidebar name="custom">
-              <Sidebar.Tabs defaultTab="one">
+              <Sidebar.Tabs>
                 <Sidebar.Header />
                 <Sidebar.Tab tab="one">Tab one!</Sidebar.Tab>
                 <Sidebar.Tab tab="two">Tab two!</Sidebar.Tab>
@@ -700,6 +700,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             </Sidebar>
             <Sidebar.Trigger
               name="custom"
+              tab="one"
               style={{
                 position: "absolute",
                 left: "50%",

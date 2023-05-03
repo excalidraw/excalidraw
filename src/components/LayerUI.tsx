@@ -364,6 +364,7 @@ const LayerUI = ({
             );
           }
         }}
+        tab={DEFAULT_SIDEBAR.defaultTab}
       >
         {t("toolBar.library")}
       </DefaultSidebar.Trigger>
