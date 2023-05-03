@@ -15,11 +15,10 @@ export type SidebarTriggerProps = {
 export type SidebarProps<P = {}> = {
   name: SidebarName;
   children: React.ReactNode;
-  onStateChange?: (openSidebar: AppState["openSidebar"]) => void;
   /**
-   * Called on sidebar close (either by user action or by the editor).
+   * Called on sidebar open/close or tab change.
    */
-  onToggle?: (open: boolean) => void;
+  onStateChange?: (state: AppState["openSidebar"]) => void;
   /** if not supplied, sidebar won't be dockable */
   onDock?: (docked: boolean) => void;
   docked?: boolean;

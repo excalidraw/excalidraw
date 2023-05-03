@@ -81,7 +81,6 @@ export const SidebarInner = forwardRef(
       docked,
       dockable = docked !== undefined,
       className,
-      onToggle,
       ...rest
     }: SidebarProps & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">,
     ref: React.ForwardedRef<HTMLDivElement>,
@@ -96,16 +95,6 @@ export const SidebarInner = forwardRef(
       );
       dockable = false;
     }
-
-    const onToggleRef = useRef(onToggle);
-    onToggleRef.current = onToggle;
-
-    useEffect(() => {
-      onToggleRef.current?.(true);
-      return () => {
-        onToggleRef.current?.(false);
-      };
-    }, [name]);
 
     const setAppState = useExcalidrawSetAppState();
 
@@ -298,11 +287,25 @@ export const Sidebar = Object.assign(
 
     const refPrevOpenSidebar = useRef(appState.openSidebar);
     useEffect(() => {
-      if (appState.openSidebar !== refPrevOpenSidebar.current) {
-        refPrevOpenSidebar.current = appState.openSidebar;
-        onStateChange?.(appState.openSidebar);
+      if (
+        // closing sidebar
+        ((!appState.openSidebar &&
+          refPrevOpenSidebar?.current?.name === props.name) ||
+          // opening current sidebar
+          (appState.openSidebar?.name === props.name &&
+            refPrevOpenSidebar?.current?.name !== props.name) ||
+          // switching tabs or switching to a different sidebar
+          refPrevOpenSidebar.current?.name === props.name) &&
+        appState.openSidebar !== refPrevOpenSidebar.current
+      ) {
+        onStateChange?.(
+          appState.openSidebar?.name !== props.name
+            ? null
+            : appState.openSidebar,
+        );
       }
-    }, [appState.openSidebar, onStateChange]);
+      refPrevOpenSidebar.current = appState.openSidebar;
+    }, [appState.openSidebar, onStateChange, props.name]);
 
     const [mounted, setMounted] = useState(false);
     useLayoutEffect(() => {
