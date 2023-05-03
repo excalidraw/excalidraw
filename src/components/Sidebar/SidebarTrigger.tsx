@@ -1,8 +1,4 @@
-import {
-  useDevice,
-  useExcalidrawSetAppState,
-  useExcalidrawAppState,
-} from "../App";
+import { useExcalidrawSetAppState, useExcalidrawAppState } from "../App";
 import { SidebarTriggerProps } from "./common";
 
 import "./SidebarTrigger.scss";
@@ -18,7 +14,6 @@ export const SidebarTrigger = ({
   className,
   style,
 }: SidebarTriggerProps) => {
-  const device = useDevice();
   const setAppState = useExcalidrawSetAppState();
   // TODO replace with sidebar context
   const appState = useExcalidrawAppState();
@@ -42,9 +37,7 @@ export const SidebarTrigger = ({
       />
       <div className={clsx("sidebar-trigger", className)} style={style}>
         {icon && <div>{icon}</div>}
-        {!device.isMobile && children && (
-          <div className="sidebar-trigger__label">{children}</div>
-        )}
+        {children && <div className="sidebar-trigger__label">{children}</div>}
       </div>
     </label>
   );

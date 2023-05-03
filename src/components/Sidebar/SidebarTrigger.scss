@@ -1,28 +1,30 @@
 @import "../../css/variables.module";
 
-.sidebar-trigger {
-  @include outlineButtonStyles;
+.excalidraw {
+  .sidebar-trigger {
+    @include outlineButtonStyles;
 
-  background-color: var(--island-bg-color);
+    background-color: var(--island-bg-color);
 
-  width: auto;
-  height: var(--lg-button-size);
+    width: auto;
+    height: var(--lg-button-size);
 
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 
-  line-height: 0;
+    line-height: 0;
 
-  font-size: 0.75rem;
-  letter-spacing: 0.4px;
+    font-size: 0.75rem;
+    letter-spacing: 0.4px;
 
-  svg {
-    width: var(--lg-icon-size);
-    height: var(--lg-icon-size);
+    svg {
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
+    }
   }
 
-  &__label {
+  .default-sidebar-trigger .sidebar-trigger__label {
     display: none;
 
     @media screen and (min-width: 1024px) {
