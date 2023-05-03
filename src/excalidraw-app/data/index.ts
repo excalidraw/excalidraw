@@ -7,6 +7,7 @@ import {
 import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
+import { convertToExcalidrawElements } from "../../element/newElement";
 import { isInvisiblySmallElement } from "../../element/sizeHelpers";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import { ExcalidrawElement, FileId } from "../../element/types";
@@ -262,7 +263,7 @@ export const loadScene = async (
     data = restore(
       await importFromBackend(id, privateKey),
       localDataState?.appState,
-      localDataState?.elements,
+      convertToExcalidrawElements(localDataState?.elements),
       { repairBindings: true, refreshDimensions: false },
     );
   } else {

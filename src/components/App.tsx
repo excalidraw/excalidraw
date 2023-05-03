@@ -129,6 +129,7 @@ import {
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
+  convertToExcalidrawElements,
   deepCopyElement,
   duplicateElements,
   newFreeDrawElement,
@@ -2001,7 +2002,9 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.elements) {
-        this.scene.replaceAllElements(sceneData.elements);
+        this.scene.replaceAllElements(
+          convertToExcalidrawElements(sceneData.elements),
+        );
       }
 
       if (sceneData.collaborators) {

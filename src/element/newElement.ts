@@ -12,7 +12,6 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawTextContainer,
-  NonDeletedExcalidrawElement,
 } from "../element/types";
 import {
   arrayToMap,
@@ -47,9 +46,9 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { isArrowElement, isTextElement } from "./typeChecks";
+import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
-import { Children } from "react";
+import { ImportedDataState } from "../data/types";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -649,21 +648,33 @@ export const duplicateElements = (
   return clonedElements;
 };
 
-export const updateElementChildren = (element: {
-  type: ExcalidrawGenericElement["type"];
-  children?: [
-    { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
-  ] &
-    MarkOptional<ElementConstructorOpts, "x" | "y">;
-}) => {
-  const textElement = element.children?.find(
-    (
-      child: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
-    ) => child.text !== null,
-  );
-  if (isValidTextContainer(element) && textElement) {
-    const elements = bindTextToContainer(element, textElement);
-    return elements;
+export const convertToExcalidrawElements = (
+  elements: ImportedDataState["elements"],
+) => {
+  const res: ExcalidrawElement[] = [];
+  if (!elements) {
+    return [];
   }
-  return null;
+  elements.forEach((element) => {
+    if (!element) {
+      return;
+    }
+    const textElement = element.children?.find((child) => child.text !== null);
+    if (
+      isValidTextContainer(element) &&
+      textElement &&
+      (element.type === "rectangle" ||
+        element.type === "ellipse" ||
+        element.type === "diamond")
+    ) {
+      const elements = bindTextToContainer(element, textElement);
+      res.push(...elements);
+    } else {
+      delete element.children;
+      //@ts-ignore
+      res.push(element);
+    }
+  });
+
+  return res;
 };

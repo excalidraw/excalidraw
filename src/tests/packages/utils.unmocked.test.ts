@@ -1,5 +1,6 @@
 import { decodePngMetadata, decodeSvgMetadata } from "../../data/image";
 import { ImportedDataState } from "../../data/types";
+import { convertToExcalidrawElements } from "../../element/newElement";
 import * as utils from "../../packages/utils";
 import { API } from "../helpers/api";
 
@@ -31,7 +32,7 @@ describe("embedding scene data", () => {
       const importedData: ImportedDataState = JSON.parse(parsedString);
 
       expect(sourceElements.map((x) => x.id)).toEqual(
-        importedData.elements?.map((el) => el.id),
+        convertToExcalidrawElements(importedData.elements)?.map((el) => el.id),
       );
     });
   });
@@ -60,7 +61,7 @@ describe("embedding scene data", () => {
       const importedData: ImportedDataState = JSON.parse(parsedString);
 
       expect(sourceElements.map((x) => x.id)).toEqual(
-        importedData.elements?.map((el) => el.id),
+        convertToExcalidrawElements(importedData.elements)?.map((el) => el.id),
       );
     });
   });

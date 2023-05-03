@@ -40,7 +40,7 @@ import {
   getDefaultLineHeight,
   measureBaseline,
 } from "../element/textElement";
-import { updateElementChildren } from "../element/newElement";
+import { convertToExcalidrawElements } from "../element/newElement";
 
 type RestoredAppState = Omit<
   AppState,
@@ -373,41 +373,37 @@ export const restoreElements = (
 ): ExcalidrawElement[] => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-
+  const excalidrawElements = convertToExcalidrawElements(elements);
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
-  const restoredElements = (elements || []).reduce((elements, element) => {
-    // filtering out selection, which is legacy, no longer kept in elements,
-    // and causing issues if retained
-    if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-      let migratedElement: ExcalidrawElement | null = restoreElement(
-        element,
-        opts?.refreshDimensions,
-      );
-      if (migratedElement) {
-        const localElement = localElementsMap?.get(element.id);
-        if (localElement && localElement.version > migratedElement.version) {
-          migratedElement = bumpVersion(migratedElement, localElement.version);
-        }
-        if (existingIds.has(migratedElement.id)) {
-          migratedElement = { ...migratedElement, id: randomId() };
-        }
-        existingIds.add(migratedElement.id);
-        //@ts-ignore
-        if (element.children?.length) {
-          //@ts-ignore
-          const newElements = updateElementChildren(element);
-          if (newElements) {
-            elements.push(...newElements);
-          } else {
-            elements.push(migratedElement);
+  const restoredElements = (excalidrawElements || []).reduce(
+    (elements, element) => {
+      // filtering out selection, which is legacy, no longer kept in elements,
+      // and causing issues if retained
+      if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
+        let migratedElement: ExcalidrawElement | null = restoreElement(
+          element,
+          opts?.refreshDimensions,
+        );
+        if (migratedElement) {
+          const localElement = localElementsMap?.get(element.id);
+          if (localElement && localElement.version > migratedElement.version) {
+            migratedElement = bumpVersion(
+              migratedElement,
+              localElement.version,
+            );
           }
-        } else {
+          if (existingIds.has(migratedElement.id)) {
+            migratedElement = { ...migratedElement, id: randomId() };
+          }
+          existingIds.add(migratedElement.id);
+
           elements.push(migratedElement);
         }
       }
-    }
-    return elements;
-  }, [] as ExcalidrawElement[]);
+      return elements;
+    },
+    [] as ExcalidrawElement[],
+  );
 
   if (!opts?.repairBindings) {
     return restoredElements;

@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawGenericElement } from "../element/types";
 import {
   AppState,
   BinaryFiles,
@@ -7,6 +7,8 @@ import {
 } from "../types";
 import type { cleanAppStateForExport } from "../appState";
 import { VERSIONS } from "../constants";
+import { MarkOptional } from "../utility-types";
+import { ElementConstructorOpts } from "../element/newElement";
 
 export interface ExportedDataState {
   type: string;
@@ -35,7 +37,28 @@ export interface ImportedDataState {
   type?: string;
   version?: number;
   source?: string;
-  elements?: readonly ExcalidrawElement[] | null;
+  elements?:
+    | readonly (
+        | (ExcalidrawElement & {
+            children?: [
+              { text: string } & MarkOptional<
+                ElementConstructorOpts,
+                "x" | "y"
+              >,
+            ];
+          })
+        | {
+            type: Exclude<ExcalidrawGenericElement["type"], "selection">;
+            children?: [
+              { text: string } & MarkOptional<
+                ElementConstructorOpts,
+                "x" | "y"
+              >,
+            ] &
+              MarkOptional<ElementConstructorOpts, "x" | "y">;
+          }
+      )[]
+    | null;
   appState?: Readonly<
     Partial<
       AppState & {

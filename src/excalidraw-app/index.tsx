@@ -86,6 +86,7 @@ import { appJotaiStore } from "./app-jotai";
 
 import "./index.scss";
 import { ResolutionType } from "../utility-types";
+import { convertToExcalidrawElements } from "../element/newElement";
 
 polyfill();
 
@@ -206,7 +207,7 @@ const initializeScene = async (opts: {
           isLoading: false,
         },
         elements: reconcileElements(
-          scene?.elements || [],
+          convertToExcalidrawElements(scene?.elements || []),
           excalidrawAPI.getSceneElementsIncludingDeleted(),
           excalidrawAPI.getAppState(),
         ),
@@ -286,7 +287,7 @@ const ExcalidrawWrapper = () => {
         if (data.scene.elements) {
           collabAPI
             .fetchImageFilesFromFirebase({
-              elements: data.scene.elements,
+              elements: convertToExcalidrawElements(data.scene.elements),
               forceFetchFiles: true,
             })
             .then(({ loadedFiles, erroredFiles }) => {
@@ -299,8 +300,9 @@ const ExcalidrawWrapper = () => {
             });
         }
       } else {
+        const sceneElements = convertToExcalidrawElements(data.scene.elements);
         const fileIds =
-          data.scene.elements?.reduce((acc, element) => {
+          sceneElements?.reduce((acc, element) => {
             if (isInitializedImageElement(element)) {
               return acc.concat(element.fileId);
             }
@@ -351,7 +353,6 @@ const ExcalidrawWrapper = () => {
         elements: [
           {
             type: "rectangle",
-            //@ts-ignore
             children: [{ text: "HELLO DAMMMMY" }],
           },
         ],

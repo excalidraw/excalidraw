@@ -1,7 +1,10 @@
 import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
+  ExcalidrawDiamondElement,
   ExcalidrawElement,
+  ExcalidrawEllipseElement,
   ExcalidrawGenericElement,
+  ExcalidrawRectangleElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -982,9 +985,10 @@ export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
 };
 
 export const bindTextToContainer = (
-  containerProps: {
-    type: ExcalidrawGenericElement["type"];
-  } & MarkOptional<ElementConstructorOpts, "x" | "y">,
+  containerProps:
+    | {
+        type: Exclude<ExcalidrawGenericElement["type"], "selection">;
+      } & MarkOptional<ElementConstructorOpts, "x" | "y">,
   textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
 ) => {
   const container = newElement({
@@ -1000,6 +1004,7 @@ export const bindTextToContainer = (
     textAlign: TEXT_ALIGN.CENTER,
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
   });
+
   mutateElement(container, {
     boundElements: (container.boundElements || []).concat({
       type: "text",
