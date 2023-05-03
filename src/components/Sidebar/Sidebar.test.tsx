@@ -259,11 +259,7 @@ describe("Sidebar", () => {
             appState: { openSidebar: { name: DEFAULT_SIDEBAR.name } },
           }}
         >
-          <DefaultSidebar
-            className="test-sidebar"
-            docked={docked}
-            // onDock={() => {}}
-          >
+          <DefaultSidebar className="test-sidebar" docked={docked}>
             hello
           </DefaultSidebar>
         </Excalidraw>
