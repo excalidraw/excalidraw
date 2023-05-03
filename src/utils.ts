@@ -1,21 +1,21 @@
 import oc from "open-color";
-
+import { unstable_batchedUpdates } from "react-dom";
+import { isEraserActive, isHandToolActive } from "./appState";
 import colors from "./colors";
 import {
   CURSOR_TYPE,
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
+  FONT_FAMILY_FALLBACKS,
   isDarwin,
   MIME_TYPES,
   THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
-import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
-import { isEraserActive, isHandToolActive } from "./appState";
+import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { ResolutionType } from "./utility-types";
 
 let mockDateTime: string | null = null;
@@ -81,7 +81,7 @@ export const getFontFamilyString = ({
 }) => {
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
-      return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
+      return `${fontFamilyString}, ${FONT_FAMILY_FALLBACKS[id]}`;
     }
   }
   return WINDOWS_EMOJI_FALLBACK_FONT;
