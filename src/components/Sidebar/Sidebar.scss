@@ -209,31 +209,32 @@
     .layer-ui__sidebar__header {
       border-bottom: 1px solid var(--sidebar-border-color);
     }
+  }
 
-    .layer-ui__sidebar__header__buttons {
-      gap: 0;
+  .layer-ui__sidebar__header__buttons {
+    gap: 0;
 
-      .ToolIcon,
-      button {
-        background-color: initial;
-        border: 0 !important;
-        box-shadow: none !important;
+    .ToolIcon,
+    button,
+    .Sidebar__pin-btn {
+      background-color: initial;
+      border: 0 !important;
+      box-shadow: none !important;
 
-        &:hover {
-          background: var(--button-hover-bg, var(--island-bg-color));
-        }
+      &:hover {
+        background: var(--button-hover-bg, var(--island-bg-color));
       }
+    }
 
-      .Sidebar__pin-btn {
-        border: 0;
-      }
-      .Sidebar__pin-btn--pinned {
-        background-color: initial;
-        border: 0;
-        svg {
-          stroke: var(--color-primary);
-          fill: var(--color-primary);
-        }
+    .Sidebar__pin-btn {
+      border: 0;
+    }
+    .Sidebar__pin-btn--pinned {
+      background-color: initial;
+      border: 0;
+      svg {
+        stroke: var(--color-primary);
+        fill: var(--color-primary);
       }
     }
   }
