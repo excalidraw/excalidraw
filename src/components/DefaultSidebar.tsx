@@ -67,7 +67,10 @@ export const DefaultSidebar = Object.assign(
           key="default"
           className={clsx("layer-ui__default-sidebar", className)}
           docked={docked ?? appState.defaultSidebarDockedPreference}
-          dockable={docked == null ? dockable : false}
+          // we need to explicitly reset dockable here because we always pass
+          // onDock regardless of host app's onDock callback, which would
+          // make it always dockable even if the host app doesn't listen to it.
+          dockable={onDock != null ? dockable : false}
           onDock={composeEventHandlers(onDock, (docked) => {
             setAppState({ defaultSidebarDockedPreference: docked });
           })}
