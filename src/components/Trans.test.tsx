@@ -12,6 +12,7 @@ describe("Test <Trans/>", () => {
       key2: "Please <link>click the button</link> to continue.",
       key3: "Please <link>click {{location}}</link> to continue.",
       key4: "Please <link>click <bold>{{location}}</bold></link> to continue.",
+      key5: "Please <connect-link>click the button</connect-link> to continue.",
     };
 
     const { getByTestId } = render(
@@ -40,6 +41,12 @@ describe("Test <Trans/>", () => {
             bold={(el) => <strong>{el}</strong>}
           />
         </div>
+        <div data-testid="test5">
+          <Trans
+            i18nKey="transTest.key5"
+            connect-link={(el) => <a href="https://example.com">{el}</a>}
+          />
+        </div>
       </>,
     );
 
@@ -52,6 +59,9 @@ describe("Test <Trans/>", () => {
     );
     expect(getByTestId("test4").innerHTML).toEqual(
       `Please <a href="https://example.com">click <strong>the button</strong></a> to continue.`,
+    );
+    expect(getByTestId("test5").innerHTML).toEqual(
+      `Please <a href="https://example.com">click the button</a> to continue.`,
     );
   });
 });
