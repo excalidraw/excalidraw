@@ -285,18 +285,16 @@ describe("Sidebar", () => {
           return dockBotton!;
         });
 
-        const dockButtonInput = dockButton.querySelector("input")!;
-
-        fireEvent.click(dockButtonInput);
+        fireEvent.click(dockButton);
         await waitFor(() => {
           expect(h.state.defaultSidebarDockedPreference).toBe(true);
-          expect(dockButtonInput).toBeChecked();
+          expect(dockButton).toHaveClass("selected");
         });
 
-        fireEvent.click(dockButtonInput);
+        fireEvent.click(dockButton);
         await waitFor(() => {
           expect(h.state.defaultSidebarDockedPreference).toBe(false);
-          expect(dockButtonInput).not.toBeChecked();
+          expect(dockButton).not.toHaveClass("selected");
         });
       }
 
@@ -353,18 +351,16 @@ describe("Sidebar", () => {
           return dockBotton!;
         });
 
-        const dockButtonInput = dockButton.querySelector("input")!;
-
-        fireEvent.click(dockButtonInput);
+        fireEvent.click(dockButton);
         await waitFor(() => {
           expect(h.state.defaultSidebarDockedPreference).toBe(true);
-          expect(dockButtonInput).toBeChecked();
+          expect(dockButton).toHaveClass("selected");
         });
 
-        fireEvent.click(dockButtonInput);
+        fireEvent.click(dockButton);
         await waitFor(() => {
           expect(h.state.defaultSidebarDockedPreference).toBe(false);
-          expect(dockButtonInput).not.toBeChecked();
+          expect(dockButton).not.toHaveClass("selected");
         });
       }
     });
