@@ -22,7 +22,6 @@ export type SidebarProps<P = {}> = {
   /** if not supplied, sidebar won't be dockable */
   onDock?: (docked: boolean) => void;
   docked?: boolean;
-  dockable?: boolean;
   className?: string;
   // NOTE sidebars we use internally inside the editor must have this flag set.
   // It indicates that this sidebar should have lower precedence over host
@@ -33,8 +32,8 @@ export type SidebarProps<P = {}> = {
 
 export type SidebarPropsContextValue = Pick<
   SidebarProps,
-  "onDock" | "docked" | "dockable"
-> & { onCloseRequest: () => void };
+  "onDock" | "docked"
+> & { onCloseRequest: () => void; dockable: boolean };
 
 export const SidebarPropsContext =
   React.createContext<SidebarPropsContextValue>({} as SidebarPropsContextValue);

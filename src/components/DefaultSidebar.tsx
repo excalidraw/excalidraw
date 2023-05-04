@@ -3,7 +3,7 @@ import { DEFAULT_SIDEBAR, LIBRARY_SIDEBAR_TAB } from "../constants";
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
 import { t } from "../i18n";
-import { MarkOptional } from "../utility-types";
+import { MarkOptional, Merge } from "../utility-types";
 import { composeEventHandlers } from "../utils";
 import { useExcalidrawSetAppState } from "./App";
 import { withInternalFallback } from "./hoc/withInternalFallback";
@@ -52,9 +52,14 @@ export const DefaultSidebar = Object.assign(
       className,
       onDock,
       docked,
-      dockable,
       ...rest
-    }: MarkOptional<Omit<SidebarProps, "name">, "children">) => {
+    }: Merge<
+      MarkOptional<Omit<SidebarProps, "name">, "children">,
+      {
+        /** pass `false` to disable docking */
+        onDock?: SidebarProps["onDock"] | false;
+      }
+    >) => {
       const appState = useUIAppState();
       const setAppState = useExcalidrawSetAppState();
 
@@ -67,13 +72,16 @@ export const DefaultSidebar = Object.assign(
           key="default"
           className={clsx("layer-ui__default-sidebar", className)}
           docked={docked ?? appState.defaultSidebarDockedPreference}
-          // we need to explicitly reset dockable here because we always pass
-          // onDock regardless of host app's onDock callback, which would
-          // make it always dockable even if the host app doesn't listen to it.
-          dockable={docked == null || onDock != null ? dockable : false}
-          onDock={composeEventHandlers(onDock, (docked) => {
-            setAppState({ defaultSidebarDockedPreference: docked });
-          })}
+          onDock={
+            // `onDock=false` disables docking.
+            // if `docked` passed, but no onDock passed, disable manual docking.
+            onDock === false || (!onDock && docked != null)
+              ? undefined
+              : // compose to allow the host app to listen on default behavior
+                composeEventHandlers(onDock, (docked) => {
+                  setAppState({ defaultSidebarDockedPreference: docked });
+                })
+          }
         >
           <Sidebar.Tabs>
             <Sidebar.Header>

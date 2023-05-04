@@ -68,7 +68,7 @@ const useOnClickOutside = (
  * Flags whether the currently rendered Sidebar is docked or not, for use
  * in upstream components that need to act on this (e.g. LayerUI to shift the
  * UI). We use an atom because of potential host app sidebars (for the default
- * sidebar we could just read from appState.isSidebarDocked).
+ * sidebar we could just read from appState.defaultSidebarDockedPreference).
  *
  * Since we can only render one Sidebar at a time, we can use a simple flag.
  */
@@ -81,23 +81,11 @@ export const SidebarInner = forwardRef(
       children,
       onDock,
       docked,
-      dockable = docked !== undefined,
       className,
       ...rest
     }: SidebarProps & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">,
     ref: React.ForwardedRef<HTMLDivElement>,
   ) => {
-    if (
-      process.env.NODE_ENV === "development" &&
-      dockable &&
-      onDock === undefined
-    ) {
-      console.warn(
-        "When Sidebar's `docked` prop is set and `dockable` isn't set to false, `onDock` must be provided as you should listen to state changes and update `docked` accordingly. As such we're defaulting `dockabled` to false, otherwise the dock button will be rendered but won't do anything. Either provide `onDock` or set `dockable` to false to hide this message.",
-      );
-      dockable = false;
-    }
-
     const setAppState = useExcalidrawSetAppState();
 
     const setIsSidebarDockedAtom = useSetAtom(isSidebarDockedAtom, jotaiScope);
@@ -121,7 +109,8 @@ export const SidebarInner = forwardRef(
     // the <Sidebar.Header/> can be rendered upstream.
     headerPropsRef.current = updateObject(headerPropsRef.current, {
       docked,
-      dockable,
+      // explicit prop to rerender on update
+      dockable: !!onDock && docked !== null,
     });
 
     const islandRef = useRef<HTMLDivElement>(null);
