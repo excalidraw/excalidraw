@@ -2,7 +2,6 @@ import React from "react";
 import { DEFAULT_SIDEBAR } from "../../constants";
 import { Excalidraw, Sidebar } from "../../packages/excalidraw/index";
 import {
-  act,
   fireEvent,
   GlobalTestState,
   queryAllByTestId,
@@ -19,20 +18,31 @@ export const assertSidebarDockButton = async <T extends boolean>(
     ? { dockButton: null; sidebar: HTMLElement }
     : { dockButton: HTMLElement; sidebar: HTMLElement }
 > => {
-  return await waitFor(() => {
-    const sidebar =
-      GlobalTestState.renderResult.container.querySelector<HTMLElement>(
-        ".test-sidebar",
-      );
-    expect(sidebar).not.toBe(null);
-    const dockButton = queryByTestId(sidebar!, "sidebar-dock");
-    if (hasDockButton) {
-      expect(dockButton).not.toBe(null);
-      return { dockButton: dockButton!, sidebar: sidebar! } as any;
-    }
-    expect(dockButton).toBe(null);
-    return { dockButton: null, sidebar: sidebar! } as any;
-  });
+  const sidebar =
+    GlobalTestState.renderResult.container.querySelector<HTMLElement>(
+      ".sidebar",
+    );
+  expect(sidebar).not.toBe(null);
+  const dockButton = queryByTestId(sidebar!, "sidebar-dock");
+  if (hasDockButton) {
+    expect(dockButton).not.toBe(null);
+    return { dockButton: dockButton!, sidebar: sidebar! } as any;
+  }
+  expect(dockButton).toBe(null);
+  return { dockButton: null, sidebar: sidebar! } as any;
+};
+
+export const assertExcalidrawWithSidebar = async (
+  sidebar: React.ReactNode,
+  name: string,
+  test: () => void,
+) => {
+  await render(
+    <Excalidraw initialData={{ appState: { openSidebar: { name } } }}>
+      {sidebar}
+    </Excalidraw>,
+  );
+  await withExcalidrawDimensions({ width: 1920, height: 1080 }, test);
 };
 
 describe("Sidebar", () => {
@@ -235,47 +245,40 @@ describe("Sidebar", () => {
   });
 
   describe("Docking behavior", () => {
-    it("shouldn't be user-dockable if `onDock` not supplied (regardless of `docked`)", async () => {
-      let _setDocked: (docked: boolean) => void = null!;
+    it("shouldn't be user-dockable if `onDock` not supplied", async () => {
+      await assertExcalidrawWithSidebar(
+        <Sidebar name="customSidebar">
+          <Sidebar.Header />
+        </Sidebar>,
+        "customSidebar",
+        async () => {
+          await assertSidebarDockButton(false);
+        },
+      );
+    });
 
-      const CustomExcalidraw = () => {
-        const [docked, setDocked] = React.useState<boolean | undefined>();
-        _setDocked = setDocked;
+    it("shouldn't be user-dockable if `onDock` not supplied & `docked={true}`", async () => {
+      await assertExcalidrawWithSidebar(
+        <Sidebar name="customSidebar" docked={true}>
+          <Sidebar.Header />
+        </Sidebar>,
+        "customSidebar",
+        async () => {
+          await assertSidebarDockButton(false);
+        },
+      );
+    });
 
-        return (
-          <Excalidraw
-            initialData={{
-              appState: { openSidebar: { name: "customSidebar" } },
-            }}
-          >
-            <Sidebar
-              name="customSidebar"
-              className="test-sidebar"
-              docked={docked}
-            >
-              <Sidebar.Header />
-            </Sidebar>
-          </Excalidraw>
-        );
-      };
-
-      await render(<CustomExcalidraw />);
-
-      // shouldn't be user-dockable if `onDock` not supplied
-      // (undefined `docked`)
-      // -------------------------------------------------------------------------
-
-      await assertSidebarDockButton(false);
-
-      // shouldn't be user-dockable if `onDock` not supplied, even when `docked`
-      // supplied
-      // -------------------------------------------------------------------------
-
-      act(() => {
-        _setDocked(true);
-      });
-
-      await assertSidebarDockButton(false);
+    it("shouldn't be user-dockable if `onDock` not supplied & docked={false}`", async () => {
+      await assertExcalidrawWithSidebar(
+        <Sidebar name="customSidebar" docked={false}>
+          <Sidebar.Header />
+        </Sidebar>,
+        "customSidebar",
+        async () => {
+          await assertSidebarDockButton(false);
+        },
+      );
     });
 
     it("should be user-dockable when both `onDock` and `docked` supplied", async () => {
