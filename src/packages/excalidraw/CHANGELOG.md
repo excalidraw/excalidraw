@@ -16,6 +16,7 @@ Please add the latest change on the top under the correct section.
 ### Features
 
 - Sidebar component now supports tabs — for more detailed description of new behavior and breaking changes, see the linked PR. [#6213](https://github.com/excalidraw/excalidraw/pull/6213)
+- Exposed `DefaultSidebar` component to allow modifying the default sidebar, such as adding custom tabs to it. [#6213](https://github.com/excalidraw/excalidraw/pull/6213)
 
   #### BREAKING CHANGES
 
