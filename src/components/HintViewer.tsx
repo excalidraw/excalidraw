@@ -29,7 +29,7 @@ const getHints = ({
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
-  if (appState.openSidebar === "library" && !device.canDeviceFitSidebar) {
+  if (appState.openSidebar && !device.canDeviceFitSidebar) {
     return null;
   }
 

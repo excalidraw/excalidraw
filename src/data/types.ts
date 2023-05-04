@@ -25,10 +25,8 @@ export interface ExportedDataState {
  * Don't consume on its own.
  */
 export type LegacyAppState = {
-  /** @deprecated #5663 TODO remove 22-12-15 */
-  isLibraryOpen: [boolean, "openSidebar"];
-  /** @deprecated #5663 TODO remove 22-12-15 */
-  isLibraryMenuDocked: [boolean, "isSidebarDocked"];
+  /** @deprecated #6213 TODO remove 23-06-01 */
+  isSidebarDocked: [boolean, "defaultSidebarDockedPreference"];
 };
 
 export interface ImportedDataState {

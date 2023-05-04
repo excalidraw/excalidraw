@@ -1,17 +1,19 @@
 import { atom, useAtom } from "jotai";
 import React, { useLayoutEffect } from "react";
-import { useTunnels } from "../context/tunnels";
+import { useTunnels } from "../../context/tunnels";
 
 export const withInternalFallback = <P,>(
   componentName: string,
   Component: React.FC<P>,
 ) => {
-  const counterAtom = atom(0);
+  const renderAtom = atom(0);
   // flag set on initial render to tell the fallback component to skip the
   // render until mount counter are initialized. This is because the counter
   // is initialized in an effect, and thus we could end rendering both
   // components at the same time until counter is initialized.
   let preferHost = false;
+
+  let counter = 0;
 
   const WrapperComponent: React.FC<
     P & {
@@ -19,14 +21,26 @@ export const withInternalFallback = <P,>(
     }
   > = (props) => {
     const { jotaiScope } = useTunnels();
-    const [counter, setCounter] = useAtom(counterAtom, jotaiScope);
+    const [, setRender] = useAtom(renderAtom, jotaiScope);
 
     useLayoutEffect(() => {
-      setCounter((counter) => counter + 1);
+      setRender((c) => {
+        const next = c + 1;
+        counter = next;
+
+        return next;
+      });
       return () => {
-        setCounter((counter) => counter - 1);
+        setRender((c) => {
+          const next = c - 1;
+          counter = next;
+          if (!next) {
+            preferHost = false;
+          }
+          return next;
+        });
       };
-    }, [setCounter]);
+    }, [setRender]);
 
     if (!props.__fallback) {
       preferHost = true;

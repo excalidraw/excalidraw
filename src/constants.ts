@@ -275,3 +275,10 @@ export const DEFAULT_ELEMENT_PROPS: {
   opacity: 100,
   locked: false,
 };
+
+export const LIBRARY_SIDEBAR_TAB = "library";
+
+export const DEFAULT_SIDEBAR = {
+  name: "default",
+  defaultTab: LIBRARY_SIDEBAR_TAB,
+} as const;

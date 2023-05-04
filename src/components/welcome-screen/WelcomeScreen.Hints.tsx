@@ -1,5 +1,5 @@
 import { t } from "../../i18n";
-import { useTunnels } from "../context/tunnels";
+import { useTunnels } from "../../context/tunnels";
 import {
   WelcomeScreenHelpArrow,
   WelcomeScreenMenuArrow,
@@ -7,44 +7,44 @@ import {
 } from "../icons";
 
 const MenuHint = ({ children }: { children?: React.ReactNode }) => {
-  const { welcomeScreenMenuHintTunnel } = useTunnels();
+  const { WelcomeScreenMenuHintTunnel } = useTunnels();
   return (
-    <welcomeScreenMenuHintTunnel.In>
+    <WelcomeScreenMenuHintTunnel.In>
       <div className="virgil welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--menu">
         {WelcomeScreenMenuArrow}
         <div className="welcome-screen-decor-hint__label">
           {children || t("welcomeScreen.defaults.menuHint")}
         </div>
       </div>
-    </welcomeScreenMenuHintTunnel.In>
+    </WelcomeScreenMenuHintTunnel.In>
   );
 };
 MenuHint.displayName = "MenuHint";
 
 const ToolbarHint = ({ children }: { children?: React.ReactNode }) => {
-  const { welcomeScreenToolbarHintTunnel } = useTunnels();
+  const { WelcomeScreenToolbarHintTunnel } = useTunnels();
   return (
-    <welcomeScreenToolbarHintTunnel.In>
+    <WelcomeScreenToolbarHintTunnel.In>
       <div className="virgil welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--toolbar">
         <div className="welcome-screen-decor-hint__label">
           {children || t("welcomeScreen.defaults.toolbarHint")}
         </div>
         {WelcomeScreenTopToolbarArrow}
       </div>
-    </welcomeScreenToolbarHintTunnel.In>
+    </WelcomeScreenToolbarHintTunnel.In>
   );
 };
 ToolbarHint.displayName = "ToolbarHint";
 
 const HelpHint = ({ children }: { children?: React.ReactNode }) => {
-  const { welcomeScreenHelpHintTunnel } = useTunnels();
+  const { WelcomeScreenHelpHintTunnel } = useTunnels();
   return (
-    <welcomeScreenHelpHintTunnel.In>
+    <WelcomeScreenHelpHintTunnel.In>
       <div className="virgil welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--help">
         <div>{children || t("welcomeScreen.defaults.helpHint")}</div>
         {WelcomeScreenHelpArrow}
       </div>
-    </welcomeScreenHelpHintTunnel.In>
+    </WelcomeScreenHelpHintTunnel.In>
   );
 };
 HelpHint.displayName = "HelpHint";

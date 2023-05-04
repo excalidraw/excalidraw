@@ -27,6 +27,7 @@ import {
   PRECEDING_ELEMENT_KEY,
   FONT_FAMILY,
   ROUNDNESS,
+  DEFAULT_SIDEBAR,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -431,21 +432,15 @@ const LegacyAppStateMigrations: {
     defaultAppState: ReturnType<typeof getDefaultAppState>,
   ) => [LegacyAppState[K][1], AppState[LegacyAppState[K][1]]];
 } = {
-  isLibraryOpen: (appState, defaultAppState) => {
+  isSidebarDocked: (appState, defaultAppState) => {
     return [
-      "openSidebar",
-      "isLibraryOpen" in appState
-        ? appState.isLibraryOpen
-          ? "library"
-          : null
-        : coalesceAppStateValue("openSidebar", appState, defaultAppState),
-    ];
-  },
-  isLibraryMenuDocked: (appState, defaultAppState) => {
-    return [
-      "isSidebarDocked",
-      appState.isLibraryMenuDocked ??
-        coalesceAppStateValue("isSidebarDocked", appState, defaultAppState),
+      "defaultSidebarDockedPreference",
+      appState.isSidebarDocked ??
+        coalesceAppStateValue(
+          "defaultSidebarDockedPreference",
+          appState,
+          defaultAppState,
+        ),
     ];
   },
 };
@@ -517,13 +512,10 @@ export const restoreAppState = (
         : appState.zoom?.value
         ? appState.zoom
         : defaultAppState.zoom,
-    // when sidebar docked and user left it open in last session,
-    // keep it open. If not docked, keep it closed irrespective of last state.
     openSidebar:
-      nextAppState.openSidebar === "library"
-        ? nextAppState.isSidebarDocked
-          ? "library"
-          : null
+      // string (legacy)
+      typeof (appState.openSidebar as any as string) === "string"
+        ? { name: DEFAULT_SIDEBAR.name }
         : nextAppState.openSidebar,
   };
 };
