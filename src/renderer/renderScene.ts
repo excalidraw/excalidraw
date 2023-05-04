@@ -145,13 +145,18 @@ const strokeGrid = (
   context.save();
   context.strokeStyle = "rgba(0,0,0,0.1)";
   context.beginPath();
-  for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
-    context.moveTo(x, offsetY - gridSize);
-    context.lineTo(x, offsetY + height + gridSize * 2);
+  const left = offsetX - gridSize;
+  const top = offsetY - gridSize;
+  const right = offsetX + width + gridSize;
+  const bottom = offsetY + height + gridSize;
+  for (let x = offsetX; x < right; x += gridSize) {
+    context.moveTo(x, top);
+    context.lineTo(x, bottom);
   }
-  for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
-    context.moveTo(offsetX - gridSize, y);
-    context.lineTo(offsetX + width + gridSize * 2, y);
+
+  for (let y = offsetY; y < bottom; y += gridSize) {
+    context.moveTo(left, y);
+    context.lineTo(right, y);
   }
   context.stroke();
   context.restore();
@@ -383,12 +388,8 @@ export const _renderScene = ({
       strokeGrid(
         context,
         appState.gridSize,
-        -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
-          appState.gridSize +
-          (renderConfig.scrollX % appState.gridSize),
-        -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
-          appState.gridSize +
-          (renderConfig.scrollY % appState.gridSize),
+        renderConfig.scrollX % appState.gridSize,
+        renderConfig.scrollY % appState.gridSize,
         normalizedCanvasWidth / renderConfig.zoom.value,
         normalizedCanvasHeight / renderConfig.zoom.value,
       );
