@@ -4746,23 +4746,15 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           const dragOffset = {
-            // from pointer down origin
-            total: {
-              x: pointerCoords.x - pointerDownState.origin.x,
-              y: pointerCoords.y - pointerDownState.origin.y,
-            },
-            // from last pointer move
-            relative: {
-              x: pointerCoords.x - pointerDownState.lastCoords.x,
-              y: pointerCoords.y - pointerDownState.lastCoords.y,
-            },
+            x: pointerCoords.x - pointerDownState.origin.x,
+            y: pointerCoords.y - pointerDownState.origin.y,
           };
 
           const snaps = getSnaps({
             elements: [...pointerDownState.originalElements.values()],
             appState: this.state,
             event,
-            dragOffset: dragOffset.total,
+            dragOffset: dragOffset,
           });
           this.setState({ snaps });
 

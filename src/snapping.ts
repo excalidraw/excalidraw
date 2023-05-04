@@ -6,7 +6,6 @@ import {
 import * as GA from "./ga";
 import * as GALines from "./galines";
 import * as GAPoints from "./gapoints";
-import * as GADirections from "./gadirections";
 import { getMaximumGroups } from "./groups";
 import { getSelectedElements } from "./scene";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
@@ -75,6 +74,9 @@ const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
   ].filter((snapLine): snapLine is SnapLine => snapLine !== null);
 };
 
+/**
+ * return only the nearest horizontal and vertical snaps to the given elements
+ */
 export const getSnaps = ({
   elements,
   appState,
@@ -98,7 +100,9 @@ export const getSnaps = ({
 
   const selectionCoordinates = getElementsCoordinates(selectedElements);
 
-  return getMaximumGroups(getVisibleAndNonSelectedElements(elements, appState))
+  const snaps = getMaximumGroups(
+    getVisibleAndNonSelectedElements(elements, appState),
+  )
     .filter(
       (elementsGroup) => !elementsGroup.every((element) => element.locked),
     )
@@ -119,8 +123,39 @@ export const getSnaps = ({
         })
         .filter((snap): snap is Snap => snap !== null),
     )
-    .filter((snap) => shouldSnap(snap, appState.zoom))
-    .sort((a, b) => a.distance - b.distance);
+    .filter((snap) => shouldSnap(snap, appState.zoom));
+
+  if (snaps.length > 0) {
+    // one group stores horizontal snaps, the other keeps vertical snaps
+    const groupA: Snaps = [];
+    const groupB: Snaps = [];
+
+    for (const snap of snaps) {
+      if (GALines.areParallel(snap.snapLine.line, snaps[0].snapLine.line)) {
+        groupA.push(snap);
+      } else {
+        groupB.push(snap);
+      }
+    }
+
+    const leastDistanceGroupA = Math.min(
+      ...groupA.map((snap) => snap.distance),
+    );
+    const leastDistanceGroupB = Math.min(
+      ...groupB.map((snap) => snap.distance),
+    );
+
+    return [
+      ...groupA.filter((snap) =>
+        areRoughlyEqual(snap.distance, leastDistanceGroupA),
+      ),
+      ...groupB.filter((snap) =>
+        areRoughlyEqual(snap.distance, leastDistanceGroupB),
+      ),
+    ];
+  }
+
+  return null;
 };
 
 export const isSnapped = (snaps: Snaps, [x, y]: TuplePoint) =>
@@ -191,10 +226,7 @@ const getLineExtremities = (
 export interface ProjectionOptions {
   zoom: Zoom;
   origin: { x: number; y: number };
-  offset: {
-    total: { x: number; y: number };
-    relative: { x: number; y: number };
-  };
+  offset: { x: number; y: number };
   snaps: Snaps | null;
 }
 
@@ -206,14 +238,10 @@ export const snapProject = ({
 }: ProjectionOptions) => {
   if (!snaps) {
     return GAPoints.toObject(
-      GA.add(
-        GA.point(origin.x, origin.y),
-        GA.offset(offset.total.x, offset.total.y),
-      ),
+      GA.add(GA.point(origin.x, origin.y), GA.offset(offset.x, offset.y)),
     );
   }
 
-  const mouseOffset = GA.offset(offset.relative.x, offset.relative.y);
   let totalOffset = GA.offset(0, 0);
 
   for (const snap of keepOnlyClosestPoints(snaps)) {
@@ -233,18 +261,13 @@ export const snapProject = ({
 
     const snapOffset = GA.sub(snapReferencePoint, snapProjection);
 
-    // When attraction are opposite, ignore it
-    if (!GADirections.hasSameSign(GA.mul(snapOffset, -1), mouseOffset)) {
-      continue;
-    }
-
     totalOffset = GA.sub(totalOffset, snapOffset);
   }
 
   return GAPoints.toObject(
     GA.add(
       GA.point(origin.x, origin.y),
-      GA.add(totalOffset, GA.offset(offset.total.x, offset.total.y)),
+      GA.add(totalOffset, GA.offset(offset.x, offset.y)),
     ),
   );
 };
@@ -270,4 +293,8 @@ const keepOnlyClosestPoints = (snaps: Snaps) => {
   }, [] as Snaps);
 
   return groups;
+};
+
+const areRoughlyEqual = (a: number, b: number, precision = PRECISION) => {
+  return Math.abs(a - b) <= precision;
 };
