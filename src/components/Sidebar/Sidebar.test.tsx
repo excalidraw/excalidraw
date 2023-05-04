@@ -1,10 +1,6 @@
 import React from "react";
 import { DEFAULT_SIDEBAR } from "../../constants";
-import {
-  DefaultSidebar,
-  Excalidraw,
-  Sidebar,
-} from "../../packages/excalidraw/index";
+import { Excalidraw, Sidebar } from "../../packages/excalidraw/index";
 import {
   act,
   fireEvent,
@@ -16,7 +12,7 @@ import {
   withExcalidrawDimensions,
 } from "../../tests/test-utils";
 
-const assertSidebarDockButton = async <T extends boolean>(
+export const assertSidebarDockButton = async <T extends boolean>(
   hasDockButton: T,
 ): Promise<
   T extends false
@@ -168,17 +164,12 @@ describe("Sidebar", () => {
       );
     };
 
-    const { container } = await render(<CustomExcalidraw />);
+    await render(<CustomExcalidraw />);
 
     // should show dock button when the sidebar fits to be docked
     // -------------------------------------------------------------------------
 
-    await withExcalidrawDimensions({ width: 1920, height: 1080 }, () => {
-      const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
-      expect(sidebar).not.toBe(null);
-      const closeButton = queryByTestId(sidebar!, "sidebar-dock");
-      expect(closeButton).toBe(null);
-    });
+    await assertSidebarDockButton(false);
   });
 
   it("should render custom sidebar with dock button if onDock supplied", async () => {
@@ -200,16 +191,13 @@ describe("Sidebar", () => {
       );
     };
 
-    const { container } = await render(<CustomExcalidraw />);
+    await render(<CustomExcalidraw />);
 
     // should show dock button when the sidebar fits to be docked
     // -------------------------------------------------------------------------
 
-    await withExcalidrawDimensions({ width: 1920, height: 1080 }, () => {
-      const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
-      expect(sidebar).not.toBe(null);
-      const closeButton = queryByTestId(sidebar!, "sidebar-dock");
-      expect(closeButton).not.toBe(null);
+    await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
+      await assertSidebarDockButton(true);
     });
   });
 
@@ -236,7 +224,7 @@ describe("Sidebar", () => {
       );
     };
 
-    const { container } = await render(<CustomExcalidraw />);
+    await render(<CustomExcalidraw />);
 
     await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
       // should not show dock button when `dockable` is `false`
@@ -246,12 +234,7 @@ describe("Sidebar", () => {
         _setDockable(false);
       });
 
-      await waitFor(() => {
-        const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
-        expect(sidebar).not.toBe(null);
-        const closeButton = queryByTestId(sidebar!, "sidebar-dock");
-        expect(closeButton).toBe(null);
-      });
+      await assertSidebarDockButton(false);
 
       // should show dock button when `dockable` is `true`, even if `docked`
       // prop is set
@@ -261,240 +244,7 @@ describe("Sidebar", () => {
         _setDockable(true);
       });
 
-      await waitFor(() => {
-        const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
-        expect(sidebar).not.toBe(null);
-        const closeButton = queryByTestId(sidebar!, "sidebar-dock");
-        expect(closeButton).not.toBe(null);
-      });
-    });
-  });
-
-  it("DefaultSidebar docking should be fully-controlled when `docked` prop passed", async () => {
-    let _setDocked: (docked?: boolean) => void = null!;
-
-    const CustomExcalidraw = () => {
-      const [docked, setDocked] = React.useState<boolean | undefined>();
-      _setDocked = setDocked;
-      return (
-        <Excalidraw
-          initialData={{
-            appState: { openSidebar: { name: DEFAULT_SIDEBAR.name } },
-          }}
-        >
-          <DefaultSidebar className="test-sidebar" docked={docked}>
-            hello
-          </DefaultSidebar>
-        </Excalidraw>
-      );
-    };
-
-    const { container } = await render(<CustomExcalidraw />);
-
-    const { h } = window;
-
-    await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
-      // if `docked={undefined}` passed, should allow docking as normal
-      // -------------------------------------------------------------------------
-
-      {
-        expect(h.state.defaultSidebarDockedPreference).toBe(false);
-
-        const dockButton = await waitFor(() => {
-          const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
-          expect(sidebar).not.toBe(null);
-          const dockButton = queryByTestId(sidebar!, "sidebar-dock");
-          expect(dockButton).not.toBe(null);
-          return dockButton!;
-        });
-
-        fireEvent.click(dockButton);
-        await waitFor(() => {
-          expect(h.state.defaultSidebarDockedPreference).toBe(true);
-          expect(dockButton).toHaveClass("selected");
-        });
-
-        fireEvent.click(dockButton);
-        await waitFor(() => {
-          expect(h.state.defaultSidebarDockedPreference).toBe(false);
-          expect(dockButton).not.toHaveClass("selected");
-        });
-      }
-
-      // once `docked` is defined, shouldn't allow docking for DefaultSidebar
-      // -------------------------------------------------------------------------
-
-      act(() => {
-        _setDocked(true);
-      });
-
-      await waitFor(() => {
-        const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
-        expect(sidebar).not.toBe(null);
-
-        const dockButton = queryByTestId(sidebar!, "sidebar-dock");
-        expect(dockButton).toBe(null);
-
-        // defaultSidebarDockedPreference is disconnected from the actual
-        // docked state
-        expect(h.state.defaultSidebarDockedPreference).toBe(false);
-      });
-
-      act(() => {
-        _setDocked(false);
-      });
-
-      await waitFor(() => {
-        const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
-        expect(sidebar).not.toBe(null);
-
-        const dockButton = queryByTestId(sidebar!, "sidebar-dock");
-        expect(dockButton).toBe(null);
-
-        // defaultSidebarDockedPreference is disconnected from the actual
-        // docked state
-        expect(h.state.defaultSidebarDockedPreference).toBe(false);
-      });
-
-      // reverting back to `docked={undefined}` should allow docking again
-      // -----------------------------------------------------------------------
-
-      {
-        act(() => {
-          _setDocked(undefined);
-        });
-
-        expect(h.state.defaultSidebarDockedPreference).toBe(false);
-
-        const dockButton = await waitFor(() => {
-          const sidebar = container.querySelector<HTMLElement>(".test-sidebar");
-          expect(sidebar).not.toBe(null);
-          const dockButton = queryByTestId(sidebar!, "sidebar-dock");
-          expect(dockButton).not.toBe(null);
-          return dockButton!;
-        });
-
-        fireEvent.click(dockButton);
-        await waitFor(() => {
-          expect(h.state.defaultSidebarDockedPreference).toBe(true);
-          expect(dockButton).toHaveClass("selected");
-        });
-
-        fireEvent.click(dockButton);
-        await waitFor(() => {
-          expect(h.state.defaultSidebarDockedPreference).toBe(false);
-          expect(dockButton).not.toHaveClass("selected");
-        });
-      }
-    });
-  });
-
-  it("DefaultSidebar should require passing both `onDock` and `docked` to be dockable", async () => {
-    let _setOnDock: (
-      value: undefined | false | (() => void),
-    ) => void | undefined = null!;
-    let _setDocked: (docked: boolean) => void = null!;
-
-    const CustomExcalidraw = () => {
-      const [docked, setDocked] = React.useState<boolean | undefined>();
-      _setDocked = setDocked;
-      const [onDock, setOnDock] = React.useState<
-        (() => void) | false | undefined
-      >();
-      _setOnDock = setOnDock;
-      return (
-        <Excalidraw
-          initialData={{
-            appState: { openSidebar: { name: DEFAULT_SIDEBAR.name } },
-          }}
-        >
-          <DefaultSidebar
-            className="test-sidebar"
-            docked={docked}
-            onDock={onDock}
-          >
-            hello
-          </DefaultSidebar>
-        </Excalidraw>
-      );
-    };
-
-    await render(<CustomExcalidraw />);
-
-    const { h } = window;
-
-    // if `docked={undefined}` & `onDock={undefined}`, should allow docking
-    // as normal
-    // -------------------------------------------------------------------------
-    await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
-      expect(h.state.defaultSidebarDockedPreference).toBe(false);
-
-      const { dockButton } = await assertSidebarDockButton(true);
-
-      fireEvent.click(dockButton);
-      await waitFor(() => {
-        expect(h.state.defaultSidebarDockedPreference).toBe(true);
-        expect(dockButton).toHaveClass("selected");
-      });
-
-      fireEvent.click(dockButton);
-      await waitFor(() => {
-        expect(h.state.defaultSidebarDockedPreference).toBe(false);
-        expect(dockButton).not.toHaveClass("selected");
-      });
-    });
-
-    // if `docked={undefined}` & `onDock={() => {}}`, should allow docking
-    // as normal (handled by editor), and only listen on changes
-    // -------------------------------------------------------------------------
-    act(() => {
-      _setOnDock(() => {});
-    });
-
-    await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
-      expect(h.state.defaultSidebarDockedPreference).toBe(false);
-
-      const { dockButton, sidebar } = await assertSidebarDockButton(true);
-
-      fireEvent.click(dockButton);
-      await waitFor(() => {
-        expect(h.state.defaultSidebarDockedPreference).toBe(true);
-        expect(dockButton).toHaveClass("selected");
-        expect(sidebar).toHaveClass("layer-ui__sidebar--docked");
-      });
-
-      fireEvent.click(dockButton);
-      await waitFor(() => {
-        expect(h.state.defaultSidebarDockedPreference).toBe(false);
-        expect(dockButton).not.toHaveClass("selected");
-        expect(sidebar).not.toHaveClass("layer-ui__sidebar--docked");
-      });
-    });
-
-    // if `onDock={false}`, should disable docking
-    // -------------------------------------------------------------------------
-    act(() => {
-      _setOnDock(false);
-    });
-
-    await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
-      expect(h.state.defaultSidebarDockedPreference).toBe(false);
-
-      await assertSidebarDockButton(false);
-    });
-
-    // if `docked={true}` & `onDock={false}`, should disable docking,
-    // but keep sidebar docked
-    // -------------------------------------------------------------------------
-    act(() => {
-      _setDocked(true);
-    });
-
-    await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
-      expect(h.state.defaultSidebarDockedPreference).toBe(false);
-
-      const { sidebar } = await assertSidebarDockButton(false);
-      expect(sidebar).toHaveClass("layer-ui__sidebar--docked");
+      await assertSidebarDockButton(true);
     });
   });
 
