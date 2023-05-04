@@ -24,12 +24,14 @@ import {
   useExcalidrawSetAppState,
 } from "../App";
 import { updateObject } from "../../utils";
-import * as RadixTabs from "@radix-ui/react-tabs";
 import { KEYS } from "../../keys";
 import { EVENT } from "../../constants";
 import { SidebarTrigger } from "./SidebarTrigger";
 import { useUIAppState } from "../../context/ui-appState";
-import { SidebarTabName } from "../../types";
+import { SidebarTabTriggers } from "./SidebarTabTriggers";
+import { SidebarTabTrigger } from "./SidebarTabTrigger";
+import { SidebarTabs } from "./SidebarTabs";
+import { SidebarTab } from "./SidebarTab";
 
 import "./Sidebar.scss";
 
@@ -190,94 +192,6 @@ export const SidebarInner = forwardRef(
   },
 );
 SidebarInner.displayName = "SidebarInner";
-
-const SidebarTabs = ({
-  children,
-  ...rest
-}: {
-  children: React.ReactNode;
-} & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">) => {
-  const appState = useUIAppState();
-  const setAppState = useExcalidrawSetAppState();
-
-  if (!appState.openSidebar) {
-    return null;
-  }
-
-  const { name } = appState.openSidebar;
-
-  return (
-    <RadixTabs.Root
-      className="sidebar-tabs-root"
-      value={appState.openSidebar.tab}
-      onValueChange={(tab) =>
-        setAppState((state) => ({
-          ...state,
-          openSidebar: { ...state.openSidebar, name, tab },
-        }))
-      }
-      {...rest}
-    >
-      {children}
-    </RadixTabs.Root>
-  );
-};
-SidebarTabs.displayName = "SidebarTabs";
-
-const SidebarTabTriggers = ({
-  children,
-  ...rest
-}: { children: React.ReactNode } & Omit<
-  React.RefAttributes<HTMLDivElement>,
-  "onSelect"
->) => {
-  return (
-    <RadixTabs.List className="sidebar-triggers" {...rest}>
-      {children}
-    </RadixTabs.List>
-  );
-};
-SidebarTabTriggers.displayName = "SidebarTabTriggers";
-
-const SidebarTabTrigger = ({
-  children,
-  tab,
-  onSelect,
-  ...rest
-}: {
-  children: React.ReactNode;
-  tab: SidebarTabName;
-  onSelect?: React.ReactEventHandler<HTMLButtonElement> | undefined;
-} & Omit<React.HTMLAttributes<HTMLButtonElement>, "onSelect">) => {
-  return (
-    <RadixTabs.Trigger value={tab} asChild onSelect={onSelect}>
-      <button
-        type={"button"}
-        className={`excalidraw-button sidebar-tab-trigger`}
-        {...rest}
-      >
-        {children}
-      </button>
-    </RadixTabs.Trigger>
-  );
-};
-SidebarTabTrigger.displayName = "SidebarTabTrigger";
-
-const SidebarTab = ({
-  tab,
-  children,
-  ...rest
-}: {
-  tab: SidebarTabName;
-  children: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>) => {
-  return (
-    <RadixTabs.Content {...rest} value={tab}>
-      {children}
-    </RadixTabs.Content>
-  );
-};
-SidebarTab.displayName = "SidebarTab";
 
 export const Sidebar = Object.assign(
   forwardRef((props: SidebarProps, ref: React.ForwardedRef<HTMLDivElement>) => {
