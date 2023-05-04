@@ -226,7 +226,7 @@ describe("DefaultSidebar", () => {
     });
 
     // if `docked={true}` & `onDock={false}`, should disable docking,
-    // but keep sidebar docked
+    // and force sidebar to be docked
     // -------------------------------------------------------------------------
     act(() => {
       _setDocked(true);
@@ -237,6 +237,34 @@ describe("DefaultSidebar", () => {
 
       const { sidebar } = await assertSidebarDockButton(false);
       expect(sidebar).toHaveClass("layer-ui__sidebar--docked");
+    });
+
+    // if `docked={true}` & `onDock={undefined}`, should disable docking,
+    // and force sidebar to be docked
+    // -------------------------------------------------------------------------
+    act(() => {
+      _setDocked(true);
+    });
+
+    await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
+      expect(h.state.defaultSidebarDockedPreference).toBe(false);
+
+      const { sidebar } = await assertSidebarDockButton(false);
+      expect(sidebar).toHaveClass("layer-ui__sidebar--docked");
+    });
+
+    // if `docked={false}` & `onDock={undefined}`, should disable docking,
+    // and force sidebar to be undocked
+    // -------------------------------------------------------------------------
+    act(() => {
+      _setDocked(false);
+    });
+
+    await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
+      expect(h.state.defaultSidebarDockedPreference).toBe(false);
+
+      const { sidebar } = await assertSidebarDockButton(false);
+      expect(sidebar).not.toHaveClass("layer-ui__sidebar--docked");
     });
   });
 });

@@ -172,32 +172,49 @@ describe("Sidebar", () => {
     await assertSidebarDockButton(false);
   });
 
-  it("should render custom sidebar with dock button if onDock supplied", async () => {
-    const CustomExcalidraw = () => {
-      return (
-        <Excalidraw
-          initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
+  it("should be dockable when both `onDock` and `docked` supplied", async () => {
+    await render(
+      <Excalidraw
+        initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
+      >
+        <Sidebar
+          name="customSidebar"
+          className="test-sidebar"
+          onDock={() => {}}
+          docked
         >
-          <Sidebar
-            name="customSidebar"
-            className="test-sidebar"
-            onDock={() => {}}
-            docked
-          >
-            <Sidebar.Header />
-            hello
-          </Sidebar>
-        </Excalidraw>
-      );
-    };
-
-    await render(<CustomExcalidraw />);
-
-    // should show dock button when the sidebar fits to be docked
-    // -------------------------------------------------------------------------
+          <Sidebar.Header />
+          hello
+        </Sidebar>
+      </Excalidraw>,
+    );
 
     await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
       await assertSidebarDockButton(true);
+    });
+  });
+
+  it("shouldn't be dockable when only `onDock` supplied w/o `docked`", async () => {
+    // should be dockable when both `onDock` and `docked` are supplied
+    // -------------------------------------------------------------------------
+
+    await render(
+      <Excalidraw
+        initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
+      >
+        <Sidebar
+          name="customSidebar"
+          className="test-sidebar"
+          onDock={() => {}}
+        >
+          <Sidebar.Header />
+          hello
+        </Sidebar>
+      </Excalidraw>,
+    );
+
+    await withExcalidrawDimensions({ width: 1920, height: 1080 }, async () => {
+      await assertSidebarDockButton(false);
     });
   });
 

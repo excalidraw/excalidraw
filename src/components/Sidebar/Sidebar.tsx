@@ -27,7 +27,6 @@ import { updateObject } from "../../utils";
 import { KEYS } from "../../keys";
 import { EVENT } from "../../constants";
 import { SidebarTrigger } from "./SidebarTrigger";
-import { useUIAppState } from "../../context/ui-appState";
 import { SidebarTabTriggers } from "./SidebarTabTriggers";
 import { SidebarTabTrigger } from "./SidebarTabTrigger";
 import { SidebarTabs } from "./SidebarTabs";
@@ -86,6 +85,12 @@ export const SidebarInner = forwardRef(
     }: SidebarProps & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">,
     ref: React.ForwardedRef<HTMLDivElement>,
   ) => {
+    if (process.env.NODE_ENV === "development" && onDock && docked == null) {
+      console.warn(
+        "Sidebar: `docked` must be set when `onDock` is supplied for the sidebar to be dockable. To hide this message, either pass `docked` or remove `onDock`",
+      );
+    }
+
     const setAppState = useExcalidrawSetAppState();
 
     const setIsSidebarDockedAtom = useSetAtom(isSidebarDockedAtom, jotaiScope);
@@ -110,7 +115,7 @@ export const SidebarInner = forwardRef(
     headerPropsRef.current = updateObject(headerPropsRef.current, {
       docked,
       // explicit prop to rerender on update
-      dockable: !!onDock && docked !== null,
+      dockable: !!onDock && docked != null,
     });
 
     const islandRef = useRef<HTMLDivElement>(null);
