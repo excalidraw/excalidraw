@@ -154,7 +154,7 @@ const RoomDialog = ({
             <p>
               <span role="img" aria-hidden="true" className="RoomDialog-emoji">
                 {"🔒"}
-              </span>{" "}
+              </span>
               {t("roomDialog.desc_privacy")}
             </p>
             <p>{t("roomDialog.desc_exitSession")}</p>

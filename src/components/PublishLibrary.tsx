@@ -409,7 +409,7 @@ const PublishLibrary = ({
               rel="noopener noreferrer"
             >
               {t("publishDialog.noteDescription.link")}
-            </a>{" "}
+            </a>
             {t("publishDialog.noteDescription.post")}
           </div>
           <span className="publish-library-note">

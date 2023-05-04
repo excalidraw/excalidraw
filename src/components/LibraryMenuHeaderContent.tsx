@@ -106,7 +106,7 @@ export const LibraryDropdownMenuButton: React.FC<{
         <p>
           {t("publishSuccessDialog.content", {
             authorName: publishLibSuccess!.authorName,
-          })}{" "}
+          })}
           <a
             href={publishLibSuccess?.url}
             target="_blank"

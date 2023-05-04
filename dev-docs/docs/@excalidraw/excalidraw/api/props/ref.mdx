@@ -3,13 +3,13 @@
 <pre>
   <a href="https://reactjs.org/docs/refs-and-the-dom.html#creating-refs">
     createRef
-  </a>{" "}
-  &#124;{" "}
-  <a href="https://reactjs.org/docs/hooks-reference.html#useref">useRef</a>{" "}
-  &#124;{" "}
+  </a>
+  &#124;
+  <a href="https://reactjs.org/docs/hooks-reference.html#useref">useRef</a>
+  &#124;
   <a href="https://reactjs.org/docs/refs-and-the-dom.html#callback-refs">
     callbackRef
-  </a>{" "}
+  </a>
   &#124; <br />
   &#123; current: &#123; readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L460">
     resolvablePromise
@@ -91,7 +91,7 @@ const App = () => {
 ## updateScene
 
 <pre>
-  (scene:{" "}
+  (scene:
   <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L339">
     sceneData
   </a>
@@ -164,7 +164,7 @@ function App() {
 ### updateLibrary
 
 <pre>
-  (opts: &#123; <br /> libraryItems:{" "}
+  (opts: &#123; <br /> libraryItems:
   <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L249">
     LibraryItemsSource
   </a>
@@ -243,7 +243,7 @@ function App() {
 ### addFiles
 
 <pre>
-  (files:{" "}
+  (files:
   <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L59">
     BinaryFileData
   </a>
@@ -263,7 +263,7 @@ Resets the scene. If `resetLoadingState` is passed as true then it will also for
 ## getSceneElementsIncludingDeleted
 
 <pre>
-  () =>{" "}
+  () =>
   <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
     ExcalidrawElement[]
   </a>
@@ -286,7 +286,7 @@ Returns all the elements excluding the deleted in the scene
 ## getAppState
 
 <pre>
-  () =>{" "}
+  () =>
   <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">
     AppState
   </a>
@@ -309,11 +309,11 @@ This is the history API. history.clear() will clear the history.
 <pre>
   (<br />
   {"  "}
-  target?:{" "}
+  target?:
   <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
     ExcalidrawElement
-  </a>{" "}
-  &#124;{" "}
+  </a>
+  &#124;
   <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
     ExcalidrawElement
   </a>
@@ -373,7 +373,7 @@ The unique id of the excalidraw component. This can be used to identify the exca
 ## getFiles
 
 <pre>
-  () =>{" "}
+  () =>
   <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L82">
     files
   </a>
@@ -386,7 +386,7 @@ This API can be used to get the files present in the scene. It may contain files
 This API has the below signature. It sets the `tool` passed in param as the active tool.
 
 <pre>
-  (tool: <br /> &#123; type:{" "}
+  (tool: <br /> &#123; type:
   <a href="https://github.com/excalidraw/excalidraw/blob/master/src/shapes.tsx#L15">
     SHAPES
   </a>

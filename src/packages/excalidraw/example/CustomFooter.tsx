@@ -65,8 +65,8 @@ const CustomFooter = ({
         className="custom-footer"
         onClick={() => alert("This is dummy footer")}
       >
-        {" "}
-        custom footer{" "}
+        
+        custom footer
       </button>
     </>
   );
