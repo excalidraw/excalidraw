@@ -51,6 +51,7 @@ import {
   measureText,
   getMaxContainerHeight,
 } from "./textElement";
+import { LinearElementEditor } from "./linearElementEditor";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -634,12 +635,23 @@ export const resizeMultipleElements = (
 
   // getCommonBoundingBox() uses getBoundTextElement() which returns null for
   // original elements from pointerDownState, so we have to find and add these
-  // bound text elements manually
-  const boundTextElements = targetElements
-    .map(({ orig }) => getBoundTextElementId(orig))
-    .filter((id): id is string => typeof id === "string")
-    .map((id) => pointerDownState.originalElements.get(id) ?? null)
-    .filter(isBoundToContainer);
+  // bound text elements manually. Additionally, the coordinates of bound text
+  // elements aren't always up to date.
+  const boundTextElements = targetElements.reduce((acc, { orig }) => {
+    if (!isLinearElement(orig)) {
+      return acc;
+    }
+    const textId = getBoundTextElementId(orig);
+    if (!textId) {
+      return acc;
+    }
+    const text = pointerDownState.originalElements.get(textId) ?? null;
+    if (!isBoundToContainer(text)) {
+      return acc;
+    }
+    const xy = LinearElementEditor.getBoundTextElementPosition(orig, text);
+    return [...acc, { ...text, ...xy }];
+  }, [] as ExcalidrawTextElementWithContainer[]);
 
   const { minX, minY, maxX, maxY, midX, midY } = getCommonBoundingBox(
     targetElements.map(({ orig }) => orig).concat(boundTextElements),
