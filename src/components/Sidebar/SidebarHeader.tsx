@@ -5,40 +5,7 @@ import { useDevice } from "../App";
 import { SidebarPropsContext } from "./common";
 import { CloseIcon, PinIcon } from "../icons";
 import { Tooltip } from "../Tooltip";
-
-export const SidebarDockButton = (props: {
-  checked: boolean;
-  onChange?(): void;
-}) => {
-  return (
-    <div className="layer-ui__sidebar-dock-button" data-testid="sidebar-dock">
-      <Tooltip label={t("labels.sidebarLock")}>
-        <label
-          className={clsx(
-            "ToolIcon ToolIcon__lock ToolIcon_type_floating",
-            `ToolIcon_size_medium`,
-          )}
-        >
-          <input
-            className="ToolIcon_type_checkbox"
-            type="checkbox"
-            onChange={props.onChange}
-            checked={props.checked}
-            aria-label={t("labels.sidebarLock")}
-          />{" "}
-          <div
-            className={clsx("Sidebar__pin-btn", {
-              "Sidebar__pin-btn--pinned": props.checked,
-            })}
-            tabIndex={0}
-          >
-            {PinIcon}
-          </div>{" "}
-        </label>{" "}
-      </Tooltip>
-    </div>
-  );
-};
+import { Button } from "../Button";
 
 export const SidebarHeader = ({
   children,
@@ -60,21 +27,26 @@ export const SidebarHeader = ({
       {children}
       <div className="layer-ui__sidebar__header__buttons">
         {renderDockButton && (
-          <SidebarDockButton
-            checked={!!props.docked}
-            onChange={() => {
-              props.onDock?.(!props.docked);
-            }}
-          />
+          <Tooltip label={t("labels.sidebarLock")}>
+            <Button
+              onSelect={() => props.onDock?.(!props.docked)}
+              selected={!!props.docked}
+              className="Sidebar__pin-btn"
+              data-testid="sidebar-dock"
+              aria-label={t("labels.sidebarLock")}
+            >
+              {PinIcon}
+            </Button>
+          </Tooltip>
         )}
-        <button
+        <Button
           data-testid="sidebar-close"
           className="Sidebar__close-btn"
-          onClick={props.onCloseRequest}
+          onSelect={props.onCloseRequest}
           aria-label={t("buttons.close")}
         >
           {CloseIcon}
-        </button>
+        </Button>
       </div>
     </div>
   );

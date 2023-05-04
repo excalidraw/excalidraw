@@ -32,6 +32,12 @@
         }
       }
     }
+    &__pin-btn.selected {
+      svg {
+        stroke: var(--color-primary);
+        fill: var(--color-primary);
+      }
+    }
   }
 
   &.theme--dark {
@@ -214,27 +220,11 @@
   .layer-ui__sidebar__header__buttons {
     gap: 0;
 
-    .ToolIcon,
-    button,
-    .Sidebar__pin-btn {
+    button {
       background-color: initial;
-      border: 0 !important;
-      box-shadow: none !important;
-
+      border: 0;
       &:hover {
         background: var(--button-hover-bg, var(--island-bg-color));
-      }
-    }
-
-    .Sidebar__pin-btn {
-      border: 0;
-    }
-    .Sidebar__pin-btn--pinned {
-      background-color: initial;
-      border: 0;
-      svg {
-        stroke: var(--color-primary);
-        fill: var(--color-primary);
       }
     }
   }
