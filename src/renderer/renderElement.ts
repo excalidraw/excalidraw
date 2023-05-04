@@ -44,8 +44,8 @@ import {
   getContainerCoords,
   getContainerElement,
   getLineHeightInPx,
-  getMaxContainerHeight,
-  getMaxContainerWidth,
+  getBoundTextMaxHeight,
+  getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -864,17 +864,21 @@ const drawElementFromCanvas = (
     );
 
     if (
-      process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX &&
+      process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
+        "true" &&
       hasBoundTextElement(element)
     ) {
+      const textElement = getBoundTextElement(
+        element,
+      ) as ExcalidrawTextElementWithContainer;
       const coords = getContainerCoords(element);
       context.strokeStyle = "#c92a2a";
       context.lineWidth = 3;
       context.strokeRect(
         (coords.x + renderConfig.scrollX) * window.devicePixelRatio,
         (coords.y + renderConfig.scrollY) * window.devicePixelRatio,
-        getMaxContainerWidth(element) * window.devicePixelRatio,
-        getMaxContainerHeight(element) * window.devicePixelRatio,
+        getBoundTextMaxWidth(element) * window.devicePixelRatio,
+        getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
       );
     }
   }

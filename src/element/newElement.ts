@@ -20,7 +20,7 @@ import {
   isTestEnv,
 } from "../utils";
 import { randomInteger, randomId } from "../random";
-import { mutateElement, newElementWith } from "./mutateElement";
+import { bumpVersion, mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
@@ -33,10 +33,17 @@ import {
   measureText,
   normalizeText,
   wrapText,
-  getMaxContainerWidth,
+  getBoundTextMaxWidth,
   getDefaultLineHeight,
 } from "./textElement";
-import { VERTICAL_ALIGN } from "../constants";
+import {
+  DEFAULT_ELEMENT_PROPS,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  DEFAULT_TEXT_ALIGN,
+  DEFAULT_VERTICAL_ALIGN,
+  VERTICAL_ALIGN,
+} from "../constants";
 import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
 
@@ -51,6 +58,15 @@ type ElementConstructorOpts = MarkOptional<
   | "version"
   | "versionNonce"
   | "link"
+  | "strokeStyle"
+  | "fillStyle"
+  | "strokeColor"
+  | "backgroundColor"
+  | "roughness"
+  | "strokeWidth"
+  | "roundness"
+  | "locked"
+  | "opacity"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -58,13 +74,13 @@ const _newElementBase = <T extends ExcalidrawElement>(
   {
     x,
     y,
-    strokeColor,
-    backgroundColor,
-    fillStyle,
-    strokeWidth,
-    strokeStyle,
-    roughness,
-    opacity,
+    strokeColor = DEFAULT_ELEMENT_PROPS.strokeColor,
+    backgroundColor = DEFAULT_ELEMENT_PROPS.backgroundColor,
+    fillStyle = DEFAULT_ELEMENT_PROPS.fillStyle,
+    strokeWidth = DEFAULT_ELEMENT_PROPS.strokeWidth,
+    strokeStyle = DEFAULT_ELEMENT_PROPS.strokeStyle,
+    roughness = DEFAULT_ELEMENT_PROPS.roughness,
+    opacity = DEFAULT_ELEMENT_PROPS.opacity,
     width = 0,
     height = 0,
     angle = 0,
@@ -72,7 +88,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     roundness = null,
     boundElements = null,
     link = null,
-    locked,
+    locked = DEFAULT_ELEMENT_PROPS.locked,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
@@ -138,27 +154,39 @@ const getTextElementPositionOffsets = (
 export const newTextElement = (
   opts: {
     text: string;
-    fontSize: number;
-    fontFamily: FontFamilyValues;
-    textAlign: TextAlign;
-    verticalAlign: VerticalAlign;
+    fontSize?: number;
+    fontFamily?: FontFamilyValues;
+    textAlign?: TextAlign;
+    verticalAlign?: VerticalAlign;
     containerId?: ExcalidrawTextContainer["id"];
     lineHeight?: ExcalidrawTextElement["lineHeight"];
+    strokeWidth?: ExcalidrawTextElement["strokeWidth"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const lineHeight = opts.lineHeight || getDefaultLineHeight(opts.fontFamily);
+  const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
+  const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
+  const lineHeight = opts.lineHeight || getDefaultLineHeight(fontFamily);
   const text = normalizeText(opts.text);
-  const metrics = measureText(text, getFontString(opts), lineHeight);
-  const offsets = getTextElementPositionOffsets(opts, metrics);
+  const metrics = measureText(
+    text,
+    getFontString({ fontFamily, fontSize }),
+    lineHeight,
+  );
+  const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
+  const verticalAlign = opts.verticalAlign || DEFAULT_VERTICAL_ALIGN;
+  const offsets = getTextElementPositionOffsets(
+    { textAlign, verticalAlign },
+    metrics,
+  );
 
   const textElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
       text,
-      fontSize: opts.fontSize,
-      fontFamily: opts.fontFamily,
-      textAlign: opts.textAlign,
-      verticalAlign: opts.verticalAlign,
+      fontSize,
+      fontFamily,
+      textAlign,
+      verticalAlign,
       x: opts.x - offsets.x,
       y: opts.y - offsets.y,
       width: metrics.width,
@@ -282,7 +310,7 @@ export const refreshTextDimensions = (
     text = wrapText(
       text,
       getFontString(textElement),
-      getMaxContainerWidth(container),
+      getBoundTextMaxWidth(container),
     );
   }
   const dimensions = getAdjustedDimensions(textElement, text);
@@ -511,8 +539,16 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
  * it's advised to supply the whole elements array, or sets of elements that
  * are encapsulated (such as library items), if the purpose is to retain
  * bindings to the cloned elements intact.
+ *
+ * NOTE by default does not randomize or regenerate anything except the id.
  */
-export const duplicateElements = (elements: readonly ExcalidrawElement[]) => {
+export const duplicateElements = (
+  elements: readonly ExcalidrawElement[],
+  opts?: {
+    /** NOTE also updates version flags and `updated` */
+    randomizeSeed: boolean;
+  },
+) => {
   const clonedElements: ExcalidrawElement[] = [];
 
   const origElementsMap = arrayToMap(elements);
@@ -545,6 +581,11 @@ export const duplicateElements = (elements: readonly ExcalidrawElement[]) => {
     const clonedElement: Mutable<ExcalidrawElement> = _deepCopyElement(element);
 
     clonedElement.id = maybeGetNewId(element.id)!;
+
+    if (opts?.randomizeSeed) {
+      clonedElement.seed = randomInteger();
+      bumpVersion(clonedElement);
+    }
 
     if (clonedElement.groupIds) {
       clonedElement.groupIds = clonedElement.groupIds.map((groupId) => {

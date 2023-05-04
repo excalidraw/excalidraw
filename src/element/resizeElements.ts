@@ -46,10 +46,10 @@ import {
   getBoundTextElementId,
   getContainerElement,
   handleBindTextResize,
-  getMaxContainerWidth,
+  getBoundTextMaxWidth,
   getApproxMinLineHeight,
   measureText,
-  getMaxContainerHeight,
+  getBoundTextMaxHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 
@@ -210,7 +210,7 @@ const measureFontSizeFromWidth = (
   if (hasContainer) {
     const container = getContainerElement(element);
     if (container) {
-      width = getMaxContainerWidth(container);
+      width = getBoundTextMaxWidth(container);
     }
   }
   const nextFontSize = element.fontSize * (nextWidth / width);
@@ -441,8 +441,8 @@ export const resizeSingleElement = (
 
       const nextFont = measureFontSizeFromWidth(
         boundTextElement,
-        getMaxContainerWidth(updatedElement),
-        getMaxContainerHeight(updatedElement),
+        getBoundTextMaxWidth(updatedElement),
+        getBoundTextMaxHeight(updatedElement, boundTextElement),
       );
       if (nextFont === null) {
         return;

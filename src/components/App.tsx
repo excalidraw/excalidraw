@@ -60,6 +60,7 @@ import {
   ENV,
   EVENT,
   GRID_SIZE,
+  IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
   isAndroid,
   isBrave,
@@ -295,7 +296,7 @@ import {
 } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
-import { actionCreateContainerFromText } from "../actions/actionBoundText";
+import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 
 const deviceContextInitialValue = {
@@ -1589,6 +1590,7 @@ class App extends React.Component<AppProps, AppState> {
           elements: data.elements,
           files: data.files || null,
           position: "cursor",
+          retainSeed: isPlainPaste,
         });
       } else if (data.text) {
         this.addTextFromPaste(data.text, isPlainPaste);
@@ -1602,6 +1604,7 @@ class App extends React.Component<AppProps, AppState> {
     elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
     position: { clientX: number; clientY: number } | "cursor" | "center";
+    retainSeed?: boolean;
   }) => {
     const elements = restoreElements(opts.elements, null);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
@@ -1639,6 +1642,9 @@ class App extends React.Component<AppProps, AppState> {
           y: element.y + gridY - minY,
         });
       }),
+      {
+        randomizeSeed: !opts.retainSeed,
+      },
     );
 
     const nextElements = [
@@ -2732,7 +2738,6 @@ class App extends React.Component<AppProps, AppState> {
           strokeStyle: this.state.currentItemStrokeStyle,
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
-          roundness: null,
           text: "",
           fontSize,
           fontFamily,
@@ -2744,8 +2749,8 @@ class App extends React.Component<AppProps, AppState> {
             : DEFAULT_VERTICAL_ALIGN,
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
-          locked: false,
           lineHeight,
+          angle: container?.angle ?? 0,
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {
@@ -4721,7 +4726,12 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.drag.hasOccurred = true;
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
-        if (selectedElements.length > 0 && !pointerDownState.withCmdOrCtrl) {
+        // Checking for editingElement to avoid jump while editing on mobile #6503
+        if (
+          selectedElements.length > 0 &&
+          !pointerDownState.withCmdOrCtrl &&
+          !this.state.editingElement
+        ) {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
             pointerCoords.y - pointerDownState.drag.offset.y,
@@ -5744,7 +5754,9 @@ class App extends React.Component<AppProps, AppState> {
 
       const imageFile = await fileOpen({
         description: "Image",
-        extensions: ["jpg", "png", "svg", "gif"],
+        extensions: Object.keys(
+          IMAGE_MIME_TYPES,
+        ) as (keyof typeof IMAGE_MIME_TYPES)[],
       });
 
       const imageElement = this.createImageElement({
@@ -6366,7 +6378,7 @@ class App extends React.Component<AppProps, AppState> {
       actionGroup,
       actionUnbindText,
       actionBindText,
-      actionCreateContainerFromText,
+      actionWrapTextInContainer,
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,
