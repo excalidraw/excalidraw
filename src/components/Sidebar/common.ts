@@ -19,7 +19,9 @@ export type SidebarProps<P = {}> = {
    * Called on sidebar open/close or tab change.
    */
   onStateChange?: (state: AppState["openSidebar"]) => void;
-  /** if not supplied, sidebar won't be dockable */
+  /**
+   * supply alongside `docked` prop in order to make the Sidebar user-dockable
+   */
   onDock?: (docked: boolean) => void;
   docked?: boolean;
   className?: string;
@@ -33,7 +35,7 @@ export type SidebarProps<P = {}> = {
 export type SidebarPropsContextValue = Pick<
   SidebarProps,
   "onDock" | "docked"
-> & { onCloseRequest: () => void; dockable: boolean };
+> & { onCloseRequest: () => void; shouldRenderDockButton: boolean };
 
 export const SidebarPropsContext =
   React.createContext<SidebarPropsContextValue>({} as SidebarPropsContextValue);

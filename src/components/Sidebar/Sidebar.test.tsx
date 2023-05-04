@@ -209,7 +209,6 @@ describe("Sidebar", () => {
               onStateChange={onStateChange}
             >
               <Sidebar.Header />
-              hello
             </Sidebar>
           </Excalidraw>
         );
@@ -236,17 +235,25 @@ describe("Sidebar", () => {
   });
 
   describe("Docking behavior", () => {
-    it("should render custom sidebar without dock button if onDock not supplied", async () => {
+    it("shouldn't be user-dockable if `onDock` not supplied (regardless of `docked`)", async () => {
+      let _setDocked: (docked: boolean) => void = null!;
+
       const CustomExcalidraw = () => {
+        const [docked, setDocked] = React.useState<boolean | undefined>();
+        _setDocked = setDocked;
+
         return (
           <Excalidraw
             initialData={{
               appState: { openSidebar: { name: "customSidebar" } },
             }}
           >
-            <Sidebar name="customSidebar" className="test-sidebar">
+            <Sidebar
+              name="customSidebar"
+              className="test-sidebar"
+              docked={docked}
+            >
               <Sidebar.Header />
-              hello
             </Sidebar>
           </Excalidraw>
         );
@@ -254,13 +261,24 @@ describe("Sidebar", () => {
 
       await render(<CustomExcalidraw />);
 
-      // should show dock button when the sidebar fits to be docked
+      // shouldn't be user-dockable if `onDock` not supplied
+      // (undefined `docked`)
       // -------------------------------------------------------------------------
+
+      await assertSidebarDockButton(false);
+
+      // shouldn't be user-dockable if `onDock` not supplied, even when `docked`
+      // supplied
+      // -------------------------------------------------------------------------
+
+      act(() => {
+        _setDocked(true);
+      });
 
       await assertSidebarDockButton(false);
     });
 
-    it("should be dockable when both `onDock` and `docked` supplied", async () => {
+    it("should be user-dockable when both `onDock` and `docked` supplied", async () => {
       await render(
         <Excalidraw
           initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
@@ -272,7 +290,6 @@ describe("Sidebar", () => {
             docked
           >
             <Sidebar.Header />
-            hello
           </Sidebar>
         </Excalidraw>,
       );
@@ -285,10 +302,7 @@ describe("Sidebar", () => {
       );
     });
 
-    it("shouldn't be dockable when only `onDock` supplied w/o `docked`", async () => {
-      // should be dockable when both `onDock` and `docked` are supplied
-      // -------------------------------------------------------------------------
-
+    it("shouldn't be user-dockable when only `onDock` supplied w/o `docked`", async () => {
       await render(
         <Excalidraw
           initialData={{ appState: { openSidebar: { name: "customSidebar" } } }}
@@ -299,7 +313,6 @@ describe("Sidebar", () => {
             onDock={() => {}}
           >
             <Sidebar.Header />
-            hello
           </Sidebar>
         </Excalidraw>,
       );
@@ -308,58 +321,6 @@ describe("Sidebar", () => {
         { width: 1920, height: 1080 },
         async () => {
           await assertSidebarDockButton(false);
-        },
-      );
-    });
-
-    it("should support controlled docking", async () => {
-      let _setDockable: (dockable: boolean) => void = null!;
-
-      const CustomExcalidraw = () => {
-        const [dockable, setDockable] = React.useState(false);
-        _setDockable = setDockable;
-        return (
-          <Excalidraw
-            initialData={{
-              appState: { openSidebar: { name: "customSidebar" } },
-            }}
-          >
-            <Sidebar
-              name="customSidebar"
-              className="test-sidebar"
-              docked={false}
-              onDock={dockable ? () => {} : undefined}
-            >
-              <Sidebar.Header />
-              hello
-            </Sidebar>
-          </Excalidraw>
-        );
-      };
-
-      await render(<CustomExcalidraw />);
-
-      await withExcalidrawDimensions(
-        { width: 1920, height: 1080 },
-        async () => {
-          // should not show dock button when `dockable` is `false`
-          // -------------------------------------------------------------------------
-
-          act(() => {
-            _setDockable(false);
-          });
-
-          await assertSidebarDockButton(false);
-
-          // should show dock button when `dockable` is `true`, even if `docked`
-          // prop is set
-          // -------------------------------------------------------------------------
-
-          act(() => {
-            _setDockable(true);
-          });
-
-          await assertSidebarDockButton(true);
         },
       );
     });

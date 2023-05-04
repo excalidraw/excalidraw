@@ -87,7 +87,7 @@ export const SidebarInner = forwardRef(
   ) => {
     if (process.env.NODE_ENV === "development" && onDock && docked == null) {
       console.warn(
-        "Sidebar: `docked` must be set when `onDock` is supplied for the sidebar to be dockable. To hide this message, either pass `docked` or remove `onDock`",
+        "Sidebar: `docked` must be set when `onDock` is supplied for the sidebar to be user-dockable. To hide this message, either pass `docked` or remove `onDock`",
       );
     }
 
@@ -115,7 +115,7 @@ export const SidebarInner = forwardRef(
     headerPropsRef.current = updateObject(headerPropsRef.current, {
       docked,
       // explicit prop to rerender on update
-      dockable: !!onDock && docked != null,
+      shouldRenderDockButton: !!onDock && docked != null,
     });
 
     const islandRef = useRef<HTMLDivElement>(null);
