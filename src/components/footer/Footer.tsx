@@ -9,7 +9,7 @@ import {
   ZoomActions,
 } from "../Actions";
 import { useDevice } from "../App";
-import { useTunnels } from "../context/tunnels";
+import { useTunnels } from "../../context/tunnels";
 import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
@@ -25,7 +25,7 @@ const Footer = ({
   showExitZenModeBtn: boolean;
   renderWelcomeScreen: boolean;
 }) => {
-  const { footerCenterTunnel, welcomeScreenHelpHintTunnel } = useTunnels();
+  const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
 
   const device = useDevice();
   const showFinalize =
@@ -70,14 +70,14 @@ const Footer = ({
           </Section>
         </Stack.Col>
       </div>
-      <footerCenterTunnel.Out />
+      <FooterCenterTunnel.Out />
       <div
         className={clsx("layer-ui__wrapper__footer-right zen-mode-transition", {
           "transition-right disable-pointerEvents": appState.zenModeEnabled,
         })}
       >
         <div style={{ position: "relative" }}>
-          {renderWelcomeScreen && <welcomeScreenHelpHintTunnel.Out />}
+          {renderWelcomeScreen && <WelcomeScreenHelpHintTunnel.Out />}
           <HelpButton
             onClick={() => actionManager.executeAction(actionShortcuts)}
           />

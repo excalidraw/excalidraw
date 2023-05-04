@@ -2,66 +2,25 @@
 @import "../../css/variables.module";
 
 .excalidraw {
-  .Sidebar {
-    &__close-btn,
-    &__pin-btn,
-    &__dropdown-btn {
-      @include outlineButtonStyles;
-      width: var(--lg-button-size);
-      height: var(--lg-button-size);
-      padding: 0;
-
-      svg {
-        width: var(--lg-icon-size);
-        height: var(--lg-icon-size);
-      }
-    }
-
-    &__pin-btn {
-      &--pinned {
-        background-color: var(--color-primary);
-        border-color: var(--color-primary);
-
-        svg {
-          color: #fff;
-        }
-
-        &:hover,
-        &:active {
-          background-color: var(--color-primary-darker);
-        }
-      }
-    }
-  }
-
-  &.theme--dark {
-    .Sidebar {
-      &__pin-btn {
-        &--pinned {
-          svg {
-            color: var(--color-gray-90);
-          }
-        }
-      }
-    }
-  }
-
-  .layer-ui__sidebar {
+  .sidebar {
+    display: flex;
+    flex-direction: column;
     position: absolute;
     top: 0;
     bottom: 0;
     right: 0;
     z-index: 5;
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    background-color: var(--sidebar-bg-color);
+    box-shadow: var(--sidebar-shadow);
 
     :root[dir="rtl"] & {
       left: 0;
       right: auto;
     }
-
-    background-color: var(--sidebar-bg-color);
-
-    box-shadow: var(--sidebar-shadow);
 
     &--docked {
       box-shadow: none;
@@ -77,52 +36,134 @@
       border-right: 1px solid var(--sidebar-border-color);
       border-left: 0;
     }
-
-    padding: 0;
-    box-sizing: border-box;
-
-    .Island {
-      box-shadow: none;
-    }
-
-    .ToolIcon__icon {
-      border-radius: var(--border-radius-md);
-    }
-
-    .ToolIcon__icon__close {
-      .Modal__close {
-        width: calc(var(--space-factor) * 7);
-        height: calc(var(--space-factor) * 7);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: var(--color-text);
-      }
-    }
-
-    .Island {
-      --padding: 0;
-      background-color: var(--island-bg-color);
-      border-radius: var(--border-radius-lg);
-      padding: calc(var(--padding) * var(--space-factor));
-      position: relative;
-      transition: box-shadow 0.5s ease-in-out;
-    }
   }
 
-  .layer-ui__sidebar__header {
+  // ---------------------------- sidebar header ------------------------------
+
+  .sidebar__header {
     box-sizing: border-box;
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 1rem;
-    border-bottom: 1px solid var(--sidebar-border-color);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
   }
 
-  .layer-ui__sidebar__header__buttons {
+  .sidebar__header__buttons {
+    gap: 0;
     display: flex;
     align-items: center;
-    gap: 0.625rem;
+    margin-left: auto;
+
+    button {
+      @include outlineButtonStyles;
+      --button-bg: transparent;
+      border: 0 !important;
+
+      width: var(--lg-button-size);
+      height: var(--lg-button-size);
+      padding: 0;
+
+      svg {
+        width: var(--lg-icon-size);
+        height: var(--lg-icon-size);
+      }
+
+      &:hover {
+        background: var(--button-hover-bg, var(--island-bg-color));
+      }
+    }
+
+    .sidebar__dock.selected {
+      svg {
+        stroke: var(--color-primary);
+        fill: var(--color-primary);
+      }
+    }
+  }
+
+  // ---------------------------- sidebar tabs ------------------------------
+
+  .sidebar-tabs-root {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    padding: 1rem 0.75rem;
+
+    [role="tabpanel"] {
+      flex: 1;
+      outline: none;
+
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      outline: none;
+    }
+
+    [role="tabpanel"][data-state="inactive"] {
+      display: none !important;
+    }
+
+    [role="tablist"] {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    }
+  }
+
+  .sidebar-tabs-root > .sidebar__header {
+    padding-top: 0;
+    padding-bottom: 1rem;
+  }
+
+  .sidebar-tab-trigger {
+    --button-width: auto;
+    --button-bg: transparent;
+    --button-hover-bg: transparent;
+    --button-active-bg: var(--color-primary);
+    --button-hover-color: var(--color-primary);
+    --button-hover-border: var(--color-primary);
+
+    &[data-state="active"] {
+      --button-bg: var(--color-primary);
+      --button-hover-bg: var(--color-primary-darker);
+      --button-hover-color: var(--color-icon-white);
+      --button-border: var(--color-primary);
+      color: var(--color-icon-white);
+    }
+  }
+
+  // ---------------------------- default sidebar ------------------------------
+
+  .default-sidebar {
+    display: flex;
+    flex-direction: column;
+
+    .sidebar-triggers {
+      $padding: 2px;
+      $border: 1px;
+      display: flex;
+      gap: 0;
+      padding: $padding;
+      // offset by padding + border to vertically center the list with sibling
+      // buttons (both from top and bototm, due to flex layout)
+      margin-top: -#{$padding + $border};
+      margin-bottom: -#{$padding + $border};
+      border: $border solid var(--sidebar-border-color);
+      background: var(--default-bg-color);
+      border-radius: 0.625rem;
+
+      .sidebar-tab-trigger {
+        height: var(--lg-button-size);
+        width: var(--lg-button-size);
+
+        border: none;
+      }
+    }
+
+    .sidebar__header {
+      border-bottom: 1px solid var(--sidebar-border-color);
+    }
   }
 }

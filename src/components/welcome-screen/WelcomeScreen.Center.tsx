@@ -6,7 +6,7 @@ import {
   useExcalidrawActionManager,
   useExcalidrawAppState,
 } from "../App";
-import { useTunnels } from "../context/tunnels";
+import { useTunnels } from "../../context/tunnels";
 import { ExcalLogo, HelpIcon, LoadIcon, usersIcon } from "../icons";
 
 const WelcomeScreenMenuItemContent = ({
@@ -89,9 +89,9 @@ const WelcomeScreenMenuItemLink = ({
 WelcomeScreenMenuItemLink.displayName = "WelcomeScreenMenuItemLink";
 
 const Center = ({ children }: { children?: React.ReactNode }) => {
-  const { welcomeScreenCenterTunnel } = useTunnels();
+  const { WelcomeScreenCenterTunnel } = useTunnels();
   return (
-    <welcomeScreenCenterTunnel.In>
+    <WelcomeScreenCenterTunnel.In>
       <div className="welcome-screen-center">
         {children || (
           <>
@@ -104,7 +104,7 @@ const Center = ({ children }: { children?: React.ReactNode }) => {
           </>
         )}
       </div>
-    </welcomeScreenCenterTunnel.In>
+    </WelcomeScreenCenterTunnel.In>
   );
 };
 Center.displayName = "Center";

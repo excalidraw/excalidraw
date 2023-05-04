@@ -24,7 +24,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     isCollaborating = false,
     onPointerUpdate,
     renderTopRightUI,
-    renderSidebar,
     langCode = defaultLang.code,
     viewModeEnabled,
     zenModeEnabled,
@@ -47,6 +46,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
 
   const canvasActions = props.UIOptions?.canvasActions;
 
+  // FIXME normalize/set defaults in parent component so that the memo resolver
+  // compares the same values
   const UIOptions: AppProps["UIOptions"] = {
     ...props.UIOptions,
     canvasActions: {
@@ -114,7 +115,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
-          renderSidebar={renderSidebar}
         >
           {children}
         </App>
@@ -245,3 +245,5 @@ export { MainMenu };
 export { useDevice } from "../../components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
+
+export { DefaultSidebar } from "../../components/DefaultSidebar";
