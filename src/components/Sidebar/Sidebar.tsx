@@ -171,11 +171,7 @@ export const SidebarInner = forwardRef(
     return (
       <Island
         {...rest}
-        className={clsx(
-          "layer-ui__sidebar",
-          { "layer-ui__sidebar--docked": docked },
-          className,
-        )}
+        className={clsx("sidebar", { "sidebar--docked": docked }, className)}
         ref={islandRef}
       >
         <SidebarPropsContext.Provider value={headerPropsRef.current}>

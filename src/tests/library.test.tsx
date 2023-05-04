@@ -192,7 +192,12 @@ describe("library menu", () => {
     const libraryButton = container.querySelector(".sidebar-trigger");
 
     fireEvent.click(libraryButton!);
-    fireEvent.click(container.querySelector(".Sidebar__dropdown-btn")!);
+    fireEvent.click(
+      queryByTestId(
+        container.querySelector(".layer-ui__library")!,
+        "dropdown-menu-button",
+      )!,
+    );
     queryByTestId(container, "lib-dropdown--load")!.click();
 
     const libraryItems = parseLibraryJSON(await libraryJSONPromise);

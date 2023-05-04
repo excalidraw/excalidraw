@@ -23,17 +23,17 @@ export const SidebarHeader = ({
 
   return (
     <div
-      className={clsx("layer-ui__sidebar__header", className)}
+      className={clsx("sidebar__header", className)}
       data-testid="sidebar-header"
     >
       {children}
-      <div className="layer-ui__sidebar__header__buttons">
+      <div className="sidebar__header__buttons">
         {renderDockButton && (
           <Tooltip label={t("labels.sidebarLock")}>
             <Button
               onSelect={() => props.onDock?.(!props.docked)}
               selected={!!props.docked}
-              className="Sidebar__pin-btn"
+              className="sidebar__dock"
               data-testid="sidebar-dock"
               aria-label={t("labels.sidebarLock")}
             >
@@ -43,7 +43,7 @@ export const SidebarHeader = ({
         )}
         <Button
           data-testid="sidebar-close"
-          className="Sidebar__close-btn"
+          className="sidebar__close"
           onSelect={props.onCloseRequest}
           aria-label={t("buttons.close")}
         >

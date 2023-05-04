@@ -181,7 +181,6 @@ export const LibraryDropdownMenuButton: React.FC<{
     return (
       <DropdownMenu open={isLibraryMenuOpen}>
         <DropdownMenu.Trigger
-          className="Sidebar__dropdown-btn"
           onToggle={() => setIsLibraryMenuOpen(!isLibraryMenuOpen)}
         >
           {DotsIcon}

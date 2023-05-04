@@ -2,57 +2,7 @@
 @import "../../css/variables.module";
 
 .excalidraw {
-  .Sidebar {
-    &__close-btn,
-    &__pin-btn,
-    &__dropdown-btn {
-      @include outlineButtonStyles;
-      width: var(--lg-button-size);
-      height: var(--lg-button-size);
-      padding: 0;
-
-      svg {
-        width: var(--lg-icon-size);
-        height: var(--lg-icon-size);
-      }
-    }
-
-    &__pin-btn {
-      &--pinned {
-        background-color: var(--color-primary);
-        border-color: var(--color-primary);
-
-        svg {
-          color: #fff;
-        }
-
-        &:hover,
-        &:active {
-          background-color: var(--color-primary-darker);
-        }
-      }
-    }
-    &__pin-btn.selected {
-      svg {
-        stroke: var(--color-primary);
-        fill: var(--color-primary);
-      }
-    }
-  }
-
-  &.theme--dark {
-    .Sidebar {
-      &__pin-btn {
-        &--pinned {
-          svg {
-            color: var(--color-gray-90);
-          }
-        }
-      }
-    }
-  }
-
-  .layer-ui__sidebar {
+  .sidebar {
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -61,15 +11,16 @@
     right: 0;
     z-index: 5;
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    background-color: var(--sidebar-bg-color);
+    box-shadow: var(--sidebar-shadow);
 
     :root[dir="rtl"] & {
       left: 0;
       right: auto;
     }
-
-    background-color: var(--sidebar-bg-color);
-
-    box-shadow: var(--sidebar-shadow);
 
     &--docked {
       box-shadow: none;
@@ -85,44 +36,60 @@
       border-right: 1px solid var(--sidebar-border-color);
       border-left: 0;
     }
+  }
 
-    padding: 0;
+  // ---------------------------- sidebar header ------------------------------
+
+  .sidebar__header {
     box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
 
-    .Island {
-      box-shadow: none;
-    }
+  .sidebar__header__buttons {
+    gap: 0;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
 
-    .ToolIcon__icon {
-      border-radius: var(--border-radius-md);
-    }
+    button {
+      @include outlineButtonStyles;
+      --button-bg: transparent;
+      border: 0 !important;
 
-    .ToolIcon__icon__close {
-      .Modal__close {
-        width: calc(var(--space-factor) * 7);
-        height: calc(var(--space-factor) * 7);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: var(--color-text);
+      width: var(--lg-button-size);
+      height: var(--lg-button-size);
+      padding: 0;
+
+      svg {
+        width: var(--lg-icon-size);
+        height: var(--lg-icon-size);
+      }
+
+      &:hover {
+        background: var(--button-hover-bg, var(--island-bg-color));
       }
     }
 
-    .Island {
-      --padding: 0;
-      background-color: var(--island-bg-color);
-      border-radius: var(--border-radius-lg);
-      padding: calc(var(--padding) * var(--space-factor));
-      position: relative;
-      transition: box-shadow 0.5s ease-in-out;
+    .sidebar__dock.selected {
+      svg {
+        stroke: var(--color-primary);
+        fill: var(--color-primary);
+      }
     }
+  }
 
-    .sidebar-tabs-root {
-      display: flex;
-      flex-direction: column;
-      flex: 1 1 auto;
-      padding: 1rem 0.75rem;
-    }
+  // ---------------------------- sidebar tabs ------------------------------
+
+  .sidebar-tabs-root {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    padding: 1rem 0.75rem;
 
     [role="tabpanel"] {
       flex: 1;
@@ -145,26 +112,9 @@
     }
   }
 
-  .sidebar-tabs-root > .layer-ui__sidebar__header {
+  .sidebar-tabs-root > .sidebar__header {
     padding-top: 0;
     padding-bottom: 1rem;
-  }
-
-  .layer-ui__sidebar__header {
-    box-sizing: border-box;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-  }
-
-  .layer-ui__sidebar__header__buttons {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    margin-left: auto;
   }
 
   .sidebar-tab-trigger {
@@ -186,7 +136,7 @@
 
   // ---------------------------- default sidebar ------------------------------
 
-  .layer-ui__default-sidebar {
+  .default-sidebar {
     display: flex;
     flex-direction: column;
 
@@ -212,20 +162,8 @@
       }
     }
 
-    .layer-ui__sidebar__header {
+    .sidebar__header {
       border-bottom: 1px solid var(--sidebar-border-color);
-    }
-  }
-
-  .layer-ui__sidebar__header__buttons {
-    gap: 0;
-
-    button {
-      background-color: initial;
-      border: 0;
-      &:hover {
-        background: var(--button-hover-bg, var(--island-bg-color));
-      }
     }
   }
 }

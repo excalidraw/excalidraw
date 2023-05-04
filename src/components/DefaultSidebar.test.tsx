@@ -202,14 +202,14 @@ describe("DefaultSidebar", () => {
       await waitFor(() => {
         expect(h.state.defaultSidebarDockedPreference).toBe(true);
         expect(dockButton).toHaveClass("selected");
-        expect(sidebar).toHaveClass("layer-ui__sidebar--docked");
+        expect(sidebar).toHaveClass("sidebar--docked");
       });
 
       fireEvent.click(dockButton);
       await waitFor(() => {
         expect(h.state.defaultSidebarDockedPreference).toBe(false);
         expect(dockButton).not.toHaveClass("selected");
-        expect(sidebar).not.toHaveClass("layer-ui__sidebar--docked");
+        expect(sidebar).not.toHaveClass("sidebar--docked");
       });
     });
 
@@ -236,7 +236,7 @@ describe("DefaultSidebar", () => {
       expect(h.state.defaultSidebarDockedPreference).toBe(false);
 
       const { sidebar } = await assertSidebarDockButton(false);
-      expect(sidebar).toHaveClass("layer-ui__sidebar--docked");
+      expect(sidebar).toHaveClass("sidebar--docked");
     });
 
     // if `docked={true}` & `onDock={undefined}`, should disable docking,
@@ -250,7 +250,7 @@ describe("DefaultSidebar", () => {
       expect(h.state.defaultSidebarDockedPreference).toBe(false);
 
       const { sidebar } = await assertSidebarDockButton(false);
-      expect(sidebar).toHaveClass("layer-ui__sidebar--docked");
+      expect(sidebar).toHaveClass("sidebar--docked");
     });
 
     // if `docked={false}` & `onDock={undefined}`, should disable docking,
@@ -264,7 +264,7 @@ describe("DefaultSidebar", () => {
       expect(h.state.defaultSidebarDockedPreference).toBe(false);
 
       const { sidebar } = await assertSidebarDockButton(false);
-      expect(sidebar).not.toHaveClass("layer-ui__sidebar--docked");
+      expect(sidebar).not.toHaveClass("sidebar--docked");
     });
   });
 });

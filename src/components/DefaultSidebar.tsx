@@ -70,7 +70,7 @@ export const DefaultSidebar = Object.assign(
           {...rest}
           name="default"
           key="default"
-          className={clsx("layer-ui__default-sidebar", className)}
+          className={clsx("default-sidebar", className)}
           docked={docked ?? appState.defaultSidebarDockedPreference}
           onDock={
             // `onDock=false` disables docking.

@@ -69,7 +69,7 @@ describe("Sidebar", () => {
         expect(node).not.toBe(null);
 
         // make sure only one sidebar is rendered
-        const sidebars = container.querySelectorAll(".layer-ui__sidebar");
+        const sidebars = container.querySelectorAll(".sidebar");
         expect(sidebars.length).toBe(1);
       });
     });
@@ -144,7 +144,7 @@ describe("Sidebar", () => {
         expect(node).toBe(null);
 
         // make sure only one sidebar is rendered
-        const sidebars = container.querySelectorAll(".layer-ui__sidebar");
+        const sidebars = container.querySelectorAll(".sidebar");
         expect(sidebars.length).toBe(1);
       });
     });
