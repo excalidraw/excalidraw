@@ -1,9 +1,9 @@
 @import "open-color/open-color";
 
 .excalidraw {
-  .layer-ui__library-sidebar {
-    display: flex;
-    flex-direction: column;
+  .library-menu-items-container {
+    height: 100%;
+    width: 100%;
   }
 
   .layer-ui__library {
@@ -11,28 +11,6 @@
     flex-direction: column;
 
     flex: 1 1 auto;
-
-    .layer-ui__library-header {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      margin: 2px 0 15px 0;
-      .Spinner {
-        margin-right: 1rem;
-      }
-
-      button {
-        // 2px from the left to account for focus border of left-most button
-        margin: 0 2px;
-      }
-    }
-  }
-
-  .layer-ui__sidebar {
-    .library-menu-items-container {
-      height: 100%;
-      width: 100%;
-    }
   }
 
   .library-actions-counter {
@@ -87,10 +65,17 @@
     }
   }
 
-  .library-menu-browse-button {
-    margin: 1rem auto;
+  .library-menu-control-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+  }
 
-    padding: 0.875rem 1rem;
+  .library-menu-browse-button {
+    flex: 1;
+
+    height: var(--lg-button-size);
 
     display: flex;
     align-items: center;
@@ -122,30 +107,19 @@
     }
   }
 
-  .library-menu-browse-button--mobile {
-    min-height: 22px;
-    margin-left: auto;
-    a {
-      padding-right: 0;
-    }
+  &.excalidraw--mobile .library-menu-browse-button {
+    height: var(--default-button-size);
   }
 
-  .layer-ui__sidebar__header .dropdown-menu {
-    &.dropdown-menu--mobile {
-      top: 100%;
-    }
+  .layer-ui__library .dropdown-menu {
+    width: auto;
+    top: initial;
+    right: 0;
+    left: initial;
+    bottom: 100%;
+    margin-bottom: 0.625rem;
+
     .dropdown-menu-container {
-      --gap: 0;
-      z-index: 1;
-      position: absolute;
-      top: 100%;
-      left: 0;
-
-      :root[dir="rtl"] & {
-        right: 0;
-        left: auto;
-      }
-
       width: 196px;
       box-shadow: var(--library-dropdown-shadow);
       border-radius: var(--border-radius-lg);
