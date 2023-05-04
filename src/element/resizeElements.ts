@@ -789,7 +789,9 @@ export const resizeMultipleElements = (
 
     const boundTextElement = getBoundTextElement(latestElement);
     if (boundTextElement) {
-      mutateElement(boundTextElement, { angle });
+      if (!isLinearElement(latestElement)) {
+        mutateElement(boundTextElement, { angle });
+      }
       handleBindTextResize(latestElement, transformHandleType);
     }
   });
