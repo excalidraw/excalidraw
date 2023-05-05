@@ -208,18 +208,10 @@
     "collabSaveFailed": "Không thể lưu vào cơ sở dữ liệu. Nếu vấn đề tiếp tục xảy ra, bạn nên lưu tệp vào máy để đảm bảo bạn không bị mất công việc.",
     "collabSaveFailed_sizeExceeded": "Không thể lưu vào cơ sở dữ liệu, canvas có vẻ quá lớn. Bạn nên lưu tệp cục bộ để đảm bảo bạn không bị mất công việc.",
     "brave_measure_text_error": {
-      "start": "Có vẻ bạn đang sử dụng trình duyện Brave với chức năng",
-      "aggressive_block_fingerprint": "Aggressively Block Fingerprinting",
-      "setting_enabled": "được bật",
-      "break": "Điều này có thể xảy ra lỗi các",
-      "text_elements": "Yếu Tố Chữ",
-      "in_your_drawings": "trong bản vẽ của bạn",
-      "strongly_recommend": "Chúng tôi khuyên rằng bạn nên tắt chức năng này. Bạn có thể theo",
-      "steps": "các bước sau đây",
-      "how": "để tắt nó",
-      "disable_setting": " Nếu tắt chức năng này vẫn không sửa lại lỗi hiện thị các yếu tố chữ, hảy mở",
-      "issue": "issue",
-      "write": "trên trang GitHUb của chúng tôi, hoặc nhắn chúng tôi tại",
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": "",
       "discord": "Discord"
     }
   },
