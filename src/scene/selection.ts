@@ -75,19 +75,11 @@ export const getSelectedElements = (
 
 export const getVisibleAndNonSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
-) =>
-  elements.filter(
-    (element) =>
-      !appState.selectedElementIds[element.id] &&
-      isVisibleElement(element, appState.width, appState.height, {
-        zoom: appState.zoom,
-        offsetLeft: appState.offsetLeft,
-        offsetTop: appState.offsetTop,
-        scrollX: appState.scrollX,
-        scrollY: appState.scrollY,
-      }),
-  );
+  selectedElements: readonly NonDeletedExcalidrawElement[],
+) => {
+  const selectedElementsSet = new Set(selectedElements);
+  return elements.filter((element) => !selectedElementsSet.has(element));
+};
 
 export const getTargetElements = (
   elements: readonly NonDeletedExcalidrawElement[],

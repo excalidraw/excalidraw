@@ -93,7 +93,7 @@ export const getSnaps = ({
     return null;
   }
 
-  const selectedElements = getSelectedElements(elements, appState);
+  const selectedElements = getSelectedElements(elements, appState, true);
   if (selectedElements.length === 0) {
     return null;
   }
@@ -101,7 +101,7 @@ export const getSnaps = ({
   const selectionCoordinates = getElementsCoordinates(selectedElements);
 
   const snaps = getMaximumGroups(
-    getVisibleAndNonSelectedElements(elements, appState),
+    getVisibleAndNonSelectedElements(elements, selectedElements),
   )
     .filter(
       (elementsGroup) => !elementsGroup.every((element) => element.locked),
