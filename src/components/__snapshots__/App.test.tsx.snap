@@ -32,7 +32,7 @@ exports[`Test <App/> should show error modal when using brave and measureText AP
      on how to do so.
   </p>
   <p>
-     If disabling this setting doesn't fix the display of text elements, please open an 
+    If disabling this setting doesn't fix the display of text elements, please open an 
     <a
       href="https://github.com/excalidraw/excalidraw/issues/new"
     >
