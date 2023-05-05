@@ -18,11 +18,7 @@ import {
 } from "./common";
 import { SidebarHeader } from "./SidebarHeader";
 import clsx from "clsx";
-import {
-  useDevice,
-  useExcalidrawAppState,
-  useExcalidrawSetAppState,
-} from "../App";
+import { useDevice, useExcalidrawSetAppState } from "../App";
 import { updateObject } from "../../utils";
 import { KEYS } from "../../keys";
 import { EVENT } from "../../constants";
@@ -33,6 +29,7 @@ import { SidebarTabs } from "./SidebarTabs";
 import { SidebarTab } from "./SidebarTab";
 
 import "./Sidebar.scss";
+import { useUIAppState } from "../../context/ui-appState";
 
 // FIXME replace this with the implem from ColorPicker once it's merged
 const useOnClickOutside = (
@@ -185,7 +182,7 @@ SidebarInner.displayName = "SidebarInner";
 
 export const Sidebar = Object.assign(
   forwardRef((props: SidebarProps, ref: React.ForwardedRef<HTMLDivElement>) => {
-    const appState = useExcalidrawAppState();
+    const appState = useUIAppState();
 
     const { onStateChange } = props;
 

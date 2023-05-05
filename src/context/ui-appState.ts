@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState } from "../types";
+import { UIAppState } from "../types";
 
-export const UIAppStateContext = React.createContext<AppState>(null!);
+export const UIAppStateContext = React.createContext<UIAppState>(null!);
 export const useUIAppState = () => React.useContext(UIAppStateContext);

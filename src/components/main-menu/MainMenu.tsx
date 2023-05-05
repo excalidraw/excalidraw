@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  useDevice,
-  useExcalidrawAppState,
-  useExcalidrawSetAppState,
-} from "../App";
+import { useDevice, useExcalidrawSetAppState } from "../App";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 
 import * as DefaultItems from "./DefaultItems";
@@ -14,6 +10,7 @@ import { HamburgerMenuIcon } from "../icons";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { composeEventHandlers } from "../../utils";
 import { useTunnels } from "../../context/tunnels";
+import { useUIAppState } from "../../context/ui-appState";
 
 const MainMenu = Object.assign(
   withInternalFallback(
@@ -30,7 +27,7 @@ const MainMenu = Object.assign(
     }) => {
       const { MainMenuTunnel } = useTunnels();
       const device = useDevice();
-      const appState = useExcalidrawAppState();
+      const appState = useUIAppState();
       const setAppState = useExcalidrawSetAppState();
       const onClickOutside = device.isMobile
         ? undefined
