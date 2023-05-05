@@ -1,18 +1,16 @@
 name: 'coverage'
 on:
-    pull_request:
-        branches:
-            - master
+  pull_request_target:
+    branches:
+        - master
 jobs:
-    coverage:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v1
-            - uses: artiomtr/jest-coverage-report-action@v2
-              with:
-                  test-script: 'yarn test:app'
-                  package-manager: yarn
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  coverage-file: ./coverage/report.json
-                  base-coverage-file: ./coverage/master/report.json
-                  threshold: 65
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: artiomtr/jest-coverage-report-action@v2
+        with:
+            test-script: 'yarn test:app'
+            package-manager: yarn
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            threshold: 65
