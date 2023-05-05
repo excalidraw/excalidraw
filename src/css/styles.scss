@@ -164,6 +164,11 @@
     box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
 
+  a:focus-visible {
+    outline: none;
+    text-decoration: underline;
+  }
+
   .buttonList {
     .ToolIcon__icon {
       all: unset !important;
