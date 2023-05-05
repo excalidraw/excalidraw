@@ -7,6 +7,7 @@ import { AppState, PointerDownState, Zoom } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
 import { Snaps, snapProject } from "../snapping";
+import { getGridPoint } from "../math";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -22,7 +23,7 @@ export const dragSelectedElements = (
       pointerDownState,
       element,
       offset,
-      appState.zoom,
+      appState,
       snaps,
     );
     // update coords of bound text only if we're dragging the container directly
@@ -41,7 +42,7 @@ export const dragSelectedElements = (
           pointerDownState,
           textElement,
           offset,
-          appState.zoom,
+          appState,
           snaps,
         );
       }
@@ -57,7 +58,7 @@ const updateElementCoords = (
   pointerDownState: PointerDownState,
   element: NonDeletedExcalidrawElement,
   offset: { x: number; y: number },
-  zoom: Zoom,
+  appState: AppState,
   snaps: Snaps | null = null,
 ) => {
   const distanceX = Math.abs(offset.x);
@@ -74,17 +75,30 @@ const updateElementCoords = (
     y: originalElement.y,
   };
 
-  const projection = snapProject({
-    origin,
-    offset,
-    snaps,
-    zoom,
-  });
+  if (!snaps || snaps.length === 0) {
+    const [nextX, nextY] = getGridPoint(
+      lockX ? origin.x : origin.x + offset.x,
+      lockY ? origin.y : origin.y + offset.y,
+      appState.gridSize,
+    );
 
-  mutateElement(element, {
-    x: lockX ? origin.x : projection.x,
-    y: lockY ? origin.y : projection.y,
-  });
+    mutateElement(element, {
+      x: nextX,
+      y: nextY,
+    });
+  } else {
+    const projection = snapProject({
+      origin,
+      offset,
+      snaps,
+      zoom: appState.zoom,
+    });
+
+    mutateElement(element, {
+      x: lockX ? origin.x : projection.x,
+      y: lockY ? origin.y : projection.y,
+    });
+  }
 };
 
 export const getDragOffsetXY = (

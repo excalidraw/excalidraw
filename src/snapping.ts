@@ -227,7 +227,7 @@ export interface ProjectionOptions {
   zoom: Zoom;
   origin: { x: number; y: number };
   offset: { x: number; y: number };
-  snaps: Snaps | null;
+  snaps: Snaps;
 }
 
 export const snapProject = ({
@@ -236,12 +236,6 @@ export const snapProject = ({
   snaps,
   zoom,
 }: ProjectionOptions) => {
-  if (!snaps) {
-    return GAPoints.toObject(
-      GA.add(GA.point(origin.x, origin.y), GA.offset(offset.x, offset.y)),
-    );
-  }
-
   let totalOffset = GA.offset(0, 0);
 
   for (const snap of keepOnlyClosestPoints(snaps)) {

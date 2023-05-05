@@ -4754,7 +4754,7 @@ class App extends React.Component<AppProps, AppState> {
             elements: [...pointerDownState.originalElements.values()],
             appState: this.state,
             event,
-            dragOffset: dragOffset,
+            dragOffset,
           });
           this.setState({ snaps });
 
