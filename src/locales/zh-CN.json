@@ -211,7 +211,7 @@
       "line1": "您似乎正在使用 Brave 浏览器并启用了<bold>积极阻止指纹识别</bold>的设置。",
       "line2": "这可能会破坏绘图中的 <bold>文本元素</bold>。",
       "line3": "我们强烈建议禁用此设置。您可以按照 <link>这些步骤</link> 来设置。",
-      "line4": ""
+      "line4": "如果禁用此设置无法修复文本元素的显示，请在 GitHub 上提交一个 <issueLink>issue</issueLink> ，或者在 <discordLink>Discord</discordLink> 上反馈"
     }
   },
   "toolBar": {
