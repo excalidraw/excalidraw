@@ -211,7 +211,7 @@
       "line1": "看起來您開啟了 Brave 瀏覽器的 <bold>Aggressively Block Fingerprinting</bold> 設定。",
       "line2": "這可能造成您畫布中 <bold>文字元素</bold> 的異常。",
       "line3": "我們強烈建議您關閉此設定。您可以依照 <link>這些步驟</link> 來進行。",
-      "line4": ""
+      "line4": "若關閉此設定並未修復文字元素的顯示問題，請回報於我們 GitHub 上的 <issueLink>issue</issueLink>，或在 <discordLink>Discord</discordLink> 上告訴我們。"
     }
   },
   "toolBar": {
