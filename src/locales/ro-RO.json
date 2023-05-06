@@ -211,8 +211,7 @@
       "line1": "Se pare că folosești navigatorul Brave cu opțiunea <bold>strictă pentru blocarea amprentării</bold>.",
       "line2": "Acest lucru poate duce la întreruperea <bold>elementelor text</bold> din desene.",
       "line3": "Îți recomandăm ferm să dezactivezi această setare. Poți urma <link>acești pași</link> pentru a face acest lucru.",
-      "line4": "Dacă dezactivarea acestei setări nu duce la remedierea afișării elementelor text, deschide un tichet de <issueLink>problemă</issueLink> pe pagina noastră de GitHub sau scrie-ne pe <discordLink>Discord</discordLink>",
-      "discord": "Discord"
+      "line4": ""
     }
   },
   "toolBar": {
