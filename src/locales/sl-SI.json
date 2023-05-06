@@ -211,7 +211,7 @@
       "line1": "Videti je, da uporabljate brskalnik Brave z omogočeno nastavitvijo <bold>Agresivno blokiranje prstnih odtisov</bold>.",
       "line2": "To bi lahko povzročilo motnje v obnašanju <bold>besedilnih elementov</bold> v vaših risbah.",
       "line3": "Močno priporočamo, da onemogočite to nastavitev. Sledite <link>tem korakom</link>, kako to storiti.",
-      "line4": ""
+      "line4": "Če onemogočanje te nastavitve ne popravi prikaza besedilnih elementov, odprite <issueLink>vprašanje</issueLink> na našem GitHubu ali nam pišite na <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
