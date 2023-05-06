@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { t } from "../i18n";
+import Trans from "./Trans";
 import { jotaiScope } from "../jotai";
 import { AppState, LibraryItem, LibraryItems } from "../types";
 import { useApp, useExcalidrawAppState, useExcalidrawSetAppState } from "./App";
@@ -104,16 +105,19 @@ export const LibraryDropdownMenuButton: React.FC<{
         small={true}
       >
         <p>
-          {t("publishSuccessDialog.content", {
-            authorName: publishLibSuccess!.authorName,
-          })}{" "}
-          <a
-            href={publishLibSuccess?.url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t("publishSuccessDialog.link")}
-          </a>
+          <Trans
+            i18nKey="publishSuccessDialog.content"
+            authorName={publishLibSuccess!.authorName}
+            link={(el) => (
+              <a
+                href={publishLibSuccess?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {el}
+              </a>
+            )}
+          />
         </p>
         <ToolButton
           type="button"
