@@ -211,8 +211,7 @@
       "line1": "Ser ut som om du bruker Brave nettleser med <bold>Aggressivt Block Finger</bold> -innstillingen aktivert.",
       "line2": "Dette kan resultere i å bryte <bold>tekst-elementene</bold> i tegningene.",
       "line3": "Vi anbefaler på det sterkeste å deaktivere denne innstillingen. Du kan følge <link>disse trinnene</link> om hvordan du gjør det.",
-      "line4": " Hvis deaktivering av denne innstillingen ikke fikser visningen av tekstelementer, vennligst åpne en <issueLink>sak</issueLink> på vår GitHub, eller skriv oss på <discordLink>Discord</discordLink>",
-      "discord": "Discord"
+      "line4": ""
     }
   },
   "toolBar": {
