@@ -87,6 +87,7 @@ describe("contextMenu element", () => {
       "gridMode",
       "zenMode",
       "viewMode",
+      "objectsSnapMode",
       "stats",
     ];
 
