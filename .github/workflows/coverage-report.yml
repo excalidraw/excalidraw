@@ -1,8 +1,8 @@
-name: 'coverage'
+name: "coverage"
 on:
   pull_request_target:
     branches:
-        - master
+      - master
 jobs:
   coverage:
     runs-on: ubuntu-latest
@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v1
       - uses: artiomtr/jest-coverage-report-action@v2
         with:
-            test-script: 'yarn test:app'
-            package-manager: yarn
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            threshold: 65
+          test-script: "yarn test:app"
+          package-manager: yarn
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          threshold: 65
