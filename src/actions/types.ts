@@ -119,7 +119,8 @@ export type ActionName =
   | "removeAllElementsInFrame"
   | "toggleFrameRendering"
   | "setFrameAsActiveTool"
-  | "createContainerFromText";
+  | "createContainerFromText"
+  | "wrapTextInContainer";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

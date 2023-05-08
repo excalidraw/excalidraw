@@ -21,7 +21,7 @@ export const actionCopy = register({
       includeElementsInFrames: true,
     });
 
-    copyToClipboard(elementsToCopy, appState, app.files);
+    copyToClipboard(elementsToCopy, app.files);
 
     return {
       commitToHistory: false,

@@ -46,8 +46,8 @@ import {
   getContainerCoords,
   getContainerElement,
   getLineHeightInPx,
-  getMaxContainerHeight,
-  getMaxContainerWidth,
+  getBoundTextMaxHeight,
+  getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { getContainingFrame } from "../frame";
@@ -91,6 +91,7 @@ export interface ExcalidrawElementWithCanvas {
   canvas: HTMLCanvasElement;
   theme: RenderConfig["theme"];
   scale: number;
+  zoomValue: RenderConfig["zoom"]["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
   boundTextElementVersion: number | null;
@@ -206,6 +207,7 @@ const generateElementCanvas = (
     canvas,
     theme: renderConfig.theme,
     scale,
+    zoomValue: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
     boundTextElementVersion: getBoundTextElement(element)?.version || null,
@@ -719,7 +721,7 @@ const generateElementWithCanvas = (
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
-    prevElementWithCanvas.scale !== zoom.value &&
+    prevElementWithCanvas.zoomValue !== zoom.value &&
     !renderConfig?.shouldCacheIgnoreZoom;
   const boundTextElementVersion = getBoundTextElement(element)?.version || null;
   const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
@@ -871,17 +873,21 @@ const drawElementFromCanvas = (
     );
 
     if (
-      process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX &&
+      process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
+        "true" &&
       hasBoundTextElement(element)
     ) {
+      const textElement = getBoundTextElement(
+        element,
+      ) as ExcalidrawTextElementWithContainer;
       const coords = getContainerCoords(element);
       context.strokeStyle = "#c92a2a";
       context.lineWidth = 3;
       context.strokeRect(
         (coords.x + renderConfig.scrollX) * window.devicePixelRatio,
         (coords.y + renderConfig.scrollY) * window.devicePixelRatio,
-        getMaxContainerWidth(element) * window.devicePixelRatio,
-        getMaxContainerHeight(element) * window.devicePixelRatio,
+        getBoundTextMaxWidth(element) * window.devicePixelRatio,
+        getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
       );
     }
   }

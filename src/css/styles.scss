@@ -354,6 +354,7 @@
     border-radius: var(--space-factor);
     border: 1px solid var(--button-gray-2);
     font-size: 0.8rem;
+    font-family: inherit;
     outline: none;
     appearance: none;
     background-image: var(--dropdown-icon);
@@ -413,6 +414,7 @@
     bottom: 30px;
     transform: translateX(-50%);
     pointer-events: all;
+    font-family: inherit;
 
     &:hover {
       background-color: var(--button-hover-bg);
@@ -565,7 +567,7 @@
       border-radius: 0;
     }
 
-    .library-button {
+    .default-sidebar-trigger {
       border: 0;
     }
   }

@@ -54,6 +54,7 @@
     "veryLarge": "Ļoti liels",
     "solid": "Pilns",
     "hachure": "Svītrots",
+    "zigzag": "Zigzaglīnija",
     "crossHatch": "Šķērssvītrots",
     "thin": "Šaurs",
     "bold": "Trekns",
@@ -110,7 +111,7 @@
     "increaseFontSize": "Palielināt fonta izmēru",
     "unbindText": "Atdalīt tekstu",
     "bindText": "Piesaistīt tekstu figūrai",
-    "createContainerFromText": "",
+    "createContainerFromText": "Ietilpināt tekstu figurā",
     "link": {
       "edit": "Rediģēt saiti",
       "create": "Izveidot saiti",
@@ -194,7 +195,7 @@
     "resetLibrary": "Šī funkcija iztukšos bibliotēku. Vai turpināt?",
     "removeItemsFromsLibrary": "Vai izņemt {{count}} vienumu(s) no bibliotēkas?",
     "invalidEncryptionKey": "Šifrēšanas atslēgai jābūt 22 simbolus garai. Tiešsaistes sadarbība ir izslēgta.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Nav pieejams interneta pieslēgums.\nJūsu izmaiņas netiks saglabātas!"
   },
   "errors": {
     "unsupportedFileType": "Neatbalstīts datnes veids.",
@@ -207,19 +208,19 @@
     "collabSaveFailed": "Darbs nav saglabāts datubāzē. Ja problēma turpinās, saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu.",
     "collabSaveFailed_sizeExceeded": "Darbs nav saglabāts datubāzē, šķiet, ka tāfele ir pārāk liela. Saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu.",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "start": "Izskatās, ka izmanto Brave interneta plārlūku ar ieslēgtu",
+      "aggressive_block_fingerprint": "Aggressively Block Fingerprinting",
+      "setting_enabled": "ieslēgtu iestatījumu",
+      "break": "Tas var salauzt",
+      "text_elements": "Teksta elementus",
+      "in_your_drawings": "tavos zīmējumos",
+      "strongly_recommend": "Mēs iesakām izslēgt šo iestatījumu. Tu vari sekot",
+      "steps": "šiem soļiem",
+      "how": "kā to izdarīt",
+      "disable_setting": " Ja šī iestatījuma izslēgšana neatrisina teksta elementu attēlošanu, tad, lūdzu, atver",
+      "issue": "problēmu",
+      "write": "mūsu GitHub vai raksti mums",
+      "discord": "Discord"
     }
   },
   "toolBar": {
@@ -237,7 +238,7 @@
     "penMode": "Pildspalvas režīms – novērst pieskaršanos",
     "link": "Pievienot/rediģēt atlasītās figūras saiti",
     "eraser": "Dzēšgumija",
-    "hand": ""
+    "hand": "Roka (panoramēšanas rīks)"
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
@@ -245,7 +246,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Lai bīdītu tāfeli, turiet nospiestu ritināšanas vai atstarpes taustiņu, vai izmanto rokas rīku",
     "linearElement": "Klikšķiniet, lai sāktu zīmēt vairākus punktus; velciet, lai zīmētu līniju",
     "freeDraw": "Spiediet un velciet; atlaidiet, kad pabeidzat",
     "text": "Ieteikums: lai pievienotu tekstu, varat arī jebkur dubultklikšķināt ar atlases rīku",
@@ -264,7 +265,7 @@
     "bindTextToElement": "Spiediet ievades taustiņu, lai pievienotu tekstu",
     "deepBoxSelect": "Turient nospiestu Ctrl vai Cmd, lai atlasītu dziļumā un lai nepieļautu objektu pavilkšanu",
     "eraserRevert": "Turiet Alt, lai noņemtu elementus no dzēsšanas atlases",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Šis iestatījums var tikt ieslēgts ar \"dom.events.asyncClipboard.clipboardItem\" marķieri pārslēgtu uz \"true\". Lai mainītu pārlūka marķierus Firefox, apmeklē \"about:config\" lapu."
   },
   "canvasError": {
     "cannotShowPreview": "Nevar rādīt priekšskatījumu",
@@ -319,8 +320,8 @@
     "doubleClick": "dubultklikšķis",
     "drag": "vilkt",
     "editor": "Redaktors",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Rediģēt līniju/bultu punktus",
+    "editText": "Rediģēt tekstu/pievienot birku",
     "github": "Sastapāt kļūdu? Ziņot",
     "howto": "Sekojiet mūsu instrukcijām",
     "or": "vai",
@@ -468,15 +469,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Visi jūsu dati tiek glabāti uz vietas jūsu pārlūkā.",
+      "center_heading_plus": "Vai tā vietā vēlies doties uz Excalidraw+?",
+      "menuHint": "Eksportēšana, iestatījumi, valodas..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Eksportēšana, iestatījumi un vēl...",
+      "center_heading": "Diagrammas. Izveidotas. Vienkārši.",
+      "toolbarHint": "Izvēlies rīku un sāc zīmēt!",
+      "helpHint": "Īsceļi un palīdzība"
     }
   }
 }

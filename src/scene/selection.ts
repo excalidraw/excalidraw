@@ -66,7 +66,7 @@ export const getElementsWithinSelection = (
 
 export const isSomeElementSelected = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
+  appState: Pick<AppState, "selectedElementIds">,
 ): boolean =>
   elements.some((element) => appState.selectedElementIds[element.id]);
 
@@ -76,7 +76,7 @@ export const isSomeElementSelected = (
  */
 export const getCommonAttributeOfSelectedElements = <T>(
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
+  appState: Pick<AppState, "selectedElementIds">,
   getAttribute: (element: ExcalidrawElement) => T,
 ): T | null => {
   const attributes = Array.from(
@@ -91,7 +91,7 @@ export const getCommonAttributeOfSelectedElements = <T>(
 
 export const getSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
+  appState: Pick<AppState, "selectedElementIds">,
   opts?: {
     includeBoundTextElement?: boolean;
     includeElementsInFrames?: boolean;
@@ -130,7 +130,7 @@ export const getSelectedElements = (
 
 export const getTargetElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
+  appState: Pick<AppState, "selectedElementIds" | "editingElement">,
 ) =>
   appState.editingElement
     ? [appState.editingElement]
