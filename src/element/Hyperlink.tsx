@@ -1,4 +1,4 @@
-import { AppState, ExcalidrawProps, Point } from "../types";
+import { AppState, ExcalidrawProps, Point, UIAppState } from "../types";
 import {
   getShortcutKey,
   sceneCoordsToViewportCoords,
@@ -297,10 +297,11 @@ export const getContextMenuLabel = (
     : "labels.link.create";
   return label;
 };
+
 export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
-  appState: AppState,
+  appState: UIAppState,
 ): [x: number, y: number, width: number, height: number] => {
   const size = DEFAULT_LINK_SIZE;
   const linkWidth = size / appState.zoom.value;

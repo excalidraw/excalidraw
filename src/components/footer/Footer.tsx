@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import { actionShortcuts } from "../../actions";
 import { ActionManager } from "../../actions/manager";
-import { AppState } from "../../types";
 import {
   ExitZenModeAction,
   FinalizeAction,
@@ -13,6 +12,7 @@ import { useTunnels } from "../../context/tunnels";
 import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
+import { UIAppState } from "../../types";
 
 const Footer = ({
   appState,
@@ -20,7 +20,7 @@ const Footer = ({
   showExitZenModeBtn,
   renderWelcomeScreen,
 }: {
-  appState: AppState;
+  appState: UIAppState;
   actionManager: ActionManager;
   showExitZenModeBtn: boolean;
   renderWelcomeScreen: boolean;

@@ -1,8 +1,9 @@
-import { useExcalidrawSetAppState, useExcalidrawAppState } from "../App";
+import { useExcalidrawSetAppState } from "../App";
 import { SidebarTriggerProps } from "./common";
+import { useUIAppState } from "../../context/ui-appState";
+import clsx from "clsx";
 
 import "./SidebarTrigger.scss";
-import clsx from "clsx";
 
 export const SidebarTrigger = ({
   name,
@@ -15,8 +16,7 @@ export const SidebarTrigger = ({
   style,
 }: SidebarTriggerProps) => {
   const setAppState = useExcalidrawSetAppState();
-  // TODO replace with sidebar context
-  const appState = useExcalidrawAppState();
+  const appState = useUIAppState();
 
   return (
     <label title={title}>

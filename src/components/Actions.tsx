@@ -14,7 +14,7 @@ import {
   hasText,
 } from "../scene";
 import { SHAPES } from "../shapes";
-import { AppState, Zoom } from "../types";
+import { UIAppState, Zoom } from "../types";
 import {
   capitalizeString,
   isTransparent,
@@ -28,19 +28,20 @@ import { trackEvent } from "../analytics";
 import { hasBoundTextElement } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
-import "./Actions.scss";
 import { Tooltip } from "./Tooltip";
 import {
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
 } from "../element/textElement";
 
+import "./Actions.scss";
+
 export const SelectedShapeActions = ({
   appState,
   elements,
   renderAction,
 }: {
-  appState: AppState;
+  appState: UIAppState;
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
 }) => {
@@ -215,10 +216,10 @@ export const ShapesSwitcher = ({
   appState,
 }: {
   canvas: HTMLCanvasElement | null;
-  activeTool: AppState["activeTool"];
-  setAppState: React.Component<any, AppState>["setState"];
+  activeTool: UIAppState["activeTool"];
+  setAppState: React.Component<any, UIAppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
-  appState: AppState;
+  appState: UIAppState;
 }) => (
   <>
     {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {

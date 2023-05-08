@@ -372,7 +372,7 @@ export const setEraserCursor = (
 
 export const setCursorForShape = (
   canvas: HTMLCanvasElement | null,
-  appState: AppState,
+  appState: Pick<AppState, "activeTool" | "theme">,
 ) => {
   if (!canvas) {
     return;
@@ -787,7 +787,12 @@ export const isShallowEqual = <
       ? comparator(objA[key], objB[key])
       : objA[key] === objB[key];
     if (!ret && debug) {
-      console.warn(`isShallowEqual: ${key} not equal ->`, objA[key], objB[key]);
+      console.info(
+        `%cisShallowEqual: ${key} not equal ->`,
+        "color: #8B4000",
+        objA[key],
+        objB[key],
+      );
     }
     return ret;
   });

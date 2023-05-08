@@ -8,7 +8,13 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { ExportType } from "../scene/types";
-import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
+import {
+  AppProps,
+  AppState,
+  ExcalidrawProps,
+  BinaryFiles,
+  UIAppState,
+} from "../types";
 import { capitalizeString, isShallowEqual, muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { ErrorDialog } from "./ErrorDialog";
@@ -49,7 +55,7 @@ import "./Toolbar.scss";
 
 interface LayerUIProps {
   actionManager: ActionManager;
-  appState: AppState;
+  appState: UIAppState;
   files: BinaryFiles;
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
@@ -144,7 +150,8 @@ const LayerUI = ({
         const fileHandle = await exportCanvas(
           type,
           exportedElements,
-          appState,
+          // FIXME once we split UI canvas from element canvas
+          appState as AppState,
           files,
           {
             exportBackground: appState.exportBackground,
@@ -458,9 +465,9 @@ const LayerUI = ({
               <button
                 className="scroll-back-to-content"
                 onClick={() => {
-                  setAppState({
+                  setAppState((appState) => ({
                     ...calculateScrollCenter(elements, appState, canvas),
-                  });
+                  }));
                 }}
               >
                 {t("buttons.scrollBackToContent")}
@@ -484,14 +491,15 @@ const LayerUI = ({
   );
 };
 
-const stripIrrelevantAppStateProps = (
-  appState: AppState,
-): Omit<
-  AppState,
-  "suggestedBindings" | "startBoundElement" | "cursorButton"
-> => {
-  const { suggestedBindings, startBoundElement, cursorButton, ...ret } =
-    appState;
+const stripIrrelevantAppStateProps = (appState: AppState): UIAppState => {
+  const {
+    suggestedBindings,
+    startBoundElement,
+    cursorButton,
+    scrollX,
+    scrollY,
+    ...ret
+  } = appState;
   return ret;
 };
 
@@ -506,8 +514,10 @@ const areEqual = (prevProps: LayerUIProps, nextProps: LayerUIProps) => {
 
   return (
     isShallowEqual(
-      stripIrrelevantAppStateProps(prevAppState),
-      stripIrrelevantAppStateProps(nextAppState),
+      // asserting AppState because we're being passed the whole AppState
+      // but resolve to only the UI-relevant props
+      stripIrrelevantAppStateProps(prevAppState as AppState),
+      stripIrrelevantAppStateProps(nextAppState as AppState),
       {
         selectedElementIds: isShallowEqual,
         selectedGroupIds: isShallowEqual,
