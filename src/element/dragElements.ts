@@ -75,30 +75,24 @@ const updateElementCoords = (
     y: originalElement.y,
   };
 
-  if (!snaps || snaps.length === 0) {
-    const [nextX, nextY] = getGridPoint(
-      lockX ? origin.x : origin.x + offset.x,
-      lockY ? origin.y : origin.y + offset.y,
-      appState.gridSize,
-    );
+  const [nextX, nextY] =
+    !snaps || snaps.length === 0
+      ? getGridPoint(
+          lockX ? origin.x : origin.x + offset.x,
+          lockY ? origin.y : origin.y + offset.y,
+          appState.gridSize,
+        )
+      : snapProject({
+          origin,
+          offset,
+          snaps,
+          zoom: appState.zoom,
+        });
 
-    mutateElement(element, {
-      x: nextX,
-      y: nextY,
-    });
-  } else {
-    const projection = snapProject({
-      origin,
-      offset,
-      snaps,
-      zoom: appState.zoom,
-    });
-
-    mutateElement(element, {
-      x: lockX ? origin.x : projection.x,
-      y: lockY ? origin.y : projection.y,
-    });
-  }
+  mutateElement(element, {
+    x: lockX ? origin.x : nextX,
+    y: lockY ? origin.y : nextY,
+  });
 };
 
 export const getDragOffsetXY = (

@@ -10,7 +10,7 @@ import { AppState, Zoom } from "../types";
 import { isTextElement } from ".";
 import { isLinearElement } from "./typeChecks";
 import { DEFAULT_SPACING } from "../renderer/renderScene";
-import { isSnapped, Snaps } from "../snapping";
+import { isPointSnapped, Snaps } from "../snapping";
 
 export type TransformHandleDirection =
   | "n"
@@ -100,7 +100,7 @@ export const getTransformHandlesFromCoords = (
   const generateTransformHandle = (
     [x, y]: [x: number, y: number],
     [dx, dy]: [x: number, y: number],
-    isHighlighted = isSnapped(snaps ?? [], applyAngle(x, y)),
+    isHighlighted = isPointSnapped(applyAngle(x, y), snaps ?? []),
   ): TransformHandle => {
     const [xx, yy] = applyAngle(
       x + dx + handleWidth / 2,

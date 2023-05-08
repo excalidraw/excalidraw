@@ -1,4 +1,4 @@
-import { getCommonBounds } from "./element";
+import { getElementsHandleCoordinates } from "./element/bounds";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -9,9 +9,7 @@ import * as GAPoints from "./gapoints";
 import { getMaximumGroups } from "./groups";
 import { getSelectedElements } from "./scene";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
-import { AppState, Zoom } from "./types";
-
-export type TuplePoint = [x: number, y: number];
+import { AppState, Point, Zoom } from "./types";
 
 export type Snap = {
   distance: number;
@@ -28,38 +26,24 @@ export type SnapLine = {
 
 const SNAP_DISTANCE = 15;
 // handle floating point errors
-const PRECISION = 0.001;
+export const SNAP_PRECISION = 0.001;
 
-const getElementsCoordinates = (elements: ExcalidrawElement[]) => {
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  const width = maxX - minX;
-  const height = maxY - minY;
+const snapLine = (from: Point, to: Point): SnapLine | null => {
+  const gaFrom = GAPoints.from(from);
+  const gaTo = GAPoints.from(to);
 
-  return {
-    nw: GA.point(minX, minY),
-    ne: GA.point(maxX, minY),
-    sw: GA.point(minX, maxY),
-    se: GA.point(maxX, maxY),
-    n: GA.point(minX + width / 2, minY),
-    s: GA.point(minX + width / 2, maxY),
-    w: GA.point(minX, minY + height / 2),
-    e: GA.point(maxX, minY + height / 2),
-  };
-};
-
-const snapLine = (from: GA.Point, to: GA.Point): SnapLine | null => {
-  if (GA.equal(from, to, PRECISION)) {
+  if (GA.equal(gaFrom, gaTo, SNAP_PRECISION)) {
     return null;
   }
 
   return {
-    line: GALines.through(from, to),
-    points: [from, to],
+    line: GALines.through(gaFrom, gaTo),
+    points: [gaFrom, gaTo],
   };
 };
 
 const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
-  const borderPoints = getElementsCoordinates(elements);
+  const borderPoints = getElementsHandleCoordinates(elements);
 
   return [
     // left
@@ -70,12 +54,13 @@ const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
     snapLine(borderPoints.nw, borderPoints.ne),
     // bottom
     snapLine(borderPoints.sw, borderPoints.se),
-    // FIXME: handle center axes
+    // TODO: handle center axes
   ].filter((snapLine): snapLine is SnapLine => snapLine !== null);
 };
 
 /**
- * return only the nearest horizontal and vertical snaps to the given elements
+ * Given a list of elements and `appState`, `getSnaps` returns
+ * only the nearest horizontal and vertical snaps to the selected elements
  */
 export const getSnaps = ({
   elements,
@@ -98,8 +83,9 @@ export const getSnaps = ({
     return null;
   }
 
-  const selectionCoordinates = getElementsCoordinates(selectedElements);
+  const selectionCoordinates = getElementsHandleCoordinates(selectedElements);
 
+  // get snaps that are within the "shouldSnap" distance
   const snaps = getMaximumGroups(
     getVisibleAndNonSelectedElements(elements, selectedElements),
   )
@@ -110,7 +96,7 @@ export const getSnaps = ({
     .flatMap((snapLine) =>
       Object.values(selectionCoordinates)
         .map((originPoint) => {
-          const point = GA.add(originPoint, offset);
+          const point = GA.add(GAPoints.from(originPoint), offset);
           const distance = Math.abs(
             GAPoints.distanceToLine(point, snapLine.line),
           );
@@ -121,10 +107,13 @@ export const getSnaps = ({
 
           return { distance, point, snapLine };
         })
-        .filter((snap): snap is Snap => snap !== null),
-    )
-    .filter((snap) => shouldSnap(snap, appState.zoom));
+        .filter(
+          (snap): snap is Snap =>
+            snap !== null && shouldSnap(snap, appState.zoom),
+        ),
+    );
 
+  // IMPORTANT: select and return only the nearest horizontal & vertical snaps
   if (snaps.length > 0) {
     // one group stores horizontal snaps, the other keeps vertical snaps
     const groupA: Snaps = [];
@@ -158,18 +147,24 @@ export const getSnaps = ({
   return null;
 };
 
-export const isSnapped = (snaps: Snaps, [x, y]: TuplePoint) =>
+export const isPointSnapped = ([x, y]: Point, snaps: Snaps) =>
   snaps.some(
     (snap) =>
       Math.abs(GAPoints.distanceToLine(GA.point(x, y), snap.snapLine.line)) < 1,
   );
 
-export const shouldSnap = (snap: Snap, zoom: Zoom) =>
+const shouldSnap = (snap: Snap, zoom: Zoom) =>
   snap.distance < SNAP_DISTANCE / zoom.value;
 
-// return the extremity coordinates for the given snapline
-// which in turn decide how long the rendered snapline will be
-export const getSnapLineCoordinates = (
+//
+/**
+ * return the extremity coordinates for the given snapline
+ * which in turn decide how long we should render the snapline
+ *
+ * optional `expansionFactor` can be supplied so that the snapline
+ * is rendered with extra width proportional to its length
+ */
+export const getSnapLineEndPointsCoords = (
   snapLine: SnapLine,
   expansionFactor = 0,
 ) => {
@@ -196,9 +191,11 @@ const isSnapEnabled = ({
   (appState.objectsSnapModeEnabled && !event.metaKey) ||
   (!appState.objectsSnapModeEnabled && event.metaKey);
 
-// given a line and some points (not necessarily on the line)
-// return coordinates of the extremity projection points on the line
-// from the given points
+/**
+ * given a line and some points (not necessarily on the line)
+ * return coordinates of the extremity projection points on the line
+ * from the given points
+ */
 const getLineExtremities = (
   line: GA.Line,
   points: [GA.Point, GA.Point, ...GA.Point[]],
@@ -223,7 +220,7 @@ const getLineExtremities = (
   return { from: pa, to: pb };
 };
 
-export interface ProjectionOptions {
+interface ProjectionOptions {
   zoom: Zoom;
   origin: { x: number; y: number };
   offset: { x: number; y: number };
@@ -238,7 +235,7 @@ export const snapProject = ({
 }: ProjectionOptions) => {
   let totalOffset = GA.offset(0, 0);
 
-  for (const snap of keepOnlyClosestPoints(snaps)) {
+  for (const snap of snaps) {
     if (!shouldSnap(snap, zoom)) {
       continue;
     }
@@ -258,7 +255,7 @@ export const snapProject = ({
     totalOffset = GA.sub(totalOffset, snapOffset);
   }
 
-  return GAPoints.toObject(
+  return GAPoints.toTuple(
     GA.add(
       GA.point(origin.x, origin.y),
       GA.add(totalOffset, GA.offset(offset.x, offset.y)),
@@ -266,29 +263,6 @@ export const snapProject = ({
   );
 };
 
-/**
- * Group all snap lines that are using the same axe (parallel and close enough)
- */
-const keepOnlyClosestPoints = (snaps: Snaps) => {
-  const groups = snaps.reduce((axes, snap) => {
-    const axeIndex = axes.findIndex(
-      (axe) =>
-        GALines.areParallel(axe.snapLine.line, snap.snapLine.line, PRECISION) &&
-        GALines.distance(axe.snapLine.line, snap.snapLine.line) < PRECISION,
-    );
-
-    if (axeIndex === -1) {
-      axes.push(snap);
-    } else if (snap.distance < axes[axeIndex].distance) {
-      axes[axeIndex] = snap;
-    }
-
-    return axes;
-  }, [] as Snaps);
-
-  return groups;
-};
-
-const areRoughlyEqual = (a: number, b: number, precision = PRECISION) => {
+const areRoughlyEqual = (a: number, b: number, precision = SNAP_PRECISION) => {
   return Math.abs(a - b) <= precision;
 };

@@ -24,6 +24,7 @@ import { rescalePoints } from "../points";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { Mutable } from "../utility-types";
+import { TransformHandleDirection } from "./transformHandles";
 
 // x and y position of top left corner, x and y position of bottom right corner
 export type Bounds = readonly [number, number, number, number];
@@ -67,6 +68,29 @@ export const getElementAbsoluteCoords = (
     element.x + element.width / 2,
     element.y + element.height / 2,
   ];
+};
+
+/**
+ * Returns the coordinates of the bounding box of the given elements
+ * at the 8 transform handle directions
+ */
+export const getElementsHandleCoordinates = (
+  elements: ExcalidrawElement[],
+): Record<TransformHandleDirection, Point> => {
+  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  const width = maxX - minX;
+  const height = maxY - minY;
+
+  return {
+    nw: [minX, minY],
+    ne: [maxX, minY],
+    sw: [minX, maxY],
+    se: [maxX, maxY],
+    n: [minX + width / 2, minY],
+    s: [minX + width / 2, maxY],
+    w: [minX, minY + height / 2],
+    e: [maxX, minY + height / 2],
+  };
 };
 
 export const pointRelativeTo = (
