@@ -208,10 +208,10 @@
     "collabSaveFailed": "Det gick inte att spara i backend-databasen. Om problemen kvarstår bör du spara filen lokalt för att se till att du inte förlorar ditt arbete.",
     "collabSaveFailed_sizeExceeded": "Det gick inte att spara till backend-databasen, whiteboarden verkar vara för stor. Du bör spara filen lokalt för att du inte ska förlora ditt arbete.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "Det ser ut som om du använder Brave-webbläsaren med <bold>Aggressivt Blockera fingeravtryck</bold> inställningen aktiverad.",
+      "line2": "Detta kan resultera i trasiga <bold>Textelement</bold> i dina ritningar.",
+      "line3": "Vi rekommenderar starkt att du inaktiverar den här inställningen. Du kan följa <link>dessa steg</link> för att inaktivera den.",
+      "line4": "Om inaktivering av denna inställning inte åtgärdar visningen av textelement, öppna ett <issueLink>ärende</issueLink> på vår GitHub, eller skriv till oss på <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
