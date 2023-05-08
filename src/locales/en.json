@@ -265,16 +265,11 @@
     "canvasTooBigTip": "Tip: try moving the farthest elements a bit closer together."
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
+    "headingMain": "Encountered an error. Try <button>reloading the page</button>.",
+    "clearCanvasMessage": "If reloading doesn't work, try <button>clearing the canvas</button>.",
     "clearCanvasCaveat": " This will result in loss of work ",
-    "trackedToSentry_pre": "The error with identifier ",
-    "trackedToSentry_post": " was tracked on our system.",
-    "openIssueMessage_pre": "We were very cautious not to include your scene information on the error. If your scene is not private, please consider following up on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include information below by copying and pasting into the GitHub issue.",
+    "trackedToSentry": "The error with identifier {{eventId}} was tracked on our system.",
+    "openIssueMessage": "We were very cautious not to include your scene information on the error. If your scene is not private, please consider following up on our <button>bug tracker</button>. Please include information below by copying and pasting into the GitHub issue.",
     "sceneContent": "Scene content:"
   },
   "roomDialog": {
