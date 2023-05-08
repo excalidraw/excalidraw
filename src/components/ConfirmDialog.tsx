@@ -4,8 +4,8 @@ import { Dialog, DialogProps } from "./Dialog";
 import "./ConfirmDialog.scss";
 import DialogActionButton from "./DialogActionButton";
 import { useSetAtom } from "jotai";
-import { isLibraryMenuOpenAtom } from "./LibraryMenuHeaderContent";
-import { useExcalidrawSetAppState } from "./App";
+import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+import { useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
 import { jotaiScope } from "../jotai";
 
 interface Props extends Omit<DialogProps, "onCloseRequest"> {
@@ -26,6 +26,7 @@ const ConfirmDialog = (props: Props) => {
   } = props;
   const setAppState = useExcalidrawSetAppState();
   const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom, jotaiScope);
+  const { container } = useExcalidrawContainer();
 
   return (
     <Dialog
@@ -42,6 +43,7 @@ const ConfirmDialog = (props: Props) => {
             setAppState({ openMenu: null });
             setIsLibraryMenuOpen(false);
             onCancel();
+            container?.focus();
           }}
         />
         <DialogActionButton
@@ -50,6 +52,7 @@ const ConfirmDialog = (props: Props) => {
             setAppState({ openMenu: null });
             setIsLibraryMenuOpen(false);
             onConfirm();
+            container?.focus();
           }}
           actionType="danger"
         />

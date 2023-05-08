@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "دانانەوە",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "دایبنێ وەک دەقی سادە",
     "pasteCharts": "دانانەوەی خشتەکان",
     "selectAll": "دیاریکردنی هەموو",
     "multiSelect": "زیادکردنی بۆ دیاریکراوەکان",
@@ -54,6 +54,7 @@
     "veryLarge": "زۆر گه‌وره‌",
     "solid": "سادە",
     "hachure": "هاچور",
+    "zigzag": "زیگزاگ",
     "crossHatch": "کرۆس هاتچ",
     "thin": "تەنک",
     "bold": "تۆخ",
@@ -110,7 +111,7 @@
     "increaseFontSize": "زایدکردنی قەبارەی فۆنت",
     "unbindText": "دەقەکە جیابکەرەوە",
     "bindText": "دەقەکە ببەستەوە بە کۆنتەینەرەکەوە",
-    "createContainerFromText": "",
+    "createContainerFromText": "دەق لە چوارچێوەیەکدا بپێچە",
     "link": {
       "edit": "دەستکاریکردنی بەستەر",
       "create": "دروستکردنی بەستەر",
@@ -194,7 +195,7 @@
     "resetLibrary": "ئەمە کتێبخانەکەت خاوێن دەکاتەوە. ئایا دڵنیایت?",
     "removeItemsFromsLibrary": "سڕینەوەی {{count}} ئایتم(ەکان) لە کتێبخانە؟",
     "invalidEncryptionKey": "کلیلی رەمزاندن دەبێت لە 22 پیت بێت. هاوکاری ڕاستەوخۆ لە کارخراوە.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "هێڵی ئینتەرنێت بەردەست نییە.\n گۆڕانکارییەکانت سەیڤ ناکرێن!"
   },
   "errors": {
     "unsupportedFileType": "جۆری فایلی پشتگیری نەکراو.",
@@ -204,22 +205,22 @@
     "invalidSVGString": "ئێس ڤی جی نادروستە.",
     "cannotResolveCollabServer": "ناتوانێت پەیوەندی بکات بە سێرڤەری کۆلاب. تکایە لاپەڕەکە دووبارە باربکەوە و دووبارە هەوڵ بدەوە.",
     "importLibraryError": "نەیتوانی کتێبخانە بار بکات",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": "",
+    "collabSaveFailed": "نەتوانرا لە بنکەدراوەی ڕاژەدا پاشەکەوت بکرێت. ئەگەر کێشەکان بەردەوام بوون، پێویستە فایلەکەت لە ناوخۆدا هەڵبگریت بۆ ئەوەی دڵنیا بیت کە کارەکانت لەدەست نادەیت.",
+    "collabSaveFailed_sizeExceeded": "نەتوانرا لە بنکەدراوەی ڕاژەدا پاشەکەوت بکرێت، پێدەچێت تابلۆکە زۆر گەورە بێت. پێویستە فایلەکە لە ناوخۆدا هەڵبگریت بۆ ئەوەی دڵنیا بیت کە کارەکانت لەدەست نادەیت.",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "start": "پێدەچێت وێبگەڕی Brave بەکاربهێنیت لەگەڵ",
+      "aggressive_block_fingerprint": "بلۆککردنی Fingerprinting بەشێوەیەکی توندوتیژانە",
+      "setting_enabled": "ڕێکخستن چالاک کراوە",
+      "break": "ئەمە دەکرێت ببێتە هۆی تێکدانی",
+      "text_elements": "دانە دەقییەکان",
+      "in_your_drawings": "لە وێنەکێشانەکانتدا",
+      "strongly_recommend": "بە توندی پێشنیار دەکەین ئەم ڕێکخستنە لەکاربخەیت. دەتوانیت بڕۆیت بە دوای",
+      "steps": "ئەم هەنگاوانەدا",
+      "how": "بۆ ئەوەی ئەنجامی بدەیت",
+      "disable_setting": " ئەگەر لەکارخستنی ئەم ڕێکخستنە پیشاندانی توخمەکانی دەق چاک نەکاتەوە، تکایە هەڵبستە بە کردنەوەی",
+      "issue": "کێشەیەک",
+      "write": "لەسەر گیتهەبەکەمان، یان بۆمان بنوسە لە",
+      "discord": "دیسکۆرد"
     }
   },
   "toolBar": {
@@ -237,7 +238,7 @@
     "penMode": "شێوازی قەڵەم - دەست لێدان ڕابگرە",
     "link": "زیادکردن/ نوێکردنەوەی لینک بۆ شێوەی دیاریکراو",
     "eraser": "سڕەر",
-    "hand": ""
+    "hand": "دەست (ئامرازی پانکردن)"
   },
   "headings": {
     "canvasActions": "کردارەکانی تابلۆ",
@@ -245,7 +246,7 @@
     "shapes": "شێوەکان"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "بۆ جوڵاندنی تابلۆ، ویلی ماوسەکەت یان دوگمەی سپەیس بگرە لەکاتی ڕاکێشاندە، یانیش ئامرازی دەستەکە بەکاربهێنە",
     "linearElement": "کرتە بکە بۆ دەستپێکردنی چەند خاڵێک، ڕایبکێشە بۆ یەک هێڵ",
     "freeDraw": "کرتە بکە و ڕایبکێشە، کاتێک تەواو بوویت دەست هەڵگرە",
     "text": "زانیاری: هەروەها دەتوانیت دەق زیادبکەیت بە دوو کرتەکردن لە هەر شوێنێک لەگەڵ ئامڕازی دەستنیشانکردن",
@@ -256,7 +257,7 @@
     "resize": "دەتوانیت ڕێژەکان سنووردار بکەیت بە ڕاگرتنی SHIFT لەکاتی گۆڕینی قەبارەدا،\nALT ڕابگرە بۆ گۆڕینی قەبارە لە ناوەندەوە",
     "resizeImage": "دەتوانیت بە ئازادی قەبارە بگۆڕیت بە ڕاگرتنی SHIFT،\nALT ڕابگرە بۆ گۆڕینی قەبارە لە ناوەندەوە",
     "rotate": "دەتوانیت گۆشەکان سنووردار بکەیت بە ڕاگرتنی SHIFT لەکاتی سوڕانەوەدا",
-    "lineEditor_info": "",
+    "lineEditor_info": "یان Ctrl یان Cmd بگرە و دوانە کلیک بکە یانیش پەنجە بنێ بە Ctrl یان Cmd + ئینتەر بۆ دەستکاریکردنی خاڵەکان",
     "lineEditor_pointSelected": "بۆ لابردنی خاڵەکان Delete دابگرە، Ctrl Cmd+D بکە بۆ لەبەرگرتنەوە، یان بۆ جووڵە ڕاکێشان بکە",
     "lineEditor_nothingSelected": "خاڵێک هەڵبژێرە بۆ دەستکاریکردن (SHIFT ڕابگرە بۆ هەڵبژاردنی چەندین)،\nیان Alt ڕابگرە و کلیک بکە بۆ زیادکردنی خاڵە نوێیەکان",
     "placeImage": "کلیک بکە بۆ دانانی وێنەکە، یان کلیک بکە و ڕایبکێشە بۆ ئەوەی قەبارەکەی بە دەستی دابنێیت",
@@ -264,7 +265,7 @@
     "bindTextToElement": "بۆ زیادکردنی دەق enter بکە",
     "deepBoxSelect": "CtrlOrCmd ڕابگرە بۆ هەڵبژاردنی قووڵ، و بۆ ڕێگریکردن لە ڕاکێشان",
     "eraserRevert": "بۆ گەڕاندنەوەی ئەو توخمانەی کە بۆ سڕینەوە نیشانە کراون، Alt ڕابگرە",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "ئەم تایبەتمەندییە بە ئەگەرێکی زۆرەوە دەتوانرێت چالاک بکرێت بە ڕێکخستنی ئاڵای \"dom.events.asyncClipboard.clipboardItem\" بۆ \"true\". بۆ گۆڕینی ئاڵاکانی وێبگەڕ لە فایەرفۆکسدا، سەردانی لاپەڕەی \"about:config\" بکە."
   },
   "canvasError": {
     "cannotShowPreview": "ناتوانرێ پێشبینین پیشان بدرێت",
@@ -319,8 +320,8 @@
     "doubleClick": "دوو گرتە",
     "drag": "راکێشان",
     "editor": "دەستکاریکەر",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "دەستکاری خاڵەکانی هێڵ/تیر بکە",
+    "editText": "دەستکاری دەق بکە / لەیبڵێک زیاد بکە",
     "github": "کێشەیەکت دۆزیەوە؟ پێشکەشکردن",
     "howto": "شوێن ڕینماییەکانمان بکەوە",
     "or": "یان",
@@ -334,8 +335,8 @@
     "zoomToFit": "زووم بکە بۆ ئەوەی لەگەڵ هەموو توخمەکاندا بگونجێت",
     "zoomToSelection": "زووم بکە بۆ دەستنیشانکراوەکان",
     "toggleElementLock": "قفڵ/کردنەوەی دەستنیشانکراوەکان",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "لاپەڕەکە بجوڵێنە بۆ سەرەوە/خوارەوە",
+    "movePageLeftRight": "لاپەڕەکە بجوڵێنە بۆ چەپ/ڕاست"
   },
   "clearCanvasDialog": {
     "title": "تابلۆکە خاوێن بکەرەوە"
@@ -417,7 +418,7 @@
     "fileSavedToFilename": "هەڵگیراوە بۆ {filename}",
     "canvas": "تابلۆ",
     "selection": "دەستنیشانکراوەکان",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "بۆ دانانەوە وەکو یەک توخم یان دانانەوە بۆ نێو دەسکاریکەرێکی دەق کە بوونی هەیە {{shortcut}} بەکاربهێنە"
   },
   "colors": {
     "ffffff": "سپی",
@@ -468,15 +469,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "هەموو داتاکانت لە ناوخۆی وێنگەڕەکەتدا پاشەکەوت کراوە.",
+      "center_heading_plus": "ویستت بڕۆیت بۆ Excalidraw+?",
+      "menuHint": "هەناردەکردن، ڕێکخستنەکان، زمانەکان، ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "هەناردەکردن، ڕێکخستنەکان، و زیاتر...",
+      "center_heading": "دایاگرامەکان. ئاسان. کراون.",
+      "toolbarHint": "ئامرازێک هەڵبگرە و دەستبکە بە کێشان!",
+      "helpHint": "قەدبڕەکان و یارمەتی"
     }
   }
 }

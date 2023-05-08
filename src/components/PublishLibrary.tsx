@@ -4,7 +4,7 @@ import OpenColor from "open-color";
 import { Dialog } from "./Dialog";
 import { t } from "../i18n";
 
-import { AppState, LibraryItems, LibraryItem } from "../types";
+import { LibraryItems, LibraryItem, UIAppState } from "../types";
 import { exportToCanvas, exportToSvg } from "../packages/utils";
 import {
   EXPORT_DATA_TYPES,
@@ -135,7 +135,7 @@ const SingleLibraryItem = ({
   onRemove,
 }: {
   libItem: LibraryItem;
-  appState: AppState;
+  appState: UIAppState;
   index: number;
   onChange: (val: string, index: number) => void;
   onRemove: (id: string) => void;
@@ -231,7 +231,7 @@ const PublishLibrary = ({
 }: {
   onClose: () => void;
   libraryItems: LibraryItems;
-  appState: AppState;
+  appState: UIAppState;
   onSuccess: (data: {
     url: string;
     authorName: string;
