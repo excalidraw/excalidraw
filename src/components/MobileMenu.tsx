@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState, Device, ExcalidrawProps } from "../types";
+import { AppState, Device, ExcalidrawProps, UIAppState } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -21,7 +21,7 @@ import { isHandToolActive } from "../appState";
 import { useTunnels } from "../context/tunnels";
 
 type MobileMenuProps = {
-  appState: AppState;
+  appState: UIAppState;
   actionManager: ActionManager;
   renderJSONExportDialog: () => React.ReactNode;
   renderImageExportDialog: () => React.ReactNode;
@@ -35,7 +35,7 @@ type MobileMenuProps = {
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
-    appState: AppState,
+    appState: UIAppState,
   ) => JSX.Element | null;
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderSidebars: () => JSX.Element | null;
@@ -193,9 +193,9 @@ export const MobileMenu = ({
                 <button
                   className="scroll-back-to-content"
                   onClick={() => {
-                    setAppState({
+                    setAppState((appState) => ({
                       ...calculateScrollCenter(elements, appState, canvas),
-                    });
+                    }));
                   }}
                 >
                   {t("buttons.scrollBackToContent")}

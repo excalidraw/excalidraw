@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
 import { t } from "../i18n";
 import { jotaiScope } from "../jotai";
-import { AppState, LibraryItem, LibraryItems } from "../types";
-import { useApp, useExcalidrawAppState, useExcalidrawSetAppState } from "./App";
+import { LibraryItem, LibraryItems, UIAppState } from "../types";
+import { useApp, useExcalidrawSetAppState } from "./App";
 import { saveLibraryAsJSON } from "../data/json";
 import Library, { libraryItemsAtom } from "../data/library";
 import {
@@ -21,6 +21,7 @@ import PublishLibrary from "./PublishLibrary";
 import { Dialog } from "./Dialog";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+import { useUIAppState } from "../context/ui-appState";
 
 const getSelectedItems = (
   libraryItems: LibraryItems,
@@ -28,13 +29,13 @@ const getSelectedItems = (
 ) => libraryItems.filter((item) => selectedItems.includes(item.id));
 
 export const LibraryDropdownMenuButton: React.FC<{
-  setAppState: React.Component<any, AppState>["setState"];
+  setAppState: React.Component<any, UIAppState>["setState"];
   selectedItems: LibraryItem["id"][];
   library: Library;
   onRemoveFromLibrary: () => void;
   resetLibrary: () => void;
   onSelectItems: (items: LibraryItem["id"][]) => void;
-  appState: AppState;
+  appState: UIAppState;
 }> = ({
   setAppState,
   selectedItems,
@@ -270,7 +271,7 @@ export const LibraryDropdownMenu = ({
   onSelectItems: (id: LibraryItem["id"][]) => void;
 }) => {
   const { library } = useApp();
-  const appState = useExcalidrawAppState();
+  const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
 
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);

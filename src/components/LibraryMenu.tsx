@@ -5,7 +5,12 @@ import Library, {
 } from "../data/library";
 import { t } from "../i18n";
 import { randomId } from "../random";
-import { LibraryItems, LibraryItem, AppState, ExcalidrawProps } from "../types";
+import {
+  LibraryItems,
+  LibraryItem,
+  ExcalidrawProps,
+  UIAppState,
+} from "../types";
 import LibraryMenuItems from "./LibraryMenuItems";
 import { trackEvent } from "../analytics";
 import { atom, useAtom } from "jotai";
@@ -44,11 +49,11 @@ export const LibraryMenuContent = ({
   pendingElements: LibraryItem["elements"];
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: () => void;
-  setAppState: React.Component<any, AppState>["setState"];
+  setAppState: React.Component<any, UIAppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   library: Library;
   id: string;
-  appState: AppState;
+  appState: UIAppState;
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
 }) => {

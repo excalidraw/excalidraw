@@ -2,16 +2,21 @@ import React, { useState } from "react";
 import { serializeLibraryAsJSON } from "../data/json";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
-import { AppState, ExcalidrawProps, LibraryItem, LibraryItems } from "../types";
+import {
+  ExcalidrawProps,
+  LibraryItem,
+  LibraryItems,
+  UIAppState,
+} from "../types";
 import { arrayToMap, chunk } from "../utils";
 import { LibraryUnit } from "./LibraryUnit";
 import Stack from "./Stack";
-
-import "./LibraryMenuItems.scss";
 import { MIME_TYPES } from "../constants";
 import Spinner from "./Spinner";
 import { duplicateElements } from "../element/newElement";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
+
+import "./LibraryMenuItems.scss";
 
 const CELLS_PER_ROW = 4;
 
@@ -35,7 +40,7 @@ const LibraryMenuItems = ({
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
-  theme: AppState["theme"];
+  theme: UIAppState["theme"];
   id: string;
 }) => {
   const [lastSelectedItem, setLastSelectedItem] = useState<
