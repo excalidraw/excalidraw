@@ -78,9 +78,7 @@ export class TopErrorBoundary extends React.Component<
             <Trans
               i18nKey="errorSplash.headingMain"
               button={(el) => (
-                <button onClick={() => window.location.reload()}>
-                  {el}
-                </button>
+                <button onClick={() => window.location.reload()}>{el}</button>
               )}
             />
           </div>
@@ -115,15 +113,15 @@ export class TopErrorBoundary extends React.Component<
           </div>
           <div>
             <div className="ErrorSplash-paragraph">
-              {t("errorSplash.trackedToSentry", { eventId: this.state.sentryEventId })}
+              {t("errorSplash.trackedToSentry", {
+                eventId: this.state.sentryEventId,
+              })}
             </div>
             <div className="ErrorSplash-paragraph">
               <Trans
                 i18nKey="errorSplash.openIssueMessage"
                 button={(el) => (
-                  <button onClick={() => this.createGithubIssue()}>
-                    {el}
-                  </button>
+                  <button onClick={() => this.createGithubIssue()}>{el}</button>
                 )}
               />
             </div>
