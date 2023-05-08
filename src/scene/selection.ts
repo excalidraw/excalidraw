@@ -5,7 +5,6 @@ import {
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
-import { isVisibleElement } from "../renderer/renderScene";
 
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],

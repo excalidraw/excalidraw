@@ -3,7 +3,7 @@ import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { NonDeletedExcalidrawElement } from "./types";
-import { AppState, PointerDownState, Zoom } from "../types";
+import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
 import { Snaps, snapProject } from "../snapping";
