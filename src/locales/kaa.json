@@ -396,7 +396,7 @@
     "title": "",
     "total": "",
     "version": "Versiya",
-    "versionCopy": "",
+    "versionCopy": "Kóshirip alıw ushın basıń",
     "versionNotAvailable": "",
     "width": ""
   },
@@ -406,7 +406,7 @@
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
     "fileSaved": "Fayl saqlandı.",
-    "fileSavedToFilename": "",
+    "fileSavedToFilename": "{filename} saqlandı",
     "canvas": "",
     "selection": "",
     "pasteAsSingleElement": ""
@@ -446,7 +446,7 @@
     "343a40": "",
     "495057": "",
     "c92a2a": "Qızıl 9",
-    "a61e4d": "",
+    "a61e4d": "Qızǵılt 9",
     "862e9c": "",
     "5f3dc4": "",
     "364fc7": "",
