@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "পেস্ট করুন",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "প্লেইনটেক্সট হিসাবে পেস্ট করুন",
     "pasteCharts": "চার্ট পেস্ট করুন",
     "selectAll": "সবটা সিলেক্ট করুন",
     "multiSelect": "একাধিক সিলেক্ট করুন",
@@ -54,7 +54,7 @@
     "veryLarge": "অনেক বড়",
     "solid": "দৃঢ়",
     "hachure": "ভ্রুলেখা",
-    "zigzag": "",
+    "zigzag": "আঁকাবাঁকা",
     "crossHatch": "ক্রস হ্যাচ",
     "thin": "পাতলা",
     "bold": "পুরু",
@@ -73,7 +73,7 @@
     "layers": "মাত্রা",
     "actions": "ক্রিয়া",
     "language": "ভাষা",
-    "liveCollaboration": "",
+    "liveCollaboration": "সরাসরি পারস্পরিক সহযোগিতা...",
     "duplicateSelection": "সদৃশ সিলেক্ট",
     "untitled": "অনামী",
     "name": "নাম",
@@ -208,19 +208,10 @@
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {

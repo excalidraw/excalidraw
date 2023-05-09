@@ -54,7 +54,7 @@
     "veryLarge": "Veľmi veľké",
     "solid": "Plná",
     "hachure": "Šrafovaná",
-    "zigzag": "",
+    "zigzag": "Cik-cak",
     "crossHatch": "Mriežkovaná",
     "thin": "Tenká",
     "bold": "Hrubá",
@@ -208,19 +208,10 @@
     "collabSaveFailed": "Uloženie do databázy sa nepodarilo. Ak tento problém pretrváva uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
     "collabSaveFailed_sizeExceeded": "Uloženie do databázy sa nepodarilo, pretože veľkosť plátna je príliš veľká. Uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
     "brave_measure_text_error": {
-      "start": "Vyzerá to, že používate prehliadač Brave s",
-      "aggressive_block_fingerprint": "agresívnym blokovaním sledovania",
-      "setting_enabled": "zapnutým",
-      "break": "Toto môže znemožniť používanie",
-      "text_elements": "textových prvkov",
-      "in_your_drawings": "vo vašich kresbách",
-      "strongly_recommend": "Odporúčame vypnutie tohto nastavenia. Postupuje podľa",
-      "steps": "týchto krokov",
-      "how": "pre jeho vypnutie",
-      "disable_setting": " Ak sa vypnutím tohto nastavenia problém zobrazenia textových prvkov neodstráni, prosím vytvorte",
-      "issue": "issue",
-      "write": "na našom Github-e alebo nám to oznámte na",
-      "discord": "Discord"
+      "line1": "Vyzerá to, že používate prehliadač Brave so zapnutým nastavením pre <bold>agresívne blokovanie</bold>.",
+      "line2": "To môže spôsobiť nesprávne zobrazenie <bold>textových prvkov</bold> vo vašej kresbe.",
+      "line3": "Dôrazne odporúčame vypnutie toho nastavenia. Môžete tak spraviť vykonaním <link>týchto krokov</link>.",
+      "line4": "Ak vypnutie toho nastavenia nevyrieši problém so zobrazením textových prvkov, prosím ohláste <issueLink>problém</issueLink> na našom GitHub-e alebo nám napíšte na náš <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {

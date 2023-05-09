@@ -208,19 +208,10 @@
     "collabSaveFailed": "데이터베이스에 저장하지 못했습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
     "collabSaveFailed_sizeExceeded": "데이터베이스에 저장하지 못했습니다. 캔버스가 너무 큰 거 같습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
     "brave_measure_text_error": {
-      "start": "귀하께서는",
-      "aggressive_block_fingerprint": "강력한 지문 차단",
-      "setting_enabled": "설정이 활성화된 Brave browser를 사용하고 계신 것 같습니다",
-      "break": "이 기능으로 인해 화이트보드의",
-      "text_elements": "텍스트 요소들이",
-      "in_your_drawings": "손상될 수 있습니다",
-      "strongly_recommend": "해당 기능을 설정에서 비활성화하는 것을 강력히 권장 드립니다. 비활성화 방법에 대해서는",
-      "steps": "이 게시글을",
-      "how": "참고해주세요.",
-      "disable_setting": " 만약 이 설정을 껐음에도 텍스트 요소들이 올바르게 표시되지 않는다면, 저희",
-      "issue": "Github에 이슈를",
-      "write": "올려주시거나",
-      "discord": "Discord에 제보해주세요"
+      "line1": "귀하께서는 <bold>강력한 지문 차단 설정</bold>이 활성화된 Brave browser를 사용하고 계신 것 같습니다.",
+      "line2": "이 기능으로 인해 화이트보드의 <bold>텍스트 요소들</bold>이 손상될 수 있습니다.",
+      "line3": "저희는 해당 기능을 비활성화하는 것을 강력히 권장 드립니다. 비활성화 방법에 대해서는 <link>이 게시글</link>을 참고해주세요.",
+      "line4": "만약 이 설정을 껐음에도 텍스트 요소들이 올바르게 표시되지 않는다면, 저희 Github에 <issueLink>이슈</issueLink>를 올려주시거나 <discordLink>Discord</discordLink>로 알려주세요."
     }
   },
   "toolBar": {

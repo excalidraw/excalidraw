@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "جای گذاری",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "جای‌گذاری به عنوان متن ساده",
     "pasteCharts": "قراردادن نمودارها",
     "selectAll": "انتخاب همه",
     "multiSelect": "یک ایتم به انتخاب شده ها اضافه کنید.",
@@ -54,7 +54,7 @@
     "veryLarge": "بسیار بزرگ",
     "solid": "توپر",
     "hachure": "هاشور",
-    "zigzag": "",
+    "zigzag": "زیگزاگ",
     "crossHatch": "هاشور متقاطع",
     "thin": "نازک",
     "bold": "ضخیم",
@@ -111,7 +111,7 @@
     "increaseFontSize": "افزایش دادن اندازه فونت",
     "unbindText": "بازکردن نوشته",
     "bindText": "بستن نوشته",
-    "createContainerFromText": "",
+    "createContainerFromText": "متن را در یک جایگاه بپیچید",
     "link": {
       "edit": "ویرایش لینک",
       "create": "ایجاد پیوند",
@@ -195,7 +195,7 @@
     "resetLibrary": "ین کار کل صفحه را پاک میکند. آیا مطمئنید?",
     "removeItemsFromsLibrary": "حذف {{count}} آیتم(ها) از کتابخانه?",
     "invalidEncryptionKey": "کلید رمزگذاری باید 22 کاراکتر باشد. همکاری زنده غیرفعال است.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "اتصال به اینترنت در دسترس نیست.\nتغییرات شما ذخیره نمی شود!"
   },
   "errors": {
     "unsupportedFileType": "نوع فایل پشتیبانی نشده.",
@@ -205,22 +205,13 @@
     "invalidSVGString": "SVG نادرست.",
     "cannotResolveCollabServer": "به سرور collab متصل نشد. لطفا صفحه را مجددا بارگذاری کنید و دوباره تلاش کنید.",
     "importLibraryError": "داده‌ها بارگذاری نشدند",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": "",
+    "collabSaveFailed": "در پایگاه داده باطن ذخیره نشد. اگر مشکلات همچنان ادامه داشت، باید فایل خود را به صورت محلی ذخیره کنید تا مطمئن شوید کار خود را از دست نمی دهید.",
+    "collabSaveFailed_sizeExceeded": "در پایگاه داده بکند ذخیره نشد. اگر مشکلات همچنان ادامه داشت، باید فایل خود را به صورت محلی ذخیره کنید تا مطمئن شوید کار خود را از دست نمی دهید.",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "به نظر می‌رسد از مرورگر Brave با تنظیم <bold> مسدود کردن شدید اثرانگشت</bold> استفاده می‌کنید.",
+      "line2": "این می تواند منجر به شکستن <bold>عناصر متن</bold> در نقاشی های شما شود.",
+      "line3": "اکیداً توصیه می کنیم این تنظیم را غیرفعال کنید. برای نحوه انجام این کار می‌توانید <link>این مراحل</link> را دنبال کنید.",
+      "line4": "اگر غیرفعال کردن این تنظیم نمایش عناصر متنی را برطرف نکرد، لطفاً یک <issueLink>مشکل</issueLink> را در GitHub ما باز کنید یا برای ما در <discordLink>Discord</discordLink> بنویسید."
     }
   },
   "toolBar": {
@@ -238,7 +229,7 @@
     "penMode": "حالت قلم - جلوگیری از تماس",
     "link": "افزودن/به‌روزرسانی پیوند برای شکل انتخابی",
     "eraser": "پاک کن",
-    "hand": ""
+    "hand": "دست (ابزار پانینگ)"
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",
@@ -246,7 +237,7 @@
     "shapes": "شکل‌ها"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "برای حرکت دادن بوم، چرخ ماوس یا فاصله را در حین کشیدن نگه دارید یا از ابزار دستی استفاده کنید",
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
@@ -257,7 +248,7 @@
     "resize": "می توانید با نگه داشتن SHIFT در هنگام تغییر اندازه، نسبت ها را محدود کنید،ALT را برای تغییر اندازه از مرکز نگه دارید",
     "resizeImage": "با نگه داشتن SHIFT می توانید آزادانه اندازه را تغییر دهید،\nبرای تغییر اندازه از مرکز، ALT را نگه دارید",
     "rotate": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
-    "lineEditor_info": "",
+    "lineEditor_info": "CtrlOrCmd را نگه دارید و دوبار کلیک کنید یا CtrlOrCmd + Enter را فشار دهید تا نقاط را ویرایش کنید.",
     "lineEditor_pointSelected": "برای حذف نقطه Delete برای کپی زدن Ctrl یا Cmd+D را بزنید و یا برای جابجایی بکشید",
     "lineEditor_nothingSelected": "یک نقطه را برای ویرایش انتخاب کنید (SHIFT را برای انتخاب چندگانه نگه دارید)،\nیا Alt را نگه دارید و برای افزودن نقاط جدید کلیک کنید",
     "placeImage": "برای قرار دادن تصویر کلیک کنید، یا کلیک کنید و بکشید تا اندازه آن به صورت دستی تنظیم شود",
@@ -265,7 +256,7 @@
     "bindTextToElement": "برای افزودن اینتر را بزنید",
     "deepBoxSelect": "CtrlOrCmd را برای انتخاب عمیق و جلوگیری از کشیدن نگه دارید",
     "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "احتمالاً می‌توان این ویژگی را با تنظیم پرچم «dom.events.asyncClipboard.clipboardItem» روی «true» فعال کرد. برای تغییر پرچم های مرورگر در فایرفاکس، از صفحه \"about:config\" دیدن کنید."
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -320,8 +311,8 @@
     "doubleClick": "دابل کلیک",
     "drag": "کشیدن",
     "editor": "ویرایشگر",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "نقاط خط/پیکان را ویرایش کنید",
+    "editText": "ویرایش متن / افزودن برچسب",
     "github": "اشکالی می بینید؟ گزارش دهید",
     "howto": "راهنمای ما را دنبال کنید",
     "or": "یا",
@@ -335,8 +326,8 @@
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
     "zoomToSelection": "بزرگنمایی قسمت انتخاب شده",
     "toggleElementLock": "قفل/بازکردن انتخاب شده ها",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "حرکت صفحه به بالا/پایین",
+    "movePageLeftRight": "حرکت صفحه به چپ/راست"
   },
   "clearCanvasDialog": {
     "title": "پاک کردن بوم"
@@ -418,7 +409,7 @@
     "fileSavedToFilename": "ذخیره در {filename}",
     "canvas": "بوم",
     "selection": "انتخاب",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "از {{shortcut}} برای چسباندن به عنوان یک عنصر استفاده کنید،\nیا در یک ویرایشگر متن موجود جایگذاری کنید"
   },
   "colors": {
     "ffffff": "سفید",
@@ -469,15 +460,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "تمام داده های شما به صورت محلی در مرورگر شما ذخیره می شود.",
+      "center_heading_plus": "آیا می‌خواهید به جای آن به Excalidraw+ بروید؟",
+      "menuHint": "خروجی، ترجیحات، زبان ها، ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "خروجی، ترجیحات، وبیشتر ...",
+      "center_heading": "نمودارها .ساخته شده. ساده.",
+      "toolbarHint": "ابزاری را انتخاب کنید و نقاشی را شروع کنید!",
+      "helpHint": "میانبرها و راهنما"
     }
   }
 }

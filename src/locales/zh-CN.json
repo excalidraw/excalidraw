@@ -54,7 +54,7 @@
     "veryLarge": "加大",
     "solid": "实心",
     "hachure": "线条",
-    "zigzag": "",
+    "zigzag": "之字形折线",
     "crossHatch": "交叉线条",
     "thin": "细",
     "bold": "粗",
@@ -208,19 +208,10 @@
     "collabSaveFailed": "无法保存到后端数据库。如果问题持续存在，您应该保存文件到本地，以确保您的工作不会丢失。",
     "collabSaveFailed_sizeExceeded": "无法保存到后端数据库，画布似乎过大。您应该保存文件到本地，以确保您的工作不会丢失。",
     "brave_measure_text_error": {
-      "start": "看起来您正在使用 Brave 浏览器并启用了",
-      "aggressive_block_fingerprint": "积极阻止指纹识别",
-      "setting_enabled": "设置",
-      "break": "这可能会破坏绘图中的",
-      "text_elements": "文本元素",
-      "in_your_drawings": " ",
-      "strongly_recommend": "我们强烈建议禁用此设置。您可以按照",
-      "steps": "这些步骤",
-      "how": "来设置",
-      "disable_setting": " 如果禁用此设置无法修复文本元素的显示，请在 GitHub 提交一个",
-      "issue": "issue",
-      "write": "，或者通过",
-      "discord": "Discord 反馈"
+      "line1": "您似乎正在使用 Brave 浏览器并启用了<bold>积极阻止指纹识别</bold>的设置。",
+      "line2": "这可能会破坏绘图中的 <bold>文本元素</bold>。",
+      "line3": "我们强烈建议禁用此设置。您可以按照 <link>这些步骤</link> 来设置。",
+      "line4": "如果禁用此设置无法修复文本元素的显示，请在 GitHub 上提交一个 <issueLink>issue</issueLink> ，或者在 <discordLink>Discord</discordLink> 上反馈"
     }
   },
   "toolBar": {

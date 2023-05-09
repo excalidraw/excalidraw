@@ -208,19 +208,10 @@
     "collabSaveFailed": "Ulamek asekles deg uzadur n yisefka deg ugilal. Ma ikemmel wugur, isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
     "collabSaveFailed_sizeExceeded": "Ulamek asekles deg uzadur n yisefka deg ugilal, taɣzut n usuneɣ tettban-d temqer aṭas. Isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
     "brave_measure_text_error": {
-      "start": "Ittban-d am wakken tsseqdaceḍ iminig Brave akked",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "yermed",
-      "break": "Ayagi yezmer ad d-iseglu s truẓi n",
-      "text_elements": "Iferdisen iḍrisen",
-      "in_your_drawings": "deg wunuɣen-inek",
-      "strongly_recommend": "",
-      "steps": "isurifen-agi",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "di GitHub inek neɣ aru-yaɣ-d di",
-      "discord": ""
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
