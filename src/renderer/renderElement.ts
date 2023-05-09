@@ -34,7 +34,6 @@ import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
-  FONT_FAMILY,
   FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
