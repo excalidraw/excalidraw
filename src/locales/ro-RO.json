@@ -208,19 +208,10 @@
     "collabSaveFailed": "Nu s-a putut salva în baza de date la nivel de server. Dacă problemele persistă, ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
     "collabSaveFailed_sizeExceeded": "Nu s-a putut salva în baza de date la nivel de server, întrucât se pare că pânza este prea mare. Ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
     "brave_measure_text_error": {
-      "start": "Se pare că folosești navigatorul Brave cu",
-      "aggressive_block_fingerprint": "setarea „Blocați amprentarea” în modul strict",
-      "setting_enabled": "activată",
-      "break": "Acest lucru ar putea duce la întreruperea",
-      "text_elements": "elementelor de text",
-      "in_your_drawings": "din desenele tale",
-      "strongly_recommend": "Recomandăm insistent dezactivarea acestei setări. Poți urma",
-      "steps": "acești pași",
-      "how": "pentru efectuarea procedurii",
-      "disable_setting": " Dacă dezactivarea acestei setări nu remediază afișarea elementelor de text, deschide",
-      "issue": "un tichet cu probleme",
-      "write": "pe pagina noastră de GitHub sau scrie-ne pe",
-      "discord": "Discord"
+      "line1": "Se pare că folosești navigatorul Brave cu opțiunea <bold>strictă pentru blocarea amprentării</bold>.",
+      "line2": "Acest lucru poate duce la întreruperea <bold>elementelor text</bold> din desene.",
+      "line3": "Îți recomandăm ferm să dezactivezi această setare. Poți urma <link>acești pași</link> pentru a face acest lucru.",
+      "line4": "Dacă dezactivarea acestei setări nu duce la remedierea afișării elementelor text, deschide un tichet de <issueLink>problemă</issueLink> pe pagina noastră de GitHub sau scrie-ne pe <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {

@@ -208,19 +208,10 @@
     "collabSaveFailed": "Non se puido gardar na base de datos. Se o problema persiste, deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
     "collabSaveFailed_sizeExceeded": "Non se puido gardar na base de datos, o lenzo semella demasiado grande. Deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
     "brave_measure_text_error": {
-      "start": "Semella que estás usando o navegador Brave coa opción",
-      "aggressive_block_fingerprint": "Aggressively Block Fingerprinting",
-      "setting_enabled": "activada",
-      "break": "Isto podería provocar unha ruptura dos",
-      "text_elements": "Elementos de Texto",
-      "in_your_drawings": "nos seus debuxos",
-      "strongly_recommend": "Recomendámoslle encarecidamente que desactive esa opción. Pode seguir",
-      "steps": "estes pasos",
-      "how": "sobre como facelo",
-      "disable_setting": " Se ao desactivar esta opción non se arranxa o problema ao mostrar os elementos de texto, por favor abra unha",
-      "issue": "issue",
-      "write": "no noso GitHub, ou escríbenos ao",
-      "discord": "Discord"
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
