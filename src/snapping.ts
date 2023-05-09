@@ -54,7 +54,10 @@ const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
     snapLine(borderPoints.nw, borderPoints.ne),
     // bottom
     snapLine(borderPoints.sw, borderPoints.se),
-    // TODO: handle center axes
+    // center vertical
+    snapLine(borderPoints.n, borderPoints.s),
+    // center horizontal
+    snapLine(borderPoints.w, borderPoints.e),
   ].filter((snapLine): snapLine is SnapLine => snapLine !== null);
 };
 
