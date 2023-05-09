@@ -208,19 +208,10 @@
     "collabSaveFailed": "Não foi possível guardar na base de dados de backend. Se os problemas persistirem, guarde o ficheiro localmente para garantir que não perde o seu trabalho.",
     "collabSaveFailed_sizeExceeded": "Não foi possível guardar na base de dados de backend, o ecrã parece estar muito grande. Deve guardar o ficheiro localmente para garantir que não perde o seu trabalho.",
     "brave_measure_text_error": {
-      "start": "Parece que está a usar o navegador Brave com o",
-      "aggressive_block_fingerprint": "Bloqueio Agressivo via Impressão Digital",
-      "setting_enabled": "activo",
-      "break": "Isso pode desconfigurar os",
-      "text_elements": "Elementos de Texto",
-      "in_your_drawings": "nos seus desenhos",
-      "strongly_recommend": "Recomendamos fortemente a desactivação desta configuração. Pode seguir",
-      "steps": "os seguintes passos",
-      "how": "para saber como o fazer",
-      "disable_setting": " Se desactivar esta configuração não consertar a exibição de elementos de texto, por favor, abra um",
-      "issue": "problema",
-      "write": "no nosso GitHub ou então escreva-nos no",
-      "discord": "Discord"
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {

@@ -208,19 +208,10 @@
     "collabSaveFailed": "Ezin izan da backend datu-basean gorde. Arazoak jarraitzen badu, zure fitxategia lokalean gorde beharko zenuke zure lana ez duzula galtzen ziurtatzeko.",
     "collabSaveFailed_sizeExceeded": "Ezin izan da backend datu-basean gorde, ohiala handiegia dela dirudi. Fitxategia lokalean gorde beharko zenuke zure lana galtzen ez duzula ziurtatzeko.",
     "brave_measure_text_error": {
-      "start": "Brave nabigatzailea erabiltzen ari zarela dirudi",
-      "aggressive_block_fingerprint": "Aggressively Block Fingerprinting",
-      "setting_enabled": "ezarpena gaituta",
-      "break": "Honek honen haustea eragin dezake",
-      "text_elements": "Testu-elementuak",
-      "in_your_drawings": "zure marrazkietan",
-      "strongly_recommend": "Ezarpen hau desgaitzea gomendatzen dugu. Jarrai dezakezu",
-      "steps": "urrats hauek",
-      "how": "jakiteko nola egin",
-      "disable_setting": " Ezarpen hau desgaitzeak testu-elementuen bistaratzea konpontzen ez badu, ireki",
-      "issue": "eskaera (issue) bat",
-      "write": "gure Github-en edo idatz iezaguzu",
-      "discord": "Discord-en"
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {

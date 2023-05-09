@@ -208,19 +208,10 @@
     "collabSaveFailed": "Keine Speicherung in der Backend-Datenbank möglich. Wenn die Probleme weiterhin bestehen, solltest Du Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
     "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
     "brave_measure_text_error": {
-      "start": "Sieht so aus, als ob du den Brave Browser benutzt mit der",
-      "aggressive_block_fingerprint": "\"Fingerprinting aggressiv blockieren\"",
-      "setting_enabled": "Einstellung aktiviert",
-      "break": "Dies könnte zur inkorrekten Darstellung der",
-      "text_elements": "Textelemente",
-      "in_your_drawings": "in deinen Zeichnungen führen",
-      "strongly_recommend": "Wir empfehlen dringend, diese Einstellung zu deaktivieren. Du kannst",
-      "steps": "diesen Schritten entsprechend",
-      "how": "folgen",
-      "disable_setting": " Wenn die Deaktivierung dieser Einstellung nicht zu einer korrekten Textdarstellung führt, öffne bitte einen",
-      "issue": "Issue",
-      "write": "auf GitHub, oder schreibe uns auf",
-      "discord": "Discord"
+      "line1": "Sieht so aus, als ob Du den Brave-Browser verwendest und die <bold>aggressive Blockierung von Fingerabdrücken</bold> aktiviert hast.",
+      "line2": "Dies könnte dazu führen, dass die <bold>Textelemente</bold> in Ihren Zeichnungen zerstört werden.",
+      "line3": "Wir empfehlen dringend, diese Einstellung zu deaktivieren. Dazu kannst Du <link>diesen Schritten</link> folgen.",
+      "line4": "Wenn die Deaktivierung dieser Einstellung die fehlerhafte Anzeige von Textelementen nicht behebt, öffne bitte ein <issueLink>Ticket</issueLink> auf unserem GitHub oder schreibe uns auf <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {

@@ -208,19 +208,10 @@
     "collabSaveFailed": "Impossibile salvare nel database di backend. Se i problemi persistono, dovresti salvare il tuo file localmente per assicurarti di non perdere il tuo lavoro.",
     "collabSaveFailed_sizeExceeded": "Impossibile salvare nel database di backend, la tela sembra essere troppo grande. Dovresti salvare il file localmente per assicurarti di non perdere il tuo lavoro.",
     "brave_measure_text_error": {
-      "start": "Sembra che tu stia usando il browser Brave con il",
-      "aggressive_block_fingerprint": "Blocco Aggressivamente Impronte Digitali",
-      "setting_enabled": "impostazioni abilitate",
-      "break": "Questo potrebbe portare a rompere gli",
-      "text_elements": "Elementi Di Testo",
-      "in_your_drawings": "nei tuoi disegni",
-      "strongly_recommend": "Si consiglia vivamente di disabilitare questa impostazione. È possibile seguire",
-      "steps": "questi passaggi",
-      "how": "su come fare",
-      "disable_setting": " Se la disabilitazione di questa impostazione non corregge la visualizzazione degli elementi di testo, apri un",
-      "issue": "problema",
-      "write": "sul nostro GitHub, o scrivici su",
-      "discord": "Discord"
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
