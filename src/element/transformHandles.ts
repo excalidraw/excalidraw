@@ -10,7 +10,10 @@ import { AppState, Zoom } from "../types";
 import { isTextElement } from ".";
 import { isLinearElement } from "./typeChecks";
 import { DEFAULT_SPACING } from "../renderer/renderScene";
-import { Snaps, isPointSnapped } from "../snapping";
+import {
+  Snaps,
+  // isPointSnapped
+} from "../snapping";
 
 export type TransformHandleDirection =
   | "n"

@@ -92,7 +92,7 @@ export const getSnaps = ({
 
   // get snaps that are within the "shouldSnap" distance
   const snaps = getMaximumGroups(
-    getVisibleAndNonSelectedElements(elements, selectedElements),
+    getVisibleAndNonSelectedElements(elements, selectedElements, appState),
   )
     .filter(
       (elementsGroup) => !elementsGroup.every((element) => element.locked),

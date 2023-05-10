@@ -1,3 +1,4 @@
+import { getElementBounds } from "../../element";
 import { ExcalidrawElement } from "../../element/types";
 
 const elementBase: Omit<ExcalidrawElement, "type"> = {
@@ -21,6 +22,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   versionNonce: 1188004276,
   isDeleted: false,
   boundElements: null,
+  bounds: null,
   updated: 1,
   link: null,
   locked: false,

@@ -481,7 +481,12 @@ const getLinearElementRotatedBounds = (
 // We could cache this stuff
 export const getElementBounds = (
   element: ExcalidrawElement,
+  recompuate = false,
 ): [number, number, number, number] => {
+  if (element.bounds && !recompuate) {
+    return element.bounds;
+  }
+
   let bounds: [number, number, number, number];
 
   const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);

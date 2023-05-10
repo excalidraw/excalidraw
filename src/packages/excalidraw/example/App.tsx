@@ -206,6 +206,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             seed: 1968410350,
             groupIds: [],
             boundElements: null,
+            bounds: null,
             locked: false,
             link: null,
             updated: 1,

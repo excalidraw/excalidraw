@@ -5,6 +5,7 @@ import {
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
+import { isVisibleElement } from "../renderer/renderScene";
 
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -75,9 +76,20 @@ export const getSelectedElements = (
 export const getVisibleAndNonSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
 ) => {
   const selectedElementsSet = new Set(selectedElements);
-  return elements.filter((element) => !selectedElementsSet.has(element));
+  return elements.filter(
+    (element) =>
+      !selectedElementsSet.has(element) &&
+      isVisibleElement(element, appState.width, appState.height, {
+        zoom: appState.zoom,
+        offsetLeft: appState.offsetLeft,
+        offsetTop: appState.offsetTop,
+        scrollX: appState.scrollX,
+        scrollY: appState.scrollY,
+      }),
+  );
 };
 
 export const getTargetElements = (

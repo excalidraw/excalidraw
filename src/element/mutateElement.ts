@@ -6,6 +6,7 @@ import { randomInteger } from "../random";
 import { Point } from "../types";
 import { getUpdatedTimestamp } from "../utils";
 import { Mutable } from "../utility-types";
+import { getElementBounds } from ".";
 
 type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -95,6 +96,11 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element.version++;
   element.versionNonce = randomInteger();
   element.updated = getUpdatedTimestamp();
+
+  // UPDATE THE ELEMENT'S BOUNDS HERE
+  // TODO: improve implementation (only update bounds when related
+  //       properties are updated, e.g. x, y, width, height, ...)
+  element.bounds = getElementBounds(element, true);
 
   if (informMutation) {
     Scene.getScene(element)?.informMutation();

@@ -141,6 +141,7 @@ export class API {
       | "versionNonce"
       | "isDeleted"
       | "groupIds"
+      | "bounds"
       | "link"
       | "updated"
     > = {
