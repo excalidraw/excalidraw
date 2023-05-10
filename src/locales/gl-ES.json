@@ -264,11 +264,11 @@
     "canvasTooBigTip": "Consello: Probe a acercar un pouco os elementos máis afastados."
   },
   "errorSplash": {
-    "headingMain": "",
-    "clearCanvasMessage": "",
+    "headingMain": "Atopouse un erro. Probe <button>recargando a páxina.</button>",
+    "clearCanvasMessage": "Se recargar non funcionou, probe <button>limpando o lenzo.</button>",
     "clearCanvasCaveat": " Isto resultará nunha perda do seu traballo ",
-    "trackedToSentry": "",
-    "openIssueMessage": "",
+    "trackedToSentry": "O erro con identificador {{eventId}} foi rastrexado no noso sistema.",
+    "openIssueMessage": "Fomos moi cautelosos de non incluír a información da súa escena no erro. Se a súa escena non é privada, por favor, considere o seguimento do noso <button>rastrexador de erros.</button> Por favor inclúa a seguinte información copiándoa e pegándoa na issue de Github.",
     "sceneContent": "Contido da escena:"
   },
   "roomDialog": {
@@ -348,16 +348,16 @@
       "required": "Obrigatorio",
       "website": "Introduza unha URL válida"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
-    "noteLicense": "",
+    "noteDescription": "Envíe a súa biblioteca para que sexa incluída no <link>repositorio público de bibliotecas</link>para que outra xente a poida usar nos seus debuxos.",
+    "noteGuidelines": "A biblioteca necesita ser aprobada manualmente primeiro. Por favor, lea as <link>normas</link> antes de ser enviado. Necesitarás unha conta de GitHub para comunicarte ou facer cambios se se solicitan, pero non é estritamente necesario.",
+    "noteLicense": "Ao enviar, estás de acordo con que a biblioteca sexa publicada baixo a <link>Licenza MIT, </link>o cal significa que, en resumo, calquera pode usalo sen restricións.",
     "noteItems": "Cada elemento da biblioteca debe ter o seu nome propio para que se poida filtrar. Os seguintes elementos da biblioteca serán incluídos:",
     "atleastOneLibItem": "Por favor seleccione polo menos un elemento da biblioteca para comezar",
     "republishWarning": "Nota: algúns dos elementos seleccionados están marcados como xa publicados/enviados. Só deberías reenviar elementos cando se actualice unha biblioteca ou envío."
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",
-    "content": ""
+    "content": "Grazas {{authorName}}. A súa biblioteca foi enviada para ser revisada. Pode seguir o estado<link>aquí</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Restablecer biblioteca",
