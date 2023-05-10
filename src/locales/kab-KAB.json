@@ -264,16 +264,11 @@
     "canvasTooBigTip": "Tixidest: eɛreḍ ad tesqerbeḍ ciṭ iferdisen yembaɛaden."
   },
   "errorSplash": {
-    "headingMain_pre": "Teḍra-d tuccḍa. Eɛreḍ ",
-    "headingMain_button": "asali n usebter tikkelt-nniḍen.",
-    "clearCanvasMessage": "Ma yella tulsa n usali ur tefri ara ugur, eɛreḍ ",
-    "clearCanvasMessage_button": "asfaḍ n teɣzut n usuneɣ.",
+    "headingMain": "Teḍra-d tuccḍa. Eɛreḍ <button>asali n usebter tikkelt-nniḍen.</button>",
+    "clearCanvasMessage": "Ma yella tulsa n usali ur tefri ara ugur, eɛreḍ <button>asfaḍ n teɣzut n usuneɣ.</button>",
     "clearCanvasCaveat": " Ayagi ad d-iglu s usṛuḥu n umahil ",
-    "trackedToSentry_pre": "Tuccḍa akked umesmagi ",
-    "trackedToSentry_post": " tettwasekles deg unagraw-nneɣ.",
-    "openIssueMessage_pre": "Nḥuder aṭas akken ur nseddu ara talɣut n usayes-inek (m) di tuccḍa. Ma yella asayes-inek (m) mačči d amaẓlay, ttxil-k (m) xemmem ad ḍefreḍ ",
-    "openIssueMessage_button": "afecku n weḍfar n yibugen.",
-    "openIssueMessage_post": " Ma ulac uɣilif seddu talɣut ukessar-agi s wenɣal akked usenṭeḍ di GitHub issue.",
+    "trackedToSentry": "Tuccḍa akked umesmagi {{eventId}} tettwasekles deg unagraw-nneɣ.",
+    "openIssueMessage": "Nḥuder aṭas akken ur nseddu ara talɣut n usayes-inek (m) di tuccḍa. Ma yella asayes-inek (m) mačči d amaẓlay, ttxil-k (m) xemmem ad ḍefreḍ <button>afecku n weḍfar n yibugen.</button> Ma ulac uɣilif seddu talɣut ukessar-agi s wenɣal akked usenṭeḍ di GitHub issue.",
     "sceneContent": "Agbur n usayes:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "Yettwasra",
       "website": "Sekcem URL ameɣtu"
     },
-    "noteDescription": {
-      "pre": "Azen tamkarḍit-inek•inem akken ad teddu di ",
-      "link": "akaram azayez n temkarḍit",
-      "post": "i yimdanen-nniḍen ara isqedcen deg wunuɣen-nnsen."
-    },
-    "noteGuidelines": {
-      "pre": "Tamkarḍit teḥwaǧ ad tettwaqbel s ufus qbel. Ma ulac uɣilif ɣer ",
-      "link": "iwellihen",
-      "post": " send ad tazneḍ. Tesriḍ amiḍan n GitHub akken ad tmmeslayeḍ yerna ad tgeḍ ibeddilen ma yelaq, maca mačči d ayen yettwaḥetmen."
-    },
-    "noteLicense": {
-      "pre": "Mi tuzneḍ ad tqebleḍ akken tamkarḍit ad d-teffeɣ s ",
-      "link": "Turagt MIT, ",
-      "post": "ayen yebɣan ad d-yini belli yal yiwen izmer ad ten-iseqdec war tilist."
-    },
+    "noteDescription": "Azen tamkarḍit-inek•inem akken ad teddu di <link>akaram azayez n temkarḍit</link>i yimdanen-nniḍen ara isqedcen deg wunuɣen-nnsen.",
+    "noteGuidelines": "Tamkarḍit teḥwaǧ ad tettwaqbel s ufus qbel. Ma ulac uɣilif ɣer <link>iwellihen</link> send ad tazneḍ. Tesriḍ amiḍan n GitHub akken ad tmmeslayeḍ yerna ad tgeḍ ibeddilen ma yelaq, maca mačči d ayen yettwaḥetmen.",
+    "noteLicense": "Mi tuzneḍ ad tqebleḍ akken tamkarḍit ad d-teffeɣ s <link>Turagt MIT, </link>ayen yebɣan ad d-yini belli yal yiwen izmer ad ten-iseqdec war tilist.",
     "noteItems": "Yal aferdis n temkarḍit isefk ad isɛu isem-is i yiman-is akken ad yili wamek ara yettusizdeg. Iferdisen-agi n temkarḍit ad ddun:",
     "atleastOneLibItem": "Ma ulac uɣilif fern ma drus yiwen n uferdis n temkarḍit akken ad tebduḍ",
     "republishWarning": "Tamawt: kra n yiferdisen yettwafernen ttwacerḍen ffeɣen-d/ttwaznen. Isefk ad talseḍ tuzzna n yiferdisen anagar mi ara tleqqemeḍ tamkarḍit neɣ tuzzna yellan."
   },
   "publishSuccessDialog": {
     "title": "Tamkarḍit tettwazen",
-    "content": "Tanemmirt-ik•im {{authorName}}. Tamkarḍit-inek•inem tettwazen i weselken. Tzemreḍ ad tḍefreḍ aẓayer",
-    "link": "dagi"
+    "content": "Tanemmirt-ik•im {{authorName}}. Tamkarḍit-inek•inem tettwazen i weselken. Tzemreḍ ad tḍefreḍ aẓayer<link>dagi</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Ales awennez n temkarḍit",

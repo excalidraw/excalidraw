@@ -264,16 +264,11 @@
     "canvasTooBigTip": ""
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "กำลังรีโหลดหน้า",
-    "clearCanvasMessage": "ถ้าโหลดไม่ได้ ให้ลอง ",
-    "clearCanvasMessage_button": "เคลียร์ผืนผ้าใบ",
+    "headingMain": "<button>กำลังรีโหลดหน้า</button>",
+    "clearCanvasMessage": "ถ้าโหลดไม่ได้ ให้ลอง <button>เคลียร์ผืนผ้าใบ</button>",
     "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": ""
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "",
       "website": ""
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": ""
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",

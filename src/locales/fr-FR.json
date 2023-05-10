@@ -264,16 +264,11 @@
     "canvasTooBigTip": "Astuce : essayez de rapprocher un peu les éléments les plus éloignés."
   },
   "errorSplash": {
-    "headingMain_pre": "Une erreur est survenue. Essayez ",
-    "headingMain_button": "de recharger la page.",
-    "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
-    "clearCanvasMessage_button": "effacement du canevas.",
+    "headingMain": "Une erreur est survenue. Essayez <button>de recharger la page.</button>",
+    "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez <button>effacement du canevas.</button>",
     "clearCanvasCaveat": " Cela entraînera une perte du travail ",
-    "trackedToSentry_pre": "L'erreur avec l'identifiant ",
-    "trackedToSentry_post": " a été enregistrée dans notre système.",
-    "openIssueMessage_pre": "Nous avons fait très attention à ne pas inclure les informations de votre scène dans l'erreur. Si votre scène n'est pas privée, veuillez envisager de poursuivre sur notre ",
-    "openIssueMessage_button": "outil de suivi des bugs.",
-    "openIssueMessage_post": " Veuillez inclure les informations ci-dessous en les copiant-collant dans le ticket GitHub.",
+    "trackedToSentry": "L'erreur avec l'identifiant {{eventId}} a été enregistrée dans notre système.",
+    "openIssueMessage": "Nous avons fait très attention à ne pas inclure les informations de votre scène dans l'erreur. Si votre scène n'est pas privée, veuillez envisager de poursuivre sur notre <button>outil de suivi des bugs.</button> Veuillez inclure les informations ci-dessous en les copiant-collant dans le ticket GitHub.",
     "sceneContent": "Contenu de la scène :"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "Requis",
       "website": "Entrer une URL valide"
     },
-    "noteDescription": {
-      "pre": "Soumets ta bibliothèque pour l'inclure au ",
-      "link": "dépôt de bibliothèque publique",
-      "post": "pour permettre son utilisation par autrui dans leurs dessins."
-    },
-    "noteGuidelines": {
-      "pre": "La bibliothèque doit d'abord être approuvée manuellement. Veuillez lire les ",
-      "link": "lignes directrices",
-      "post": " avant de la soumettre. Vous aurez besoin d'un compte GitHub pour communiquer et apporter des modifications si demandé, mais ce n'est pas obligatoire."
-    },
-    "noteLicense": {
-      "pre": "En soumettant, vous acceptez que la bibliothèque soit publiée sous la ",
-      "link": "Licence MIT, ",
-      "post": "ce qui en gros signifie que tout le monde peut l'utiliser sans restrictions."
-    },
+    "noteDescription": "Soumets ta bibliothèque pour l'inclure au <link>dépôt de bibliothèque publique</link>pour permettre son utilisation par autrui dans leurs dessins.",
+    "noteGuidelines": "La bibliothèque doit d'abord être approuvée manuellement. Veuillez lire les <link>lignes directrices</link> avant de la soumettre. Vous aurez besoin d'un compte GitHub pour communiquer et apporter des modifications si demandé, mais ce n'est pas obligatoire.",
+    "noteLicense": "En soumettant, vous acceptez que la bibliothèque soit publiée sous la <link>Licence MIT, </link>ce qui en gros signifie que tout le monde peut l'utiliser sans restrictions.",
     "noteItems": "Chaque élément de la bibliothèque doit avoir son propre nom afin qu'il soit filtrable. Les éléments de bibliothèque suivants seront inclus :",
     "atleastOneLibItem": "Veuillez sélectionner au moins un élément de bibliothèque pour commencer",
     "republishWarning": "Remarque : certains des éléments sélectionnés sont marqués comme étant déjà publiés/soumis. Vous devez uniquement resoumettre des éléments lors de la mise à jour d'une bibliothèque ou d'une soumission existante."
   },
   "publishSuccessDialog": {
     "title": "Bibliothèque soumise",
-    "content": "Merci {{authorName}}. Votre bibliothèque a été soumise pour examen. Vous pouvez suivre le statut",
-    "link": "ici"
+    "content": "Merci {{authorName}}. Votre bibliothèque a été soumise pour examen. Vous pouvez suivre le statut<link>ici</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Réinitialiser la bibliothèque",
