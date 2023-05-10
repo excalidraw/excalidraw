@@ -265,7 +265,7 @@
   },
   "errorSplash": {
     "headingMain": "",
-    "clearCanvasMessage": "",
+    "clearCanvasMessage": "Nếu không tải lại được, hãy thử <button>dọn canvas.</button>",
     "clearCanvasCaveat": " Điều này sẽ dẫn đến mất dữ liệu bạn đã làm ",
     "trackedToSentry": "",
     "openIssueMessage": "",
