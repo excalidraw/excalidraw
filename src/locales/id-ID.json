@@ -264,11 +264,11 @@
     "canvasTooBigTip": "Tip: coba pindahkan elemen-terjauh lebih dekat bersama."
   },
   "errorSplash": {
-    "headingMain": "",
-    "clearCanvasMessage": "",
+    "headingMain": "Mengalami sebuah kesalahan. Cobalah <button>muat ulang halaman.</button>",
+    "clearCanvasMessage": "Jika memuat ulang tidak bekerja, cobalah <button>bersihkan canvas.</button>",
     "clearCanvasCaveat": " Ini akan menghasilkan hilangnya pekerjaan ",
-    "trackedToSentry": "",
-    "openIssueMessage": "",
+    "trackedToSentry": "Kesalahan dengan pengidentifikasi {{eventId}} dilacak di sistem kami.",
+    "openIssueMessage": "Kami sangat berhati-hati untuk tidak menyertakan informasi pemandangan Anda pada kesalahan. Jika pemandangan Anda tidak bersifat pribadi, mohon pertimbangkan menindak lanjut pada <button>pelacak bug.</button> Mohon sertakan informasi dibawah ini dengan menyalin dan menempelkan di Github issue.",
     "sceneContent": "Pemandangan konten:"
   },
   "roomDialog": {
@@ -348,16 +348,16 @@
       "required": "Dibutuhkan",
       "website": "Masukkan URL valid"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
-    "noteLicense": "",
+    "noteDescription": "Kirimkan pustaka Anda untuk disertakan di <link>repositori pustaka publik</link>untuk orang lain menggunakannya dalam gambar mereka.",
+    "noteGuidelines": "Pustaka butuh disetujui secara manual terlebih dahulu. Baca <link>pedoman</link> sebelum mengirim. Anda butuh akun GitHub untuk berkomunikasi dan membuat perubahan jika dibutuhkan, tetapi tidak wajib dibutukan.",
+    "noteLicense": "Dengan mengkirimkannya, Anda setuju pustaka akan diterbitkan dibawah <link>Lisensi MIT, </link>yang artinya siapa pun dapat menggunakannya tanpa batasan.",
     "noteItems": "Setiap item pustaka harus memiliki nama, sehingga bisa disortir. Item pustaka di bawah ini akan dimasukan:",
     "atleastOneLibItem": "Pilih setidaknya satu item pustaka untuk mulai",
     "republishWarning": "Catatan: beberapa item yang dipilih telah ditandai sebagai sudah dipublikasikan/diserahkan. Anda hanya dapat menyerahkan kembali item-item ketika memperbarui pustaka atau pengumpulan."
   },
   "publishSuccessDialog": {
     "title": "Pustaka telah dikirm",
-    "content": ""
+    "content": "Terima kasih {{authorName}}. pustaka Anda telah diserahkan untuk ditinjau ulang. Anda dapat cek statusnya<link>di sini</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Reset pustaka",
