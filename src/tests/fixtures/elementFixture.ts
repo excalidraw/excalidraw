@@ -1,4 +1,3 @@
-import { getElementBounds } from "../../element";
 import { ExcalidrawElement } from "../../element/types";
 
 const elementBase: Omit<ExcalidrawElement, "type"> = {
