@@ -265,7 +265,7 @@
   },
   "errorSplash": {
     "headingMain": "",
-    "clearCanvasMessage": "",
+    "clearCanvasMessage": "اگر بازنشانی صفحه مشکل را حل نکرد این را امتحان کنید ",
     "clearCanvasCaveat": " این باعث میشود کارهای شما ذخیره نشود ",
     "trackedToSentry": "",
     "openIssueMessage": "",
@@ -357,7 +357,7 @@
   },
   "publishSuccessDialog": {
     "title": "کتابخانه ارسال شد",
-    "content": ""
+    "content": "تشکر از شما {{authorName}}. کتابخانه شما برای بررسی ارسال شده است. می توانید وضعیت را پیگیری کنید"
   },
   "confirmDialog": {
     "resetLibrary": "تنظیم مجدد کتابخانه",
