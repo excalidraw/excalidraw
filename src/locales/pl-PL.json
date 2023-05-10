@@ -264,16 +264,11 @@
     "canvasTooBigTip": "Wskazówka: spróbuj nieco zbliżyć najdalej wysunięte elementy."
   },
   "errorSplash": {
-    "headingMain_pre": "Wystąpił błąd. Spróbuj ",
-    "headingMain_button": "odświeżyć stronę.",
-    "clearCanvasMessage": "Jeśli odświeżenie strony nie zadziałało, spróbuj ",
-    "clearCanvasMessage_button": "usunąć wszystko z dokumentu.",
+    "headingMain": "",
+    "clearCanvasMessage": "",
     "clearCanvasCaveat": " Pamiętaj tylko, że spowoduje to utratę całej twojej pracy ",
-    "trackedToSentry_pre": "Błąd o identyfikatorze ",
-    "trackedToSentry_post": " został zaraportowany w naszym systemie.",
-    "openIssueMessage_pre": "Szanujemy twoją prywatność i raport nie zawierał żadnych danych dotyczących tego nad czym pracowałeś, natomiast jeżeli jesteś w stanie podzielić się tym nad czym pracowałeś, prosimy o dodatkowy raport poprzez ",
-    "openIssueMessage_button": "nasze narzędzie do raportowania błędów.",
-    "openIssueMessage_post": " Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i umieszczenie jej w zgłoszeniu na portalu GitHub.",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": "Zawartość dokumentu:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "Wymagane",
       "website": "Wprowadź prawidłowy adres URL"
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": "dla innych osób do wykorzystania w swoich rysunkach."
-    },
-    "noteGuidelines": {
-      "pre": "Biblioteka musi być najpierw zatwierdzona ręcznie. Przeczytaj ",
-      "link": "wytyczne",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "Wysyłając zgadzasz się, że biblioteka zostanie opublikowana pod ",
-      "link": "Licencja MIT, ",
-      "post": "w skrócie, każdy może z nich korzystać bez ograniczeń."
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "Proszę wybrać co najmniej jeden element biblioteki, by rozpocząć",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Biblioteka została przesłana",
-    "content": "Dziękujemy {{authorName}}. Twoja biblioteka została przesłana do sprawdzenia. Możesz śledzić jej stan",
-    "link": "tutaj"
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "Zresetuj Bibliotekę",
