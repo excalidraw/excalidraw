@@ -265,7 +265,7 @@
   },
   "errorSplash": {
     "headingMain": "",
-    "clearCanvasMessage": "",
+    "clearCanvasMessage": "אם טעינה מחדש לא עובדת, נסה ",
     "clearCanvasCaveat": " זה יגרום לאובדן העבודה ",
     "trackedToSentry": "",
     "openIssueMessage": "",
@@ -357,7 +357,7 @@
   },
   "publishSuccessDialog": {
     "title": "הספריה הוגשה",
-    "content": ""
+    "content": "תודה {{authorName}}. הספריה שלך נשלחה לבחינה. תוכל לעקוב אחרי סטטוס הפרסום"
   },
   "confirmDialog": {
     "resetLibrary": "איפוס ספריה",
