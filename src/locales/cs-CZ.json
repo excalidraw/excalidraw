@@ -267,7 +267,7 @@
     "headingMain": "",
     "clearCanvasMessage": "",
     "clearCanvasCaveat": "",
-    "trackedToSentry": "",
+    "trackedToSentry": "Chyba identifikátoru {{eventId}} byl zaznamenán v našem systému.",
     "openIssueMessage": "",
     "sceneContent": ""
   },
@@ -348,8 +348,8 @@
       "required": "Povinné",
       "website": "Zadejte platnou URL adresu"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
+    "noteDescription": "Odešlete svou knihovnu, pro zařazení do <link>veřejného úložiště knihoven</link>, odkud ji budou moci při kreslení využít i ostatní uživatelé.",
+    "noteGuidelines": "Knihovna musí být nejdříve ručně schválena. Přečtěte si prosím <link>pokyny</link>",
     "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
