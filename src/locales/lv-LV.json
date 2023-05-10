@@ -264,16 +264,11 @@
     "canvasTooBigTip": "Ieteikums: mēģiniet satuvināt pašus tālākos elementus."
   },
   "errorSplash": {
-    "headingMain_pre": "Notikusi kļūda. Mēģiniet ",
-    "headingMain_button": "pārlādēt lapu.",
-    "clearCanvasMessage": "Ja pārlādēšana nestrādā, mēģiniet ",
-    "clearCanvasMessage_button": "notīrot tāfeli.",
+    "headingMain": "Notikusi kļūda. Mēģiniet <button>pārlādēt lapu.</button>",
+    "clearCanvasMessage": "Ja pārlādēšana nestrādā, mēģiniet <button>notīrot tāfeli.</button>",
     "clearCanvasCaveat": " Tas novedīs pie darba zaudēšanas ",
-    "trackedToSentry_pre": "Kļūda ar kodu ",
-    "trackedToSentry_post": " tika noteikta mūsu sistēmā.",
-    "openIssueMessage_pre": "Mēs uzmanījāmies, lai neiekļautu jūsu ainas informāciju šajā kļūdā. Ja jūsu aina nav privāta, lūdzu ziņojiet par šo kļūdu mūsu ",
-    "openIssueMessage_button": "kļūdu uzskaitē.",
-    "openIssueMessage_post": " Lūdzu, miniet sekojošo informāciju to kopējot un ielīmējot jūsu ziņojumā platformā GitHub.",
+    "trackedToSentry": "Kļūda ar kodu {{eventId}} tika noteikta mūsu sistēmā.",
+    "openIssueMessage": "Mēs uzmanījāmies, lai neiekļautu jūsu ainas informāciju šajā kļūdā. Ja jūsu aina nav privāta, lūdzu ziņojiet par šo kļūdu mūsu <button>kļūdu uzskaitē.</button> Lūdzu, miniet sekojošo informāciju to kopējot un ielīmējot jūsu ziņojumā platformā GitHub.",
     "sceneContent": "Ainas saturs:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "Obligāts",
       "website": "Ievadiet derīgu URL"
     },
-    "noteDescription": {
-      "pre": "Iesniegt savu bibliotēku iekļaušanai ",
-      "link": "publiskajā bibliotēku datubāzē",
-      "post": ", lai citi to varētu izmantot savos zīmējumos."
-    },
-    "noteGuidelines": {
-      "pre": "Šai bibliotēkai vispirms jātiek manuāli apstiprinātai. Lūdzu, izlasiet ",
-      "link": "norādījumus",
-      "post": " pirms iesniegšanas. Jums vajadzēs GitHub kontu, lai sazinātos un veiktu izmaiņas, ja tādas būs pieprasītas, bet tas nav absolūti nepieciešams."
-    },
-    "noteLicense": {
-      "pre": "Iesniedzot bibliotēku, jūs piekrītat tās publicēšanai saskaņā ar ",
-      "link": "MIT Licenci, ",
-      "post": "kas īsumā nozīmē, ka jebkurš to varēs izmantot bez ierobežojumiem."
-    },
+    "noteDescription": "Iesniegt savu bibliotēku iekļaušanai <link>publiskajā bibliotēku datubāzē</link>, lai citi to varētu izmantot savos zīmējumos.",
+    "noteGuidelines": "Šai bibliotēkai vispirms jātiek manuāli apstiprinātai. Lūdzu, izlasiet <link>norādījumus</link> pirms iesniegšanas. Jums vajadzēs GitHub kontu, lai sazinātos un veiktu izmaiņas, ja tādas būs pieprasītas, bet tas nav absolūti nepieciešams.",
+    "noteLicense": "Iesniedzot bibliotēku, jūs piekrītat tās publicēšanai saskaņā ar <link>MIT Licenci, </link>kas īsumā nozīmē, ka jebkurš to varēs izmantot bez ierobežojumiem.",
     "noteItems": "Katram bibliotēkas vienumam jābūt savam nosaukumam, lai to varētu atrast filtrējot. Tiks iekļauti sekojošie bibliotēkas vienumi:",
     "atleastOneLibItem": "Lūdzu, atlasiet vismaz vienu bibliotēkas vienumu, lai sāktu darbu",
     "republishWarning": "Ievēro: daži no atzīmētajiem objektiem jau atzīmēti kā publicēti vai iesniegti publicēšanai. Tos vajadzētu atkārtoti iesniegt tikai tad, ja vēlies labot esošo bibliotēku."
   },
   "publishSuccessDialog": {
     "title": "Bibliotēka iesniegta",
-    "content": "Paldies, {{authorName}}! Jūsu bibliotēka iesniegta izskatīšanai. Jūs varat izsekot iesnieguma statusam",
-    "link": "šeit"
+    "content": "Paldies, {{authorName}}! Jūsu bibliotēka iesniegta izskatīšanai. Jūs varat izsekot iesnieguma statusam<link>šeit</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Atiestatīt bibliotēku",

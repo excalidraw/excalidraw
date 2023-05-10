@@ -264,16 +264,11 @@
     "canvasTooBigTip": "Aholkua: saiatu urrunen dauden elementuak pixka bat hurbiltzen."
   },
   "errorSplash": {
-    "headingMain_pre": "Errore bat aurkitu da. Saiatu ",
-    "headingMain_button": "orria birkargatzen.",
-    "clearCanvasMessage": "Birkargatzea ez bada burutzen, saiatu ",
-    "clearCanvasMessage_button": "oihala garbitzen.",
+    "headingMain": "Errore bat aurkitu da. Saiatu <button>orria birkargatzen.</button>",
+    "clearCanvasMessage": "Birkargatzea ez bada burutzen, saiatu <button>oihala garbitzen.</button>",
     "clearCanvasCaveat": " Honen ondorioz lana galduko da ",
-    "trackedToSentry_pre": "Identifikatzailearen errorea ",
-    "trackedToSentry_post": " gure sistemak behatu du.",
-    "openIssueMessage_pre": "Oso kontuz ibili gara zure eszenaren informazioa errorean ez sartzeko. Zure eszena pribatua ez bada, kontuan hartu gure ",
-    "openIssueMessage_button": "erroreen jarraipena egitea.",
-    "openIssueMessage_post": " Sartu beheko informazioa kopiatu eta itsatsi bidez GitHub issue-n.",
+    "trackedToSentry": "Identifikatzailearen errorea {{eventId}} gure sistemak behatu du.",
+    "openIssueMessage": "Oso kontuz ibili gara zure eszenaren informazioa errorean ez sartzeko. Zure eszena pribatua ez bada, kontuan hartu gure <button>erroreen jarraipena egitea.</button> Sartu beheko informazioa kopiatu eta itsatsi bidez GitHub issue-n.",
     "sceneContent": "Eszenaren edukia:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "Beharrezkoa",
       "website": "Sartu baliozko URL bat"
     },
-    "noteDescription": {
-      "pre": "Bidali zure liburutegira sartu ahal izateko ",
-      "link": "zure liburutegiko biltegian",
-      "post": "beste jendeak bere marrazkietan erabili ahal izateko."
-    },
-    "noteGuidelines": {
-      "pre": "Liburutegia eskuz onartu behar da. Irakurri ",
-      "link": "gidalerroak",
-      "post": " bidali aurretik. GitHub kontu bat edukitzea komeni da komunikatzeko eta aldaketak egin ahal izateko, baina ez da guztiz beharrezkoa."
-    },
-    "noteLicense": {
-      "pre": "Bidaltzen baduzu, onartzen duzu liburutegia ",
-      "link": "MIT lizentziarekin argitaratuko dela, ",
-      "post": "zeinak, laburbilduz, esan nahi du edozeinek erabiltzen ahal duela murrizketarik gabe."
-    },
+    "noteDescription": "Bidali zure liburutegira sartu ahal izateko <link>zure liburutegiko biltegian</link>beste jendeak bere marrazkietan erabili ahal izateko.",
+    "noteGuidelines": "Liburutegia eskuz onartu behar da. Irakurri <link>gidalerroak</link> bidali aurretik. GitHub kontu bat edukitzea komeni da komunikatzeko eta aldaketak egin ahal izateko, baina ez da guztiz beharrezkoa.",
+    "noteLicense": "Bidaltzen baduzu, onartzen duzu liburutegia <link>MIT lizentziarekin argitaratuko dela, </link>zeinak, laburbilduz, esan nahi du edozeinek erabiltzen ahal duela murrizketarik gabe.",
     "noteItems": "Liburutegiko elementu bakoitzak bere izena eduki behar du iragazi ahal izateko. Liburutegiko hurrengo elementuak barne daude:",
     "atleastOneLibItem": "Hautatu gutxienez liburutegiko elementu bat gutxienez hasi ahal izateko",
     "republishWarning": "Oharra: hautatutako elementu batzuk dagoeneko argitaratuta/bidalita bezala markatuta daude. Elementuak berriro bidali behar dituzu lehendik dagoen liburutegi edo bidalketa eguneratzen duzunean."
   },
   "publishSuccessDialog": {
     "title": "Liburutegia bidali da",
-    "content": "Eskerrik asko {{authorName}}. Zure liburutegia bidali da berrikustera. Jarraitu dezakezu haren egoera",
-    "link": "hemen"
+    "content": "Eskerrik asko {{authorName}}. Zure liburutegia bidali da berrikustera. Jarraitu dezakezu haren egoera<link>hemen</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Leheneratu liburutegia",

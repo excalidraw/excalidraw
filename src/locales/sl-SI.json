@@ -264,16 +264,11 @@
     "canvasTooBigTip": "Nasvet: poskusite premakniti najbolj oddaljene elemente nekoliko bližje skupaj."
   },
   "errorSplash": {
-    "headingMain_pre": "Prišlo je do napake. Poskusite ",
-    "headingMain_button": "ponovno naložiti stran.",
-    "clearCanvasMessage": "Če ponovno nalaganje ne deluje, poskusite ",
-    "clearCanvasMessage_button": "počistiti platno.",
+    "headingMain": "Prišlo je do napake. Poskusite <button>ponovno naložiti stran.</button>",
+    "clearCanvasMessage": "Če ponovno nalaganje ne deluje, poskusite <button>počistiti platno.</button>",
     "clearCanvasCaveat": " To bo povzročilo izgubo dela ",
-    "trackedToSentry_pre": "Napaka z identifikatorjem ",
-    "trackedToSentry_post": " smo zabeležili v naš sistem.",
-    "openIssueMessage_pre": "Zelo smo bili previdni, da v podatke o napaki nismo vključili vaših podatkov o sceni. Če vaša scena ni zasebna, vas prosimo, da napišete več podrobnosti na našem ",
-    "openIssueMessage_button": "sledilniku hroščev.",
-    "openIssueMessage_post": " Prosimo, vključite spodnje informacije tako, da jih kopirate in prilepite v GitHub vprašanje.",
+    "trackedToSentry": "Napaka z identifikatorjem {{eventId}} smo zabeležili v naš sistem.",
+    "openIssueMessage": "Zelo smo bili previdni, da v podatke o napaki nismo vključili vaših podatkov o sceni. Če vaša scena ni zasebna, vas prosimo, da napišete več podrobnosti na našem <button>sledilniku hroščev.</button> Prosimo, vključite spodnje informacije tako, da jih kopirate in prilepite v GitHub vprašanje.",
     "sceneContent": "Vsebina scene:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "Obvezno",
       "website": "Vnesite veljaven URL"
     },
-    "noteDescription": {
-      "pre": "Predložite svojo knjižnico, da bo vključena v ",
-      "link": "javno skladišče knjižnic,",
-      "post": "da jih drugi lahko uporabljajo v svojih risbah."
-    },
-    "noteGuidelines": {
-      "pre": "Knjižnica mora biti najprej ročno odobrena. Prosimo vas, da pred oddajanjem preberete naše ",
-      "link": "smernice.",
-      "post": "Za komunikacijo in spreminjanje po potrebi boste potrebovali račun GitHub, vendar to ni obvezno."
-    },
-    "noteLicense": {
-      "pre": "Z oddajo se strinjate, da bo knjižnica objavljena pod ",
-      "link": "licenco MIT, ",
-      "post": "kar na kratko pomeni, da jo lahko kdorkoli uporablja brez omejitev."
-    },
+    "noteDescription": "Predložite svojo knjižnico, da bo vključena v <link>javno skladišče knjižnic,</link>da jih drugi lahko uporabljajo v svojih risbah.",
+    "noteGuidelines": "Knjižnica mora biti najprej ročno odobrena. Prosimo vas, da pred oddajanjem preberete naše <link>smernice.</link>Za komunikacijo in spreminjanje po potrebi boste potrebovali račun GitHub, vendar to ni obvezno.",
+    "noteLicense": "Z oddajo se strinjate, da bo knjižnica objavljena pod <link>licenco MIT, </link>kar na kratko pomeni, da jo lahko kdorkoli uporablja brez omejitev.",
     "noteItems": "Vsak element knjižnice mora imeti svoje ime, tako da ga je mogoče filtrirati. Vključeni bodo naslednji elementi knjižnice:",
     "atleastOneLibItem": "Za začetek izberite vsaj en element knjižnice",
     "republishWarning": "Opomba: nekateri izbrani predmeti so označeni kot že objavljeni/oddani. Elemente lahko znova oddate samo, ko posodabljate obstoječo knjižnico ali oddajo."
   },
   "publishSuccessDialog": {
     "title": "Knjižnica oddana",
-    "content": "{{authorName}}, hvala. Vaša knjižnica je bila poslana v pregled. Stanje lahko spremljate",
-    "link": "tukaj"
+    "content": "{{authorName}}, hvala. Vaša knjižnica je bila poslana v pregled. Stanje lahko spremljate<link>tukaj</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Ponastavi knjižnico",

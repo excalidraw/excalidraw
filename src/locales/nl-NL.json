@@ -264,16 +264,11 @@
     "canvasTooBigTip": "Tip: beweeg de verste elementen iets dichter bij elkaar."
   },
   "errorSplash": {
-    "headingMain_pre": "Fout opgetreden. Probeer ",
-    "headingMain_button": "de pagina opnieuw laden.",
-    "clearCanvasMessage": "Als herladen niet werkt, probeer ",
-    "clearCanvasMessage_button": "het canvas te wissen.",
+    "headingMain": "Fout opgetreden. Probeer <button>de pagina opnieuw laden.</button>",
+    "clearCanvasMessage": "Als herladen niet werkt, probeer <button>het canvas te wissen.</button>",
     "clearCanvasCaveat": " Dit zal leiden tot verlies van je werk ",
-    "trackedToSentry_pre": "De fout met ID ",
-    "trackedToSentry_post": " was gevolgd op ons systeem.",
-    "openIssueMessage_pre": "We waren voorzichtig om je scène-informatie niet in de fout toe te voegen. Als je scène niet privé is, overweeg dan alstublieft het opvolgen op onze ",
-    "openIssueMessage_button": "bugtracker.",
-    "openIssueMessage_post": " Kopieer de informatie hieronder naar de GitHub issue.",
+    "trackedToSentry": "De fout met ID {{eventId}} was gevolgd op ons systeem.",
+    "openIssueMessage": "We waren voorzichtig om je scène-informatie niet in de fout toe te voegen. Als je scène niet privé is, overweeg dan alstublieft het opvolgen op onze <button>bugtracker.</button> Kopieer de informatie hieronder naar de GitHub issue.",
     "sceneContent": "Scène-inhoud:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "Vereist",
       "website": "Vul een geldige URL in"
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "openbare repository",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "richtlijnen",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "MIT-licentie, ",
-      "post": ""
-    },
+    "noteDescription": "<link>openbare repository</link>",
+    "noteGuidelines": "<link>richtlijnen</link>",
+    "noteLicense": "<link>MIT-licentie, </link>",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliotheek ingediend",
-    "content": "",
-    "link": "Hier"
+    "content": "<link>Hier</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Reset bibliotheek",

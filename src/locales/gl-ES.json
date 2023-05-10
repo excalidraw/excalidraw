@@ -264,16 +264,11 @@
     "canvasTooBigTip": "Consello: Probe a acercar un pouco os elementos máis afastados."
   },
   "errorSplash": {
-    "headingMain_pre": "Atopouse un erro. Probe ",
-    "headingMain_button": "recargando a páxina.",
-    "clearCanvasMessage": "Se recargar non funcionou, probe ",
-    "clearCanvasMessage_button": "limpando o lenzo.",
+    "headingMain": "Atopouse un erro. Probe <button>recargando a páxina.</button>",
+    "clearCanvasMessage": "Se recargar non funcionou, probe <button>limpando o lenzo.</button>",
     "clearCanvasCaveat": " Isto resultará nunha perda do seu traballo ",
-    "trackedToSentry_pre": "O erro con identificador ",
-    "trackedToSentry_post": " foi rastrexado no noso sistema.",
-    "openIssueMessage_pre": "Fomos moi cautelosos de non incluír a información da súa escena no erro. Se a súa escena non é privada, por favor, considere o seguimento do noso ",
-    "openIssueMessage_button": "rastrexador de erros.",
-    "openIssueMessage_post": " Por favor inclúa a seguinte información copiándoa e pegándoa na issue de Github.",
+    "trackedToSentry": "O erro con identificador {{eventId}} foi rastrexado no noso sistema.",
+    "openIssueMessage": "Fomos moi cautelosos de non incluír a información da súa escena no erro. Se a súa escena non é privada, por favor, considere o seguimento do noso <button>rastrexador de erros.</button> Por favor inclúa a seguinte información copiándoa e pegándoa na issue de Github.",
     "sceneContent": "Contido da escena:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "Obrigatorio",
       "website": "Introduza unha URL válida"
     },
-    "noteDescription": {
-      "pre": "Envíe a súa biblioteca para que sexa incluída no ",
-      "link": "repositorio público de bibliotecas",
-      "post": "para que outra xente a poida usar nos seus debuxos."
-    },
-    "noteGuidelines": {
-      "pre": "A biblioteca necesita ser aprobada manualmente primeiro. Por favor, lea as ",
-      "link": "normas",
-      "post": " antes de ser enviado. Necesitarás unha conta de GitHub para comunicarte ou facer cambios se se solicitan, pero non é estritamente necesario."
-    },
-    "noteLicense": {
-      "pre": "Ao enviar, estás de acordo con que a biblioteca sexa publicada baixo a ",
-      "link": "Licenza MIT, ",
-      "post": "o cal significa que, en resumo, calquera pode usalo sen restricións."
-    },
+    "noteDescription": "Envíe a súa biblioteca para que sexa incluída no <link>repositorio público de bibliotecas</link>para que outra xente a poida usar nos seus debuxos.",
+    "noteGuidelines": "A biblioteca necesita ser aprobada manualmente primeiro. Por favor, lea as <link>normas</link> antes de ser enviado. Necesitarás unha conta de GitHub para comunicarte ou facer cambios se se solicitan, pero non é estritamente necesario.",
+    "noteLicense": "Ao enviar, estás de acordo con que a biblioteca sexa publicada baixo a <link>Licenza MIT, </link>o cal significa que, en resumo, calquera pode usalo sen restricións.",
     "noteItems": "Cada elemento da biblioteca debe ter o seu nome propio para que se poida filtrar. Os seguintes elementos da biblioteca serán incluídos:",
     "atleastOneLibItem": "Por favor seleccione polo menos un elemento da biblioteca para comezar",
     "republishWarning": "Nota: algúns dos elementos seleccionados están marcados como xa publicados/enviados. Só deberías reenviar elementos cando se actualice unha biblioteca ou envío."
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",
-    "content": "Grazas {{authorName}}. A súa biblioteca foi enviada para ser revisada. Pode seguir o estado",
-    "link": "aquí"
+    "content": "Grazas {{authorName}}. A súa biblioteca foi enviada para ser revisada. Pode seguir o estado<link>aquí</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Restablecer biblioteca",

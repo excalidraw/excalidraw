@@ -1,6 +1,7 @@
 import React from "react";
 import * as Sentry from "@sentry/browser";
 import { t } from "../i18n";
+import Trans from "./Trans";
 
 interface TopErrorBoundaryState {
   hasError: boolean;
@@ -74,25 +75,31 @@ export class TopErrorBoundary extends React.Component<
       <div className="ErrorSplash excalidraw">
         <div className="ErrorSplash-messageContainer">
           <div className="ErrorSplash-paragraph bigger align-center">
-            {t("errorSplash.headingMain_pre")}
-            <button onClick={() => window.location.reload()}>
-              {t("errorSplash.headingMain_button")}
-            </button>
+            <Trans
+              i18nKey="errorSplash.headingMain"
+              button={(el) => (
+                <button onClick={() => window.location.reload()}>{el}</button>
+              )}
+            />
           </div>
           <div className="ErrorSplash-paragraph align-center">
-            {t("errorSplash.clearCanvasMessage")}
-            <button
-              onClick={() => {
-                try {
-                  localStorage.clear();
-                  window.location.reload();
-                } catch (error: any) {
-                  console.error(error);
-                }
-              }}
-            >
-              {t("errorSplash.clearCanvasMessage_button")}
-            </button>
+            <Trans
+              i18nKey="errorSplash.clearCanvasMessage"
+              button={(el) => (
+                <button
+                  onClick={() => {
+                    try {
+                      localStorage.clear();
+                      window.location.reload();
+                    } catch (error: any) {
+                      console.error(error);
+                    }
+                  }}
+                >
+                  {el}
+                </button>
+              )}
+            />
             <br />
             <div className="smaller">
               <span role="img" aria-label="warning">
@@ -106,16 +113,17 @@ export class TopErrorBoundary extends React.Component<
           </div>
           <div>
             <div className="ErrorSplash-paragraph">
-              {t("errorSplash.trackedToSentry_pre")}
-              {this.state.sentryEventId}
-              {t("errorSplash.trackedToSentry_post")}
+              {t("errorSplash.trackedToSentry", {
+                eventId: this.state.sentryEventId,
+              })}
             </div>
             <div className="ErrorSplash-paragraph">
-              {t("errorSplash.openIssueMessage_pre")}
-              <button onClick={() => this.createGithubIssue()}>
-                {t("errorSplash.openIssueMessage_button")}
-              </button>
-              {t("errorSplash.openIssueMessage_post")}
+              <Trans
+                i18nKey="errorSplash.openIssueMessage"
+                button={(el) => (
+                  <button onClick={() => this.createGithubIssue()}>{el}</button>
+                )}
+              />
             </div>
             <div className="ErrorSplash-paragraph">
               <div className="ErrorSplash-details">

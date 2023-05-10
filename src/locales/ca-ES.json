@@ -264,16 +264,11 @@
     "canvasTooBigTip": "Consell: proveu d’acostar una mica els elements més allunyats."
   },
   "errorSplash": {
-    "headingMain_pre": "S'ha produït un error. Proveu ",
-    "headingMain_button": "recarregar la pàgina.",
-    "clearCanvasMessage": "Si la recàrrega no funciona, proveu ",
-    "clearCanvasMessage_button": "esborrar el llenç.",
+    "headingMain": "S'ha produït un error. Proveu <button>recarregar la pàgina.</button>",
+    "clearCanvasMessage": "Si la recàrrega no funciona, proveu <button>esborrar el llenç.</button>",
     "clearCanvasCaveat": " Això resultarà en la pèrdua de feina ",
-    "trackedToSentry_pre": "L'error amb l'identificador ",
-    "trackedToSentry_post": " s'ha rastrejat en el nostre sistema.",
-    "openIssueMessage_pre": "Anàvem amb molta cura de no incloure la informació de la vostra escena en l'error. Si l'escena no és privada, podeu fer-ne el seguiment al nostre ",
-    "openIssueMessage_button": "rastrejador d'errors.",
-    "openIssueMessage_post": " Incloeu la informació a continuació copiant i enganxant a GitHub Issues.",
+    "trackedToSentry": "L'error amb l'identificador {{eventId}} s'ha rastrejat en el nostre sistema.",
+    "openIssueMessage": "Anàvem amb molta cura de no incloure la informació de la vostra escena en l'error. Si l'escena no és privada, podeu fer-ne el seguiment al nostre <button>rastrejador d'errors.</button> Incloeu la informació a continuació copiant i enganxant a GitHub Issues.",
     "sceneContent": "Contingut de l'escena:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "Requerit",
       "website": "Introduïu una URL vàlida"
     },
-    "noteDescription": {
-      "pre": "Envieu la vostra biblioteca perquè sigui inclosa al ",
-      "link": "repositori públic",
-      "post": "per tal que altres persones puguin fer-ne ús en els seus dibuixos."
-    },
-    "noteGuidelines": {
-      "pre": "La biblioteca ha de ser aprovada manualment. Si us plau, llegiu les ",
-      "link": "directrius",
-      "post": " abans d'enviar-hi res. Necessitareu un compte de GitHub per a comunicar i fer-hi canvis si cal, però no és requisit imprescindible."
-    },
-    "noteLicense": {
-      "pre": "Quan l'envieu, accepteu que la biblioteca sigui publicada sota la ",
-      "link": "llicència MIT, ",
-      "post": "que, en resum, vol dir que qualsevol persona pot fer-ne ús sense restriccions."
-    },
+    "noteDescription": "Envieu la vostra biblioteca perquè sigui inclosa al <link>repositori públic</link>per tal que altres persones puguin fer-ne ús en els seus dibuixos.",
+    "noteGuidelines": "La biblioteca ha de ser aprovada manualment. Si us plau, llegiu les <link>directrius</link> abans d'enviar-hi res. Necessitareu un compte de GitHub per a comunicar i fer-hi canvis si cal, però no és requisit imprescindible.",
+    "noteLicense": "Quan l'envieu, accepteu que la biblioteca sigui publicada sota la <link>llicència MIT, </link>que, en resum, vol dir que qualsevol persona pot fer-ne ús sense restriccions.",
     "noteItems": "Cada element de la biblioteca ha de tenir el seu propi nom per tal que sigui filtrable. S'hi inclouran els elements següents:",
     "atleastOneLibItem": "Si us plau, seleccioneu si més no un element de la biblioteca per a començar",
     "republishWarning": "Nota: alguns dels elements seleccionats s'han marcat com a publicats/enviats. Només hauríeu de reenviar elements quan actualitzeu una biblioteca existent."
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",
-    "content": "Gràcies, {{authorName}}. La vostra biblioteca ha estat enviada per a ser revisada. Podeu comprovar-ne l'estat",
-    "link": "aquí"
+    "content": "Gràcies, {{authorName}}. La vostra biblioteca ha estat enviada per a ser revisada. Podeu comprovar-ne l'estat<link>aquí</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Restableix la biblioteca",

@@ -264,16 +264,11 @@
     "canvasTooBigTip": "提示：尝试将最远的元素移动到和其它元素更近一些。"
   },
   "errorSplash": {
-    "headingMain_pre": "遇到异常。请尝试",
-    "headingMain_button": "重新加载页面。",
-    "clearCanvasMessage": "如果重新加载页面无效, 请尝试",
-    "clearCanvasMessage_button": "清除画布。",
+    "headingMain": "遇到异常。请尝试<button>重新加载页面。</button>",
+    "clearCanvasMessage": "如果重新加载页面无效, 请尝试<button>清除画布。</button>",
     "clearCanvasCaveat": "这会造成当前工作丢失",
-    "trackedToSentry_pre": "带有标识符的错误",
-    "trackedToSentry_post": "已在我们的系统中跟踪",
-    "openIssueMessage_pre": "我们非常谨慎地处理错误信息，您的画布内容不会被包含在错误报告中。如果您的画布内容不需要保持私密，请考虑使用我们的",
-    "openIssueMessage_button": "错误追踪器。",
-    "openIssueMessage_post": " 请复制并粘贴以下信息到 GitHub Issue 中。",
+    "trackedToSentry": "带有标识符的错误{{eventId}}已在我们的系统中跟踪",
+    "openIssueMessage": "我们非常谨慎地处理错误信息，您的画布内容不会被包含在错误报告中。如果您的画布内容不需要保持私密，请考虑使用我们的<button>错误追踪器。</button> 请复制并粘贴以下信息到 GitHub Issue 中。",
     "sceneContent": "画布内容:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "必填",
       "website": "输入一个有效的URL"
     },
-    "noteDescription": {
-      "pre": "提交后，您的素材库将被包含在 ",
-      "link": "公共素材库广场",
-      "post": "以供其他人在绘图中使用。"
-    },
-    "noteGuidelines": {
-      "pre": "提交的素材库需先经人工审核。在提交之前，请先阅读 ",
-      "link": "指南",
-      "post": " 。后续沟通和对库的修改需要 GitHub 账号，但这不是必须的。"
-    },
-    "noteLicense": {
-      "pre": "提交即表明您已同意素材库将遵循 ",
-      "link": "MIT 许可证， ",
-      "post": "简而言之，任何人都可以不受限制地使用它们。"
-    },
+    "noteDescription": "提交后，您的素材库将被包含在 <link>公共素材库广场</link>以供其他人在绘图中使用。",
+    "noteGuidelines": "提交的素材库需先经人工审核。在提交之前，请先阅读 <link>指南</link> 。后续沟通和对库的修改需要 GitHub 账号，但这不是必须的。",
+    "noteLicense": "提交即表明您已同意素材库将遵循 <link>MIT 许可证， </link>简而言之，任何人都可以不受限制地使用它们。",
     "noteItems": "素材库中每个项目都有各自的名称以供筛选。以下项目将被包含：",
     "atleastOneLibItem": "请选择至少一个素材库以开始",
     "republishWarning": "注意：部分选中的项目已经发布或提交。请仅在更新已有或已提交的素材库时重复提交项目。"
   },
   "publishSuccessDialog": {
     "title": "素材库已提交",
-    "content": "谢谢你 {{authorName}}。您的素材库已被提交审核。跟进此次提交的状态请点击",
-    "link": "此处"
+    "content": "谢谢你 {{authorName}}。您的素材库已被提交审核。跟进此次提交的状态请点击<link>此处</link>"
   },
   "confirmDialog": {
     "resetLibrary": "重置素材库",
