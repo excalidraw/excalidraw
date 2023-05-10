@@ -264,16 +264,11 @@
     "canvasTooBigTip": "Tips: Prøv å flytte de ytterste elementene litt tettere sammen."
   },
   "errorSplash": {
-    "headingMain_pre": "En feil oppsto. Prøv ",
-    "headingMain_button": "å laste siden på nytt.",
-    "clearCanvasMessage": "Om ny sidelasting ikke fungerer, prøv ",
-    "clearCanvasMessage_button": "å tømme lerretet.",
+    "headingMain": "En feil oppsto. Prøv <button>å laste siden på nytt.</button>",
+    "clearCanvasMessage": "Om ny sidelasting ikke fungerer, prøv <button>å tømme lerretet.</button>",
     "clearCanvasCaveat": " Dette vil føre til tap av arbeid ",
-    "trackedToSentry_pre": "Feilen med identifikator ",
-    "trackedToSentry_post": " ble logget i vårt system.",
-    "openIssueMessage_pre": "Vi er veldig nøye med å ikke inkludere dine scene-opplysninger i feilen. Hvis din scene ikke er privat, vurder å følge opp i vårt ",
-    "openIssueMessage_button": "feilrapporteringssystem.",
-    "openIssueMessage_post": " Ta med opplysningene nedenfor ved å kopiere og lime inn i GitHub-saken.",
+    "trackedToSentry": "Feilen med identifikator {{eventId}} ble logget i vårt system.",
+    "openIssueMessage": "Vi er veldig nøye med å ikke inkludere dine scene-opplysninger i feilen. Hvis din scene ikke er privat, vurder å følge opp i vårt <button>feilrapporteringssystem.</button> Ta med opplysningene nedenfor ved å kopiere og lime inn i GitHub-saken.",
     "sceneContent": "Scene-innhold:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "Påkrevd",
       "website": "Angi en gyldig nettadresse"
     },
-    "noteDescription": {
-      "pre": "Send inn biblioteket ditt som skal inkluderes i ",
-      "link": "kildekode for offentlig bibliotek",
-      "post": "for andre å bruke dem i tegninger."
-    },
-    "noteGuidelines": {
-      "pre": "Biblioteket må godkjennes manuelt først. Les ",
-      "link": "retningslinjene",
-      "post": " før innsending. Du vil trenge en GitHub-konto for å kommunisere og gjøre endringer hvis ønsket, men det er ikke påkrevd."
-    },
-    "noteLicense": {
-      "pre": "Ved å sende inn godtar du at biblioteket blir publisert under ",
-      "link": "MIT-lisens, ",
-      "post": "som kortfattet betyr at andre kan bruke dem uten begrensninger."
-    },
+    "noteDescription": "Send inn biblioteket ditt som skal inkluderes i <link>kildekode for offentlig bibliotek</link>for andre å bruke dem i tegninger.",
+    "noteGuidelines": "Biblioteket må godkjennes manuelt først. Les <link>retningslinjene</link> før innsending. Du vil trenge en GitHub-konto for å kommunisere og gjøre endringer hvis ønsket, men det er ikke påkrevd.",
+    "noteLicense": "Ved å sende inn godtar du at biblioteket blir publisert under <link>MIT-lisens, </link>som kortfattet betyr at andre kan bruke dem uten begrensninger.",
     "noteItems": "Hvert bibliotek må ha sitt eget navn, så det er filtrerbart. Følgende bibliotekselementer vil bli inkludert:",
     "atleastOneLibItem": "Vennligst velg minst ett bibliotek for å komme i gang",
     "republishWarning": "Merk: noen av de valgte elementene er merket som allerede publisert/sendt. Du bør kun sende inn elementer på nytt når du oppdaterer et eksisterende bibliotek eller innlevering."
   },
   "publishSuccessDialog": {
     "title": "Bibliotek innsendt",
-    "content": "Takk {{authorName}}. Ditt bibliotek har blitt sendt inn for gjennomgang. Du kan spore statusen",
-    "link": "her"
+    "content": "Takk {{authorName}}. Ditt bibliotek har blitt sendt inn for gjennomgang. Du kan spore statusen<link>her</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Nullstill bibliotek",

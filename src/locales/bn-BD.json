@@ -264,16 +264,11 @@
     "canvasTooBigTip": "বিশেষ্য: দূরতম উপাদানগুলোকে একটু কাছাকাছি নিয়ে যাওয়ার চেষ্টা করুন।"
   },
   "errorSplash": {
-    "headingMain_pre": "একটি ত্রুটির সম্মুখীন হয়েছে৷ চেষ্টা করুন ",
-    "headingMain_button": "পৃষ্ঠাটি পুনরায় লোড করার।",
-    "clearCanvasMessage": "যদি পুনরায় লোড করা কাজ না করে, চেষ্টা করুন ",
-    "clearCanvasMessage_button": "ক্যানভাস পরিষ্কার করার।",
+    "headingMain": "একটি ত্রুটির সম্মুখীন হয়েছে৷ চেষ্টা করুন <button>পৃষ্ঠাটি পুনরায় লোড করার।</button>",
+    "clearCanvasMessage": "যদি পুনরায় লোড করা কাজ না করে, চেষ্টা করুন <button>ক্যানভাস পরিষ্কার করার।</button>",
     "clearCanvasCaveat": " এর ফলে কাজের ক্ষতি হবে ",
-    "trackedToSentry_pre": "ত্রুটি ",
-    "trackedToSentry_post": " আমাদের সিস্টেমে ট্র্যাক করা হয়েছিল।",
-    "openIssueMessage_pre": "আমরা ত্রুটিতে আপনার দৃশ্যের তথ্য অন্তর্ভুক্ত না করার জন্য খুব সতর্ক ছিলাম। আপনার দৃশ্য ব্যক্তিগত না হলে, আমাদের অনুসরণ করার কথা বিবেচনা করুন ",
-    "openIssueMessage_button": "ত্রুটি ইতিবৃত্ত।",
-    "openIssueMessage_post": " অনুগ্রহ করে GitHub ইস্যুতে অনুলিপি এবং পেস্ট করে নীচের তথ্য অন্তর্ভুক্ত করুন।",
+    "trackedToSentry": "ত্রুটি {{eventId}} আমাদের সিস্টেমে ট্র্যাক করা হয়েছিল।",
+    "openIssueMessage": "আমরা ত্রুটিতে আপনার দৃশ্যের তথ্য অন্তর্ভুক্ত না করার জন্য খুব সতর্ক ছিলাম। আপনার দৃশ্য ব্যক্তিগত না হলে, আমাদের অনুসরণ করার কথা বিবেচনা করুন <button>ত্রুটি ইতিবৃত্ত।</button> অনুগ্রহ করে GitHub ইস্যুতে অনুলিপি এবং পেস্ট করে নীচের তথ্য অন্তর্ভুক্ত করুন।",
     "sceneContent": "দৃশ্য বিষয়বস্তু:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "",
       "website": ""
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": ""
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",

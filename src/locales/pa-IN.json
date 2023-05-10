@@ -264,16 +264,11 @@
     "canvasTooBigTip": "ਨੁਸਖਾ: ਸਭ ਤੋਂ ਦੂਰ ਸਥਿੱਤ ਐਲੀਮੈਂਟਾਂ ਨੂੰ ਥੋੜ੍ਹਾ ਜਿਹਾ ਨੇੜੇ ਲਿਆ ਕੇ ਦੇਖੋ।"
   },
   "errorSplash": {
-    "headingMain_pre": "ਗਲਤੀ ਹੋਈ। ਇਹ ਕਰਕੇ ਦੇਖੋ ",
-    "headingMain_button": "ਪੰਨਾ ਮੁੜ-ਲੋਡ ਕਰੋ।",
-    "clearCanvasMessage": "ਜੇ ਮੁੜ-ਲੋਡ ਕਰਨਾ ਕੰਮ ਨਾ ਕਰੇ, ਤਾਂ ਇਹ ਕਰਕੇ ਦੇਖੋ ",
-    "clearCanvasMessage_button": "ਕੈਨਵਸ ਸਾਫ ਕਰੋ।",
+    "headingMain": "ਗਲਤੀ ਹੋਈ। ਇਹ ਕਰਕੇ ਦੇਖੋ <button>ਪੰਨਾ ਮੁੜ-ਲੋਡ ਕਰੋ।</button>",
+    "clearCanvasMessage": "ਜੇ ਮੁੜ-ਲੋਡ ਕਰਨਾ ਕੰਮ ਨਾ ਕਰੇ, ਤਾਂ ਇਹ ਕਰਕੇ ਦੇਖੋ <button>ਕੈਨਵਸ ਸਾਫ ਕਰੋ।</button>",
     "clearCanvasCaveat": " ਇਹ ਸਾਰਾ ਕੰਮ ਗਵਾ ਦੇਵੇਗਾ ",
-    "trackedToSentry_pre": "ਗਲਤੀ ਸੂਚਕ ",
-    "trackedToSentry_post": " ਸਾਡੇ ਸਿਸਟਮ 'ਤੇ ਟਰੈਕ ਕੀਤਾ ਗਿਆ ਸੀ।",
-    "openIssueMessage_pre": "ਅਸੀਂ ਬੜੇ ਸਾਵਧਾਨ ਸੀ ਕਿ ਗਲਤੀ ਵਿੱਚ ਤੁਹਾਡੇ ਦ੍ਰਿਸ਼ ਦੀ ਜਾਣਕਾਰੀ ਸ਼ਾਮਲ ਨਾ ਕਰੀਏ। ਜੇ ਤੁਹਾਡਾ ਦ੍ਰਿਸ਼ ਨਿੱਜੀ ਨਹੀਂ ਹੈ ਤਾਂ ਇਸ 'ਤੇ ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ ਜੀ ",
-    "openIssueMessage_button": "ਬੱਗ ਟਰੈਕਰ।",
-    "openIssueMessage_post": "ਹੇਠਾਂ ਦਿੱਤੀ ਜਾਣਕਾਰੀ ਨੂੰ ਕਾਪੀ ਕਰਕੇ ਗਿੱਟਹੱਬ ਮੁੱਦੇ ਵਿੱਚ ਪੇਸਟ ਕਰਕੇ ਸ਼ਾਮਲ ਕਰੋ ਜੀ।",
+    "trackedToSentry": "ਗਲਤੀ ਸੂਚਕ {{eventId}} ਸਾਡੇ ਸਿਸਟਮ 'ਤੇ ਟਰੈਕ ਕੀਤਾ ਗਿਆ ਸੀ।",
+    "openIssueMessage": "ਅਸੀਂ ਬੜੇ ਸਾਵਧਾਨ ਸੀ ਕਿ ਗਲਤੀ ਵਿੱਚ ਤੁਹਾਡੇ ਦ੍ਰਿਸ਼ ਦੀ ਜਾਣਕਾਰੀ ਸ਼ਾਮਲ ਨਾ ਕਰੀਏ। ਜੇ ਤੁਹਾਡਾ ਦ੍ਰਿਸ਼ ਨਿੱਜੀ ਨਹੀਂ ਹੈ ਤਾਂ ਇਸ 'ਤੇ ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ ਜੀ <button>ਬੱਗ ਟਰੈਕਰ।</button>ਹੇਠਾਂ ਦਿੱਤੀ ਜਾਣਕਾਰੀ ਨੂੰ ਕਾਪੀ ਕਰਕੇ ਗਿੱਟਹੱਬ ਮੁੱਦੇ ਵਿੱਚ ਪੇਸਟ ਕਰਕੇ ਸ਼ਾਮਲ ਕਰੋ ਜੀ।",
     "sceneContent": "ਦ੍ਰਿਸ਼ ਦੀ ਸਮੱਗਰੀ:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "ਲੋੜੀਂਦਾ",
       "website": "ਜਾਇਜ਼ URL ਭਰੋ"
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "ਜਨਤਕ ਲਾਇਬ੍ਰੇਰੀ ਦੀ ਰਿਪਾਜ਼ੀਟਰੀ",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "ਦਿਸ਼ਾ ਨਿਰਦੇਸ਼",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "MIT ਲਾਇਸੈਂਸ, ",
-      "post": ""
-    },
+    "noteDescription": "<link>ਜਨਤਕ ਲਾਇਬ੍ਰੇਰੀ ਦੀ ਰਿਪਾਜ਼ੀਟਰੀ</link>",
+    "noteGuidelines": "<link>ਦਿਸ਼ਾ ਨਿਰਦੇਸ਼</link>",
+    "noteLicense": "<link>MIT ਲਾਇਸੈਂਸ, </link>",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": "ਇੱਥੇ"
+    "content": "<link>ਇੱਥੇ</link>"
   },
   "confirmDialog": {
     "resetLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਰੀਸੈੱਟ ਕਰੋ",

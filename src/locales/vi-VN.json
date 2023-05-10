@@ -264,16 +264,11 @@
     "canvasTooBigTip": "Mẹo: hãy thử di chuyển các elements nhất lại gần nhau hơn một chút."
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
-    "clearCanvasMessage": "Nếu không tải lại được, hãy thử ",
-    "clearCanvasMessage_button": "dọn canvas.",
+    "headingMain": "",
+    "clearCanvasMessage": "Nếu không tải lại được, hãy thử <button>dọn canvas.</button>",
     "clearCanvasCaveat": " Điều này sẽ dẫn đến mất dữ liệu bạn đã làm ",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": ""
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "",
       "website": ""
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "Từng món trong thư viện phải có tên riêng để có thể lọc. Các món thư viện sau đây sẽ thêm:",
     "atleastOneLibItem": "Vui lòng chọn ít nhất một món thư viện để bắt đầu",
     "republishWarning": "Lưu ý: một số món đã chọn được đánh dấu là đã xuất bản/đã gửi. Bạn chỉ nên gửi lại các món khi cập nhật thư viện hiện có hoặc gửi."
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": ""
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",

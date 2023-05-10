@@ -264,16 +264,11 @@
     "canvasTooBigTip": ""
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
+    "headingMain": "",
     "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "",
     "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "Chyba identifikátoru ",
-    "trackedToSentry_post": " byl zaznamenán v našem systému.",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "trackedToSentry": "Chyba identifikátoru {{eventId}} byl zaznamenán v našem systému.",
+    "openIssueMessage": "",
     "sceneContent": ""
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "Povinné",
       "website": "Zadejte platnou URL adresu"
     },
-    "noteDescription": {
-      "pre": "Odešlete svou knihovnu, pro zařazení do ",
-      "link": "veřejného úložiště knihoven",
-      "post": ", odkud ji budou moci při kreslení využít i ostatní uživatelé."
-    },
-    "noteGuidelines": {
-      "pre": "Knihovna musí být nejdříve ručně schválena. Přečtěte si prosím ",
-      "link": "pokyny",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "Odešlete svou knihovnu, pro zařazení do <link>veřejného úložiště knihoven</link>, odkud ji budou moci při kreslení využít i ostatní uživatelé.",
+    "noteGuidelines": "Knihovna musí být nejdříve ručně schválena. Přečtěte si prosím <link>pokyny</link>",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Knihovna byla odeslána",
-    "content": "",
-    "link": ""
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",
