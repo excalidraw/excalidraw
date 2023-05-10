@@ -348,16 +348,16 @@
       "required": "Privalomas",
       "website": "Įveskite teisingą nuorodą (URL)"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
-    "noteLicense": "",
+    "noteDescription": "Pateik savo biblioteką, jog ji galėtų būti įtraukta į <link></link>jog kiti žmonės galėtų tai naudoti savo piešiniuose.",
+    "noteGuidelines": "Visų pirma, biblioteka turi būti rankiniu būdu patvirtinta. Prašome paskaityti <link>gairės</link>",
+    "noteLicense": "<link>MIT licencija, </link>",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Biblioteka pateikta",
-    "content": ""
+    "content": "Ačiū {{authorName}}. Tavo biblioteka buvo pateikta peržiūrai. Gali sekti būseną<link>čia</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Atstatyti biblioteką",
