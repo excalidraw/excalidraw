@@ -264,11 +264,11 @@
     "canvasTooBigTip": "कैनवास बहुत बड़ा टिप"
   },
   "errorSplash": {
-    "headingMain": "",
-    "clearCanvasMessage": "",
+    "headingMain": "एक त्रुटि का सामना करना पड़ा। प्रयत्न <button>इस पृष्ठ को पुनः लोड करें</button>",
+    "clearCanvasMessage": "यदि पुनः लोड करना काम नहीं करता है, तो प्रयास करें <button>कैनवास साफ करना।</button>",
     "clearCanvasCaveat": " इससे काम का नुकसान होगा ",
-    "trackedToSentry": "",
-    "openIssueMessage": "",
+    "trackedToSentry": "पहचानकर्ता के साथ त्रुटि {{eventId}} हमारे सिस्टम पर नज़र रखी गई थी।",
+    "openIssueMessage": "हम बहुत सतर्क थे कि त्रुटि पर आपकी दृश्य जानकारी शामिल न करें। यदि आपका दृश्य निजी नहीं है, तो कृपया हमारे बारे में विचार करें <button>बग ट्रैकर</button> कृपया GitHub मुद्दे को कॉपी और पेस्ट करके नीचे दी गई जानकारी शामिल करें।",
     "sceneContent": "दृश्य सामग्री:"
   },
   "roomDialog": {
@@ -348,8 +348,8 @@
       "required": "",
       "website": "मान्य URL प्रविष्ट करें"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
+    "noteDescription": "संग्रह सम्मिलित करने हेतु प्रस्तुत करें <link>सार्वजनिक संग्रहालय</link>अन्य वक्तियों को उनके चित्रकारी में उपयोग के लिये",
+    "noteGuidelines": "संग्रह को पहले स्वीकृति आवश्यक कृपया यह पढ़ें <link>दिशा-निर्देश</link>",
     "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
