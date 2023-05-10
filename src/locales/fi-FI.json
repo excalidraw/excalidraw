@@ -264,11 +264,11 @@
     "canvasTooBigTip": "Vinkki: yritä siirtää kaukaisimpia elementtejä hieman lähemmäs toisiaan."
   },
   "errorSplash": {
-    "headingMain": "",
-    "clearCanvasMessage": "",
+    "headingMain": "Tapahtui virhe. Yritä <button>sivun lataamista uudelleen.</button>",
+    "clearCanvasMessage": "Mikäli sivun lataaminen uudelleen ei auta, yritä <button>tyhjentää piirtoalue.</button>",
     "clearCanvasCaveat": " Tämä johtaa työn menetykseen ",
-    "trackedToSentry": "",
-    "openIssueMessage": "",
+    "trackedToSentry": "Virhe tunnisteella {{eventId}} tallennettiin järjestelmäämme.",
+    "openIssueMessage": "Olimme varovaisia emmekä sisällyttäneet tietoa piirroksestasi virheeseen. Mikäli piirroksesi ei ole yksityinen, harkitsethan kertovasi meille <button>virheenseurantajärjestelmässämme.</button> Sisällytä alla olevat tiedot kopioimalla ne GitHub-ongelmaan.",
     "sceneContent": "Piirroksen tiedot:"
   },
   "roomDialog": {
@@ -348,16 +348,16 @@
       "required": "Pakollinen",
       "website": "Syötä oikeamuotoinen URL-osoite"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
-    "noteLicense": "",
+    "noteDescription": "Lähetä kirjastosi, jotta se voidaan sisällyttää <link>julkisessa kirjastolistauksessa</link>muiden käyttöön omissa piirrustuksissaan.",
+    "noteGuidelines": "Kirjasto on ensin hyväksyttävä manuaalisesti. Ole hyvä ja lue <link>ohjeet</link> ennen lähettämistä. Tarvitset GitHub-tilin, jotta voit viestiä ja tehdä muutoksia pyydettäessä, mutta se ei ole ehdottoman välttämätöntä.",
+    "noteLicense": "Lähettämällä hyväksyt että kirjasto julkaistaan <link>MIT-lisenssin </link>alla, mikä lyhyesti antaa muiden käyttää sitä ilman rajoituksia.",
     "noteItems": "Jokaisella kirjaston kohteella on oltava oma nimensä suodatusta varten. Seuraavat kirjaston kohteet sisältyvät:",
     "atleastOneLibItem": "Valitse vähintään yksi kirjaston kohde aloittaaksesi",
     "republishWarning": "Huom! Osa valituista kohteista on merkitty jo julkaistu/lähetetyiksi. Lähetä kohteita uudelleen vain päivitettäessä olemassa olevaa kirjastoa tai ehdotusta."
   },
   "publishSuccessDialog": {
     "title": "Kirjasto lähetetty",
-    "content": ""
+    "content": "Kiitos {{authorName}}. Kirjastosi on lähetetty tarkistettavaksi. Voit seurata sen tilaa<link>täällä</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Tyhjennä kirjasto",
