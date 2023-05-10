@@ -265,7 +265,7 @@
   },
   "errorSplash": {
     "headingMain": "",
-    "clearCanvasMessage": "",
+    "clearCanvasMessage": "إذا لم تعمل إعادة التحميل، حاول مرة أخرى ",
     "clearCanvasCaveat": " هذا سيؤدي إلى فقدان العمل ",
     "trackedToSentry": "",
     "openIssueMessage": "",
@@ -357,7 +357,7 @@
   },
   "publishSuccessDialog": {
     "title": "تم إرسال المكتبة",
-    "content": ""
+    "content": "شكرا لك {{authorName}}. لقد تم إرسال مكتبتك للمراجعة. يمكنك تتبع الحالة"
   },
   "confirmDialog": {
     "resetLibrary": "إعادة ضبط المكتبة",
