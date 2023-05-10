@@ -1,4 +1,5 @@
 import { getElementsHandleCoordinates } from "./element/bounds";
+import { TransformHandleDirection } from "./element/transformHandles";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -14,6 +15,7 @@ import { AppState, Point, Zoom } from "./types";
 export type Snap = {
   distance: number;
   point: GA.Point;
+  direction: TransformHandleDirection;
   snapLine: SnapLine;
 };
 
@@ -97,8 +99,8 @@ export const getSnaps = ({
     )
     .flatMap(getElementsSnapLines)
     .flatMap((snapLine) =>
-      Object.values(selectionCoordinates)
-        .map((originPoint) => {
+      Object.entries(selectionCoordinates)
+        .map(([handle, originPoint]) => {
           const point = GA.add(GAPoints.from(originPoint), offset);
           const distance = Math.abs(
             GAPoints.distanceToLine(point, snapLine.line),
@@ -108,7 +110,12 @@ export const getSnaps = ({
             return null;
           }
 
-          return { distance, point, snapLine };
+          return {
+            distance,
+            point,
+            snapLine,
+            direction: handle as TransformHandleDirection,
+          };
         })
         .filter(
           (snap): snap is Snap =>
@@ -150,10 +157,11 @@ export const getSnaps = ({
   return null;
 };
 
-export const isPointSnapped = ([x, y]: Point, snaps: Snaps) =>
+export const isPointSnapped = ([x, y]: Point, snaps: Snaps, gap = 0) =>
   snaps.some(
     (snap) =>
-      Math.abs(GAPoints.distanceToLine(GA.point(x, y), snap.snapLine.line)) < 1,
+      Math.abs(GAPoints.distanceToLine(GA.point(x, y), snap.snapLine.line)) <
+      1 + gap,
   );
 
 const shouldSnap = (snap: Snap, zoom: Zoom) =>
