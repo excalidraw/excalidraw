@@ -36,14 +36,14 @@ class ElementBoundsCache {
     {
       bounds: Bounds;
       version: ExcalidrawElement["version"];
-      versionNounce: ExcalidrawElement["versionNonce"];
+      versionNonce: ExcalidrawElement["versionNonce"];
     }
   >();
 
   updateBounds(element: ExcalidrawElement, bounds: Bounds) {
     this.boundsCache.set(element, {
       version: element.version,
-      versionNounce: element.versionNonce,
+      versionNonce: element.versionNonce,
       bounds,
     });
   }
@@ -513,7 +513,7 @@ export const getElementBounds = (
     if (
       cachedBounds &&
       cachedBounds.version === element.version &&
-      cachedBounds.versionNounce === element.versionNonce &&
+      cachedBounds.versionNonce === element.versionNonce &&
       cachedBounds.bounds
     ) {
       return cachedBounds.bounds;
