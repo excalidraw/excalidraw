@@ -5042,6 +5042,7 @@ class App extends React.Component<AppProps, AppState> {
           multiElement || isTextElement(this.state.editingElement)
             ? this.state.editingElement
             : null,
+        snaps: null,
       });
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
