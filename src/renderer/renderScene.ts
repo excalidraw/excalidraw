@@ -611,7 +611,6 @@ export const _renderScene = ({
             renderConfig,
             transformHandles,
             locallySelectedElements[0].angle,
-            !!appState.draggingElement,
           );
         }
       } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
@@ -642,17 +641,9 @@ export const _renderScene = ({
           renderConfig.zoom,
           "mouse",
           OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-          undefined,
-          appState.snaps,
         );
         if (locallySelectedElements.some((element) => !element.locked)) {
-          renderTransformHandles(
-            context,
-            renderConfig,
-            transformHandles,
-            0,
-            !!appState.draggingElement,
-          );
+          renderTransformHandles(context, renderConfig, transformHandles, 0);
         }
       }
       context.restore();
@@ -858,12 +849,11 @@ const renderTransformHandles = (
   renderConfig: RenderConfig,
   transformHandles: TransformHandles,
   angle: number,
-  highlights = false,
 ): void => {
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];
     if (transformHandle !== undefined) {
-      const [x, y, width, height, isHighlighted] = transformHandle;
+      const [x, y, width, height] = transformHandle;
 
       context.save();
       context.lineWidth = 1 / renderConfig.zoom.value;
@@ -876,9 +866,6 @@ const renderTransformHandles = (
       } else if (context.roundRect) {
         context.beginPath();
         context.roundRect(x, y, width, height, 2 / renderConfig.zoom.value);
-        if (highlights && isHighlighted && renderConfig.selectionColor) {
-          context.fillStyle = renderConfig.selectionColor;
-        }
         context.fill();
         context.stroke();
       } else {

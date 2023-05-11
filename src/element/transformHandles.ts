@@ -10,10 +10,7 @@ import { AppState, Zoom } from "../types";
 import { isTextElement } from ".";
 import { isLinearElement } from "./typeChecks";
 import { DEFAULT_SPACING } from "../renderer/renderScene";
-import {
-  Snaps,
-  // isPointSnapped
-} from "../snapping";
+import { Snaps } from "../snapping";
 
 export type TransformHandleDirection =
   | "n"
@@ -27,7 +24,7 @@ export type TransformHandleDirection =
 
 export type TransformHandleType = TransformHandleDirection | "rotation";
 
-export type TransformHandle = [number, number, number, number, boolean];
+export type TransformHandle = [number, number, number, number];
 export type TransformHandles = Partial<{
   [T in TransformHandleType]: TransformHandle;
 }>;
@@ -79,18 +76,9 @@ const generateTransformHandle = (
   cx: number,
   cy: number,
   angle: number,
-  snaps: Snaps | null,
 ): TransformHandle => {
   const [xx, yy] = rotate(x + width / 2, y + height / 2, cx, cy, angle);
-  return [
-    xx - width / 2,
-    yy - height / 2,
-    width,
-    height,
-    // TODO: decide if we should highlight transform handle
-    // isPointSnapped([xx, yy], snaps ?? [], 8),
-    false,
-  ];
+  return [xx - width / 2, yy - height / 2, width, height];
 };
 
 export const getTransformHandlesFromCoords = (
@@ -100,7 +88,6 @@ export const getTransformHandlesFromCoords = (
   pointerType: PointerType,
   omitSides: { [T in TransformHandleType]?: boolean } = {},
   margin = 4,
-  snaps: Snaps | null,
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
   const handleWidth = size / zoom.value;
@@ -125,7 +112,6 @@ export const getTransformHandlesFromCoords = (
           cx,
           cy,
           angle,
-          snaps,
         ),
     ne: omitSides.ne
       ? undefined
@@ -137,7 +123,6 @@ export const getTransformHandlesFromCoords = (
           cx,
           cy,
           angle,
-          snaps,
         ),
     sw: omitSides.sw
       ? undefined
@@ -149,7 +134,6 @@ export const getTransformHandlesFromCoords = (
           cx,
           cy,
           angle,
-          snaps,
         ),
     se: omitSides.se
       ? undefined
@@ -161,7 +145,6 @@ export const getTransformHandlesFromCoords = (
           cx,
           cy,
           angle,
-          snaps,
         ),
     rotation: omitSides.rotation
       ? undefined
@@ -177,7 +160,6 @@ export const getTransformHandlesFromCoords = (
           cx,
           cy,
           angle,
-          snaps,
         ),
   };
 
@@ -195,7 +177,6 @@ export const getTransformHandlesFromCoords = (
         cx,
         cy,
         angle,
-        snaps,
       );
     }
     if (!omitSides.s) {
@@ -207,7 +188,6 @@ export const getTransformHandlesFromCoords = (
         cx,
         cy,
         angle,
-        snaps,
       );
     }
   }
@@ -221,7 +201,6 @@ export const getTransformHandlesFromCoords = (
         cx,
         cy,
         angle,
-        snaps,
       );
     }
     if (!omitSides.e) {
@@ -233,7 +212,6 @@ export const getTransformHandlesFromCoords = (
         cx,
         cy,
         angle,
-        snaps,
       );
     }
   }
@@ -284,7 +262,6 @@ export const getTransformHandles = (
     pointerType,
     omitSides,
     dashedLineMargin,
-    snaps,
   );
 };
 

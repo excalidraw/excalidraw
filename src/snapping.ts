@@ -157,13 +157,6 @@ export const getSnaps = ({
   return null;
 };
 
-export const isPointSnapped = ([x, y]: Point, snaps: Snaps, gap = 0) =>
-  snaps.some(
-    (snap) =>
-      Math.abs(GAPoints.distanceToLine(GA.point(x, y), snap.snapLine.line)) <
-      1 + gap,
-  );
-
 const shouldSnap = (snap: Snap, zoom: Zoom) =>
   snap.distance < SNAP_DISTANCE / zoom.value;
 

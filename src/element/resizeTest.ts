@@ -101,8 +101,6 @@ export const getTransformHandleTypeFromCoords = (
     zoom,
     pointerType,
     OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-    undefined,
-    snaps,
   );
 
   const found = Object.keys(transformHandles).find((key) => {
