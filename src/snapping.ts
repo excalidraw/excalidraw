@@ -79,7 +79,7 @@ export const getSnaps = ({
   dragOffset: { x: number; y: number };
 }): Snaps | null => {
   const offset = GA.offset(dragOffset.x, dragOffset.y);
-  if (!isSnapEnabled({ appState, event })) {
+  if (!isSnappingEnabled({ appState, event })) {
     return null;
   }
 
@@ -185,7 +185,7 @@ export const getSnapLineEndPointsCoords = (
   };
 };
 
-const isSnapEnabled = ({
+const isSnappingEnabled = ({
   event,
   appState,
 }: {

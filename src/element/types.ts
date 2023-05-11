@@ -54,7 +54,6 @@ type _ExcalidrawElementBase = Readonly<{
       Ordered from deepest to shallowest. */
   groupIds: readonly GroupId[];
   /** other elements that are bound to this element */
-  bounds: [number, number, number, number] | null;
   boundElements:
     | readonly Readonly<{
         id: ExcalidrawLinearElement["id"];

@@ -53,7 +53,6 @@ type ElementConstructorOpts = MarkOptional<
   | "height"
   | "angle"
   | "groupIds"
-  | "bounds"
   | "boundElements"
   | "seed"
   | "version"
@@ -87,7 +86,6 @@ const _newElementBase = <T extends ExcalidrawElement>(
     angle = 0,
     groupIds = [],
     roundness = null,
-    bounds = null,
     boundElements = null,
     link = null,
     locked = DEFAULT_ELEMENT_PROPS.locked,
@@ -116,7 +114,6 @@ const _newElementBase = <T extends ExcalidrawElement>(
     version: rest.version || 1,
     versionNonce: rest.versionNonce ?? 0,
     isDeleted: false as false,
-    bounds,
     boundElements,
     updated: getUpdatedTimestamp(),
     link,

@@ -30,6 +30,31 @@ import { TransformHandleDirection } from "./transformHandles";
 export type Bounds = readonly [number, number, number, number];
 type MaybeQuadraticSolution = [number | null, number | null] | false;
 
+class ElementBoundsCache {
+  private boundsCache = new WeakMap<
+    ExcalidrawElement,
+    {
+      bounds: Bounds;
+      version: ExcalidrawElement["version"];
+      versionNounce: ExcalidrawElement["versionNonce"];
+    }
+  >();
+
+  updateBounds(element: ExcalidrawElement, bounds: Bounds) {
+    this.boundsCache.set(element, {
+      version: element.version,
+      versionNounce: element.versionNonce,
+      bounds,
+    });
+  }
+
+  getCachedBounds(element: ExcalidrawElement) {
+    return this.boundsCache.get(element);
+  }
+}
+
+export const cachedElementBounds = new ElementBoundsCache();
+
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
 export const getElementAbsoluteCoords = (
@@ -482,9 +507,17 @@ const getLinearElementRotatedBounds = (
 export const getElementBounds = (
   element: ExcalidrawElement,
   recompuate = false,
-): [number, number, number, number] => {
-  if (element.bounds && !recompuate) {
-    return element.bounds;
+): Bounds => {
+  if (!recompuate) {
+    const cachedBounds = cachedElementBounds.getCachedBounds(element);
+    if (
+      cachedBounds &&
+      cachedBounds.version === element.version &&
+      cachedBounds.versionNounce === element.versionNonce &&
+      cachedBounds.bounds
+    ) {
+      return cachedBounds.bounds;
+    }
   }
 
   let bounds: [number, number, number, number];
@@ -534,6 +567,9 @@ export const getElementBounds = (
     const maxY = Math.max(y11, y12, y22, y21);
     bounds = [minX, minY, maxX, maxY];
   }
+
+  // update cached bounds here when cache miss or recompute
+  cachedElementBounds.updateBounds(element, bounds);
 
   return bounds;
 };
@@ -637,7 +673,7 @@ export const getElementPointsCoords = (
 export const getClosestElementBounds = (
   elements: readonly ExcalidrawElement[],
   from: { x: number; y: number },
-): [number, number, number, number] => {
+): Bounds => {
   if (!elements.length) {
     return [0, 0, 0, 0];
   }
