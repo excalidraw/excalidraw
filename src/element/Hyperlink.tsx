@@ -1,4 +1,4 @@
-import { AppState, ExcalidrawProps, Point } from "../types";
+import { AppState, ExcalidrawProps, Point, UIAppState } from "../types";
 import {
   getShortcutKey,
   sceneCoordsToViewportCoords,
@@ -10,7 +10,7 @@ import { NonDeletedExcalidrawElement } from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
-import { editIcon, link, trash } from "../components/icons";
+import { FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
 import { t } from "../i18n";
 import {
   useCallback,
@@ -197,7 +197,7 @@ export const Hyperlink = ({
             label={t("buttons.edit")}
             onClick={onEdit}
             className="excalidraw-hyperlinkContainer--edit"
-            icon={editIcon}
+            icon={FreedrawIcon}
           />
         )}
 
@@ -209,7 +209,7 @@ export const Hyperlink = ({
             label={t("buttons.remove")}
             onClick={handleRemove}
             className="excalidraw-hyperlinkContainer--remove"
-            icon={trash}
+            icon={TrashIcon}
           />
         )}
       </div>
@@ -267,7 +267,7 @@ export const actionLink = register({
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
   contextItemLabel: (elements, appState) =>
     getContextMenuLabel(elements, appState),
-  contextItemPredicate: (elements, appState) => {
+  predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
     return selectedElements.length === 1;
   },
@@ -277,7 +277,7 @@ export const actionLink = register({
     return (
       <ToolButton
         type="button"
-        icon={link}
+        icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
         title={`${t("labels.link.label")} - ${getShortcutKey("CtrlOrCmd+K")}`}
         onClick={() => updateData(null)}
@@ -297,10 +297,11 @@ export const getContextMenuLabel = (
     : "labels.link.create";
   return label;
 };
+
 export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
-  appState: AppState,
+  appState: UIAppState,
 ): [x: number, y: number, width: number, height: number] => {
   const size = DEFAULT_LINK_SIZE;
   const linkWidth = size / appState.zoom.value;

@@ -3,17 +3,17 @@ import { getClientInitials } from "../clients";
 describe("getClientInitials", () => {
   it("returns substring if one name provided", () => {
     const result = getClientInitials("Alan");
-    expect(result).toBe("AL");
+    expect(result).toBe("A");
   });
 
   it("returns initials", () => {
     const result = getClientInitials("John Doe");
-    expect(result).toBe("JD");
+    expect(result).toBe("J");
   });
 
   it("returns correct initials if many names provided", () => {
     const result = getClientInitials("John Alan Doe");
-    expect(result).toBe("JD");
+    expect(result).toBe("J");
   });
 
   it("returns single initial if 1 letter provided", () => {
@@ -34,6 +34,11 @@ describe("getClientInitials", () => {
     expect(result).toBe("?");
 
     result = getClientInitials(null);
+    expect(result).toBe("?");
+  });
+
+  it('returns "?" when value is blank', () => {
+    const result = getClientInitials(" ");
     expect(result).toBe("?");
   });
 });

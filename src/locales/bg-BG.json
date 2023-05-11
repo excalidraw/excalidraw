@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Постави",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Постави графики",
     "selectAll": "Маркирай всичко",
     "multiSelect": "Добави елемент към селекция",
@@ -53,6 +54,7 @@
     "veryLarge": "Много голям",
     "solid": "Солиден",
     "hachure": "Хералдика",
+    "zigzag": "",
     "crossHatch": "Двойно-пресечено",
     "thin": "Тънък",
     "bold": "Ясно очертан",
@@ -109,10 +111,15 @@
     "increaseFontSize": "",
     "unbindText": "",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "lineEditor": {
+      "edit": "",
+      "exit": ""
     },
     "elementLock": {
       "lock": "",
@@ -131,8 +138,8 @@
   "buttons": {
     "clearReset": "Нулиране на платно",
     "exportJSON": "",
-    "exportImage": "Запиши като изображение",
-    "export": "Експортиране",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Изнасяне в PNG",
     "exportToSvg": "Изнасяне в SVG",
     "copyToClipboard": "Копиране в клипборда",
@@ -140,7 +147,7 @@
     "scale": "Мащаб",
     "save": "",
     "saveAs": "Запиши като",
-    "load": "Зареждане",
+    "load": "",
     "getShareableLink": "Получаване на връзка за споделяне",
     "close": "Затвори",
     "selectLanguage": "Избор на език",
@@ -187,7 +194,8 @@
     "invalidSceneUrl": "",
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "Този файлов формат не се поддържа.",
@@ -196,7 +204,15 @@
     "svgImageInsertError": "",
     "invalidSVGString": "",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Селекция",
@@ -212,7 +228,8 @@
     "lock": "Поддържайте избрания инструмент активен след рисуване",
     "penMode": "",
     "link": "",
-    "eraser": ""
+    "eraser": "",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Действия по платното",
@@ -231,14 +248,15 @@
     "resize": "Може да ограничите при преоразмеряване като задържите SHIFT,\nзадръжте ALT за преоразмерите през центъра",
     "resizeImage": "",
     "rotate": "Можете да ограничите ъглите, като държите SHIFT, докато се въртите",
-    "lineEditor_info": "Кликнете два пъти или натиснете Enter за да промените точките",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Натиснете Delete за да изтриете точка(и), CtrlOrCmd+D за дуплициране, или извлачете за да преместите",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "Натиснете Enter, за да добавите",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Невъзможност за показване на preview",
@@ -246,16 +264,11 @@
     "canvasTooBigTip": "Подсказка: пробвайте да приближите далечните елементи по-близко."
   },
   "errorSplash": {
-    "headingMain_pre": "Среща грешка. Опитайте ",
-    "headingMain_button": "презареждане на страницата.",
-    "clearCanvasMessage": "Ако презареждането не работи, опитайте ",
-    "clearCanvasMessage_button": "изчистване на платното.",
+    "headingMain": "Среща грешка. Опитайте <button>презареждане на страницата.</button>",
+    "clearCanvasMessage": "Ако презареждането не работи, опитайте <button>изчистване на платното.</button>",
     "clearCanvasCaveat": " Това ще доведе до загуба на работа ",
-    "trackedToSentry_pre": "Грешката с идентификатор ",
-    "trackedToSentry_post": " беше проследен в нашата система.",
-    "openIssueMessage_pre": "Бяхме много предпазливи да не включите информацията за вашата сцена при грешката. Ако сцената ви не е частна, моля, помислете за последващи действия на нашата ",
-    "openIssueMessage_button": "тракер за грешки.",
-    "openIssueMessage_post": " Моля, включете информация по-долу, като я копирате и добавите в GitHub.",
+    "trackedToSentry": "Грешката с идентификатор {{eventId}} беше проследен в нашата система.",
+    "openIssueMessage": "Бяхме много предпазливи да не включите информацията за вашата сцена при грешката. Ако сцената ви не е частна, моля, помислете за последващи действия на нашата <button>тракер за грешки.</button> Моля, включете информация по-долу, като я копирате и добавите в GitHub.",
     "sceneContent": "Съдържание на сцената:"
   },
   "roomDialog": {
@@ -293,7 +306,8 @@
     "doubleClick": "",
     "drag": "плъзнете",
     "editor": "Редактор",
-    "editSelectedShape": "",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Намерихте проблем? Изпратете",
     "howto": "Следвайте нашите ръководства",
     "or": "или",
@@ -306,7 +320,9 @@
     "view": "Преглед",
     "zoomToFit": "Приближи докато се виждат всички елементи",
     "zoomToSelection": "Приближи селекцията",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -332,29 +348,16 @@
       "required": "",
       "website": ""
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": ""
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",
@@ -387,7 +390,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
@@ -435,5 +439,18 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

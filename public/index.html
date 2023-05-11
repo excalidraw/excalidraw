@@ -8,50 +8,78 @@
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no"
     />
     <meta name="referrer" content="origin" />
-
     <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#121212" />
 
-    <meta name="theme-color" content="#000" />
+    <!-- Primary Meta Tags -->
+    <meta
+      name="title"
+      content="Excalidraw — Collaborative whiteboarding made easy"
+    />
+    <meta
+      name="description"
+      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+    />
+    <meta name="image" content="https://excalidraw.com/og-general-v1.png" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:site_name" content="Excalidraw" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://excalidraw.com" />
+    <meta
+      property="og:title"
+      content="Excalidraw — Collaborative whiteboarding made easy"
+    />
+    <meta property="og:image:alt" content="Excalidraw logo" />
+    <meta
+      property="og:description"
+      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+    />
+    <meta property="og:image" content="https://excalidraw.com/og-fb-v1.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:site" content="@excalidraw" />
+    <meta property="twitter:url" content="https://excalidraw.com" />
+    <meta
+      property="twitter:title"
+      content="Excalidraw — Collaborative whiteboarding made easy"
+    />
+    <meta
+      property="twitter:description"
+      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+    />
+    <meta
+      property="twitter:image"
+      content="https://excalidraw.com/og-twitter-v1.png"
+    />
 
     <!-- General tags -->
     <meta
       name="description"
       content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
-    <meta name="image" content="og-image.png" />
 
-    <!-- OpenGraph tags -->
-    <meta property="og:url" content="https://excalidraw.com" />
-    <meta property="og:site_name" content="Excalidraw" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Excalidraw" />
-    <meta
-      property="og:description"
-      content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
-    />
-    <!-- OG tags require an absolute url for images -->
-    <meta
-      property="og:image"
-      name="twitter:image"
-      content="https://excalidraw.com/og-image.png"
-    />
-    <meta
-      property="og:image:secure_url"
-      name="twitter:image"
-      content="https://excalidraw.com/og-image.png"
-    />
-    <meta property="og:image:width" content="1280" />
-    <meta property="og:image:height" content="669" />
-    <meta property="og:image:alt" content="Excalidraw logo with byline." />
+    <!------------------------------------------------------------------------->
+    <!--   to minimize white flash on load when user has dark mode enabled   -->
+    <script>
+      try {
+        //
+        const theme = window.localStorage.getItem("excalidraw-theme");
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
+        }
+      } catch {}
+    </script>
+    <style>
+      html.dark {
+        background-color: #121212;
+        color: #fff;
+      }
+    </style>
+    <!------------------------------------------------------------------------->
 
-    <!-- Twitter Card tags -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Excalidraw" />
-    <meta
-      name="twitter:description"
-      content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
-    />
-
+    <% if (process.env.NODE_ENV === "production") { %>
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -70,6 +98,7 @@
         window.location.href = "https://app.excalidraw.com";
       }
     </script>
+    <% } %>
 
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
@@ -98,7 +127,7 @@
     />
 
     <link rel="stylesheet" href="fonts.css" type="text/css" />
-    <% if (process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD === "true") { %>
+    <% if (process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD==="true" ) { %>
     <script>
       {
         const _WebSocket = window.WebSocket;
@@ -119,6 +148,17 @@
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
     </script>
+    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
+
+    <!-- Fathom - privacy-friendly analytics -->
+    <script
+      src="https://cdn.usefathom.com/script.js"
+      data-site="VMSBUEYA"
+      defer
+    ></script>
+    <!-- / Fathom -->
+
+    <!-- LEGACY GOOGLE ANALYTICS -->
     <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
     <script
       async
@@ -133,15 +173,14 @@
       gtag("config", "%REACT_APP_GOOGLE_ANALYTICS_ID%");
     </script>
     <% } %>
+    <!-- end LEGACY GOOGLE ANALYTICS -->
+    <% } %>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
     <style>
       body,
       html {
         margin: 0;
-        --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
-          Roboto, Helvetica, Arial, sans-serif;
-        font-family: var(--ui-font);
         -webkit-text-size-adjust: 100%;
 
         width: 100%;
@@ -155,7 +194,7 @@
         width: 1px;
         overflow: hidden;
         clip: rect(1px, 1px, 1px, 1px);
-        white-space: nowrap; /* added line */
+        white-space: nowrap;
         user-select: none;
       }
 
@@ -188,5 +227,17 @@
       <h1 class="visually-hidden">Excalidraw</h1>
     </header>
     <div id="root"></div>
+    <!-- 100% privacy friendly analytics -->
+    <script
+      async
+      defer
+      src="https://scripts.simpleanalyticscdn.com/latest.js"
+    ></script>
+    <noscript
+      ><img
+        src="https://queue.simpleanalyticscdn.com/noscript.gif"
+        alt=""
+        referrerpolicy="no-referrer-when-downgrade"
+    /></noscript>
   </body>
 </html>

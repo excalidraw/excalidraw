@@ -2,14 +2,21 @@ import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import { useExcalidrawContainer, useDevice } from "../components/App";
+import {
+  useExcalidrawContainer,
+  useDevice,
+  useExcalidrawSetAppState,
+} from "../components/App";
 import { KEYS } from "../keys";
 import "./Dialog.scss";
-import { back, close } from "./icons";
+import { back, CloseIcon } from "./icons";
 import { Island } from "./Island";
 import { Modal } from "./Modal";
 import { AppState } from "../types";
 import { queryFocusableElements } from "../utils";
+import { useSetAtom } from "jotai";
+import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+import { jotaiScope } from "../jotai";
 
 export interface DialogProps {
   children: React.ReactNode;
@@ -65,7 +72,12 @@ export const Dialog = (props: DialogProps) => {
     return () => islandNode.removeEventListener("keydown", handleKeyDown);
   }, [islandNode, props.autofocus]);
 
+  const setAppState = useExcalidrawSetAppState();
+  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom, jotaiScope);
+
   const onClose = () => {
+    setAppState({ openMenu: null });
+    setIsLibraryMenuOpen(false);
     (lastActiveElement as HTMLElement).focus();
     props.onCloseRequest();
   };
@@ -88,7 +100,7 @@ export const Dialog = (props: DialogProps) => {
             title={t("buttons.close")}
             aria-label={t("buttons.close")}
           >
-            {useDevice().isMobile ? back : close}
+            {useDevice().isMobile ? back : CloseIcon}
           </button>
         </h2>
         <div className="Dialog__content">{props.children}</div>

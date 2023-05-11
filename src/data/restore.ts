@@ -1,7 +1,9 @@
 import {
   ExcalidrawElement,
   ExcalidrawSelectionElement,
+  ExcalidrawTextElement,
   FontFamilyValues,
+  StrokeRoundness,
 } from "../element/types";
 import {
   AppState,
@@ -9,25 +11,36 @@ import {
   LibraryItem,
   NormalizedZoomValue,
 } from "../types";
-import { ImportedDataState } from "./types";
+import { ImportedDataState, LegacyAppState } from "./types";
 import {
   getNonDeletedElements,
   getNormalizedDimensions,
   isInvisiblySmallElement,
+  refreshTextDimensions,
 } from "../element";
-import { isLinearElementType } from "../element/typeChecks";
+import { isTextElement, isUsingAdaptiveRadius } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
+  PRECEDING_ELEMENT_KEY,
   FONT_FAMILY,
+  ROUNDNESS,
+  DEFAULT_SIDEBAR,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
-import { getUpdatedTimestamp, updateActiveTool } from "../utils";
+import { getFontString, getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
+import oc from "open-color";
+import { MarkOptional, Mutable } from "../utility-types";
+import {
+  detectLineHeight,
+  getDefaultLineHeight,
+  measureBaseline,
+} from "../element/textElement";
 
 type RestoredAppState = Omit<
   AppState,
@@ -49,6 +62,7 @@ export const AllowedExcalidrawActiveTools: Record<
   freedraw: true,
   eraser: false,
   custom: true,
+  hand: true,
 };
 
 export type RestoredDataState = {
@@ -71,6 +85,10 @@ const restoreElementWithProperties = <
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
+    /** @deprecated */
+    strokeSharpness?: StrokeRoundness;
+    /** metadata that may be present in elements during collaboration */
+    [PRECEDING_ELEMENT_KEY]?: string;
   },
   K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
@@ -83,7 +101,9 @@ const restoreElementWithProperties = <
   > &
     Partial<Pick<ExcalidrawElement, "type" | "x" | "y">>,
 ): T => {
-  const base: Pick<T, keyof ExcalidrawElement> = {
+  const base: Pick<T, keyof ExcalidrawElement> & {
+    [PRECEDING_ELEMENT_KEY]?: string;
+  } = {
     type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
@@ -99,15 +119,23 @@ const restoreElementWithProperties = <
     angle: element.angle || 0,
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
-    strokeColor: element.strokeColor,
-    backgroundColor: element.backgroundColor,
+    strokeColor: element.strokeColor || oc.black,
+    backgroundColor: element.backgroundColor || "transparent",
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
-    strokeSharpness:
-      element.strokeSharpness ??
-      (isLinearElementType(element.type) ? "round" : "sharp"),
+    roundness: element.roundness
+      ? element.roundness
+      : element.strokeSharpness === "round"
+      ? {
+          // for old elements that would now use adaptive radius algo,
+          // use legacy algo instead
+          type: isUsingAdaptiveRadius(element.type)
+            ? ROUNDNESS.LEGACY
+            : ROUNDNESS.PROPORTIONAL_RADIUS,
+        }
+      : null,
     boundElements: element.boundElementIds
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
@@ -120,6 +148,10 @@ const restoreElementWithProperties = <
     base.customData = element.customData;
   }
 
+  if (PRECEDING_ELEMENT_KEY in element) {
+    base[PRECEDING_ELEMENT_KEY] = element[PRECEDING_ELEMENT_KEY];
+  }
+
   return {
     ...base,
     ...getNormalizedDimensions(base),
@@ -129,6 +161,7 @@ const restoreElementWithProperties = <
 
 const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+  refreshDimensions = false,
 ): typeof element | null => {
   switch (element.type) {
     case "text":
@@ -138,19 +171,46 @@ const restoreElement = (
         const [fontPx, _fontFamily]: [string, string] = (
           element as any
         ).font.split(" ");
-        fontSize = parseInt(fontPx, 10);
+        fontSize = parseFloat(fontPx);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
-      return restoreElementWithProperties(element, {
+      const text = element.text ?? "";
+
+      // line-height might not be specified either when creating elements
+      // programmatically, or when importing old diagrams.
+      // For the latter we want to detect the original line height which
+      // will likely differ from our per-font fixed line height we now use,
+      // to maintain backward compatibility.
+      const lineHeight =
+        element.lineHeight ||
+        (element.height
+          ? // detect line-height from current element height and font-size
+            detectLineHeight(element)
+          : // no element height likely means programmatic use, so default
+            // to a fixed line height
+            getDefaultLineHeight(element.fontFamily));
+      const baseline = measureBaseline(
+        element.text,
+        getFontString(element),
+        lineHeight,
+      );
+      element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
-        text: element.text ?? "",
-        baseline: element.baseline,
+        text,
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
-        originalText: element.originalText || element.text,
+        originalText: element.originalText || text,
+
+        lineHeight,
+        baseline,
       });
+
+      if (refreshDimensions) {
+        element = { ...element, ...refreshTextDimensions(element) };
+      }
+      return element;
     case "freedraw": {
       return restoreElementWithProperties(element, {
         points: element.points,
@@ -219,27 +279,170 @@ const restoreElement = (
   }
 };
 
+/**
+ * Repairs contaienr element's boundElements array by removing duplicates and
+ * fixing containerId of bound elements if not present. Also removes any
+ * bound elements that do not exist in the elements array.
+ *
+ * NOTE mutates elements.
+ */
+const repairContainerElement = (
+  container: Mutable<ExcalidrawElement>,
+  elementsMap: Map<string, Mutable<ExcalidrawElement>>,
+) => {
+  if (container.boundElements) {
+    // copy because we're not cloning on restore, and we don't want to mutate upstream
+    const boundElements = container.boundElements.slice();
+
+    // dedupe bindings & fix boundElement.containerId if not set already
+    const boundIds = new Set<ExcalidrawElement["id"]>();
+    container.boundElements = boundElements.reduce(
+      (
+        acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
+        binding,
+      ) => {
+        const boundElement = elementsMap.get(binding.id);
+        if (boundElement && !boundIds.has(binding.id)) {
+          boundIds.add(binding.id);
+
+          if (boundElement.isDeleted) {
+            return acc;
+          }
+
+          acc.push(binding);
+
+          if (
+            isTextElement(boundElement) &&
+            // being slightly conservative here, preserving existing containerId
+            // if defined, lest boundElements is stale
+            !boundElement.containerId
+          ) {
+            (boundElement as Mutable<ExcalidrawTextElement>).containerId =
+              container.id;
+          }
+        }
+        return acc;
+      },
+      [],
+    );
+  }
+};
+
+/**
+ * Repairs target bound element's container's boundElements array,
+ * or removes contaienrId if container does not exist.
+ *
+ * NOTE mutates elements.
+ */
+const repairBoundElement = (
+  boundElement: Mutable<ExcalidrawTextElement>,
+  elementsMap: Map<string, Mutable<ExcalidrawElement>>,
+) => {
+  const container = boundElement.containerId
+    ? elementsMap.get(boundElement.containerId)
+    : null;
+
+  if (!container) {
+    boundElement.containerId = null;
+    return;
+  }
+
+  if (boundElement.isDeleted) {
+    return;
+  }
+
+  if (
+    container.boundElements &&
+    !container.boundElements.find((binding) => binding.id === boundElement.id)
+  ) {
+    // copy because we're not cloning on restore, and we don't want to mutate upstream
+    const boundElements = (
+      container.boundElements || (container.boundElements = [])
+    ).slice();
+    boundElements.push({ type: "text", id: boundElement.id });
+    container.boundElements = boundElements;
+  }
+};
+
 export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
+  opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,
 ): ExcalidrawElement[] => {
+  // used to detect duplicate top-level element ids
+  const existingIds = new Set<string>();
+
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
-  return (elements || []).reduce((elements, element) => {
+  const restoredElements = (elements || []).reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
     // and causing issues if retained
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-      let migratedElement: ExcalidrawElement | null = restoreElement(element);
+      let migratedElement: ExcalidrawElement | null = restoreElement(
+        element,
+        opts?.refreshDimensions,
+      );
       if (migratedElement) {
         const localElement = localElementsMap?.get(element.id);
         if (localElement && localElement.version > migratedElement.version) {
           migratedElement = bumpVersion(migratedElement, localElement.version);
         }
+        if (existingIds.has(migratedElement.id)) {
+          migratedElement = { ...migratedElement, id: randomId() };
+        }
+        existingIds.add(migratedElement.id);
         elements.push(migratedElement);
       }
     }
     return elements;
   }, [] as ExcalidrawElement[]);
+
+  if (!opts?.repairBindings) {
+    return restoredElements;
+  }
+
+  // repair binding. Mutates elements.
+  const restoredElementsMap = arrayToMap(restoredElements);
+  for (const element of restoredElements) {
+    if (isTextElement(element) && element.containerId) {
+      repairBoundElement(element, restoredElementsMap);
+    } else if (element.boundElements) {
+      repairContainerElement(element, restoredElementsMap);
+    }
+  }
+
+  return restoredElements;
+};
+
+const coalesceAppStateValue = <
+  T extends keyof ReturnType<typeof getDefaultAppState>,
+>(
+  key: T,
+  appState: Exclude<ImportedDataState["appState"], null | undefined>,
+  defaultAppState: ReturnType<typeof getDefaultAppState>,
+) => {
+  const value = appState[key];
+  // NOTE the value! assertion is needed in TS 4.5.5 (fixed in newer versions)
+  return value !== undefined ? value! : defaultAppState[key];
+};
+
+const LegacyAppStateMigrations: {
+  [K in keyof LegacyAppState]: (
+    ImportedDataState: Exclude<ImportedDataState["appState"], null | undefined>,
+    defaultAppState: ReturnType<typeof getDefaultAppState>,
+  ) => [LegacyAppState[K][1], AppState[LegacyAppState[K][1]]];
+} = {
+  isSidebarDocked: (appState, defaultAppState) => {
+    return [
+      "defaultSidebarDockedPreference",
+      appState.isSidebarDocked ??
+        coalesceAppStateValue(
+          "defaultSidebarDockedPreference",
+          appState,
+          defaultAppState,
+        ),
+    ];
+  },
 };
 
 export const restoreAppState = (
@@ -249,11 +452,30 @@ export const restoreAppState = (
   appState = appState || {};
   const defaultAppState = getDefaultAppState();
   const nextAppState = {} as typeof defaultAppState;
+
+  // first, migrate all legacy AppState properties to new ones. We do it
+  // in one go before migrate the rest of the properties in case the new ones
+  // depend on checking any other key (i.e. they are coupled)
+  for (const legacyKey of Object.keys(
+    LegacyAppStateMigrations,
+  ) as (keyof typeof LegacyAppStateMigrations)[]) {
+    if (legacyKey in appState) {
+      const [nextKey, nextValue] = LegacyAppStateMigrations[legacyKey](
+        appState,
+        defaultAppState,
+      );
+      (nextAppState as any)[nextKey] = nextValue;
+    }
+  }
+
   for (const [key, defaultValue] of Object.entries(defaultAppState) as [
     keyof typeof defaultAppState,
     any,
   ][]) {
+    // if AppState contains a legacy key, prefer that one and migrate its
+    // value to the new one
     const suppliedValue = appState[key];
+
     const localValue = localAppState ? localAppState[key] : undefined;
     (nextAppState as any)[key] =
       suppliedValue !== undefined
@@ -278,7 +500,7 @@ export const restoreAppState = (
           ? nextAppState.activeTool
           : { type: "selection" },
       ),
-      lastActiveToolBeforeEraser: null,
+      lastActiveTool: null,
       locked: nextAppState.activeTool.locked ?? false,
     },
     // Migrates from previous version where appState.zoom was a number
@@ -287,12 +509,14 @@ export const restoreAppState = (
         ? {
             value: appState.zoom as NormalizedZoomValue,
           }
-        : appState.zoom || defaultAppState.zoom,
-    // when sidebar docked and user left it open in last session,
-    // keep it open. If not docked, keep it closed irrespective of last state.
-    isLibraryOpen: nextAppState.isLibraryMenuDocked
-      ? nextAppState.isLibraryOpen
-      : false,
+        : appState.zoom?.value
+        ? appState.zoom
+        : defaultAppState.zoom,
+    openSidebar:
+      // string (legacy)
+      typeof (appState.openSidebar as any as string) === "string"
+        ? { name: DEFAULT_SIDEBAR.name }
+        : nextAppState.openSidebar,
   };
 };
 
@@ -306,9 +530,10 @@ export const restore = (
    */
   localAppState: Partial<AppState> | null | undefined,
   localElements: readonly ExcalidrawElement[] | null | undefined,
+  elementsConfig?: { refreshDimensions?: boolean; repairBindings?: boolean },
 ): RestoredDataState => {
   return {
-    elements: restoreElements(data?.elements, localElements),
+    elements: restoreElements(data?.elements, localElements, elementsConfig),
     appState: restoreAppState(data?.appState, localAppState || null),
     files: data?.files || {},
   };

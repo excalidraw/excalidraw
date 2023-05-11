@@ -1,7 +1,6 @@
 import { isSomeElementSelected } from "../scene";
 import { KEYS } from "../keys";
 import { ToolButton } from "../components/ToolButton";
-import { trash } from "../components/icons";
 import { t } from "../i18n";
 import { register } from "./register";
 import { getNonDeletedElements } from "../element";
@@ -13,6 +12,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { fixBindingsAfterDeletion } from "../element/binding";
 import { isBoundToContainer } from "../element/typeChecks";
 import { updateActiveTool } from "../utils";
+import { TrashIcon } from "../components/icons";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
@@ -72,13 +72,22 @@ export const actionDeleteSelected = register({
       if (!element) {
         return false;
       }
-      if (
-        // case: no point selected → delete whole element
-        selectedPointsIndices == null ||
-        // case: deleting last remaining point
-        element.points.length < 2
-      ) {
-        const nextElements = elements.filter((el) => el.id !== element.id);
+      // case: no point selected → do nothing, as deleting the whole element
+      // is most likely a mistake, where you wanted to delete a specific point
+      // but failed to select it (or you thought it's selected, while it was
+      // only in a hover state)
+      if (selectedPointsIndices == null) {
+        return false;
+      }
+
+      // case: deleting last remaining point
+      if (element.points.length < 2) {
+        const nextElements = elements.map((el) => {
+          if (el.id === element.id) {
+            return newElementWith(el, { isDeleted: true });
+          }
+          return el;
+        });
         const nextAppState = handleGroupEditingState(appState, nextElements);
 
         return {
@@ -145,11 +154,13 @@ export const actionDeleteSelected = register({
     };
   },
   contextItemLabel: "labels.delete",
-  keyTest: (event) => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE,
+  keyTest: (event, appState, elements) =>
+    (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
+    !event[KEYS.CTRL_OR_CMD],
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"
-      icon={trash}
+      icon={TrashIcon}
       title={t("labels.delete")}
       aria-label={t("labels.delete")}
       onClick={() => updateData(null)}

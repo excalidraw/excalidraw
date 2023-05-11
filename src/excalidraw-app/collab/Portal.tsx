@@ -14,10 +14,11 @@ import {
 } from "../app_constants";
 import { UserIdleState } from "../../types";
 import { trackEvent } from "../../analytics";
-import { throttle } from "lodash";
+import throttle from "lodash.throttle";
 import { newElementWith } from "../../element/mutateElement";
 import { BroadcastedExcalidrawElement } from "./reconciliation";
 import { encryptData } from "../../data/encryption";
+import { PRECEDING_ELEMENT_KEY } from "../../constants";
 
 class Portal {
   collab: TCollabClass;
@@ -152,7 +153,7 @@ class Portal {
           acc.push({
             ...element,
             // z-index info for the reconciler
-            parent: idx === 0 ? "^" : elements[idx - 1]?.id,
+            [PRECEDING_ELEMENT_KEY]: idx === 0 ? "^" : elements[idx - 1]?.id,
           });
         }
         return acc;

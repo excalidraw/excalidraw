@@ -4,7 +4,6 @@ import { ExcalidrawElement } from "../element/types";
 import { duplicateElement, getNonDeletedElements } from "../element";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
-import { clone } from "../components/icons";
 import { t } from "../i18n";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -17,8 +16,13 @@ import { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
 import { ActionResult } from "./types";
 import { GRID_SIZE } from "../constants";
-import { bindTextToShapeAfterDuplication } from "../element/textElement";
+import {
+  bindTextToShapeAfterDuplication,
+  getBoundTextElement,
+} from "../element/textElement";
 import { isBoundToContainer } from "../element/typeChecks";
+import { normalizeElementOrder } from "../element/sortElements";
+import { DuplicateIcon } from "../components/icons";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -49,7 +53,7 @@ export const actionDuplicateSelection = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"
-      icon={clone}
+      icon={DuplicateIcon}
       title={`${t("labels.duplicateSelection")} — ${getShortcutKey(
         "CtrlOrCmd+D",
       )}`}
@@ -64,6 +68,11 @@ const duplicateElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ): Partial<ActionResult> => {
+  // ---------------------------------------------------------------------------
+
+  // step (1)
+
+  const sortedElements = normalizeElementOrder(elements);
   const groupIdMap = new Map();
   const newElements: ExcalidrawElement[] = [];
   const oldElements: ExcalidrawElement[] = [];
@@ -85,42 +94,112 @@ const duplicateElements = (
     return newElement;
   };
 
-  const finalElements: ExcalidrawElement[] = [];
-
-  let index = 0;
   const selectedElementIds = arrayToMap(
-    getSelectedElements(elements, appState, true),
+    getSelectedElements(sortedElements, appState, true),
   );
-  while (index < elements.length) {
-    const element = elements[index];
+
+  // Ids of elements that have already been processed so we don't push them
+  // into the array twice if we end up backtracking when retrieving
+  // discontiguous group of elements (can happen due to a bug, or in edge
+  // cases such as a group containing deleted elements which were not selected).
+  //
+  // This is not enough to prevent duplicates, so we do a second loop afterwards
+  // to remove them.
+  //
+  // For convenience we mark even the newly created ones even though we don't
+  // loop over them.
+  const processedIds = new Map<ExcalidrawElement["id"], true>();
+
+  const markAsProcessed = (elements: ExcalidrawElement[]) => {
+    for (const element of elements) {
+      processedIds.set(element.id, true);
+    }
+    return elements;
+  };
+
+  const elementsWithClones: ExcalidrawElement[] = [];
+
+  let index = -1;
+
+  while (++index < sortedElements.length) {
+    const element = sortedElements[index];
+
+    if (processedIds.get(element.id)) {
+      continue;
+    }
+
+    const boundTextElement = getBoundTextElement(element);
     if (selectedElementIds.get(element.id)) {
-      if (element.groupIds.length) {
+      // if a group or a container/bound-text, duplicate atomically
+      if (element.groupIds.length || boundTextElement) {
         const groupId = getSelectedGroupForElement(appState, element);
-        // if group selected, duplicate it atomically
         if (groupId) {
-          const groupElements = getElementsInGroup(elements, groupId);
-          finalElements.push(
-            ...groupElements,
-            ...groupElements.map((element) =>
-              duplicateAndOffsetElement(element),
-            ),
+          const groupElements = getElementsInGroup(sortedElements, groupId);
+          elementsWithClones.push(
+            ...markAsProcessed([
+              ...groupElements,
+              ...groupElements.map((element) =>
+                duplicateAndOffsetElement(element),
+              ),
+            ]),
           );
-          index = index + groupElements.length;
+          continue;
+        }
+        if (boundTextElement) {
+          elementsWithClones.push(
+            ...markAsProcessed([
+              element,
+              boundTextElement,
+              duplicateAndOffsetElement(element),
+              duplicateAndOffsetElement(boundTextElement),
+            ]),
+          );
           continue;
         }
       }
-      finalElements.push(element, duplicateAndOffsetElement(element));
+      elementsWithClones.push(
+        ...markAsProcessed([element, duplicateAndOffsetElement(element)]),
+      );
     } else {
-      finalElements.push(element);
+      elementsWithClones.push(...markAsProcessed([element]));
     }
-    index++;
   }
+
+  // step (2)
+
+  // second pass to remove duplicates. We loop from the end as it's likelier
+  // that the last elements are in the correct order (contiguous or otherwise).
+  // Thus we need to reverse as the last step (3).
+
+  const finalElementsReversed: ExcalidrawElement[] = [];
+
+  const finalElementIds = new Map<ExcalidrawElement["id"], true>();
+  index = elementsWithClones.length;
+
+  while (--index >= 0) {
+    const element = elementsWithClones[index];
+    if (!finalElementIds.get(element.id)) {
+      finalElementIds.set(element.id, true);
+      finalElementsReversed.push(element);
+    }
+  }
+
+  // step (3)
+
+  const finalElements = finalElementsReversed.reverse();
+
+  // ---------------------------------------------------------------------------
+
   bindTextToShapeAfterDuplication(
-    finalElements,
+    elementsWithClones,
     oldElements,
     oldIdToDuplicatedId,
   );
-  fixBindingsAfterDuplication(finalElements, oldElements, oldIdToDuplicatedId);
+  fixBindingsAfterDuplication(
+    elementsWithClones,
+    oldElements,
+    oldIdToDuplicatedId,
+  );
 
   return {
     elements: finalElements,

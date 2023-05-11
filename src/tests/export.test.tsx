@@ -7,6 +7,10 @@ import {
   decodeSvgMetadata,
 } from "../data/image";
 import { serializeAsJSON } from "../data/json";
+import { exportToSvg } from "../scene/export";
+import { FileId } from "../element/types";
+import { getDataURL } from "../data/blob";
+import { getDefaultAppState } from "../appState";
 
 const { h } = window;
 
@@ -100,5 +104,75 @@ describe("export", () => {
         expect.objectContaining({ type: "text", text: "😀" }),
       ]);
     });
+  });
+
+  it("exporting svg containing transformed images", async () => {
+    const normalizeAngle = (angle: number) => (angle / 180) * Math.PI;
+
+    const elements = [
+      API.createElement({
+        type: "image",
+        fileId: "file_A",
+        x: 0,
+        y: 0,
+        scale: [1, 1],
+        width: 100,
+        height: 100,
+        angle: normalizeAngle(315),
+      }),
+      API.createElement({
+        type: "image",
+        fileId: "file_A",
+        x: 100,
+        y: 0,
+        scale: [-1, 1],
+        width: 50,
+        height: 50,
+        angle: normalizeAngle(45),
+      }),
+      API.createElement({
+        type: "image",
+        fileId: "file_A",
+        x: 0,
+        y: 100,
+        scale: [1, -1],
+        width: 100,
+        height: 100,
+        angle: normalizeAngle(45),
+      }),
+      API.createElement({
+        type: "image",
+        fileId: "file_A",
+        x: 100,
+        y: 100,
+        scale: [-1, -1],
+        width: 50,
+        height: 50,
+        angle: normalizeAngle(315),
+      }),
+    ];
+    const appState = { ...getDefaultAppState(), exportBackground: false };
+    const files = {
+      file_A: {
+        id: "file_A" as FileId,
+        dataURL: await getDataURL(await API.loadFile("./fixtures/deer.png")),
+        mimeType: "image/png",
+        created: Date.now(),
+        lastRetrieved: Date.now(),
+      },
+    } as const;
+
+    const svg = await exportToSvg(elements, appState, files);
+
+    const svgText = svg.outerHTML;
+
+    // expect 1 <image> element (deduped)
+    expect(svgText.match(/<image/g)?.length).toBe(1);
+    // expect 4 <use> elements (one for each excalidraw image element)
+    expect(svgText.match(/<use/g)?.length).toBe(4);
+
+    // in case of regressions, save the SVG to a file and visually compare to:
+    // src/tests/fixtures/svg-image-exporting-reference.svg
+    expect(svgText).toMatchSnapshot(`svg export output`);
   });
 });

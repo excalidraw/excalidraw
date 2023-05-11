@@ -1,5 +1,6 @@
 import oc from "open-color";
 import {
+  DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
@@ -19,22 +20,22 @@ export const getDefaultAppState = (): Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 > => {
   return {
+    showWelcomeScreen: false,
     theme: THEME.LIGHT,
     collaborators: new Map(),
     currentChartType: "bar",
-    currentItemBackgroundColor: "transparent",
+    currentItemBackgroundColor: DEFAULT_ELEMENT_PROPS.backgroundColor,
     currentItemEndArrowhead: "arrow",
-    currentItemFillStyle: "hachure",
+    currentItemFillStyle: DEFAULT_ELEMENT_PROPS.fillStyle,
     currentItemFontFamily: DEFAULT_FONT_FAMILY,
     currentItemFontSize: DEFAULT_FONT_SIZE,
-    currentItemLinearStrokeSharpness: "round",
-    currentItemOpacity: 100,
-    currentItemRoughness: 1,
+    currentItemOpacity: DEFAULT_ELEMENT_PROPS.opacity,
+    currentItemRoughness: DEFAULT_ELEMENT_PROPS.roughness,
     currentItemStartArrowhead: null,
-    currentItemStrokeColor: oc.black,
-    currentItemStrokeSharpness: "sharp",
-    currentItemStrokeStyle: "solid",
-    currentItemStrokeWidth: 1,
+    currentItemStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
+    currentItemRoundness: "round",
+    currentItemStrokeStyle: DEFAULT_ELEMENT_PROPS.strokeStyle,
+    currentItemStrokeWidth: DEFAULT_ELEMENT_PROPS.strokeWidth,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     cursorButton: "up",
     draggingElement: null,
@@ -44,8 +45,8 @@ export const getDefaultAppState = (): Omit<
     activeTool: {
       type: "selection",
       customType: null,
-      locked: false,
-      lastActiveToolBeforeEraser: null,
+      locked: DEFAULT_ELEMENT_PROPS.locked,
+      lastActiveTool: null,
     },
     penMode: false,
     penDetected: false,
@@ -57,16 +58,18 @@ export const getDefaultAppState = (): Omit<
     fileHandle: null,
     gridSize: null,
     isBindingEnabled: true,
-    isLibraryOpen: false,
-    isLibraryMenuDocked: false,
+    defaultSidebarDockedPreference: false,
     isLoading: false,
     isResizing: false,
     isRotating: false,
     lastPointerDownWith: "mouse",
     multiElement: null,
     name: `${t("labels.untitled")}-${getDateTime()}`,
+    contextMenu: null,
     openMenu: null,
     openPopup: null,
+    openSidebar: null,
+    openDialog: null,
     pasteDialog: { shown: false, data: null },
     previousSelectedElementIds: {},
     resizingElement: null,
@@ -77,7 +80,6 @@ export const getDefaultAppState = (): Omit<
     selectedGroupIds: {},
     selectionElement: null,
     shouldCacheIgnoreZoom: false,
-    showHelpDialog: false,
     showStats: false,
     startBoundElement: null,
     suggestedBindings: [],
@@ -110,6 +112,7 @@ const APP_STATE_STORAGE_CONF = (<
   T extends Record<keyof AppState, Values>,
 >(config: { [K in keyof T]: K extends keyof AppState ? T[K] : never }) =>
   config)({
+  showWelcomeScreen: { browser: true, export: false, server: false },
   theme: { browser: true, export: false, server: false },
   collaborators: { browser: false, export: false, server: false },
   currentChartType: { browser: true, export: false, server: false },
@@ -118,7 +121,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemFillStyle: { browser: true, export: false, server: false },
   currentItemFontFamily: { browser: true, export: false, server: false },
   currentItemFontSize: { browser: true, export: false, server: false },
-  currentItemLinearStrokeSharpness: {
+  currentItemRoundness: {
     browser: true,
     export: false,
     server: false,
@@ -127,7 +130,6 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemRoughness: { browser: true, export: false, server: false },
   currentItemStartArrowhead: { browser: true, export: false, server: false },
   currentItemStrokeColor: { browser: true, export: false, server: false },
-  currentItemStrokeSharpness: { browser: true, export: false, server: false },
   currentItemStrokeStyle: { browser: true, export: false, server: false },
   currentItemStrokeWidth: { browser: true, export: false, server: false },
   currentItemTextAlign: { browser: true, export: false, server: false },
@@ -148,8 +150,11 @@ const APP_STATE_STORAGE_CONF = (<
   gridSize: { browser: true, export: true, server: true },
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: false, export: false, server: false },
-  isLibraryOpen: { browser: true, export: false, server: false },
-  isLibraryMenuDocked: { browser: true, export: false, server: false },
+  defaultSidebarDockedPreference: {
+    browser: true,
+    export: false,
+    server: false,
+  },
   isLoading: { browser: false, export: false, server: false },
   isResizing: { browser: false, export: false, server: false },
   isRotating: { browser: false, export: false, server: false },
@@ -158,8 +163,11 @@ const APP_STATE_STORAGE_CONF = (<
   name: { browser: true, export: false, server: false },
   offsetLeft: { browser: false, export: false, server: false },
   offsetTop: { browser: false, export: false, server: false },
+  contextMenu: { browser: false, export: false, server: false },
   openMenu: { browser: true, export: false, server: false },
   openPopup: { browser: false, export: false, server: false },
+  openSidebar: { browser: true, export: false, server: false },
+  openDialog: { browser: false, export: false, server: false },
   pasteDialog: { browser: false, export: false, server: false },
   previousSelectedElementIds: { browser: true, export: false, server: false },
   resizingElement: { browser: false, export: false, server: false },
@@ -170,7 +178,6 @@ const APP_STATE_STORAGE_CONF = (<
   selectedGroupIds: { browser: true, export: false, server: false },
   selectionElement: { browser: false, export: false, server: false },
   shouldCacheIgnoreZoom: { browser: true, export: false, server: false },
-  showHelpDialog: { browser: false, export: false, server: false },
   showStats: { browser: true, export: false, server: false },
   startBoundElement: { browser: false, export: false, server: false },
   suggestedBindings: { browser: false, export: false, server: false },
@@ -226,3 +233,11 @@ export const isEraserActive = ({
 }: {
   activeTool: AppState["activeTool"];
 }) => activeTool.type === "eraser";
+
+export const isHandToolActive = ({
+  activeTool,
+}: {
+  activeTool: AppState["activeTool"];
+}) => {
+  return activeTool.type === "hand";
+};

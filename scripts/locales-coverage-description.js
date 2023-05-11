@@ -2,6 +2,9 @@ const fs = require("fs");
 
 const THRESSHOLD = 85;
 
+// we're using BCP 47 language tags as keys
+// e.g. https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1
+
 const crowdinMap = {
   "ar-SA": "en-ar",
   "bg-BG": "en-bg",
@@ -15,6 +18,7 @@ const crowdinMap = {
   "fa-IR": "en-fa",
   "fi-FI": "en-fi",
   "fr-FR": "en-fr",
+  "gl-ES": "en-gl",
   "he-IL": "en-he",
   "hi-IN": "en-hi",
   "hu-HU": "en-hu",
@@ -23,6 +27,7 @@ const crowdinMap = {
   "ja-JP": "en-ja",
   "kab-KAB": "en-kab",
   "ko-KR": "en-ko",
+  "ku-TR": "en-ku",
   "my-MM": "en-my",
   "nb-NO": "en-nb",
   "nl-NL": "en-nl",
@@ -48,8 +53,9 @@ const crowdinMap = {
   "lv-LV": "en-lv",
   "cs-CZ": "en-cs",
   "kk-KZ": "en-kk",
-  "vi-vn": "en-vi",
-  "mr-in": "en-mr",
+  "vi-VN": "en-vi",
+  "mr-IN": "en-mr",
+  "th-TH": "en-th",
 };
 
 const flags = {
@@ -65,6 +71,7 @@ const flags = {
   "fa-IR": "🇮🇷",
   "fi-FI": "🇫🇮",
   "fr-FR": "🇫🇷",
+  "gl-ES": "🇪🇸",
   "he-IL": "🇮🇱",
   "hi-IN": "🇮🇳",
   "hu-HU": "🇭🇺",
@@ -74,6 +81,7 @@ const flags = {
   "kab-KAB": "🏳",
   "kk-KZ": "🇰🇿",
   "ko-KR": "🇰🇷",
+  "ku-TR": "🏳",
   "lt-LT": "🇱🇹",
   "lv-LV": "🇱🇻",
   "my-MM": "🇲🇲",
@@ -100,6 +108,7 @@ const flags = {
   "eu-ES": "🇪🇦",
   "vi-VN": "🇻🇳",
   "mr-IN": "🇮🇳",
+  "th-TH": "🇹🇭",
 };
 
 const languages = {
@@ -116,6 +125,7 @@ const languages = {
   "fa-IR": "فارسی",
   "fi-FI": "Suomi",
   "fr-FR": "Français",
+  "gl-ES": "Galego",
   "he-IL": "עברית",
   "hi-IN": "हिन्दी",
   "hu-HU": "Magyar",
@@ -125,6 +135,7 @@ const languages = {
   "kab-KAB": "Taqbaylit",
   "kk-KZ": "Қазақ тілі",
   "ko-KR": "한국어",
+  "ku-TR": "Kurdî",
   "lt-LT": "Lietuvių",
   "lv-LV": "Latviešu",
   "my-MM": "Burmese",
@@ -150,6 +161,7 @@ const languages = {
   "zh-TW": "繁體中文",
   "vi-VN": "Tiếng Việt",
   "mr-IN": "मराठी",
+  "th-TH": "ภาษาไทย",
 };
 
 const percentages = fs.readFileSync(

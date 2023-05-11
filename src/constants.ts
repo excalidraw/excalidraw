@@ -1,6 +1,21 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
-import { FontFamilyValues } from "./element/types";
+import { ExcalidrawElement, FontFamilyValues } from "./element/types";
+import oc from "open-color";
+
+export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+export const isWindows = /^Win/.test(navigator.platform);
+export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
+export const isFirefox =
+  "netscape" in window &&
+  navigator.userAgent.indexOf("rv:") > 1 &&
+  navigator.userAgent.indexOf("Gecko") > 1;
+export const isChrome = navigator.userAgent.indexOf("Chrome") !== -1;
+export const isSafari =
+  !isChrome && navigator.userAgent.indexOf("Safari") !== -1;
+// keeping function so it can be mocked in test
+export const isBrave = () =>
+  (navigator as any).brave?.isBrave?.name === "isBrave";
 
 export const APP_NAME = "Excalidraw";
 
@@ -54,6 +69,7 @@ export enum EVENT {
   SCROLL = "scroll",
   // custom events
   EXCALIDRAW_LINK = "excalidraw-link",
+  MENU_ITEM_SELECT = "menu.itemSelect",
 }
 
 export const ENV = {
@@ -89,17 +105,30 @@ export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 
 export const GRID_SIZE = 20; // TODO make it configurable?
 
-export const MIME_TYPES = {
-  excalidraw: "application/vnd.excalidraw+json",
-  excalidrawlib: "application/vnd.excalidrawlib+json",
-  json: "application/json",
+export const IMAGE_MIME_TYPES = {
   svg: "image/svg+xml",
-  "excalidraw.svg": "image/svg+xml",
   png: "image/png",
-  "excalidraw.png": "image/png",
   jpg: "image/jpeg",
   gif: "image/gif",
+  webp: "image/webp",
+  bmp: "image/bmp",
+  ico: "image/x-icon",
+  avif: "image/avif",
+  jfif: "image/jfif",
+} as const;
+
+export const MIME_TYPES = {
+  json: "application/json",
+  // excalidraw data
+  excalidraw: "application/vnd.excalidraw+json",
+  excalidrawlib: "application/vnd.excalidrawlib+json",
+  // image-encoded excalidraw data
+  "excalidraw.svg": "image/svg+xml",
+  "excalidraw.png": "image/png",
+  // binary
   binary: "application/octet-stream",
+  // image
+  ...IMAGE_MIME_TYPES,
 } as const;
 
 export const EXPORT_DATA_TYPES = {
@@ -119,18 +148,13 @@ export const TITLE_TIMEOUT = 10000;
 export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
 export const ZOOM_STEP = 0.1;
+export const MIN_ZOOM = 0.1;
 export const HYPERLINK_TOOLTIP_DELAY = 300;
 
 // Report a user inactive after IDLE_THRESHOLD milliseconds
 export const IDLE_THRESHOLD = 60_000;
 // Report a user active each ACTIVE_THRESHOLD milliseconds
 export const ACTIVE_THRESHOLD = 3_000;
-
-export const MODES = {
-  VIEW: "viewMode",
-  ZEN: "zenMode",
-  GRID: "gridMode",
-};
 
 export const THEME_FILTER = cssVariables.themeFilter;
 
@@ -149,7 +173,7 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     export: { saveFileToDisk: true },
     loadScene: true,
     saveToActiveFile: true,
-    theme: true,
+    toggleTheme: null,
     saveAsImage: true,
   },
 };
@@ -175,13 +199,6 @@ export const DEFAULT_EXPORT_PADDING = 10; // px
 
 export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 
-export const ALLOWED_IMAGE_MIME_TYPES = [
-  MIME_TYPES.png,
-  MIME_TYPES.jpg,
-  MIME_TYPES.svg,
-  MIME_TYPES.gif,
-] as const;
-
 export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
@@ -201,8 +218,67 @@ export const VERTICAL_ALIGN = {
   BOTTOM: "bottom",
 };
 
+export const TEXT_ALIGN = {
+  LEFT: "left",
+  CENTER: "center",
+  RIGHT: "right",
+};
+
 export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
 
-export const COOKIES = {
-  AUTH_STATE_COOKIE: "excplus-auth",
+// Radius represented as 25% of element's largest side (width/height).
+// Used for LEGACY and PROPORTIONAL_RADIUS algorithms, or when the element is
+// below the cutoff size.
+export const DEFAULT_PROPORTIONAL_RADIUS = 0.25;
+// Fixed radius for the ADAPTIVE_RADIUS algorithm. In pixels.
+export const DEFAULT_ADAPTIVE_RADIUS = 32;
+// roundness type (algorithm)
+export const ROUNDNESS = {
+  // Used for legacy rounding (rectangles), which currently works the same
+  // as PROPORTIONAL_RADIUS, but we need to differentiate for UI purposes and
+  // forwards-compat.
+  LEGACY: 1,
+
+  // Used for linear elements & diamonds
+  PROPORTIONAL_RADIUS: 2,
+
+  // Current default algorithm for rectangles, using fixed pixel radius.
+  // It's working similarly to a regular border-radius, but attemps to make
+  // radius visually similar across differnt element sizes, especially
+  // very large and very small elements.
+  //
+  // NOTE right now we don't allow configuration and use a constant radius
+  // (see DEFAULT_ADAPTIVE_RADIUS constant)
+  ADAPTIVE_RADIUS: 3,
+} as const;
+
+/** key containt id of precedeing elemnt id we use in reconciliation during
+ * collaboration */
+export const PRECEDING_ELEMENT_KEY = "__precedingElement__";
+
+export const DEFAULT_ELEMENT_PROPS: {
+  strokeColor: ExcalidrawElement["strokeColor"];
+  backgroundColor: ExcalidrawElement["backgroundColor"];
+  fillStyle: ExcalidrawElement["fillStyle"];
+  strokeWidth: ExcalidrawElement["strokeWidth"];
+  strokeStyle: ExcalidrawElement["strokeStyle"];
+  roughness: ExcalidrawElement["roughness"];
+  opacity: ExcalidrawElement["opacity"];
+  locked: ExcalidrawElement["locked"];
+} = {
+  strokeColor: oc.black,
+  backgroundColor: "transparent",
+  fillStyle: "hachure",
+  strokeWidth: 1,
+  strokeStyle: "solid",
+  roughness: 1,
+  opacity: 100,
+  locked: false,
+};
+
+export const LIBRARY_SIDEBAR_TAB = "library";
+
+export const DEFAULT_SIDEBAR = {
+  name: "default",
+  defaultTab: LIBRARY_SIDEBAR_TAB,
 } as const;

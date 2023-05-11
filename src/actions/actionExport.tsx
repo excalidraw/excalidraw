@@ -1,7 +1,6 @@
-import { load, questionCircle, saveAs } from "../components/icons";
+import { questionCircle, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
-import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
@@ -15,10 +14,11 @@ import { getExportSize } from "../scene/export";
 import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
-import { ActiveFile } from "../components/ActiveFile";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
+
+import "../components/ToolIcon.scss";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -131,6 +131,13 @@ export const actionChangeExportEmbedScene = register({
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
   trackEvent: { category: "export" },
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.saveToActiveFile &&
+      !!appState.fileHandle &&
+      !appState.viewModeEnabled
+    );
+  },
   perform: async (elements, appState, value, app) => {
     const fileHandleExists = !!appState.fileHandle;
 
@@ -167,16 +174,11 @@ export const actionSaveToActiveFile = register({
   },
   keyTest: (event) =>
     event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
-  PanelComponent: ({ updateData, appState }) => (
-    <ActiveFile
-      onSave={() => updateData(null)}
-      fileName={appState.fileHandle?.name}
-    />
-  ),
 });
 
 export const actionSaveFileToDisk = register({
   name: "saveFileToDisk",
+  viewMode: true,
   trackEvent: { category: "export" },
   perform: async (elements, appState, value, app) => {
     try {
@@ -217,6 +219,11 @@ export const actionSaveFileToDisk = register({
 export const actionLoadScene = register({
   name: "loadScene",
   trackEvent: { category: "export" },
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.loadScene && !appState.viewModeEnabled
+    );
+  },
   perform: async (elements, appState, _, app) => {
     try {
       const {
@@ -244,17 +251,6 @@ export const actionLoadScene = register({
     }
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
-  PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="button"
-      icon={load}
-      title={t("buttons.load")}
-      aria-label={t("buttons.load")}
-      showAriaLabel={useDevice().isMobile}
-      onClick={updateData}
-      data-testid="load-button"
-    />
-  ),
 });
 
 export const actionExportWithDarkMode = register({

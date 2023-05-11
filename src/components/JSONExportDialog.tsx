@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import { useDevice } from "./App";
-import { AppState, ExportOpts, BinaryFiles } from "../types";
+
+import { ExportOpts, BinaryFiles, UIAppState } from "../types";
 import { Dialog } from "./Dialog";
-import { exportFile, exportToFileIcon, link } from "./icons";
+import { exportToFileIcon, LinkIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
 import { actionSaveFileToDisk } from "../actions/actionExport";
 import { Card } from "./Card";
@@ -28,7 +28,7 @@ const JSONExportModal = ({
   exportOpts,
   canvas,
 }: {
-  appState: AppState;
+  appState: UIAppState;
   files: BinaryFiles;
   elements: readonly NonDeletedExcalidrawElement[];
   actionManager: ActionManager;
@@ -63,7 +63,7 @@ const JSONExportModal = ({
         )}
         {onExportToBackend && (
           <Card color="pink">
-            <div className="Card-icon">{link}</div>
+            <div className="Card-icon">{LinkIcon}</div>
             <h2>{t("exportDialog.link_title")}</h2>
             <div className="Card-details">{t("exportDialog.link_details")}</div>
             <ToolButton
@@ -93,34 +93,23 @@ export const JSONExportDialog = ({
   actionManager,
   exportOpts,
   canvas,
+  setAppState,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
-  appState: AppState;
+  appState: UIAppState;
   files: BinaryFiles;
   actionManager: ActionManager;
   exportOpts: ExportOpts;
   canvas: HTMLCanvasElement | null;
+  setAppState: React.Component<any, UIAppState>["setState"];
 }) => {
-  const [modalIsShown, setModalIsShown] = useState(false);
-
   const handleClose = React.useCallback(() => {
-    setModalIsShown(false);
-  }, []);
+    setAppState({ openDialog: null });
+  }, [setAppState]);
 
   return (
     <>
-      <ToolButton
-        onClick={() => {
-          setModalIsShown(true);
-        }}
-        data-testid="json-export-button"
-        icon={exportFile}
-        type="button"
-        aria-label={t("buttons.export")}
-        showAriaLabel={useDevice().isMobile}
-        title={t("buttons.export")}
-      />
-      {modalIsShown && (
+      {appState.openDialog === "jsonExport" && (
         <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
           <JSONExportModal
             elements={elements}

@@ -1,4 +1,4 @@
-import { CODES, KEYS } from "../keys";
+import { KEYS } from "../keys";
 import { t } from "../i18n";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
@@ -129,10 +129,9 @@ export const actionGroup = register({
     };
   },
   contextItemLabel: "labels.group",
-  contextItemPredicate: (elements, appState) =>
-    enableActionGroup(elements, appState),
+  predicate: (elements, appState) => enableActionGroup(elements, appState),
   keyTest: (event) =>
-    !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.code === CODES.G,
+    !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
@@ -189,10 +188,11 @@ export const actionUngroup = register({
     };
   },
   keyTest: (event) =>
-    event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.code === CODES.G,
+    event.shiftKey &&
+    event[KEYS.CTRL_OR_CMD] &&
+    event.key === KEYS.G.toUpperCase(),
   contextItemLabel: "labels.ungroup",
-  contextItemPredicate: (elements, appState) =>
-    getSelectedGroupIds(appState).length > 0,
+  predicate: (elements, appState) => getSelectedGroupIds(appState).length > 0,
 
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton

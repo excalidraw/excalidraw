@@ -1,8 +1,12 @@
 import { t } from "../i18n";
 import { Dialog, DialogProps } from "./Dialog";
-import { ToolButton } from "./ToolButton";
 
 import "./ConfirmDialog.scss";
+import DialogActionButton from "./DialogActionButton";
+import { useSetAtom } from "jotai";
+import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+import { useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
+import { jotaiScope } from "../jotai";
 
 interface Props extends Omit<DialogProps, "onCloseRequest"> {
   onConfirm: () => void;
@@ -20,6 +24,10 @@ const ConfirmDialog = (props: Props) => {
     className = "",
     ...rest
   } = props;
+  const setAppState = useExcalidrawSetAppState();
+  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom, jotaiScope);
+  const { container } = useExcalidrawContainer();
+
   return (
     <Dialog
       onCloseRequest={onCancel}
@@ -29,21 +37,24 @@ const ConfirmDialog = (props: Props) => {
     >
       {children}
       <div className="confirm-dialog-buttons">
-        <ToolButton
-          type="button"
-          title={cancelText}
-          aria-label={cancelText}
+        <DialogActionButton
           label={cancelText}
-          onClick={onCancel}
-          className="confirm-dialog--cancel"
+          onClick={() => {
+            setAppState({ openMenu: null });
+            setIsLibraryMenuOpen(false);
+            onCancel();
+            container?.focus();
+          }}
         />
-        <ToolButton
-          type="button"
-          title={confirmText}
-          aria-label={confirmText}
+        <DialogActionButton
           label={confirmText}
-          onClick={onConfirm}
-          className="confirm-dialog--confirm"
+          onClick={() => {
+            setAppState({ openMenu: null });
+            setIsLibraryMenuOpen(false);
+            onConfirm();
+            container?.focus();
+          }}
+          actionType="danger"
         />
       </div>
     </Dialog>

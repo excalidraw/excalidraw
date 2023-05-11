@@ -152,7 +152,7 @@ describe("element locking", () => {
     expect(contextMenu).not.toBeNull();
     expect(
       contextMenu?.querySelector(
-        `li[data-testid="toggleLock"] .context-menu-option__label`,
+        `li[data-testid="toggleLock"] .context-menu-item__label`,
       ),
     ).toHaveTextContent(t("labels.elementLock.unlock"));
   });
@@ -232,7 +232,7 @@ describe("element locking", () => {
     API.setSelectedElements([container]);
     Keyboard.keyPress(KEYS.ENTER);
     expect(h.state.editingElement?.id).not.toBe(text.id);
-    expect(h.state.editingElement?.id).toBe(h.elements[2].id);
+    expect(h.state.editingElement?.id).toBe(h.elements[1].id);
   });
 
   it("should ignore locked text under cursor when clicked with text tool", () => {

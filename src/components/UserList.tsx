@@ -4,16 +4,16 @@ import React from "react";
 import clsx from "clsx";
 import { AppState, Collaborator } from "../types";
 import { Tooltip } from "./Tooltip";
-import { ActionManager } from "../actions/manager";
+import { useExcalidrawActionManager } from "./App";
 
 export const UserList: React.FC<{
   className?: string;
   mobile?: boolean;
   collaborators: AppState["collaborators"];
-  actionManager: ActionManager;
-}> = ({ className, mobile, collaborators, actionManager }) => {
-  const uniqueCollaborators = new Map<string, Collaborator>();
+}> = ({ className, mobile, collaborators }) => {
+  const actionManager = useExcalidrawActionManager();
 
+  const uniqueCollaborators = new Map<string, Collaborator>();
   collaborators.forEach((collaborator, socketId) => {
     uniqueCollaborators.set(
       // filter on user id, else fall back on unique socketId

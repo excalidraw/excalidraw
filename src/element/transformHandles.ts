@@ -4,7 +4,7 @@ import {
   PointerType,
 } from "./types";
 
-import { getElementAbsoluteCoords, Bounds } from "./bounds";
+import { getElementAbsoluteCoords } from "./bounds";
 import { rotate } from "../math";
 import { AppState, Zoom } from "../types";
 import { isTextElement } from ".";
@@ -81,7 +81,7 @@ const generateTransformHandle = (
 };
 
 export const getTransformHandlesFromCoords = (
-  [x1, y1, x2, y2]: Bounds,
+  [x1, y1, x2, y2, cx, cy]: [number, number, number, number, number, number],
   angle: number,
   zoom: Zoom,
   pointerType: PointerType,
@@ -97,10 +97,8 @@ export const getTransformHandlesFromCoords = (
 
   const width = x2 - x1;
   const height = y2 - y1;
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
   const dashedLineMargin = margin / zoom.value;
-  const centeringOffset = (size - 8) / (2 * zoom.value);
+  const centeringOffset = (size - DEFAULT_SPACING * 2) / (2 * zoom.value);
 
   const transformHandles: TransformHandles = {
     nw: omitSides.nw
@@ -253,10 +251,10 @@ export const getTransformHandles = (
     omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   }
   const dashedLineMargin = isLinearElement(element)
-    ? DEFAULT_SPACING * 3
+    ? DEFAULT_SPACING + 8
     : DEFAULT_SPACING;
   return getTransformHandlesFromCoords(
-    getElementAbsoluteCoords(element),
+    getElementAbsoluteCoords(element, true),
     element.angle,
     zoom,
     pointerType,

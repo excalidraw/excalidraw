@@ -263,9 +263,12 @@ export const loadScene = async (
       await importFromBackend(id, privateKey),
       localDataState?.appState,
       localDataState?.elements,
+      { repairBindings: true, refreshDimensions: false },
     );
   } else {
-    data = restore(localDataState || null, null, null);
+    data = restore(localDataState || null, null, null, {
+      repairBindings: true,
+    });
   }
 
   return {
@@ -281,7 +284,7 @@ export const loadScene = async (
 
 export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
-  appState: AppState,
+  appState: Partial<AppState>,
   files: BinaryFiles,
 ) => {
   const encryptionKey = await generateEncryptionKey("string");

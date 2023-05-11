@@ -138,7 +138,7 @@ describe("regression tests", () => {
     [`4${KEYS.O}`, "ellipse", true],
     [`5${KEYS.A}`, "arrow", true],
     [`6${KEYS.L}`, "line", true],
-    [`7${KEYS.X}`, "freedraw", false],
+    [`7${KEYS.P}`, "freedraw", false],
   ] as [string, ExcalidrawElement["type"], boolean][]) {
     for (const key of keys) {
       it(`key ${key} selects ${shape} tool`, () => {
@@ -174,7 +174,7 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     const { x: prevX, y: prevY } = API.getSelectedElement();
-    mouse.down(-10, -10);
+    mouse.down(-8, -8);
     mouse.up(10, 10);
 
     const { x: nextX, y: nextY } = API.getSelectedElement();
@@ -201,7 +201,7 @@ describe("regression tests", () => {
     ).toBe(1);
 
     Keyboard.withModifierKeys({ alt: true }, () => {
-      mouse.down(-10, -10);
+      mouse.down(-8, -8);
       mouse.up(10, 10);
     });
 
@@ -446,6 +446,8 @@ describe("regression tests", () => {
     UI.clickTool("rectangle");
     // english lang should display `thin` label
     expect(screen.queryByTitle(/thin/i)).not.toBeNull();
+    fireEvent.click(document.querySelector(".dropdown-menu-button")!);
+
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
       target: { value: "de-DE" },
     });
@@ -485,7 +487,7 @@ describe("regression tests", () => {
     }
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     for (const element of h.elements) {
@@ -509,6 +511,51 @@ describe("regression tests", () => {
     expect(groups.size).toBe(2);
   });
 
+  it("should group elements and ungroup them", () => {
+    UI.clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+
+    UI.clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+
+    UI.clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+    const end = mouse.getPosition();
+
+    mouse.reset();
+    mouse.down();
+    mouse.restorePosition(...end);
+    mouse.up();
+
+    for (const element of h.elements) {
+      expect(element.groupIds.length).toBe(0);
+    }
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.G);
+    });
+
+    for (const element of h.elements) {
+      expect(element.groupIds.length).toBe(1);
+    }
+
+    mouse.reset();
+    mouse.down();
+    mouse.restorePosition(...end);
+    mouse.up();
+
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress(KEYS.G);
+    });
+
+    for (const element of h.elements) {
+      expect(element.groupIds.length).toBe(0);
+    }
+  });
+
   it("double click to edit a group", () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);
@@ -524,7 +571,7 @@ describe("regression tests", () => {
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.A);
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     expect(API.getSelectedElements().length).toBe(3);
@@ -561,7 +608,7 @@ describe("regression tests", () => {
       mouse.click();
     });
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     expect(h.elements.map((element) => element.id)).toEqual([
@@ -578,7 +625,7 @@ describe("regression tests", () => {
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.A);
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     mouse.doubleClickOn(rectC);
@@ -586,7 +633,7 @@ describe("regression tests", () => {
       mouse.clickOn(rectA);
     });
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     expect(rectC.groupIds.length).toBe(2);
@@ -627,9 +674,10 @@ describe("regression tests", () => {
     mouse.down();
     mouse.up(100, 100);
 
-    // hits bounding box without hitting element
-    mouse.down();
     expect(API.getSelectedElements().length).toBe(1);
+
+    // hits bounding box without hitting element
+    mouse.down(98, 98);
     mouse.up();
     expect(API.getSelectedElements().length).toBe(0);
   });
@@ -699,7 +747,7 @@ describe("regression tests", () => {
 
     // drag element from point on bounding box that doesn't hit element
     mouse.reset();
-    mouse.down();
+    mouse.down(8, 8);
     mouse.up(25, 25);
 
     expect(API.getSelectedElement().x).toEqual(prevX + 25);
@@ -975,7 +1023,7 @@ describe("regression tests", () => {
     // Rectangle is already selected since creating
     // it was our last action
     Keyboard.withModifierKeys({ shift: true }, () => {
-      mouse.down();
+      mouse.down(-8, -8);
     });
     expect(API.getSelectedElements().length).toBe(1);
 
@@ -996,7 +1044,7 @@ describe("regression tests", () => {
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.A);
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     const selectedGroupIds_prev = h.state.selectedGroupIds;
@@ -1110,7 +1158,7 @@ it(
 
     // Create group with first and third rectangle
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.codePress(CODES.G);
+      Keyboard.keyPress(KEYS.G);
     });
 
     expect(API.getSelectedElements().length).toBe(2);

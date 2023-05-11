@@ -17,7 +17,9 @@ exports[`exportToSvg with default arguments 1`] = `
   <defs>
     
     
-    <style>
+    <style
+      class="style-fonts"
+    >
       
       @font-face {
         font-family: "Virgil";
@@ -76,7 +78,7 @@ exports[`exportToSvg with elements that have a link 1`] = `
   <!-- svg-source:excalidraw -->
   
   <defs>
-    <style>
+    <style class=\\"style-fonts\\">
       @font-face {
         font-family: \\"Virgil\\";
         src: url(\\"https://excalidraw.com/Virgil.woff2\\");
@@ -93,9 +95,9 @@ exports[`exportToSvg with elements that have a link 1`] = `
 exports[`exportToSvg with exportEmbedScene 1`] = `
 "
   <!-- svg-source:excalidraw -->
-  <!-- payload-type:application/vnd.excalidraw+json --><!-- payload-version:2 --><!-- payload-start -->eyJ2ZXJzaW9uIjoiMSIsImVuY29kaW5nIjoiYnN0cmluZyIsImNvbXByZXNzZWQiOnRydWUsImVuY29kZWQiOiJ4nO1SPW/CMFx1MDAxMN35XHUwMDE1kbtcIpGk4aNstFRVpapcdTAwMWRcdTAwMTiQWnUw8YVYMbaxXHUwMDFkPoT477VccsRtxNpcclx1MDAwZpbu+b278907dKJcYpm9XHUwMDA0NI5cdTAwMTDscswoUXiLulx1MDAwZd+A0lRw+5T6WIta5Z5ZXHUwMDFhI8e9XHUwMDFlXHUwMDEzVlBcbm1OfGCwXHUwMDAybrRlfNk4ilx1MDAwZf62L5Q41Wau1lx1MDAxZpOiopyk63w1fJtOXj691JN2lpMlWVx1MDAxM+9d4fthXHUwMDEzbykxpcWSOG6wXHUwMDEy6LI0LVx1MDAxMPMlc21cdTAwMDZEXHUwMDFiJSp4XHUwMDEyTCjXyF3sTyi9wHm1VKLmJHCSPsaLXCJwXG7K2Mzs2WlcdTAwMDA4L2tcdTAwMDWoVWF+abGFNzot7ICDypZcXJZcdTAwMWO0/qNcdTAwMTFcdTAwMTLn1Oxbv3L9yVfip/vdzl9iJc95kHbBr85cdTAwMDCIT5Ulg/7wIVx1MDAxZTUvYb9JXHUwMDFht9F3wf2uk2Q0iuMsXHUwMDFkXHUwMDBlXHUwMDFhXHUwMDA21VO7auPTXHUwMDE2mGlcYnN0I3xcdTAwMGU24DVjzWMtXHQ+icJXXHUwMDE55VWbZ11VXcl9cSmheCU4QVx1MDAxZT92b0a7XHUwMDE57X+MXHUwMDA2jFGp4Ww0e/thICzlzNj8lnKyXHUwMDFk2lDYPl5ZbOGP03ubusWCa/Zw7Fx1MDAxY39cdTAwMDCLqmbvIn0=<!-- payload-end -->
+  <!-- payload-type:application/vnd.excalidraw+json --><!-- payload-version:2 --><!-- payload-start -->eyJ2ZXJzaW9uIjoiMSIsImVuY29kaW5nIjoiYnN0cmluZyIsImNvbXByZXNzZWQiOnRydWUsImVuY29kZWQiOiJ4nO1SsW7CMFx1MDAxMN35iihdkUjSQChcdTAwMWItVVWpalx1MDAwN1x1MDAwNqRWXHUwMDFkTHxJrFx1MDAxONvEXHUwMDBlXHUwMDEwIf69tlx1MDAwM3GJXHUwMDE4O9aDpXt+7+58945cdTAwMDPP81UjwJ95Plx1MDAxY1JEXHSu0N5cdTAwMWZcdTAwMWF8XHUwMDA3lSSc6afIxpLXVWqZhVJiNlx1MDAxYVGuXHUwMDA1XHUwMDA1l6rlXHUwMDAzhVxyMCU140vHnne0t34h2Kh2q2r7Mc9KwnC0TTfJ22L+8mmllnTQnDiMu7gxhe+TLt5cdTAwMTOsXG6NhUHQYVx1MDAwNZC8UD1cdTAwMTCxnJo2XHUwMDFkXCJVxUt44pRXppG7wFx1MDAxZVd6jdIyr3jNsOOEY4TWmeNkhNKlamg7XHUwMDAwlFx1MDAxNnVcdTAwMDV+r8Lq0mJcdTAwMGbvdJLrXHUwMDAxO5UumVx1MDAxN1xmpLzScIFSoprer0x/4lx1MDAxNdvpfv/OwPA5XHUwMDAzqyl1hVx1MDAwMbDNXHUwMDEwh5Nx8lx1MDAxMEy7XHUwMDE3t9YwXG766DtndsVhOJ1cdTAwMDZBXHUwMDFjJZOOQeRCb1jZtFx1MDAxOaJcdTAwMTLc+ExcdTAwMTPPbvtXjdRcdTAwMDKjVuR+SFx0K/s8babyRu6LOTFBXHUwMDFizrBv8dPw31///vpTf1x1MDAwMaVESDj7S992XHUwMDA2Plx1MDAxMmKpdH5Nad3m71xi7Fx1MDAxZm/sM7PH6K07zT7BNHs8XHJOP7VXYMUifQ==<!-- payload-end -->
   <defs>
-    <style>
+    <style class=\\"style-fonts\\">
       @font-face {
         font-family: \\"Virgil\\";
         src: url(\\"https://excalidraw.com/Virgil.woff2\\");

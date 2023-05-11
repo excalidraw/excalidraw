@@ -41,15 +41,9 @@ export const actionToggleLock = register({
         : "labels.elementLock.lock";
     }
 
-    if (selected.length > 1) {
-      return getOperation(selected) === "lock"
-        ? "labels.elementLock.lockAll"
-        : "labels.elementLock.unlockAll";
-    }
-
-    throw new Error(
-      "Unexpected zero elements to lock/unlock. This should never happen.",
-    );
+    return getOperation(selected) === "lock"
+      ? "labels.elementLock.lockAll"
+      : "labels.elementLock.unlockAll";
   },
   keyTest: (event, appState, elements) => {
     return (

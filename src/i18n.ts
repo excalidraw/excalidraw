@@ -1,6 +1,8 @@
 import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 import { ENV } from "./constants";
+import { jotaiScope, jotaiStore } from "./jotai";
+import { atom, useAtomValue } from "jotai";
 
 const COMPLETION_THRESHOLD = 85;
 
@@ -24,6 +26,7 @@ const allLanguages: Language[] = [
   { code: "fa-IR", label: "فارسی", rtl: true },
   { code: "fi-FI", label: "Suomi" },
   { code: "fr-FR", label: "Français" },
+  { code: "gl-ES", label: "Galego" },
   { code: "he-IL", label: "עברית", rtl: true },
   { code: "hi-IN", label: "हिन्दी" },
   { code: "hu-HU", label: "Magyar" },
@@ -33,6 +36,7 @@ const allLanguages: Language[] = [
   { code: "kab-KAB", label: "Taqbaylit" },
   { code: "kk-KZ", label: "Қазақ тілі" },
   { code: "ko-KR", label: "한국어" },
+  { code: "ku-TR", label: "Kurdî" },
   { code: "lt-LT", label: "Lietuvių" },
   { code: "lv-LV", label: "Latviešu" },
   { code: "my-MM", label: "Burmese" },
@@ -88,10 +92,17 @@ export const setLanguage = async (lang: Language) => {
   if (lang.code.startsWith(TEST_LANG_CODE)) {
     currentLangData = {};
   } else {
-    currentLangData = await import(
-      /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
-    );
+    try {
+      currentLangData = await import(
+        /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
+      );
+    } catch (error: any) {
+      console.error(`Failed to load language ${lang.code}:`, error.message);
+      currentLangData = fallbackLangData;
+    }
   }
+
+  jotaiStore.set(editorLangCodeAtom, lang.code);
 };
 
 export const getLanguage = () => currentLang;
@@ -135,4 +146,16 @@ export const t = (
     }
   }
   return translation;
+};
+
+/** @private atom used solely to rerender components using `useI18n` hook */
+const editorLangCodeAtom = atom(defaultLang.code);
+
+// Should be used in components that fall under these cases:
+// - component is rendered as an <Excalidraw> child
+// - component is rendered internally by <Excalidraw>, but the component
+//   is memoized w/o being updated on `langCode`, `AppState`, or `UIAppState`
+export const useI18n = () => {
+  const langCode = useAtomValue(editorLangCodeAtom, jotaiScope);
+  return { t, langCode };
 };

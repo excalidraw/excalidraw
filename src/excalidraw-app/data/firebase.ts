@@ -14,6 +14,7 @@ import { encryptData, decryptData } from "../../data/encryption";
 import { MIME_TYPES } from "../../constants";
 import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
+import { ResolutionType } from "../../utility-types";
 
 // private
 // -----------------------------------------------------------------------------
@@ -330,6 +331,7 @@ export const loadFilesFromFirebase = async (
             id,
             dataURL,
             created: metadata?.created || Date.now(),
+            lastRetrieved: metadata?.created || Date.now(),
           });
         } else {
           erroredFiles.set(id, true);
