@@ -388,7 +388,7 @@ const LayerUI = ({
         }}
         tab={DEFAULT_SIDEBAR.defaultTab}
       >
-        {t("toolBar.library")}
+        {/*t("toolBar.library") //zsviczian */}
       </DefaultSidebar.Trigger>
       {/* ------------------------------------------------------------------ */}
 

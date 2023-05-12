@@ -97,7 +97,7 @@ export const DefaultSidebar = Object.assign(
                     paddingRight: "1em",
                   }}
                 >
-                  {t("toolBar.library")}
+                  {/*t("toolBar.library") //zsviczian */}
                 </div>
               )}
               <DefaultSidebarTabTriggersTunnel.Out />

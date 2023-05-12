@@ -237,7 +237,7 @@ export {
   getDefaultLineHeight, //zsviczian
   wrapText, //zsviczian
   getFontString, //zsviczian
-  getMaxContainerWidth, //zsviczian
+  getBoundTextMaxWidth, //zsviczian
   exportToClipboard,
   mergeLibraryItems,
 } from "../../packages/utils";

@@ -239,5 +239,5 @@ export { intersectElementWithLine } from "../element/collision"; //zsviczian
 export { determineFocusDistance } from "../element/collision"; //zsviczian
 export { measureText, wrapText, getDefaultLineHeight } from "../element/textElement"; //zsviczian
 export { getFontString } from "../utils"; //zsviczian
-export { getMaxContainerWidth } from "../element/textElement"; //zsviczian
+export { getBoundTextMaxWidth } from "../element/textElement"; //zsviczian
 export { mergeLibraryItems } from "../data/library";
