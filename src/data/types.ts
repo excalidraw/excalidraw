@@ -40,7 +40,7 @@ export interface ImportedDataState {
   elements?:
     | readonly (
         | (ExcalidrawElement & {
-            children?: [
+            label?: [
               { text: string } & MarkOptional<
                 ElementConstructorOpts,
                 "x" | "y"
@@ -49,7 +49,7 @@ export interface ImportedDataState {
           })
         | {
             type: Exclude<ExcalidrawGenericElement["type"], "selection">;
-            children?: [
+            label?: [
               { text: string } & MarkOptional<
                 ElementConstructorOpts,
                 "x" | "y"

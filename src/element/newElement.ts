@@ -659,7 +659,7 @@ export const convertToExcalidrawElements = (
     if (!element) {
       return;
     }
-    const textElement = element.children?.find((child) => child.text !== null);
+    const textElement = element.label?.find((child) => child.text !== null);
     if (
       isValidTextContainer(element) &&
       textElement &&
