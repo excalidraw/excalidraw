@@ -2,17 +2,21 @@ import React, { useState } from "react";
 import { serializeLibraryAsJSON } from "../data/json";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
-import { AppState, ExcalidrawProps, LibraryItem, LibraryItems } from "../types";
+import {
+  ExcalidrawProps,
+  LibraryItem,
+  LibraryItems,
+  UIAppState,
+} from "../types";
 import { arrayToMap, chunk } from "../utils";
 import { LibraryUnit } from "./LibraryUnit";
 import Stack from "./Stack";
-
-import "./LibraryMenuItems.scss";
 import { MIME_TYPES } from "../constants";
 import Spinner from "./Spinner";
-import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
-import clsx from "clsx";
 import { duplicateElements } from "../element/newElement";
+import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
+
+import "./LibraryMenuItems.scss";
 
 const CELLS_PER_ROW = 4;
 
@@ -36,7 +40,7 @@ const LibraryMenuItems = ({
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
-  theme: AppState["theme"];
+  theme: UIAppState["theme"];
   id: string;
 }) => {
   const [lastSelectedItem, setLastSelectedItem] = useState<
@@ -102,7 +106,7 @@ const LibraryMenuItems = ({
         ...item,
         // duplicate each library item before inserting on canvas to confine
         // ids and bindings to each library item. See #6465
-        elements: duplicateElements(item.elements),
+        elements: duplicateElements(item.elements, { randomizeSeed: true }),
       };
     });
   };
@@ -201,11 +205,7 @@ const LibraryMenuItems = ({
     (item) => item.status === "published",
   );
 
-  const showBtn =
-    !libraryItems.length &&
-    !unpublishedItems.length &&
-    !publishedItems.length &&
-    !pendingElements.length;
+  const showBtn = !libraryItems.length && !pendingElements.length;
 
   return (
     <div
@@ -215,7 +215,7 @@ const LibraryMenuItems = ({
         unpublishedItems.length ||
         publishedItems.length
           ? { justifyContent: "flex-start" }
-          : {}
+          : { borderBottom: 0 }
       }
     >
       <Stack.Col
@@ -251,11 +251,7 @@ const LibraryMenuItems = ({
           </div>
           {!pendingElements.length && !unpublishedItems.length ? (
             <div className="library-menu-items__no-items">
-              <div
-                className={clsx({
-                  "library-menu-items__no-items__label": showBtn,
-                })}
-              >
+              <div className="library-menu-items__no-items__label">
                 {t("library.noItems")}
               </div>
               <div className="library-menu-items__no-items__hint">
@@ -303,10 +299,13 @@ const LibraryMenuItems = ({
         </>
 
         {showBtn && (
-          <LibraryMenuBrowseButton
+          <LibraryMenuControlButtons
+            style={{ padding: "16px 0", width: "100%" }}
             id={id}
             libraryReturnUrl={libraryReturnUrl}
             theme={theme}
+            selectedItems={selectedItems}
+            onSelectItems={onSelectItems}
           />
         )}
       </Stack.Col>

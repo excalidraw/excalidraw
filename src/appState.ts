@@ -60,7 +60,7 @@ export const getDefaultAppState = (): Omit<
     gridSize: null,
     previousGridSize: null, //zsviczian
     isBindingEnabled: true,
-    isSidebarDocked: false,
+    defaultSidebarDockedPreference: false,
     isLoading: false,
     isResizing: false,
     isRotating: false,
@@ -165,7 +165,11 @@ const APP_STATE_STORAGE_CONF = (<
   previousGridSize: { browser: false, export: false, server: false }, //zsviczian
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: false, export: false, server: false },
-  isSidebarDocked: { browser: true, export: false, server: false },
+  defaultSidebarDockedPreference: {
+    browser: true,
+    export: false,
+    server: false,
+  },
   isLoading: { browser: false, export: false, server: false },
   isResizing: { browser: false, export: false, server: false },
   isRotating: { browser: false, export: false, server: false },

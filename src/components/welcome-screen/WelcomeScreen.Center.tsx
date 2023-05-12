@@ -1,13 +1,10 @@
 import { actionLoadScene, actionShortcuts } from "../../actions";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { t, useI18n } from "../../i18n";
-import {
-  useDevice,
-  useExcalidrawActionManager,
-  useExcalidrawAppState,
-} from "../App";
-import { useTunnels } from "../context/tunnels";
+import { useDevice, useExcalidrawActionManager } from "../App";
+import { useTunnels } from "../../context/tunnels";
 import { ExcalLogo, HelpIcon, LoadIcon, usersIcon } from "../icons";
+import { useUIAppState } from "../../context/ui-appState";
 
 const WelcomeScreenMenuItemContent = ({
   icon,
@@ -89,9 +86,9 @@ const WelcomeScreenMenuItemLink = ({
 WelcomeScreenMenuItemLink.displayName = "WelcomeScreenMenuItemLink";
 
 const Center = ({ children }: { children?: React.ReactNode }) => {
-  const { welcomeScreenCenterTunnel } = useTunnels();
+  const { WelcomeScreenCenterTunnel } = useTunnels();
   return (
-    <welcomeScreenCenterTunnel.In>
+    <WelcomeScreenCenterTunnel.In>
       <div className="welcome-screen-center">
         {children || (
           <>
@@ -104,7 +101,7 @@ const Center = ({ children }: { children?: React.ReactNode }) => {
           </>
         )}
       </div>
-    </welcomeScreenCenterTunnel.In>
+    </WelcomeScreenCenterTunnel.In>
   );
 };
 Center.displayName = "Center";
@@ -148,7 +145,7 @@ const MenuItemHelp = () => {
 MenuItemHelp.displayName = "MenuItemHelp";
 
 const MenuItemLoadScene = () => {
-  const appState = useExcalidrawAppState();
+  const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
 
   if (appState.viewModeEnabled) {
