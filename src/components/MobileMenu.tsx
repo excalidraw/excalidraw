@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState, Device, ExcalidrawProps } from "../types";
+import { AppState, Device, ExcalidrawProps, UIAppState } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -13,16 +13,15 @@ import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { Section } from "./Section";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockButton } from "./LockButton";
-import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
-import { useTunnels } from "./context/tunnels";
+import { useTunnels } from "../context/tunnels";
 
 type MobileMenuProps = {
-  appState: AppState;
+  appState: UIAppState;
   actionManager: ActionManager;
   renderJSONExportDialog: () => React.ReactNode;
   renderImageExportDialog: () => React.ReactNode;
@@ -36,7 +35,7 @@ type MobileMenuProps = {
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
-    appState: AppState,
+    appState: UIAppState,
   ) => JSX.Element | null;
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderSidebars: () => JSX.Element | null;
@@ -60,11 +59,15 @@ export const MobileMenu = ({
   device,
   renderWelcomeScreen,
 }: MobileMenuProps) => {
-  const { welcomeScreenCenterTunnel, mainMenuTunnel } = useTunnels();
+  const {
+    WelcomeScreenCenterTunnel,
+    MainMenuTunnel,
+    DefaultSidebarTriggerTunnel,
+  } = useTunnels();
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
-        {renderWelcomeScreen && <welcomeScreenCenterTunnel.Out />}
+        {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
         <Section heading="shapes">
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
@@ -89,11 +92,7 @@ export const MobileMenu = ({
                   {!appState.viewModeEnabled && //zsviczian
                     renderTopRightUI?.(true, appState)}
                   {!appState.viewModeEnabled && (
-                    <LibraryButton
-                      appState={appState}
-                      setAppState={setAppState}
-                      isMobile
-                    />
+                    <DefaultSidebarTriggerTunnel.Out />
                   )}
                   <PenModeButton
                     checked={appState.penMode}
@@ -134,7 +133,7 @@ export const MobileMenu = ({
       return; //zsviczian
       /*return (
         <div className="App-toolbar-content">
-          <mainMenuTunnel.Out />
+          <MainMenuTunnel.Out />
         </div>
       );*/
     }
@@ -151,7 +150,7 @@ export const MobileMenu = ({
 
     return (
       <div className="App-toolbar-content">
-        <mainMenuTunnel.Out />
+        <MainMenuTunnel.Out />
         {showEditMenu ? ( //zsviczian
           actionManager.renderAction("toggleEditMenu")
         ) : (
@@ -214,13 +213,13 @@ export const MobileMenu = ({
             {renderAppToolbar()}
             {appState.scrolledOutside &&
               !appState.openMenu &&
-              appState.openSidebar !== "library" && (
+              !appState.openSidebar && (
                 <button
                   className="scroll-back-to-content"
                   onClick={() => {
-                    setAppState({
+                    setAppState((appState) => ({
                       ...calculateScrollCenter(elements, appState, canvas),
-                    });
+                    }));
                   }}
                 >
                   {t("buttons.scrollBackToContent")}

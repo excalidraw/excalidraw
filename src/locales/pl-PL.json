@@ -54,6 +54,7 @@
     "veryLarge": "Bardzo duży",
     "solid": "Pełne",
     "hachure": "Linie",
+    "zigzag": "",
     "crossHatch": "Zakreślone",
     "thin": "Cienkie",
     "bold": "Pogrubione",
@@ -207,19 +208,10 @@
     "collabSaveFailed": "Nie udało się zapisać w bazie danych. Jeśli problemy nie ustąpią, zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "collabSaveFailed_sizeExceeded": "Nie udało się zapisać w bazie danych — dokument jest za duży. Zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "problem",
-      "write": "na naszym GitHubie lub napisz do nas na",
-      "discord": "Discord"
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -272,16 +264,11 @@
     "canvasTooBigTip": "Wskazówka: spróbuj nieco zbliżyć najdalej wysunięte elementy."
   },
   "errorSplash": {
-    "headingMain_pre": "Wystąpił błąd. Spróbuj ",
-    "headingMain_button": "odświeżyć stronę.",
-    "clearCanvasMessage": "Jeśli odświeżenie strony nie zadziałało, spróbuj ",
-    "clearCanvasMessage_button": "usunąć wszystko z dokumentu.",
+    "headingMain": "Wystąpił błąd. Spróbuj <button>odświeżyć stronę.</button>",
+    "clearCanvasMessage": "Jeśli odświeżenie strony nie zadziałało, spróbuj <button>usunąć wszystko z dokumentu.</button>",
     "clearCanvasCaveat": " Pamiętaj tylko, że spowoduje to utratę całej twojej pracy ",
-    "trackedToSentry_pre": "Błąd o identyfikatorze ",
-    "trackedToSentry_post": " został zaraportowany w naszym systemie.",
-    "openIssueMessage_pre": "Szanujemy twoją prywatność i raport nie zawierał żadnych danych dotyczących tego nad czym pracowałeś, natomiast jeżeli jesteś w stanie podzielić się tym nad czym pracowałeś, prosimy o dodatkowy raport poprzez ",
-    "openIssueMessage_button": "nasze narzędzie do raportowania błędów.",
-    "openIssueMessage_post": " Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i umieszczenie jej w zgłoszeniu na portalu GitHub.",
+    "trackedToSentry": "Błąd o identyfikatorze {{eventId}} został zaraportowany w naszym systemie.",
+    "openIssueMessage": "Szanujemy twoją prywatność i raport nie zawierał żadnych danych dotyczących tego nad czym pracowałeś, natomiast jeżeli jesteś w stanie podzielić się tym nad czym pracowałeś, prosimy o dodatkowy raport poprzez <button>nasze narzędzie do raportowania błędów.</button> Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i umieszczenie jej w zgłoszeniu na portalu GitHub.",
     "sceneContent": "Zawartość dokumentu:"
   },
   "roomDialog": {
@@ -361,29 +348,16 @@
       "required": "Wymagane",
       "website": "Wprowadź prawidłowy adres URL"
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": "dla innych osób do wykorzystania w swoich rysunkach."
-    },
-    "noteGuidelines": {
-      "pre": "Biblioteka musi być najpierw zatwierdzona ręcznie. Przeczytaj ",
-      "link": "wytyczne",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "Wysyłając zgadzasz się, że biblioteka zostanie opublikowana pod ",
-      "link": "Licencja MIT, ",
-      "post": "w skrócie, każdy może z nich korzystać bez ograniczeń."
-    },
+    "noteDescription": "<link></link>dla innych osób do wykorzystania w swoich rysunkach.",
+    "noteGuidelines": "Biblioteka musi być najpierw zatwierdzona ręcznie. Przeczytaj <link>wytyczne</link>",
+    "noteLicense": "Wysyłając zgadzasz się, że biblioteka zostanie opublikowana pod <link>Licencja MIT, </link>w skrócie, każdy może z nich korzystać bez ograniczeń.",
     "noteItems": "",
     "atleastOneLibItem": "Proszę wybrać co najmniej jeden element biblioteki, by rozpocząć",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Biblioteka została przesłana",
-    "content": "Dziękujemy {{authorName}}. Twoja biblioteka została przesłana do sprawdzenia. Możesz śledzić jej stan",
-    "link": "tutaj"
+    "content": "Dziękujemy {{authorName}}. Twoja biblioteka została przesłana do sprawdzenia. Możesz śledzić jej stan<link>tutaj</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Zresetuj Bibliotekę",
