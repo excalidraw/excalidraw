@@ -47,7 +47,7 @@
 
     &__items {
       row-gap: 0.5rem;
-      padding: var(--container-padding-y) var(--container-padding-x);
+      padding: var(--container-padding-y) 0;
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
@@ -61,7 +61,7 @@
       margin-bottom: 0.75rem;
 
       &--excal {
-        margin-top: 2.5rem;
+        margin-top: 2rem;
       }
     }
 
