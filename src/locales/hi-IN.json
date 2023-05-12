@@ -357,7 +357,7 @@
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": ""
+    "content": "{{authorName}} धन्यवाद. आपका संग्रहण समीक्षा के लिए दर्ज हो चुका है. समीक्षा स्थिति <link>यहाँ</link>जान सकते हैं."
   },
   "confirmDialog": {
     "resetLibrary": "",
