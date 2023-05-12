@@ -26,6 +26,7 @@
   }
 
   .library-menu-items-container {
+    width: 100%;
     display: flex;
     flex-grow: 1;
     flex-shrink: 1;
@@ -35,9 +36,13 @@
     height: 100%;
     justify-content: center;
     margin: 0;
-    border-bottom: 1px solid var(--sidebar-border-color);
 
     position: relative;
+
+    & > div {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
 
     &__row {
       display: grid;
