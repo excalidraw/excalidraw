@@ -268,6 +268,50 @@ export const zoomToFitElements = (
   };
 };
 
+// TODO
+// maybe make this configurable, as parts of opts?
+// 30% offset from the edges
+const ZOOM_OFFSET = 0.7;
+
+export const zoomToFitViewport = (
+  elements: readonly ExcalidrawElement[],
+  appState: Readonly<AppState>,
+  zoomToSelection: boolean,
+) => {
+  const nonDeletedElements = getNonDeletedElements(elements);
+  const selectedElements = getSelectedElements(nonDeletedElements, appState);
+  const commonBounds =
+    zoomToSelection && selectedElements.length > 0
+      ? getCommonBounds(selectedElements)
+      : getCommonBounds(nonDeletedElements);
+
+  const [x1, y1, x2, y2] = commonBounds;
+  const centerX = (x1 + x2) / 2;
+  const centerY = (y1 + y2) / 2;
+
+  const commonBoundsWidth = x2 - x1;
+  const commonBoundsHeight = y2 - y1;
+
+  const desiredZoom =
+    Math.min(
+      appState.width / commonBoundsWidth,
+      appState.height / commonBoundsHeight,
+    ) * ZOOM_OFFSET;
+
+  const scrollX = (appState.width / 2) * (1 / desiredZoom) - centerX;
+  const scrollY = (appState.height / 2) * (1 / desiredZoom) - centerY;
+
+  return {
+    appState: {
+      ...appState,
+      scrollX,
+      scrollY,
+      zoom: { value: desiredZoom as NormalizedZoomValue },
+    },
+    commitToHistory: false,
+  };
+};
+
 export const actionZoomToSelected = register({
   name: "zoomToSelection",
   trackEvent: { category: "canvas" },

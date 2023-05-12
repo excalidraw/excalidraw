@@ -306,30 +306,32 @@ This is the history API. history.clear() will clear the history.
 
 ## scrollToContent
 
-<pre>
-  (<br />
-  {"  "}
-  target?:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
-    ExcalidrawElement
-  </a>{" "}
-  &#124;{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
-    ExcalidrawElement
-  </a>
-  [],
-  <br />
-  {"  "}opts?: &#123; fitToContent?: boolean; animate?: boolean; duration?: number
-  &#125;
-  <br />) => void
-</pre>
+```tsx
+(
+  target?: ExcalidrawElement | ExcalidrawElement[],
+  opts?:
+      | {
+          fitToContent?: boolean;
+          fitToViewport?: never;
+          animate?: boolean;
+          duration?: number;
+        }
+      | {
+          fitToContent?: never;
+          fitToViewport?: boolean;
+          animate?: boolean;
+          duration?: number;
+        }
+) => void
+```
 
 Scroll the nearest element out of the elements supplied to the center of the viewport. Defaults to the elements on the scene.
 
 | Attribute | type | default | Description |
 | --- | --- | --- | --- |
-| target | <code>ExcalidrawElement &#124; ExcalidrawElement[]</code> | All scene elements | The element(s) to scroll to. |
-| opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. |
+| target | [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115) | All scene elements | The element(s) to scroll to. |
+| opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. Note that the zoom range is between 10%-100%. |
+| opts.fitToViewport | boolean | false | Similar to fitToContent but the zoom range is not limited. If elements are smaller than the viewport, zoom will go above 100%. |
 | opts.animate | boolean | false | Whether to animate between starting and ending position. Note that for larger scenes the animation may not be smooth due to performance issues. |
 | opts.duration | number | 500 | Duration of the animation if `opts.animate` is `true`. |
 
