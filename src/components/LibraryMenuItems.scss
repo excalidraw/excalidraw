@@ -83,4 +83,11 @@
       color: var(--text-primary-color);
     }
   }
+
+  .library-menu-items-private-library-container {
+    // so that when you toggle between pending item and no items, there's
+    // no layout shift (this is hardcoded and works only with ENG locale)
+    min-height: 3.75rem;
+    width: 100%;
+  }
 }
