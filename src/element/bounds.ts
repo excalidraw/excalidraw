@@ -30,30 +30,98 @@ import { TransformHandleDirection } from "./transformHandles";
 export type Bounds = readonly [number, number, number, number];
 type MaybeQuadraticSolution = [number | null, number | null] | false;
 
-class ElementBoundsCache {
+let _elementBoundsSingleton: ElementBounds;
+
+export class ElementBounds {
   private boundsCache = new WeakMap<
     ExcalidrawElement,
     {
       bounds: Bounds;
       version: ExcalidrawElement["version"];
-      versionNonce: ExcalidrawElement["versionNonce"];
     }
   >();
+
+  constructor() {
+    if (_elementBoundsSingleton) {
+      return _elementBoundsSingleton;
+    }
+    _elementBoundsSingleton = this;
+    return _elementBoundsSingleton;
+  }
 
   updateBounds(element: ExcalidrawElement, bounds: Bounds) {
     this.boundsCache.set(element, {
       version: element.version,
-      versionNonce: element.versionNonce,
       bounds,
     });
   }
 
   getCachedBounds(element: ExcalidrawElement) {
-    return this.boundsCache.get(element);
+    const cachedBounds = this.boundsCache.get(element);
+    if (
+      cachedBounds &&
+      cachedBounds.version === element.version &&
+      cachedBounds.bounds
+    ) {
+      return cachedBounds.bounds;
+    }
+    return null;
+  }
+
+  static calculateBounds(element: ExcalidrawElement): Bounds {
+    let bounds: [number, number, number, number];
+
+    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
+    if (isFreeDrawElement(element)) {
+      const [minX, minY, maxX, maxY] = getBoundsFromPoints(
+        element.points.map(([x, y]) =>
+          rotate(x, y, cx - element.x, cy - element.y, element.angle),
+        ),
+      );
+
+      return [
+        minX + element.x,
+        minY + element.y,
+        maxX + element.x,
+        maxY + element.y,
+      ];
+    } else if (isLinearElement(element)) {
+      bounds = getLinearElementRotatedBounds(element, cx, cy);
+    } else if (element.type === "diamond") {
+      const [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
+      const [x12, y12] = rotate(cx, y2, cx, cy, element.angle);
+      const [x22, y22] = rotate(x1, cy, cx, cy, element.angle);
+      const [x21, y21] = rotate(x2, cy, cx, cy, element.angle);
+      const minX = Math.min(x11, x12, x22, x21);
+      const minY = Math.min(y11, y12, y22, y21);
+      const maxX = Math.max(x11, x12, x22, x21);
+      const maxY = Math.max(y11, y12, y22, y21);
+      bounds = [minX, minY, maxX, maxY];
+    } else if (element.type === "ellipse") {
+      const w = (x2 - x1) / 2;
+      const h = (y2 - y1) / 2;
+      const cos = Math.cos(element.angle);
+      const sin = Math.sin(element.angle);
+      const ww = Math.hypot(w * cos, h * sin);
+      const hh = Math.hypot(h * cos, w * sin);
+      bounds = [cx - ww, cy - hh, cx + ww, cy + hh];
+    } else {
+      const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
+      const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
+      const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
+      const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
+      const minX = Math.min(x11, x12, x22, x21);
+      const minY = Math.min(y11, y12, y22, y21);
+      const maxX = Math.max(x11, x12, x22, x21);
+      const maxY = Math.max(y11, y12, y22, y21);
+      bounds = [minX, minY, maxX, maxY];
+    }
+
+    return bounds;
   }
 }
 
-export const cachedElementBounds = new ElementBoundsCache();
+export const elementBounds = new ElementBounds();
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
@@ -509,67 +577,15 @@ export const getElementBounds = (
   recompuate = false,
 ): Bounds => {
   if (!recompuate) {
-    const cachedBounds = cachedElementBounds.getCachedBounds(element);
-    if (
-      cachedBounds &&
-      cachedBounds.version === element.version &&
-      cachedBounds.versionNonce === element.versionNonce &&
-      cachedBounds.bounds
-    ) {
-      return cachedBounds.bounds;
+    const cachedBounds = elementBounds.getCachedBounds(element);
+    if (cachedBounds) {
+      return cachedBounds;
     }
   }
 
-  let bounds: [number, number, number, number];
-
-  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
-  if (isFreeDrawElement(element)) {
-    const [minX, minY, maxX, maxY] = getBoundsFromPoints(
-      element.points.map(([x, y]) =>
-        rotate(x, y, cx - element.x, cy - element.y, element.angle),
-      ),
-    );
-
-    return [
-      minX + element.x,
-      minY + element.y,
-      maxX + element.x,
-      maxY + element.y,
-    ];
-  } else if (isLinearElement(element)) {
-    bounds = getLinearElementRotatedBounds(element, cx, cy);
-  } else if (element.type === "diamond") {
-    const [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
-    const [x12, y12] = rotate(cx, y2, cx, cy, element.angle);
-    const [x22, y22] = rotate(x1, cy, cx, cy, element.angle);
-    const [x21, y21] = rotate(x2, cy, cx, cy, element.angle);
-    const minX = Math.min(x11, x12, x22, x21);
-    const minY = Math.min(y11, y12, y22, y21);
-    const maxX = Math.max(x11, x12, x22, x21);
-    const maxY = Math.max(y11, y12, y22, y21);
-    bounds = [minX, minY, maxX, maxY];
-  } else if (element.type === "ellipse") {
-    const w = (x2 - x1) / 2;
-    const h = (y2 - y1) / 2;
-    const cos = Math.cos(element.angle);
-    const sin = Math.sin(element.angle);
-    const ww = Math.hypot(w * cos, h * sin);
-    const hh = Math.hypot(h * cos, w * sin);
-    bounds = [cx - ww, cy - hh, cx + ww, cy + hh];
-  } else {
-    const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
-    const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
-    const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
-    const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
-    const minX = Math.min(x11, x12, x22, x21);
-    const minY = Math.min(y11, y12, y22, y21);
-    const maxX = Math.max(x11, x12, x22, x21);
-    const maxY = Math.max(y11, y12, y22, y21);
-    bounds = [minX, minY, maxX, maxY];
-  }
-
-  // update cached bounds here when cache miss or recompute
-  cachedElementBounds.updateBounds(element, bounds);
+  const bounds = ElementBounds.calculateBounds(element);
+  // update bounds cache when recomputing the bounds or the bounds have not yet been cached
+  elementBounds.updateBounds(element, bounds);
 
   return bounds;
 };
