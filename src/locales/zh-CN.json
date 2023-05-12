@@ -273,7 +273,7 @@
   },
   "roomDialog": {
     "desc_intro": "你可以邀请其他人到目前的画面中与你协作。",
-    "desc_privacy": "别担心, 该会话使用端到端加密, 无论绘制什么都将保持私密，甚至连我们的服务器也无法查看。",
+    "desc_privacy": "别担心，该会话使用端到端加密，无论绘制什么都将保持私密，甚至连我们的服务器也无法查看。",
     "button_startSession": "启动会议",
     "button_stopSession": "结束会议",
     "desc_inProgressIntro": "实时协作会议正在进行。",
@@ -364,7 +364,7 @@
     "removeItemsFromLib": "从素材库中删除选中的项目"
   },
   "encrypted": {
-    "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
+    "tooltip": "您的绘图采用端到端加密，其内容对于 Excalidraw 服务器是不可见的。",
     "link": "Excalidraw 中关于端到端加密的博客"
   },
   "stats": {
