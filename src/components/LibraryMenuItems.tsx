@@ -15,6 +15,7 @@ import { MIME_TYPES } from "../constants";
 import Spinner from "./Spinner";
 import { duplicateElements } from "../element/newElement";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
+import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
 
 import "./LibraryMenuItems.scss";
 
@@ -207,6 +208,11 @@ const LibraryMenuItems = ({
 
   const showBtn = !libraryItems.length && !pendingElements.length;
 
+  const isLibraryEmpty =
+    !pendingElements.length &&
+    !unpublishedItems.length &&
+    !publishedItems.length;
+
   return (
     <div
       className="library-menu-items-container"
@@ -218,6 +224,13 @@ const LibraryMenuItems = ({
           : { borderBottom: 0 }
       }
     >
+      {!isLibraryEmpty && (
+        <LibraryDropdownMenu
+          selectedItems={selectedItems}
+          onSelectItems={onSelectItems}
+          className="library-menu-dropdown-container--in-heading"
+        />
+      )}
       <Stack.Col
         className="library-menu-items-container__items"
         align="start"
@@ -228,27 +241,23 @@ const LibraryMenuItems = ({
         }}
       >
         <>
-          <div>
-            {(pendingElements.length > 0 ||
-              unpublishedItems.length > 0 ||
-              publishedItems.length > 0) && (
-              <div className="library-menu-items-container__header">
-                {t("labels.personalLib")}
-              </div>
-            )}
-            {isLoading && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "var(--container-padding-y)",
-                  right: "var(--container-padding-x)",
-                  transform: "translateY(50%)",
-                }}
-              >
-                <Spinner />
-              </div>
-            )}
-          </div>
+          {!isLibraryEmpty && (
+            <div className="library-menu-items-container__header">
+              {t("labels.personalLib")}
+            </div>
+          )}
+          {isLoading && (
+            <div
+              style={{
+                position: "absolute",
+                top: "var(--container-padding-y)",
+                right: "var(--container-padding-x)",
+                transform: "translateY(50%)",
+              }}
+            >
+              <Spinner />
+            </div>
+          )}
           {!pendingElements.length && !unpublishedItems.length ? (
             <div className="library-menu-items__no-items">
               <div className="library-menu-items__no-items__label">
@@ -304,9 +313,12 @@ const LibraryMenuItems = ({
             id={id}
             libraryReturnUrl={libraryReturnUrl}
             theme={theme}
-            selectedItems={selectedItems}
-            onSelectItems={onSelectItems}
-          />
+          >
+            <LibraryDropdownMenu
+              selectedItems={selectedItems}
+              onSelectItems={onSelectItems}
+            />
+          </LibraryMenuControlButtons>
         )}
       </Stack.Col>
     </div>

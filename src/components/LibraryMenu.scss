@@ -126,4 +126,20 @@
       padding: 0.25rem 0.5rem;
     }
   }
+
+  .library-menu-dropdown-container {
+    position: relative;
+
+    &--in-heading {
+      margin-left: auto;
+      position: absolute;
+      top: 16px;
+      right: 10px;
+      z-index: 1;
+
+      .dropdown-menu {
+        top: 100%;
+      }
+    }
+  }
 }

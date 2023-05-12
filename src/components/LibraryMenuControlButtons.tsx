@@ -1,21 +1,18 @@
-import { LibraryItem, ExcalidrawProps, UIAppState } from "../types";
+import { ExcalidrawProps, UIAppState } from "../types";
 import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
-import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
 
 export const LibraryMenuControlButtons = ({
-  selectedItems,
-  onSelectItems,
   libraryReturnUrl,
   theme,
   id,
   style,
+  children,
 }: {
-  selectedItems: LibraryItem["id"][];
-  onSelectItems: (id: LibraryItem["id"][]) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   theme: UIAppState["theme"];
   id: string;
   style: React.CSSProperties;
+  children?: React.ReactNode;
 }) => {
   return (
     <div className="library-menu-control-buttons" style={style}>
@@ -24,10 +21,7 @@ export const LibraryMenuControlButtons = ({
         libraryReturnUrl={libraryReturnUrl}
         theme={theme}
       />
-      <LibraryDropdownMenu
-        selectedItems={selectedItems}
-        onSelectItems={onSelectItems}
-      />
+      {children}
     </div>
   );
 };

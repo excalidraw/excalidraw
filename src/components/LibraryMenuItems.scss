@@ -59,6 +59,9 @@
       font-size: 1.125rem;
       font-weight: bold;
       margin-bottom: 0.75rem;
+      width: 100%;
+      padding-right: 4rem; // due to dropdown button
+      box-sizing: border-box;
 
       &--excal {
         margin-top: 2rem;

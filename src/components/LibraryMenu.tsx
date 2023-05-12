@@ -125,8 +125,6 @@ export const LibraryMenuContent = ({
           id={id}
           libraryReturnUrl={libraryReturnUrl}
           theme={appState.theme}
-          selectedItems={selectedItems}
-          onSelectItems={onSelectItems}
         />
       )}
     </LibraryMenuWrapper>
