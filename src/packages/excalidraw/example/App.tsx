@@ -161,7 +161,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
           onClick={() => alert("This is an empty top right UI")}
           style={{ height: "2.5rem" }}
         >
-          
           Click me
         </button>
       </>
