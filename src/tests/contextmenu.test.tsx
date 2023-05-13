@@ -125,7 +125,7 @@ describe("contextMenu element", () => {
       "bringToFront",
       "duplicateSelection",
       "hyperlink",
-      "toggleLock",
+      "toggleElementLock",
     ];
 
     expect(contextMenu).not.toBeNull();
@@ -212,7 +212,7 @@ describe("contextMenu element", () => {
       "sendToBack",
       "bringToFront",
       "duplicateSelection",
-      "toggleLock",
+      "toggleElementLock",
     ];
 
     expect(contextMenu).not.toBeNull();
@@ -263,7 +263,7 @@ describe("contextMenu element", () => {
       "sendToBack",
       "bringToFront",
       "duplicateSelection",
-      "toggleLock",
+      "toggleElementLock",
     ];
 
     expect(contextMenu).not.toBeNull();

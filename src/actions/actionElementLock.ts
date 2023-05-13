@@ -5,8 +5,8 @@ import { getSelectedElements } from "../scene";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 
-export const actionToggleLock = register({
-  name: "toggleLock",
+export const actionToggleElementLock = register({
+  name: "toggleElementLock",
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState, true);
@@ -55,8 +55,8 @@ export const actionToggleLock = register({
   },
 });
 
-export const actionUnlockAllCanvasElements = register({
-  name: "unlockAllCanvasElements",
+export const actionUnlockAllElements = register({
+  name: "unlockAllElements",
   trackEvent: { category: "canvas" },
   viewMode: false,
   predicate: (elements, appState) => {
