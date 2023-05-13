@@ -152,7 +152,7 @@ describe("element locking", () => {
     expect(contextMenu).not.toBeNull();
     expect(
       contextMenu?.querySelector(
-        `li[data-testid="toggleLock"] .context-menu-item__label`,
+        `li[data-testid="toggleElementLock"] .context-menu-item__label`,
       ),
     ).toHaveTextContent(t("labels.elementLock.unlock"));
   });

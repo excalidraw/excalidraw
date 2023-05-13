@@ -247,7 +247,7 @@ Object {
       Object {
         "contextItemLabel": [Function],
         "keyTest": [Function],
-        "name": "toggleLock",
+        "name": "toggleElementLock",
         "perform": [Function],
         "trackEvent": Object {
           "category": "element",
@@ -4644,7 +4644,7 @@ Object {
       Object {
         "contextItemLabel": [Function],
         "keyTest": [Function],
-        "name": "toggleLock",
+        "name": "toggleElementLock",
         "perform": [Function],
         "trackEvent": Object {
           "category": "element",
@@ -5194,7 +5194,7 @@ Object {
       Object {
         "contextItemLabel": [Function],
         "keyTest": [Function],
-        "name": "toggleLock",
+        "name": "toggleElementLock",
         "perform": [Function],
         "trackEvent": Object {
           "category": "element",
@@ -5642,6 +5642,16 @@ Object {
           "category": "canvas",
         },
       },
+      Object {
+        "contextItemLabel": "labels.elementLock.unlockAll",
+        "name": "unlockAllElements",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "canvas",
+        },
+        "viewMode": false,
+      },
       "separator",
       Object {
         "checked": [Function],
@@ -6043,7 +6053,7 @@ Object {
       Object {
         "contextItemLabel": [Function],
         "keyTest": [Function],
-        "name": "toggleLock",
+        "name": "toggleElementLock",
         "perform": [Function],
         "trackEvent": Object {
           "category": "element",
@@ -6389,7 +6399,7 @@ Object {
       Object {
         "contextItemLabel": [Function],
         "keyTest": [Function],
-        "name": "toggleLock",
+        "name": "toggleElementLock",
         "perform": [Function],
         "trackEvent": Object {
           "category": "element",
