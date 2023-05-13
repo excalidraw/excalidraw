@@ -264,11 +264,11 @@
     "canvasTooBigTip": "Sfat: încearcă să apropii puțin mai mult elementele cele mai îndepărtate."
   },
   "errorSplash": {
-    "headingMain": "A apărut o eroare. Încearcă <button>să reîncarci pagina.</button>",
-    "clearCanvasMessage": "Dacă reîncărcarea nu funcționează, încearcă <button>să golești pânza.</button>",
+    "headingMain": "A apărut o eroare. Încearcă <button>să reîncarci pagina</button>.",
+    "clearCanvasMessage": "Dacă reîncărcarea nu funcționează, încearcă <button>să ștergi pânza</button>.",
     "clearCanvasCaveat": " Acest lucru va duce la pierderea progresului ",
     "trackedToSentry": "Eroarea cu identificatorul {{eventId}} a fost urmărită în sistemul nostru.",
-    "openIssueMessage": "Am luat măsuri de precauție pentru a nu include informații despre scenă în eroare. Dacă scena nu este privată, te rugăm să ne oferi mai multe informații în <button>monitorul nostru pentru erori.</button> Te rugăm să incluzi informațiile de mai jos prin copierea și lipirea în problema GitHub.",
+    "openIssueMessage": "Am luat măsuri de precauție pentru a nu include informații despre scenă în eroare. Dacă scena nu este privată, oferă-ne mai multe informații în <button>monitorul nostru pentru erori</button>. Include informațiile de mai jos copiindu-le și lipindu-le în tichetul cu problemă de pe GitHub.",
     "sceneContent": "Conținutul scenei:"
   },
   "roomDialog": {
@@ -348,8 +348,8 @@
       "required": "Obligatoriu",
       "website": "Introdu un URL valid"
     },
-    "noteDescription": "Trimite-ți biblioteca pentru fi inclus în <link>depozitul de biblioteci publice</link>pentru utilizarea de către alte persoane în desenele lor.",
-    "noteGuidelines": "Biblioteca trebuie aprobată manual. Citește <link>orientările</link> înainte de trimitere. Vei avea nevoie de un cont GitHub pentru a comunica și efectua modificări, dacă este cazul, însă nu este strict necesar.",
+    "noteDescription": "Trimite-ți biblioteca pentru a fi inclusă în <link>depozitul de biblioteci publice</link> în vederea utilizării de către alte persoane în desenele lor.",
+    "noteGuidelines": "Biblioteca trebuie aprobată manual mai întâi. Citește <link>orientările</link> înainte de trimitere. Vei avea nevoie de un cont GitHub pentru a comunica și efectua modificări, dacă este cazul, însă nu este strict necesar.",
     "noteLicense": "Prin trimiterea bibliotecii, ești de acord că aceasta va fi publicată sub <link>Licența MIT, </link>care, pe scurt, înseamnă că oricine o poate folosi fără restricții.",
     "noteItems": "Fiecare element din bibliotecă trebuie să aibă propriul nume astfel încât să fie filtrabil. Următoarele elemente din bibliotecă vor fi incluse:",
     "atleastOneLibItem": "Selectează cel puțin un element din bibliotecă pentru a începe",
@@ -357,7 +357,7 @@
   },
   "publishSuccessDialog": {
     "title": "Bibliotecă trimisă",
-    "content": "Îți mulțumim, {{authorName}}. Biblioteca ta a fost trimisă spre revizuire. Poți urmări starea<link>aici</link>"
+    "content": "Îți mulțumim, {{authorName}}. Biblioteca a fost trimisă spre revizuire. Poți urmări starea <link>aici</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Resetare bibliotecă",
