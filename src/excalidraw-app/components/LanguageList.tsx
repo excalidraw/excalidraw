@@ -1,7 +1,7 @@
 import { useSetAtom } from "jotai";
 import React from "react";
 import { appLangCodeAtom } from "..";
-import { defaultLang, useI18n } from "../../i18n";
+import { useI18n } from "../../i18n";
 import { languages } from "../../i18n";
 
 export const LanguageList = ({ style }: { style?: React.CSSProperties }) => {
@@ -16,9 +16,6 @@ export const LanguageList = ({ style }: { style?: React.CSSProperties }) => {
       aria-label={t("buttons.selectLanguage")}
       style={style}
     >
-      <option key={defaultLang.code} value={defaultLang.code}>
-        {defaultLang.label}
-      </option>
       {languages.map((lang) => (
         <option key={lang.code} value={lang.code}>
           {lang.label}
