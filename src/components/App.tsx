@@ -4810,6 +4810,14 @@ class App extends React.Component<AppProps, AppState> {
                   x: duplicatedElement.x + (originDragX - dragX),
                   y: duplicatedElement.y + (originDragY - dragY),
                 });
+
+                // put duplicated element to pointerDownState.originalElements
+                // so that we can snap to the duplicated element without releasing
+                pointerDownState.originalElements.set(
+                  duplicatedElement.id,
+                  duplicatedElement,
+                );
+
                 nextElements.push(duplicatedElement);
                 elementsToAppend.push(element);
                 oldIdToDuplicatedId.set(element.id, duplicatedElement.id);

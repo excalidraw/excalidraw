@@ -79,11 +79,12 @@ export const getSnaps = ({
   event: PointerEvent;
   dragOffset: { x: number; y: number };
 }): Snaps | null => {
-  if (!isSnappingEnabled({ appState, event })) {
+  const selectedElements = getSelectedElements(elements, appState, true);
+
+  if (!isSnappingEnabled({ appState, event, selectedElements })) {
     return null;
   }
 
-  const selectedElements = getSelectedElements(elements, appState, true);
   if (selectedElements.length === 0) {
     return null;
   }
@@ -189,12 +190,21 @@ export const getSnapLineEndPointsCoords = (
 const isSnappingEnabled = ({
   event,
   appState,
+  selectedElements,
 }: {
   appState: AppState;
   event: PointerEvent;
-}) =>
-  (appState.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
-  (!appState.objectsSnapModeEnabled && event[KEYS.CTRL_OR_CMD]);
+  selectedElements: NonDeletedExcalidrawElement[];
+}) => {
+  // do not suggest snaps for an arrow to give way to binding
+  if (selectedElements.length === 1 && selectedElements[0].type === "arrow") {
+    return false;
+  }
+  return (
+    (appState.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
+    (!appState.objectsSnapModeEnabled && event[KEYS.CTRL_OR_CMD])
+  );
+};
 
 /**
  * given a line and some points (not necessarily on the line)
