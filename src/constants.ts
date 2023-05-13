@@ -131,6 +131,12 @@ export const MIME_TYPES = {
   ...IMAGE_MIME_TYPES,
 } as const;
 
+export const EXPORT_IMAGE_TYPES = {
+  png: "png",
+  svg: "svg",
+  clipboard: "clipboard",
+} as const;
+
 export const EXPORT_DATA_TYPES = {
   excalidraw: "excalidraw",
   excalidrawClipboard: "excalidraw/clipboard",
