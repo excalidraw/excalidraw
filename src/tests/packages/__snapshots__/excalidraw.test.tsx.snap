@@ -43,7 +43,6 @@ exports[`<Excalidraw/> <MainMenu/> should render main menu with host menu items 
       <button
         style="height: 2rem;"
       >
-         
         custom menu item
       </button>
     </div>

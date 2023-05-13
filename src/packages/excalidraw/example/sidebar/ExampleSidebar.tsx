@@ -11,7 +11,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
         </button>
         <div className="sidebar-links">
           <button>Empty Home</button>
-          <button>Empty About</button>{" "}
+          <button>Empty About</button>
         </div>
       </div>
       <div className={`${open ? "sidebar-open" : ""}`}>
