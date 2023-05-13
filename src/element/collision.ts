@@ -25,6 +25,7 @@ import {
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
+  StrokeRoundness,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -36,6 +37,8 @@ import { hasBoundTextElement, isImageElement } from "./typeChecks";
 import { isTextElement } from ".";
 import { isTransparent } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
+import { getBoundTextElement } from "./textElement";
+import { Mutable } from "../utility-types";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -72,6 +75,13 @@ export const hitTest = (
     return isPointHittingElementBoundingBox(element, point, threshold);
   }
 
+  const boundTextElement = getBoundTextElement(element);
+  if (boundTextElement) {
+    const isHittingBoundTextElement = hitTest(boundTextElement, appState, x, y);
+    if (isHittingBoundTextElement) {
+      return true;
+    }
+  }
   return isHittingElementNotConsideringBoundingBox(element, appState, point);
 };
 
@@ -82,6 +92,13 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
   y: number,
 ): boolean => {
   const threshold = 10 / appState.zoom.value;
+
+  // So that bound text element hit is considered within bounding box of container even if its outside actual bounding box of element
+  // eg for linear elements text can be outside the element bounding box
+  const boundTextElement = getBoundTextElement(element);
+  if (boundTextElement && hitTest(boundTextElement, appState, x, y)) {
+    return false;
+  }
 
   return (
     !isHittingElementNotConsideringBoundingBox(element, appState, [x, y]) &&
@@ -95,7 +112,6 @@ export const isHittingElementNotConsideringBoundingBox = (
   point: Point,
 ): boolean => {
   const threshold = 10 / appState.zoom.value;
-
   const check = isTextElement(element)
     ? isStrictlyInside
     : isElementDraggableFromInside(element)
@@ -382,6 +398,7 @@ const hitTestLinear = (args: HitTestArgs): boolean => {
   if (!getShapeForElement(element)) {
     return false;
   }
+
   const [point, pointAbs, hwidth, hheight] = pointRelativeToElement(
     args.element,
     args.point,
@@ -404,7 +421,12 @@ const hitTestLinear = (args: HitTestArgs): boolean => {
 
   if (args.check === isInsideCheck) {
     const hit = shape.some((subshape) =>
-      hitTestCurveInside(subshape, relX, relY, element.strokeSharpness),
+      hitTestCurveInside(
+        subshape,
+        relX,
+        relY,
+        element.roundness ? "round" : "sharp",
+      ),
     );
     if (hit) {
       return true;
@@ -434,8 +456,9 @@ const pointRelativeToElement = (
   pointTuple: Point,
 ): [GA.Point, GA.Point, number, number] => {
   const point = GAPoint.from(pointTuple);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const elementCoords = getElementAbsoluteCoords(element);
-  const center = coordsCenter(elementCoords);
+  const center = coordsCenter([x1, y1, x2, y2]);
   // GA has angle orientation opposite to `rotate`
   const rotate = GATransform.rotation(center, element.angle);
   const pointRotated = GATransform.apply(rotate, point);
@@ -466,8 +489,8 @@ export const pointInAbsoluteCoords = (
 const relativizationToElementCenter = (
   element: ExcalidrawElement,
 ): GA.Transform => {
-  const elementCoords = getElementAbsoluteCoords(element);
-  const center = coordsCenter(elementCoords);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const center = coordsCenter([x1, y1, x2, y2]);
   // GA has angle orientation opposite to `rotate`
   const rotate = GATransform.rotation(center, element.angle);
   const translate = GA.reverse(
@@ -524,8 +547,8 @@ export const determineFocusPoint = (
   adjecentPoint: Point,
 ): Point => {
   if (focus === 0) {
-    const elementCoords = getElementAbsoluteCoords(element);
-    const center = coordsCenter(elementCoords);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const center = coordsCenter([x1, y1, x2, y2]);
     return GAPoint.toTuple(center);
   }
   const relateToCenter = relativizationToElementCenter(element);
@@ -763,7 +786,12 @@ export const findFocusPointForEllipse = (
       orientation * py * Math.sqrt(Math.max(0, squares - a ** 2 * b ** 2))) /
     squares;
 
-  const n = (-m * px - 1) / py;
+  let n = (-m * px - 1) / py;
+
+  if (n === 0) {
+    // if zero {-0, 0}, fall back to a same-sign value in the similar range
+    n = (Object.is(n, -0) ? -1 : 1) * 0.01;
+  }
 
   const x = -(a ** 2 * m) / (n ** 2 * b ** 2 + m ** 2 * a ** 2);
   return GA.point(x, (-m * x - 1) / n);
@@ -835,7 +863,7 @@ const hitTestCurveInside = (
   drawable: Drawable,
   x: number,
   y: number,
-  sharpness: ExcalidrawElement["strokeSharpness"],
+  roundness: StrokeRoundness,
 ) => {
   const ops = getCurvePathOps(drawable);
   const points: Mutable<Point>[] = [];
@@ -859,7 +887,7 @@ const hitTestCurveInside = (
     }
   }
   if (points.length >= 4) {
-    if (sharpness === "sharp") {
+    if (roundness === "sharp") {
       return isPointInPolygon(points, x, y);
     }
     const polygonPoints = pointsOnBezierCurves(points, 10, 5);

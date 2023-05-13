@@ -6,15 +6,17 @@ import {
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
+  isDarwin,
   MIME_TYPES,
   THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { AppState, DataURL, LastActiveToolBeforeEraser, Zoom } from "./types";
+import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
-import { isDarwin } from "./keys";
 import { SHAPES } from "./shapes";
+import { isEraserActive, isHandToolActive } from "./appState";
+import { ResolutionType } from "./utility-types";
 
 let mockDateTime: string | null = null;
 
@@ -179,6 +181,79 @@ export const throttleRAF = <T extends any[]>(
   return ret;
 };
 
+/**
+ * Exponential ease-out method
+ *
+ * @param {number} k - The value to be tweened.
+ * @returns {number} The tweened value.
+ */
+function easeOut(k: number): number {
+  return 1 - Math.pow(1 - k, 4);
+}
+
+/**
+ * Compute new values based on the same ease function and trigger the
+ * callback through a requestAnimationFrame call
+ *
+ * use `opts` to define a duration and/or an easeFn
+ *
+ * for example:
+ * ```ts
+ * easeToValuesRAF([10, 20, 10], [0, 0, 0], (a, b, c) => setState(a,b, c))
+ * ```
+ *
+ * @param fromValues The initial values, must be numeric
+ * @param toValues The destination values, must also be numeric
+ * @param callback The callback receiving the values
+ * @param opts default to 250ms duration and the easeOut function
+ */
+export const easeToValuesRAF = (
+  fromValues: number[],
+  toValues: number[],
+  callback: (...values: number[]) => void,
+  opts?: { duration?: number; easeFn?: (value: number) => number },
+) => {
+  let canceled = false;
+  let frameId = 0;
+  let startTime: number;
+
+  const duration = opts?.duration || 250; // default animation to 0.25 seconds
+  const easeFn = opts?.easeFn || easeOut; // default the easeFn to easeOut
+
+  function step(timestamp: number) {
+    if (canceled) {
+      return;
+    }
+    if (startTime === undefined) {
+      startTime = timestamp;
+    }
+
+    const elapsed = timestamp - startTime;
+
+    if (elapsed < duration) {
+      // console.log(elapsed, duration, elapsed / duration);
+      const factor = easeFn(elapsed / duration);
+      const newValues = fromValues.map(
+        (fromValue, index) =>
+          (toValues[index] - fromValue) * factor + fromValue,
+      );
+
+      callback(...newValues);
+      frameId = window.requestAnimationFrame(step);
+    } else {
+      // ensure final values are reached at the end of the transition
+      callback(...toValues);
+    }
+  }
+
+  frameId = window.requestAnimationFrame(step);
+
+  return () => {
+    canceled = true;
+    window.cancelAnimationFrame(frameId);
+  };
+};
+
 // https://github.com/lodash/lodash/blob/es/chunk.js
 export const chunk = <T extends any>(
   array: readonly T[],
@@ -218,9 +293,9 @@ export const distance = (x: number, y: number) => Math.abs(x - y);
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: (
-    | { type: typeof SHAPES[number]["value"] | "eraser" }
+    | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" }
     | { type: "custom"; customType: string }
-  ) & { lastActiveToolBeforeEraser?: LastActiveToolBeforeEraser },
+  ) & { lastActiveToolBeforeEraser?: LastActiveTool },
 ): AppState["activeTool"] => {
   if (data.type === "custom") {
     return {
@@ -232,9 +307,9 @@ export const updateActiveTool = (
 
   return {
     ...appState.activeTool,
-    lastActiveToolBeforeEraser:
+    lastActiveTool:
       data.lastActiveToolBeforeEraser === undefined
-        ? appState.activeTool.lastActiveToolBeforeEraser
+        ? appState.activeTool.lastActiveTool
         : data.lastActiveToolBeforeEraser,
     type: data.type,
     customType: null,
@@ -297,14 +372,16 @@ export const setEraserCursor = (
 
 export const setCursorForShape = (
   canvas: HTMLCanvasElement | null,
-  appState: AppState,
+  appState: Pick<AppState, "activeTool" | "theme">,
 ) => {
   if (!canvas) {
     return;
   }
   if (appState.activeTool.type === "selection") {
     resetCursor(canvas);
-  } else if (appState.activeTool.type === "eraser") {
+  } else if (isHandToolActive(appState)) {
+    canvas.style.cursor = CURSOR_TYPE.GRAB;
+  } else if (isEraserActive(appState)) {
     setEraserCursor(canvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
@@ -326,15 +403,13 @@ export const getShortcutKey = (shortcut: string): string => {
   shortcut = shortcut
     .replace(/\bAlt\b/i, "Alt")
     .replace(/\bShift\b/i, "Shift")
-    .replace(/\b(Enter|Return)\b/i, "Enter")
-    .replace(/\bDel\b/i, "Delete");
-
+    .replace(/\b(Enter|Return)\b/i, "Enter");
   if (isDarwin) {
     return shortcut
-      .replace(/\bCtrlOrCmd\b/i, "Cmd")
+      .replace(/\bCtrlOrCmd\b/gi, "Cmd")
       .replace(/\bAlt\b/i, "Option");
   }
-  return shortcut.replace(/\bCtrlOrCmd\b/i, "Ctrl");
+  return shortcut.replace(/\bCtrlOrCmd\b/gi, "Ctrl");
 };
 
 export const viewportCoordsToSceneCoords = (
@@ -353,9 +428,8 @@ export const viewportCoordsToSceneCoords = (
     scrollY: number;
   },
 ) => {
-  const invScale = 1 / zoom.value;
-  const x = (clientX - offsetLeft) * invScale - scrollX;
-  const y = (clientY - offsetTop) * invScale - scrollY;
+  const x = (clientX - offsetLeft) / zoom.value - scrollX;
+  const y = (clientY - offsetTop) / zoom.value - scrollY;
 
   return { x, y };
 };
@@ -607,11 +681,15 @@ export const arrayToMap = <T extends { id: string } | string>(
   }, new Map());
 };
 
-export const isTestEnv = () =>
-  typeof process !== "undefined" && process.env?.NODE_ENV === "test";
+export const arrayToMapWithIndex = <T extends { id: string }>(
+  elements: readonly T[],
+) =>
+  elements.reduce((acc, element: T, idx) => {
+    acc.set(element.id, [element, idx]);
+    return acc;
+  }, new Map<string, [element: T, index: number]>());
 
-export const isProdEnv = () =>
-  typeof process !== "undefined" && process.env?.NODE_ENV === "production";
+export const isTestEnv = () => process.env.NODE_ENV === "test";
 
 export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
   return new CustomEvent(name, {
@@ -687,4 +765,54 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
           element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
       )
     : [];
+};
+
+export const isShallowEqual = <
+  T extends Record<string, any>,
+  I extends keyof T,
+>(
+  objA: T,
+  objB: T,
+  comparators?: Record<I, (a: T[I], b: T[I]) => boolean>,
+  debug = false,
+) => {
+  const aKeys = Object.keys(objA);
+  const bKeys = Object.keys(objB);
+  if (aKeys.length !== bKeys.length) {
+    return false;
+  }
+  return aKeys.every((key) => {
+    const comparator = comparators?.[key as I];
+    const ret = comparator
+      ? comparator(objA[key], objB[key])
+      : objA[key] === objB[key];
+    if (!ret && debug) {
+      console.info(
+        `%cisShallowEqual: ${key} not equal ->`,
+        "color: #8B4000",
+        objA[key],
+        objB[key],
+      );
+    }
+    return ret;
+  });
+};
+
+// taken from Radix UI
+// https://github.com/radix-ui/primitives/blob/main/packages/core/primitive/src/primitive.tsx
+export const composeEventHandlers = <E>(
+  originalEventHandler?: (event: E) => void,
+  ourEventHandler?: (event: E) => void,
+  { checkForDefaultPrevented = true } = {},
+) => {
+  return function handleEvent(event: E) {
+    originalEventHandler?.(event);
+
+    if (
+      !checkForDefaultPrevented ||
+      !(event as unknown as Event).defaultPrevented
+    ) {
+      return ourEventHandler?.(event);
+    }
+  };
 };

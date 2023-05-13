@@ -79,6 +79,7 @@
     </style>
     <!------------------------------------------------------------------------->
 
+    <% if (process.env.NODE_ENV === "production") { %>
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -97,6 +98,7 @@
         window.location.href = "https://app.excalidraw.com";
       }
     </script>
+    <% } %>
 
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
@@ -146,6 +148,17 @@
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
     </script>
+    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
+
+    <!-- Fathom - privacy-friendly analytics -->
+    <script
+      src="https://cdn.usefathom.com/script.js"
+      data-site="VMSBUEYA"
+      defer
+    ></script>
+    <!-- / Fathom -->
+
+    <!-- LEGACY GOOGLE ANALYTICS -->
     <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
     <script
       async
@@ -160,15 +173,14 @@
       gtag("config", "%REACT_APP_GOOGLE_ANALYTICS_ID%");
     </script>
     <% } %>
+    <!-- end LEGACY GOOGLE ANALYTICS -->
+    <% } %>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
     <style>
       body,
       html {
         margin: 0;
-        --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system,
-          Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-        font-family: var(--ui-font);
         -webkit-text-size-adjust: 100%;
 
         width: 100%;
@@ -215,5 +227,17 @@
       <h1 class="visually-hidden">Excalidraw</h1>
     </header>
     <div id="root"></div>
+    <!-- 100% privacy friendly analytics -->
+    <script
+      async
+      defer
+      src="https://scripts.simpleanalyticscdn.com/latest.js"
+    ></script>
+    <noscript
+      ><img
+        src="https://queue.simpleanalyticscdn.com/noscript.gif"
+        alt=""
+        referrerpolicy="no-referrer-when-downgrade"
+    /></noscript>
   </body>
 </html>

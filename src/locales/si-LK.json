@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "අලවන්න",
+    "pasteAsPlaintext": "",
     "pasteCharts": "ප්‍රස්ථාරය",
     "selectAll": "සියල්ලම",
     "multiSelect": "තෝරා ගැනීමට අංගය එකතු කරන්න",
@@ -53,6 +54,7 @@
     "veryLarge": "ඉතා විශාල",
     "solid": "විශාල",
     "hachure": "මධ්‍යම",
+    "zigzag": "",
     "crossHatch": "",
     "thin": "කෙට්ටු",
     "bold": "තද",
@@ -109,6 +111,7 @@
     "increaseFontSize": "",
     "unbindText": "",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "",
       "create": "",
@@ -191,7 +194,8 @@
     "invalidSceneUrl": "",
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "",
@@ -200,7 +204,15 @@
     "svgImageInsertError": "",
     "invalidSVGString": "",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "",
@@ -216,7 +228,8 @@
     "lock": "",
     "penMode": "",
     "link": "",
-    "eraser": ""
+    "eraser": "",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "",
@@ -242,7 +255,8 @@
     "publishLibrary": "",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -250,16 +264,11 @@
     "canvasTooBigTip": ""
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
+    "headingMain": "",
     "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "",
     "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": ""
   },
   "roomDialog": {
@@ -297,7 +306,8 @@
     "doubleClick": "",
     "drag": "",
     "editor": "",
-    "editSelectedShape": "",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "",
     "howto": "",
     "or": "",
@@ -310,7 +320,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": "",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -336,29 +348,16 @@
       "required": "",
       "website": ""
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": ""
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",
@@ -391,7 +390,8 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "",
@@ -439,5 +439,18 @@
     "5c940d": "",
     "e67700": "",
     "d9480f": ""
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

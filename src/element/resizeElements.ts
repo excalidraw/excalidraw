@@ -1,4 +1,4 @@
-import { BOUND_TEXT_PADDING, SHIFT_LOCKING_ANGLE } from "../constants";
+import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
 import {
@@ -13,6 +13,7 @@ import {
   NonDeletedExcalidrawElement,
   NonDeleted,
   ExcalidrawElement,
+  ExcalidrawTextElementWithContainer,
 } from "./types";
 import {
   getElementAbsoluteCoords,
@@ -21,12 +22,13 @@ import {
   getCommonBoundingBox,
 } from "./bounds";
 import {
+  isArrowElement,
+  isBoundToContainer,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
-import { getPerfectElementSize } from "./sizeHelpers";
 import { getFontString } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
@@ -37,12 +39,15 @@ import {
 import { Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
-  getApproxMinLineHeight,
   getApproxMinLineWidth,
   getBoundTextElement,
   getBoundTextElementId,
+  getContainerElement,
   handleBindTextResize,
+  getBoundTextMaxWidth,
+  getApproxMinLineHeight,
   measureText,
+  getBoundTextMaxHeight,
 } from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
@@ -74,23 +79,9 @@ export const transformElements = (
         pointerX,
         pointerY,
         shouldRotateWithDiscreteAngle,
+        pointerDownState.originalElements,
       );
       updateBoundElements(element);
-    } else if (
-      isLinearElement(element) &&
-      element.points.length === 2 &&
-      (transformHandleType === "nw" ||
-        transformHandleType === "ne" ||
-        transformHandleType === "sw" ||
-        transformHandleType === "se")
-    ) {
-      reshapeSingleTwoPointElement(
-        element,
-        resizeArrowDirection,
-        shouldRotateWithDiscreteAngle,
-        pointerX,
-        pointerY,
-      );
     } else if (
       isTextElement(element) &&
       (transformHandleType === "nw" ||
@@ -156,6 +147,7 @@ const rotateSingleElement = (
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
+  originalElements: Map<string, NonDeleted<ExcalidrawElement>>,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
@@ -166,98 +158,19 @@ const rotateSingleElement = (
     angle -= angle % SHIFT_LOCKING_ANGLE;
   }
   angle = normalizeAngle(angle);
-  mutateElement(element, { angle });
   const boundTextElementId = getBoundTextElementId(element);
+
+  mutateElement(element, { angle });
   if (boundTextElementId) {
-    const textElement = Scene.getScene(element)!.getElement(boundTextElementId);
-    mutateElement(textElement!, { angle });
-  }
-};
+    const textElement =
+      Scene.getScene(element)?.getElement<ExcalidrawTextElementWithContainer>(
+        boundTextElementId,
+      );
 
-// used in DEV only
-const validateTwoPointElementNormalized = (
-  element: NonDeleted<ExcalidrawLinearElement>,
-) => {
-  if (
-    element.points.length !== 2 ||
-    element.points[0][0] !== 0 ||
-    element.points[0][1] !== 0 ||
-    Math.abs(element.points[1][0]) !== element.width ||
-    Math.abs(element.points[1][1]) !== element.height
-  ) {
-    throw new Error("Two-point element is not normalized");
+    if (textElement && !isArrowElement(element)) {
+      mutateElement(textElement, { angle });
+    }
   }
-};
-
-const getPerfectElementSizeWithRotation = (
-  elementType: ExcalidrawElement["type"],
-  width: number,
-  height: number,
-  angle: number,
-): [number, number] => {
-  const size = getPerfectElementSize(
-    elementType,
-    ...rotate(width, height, 0, 0, angle),
-  );
-  return rotate(size.width, size.height, 0, 0, -angle);
-};
-
-export const reshapeSingleTwoPointElement = (
-  element: NonDeleted<ExcalidrawLinearElement>,
-  resizeArrowDirection: "origin" | "end",
-  shouldRotateWithDiscreteAngle: boolean,
-  pointerX: number,
-  pointerY: number,
-) => {
-  if (process.env.NODE_ENV !== "production") {
-    validateTwoPointElementNormalized(element);
-  }
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
-  // rotation pointer with reverse angle
-  const [rotatedX, rotatedY] = rotate(
-    pointerX,
-    pointerY,
-    cx,
-    cy,
-    -element.angle,
-  );
-  let [width, height] =
-    resizeArrowDirection === "end"
-      ? [rotatedX - element.x, rotatedY - element.y]
-      : [
-          element.x + element.points[1][0] - rotatedX,
-          element.y + element.points[1][1] - rotatedY,
-        ];
-  if (shouldRotateWithDiscreteAngle) {
-    [width, height] = getPerfectElementSizeWithRotation(
-      element.type,
-      width,
-      height,
-      element.angle,
-    );
-  }
-  const [nextElementX, nextElementY] = adjustXYWithRotation(
-    resizeArrowDirection === "end"
-      ? { s: true, e: true }
-      : { n: true, w: true },
-    element.x,
-    element.y,
-    element.angle,
-    0,
-    0,
-    (element.points[1][0] - width) / 2,
-    (element.points[1][1] - height) / 2,
-  );
-  mutateElement(element, {
-    x: nextElementX,
-    y: nextElementY,
-    points: [
-      [0, 0],
-      [width, height],
-    ],
-  });
 };
 
 const rescalePointsInElement = (
@@ -279,20 +192,29 @@ const rescalePointsInElement = (
 
 const MIN_FONT_SIZE = 1;
 
-const measureFontSizeFromWH = (
+const measureFontSizeFromWidth = (
   element: NonDeleted<ExcalidrawTextElement>,
   nextWidth: number,
   nextHeight: number,
 ): { size: number; baseline: number } | null => {
   // We only use width to scale font on resize
-  const nextFontSize = element.fontSize * (nextWidth / element.width);
+  let width = element.width;
+
+  const hasContainer = isBoundToContainer(element);
+  if (hasContainer) {
+    const container = getContainerElement(element);
+    if (container) {
+      width = getBoundTextMaxWidth(container);
+    }
+  }
+  const nextFontSize = element.fontSize * (nextWidth / width);
   if (nextFontSize < MIN_FONT_SIZE) {
     return null;
   }
   const metrics = measureText(
     element.text,
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
-    element.containerId ? element.width : null,
+    element.lineHeight,
   );
   return {
     size: nextFontSize,
@@ -368,8 +290,8 @@ const resizeSingleTextElement = (
   if (scale > 0) {
     const nextWidth = element.width * scale;
     const nextHeight = element.height * scale;
-    const nextFont = measureFontSizeFromWH(element, nextWidth, nextHeight);
-    if (nextFont === null) {
+    const metrics = measureFontSizeFromWidth(element, nextWidth, nextHeight);
+    if (metrics === null) {
       return;
     }
     const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
@@ -393,10 +315,10 @@ const resizeSingleTextElement = (
       deltaY2,
     );
     mutateElement(element, {
-      fontSize: nextFont.size,
+      fontSize: metrics.size,
       width: nextWidth,
       height: nextHeight,
-      baseline: nextFont.baseline,
+      baseline: metrics.baseline,
       x: nextElementX,
       y: nextElementY,
     });
@@ -505,10 +427,16 @@ export const resizeSingleElement = (
       };
     }
     if (shouldMaintainAspectRatio) {
-      const nextFont = measureFontSizeFromWH(
+      const updatedElement = {
+        ...element,
+        width: eleNewWidth,
+        height: eleNewHeight,
+      };
+
+      const nextFont = measureFontSizeFromWidth(
         boundTextElement,
-        eleNewWidth - BOUND_TEXT_PADDING * 2,
-        eleNewHeight - BOUND_TEXT_PADDING * 2,
+        getBoundTextMaxWidth(updatedElement),
+        getBoundTextMaxHeight(updatedElement, boundTextElement),
       );
       if (nextFont === null) {
         return;
@@ -518,8 +446,14 @@ export const resizeSingleElement = (
         baseline: nextFont.baseline,
       };
     } else {
-      const minWidth = getApproxMinLineWidth(getFontString(boundTextElement));
-      const minHeight = getApproxMinLineHeight(getFontString(boundTextElement));
+      const minWidth = getApproxMinLineWidth(
+        getFontString(boundTextElement),
+        boundTextElement.lineHeight,
+      );
+      const minHeight = getApproxMinLineHeight(
+        boundTextElement.fontSize,
+        boundTextElement.lineHeight,
+      );
       eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
       eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
     }
@@ -597,34 +531,46 @@ export const resizeSingleElement = (
   newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
 
   // Readjust points for linear elements
-  const rescaledPoints = rescalePointsInElement(
-    stateAtResizeStart,
-    eleNewWidth,
-    eleNewHeight,
-    true,
-  );
+  let rescaledElementPointsY;
+  let rescaledPoints;
+
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    rescaledElementPointsY = rescalePoints(
+      1,
+      eleNewHeight,
+      (stateAtResizeStart as ExcalidrawLinearElement).points,
+      true,
+    );
+
+    rescaledPoints = rescalePoints(
+      0,
+      eleNewWidth,
+      rescaledElementPointsY,
+      true,
+    );
+  }
+
   // For linear elements (x,y) are the coordinates of the first drawn point not the top-left corner
   // So we need to readjust (x,y) to be where the first point should be
   const newOrigin = [...newTopLeft];
   newOrigin[0] += stateAtResizeStart.x - newBoundsX1;
   newOrigin[1] += stateAtResizeStart.y - newBoundsY1;
-
   const resizedElement = {
     width: Math.abs(eleNewWidth),
     height: Math.abs(eleNewHeight),
     x: newOrigin[0],
     y: newOrigin[1],
-    ...rescaledPoints,
+    points: rescaledPoints,
   };
 
   if ("scale" in element && "scale" in stateAtResizeStart) {
     mutateElement(element, {
       scale: [
         // defaulting because scaleX/Y can be 0/-0
-        (Math.sign(scaleX) || stateAtResizeStart.scale[0]) *
-          stateAtResizeStart.scale[0],
-        (Math.sign(scaleY) || stateAtResizeStart.scale[1]) *
-          stateAtResizeStart.scale[1],
+        (Math.sign(newBoundsX2 - stateAtResizeStart.x) ||
+          stateAtResizeStart.scale[0]) * stateAtResizeStart.scale[0],
+        (Math.sign(newBoundsY2 - stateAtResizeStart.y) ||
+          stateAtResizeStart.scale[1]) * stateAtResizeStart.scale[1],
       ],
     });
   }
@@ -638,9 +584,13 @@ export const resizeSingleElement = (
     updateBoundElements(element, {
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
+
     mutateElement(element, resizedElement);
-    if (boundTextElement && boundTextFont) {
-      mutateElement(boundTextElement, { fontSize: boundTextFont.fontSize });
+    if (boundTextElement && boundTextFont != null) {
+      mutateElement(boundTextElement, {
+        fontSize: boundTextFont.fontSize,
+        baseline: boundTextFont.baseline,
+      });
     }
     handleBindTextResize(element, transformHandleDirection);
   }
@@ -760,26 +710,34 @@ const resizeMultipleElements = (
     const boundTextElement = getBoundTextElement(element.latest);
 
     if (boundTextElement || isTextElement(element.orig)) {
-      const optionalPadding = boundTextElement ? BOUND_TEXT_PADDING * 2 : 0;
-      const textMeasurements = measureFontSizeFromWH(
+      const updatedElement = {
+        ...element.latest,
+        width,
+        height,
+      };
+      const metrics = measureFontSizeFromWidth(
         boundTextElement ?? (element.orig as ExcalidrawTextElement),
-        width - optionalPadding,
-        height - optionalPadding,
+        boundTextElement
+          ? getBoundTextMaxWidth(updatedElement)
+          : updatedElement.width,
+        boundTextElement
+          ? getBoundTextMaxHeight(updatedElement, boundTextElement)
+          : updatedElement.height,
       );
 
-      if (!textMeasurements) {
+      if (!metrics) {
         return;
       }
 
       if (isTextElement(element.orig)) {
-        update.fontSize = textMeasurements.size;
-        update.baseline = textMeasurements.baseline;
+        update.fontSize = metrics.size;
+        update.baseline = metrics.baseline;
       }
 
       if (boundTextElement) {
         boundTextUpdates = {
-          fontSize: textMeasurements.size,
-          baseline: textMeasurements.baseline,
+          fontSize: metrics.size,
+          baseline: metrics.baseline,
         };
       }
     }
@@ -790,6 +748,7 @@ const resizeMultipleElements = (
 
     if (boundTextElement && boundTextUpdates) {
       mutateElement(boundTextElement, boundTextUpdates);
+
       handleBindTextResize(element.latest, transformHandleType);
     }
   });
@@ -810,7 +769,7 @@ const rotateMultipleElements = (
     centerAngle += SHIFT_LOCKING_ANGLE / 2;
     centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
   }
-  elements.forEach((element, index) => {
+  elements.forEach((element) => {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
@@ -831,12 +790,16 @@ const rotateMultipleElements = (
     const boundTextElementId = getBoundTextElementId(element);
     if (boundTextElementId) {
       const textElement =
-        Scene.getScene(element)!.getElement(boundTextElementId)!;
-      mutateElement(textElement, {
-        x: textElement.x + (rotatedCX - cx),
-        y: textElement.y + (rotatedCY - cy),
-        angle: normalizeAngle(centerAngle + origAngle),
-      });
+        Scene.getScene(element)?.getElement<ExcalidrawTextElementWithContainer>(
+          boundTextElementId,
+        );
+      if (textElement && !isArrowElement(element)) {
+        mutateElement(textElement, {
+          x: textElement.x + (rotatedCX - cx),
+          y: textElement.y + (rotatedCY - cy),
+          angle: normalizeAngle(centerAngle + origAngle),
+        });
+      }
     }
   });
 };

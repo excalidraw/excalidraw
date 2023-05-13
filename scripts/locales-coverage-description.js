@@ -2,6 +2,9 @@ const fs = require("fs");
 
 const THRESSHOLD = 85;
 
+// we're using BCP 47 language tags as keys
+// e.g. https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1
+
 const crowdinMap = {
   "ar-SA": "en-ar",
   "bg-BG": "en-bg",
@@ -50,8 +53,9 @@ const crowdinMap = {
   "lv-LV": "en-lv",
   "cs-CZ": "en-cs",
   "kk-KZ": "en-kk",
-  "vi-vn": "en-vi",
-  "mr-in": "en-mr",
+  "vi-VN": "en-vi",
+  "mr-IN": "en-mr",
+  "th-TH": "en-th",
 };
 
 const flags = {
@@ -104,6 +108,7 @@ const flags = {
   "eu-ES": "🇪🇦",
   "vi-VN": "🇻🇳",
   "mr-IN": "🇮🇳",
+  "th-TH": "🇹🇭",
 };
 
 const languages = {
@@ -120,6 +125,7 @@ const languages = {
   "fa-IR": "فارسی",
   "fi-FI": "Suomi",
   "fr-FR": "Français",
+  "gl-ES": "Galego",
   "he-IL": "עברית",
   "hi-IN": "हिन्दी",
   "hu-HU": "Magyar",
@@ -129,6 +135,7 @@ const languages = {
   "kab-KAB": "Taqbaylit",
   "kk-KZ": "Қазақ тілі",
   "ko-KR": "한국어",
+  "ku-TR": "Kurdî",
   "lt-LT": "Lietuvių",
   "lv-LV": "Latviešu",
   "my-MM": "Burmese",
@@ -154,6 +161,7 @@ const languages = {
   "zh-TW": "繁體中文",
   "vi-VN": "Tiếng Việt",
   "mr-IN": "मराठी",
+  "th-TH": "ภาษาไทย",
 };
 
 const percentages = fs.readFileSync(

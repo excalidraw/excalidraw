@@ -41,15 +41,9 @@ export const actionToggleLock = register({
         : "labels.elementLock.lock";
     }
 
-    if (selected.length > 1) {
-      return getOperation(selected) === "lock"
-        ? "labels.elementLock.lockAll"
-        : "labels.elementLock.unlockAll";
-    }
-
-    throw new Error(
-      "Unexpected zero elements to lock/unlock. This should never happen.",
-    );
+    return getOperation(selected) === "lock"
+      ? "labels.elementLock.lockAll"
+      : "labels.elementLock.unlockAll";
   },
   keyTest: (event, appState, elements) => {
     return (
@@ -64,6 +58,10 @@ export const actionToggleLock = register({
 export const actionUnlockAllCanvasElements = register({
   name: "unlockAllCanvasElements",
   trackEvent: { category: "canvas" },
+  viewMode: false,
+  predicate: (elements, appState) => {
+    return elements.some((element) => element.locked);
+  },
   perform: (elements, appState) => {
     const lockedElements = elements.filter((el) => el.locked);
 
@@ -82,9 +80,6 @@ export const actionUnlockAllCanvasElements = register({
       },
       commitToHistory: true,
     };
-  },
-  contextItemPredicate: (elements, appState) => {
-    return elements.some((element) => element.locked);
   },
   contextItemLabel: "labels.elementLock.unlockAllCanvasElements",
 });

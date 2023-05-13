@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Liitä",
+    "pasteAsPlaintext": "Liitä pelkkänä tekstinä",
     "pasteCharts": "Liitä kaaviot",
     "selectAll": "Valitse kaikki",
     "multiSelect": "Lisää kohde valintaan",
@@ -53,6 +54,7 @@
     "veryLarge": "Erittäin suuri",
     "solid": "Yhtenäinen",
     "hachure": "Vinoviivoitus",
+    "zigzag": "",
     "crossHatch": "Ristiviivoitus",
     "thin": "Ohut",
     "bold": "Lihavoitu",
@@ -71,7 +73,7 @@
     "layers": "Tasot",
     "actions": "Toiminnot",
     "language": "Kieli",
-    "liveCollaboration": "Live-yhteistyö",
+    "liveCollaboration": "Live Yhteistyö...",
     "duplicateSelection": "Monista",
     "untitled": "Nimetön",
     "name": "Nimi",
@@ -109,20 +111,21 @@
     "increaseFontSize": "Kasvata kirjasinkokoa",
     "unbindText": "Irroita teksti",
     "bindText": "Kiinnitä teksti säiliöön",
+    "createContainerFromText": "",
     "link": {
       "edit": "Muokkaa linkkiä",
       "create": "Luo linkki",
       "label": "Linkki"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Muokkaa riviä",
+      "exit": "Poistu rivieditorista"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Lukitse",
+      "unlock": "Poista lukitus",
+      "lockAll": "Lukitse kaikki",
+      "unlockAll": "Poista lukitus kaikista"
     },
     "statusPublished": "Julkaistu",
     "sidebarLock": "Pidä sivupalkki avoinna"
@@ -135,8 +138,8 @@
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
     "exportJSON": "Vie tiedostoon",
-    "exportImage": "Tallenna kuvana",
-    "export": "Vie",
+    "exportImage": "Vie kuva...",
+    "export": "Tallenna nimellä...",
     "exportToPng": "Vie PNG-tiedostona",
     "exportToSvg": "Vie SVG-tiedostona",
     "copyToClipboard": "Kopioi leikepöydälle",
@@ -191,7 +194,8 @@
     "invalidSceneUrl": "Teosta ei voitu tuoda annetusta URL-osoitteesta. Tallenne on vioittunut, tai osoitteessa ei ole Excalidraw JSON-dataa.",
     "resetLibrary": "Tämä tyhjentää kirjastosi. Jatketaanko?",
     "removeItemsFromsLibrary": "Poista {{count}} kohdetta kirjastosta?",
-    "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä."
+    "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä.",
+    "collabOfflineWarning": "Internet-yhteyttä ei ole saatavilla.\nMuutoksiasi ei tallenneta!"
   },
   "errors": {
     "unsupportedFileType": "Tiedostotyyppiä ei tueta.",
@@ -200,7 +204,15 @@
     "svgImageInsertError": "SVG- kuvaa ei voitu lisätä. Tiedoston SVG-sisältö näyttää virheelliseltä.",
     "invalidSVGString": "Virheellinen SVG.",
     "cannotResolveCollabServer": "Yhteyden muodostaminen collab-palvelimeen epäonnistui. Virkistä sivu ja yritä uudelleen.",
-    "importLibraryError": ""
+    "importLibraryError": "Kokoelman lataaminen epäonnistui",
+    "collabSaveFailed": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi.",
+    "collabSaveFailed_sizeExceeded": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi.",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Valinta",
@@ -214,9 +226,10 @@
     "text": "Teksti",
     "library": "Kirjasto",
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen",
-    "penMode": "Estä nipistyszoomaus ja vastaanota ainoastaan kynällä piirretty",
+    "penMode": "Kynätila - estä kosketus",
     "link": "Lisää/päivitä linkki valitulle muodolle",
-    "eraser": "Poistotyökalu"
+    "eraser": "Poistotyökalu",
+    "hand": "Käsi (panning-työkalu)"
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
@@ -224,7 +237,7 @@
     "shapes": "Muodot"
   },
   "hints": {
-    "canvasPanning": "Liikuttaaksesi piirtoaluetta, raahaa hiiren vieritysrulla tai välilyöntinäppäin alaspainettuna",
+    "canvasPanning": "Piirtoalueen liikuttamiseksi pidä hiiren pyörää tai välilyöntiä pohjassa tai käytä käsityökalua",
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
@@ -235,14 +248,15 @@
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT-näppäintä alaspainettuna kun muutat kokoa, pidä ALT-näppäintä alaspainettuna muuttaaksesi kokoa keskipisteen suhteen",
     "resizeImage": "Voit muuttaa kokoa vapaasti pitämällä SHIFTiä pohjassa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen ympäri",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
-    "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
+    "lineEditor_info": "Pidä CtrlOrCmd pohjassa ja kaksoisnapsauta tai paina CtrlOrCmd + Enter muokataksesi pisteitä",
     "lineEditor_pointSelected": "Poista piste(et) painamalla delete, monista painamalla CtrlOrCmd+D, tai liikuta raahaamalla",
     "lineEditor_nothingSelected": "Valitse muokattava piste (monivalinta pitämällä SHIFT pohjassa), tai paina Alt ja klikkaa lisätäksesi uusia pisteitä",
     "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
     "publishLibrary": "Julkaise oma kirjasto",
     "bindTextToElement": "Lisää tekstiä painamalla enter",
     "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus painamalla CtrlOrCmd",
-    "eraserRevert": "Pidä Alt alaspainettuna, kumotaksesi merkittyjen elementtien poistamisen"
+    "eraserRevert": "Pidä Alt alaspainettuna, kumotaksesi merkittyjen elementtien poistamisen",
+    "firefox_clipboard_write": "Tämä ominaisuus voidaan todennäköisesti ottaa käyttöön asettamalla \"dom.events.asyncClipboard.clipboardItem\" kohta \"true\":ksi. Vaihtaaksesi selaimen kohdan Firefoxissa, käy \"about:config\" sivulla."
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
@@ -250,16 +264,11 @@
     "canvasTooBigTip": "Vinkki: yritä siirtää kaukaisimpia elementtejä hieman lähemmäs toisiaan."
   },
   "errorSplash": {
-    "headingMain_pre": "Tapahtui virhe. Yritä ",
-    "headingMain_button": "sivun lataamista uudelleen.",
-    "clearCanvasMessage": "Mikäli sivun lataaminen uudelleen ei auta, yritä ",
-    "clearCanvasMessage_button": "tyhjentää piirtoalue.",
+    "headingMain": "Tapahtui virhe. Yritä <button>sivun lataamista uudelleen.</button>",
+    "clearCanvasMessage": "Mikäli sivun lataaminen uudelleen ei auta, yritä <button>tyhjentää piirtoalue.</button>",
     "clearCanvasCaveat": " Tämä johtaa työn menetykseen ",
-    "trackedToSentry_pre": "Virhe tunnisteella ",
-    "trackedToSentry_post": " tallennettiin järjestelmäämme.",
-    "openIssueMessage_pre": "Olimme varovaisia emmekä sisällyttäneet tietoa piirroksestasi virheeseen. Mikäli piirroksesi ei ole yksityinen, harkitsethan kertovasi meille ",
-    "openIssueMessage_button": "virheenseurantajärjestelmässämme.",
-    "openIssueMessage_post": " Sisällytä alla olevat tiedot kopioimalla ne GitHub-ongelmaan.",
+    "trackedToSentry": "Virhe tunnisteella {{eventId}} tallennettiin järjestelmäämme.",
+    "openIssueMessage": "Olimme varovaisia emmekä sisällyttäneet tietoa piirroksestasi virheeseen. Mikäli piirroksesi ei ole yksityinen, harkitsethan kertovasi meille <button>virheenseurantajärjestelmässämme.</button> Sisällytä alla olevat tiedot kopioimalla ne GitHub-ongelmaan.",
     "sceneContent": "Piirroksen tiedot:"
   },
   "roomDialog": {
@@ -297,7 +306,8 @@
     "doubleClick": "kaksoisnapsautus",
     "drag": "vedä",
     "editor": "Muokkausohjelma",
-    "editSelectedShape": "Muokkaa valittua muotoa (teksti/nuoli/viiva)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Löysitkö ongelman? Kerro meille",
     "howto": "Seuraa oppaitamme",
     "or": "tai",
@@ -310,7 +320,9 @@
     "view": "Näkymä",
     "zoomToFit": "Näytä kaikki elementit",
     "zoomToSelection": "Näytä valinta",
-    "toggleElementLock": ""
+    "toggleElementLock": "Lukitse / poista lukitus valinta",
+    "movePageUpDown": "Siirrä sivua ylös/alas",
+    "movePageLeftRight": "Siirrä sivua vasemmalle/oikealle"
   },
   "clearCanvasDialog": {
     "title": "Pyyhi piirtoalue"
@@ -336,29 +348,16 @@
       "required": "Pakollinen",
       "website": "Syötä oikeamuotoinen URL-osoite"
     },
-    "noteDescription": {
-      "pre": "Lähetä kirjastosi, jotta se voidaan sisällyttää ",
-      "link": "julkisessa kirjastolistauksessa",
-      "post": "muiden käyttöön omissa piirrustuksissaan."
-    },
-    "noteGuidelines": {
-      "pre": "Kirjasto on ensin hyväksyttävä manuaalisesti. Ole hyvä ja lue ",
-      "link": "ohjeet",
-      "post": " ennen lähettämistä. Tarvitset GitHub-tilin, jotta voit viestiä ja tehdä muutoksia pyydettäessä, mutta se ei ole ehdottoman välttämätöntä."
-    },
-    "noteLicense": {
-      "pre": "Lähettämällä hyväksyt että kirjasto julkaistaan ",
-      "link": "MIT-lisenssin ",
-      "post": "alla, mikä lyhyesti antaa muiden käyttää sitä ilman rajoituksia."
-    },
+    "noteDescription": "Lähetä kirjastosi, jotta se voidaan sisällyttää <link>julkisessa kirjastolistauksessa</link>muiden käyttöön omissa piirrustuksissaan.",
+    "noteGuidelines": "Kirjasto on ensin hyväksyttävä manuaalisesti. Ole hyvä ja lue <link>ohjeet</link> ennen lähettämistä. Tarvitset GitHub-tilin, jotta voit viestiä ja tehdä muutoksia pyydettäessä, mutta se ei ole ehdottoman välttämätöntä.",
+    "noteLicense": "Lähettämällä hyväksyt että kirjasto julkaistaan <link>MIT-lisenssin </link>alla, mikä lyhyesti antaa muiden käyttää sitä ilman rajoituksia.",
     "noteItems": "Jokaisella kirjaston kohteella on oltava oma nimensä suodatusta varten. Seuraavat kirjaston kohteet sisältyvät:",
     "atleastOneLibItem": "Valitse vähintään yksi kirjaston kohde aloittaaksesi",
     "republishWarning": "Huom! Osa valituista kohteista on merkitty jo julkaistu/lähetetyiksi. Lähetä kohteita uudelleen vain päivitettäessä olemassa olevaa kirjastoa tai ehdotusta."
   },
   "publishSuccessDialog": {
     "title": "Kirjasto lähetetty",
-    "content": "Kiitos {{authorName}}. Kirjastosi on lähetetty tarkistettavaksi. Voit seurata sen tilaa",
-    "link": "täällä"
+    "content": "Kiitos {{authorName}}. Kirjastosi on lähetetty tarkistettavaksi. Voit seurata sen tilaa<link>täällä</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Tyhjennä kirjasto",
@@ -391,7 +390,8 @@
     "fileSaved": "Tiedosto tallennettu.",
     "fileSavedToFilename": "Tallennettiin kohteeseen {filename}",
     "canvas": "piirtoalue",
-    "selection": "valinta"
+    "selection": "valinta",
+    "pasteAsSingleElement": "Käytä {{shortcut}} liittääksesi yhtenä elementtinä,\ntai liittääksesi olemassa olevaan tekstieditoriin"
   },
   "colors": {
     "ffffff": "Valkoinen",
@@ -439,5 +439,18 @@
     "5c940d": "Limenvihreä 9",
     "e67700": "Keltainen 9",
     "d9480f": "Oranssi 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "Kaikki tietosi on tallennettu paikallisesti selaimellesi.",
+      "center_heading_plus": "Haluatko sen sijaan mennä Excalidraw+:aan?",
+      "menuHint": "Vie, asetukset, kielet, ..."
+    },
+    "defaults": {
+      "menuHint": "Vie, asetukset ja lisää...",
+      "center_heading": "Kaaviot. Tehty. Yksinkertaiseksi.",
+      "toolbarHint": "Valitse työkalu ja aloita piirtäminen!",
+      "helpHint": "Pikanäppäimet & ohje"
+    }
   }
 }

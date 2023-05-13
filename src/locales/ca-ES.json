@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Enganxa",
+    "pasteAsPlaintext": "Enganxar com a text pla",
     "pasteCharts": "Enganxa els diagrames",
     "selectAll": "Selecciona-ho tot",
     "multiSelect": "Afegeix un element a la selecció",
@@ -53,6 +54,7 @@
     "veryLarge": "Molt gran",
     "solid": "Sòlid",
     "hachure": "Ratlletes",
+    "zigzag": "",
     "crossHatch": "Ratlletes creuades",
     "thin": "Fi",
     "bold": "Negreta",
@@ -71,7 +73,7 @@
     "layers": "Capes",
     "actions": "Accions",
     "language": "Llengua",
-    "liveCollaboration": "Col·laboració en directe",
+    "liveCollaboration": "Col·laboració en directe...",
     "duplicateSelection": "Duplica",
     "untitled": "Sense títol",
     "name": "Nom",
@@ -109,14 +111,15 @@
     "increaseFontSize": "Augmenta la mida de la lletra",
     "unbindText": "Desvincular el text",
     "bindText": "Ajusta el text al contenidor",
+    "createContainerFromText": "",
     "link": {
       "edit": "Edita l'enllaç",
       "create": "Crea un enllaç",
       "label": "Enllaç"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Editar línia",
+      "exit": "Sortir de l'editor de línia"
     },
     "elementLock": {
       "lock": "Bloca",
@@ -135,8 +138,8 @@
   "buttons": {
     "clearReset": "Neteja el llenç",
     "exportJSON": "Exporta a un fitxer",
-    "exportImage": "Desa com a imatge",
-    "export": "Exporta",
+    "exportImage": "Exporta la imatge...",
+    "export": "Guardar a...",
     "exportToPng": "Exporta a PNG",
     "exportToSvg": "Exporta a SNG",
     "copyToClipboard": "Copia al porta-retalls",
@@ -144,7 +147,7 @@
     "scale": "Escala",
     "save": "Desa al fitxer actual",
     "saveAs": "Anomena i desa",
-    "load": "Carrega",
+    "load": "Obrir",
     "getShareableLink": "Obté l'enllaç per a compartir",
     "close": "Tanca",
     "selectLanguage": "Trieu la llengua",
@@ -191,7 +194,8 @@
     "invalidSceneUrl": "No s'ha pogut importar l'escena des de l'adreça URL proporcionada. Està malformada o no conté dades Excalidraw JSON vàlides.",
     "resetLibrary": "Això buidarà la biblioteca. N'esteu segur?",
     "removeItemsFromsLibrary": "Suprimir {{count}} element(s) de la biblioteca?",
-    "invalidEncryptionKey": "La clau d'encriptació ha de tenir 22 caràcters. La col·laboració en directe està desactivada."
+    "invalidEncryptionKey": "La clau d'encriptació ha de tenir 22 caràcters. La col·laboració en directe està desactivada.",
+    "collabOfflineWarning": "Sense connexió a internet disponible.\nEls vostres canvis no seran guardats!"
   },
   "errors": {
     "unsupportedFileType": "Tipus de fitxer no suportat.",
@@ -200,7 +204,15 @@
     "svgImageInsertError": "No ha estat possible inserir la imatge SVG. Les marques SVG semblen invàlides.",
     "invalidSVGString": "SVG no vàlid.",
     "cannotResolveCollabServer": "No ha estat possible connectar amb el servidor collab. Si us plau recarregueu la pàgina i torneu a provar.",
-    "importLibraryError": "No s'ha pogut carregar la biblioteca"
+    "importLibraryError": "No s'ha pogut carregar la biblioteca",
+    "collabSaveFailed": "No s'ha pogut desar a la base de dades de fons. Si els problemes persisteixen, hauríeu de desar el fitxer localment per assegurar-vos que no perdeu el vostre treball.",
+    "collabSaveFailed_sizeExceeded": "No s'ha pogut desar a la base de dades de fons, sembla que el llenç és massa gran. Hauríeu de desar el fitxer localment per assegurar-vos que no perdeu el vostre treball.",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Selecció",
@@ -214,9 +226,10 @@
     "text": "Text",
     "library": "Biblioteca",
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
-    "penMode": "Evita el zoom i accepta solament el dibuix lliure amb bolígraf",
+    "penMode": "Mode de llapis - evita tocar",
     "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
-    "eraser": "Esborrador"
+    "eraser": "Esborrador",
+    "hand": "Mà (eina de desplaçament)"
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -224,7 +237,7 @@
     "shapes": "Formes"
   },
   "hints": {
-    "canvasPanning": "Per a moure el llenç, mantingueu premuda la roda del ratolí o la tecla espai mentre l'arrossegueu",
+    "canvasPanning": "Per moure el llenç, manteniu premuda la roda del ratolí o la barra espaiadora mentre arrossegueu o utilitzeu l'eina manual",
     "linearElement": "Feu clic per a dibuixar múltiples punts; arrossegueu per a una sola línia",
     "freeDraw": "Feu clic i arrossegueu, deixeu anar per a finalitzar",
     "text": "Consell: també podeu afegir text fent doble clic en qualsevol lloc amb l'eina de selecció",
@@ -235,14 +248,15 @@
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
     "resizeImage": "Podeu redimensionar lliurement prement MAJÚSCULA;\nper a redimensionar des del centre, premeu ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
-    "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
+    "lineEditor_info": "Mantingueu premut Ctrl o Cmd i feu doble clic o premeu Ctrl o Cmd + Retorn per editar els punts",
     "lineEditor_pointSelected": "Premeu Suprimir per a eliminar el(s) punt(s), CtrlOrCmd+D per a duplicar-lo, o arrossegueu-lo per a moure'l",
     "lineEditor_nothingSelected": "Seleccioneu un punt per a editar-lo (premeu SHIFT si voleu\nselecció múltiple), o manteniu Alt i feu clic per a afegir més punts",
     "placeImage": "Feu clic per a col·locar la imatge o clic i arrossegar per a establir-ne la mida manualment",
     "publishLibrary": "Publiqueu la vostra pròpia llibreria",
     "bindTextToElement": "Premeu enter per a afegir-hi text",
     "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament",
-    "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar"
+    "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar",
+    "firefox_clipboard_write": "És probable que aquesta funció es pugui activar posant la marca \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Per canviar les marques del navegador al Firefox, visiteu la pàgina \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
@@ -250,16 +264,11 @@
     "canvasTooBigTip": "Consell: proveu d’acostar una mica els elements més allunyats."
   },
   "errorSplash": {
-    "headingMain_pre": "S'ha produït un error. Proveu ",
-    "headingMain_button": "recarregar la pàgina.",
-    "clearCanvasMessage": "Si la recàrrega no funciona, proveu ",
-    "clearCanvasMessage_button": "esborrar el llenç.",
+    "headingMain": "S'ha produït un error. Proveu <button>recarregar la pàgina.</button>",
+    "clearCanvasMessage": "Si la recàrrega no funciona, proveu <button>esborrar el llenç.</button>",
     "clearCanvasCaveat": " Això resultarà en la pèrdua de feina ",
-    "trackedToSentry_pre": "L'error amb l'identificador ",
-    "trackedToSentry_post": " s'ha rastrejat en el nostre sistema.",
-    "openIssueMessage_pre": "Anàvem amb molta cura de no incloure la informació de la vostra escena en l'error. Si l'escena no és privada, podeu fer-ne el seguiment al nostre ",
-    "openIssueMessage_button": "rastrejador d'errors.",
-    "openIssueMessage_post": " Incloeu la informació a continuació copiant i enganxant a GitHub Issues.",
+    "trackedToSentry": "L'error amb l'identificador {{eventId}} s'ha rastrejat en el nostre sistema.",
+    "openIssueMessage": "Anàvem amb molta cura de no incloure la informació de la vostra escena en l'error. Si l'escena no és privada, podeu fer-ne el seguiment al nostre <button>rastrejador d'errors.</button> Incloeu la informació a continuació copiant i enganxant a GitHub Issues.",
     "sceneContent": "Contingut de l'escena:"
   },
   "roomDialog": {
@@ -290,14 +299,15 @@
     "blog": "Llegiu el nostre blog",
     "click": "clic",
     "deepSelect": "Selecció profunda",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "Seleccioneu profundament dins del quadre i eviteu arrossegar",
     "curvedArrow": "Fletxa corba",
     "curvedLine": "Línia corba",
     "documentation": "Documentació",
     "doubleClick": "doble clic",
     "drag": "arrossega",
     "editor": "Editor",
-    "editSelectedShape": "Edita la forma seleccionada (text, fletxa o línia)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Hi heu trobat un problema? Informeu-ne",
     "howto": "Seguiu les nostres guies",
     "or": "o",
@@ -310,7 +320,9 @@
     "view": "Visualització",
     "zoomToFit": "Zoom per veure tots els elements",
     "zoomToSelection": "Zoom per veure la selecció",
-    "toggleElementLock": "Blocar/desblocar la selecció"
+    "toggleElementLock": "Blocar/desblocar la selecció",
+    "movePageUpDown": "Mou la pàgina cap amunt/a baix",
+    "movePageLeftRight": "Mou la pàgina cap a l'esquerra/dreta"
   },
   "clearCanvasDialog": {
     "title": "Neteja el llenç"
@@ -336,29 +348,16 @@
       "required": "Requerit",
       "website": "Introduïu una URL vàlida"
     },
-    "noteDescription": {
-      "pre": "Envieu la vostra biblioteca perquè sigui inclosa al ",
-      "link": "repositori públic",
-      "post": "per tal que altres persones puguin fer-ne ús en els seus dibuixos."
-    },
-    "noteGuidelines": {
-      "pre": "La biblioteca ha de ser aprovada manualment. Si us plau, llegiu les ",
-      "link": "directrius",
-      "post": " abans d'enviar-hi res. Necessitareu un compte de GitHub per a comunicar i fer-hi canvis si cal, però no és requisit imprescindible."
-    },
-    "noteLicense": {
-      "pre": "Quan l'envieu, accepteu que la biblioteca sigui publicada sota la ",
-      "link": "llicència MIT, ",
-      "post": "que, en resum, vol dir que qualsevol persona pot fer-ne ús sense restriccions."
-    },
+    "noteDescription": "Envieu la vostra biblioteca perquè sigui inclosa al <link>repositori públic</link>per tal que altres persones puguin fer-ne ús en els seus dibuixos.",
+    "noteGuidelines": "La biblioteca ha de ser aprovada manualment. Si us plau, llegiu les <link>directrius</link> abans d'enviar-hi res. Necessitareu un compte de GitHub per a comunicar i fer-hi canvis si cal, però no és requisit imprescindible.",
+    "noteLicense": "Quan l'envieu, accepteu que la biblioteca sigui publicada sota la <link>llicència MIT, </link>que, en resum, vol dir que qualsevol persona pot fer-ne ús sense restriccions.",
     "noteItems": "Cada element de la biblioteca ha de tenir el seu propi nom per tal que sigui filtrable. S'hi inclouran els elements següents:",
     "atleastOneLibItem": "Si us plau, seleccioneu si més no un element de la biblioteca per a començar",
     "republishWarning": "Nota: alguns dels elements seleccionats s'han marcat com a publicats/enviats. Només hauríeu de reenviar elements quan actualitzeu una biblioteca existent."
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",
-    "content": "Gràcies, {{authorName}}. La vostra biblioteca ha estat enviada per a ser revisada. Podeu comprovar-ne l'estat",
-    "link": "aquí"
+    "content": "Gràcies, {{authorName}}. La vostra biblioteca ha estat enviada per a ser revisada. Podeu comprovar-ne l'estat<link>aquí</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Restableix la biblioteca",
@@ -391,7 +390,8 @@
     "fileSaved": "S'ha desat el fitxer.",
     "fileSavedToFilename": "S'ha desat a {filename}",
     "canvas": "el llenç",
-    "selection": "la selecció"
+    "selection": "la selecció",
+    "pasteAsSingleElement": "Fer servir {{shortcut}} per enganxar com un sol element,\no enganxeu-lo en un editor de text existent"
   },
   "colors": {
     "ffffff": "Blanc",
@@ -439,5 +439,18 @@
     "5c940d": "Llima 9",
     "e67700": "Groc 9",
     "d9480f": "Taronja 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "Totes les vostres dades es guarden localment al vostre navegador.",
+      "center_heading_plus": "Vols anar a Excalidraw+ en comptes?",
+      "menuHint": "Exportar, preferències, llenguatges..."
+    },
+    "defaults": {
+      "menuHint": "Exportar, preferències i més...",
+      "center_heading": "Diagrames. Fer. Simple.",
+      "toolbarHint": "Selecciona una eina i comença a dibuixar!",
+      "helpHint": "Dreceres i ajuda"
+    }
   }
 }

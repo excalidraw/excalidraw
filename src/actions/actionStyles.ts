@@ -12,8 +12,15 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
-import { getBoundTextElement } from "../element/textElement";
-import { hasBoundTextElement } from "../element/typeChecks";
+import {
+  getBoundTextElement,
+  getDefaultLineHeight,
+} from "../element/textElement";
+import {
+  hasBoundTextElement,
+  canApplyRoundnessTypeToElement,
+  getDefaultRoundnessTypeForElement,
+} from "../element/typeChecks";
 import { getSelectedElements } from "../scene";
 
 // `copiedStyles` is exported only for tests.
@@ -77,15 +84,29 @@ export const actionPasteStyles = register({
             fillStyle: elementStylesToCopyFrom?.fillStyle,
             opacity: elementStylesToCopyFrom?.opacity,
             roughness: elementStylesToCopyFrom?.roughness,
+            roundness: elementStylesToCopyFrom.roundness
+              ? canApplyRoundnessTypeToElement(
+                  elementStylesToCopyFrom.roundness.type,
+                  element,
+                )
+                ? elementStylesToCopyFrom.roundness
+                : getDefaultRoundnessTypeForElement(element)
+              : null,
           });
 
           if (isTextElement(newElement)) {
+            const fontSize =
+              elementStylesToCopyFrom?.fontSize || DEFAULT_FONT_SIZE;
+            const fontFamily =
+              elementStylesToCopyFrom?.fontFamily || DEFAULT_FONT_FAMILY;
             newElement = newElementWith(newElement, {
-              fontSize: elementStylesToCopyFrom?.fontSize || DEFAULT_FONT_SIZE,
-              fontFamily:
-                elementStylesToCopyFrom?.fontFamily || DEFAULT_FONT_FAMILY,
+              fontSize,
+              fontFamily,
               textAlign:
                 elementStylesToCopyFrom?.textAlign || DEFAULT_TEXT_ALIGN,
+              lineHeight:
+                elementStylesToCopyFrom.lineHeight ||
+                getDefaultLineHeight(fontFamily),
             });
             let container = null;
             if (newElement.containerId) {

@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "ਪੇਸਟ ਕਰੋ",
+    "pasteAsPlaintext": "",
     "pasteCharts": "ਚਾਰਟ ਪੇਸਟ ਕਰੋ",
     "selectAll": "ਸਾਰੇ ਚੁਣੋ",
     "multiSelect": "ਐਲੀਮੈਂਟ ਨੂੰ ਚੋਣ ਵਿੱਚ ਜੋੜੋ",
@@ -53,6 +54,7 @@
     "veryLarge": "ਬਹੁਤ ਵੱਡਾ",
     "solid": "ਠੋਸ",
     "hachure": "ਤਿਰਛੀਆਂ ਗਰਿੱਲਾਂ",
+    "zigzag": "",
     "crossHatch": "ਜਾਲੀ",
     "thin": "ਪਤਲੀ",
     "bold": "ਮੋਟੀ",
@@ -71,7 +73,7 @@
     "layers": "ਪਰਤਾਂ",
     "actions": "ਕਾਰਵਾਈਆਂ",
     "language": "ਭਾਸ਼ਾ",
-    "liveCollaboration": "ਲਾਇਵ ਸਹਿਯੋਗ",
+    "liveCollaboration": "",
     "duplicateSelection": "ਡੁਪਲੀਕੇਟ ਬਣਾਓ",
     "untitled": "ਬੇ-ਸਿਰਨਾਵਾਂ",
     "name": "ਨਾਂ",
@@ -109,6 +111,7 @@
     "increaseFontSize": "ਫੌਂਟ ਦਾ ਅਕਾਰ ਵਧਾਓ",
     "unbindText": "",
     "bindText": "ਪਾਠ ਨੂੰ ਕੰਟੇਨਰ ਨਾਲ ਬੰਨ੍ਹੋ",
+    "createContainerFromText": "",
     "link": {
       "edit": "ਕੜੀ ਸੋਧੋ",
       "create": "ਕੜੀ ਬਣਾਓ",
@@ -135,8 +138,8 @@
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",
     "exportJSON": "ਫਾਈਲ ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
-    "exportImage": "ਤਸਵੀਰ ਵਜੋਂ ਸਾਂਭੋ",
-    "export": "ਨਿਰਯਾਤ",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "PNG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
     "exportToSvg": "SVG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
     "copyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕਰੋ",
@@ -144,7 +147,7 @@
     "scale": "ਪੈਮਾਇਸ਼",
     "save": "ਮੌਜੂਦਾ ਫਾਈਲ ਵਿੱਚ ਸਾਂਭੋ",
     "saveAs": "ਇਸ ਵਜੋਂ ਸਾਂਭੋ",
-    "load": "ਲੋਡ ਕਰੋ",
+    "load": "",
     "getShareableLink": "ਸਾਂਝੀ ਕਰਨ ਵਾਲੀ ਲਿੰਕ ਲਵੋ",
     "close": "ਬੰਦ ਕਰੋ",
     "selectLanguage": "ਭਾਸ਼ਾ ਚੁਣੋ",
@@ -191,7 +194,8 @@
     "invalidSceneUrl": "ਦਿੱਤੀ ਗਈ URL 'ਚੋਂ ਦ੍ਰਿਸ਼ ਨੂੰ ਆਯਾਤ ਨਹੀਂ ਕਰ ਸਕੇ। ਇਹ ਜਾਂ ਤਾਂ ਖਰਾਬ ਹੈ, ਜਾਂ ਇਸ ਵਿੱਚ ਜਾਇਜ਼ Excalidraw JSON ਡਾਟਾ ਸ਼ਾਮਲ ਨਹੀਂ ਹੈ।",
     "resetLibrary": "ਇਹ ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਸਾਫ ਕਰ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
     "removeItemsFromsLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ {{count}} ਚੀਜ਼(-ਜ਼ਾਂ) ਮਿਟਾਉਣੀਆਂ ਹਨ?",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "",
@@ -200,7 +204,15 @@
     "svgImageInsertError": "",
     "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
@@ -216,7 +228,8 @@
     "lock": "ਡਰਾਇੰਗ ਤੋਂ ਬਾਅਦ ਵੀ ਚੁਣੇ ਹੋਏ ਸੰਦ ਨੂੰ ਸਰਗਰਮ ਰੱਖੋ ",
     "penMode": "",
     "link": "",
-    "eraser": "ਰਬੜ"
+    "eraser": "ਰਬੜ",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "ਕੈਨਵਸ ਦੀਆਂ ਕਾਰਵਾਈਆਂ",
@@ -235,14 +248,15 @@
     "resize": "ਤੁਸੀਂ ਅਕਾਰ ਬਦਲਦੇ ਸਮੇਂ SHIFT ਦਬਾਈ ਰੱਖ ਕੇ ਅਨੁਪਾਤ ਨੂੰ ਕਾਬੂ ਕਰ ਸਕਦੇ ਹੋ, ਵਿਚਕਾਰ ਤੋਂ ਅਕਾਰ ਬਦਲਣ ਲਈ ALT ਦਬਾਓ",
     "resizeImage": "",
     "rotate": "ਤੁਸੀਂ ਘੁਮਾਉਂਦੇ ਹੋਏ SHIFT ਦਬਾਈ ਰੱਖ ਕੇ ਕੋਣਾਂ ਨੂੰ ਕਾਬੂ ਕਰ ਸਕਦੇ ਹੋ",
-    "lineEditor_info": "ਬਿੰਦੂਆਂ ਨੂੰ ਸੋਧਣ ਲਈ ਡਬਲ-ਕਲਿੱਕ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "ਆਪਣੀ ਲਾਇਬ੍ਰੇਰੀ ਪ੍ਰਕਾਸ਼ਿਤ ਕਰੋ",
     "bindTextToElement": "ਪਾਠ ਜੋੜਨ ਲਈ ਐੰਟਰ ਦਬਾਓ",
     "deepBoxSelect": "",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "ਝਲਕ ਨਹੀਂ ਦਿਖਾ ਸਕਦੇ",
@@ -250,16 +264,11 @@
     "canvasTooBigTip": "ਨੁਸਖਾ: ਸਭ ਤੋਂ ਦੂਰ ਸਥਿੱਤ ਐਲੀਮੈਂਟਾਂ ਨੂੰ ਥੋੜ੍ਹਾ ਜਿਹਾ ਨੇੜੇ ਲਿਆ ਕੇ ਦੇਖੋ।"
   },
   "errorSplash": {
-    "headingMain_pre": "ਗਲਤੀ ਹੋਈ। ਇਹ ਕਰਕੇ ਦੇਖੋ ",
-    "headingMain_button": "ਪੰਨਾ ਮੁੜ-ਲੋਡ ਕਰੋ।",
-    "clearCanvasMessage": "ਜੇ ਮੁੜ-ਲੋਡ ਕਰਨਾ ਕੰਮ ਨਾ ਕਰੇ, ਤਾਂ ਇਹ ਕਰਕੇ ਦੇਖੋ ",
-    "clearCanvasMessage_button": "ਕੈਨਵਸ ਸਾਫ ਕਰੋ।",
+    "headingMain": "ਗਲਤੀ ਹੋਈ। ਇਹ ਕਰਕੇ ਦੇਖੋ <button>ਪੰਨਾ ਮੁੜ-ਲੋਡ ਕਰੋ।</button>",
+    "clearCanvasMessage": "ਜੇ ਮੁੜ-ਲੋਡ ਕਰਨਾ ਕੰਮ ਨਾ ਕਰੇ, ਤਾਂ ਇਹ ਕਰਕੇ ਦੇਖੋ <button>ਕੈਨਵਸ ਸਾਫ ਕਰੋ।</button>",
     "clearCanvasCaveat": " ਇਹ ਸਾਰਾ ਕੰਮ ਗਵਾ ਦੇਵੇਗਾ ",
-    "trackedToSentry_pre": "ਗਲਤੀ ਸੂਚਕ ",
-    "trackedToSentry_post": " ਸਾਡੇ ਸਿਸਟਮ 'ਤੇ ਟਰੈਕ ਕੀਤਾ ਗਿਆ ਸੀ।",
-    "openIssueMessage_pre": "ਅਸੀਂ ਬੜੇ ਸਾਵਧਾਨ ਸੀ ਕਿ ਗਲਤੀ ਵਿੱਚ ਤੁਹਾਡੇ ਦ੍ਰਿਸ਼ ਦੀ ਜਾਣਕਾਰੀ ਸ਼ਾਮਲ ਨਾ ਕਰੀਏ। ਜੇ ਤੁਹਾਡਾ ਦ੍ਰਿਸ਼ ਨਿੱਜੀ ਨਹੀਂ ਹੈ ਤਾਂ ਇਸ 'ਤੇ ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ ਜੀ ",
-    "openIssueMessage_button": "ਬੱਗ ਟਰੈਕਰ।",
-    "openIssueMessage_post": "ਹੇਠਾਂ ਦਿੱਤੀ ਜਾਣਕਾਰੀ ਨੂੰ ਕਾਪੀ ਕਰਕੇ ਗਿੱਟਹੱਬ ਮੁੱਦੇ ਵਿੱਚ ਪੇਸਟ ਕਰਕੇ ਸ਼ਾਮਲ ਕਰੋ ਜੀ।",
+    "trackedToSentry": "ਗਲਤੀ ਸੂਚਕ {{eventId}} ਸਾਡੇ ਸਿਸਟਮ 'ਤੇ ਟਰੈਕ ਕੀਤਾ ਗਿਆ ਸੀ।",
+    "openIssueMessage": "ਅਸੀਂ ਬੜੇ ਸਾਵਧਾਨ ਸੀ ਕਿ ਗਲਤੀ ਵਿੱਚ ਤੁਹਾਡੇ ਦ੍ਰਿਸ਼ ਦੀ ਜਾਣਕਾਰੀ ਸ਼ਾਮਲ ਨਾ ਕਰੀਏ। ਜੇ ਤੁਹਾਡਾ ਦ੍ਰਿਸ਼ ਨਿੱਜੀ ਨਹੀਂ ਹੈ ਤਾਂ ਇਸ 'ਤੇ ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ ਜੀ <button>ਬੱਗ ਟਰੈਕਰ।</button>ਹੇਠਾਂ ਦਿੱਤੀ ਜਾਣਕਾਰੀ ਨੂੰ ਕਾਪੀ ਕਰਕੇ ਗਿੱਟਹੱਬ ਮੁੱਦੇ ਵਿੱਚ ਪੇਸਟ ਕਰਕੇ ਸ਼ਾਮਲ ਕਰੋ ਜੀ।",
     "sceneContent": "ਦ੍ਰਿਸ਼ ਦੀ ਸਮੱਗਰੀ:"
   },
   "roomDialog": {
@@ -297,7 +306,8 @@
     "doubleClick": "ਡਬਲ-ਕਲਿੱਕ",
     "drag": "ਘਸੀਟੋ",
     "editor": "ਸੋਧਕ",
-    "editSelectedShape": "ਚੁਣਿਆ ਰੂਪ ਸੋਧੋ (ਪਾਠ/ਤੀਰ/ਲਾਈਨ)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "ਕੋਈ ਸਮੱਸਿਆ ਲੱਭੀ? ਜਮ੍ਹਾਂ ਕਰਵਾਓ",
     "howto": "ਸਾਡੀਆਂ ਗਾਈਡਾਂ ਦੀ ਪਾਲਣਾ ਕਰੋ",
     "or": "ਜਾਂ",
@@ -310,7 +320,9 @@
     "view": "ਦਿੱਖ",
     "zoomToFit": "ਸਾਰੇ ਐਲੀਮੈਂਟਾਂ ਨੂੰ ਫਿੱਟ ਕਰਨ ਲਈ ਜ਼ੂਮ ਕਰੋ",
     "zoomToSelection": "ਚੋਣ ਤੱਕ ਜ਼ੂਮ ਕਰੋ",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "ਕੈਨਵਸ ਨੂੰ ਸਾਫ਼ ਕਰੋ"
@@ -336,29 +348,16 @@
       "required": "ਲੋੜੀਂਦਾ",
       "website": "ਜਾਇਜ਼ URL ਭਰੋ"
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "ਜਨਤਕ ਲਾਇਬ੍ਰੇਰੀ ਦੀ ਰਿਪਾਜ਼ੀਟਰੀ",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "ਦਿਸ਼ਾ ਨਿਰਦੇਸ਼",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "MIT ਲਾਇਸੈਂਸ, ",
-      "post": ""
-    },
+    "noteDescription": "<link>ਜਨਤਕ ਲਾਇਬ੍ਰੇਰੀ ਦੀ ਰਿਪਾਜ਼ੀਟਰੀ</link>",
+    "noteGuidelines": "<link>ਦਿਸ਼ਾ ਨਿਰਦੇਸ਼</link>",
+    "noteLicense": "<link>MIT ਲਾਇਸੈਂਸ, </link>",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": "ਇੱਥੇ"
+    "content": "<link>ਇੱਥੇ</link>"
   },
   "confirmDialog": {
     "resetLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਰੀਸੈੱਟ ਕਰੋ",
@@ -391,7 +390,8 @@
     "fileSaved": "ਫਾਈਲ ਸਾਂਭੀ ਗਈ।",
     "fileSavedToFilename": "{filename} ਵਿੱਚ ਸਾਂਭੀ",
     "canvas": "ਕੈਨਵਸ",
-    "selection": "ਚੋਣ"
+    "selection": "ਚੋਣ",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "ਚਿੱਟਾ",
@@ -439,5 +439,18 @@
     "5c940d": "ਲਾਇਮ 9",
     "e67700": "ਪੀਲਾ 9",
     "d9480f": "ਸੰਤਰੀ 9"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

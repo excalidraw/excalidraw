@@ -1,8 +1,11 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
+import { t } from "../i18n";
+import Trans from "./Trans";
+import { jotaiScope } from "../jotai";
+import { LibraryItem, LibraryItems, UIAppState } from "../types";
+import { useApp, useExcalidrawSetAppState } from "./App";
 import { saveLibraryAsJSON } from "../data/json";
 import Library, { libraryItemsAtom } from "../data/library";
-import { t } from "../i18n";
-import { AppState, LibraryItem, LibraryItems } from "../types";
 import {
   DotsIcon,
   ExportIcon,
@@ -14,27 +17,28 @@ import { ToolButton } from "./ToolButton";
 import { fileOpen } from "../data/filesystem";
 import { muteFSAbortError } from "../utils";
 import { useAtom } from "jotai";
-import { jotaiScope } from "../jotai";
 import ConfirmDialog from "./ConfirmDialog";
 import PublishLibrary from "./PublishLibrary";
 import { Dialog } from "./Dialog";
-import { useOutsideClickHook } from "../hooks/useOutsideClick";
-import MenuItem from "./MenuItem";
-import { isDropdownOpenAtom } from "./App";
+import DropdownMenu from "./dropdownMenu/DropdownMenu";
+import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+import { useUIAppState } from "../context/ui-appState";
+import clsx from "clsx";
 
 const getSelectedItems = (
   libraryItems: LibraryItems,
   selectedItems: LibraryItem["id"][],
 ) => libraryItems.filter((item) => selectedItems.includes(item.id));
 
-export const LibraryMenuHeader: React.FC<{
-  setAppState: React.Component<any, AppState>["setState"];
+export const LibraryDropdownMenuButton: React.FC<{
+  setAppState: React.Component<any, UIAppState>["setState"];
   selectedItems: LibraryItem["id"][];
   library: Library;
   onRemoveFromLibrary: () => void;
   resetLibrary: () => void;
   onSelectItems: (items: LibraryItem["id"][]) => void;
-  appState: AppState;
+  appState: UIAppState;
+  className?: string;
 }> = ({
   setAppState,
   selectedItems,
@@ -43,8 +47,13 @@ export const LibraryMenuHeader: React.FC<{
   resetLibrary,
   onSelectItems,
   appState,
+  className,
 }) => {
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
+  const [isLibraryMenuOpen, setIsLibraryMenuOpen] = useAtom(
+    isLibraryMenuOpenAtom,
+    jotaiScope,
+  );
 
   const renderRemoveLibAlert = useCallback(() => {
     const content = selectedItems.length
@@ -100,16 +109,19 @@ export const LibraryMenuHeader: React.FC<{
         small={true}
       >
         <p>
-          {t("publishSuccessDialog.content", {
-            authorName: publishLibSuccess!.authorName,
-          })}{" "}
-          <a
-            href={publishLibSuccess?.url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t("publishSuccessDialog.link")}
-          </a>
+          <Trans
+            i18nKey="publishSuccessDialog.content"
+            authorName={publishLibSuccess!.authorName}
+            link={(el) => (
+              <a
+                href={publishLibSuccess?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {el}
+              </a>
+            )}
+          />
         </p>
         <ToolButton
           type="button"
@@ -173,85 +185,135 @@ export const LibraryMenuHeader: React.FC<{
       });
   };
 
-  const [isDropdownOpen, setIsDropdownOpen] = useAtom(isDropdownOpenAtom);
-  const dropdownRef = useOutsideClickHook(() => setIsDropdownOpen(false));
+  const renderLibraryMenu = () => {
+    return (
+      <DropdownMenu open={isLibraryMenuOpen}>
+        <DropdownMenu.Trigger
+          onToggle={() => setIsLibraryMenuOpen(!isLibraryMenuOpen)}
+        >
+          {DotsIcon}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
+          onClickOutside={() => setIsLibraryMenuOpen(false)}
+          onSelect={() => setIsLibraryMenuOpen(false)}
+          className="library-menu"
+        >
+          {!itemsSelected && (
+            <DropdownMenu.Item
+              onSelect={onLibraryImport}
+              icon={LoadIcon}
+              data-testid="lib-dropdown--load"
+            >
+              {t("buttons.load")}
+            </DropdownMenu.Item>
+          )}
+          {!!items.length && (
+            <DropdownMenu.Item
+              onSelect={onLibraryExport}
+              icon={ExportIcon}
+              data-testid="lib-dropdown--export"
+            >
+              {t("buttons.export")}
+            </DropdownMenu.Item>
+          )}
+          {!!items.length && (
+            <DropdownMenu.Item
+              onSelect={() => setShowRemoveLibAlert(true)}
+              icon={TrashIcon}
+            >
+              {resetLabel}
+            </DropdownMenu.Item>
+          )}
+          {itemsSelected && (
+            <DropdownMenu.Item
+              icon={publishIcon}
+              onSelect={() => setShowPublishLibraryDialog(true)}
+              data-testid="lib-dropdown--remove"
+            >
+              {t("buttons.publishLibrary")}
+            </DropdownMenu.Item>
+          )}
+        </DropdownMenu.Content>
+      </DropdownMenu>
+    );
+  };
 
   return (
-    <div style={{ position: "relative" }}>
-      <button
-        type="button"
-        className="Sidebar__dropdown-btn"
-        data-prevent-outside-click
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-      >
-        {DotsIcon}
-      </button>
-
+    <div className={clsx("library-menu-dropdown-container", className)}>
+      {renderLibraryMenu()}
       {selectedItems.length > 0 && (
         <div className="library-actions-counter">{selectedItems.length}</div>
       )}
-
-      {isDropdownOpen && (
-        <div
-          className="Sidebar__dropdown-content menu-container"
-          ref={dropdownRef}
-        >
-          {!itemsSelected && (
-            <MenuItem
-              label={t("buttons.load")}
-              icon={LoadIcon}
-              dataTestId="lib-dropdown--load"
-              onClick={onLibraryImport}
-            />
+      {showRemoveLibAlert && renderRemoveLibAlert()}
+      {showPublishLibraryDialog && (
+        <PublishLibrary
+          onClose={() => setShowPublishLibraryDialog(false)}
+          libraryItems={getSelectedItems(
+            libraryItemsData.libraryItems,
+            selectedItems,
           )}
-          {showRemoveLibAlert && renderRemoveLibAlert()}
-          {showPublishLibraryDialog && (
-            <PublishLibrary
-              onClose={() => setShowPublishLibraryDialog(false)}
-              libraryItems={getSelectedItems(
-                libraryItemsData.libraryItems,
-                selectedItems,
-              )}
-              appState={appState}
-              onSuccess={(data) =>
-                onPublishLibSuccess(data, libraryItemsData.libraryItems)
-              }
-              onError={(error) => window.alert(error)}
-              updateItemsInStorage={() =>
-                library.setLibrary(libraryItemsData.libraryItems)
-              }
-              onRemove={(id: string) =>
-                onSelectItems(selectedItems.filter((_id) => _id !== id))
-              }
-            />
-          )}
-          {publishLibSuccess && renderPublishSuccess()}
-          {!!items.length && (
-            <>
-              <MenuItem
-                label={t("buttons.export")}
-                icon={ExportIcon}
-                onClick={onLibraryExport}
-                dataTestId="lib-dropdown--export"
-              />
-              <MenuItem
-                label={resetLabel}
-                icon={TrashIcon}
-                onClick={() => setShowRemoveLibAlert(true)}
-                dataTestId="lib-dropdown--remove"
-              />
-            </>
-          )}
-          {itemsSelected && (
-            <MenuItem
-              label={t("buttons.publishLibrary")}
-              icon={publishIcon}
-              dataTestId="lib-dropdown--publish"
-              onClick={() => setShowPublishLibraryDialog(true)}
-            />
-          )}
-        </div>
+          appState={appState}
+          onSuccess={(data) =>
+            onPublishLibSuccess(data, libraryItemsData.libraryItems)
+          }
+          onError={(error) => window.alert(error)}
+          updateItemsInStorage={() =>
+            library.setLibrary(libraryItemsData.libraryItems)
+          }
+          onRemove={(id: string) =>
+            onSelectItems(selectedItems.filter((_id) => _id !== id))
+          }
+        />
       )}
+      {publishLibSuccess && renderPublishSuccess()}
     </div>
+  );
+};
+
+export const LibraryDropdownMenu = ({
+  selectedItems,
+  onSelectItems,
+  className,
+}: {
+  selectedItems: LibraryItem["id"][];
+  onSelectItems: (id: LibraryItem["id"][]) => void;
+  className?: string;
+}) => {
+  const { library } = useApp();
+  const appState = useUIAppState();
+  const setAppState = useExcalidrawSetAppState();
+
+  const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
+
+  const removeFromLibrary = useCallback(
+    async (libraryItems: LibraryItems) => {
+      const nextItems = libraryItems.filter(
+        (item) => !selectedItems.includes(item.id),
+      );
+      library.setLibrary(nextItems).catch(() => {
+        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
+      });
+      onSelectItems([]);
+    },
+    [library, setAppState, selectedItems, onSelectItems],
+  );
+
+  const resetLibrary = useCallback(() => {
+    library.resetLibrary();
+  }, [library]);
+
+  return (
+    <LibraryDropdownMenuButton
+      appState={appState}
+      setAppState={setAppState}
+      selectedItems={selectedItems}
+      onSelectItems={onSelectItems}
+      library={library}
+      onRemoveFromLibrary={() =>
+        removeFromLibrary(libraryItemsData.libraryItems)
+      }
+      resetLibrary={resetLibrary}
+      className={className}
+    />
   );
 };

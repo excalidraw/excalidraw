@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Beillesztés",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Grafikon beillesztése",
     "selectAll": "Összes kijelölése",
     "multiSelect": "Elem hozzáadása a kijelöléshez",
@@ -53,6 +54,7 @@
     "veryLarge": "Nagyon nagy",
     "solid": "Kitöltött",
     "hachure": "Vonalkázott",
+    "zigzag": "",
     "crossHatch": "Keresztcsíkozott",
     "thin": "Vékony",
     "bold": "Félkövér",
@@ -71,7 +73,7 @@
     "layers": "Rétegek",
     "actions": "Műveletek",
     "language": "Nyelv",
-    "liveCollaboration": "Élő együttműködés",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplikálás",
     "untitled": "Névtelen",
     "name": "Név",
@@ -109,6 +111,7 @@
     "increaseFontSize": "Betűméret növelése",
     "unbindText": "Szövegkötés feloldása",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "Hivatkozás szerkesztése",
       "create": "Hivatkozás létrehozása",
@@ -135,8 +138,8 @@
   "buttons": {
     "clearReset": "Vászon törlése",
     "exportJSON": "Exportálás fájlba",
-    "exportImage": "Mentés képként",
-    "export": "Exportálás",
+    "exportImage": "",
+    "export": "",
     "exportToPng": "Exportálás PNG-be",
     "exportToSvg": "Exportálás SVG-be",
     "copyToClipboard": "Vágólapra másolás",
@@ -144,7 +147,7 @@
     "scale": "Nagyítás",
     "save": "Mentés az aktuális fájlba",
     "saveAs": "Mentés másként",
-    "load": "Betöltés",
+    "load": "",
     "getShareableLink": "Megosztható link létrehozása",
     "close": "Bezárás",
     "selectLanguage": "Nyelv kiválasztása",
@@ -191,7 +194,8 @@
     "invalidSceneUrl": "Nem sikerült importálni a jelenetet a megadott URL-ről. Rossz formátumú, vagy nem tartalmaz érvényes Excalidraw JSON-adatokat.",
     "resetLibrary": "Ezzel törlöd a könyvtárát. biztos vagy ebben?",
     "removeItemsFromsLibrary": "{{count}} elemet törölsz a könyvtárból?",
-    "invalidEncryptionKey": "A titkosítási kulcsnak 22 karakterből kell állnia. Az élő együttműködés le van tiltva."
+    "invalidEncryptionKey": "A titkosítási kulcsnak 22 karakterből kell állnia. Az élő együttműködés le van tiltva.",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "Nem támogatott fájltípus.",
@@ -200,7 +204,15 @@
     "svgImageInsertError": "Nem sikerült beszúrni az SVG-képet. Az SVG szintaktika érvénytelennek tűnik.",
     "invalidSVGString": "Érvénytelen SVG.",
     "cannotResolveCollabServer": "",
-    "importLibraryError": ""
+    "importLibraryError": "",
+    "collabSaveFailed": "",
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Kijelölés",
@@ -214,9 +226,10 @@
     "text": "Szöveg",
     "library": "Könyvtár",
     "lock": "Rajzolás után az aktív eszközt tartsa kijelölve",
-    "penMode": "Akadályozza meg a kicsinyítést, és csak tollról fogadja el a szabadkézi bevitelt",
+    "penMode": "",
     "link": "Hivatkozás hozzáadása/frissítése a kiválasztott alakzathoz",
-    "eraser": ""
+    "eraser": "",
+    "hand": ""
   },
   "headings": {
     "canvasActions": "Vászon műveletek",
@@ -224,7 +237,7 @@
     "shapes": "Alakzatok"
   },
   "hints": {
-    "canvasPanning": "A vászon mozgatásához tartsd lenyomva az egér görgőjét vagy a szóköz billentyűt húzás közben",
+    "canvasPanning": "",
     "linearElement": "Kattintással görbe, az eger húzásával pedig egyenes nyilat rajzolhatsz",
     "freeDraw": "Kattints és húzd, majd engedd el, amikor végeztél",
     "text": "Tipp: A kijelölés eszközzel a dupla kattintás új szöveget hoz létre",
@@ -235,14 +248,15 @@
     "resize": "A SHIFT billentyű lenyomva tartásával az átméretezés megtartja az arányokat,\naz ALT lenyomva tartásával pedig a középpont egy helyben marad",
     "resizeImage": "A SHIFT billentyű lenyomva tartásával szabadon átméretezheted,\ntartsd lenyomva az ALT billentyűt a középről való átméretezéshez",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
-    "lineEditor_info": "Kattints duplán, vagy nyomj entert a pontok szerkesztéséhez",
+    "lineEditor_info": "",
     "lineEditor_pointSelected": "Nyomd meg a Törlés gombot a pont(ok) eltávolításához,\nA Ctrl/Cmd+D a többszörözéshez, vagy húzással mozgathatja",
     "lineEditor_nothingSelected": "Válaszd ki a szerkeszteni kívánt pontot (több kijelöléséhez tartsd lenyomva a SHIFT billentyűt),\nvagy Alt, és kattintson az új pontok hozzáadásához",
     "placeImage": "Kattints a kép elhelyezéséhez, vagy kattints és méretezd manuálisan",
     "publishLibrary": "Tedd közzé saját könyvtáradat",
     "bindTextToElement": "Nyomd meg az Entert szöveg hozzáadáshoz",
     "deepBoxSelect": "Tartsd lenyomva a Ctrl/Cmd billentyűt a mély kijelöléshez és a húzás megakadályozásához",
-    "eraserRevert": ""
+    "eraserRevert": "",
+    "firefox_clipboard_write": ""
   },
   "canvasError": {
     "cannotShowPreview": "Előnézet nem jeleníthető meg",
@@ -250,16 +264,11 @@
     "canvasTooBigTip": "Tipp: próbáld meg a legtávolabbi elemeket közelebb hozni egy máshoz."
   },
   "errorSplash": {
-    "headingMain_pre": "Hiba történt. Próbáld ",
-    "headingMain_button": "újratölteni az oldalt.",
-    "clearCanvasMessage": "Ha az újratöltés nem működik, próbáld ",
-    "clearCanvasMessage_button": "letörölni a vászont.",
+    "headingMain": "Hiba történt. Próbáld <button>újratölteni az oldalt.</button>",
+    "clearCanvasMessage": "Ha az újratöltés nem működik, próbáld <button>letörölni a vászont.</button>",
     "clearCanvasCaveat": " Ezzel az eddigi munka elveszik ",
-    "trackedToSentry_pre": "A hibakód azonosítóval ",
-    "trackedToSentry_post": " nyomon van követve a rendszerünkben.",
-    "openIssueMessage_pre": "Vigyáztunk arra, hogy a jelenthez tartozó információ ne jelenjen meg a hibaüzenetben. Ha a jeleneted nem bizalmas, kérjük add hozzá a ",
-    "openIssueMessage_button": "hibakövető rendszerünkhöz.",
-    "openIssueMessage_post": " Kérjük, másolja be az alábbi információkat a GitHub problémába.",
+    "trackedToSentry": "A hibakód azonosítóval {{eventId}} nyomon van követve a rendszerünkben.",
+    "openIssueMessage": "Vigyáztunk arra, hogy a jelenthez tartozó információ ne jelenjen meg a hibaüzenetben. Ha a jeleneted nem bizalmas, kérjük add hozzá a <button>hibakövető rendszerünkhöz.</button> Kérjük, másolja be az alábbi információkat a GitHub problémába.",
     "sceneContent": "Jelenet tartalma:"
   },
   "roomDialog": {
@@ -297,7 +306,8 @@
     "doubleClick": "dupla kattintás",
     "drag": "vonszolás",
     "editor": "Szerkesztő",
-    "editSelectedShape": "Kijelölt alakzat szerkesztése (szöveg/nyíl/vonal)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Hibát találtál? Küld be",
     "howto": "Kövesd az útmutatóinkat",
     "or": "vagy",
@@ -310,7 +320,9 @@
     "view": "Nézet",
     "zoomToFit": "Az összes elem látótérbe hozása",
     "zoomToSelection": "Kijelölésre nagyítás",
-    "toggleElementLock": ""
+    "toggleElementLock": "",
+    "movePageUpDown": "",
+    "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
     "title": "Rajzvászon alaphelyzetbe"
@@ -336,29 +348,16 @@
       "required": "Kötelező",
       "website": "Adj meg egy érvényes URL-t"
     },
-    "noteDescription": {
-      "pre": "Küld be könyvtáradat, hogy bekerüljön a ",
-      "link": "nyilvános könyvtár tárolóba",
-      "post": "hogy mások is felhasználhassák a rajzaikban."
-    },
-    "noteGuidelines": {
-      "pre": "A könyvtárat először manuálisan kell jóváhagyni. Kérjük, olvassa el a ",
-      "link": "segédletet",
-      "post": " benyújtása előtt. Szüksége lesz egy GitHub-fiókra a kommunikációhoz és a módosításokhoz, ha kérik, de ez nem feltétlenül szükséges."
-    },
-    "noteLicense": {
-      "pre": "A beküldéssel elfogadja, hogy a könyvtár a következő alatt kerül közzétételre ",
-      "link": "MIT Licensz ",
-      "post": "ami röviden azt jelenti, hogy bárki korlátozás nélkül használhatja őket."
-    },
+    "noteDescription": "Küld be könyvtáradat, hogy bekerüljön a <link>nyilvános könyvtár tárolóba</link>hogy mások is felhasználhassák a rajzaikban.",
+    "noteGuidelines": "A könyvtárat először manuálisan kell jóváhagyni. Kérjük, olvassa el a <link>segédletet</link> benyújtása előtt. Szüksége lesz egy GitHub-fiókra a kommunikációhoz és a módosításokhoz, ha kérik, de ez nem feltétlenül szükséges.",
+    "noteLicense": "A beküldéssel elfogadja, hogy a könyvtár a következő alatt kerül közzétételre <link>MIT Licensz </link>ami röviden azt jelenti, hogy bárki korlátozás nélkül használhatja őket.",
     "noteItems": "Minden könyvtárelemnek saját nevével kell rendelkeznie, hogy szűrhető legyen. A következő könyvtári tételek kerülnek bele:",
     "atleastOneLibItem": "A kezdéshez válassz ki legalább egy könyvtári elemet",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "A könyvtár beküldve",
-    "content": "Köszönjük {{authorName}}. Könyvtáradat elküldtük felülvizsgálatra. Nyomon követheted az állapotot",
-    "link": "itt"
+    "content": "Köszönjük {{authorName}}. Könyvtáradat elküldtük felülvizsgálatra. Nyomon követheted az állapotot<link>itt</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Könyvtár alaphelyzetbe állítása",
@@ -391,7 +390,8 @@
     "fileSaved": "Fájl elmentve.",
     "fileSavedToFilename": "Mentve mint {filename}",
     "canvas": "rajzvászon",
-    "selection": "kijelölés"
+    "selection": "kijelölés",
+    "pasteAsSingleElement": ""
   },
   "colors": {
     "ffffff": "Fehér",
@@ -441,9 +441,16 @@
     "d9480f": "Narancs 9"
   },
   "welcomeScreen": {
-    "data": "Minden adatodat kizárólag a böngésződben tároljuk.",
-    "menuHints": "Export, beállítások, nyelvek, ...",
-    "toolbarHints": "Válassz egy eszközt & kezdj alkotni!",
-    "helpHints": "Gyorsbillentyűk & súgó"
+    "app": {
+      "center_heading": "",
+      "center_heading_plus": "",
+      "menuHint": ""
+    },
+    "defaults": {
+      "menuHint": "",
+      "center_heading": "",
+      "toolbarHint": "",
+      "helpHint": ""
+    }
   }
 }

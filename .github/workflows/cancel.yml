@@ -3,7 +3,7 @@ name: Cancel previous runs
 on:
   push:
     branches:
-      - master
+      - release
   pull_request:
 
 jobs:

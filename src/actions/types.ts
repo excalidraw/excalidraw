@@ -6,6 +6,7 @@ import {
   ExcalidrawProps,
   BinaryFiles,
 } from "../types";
+import { MarkOptional } from "../utility-types";
 
 export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
 
@@ -91,7 +92,7 @@ export type ActionName =
   | "ungroup"
   | "goToCollaborator"
   | "addToLibrary"
-  | "changeSharpness"
+  | "changeRoundness"
   | "alignTop"
   | "alignBottom"
   | "alignLeft"
@@ -109,11 +110,13 @@ export type ActionName =
   | "decreaseFontSize"
   | "unbindText"
   | "hyperlink"
-  | "eraser"
   | "bindText"
   | "unlockAllCanvasElements"
   | "toggleLock"
-  | "toggleLinearEditor";
+  | "toggleLinearEditor"
+  | "toggleEraserTool"
+  | "toggleHandTool"
+  | "wrapTextInContainer";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -125,9 +128,7 @@ export type PanelComponentProps = {
 
 export interface Action {
   name: ActionName;
-  PanelComponent?: React.FC<
-    PanelComponentProps & { isInHamburgerMenu: boolean }
-  >;
+  PanelComponent?: React.FC<PanelComponentProps>;
   perform: ActionFn;
   keyPriority?: number;
   keyTest?: (
@@ -141,9 +142,11 @@ export interface Action {
         elements: readonly ExcalidrawElement[],
         appState: Readonly<AppState>,
       ) => string);
-  contextItemPredicate?: (
+  predicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
+    appProps: ExcalidrawProps,
+    app: AppClassProperties,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
   trackEvent:
@@ -165,4 +168,7 @@ export interface Action {
           value: any,
         ) => boolean;
       };
+  /** if set to `true`, allow action to be performed in viewMode.
+   *  Defaults to `false` */
+  viewMode?: boolean;
 }

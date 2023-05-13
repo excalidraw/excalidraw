@@ -6,7 +6,7 @@ import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
 import { FileId, NonDeletedExcalidrawElement } from "../../element/types";
 import { AppState, BinaryFileData, BinaryFiles } from "../../types";
 import { nanoid } from "nanoid";
-import { t } from "../../i18n";
+import { useI18n } from "../../i18n";
 import { excalidrawPlusIcon } from "./icons";
 import { encryptData, generateEncryptionKey } from "../../data/encryption";
 import { isInitializedImageElement } from "../../element/typeChecks";
@@ -18,7 +18,7 @@ import { getFrame } from "../../utils";
 
 const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
+  appState: Partial<AppState>,
   files: BinaryFiles,
 ) => {
   const firebase = await loadFirebaseStorage();
@@ -75,10 +75,11 @@ const exportToExcalidrawPlus = async (
 
 export const ExportToExcalidrawPlus: React.FC<{
   elements: readonly NonDeletedExcalidrawElement[];
-  appState: AppState;
+  appState: Partial<AppState>;
   files: BinaryFiles;
   onError: (error: Error) => void;
 }> = ({ elements, appState, files, onError }) => {
+  const { t } = useI18n();
   return (
     <Card color="primary">
       <div className="Card-icon">{excalidrawPlusIcon}</div>

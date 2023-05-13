@@ -1,8 +1,18 @@
 import { NormalizedZoomValue, Point, Zoom } from "./types";
-import { LINE_CONFIRM_THRESHOLD } from "./constants";
-import { ExcalidrawLinearElement, NonDeleted } from "./element/types";
+import {
+  DEFAULT_ADAPTIVE_RADIUS,
+  LINE_CONFIRM_THRESHOLD,
+  DEFAULT_PROPORTIONAL_RADIUS,
+  ROUNDNESS,
+} from "./constants";
+import {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  NonDeleted,
+} from "./element/types";
 import { getShapeForElement } from "./renderer/renderElement";
 import { getCurvePathOps } from "./element/bounds";
+import { Mutable } from "./utility-types";
 
 export const rotate = (
   x1: number,
@@ -266,6 +276,29 @@ export const getGridPoint = (
   return [x, y];
 };
 
+export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
+  if (
+    element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS ||
+    element.roundness?.type === ROUNDNESS.LEGACY
+  ) {
+    return x * DEFAULT_PROPORTIONAL_RADIUS;
+  }
+
+  if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
+    const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
+
+    const CUTOFF_SIZE = fixedRadiusSize / DEFAULT_PROPORTIONAL_RADIUS;
+
+    if (x <= CUTOFF_SIZE) {
+      return x * DEFAULT_PROPORTIONAL_RADIUS;
+    }
+
+    return fixedRadiusSize;
+  }
+
+  return 0;
+};
+
 export const getControlPointsForBezierCurve = (
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: Point,
@@ -426,4 +459,16 @@ export const mapIntervalToBezierT = (
 
 export const arePointsEqual = (p1: Point, p2: Point) => {
   return p1[0] === p2[0] && p1[1] === p2[1];
+};
+
+export const isRightAngle = (angle: number) => {
+  // if our angles were mathematically accurate, we could just check
+  //
+  //    angle % (Math.PI / 2) === 0
+  //
+  // but since we're in floating point land, we need to round.
+  //
+  // Below, after dividing by Math.PI, a multiple of 0.5 indicates a right
+  // angle, which we can check with modulo after rounding.
+  return Math.round((angle / Math.PI) * 10000) % 5000 === 0;
 };

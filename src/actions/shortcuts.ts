@@ -1,5 +1,6 @@
+import { isDarwin } from "../constants";
 import { t } from "../i18n";
-import { isDarwin } from "../keys";
+import { SubtypeOf } from "../utility-types";
 import { getShortcutKey } from "../utils";
 import { ActionName } from "./types";
 
@@ -8,6 +9,7 @@ export type ShortcutName =
       ActionName,
       | "toggleTheme"
       | "loadScene"
+      | "clearCanvas"
       | "cut"
       | "copy"
       | "paste"
@@ -41,6 +43,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   toggleTheme: [getShortcutKey("Shift+Alt+D")],
   saveScene: [getShortcutKey("CtrlOrCmd+S")],
   loadScene: [getShortcutKey("CtrlOrCmd+O")],
+  clearCanvas: [getShortcutKey("CtrlOrCmd+Delete")],
   imageExport: [getShortcutKey("CtrlOrCmd+Shift+E")],
   cut: [getShortcutKey("CtrlOrCmd+X")],
   copy: [getShortcutKey("CtrlOrCmd+C")],
@@ -48,7 +51,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   copyStyles: [getShortcutKey("CtrlOrCmd+Alt+C")],
   pasteStyles: [getShortcutKey("CtrlOrCmd+Alt+V")],
   selectAll: [getShortcutKey("CtrlOrCmd+A")],
-  deleteSelectedElements: [getShortcutKey("Del")],
+  deleteSelectedElements: [getShortcutKey("Delete")],
   duplicateSelection: [
     getShortcutKey("CtrlOrCmd+D"),
     getShortcutKey(`Alt+${t("helpDialog.drag")}`),

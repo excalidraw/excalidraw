@@ -1,4 +1,5 @@
 import { AppState } from "../../src/types";
+import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
@@ -37,11 +38,13 @@ import {
   TextAlignLeftIcon,
   TextAlignCenterIcon,
   TextAlignRightIcon,
+  FillZigZagIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
+  ROUNDNESS,
   VERTICAL_ALIGN,
 } from "../constants";
 import {
@@ -53,11 +56,12 @@ import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
   getBoundTextElement,
   getContainerElement,
+  getDefaultLineHeight,
 } from "../element/textElement";
 import {
   isBoundToContainer,
   isLinearElement,
-  isLinearElementType,
+  isUsingAdaptiveRadius,
 } from "../element/typeChecks";
 import {
   Arrowhead,
@@ -72,7 +76,7 @@ import { getLanguage, t } from "../i18n";
 import { KEYS } from "../keys";
 import { randomInteger } from "../random";
 import {
-  canChangeSharpness,
+  canChangeRoundness,
   canHaveArrowheads,
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
@@ -80,7 +84,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import { arrayToMap } from "../utils";
+import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
@@ -292,7 +296,12 @@ export const actionChangeBackgroundColor = register({
 export const actionChangeFillStyle = register({
   name: "changeFillStyle",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
+    trackEvent(
+      "element",
+      "changeFillStyle",
+      `${value} (${app.device.isMobile ? "mobile" : "desktop"})`,
+    );
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -303,40 +312,57 @@ export const actionChangeFillStyle = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.fill")}</legend>
-      <ButtonIconSelect
-        options={[
-          {
-            value: "hachure",
-            text: t("labels.hachure"),
-            icon: FillHachureIcon,
-          },
-          {
-            value: "cross-hatch",
-            text: t("labels.crossHatch"),
-            icon: FillCrossHatchIcon,
-          },
-          {
-            value: "solid",
-            text: t("labels.solid"),
-            icon: FillSolidIcon,
-          },
-        ]}
-        group="fill"
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => element.fillStyle,
-          appState.currentItemFillStyle,
-        )}
-        onChange={(value) => {
-          updateData(value);
-        }}
-      />
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    const allElementsZigZag =
+      selectedElements.length > 0 &&
+      selectedElements.every((el) => el.fillStyle === "zigzag");
+
+    return (
+      <fieldset>
+        <legend>{t("labels.fill")}</legend>
+        <ButtonIconSelect
+          type="button"
+          options={[
+            {
+              value: "hachure",
+              text: `${
+                allElementsZigZag ? t("labels.zigzag") : t("labels.hachure")
+              } (${getShortcutKey("Alt-Click")})`,
+              icon: allElementsZigZag ? FillZigZagIcon : FillHachureIcon,
+              active: allElementsZigZag ? true : undefined,
+            },
+            {
+              value: "cross-hatch",
+              text: t("labels.crossHatch"),
+              icon: FillCrossHatchIcon,
+            },
+            {
+              value: "solid",
+              text: t("labels.solid"),
+              icon: FillSolidIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => element.fillStyle,
+            appState.currentItemFillStyle,
+          )}
+          onClick={(value, event) => {
+            const nextValue =
+              event.altKey &&
+              value === "hachure" &&
+              selectedElements.every((el) => el.fillStyle === "hachure")
+                ? "zigzag"
+                : value;
+
+            updateData(nextValue);
+          }}
+        />
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeStrokeWidth = register({
@@ -636,6 +662,7 @@ export const actionChangeFontFamily = register({
               oldElement,
               {
                 fontFamily: value,
+                lineHeight: getDefaultLineHeight(value),
               },
             );
             redrawTextBoundingBox(newElement, getContainerElement(oldElement));
@@ -744,16 +771,19 @@ export const actionChangeTextAlign = register({
               value: "left",
               text: t("labels.left"),
               icon: TextAlignLeftIcon,
+              testId: "align-left",
             },
             {
               value: "center",
               text: t("labels.center"),
               icon: TextAlignCenterIcon,
+              testId: "align-horizontal-center",
             },
             {
               value: "right",
               text: t("labels.right"),
               icon: TextAlignRightIcon,
+              testId: "align-right",
             },
           ]}
           value={getFormValue(
@@ -816,16 +846,19 @@ export const actionChangeVerticalAlign = register({
               value: VERTICAL_ALIGN.TOP,
               text: t("labels.alignTop"),
               icon: <TextAlignTopIcon theme={appState.theme} />,
+              testId: "align-top",
             },
             {
               value: VERTICAL_ALIGN.MIDDLE,
               text: t("labels.centerVertically"),
               icon: <TextAlignMiddleIcon theme={appState.theme} />,
+              testId: "align-middle",
             },
             {
               value: VERTICAL_ALIGN.BOTTOM,
               text: t("labels.alignBottom"),
               icon: <TextAlignBottomIcon theme={appState.theme} />,
+              testId: "align-bottom",
             },
           ]}
           value={getFormValue(elements, appState, (element) => {
@@ -845,69 +878,71 @@ export const actionChangeVerticalAlign = register({
   },
 });
 
-export const actionChangeSharpness = register({
-  name: "changeSharpness",
+export const actionChangeRoundness = register({
+  name: "changeRoundness",
   trackEvent: false,
   perform: (elements, appState, value) => {
-    const targetElements = getTargetElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
-    const shouldUpdateForNonLinearElements = targetElements.length
-      ? targetElements.every((el) => !isLinearElement(el))
-      : !isLinearElementType(appState.activeTool.type);
-    const shouldUpdateForLinearElements = targetElements.length
-      ? targetElements.every(isLinearElement)
-      : isLinearElementType(appState.activeTool.type);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
-          strokeSharpness: value,
+          roundness:
+            value === "round"
+              ? {
+                  type: isUsingAdaptiveRadius(el.type)
+                    ? ROUNDNESS.ADAPTIVE_RADIUS
+                    : ROUNDNESS.PROPORTIONAL_RADIUS,
+                }
+              : null,
         }),
       ),
       appState: {
         ...appState,
-        currentItemStrokeSharpness: shouldUpdateForNonLinearElements
-          ? value
-          : appState.currentItemStrokeSharpness,
-        currentItemLinearStrokeSharpness: shouldUpdateForLinearElements
-          ? value
-          : appState.currentItemLinearStrokeSharpness,
+        currentItemRoundness: value,
       },
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.edges")}</legend>
-      <ButtonIconSelect
-        group="edges"
-        options={[
-          {
-            value: "sharp",
-            text: t("labels.sharp"),
-            icon: EdgeSharpIcon,
-          },
-          {
-            value: "round",
-            text: t("labels.round"),
-            icon: EdgeRoundIcon,
-          },
-        ]}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => element.strokeSharpness,
-          (canChangeSharpness(appState.activeTool.type) &&
-            (isLinearElementType(appState.activeTool.type)
-              ? appState.currentItemLinearStrokeSharpness
-              : appState.currentItemStrokeSharpness)) ||
-            null,
-        )}
-        onChange={(value) => updateData(value)}
-      />
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const targetElements = getTargetElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+
+    const hasLegacyRoundness = targetElements.some(
+      (el) => el.roundness?.type === ROUNDNESS.LEGACY,
+    );
+
+    return (
+      <fieldset>
+        <legend>{t("labels.edges")}</legend>
+        <ButtonIconSelect
+          group="edges"
+          options={[
+            {
+              value: "sharp",
+              text: t("labels.sharp"),
+              icon: EdgeSharpIcon,
+            },
+            {
+              value: "round",
+              text: t("labels.round"),
+              icon: EdgeRoundIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) =>
+              hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
+            (canChangeRoundness(appState.activeTool.type) &&
+              appState.currentItemRoundness) ||
+              null,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeArrowhead = register({

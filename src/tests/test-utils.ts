@@ -6,6 +6,7 @@ import {
   RenderResult,
   RenderOptions,
   waitFor,
+  fireEvent,
 } from "@testing-library/react";
 
 import * as toolQueries from "./queries/toolQueries";
@@ -183,4 +184,30 @@ export const assertSelectedElements = (
     .map((item) => (typeof item === "string" ? item : item.id));
   expect(selectedElementIds.length).toBe(ids.length);
   expect(selectedElementIds).toEqual(expect.arrayContaining(ids));
+};
+
+export const toggleMenu = (container: HTMLElement) => {
+  // open menu
+  fireEvent.click(container.querySelector(".dropdown-menu-button")!);
+};
+
+export const createPasteEvent = (
+  text:
+    | string
+    | /* getData function */ ((type: string) => string | Promise<string>),
+  files?: File[],
+) => {
+  return Object.assign(
+    new Event("paste", {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+    }),
+    {
+      clipboardData: {
+        getData: typeof text === "string" ? () => text : text,
+        files: files || [],
+      },
+    },
+  );
 };

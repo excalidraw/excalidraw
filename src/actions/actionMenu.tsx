@@ -1,12 +1,10 @@
-import { HamburgerMenuIcon, HelpIcon, palette } from "../components/icons";
+import { HamburgerMenuIcon, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
 import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { KEYS } from "../keys";
-import { HelpButton } from "../components/HelpButton";
-import MenuItem from "../components/MenuItem";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -56,6 +54,7 @@ export const actionToggleEditMenu = register({
 
 export const actionFullScreen = register({
   name: "toggleFullScreen",
+  viewMode: true,
   trackEvent: { category: "canvas", predicate: (appState) => !isFullScreen() },
   perform: () => {
     if (!isFullScreen()) {
@@ -73,6 +72,7 @@ export const actionFullScreen = register({
 
 export const actionShortcuts = register({
   name: "toggleShortcuts",
+  viewMode: true,
   trackEvent: { category: "menu", action: "toggleHelpDialog" },
   perform: (_elements, appState, _, { focusContainer }) => {
     if (appState.openDialog === "help") {
@@ -86,17 +86,5 @@ export const actionShortcuts = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData, isInHamburgerMenu }) =>
-    isInHamburgerMenu ? (
-      <MenuItem
-        label={t("helpDialog.title")}
-        dataTestId="help-menu-item"
-        icon={HelpIcon}
-        onClick={updateData}
-        shortcut="?"
-      />
-    ) : (
-      <HelpButton title={t("helpDialog.title")} onClick={updateData} />
-    ),
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,
 });
