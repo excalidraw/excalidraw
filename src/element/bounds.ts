@@ -43,7 +43,7 @@ export class ElementBounds {
   static getBounds(element: ExcalidrawElement) {
     const cachedBounds = ElementBounds.boundsCache.get(element);
 
-    if (cachedBounds?.version === element.version) {
+    if (cachedBounds?.version && cachedBounds.version === element.version) {
       return cachedBounds.bounds;
     }
 
@@ -61,6 +61,7 @@ export class ElementBounds {
     let bounds: [number, number, number, number];
 
     const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
+
     if (isFreeDrawElement(element)) {
       const [minX, minY, maxX, maxY] = getBoundsFromPoints(
         element.points.map(([x, y]) =>
