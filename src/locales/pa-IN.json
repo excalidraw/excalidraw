@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "ਪੇਸਟ ਕਰੋ",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "ਸਾਦੇ ਪਾਠ ਵਜੋਂ ਪੇਸਟ ਕਰੋ",
     "pasteCharts": "ਚਾਰਟ ਪੇਸਟ ਕਰੋ",
     "selectAll": "ਸਾਰੇ ਚੁਣੋ",
     "multiSelect": "ਐਲੀਮੈਂਟ ਨੂੰ ਚੋਣ ਵਿੱਚ ਜੋੜੋ",
@@ -10,7 +10,7 @@
     "copy": "ਕਾਪੀ ਕਰੋ",
     "copyAsPng": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
     "copyAsSvg": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ SVG ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
-    "copyText": "",
+    "copyText": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਪਾਠ ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
     "bringForward": "ਅੱਗੇ ਲਿਆਓ",
     "sendToBack": "ਸਭ ਤੋਂ ਪਿੱਛੇ ਭੇਜੋ",
     "bringToFront": "ਸਭ ਤੋਂ ਅੱਗੇ ਲਿਆਓ",
@@ -73,7 +73,7 @@
     "layers": "ਪਰਤਾਂ",
     "actions": "ਕਾਰਵਾਈਆਂ",
     "language": "ਭਾਸ਼ਾ",
-    "liveCollaboration": "",
+    "liveCollaboration": "ਲਾਇਵ ਸਹਿਯੋਗ...",
     "duplicateSelection": "ਡੁਪਲੀਕੇਟ ਬਣਾਓ",
     "untitled": "ਬੇ-ਸਿਰਨਾਵਾਂ",
     "name": "ਨਾਂ",
@@ -109,37 +109,37 @@
     "excalidrawLib": "ਐਕਸਕਲੀਡਰਾਅ ਲਾਇਬ੍ਰੇਰੀ",
     "decreaseFontSize": "ਫੌਂਟ ਦਾ ਅਕਾਰ ਘਟਾਓ",
     "increaseFontSize": "ਫੌਂਟ ਦਾ ਅਕਾਰ ਵਧਾਓ",
-    "unbindText": "",
+    "unbindText": "ਪਾਠ ਨੂੰ ਵੱਖ ਕਰੋ",
     "bindText": "ਪਾਠ ਨੂੰ ਕੰਟੇਨਰ ਨਾਲ ਬੰਨ੍ਹੋ",
-    "createContainerFromText": "",
+    "createContainerFromText": "ਪਾਠ ਨੂੰ ਕੰਟੇਨਰ ਵਿੱਚ ਇਕੱਠਾ ਕਰੋ",
     "link": {
       "edit": "ਕੜੀ ਸੋਧੋ",
       "create": "ਕੜੀ ਬਣਾਓ",
       "label": "ਕੜੀ"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "ਪੰਕਤੀ ਸੋਧੋ",
+      "exit": "ਪੰਕਤੀ ਸੋਧਕ 'ਤੋਂ ਬਾਹਰ ਨਿਕਲੋ"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "ਲਾਕ ਕਰੋ",
+      "unlock": "ਅਨਲਾਕ ਕਰੋ",
+      "lockAll": "ਸਭ ਲਾਕ ਕਰੋ",
+      "unlockAll": "ਸਭ ਅਨਲਾਕ ਕਰੋ"
     },
-    "statusPublished": "",
-    "sidebarLock": ""
+    "statusPublished": "ਪ੍ਰਕਾਸ਼ਤ ਹੈ",
+    "sidebarLock": "ਸਾਈਡਬਾਰ ਨੂੰ ਖੁੱਲ੍ਹਾ ਰੱਖੋ"
   },
   "library": {
-    "noItems": "",
+    "noItems": "ਹਾਲੇ ਤੱਕ ਕੋਈ ਚੀਜ ਜੋੜੀ ਨਹੀਂ ਗਈ...",
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",
     "exportJSON": "ਫਾਈਲ ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "ਤਸਵੀਰ ਨਿਰਯਾਤ ਕਰੋ...",
+    "export": "ਇਸ ਵਿੱਚ ਸਾਂਭੋ...",
     "exportToPng": "PNG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
     "exportToSvg": "SVG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
     "copyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕਰੋ",
@@ -147,7 +147,7 @@
     "scale": "ਪੈਮਾਇਸ਼",
     "save": "ਮੌਜੂਦਾ ਫਾਈਲ ਵਿੱਚ ਸਾਂਭੋ",
     "saveAs": "ਇਸ ਵਜੋਂ ਸਾਂਭੋ",
-    "load": "",
+    "load": "ਖੋਲ੍ਹੋ",
     "getShareableLink": "ਸਾਂਝੀ ਕਰਨ ਵਾਲੀ ਲਿੰਕ ਲਵੋ",
     "close": "ਬੰਦ ਕਰੋ",
     "selectLanguage": "ਭਾਸ਼ਾ ਚੁਣੋ",
@@ -181,7 +181,7 @@
     "couldNotLoadInvalidFile": "ਨਜਾਇਜ਼ ਫਾਈਲ ਲੋਡ ਨਹੀਂ ਕਰ ਸਕੇ",
     "importBackendFailed": "ਬੈਕਐੱਨਡ ਤੋਂ ਆਯਾਤ ਕਰਨ ਵਿੱਚ ਅਸਫਲ ਰਹੇ।",
     "cannotExportEmptyCanvas": "ਖਾਲੀ ਕੈਨਵਸ ਨਿਰਯਾਤ ਨਹੀਂ ਕਰ ਸਕਦੇ।",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ।",
     "decryptFailed": "ਡਾਟਾ ਡੀਕਰਿਪਟ ਨਹੀਂ ਕਰ ਸਕੇ।",
     "uploadedSecurly": "ਅੱਪਲੋਡ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਸ਼ਨ ਨਾਲ ਸੁਰੱਖਿਅਤ ਕੀਤੀ ਹੋਈ ਹੈ, ਜਿਸਦਾ ਮਤਲਬ ਇਹ ਹੈ ਕਿ Excalidraw ਸਰਵਰ ਅਤੇ ਤੀਜੀ ਧਿਰ ਦੇ ਬੰਦੇ ਸਮੱਗਰੀ ਨੂੰ ਪੜ੍ਹ ਨਹੀਂ ਸਕਦੇ।",
     "loadSceneOverridePrompt": "ਬਾਹਰੀ ਡਰਾਇੰਗ ਨੂੰ ਲੋਡ ਕਰਨਾ ਤੁਹਾਡੀ ਮੌਜੂਦਾ ਸਮੱਗਰੀ ਦੀ ਥਾਂ ਲੈ ਲਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਜਾਰੀ ਰੱਖਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
@@ -198,13 +198,13 @@
     "collabOfflineWarning": ""
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
+    "unsupportedFileType": "ਫਾਈਲ ਦੀ ਕਿਸਮ ਦਾ ਸਮਰਥਨ ਨਹੀਂ ਕੀਤਾ ਜਾਂਦਾ।",
+    "imageInsertError": "ਚਿੱਤਰ ਸ਼ਾਮਲ ਨਹੀਂ ਜਾ ਸਕਿਆ, ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ...",
+    "fileTooBig": "ਫਾਈਲ ਬਹੁਤ ਜ਼ਿਆਦਾ ਵੱਡੀ ਹੈ। ਵੱਧ-ਤੋਂ-ਵੱਧ ਪ੍ਰਵਾਨਤ ਅਕਾਰ {{maxSize}} ਹੈ।",
     "svgImageInsertError": "",
     "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।",
     "cannotResolveCollabServer": "",
-    "importLibraryError": "",
+    "importLibraryError": "ਲਾਇਬ੍ਰੇਰੀ ਲੋਡ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕੀ",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "brave_measure_text_error": {

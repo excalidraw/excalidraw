@@ -264,16 +264,11 @@
     "canvasTooBigTip": ""
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
+    "headingMain": "",
     "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "",
     "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": ""
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "",
       "website": ""
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": "usı jerde"
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",
@@ -390,13 +372,13 @@
     "element": "",
     "elements": "",
     "height": "",
-    "scene": "",
+    "scene": "Saxna",
     "selected": "Tańlandı",
     "storage": "",
     "title": "",
     "total": "",
     "version": "Versiya",
-    "versionCopy": "",
+    "versionCopy": "Kóshirip alıw ushın basıń",
     "versionNotAvailable": "",
     "width": ""
   },
@@ -406,7 +388,7 @@
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
     "fileSaved": "Fayl saqlandı.",
-    "fileSavedToFilename": "",
+    "fileSavedToFilename": "{filename} saqlandı",
     "canvas": "",
     "selection": "",
     "pasteAsSingleElement": ""
@@ -422,7 +404,7 @@
     "edf2ff": "",
     "e7f5ff": "Kók",
     "e3fafc": "",
-    "e6fcf5": "",
+    "e6fcf5": "Piruza 0",
     "ebfbee": "",
     "f4fce3": "",
     "fff9db": "Sarı 0",
@@ -437,7 +419,7 @@
     "4c6ef5": "",
     "228be6": "Kók 6",
     "15aabf": "",
-    "12b886": "",
+    "12b886": "Piruza 6",
     "40c057": "Jasıl 6",
     "82c91e": "",
     "fab005": "Sarı 6",
@@ -446,7 +428,7 @@
     "343a40": "",
     "495057": "",
     "c92a2a": "Qızıl 9",
-    "a61e4d": "",
+    "a61e4d": "Qızǵılt 9",
     "862e9c": "",
     "5f3dc4": "",
     "364fc7": "",
