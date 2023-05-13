@@ -2,23 +2,22 @@ import clsx from "clsx";
 import React from "react";
 import { ActionManager } from "../actions/manager";
 import { CLASSES, DEFAULT_SIDEBAR, LIBRARY_SIDEBAR_WIDTH } from "../constants";
-import { exportCanvas } from "../data";
 import { isTextElement, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
-import { ExportType } from "../scene/types";
 import {
   AppProps,
   AppState,
   ExcalidrawProps,
   BinaryFiles,
   UIAppState,
+  AppClassProperties,
 } from "../types";
-import { capitalizeString, isShallowEqual, muteFSAbortError } from "../utils";
+import { capitalizeString, isShallowEqual } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { ErrorDialog } from "./ErrorDialog";
-import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
+import { ImageExportDialog } from "./ImageExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HintViewer } from "./HintViewer";
 import { Island } from "./Island";
@@ -31,7 +30,6 @@ import { HelpDialog } from "./HelpDialog";
 import Stack from "./Stack";
 import { UserList } from "./UserList";
 import { JSONExportDialog } from "./JSONExportDialog";
-import { isImageFileHandle } from "../data/blob";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
 import { useDevice } from "../components/App";
@@ -69,6 +67,7 @@ interface LayerUIProps {
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   UIOptions: AppProps["UIOptions"];
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
+  onExportImage: AppClassProperties["onExportImage"];
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
 }
@@ -114,6 +113,7 @@ const LayerUI = ({
   renderCustomStats,
   UIOptions,
   onImageAction,
+  onExportImage,
   renderWelcomeScreen,
   children,
 }: LayerUIProps) => {
@@ -143,47 +143,14 @@ const LayerUI = ({
       return null;
     }
 
-    const createExporter =
-      (type: ExportType): ExportCB =>
-      async (exportedElements) => {
-        trackEvent("export", type, "ui");
-        const fileHandle = await exportCanvas(
-          type,
-          exportedElements,
-          // FIXME once we split UI canvas from element canvas
-          appState as AppState,
-          files,
-          {
-            exportBackground: appState.exportBackground,
-            name: appState.name,
-            viewBackgroundColor: appState.viewBackgroundColor,
-          },
-        )
-          .catch(muteFSAbortError)
-          .catch((error) => {
-            console.error(error);
-            setAppState({ errorMessage: error.message });
-          });
-
-        if (
-          appState.exportEmbedScene &&
-          fileHandle &&
-          isImageFileHandle(fileHandle)
-        ) {
-          setAppState({ fileHandle });
-        }
-      };
-
     return (
       <ImageExportDialog
         elements={elements}
         appState={appState}
-        setAppState={setAppState}
         files={files}
         actionManager={actionManager}
-        onExportToPng={createExporter("png")}
-        onExportToSvg={createExporter("svg")}
-        onExportToClipboard={createExporter("clipboard")}
+        onExportImage={onExportImage}
+        onCloseRequest={() => setAppState({ openDialog: null })}
       />
     );
   };

@@ -59,6 +59,7 @@ import {
   ELEMENT_TRANSLATE_AMOUNT,
   ENV,
   EVENT,
+  EXPORT_IMAGE_TYPES,
   GRID_SIZE,
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
@@ -82,7 +83,7 @@ import {
   VERTICAL_ALIGN,
   ZOOM_STEP,
 } from "../constants";
-import { loadFromBlob } from "../data";
+import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import {
@@ -237,6 +238,7 @@ import {
   getShortcutKey,
   isTransparent,
   easeToValuesRAF,
+  muteFSAbortError,
 } from "../utils";
 import {
   ContextMenu,
@@ -251,6 +253,7 @@ import {
   generateIdFromFile,
   getDataURL,
   getFileFromEvent,
+  isImageFileHandle,
   isSupportedImageFile,
   loadSceneOrLibraryFromBlob,
   normalizeFile,
@@ -618,6 +621,7 @@ class App extends React.Component<AppProps, AppState> {
                           }
                           UIOptions={this.props.UIOptions}
                           onImageAction={this.onImageAction}
+                          onExportImage={this.onExportImage}
                           renderWelcomeScreen={
                             !this.state.isLoading &&
                             this.state.showWelcomeScreen &&
@@ -686,6 +690,37 @@ class App extends React.Component<AppProps, AppState> {
       position: "center",
       files: null,
     });
+  };
+
+  public onExportImage = async (
+    type: keyof typeof EXPORT_IMAGE_TYPES,
+    elements: readonly NonDeletedExcalidrawElement[],
+  ) => {
+    trackEvent("export", type, "ui");
+    const fileHandle = await exportCanvas(
+      type,
+      elements,
+      this.state,
+      this.files,
+      {
+        exportBackground: this.state.exportBackground,
+        name: this.state.name,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+      },
+    )
+      .catch(muteFSAbortError)
+      .catch((error) => {
+        console.error(error);
+        this.setState({ errorMessage: error.message });
+      });
+
+    if (
+      this.state.exportEmbedScene &&
+      fileHandle &&
+      isImageFileHandle(fileHandle)
+    ) {
+      this.setState({ fileHandle });
+    }
   };
 
   private syncActionResult = withBatchedUpdates(

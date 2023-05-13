@@ -442,6 +442,7 @@ export type AppClassProperties = {
   pasteFromClipboard: App["pasteFromClipboard"];
   id: App["id"];
   onInsertElements: App["onInsertElements"];
+  onExportImage: App["onExportImage"];
 };
 
 export type PointerDownState = Readonly<{
