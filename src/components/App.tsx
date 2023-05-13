@@ -34,6 +34,7 @@ import {
   actionUngroup,
   actionLink,
   actionToggleLock,
+  actionToggleEditMenu,
   actionToggleLinearEditor,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
@@ -3543,7 +3544,6 @@ class App extends React.Component<AppProps, AppState> {
     if (selection?.anchorNode) {
       selection.removeAllRanges();
     }
-    this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
     this.maybeCleanupAfterMissingPointerUp(event);
 
     //fires only once, if pen is detected, penMode is enabled
@@ -3603,7 +3603,9 @@ class App extends React.Component<AppProps, AppState> {
     this.clearSelectionIfNotUsingSelection();
     this.updateBindingEnabledOnPointerMove(event);
 
-    if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
+    const handledSelection = this.handleSelectionOnPointerDown(event, pointerDownState)
+    this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event, pointerDownState);
+    if (handledSelection) {
       return;
     }
 
@@ -3728,16 +3730,24 @@ class App extends React.Component<AppProps, AppState> {
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
     event: React.PointerEvent<HTMLCanvasElement>,
+    pointerDownState: PointerDownState,
   ): void => {
     // deal with opening context menu on touch devices
     if (event.pointerType === "touch") {
       invalidateContextMenu = false;
-
       if (touchTimeout) {
-        // If there's already a touchTimeout, this means that there's another
-        // touch down and we are doing another touch, so we shouldn't open the
-        // context menu.
-        invalidateContextMenu = true;
+        // If there's already a touchTimeout, then this is another
+        // touch down, so we invalidate the context menu action if the pointer
+        // has moved beyond the DRAGGING_THRESHOLD
+        const delta = distance2d(
+          event.clientX,
+          event.clientY,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        );
+        if (delta >= DRAGGING_THRESHOLD) {
+          invalidateContextMenu = true;
+        }
       } else {
         // open the context menu with the first touch's clientX and clientY
         // if the touch is not moving
