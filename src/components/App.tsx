@@ -33,7 +33,7 @@ import {
   actionBindText,
   actionUngroup,
   actionLink,
-  actionToggleLock,
+  actionToggleElementLock,
   actionToggleLinearEditor,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
@@ -290,6 +290,7 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
+import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
 import {
@@ -6347,6 +6348,7 @@ class App extends React.Component<AppProps, AppState> {
         copyText,
         CONTEXT_MENU_SEPARATOR,
         actionSelectAll,
+        actionUnlockAllElements,
         CONTEXT_MENU_SEPARATOR,
         actionToggleGridMode,
         actionToggleZenMode,
@@ -6393,7 +6395,7 @@ class App extends React.Component<AppProps, AppState> {
       actionToggleLinearEditor,
       actionLink,
       actionDuplicateSelection,
-      actionToggleLock,
+      actionToggleElementLock,
       CONTEXT_MENU_SEPARATOR,
       actionDeleteSelected,
     ];
