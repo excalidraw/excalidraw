@@ -209,8 +209,8 @@
     "collabSaveFailed_sizeExceeded": "Ulamek asekles deg uzadur n yisefka deg ugilal, taɣzut n usuneɣ tettban-d temqer aṭas. Isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
     "brave_measure_text_error": {
       "line1": "",
-      "line2": "",
-      "line3": "",
+      "line2": "Ayagi yezmer ad d-iglu s truẓi n<bold>Iferdisen n uḍris</bold>deg wunuɣen-inek.",
+      "line3": "Ad k-nsemter ad tsexsiḍ aɣewwar-agi. Tzemreḍ ad tḍefreḍ<link>isurifen-agi</link> ɣef wamek ara txedmeḍ.",
       "line4": ""
     }
   },
@@ -306,8 +306,8 @@
     "doubleClick": "ssit snat n tikkal",
     "drag": "zuɣer",
     "editor": "Amaẓrag",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Ẓreg tinqiḍin n yizirig/taneccabt",
+    "editText": "Ẓreg aḍris/rnu tabzimt",
     "github": "Tufiḍ-d ugur? Azen-aɣ-d",
     "howto": "Ḍfer imniren-nneɣ",
     "or": "neɣ",
@@ -442,15 +442,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
+      "center_heading": "Akk isefka-inek•inem ttwakelsen s wudem adigan deg yiminig-inek•inem.",
       "center_heading_plus": "Tebɣiḍ ad tedduḍ ɣer Excalidraw+ deg umḍiq?",
       "menuHint": "Asifeḍ, ismenyifen, tutlayin, ..."
     },
     "defaults": {
       "menuHint": "Asifeḍ, ismenyifen, d wayen-nniḍen...",
       "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "toolbarHint": "Fren afecku tebduḍ asuneɣ!",
+      "helpHint": "Inegzumen akked tallelt"
     }
   }
 }

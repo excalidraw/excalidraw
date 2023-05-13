@@ -264,16 +264,11 @@
     "canvasTooBigTip": ""
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
+    "headingMain": "",
     "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "",
     "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": ""
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "",
       "website": ""
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": ""
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",
@@ -422,53 +404,53 @@
     "edf2ff": "",
     "e7f5ff": "",
     "e3fafc": "",
-    "e6fcf5": "",
-    "ebfbee": "",
-    "f4fce3": "",
-    "fff9db": "",
-    "fff4e6": "",
-    "transparent": "",
-    "ced4da": "",
-    "868e96": "",
-    "fa5252": "",
-    "e64980": "",
-    "be4bdb": "",
-    "7950f2": "",
-    "4c6ef5": "",
-    "228be6": "",
-    "15aabf": "",
-    "12b886": "",
-    "40c057": "",
-    "82c91e": "",
-    "fab005": "",
-    "fd7e14": "",
-    "000000": "",
-    "343a40": "",
-    "495057": "",
-    "c92a2a": "",
-    "a61e4d": "",
-    "862e9c": "",
-    "5f3dc4": "",
-    "364fc7": "",
-    "1864ab": "",
-    "0b7285": "",
-    "087f5b": "",
-    "2b8a3e": "",
-    "5c940d": "",
-    "e67700": "",
-    "d9480f": ""
+    "e6fcf5": "កាប់ស្តាំង ០",
+    "ebfbee": "បៃតង ០",
+    "f4fce3": "បៃតងខ្ចី ០",
+    "fff9db": "លឿង ០",
+    "fff4e6": "ទឹកក្រូច ០",
+    "transparent": "ថ្លាមើលធ្លុះ",
+    "ced4da": "ប្រផេះ ៤",
+    "868e96": "ប្រផេះ ៦",
+    "fa5252": "ក្រហម ៦",
+    "e64980": "ផ្កាឈូក ៦",
+    "be4bdb": "ស្វាយចាស់ ៦",
+    "7950f2": "ស្វាយ​ ៦",
+    "4c6ef5": "ខៀវចាស់ ៦",
+    "228be6": "ខៀវ ៦",
+    "15aabf": "ខៀវខ្ចី ៦",
+    "12b886": "កាប់ស្តាំង ៦",
+    "40c057": "បៃតង ៦",
+    "82c91e": "បៃតងខ្ចី ៦",
+    "fab005": "លឿង ៦",
+    "fd7e14": "ទឹកក្រូច ៦",
+    "000000": "ខ្មៅ",
+    "343a40": "ប្រផេះ ៨",
+    "495057": "ប្រផេះ ៧",
+    "c92a2a": "ក្រហម​ ៩",
+    "a61e4d": "ផ្កាឈូក ៩",
+    "862e9c": "ស្វាយចាស់ ៩",
+    "5f3dc4": "ស្វាយ ៩",
+    "364fc7": "ខៀវចាស់ ៩",
+    "1864ab": "ខៀវ ៩",
+    "0b7285": "ខៀវខ្ចី ៩",
+    "087f5b": "កាប់ស្តាំង ៩",
+    "2b8a3e": "បៃតង ៩",
+    "5c940d": "បៃតងខ្ចី ៩",
+    "e67700": "លឿង ៩",
+    "d9480f": "ទឹកក្រូច ៩"
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "ទិន្នន័យទាំងអស់របស់អ្នក ត្រូវបានរក្សាទុកនៅក្នុង browser របស់អ្នក ។",
+      "center_heading_plus": "តើ​អ្នក​ចង់​ទៅ Excalidraw+ ​វិញ ឬ មែន?",
+      "menuHint": "នាំចេញ ចំណូលចិត្ត ភាសា ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "ការនាំចេញ ចំណូលចិត្ត និង ច្រើនទៀត...",
+      "center_heading": "ងាយស្រួល ។ ធ្វើ ។​ ដ្យាក្រាម ។",
+      "toolbarHint": "ជ្រើសរើសឧបករណ៍មួយ និង ចាប់ផ្តើមគូរ!",
+      "helpHint": "ផ្លូវកាត់ &​ ជំនួយ"
     }
   }
 }

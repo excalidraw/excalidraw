@@ -264,16 +264,11 @@
     "canvasTooBigTip": "טיפ: נסה להזיז את הרכיבים הרחוקים ביותר מעט קרוב יותר האחד לשני."
   },
   "errorSplash": {
-    "headingMain_pre": "אירעה שגיאה. נסה ",
-    "headingMain_button": "טוען את העמוד מחדש.",
+    "headingMain": "",
     "clearCanvasMessage": "אם טעינה מחדש לא עובדת, נסה ",
-    "clearCanvasMessage_button": "מנקה את הקנבאס.",
     "clearCanvasCaveat": " זה יגרום לאובדן העבודה ",
-    "trackedToSentry_pre": "השגיאה עם מזהה ",
-    "trackedToSentry_post": " נמצאה במערכת שלנו.",
-    "openIssueMessage_pre": "נזהרנו מאוד שלא לכלול מידע מהקנבאס שלך בשגיאה. אם המידע בקנבאס אינו אישי, שקול לבצע מעקב אחר הטיפול שלנו ",
-    "openIssueMessage_button": "מעקב באגים.",
-    "openIssueMessage_post": " בבקשה כלול את המידע מטה באמצעות העתקתה שלו, והדבקה שלו ב- GitHub Issue.",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": "תוכן הקנבאס:"
   },
   "roomDialog": {
@@ -353,29 +348,16 @@
       "required": "נדרש",
       "website": "הזינו כתובת URL תקינה"
     },
-    "noteDescription": {
-      "pre": "הגש את הספריה שלך להכללתה ב ",
-      "link": "מאגר הספריה הציבורית",
-      "post": "לשימושם של אנשים אחרים בציורים שלהם."
-    },
-    "noteGuidelines": {
-      "pre": "הספריה צריכה לקבל אישור ידני קודם לכן. אנא קרא את ",
-      "link": "הנחיות",
-      "post": " לפני השליחה. אתה תצטרך לחשבון GitHub כדי לתקשר ולבצע שינויים אם תתבקש, אבל זה לא דרישה הכרחית."
-    },
-    "noteLicense": {
-      "pre": "על ידי שליחה, אתה מסכים שהסיפריה תפורסם תחת ה- ",
-      "link": "רישיון MIT, ",
-      "post": "שאומר בקצרה, שכל אחד יכול לעשות בהם שימוש ללא מגבלות."
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "לכל פריט בסיפריה חייב להיות שם כדי שאפשר יהיה לסנן. הפריטי סיפריה הבאים יהיו כלולים:",
     "atleastOneLibItem": "אנא בחר לפחות פריט אחד מספריה כדי להתחיל",
     "republishWarning": "הערה: חלק מהפריטים שבחרת מסומנים ככאלו שכבר פורסמו/נשלחו. אתה צריך לשלוח פריטים מחדש כאשר אתה מעדכן ספריה או הגשה קיימים."
   },
   "publishSuccessDialog": {
     "title": "הספריה הוגשה",
-    "content": "תודה {{authorName}}. הספריה שלך נשלחה לבחינה. תוכל לעקוב אחרי סטטוס הפרסום",
-    "link": "כאן"
+    "content": "תודה {{authorName}}. הספריה שלך נשלחה לבחינה. תוכל לעקוב אחרי סטטוס הפרסום"
   },
   "confirmDialog": {
     "resetLibrary": "איפוס ספריה",

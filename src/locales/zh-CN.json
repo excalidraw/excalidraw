@@ -16,7 +16,7 @@
     "bringToFront": "置于顶层",
     "sendBackward": "下移一层",
     "delete": "删除",
-    "copyStyles": "复制样式",
+    "copyStyles": "拷贝样式",
     "pasteStyles": "粘贴样式",
     "stroke": "描边",
     "background": "背景",
@@ -210,7 +210,7 @@
     "brave_measure_text_error": {
       "line1": "您似乎正在使用 Brave 浏览器并启用了<bold>积极阻止指纹识别</bold>的设置。",
       "line2": "这可能会破坏绘图中的 <bold>文本元素</bold>。",
-      "line3": "我们强烈建议禁用此设置。您可以按照 <link>这些步骤</link> 来设置。",
+      "line3": "我们强烈建议禁用此设置。您可以按照<link>这些步骤</link>来设置。",
       "line4": "如果禁用此设置无法修复文本元素的显示，请在 GitHub 上提交一个 <issueLink>issue</issueLink> ，或者在 <discordLink>Discord</discordLink> 上反馈"
     }
   },
@@ -264,16 +264,16 @@
     "canvasTooBigTip": "提示：尝试将最远的元素移动到和其它元素更近一些。"
   },
   "errorSplash": {
-    "headingMain": "遇到异常。请尝试<button>重新加载页面。</button>",
-    "clearCanvasMessage": "如果重新加载页面无效, 请尝试<button>清除画布。</button>",
+    "headingMain": "遇到异常。请尝试<button>重新加载页面</button>。",
+    "clearCanvasMessage": "如果重新加载页面无效，请尝试<button>清除画布</button>。",
     "clearCanvasCaveat": "这会造成当前工作丢失",
-    "trackedToSentry": "带有标识符的错误{{eventId}}已在我们的系统中跟踪",
-    "openIssueMessage": "我们非常谨慎地处理错误信息，您的画布内容不会被包含在错误报告中。如果您的画布内容不需要保持私密，请考虑使用我们的<button>错误追踪器。</button> 请复制并粘贴以下信息到 GitHub Issue 中。",
+    "trackedToSentry": "标识符为{{eventId}}的错误已在我们的系统中被记录",
+    "openIssueMessage": "我们非常谨慎地处理错误信息，您的画布内容不会被包含在错误报告中。如果您的画布内容不需要保持私密，请考虑在我们的 <button>bug 跟踪系统</button>上提供更多信息。请复制粘贴以下信息到 GitHub Issue 中。",
     "sceneContent": "画布内容:"
   },
   "roomDialog": {
     "desc_intro": "你可以邀请其他人到目前的画面中与你协作。",
-    "desc_privacy": "别担心, 该会话使用端到端加密, 无论绘制什么都将保持私密，甚至连我们的服务器也无法查看。",
+    "desc_privacy": "别担心，该会话使用端到端加密，无论绘制什么都将保持私密，甚至连我们的服务器也无法查看。",
     "button_startSession": "启动会议",
     "button_stopSession": "结束会议",
     "desc_inProgressIntro": "实时协作会议正在进行。",
@@ -348,23 +348,23 @@
       "required": "必填",
       "website": "输入一个有效的URL"
     },
-    "noteDescription": "提交后，您的素材库将被包含在 <link>公共素材库广场</link>以供其他人在绘图中使用。",
-    "noteGuidelines": "提交的素材库需先经人工审核。在提交之前，请先阅读 <link>指南</link> 。后续沟通和对库的修改需要 GitHub 账号，但这不是必须的。",
-    "noteLicense": "提交即表明您已同意素材库将遵循 <link>MIT 许可证， </link>简而言之，任何人都可以不受限制地使用它们。",
+    "noteDescription": "提交后，您的素材库将被包含在<link>公共素材库广场</link>以供其他人在绘图中使用。",
+    "noteGuidelines": "提交的素材库需先经人工审核。在提交之前，请先阅读<link>指南</link> 。后续沟通和对库的修改需要 GitHub 账号，但这不是必须的。",
+    "noteLicense": "提交即表明您已同意素材库将遵循 <link>MIT 许可证</link>，简而言之，任何人都可以不受限制地使用它们。",
     "noteItems": "素材库中每个项目都有各自的名称以供筛选。以下项目将被包含：",
     "atleastOneLibItem": "请选择至少一个素材库以开始",
     "republishWarning": "注意：部分选中的项目已经发布或提交。请仅在更新已有或已提交的素材库时重复提交项目。"
   },
   "publishSuccessDialog": {
     "title": "素材库已提交",
-    "content": "谢谢你 {{authorName}}。您的素材库已被提交审核。跟进此次提交的状态请点击<link>此处</link>"
+    "content": "谢谢你 {{authorName}}。您的素材库已被提交审核。请点击<link>此处</link>跟进此次提交的状态"
   },
   "confirmDialog": {
     "resetLibrary": "重置素材库",
     "removeItemsFromLib": "从素材库中删除选中的项目"
   },
   "encrypted": {
-    "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
+    "tooltip": "您的绘图采用端到端加密，其内容对于 Excalidraw 服务器是不可见的。",
     "link": "Excalidraw 中关于端到端加密的博客"
   },
   "stats": {
@@ -384,7 +384,7 @@
   },
   "toast": {
     "addedToLibrary": "添加到素材库中",
-    "copyStyles": "复制样式",
+    "copyStyles": "样式已拷贝。",
     "copyToClipboard": "已复制到剪切板。",
     "copyToClipboardAsPng": "已将 {{exportSelection}} 作为 PNG 复制到剪贴板\n({{exportColorScheme}})",
     "fileSaved": "文件已保存。",
