@@ -46,8 +46,17 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+    padding: 1rem 0.75rem;
+    position: relative;
+
+    &::after {
+      content: "";
+      width: calc(100% - 1.5rem);
+      height: 1px;
+      background: var(--sidebar-border-color);
+      position: absolute;
+      bottom: -1px;
+    }
   }
 
   .sidebar__header__buttons {
@@ -89,7 +98,7 @@
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
-    padding: 1rem 0.75rem;
+    padding: 1rem 0;
 
     [role="tabpanel"] {
       flex: 1;
@@ -160,10 +169,6 @@
 
         border: none;
       }
-    }
-
-    .sidebar__header {
-      border-bottom: 1px solid var(--sidebar-border-color);
     }
   }
 }
