@@ -23,6 +23,7 @@ import { Dialog } from "./Dialog";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { useUIAppState } from "../context/ui-appState";
+import clsx from "clsx";
 
 const getSelectedItems = (
   libraryItems: LibraryItems,
@@ -37,6 +38,7 @@ export const LibraryDropdownMenuButton: React.FC<{
   resetLibrary: () => void;
   onSelectItems: (items: LibraryItem["id"][]) => void;
   appState: UIAppState;
+  className?: string;
 }> = ({
   setAppState,
   selectedItems,
@@ -45,6 +47,7 @@ export const LibraryDropdownMenuButton: React.FC<{
   resetLibrary,
   onSelectItems,
   appState,
+  className,
 }) => {
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
   const [isLibraryMenuOpen, setIsLibraryMenuOpen] = useAtom(
@@ -236,7 +239,7 @@ export const LibraryDropdownMenuButton: React.FC<{
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className={clsx("library-menu-dropdown-container", className)}>
       {renderLibraryMenu()}
       {selectedItems.length > 0 && (
         <div className="library-actions-counter">{selectedItems.length}</div>
@@ -270,9 +273,11 @@ export const LibraryDropdownMenuButton: React.FC<{
 export const LibraryDropdownMenu = ({
   selectedItems,
   onSelectItems,
+  className,
 }: {
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
+  className?: string;
 }) => {
   const { library } = useApp();
   const appState = useUIAppState();
@@ -308,6 +313,7 @@ export const LibraryDropdownMenu = ({
         removeFromLibrary(libraryItemsData.libraryItems)
       }
       resetLibrary={resetLibrary}
+      className={className}
     />
   );
 };
