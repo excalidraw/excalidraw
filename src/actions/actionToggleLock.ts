@@ -81,7 +81,7 @@ export const actionUnlockAllCanvasElements = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.elementLock.unlockAllCanvasElements",
+  contextItemLabel: "labels.elementLock.unlockAll",
 });
 
 const getOperation = (

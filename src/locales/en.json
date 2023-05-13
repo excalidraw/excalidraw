@@ -125,8 +125,7 @@
       "lock": "Lock",
       "unlock": "Unlock",
       "lockAll": "Lock all",
-      "unlockAll": "Unlock all",
-      "unlockAllCanvasElements": "Unlock all elements"
+      "unlockAll": "Unlock all"
     },
     "statusPublished": "Published",
     "sidebarLock": "Keep sidebar open"
