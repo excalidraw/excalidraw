@@ -26,14 +26,13 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { Mutable } from "../utility-types";
 import { TransformHandleDirection } from "./transformHandles";
 
-// x and y position of top left corner, x and y position of bottom right corner
-export type Bounds = readonly [number, number, number, number];
 type MaybeQuadraticSolution = [number | null, number | null] | false;
 
-let _elementBoundsSingleton: ElementBounds;
+// x and y position of top left corner, x and y position of bottom right corner
+export type Bounds = readonly [x1: number, y1: number, x2: number, y2: number];
 
 export class ElementBounds {
-  private boundsCache = new WeakMap<
+  private static boundsCache = new WeakMap<
     ExcalidrawElement,
     {
       bounds: Bounds;
@@ -41,34 +40,24 @@ export class ElementBounds {
     }
   >();
 
-  constructor() {
-    if (_elementBoundsSingleton) {
-      return _elementBoundsSingleton;
-    }
-    _elementBoundsSingleton = this;
-    return _elementBoundsSingleton;
-  }
+  static getBounds(element: ExcalidrawElement) {
+    const cachedBounds = ElementBounds.boundsCache.get(element);
 
-  updateBounds(element: ExcalidrawElement, bounds: Bounds) {
-    this.boundsCache.set(element, {
+    if (cachedBounds?.version === element.version) {
+      return cachedBounds.bounds;
+    }
+
+    const bounds = ElementBounds.calculateBounds(element);
+
+    ElementBounds.boundsCache.set(element, {
       version: element.version,
       bounds,
     });
+
+    return bounds;
   }
 
-  getCachedBounds(element: ExcalidrawElement) {
-    const cachedBounds = this.boundsCache.get(element);
-    if (
-      cachedBounds &&
-      cachedBounds.version === element.version &&
-      cachedBounds.bounds
-    ) {
-      return cachedBounds.bounds;
-    }
-    return null;
-  }
-
-  static calculateBounds(element: ExcalidrawElement): Bounds {
+  private static calculateBounds(element: ExcalidrawElement): Bounds {
     let bounds: [number, number, number, number];
 
     const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
@@ -120,8 +109,6 @@ export class ElementBounds {
     return bounds;
   }
 }
-
-export const elementBounds = new ElementBounds();
 
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
@@ -571,23 +558,8 @@ const getLinearElementRotatedBounds = (
   return coords;
 };
 
-// We could cache this stuff
-export const getElementBounds = (
-  element: ExcalidrawElement,
-  recompuate = false,
-): Bounds => {
-  if (!recompuate) {
-    const cachedBounds = elementBounds.getCachedBounds(element);
-    if (cachedBounds) {
-      return cachedBounds;
-    }
-  }
-
-  const bounds = ElementBounds.calculateBounds(element);
-  // update bounds cache when recomputing the bounds or the bounds have not yet been cached
-  elementBounds.updateBounds(element, bounds);
-
-  return bounds;
+export const getElementBounds = (element: ExcalidrawElement): Bounds => {
+  return ElementBounds.getBounds(element);
 };
 
 export const getCommonBounds = (
