@@ -538,6 +538,10 @@
     height: 3px;
   }
 
+  select::-webkit-scrollbar {
+    width: 10px;
+  }
+
   ::-webkit-scrollbar-thumb {
     background: var(--scrollbar-thumb);
     border-radius: 10px;
