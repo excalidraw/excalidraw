@@ -661,7 +661,7 @@ class App extends React.Component<AppProps, AppState> {
                         )}
                         <main>{this.renderCanvas()}</main>
                       </ExcalidrawActionManagerContext.Provider>
-                    </ExcalidrawElementsContext.Provider>{" "}
+                    </ExcalidrawElementsContext.Provider>
                   </ExcalidrawAppStateContext.Provider>
                 </ExcalidrawSetAppStateContext.Provider>
               </DeviceContext.Provider>
