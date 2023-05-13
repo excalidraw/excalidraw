@@ -1,7 +1,7 @@
 import "./Avatar.scss";
 
 import React, { useState } from "react";
-import { getClientInitials } from "../clients";
+import { getNameInitial } from "../clients";
 
 type AvatarProps = {
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -12,7 +12,7 @@ type AvatarProps = {
 };
 
 export const Avatar = ({ color, onClick, name, src }: AvatarProps) => {
-  const shortName = getClientInitials(name);
+  const shortName = getNameInitial(name);
   const [error, setError] = useState(false);
   const loadImg = !error && src;
   const style = loadImg ? undefined : { background: color };

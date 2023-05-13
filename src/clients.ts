@@ -20,9 +20,13 @@ export const getClientColors = (clientId: string, appState: AppState) => {
   };
 };
 
-export const getClientInitials = (userName?: string | null) => {
-  if (!userName?.trim()) {
-    return "?";
-  }
-  return userName.trim()[0].toUpperCase();
+/**
+ * returns first char, capitalized
+ */
+export const getNameInitial = (name?: string | null) => {
+  // first char can be a surrogate pair, hence using codePointAt
+  const firstCodePoint = name?.trim()?.codePointAt(0);
+  return (
+    firstCodePoint ? String.fromCodePoint(firstCodePoint) : "?"
+  ).toUpperCase();
 };
