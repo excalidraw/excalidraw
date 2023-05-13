@@ -4766,6 +4766,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
             snaps,
           );
+
           this.maybeSuggestBindingForAll(selectedElements);
 
           // We duplicate the selected element if alt is pressed on pointer move
@@ -4830,9 +4831,6 @@ class App extends React.Component<AppProps, AppState> {
             );
             this.scene.replaceAllElements(nextSceneElements);
           }
-
-          pointerDownState.lastCoords.x = pointerCoords.x;
-          pointerDownState.lastCoords.y = pointerCoords.y;
           return;
         }
       }

@@ -8,6 +8,7 @@ import * as GA from "./ga";
 import * as GALines from "./galines";
 import * as GAPoints from "./gapoints";
 import { getMaximumGroups } from "./groups";
+import { KEYS } from "./keys";
 import { getSelectedElements } from "./scene";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
 import { AppState, Point, Zoom } from "./types";
@@ -78,7 +79,6 @@ export const getSnaps = ({
   event: PointerEvent;
   dragOffset: { x: number; y: number };
 }): Snaps | null => {
-  const offset = GA.offset(dragOffset.x, dragOffset.y);
   if (!isSnappingEnabled({ appState, event })) {
     return null;
   }
@@ -91,6 +91,7 @@ export const getSnaps = ({
   const selectionCoordinates = getElementsHandleCoordinates(selectedElements);
 
   // get snaps that are within the "shouldSnap" distance
+  const offset = GA.offset(dragOffset.x, dragOffset.y);
   const snaps = getMaximumGroups(
     getVisibleAndNonSelectedElements(elements, selectedElements, appState),
   )
@@ -192,8 +193,8 @@ const isSnappingEnabled = ({
   appState: AppState;
   event: PointerEvent;
 }) =>
-  (appState.objectsSnapModeEnabled && !event.metaKey) ||
-  (!appState.objectsSnapModeEnabled && event.metaKey);
+  (appState.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
+  (!appState.objectsSnapModeEnabled && event[KEYS.CTRL_OR_CMD]);
 
 /**
  * given a line and some points (not necessarily on the line)
