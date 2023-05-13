@@ -220,7 +220,6 @@ describe("<Excalidraw/>", () => {
                   style={{ height: "2rem" }}
                   onClick={() => window.alert("custom menu item")}
                 >
-                  {" "}
                   custom item
                 </button>
               </MainMenu.ItemCustom>
@@ -345,7 +344,6 @@ describe("<Excalidraw/>", () => {
                 style={{ height: "2rem" }}
                 onClick={() => window.alert("custom menu item")}
               >
-                {" "}
                 custom menu item
               </button>
             </MainMenu.ItemCustom>
