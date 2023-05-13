@@ -5642,6 +5642,16 @@ Object {
           "category": "canvas",
         },
       },
+      Object {
+        "contextItemLabel": "labels.elementLock.unlockAll",
+        "name": "unlockAllCanvasElements",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": Object {
+          "category": "canvas",
+        },
+        "viewMode": false,
+      },
       "separator",
       Object {
         "checked": [Function],
