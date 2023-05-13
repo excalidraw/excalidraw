@@ -4578,7 +4578,6 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      this.setState({ snaps: [] });
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,

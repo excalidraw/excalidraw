@@ -7301,7 +7301,7 @@ Object {
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
-  "snaps": Array [],
+  "snaps": null,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -10291,7 +10291,7 @@ Object {
 
 exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `20`;
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] appState 1`] = `
 Object {
@@ -11976,7 +11976,7 @@ Object {
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
-  "snaps": Array [],
+  "snaps": null,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
@@ -13056,7 +13056,7 @@ Object {
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
-  "snaps": Array [],
+  "snaps": null,
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",
