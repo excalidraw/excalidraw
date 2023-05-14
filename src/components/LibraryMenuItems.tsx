@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState, memo } from "react";
 import { serializeLibraryAsJSON } from "../data/json";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
@@ -8,8 +8,8 @@ import {
   LibraryItems,
   UIAppState,
 } from "../types";
-import { arrayToMap, chunk } from "../utils";
-import { LibraryUnit } from "./LibraryUnit";
+import { arrayToMap, chunk, propsAreEqual } from "../utils";
+import LibraryUnit from "./LibraryUnit";
 import Stack from "./Stack";
 import { MIME_TYPES } from "../constants";
 import Spinner from "./Spinner";
@@ -48,162 +48,188 @@ const LibraryMenuItems = ({
     LibraryItem["id"] | null
   >(null);
 
-  const onItemSelectToggle = (
-    id: LibraryItem["id"],
-    event: React.MouseEvent,
-  ) => {
-    const shouldSelect = !selectedItems.includes(id);
-
-    const orderedItems = [...unpublishedItems, ...publishedItems];
-
-    if (shouldSelect) {
-      if (event.shiftKey && lastSelectedItem) {
-        const rangeStart = orderedItems.findIndex(
-          (item) => item.id === lastSelectedItem,
-        );
-        const rangeEnd = orderedItems.findIndex((item) => item.id === id);
-
-        if (rangeStart === -1 || rangeEnd === -1) {
-          onSelectItems([...selectedItems, id]);
-          return;
-        }
-
-        const selectedItemsMap = arrayToMap(selectedItems);
-        const nextSelectedIds = orderedItems.reduce(
-          (acc: LibraryItem["id"][], item, idx) => {
-            if (
-              (idx >= rangeStart && idx <= rangeEnd) ||
-              selectedItemsMap.has(item.id)
-            ) {
-              acc.push(item.id);
-            }
-            return acc;
-          },
-          [],
-        );
-
-        onSelectItems(nextSelectedIds);
-      } else {
-        onSelectItems([...selectedItems, id]);
-      }
-      setLastSelectedItem(id);
-    } else {
-      setLastSelectedItem(null);
-      onSelectItems(selectedItems.filter((_id) => _id !== id));
-    }
-  };
-
-  const getInsertedElements = (id: string) => {
-    let targetElements;
-    if (selectedItems.includes(id)) {
-      targetElements = libraryItems.filter((item) =>
-        selectedItems.includes(item.id),
-      );
-    } else {
-      targetElements = libraryItems.filter((item) => item.id === id);
-    }
-    return targetElements.map((item) => {
-      return {
-        ...item,
-        // duplicate each library item before inserting on canvas to confine
-        // ids and bindings to each library item. See #6465
-        elements: duplicateElements(item.elements, { randomizeSeed: true }),
-      };
-    });
-  };
-
-  const createLibraryItemCompo = (params: {
-    item:
-      | LibraryItem
-      | /* pending library item */ {
-          id: null;
-          elements: readonly NonDeleted<ExcalidrawElement>[];
-        }
-      | null;
-    onClick?: () => void;
-    key: string;
-  }) => {
-    return (
-      <Stack.Col key={params.key}>
-        <LibraryUnit
-          elements={params.item?.elements}
-          isPending={!params.item?.id && !!params.item?.elements}
-          onClick={params.onClick || (() => {})}
-          id={params.item?.id || null}
-          selected={!!params.item?.id && selectedItems.includes(params.item.id)}
-          onToggle={onItemSelectToggle}
-          onDrag={(id, event) => {
-            event.dataTransfer.setData(
-              MIME_TYPES.excalidrawlib,
-              serializeLibraryAsJSON(getInsertedElements(id)),
-            );
-          }}
-        />
-      </Stack.Col>
-    );
-  };
-
-  const renderLibrarySection = (
-    items: (
-      | LibraryItem
-      | /* pending library item */ {
-          id: null;
-          elements: readonly NonDeleted<ExcalidrawElement>[];
-        }
-    )[],
-  ) => {
-    const _items = items.map((item) => {
-      if (item.id) {
-        return createLibraryItemCompo({
-          item,
-          onClick: () => onInsertLibraryItems(getInsertedElements(item.id)),
-          key: item.id,
-        });
-      }
-      return createLibraryItemCompo({
-        key: "__pending__item__",
-        item,
-        onClick: () => onAddToLibrary(pendingElements),
-      });
-    });
-
-    // ensure we render all empty cells if no items are present
-    let rows = chunk(_items, CELLS_PER_ROW);
-    if (!rows.length) {
-      rows = [[]];
-    }
-
-    return rows.map((rowItems, index, rows) => {
-      if (index === rows.length - 1) {
-        // pad row with empty cells
-        rowItems = rowItems.concat(
-          new Array(CELLS_PER_ROW - rowItems.length)
-            .fill(null)
-            .map((_, index) => {
-              return createLibraryItemCompo({
-                key: `empty_${index}`,
-                item: null,
-              });
-            }),
-        );
-      }
-      return (
-        <Stack.Row
-          align="center"
-          key={index}
-          className="library-menu-items-container__row"
-        >
-          {rowItems}
-        </Stack.Row>
-      );
-    });
-  };
-
-  const unpublishedItems = libraryItems.filter(
-    (item) => item.status !== "published",
+  const unpublishedItems = useMemo(
+    () => libraryItems.filter((item) => item.status !== "published"),
+    [libraryItems],
   );
-  const publishedItems = libraryItems.filter(
-    (item) => item.status === "published",
+
+  const publishedItems = useMemo(
+    () => libraryItems.filter((item) => item.status === "published"),
+    [libraryItems],
+  );
+
+  const onItemSelectToggle = useCallback(
+    (id: LibraryItem["id"], event: React.MouseEvent) => {
+      const shouldSelect = !selectedItems.includes(id);
+
+      const orderedItems = [...unpublishedItems, ...publishedItems];
+
+      if (shouldSelect) {
+        if (event.shiftKey && lastSelectedItem) {
+          const rangeStart = orderedItems.findIndex(
+            (item) => item.id === lastSelectedItem,
+          );
+          const rangeEnd = orderedItems.findIndex((item) => item.id === id);
+
+          if (rangeStart === -1 || rangeEnd === -1) {
+            onSelectItems([...selectedItems, id]);
+            return;
+          }
+
+          const selectedItemsMap = arrayToMap(selectedItems);
+          const nextSelectedIds = orderedItems.reduce(
+            (acc: LibraryItem["id"][], item, idx) => {
+              if (
+                (idx >= rangeStart && idx <= rangeEnd) ||
+                selectedItemsMap.has(item.id)
+              ) {
+                acc.push(item.id);
+              }
+              return acc;
+            },
+            [],
+          );
+
+          onSelectItems(nextSelectedIds);
+        } else {
+          onSelectItems([...selectedItems, id]);
+        }
+        setLastSelectedItem(id);
+      } else {
+        setLastSelectedItem(null);
+        onSelectItems(selectedItems.filter((_id) => _id !== id));
+      }
+    },
+    [
+      lastSelectedItem,
+      onSelectItems,
+      selectedItems,
+      publishedItems,
+      unpublishedItems,
+    ],
+  );
+
+  const getInsertedElements = useCallback(
+    (id: string) => {
+      let targetElements;
+      if (selectedItems.includes(id)) {
+        targetElements = libraryItems.filter((item) =>
+          selectedItems.includes(item.id),
+        );
+      } else {
+        targetElements = libraryItems.filter((item) => item.id === id);
+      }
+      return targetElements.map((item) => {
+        return {
+          ...item,
+          // duplicate each library item before inserting on canvas to confine
+          // ids and bindings to each library item. See #6465
+          elements: duplicateElements(item.elements, { randomizeSeed: true }),
+        };
+      });
+    },
+    [libraryItems, selectedItems],
+  );
+
+  const createLibraryItemCompo = useCallback(
+    (params: {
+      item:
+        | LibraryItem
+        | /* pending library item */ {
+            id: null;
+            elements: readonly NonDeleted<ExcalidrawElement>[];
+          }
+        | null;
+      onClick?: () => void;
+      key: string;
+    }) => {
+      return (
+        <Stack.Col key={params.key}>
+          <LibraryUnit
+            elements={params.item?.elements}
+            isPending={!params.item?.id && !!params.item?.elements}
+            onClick={params.onClick || (() => {})}
+            id={params.item?.id || null}
+            selected={
+              !!params.item?.id && selectedItems.includes(params.item.id)
+            }
+            onToggle={onItemSelectToggle}
+            onDrag={(id, event) => {
+              event.dataTransfer.setData(
+                MIME_TYPES.excalidrawlib,
+                serializeLibraryAsJSON(getInsertedElements(id)),
+              );
+            }}
+          />
+        </Stack.Col>
+      );
+    },
+    [getInsertedElements, onItemSelectToggle, selectedItems],
+  );
+
+  const renderLibrarySection = useCallback(
+    (
+      items: (
+        | LibraryItem
+        | /* pending library item */ {
+            id: null;
+            elements: readonly NonDeleted<ExcalidrawElement>[];
+          }
+      )[],
+      pendingElements: LibraryItem["elements"],
+    ) => {
+      const _items = items.map((item) => {
+        if (item.id) {
+          return createLibraryItemCompo({
+            item,
+            onClick: () => onInsertLibraryItems(getInsertedElements(item.id)),
+            key: item.id,
+          });
+        }
+        return createLibraryItemCompo({
+          key: "__pending__item__",
+          item,
+          onClick: () => onAddToLibrary(pendingElements),
+        });
+      });
+
+      // ensure we render all empty cells if no items are present
+      let rows = chunk(_items, CELLS_PER_ROW);
+      if (!rows.length) {
+        rows = [[]];
+      }
+
+      return rows.map((rowItems, index, rows) => {
+        if (index === rows.length - 1) {
+          // pad row with empty cells
+          rowItems = rowItems.concat(
+            new Array(CELLS_PER_ROW - rowItems.length)
+              .fill(null)
+              .map((_, index) => {
+                return createLibraryItemCompo({
+                  key: `empty_${index}`,
+                  item: null,
+                });
+              }),
+          );
+        }
+        return (
+          <Stack.Row
+            align="center"
+            key={index}
+            className="library-menu-items-container__row"
+          >
+            {rowItems}
+          </Stack.Row>
+        );
+      });
+    },
+    [
+      onInsertLibraryItems,
+      onAddToLibrary,
+      getInsertedElements,
+      createLibraryItemCompo,
+    ],
   );
 
   const showBtn = !libraryItems.length && !pendingElements.length;
@@ -271,13 +297,16 @@ const LibraryMenuItems = ({
                 </div>
               </div>
             ) : (
-              renderLibrarySection([
-                // append pending library item
-                ...(pendingElements.length
-                  ? [{ id: null, elements: pendingElements }]
-                  : []),
-                ...unpublishedItems,
-              ])
+              renderLibrarySection(
+                [
+                  // append pending library item
+                  ...(pendingElements.length
+                    ? [{ id: null, elements: pendingElements }]
+                    : []),
+                  ...unpublishedItems,
+                ],
+                pendingElements,
+              )
             )}
           </div>
         </>
@@ -291,7 +320,7 @@ const LibraryMenuItems = ({
             </div>
           )}
           {publishedItems.length > 0 ? (
-            renderLibrarySection(publishedItems)
+            renderLibrarySection(publishedItems, [])
           ) : unpublishedItems.length > 0 ? (
             <div
               style={{
@@ -327,4 +356,5 @@ const LibraryMenuItems = ({
   );
 };
 
-export default LibraryMenuItems;
+// React is using `Object.is` which isn't able to compase functions and arrays
+export default memo(LibraryMenuItems, propsAreEqual);

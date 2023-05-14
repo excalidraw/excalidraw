@@ -1,12 +1,13 @@
 import clsx from "clsx";
 import oc from "open-color";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { useDevice } from "../components/App";
 import { exportToSvg } from "../packages/utils";
 import { LibraryItem } from "../types";
 import "./LibraryUnit.scss";
 import { CheckboxItem } from "./CheckboxItem";
 import { PlusIcon } from "./icons";
+import { propsAreEqual } from "../utils";
 
 export const LibraryUnit = ({
   id,
@@ -106,3 +107,5 @@ export const LibraryUnit = ({
     </div>
   );
 };
+
+export default memo(LibraryUnit, propsAreEqual);

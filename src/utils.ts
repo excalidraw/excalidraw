@@ -1,4 +1,5 @@
 import oc from "open-color";
+import isEqual from "lodash.isequal";
 
 import colors from "./colors";
 import {
@@ -815,4 +816,32 @@ export const composeEventHandlers = <E>(
       return ourEventHandler?.(event);
     }
   };
+};
+
+export const propsAreEqual = <T extends Readonly<{}>>(
+  prevProps: T,
+  nextProps: T,
+): boolean => {
+  return Object.keys(prevProps).every((prop) => {
+    const prevProp = prevProps[prop as unknown as keyof typeof prevProps];
+    const nextProp = nextProps[prop as unknown as keyof typeof nextProps];
+
+    // Next props have all items from prevProps
+    if (prevProp !== undefined && nextProp === undefined) {
+      return false;
+    }
+
+    // Both props have same type
+    if (typeof prevProp !== typeof nextProp) {
+      return false;
+    }
+
+    switch (typeof prevProp) {
+      case "function":
+        // We can't compare 2 functions as other values, therefore we are treating them as equal
+        return true;
+      default:
+        return isEqual(prevProp, nextProp);
+    }
+  });
 };
