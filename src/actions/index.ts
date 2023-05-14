@@ -85,5 +85,5 @@ export { actionToggleZenMode } from "./actionToggleZenMode";
 export { actionToggleStats } from "./actionToggleStats";
 export { actionUnbindText, actionBindText } from "./actionBoundText";
 export { actionLink } from "../element/Hyperlink";
-export { actionToggleLock } from "./actionToggleLock";
+export { actionToggleElementLock } from "./actionElementLock";
 export { actionToggleLinearEditor } from "./actionLinearEditor";

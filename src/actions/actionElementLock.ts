@@ -5,8 +5,11 @@ import { getSelectedElements } from "../scene";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 
-export const actionToggleLock = register({
-  name: "toggleLock",
+const shouldLock = (elements: readonly ExcalidrawElement[]) =>
+  elements.every((el) => !el.locked);
+
+export const actionToggleElementLock = register({
+  name: "toggleElementLock",
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState, true);
@@ -15,20 +18,21 @@ export const actionToggleLock = register({
       return false;
     }
 
-    const operation = getOperation(selectedElements);
+    const nextLockState = shouldLock(selectedElements);
     const selectedElementsMap = arrayToMap(selectedElements);
-    const lock = operation === "lock";
     return {
       elements: elements.map((element) => {
         if (!selectedElementsMap.has(element.id)) {
           return element;
         }
 
-        return newElementWith(element, { locked: lock });
+        return newElementWith(element, { locked: nextLockState });
       }),
       appState: {
         ...appState,
-        selectedLinearElement: lock ? null : appState.selectedLinearElement,
+        selectedLinearElement: nextLockState
+          ? null
+          : appState.selectedLinearElement,
       },
       commitToHistory: true,
     };
@@ -41,7 +45,7 @@ export const actionToggleLock = register({
         : "labels.elementLock.lock";
     }
 
-    return getOperation(selected) === "lock"
+    return shouldLock(selected)
       ? "labels.elementLock.lockAll"
       : "labels.elementLock.unlockAll";
   },
@@ -55,6 +59,31 @@ export const actionToggleLock = register({
   },
 });
 
-const getOperation = (
-  elements: readonly ExcalidrawElement[],
-): "lock" | "unlock" => (elements.some((el) => !el.locked) ? "lock" : "unlock");
+export const actionUnlockAllElements = register({
+  name: "unlockAllElements",
+  trackEvent: { category: "canvas" },
+  viewMode: false,
+  predicate: (elements) => {
+    return elements.some((element) => element.locked);
+  },
+  perform: (elements, appState) => {
+    const lockedElements = elements.filter((el) => el.locked);
+
+    return {
+      elements: elements.map((element) => {
+        if (element.locked) {
+          return newElementWith(element, { locked: false });
+        }
+        return element;
+      }),
+      appState: {
+        ...appState,
+        selectedElementIds: Object.fromEntries(
+          lockedElements.map((el) => [el.id, true]),
+        ),
+      },
+      commitToHistory: true,
+    };
+  },
+  contextItemLabel: "labels.elementLock.unlockAll",
+});
