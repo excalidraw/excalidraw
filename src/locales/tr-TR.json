@@ -54,6 +54,7 @@
     "veryLarge": "Çok geniş",
     "solid": "Dolu",
     "hachure": "Taralı",
+    "zigzag": "",
     "crossHatch": "Çapraz-taralı",
     "thin": "İnce",
     "bold": "Kalın",
@@ -66,7 +67,7 @@
     "cartoonist": "Karikatürist",
     "fileTitle": "Dosya adı",
     "colorPicker": "Renk seçici",
-    "canvasColors": "Tuvallerin üzerinde kullanıldı",
+    "canvasColors": "Tuvalin üzerinde kullanıldı",
     "canvasBackground": "Tuval arka planı",
     "drawingCanvas": "Çizim tuvali",
     "layers": "Katmanlar",
@@ -110,6 +111,7 @@
     "increaseFontSize": "Yazı Tipi Boyutunu Büyült",
     "unbindText": "Metni çöz",
     "bindText": "Metni taşıyıcıya bağla",
+    "createContainerFromText": "",
     "link": {
       "edit": "Bağlantıyı düzenle",
       "create": "Bağlantı oluştur",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "İş birliği sunucusuna bağlanılamıyor. Lütfen sayfayı yenileyip tekrar deneyin.",
     "importLibraryError": "Kütüphane yüklenemedi",
     "collabSaveFailed": "Backend veritabanına kaydedilemedi. Eğer problem devam ederse, çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
-    "collabSaveFailed_sizeExceeded": "Backend veritabanına kaydedilemedi; tuval çok büyük. Çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz."
+    "collabSaveFailed_sizeExceeded": "Backend veritabanına kaydedilemedi; tuval çok büyük. Çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Seçme",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "İpucu: En uzaktaki elemanları birbirine yakınlaştırmayı deneyin."
   },
   "errorSplash": {
-    "headingMain_pre": "Hata oluştu. Lütfen ",
-    "headingMain_button": "sayfayı yenilemeyi deneyin.",
-    "clearCanvasMessage": "Yenileme sonrası sorun devam ediyorsa, lütfen ",
-    "clearCanvasMessage_button": "çizim alanını temizlemeyi deneyin.",
+    "headingMain": "Hata oluştu. Lütfen <button>sayfayı yenilemeyi deneyin.</button>",
+    "clearCanvasMessage": "Yenileme sonrası sorun devam ediyorsa, lütfen <button>çizim alanını temizlemeyi deneyin.</button>",
     "clearCanvasCaveat": " Bu, yaptığınız değişiklikleri sıfırlayacak ",
-    "trackedToSentry_pre": "Tanımlayıcı ile ilgili hata ",
-    "trackedToSentry_post": " sistemimize yakalandı.",
-    "openIssueMessage_pre": "Sahne bilginizi hata mesajına yansıtmamak için oldukça dikkatli davrandık. Eğer sahneniz gizli değilse hatayı lütfen şuradan takip edin ",
-    "openIssueMessage_button": "hata takibi.",
-    "openIssueMessage_post": " Lütfen aşağıya GitHub sorununa kopyalayarak ve yapıştırarak bilgi ekleyin.",
+    "trackedToSentry": "Tanımlayıcı ile ilgili hata {{eventId}} sistemimize yakalandı.",
+    "openIssueMessage": "Sahne bilginizi hata mesajına yansıtmamak için oldukça dikkatli davrandık. Eğer sahneniz gizli değilse hatayı lütfen şuradan takip edin <button>hata takibi.</button> Lütfen aşağıya GitHub sorununa kopyalayarak ve yapıştırarak bilgi ekleyin.",
     "sceneContent": "Sahne içeriği:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "çift-tıklama",
     "drag": "sürükle",
     "editor": "Düzenleyici",
-    "editSelectedShape": "Seçili şekli düzenle (metin/ok/çizgi)",
+    "editLineArrowPoints": "Çizgi/ok noktalarını düzenle",
+    "editText": "Etiket / metin düzenle",
     "github": "Bir hata mı buldun? Bildir",
     "howto": "Rehberlerimizi takip edin",
     "or": "veya",
@@ -344,29 +348,16 @@
       "required": "Gerekli",
       "website": "Geçerli bir URL girin"
     },
-    "noteDescription": {
-      "pre": "Submit your library to be included in the ",
-      "link": "genel kütüphane reposu",
-      "post": "diğer insanlar çizimlerinde kullanabilsin diye."
-    },
-    "noteGuidelines": {
-      "pre": "Önce kütüphane elle onaylanmalı. şunu okuyun ",
-      "link": "yönergeler",
-      "post": " onaylamadan önce. gerekli olması halinde iletişim kurmak için ve değişiklik için Github hesabı gerekli, ama çok da illaki olmalı değil."
-    },
-    "noteLicense": {
-      "pre": "Bunu onaylayarak, kütüğhanenin şu lisansla yayınlanmasını onaylıyorsunuz ",
-      "link": "MIT Lisans, ",
-      "post": "ki bu kısaca herkesin onu kısıtlama olmaksızın kullanabileceği anlamına gelmektedir."
-    },
+    "noteDescription": "Submit your library to be included in the <link>genel kütüphane reposu</link>diğer insanlar çizimlerinde kullanabilsin diye.",
+    "noteGuidelines": "Önce kütüphane elle onaylanmalı. şunu okuyun <link>yönergeler</link> onaylamadan önce. gerekli olması halinde iletişim kurmak için ve değişiklik için Github hesabı gerekli, ama çok da illaki olmalı değil.",
+    "noteLicense": "Bunu onaylayarak, kütüğhanenin şu lisansla yayınlanmasını onaylıyorsunuz <link>MIT Lisans, </link>ki bu kısaca herkesin onu kısıtlama olmaksızın kullanabileceği anlamına gelmektedir.",
     "noteItems": "Her kütüphane kendi ismine sahip olmalı ki tarama yapabilelim. Şu kütüphane ögeleri dahil edilecek:",
     "atleastOneLibItem": "Lütfen başlamak için en az bir tane kütüphane ögesi seçin",
     "republishWarning": "Not: seçilen ögelerden bir kısmı zaten yayınlanmış/gönderilmiş. Yalnızca mevcut kütüphane ve gönderileri güncellerken yeniden gönderme işlemi yapmalısınız."
   },
   "publishSuccessDialog": {
     "title": "Kütüphane gönderildi",
-    "content": "Teşekkürler {{authorName}}. Kütüphaneniz gözden geçirme için alındı. Durumu takip edebilirsiniz",
-    "link": "burada"
+    "content": "Teşekkürler {{authorName}}. Kütüphaneniz gözden geçirme için alındı. Durumu takip edebilirsiniz<link>burada</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Kütüphaneyi sıfırla",
@@ -453,13 +444,13 @@
     "app": {
       "center_heading": "",
       "center_heading_plus": "",
-      "menuHint": ""
+      "menuHint": "Dışa aktar, seçenekler, diller, ..."
     },
     "defaults": {
-      "menuHint": "",
+      "menuHint": "Dışa aktar, seçenekler, ve daha fazlası...",
       "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "toolbarHint": "Bir araç seçin ve çizime başlayın!",
+      "helpHint": "Kısayollar & yardım"
     }
   }
 }

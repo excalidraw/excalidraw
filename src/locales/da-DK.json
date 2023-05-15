@@ -54,6 +54,7 @@
     "veryLarge": "Meget stor",
     "solid": "Solid",
     "hachure": "Skravering",
+    "zigzag": "",
     "crossHatch": "Krydsskravering",
     "thin": "Tynd",
     "bold": "Fed",
@@ -110,6 +111,7 @@
     "increaseFontSize": "",
     "unbindText": "",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "",
       "create": "",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "",
     "importLibraryError": "",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": ""
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
+    "headingMain": "",
     "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "",
     "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": " Kopiere og indsæt venligst oplysningerne nedenfor i et GitHub problem.",
+    "trackedToSentry": "",
+    "openIssueMessage": "<button></button> Kopiere og indsæt venligst oplysningerne nedenfor i et GitHub problem.",
     "sceneContent": "Scene indhold:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "",
     "drag": "",
     "editor": "",
-    "editSelectedShape": "",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "",
     "howto": "",
     "or": "",
@@ -344,29 +348,16 @@
       "required": "",
       "website": ""
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": ""
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",

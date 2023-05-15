@@ -54,6 +54,7 @@
     "veryLarge": "ပိုကြီး",
     "solid": "အပြည့်",
     "hachure": "မျဉ်းစောင်း",
+    "zigzag": "",
     "crossHatch": "ဇကာကွက်",
     "thin": "ပါး",
     "bold": "ထူ",
@@ -110,6 +111,7 @@
     "increaseFontSize": "",
     "unbindText": "",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "",
       "create": "",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "",
     "importLibraryError": "",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "မှတ်ချက်။ ။ဝေးကွာနေသော ပုံများ၊ စာများအား ပိုမိုနီးကပ်အောင်ရွှေ့ကြည့်ပါ။"
   },
   "errorSplash": {
-    "headingMain_pre": "ချို့ယွင်းမှုဖြစ်ပေါ်ခဲ့သဖြင့် ထပ်မံကြိုးစားကြည့်ရန် ",
-    "headingMain_button": "စာမျက်နှာအား အသစ်ပြန်လည်ရယူပါ။",
-    "clearCanvasMessage": "အသစ်ပြန်လည်မရယူနိုင်ပါက ထပ်မံကြိုးစားကြည့်ရန်",
-    "clearCanvasMessage_button": "ကားချပ်အား ရှင်းလင်းပါ။",
+    "headingMain": "ချို့ယွင်းမှုဖြစ်ပေါ်ခဲ့သဖြင့် ထပ်မံကြိုးစားကြည့်ရန် <button>စာမျက်နှာအား အသစ်ပြန်လည်ရယူပါ။</button>",
+    "clearCanvasMessage": "အသစ်ပြန်လည်မရယူနိုင်ပါက ထပ်မံကြိုးစားကြည့်ရန်<button>ကားချပ်အား ရှင်းလင်းပါ။</button>",
     "clearCanvasCaveat": " ရေးဆွဲထားသည်များ ဆုံးရှုံးနိုင်သည် ",
-    "trackedToSentry_pre": "ချို့ယွင်းမှုသတ်မှတ်ချက် ",
-    "trackedToSentry_post": " အားစနစ်အတွင်းခြေရာကောက်ပြီးပါပြီ။",
-    "openIssueMessage_pre": "ချို့ယွင်းမှုမှတ်တမ်းတွင် အရေးကြီးအချက်အလက်များပါဝင်မှုမရှိစေရန်အထူးသတိပြုပါသည်။ မပါဝင်ပါက ဆက်လက်ဆောင်ရွက်ရန် ",
-    "openIssueMessage_button": "ချို့ယွင်းမှုအားခြေရာကောက်ပါ။",
-    "openIssueMessage_post": " အောက်ပါအချက်အလက်များအား Github တွင် Issue အနေဖြင့်ဖြည့်သွင်းဖော်ပြပေးပါ။",
+    "trackedToSentry": "ချို့ယွင်းမှုသတ်မှတ်ချက် {{eventId}} အားစနစ်အတွင်းခြေရာကောက်ပြီးပါပြီ။",
+    "openIssueMessage": "ချို့ယွင်းမှုမှတ်တမ်းတွင် အရေးကြီးအချက်အလက်များပါဝင်မှုမရှိစေရန်အထူးသတိပြုပါသည်။ မပါဝင်ပါက ဆက်လက်ဆောင်ရွက်ရန် <button>ချို့ယွင်းမှုအားခြေရာကောက်ပါ။</button> အောက်ပါအချက်အလက်များအား Github တွင် Issue အနေဖြင့်ဖြည့်သွင်းဖော်ပြပေးပါ။",
     "sceneContent": "မြင်ကွင်းပါအချက်အလက်။ ။"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "",
     "drag": "",
     "editor": "",
-    "editSelectedShape": "",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "",
     "howto": "",
     "or": "",
@@ -344,29 +348,16 @@
       "required": "",
       "website": ""
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": ""
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",

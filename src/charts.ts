@@ -327,7 +327,6 @@ const chartBaseElements = (
         x: x + chartWidth / 2,
         y: y - BAR_HEIGHT - BAR_GAP * 2 - DEFAULT_FONT_SIZE,
         roundness: null,
-        strokeStyle: "solid",
         textAlign: "center",
       })
     : null;

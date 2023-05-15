@@ -54,6 +54,7 @@
     "veryLarge": "Sehr groß",
     "solid": "Deckend",
     "hachure": "Schraffiert",
+    "zigzag": "Zickzack",
     "crossHatch": "Kreuzschraffiert",
     "thin": "Dünn",
     "bold": "Fett",
@@ -110,6 +111,7 @@
     "increaseFontSize": "Schrift vergrößern",
     "unbindText": "Text lösen",
     "bindText": "Text an Container binden",
+    "createContainerFromText": "Text in Container einbetten",
     "link": {
       "edit": "Link bearbeiten",
       "create": "Link erstellen",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut.",
     "importLibraryError": "Bibliothek konnte nicht geladen werden",
     "collabSaveFailed": "Keine Speicherung in der Backend-Datenbank möglich. Wenn die Probleme weiterhin bestehen, solltest Du Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
-    "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst."
+    "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
+    "brave_measure_text_error": {
+      "line1": "Sieht so aus, als ob Du den Brave-Browser verwendest und die <bold>aggressive Blockierung von Fingerabdrücken</bold> aktiviert hast.",
+      "line2": "Dies könnte dazu führen, dass die <bold>Textelemente</bold> in Ihren Zeichnungen zerstört werden.",
+      "line3": "Wir empfehlen dringend, diese Einstellung zu deaktivieren. Dazu kannst Du <link>diesen Schritten</link> folgen.",
+      "line4": "Wenn die Deaktivierung dieser Einstellung die fehlerhafte Anzeige von Textelementen nicht behebt, öffne bitte ein <issueLink>Ticket</issueLink> auf unserem GitHub oder schreibe uns auf <discordLink>Discord</discordLink>"
+    }
   },
   "toolBar": {
     "selection": "Auswahl",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "Tipp: Schiebe die am weitesten entfernten Elemente ein wenig näher zusammen."
   },
   "errorSplash": {
-    "headingMain_pre": "Es ist ein Fehler aufgetreten. Versuche ",
-    "headingMain_button": "die Seite neu zu laden.",
-    "clearCanvasMessage": "Wenn das Neuladen nicht funktioniert, versuche ",
-    "clearCanvasMessage_button": "die Zeichenfläche zu löschen.",
+    "headingMain": "Es ist ein Fehler aufgetreten. Versuche <button>die Seite neu zu laden.</button>",
+    "clearCanvasMessage": "Wenn das Neuladen nicht funktioniert, versuche <button>die Zeichenfläche zu löschen.</button>",
     "clearCanvasCaveat": " Dies wird zum Verlust von Daten führen ",
-    "trackedToSentry_pre": "Der Fehler mit der Kennung ",
-    "trackedToSentry_post": " wurde in unserem System registriert.",
-    "openIssueMessage_pre": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in die Fehlerinformationen aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren ",
-    "openIssueMessage_button": "Bug-Tracker.",
-    "openIssueMessage_post": " Bitte teile die unten stehenden Informationen mit uns im GitHub Issue (Kopieren und Einfügen).",
+    "trackedToSentry": "Der Fehler mit der Kennung {{eventId}} wurde in unserem System registriert.",
+    "openIssueMessage": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in die Fehlerinformationen aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren <button>Bug-Tracker</button>. Bitte teile die unten stehenden Informationen mit uns im GitHub Issue (Kopieren und Einfügen).",
     "sceneContent": "Zeichnungsinhalt:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "doppelklicken",
     "drag": "ziehen",
     "editor": "Editor",
-    "editSelectedShape": "Ausgewählte Form bearbeiten (Text/Pfeil/Linie)",
+    "editLineArrowPoints": "Linien-/Pfeil-Punkte bearbeiten",
+    "editText": "Text bearbeiten / Label hinzufügen",
     "github": "Ein Problem gefunden? Informiere uns",
     "howto": "Folge unseren Anleitungen",
     "or": "oder",
@@ -344,29 +348,16 @@
       "required": "Erforderlich",
       "website": "Gültige URL eingeben"
     },
-    "noteDescription": {
-      "pre": "Sende deine Bibliothek ein, um in die ",
-      "link": "öffentliche Bibliotheks-Repository aufgenommen zu werden",
-      "post": "damit andere Nutzer sie in ihren Zeichnungen verwenden können."
-    },
-    "noteGuidelines": {
-      "pre": "Die Bibliothek muss zuerst manuell freigegeben werden. Bitte lies die ",
-      "link": "Richtlinien",
-      "post": " vor dem Absenden. Du benötigst ein GitHub-Konto, um zu kommunizieren und Änderungen vorzunehmen, falls erforderlich, aber es ist nicht unbedingt erforderlich."
-    },
-    "noteLicense": {
-      "pre": "Mit dem Absenden stimmst du zu, dass die Bibliothek unter der ",
-      "link": "MIT-Lizenz, ",
-      "post": "die zusammengefasst beinhaltet, dass jeder sie ohne Einschränkungen nutzen kann."
-    },
+    "noteDescription": "Sende deine Bibliothek ein, um in die <link>öffentliche Bibliotheks-Repository aufgenommen zu werden</link>damit andere Nutzer sie in ihren Zeichnungen verwenden können.",
+    "noteGuidelines": "Die Bibliothek muss zuerst manuell freigegeben werden. Bitte lies die <link>Richtlinien</link> vor dem Absenden. Du benötigst ein GitHub-Konto, um zu kommunizieren und Änderungen vorzunehmen, falls erforderlich, aber es ist nicht unbedingt erforderlich.",
+    "noteLicense": "Mit dem Absenden stimmst du zu, dass die Bibliothek unter der <link>MIT-Lizenz, </link>die zusammengefasst beinhaltet, dass jeder sie ohne Einschränkungen nutzen kann.",
     "noteItems": "Jedes Bibliothekselement muss einen eigenen Namen haben, damit es gefiltert werden kann. Die folgenden Bibliothekselemente werden hinzugefügt:",
     "atleastOneLibItem": "Bitte wähle mindestens ein Bibliothekselement aus, um zu beginnen",
     "republishWarning": "Hinweis: Einige der ausgewählten Elemente sind bereits als veröffentlicht/eingereicht markiert. Du solltest Elemente nur erneut einreichen, wenn Du eine existierende Bibliothek oder Einreichung aktualisierst."
   },
   "publishSuccessDialog": {
     "title": "Bibliothek übermittelt",
-    "content": "Vielen Dank {{authorName}}. Deine Bibliothek wurde zur Überprüfung eingereicht. Du kannst den Status verfolgen",
-    "link": "hier"
+    "content": "Vielen Dank {{authorName}}. Deine Bibliothek wurde zur Überprüfung eingereicht. Du kannst den Status verfolgen<link>hier</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Bibliothek zurücksetzen",

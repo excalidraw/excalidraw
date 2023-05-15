@@ -54,6 +54,7 @@
     "veryLarge": "Ļoti liels",
     "solid": "Pilns",
     "hachure": "Svītrots",
+    "zigzag": "Zigzaglīnija",
     "crossHatch": "Šķērssvītrots",
     "thin": "Šaurs",
     "bold": "Trekns",
@@ -110,6 +111,7 @@
     "increaseFontSize": "Palielināt fonta izmēru",
     "unbindText": "Atdalīt tekstu",
     "bindText": "Piesaistīt tekstu figūrai",
+    "createContainerFromText": "Ietilpināt tekstu figurā",
     "link": {
       "edit": "Rediģēt saiti",
       "create": "Izveidot saiti",
@@ -193,7 +195,7 @@
     "resetLibrary": "Šī funkcija iztukšos bibliotēku. Vai turpināt?",
     "removeItemsFromsLibrary": "Vai izņemt {{count}} vienumu(s) no bibliotēkas?",
     "invalidEncryptionKey": "Šifrēšanas atslēgai jābūt 22 simbolus garai. Tiešsaistes sadarbība ir izslēgta.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Nav pieejams interneta pieslēgums.\nJūsu izmaiņas netiks saglabātas!"
   },
   "errors": {
     "unsupportedFileType": "Neatbalstīts datnes veids.",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "Nevarēja savienoties ar sadarbošanās serveri. Lūdzu, pārlādējiet lapu un mēģiniet vēlreiz.",
     "importLibraryError": "Nevarēja ielādēt bibliotēku",
     "collabSaveFailed": "Darbs nav saglabāts datubāzē. Ja problēma turpinās, saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu.",
-    "collabSaveFailed_sizeExceeded": "Darbs nav saglabāts datubāzē, šķiet, ka tāfele ir pārāk liela. Saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu."
+    "collabSaveFailed_sizeExceeded": "Darbs nav saglabāts datubāzē, šķiet, ka tāfele ir pārāk liela. Saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu.",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Atlase",
@@ -221,7 +229,7 @@
     "penMode": "Pildspalvas režīms – novērst pieskaršanos",
     "link": "Pievienot/rediģēt atlasītās figūras saiti",
     "eraser": "Dzēšgumija",
-    "hand": ""
+    "hand": "Roka (panoramēšanas rīks)"
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
@@ -229,7 +237,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Lai bīdītu tāfeli, turiet nospiestu ritināšanas vai atstarpes taustiņu, vai izmanto rokas rīku",
     "linearElement": "Klikšķiniet, lai sāktu zīmēt vairākus punktus; velciet, lai zīmētu līniju",
     "freeDraw": "Spiediet un velciet; atlaidiet, kad pabeidzat",
     "text": "Ieteikums: lai pievienotu tekstu, varat arī jebkur dubultklikšķināt ar atlases rīku",
@@ -248,7 +256,7 @@
     "bindTextToElement": "Spiediet ievades taustiņu, lai pievienotu tekstu",
     "deepBoxSelect": "Turient nospiestu Ctrl vai Cmd, lai atlasītu dziļumā un lai nepieļautu objektu pavilkšanu",
     "eraserRevert": "Turiet Alt, lai noņemtu elementus no dzēsšanas atlases",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Šis iestatījums var tikt ieslēgts ar \"dom.events.asyncClipboard.clipboardItem\" marķieri pārslēgtu uz \"true\". Lai mainītu pārlūka marķierus Firefox, apmeklē \"about:config\" lapu."
   },
   "canvasError": {
     "cannotShowPreview": "Nevar rādīt priekšskatījumu",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "Ieteikums: mēģiniet satuvināt pašus tālākos elementus."
   },
   "errorSplash": {
-    "headingMain_pre": "Notikusi kļūda. Mēģiniet ",
-    "headingMain_button": "pārlādēt lapu.",
-    "clearCanvasMessage": "Ja pārlādēšana nestrādā, mēģiniet ",
-    "clearCanvasMessage_button": "notīrot tāfeli.",
+    "headingMain": "Notikusi kļūda. Mēģiniet <button>pārlādēt lapu.</button>",
+    "clearCanvasMessage": "Ja pārlādēšana nestrādā, mēģiniet <button>notīrot tāfeli.</button>",
     "clearCanvasCaveat": " Tas novedīs pie darba zaudēšanas ",
-    "trackedToSentry_pre": "Kļūda ar kodu ",
-    "trackedToSentry_post": " tika noteikta mūsu sistēmā.",
-    "openIssueMessage_pre": "Mēs uzmanījāmies, lai neiekļautu jūsu ainas informāciju šajā kļūdā. Ja jūsu aina nav privāta, lūdzu ziņojiet par šo kļūdu mūsu ",
-    "openIssueMessage_button": "kļūdu uzskaitē.",
-    "openIssueMessage_post": " Lūdzu, miniet sekojošo informāciju to kopējot un ielīmējot jūsu ziņojumā platformā GitHub.",
+    "trackedToSentry": "Kļūda ar kodu {{eventId}} tika noteikta mūsu sistēmā.",
+    "openIssueMessage": "Mēs uzmanījāmies, lai neiekļautu jūsu ainas informāciju šajā kļūdā. Ja jūsu aina nav privāta, lūdzu ziņojiet par šo kļūdu mūsu <button>kļūdu uzskaitē.</button> Lūdzu, miniet sekojošo informāciju to kopējot un ielīmējot jūsu ziņojumā platformā GitHub.",
     "sceneContent": "Ainas saturs:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "dubultklikšķis",
     "drag": "vilkt",
     "editor": "Redaktors",
-    "editSelectedShape": "Rediģēt atlasīto figūru (tekstu/bultu/līniju)",
+    "editLineArrowPoints": "Rediģēt līniju/bultu punktus",
+    "editText": "Rediģēt tekstu/pievienot birku",
     "github": "Sastapāt kļūdu? Ziņot",
     "howto": "Sekojiet mūsu instrukcijām",
     "or": "vai",
@@ -344,29 +348,16 @@
       "required": "Obligāts",
       "website": "Ievadiet derīgu URL"
     },
-    "noteDescription": {
-      "pre": "Iesniegt savu bibliotēku iekļaušanai ",
-      "link": "publiskajā bibliotēku datubāzē",
-      "post": ", lai citi to varētu izmantot savos zīmējumos."
-    },
-    "noteGuidelines": {
-      "pre": "Šai bibliotēkai vispirms jātiek manuāli apstiprinātai. Lūdzu, izlasiet ",
-      "link": "norādījumus",
-      "post": " pirms iesniegšanas. Jums vajadzēs GitHub kontu, lai sazinātos un veiktu izmaiņas, ja tādas būs pieprasītas, bet tas nav absolūti nepieciešams."
-    },
-    "noteLicense": {
-      "pre": "Iesniedzot bibliotēku, jūs piekrītat tās publicēšanai saskaņā ar ",
-      "link": "MIT Licenci, ",
-      "post": "kas īsumā nozīmē, ka jebkurš to varēs izmantot bez ierobežojumiem."
-    },
+    "noteDescription": "Iesniegt savu bibliotēku iekļaušanai <link>publiskajā bibliotēku datubāzē</link>, lai citi to varētu izmantot savos zīmējumos.",
+    "noteGuidelines": "Šai bibliotēkai vispirms jātiek manuāli apstiprinātai. Lūdzu, izlasiet <link>norādījumus</link> pirms iesniegšanas. Jums vajadzēs GitHub kontu, lai sazinātos un veiktu izmaiņas, ja tādas būs pieprasītas, bet tas nav absolūti nepieciešams.",
+    "noteLicense": "Iesniedzot bibliotēku, jūs piekrītat tās publicēšanai saskaņā ar <link>MIT Licenci, </link>kas īsumā nozīmē, ka jebkurš to varēs izmantot bez ierobežojumiem.",
     "noteItems": "Katram bibliotēkas vienumam jābūt savam nosaukumam, lai to varētu atrast filtrējot. Tiks iekļauti sekojošie bibliotēkas vienumi:",
     "atleastOneLibItem": "Lūdzu, atlasiet vismaz vienu bibliotēkas vienumu, lai sāktu darbu",
     "republishWarning": "Ievēro: daži no atzīmētajiem objektiem jau atzīmēti kā publicēti vai iesniegti publicēšanai. Tos vajadzētu atkārtoti iesniegt tikai tad, ja vēlies labot esošo bibliotēku."
   },
   "publishSuccessDialog": {
     "title": "Bibliotēka iesniegta",
-    "content": "Paldies, {{authorName}}! Jūsu bibliotēka iesniegta izskatīšanai. Jūs varat izsekot iesnieguma statusam",
-    "link": "šeit"
+    "content": "Paldies, {{authorName}}! Jūsu bibliotēka iesniegta izskatīšanai. Jūs varat izsekot iesnieguma statusam<link>šeit</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Atiestatīt bibliotēku",
@@ -451,15 +442,15 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Visi jūsu dati tiek glabāti uz vietas jūsu pārlūkā.",
+      "center_heading_plus": "Vai tā vietā vēlies doties uz Excalidraw+?",
+      "menuHint": "Eksportēšana, iestatījumi, valodas..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Eksportēšana, iestatījumi un vēl...",
+      "center_heading": "Diagrammas. Izveidotas. Vienkārši.",
+      "toolbarHint": "Izvēlies rīku un sāc zīmēt!",
+      "helpHint": "Īsceļi un palīdzība"
     }
   }
 }

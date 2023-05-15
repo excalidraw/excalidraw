@@ -1,4 +1,4 @@
-import { useOutsideClickHook } from "../../hooks/useOutsideClick";
+import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { Island } from "../Island";
 
 import { useDevice } from "../App";
@@ -24,7 +24,7 @@ const MenuContent = ({
   style?: React.CSSProperties;
 }) => {
   const device = useDevice();
-  const menuRef = useOutsideClickHook(() => {
+  const menuRef = useOutsideClick(() => {
     onClickOutside?.();
   });
 

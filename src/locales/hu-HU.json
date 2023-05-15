@@ -54,6 +54,7 @@
     "veryLarge": "Nagyon nagy",
     "solid": "Kitöltött",
     "hachure": "Vonalkázott",
+    "zigzag": "",
     "crossHatch": "Keresztcsíkozott",
     "thin": "Vékony",
     "bold": "Félkövér",
@@ -110,6 +111,7 @@
     "increaseFontSize": "Betűméret növelése",
     "unbindText": "Szövegkötés feloldása",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "Hivatkozás szerkesztése",
       "create": "Hivatkozás létrehozása",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "",
     "importLibraryError": "",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Kijelölés",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "Tipp: próbáld meg a legtávolabbi elemeket közelebb hozni egy máshoz."
   },
   "errorSplash": {
-    "headingMain_pre": "Hiba történt. Próbáld ",
-    "headingMain_button": "újratölteni az oldalt.",
-    "clearCanvasMessage": "Ha az újratöltés nem működik, próbáld ",
-    "clearCanvasMessage_button": "letörölni a vászont.",
+    "headingMain": "Hiba történt. Próbáld <button>újratölteni az oldalt.</button>",
+    "clearCanvasMessage": "Ha az újratöltés nem működik, próbáld <button>letörölni a vászont.</button>",
     "clearCanvasCaveat": " Ezzel az eddigi munka elveszik ",
-    "trackedToSentry_pre": "A hibakód azonosítóval ",
-    "trackedToSentry_post": " nyomon van követve a rendszerünkben.",
-    "openIssueMessage_pre": "Vigyáztunk arra, hogy a jelenthez tartozó információ ne jelenjen meg a hibaüzenetben. Ha a jeleneted nem bizalmas, kérjük add hozzá a ",
-    "openIssueMessage_button": "hibakövető rendszerünkhöz.",
-    "openIssueMessage_post": " Kérjük, másolja be az alábbi információkat a GitHub problémába.",
+    "trackedToSentry": "A hibakód azonosítóval {{eventId}} nyomon van követve a rendszerünkben.",
+    "openIssueMessage": "Vigyáztunk arra, hogy a jelenthez tartozó információ ne jelenjen meg a hibaüzenetben. Ha a jeleneted nem bizalmas, kérjük add hozzá a <button>hibakövető rendszerünkhöz.</button> Kérjük, másolja be az alábbi információkat a GitHub problémába.",
     "sceneContent": "Jelenet tartalma:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "dupla kattintás",
     "drag": "vonszolás",
     "editor": "Szerkesztő",
-    "editSelectedShape": "Kijelölt alakzat szerkesztése (szöveg/nyíl/vonal)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Hibát találtál? Küld be",
     "howto": "Kövesd az útmutatóinkat",
     "or": "vagy",
@@ -344,29 +348,16 @@
       "required": "Kötelező",
       "website": "Adj meg egy érvényes URL-t"
     },
-    "noteDescription": {
-      "pre": "Küld be könyvtáradat, hogy bekerüljön a ",
-      "link": "nyilvános könyvtár tárolóba",
-      "post": "hogy mások is felhasználhassák a rajzaikban."
-    },
-    "noteGuidelines": {
-      "pre": "A könyvtárat először manuálisan kell jóváhagyni. Kérjük, olvassa el a ",
-      "link": "segédletet",
-      "post": " benyújtása előtt. Szüksége lesz egy GitHub-fiókra a kommunikációhoz és a módosításokhoz, ha kérik, de ez nem feltétlenül szükséges."
-    },
-    "noteLicense": {
-      "pre": "A beküldéssel elfogadja, hogy a könyvtár a következő alatt kerül közzétételre ",
-      "link": "MIT Licensz ",
-      "post": "ami röviden azt jelenti, hogy bárki korlátozás nélkül használhatja őket."
-    },
+    "noteDescription": "Küld be könyvtáradat, hogy bekerüljön a <link>nyilvános könyvtár tárolóba</link>hogy mások is felhasználhassák a rajzaikban.",
+    "noteGuidelines": "A könyvtárat először manuálisan kell jóváhagyni. Kérjük, olvassa el a <link>segédletet</link> benyújtása előtt. Szüksége lesz egy GitHub-fiókra a kommunikációhoz és a módosításokhoz, ha kérik, de ez nem feltétlenül szükséges.",
+    "noteLicense": "A beküldéssel elfogadja, hogy a könyvtár a következő alatt kerül közzétételre <link>MIT Licensz </link>ami röviden azt jelenti, hogy bárki korlátozás nélkül használhatja őket.",
     "noteItems": "Minden könyvtárelemnek saját nevével kell rendelkeznie, hogy szűrhető legyen. A következő könyvtári tételek kerülnek bele:",
     "atleastOneLibItem": "A kezdéshez válassz ki legalább egy könyvtári elemet",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "A könyvtár beküldve",
-    "content": "Köszönjük {{authorName}}. Könyvtáradat elküldtük felülvizsgálatra. Nyomon követheted az állapotot",
-    "link": "itt"
+    "content": "Köszönjük {{authorName}}. Könyvtáradat elküldtük felülvizsgálatra. Nyomon követheted az állapotot<link>itt</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Könyvtár alaphelyzetbe állítása",

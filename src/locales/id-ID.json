@@ -54,6 +54,7 @@
     "veryLarge": "Sangat besar",
     "solid": "Padat",
     "hachure": "Garis-garis",
+    "zigzag": "",
     "crossHatch": "Asiran silang",
     "thin": "Lembut",
     "bold": "Tebal",
@@ -110,6 +111,7 @@
     "increaseFontSize": "Besarkan ukuran font",
     "unbindText": "Lepas teks",
     "bindText": "Kunci teks ke kontainer",
+    "createContainerFromText": "",
     "link": {
       "edit": "Edit tautan",
       "create": "Buat tautan",
@@ -193,7 +195,7 @@
     "resetLibrary": "Ini akan menghapus pustaka Anda. Anda yakin?",
     "removeItemsFromsLibrary": "Hapus {{count}} item dari pustaka?",
     "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Tidak ada koneksi internet.\nPerubahan tidak akan disimpan!"
   },
   "errors": {
     "unsupportedFileType": "Tipe file tidak didukung.",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "Tidak dapat terhubung ke server kolab. Muat ulang laman dan coba lagi.",
     "importLibraryError": "Tidak dapat memuat pustaka",
     "collabSaveFailed": "Tidak dapat menyimpan ke dalam basis data server. Jika masih berlanjut, Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
-    "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang."
+    "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Pilihan",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "Tip: coba pindahkan elemen-terjauh lebih dekat bersama."
   },
   "errorSplash": {
-    "headingMain_pre": "Mengalami sebuah kesalahan. Cobalah ",
-    "headingMain_button": "muat ulang halaman.",
-    "clearCanvasMessage": "Jika memuat ulang tidak bekerja, cobalah ",
-    "clearCanvasMessage_button": "bersihkan canvas.",
+    "headingMain": "Mengalami sebuah kesalahan. Cobalah <button>muat ulang halaman.</button>",
+    "clearCanvasMessage": "Jika memuat ulang tidak bekerja, cobalah <button>bersihkan canvas.</button>",
     "clearCanvasCaveat": " Ini akan menghasilkan hilangnya pekerjaan ",
-    "trackedToSentry_pre": "Kesalahan dengan pengidentifikasi ",
-    "trackedToSentry_post": " dilacak di sistem kami.",
-    "openIssueMessage_pre": "Kami sangat berhati-hati untuk tidak menyertakan informasi pemandangan Anda pada kesalahan. Jika pemandangan Anda tidak bersifat pribadi, mohon pertimbangkan menindak lanjut pada ",
-    "openIssueMessage_button": "pelacak bug.",
-    "openIssueMessage_post": " Mohon sertakan informasi dibawah ini dengan menyalin dan menempelkan di Github issue.",
+    "trackedToSentry": "Kesalahan dengan pengidentifikasi {{eventId}} dilacak di sistem kami.",
+    "openIssueMessage": "Kami sangat berhati-hati untuk tidak menyertakan informasi pemandangan Anda pada kesalahan. Jika pemandangan Anda tidak bersifat pribadi, mohon pertimbangkan menindak lanjut pada <button>pelacak bug.</button> Mohon sertakan informasi dibawah ini dengan menyalin dan menempelkan di Github issue.",
     "sceneContent": "Pemandangan konten:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "klik-ganda",
     "drag": "seret",
     "editor": "Editor",
-    "editSelectedShape": "Edit bentuk yang dipilih (teks/panah/garis)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Menemukan masalah? Kirimkan",
     "howto": "Ikuti panduan kami",
     "or": "atau",
@@ -344,29 +348,16 @@
       "required": "Dibutuhkan",
       "website": "Masukkan URL valid"
     },
-    "noteDescription": {
-      "pre": "Kirimkan pustaka Anda untuk disertakan di ",
-      "link": "repositori pustaka publik",
-      "post": "untuk orang lain menggunakannya dalam gambar mereka."
-    },
-    "noteGuidelines": {
-      "pre": "Pustaka butuh disetujui secara manual terlebih dahulu. Baca ",
-      "link": "pedoman",
-      "post": " sebelum mengirim. Anda butuh akun GitHub untuk berkomunikasi dan membuat perubahan jika dibutuhkan, tetapi tidak wajib dibutukan."
-    },
-    "noteLicense": {
-      "pre": "Dengan mengkirimkannya, Anda setuju pustaka akan diterbitkan dibawah ",
-      "link": "Lisensi MIT, ",
-      "post": "yang artinya siapa pun dapat menggunakannya tanpa batasan."
-    },
+    "noteDescription": "Kirimkan pustaka Anda untuk disertakan di <link>repositori pustaka publik</link>untuk orang lain menggunakannya dalam gambar mereka.",
+    "noteGuidelines": "Pustaka butuh disetujui secara manual terlebih dahulu. Baca <link>pedoman</link> sebelum mengirim. Anda butuh akun GitHub untuk berkomunikasi dan membuat perubahan jika dibutuhkan, tetapi tidak wajib dibutukan.",
+    "noteLicense": "Dengan mengkirimkannya, Anda setuju pustaka akan diterbitkan dibawah <link>Lisensi MIT, </link>yang artinya siapa pun dapat menggunakannya tanpa batasan.",
     "noteItems": "Setiap item pustaka harus memiliki nama, sehingga bisa disortir. Item pustaka di bawah ini akan dimasukan:",
     "atleastOneLibItem": "Pilih setidaknya satu item pustaka untuk mulai",
     "republishWarning": "Catatan: beberapa item yang dipilih telah ditandai sebagai sudah dipublikasikan/diserahkan. Anda hanya dapat menyerahkan kembali item-item ketika memperbarui pustaka atau pengumpulan."
   },
   "publishSuccessDialog": {
     "title": "Pustaka telah dikirm",
-    "content": "Terima kasih {{authorName}}. pustaka Anda telah diserahkan untuk ditinjau ulang. Anda dapat cek statusnya",
-    "link": "di sini"
+    "content": "Terima kasih {{authorName}}. pustaka Anda telah diserahkan untuk ditinjau ulang. Anda dapat cek statusnya<link>di sini</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Reset pustaka",

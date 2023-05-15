@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { cleanAppStateForExport } from "../appState";
-import { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "../constants";
+import { IMAGE_MIME_TYPES, MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { ExcalidrawElement, FileId } from "../element/types";
 import { CanvasError } from "../errors";
@@ -117,11 +117,9 @@ export const isImageFileHandle = (handle: FileSystemHandle | null) => {
 
 export const isSupportedImageFile = (
   blob: Blob | null | undefined,
-): blob is Blob & { type: typeof ALLOWED_IMAGE_MIME_TYPES[number] } => {
+): blob is Blob & { type: ValueOf<typeof IMAGE_MIME_TYPES> } => {
   const { type } = blob || {};
-  return (
-    !!type && (ALLOWED_IMAGE_MIME_TYPES as readonly string[]).includes(type)
-  );
+  return !!type && (Object.values(IMAGE_MIME_TYPES) as string[]).includes(type);
 };
 
 export const loadSceneOrLibraryFromBlob = async (
@@ -157,7 +155,7 @@ export const loadSceneOrLibraryFromBlob = async (
           },
           localAppState,
           localElements,
-          { repairBindings: true, refreshDimensions: true },
+          { repairBindings: true, refreshDimensions: false },
         ),
       };
     } else if (isValidLibrary(data)) {

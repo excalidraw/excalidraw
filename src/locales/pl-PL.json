@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Wklej",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Wklej jako zwykły tekst",
     "pasteCharts": "Wklej wykresy",
     "selectAll": "Zaznacz wszystko",
     "multiSelect": "Dodaj element do zaznaczenia",
@@ -54,6 +54,7 @@
     "veryLarge": "Bardzo duży",
     "solid": "Pełne",
     "hachure": "Linie",
+    "zigzag": "",
     "crossHatch": "Zakreślone",
     "thin": "Cienkie",
     "bold": "Pogrubione",
@@ -72,7 +73,7 @@
     "layers": "Warstwy",
     "actions": "Akcje",
     "language": "Język",
-    "liveCollaboration": "",
+    "liveCollaboration": "Współpraca w czasie rzeczywistym...",
     "duplicateSelection": "Powiel",
     "untitled": "Bez tytułu",
     "name": "Nazwa",
@@ -96,8 +97,8 @@
     "centerHorizontally": "Wyśrodkuj w poziomie",
     "distributeHorizontally": "Rozłóż poziomo",
     "distributeVertically": "Rozłóż pionowo",
-    "flipHorizontal": "Odbij w poziomie",
-    "flipVertical": "Odbij w pionie",
+    "flipHorizontal": "Odwróć w poziomie",
+    "flipVertical": "Odwróć w pionie",
     "viewMode": "Tryb widoku",
     "toggleExportColorScheme": "Przełącz schemat kolorów przy eksporcie",
     "share": "Udostępnij",
@@ -106,46 +107,47 @@
     "toggleTheme": "Przełącz motyw",
     "personalLib": "Biblioteka prywatna",
     "excalidrawLib": "Biblioteka Excalidraw",
-    "decreaseFontSize": "",
-    "increaseFontSize": "",
+    "decreaseFontSize": "Zmniejsz rozmiar czcionki",
+    "increaseFontSize": "Zwiększ rozmiar czcionki",
     "unbindText": "",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
-      "edit": "",
-      "create": "",
-      "label": ""
+      "edit": "Edytuj łącze",
+      "create": "Utwórz łącze",
+      "label": "Łącze"
     },
     "lineEditor": {
       "edit": "",
       "exit": ""
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Zablokuj",
+      "unlock": "Odblokuj",
+      "lockAll": "Zablokuj wszystko",
+      "unlockAll": "Odblokuj wszystko"
     },
-    "statusPublished": "",
-    "sidebarLock": ""
+    "statusPublished": "Opublikowano",
+    "sidebarLock": "Panel boczny zawsze otwarty"
   },
   "library": {
-    "noItems": "",
+    "noItems": "Nie dodano jeszcze żadnych elementów...",
     "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyPrivateLibrary": "Wybierz element, aby dodać go tutaj."
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
     "exportJSON": "Eksportuj do pliku",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Eksportuj obraz...",
+    "export": "Zapisz jako...",
     "exportToPng": "Zapisz jako PNG",
     "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
     "copyPngToClipboard": "Skopiuj do schowka jako plik PNG",
     "scale": "Skala",
-    "save": "",
+    "save": "Zapisz do bieżącego pliku",
     "saveAs": "Zapisz jako",
-    "load": "",
+    "load": "Otwórz",
     "getShareableLink": "Udostępnij",
     "close": "Zamknij",
     "selectLanguage": "Wybierz język",
@@ -179,11 +181,11 @@
     "couldNotLoadInvalidFile": "Nie udało się otworzyć pliku. Wybrany plik jest nieprawidłowy.",
     "importBackendFailed": "Wystąpił błąd podczas importowania pliku.",
     "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "Nie udało się skopiować do schowka.",
     "decryptFailed": "Nie udało się odszyfrować danych.",
     "uploadedSecurly": "By zapewnić Ci prywatność, udostępnianie projektu jest zabezpieczone szyfrowaniem end-to-end, co oznacza, że poza tobą i osobą z którą podzielisz się linkiem, nikt nie ma dostępu do tego co udostępniasz.",
     "loadSceneOverridePrompt": "Wczytanie zewnętrznego rysunku zastąpi istniejącą zawartość. Czy chcesz kontynuować?",
-    "collabStopOverridePrompt": "Zatrzymanie sesji nadpisze poprzedni, zapisany lokalnie rysunk. Jesteś pewien?\n\n(Jeśli chcesz zachować swój lokalny rysunek, po prostu zamknij zakładkę przeglądarki.)",
+    "collabStopOverridePrompt": "Zatrzymanie sesji nadpisze poprzedni, zapisany lokalnie rysunek. Czy jesteś pewien?\n\n(Jeśli chcesz zachować swój lokalny rysunek, po prostu zamknij zakładkę przeglądarki.)",
     "errorAddingToLibrary": "Nie udało się dodać elementu do biblioteki",
     "errorRemovingFromLibrary": "Nie udało się usunąć elementu z biblioteki",
     "confirmAddLibrary": "To doda {{numShapes}} kształtów do twojej biblioteki. Jesteś pewien?",
@@ -193,7 +195,7 @@
     "resetLibrary": "To wyczyści twoją bibliotekę. Jesteś pewien?",
     "removeItemsFromsLibrary": "Usunąć {{count}} element(ów) z biblioteki?",
     "invalidEncryptionKey": "Klucz szyfrowania musi składać się z 22 znaków. Współpraca na żywo jest wyłączona.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Brak połączenia z Internetem.\nTwoje zmiany nie zostaną zapisane!"
   },
   "errors": {
     "unsupportedFileType": "Nieobsługiwany typ pliku.",
@@ -201,10 +203,16 @@
     "fileTooBig": "Plik jest zbyt duży. Maksymalny dozwolony rozmiar to {{maxSize}}.",
     "svgImageInsertError": "Nie udało się wstawić obrazu SVG. Znacznik SVG wygląda na nieprawidłowy.",
     "invalidSVGString": "Nieprawidłowy SVG.",
-    "cannotResolveCollabServer": "",
-    "importLibraryError": "",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "cannotResolveCollabServer": "Nie można połączyć się z serwerem współpracy w czasie rzeczywistym. Proszę odświeżyć stronę i spróbować ponownie.",
+    "importLibraryError": "Wystąpił błąd w trakcie ładowania biblioteki",
+    "collabSaveFailed": "Nie udało się zapisać w bazie danych. Jeśli problemy nie ustąpią, zapisz plik lokalnie, aby nie utracić swojej pracy.",
+    "collabSaveFailed_sizeExceeded": "Nie udało się zapisać w bazie danych — dokument jest za duży. Zapisz plik lokalnie, aby nie utracić swojej pracy.",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Zaznaczenie",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "Wskazówka: spróbuj nieco zbliżyć najdalej wysunięte elementy."
   },
   "errorSplash": {
-    "headingMain_pre": "Wystąpił błąd. Spróbuj ",
-    "headingMain_button": "odświeżyć stronę.",
-    "clearCanvasMessage": "Jeśli odświeżenie strony nie zadziałało, spróbuj ",
-    "clearCanvasMessage_button": "usunąć wszystko z dokumentu.",
+    "headingMain": "Wystąpił błąd. Spróbuj <button>odświeżyć stronę.</button>",
+    "clearCanvasMessage": "Jeśli odświeżenie strony nie zadziałało, spróbuj <button>usunąć wszystko z dokumentu.</button>",
     "clearCanvasCaveat": " Pamiętaj tylko, że spowoduje to utratę całej twojej pracy ",
-    "trackedToSentry_pre": "Błąd o identyfikatorze ",
-    "trackedToSentry_post": " został zaraportowany w naszym systemie.",
-    "openIssueMessage_pre": "Szanujemy twoją prywatność i raport nie zawierał żadnych danych dotyczących tego nad czym pracowałeś, natomiast jeżeli jesteś w stanie podzielić się tym nad czym pracowałeś, prosimy o dodatkowy raport poprzez ",
-    "openIssueMessage_button": "nasze narzędzie do raportowania błędów.",
-    "openIssueMessage_post": " Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i umieszczenie jej w zgłoszeniu na portalu GitHub.",
+    "trackedToSentry": "Błąd o identyfikatorze {{eventId}} został zaraportowany w naszym systemie.",
+    "openIssueMessage": "Szanujemy twoją prywatność i raport nie zawierał żadnych danych dotyczących tego nad czym pracowałeś, natomiast jeżeli jesteś w stanie podzielić się tym nad czym pracowałeś, prosimy o dodatkowy raport poprzez <button>nasze narzędzie do raportowania błędów.</button> Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i umieszczenie jej w zgłoszeniu na portalu GitHub.",
     "sceneContent": "Zawartość dokumentu:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "podwójne kliknięcie",
     "drag": "przeciągnij",
     "editor": "Edytor",
-    "editSelectedShape": "Edytuj wybrany kształt (tekst/strzałka/linia)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Znalazłeś problem? Prześlij",
     "howto": "Skorzystaj z instrukcji",
     "or": "lub",
@@ -317,7 +321,7 @@
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
     "zoomToSelection": "Przybliż do zaznaczenia",
     "toggleElementLock": "",
-    "movePageUpDown": "",
+    "movePageUpDown": "Przesuń stronę w górę/w dół",
     "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
@@ -344,29 +348,16 @@
       "required": "Wymagane",
       "website": "Wprowadź prawidłowy adres URL"
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": "dla innych osób do wykorzystania w swoich rysunkach."
-    },
-    "noteGuidelines": {
-      "pre": "Biblioteka musi być najpierw zatwierdzona ręcznie. Przeczytaj ",
-      "link": "wytyczne",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "Wysyłając zgadzasz się, że biblioteka zostanie opublikowana pod ",
-      "link": "Licencja MIT, ",
-      "post": "w skrócie, każdy może z nich korzystać bez ograniczeń."
-    },
+    "noteDescription": "<link></link>dla innych osób do wykorzystania w swoich rysunkach.",
+    "noteGuidelines": "Biblioteka musi być najpierw zatwierdzona ręcznie. Przeczytaj <link>wytyczne</link>",
+    "noteLicense": "Wysyłając zgadzasz się, że biblioteka zostanie opublikowana pod <link>Licencja MIT, </link>w skrócie, każdy może z nich korzystać bez ograniczeń.",
     "noteItems": "",
     "atleastOneLibItem": "Proszę wybrać co najmniej jeden element biblioteki, by rozpocząć",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Biblioteka została przesłana",
-    "content": "Dziękujemy {{authorName}}. Twoja biblioteka została przesłana do sprawdzenia. Możesz śledzić jej stan",
-    "link": "tutaj"
+    "content": "Dziękujemy {{authorName}}. Twoja biblioteka została przesłana do sprawdzenia. Możesz śledzić jej stan<link>tutaj</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Zresetuj Bibliotekę",

@@ -54,6 +54,7 @@
     "veryLarge": "Labai didelis",
     "solid": "",
     "hachure": "",
+    "zigzag": "",
     "crossHatch": "",
     "thin": "Plonas",
     "bold": "Pastorintas",
@@ -110,6 +111,7 @@
     "increaseFontSize": "",
     "unbindText": "",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "Redeguoti nuorodą",
       "create": "Sukurti nuorodą",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "Nepavyko prisijungti prie serverio bendradarbiavimui. Perkrauk puslapį ir pabandyk prisijungti dar kartą.",
     "importLibraryError": "Nepavyko įkelti bibliotekos",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Žymėjimas",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": ""
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
+    "headingMain": "",
     "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "",
     "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": ""
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "dvigubas paspaudimas",
     "drag": "vilkti",
     "editor": "Redaktorius",
-    "editSelectedShape": "",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Radai klaidą? Pateik",
     "howto": "Vadovaukis mūsų gidu",
     "or": "arba",
@@ -344,29 +348,16 @@
       "required": "Privalomas",
       "website": "Įveskite teisingą nuorodą (URL)"
     },
-    "noteDescription": {
-      "pre": "Pateik savo biblioteką, jog ji galėtų būti įtraukta į ",
-      "link": "",
-      "post": "jog kiti žmonės galėtų tai naudoti savo piešiniuose."
-    },
-    "noteGuidelines": {
-      "pre": "Visų pirma, biblioteka turi būti rankiniu būdu patvirtinta. Prašome paskaityti ",
-      "link": "gairės",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "MIT licencija, ",
-      "post": ""
-    },
+    "noteDescription": "Pateik savo biblioteką, jog ji galėtų būti įtraukta į <link></link>jog kiti žmonės galėtų tai naudoti savo piešiniuose.",
+    "noteGuidelines": "Visų pirma, biblioteka turi būti rankiniu būdu patvirtinta. Prašome paskaityti <link>gairės</link>",
+    "noteLicense": "<link>MIT licencija, </link>",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Biblioteka pateikta",
-    "content": "Ačiū {{authorName}}. Tavo biblioteka buvo pateikta peržiūrai. Gali sekti būseną",
-    "link": "čia"
+    "content": "Ačiū {{authorName}}. Tavo biblioteka buvo pateikta peržiūrai. Gali sekti būseną<link>čia</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Atstatyti biblioteką",

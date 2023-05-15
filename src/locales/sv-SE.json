@@ -54,6 +54,7 @@
     "veryLarge": "Mycket stor",
     "solid": "Solid",
     "hachure": "Skraffering",
+    "zigzag": "Sicksack",
     "crossHatch": "Skraffera med kors",
     "thin": "Tunn",
     "bold": "Fet",
@@ -110,6 +111,7 @@
     "increaseFontSize": "Öka fontstorleken",
     "unbindText": "Koppla bort text",
     "bindText": "Bind texten till behållaren",
+    "createContainerFromText": "Radbryt text i en avgränsad yta",
     "link": {
       "edit": "Redigera länk",
       "create": "Skapa länk",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen.",
     "importLibraryError": "Kunde inte ladda bibliotek",
     "collabSaveFailed": "Det gick inte att spara i backend-databasen. Om problemen kvarstår bör du spara filen lokalt för att se till att du inte förlorar ditt arbete.",
-    "collabSaveFailed_sizeExceeded": "Det gick inte att spara till backend-databasen, whiteboarden verkar vara för stor. Du bör spara filen lokalt för att du inte ska förlora ditt arbete."
+    "collabSaveFailed_sizeExceeded": "Det gick inte att spara till backend-databasen, whiteboarden verkar vara för stor. Du bör spara filen lokalt för att du inte ska förlora ditt arbete.",
+    "brave_measure_text_error": {
+      "line1": "Det ser ut som om du använder Brave-webbläsaren med <bold>Aggressivt Blockera fingeravtryck</bold> inställningen aktiverad.",
+      "line2": "Detta kan resultera i trasiga <bold>Textelement</bold> i dina ritningar.",
+      "line3": "Vi rekommenderar starkt att du inaktiverar den här inställningen. Du kan följa <link>dessa steg</link> för att inaktivera den.",
+      "line4": "Om inaktivering av denna inställning inte åtgärdar visningen av textelement, öppna ett <issueLink>ärende</issueLink> på vår GitHub, eller skriv till oss på <discordLink>Discord</discordLink>"
+    }
   },
   "toolBar": {
     "selection": "Markering",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "Tips: prova att flytta de mest avlägsna elementen lite närmare varandra."
   },
   "errorSplash": {
-    "headingMain_pre": "Ett fel uppstod. Försök ",
-    "headingMain_button": "med att läsa in sidan på nytt.",
-    "clearCanvasMessage": "Om omladdning inte fungerar, försök ",
-    "clearCanvasMessage_button": "rensa canvasen.",
+    "headingMain": "Ett fel uppstod. Försök <button>med att läsa in sidan på nytt.</button>",
+    "clearCanvasMessage": "Om omladdning inte fungerar, försök <button>rensa canvasen.</button>",
     "clearCanvasCaveat": " Detta kommer att leda till förlust av arbete ",
-    "trackedToSentry_pre": "Felet med identifieraren ",
-    "trackedToSentry_post": " spårades på vårt system.",
-    "openIssueMessage_pre": "Vi var mycket försiktiga med att inte inkludera din skissinformation om felet. Om din skiss inte är privat, vänligen överväga att följa upp på vår ",
-    "openIssueMessage_button": "buggspårare.",
-    "openIssueMessage_post": " Vänligen inkludera information nedan genom att kopiera och klistra in i GitHub-problemet.",
+    "trackedToSentry": "Felet med identifieraren {{eventId}} spårades på vårt system.",
+    "openIssueMessage": "Vi var mycket försiktiga med att inte inkludera din skissinformation om felet. Om din skiss inte är privat, vänligen överväga att följa upp på vår <button>buggspårare.</button> Vänligen inkludera information nedan genom att kopiera och klistra in i GitHub-problemet.",
     "sceneContent": "Skissinnehåll:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "dubbelklicka",
     "drag": "dra",
     "editor": "Redigerare",
-    "editSelectedShape": "Redigera markerad form (text/pil/linje)",
+    "editLineArrowPoints": "Redigera linje-/pilpunkter",
+    "editText": "Redigera text / lägg till etikett",
     "github": "Hittat ett problem? Rapportera",
     "howto": "Följ våra guider",
     "or": "eller",
@@ -344,29 +348,16 @@
       "required": "Obligatoriskt",
       "website": "Ange en giltig URL"
     },
-    "noteDescription": {
-      "pre": "Skicka ditt bibliotek för att inkluderas i ",
-      "link": "det offentliga bibliotekets arkiv",
-      "post": "för andra människor att använda i sina skisser."
-    },
-    "noteGuidelines": {
-      "pre": "Biblioteket måste godkännas manuellt först. Vänligen läs ",
-      "link": "riktlinjerna",
-      "post": " innan du skickar in. Du behöver ett GitHub-konto för att kommunicera och göra ändringar om så önskas, men det krävs inte."
-    },
-    "noteLicense": {
-      "pre": "Genom att skicka in godkänner du att biblioteket kommer att publiceras under ",
-      "link": "MIT-licens, ",
-      "post": "vilket kort sagt betyder att vem som helst kan använda det utan restriktioner."
-    },
+    "noteDescription": "Skicka ditt bibliotek för att inkluderas i <link>det offentliga bibliotekets arkiv</link>för andra människor att använda i sina skisser.",
+    "noteGuidelines": "Biblioteket måste godkännas manuellt först. Vänligen läs <link>riktlinjerna</link> innan du skickar in. Du behöver ett GitHub-konto för att kommunicera och göra ändringar om så önskas, men det krävs inte.",
+    "noteLicense": "Genom att skicka in godkänner du att biblioteket kommer att publiceras under <link>MIT-licens, </link>vilket kort sagt betyder att vem som helst kan använda det utan restriktioner.",
     "noteItems": "Varje objekt måste ha sitt eget namn så att det är filtrerbart. Följande objekt kommer att inkluderas:",
     "atleastOneLibItem": "Välj minst ett biblioteksobjekt för att komma igång",
     "republishWarning": "Obs: några av de markerade objekten är redan markerade som publicerade/skickade. Du bör endast skicka objekt igen när du uppdaterar ett befintligt bibliotek eller inlämning."
   },
   "publishSuccessDialog": {
     "title": "Bibliotek inskickat",
-    "content": "Tack {{authorName}}. Ditt bibliotek har skickats för granskning. Du kan följa status",
-    "link": "här"
+    "content": "Tack {{authorName}}. Ditt bibliotek har skickats för granskning. Du kan följa status<link>här</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Återställ bibliotek",

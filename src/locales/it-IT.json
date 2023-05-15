@@ -54,6 +54,7 @@
     "veryLarge": "Molto grande",
     "solid": "Pieno",
     "hachure": "Tratteggio obliquo",
+    "zigzag": "Zig zag",
     "crossHatch": "Tratteggio incrociato",
     "thin": "Sottile",
     "bold": "Grassetto",
@@ -110,6 +111,7 @@
     "increaseFontSize": "Aumenta la dimensione dei caratteri",
     "unbindText": "Scollega testo",
     "bindText": "Associa il testo al container",
+    "createContainerFromText": "",
     "link": {
       "edit": "Modifica link",
       "create": "Crea link",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova.",
     "importLibraryError": "Impossibile caricare la libreria",
     "collabSaveFailed": "Impossibile salvare nel database di backend. Se i problemi persistono, dovresti salvare il tuo file localmente per assicurarti di non perdere il tuo lavoro.",
-    "collabSaveFailed_sizeExceeded": "Impossibile salvare nel database di backend, la tela sembra essere troppo grande. Dovresti salvare il file localmente per assicurarti di non perdere il tuo lavoro."
+    "collabSaveFailed_sizeExceeded": "Impossibile salvare nel database di backend, la tela sembra essere troppo grande. Dovresti salvare il file localmente per assicurarti di non perdere il tuo lavoro.",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Selezione",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "Suggerimento: prova a spostare gli elementi più lontani più vicini tra loro."
   },
   "errorSplash": {
-    "headingMain_pre": "Si è verificato un errore. Provare ",
-    "headingMain_button": "ricaricando la pagina.",
-    "clearCanvasMessage": "Se ricaricare non funziona, prova ",
-    "clearCanvasMessage_button": "pulire la tela.",
+    "headingMain": "Si è verificato un errore. Provare <button>ricaricando la pagina.</button>",
+    "clearCanvasMessage": "Se ricaricare non funziona, prova <button>pulire la tela.</button>",
     "clearCanvasCaveat": " Questo risulterà nella perdita del lavoro ",
-    "trackedToSentry_pre": "L'errore con identificativo ",
-    "trackedToSentry_post": " è stato tracciato nel nostro sistema.",
-    "openIssueMessage_pre": "Siamo stati molto cauti nel non includere informazioni della scena nell'errore. Se la tua scena non è privata, ti preghiamo di considerare la sua inclusione nel nostro ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Per favore includi le informazioni riportate qui sotto copiandole e incollandole nella issue di GitHub.",
+    "trackedToSentry": "L'errore con identificativo {{eventId}} è stato tracciato nel nostro sistema.",
+    "openIssueMessage": "Siamo stati molto cauti nel non includere informazioni della scena nell'errore. Se la tua scena non è privata, ti preghiamo di considerare la sua inclusione nel nostro <button>bug tracker.</button> Per favore includi le informazioni riportate qui sotto copiandole e incollandole nella issue di GitHub.",
     "sceneContent": "Contenuto della scena:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "doppio-click",
     "drag": "trascina",
     "editor": "Editor",
-    "editSelectedShape": "Modifica la forma selezionata (testo/freccia/linea)",
+    "editLineArrowPoints": "Modifica punti linea/freccia",
+    "editText": "Modifica testo / aggiungi etichetta",
     "github": "Trovato un problema? Segnalalo",
     "howto": "Segui le nostre guide",
     "or": "oppure",
@@ -344,29 +348,16 @@
       "required": "Obbligatorio",
       "website": "Inserisci un URL valido"
     },
-    "noteDescription": {
-      "pre": "Invia la tua libreria da includere nella ",
-      "link": "repository della libreria pubblica",
-      "post": "perché sia usata da altri nei loro disegni."
-    },
-    "noteGuidelines": {
-      "pre": "La libreria dev'esser prima approvata manualmente. Sei pregato di leggere le ",
-      "link": "linee guida",
-      "post": " prima di inviarla. Necessiterai di un profilo di GitHub per comunicare ed effettuare modifiche se richiesto, ma non è strettamente necessario."
-    },
-    "noteLicense": {
-      "pre": "Inviando, acconsenti che la libreria sarà pubblicata sotto la ",
-      "link": "Licenza MIT, ",
-      "post": "che in breve significa che chiunque possa usarla senza restrizioni."
-    },
+    "noteDescription": "Invia la tua libreria da includere nella <link>repository della libreria pubblica</link>perché sia usata da altri nei loro disegni.",
+    "noteGuidelines": "La libreria dev'esser prima approvata manualmente. Sei pregato di leggere le <link>linee guida</link> prima di inviarla. Necessiterai di un profilo di GitHub per comunicare ed effettuare modifiche se richiesto, ma non è strettamente necessario.",
+    "noteLicense": "Inviando, acconsenti che la libreria sarà pubblicata sotto la <link>Licenza MIT, </link>che in breve significa che chiunque possa usarla senza restrizioni.",
     "noteItems": "Ogni elemento della libreria deve avere il proprio nome, così che sia filtrabile. Gli elementi della seguente libreria saranno inclusi:",
     "atleastOneLibItem": "Sei pregato di selezionare almeno un elemento della libreria per iniziare",
     "republishWarning": "Nota: alcuni degli elementi selezionati sono contrassegnati come già pubblicati/presentati. È necessario reinviare gli elementi solo quando si aggiorna una libreria o una presentazione esistente."
   },
   "publishSuccessDialog": {
     "title": "Libreria inviata",
-    "content": "Grazie {{authorName}}. La tua libreria è stata inviata per la revisione. Puoi monitorarne lo stato",
-    "link": "qui"
+    "content": "Grazie {{authorName}}. La tua libreria è stata inviata per la revisione. Puoi monitorarne lo stato<link>qui</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Ripristina la libreria",

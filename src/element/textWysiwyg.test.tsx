@@ -526,6 +526,36 @@ describe("textWysiwyg", () => {
       ]);
     });
 
+    it("should set the text element angle to same as container angle when binding to rotated container", async () => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        width: 90,
+        height: 75,
+        angle: 45,
+      });
+      h.elements = [rectangle];
+      mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBe(rectangle.id);
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: text.id, type: "text" },
+      ]);
+      expect(text.angle).toBe(rectangle.angle);
+      mouse.down();
+      const editor = document.querySelector(
+        ".excalidraw-textEditorContainer > textarea",
+      ) as HTMLTextAreaElement;
+
+      fireEvent.change(editor, { target: { value: "Hello World!" } });
+
+      await new Promise((r) => setTimeout(r, 0));
+      editor.blur();
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: text.id, type: "text" },
+      ]);
+    });
+
     it("should compute the container height correctly and not throw error when height is updated while editing the text", async () => {
       const diamond = API.createElement({
         type: "diamond",
@@ -777,6 +807,13 @@ describe("textWysiwyg", () => {
       ]);
       expect(text.containerId).toBe(rectangle.id);
       expect(text.verticalAlign).toBe(VERTICAL_ALIGN.MIDDLE);
+      expect(text.textAlign).toBe(TEXT_ALIGN.CENTER);
+      expect(text.x).toBe(
+        h.elements[0].x + h.elements[0].width / 2 - text.width / 2,
+      );
+      expect(text.y).toBe(
+        h.elements[0].y + h.elements[0].height / 2 - text.height / 2,
+      );
     });
 
     it("should update font family correctly on undo/redo by selecting bounded text when font family was updated", async () => {
@@ -1499,7 +1536,7 @@ describe("textWysiwyg", () => {
         expect.objectContaining({
           text: "Excalidraw is an opensource virtual collaborative whiteboard",
           verticalAlign: VERTICAL_ALIGN.MIDDLE,
-          textAlign: TEXT_ALIGN.LEFT,
+          textAlign: TEXT_ALIGN.CENTER,
           boundElements: null,
         }),
       );

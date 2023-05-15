@@ -54,6 +54,7 @@
     "veryLarge": "Muy grande",
     "solid": "Sólido",
     "hachure": "Folleto",
+    "zigzag": "Zigzag",
     "crossHatch": "Rayado transversal",
     "thin": "Fino",
     "bold": "Grueso",
@@ -110,6 +111,7 @@
     "increaseFontSize": "Aumentar el tamaño de letra",
     "unbindText": "Desvincular texto",
     "bindText": "Vincular texto al contenedor",
+    "createContainerFromText": "Envolver el texto en un contenedor",
     "link": {
       "edit": "Editar enlace",
       "create": "Crear enlace",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "No se pudo conectar al servidor colaborador. Por favor, vuelva a cargar la página y vuelva a intentarlo.",
     "importLibraryError": "No se pudo cargar la librería",
     "collabSaveFailed": "No se pudo guardar en la base de datos del backend. Si los problemas persisten, debería guardar su archivo localmente para asegurarse de que no pierde su trabajo.",
-    "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Debería guardar el archivo localmente para asegurarse de que no pierde su trabajo."
+    "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Debería guardar el archivo localmente para asegurarse de que no pierde su trabajo.",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Selección",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "Sugerencia: intenta acercar un poco más los elementos más lejanos."
   },
   "errorSplash": {
-    "headingMain_pre": "Se encontró un error. Intente ",
-    "headingMain_button": "recargando la página.",
-    "clearCanvasMessage": "Si la recarga no funciona, intente ",
-    "clearCanvasMessage_button": "limpiando el lienzo.",
+    "headingMain": "Se encontró un error. Intente <button>recargando la página.</button>",
+    "clearCanvasMessage": "Si la recarga no funciona, intente <button>limpiando el lienzo.</button>",
     "clearCanvasCaveat": " Esto provocará la pérdida de su trabajo ",
-    "trackedToSentry_pre": "El error con el identificador ",
-    "trackedToSentry_post": " fue rastreado en nuestro sistema.",
-    "openIssueMessage_pre": "Fuimos muy cautelosos de no incluir la información de tu escena en el error. Si tu escena no es privada, por favor considera seguir nuestro ",
-    "openIssueMessage_button": "rastreador de errores.",
-    "openIssueMessage_post": " Por favor, incluya la siguiente información copiándola y pegándola en el issue de GitHub.",
+    "trackedToSentry": "El error con el identificador {{eventId}} fue rastreado en nuestro sistema.",
+    "openIssueMessage": "Fuimos muy cautelosos de no incluir la información de tu escena en el error. Si tu escena no es privada, por favor considera seguir nuestro <button>rastreador de errores.</button> Por favor, incluya la siguiente información copiándola y pegándola en el issue de GitHub.",
     "sceneContent": "Contenido de la escena:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "doble clic",
     "drag": "arrastrar",
     "editor": "Editor",
-    "editSelectedShape": "Editar la forma seleccionada (texto/flecha/línea)",
+    "editLineArrowPoints": "Editar puntos de línea/flecha",
+    "editText": "Editar texto / añadir etiqueta",
     "github": "¿Ha encontrado un problema? Envíelo",
     "howto": "Siga nuestras guías",
     "or": "o",
@@ -344,29 +348,16 @@
       "required": "Requerido",
       "website": "Introduce una URL válida"
     },
-    "noteDescription": {
-      "pre": "Envía tu biblioteca para ser incluida en el ",
-      "link": "repositorio de librería pública",
-      "post": "para que otras personas utilicen en sus dibujos."
-    },
-    "noteGuidelines": {
-      "pre": "La biblioteca debe ser aprobada manualmente primero. Por favor, lea la ",
-      "link": "pautas",
-      "post": " antes de enviar. Necesitará una cuenta de GitHub para comunicarse y hacer cambios si se solicita, pero no es estrictamente necesario."
-    },
-    "noteLicense": {
-      "pre": "Al enviar, usted acepta que la biblioteca se publicará bajo el ",
-      "link": "Licencia MIT ",
-      "post": "que en breve significa que cualquiera puede utilizarlos sin restricciones."
-    },
+    "noteDescription": "Envía tu biblioteca para ser incluida en el <link>repositorio de librería pública</link>para que otras personas utilicen en sus dibujos.",
+    "noteGuidelines": "La biblioteca debe ser aprobada manualmente primero. Por favor, lea la <link>pautas</link> antes de enviar. Necesitará una cuenta de GitHub para comunicarse y hacer cambios si se solicita, pero no es estrictamente necesario.",
+    "noteLicense": "Al enviar, usted acepta que la biblioteca se publicará bajo el <link>Licencia MIT </link>que en breve significa que cualquiera puede utilizarlos sin restricciones.",
     "noteItems": "Cada elemento de la biblioteca debe tener su propio nombre para que sea filtrable. Los siguientes elementos de la biblioteca serán incluidos:",
     "atleastOneLibItem": "Por favor, seleccione al menos un elemento de la biblioteca para empezar",
     "republishWarning": "Nota: algunos de los elementos seleccionados están marcados como ya publicados/enviados. Sólo debería volver a enviar elementos cuando se actualice una biblioteca o envío."
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",
-    "content": "Gracias {{authorName}}. Su biblioteca ha sido enviada para ser revisada. Puede seguir el estado",
-    "link": "aquí"
+    "content": "Gracias {{authorName}}. Su biblioteca ha sido enviada para ser revisada. Puede seguir el estado<link>aquí</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Reiniciar biblioteca",

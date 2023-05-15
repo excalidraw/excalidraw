@@ -4,7 +4,7 @@ import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { getTransformHandles } from "../element/transformHandles";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
-import { actionCreateContainerFromText } from "../actions/actionBoundText";
+import { actionWrapTextInContainer } from "../actions/actionBoundText";
 
 const { h } = window;
 
@@ -277,7 +277,7 @@ describe("element binding", () => {
 
     expect(h.state.selectedElementIds[text1.id]).toBe(true);
 
-    h.app.actionManager.executeAction(actionCreateContainerFromText);
+    h.app.actionManager.executeAction(actionWrapTextInContainer);
 
     // new text container will be placed before the text element
     const container = h.elements.at(-2)!;

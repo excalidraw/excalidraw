@@ -4,17 +4,22 @@ import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { exportToCanvas } from "../scene/export";
-import { AppState, BinaryFiles } from "../types";
+import { AppClassProperties, BinaryFiles, UIAppState } from "../types";
 import { Dialog } from "./Dialog";
 import { clipboard } from "./icons";
 import Stack from "./Stack";
-import "./ExportDialog.scss";
 import OpenColor from "open-color";
 import { CheckboxItem } from "./CheckboxItem";
-import { DEFAULT_EXPORT_PADDING, isFirefox } from "../constants";
+import {
+  DEFAULT_EXPORT_PADDING,
+  EXPORT_IMAGE_TYPES,
+  isFirefox,
+} from "../constants";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { ActionManager } from "../actions/manager";
+import { exportToCanvas } from "../packages/utils";
+
+import "./ExportDialog.scss";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -64,26 +69,18 @@ const ImageExportModal = ({
   elements,
   appState,
   files,
-  exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
-  onExportToPng,
-  onExportToSvg,
-  onExportToClipboard,
+  onExportImage,
 }: {
-  appState: AppState;
+  appState: UIAppState;
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles;
-  exportPadding?: number;
   actionManager: ActionManager;
-  onExportToPng: ExportCB;
-  onExportToSvg: ExportCB;
-  onExportToClipboard: ExportCB;
-  onCloseRequest: () => void;
+  onExportImage: AppClassProperties["onExportImage"];
 }) => {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
-  const { exportBackground, viewBackgroundColor } = appState;
   const [renderError, setRenderError] = useState<Error | null>(null);
 
   const exportedElements = exportSelected
@@ -91,18 +88,20 @@ const ImageExportModal = ({
     : elements;
 
   useEffect(() => {
-    setExportSelected(someElementIsSelected);
-  }, [someElementIsSelected]);
-
-  useEffect(() => {
     const previewNode = previewRef.current;
     if (!previewNode) {
       return;
     }
-    exportToCanvas(exportedElements, appState, files, {
-      exportBackground,
-      viewBackgroundColor,
-      exportPadding,
+    const maxWidth = previewNode.offsetWidth;
+    if (!maxWidth) {
+      return;
+    }
+    exportToCanvas({
+      elements: exportedElements,
+      appState,
+      files,
+      exportPadding: DEFAULT_EXPORT_PADDING,
+      maxWidthOrHeight: maxWidth,
     })
       .then((canvas) => {
         setRenderError(null);
@@ -116,14 +115,7 @@ const ImageExportModal = ({
         console.error(error);
         setRenderError(error);
       });
-  }, [
-    appState,
-    files,
-    exportedElements,
-    exportBackground,
-    exportPadding,
-    viewBackgroundColor,
-  ]);
+  }, [appState, files, exportedElements]);
 
   return (
     <div className="ExportDialog">
@@ -178,7 +170,9 @@ const ImageExportModal = ({
           color="indigo"
           title={t("buttons.exportToPng")}
           aria-label={t("buttons.exportToPng")}
-          onClick={() => onExportToPng(exportedElements)}
+          onClick={() =>
+            onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements)
+          }
         >
           PNG
         </ExportButton>
@@ -186,7 +180,9 @@ const ImageExportModal = ({
           color="red"
           title={t("buttons.exportToSvg")}
           aria-label={t("buttons.exportToSvg")}
-          onClick={() => onExportToSvg(exportedElements)}
+          onClick={() =>
+            onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements)
+          }
         >
           SVG
         </ExportButton>
@@ -195,7 +191,9 @@ const ImageExportModal = ({
         {(probablySupportsClipboardBlob || isFirefox) && (
           <ExportButton
             title={t("buttons.copyPngToClipboard")}
-            onClick={() => onExportToClipboard(exportedElements)}
+            onClick={() =>
+              onExportImage(EXPORT_IMAGE_TYPES.clipboard, exportedElements)
+            }
             color="gray"
             shade={7}
           >
@@ -210,45 +208,31 @@ const ImageExportModal = ({
 export const ImageExportDialog = ({
   elements,
   appState,
-  setAppState,
   files,
-  exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
-  onExportToPng,
-  onExportToSvg,
-  onExportToClipboard,
+  onExportImage,
+  onCloseRequest,
 }: {
-  appState: AppState;
-  setAppState: React.Component<any, AppState>["setState"];
+  appState: UIAppState;
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles;
-  exportPadding?: number;
   actionManager: ActionManager;
-  onExportToPng: ExportCB;
-  onExportToSvg: ExportCB;
-  onExportToClipboard: ExportCB;
+  onExportImage: AppClassProperties["onExportImage"];
+  onCloseRequest: () => void;
 }) => {
-  const handleClose = React.useCallback(() => {
-    setAppState({ openDialog: null });
-  }, [setAppState]);
+  if (appState.openDialog !== "imageExport") {
+    return null;
+  }
 
   return (
-    <>
-      {appState.openDialog === "imageExport" && (
-        <Dialog onCloseRequest={handleClose} title={t("buttons.exportImage")}>
-          <ImageExportModal
-            elements={elements}
-            appState={appState}
-            files={files}
-            exportPadding={exportPadding}
-            actionManager={actionManager}
-            onExportToPng={onExportToPng}
-            onExportToSvg={onExportToSvg}
-            onExportToClipboard={onExportToClipboard}
-            onCloseRequest={handleClose}
-          />
-        </Dialog>
-      )}
-    </>
+    <Dialog onCloseRequest={onCloseRequest} title={t("buttons.exportImage")}>
+      <ImageExportModal
+        elements={elements}
+        appState={appState}
+        files={files}
+        actionManager={actionManager}
+        onExportImage={onExportImage}
+      />
+    </Dialog>
   );
 };

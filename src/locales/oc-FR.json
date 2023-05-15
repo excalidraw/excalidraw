@@ -54,6 +54,7 @@
     "veryLarge": "Gradassa",
     "solid": "Solide",
     "hachure": "Raia",
+    "zigzag": "",
     "crossHatch": "Raia crosada",
     "thin": "Fin",
     "bold": "Espés",
@@ -110,6 +111,7 @@
     "increaseFontSize": "Aumentar talha polissa",
     "unbindText": "Dessociar lo tèxte",
     "bindText": "Ligar lo tèxt al contenidor",
+    "createContainerFromText": "",
     "link": {
       "edit": "Modificar lo ligam",
       "create": "Crear un ligam",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar.",
     "importLibraryError": "Impossible de cargar la bibliotèca",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Seleccion",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "Astúcia : ensajatz de sarrar los elements mai alonhats."
   },
   "errorSplash": {
-    "headingMain_pre": "Una error s’es producha. Ensajatz ",
-    "headingMain_button": "recargament de la pagina.",
-    "clearCanvasMessage": "Se recargar fonciona pas, ensajatz ",
-    "clearCanvasMessage_button": "d’escafar los canabasses.",
+    "headingMain": "Una error s’es producha. Ensajatz <button>recargament de la pagina.</button>",
+    "clearCanvasMessage": "Se recargar fonciona pas, ensajatz <button>d’escafar los canabasses.</button>",
     "clearCanvasCaveat": " Menarà a una pèrda del trabalh ",
-    "trackedToSentry_pre": "Error amb l’identificant ",
-    "trackedToSentry_post": " es estada enregistrada sus nòstre sistèma.",
-    "openIssueMessage_pre": "Èrem plan prudents per inclure pas d’informacions de la scèna vòstra sus l’error. Se vòstra scèna es pas privada, volgatz considerar de perseguir sus nòstre ",
-    "openIssueMessage_button": "traçadors d’avarias.",
-    "openIssueMessage_post": " Volgatz inclure las informacions çai-jos en las copiant e pegant a l’issue GitHub.",
+    "trackedToSentry": "Error amb l’identificant {{eventId}} es estada enregistrada sus nòstre sistèma.",
+    "openIssueMessage": "Èrem plan prudents per inclure pas d’informacions de la scèna vòstra sus l’error. Se vòstra scèna es pas privada, volgatz considerar de perseguir sus nòstre <button>traçadors d’avarias.</button> Volgatz inclure las informacions çai-jos en las copiant e pegant a l’issue GitHub.",
     "sceneContent": "Contengut de la scèna :"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "doble clic",
     "drag": "lisar",
     "editor": "Editor",
-    "editSelectedShape": "Modificar la fòrma seleccionada (tèxt/sageta/linha)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Problèma trobat ? Senhalatz-lo",
     "howto": "Seguissètz nòstras guidas",
     "or": "o",
@@ -344,29 +348,16 @@
       "required": "Requerit",
       "website": "Picatz una URL valida"
     },
-    "noteDescription": {
-      "pre": "Enviatz vòstra bibliotèca per èsser compresa al ",
-      "link": "repertòri public de bibliotèca",
-      "post": "per que los autres l’utilizen dins lor dessenhs."
-    },
-    "noteGuidelines": {
-      "pre": "Qualqu’un deu aprovar la bibliotèca manualament per començar. Volgatz legir las ",
-      "link": "linhas directrises",
-      "post": " abans de sometre. Vos farà mestièr un compte GitHub per comunicar e realizar de modificacions se demandadas, mas es pas complètament obligatòri."
-    },
-    "noteLicense": {
-      "pre": "En sometent, acceptatz que la bibliotèca siá publicada sota la ",
-      "link": "Licéncia MIT, ",
-      "post": "que significa en brèu que qual que siá pòt l’utilizar sens cap de restriccion."
-    },
+    "noteDescription": "Enviatz vòstra bibliotèca per èsser compresa al <link>repertòri public de bibliotèca</link>per que los autres l’utilizen dins lor dessenhs.",
+    "noteGuidelines": "Qualqu’un deu aprovar la bibliotèca manualament per començar. Volgatz legir las <link>linhas directrises</link> abans de sometre. Vos farà mestièr un compte GitHub per comunicar e realizar de modificacions se demandadas, mas es pas complètament obligatòri.",
+    "noteLicense": "En sometent, acceptatz que la bibliotèca siá publicada sota la <link>Licéncia MIT, </link>que significa en brèu que qual que siá pòt l’utilizar sens cap de restriccion.",
     "noteItems": "Cada element de bibliotèca deu aver un nom pròpri per èsser filtrable. Los elements de bibliotèca seguentas seràn incluses :",
     "atleastOneLibItem": "Volgatz seleccionar almens un element de bibliotèca per començar",
     "republishWarning": "Nòta : d’unes elements seleccionats son marcats ja coma publicats/enviats. Deuriatz sonque tornar enviar los elements pendent l’actualizacion d’una bibliotèca existenta o un mandadís."
   },
   "publishSuccessDialog": {
     "title": "Bibliotèca somesa",
-    "content": "Mercés {{authorName}}. Vòstre bibliotèca es estada somesa per repassa. Podètz seguir l’avançament",
-    "link": "aquí"
+    "content": "Mercés {{authorName}}. Vòstre bibliotèca es estada somesa per repassa. Podètz seguir l’avançament<link>aquí</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Reïnicializar la bibliotèca",

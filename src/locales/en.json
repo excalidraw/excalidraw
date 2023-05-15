@@ -54,6 +54,7 @@
     "veryLarge": "Very large",
     "solid": "Solid",
     "hachure": "Hachure",
+    "zigzag": "Zigzag",
     "crossHatch": "Cross-hatch",
     "thin": "Thin",
     "bold": "Bold",
@@ -207,19 +208,10 @@
     "collabSaveFailed": "Couldn't save to the backend database. If problems persist, you should save your file locally to ensure you don't lose your work.",
     "collabSaveFailed_sizeExceeded": "Couldn't save to the backend database, the canvas seems to be too big. You should save the file locally to ensure you don't lose your work.",
     "brave_measure_text_error": {
-      "start": "Looks like you are using Brave browser with the",
-      "aggressive_block_fingerprint": "Aggressively Block Fingerprinting",
-      "setting_enabled": "setting enabled",
-      "break": "This could result in breaking the",
-      "text_elements": "Text Elements",
-      "in_your_drawings": "in your drawings",
-      "strongly_recommend": "We strongly recommend disabling this setting. You can follow",
-      "steps": "these steps",
-      "how": "on how to do so",
-      "disable_setting": " If disabling this setting doesn't fix the display of text elements, please open an",
-      "issue": "issue",
-      "write": "on our GitHub, or write us on",
-      "discord": "Discord"
+      "line1": "Looks like you are using Brave browser with the <bold>Aggressively Block Fingerprinting</bold> setting enabled.",
+      "line2": "This could result in breaking the <bold>Text Elements</bold> in your drawings.",
+      "line3": "We strongly recommend disabling this setting. You can follow <link>these steps</link> on how to do so.",
+      "line4": "If disabling this setting doesn't fix the display of text elements, please open an <issueLink>issue</issueLink> on our GitHub, or write us on <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
@@ -272,16 +264,11 @@
     "canvasTooBigTip": "Tip: try moving the farthest elements a bit closer together."
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
+    "headingMain": "Encountered an error. Try <button>reloading the page</button>.",
+    "clearCanvasMessage": "If reloading doesn't work, try <button>clearing the canvas</button>.",
     "clearCanvasCaveat": " This will result in loss of work ",
-    "trackedToSentry_pre": "The error with identifier ",
-    "trackedToSentry_post": " was tracked on our system.",
-    "openIssueMessage_pre": "We were very cautious not to include your scene information on the error. If your scene is not private, please consider following up on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include information below by copying and pasting into the GitHub issue.",
+    "trackedToSentry": "The error with identifier {{eventId}} was tracked on our system.",
+    "openIssueMessage": "We were very cautious not to include your scene information on the error. If your scene is not private, please consider following up on our <button>bug tracker</button>. Please include information below by copying and pasting into the GitHub issue.",
     "sceneContent": "Scene content:"
   },
   "roomDialog": {
@@ -319,7 +306,8 @@
     "doubleClick": "double-click",
     "drag": "drag",
     "editor": "Editor",
-    "editSelectedShape": "Edit selected shape (text/arrow/line)",
+    "editLineArrowPoints": "Edit line/arrow points",
+    "editText": "Edit text / add label",
     "github": "Found an issue? Submit",
     "howto": "Follow our guides",
     "or": "or",
@@ -360,29 +348,16 @@
       "required": "Required",
       "website": "Enter a valid URL"
     },
-    "noteDescription": {
-      "pre": "Submit your library to be included in the ",
-      "link": "public library repository",
-      "post": "for other people to use in their drawings."
-    },
-    "noteGuidelines": {
-      "pre": "The library needs to be manually approved first. Please read the ",
-      "link": "guidelines",
-      "post": " before submitting. You will need a GitHub account to communicate and make changes if requested, but it is not strictly required."
-    },
-    "noteLicense": {
-      "pre": "By submitting, you agree the library will be published under the ",
-      "link": "MIT License, ",
-      "post": "which in short means anyone can use them without restrictions."
-    },
+    "noteDescription": "Submit your library to be included in the <link>public library repository</link> for other people to use in their drawings.",
+    "noteGuidelines": "The library needs to be manually approved first. Please read the <link>guidelines</link> before submitting. You will need a GitHub account to communicate and make changes if requested, but it is not strictly required.",
+    "noteLicense": "By submitting, you agree the library will be published under the <link>MIT License</link>, which in short means anyone can use them without restrictions.",
     "noteItems": "Each library item must have its own name so it's filterable. The following library items will be included:",
     "atleastOneLibItem": "Please select at least one library item to get started",
     "republishWarning": "Note: some of the selected items are marked as already published/submitted. You should only resubmit items when updating an existing library or submission."
   },
   "publishSuccessDialog": {
     "title": "Library submitted",
-    "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",
-    "link": "here"
+    "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status <link>here</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Reset library",

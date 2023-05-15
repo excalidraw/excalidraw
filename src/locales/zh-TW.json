@@ -54,6 +54,7 @@
     "veryLarge": "特大",
     "solid": "實心",
     "hachure": "斜線筆觸",
+    "zigzag": "Ｚ字形",
     "crossHatch": "交叉筆觸",
     "thin": "細",
     "bold": "粗",
@@ -110,6 +111,7 @@
     "increaseFontSize": "放大文字",
     "unbindText": "取消綁定文字",
     "bindText": "結合文字至容器",
+    "createContainerFromText": "將文字包於容器中",
     "link": {
       "edit": "編輯連結",
       "create": "建立連結",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "無法連結至 collab 伺服器。請重新整理後再試一次。",
     "importLibraryError": "無法載入資料庫",
     "collabSaveFailed": "無法儲存至後端資料庫。若此問題持續發生，請將檔案儲存於本機以確保資料不會遺失。",
-    "collabSaveFailed_sizeExceeded": "無法儲存至後端資料庫，可能的原因為畫布尺寸過大。請將檔案儲存於本機以確保資料不會遺失。"
+    "collabSaveFailed_sizeExceeded": "無法儲存至後端資料庫，可能的原因為畫布尺寸過大。請將檔案儲存於本機以確保資料不會遺失。",
+    "brave_measure_text_error": {
+      "line1": "看起來您開啟了 Brave 瀏覽器的 <bold>Aggressively Block Fingerprinting</bold> 設定。",
+      "line2": "這可能造成您畫布中 <bold>文字元素</bold> 的異常。",
+      "line3": "我們強烈建議您關閉此設定。您可以依照 <link>這些步驟</link> 來進行。",
+      "line4": "若關閉此設定並未修復文字元素的顯示問題，請回報於我們 GitHub 上的 <issueLink>issue</issueLink>，或在 <discordLink>Discord</discordLink> 上告訴我們。"
+    }
   },
   "toolBar": {
     "selection": "選取",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "提示：可嘗試將最遠的元素移動至較集中的位置"
   },
   "errorSplash": {
-    "headingMain_pre": "發生錯誤，嘗試",
-    "headingMain_button": "重新載入頁面。",
-    "clearCanvasMessage": "若重新載入仍無法解決問題，嘗試",
-    "clearCanvasMessage_button": "清除 canvas。",
+    "headingMain": "發生錯誤，嘗試<button>重新載入頁面。</button>",
+    "clearCanvasMessage": "若重新載入仍無法解決問題，嘗試<button>清除 canvas。</button>",
     "clearCanvasCaveat": "此動作將造成目前的作品被移除。",
-    "trackedToSentry_pre": "此錯誤與其識別碼",
-    "trackedToSentry_post": "將由系統記錄。",
-    "openIssueMessage_pre": "我們將謹慎處理，你的作品內容不會被包含在錯誤報告中。若你的作品不需保持私密，請考慮使用我們的",
-    "openIssueMessage_button": "bug tracker。",
-    "openIssueMessage_post": "請將下列資訊複製貼上至 GitHub issue 中。",
+    "trackedToSentry": "此錯誤與其識別碼{{eventId}}將由系統記錄。",
+    "openIssueMessage": "我們將謹慎處理，你的作品內容不會被包含在錯誤報告中。若你的作品不需保持私密，請考慮使用我們的<button>bug tracker。</button>請將下列資訊複製貼上至 GitHub issue 中。",
     "sceneContent": "作品內容："
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "雙擊",
     "drag": "拖曳",
     "editor": "編輯器",
-    "editSelectedShape": "編輯選定的形狀（文字/箭號/線條）",
+    "editLineArrowPoints": "編輯線/箭頭控制點",
+    "editText": "編輯文字/增加標籤",
     "github": "發現異常？回報問題",
     "howto": "參照我們的說明",
     "or": "或",
@@ -344,29 +348,16 @@
       "required": "必填",
       "website": "請輸入有效的 URL"
     },
-    "noteDescription": {
-      "pre": "送出您的資料庫後將被包含於",
-      "link": "公開資料庫 repository",
-      "post": "以利他人在其繪圖中使用。"
-    },
-    "noteGuidelines": {
-      "pre": "資料庫需先經人工審查。請閱讀",
-      "link": "說明文件",
-      "post": "再送出。若需溝通與修改時要透過 GitHub 帳號來進行，但並非強制需求。"
-    },
-    "noteLicense": {
-      "pre": "送出即代表您同意此資料庫將發布時使用 ",
-      "link": "MIT 授權，",
-      "post": "簡單來說是指任何人都能不受限制的使用。"
-    },
+    "noteDescription": "送出您的資料庫後將被包含於<link>公開資料庫 repository</link>以利他人在其繪圖中使用。",
+    "noteGuidelines": "資料庫需先經人工審查。請閱讀<link>說明文件</link>再送出。若需溝通與修改時要透過 GitHub 帳號來進行，但並非強制需求。",
+    "noteLicense": "送出即代表您同意此資料庫將發布時使用 <link>MIT 授權，</link>簡單來說是指任何人都能不受限制的使用。",
     "noteItems": "每個資料庫項目都有獨立的名稱故可篩選。會包含下列資料庫項目：",
     "atleastOneLibItem": "請選擇至少一項資料庫項目",
     "republishWarning": "注意：部分選取中的物件先前已發布/送出過。建議僅在要更新現存資料庫或已送出的物件時才重新送出這些物件。"
   },
   "publishSuccessDialog": {
     "title": "資料庫已送出",
-    "content": "感謝 {{authorName}} 。您的資料庫已送出待審查。您可查看目前狀態",
-    "link": "在此"
+    "content": "感謝 {{authorName}} 。您的資料庫已送出待審查。您可查看目前狀態<link>在此</link>"
   },
   "confirmDialog": {
     "resetLibrary": "重設資料庫",

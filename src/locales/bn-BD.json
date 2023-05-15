@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "পেস্ট করুন",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "প্লেইনটেক্সট হিসাবে পেস্ট করুন",
     "pasteCharts": "চার্ট পেস্ট করুন",
     "selectAll": "সবটা সিলেক্ট করুন",
     "multiSelect": "একাধিক সিলেক্ট করুন",
@@ -54,6 +54,7 @@
     "veryLarge": "অনেক বড়",
     "solid": "দৃঢ়",
     "hachure": "ভ্রুলেখা",
+    "zigzag": "আঁকাবাঁকা",
     "crossHatch": "ক্রস হ্যাচ",
     "thin": "পাতলা",
     "bold": "পুরু",
@@ -72,7 +73,7 @@
     "layers": "মাত্রা",
     "actions": "ক্রিয়া",
     "language": "ভাষা",
-    "liveCollaboration": "",
+    "liveCollaboration": "সরাসরি পারস্পরিক সহযোগিতা...",
     "duplicateSelection": "সদৃশ সিলেক্ট",
     "untitled": "অনামী",
     "name": "নাম",
@@ -110,6 +111,7 @@
     "increaseFontSize": "লেখনীর মাত্রা বাড়ান",
     "unbindText": "",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "লিঙ্ক সংশোধন",
       "create": "লিঙ্ক তৈরী",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "কোল্যাব সার্ভারের সাথে সংযোগ করা যায়নি। পৃষ্ঠাটি পুনরায় লোড করে আবার চেষ্টা করুন।",
     "importLibraryError": "সংগ্রহ লোড করা যায়নি",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "বাছাই",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "বিশেষ্য: দূরতম উপাদানগুলোকে একটু কাছাকাছি নিয়ে যাওয়ার চেষ্টা করুন।"
   },
   "errorSplash": {
-    "headingMain_pre": "একটি ত্রুটির সম্মুখীন হয়েছে৷ চেষ্টা করুন ",
-    "headingMain_button": "পৃষ্ঠাটি পুনরায় লোড করার।",
-    "clearCanvasMessage": "যদি পুনরায় লোড করা কাজ না করে, চেষ্টা করুন ",
-    "clearCanvasMessage_button": "ক্যানভাস পরিষ্কার করার।",
+    "headingMain": "একটি ত্রুটির সম্মুখীন হয়েছে৷ চেষ্টা করুন <button>পৃষ্ঠাটি পুনরায় লোড করার।</button>",
+    "clearCanvasMessage": "যদি পুনরায় লোড করা কাজ না করে, চেষ্টা করুন <button>ক্যানভাস পরিষ্কার করার।</button>",
     "clearCanvasCaveat": " এর ফলে কাজের ক্ষতি হবে ",
-    "trackedToSentry_pre": "ত্রুটি ",
-    "trackedToSentry_post": " আমাদের সিস্টেমে ট্র্যাক করা হয়েছিল।",
-    "openIssueMessage_pre": "আমরা ত্রুটিতে আপনার দৃশ্যের তথ্য অন্তর্ভুক্ত না করার জন্য খুব সতর্ক ছিলাম। আপনার দৃশ্য ব্যক্তিগত না হলে, আমাদের অনুসরণ করার কথা বিবেচনা করুন ",
-    "openIssueMessage_button": "ত্রুটি ইতিবৃত্ত।",
-    "openIssueMessage_post": " অনুগ্রহ করে GitHub ইস্যুতে অনুলিপি এবং পেস্ট করে নীচের তথ্য অন্তর্ভুক্ত করুন।",
+    "trackedToSentry": "ত্রুটি {{eventId}} আমাদের সিস্টেমে ট্র্যাক করা হয়েছিল।",
+    "openIssueMessage": "আমরা ত্রুটিতে আপনার দৃশ্যের তথ্য অন্তর্ভুক্ত না করার জন্য খুব সতর্ক ছিলাম। আপনার দৃশ্য ব্যক্তিগত না হলে, আমাদের অনুসরণ করার কথা বিবেচনা করুন <button>ত্রুটি ইতিবৃত্ত।</button> অনুগ্রহ করে GitHub ইস্যুতে অনুলিপি এবং পেস্ট করে নীচের তথ্য অন্তর্ভুক্ত করুন।",
     "sceneContent": "দৃশ্য বিষয়বস্তু:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "",
     "drag": "",
     "editor": "",
-    "editSelectedShape": "",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "",
     "howto": "",
     "or": "অথবা",
@@ -344,29 +348,16 @@
       "required": "",
       "website": ""
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": ""
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",

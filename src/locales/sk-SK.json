@@ -54,6 +54,7 @@
     "veryLarge": "Veľmi veľké",
     "solid": "Plná",
     "hachure": "Šrafovaná",
+    "zigzag": "Cik-cak",
     "crossHatch": "Mriežkovaná",
     "thin": "Tenká",
     "bold": "Hrubá",
@@ -110,6 +111,7 @@
     "increaseFontSize": "Zväčšiť veľkosť písma",
     "unbindText": "Zrušiť previazanie textu",
     "bindText": "Previazať text s kontajnerom",
+    "createContainerFromText": "Zabaliť text do kontajneru",
     "link": {
       "edit": "Upraviť odkaz",
       "create": "Vytvoriť odkaz",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu.",
     "importLibraryError": "Nepodarilo sa načítať knižnicu",
     "collabSaveFailed": "Uloženie do databázy sa nepodarilo. Ak tento problém pretrváva uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
-    "collabSaveFailed_sizeExceeded": "Uloženie do databázy sa nepodarilo, pretože veľkosť plátna je príliš veľká. Uložte si váš súbor lokálne aby ste nestratili vašu prácu."
+    "collabSaveFailed_sizeExceeded": "Uloženie do databázy sa nepodarilo, pretože veľkosť plátna je príliš veľká. Uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
+    "brave_measure_text_error": {
+      "line1": "Vyzerá to, že používate prehliadač Brave so zapnutým nastavením pre <bold>agresívne blokovanie</bold>.",
+      "line2": "To môže spôsobiť nesprávne zobrazenie <bold>textových prvkov</bold> vo vašej kresbe.",
+      "line3": "Dôrazne odporúčame vypnutie toho nastavenia. Môžete tak spraviť vykonaním <link>týchto krokov</link>.",
+      "line4": "Ak vypnutie toho nastavenia nevyrieši problém so zobrazením textových prvkov, prosím ohláste <issueLink>problém</issueLink> na našom GitHub-e alebo nám napíšte na náš <discordLink>Discord</discordLink>"
+    }
   },
   "toolBar": {
     "selection": "Výber",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "Tip: skúste presunúť najvzdialenejšie prvky bližšie k sebe."
   },
   "errorSplash": {
-    "headingMain_pre": "Nastala chyba. Vyskúšajte ",
-    "headingMain_button": "obnoviť stránku.",
-    "clearCanvasMessage": "Ak obnovenie stránky nepomáha, vyskúšajte ",
-    "clearCanvasMessage_button": "vyčistiť plátno.",
+    "headingMain": "Nastala chyba. Vyskúšajte <button>obnoviť stránku.</button>",
+    "clearCanvasMessage": "Ak obnovenie stránky nepomáha, vyskúšajte <button>vyčistiť plátno.</button>",
     "clearCanvasCaveat": " To bude mať za následok stratu práce ",
-    "trackedToSentry_pre": "Chyba s identifikátorom ",
-    "trackedToSentry_post": " bola zaznamenaná v našom systéme.",
-    "openIssueMessage_pre": "Boli sme veľmi opatrní, aby informácie vašej scény neboli v chybe zaznamenané. Ak vaša scéna nie je súkromná, prosím zvážte pokračovanie na naše ",
-    "openIssueMessage_button": "hlásenie chýb.",
-    "openIssueMessage_post": " Prosím zahrňte informácie nižšie pomocou kopírovania a prilepenia do GitHub issue.",
+    "trackedToSentry": "Chyba s identifikátorom {{eventId}} bola zaznamenaná v našom systéme.",
+    "openIssueMessage": "Boli sme veľmi opatrní, aby informácie vašej scény neboli v chybe zaznamenané. Ak vaša scéna nie je súkromná, prosím zvážte pokračovanie na naše <button>hlásenie chýb.</button> Prosím zahrňte informácie nižšie pomocou kopírovania a prilepenia do GitHub issue.",
     "sceneContent": "Obsah scény:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "dvojklik",
     "drag": "potiahnutie",
     "editor": "Editovanie",
-    "editSelectedShape": "Editovať zvolený tvar (text/šípka/čiara)",
+    "editLineArrowPoints": "Editácia bodov čiary/šípky",
+    "editText": "Editácia textu / pridanie štítku",
     "github": "Objavili ste problém? Nahláste ho",
     "howto": "Postupujte podľa naších návodov",
     "or": "alebo",
@@ -344,29 +348,16 @@
       "required": "Povinné",
       "website": "Zadajte platnú adresu URL"
     },
-    "noteDescription": {
-      "pre": "Uverejnite vašu knižnicu vo ",
-      "link": "verejnom zozname knižníc",
-      "post": "aby ju aj ostatní mohli použiť v ich náčrtoch."
-    },
-    "noteGuidelines": {
-      "pre": "Knižnica musí byť najprv manuálne schválená. Prosím prečítajte si ",
-      "link": "pokyny",
-      "post": " pred uverejnením. Budete potrebovať Github účet na komunikáciu a vykonanie zmien, ak budú potrebné, avšak nie je to úplne povinné."
-    },
-    "noteLicense": {
-      "pre": "Potvrdením súhlasíte, že knižnica bude zverejnená s ",
-      "link": "MIT licenciou, ",
-      "post": "čo v skratke znamená, že ju môže použiť hocikto bez obmedzení."
-    },
+    "noteDescription": "Uverejnite vašu knižnicu vo <link>verejnom zozname knižníc</link>aby ju aj ostatní mohli použiť v ich náčrtoch.",
+    "noteGuidelines": "Knižnica musí byť najprv manuálne schválená. Prosím prečítajte si <link>pokyny</link> pred uverejnením. Budete potrebovať Github účet na komunikáciu a vykonanie zmien, ak budú potrebné, avšak nie je to úplne povinné.",
+    "noteLicense": "Potvrdením súhlasíte, že knižnica bude zverejnená s <link>MIT licenciou, </link>čo v skratke znamená, že ju môže použiť hocikto bez obmedzení.",
     "noteItems": "Každá položka v knižnici musí mať svoje vlastné meno, aby sa dala vyhľadať. Súčasťou knižnice budú nasledujúce položky:",
     "atleastOneLibItem": "Začnite prosím zvolením aspoň jednej položky z knižnice",
     "republishWarning": "Poznámka: Niektoré z vybraných položiek sú už označené ako zverejnené. Ich znovu uverejnenie by ste mali vykovať iba vtedy ak aktualizujete už existujúcu knižnicu alebo požiadavku na uverejnenie."
   },
   "publishSuccessDialog": {
     "title": "Knižnica uverejnená",
-    "content": "Ďakujeme vám {{authorName}}. Vaša knižnica bola uverejnená na posúdenie. Stav môžete skontrolovať",
-    "link": "tu"
+    "content": "Ďakujeme vám {{authorName}}. Vaša knižnica bola uverejnená na posúdenie. Stav môžete skontrolovať<link>tu</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Obnoviť knižnicu",

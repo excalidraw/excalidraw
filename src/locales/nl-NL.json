@@ -54,6 +54,7 @@
     "veryLarge": "Zeer groot",
     "solid": "Ingekleurd",
     "hachure": "Arcering",
+    "zigzag": "",
     "crossHatch": "Tweemaal gearceerd",
     "thin": "Dun",
     "bold": "Vet",
@@ -110,6 +111,7 @@
     "increaseFontSize": "Letters vergroten",
     "unbindText": "Ontkoppel tekst",
     "bindText": "Koppel tekst aan de container",
+    "createContainerFromText": "",
     "link": {
       "edit": "Wijzig link",
       "create": "Maak link",
@@ -193,7 +195,7 @@
     "resetLibrary": "Dit zal je bibliotheek wissen. Weet je het zeker?",
     "removeItemsFromsLibrary": "Verwijder {{count}} item(s) uit bibliotheek?",
     "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "Geen internetverbinding beschikbaar.\nJe wijzigingen worden niet opgeslagen!"
   },
   "errors": {
     "unsupportedFileType": "Niet-ondersteund bestandstype.",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "Kan geen verbinding maken met de collab server. Herlaad de pagina en probeer het opnieuw.",
     "importLibraryError": "Kon bibliotheek niet laden",
     "collabSaveFailed": "Kan niet opslaan in de backend database. Als de problemen blijven bestaan, moet u het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
-    "collabSaveFailed_sizeExceeded": "Kan de backend database niet opslaan, het canvas lijkt te groot te zijn. U moet het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest."
+    "collabSaveFailed_sizeExceeded": "Kan de backend database niet opslaan, het canvas lijkt te groot te zijn. U moet het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Selectie",
@@ -219,7 +227,7 @@
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen",
     "penMode": "Pen modus - Blokkeer aanraken",
-    "link": "",
+    "link": "Link toevoegen / bijwerken voor een geselecteerde vorm",
     "eraser": "Gum",
     "hand": ""
   },
@@ -229,7 +237,7 @@
     "shapes": "Vormen"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Om de canvas te verplaatsen, houd muiswiel of spatiebalk ingedrukt tijdens slepen, of gebruik het handgereedschap",
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
@@ -245,7 +253,7 @@
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "Publiceer je eigen bibliotheek",
-    "bindTextToElement": "",
+    "bindTextToElement": "Druk op enter om tekst toe te voegen",
     "deepBoxSelect": "",
     "eraserRevert": "",
     "firefox_clipboard_write": ""
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "Tip: beweeg de verste elementen iets dichter bij elkaar."
   },
   "errorSplash": {
-    "headingMain_pre": "Fout opgetreden. Probeer ",
-    "headingMain_button": "de pagina opnieuw laden.",
-    "clearCanvasMessage": "Als herladen niet werkt, probeer ",
-    "clearCanvasMessage_button": "het canvas te wissen.",
+    "headingMain": "Fout opgetreden. Probeer <button>de pagina opnieuw laden.</button>",
+    "clearCanvasMessage": "Als herladen niet werkt, probeer <button>het canvas te wissen.</button>",
     "clearCanvasCaveat": " Dit zal leiden tot verlies van je werk ",
-    "trackedToSentry_pre": "De fout met ID ",
-    "trackedToSentry_post": " was gevolgd op ons systeem.",
-    "openIssueMessage_pre": "We waren voorzichtig om je scène-informatie niet in de fout toe te voegen. Als je scène niet privé is, overweeg dan alstublieft het opvolgen op onze ",
-    "openIssueMessage_button": "bugtracker.",
-    "openIssueMessage_post": " Kopieer de informatie hieronder naar de GitHub issue.",
+    "trackedToSentry": "De fout met ID {{eventId}} was gevolgd op ons systeem.",
+    "openIssueMessage": "We waren voorzichtig om je scène-informatie niet in de fout toe te voegen. Als je scène niet privé is, overweeg dan alstublieft het opvolgen op onze <button>bugtracker.</button> Kopieer de informatie hieronder naar de GitHub issue.",
     "sceneContent": "Scène-inhoud:"
   },
   "roomDialog": {
@@ -295,7 +298,7 @@
   "helpDialog": {
     "blog": "Lees onze blog",
     "click": "klik",
-    "deepSelect": "",
+    "deepSelect": "Deep selecteer",
     "deepBoxSelect": "",
     "curvedArrow": "Gebogen pijl",
     "curvedLine": "Kromme lijn",
@@ -303,7 +306,8 @@
     "doubleClick": "dubbelklikken",
     "drag": "slepen",
     "editor": "Editor",
-    "editSelectedShape": "Bewerk geselecteerde vorm (tekst/pijl/lijn)",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "Probleem gevonden? Verzenden",
     "howto": "Volg onze handleidingen",
     "or": "of",
@@ -344,33 +348,20 @@
       "required": "Vereist",
       "website": "Vul een geldige URL in"
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "openbare repository",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "richtlijnen",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "MIT-licentie, ",
-      "post": ""
-    },
+    "noteDescription": "<link>openbare repository</link>",
+    "noteGuidelines": "<link>richtlijnen</link>",
+    "noteLicense": "<link>MIT-licentie, </link>",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": "Hier"
+    "title": "Bibliotheek ingediend",
+    "content": "<link>Hier</link>"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Reset bibliotheek",
+    "removeItemsFromLib": "Verwijder geselecteerde items uit bibliotheek"
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent.",
@@ -392,7 +383,7 @@
     "width": "Breedte"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Toegevoegd aan bibliotheek",
     "copyStyles": "Stijlen gekopieerd.",
     "copyToClipboard": "Gekopieerd naar het klembord.",
     "copyToClipboardAsPng": "{{exportSelection}} naar klembord gekopieerd als PNG\n({{exportColorScheme}})",
@@ -456,10 +447,10 @@
       "menuHint": ""
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Exporteren, voorkeuren en meer...",
+      "center_heading": "Diagrammen. Eenvoudig. Gemaakt.",
+      "toolbarHint": "Kies een tool & begin met tekenen!",
+      "helpHint": "Snelkoppelingen en hulp"
     }
   }
 }

@@ -54,6 +54,7 @@
     "veryLarge": "매우 크게",
     "solid": "단색",
     "hachure": "평행선",
+    "zigzag": "지그재그",
     "crossHatch": "교차선",
     "thin": "얇게",
     "bold": "굵게",
@@ -110,6 +111,7 @@
     "increaseFontSize": "폰트 사이즈 키우기",
     "unbindText": "텍스트 분리",
     "bindText": "텍스트를 컨테이너에 결합",
+    "createContainerFromText": "텍스트를 컨테이너에 담기",
     "link": {
       "edit": "링크 수정하기",
       "create": "링크 만들기",
@@ -193,7 +195,7 @@
     "resetLibrary": "당신의 라이브러리를 초기화 합니다. 계속하시겠습니까?",
     "removeItemsFromsLibrary": "{{count}}개의 아이템을 라이브러리에서 삭제하시겠습니까?",
     "invalidEncryptionKey": "암호화 키는 반드시 22글자여야 합니다. 실시간 협업이 비활성화됩니다.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "인터넷에 연결되어 있지 않습니다.\n변경 사항들이 저장되지 않습니다!"
   },
   "errors": {
     "unsupportedFileType": "지원하지 않는 파일 형식 입니다.",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "협업 서버에 접속하는데 실패했습니다. 페이지를 새로고침하고 다시 시도해보세요.",
     "importLibraryError": "라이브러리를 불러오지 못했습니다.",
     "collabSaveFailed": "데이터베이스에 저장하지 못했습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
-    "collabSaveFailed_sizeExceeded": "데이터베이스에 저장하지 못했습니다. 캔버스가 너무 큰 거 같습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요."
+    "collabSaveFailed_sizeExceeded": "데이터베이스에 저장하지 못했습니다. 캔버스가 너무 큰 거 같습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
+    "brave_measure_text_error": {
+      "line1": "귀하께서는 <bold>강력한 지문 차단 설정</bold>이 활성화된 Brave browser를 사용하고 계신 것 같습니다.",
+      "line2": "이 기능으로 인해 화이트보드의 <bold>텍스트 요소들</bold>이 손상될 수 있습니다.",
+      "line3": "저희는 해당 기능을 비활성화하는 것을 강력히 권장 드립니다. 비활성화 방법에 대해서는 <link>이 게시글</link>을 참고해주세요.",
+      "line4": "만약 이 설정을 껐음에도 텍스트 요소들이 올바르게 표시되지 않는다면, 저희 Github에 <issueLink>이슈</issueLink>를 올려주시거나 <discordLink>Discord</discordLink>로 알려주세요."
+    }
   },
   "toolBar": {
     "selection": "선택",
@@ -221,7 +229,7 @@
     "penMode": "펜 모드 - 터치 방지",
     "link": "선택한 도형에 대해서 링크를 추가/업데이트",
     "eraser": "지우개",
-    "hand": ""
+    "hand": "손 (패닝 도구)"
   },
   "headings": {
     "canvasActions": "캔버스 동작",
@@ -229,7 +237,7 @@
     "shapes": "모양"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "캔버스를 옮기려면 마우스 휠이나 스페이스바를 누르고 드래그하거나, 손 도구를 사용하기",
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
     "freeDraw": "클릭 후 드래그하세요. 완료되면 놓으세요.",
     "text": "팁: 선택 툴로 아무 곳이나 더블 클릭해 텍스트를 추가할 수도 있습니다.",
@@ -240,7 +248,7 @@
     "resize": "SHIFT 키를 누르면서 조정하면 크기의 비율이 제한됩니다.\nALT를 누르면서 조정하면 중앙을 기준으로 크기를 조정합니다.",
     "resizeImage": "SHIFT를 눌러서 자유롭게 크기를 변경하거나,\nALT를 눌러서 중앙을 고정하고 크기를 변경하기",
     "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
-    "lineEditor_info": "포인트를 편집하려면 Ctrl/Cmd을 누르고 더블 클릭을 하거나 Ctrl/Cmd + Enter를 누르세요",
+    "lineEditor_info": "꼭짓점을 수정하려면 CtrlOrCmd 키를 누르고 더블 클릭을 하거나 CtrlOrCmd + Enter를 누르세요.",
     "lineEditor_pointSelected": "Delete 키로 꼭짓점을 제거하거나,\nCtrlOrCmd+D 로 복제하거나, 드래그 해서 이동시키기",
     "lineEditor_nothingSelected": "꼭짓점을 선택해서 수정하거나 (SHIFT를 눌러서 여러개 선택),\nAlt를 누르고 클릭해서 새로운 꼭짓점 추가하기",
     "placeImage": "클릭해서 이미지를 배치하거나, 클릭하고 드래그해서 사이즈를 조정하기",
@@ -248,7 +256,7 @@
     "bindTextToElement": "Enter 키를 눌러서 텍스트 추가하기",
     "deepBoxSelect": "CtrlOrCmd 키를 눌러서 깊게 선택하고, 드래그하지 않도록 하기",
     "eraserRevert": "Alt를 눌러서 삭제하도록 지정된 요소를 되돌리기",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "이 기능은 설정에서 \"dom.events.asyncClipboard.clipboardItem\" 플래그를 \"true\"로 설정하여 활성화할 수 있습니다. Firefox에서 브라우저 플래그를 수정하려면, \"about:config\" 페이지에 접속하세요."
   },
   "canvasError": {
     "cannotShowPreview": "미리보기를 볼 수 없습니다",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "팁: 멀리 있는 요소들을 좀 더 가까이로 붙여 보세요."
   },
   "errorSplash": {
-    "headingMain_pre": "오류가 발생했습니다. ",
-    "headingMain_button": "페이지 새로고침",
-    "clearCanvasMessage": "새로고침으로 해결되지 않을 경우, ",
-    "clearCanvasMessage_button": "캔버스 비우기",
+    "headingMain": "오류가 발생했습니다. <button>페이지 새로고침</button>",
+    "clearCanvasMessage": "새로고침으로 해결되지 않을 경우, <button>캔버스 비우기</button>",
     "clearCanvasCaveat": " 작업 내용을 잃게 됩니다 ",
-    "trackedToSentry_pre": "오류 ",
-    "trackedToSentry_post": " 가 시스템에서 발견되었습니다.",
-    "openIssueMessage_pre": "저희는 화면 정보를 오류에 포함하지 않도록 매우 주의하고 있습니다. 혹시 화면에 민감한 내용이 없다면 이곳에 업로드를 고려해주세요.",
-    "openIssueMessage_button": "버그 트래커",
-    "openIssueMessage_post": " 아래 정보를 GitHub 이슈에 복사 및 붙여넣기해 주세요.",
+    "trackedToSentry": "오류 {{eventId}} 가 시스템에서 발견되었습니다.",
+    "openIssueMessage": "저희는 화면 정보를 오류에 포함하지 않도록 매우 주의하고 있습니다. 혹시 화면에 민감한 내용이 없다면 이곳에 업로드를 고려해주세요.<button>버그 트래커</button> 아래 정보를 GitHub 이슈에 복사 및 붙여넣기해 주세요.",
     "sceneContent": "화면 내용:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "더블 클릭",
     "drag": "드래그",
     "editor": "에디터",
-    "editSelectedShape": "선택한 도형 편집하기(텍스트/화살표/라인)",
+    "editLineArrowPoints": "직선 / 화살표 꼭짓점 수정",
+    "editText": "텍스트 수정 / 라벨 추가",
     "github": "문제 제보하기",
     "howto": "가이드 참고하기",
     "or": "또는",
@@ -344,29 +348,16 @@
       "required": "필수사항",
       "website": "유효한 URL을 입력하세요"
     },
-    "noteDescription": {
-      "pre": "당신의 라이브러리를 제출하여 ",
-      "link": "공개 라이브러리 저장소",
-      "post": "에서 다른 사람들의 그림에 사용할 수 있도록 하세요."
-    },
-    "noteGuidelines": {
-      "pre": "라이브러리는 먼저 수동으로 승인되어야 합니다. 제출하기 전에 ",
-      "link": "가이드라인",
-      "post": "을 먼저 읽어보세요. 의견을 공유하거나 변경사항을 만들기 위해선 GitHub 계정이 필요하지만, 반드시 필요하진 않습니다."
-    },
-    "noteLicense": {
-      "pre": "제출함으로써, 당신은 라이브러리가 ",
-      "link": "MIT 라이선스 ",
-      "post": "하에 배포됨을, 즉 아무나 제약 없이 사용할 수 있음에 동의합니다."
-    },
+    "noteDescription": "당신의 라이브러리를 제출하여 <link>공개 라이브러리 저장소</link>에서 다른 사람들의 그림에 사용할 수 있도록 하세요.",
+    "noteGuidelines": "라이브러리는 먼저 수동으로 승인되어야 합니다. 제출하기 전에 <link>가이드라인</link>을 먼저 읽어보세요. 의견을 공유하거나 변경사항을 만들기 위해선 GitHub 계정이 필요하지만, 반드시 필요하진 않습니다.",
+    "noteLicense": "제출함으로써, 당신은 라이브러리가 <link>MIT 라이선스 </link>하에 배포됨을, 즉 아무나 제약 없이 사용할 수 있음에 동의합니다.",
     "noteItems": "각각의 라이브러리는 분류할 수 있도록 고유한 이름을 가져야 합니다. 다음의 라이브러리 항목이 포함됩니다:",
     "atleastOneLibItem": "최소한 하나의 라이브러리를 선택해주세요",
     "republishWarning": "참고: 선택된 항목의 일부는 이미 제출/게시되었습니다. 기존의 라이브러리나 제출물을 업데이트하는 경우에만 제출하세요."
   },
   "publishSuccessDialog": {
     "title": "라이브러리 제출됨",
-    "content": "{{authorName}}님 감사합니다. 당신의 라이브러리가 심사를 위해 제출되었습니다. 진행 상황을 다음의 링크에서 확인할 수 있습니다.",
-    "link": "여기"
+    "content": "{{authorName}}님 감사합니다. 당신의 라이브러리가 심사를 위해 제출되었습니다. 진행 상황을<link>여기에서 확인하실 수 있습니다.</link>"
   },
   "confirmDialog": {
     "resetLibrary": "라이브러리 리셋",
@@ -451,14 +442,14 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "당신의 모든 데이터는 브라우저에 저장되었습니다.",
+      "center_heading": "모든 데이터는 브라우저에 안전하게 저장됩니다.",
       "center_heading_plus": "대신 Excalidraw+로 이동하시겠습니까?",
       "menuHint": "내보내기, 설정, 언어, ..."
     },
     "defaults": {
-      "menuHint": "내보내기, 설정, 더 보기...",
-      "center_heading": "",
-      "toolbarHint": "도구 선택 & 그리기 시작",
+      "menuHint": "내보내기, 설정, 등등...",
+      "center_heading": "간단하게 만드는 다이어그램.",
+      "toolbarHint": "도구를 선택하고, 그리세요!",
       "helpHint": "단축키 & 도움말"
     }
   }

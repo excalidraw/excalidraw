@@ -32,8 +32,8 @@ import {
   normalizeText,
   redrawTextBoundingBox,
   wrapText,
-  getMaxContainerHeight,
-  getMaxContainerWidth,
+  getBoundTextMaxHeight,
+  getBoundTextMaxWidth,
   computeContainerDimensionForBoundText,
   detectLineHeight,
 } from "./textElement";
@@ -205,8 +205,11 @@ export const textWysiwyg = ({
           }
         }
 
-        maxWidth = getMaxContainerWidth(container);
-        maxHeight = getMaxContainerHeight(container);
+        maxWidth = getBoundTextMaxWidth(container);
+        maxHeight = getBoundTextMaxHeight(
+          container,
+          updatedTextElement as ExcalidrawTextElementWithContainer,
+        );
 
         // autogrow container height if text exceeds
         if (!isArrowElement(container) && textElementHeight > maxHeight) {
@@ -251,7 +254,6 @@ export const textWysiwyg = ({
       const initialSelectionStart = editable.selectionStart;
       const initialSelectionEnd = editable.selectionEnd;
       const initialLength = editable.value.length;
-      editable.value = updatedTextElement.originalText;
 
       // restore cursor position after value updated so it doesn't
       // go to the end of text when container auto expanded
@@ -355,6 +357,7 @@ export const textWysiwyg = ({
     overflowWrap: "break-word",
     boxSizing: "content-box",
   });
+  editable.value = element.originalText;
   updateWysiwygStyle();
 
   if (onChange) {
@@ -377,7 +380,7 @@ export const textWysiwyg = ({
         const wrappedText = wrapText(
           `${editable.value}${data}`,
           font,
-          getMaxContainerWidth(container),
+          getBoundTextMaxWidth(container),
         );
         const width = getTextWidth(wrappedText, font);
         editable.style.width = `${width}px`;
@@ -394,7 +397,7 @@ export const textWysiwyg = ({
         const wrappedText = wrapText(
           normalizeText(editable.value),
           font,
-          getMaxContainerWidth(container!),
+          getBoundTextMaxWidth(container!),
         );
         const { width, height } = measureText(
           wrappedText,

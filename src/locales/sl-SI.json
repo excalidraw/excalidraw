@@ -54,6 +54,7 @@
     "veryLarge": "Zelo velika",
     "solid": "Polno",
     "hachure": "Šrafura",
+    "zigzag": "Cikcak",
     "crossHatch": "Križno",
     "thin": "Tanko",
     "bold": "Krepko",
@@ -110,6 +111,7 @@
     "increaseFontSize": "Povečaj velikost pisave",
     "unbindText": "Veži besedilo",
     "bindText": "Veži besedilo na element",
+    "createContainerFromText": "Zavij besedilo v vsebnik",
     "link": {
       "edit": "Uredi povezavo",
       "create": "Ustvari povezavo",
@@ -204,7 +206,13 @@
     "cannotResolveCollabServer": "Povezave s strežnikom za sodelovanje ni bilo mogoče vzpostaviti. Ponovno naložite stran in poskusite znova.",
     "importLibraryError": "Nalaganje knjižnice ni uspelo",
     "collabSaveFailed": "Ni bilo mogoče shraniti v zaledno bazo podatkov. Če se težave nadaljujejo, shranite datoteko lokalno, da ne boste izgubili svojega dela.",
-    "collabSaveFailed_sizeExceeded": "Ni bilo mogoče shraniti v zaledno bazo podatkov, zdi se, da je platno preveliko. Datoteko shranite lokalno, da ne izgubite svojega dela."
+    "collabSaveFailed_sizeExceeded": "Ni bilo mogoče shraniti v zaledno bazo podatkov, zdi se, da je platno preveliko. Datoteko shranite lokalno, da ne izgubite svojega dela.",
+    "brave_measure_text_error": {
+      "line1": "Videti je, da uporabljate brskalnik Brave z omogočeno nastavitvijo <bold>Agresivno blokiranje prstnih odtisov</bold>.",
+      "line2": "To bi lahko povzročilo motnje v obnašanju <bold>besedilnih elementov</bold> v vaših risbah.",
+      "line3": "Močno priporočamo, da onemogočite to nastavitev. Sledite <link>tem korakom</link>, kako to storiti.",
+      "line4": "Če onemogočanje te nastavitve ne popravi prikaza besedilnih elementov, odprite <issueLink>vprašanje</issueLink> na našem GitHubu ali nam pišite na <discordLink>Discord</discordLink>"
+    }
   },
   "toolBar": {
     "selection": "Izbor",
@@ -256,16 +264,11 @@
     "canvasTooBigTip": "Nasvet: poskusite premakniti najbolj oddaljene elemente nekoliko bližje skupaj."
   },
   "errorSplash": {
-    "headingMain_pre": "Prišlo je do napake. Poskusite ",
-    "headingMain_button": "ponovno naložiti stran.",
-    "clearCanvasMessage": "Če ponovno nalaganje ne deluje, poskusite ",
-    "clearCanvasMessage_button": "počistiti platno.",
+    "headingMain": "Prišlo je do napake. Poskusite <button>ponovno naložiti stran.</button>",
+    "clearCanvasMessage": "Če ponovno nalaganje ne deluje, poskusite <button>počistiti platno.</button>",
     "clearCanvasCaveat": " To bo povzročilo izgubo dela ",
-    "trackedToSentry_pre": "Napaka z identifikatorjem ",
-    "trackedToSentry_post": " smo zabeležili v naš sistem.",
-    "openIssueMessage_pre": "Zelo smo bili previdni, da v podatke o napaki nismo vključili vaših podatkov o sceni. Če vaša scena ni zasebna, vas prosimo, da napišete več podrobnosti na našem ",
-    "openIssueMessage_button": "sledilniku hroščev.",
-    "openIssueMessage_post": " Prosimo, vključite spodnje informacije tako, da jih kopirate in prilepite v GitHub vprašanje.",
+    "trackedToSentry": "Napaka z identifikatorjem {{eventId}} smo zabeležili v naš sistem.",
+    "openIssueMessage": "Zelo smo bili previdni, da v podatke o napaki nismo vključili vaših podatkov o sceni. Če vaša scena ni zasebna, vas prosimo, da napišete več podrobnosti na našem <button>sledilniku hroščev.</button> Prosimo, vključite spodnje informacije tako, da jih kopirate in prilepite v GitHub vprašanje.",
     "sceneContent": "Vsebina scene:"
   },
   "roomDialog": {
@@ -303,7 +306,8 @@
     "doubleClick": "dvojni klik",
     "drag": "vleci",
     "editor": "Urejevalnik",
-    "editSelectedShape": "Uredi izbrano obliko (besedilo/puščica/črta)",
+    "editLineArrowPoints": "Uredi črto/točke puščice",
+    "editText": "Uredi besedilo / dodaj oznako",
     "github": "Ste našli težavo? Pošljite",
     "howto": "Sledite našim vodičem",
     "or": "ali",
@@ -344,29 +348,16 @@
       "required": "Obvezno",
       "website": "Vnesite veljaven URL"
     },
-    "noteDescription": {
-      "pre": "Predložite svojo knjižnico, da bo vključena v ",
-      "link": "javno skladišče knjižnic,",
-      "post": "da jih drugi lahko uporabljajo v svojih risbah."
-    },
-    "noteGuidelines": {
-      "pre": "Knjižnica mora biti najprej ročno odobrena. Prosimo vas, da pred oddajanjem preberete naše ",
-      "link": "smernice.",
-      "post": "Za komunikacijo in spreminjanje po potrebi boste potrebovali račun GitHub, vendar to ni obvezno."
-    },
-    "noteLicense": {
-      "pre": "Z oddajo se strinjate, da bo knjižnica objavljena pod ",
-      "link": "licenco MIT, ",
-      "post": "kar na kratko pomeni, da jo lahko kdorkoli uporablja brez omejitev."
-    },
+    "noteDescription": "Predložite svojo knjižnico, da bo vključena v <link>javno skladišče knjižnic,</link>da jih drugi lahko uporabljajo v svojih risbah.",
+    "noteGuidelines": "Knjižnica mora biti najprej ročno odobrena. Prosimo vas, da pred oddajanjem preberete naše <link>smernice.</link>Za komunikacijo in spreminjanje po potrebi boste potrebovali račun GitHub, vendar to ni obvezno.",
+    "noteLicense": "Z oddajo se strinjate, da bo knjižnica objavljena pod <link>licenco MIT, </link>kar na kratko pomeni, da jo lahko kdorkoli uporablja brez omejitev.",
     "noteItems": "Vsak element knjižnice mora imeti svoje ime, tako da ga je mogoče filtrirati. Vključeni bodo naslednji elementi knjižnice:",
     "atleastOneLibItem": "Za začetek izberite vsaj en element knjižnice",
     "republishWarning": "Opomba: nekateri izbrani predmeti so označeni kot že objavljeni/oddani. Elemente lahko znova oddate samo, ko posodabljate obstoječo knjižnico ali oddajo."
   },
   "publishSuccessDialog": {
     "title": "Knjižnica oddana",
-    "content": "{{authorName}}, hvala. Vaša knjižnica je bila poslana v pregled. Stanje lahko spremljate",
-    "link": "tukaj"
+    "content": "{{authorName}}, hvala. Vaša knjižnica je bila poslana v pregled. Stanje lahko spremljate<link>tukaj</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Ponastavi knjižnico",
