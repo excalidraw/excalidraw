@@ -1,10 +1,7 @@
 import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
-  ExcalidrawDiamondElement,
   ExcalidrawElement,
-  ExcalidrawEllipseElement,
   ExcalidrawGenericElement,
-  ExcalidrawRectangleElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,

@@ -50,6 +50,12 @@ import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
 import { ImportedDataState } from "../data/types";
 
+const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
+  "rectangle",
+  "ellipse",
+  "diamond",
+  "text",
+];
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
   | "width"
@@ -95,6 +101,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
+  console.log("width", width);
   // assign type to guard against excess properties
   const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
     id: rest.id || randomId(),
@@ -143,7 +150,6 @@ const getTextElementPositionOffsets = (
     height: number;
   },
 ) => {
-  console.log("metrics", metrics);
   return {
     x:
       opts.textAlign === "center"
@@ -655,25 +661,56 @@ export const convertToExcalidrawElements = (
   if (!elements) {
     return [];
   }
+  console.log(elements, "ele  ");
   elements.forEach((element) => {
     if (!element) {
       return;
     }
-    const textElement = element.label?.find((child) => child.text !== null);
     if (
       isValidTextContainer(element) &&
-      textElement &&
+      element?.label?.text &&
       (element.type === "rectangle" ||
         element.type === "ellipse" ||
         element.type === "diamond")
     ) {
-      const elements = bindTextToContainer(element, textElement);
+      const elements = bindTextToContainer(element, element.label);
       res.push(...elements);
     } else {
+      let excalidrawElement;
+      if (element.type === "text") {
+        //@ts-ignore
+        excalidrawElement = newTextElement({
+          //@ts-ignore
+          x: 0,
+          //@ts-ignore
+          y: 0,
+          ...element,
+        });
+      } else {
+        //@ts-ignore
+        excalidrawElement = newElement({
+          x: 0,
+          y: 0,
+
+          ...element,
+          width:
+            //@ts-ignore
+            element?.width ||
+            (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)
+              ? 100
+              : 0),
+          height:
+            //@ts-ignore
+            element?.height ||
+            (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)
+              ? 100
+              : 0),
+        });
+      }
       //@ts-ignore
-      res.push(element);
+
+      res.push(excalidrawElement);
     }
   });
-
   return res;
 };

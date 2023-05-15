@@ -1546,7 +1546,6 @@ class App extends React.Component<AppProps, AppState> {
       let file = event?.clipboardData?.files[0];
 
       const data = await parseClipboard(event, isPlainPaste);
-
       if (!file && data.text && !isPlainPaste) {
         const string = data.text.trim();
         if (string.startsWith("<svg") && string.endsWith("</svg>")) {

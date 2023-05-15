@@ -38,21 +38,17 @@ export interface ImportedDataState {
   elements?:
     | readonly (
         | (ExcalidrawElement & {
-            label?: [
-              { text: string } & MarkOptional<
-                ElementConstructorOpts,
-                "x" | "y"
-              >,
-            ];
+            label?: { text: string } & MarkOptional<
+              ElementConstructorOpts,
+              "x" | "y"
+            >;
           })
         | {
             type: Exclude<ExcalidrawGenericElement["type"], "selection">;
-            label?: [
-              { text: string } & MarkOptional<
-                ElementConstructorOpts,
-                "x" | "y"
-              >,
-            ] &
+            label?: { text: string } & MarkOptional<
+              ElementConstructorOpts,
+              "x" | "y"
+            > &
               MarkOptional<ElementConstructorOpts, "x" | "y">;
           }
       )[]
