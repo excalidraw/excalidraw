@@ -2,6 +2,27 @@ export default {
   elements: [
     {
       type: "rectangle",
+      x: 1000,
+      strokeWidth: "2",
+    },
+
+    {
+      type: "ellipse",
+    },
+
+    {
+      type: "diamond",
+      x: 200,
+      backgroundColor: "#fff3bf",
+      strokeWidth: "2",
+      label: {
+        text: "HELLO EXCALIDRAW",
+        strokeColor: "#099268",
+        fontSize: 30,
+      },
+    },
+    {
+      type: "rectangle",
       version: 141,
       versionNonce: 361174001,
       isDeleted: false,
