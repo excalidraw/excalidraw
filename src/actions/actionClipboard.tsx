@@ -9,8 +9,14 @@ import {
 import { actionDeleteSelected } from "./actionDeleteSelected";
 import { getSelectedElements } from "../scene/selection";
 import { exportCanvas } from "../data/index";
-import { getNonDeletedElements, isTextElement } from "../element";
+import {
+  getNonDeletedElements,
+  isTextElement,
+  getElementAbsoluteCoords,
+} from "../element";
 import { t } from "../i18n";
+import { NonDeletedExcalidrawElement } from "../element/types";
+import { memoize } from "lodash";
 
 export const actionCopy = register({
   name: "copy",
@@ -165,6 +171,17 @@ export const actionCopyAsPng = register({
   keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
 });
 
+const Y_TOLERANCE = 30;
+const getElementAbsoluteCoordsWithCache = memoize(getElementAbsoluteCoords);
+const areOnSameLine = (
+  elementA: NonDeletedExcalidrawElement,
+  elementB: NonDeletedExcalidrawElement,
+) => {
+  const [ay] = getElementAbsoluteCoordsWithCache(elementA).slice(-1);
+  const [by] = getElementAbsoluteCoordsWithCache(elementB).slice(-1);
+  return Math.abs(ay - by) <= Y_TOLERANCE;
+};
+
 export const copyText = register({
   name: "copyText",
   trackEvent: { category: "element" },
@@ -174,6 +191,17 @@ export const copyText = register({
       appState,
       true,
     );
+
+    selectedElements.sort((a, b) => {
+      const [ax, ay] = getElementAbsoluteCoordsWithCache(a).slice(-2);
+      const [bx, by] = getElementAbsoluteCoordsWithCache(b).slice(-2);
+      return areOnSameLine(a, b)
+        ? document.documentElement.dir === "ltr"
+          ? ax - bx
+          : bx - ax
+        : ay - by;
+    });
+    getElementAbsoluteCoordsWithCache.cache.clear!();
 
     const text = selectedElements
       .reduce((acc: string[], element) => {
