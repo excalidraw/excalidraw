@@ -7,7 +7,7 @@ export const SYNC_FULL_SCENE_INTERVAL_MS = 20000;
 export const SYNC_BROWSER_TABS_TIMEOUT = 50;
 export const CURSOR_SYNC_TIMEOUT = 33; // ~30fps
 export const DELETED_ELEMENT_TIMEOUT = 24 * 60 * 60 * 1000; // 1 day
-export const HIDDEN_DISCONNECT_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+export const HIDDEN_DISCONNECT_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 export const RECONNECT_TOAST_DURATION = 2000;
 
 export const FILE_UPLOAD_MAX_BYTES = 3 * 1024 * 1024; // 3 MiB
