@@ -54,7 +54,7 @@
     "veryLarge": "Muito grande",
     "solid": "Sólido",
     "hachure": "Hachura",
-    "zigzag": "",
+    "zigzag": "Zigue-zague",
     "crossHatch": "Hachura cruzada",
     "thin": "Fino",
     "bold": "Espesso",
@@ -111,7 +111,7 @@
     "increaseFontSize": "Aumentar o tamanho da fonte",
     "unbindText": "Desvincular texto",
     "bindText": "Vincular texto ao contêiner",
-    "createContainerFromText": "",
+    "createContainerFromText": "Envolver texto em um contêiner",
     "link": {
       "edit": "Editar link",
       "create": "Criar link",
@@ -211,7 +211,7 @@
       "line1": "Parece que você está usando o navegador Brave com a configuração <bold>Bloquear Impressões Digitais</bold> no modo agressivo.",
       "line2": "Isso pode acabar quebrando <bold>Elementos de Texto</bold> em seus desenhos.",
       "line3": "Recomendamos fortemente desativar essa configuração. Você pode acessar o <link>passo a passo</link> sobre como fazer isso.",
-      "line4": ""
+      "line4": "Se desativar essa configuração não corrigir a exibição de elementos de texto, por favor abra uma <issueLink>issue</issueLink> em nosso GitHub, ou mande uma mensagem em nosso <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
@@ -307,7 +307,7 @@
     "drag": "arrastar",
     "editor": "Editor",
     "editLineArrowPoints": "Editar linha/ponta da seta",
-    "editText": "",
+    "editText": "Editar texto / adicionar etiqueta",
     "github": "Encontrou algum problema? Nos informe",
     "howto": "Siga nossos guias",
     "or": "ou",
