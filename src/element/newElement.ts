@@ -55,6 +55,8 @@ const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
   "ellipse",
   "diamond",
   "text",
+  "arrow",
+  "line",
 ];
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -365,8 +367,8 @@ export const newFreeDrawElement = (
 export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
-    startArrowhead: Arrowhead | null;
-    endArrowhead: Arrowhead | null;
+    startArrowhead?: Arrowhead | null;
+    endArrowhead?: Arrowhead | null;
     points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
@@ -376,8 +378,8 @@ export const newLinearElement = (
     lastCommittedPoint: null,
     startBinding: null,
     endBinding: null,
-    startArrowhead: opts.startArrowhead,
-    endArrowhead: opts.endArrowhead,
+    startArrowhead: opts.startArrowhead || null,
+    endArrowhead: opts.endArrowhead || null,
   };
 };
 
@@ -661,7 +663,6 @@ export const convertToExcalidrawElements = (
   if (!elements) {
     return [];
   }
-  console.log(elements, "ele  ");
   elements.forEach((element) => {
     if (!element) {
       return;
@@ -684,6 +685,27 @@ export const convertToExcalidrawElements = (
           x: 0,
           //@ts-ignore
           y: 0,
+          ...element,
+        });
+      } else if (element.type === "arrow" || element.type === "line") {
+        excalidrawElement = newLinearElement({
+          //@ts-ignore
+          x: 0,
+          //@ts-ignore
+          y: 0,
+          //@ts-ignore
+          type: element.type,
+          //@ts-ignore
+          width: 200,
+          //@ts-ignore
+          height: 24,
+          //@ts-ignore,
+          endArrowhead: element.type === "arrow" ? "arrow" : null,
+          //@ts-ignore
+          points: [
+            [0, 0],
+            [200, 0],
+          ],
           ...element,
         });
       } else {

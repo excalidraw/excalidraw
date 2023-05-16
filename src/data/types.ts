@@ -48,8 +48,7 @@ export interface ImportedDataState {
             label?: { text: string } & MarkOptional<
               ElementConstructorOpts,
               "x" | "y"
-            > &
-              MarkOptional<ElementConstructorOpts, "x" | "y">;
+            >;
           }
       )[]
     | null;
