@@ -356,7 +356,6 @@ export interface ExcalidrawProps {
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
   children?: React.ReactNode;
-  colorPalette?: Partial<PaletteOptions> & Partial<TopPickOptions>;
 }
 
 export type SceneData = {
