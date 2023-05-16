@@ -208,9 +208,9 @@
     "collabSaveFailed": "Não foi possível salvar no banco de dados do servidor. Se os problemas persistirem, salve o arquivo localmente para garantir que não perca o seu trabalho.",
     "collabSaveFailed_sizeExceeded": "Não foi possível salvar no banco de dados do servidor, a tela parece ser muito grande. Se os problemas persistirem, salve o arquivo localmente para garantir que não perca o seu trabalho.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
+      "line1": "Parece que você está usando o navegador Brave com a configuração <bold>Bloquear Impressões Digitais</bold> no modo agressivo.",
+      "line2": "Isso pode acabar quebrando <bold>Elementos de Texto</bold> em seus desenhos.",
+      "line3": "Recomendamos fortemente desativar essa configuração. Você pode acessar o <link>passo a passo</link> sobre como fazer isso.",
       "line4": ""
     }
   },
@@ -306,7 +306,7 @@
     "doubleClick": "clique duplo",
     "drag": "arrastar",
     "editor": "Editor",
-    "editLineArrowPoints": "",
+    "editLineArrowPoints": "Editar linha/ponta da seta",
     "editText": "",
     "github": "Encontrou algum problema? Nos informe",
     "howto": "Siga nossos guias",
