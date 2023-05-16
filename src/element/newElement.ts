@@ -667,13 +667,8 @@ export const convertToExcalidrawElements = (
     if (!element) {
       return;
     }
-    if (
-      isValidTextContainer(element) &&
-      element?.label?.text &&
-      (element.type === "rectangle" ||
-        element.type === "ellipse" ||
-        element.type === "diamond")
-    ) {
+    if (isValidTextContainer(element) && element?.label?.text) {
+      //@ts-ignore
       const elements = bindTextToContainer(element, element.label);
       res.push(...elements);
     } else {

@@ -2,6 +2,7 @@ import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
   ExcalidrawGenericElement,
+  ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -34,7 +35,7 @@ import {
   updateOriginalContainerCache,
 } from "./textWysiwyg";
 import { ExtractSetType, MarkOptional } from "../utility-types";
-import { ElementConstructorOpts } from "./newElement";
+import { ElementConstructorOpts, newLinearElement } from "./newElement";
 
 export const normalizeText = (text: string) => {
   return (
@@ -90,7 +91,7 @@ export const redrawTextBoundingBox = (
       textElement as ExcalidrawTextElementWithContainer,
     );
     const maxContainerWidth = getBoundTextMaxWidth(container);
-
+    console.log(metrics, maxContainerWidth, container);
     if (metrics.height > maxContainerHeight) {
       const nextHeight = computeContainerDimensionForBoundText(
         metrics.height,
@@ -984,15 +985,38 @@ export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
 export const bindTextToContainer = (
   containerProps:
     | {
-        type: Exclude<ExcalidrawGenericElement["type"], "selection">;
+        type:
+          | Exclude<ExcalidrawGenericElement["type"], "selection">
+          | ExcalidrawLinearElement["type"];
       } & MarkOptional<ElementConstructorOpts, "x" | "y">,
   textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
 ) => {
-  const container = newElement({
-    x: 0,
-    y: 0,
-    ...containerProps,
-  });
+  let container;
+  if (containerProps.type === "arrow") {
+    container = newLinearElement({
+      //@ts-ignore
+      x: 0,
+      //@ts-ignore
+      y: 0,
+      //@ts-ignore
+      type: containerProps.type,
+      //@ts-ignore,
+      endArrowhead: containerProps.type === "arrow" ? "arrow" : null,
+      //@ts-ignore
+      points: [
+        [0, 0],
+        [300, 0],
+      ],
+      ...containerProps,
+    });
+  } else {
+    //@ts-ignore
+    container = newElement({
+      x: 0,
+      y: 0,
+      ...containerProps,
+    });
+  }
   const textElement: ExcalidrawTextElement = newTextElement({
     x: 0,
     y: 0,
