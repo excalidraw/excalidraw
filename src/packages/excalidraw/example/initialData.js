@@ -22,6 +22,12 @@ export default {
       },
     },
     {
+      type: "arrow",
+      x: 200,
+      y: -50,
+      label: { text: "HELLO EXCALIDRAW", strokeColor: "#1c7ed6", fontSize: 26 },
+    },
+    {
       type: "rectangle",
       version: 141,
       versionNonce: 361174001,
