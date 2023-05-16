@@ -62,7 +62,7 @@ const hotkeyHandler = ({
   setActiveColorPickerSection,
   activeShade,
 }: HotkeyHandlerProps) => {
-  if (colorObj?.shade) {
+  if (colorObj?.shade != null) {
     // shift + numpad is extremely messed up on windows apparently
     if (
       ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"].includes(e.code) &&
@@ -133,7 +133,7 @@ export const colorPickerKeyNavHandler = ({
     > = {
       custom: !!customColors.length,
       baseColors: true,
-      shades: !!colorObj?.shade,
+      shades: colorObj?.shade != null,
       hex: true,
     };
 

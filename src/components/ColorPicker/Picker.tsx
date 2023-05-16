@@ -70,7 +70,7 @@ export const Picker = ({
           ? "hex"
           : isCustom
           ? "custom"
-          : colorObj?.shade
+          : colorObj?.shade != null
           ? "shades"
           : "baseColors",
       );
@@ -85,14 +85,14 @@ export const Picker = ({
   ]);
 
   const [activeShade, setActiveShade] = useState(
-    colorObj?.shade ||
+    colorObj?.shade ??
       (type === "elementBackground"
         ? DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX
         : DEFAULT_ELEMENT_STROKE_COLOR_INDEX),
   );
 
   useEffect(() => {
-    if (colorObj?.shade) {
+    if (colorObj?.shade != null) {
       setActiveShade(colorObj.shade);
     }
   }, [colorObj]);
