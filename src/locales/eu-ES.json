@@ -54,7 +54,7 @@
     "veryLarge": "Oso handia",
     "solid": "Solidoa",
     "hachure": "Itzalduna",
-    "zigzag": "",
+    "zigzag": "Sigi-saga",
     "crossHatch": "Marraduna",
     "thin": "Mehea",
     "bold": "Lodia",
@@ -208,10 +208,10 @@
     "collabSaveFailed": "Ezin izan da backend datu-basean gorde. Arazoak jarraitzen badu, zure fitxategia lokalean gorde beharko zenuke zure lana ez duzula galtzen ziurtatzeko.",
     "collabSaveFailed_sizeExceeded": "Ezin izan da backend datu-basean gorde, ohiala handiegia dela dirudi. Fitxategia lokalean gorde beharko zenuke zure lana galtzen ez duzula ziurtatzeko.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "Brave arakatzailea erabiltzen ari zarela dirudi <bold>Blokeatu hatz-markak erasokorki</bold> ezarpena gaituta.",
+      "line2": "Honek zure marrazkietako <bold>Testu-elementuak</bold> hautsi ditzake.",
+      "line3": "Ezarpen hau desgaitzea gomendatzen dugu. <link>urrats hauek</link> jarrai ditzakezu hori nola egin jakiteko.",
+      "line4": "Ezarpen hau desgaituz gero, testu-elementuen bistaratzea konpontzen ez bada, ireki <issueLink>arazo</issueLink> gure GitHub-en edo idatzi iezaguzu <discordLink>Discord</discordLink> helbidera"
     }
   },
   "toolBar": {
@@ -306,8 +306,8 @@
     "doubleClick": "klik bikoitza",
     "drag": "arrastatu",
     "editor": "Editorea",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Editatu lerroak/gezi-puntuak",
+    "editText": "Editatu testua / gehitu etiketa",
     "github": "Arazorik izan al duzu? Eman horren berri",
     "howto": "Jarraitu gure gidak",
     "or": "edo",
