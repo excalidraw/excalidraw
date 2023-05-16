@@ -544,8 +544,8 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
               </button>
               <button
                 class="color-picker__button"
-                style="--swatch-color: #f1f3f5;"
-                title="#f1f3f5"
+                style="--swatch-color: #f8f9fa;"
+                title="#f8f9fa"
                 type="button"
               >
                 <div
@@ -554,8 +554,8 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
               </button>
               <button
                 class="color-picker__button"
-                style="--swatch-color: #ffe3e3;"
-                title="#ffe3e3"
+                style="--swatch-color: #f5faff;"
+                title="#f5faff"
                 type="button"
               >
                 <div
@@ -564,8 +564,8 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
               </button>
               <button
                 class="color-picker__button"
-                style="--swatch-color: #d0ebff;"
-                title="#d0ebff"
+                style="--swatch-color: #fffce8;"
+                title="#fffce8"
                 type="button"
               >
                 <div
@@ -574,8 +574,8 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
               </button>
               <button
                 class="color-picker__button"
-                style="--swatch-color: #fff3bf;"
-                title="#fff3bf"
+                style="--swatch-color: #fdf8f6;"
+                title="#fdf8f6"
                 type="button"
               >
                 <div

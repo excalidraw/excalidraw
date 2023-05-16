@@ -72,8 +72,8 @@ describe("actionStyles", () => {
 
     const firstRect = API.getSelectedElement();
     expect(firstRect.id).toBe(h.elements[0].id);
-    expect(firstRect.strokeColor).toBe("#c92a2a");
-    expect(firstRect.backgroundColor).toBe("#339af0");
+    expect(firstRect.strokeColor).toBe("#e03131");
+    expect(firstRect.backgroundColor).toBe("#a5d8ff");
     expect(firstRect.fillStyle).toBe("cross-hatch");
     expect(firstRect.strokeWidth).toBe(2); // Bold: 2
     expect(firstRect.strokeStyle).toBe("dotted");

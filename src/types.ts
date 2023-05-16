@@ -32,8 +32,6 @@ import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
-import { ColorPickerType } from "./components/ColorPicker/colorPickerUtils";
-import { ColorPalette, ColorTuple } from "./colors";
 import { Merge, ForwardRef, ValueOf } from "./utility-types";
 
 export type Point = Readonly<RoughPoint>;
@@ -297,10 +295,6 @@ export type ExcalidrawInitialDataState = Merge<
       | Promise<Required<ImportedDataState>["libraryItems"]>;
   }
 >;
-
-type PaletteOptions = Record<ColorPickerType, ColorPalette>;
-type TopPicks = Partial<Record<ColorPickerType, ColorTuple>>;
-type TopPickOptions = Record<"topPicks", TopPicks>;
 
 export interface ExcalidrawProps {
   onChange?: (
