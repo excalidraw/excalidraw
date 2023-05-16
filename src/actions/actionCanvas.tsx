@@ -19,10 +19,7 @@ import {
   isEraserActive,
   isHandToolActive,
 } from "../appState";
-import {
-  DEFAULT_CANVAS_BACKGROUND_COLOR_PALETTE,
-  DEFAULT_CANVAS_BACKGROUND_PICKS,
-} from "../colors";
+import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -46,7 +43,7 @@ export const actionChangeViewBackgroundColor = register({
         // ALLOW once we allow customizing the palette
         // palette={appProps.colorPalette?.canvasBackground}
         // topPicks={appProps.colorPalette?.topPicks?.canvasBackground}
-        palette={DEFAULT_CANVAS_BACKGROUND_COLOR_PALETTE}
+        palette={null}
         topPicks={DEFAULT_CANVAS_BACKGROUND_PICKS}
         label={t("labels.canvasBackground")}
         type="canvasBackground"

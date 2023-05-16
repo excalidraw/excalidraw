@@ -401,16 +401,14 @@
     "pink": "Pink",
     "grape": "Grape",
     "violet": "Violet",
-    "indigo": "Indigo",
     "gray": "Gray",
     "blue": "Blue",
     "cyan": "Cyan",
     "teal": "Teal",
     "green": "Green",
-    "lime": "Lime",
     "yellow": "Yellow",
     "orange": "Orange",
-    "slate": "Slate"
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {

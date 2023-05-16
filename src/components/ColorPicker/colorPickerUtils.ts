@@ -1,7 +1,7 @@
 import { ExcalidrawElement } from "../../element/types";
 import { atom } from "jotai";
 import {
-  Color,
+  ColorPickerColor,
   ColorPaletteCustom,
   MAX_CUSTOM_COLORS_USED_IN_CANVAS,
 } from "../../colors";
@@ -12,15 +12,18 @@ export const getColorNameAndShadeFromHex = ({
 }: {
   palette: ColorPaletteCustom;
   hex: string;
-}) => {
+}): {
+  colorName: ColorPickerColor;
+  shade: number | null;
+} | null => {
   for (const [colorName, colorVal] of Object.entries(palette)) {
     if (Array.isArray(colorVal)) {
       const shade = colorVal.indexOf(hex);
       if (shade > -1) {
-        return { colorName, shade } as { colorName: Color; shade: number };
+        return { colorName: colorName as ColorPickerColor, shade };
       }
     } else if (colorVal === hex) {
-      return { colorName, shade: -1 } as { colorName: Color; shade: number };
+      return { colorName: colorName as ColorPickerColor, shade: null };
     }
   }
   return null;

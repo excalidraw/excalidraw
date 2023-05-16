@@ -1,5 +1,5 @@
 import {
-  Color,
+  ColorPickerColor,
   ColorPalette,
   ColorPaletteCustom,
   COLORS_PER_ROW,
@@ -13,10 +13,12 @@ import {
 
 const arrowHandler = (
   eventKey: string,
-  currentIndex: number,
+  currentIndex: number | null,
   length: number,
 ) => {
   const rows = Math.ceil(length / COLORS_PER_ROW);
+
+  currentIndex = currentIndex ?? -1;
 
   switch (eventKey) {
     case "ArrowLeft": {
@@ -41,7 +43,7 @@ const arrowHandler = (
 
 interface HotkeyHandlerProps {
   e: React.KeyboardEvent;
-  colorObj: { colorName: Color; shade: number } | null;
+  colorObj: { colorName: ColorPickerColor; shade: number | null } | null;
   onChange: (color: string) => void;
   palette: ColorPaletteCustom;
   customColors: string[];
@@ -60,7 +62,7 @@ const hotkeyHandler = ({
   setActiveColorPickerSection,
   activeShade,
 }: HotkeyHandlerProps) => {
-  if (colorObj && colorObj.shade >= 0) {
+  if (colorObj?.shade) {
     // shift + numpad is extremely messed up on windows apparently
     if (
       ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"].includes(e.code) &&
@@ -131,7 +133,7 @@ export const colorPickerKeyNavHandler = ({
     > = {
       custom: !!customColors.length,
       baseColors: true,
-      shades: !!(colorObj && colorObj.shade >= 0),
+      shades: !!colorObj?.shade,
       hex: true,
     };
 

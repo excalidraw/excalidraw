@@ -10,7 +10,7 @@ interface TopPicksProps {
   onChange: (color: string) => void;
   type: ColorPickerType;
   activeColor: string | null;
-  topPicks?: string[];
+  topPicks?: readonly string[];
 }
 
 export const TopPicks = ({

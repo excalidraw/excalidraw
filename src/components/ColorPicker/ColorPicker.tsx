@@ -1,13 +1,9 @@
 import { isTransparent } from "../../utils";
-
-import "./ColorPicker.scss";
 import { ExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
-
 import { TopPicks } from "./TopPicks";
 import { Picker } from "./Picker";
 import ActiveColor from "./ActiveColor";
-
 import * as Popover from "@radix-ui/react-popover";
 import { useAtom } from "jotai";
 import {
@@ -16,6 +12,11 @@ import {
 } from "./colorPickerUtils";
 import { useDevice, useExcalidrawContainer } from "../App";
 import { ColorTuple, COLOR_PALETTE, ColorPaletteCustom } from "../../colors";
+import PickerHeading from "./PickerHeading";
+import { ColorInput } from "./ColorInput";
+import { t } from "../../i18n";
+
+import "./ColorPicker.scss";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -45,7 +46,7 @@ export interface ColorPickerProps {
   label: string;
   elements: readonly ExcalidrawElement[];
   appState: AppState;
-  palette?: ColorPaletteCustom;
+  palette?: ColorPaletteCustom | null;
   topPicks?: ColorTuple;
   updateData: (formData?: any) => void;
 }
@@ -65,6 +66,19 @@ export const ColorPicker = ({
 
   const { container } = useExcalidrawContainer();
   const { isMobile, isLandscape } = useDevice();
+
+  const colorInputJSX = (
+    <div>
+      <PickerHeading>{t("colorPicker.hexCode")}</PickerHeading>
+      <ColorInput
+        color={color}
+        label={label}
+        onChange={(color) => {
+          onChange(color);
+        }}
+      />
+    </div>
+  );
 
   return (
     <div>
@@ -123,18 +137,23 @@ export const ColorPicker = ({
                   "0px 7px 14px rgba(0, 0, 0, 0.05), 0px 0px 3.12708px rgba(0, 0, 0, 0.0798), 0px 0px 0.931014px rgba(0, 0, 0, 0.1702)",
               }}
             >
-              <Picker
-                palette={palette}
-                color={color || null}
-                onChange={(changedColor) => {
-                  onChange(changedColor);
-                }}
-                label={label}
-                showInput
-                type={type}
-                elements={elements}
-                updateData={updateData}
-              />
+              {palette ? (
+                <Picker
+                  palette={palette}
+                  color={color || null}
+                  onChange={(changedColor) => {
+                    onChange(changedColor);
+                  }}
+                  label={label}
+                  type={type}
+                  elements={elements}
+                  updateData={updateData}
+                >
+                  {colorInputJSX}
+                </Picker>
+              ) : (
+                colorInputJSX
+              )}
               <Popover.Arrow
                 width={20}
                 height={10}

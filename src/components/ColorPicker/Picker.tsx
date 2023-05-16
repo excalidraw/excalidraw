@@ -4,7 +4,6 @@ import { t } from "../../i18n";
 import { ExcalidrawElement } from "../../element/types";
 import { ShadeList } from "./ShadeList";
 
-import { ColorInput } from "./ColorInput";
 import PickerColorList from "./PickerColorList";
 import { useAtom } from "jotai";
 import { CustomColorList } from "./CustomColorList";
@@ -19,7 +18,6 @@ import {
 } from "./colorPickerUtils";
 import {
   ColorPaletteCustom,
-  DEFAULT_CANVAS_BACKGROUND_INDEX,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
 } from "../../colors";
@@ -28,22 +26,22 @@ interface PickerProps {
   color: string | null;
   onChange: (color: string) => void;
   label: string;
-  showInput: boolean;
   type: ColorPickerType;
   elements: readonly ExcalidrawElement[];
   palette: ColorPaletteCustom;
   updateData: (formData?: any) => void;
+  children?: React.ReactNode;
 }
 
 export const Picker = ({
   color,
   onChange,
   label,
-  showInput = true,
   type,
   elements,
   palette,
   updateData,
+  children,
 }: PickerProps) => {
   const [customColors] = React.useState(() => {
     if (type === "canvasBackground") {
@@ -63,7 +61,6 @@ export const Picker = ({
 
   useEffect(() => {
     if (!activeColorPickerSection) {
-      const hasShade = colorObj && colorObj.shade >= 0;
       const isCustom = isCustomColor({ color, palette });
       const isCustomButNotInList =
         isCustom && !customColors.includes(color || "");
@@ -73,7 +70,7 @@ export const Picker = ({
           ? "hex"
           : isCustom
           ? "custom"
-          : hasShade
+          : colorObj?.shade
           ? "shades"
           : "baseColors",
       );
@@ -87,29 +84,15 @@ export const Picker = ({
     customColors,
   ]);
 
-  // default to stroke color shade
-  let initialShade = DEFAULT_ELEMENT_STROKE_COLOR_INDEX;
-
-  if (colorObj && colorObj.shade >= 0) {
-    initialShade = colorObj.shade;
-  }
-
-  if (type === "elementBackground") {
-    initialShade = DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX;
-  }
-
-  if (type === "elementStroke") {
-    initialShade = DEFAULT_ELEMENT_STROKE_COLOR_INDEX;
-  }
-
-  if (type === "canvasBackground") {
-    initialShade = DEFAULT_CANVAS_BACKGROUND_INDEX;
-  }
-
-  const [activeShade, setActiveShade] = useState(initialShade);
+  const [activeShade, setActiveShade] = useState(
+    colorObj?.shade ||
+      (type === "elementBackground"
+        ? DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX
+        : DEFAULT_ELEMENT_STROKE_COLOR_INDEX),
+  );
 
   useEffect(() => {
-    if (colorObj && colorObj.shade >= 0) {
+    if (colorObj?.shade) {
       setActiveShade(colorObj.shade);
     }
   }, [colorObj]);
@@ -166,19 +149,7 @@ export const Picker = ({
           <PickerHeading>{t("colorPicker.shades")}</PickerHeading>
           <ShadeList hex={color} onChange={onChange} palette={palette} />
         </div>
-
-        {showInput && (
-          <div>
-            <PickerHeading>{t("colorPicker.hexCode")}</PickerHeading>
-            <ColorInput
-              color={color}
-              label={label}
-              onChange={(color) => {
-                onChange(color);
-              }}
-            />
-          </div>
-        )}
+        {children}
       </div>
     </div>
   );
