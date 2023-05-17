@@ -3,8 +3,9 @@ import OpenColor from "open-color";
 
 import { Dialog } from "./Dialog";
 import { t } from "../i18n";
+import Trans from "./Trans";
 
-import { AppState, LibraryItems, LibraryItem } from "../types";
+import { LibraryItems, LibraryItem, UIAppState } from "../types";
 import { exportToCanvas, exportToSvg } from "../packages/utils";
 import {
   EXPORT_DATA_TYPES,
@@ -135,7 +136,7 @@ const SingleLibraryItem = ({
   onRemove,
 }: {
   libItem: LibraryItem;
-  appState: AppState;
+  appState: UIAppState;
   index: number;
   onChange: (val: string, index: number) => void;
   onRemove: (id: string) => void;
@@ -231,7 +232,7 @@ const PublishLibrary = ({
 }: {
   onClose: () => void;
   libraryItems: LibraryItems;
-  appState: AppState;
+  appState: UIAppState;
   onSuccess: (data: {
     url: string;
     authorName: string;
@@ -402,26 +403,32 @@ const PublishLibrary = ({
       {shouldRenderForm ? (
         <form onSubmit={onSubmit}>
           <div className="publish-library-note">
-            {t("publishDialog.noteDescription.pre")}
-            <a
-              href="https://libraries.excalidraw.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t("publishDialog.noteDescription.link")}
-            </a>{" "}
-            {t("publishDialog.noteDescription.post")}
+            <Trans
+              i18nKey="publishDialog.noteDescription"
+              link={(el) => (
+                <a
+                  href="https://libraries.excalidraw.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {el}
+                </a>
+              )}
+            />
           </div>
           <span className="publish-library-note">
-            {t("publishDialog.noteGuidelines.pre")}
-            <a
-              href="https://github.com/excalidraw/excalidraw-libraries#guidelines"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t("publishDialog.noteGuidelines.link")}
-            </a>
-            {t("publishDialog.noteGuidelines.post")}
+            <Trans
+              i18nKey="publishDialog.noteGuidelines"
+              link={(el) => (
+                <a
+                  href="https://github.com/excalidraw/excalidraw-libraries#guidelines"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {el}
+                </a>
+              )}
+            />
           </span>
 
           <div className="publish-library-note">
@@ -515,15 +522,18 @@ const PublishLibrary = ({
               />
             </label>
             <span className="publish-library-note">
-              {t("publishDialog.noteLicense.pre")}
-              <a
-                href="https://github.com/excalidraw/excalidraw-libraries/blob/main/LICENSE"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t("publishDialog.noteLicense.link")}
-              </a>
-              {t("publishDialog.noteLicense.post")}
+              <Trans
+                i18nKey="publishDialog.noteLicense"
+                link={(el) => (
+                  <a
+                    href="https://github.com/excalidraw/excalidraw-libraries/blob/main/LICENSE"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {el}
+                  </a>
+                )}
+              />
             </span>
           </div>
           <div className="publish-library__buttons">

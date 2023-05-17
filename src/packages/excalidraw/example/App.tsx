@@ -161,8 +161,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
           onClick={() => alert("This is an empty top right UI")}
           style={{ height: "2.5rem" }}
         >
-          {" "}
-          Click me{" "}
+          Click me
         </button>
       </>
     );
@@ -494,15 +493,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
     );
   };
 
-  const renderSidebar = () => {
-    return (
-      <Sidebar>
-        <Sidebar.Header>Custom header!</Sidebar.Header>
-        Custom sidebar!
-      </Sidebar>
-    );
-  };
-
   const renderMenu = () => {
     return (
       <MainMenu>
@@ -668,23 +658,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
           </div>
         </div>
         <div className="excalidraw-wrapper">
-          <div
-            style={{
-              position: "absolute",
-              left: "50%",
-              bottom: "20px",
-              display: "flex",
-              zIndex: 9999999999999999,
-              padding: "5px 10px",
-              transform: "translateX(-50%)",
-              background: "rgba(255, 255, 255, 0.8)",
-              gap: "1rem",
-            }}
-          >
-            <button onClick={() => excalidrawAPI?.toggleMenu("customSidebar")}>
-              Toggle Custom Sidebar
-            </button>
-          </div>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
             initialData={initialStatePromiseRef.current.promise}
@@ -706,7 +679,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
-            renderSidebar={renderSidebar}
           >
             {excalidrawAPI && (
               <Footer>
@@ -714,6 +686,30 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               </Footer>
             )}
             <WelcomeScreen />
+            <Sidebar name="custom">
+              <Sidebar.Tabs>
+                <Sidebar.Header />
+                <Sidebar.Tab tab="one">Tab one!</Sidebar.Tab>
+                <Sidebar.Tab tab="two">Tab two!</Sidebar.Tab>
+                <Sidebar.TabTriggers>
+                  <Sidebar.TabTrigger tab="one">One</Sidebar.TabTrigger>
+                  <Sidebar.TabTrigger tab="two">Two</Sidebar.TabTrigger>
+                </Sidebar.TabTriggers>
+              </Sidebar.Tabs>
+            </Sidebar>
+            <Sidebar.Trigger
+              name="custom"
+              tab="one"
+              style={{
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
+                bottom: "20px",
+                zIndex: 9999999999999999,
+              }}
+            >
+              Toggle Custom Sidebar
+            </Sidebar.Trigger>
             {renderMenu()}
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}

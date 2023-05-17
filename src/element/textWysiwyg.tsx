@@ -294,7 +294,6 @@ export const textWysiwyg = ({
       const initialSelectionStart = editable.selectionStart;
       const initialSelectionEnd = editable.selectionEnd;
       const initialLength = editable.value.length;
-      editable.value = updatedTextElement.originalText;
 
       // restore cursor position after value updated so it doesn't
       // go to the end of text when container auto expanded
@@ -418,6 +417,7 @@ export const textWysiwyg = ({
     boxSizing: "content-box",
     ...getEditorStyle(element),
   });
+  editable.value = element.originalText;
   updateWysiwygStyle();
 
   if (onChange) {

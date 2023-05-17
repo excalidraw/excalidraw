@@ -538,6 +538,10 @@
     height: 3px;
   }
 
+  select::-webkit-scrollbar {
+    width: 10px;
+  }
+
   ::-webkit-scrollbar-thumb {
     background: var(--scrollbar-thumb);
     border-radius: 10px;
@@ -567,7 +571,7 @@
       border-radius: 0;
     }
 
-    .library-button {
+    .default-sidebar-trigger {
       border: 0;
     }
   }

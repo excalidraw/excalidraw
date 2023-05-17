@@ -54,6 +54,7 @@
     "veryLarge": "كبير جدا",
     "solid": "كامل",
     "hachure": "خطوط",
+    "zigzag": "",
     "crossHatch": "خطوط متقطعة",
     "thin": "نحيف",
     "bold": "داكن",
@@ -207,19 +208,10 @@
     "collabSaveFailed": "تعذر الحفظ في قاعدة البيانات. إذا استمرت المشاكل، يفضل أن تحفظ ملفك محليا كي لا تفقد عملك.",
     "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك.",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -272,16 +264,11 @@
     "canvasTooBigTip": "نصيحة: حاول تحريك العناصر البعيدة بشكل أقرب قليلاً."
   },
   "errorSplash": {
-    "headingMain_pre": "حدث خطأ، حاول مرة أخرى ",
-    "headingMain_button": "إعادة تحميل الصفحة.",
+    "headingMain": "",
     "clearCanvasMessage": "إذا لم تعمل إعادة التحميل، حاول مرة أخرى ",
-    "clearCanvasMessage_button": "مسح اللوحة.",
     "clearCanvasCaveat": " هذا سيؤدي إلى فقدان العمل ",
-    "trackedToSentry_pre": "الخطأ ",
-    "trackedToSentry_post": " تم تعقبه على نظامنا.",
-    "openIssueMessage_pre": "كنا حذرين جدا لعدم تضمين معلومات المشهد الخاصة بك في الخطأ. إذا لم يكن المشهد خاصًا ، يرجى النظر في متابعة هذا الأمر ",
-    "openIssueMessage_button": "متعقّب الخلل.",
-    "openIssueMessage_post": " يرجى تضمين المعلومات أدناة عن طريق نسخ ولصق المشكلة في GitHub.",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": "محتوى المشهد:"
   },
   "roomDialog": {
@@ -361,29 +348,16 @@
       "required": "مطلوب",
       "website": "أدخل عنوان URL صالح"
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "مستودع المكتبة العامة",
-      "post": "ليستخدمها الآخرون في رسوماتهم."
-    },
-    "noteGuidelines": {
-      "pre": "يجب الموافقة على المكتبة يدويًا أولاً. يرجى قراءة ",
-      "link": "الإرشادات",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "رخصة إم أي تي ",
-      "post": "وهو ما يعني باختصار أنه يمكن لأي شخص استخدامها دون قيود."
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "يجب أن يكون لكل عنصر مكتبة اسمه الخاص حتى يكون قابلاً للتصفية. سيتم تضمين عناصر المكتبة التالية:",
     "atleastOneLibItem": "يرجى تحديد عنصر مكتبة واحد على الأقل للبدء",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "تم إرسال المكتبة",
-    "content": "شكرا لك {{authorName}}. لقد تم إرسال مكتبتك للمراجعة. يمكنك تتبع الحالة",
-    "link": "هنا"
+    "content": "شكرا لك {{authorName}}. لقد تم إرسال مكتبتك للمراجعة. يمكنك تتبع الحالة"
   },
   "confirmDialog": {
     "resetLibrary": "إعادة ضبط المكتبة",
