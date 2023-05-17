@@ -3,8 +3,10 @@ import {
   ColorPalette,
   ColorPaletteCustom,
   COLORS_PER_ROW,
+  COLOR_PALETTE,
 } from "../../colors";
 import { KEYS } from "../../keys";
+import { ValueOf } from "../../utility-types";
 import {
   ActiveColorPickerSectionAtomType,
   colorPickerHotkeyBindings,
@@ -145,7 +147,14 @@ export const colorPickerKeyNavHandler = ({
     }, [] as ActiveColorPickerSectionAtomType[]);
 
     const activeSectionIndex = sections.indexOf(activeColorPickerSection);
-    const nextSectionIndex = (activeSectionIndex + 1) % sections.length;
+    const indexOffset = e.shiftKey ? -1 : 1;
+    const nextSectionIndex =
+      activeSectionIndex + indexOffset > sections.length - 1
+        ? 0
+        : activeSectionIndex + indexOffset < 0
+        ? sections.length - 1
+        : activeSectionIndex + indexOffset;
+
     const nextSection = sections[nextSectionIndex];
 
     if (nextSection) {
@@ -154,16 +163,21 @@ export const colorPickerKeyNavHandler = ({
 
     if (nextSection === "custom") {
       onChange(customColors[0]);
-    } else if (
-      activeColorPickerSection === "custom" ||
-      activeColorPickerSection === "hex"
-    ) {
-      const keys = Object.keys(palette) as (keyof ColorPalette)[];
-      const firstColor = palette[keys[0]];
+    } else if (nextSection === "baseColors") {
+      const baseColorName = (
+        Object.entries(palette) as [string, ValueOf<ColorPalette>][]
+      ).find(([name, shades]) => {
+        if (Array.isArray(shades)) {
+          return shades.includes(hex);
+        } else if (shades === hex) {
+          return name;
+        }
+        return null;
+      });
 
-      onChange(
-        Array.isArray(firstColor) ? firstColor[activeShade] : firstColor,
-      );
+      if (!baseColorName) {
+        onChange(COLOR_PALETTE.black);
+      }
     }
 
     e.preventDefault();

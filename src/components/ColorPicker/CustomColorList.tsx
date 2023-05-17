@@ -17,7 +17,9 @@ export const CustomColorList = ({
   onChange,
   label,
 }: CustomColorListProps) => {
-  const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
+  const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
+    activeColorPickerSectionAtom,
+  );
 
   const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -25,7 +27,7 @@ export const CustomColorList = ({
     if (btnRef.current) {
       btnRef.current.focus();
     }
-  }, [color]);
+  }, [color, activeColorPickerSection]);
 
   return (
     <div className="color-picker-content--default">
