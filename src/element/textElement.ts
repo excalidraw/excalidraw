@@ -1020,10 +1020,10 @@ export const bindTextToContainer = (
   const textElement: ExcalidrawTextElement = newTextElement({
     x: 0,
     y: 0,
-    ...textProps,
-    containerId: container.id,
     textAlign: TEXT_ALIGN.CENTER,
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
+    ...textProps,
+    containerId: container.id,
   });
 
   mutateElement(container, {
