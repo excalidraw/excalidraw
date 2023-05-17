@@ -6,8 +6,7 @@ import { TransformHandleType } from "./transformHandles";
 import { ExcalidrawElement, ExcalidrawImageElement, NonDeleted } from "./types";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 
-// i split out these 'internal' functions so that this functionality
-// can be easily unit tested
+// i split out these 'internal' functions so that this functionality can be easily unit tested
 export function cropElementInternal(
   element: ExcalidrawImageElement,
   transformHandle: TransformHandleType,
