@@ -606,6 +606,136 @@ const ExcalidrawWrapper = () => {
 
   const isOffline = useAtomValue(isOfflineAtom);
 
+  const getInitialData = (): ExcalidrawInitialDataState => {
+    return {
+      scrollToContent: true,
+      //"type": "excalidraw/clipboard",
+      elements: [
+        // Test case with simple rectangle
+
+        {
+          type: "rectangle",
+          x: 10,
+          y: 10,
+        },
+        // Test case with simple ellipse
+        {
+          type: "ellipse",
+          x: 50,
+          y: 200,
+        },
+        // Test case with simple diamond
+        {
+          type: "diamond",
+          x: 120,
+          y: 20,
+        },
+        // Test case with simple text element
+        {
+          type: "text",
+          x: 300,
+          y: 100,
+          text: "HELLO",
+        },
+        // Test case with rectangle and some properties
+        {
+          type: "rectangle",
+          backgroundColor: "#4dabf7",
+          width: 500,
+          height: 200,
+          x: 100,
+          y: 200,
+        },
+        // Test case with arrow and some properties
+        {
+          type: "arrow",
+          strokeColor: "#099268",
+          strokeWidth: 2,
+          x: 100,
+          y: 20,
+        },
+        // Test case with rectangle text container
+        {
+          type: "rectangle",
+          x: 240,
+          y: 30,
+          label: {
+            text: "HELLO FROM RECT",
+          },
+        },
+        // Test case with ellipse text container
+        {
+          type: "ellipse",
+          x: 400,
+          y: 410,
+          label: {
+            text: "HELLO FROM ELLIPSE",
+          },
+        },
+        // Test case with diamond text container
+        {
+          type: "diamond",
+          x: 10,
+          y: 530,
+          label: {
+            text: "HELLO Text In Diamond",
+          },
+        },
+        // Test case with diamond text container and some properties
+        {
+          type: "diamond",
+          x: 199,
+          y: 123,
+          backgroundColor: "#fff3bf",
+          strokeWidth: 2,
+          label: {
+            text: "HELLO Text In Diamond\n with props",
+            strokeColor: "#099268",
+            fontSize: 20,
+          },
+        },
+        // Test case with simple arrow
+        {
+          type: "arrow",
+          x: -120,
+          y: 40,
+          label: { text: "HELLO FROM ARROW" },
+        },
+        // Test case with simple line
+        {
+          type: "line",
+          x: -202,
+          y: 70,
+        },
+        // Test case for labeled arrow
+        {
+          type: "arrow",
+          x: -190,
+          y: 169,
+          label: {
+            text: "HELLO LABELED ARROW",
+            strokeColor: "#099268",
+            fontSize: 20,
+          },
+        },
+        // Test case for container with label alignments
+        {
+          type: "rectangle",
+          x: -300,
+          y: 200,
+          width: 113.3515625,
+          height: 100,
+          strokeColor: "#495057",
+          label: {
+            text: "HELLO RECT",
+            fontSize: 13.5,
+            textAlign: "left",
+            verticalAlign: "top",
+          },
+        },
+      ],
+    };
+  };
   return (
     <div
       style={{ height: "100%" }}
@@ -616,7 +746,7 @@ const ExcalidrawWrapper = () => {
       <Excalidraw
         ref={excalidrawRefCallback}
         onChange={onChange}
-        initialData={initialStatePromiseRef.current.promise}
+        initialData={getInitialData()}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{

@@ -36,7 +36,7 @@ import {
   getBoundTextMaxWidth,
   getDefaultLineHeight,
   bindTextToContainer,
-  isValidTextContainer,
+  VALID_CONTAINER_TYPES,
 } from "./textElement";
 import {
   DEFAULT_ELEMENT_PROPS,
@@ -50,7 +50,7 @@ import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
 import { ImportedDataState } from "../data/types";
 
-const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
+export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
   "rectangle",
   "ellipse",
   "diamond",
@@ -664,67 +664,53 @@ export const convertToExcalidrawElements = (
     return [];
   }
   elements.forEach((element) => {
-    if (!element) {
+    if (
+      !element ||
+      !ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)
+    ) {
       return;
     }
-    if (isValidTextContainer(element) && element?.label?.text) {
+    //@ts-ignore
+    if (VALID_CONTAINER_TYPES.has(element.type) && element?.label?.text) {
       //@ts-ignore
       const elements = bindTextToContainer(element, element.label);
       res.push(...elements);
     } else {
       let excalidrawElement;
+      const { type, ...rest } = element;
       if (element.type === "text") {
         //@ts-ignore
         excalidrawElement = newTextElement({
-          //@ts-ignore
-          x: 0,
-          //@ts-ignore
-          y: 0,
           ...element,
         });
-      } else if (element.type === "arrow" || element.type === "line") {
+      } else if (type === "arrow" || type === "line") {
         excalidrawElement = newLinearElement({
-          //@ts-ignore
-          x: 0,
-          //@ts-ignore
-          y: 0,
-          //@ts-ignore
-          type: element.type,
-          //@ts-ignore
+          type,
           width: 200,
-          //@ts-ignore
           height: 24,
-          //@ts-ignore,
           endArrowhead: element.type === "arrow" ? "arrow" : null,
-          //@ts-ignore
           points: [
             [0, 0],
             [200, 0],
           ],
-          ...element,
+          ...rest,
         });
       } else {
         //@ts-ignore
         excalidrawElement = newElement({
-          x: 0,
-          y: 0,
-
           ...element,
           width:
-            //@ts-ignore
             element?.width ||
             (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)
               ? 100
               : 0),
           height:
-            //@ts-ignore
             element?.height ||
             (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)
               ? 100
               : 0),
         });
       }
-      //@ts-ignore
 
       res.push(excalidrawElement);
     }

@@ -7,7 +7,6 @@ import {
   VERTICAL_ALIGN,
 } from "../constants";
 import { MarkNonNullable, MarkOptional, ValueOf } from "../utility-types";
-import { ElementConstructorOpts } from "./newElement";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";

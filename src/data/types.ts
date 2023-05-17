@@ -1,4 +1,10 @@
-import { ExcalidrawElement, ExcalidrawGenericElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawGenericElement,
+  FontFamilyValues,
+  TextAlign,
+  VerticalAlign,
+} from "../element/types";
 import {
   AppState,
   BinaryFiles,
@@ -8,7 +14,10 @@ import {
 import type { cleanAppStateForExport } from "../appState";
 import { VERSIONS } from "../constants";
 import { MarkOptional } from "../utility-types";
-import { ElementConstructorOpts } from "../element/newElement";
+import {
+  ElementConstructorOpts,
+  ELEMENTS_SUPPORTING_PROGRAMMATIC_API,
+} from "../element/newElement";
 
 export interface ExportedDataState {
   type: string;
@@ -38,18 +47,31 @@ export interface ImportedDataState {
   elements?:
     | readonly (
         | (ExcalidrawElement & {
-            label?: { text: string } & MarkOptional<
-              ElementConstructorOpts,
-              "x" | "y"
+            label?: {
+              text: string;
+              fontSize?: number;
+              fontFamily?: FontFamilyValues;
+              textAlign?: TextAlign;
+              verticalAlign?: VerticalAlign;
+            } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+          } & ElementConstructorOpts)
+        | ({
+            type: Exclude<
+              typeof ELEMENTS_SUPPORTING_PROGRAMMATIC_API[number],
+              "text"
             >;
-          })
-        | {
-            type: Exclude<ExcalidrawGenericElement["type"], "selection">;
-            label?: { text: string } & MarkOptional<
-              ElementConstructorOpts,
-              "x" | "y"
-            >;
-          }
+            label?: {
+              text: string;
+              fontSize?: number;
+              fontFamily?: FontFamilyValues;
+              textAlign?: TextAlign;
+              verticalAlign?: VerticalAlign;
+            } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+          } & ElementConstructorOpts)
+        | ({
+            type: "text";
+            text: string;
+          } & ElementConstructorOpts)
       )[]
     | null;
   appState?: Readonly<
