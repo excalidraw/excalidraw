@@ -1197,13 +1197,6 @@
   resolved "https://registry.yarnpkg.com/@csstools/selector-specificity/-/selector-specificity-2.2.0.tgz#2cbcf822bf3764c9658c4d2e568bd0c0cb748016"
   integrity sha512-+OJ9konv95ClSTOJCmMZqpd5+YGsB2S+x6w3E1oaM8UuR5j8nTNHYSz8c9BEPGDOCMQYIEEGlVPj/VY64iTbGw==
 
-"@dwelle/tunnel-rat@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@dwelle/tunnel-rat/-/tunnel-rat-0.1.1.tgz#0a0b235f8fc22ff1cf47ed102f4cc612eb51bc71"
-  integrity sha512-jb5/ZsT/af1J7tnbBXp7KO1xEyw61lWSDqJ+Bqdc6JlL3vbAvsifNhe+/mRFs6aSBCRaDqp5f2pJDHtA3MUZLw==
-  dependencies:
-    zustand "^4.3.2"
-
 "@eslint-community/eslint-utils@^4.2.0":
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/@eslint-community/eslint-utils/-/eslint-utils-4.4.0.tgz#a23514e8fb9af1269d5f7788aa556798d61c6b59"
