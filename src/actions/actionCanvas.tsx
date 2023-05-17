@@ -40,9 +40,6 @@ export const actionChangeViewBackgroundColor = register({
     // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
       <ColorPicker
-        // ALLOW once we allow customizing the palette
-        // palette={appProps.colorPalette?.canvasBackground}
-        // topPicks={appProps.colorPalette?.topPicks?.canvasBackground}
         palette={null}
         topPicks={DEFAULT_CANVAS_BACKGROUND_PICKS}
         label={t("labels.canvasBackground")}

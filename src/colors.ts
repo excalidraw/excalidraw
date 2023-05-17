@@ -129,7 +129,7 @@ export const DEFAULT_ELEMENT_STROKE_COLOR_PALETTE = {
   bronze: COLOR_PALETTE.bronze,
   // rest
   ...COMMON_ELEMENT_SHADES,
-};
+} as const;
 
 // ORDER matters for positioning in pallete (5x3 grid)s
 export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
@@ -140,27 +140,28 @@ export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
   bronze: COLOR_PALETTE.bronze,
 
   ...COMMON_ELEMENT_SHADES,
-};
+} as const;
 
 // -----------------------------------------------------------------------------
 // helpers
 // -----------------------------------------------------------------------------
 
 // !!!MUST BE WITHOUT GRAY, TRANSPARENT AND BLACK!!!
-export const getAllColorsSpecificShade = (index: 0 | 1 | 2 | 3 | 4) => [
-  // 2nd row
-  COLOR_PALETTE.cyan[index],
-  COLOR_PALETTE.blue[index],
-  COLOR_PALETTE.violet[index],
-  COLOR_PALETTE.grape[index],
-  COLOR_PALETTE.pink[index],
+export const getAllColorsSpecificShade = (index: 0 | 1 | 2 | 3 | 4) =>
+  [
+    // 2nd row
+    COLOR_PALETTE.cyan[index],
+    COLOR_PALETTE.blue[index],
+    COLOR_PALETTE.violet[index],
+    COLOR_PALETTE.grape[index],
+    COLOR_PALETTE.pink[index],
 
-  // 3rd row
-  COLOR_PALETTE.green[index],
-  COLOR_PALETTE.teal[index],
-  COLOR_PALETTE.yellow[index],
-  COLOR_PALETTE.orange[index],
-  COLOR_PALETTE.red[index],
-];
+    // 3rd row
+    COLOR_PALETTE.green[index],
+    COLOR_PALETTE.teal[index],
+    COLOR_PALETTE.yellow[index],
+    COLOR_PALETTE.orange[index],
+    COLOR_PALETTE.red[index],
+  ] as const;
 
 // -----------------------------------------------------------------------------

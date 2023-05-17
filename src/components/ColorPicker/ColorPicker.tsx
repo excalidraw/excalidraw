@@ -17,6 +17,7 @@ import { t } from "../../i18n";
 import clsx from "clsx";
 
 import "./ColorPicker.scss";
+import React from "react";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;

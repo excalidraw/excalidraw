@@ -162,10 +162,7 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   return result;
 };
 
-const bgColors = [
-  //...getAllColorsSpecificShade(2), // lighter version
-  ...getAllColorsSpecificShade(DEFAULT_CHART_COLOR_INDEX), // darker version
-];
+const bgColors = getAllColorsSpecificShade(DEFAULT_CHART_COLOR_INDEX);
 
 // Put all the common properties here so when the whole chart is selected
 // the properties dialog shows the correct selected values

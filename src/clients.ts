@@ -5,6 +5,13 @@ import {
 } from "./colors";
 import { AppState } from "./types";
 
+const BG_COLORS = getAllColorsSpecificShade(
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
+);
+const STROKE_COLORS = getAllColorsSpecificShade(
+  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
+);
+
 export const getClientColors = (clientId: string, appState: AppState) => {
   if (appState?.collaborators) {
     const currentUser = appState.collaborators.get(clientId);
@@ -15,18 +22,9 @@ export const getClientColors = (clientId: string, appState: AppState) => {
   // Naive way of getting an integer out of the clientId
   const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
 
-  // without transparent, black, white
-  const backgrounds = [
-    ...getAllColorsSpecificShade(DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX),
-  ];
-  // without transparent, black, white
-  const strokes = [
-    ...getAllColorsSpecificShade(DEFAULT_ELEMENT_STROKE_COLOR_INDEX),
-  ];
-
   return {
-    background: backgrounds[sum % backgrounds.length],
-    stroke: strokes[sum % strokes.length],
+    background: BG_COLORS[sum % BG_COLORS.length],
+    stroke: STROKE_COLORS[sum % STROKE_COLORS.length],
   };
 };
 

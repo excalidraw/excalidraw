@@ -41,7 +41,6 @@ export const TopPicks = ({
     console.error("Invalid type for TopPicks");
     return null;
   }
-  // TODO: add here the shades logic
 
   return (
     <div className="color-picker__top-picks">
