@@ -20,7 +20,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemRoundness": "round",
   "currentItemStartArrowhead": null,
-  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
   "currentItemStrokeWidth": 1,
   "currentItemTextAlign": "left",

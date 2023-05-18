@@ -5,6 +5,7 @@ import { focusNearestParent } from "../utils";
 
 import "./ProjectName.scss";
 import { useExcalidrawContainer } from "./App";
+import { KEYS } from "../keys";
 
 type Props = {
   value: string;
@@ -26,7 +27,7 @@ export const ProjectName = (props: Props) => {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Enter") {
+    if (event.key === KEYS.ENTER) {
       event.preventDefault();
       if (event.nativeEvent.isComposing || event.keyCode === 229) {
         return;
