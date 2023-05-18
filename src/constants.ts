@@ -1,7 +1,7 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
 import { ExcalidrawElement, FontFamilyValues } from "./element/types";
-import oc from "open-color";
+import { COLOR_PALETTE } from "./colors";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
@@ -272,8 +272,8 @@ export const DEFAULT_ELEMENT_PROPS: {
   opacity: ExcalidrawElement["opacity"];
   locked: ExcalidrawElement["locked"];
 } = {
-  strokeColor: oc.black,
-  backgroundColor: "transparent",
+  strokeColor: COLOR_PALETTE.black,
+  backgroundColor: COLOR_PALETTE.transparent,
   fillStyle: "hachure",
   strokeWidth: 1,
   strokeStyle: "solid",

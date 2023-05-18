@@ -14,7 +14,7 @@ import {
 } from "../element/bounds";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 
 const enableActionFlipHorizontal = (
   elements: readonly ExcalidrawElement[],
@@ -48,7 +48,7 @@ export const actionFlipHorizontal = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => event.shiftKey && event.code === "KeyH",
+  keyTest: (event) => event.shiftKey && event.code === CODES.H,
   contextItemLabel: "labels.flipHorizontal",
   predicate: (elements, appState) =>
     enableActionFlipHorizontal(elements, appState),
@@ -65,7 +65,7 @@ export const actionFlipVertical = register({
     };
   },
   keyTest: (event) =>
-    event.shiftKey && event.code === "KeyV" && !event[KEYS.CTRL_OR_CMD],
+    event.shiftKey && event.code === CODES.V && !event[KEYS.CTRL_OR_CMD],
   contextItemLabel: "labels.flipVertical",
   predicate: (elements, appState) =>
     enableActionFlipVertical(elements, appState),

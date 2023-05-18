@@ -48,7 +48,7 @@ const MenuContent = ({
           <Island
             className="dropdown-menu-container"
             padding={2}
-            style={{ zIndex: 1 }}
+            style={{ zIndex: 2 }}
           >
             {children}
           </Island>

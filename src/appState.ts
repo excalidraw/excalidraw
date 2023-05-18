@@ -1,4 +1,4 @@
-import oc from "open-color";
+import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
@@ -84,7 +84,7 @@ export const getDefaultAppState = (): Omit<
     startBoundElement: null,
     suggestedBindings: [],
     toast: null,
-    viewBackgroundColor: oc.white,
+    viewBackgroundColor: COLOR_PALETTE.white,
     zenModeEnabled: false,
     zoom: {
       value: 1 as NormalizedZoomValue,

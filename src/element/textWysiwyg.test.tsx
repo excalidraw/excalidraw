@@ -1521,7 +1521,7 @@ describe("textWysiwyg", () => {
           roundness: {
             type: 3,
           },
-          strokeColor: "#000000",
+          strokeColor: "#1e1e1e",
           strokeStyle: "solid",
           strokeWidth: 1,
           type: "rectangle",

@@ -163,11 +163,7 @@ export type AppState = {
   isRotating: boolean;
   zoom: Zoom;
   openMenu: "canvas" | "shape" | null;
-  openPopup:
-    | "canvasColorPicker"
-    | "backgroundColorPicker"
-    | "strokeColorPicker"
-    | null;
+  openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog: "imageExport" | "help" | "jsonExport" | null;
   /**
@@ -542,4 +538,5 @@ export type Device = Readonly<{
   isMobile: boolean;
   isTouchScreen: boolean;
   canDeviceFitSidebar: boolean;
+  isLandscape: boolean;
 }>;

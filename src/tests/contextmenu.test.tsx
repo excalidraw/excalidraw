@@ -9,6 +9,7 @@ import {
   queryByText,
   queryAllByText,
   waitFor,
+  togglePopover,
 } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
@@ -19,7 +20,6 @@ import { ShortcutName } from "../actions/shortcuts";
 import { copiedStyles } from "../actions/actionStyles";
 import { API } from "./helpers/api";
 import { setDateTimeForTests } from "../utils";
-import { t } from "../i18n";
 import { LibraryItem } from "../types";
 
 const checkpoint = (name: string) => {
@@ -303,10 +303,10 @@ describe("contextMenu element", () => {
     mouse.up(20, 20);
 
     // Change some styles of second rectangle
-    UI.clickLabeledElement("Stroke");
-    UI.clickLabeledElement(t("colors.c92a2a"));
-    UI.clickLabeledElement("Background");
-    UI.clickLabeledElement(t("colors.e64980"));
+    togglePopover("Stroke");
+    UI.clickOnTestId("color-red");
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
     // Fill style
     fireEvent.click(screen.getByTitle("Cross-hatch"));
     // Stroke width
@@ -320,13 +320,20 @@ describe("contextMenu element", () => {
       target: { value: "60" },
     });
 
+    // closing the background popover as this blocks
+    // context menu from rendering after we started focussing
+    // the popover once rendered :/
+    togglePopover("Background");
+
     mouse.reset();
+
     // Copy styles of second rectangle
     fireEvent.contextMenu(GlobalTestState.canvas, {
       button: 2,
       clientX: 40,
       clientY: 40,
     });
+
     let contextMenu = UI.queryContextMenu();
     fireEvent.click(queryByText(contextMenu!, "Copy styles")!);
     const secondRect = JSON.parse(copiedStyles)[0];
@@ -344,8 +351,8 @@ describe("contextMenu element", () => {
 
     const firstRect = API.getSelectedElement();
     expect(firstRect.id).toBe(h.elements[0].id);
-    expect(firstRect.strokeColor).toBe("#c92a2a");
-    expect(firstRect.backgroundColor).toBe("#e64980");
+    expect(firstRect.strokeColor).toBe("#e03131");
+    expect(firstRect.backgroundColor).toBe("#a5d8ff");
     expect(firstRect.fillStyle).toBe("cross-hatch");
     expect(firstRect.strokeWidth).toBe(2); // Bold: 2
     expect(firstRect.strokeStyle).toBe("dotted");
