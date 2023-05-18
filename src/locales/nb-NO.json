@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "Gjennomsiktig",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Svart",
+    "white": "Hvit",
+    "red": "Rød",
+    "pink": "Rosa",
+    "grape": "Drue",
+    "violet": "Fiolett",
+    "gray": "Grå",
+    "blue": "Blå",
+    "cyan": "Turkis",
+    "teal": "Blågrønn",
+    "green": "Grønn",
+    "yellow": "Gul",
+    "orange": "Oransje",
+    "bronze": "Bronse"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Mest brukte egendefinerte farger",
+    "colors": "Farger",
+    "shades": "Toner",
+    "hexCode": "Heksadesimal kode",
+    "noShades": "Ingen toner tilgjengelig for denne fargen"
   }
 }
