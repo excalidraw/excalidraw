@@ -208,10 +208,10 @@
     "collabSaveFailed": "Impossibile salvare nel database di backend. Se i problemi persistono, dovresti salvare il tuo file localmente per assicurarti di non perdere il tuo lavoro.",
     "collabSaveFailed_sizeExceeded": "Impossibile salvare nel database di backend, la tela sembra essere troppo grande. Dovresti salvare il file localmente per assicurarti di non perdere il tuo lavoro.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "Sembra che tu stia utilizzando il browser Brave con l'impostazione <bold>Blocco aggressivo delle impronte digitali</bold> abilitata.",
+      "line2": "Ciò potrebbe causare la rottura degli <bold>Elementi di testo</bold> nei tuoi disegni.",
+      "line3": "Consigliamo vivamente di disabilitare questa impostazione. Puoi seguire <link>questi passaggi</link> su come farlo.",
+      "line4": "Se la disattivazione di questa impostazione non risolve la visualizzazione degli elementi di testo, apri un <issueLink>problema</issueLink> sul nostro GitHub o scrivici su <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
@@ -394,51 +394,21 @@
     "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente"
   },
   "colors": {
-    "ffffff": "Bianco",
-    "f8f9fa": "Grigio 0",
-    "f1f3f5": "Grigio 1",
-    "fff5f5": "Rosso 0",
-    "fff0f6": "Rosa 0",
-    "f8f0fc": "Uva 0",
-    "f3f0ff": "Viola 0",
-    "edf2ff": "Indaco 0",
-    "e7f5ff": "Blu 0",
-    "e3fafc": "Ciano 0",
-    "e6fcf5": "Verde acqua 0",
-    "ebfbee": "Verde 0",
-    "f4fce3": "Lime 0",
-    "fff9db": "Giallo 0",
-    "fff4e6": "Arancio 0",
     "transparent": "Trasparente",
-    "ced4da": "Grigio 4",
-    "868e96": "Grigio 6",
-    "fa5252": "Rosso 6",
-    "e64980": "Rosa 6",
-    "be4bdb": "Uva 6",
-    "7950f2": "Viola 6",
-    "4c6ef5": "Indaco 6",
-    "228be6": "Blu 6",
-    "15aabf": "Ciano 6",
-    "12b886": "Verde acqua 6",
-    "40c057": "Verde 6",
-    "82c91e": "Lime 6",
-    "fab005": "Giallo 6",
-    "fd7e14": "Arancio 6",
-    "000000": "Nero",
-    "343a40": "Grigio 8",
-    "495057": "Grigio 7",
-    "c92a2a": "Rosso 9",
-    "a61e4d": "Rosa 9",
-    "862e9c": "Uva 9",
-    "5f3dc4": "Viola 9",
-    "364fc7": "Indaco 9",
-    "1864ab": "Blu 9",
-    "0b7285": "Ciano 9",
-    "087f5b": "Verde acqua 9",
-    "2b8a3e": "Verde 9",
-    "5c940d": "Lime 9",
-    "e67700": "Giallo 9",
-    "d9480f": "Arancio 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -452,5 +422,12 @@
       "toolbarHint": "Scegli uno strumento & Inizia a disegnare!",
       "helpHint": "Scorciatoie & aiuto"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }
