@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "Διαφανές",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Μαύρο",
+    "white": "Λευκό",
+    "red": "Κόκκινο",
+    "pink": "Ροζ",
+    "grape": "Σταφυλί",
+    "violet": "Βιολετί",
+    "gray": "Γκρι",
+    "blue": "Μπλε",
+    "cyan": "Κυανό",
+    "teal": "Τιρκουάζ",
+    "green": "Πράσινο",
+    "yellow": "Κίτρινο",
+    "orange": "Πορτοκαλί",
+    "bronze": "Χαλκινο"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Πιο χρησιμοποιούμενα χρώματα",
+    "colors": "Χρώματα",
+    "shades": "Αποχρώσεις",
+    "hexCode": "Κωδικός Hex",
+    "noShades": "Δεν υπάρχουν διαθέσιμες αποχρώσεις για αυτό το χρώμα"
   }
 }
