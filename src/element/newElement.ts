@@ -664,10 +664,12 @@ export const convertToExcalidrawElements = (
     return [];
   }
   elements.forEach((element) => {
-    if (
-      !element ||
-      !ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)
-    ) {
+    if (!element) {
+      return;
+    }
+    if (!ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)) {
+      //@ts-ignore
+      res.push(element);
       return;
     }
     //@ts-ignore
