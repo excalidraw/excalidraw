@@ -211,7 +211,7 @@
       "line1": "Sepertinya Anda menggunkan peramban Brave dengan pengaturan <bold>Blokir Fingerprinting yang Agresif</bold> diaktifkan.",
       "line2": "Ini dapat membuat <bold>Elemen Teks</bold> dalam gambar mu.",
       "line3": "Kami sangat menyarankan mematikan pengaturan ini. Anda dapat mengikuti <link>langkah-langkah ini</link> untuk melakukannya.",
-      "line4": ""
+      "line4": "Jika mematikan pengaturan ini tidak membenarkan tampilan elemen teks, mohon buka\n<issueLink>isu</issueLink> di GitHub kami, atau chat kami di <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
@@ -229,7 +229,7 @@
     "penMode": "Mode pena - mencegah sentuhan",
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
     "eraser": "Penghapus",
-    "hand": ""
+    "hand": "Tangan (alat panning)"
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
