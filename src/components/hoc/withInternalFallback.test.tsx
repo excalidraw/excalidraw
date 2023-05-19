@@ -75,4 +75,26 @@ describe("Test internal component fallback rendering", () => {
       queryAllByTestId(excalContainers[1], "dropdown-menu-button")?.length,
     ).toBe(1);
   });
+
+  it("should render only one menu per excalidraw instance (two default menus scenario)", async () => {
+    const { container } = await render(
+      <div>
+        <Excalidraw />
+        <Excalidraw />
+      </div>,
+    );
+
+    expect(queryAllByTestId(container, "dropdown-menu-button")?.length).toBe(2);
+
+    const excalContainers = container.querySelectorAll<HTMLDivElement>(
+      ".excalidraw-container",
+    );
+
+    expect(
+      queryAllByTestId(excalContainers[0], "dropdown-menu-button")?.length,
+    ).toBe(1);
+    expect(
+      queryAllByTestId(excalContainers[1], "dropdown-menu-button")?.length,
+    ).toBe(1);
+  });
 });
