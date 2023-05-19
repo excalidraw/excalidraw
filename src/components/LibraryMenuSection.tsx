@@ -65,7 +65,7 @@ function LibraryMenuSection({
   isItemSelected,
 }: Props) {
   const rows = Math.ceil(items.length / ITEMS_PER_ROW);
-  const [_, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
