@@ -1,12 +1,11 @@
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { useDevice } from "../components/App";
-import { exportToSvg } from "../packages/utils";
 import { LibraryItem } from "../types";
 import "./LibraryUnit.scss";
 import { CheckboxItem } from "./CheckboxItem";
 import { PlusIcon } from "./icons";
-import { COLOR_PALETTE } from "../colors";
+import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
 
 export const LibraryUnit = ({
   id,
@@ -26,32 +25,24 @@ export const LibraryUnit = ({
   onDrag: (id: string, event: React.DragEvent) => void;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
+  const svg = useLibraryItemSvg(id, elements);
+
   useEffect(() => {
     const node = ref.current;
+
     if (!node) {
       return;
     }
 
-    (async () => {
-      if (!elements) {
-        return;
-      }
-      const svg = await exportToSvg({
-        elements,
-        appState: {
-          exportBackground: false,
-          viewBackgroundColor: COLOR_PALETTE.white,
-        },
-        files: null,
-      });
+    if (svg) {
       svg.querySelector(".style-fonts")?.remove();
       node.innerHTML = svg.outerHTML;
-    })();
+    }
 
     return () => {
       node.innerHTML = "";
     };
-  }, [elements]);
+  }, [elements, svg]);
 
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = useDevice().isMobile;

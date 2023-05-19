@@ -204,7 +204,6 @@ const LibraryMenuItems = ({
                     : []),
                   ...unpublishedItems,
                 ]}
-                itemsPerRow={4}
                 onItemSelectToggle={onItemSelectToggle}
                 onItemDrag={onItemDrag}
                 isItemSelected={isItemSelected}
@@ -224,7 +223,6 @@ const LibraryMenuItems = ({
           {publishedItems.length > 0 ? (
             <LibraryMenuSection
               items={publishedItems}
-              itemsPerRow={4}
               onItemSelectToggle={onItemSelectToggle}
               onItemDrag={onItemDrag}
               isItemSelected={isItemSelected}

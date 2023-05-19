@@ -6,6 +6,9 @@ import Spinner from "./Spinner";
 import clsx from "clsx";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 
+const ITEMS_PER_ROW = 4;
+const ROWS_RENDERED_PER_BATCH = 4;
+
 type LibraryOrPendingItem = (
   | LibraryItem
   | /* pending library item */ {
@@ -16,7 +19,6 @@ type LibraryOrPendingItem = (
 
 interface Props {
   items: LibraryOrPendingItem;
-  itemsPerRow: number;
   onItemSelectToggle: (id: LibraryItem["id"], event: React.MouseEvent) => void;
   onItemDrag: (id: LibraryItem["id"], event: React.DragEvent) => void;
   isItemSelected: (id: LibraryItem["id"] | null) => boolean;
@@ -58,19 +60,18 @@ function LibraryRow({
 
 function LibraryMenuSection({
   items,
-  itemsPerRow,
   onItemSelectToggle,
   onItemDrag,
   isItemSelected,
 }: Props) {
-  const rows = Math.ceil(items.length / itemsPerRow);
+  const rows = Math.ceil(items.length / ITEMS_PER_ROW);
   const [_, startTransition] = useTransition();
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     if (index < rows) {
       startTransition(() => {
-        setIndex(index + 1);
+        setIndex(index + ROWS_RENDERED_PER_BATCH);
       });
     }
   }, [index, rows, startTransition]);
@@ -82,7 +83,7 @@ function LibraryMenuSection({
           {i < index ? (
             <Stack.Row gap={1}>
               <LibraryRow
-                items={items.slice(i * itemsPerRow, (i + 1) * itemsPerRow)}
+                items={items.slice(i * ITEMS_PER_ROW, (i + 1) * ITEMS_PER_ROW)}
                 onItemSelectToggle={onItemSelectToggle}
                 onItemDrag={onItemDrag}
                 isItemSelected={isItemSelected}
