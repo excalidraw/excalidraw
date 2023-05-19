@@ -17,14 +17,26 @@ type LibraryOrPendingItem = (
 interface Props {
   items: LibraryOrPendingItem;
   itemsPerRow: number;
+  onItemSelectToggle: (id: LibraryItem["id"], event: React.MouseEvent) => void;
+  onItemDrag: (id: LibraryItem["id"], event: React.DragEvent) => void;
+  isItemSelected: (id: LibraryItem["id"] | null) => boolean;
 }
 
 interface LibraryRowProps {
   items: LibraryOrPendingItem;
   onClick?: () => void;
+  onItemSelectToggle: (id: LibraryItem["id"], event: React.MouseEvent) => void;
+  onItemDrag: (id: LibraryItem["id"], event: React.DragEvent) => void;
+  isItemSelected: (id: LibraryItem["id"] | null) => boolean;
 }
 
-function LibraryRow({ items, onClick }: LibraryRowProps) {
+function LibraryRow({
+  items,
+  onClick,
+  onItemSelectToggle,
+  onItemDrag,
+  isItemSelected,
+}: LibraryRowProps) {
   return (
     <>
       {items.map((item) => (
@@ -34,9 +46,9 @@ function LibraryRow({ items, onClick }: LibraryRowProps) {
             isPending={!item?.id && !!item?.elements}
             onClick={onClick || (() => {})}
             id={item?.id || null}
-            selected={false}
-            onToggle={() => {}}
-            onDrag={() => {}}
+            selected={isItemSelected(item.id)}
+            onToggle={onItemSelectToggle}
+            onDrag={onItemDrag}
           />
         </Stack.Col>
       ))}
@@ -44,7 +56,13 @@ function LibraryRow({ items, onClick }: LibraryRowProps) {
   );
 }
 
-function LibraryMenuSection({ items, itemsPerRow }: Props) {
+function LibraryMenuSection({
+  items,
+  itemsPerRow,
+  onItemSelectToggle,
+  onItemDrag,
+  isItemSelected,
+}: Props) {
   const rows = Math.ceil(items.length / itemsPerRow);
   const [_, startTransition] = useTransition();
   const [index, setIndex] = useState(0);
@@ -65,13 +83,16 @@ function LibraryMenuSection({ items, itemsPerRow }: Props) {
             <Stack.Row gap={1}>
               <LibraryRow
                 items={items.slice(i * itemsPerRow, (i + 1) * itemsPerRow)}
+                onItemSelectToggle={onItemSelectToggle}
+                onItemDrag={onItemDrag}
+                isItemSelected={isItemSelected}
               />
             </Stack.Row>
           ) : (
             <Stack.Row gap={1}>
               <Stack.Col>
                 <div className={clsx("library-unit")}>
-                  <Spinner />
+                  {i === index + 1 && <Spinner />}
                 </div>
               </Stack.Col>
             </Stack.Row>

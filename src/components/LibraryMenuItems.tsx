@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { serializeLibraryAsJSON } from "../data/json";
-import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
 import {
   ExcalidrawProps,
@@ -8,8 +7,7 @@ import {
   LibraryItems,
   UIAppState,
 } from "../types";
-import { arrayToMap, chunk } from "../utils";
-import { LibraryUnit } from "./LibraryUnit";
+import { arrayToMap } from "../utils";
 import Stack from "./Stack";
 import { MIME_TYPES } from "../constants";
 import Spinner from "./Spinner";
@@ -19,8 +17,6 @@ import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
 
 import "./LibraryMenuItems.scss";
 import LibraryMenuSection from "./LibraryMenuSection";
-
-const CELLS_PER_ROW = 4;
 
 const LibraryMenuItems = ({
   isLoading,
@@ -58,6 +54,89 @@ const LibraryMenuItems = ({
     !pendingElements.length &&
     !unpublishedItems.length &&
     !publishedItems.length;
+
+  const [lastSelectedItem, setLastSelectedItem] = useState<
+    LibraryItem["id"] | null
+  >(null);
+
+  const onItemSelectToggle = (
+    id: LibraryItem["id"],
+    event: React.MouseEvent,
+  ) => {
+    const shouldSelect = !selectedItems.includes(id);
+
+    const orderedItems = [...unpublishedItems, ...publishedItems];
+
+    if (shouldSelect) {
+      if (event.shiftKey && lastSelectedItem) {
+        const rangeStart = orderedItems.findIndex(
+          (item) => item.id === lastSelectedItem,
+        );
+        const rangeEnd = orderedItems.findIndex((item) => item.id === id);
+
+        if (rangeStart === -1 || rangeEnd === -1) {
+          onSelectItems([...selectedItems, id]);
+          return;
+        }
+
+        const selectedItemsMap = arrayToMap(selectedItems);
+        const nextSelectedIds = orderedItems.reduce(
+          (acc: LibraryItem["id"][], item, idx) => {
+            if (
+              (idx >= rangeStart && idx <= rangeEnd) ||
+              selectedItemsMap.has(item.id)
+            ) {
+              acc.push(item.id);
+            }
+            return acc;
+          },
+          [],
+        );
+
+        onSelectItems(nextSelectedIds);
+      } else {
+        onSelectItems([...selectedItems, id]);
+      }
+      setLastSelectedItem(id);
+    } else {
+      setLastSelectedItem(null);
+      onSelectItems(selectedItems.filter((_id) => _id !== id));
+    }
+  };
+
+  const getInsertedElements = (id: string) => {
+    let targetElements;
+    if (selectedItems.includes(id)) {
+      targetElements = libraryItems.filter((item) =>
+        selectedItems.includes(item.id),
+      );
+    } else {
+      targetElements = libraryItems.filter((item) => item.id === id);
+    }
+    return targetElements.map((item) => {
+      return {
+        ...item,
+        // duplicate each library item before inserting on canvas to confine
+        // ids and bindings to each library item. See #6465
+        elements: duplicateElements(item.elements, { randomizeSeed: true }),
+      };
+    });
+  };
+
+  const onItemDrag = (id: LibraryItem["id"], event: React.DragEvent) => {
+    event.dataTransfer.setData(
+      MIME_TYPES.excalidrawlib,
+      serializeLibraryAsJSON(getInsertedElements(id)),
+    );
+  };
+
+  const isItemSelected = (id: LibraryItem["id"] | null) => {
+    if (!id) {
+      return false;
+    }
+
+    return selectedItems.includes(id);
+  };
 
   return (
     <div
@@ -126,6 +205,9 @@ const LibraryMenuItems = ({
                   ...unpublishedItems,
                 ]}
                 itemsPerRow={4}
+                onItemSelectToggle={onItemSelectToggle}
+                onItemDrag={onItemDrag}
+                isItemSelected={isItemSelected}
               />
             )}
           </div>
@@ -140,7 +222,13 @@ const LibraryMenuItems = ({
             </div>
           )}
           {publishedItems.length > 0 ? (
-            <LibraryMenuSection items={publishedItems} itemsPerRow={4} />
+            <LibraryMenuSection
+              items={publishedItems}
+              itemsPerRow={4}
+              onItemSelectToggle={onItemSelectToggle}
+              onItemDrag={onItemDrag}
+              isItemSelected={isItemSelected}
+            />
           ) : unpublishedItems.length > 0 ? (
             <div
               style={{
