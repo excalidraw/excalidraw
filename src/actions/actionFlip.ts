@@ -4,9 +4,8 @@ import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { resizeMultipleElements } from "../element/resizeElements";
 import { AppState, PointerDownState } from "../types";
-import { updateBoundElements } from "../element/binding";
 import { arrayToMap } from "../utils";
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { getCommonBoundingBox } from "../element/bounds";
 
 const enableActionFlipHorizontal = (
@@ -33,7 +32,7 @@ export const actionFlipHorizontal = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => event.shiftKey && event.code === "KeyH",
+  keyTest: (event) => event.shiftKey && event.code === CODES.H,
   contextItemLabel: "labels.flipHorizontal",
   predicate: (elements, appState) =>
     enableActionFlipHorizontal(elements, appState),
@@ -50,7 +49,7 @@ export const actionFlipVertical = register({
     };
   },
   keyTest: (event) =>
-    event.shiftKey && event.code === "KeyV" && !event[KEYS.CTRL_OR_CMD],
+    event.shiftKey && event.code === CODES.V && !event[KEYS.CTRL_OR_CMD],
   contextItemLabel: "labels.flipVertical",
   predicate: (elements, appState) =>
     enableActionFlipVertical(elements, appState),

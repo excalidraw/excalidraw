@@ -2,17 +2,22 @@ import React, { useState } from "react";
 import { serializeLibraryAsJSON } from "../data/json";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
-import { AppState, ExcalidrawProps, LibraryItem, LibraryItems } from "../types";
+import {
+  ExcalidrawProps,
+  LibraryItem,
+  LibraryItems,
+  UIAppState,
+} from "../types";
 import { arrayToMap, chunk } from "../utils";
 import { LibraryUnit } from "./LibraryUnit";
 import Stack from "./Stack";
-
-import "./LibraryMenuItems.scss";
 import { MIME_TYPES } from "../constants";
 import Spinner from "./Spinner";
-import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
-import clsx from "clsx";
 import { duplicateElements } from "../element/newElement";
+import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
+import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
+
+import "./LibraryMenuItems.scss";
 
 const CELLS_PER_ROW = 4;
 
@@ -36,7 +41,7 @@ const LibraryMenuItems = ({
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
-  theme: AppState["theme"];
+  theme: UIAppState["theme"];
   id: string;
 }) => {
   const [lastSelectedItem, setLastSelectedItem] = useState<
@@ -201,11 +206,12 @@ const LibraryMenuItems = ({
     (item) => item.status === "published",
   );
 
-  const showBtn =
-    !libraryItems.length &&
+  const showBtn = !libraryItems.length && !pendingElements.length;
+
+  const isLibraryEmpty =
+    !pendingElements.length &&
     !unpublishedItems.length &&
-    !publishedItems.length &&
-    !pendingElements.length;
+    !publishedItems.length;
 
   return (
     <div
@@ -215,9 +221,16 @@ const LibraryMenuItems = ({
         unpublishedItems.length ||
         publishedItems.length
           ? { justifyContent: "flex-start" }
-          : {}
+          : { borderBottom: 0 }
       }
     >
+      {!isLibraryEmpty && (
+        <LibraryDropdownMenu
+          selectedItems={selectedItems}
+          onSelectItems={onSelectItems}
+          className="library-menu-dropdown-container--in-heading"
+        />
+      )}
       <Stack.Col
         className="library-menu-items-container__items"
         align="start"
@@ -228,51 +241,45 @@ const LibraryMenuItems = ({
         }}
       >
         <>
-          <div>
-            {(pendingElements.length > 0 ||
-              unpublishedItems.length > 0 ||
-              publishedItems.length > 0) && (
-              <div className="library-menu-items-container__header">
-                {t("labels.personalLib")}
+          {!isLibraryEmpty && (
+            <div className="library-menu-items-container__header">
+              {t("labels.personalLib")}
+            </div>
+          )}
+          {isLoading && (
+            <div
+              style={{
+                position: "absolute",
+                top: "var(--container-padding-y)",
+                right: "var(--container-padding-x)",
+                transform: "translateY(50%)",
+              }}
+            >
+              <Spinner />
+            </div>
+          )}
+          <div className="library-menu-items-private-library-container">
+            {!pendingElements.length && !unpublishedItems.length ? (
+              <div className="library-menu-items__no-items">
+                <div className="library-menu-items__no-items__label">
+                  {t("library.noItems")}
+                </div>
+                <div className="library-menu-items__no-items__hint">
+                  {publishedItems.length > 0
+                    ? t("library.hint_emptyPrivateLibrary")
+                    : t("library.hint_emptyLibrary")}
+                </div>
               </div>
-            )}
-            {isLoading && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "var(--container-padding-y)",
-                  right: "var(--container-padding-x)",
-                  transform: "translateY(50%)",
-                }}
-              >
-                <Spinner />
-              </div>
+            ) : (
+              renderLibrarySection([
+                // append pending library item
+                ...(pendingElements.length
+                  ? [{ id: null, elements: pendingElements }]
+                  : []),
+                ...unpublishedItems,
+              ])
             )}
           </div>
-          {!pendingElements.length && !unpublishedItems.length ? (
-            <div className="library-menu-items__no-items">
-              <div
-                className={clsx({
-                  "library-menu-items__no-items__label": showBtn,
-                })}
-              >
-                {t("library.noItems")}
-              </div>
-              <div className="library-menu-items__no-items__hint">
-                {publishedItems.length > 0
-                  ? t("library.hint_emptyPrivateLibrary")
-                  : t("library.hint_emptyLibrary")}
-              </div>
-            </div>
-          ) : (
-            renderLibrarySection([
-              // append pending library item
-              ...(pendingElements.length
-                ? [{ id: null, elements: pendingElements }]
-                : []),
-              ...unpublishedItems,
-            ])
-          )}
         </>
 
         <>
@@ -303,11 +310,17 @@ const LibraryMenuItems = ({
         </>
 
         {showBtn && (
-          <LibraryMenuBrowseButton
+          <LibraryMenuControlButtons
+            style={{ padding: "16px 0", width: "100%" }}
             id={id}
             libraryReturnUrl={libraryReturnUrl}
             theme={theme}
-          />
+          >
+            <LibraryDropdownMenu
+              selectedItems={selectedItems}
+              onSelectItems={onSelectItems}
+            />
+          </LibraryMenuControlButtons>
         )}
       </Stack.Col>
     </div>

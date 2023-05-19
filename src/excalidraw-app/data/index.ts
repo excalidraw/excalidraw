@@ -284,7 +284,7 @@ export const loadScene = async (
 
 export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
-  appState: AppState,
+  appState: Partial<AppState>,
   files: BinaryFiles,
 ) => {
   const encryptionKey = await generateEncryptionKey("string");

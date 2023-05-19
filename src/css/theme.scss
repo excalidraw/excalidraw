@@ -78,10 +78,13 @@
 
   --color-selection: #6965db;
 
+  --color-icon-white: #{$oc-white};
+
   --color-primary: #6965db;
   --color-primary-darker: #5b57d1;
   --color-primary-darkest: #4a47b1;
   --color-primary-light: #e3e2fe;
+  --color-primary-light-darker: #d7d5ff;
 
   --color-gray-10: #f5f5f5;
   --color-gray-20: #ebebeb;
@@ -161,10 +164,13 @@
     // will be inverted to a lighter color.
     --color-selection: #3530c4;
 
+    --color-icon-white: var(--color-gray-90);
+
     --color-primary: #a8a5ff;
     --color-primary-darker: #b2aeff;
     --color-primary-darkest: #beb9ff;
     --color-primary-light: #4f4d6f;
+    --color-primary-light-darker: #43415e;
 
     --color-text-warning: var(--color-gray-80);
 

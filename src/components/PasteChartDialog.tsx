@@ -5,8 +5,10 @@ import { ChartElements, renderSpreadsheet, Spreadsheet } from "../charts";
 import { ChartType } from "../element/types";
 import { t } from "../i18n";
 import { exportToSvg } from "../scene/export";
-import { AppState, LibraryItem } from "../types";
+import { UIAppState } from "../types";
+import { useApp } from "./App";
 import { Dialog } from "./Dialog";
+
 import "./PasteChartDialog.scss";
 
 type OnInsertChart = (chartType: ChartType, elements: ChartElements) => void;
@@ -78,13 +80,12 @@ export const PasteChartDialog = ({
   setAppState,
   appState,
   onClose,
-  onInsertChart,
 }: {
-  appState: AppState;
+  appState: UIAppState;
   onClose: () => void;
-  setAppState: React.Component<any, AppState>["setState"];
-  onInsertChart: (elements: LibraryItem["elements"]) => void;
+  setAppState: React.Component<any, UIAppState>["setState"];
 }) => {
+  const { onInsertElements } = useApp();
   const handleClose = React.useCallback(() => {
     if (onClose) {
       onClose();
@@ -92,7 +93,7 @@ export const PasteChartDialog = ({
   }, [onClose]);
 
   const handleChartClick = (chartType: ChartType, elements: ChartElements) => {
-    onInsertChart(elements);
+    onInsertElements(elements);
     trackEvent("magic", "chart", chartType);
     setAppState({
       currentChartType: chartType,

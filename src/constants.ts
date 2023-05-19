@@ -1,7 +1,7 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
 import { ExcalidrawElement, FontFamilyValues } from "./element/types";
-import oc from "open-color";
+import { COLOR_PALETTE } from "./colors";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
@@ -129,6 +129,12 @@ export const MIME_TYPES = {
   binary: "application/octet-stream",
   // image
   ...IMAGE_MIME_TYPES,
+} as const;
+
+export const EXPORT_IMAGE_TYPES = {
+  png: "png",
+  svg: "svg",
+  clipboard: "clipboard",
 } as const;
 
 export const EXPORT_DATA_TYPES = {
@@ -266,8 +272,8 @@ export const DEFAULT_ELEMENT_PROPS: {
   opacity: ExcalidrawElement["opacity"];
   locked: ExcalidrawElement["locked"];
 } = {
-  strokeColor: oc.black,
-  backgroundColor: "transparent",
+  strokeColor: COLOR_PALETTE.black,
+  backgroundColor: COLOR_PALETTE.transparent,
   fillStyle: "hachure",
   strokeWidth: 1,
   strokeStyle: "solid",
@@ -275,3 +281,10 @@ export const DEFAULT_ELEMENT_PROPS: {
   opacity: 100,
   locked: false,
 };
+
+export const LIBRARY_SIDEBAR_TAB = "library";
+
+export const DEFAULT_SIDEBAR = {
+  name: "default",
+  defaultTab: LIBRARY_SIDEBAR_TAB,
+} as const;

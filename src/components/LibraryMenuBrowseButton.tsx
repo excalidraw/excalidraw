@@ -1,6 +1,6 @@
 import { VERSIONS } from "../constants";
 import { t } from "../i18n";
-import { AppState, ExcalidrawProps } from "../types";
+import { ExcalidrawProps, UIAppState } from "../types";
 
 const LibraryMenuBrowseButton = ({
   theme,
@@ -8,7 +8,7 @@ const LibraryMenuBrowseButton = ({
   libraryReturnUrl,
 }: {
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
-  theme: AppState["theme"];
+  theme: UIAppState["theme"];
   id: string;
 }) => {
   const referrer =

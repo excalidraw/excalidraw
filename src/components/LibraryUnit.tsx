@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import oc from "open-color";
 import { useEffect, useRef, useState } from "react";
 import { useDevice } from "../components/App";
 import { exportToSvg } from "../packages/utils";
@@ -7,6 +6,7 @@ import { LibraryItem } from "../types";
 import "./LibraryUnit.scss";
 import { CheckboxItem } from "./CheckboxItem";
 import { PlusIcon } from "./icons";
+import { COLOR_PALETTE } from "../colors";
 
 export const LibraryUnit = ({
   id,
@@ -40,7 +40,7 @@ export const LibraryUnit = ({
         elements,
         appState: {
           exportBackground: false,
-          viewBackgroundColor: oc.white,
+          viewBackgroundColor: COLOR_PALETTE.white,
         },
         files: null,
       });
