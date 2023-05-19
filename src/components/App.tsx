@@ -580,34 +580,34 @@ class App extends React.Component<AppProps, AppState> {
           transform: `translate(${x}px,${y}px) scale(${zoom.value})`,
         }}
       >
-        this.scene.getNonDeletedElements()
-          .filter((el) => {
-            return el.type === "rectangle" && el.link
-          })
-          .map((el) => {
-            return (
-              <iframe
-                src={el.link}
-                title="YouTube video player"
-                allow="accelerometer
-                autoplay=false
-                clipboardWrite=true
-                encryptedMedia=true
-                gyroscope=true
-                pictureInPicture=true
-                allowfullscreen=true
-                style={{
-                  width: `${el.width}px`,
-                  height: `${el.height}px`,
-                  border: 0,
-                  position: "relative",
-                  top: `${el.y}px`,
-                  left: `${el.x}px`,
-                  transform: `rotate(${el.angle}rad)`,
-                }}
-              />
-            );
-          })
+        {
+          this.scene.getNonDeletedElements()
+            .filter((el) => el.type === "rectangle" && el.link)
+            .map((el) => {
+              return (
+                <iframe
+                  src={el.link}
+                  title="YouTube video player"
+                  allow="accelerometer
+                  autoplay=false
+                  clipboardWrite=true
+                  encryptedMedia=true
+                  gyroscope=true
+                  pictureInPicture=true
+                  allowfullscreen=true
+                  style={{
+                    width: `${el.width}px`,
+                    height: `${el.height}px`,
+                    border: 0,
+                    position: "relative",
+                    top: `${el.y}px`,
+                    left: `${el.x}px`,
+                    transform: `rotate(${el.angle}rad)`,
+                  }}
+                />
+              );
+            })
+        }
       </div>
     );
   }
