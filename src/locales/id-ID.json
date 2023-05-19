@@ -237,7 +237,7 @@
     "shapes": "Bentuk"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Untuk memindahkan kanvas, tekan roda mouse atau spacebar sambil menyeret, atau menggunakan alat tangan",
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
@@ -306,8 +306,8 @@
     "doubleClick": "klik-ganda",
     "drag": "seret",
     "editor": "Editor",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Edit titik garis/panah",
+    "editText": "Edit teks / tambah label",
     "github": "Menemukan masalah? Kirimkan",
     "howto": "Ikuti panduan kami",
     "or": "atau",
@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "Transparan",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Hitam",
+    "white": "Putih",
+    "red": "Merah",
+    "pink": "Pink",
+    "grape": "Ungu",
+    "violet": "Violet",
+    "gray": "Abu-abu",
+    "blue": "Biru",
+    "cyan": "Cyan",
+    "teal": "Teal",
+    "green": "Hijau",
+    "yellow": "Kuning",
+    "orange": "Jingga",
+    "bronze": "Tembaga"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Warna yang sering dipakai",
+    "colors": "Warna",
+    "shades": "Nuansa",
+    "hexCode": "Kode hexa",
+    "noShades": "Tidak ada nuansa untuk warna ini"
   }
 }
