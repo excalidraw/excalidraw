@@ -95,7 +95,5 @@ const flipElements = (
     flipDirection === "horizontal" ? minY : maxY,
   );
 
-  elements.forEach((element) => updateBoundElements(element));
-
   return elements;
 };

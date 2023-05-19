@@ -784,8 +784,11 @@ export const resizeMultipleElements = (
       }
     }
 
-    updateBoundElements(latestElement, { newSize: { width, height } });
     mutateElement(latestElement, update);
+    updateBoundElements(latestElement, {
+      simultaneouslyUpdated: targetElements.map(({ latest }) => latest),
+      newSize: { width, height },
+    });
 
     const boundTextElement = getBoundTextElement(latestElement);
     if (boundTextElement) {
