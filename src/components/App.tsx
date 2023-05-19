@@ -586,15 +586,6 @@ class App extends React.Component<AppProps, AppState> {
             .map((el) => {
               return (
                 <iframe
-                  src={el.link}
-                  title="YouTube video player"
-                  allow="accelerometer
-                  autoplay=false
-                  clipboardWrite=true
-                  encryptedMedia=true
-                  gyroscope=true
-                  pictureInPicture=true
-                  allowfullscreen=true
                   style={{
                     width: `${el.width}px`,
                     height: `${el.height}px`,
@@ -604,6 +595,15 @@ class App extends React.Component<AppProps, AppState> {
                     left: `${el.x}px`,
                     transform: `rotate(${el.angle}rad)`,
                   }}
+                  src={el.link}
+                  title="YouTube video player"
+                  allow="accelerometer"
+                  autoplay=false
+                  clipboardWrite=true
+                  encryptedMedia=true
+                  gyroscope=true
+                  pictureInPicture=true
+                  allowfullscreen=true
                 />
               );
             })
