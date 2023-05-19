@@ -111,7 +111,7 @@
     "increaseFontSize": "Besarkan ukuran font",
     "unbindText": "Lepas teks",
     "bindText": "Kunci teks ke kontainer",
-    "createContainerFromText": "",
+    "createContainerFromText": "Bungkus teks dalam kontainer",
     "link": {
       "edit": "Edit tautan",
       "create": "Buat tautan",
@@ -208,9 +208,9 @@
     "collabSaveFailed": "Tidak dapat menyimpan ke dalam basis data server. Jika masih berlanjut, Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
+      "line1": "Sepertinya Anda menggunkan peramban Brave dengan pengaturan <bold>Blokir Fingerprinting yang Agresif</bold> diaktifkan.",
+      "line2": "Ini dapat membuat <bold>Elemen Teks</bold> dalam gambar mu.",
+      "line3": "Kami sangat menyarankan mematikan pengaturan ini. Anda dapat mengikuti <link>langkah-langkah ini</link> untuk melakukannya.",
       "line4": ""
     }
   },
