@@ -598,12 +598,12 @@ class App extends React.Component<AppProps, AppState> {
                   src={el.link}
                   title="YouTube video player"
                   allow="accelerometer"
-                  autoplay=false
-                  clipboardWrite=true
-                  encryptedMedia=true
-                  gyroscope=true
-                  pictureInPicture=true
-                  allowfullscreen=true
+                  autoplay={false}
+                  clipboardWrite={true}
+                  encryptedMedia={true}
+                  gyroscope={true}
+                  pictureInPicture={true}
+                  allowfullscreen={true}
                 />
               );
             })
