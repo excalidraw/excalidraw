@@ -636,20 +636,46 @@ export const textWysiwyg = ({
     // in that same tick.
     const target = event?.target;
 
-    const isTargetColorPicker =
-      target instanceof HTMLInputElement &&
-      target.closest(".color-picker-input") &&
-      isWritableElement(target);
+    const isTargetPickerTrigger =
+      target instanceof HTMLElement &&
+      target.classList.contains("active-color");
 
     setTimeout(() => {
       editable.onblur = handleSubmit;
-      if (target && isTargetColorPicker) {
-        target.onblur = () => {
-          editable.focus();
+
+      if (isTargetPickerTrigger) {
+        const callback = (
+          mutationList: MutationRecord[],
+          observer: MutationObserver,
+        ) => {
+          const radixIsRemoved = mutationList.find(
+            (mutation) =>
+              mutation.removedNodes.length > 0 &&
+              (mutation.removedNodes[0] as HTMLElement).dataset
+                ?.radixPopperContentWrapper !== undefined,
+          );
+
+          if (radixIsRemoved) {
+            // should work without this in theory
+            // and i think it does actually but radix probably somewhere,
+            // somehow sets the focus elsewhere
+            setTimeout(() => {
+              editable.focus();
+            });
+
+            observer.disconnect();
+          }
         };
+
+        const observer = new MutationObserver(callback);
+
+        observer.observe(document.querySelector(".excalidraw-container")!, {
+          childList: true,
+        });
       }
+
       // case: clicking on the same property → no change → no update → no focus
-      if (!isTargetColorPicker) {
+      if (!isTargetPickerTrigger) {
         editable.focus();
       }
     });
@@ -657,10 +683,9 @@ export const textWysiwyg = ({
 
   // prevent blur when changing properties from the menu
   const onPointerDown = (event: MouseEvent) => {
-    const isTargetColorPicker =
-      event.target instanceof HTMLInputElement &&
-      event.target.closest(".color-picker-input") &&
-      isWritableElement(event.target);
+    const isTargetPickerTrigger =
+      event.target instanceof HTMLElement &&
+      event.target.classList.contains("active-color");
     const isShapeActionsPanel = //zsviczian
       (event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
@@ -672,7 +697,7 @@ export const textWysiwyg = ({
         event.target instanceof SVGElement) &&
         isShapeActionsPanel && //zsviczian
         !isWritableElement(event.target)) ||
-      isTargetColorPicker
+      isTargetPickerTrigger
     ) {
       editable.onblur = null;
       window.addEventListener("pointerup", bindBlurEvent);
@@ -686,7 +711,7 @@ export const textWysiwyg = ({
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
     updateWysiwygStyle();
     const isColorPickerActive = !!document.activeElement?.closest(
-      ".color-picker-input",
+      ".color-picker-content",
     );
     if (!isColorPickerActive) {
       editable.focus();

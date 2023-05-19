@@ -1,5 +1,5 @@
 import { atom, useAtom } from "jotai";
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { useTunnels } from "../../context/tunnels";
 
 export const withInternalFallback = <P,>(
@@ -7,13 +7,6 @@ export const withInternalFallback = <P,>(
   Component: React.FC<P>,
 ) => {
   const renderAtom = atom(0);
-  // flag set on initial render to tell the fallback component to skip the
-  // render until mount counter are initialized. This is because the counter
-  // is initialized in an effect, and thus we could end rendering both
-  // components at the same time until counter is initialized.
-  let preferHost = false;
-
-  let counter = 0;
 
   const WrapperComponent: React.FC<
     P & {
@@ -21,38 +14,52 @@ export const withInternalFallback = <P,>(
     }
   > = (props) => {
     const { jotaiScope } = useTunnels();
-    const [, setRender] = useAtom(renderAtom, jotaiScope);
+    // for rerenders
+    const [, setCounter] = useAtom(renderAtom, jotaiScope);
+    // for initial & subsequent renders. Tracked as component state
+    // due to excalidraw multi-instance scanerios.
+    const metaRef = useRef({
+      // flag set on initial render to tell the fallback component to skip the
+      // render until mount counter are initialized. This is because the counter
+      // is initialized in an effect, and thus we could end rendering both
+      // components at the same time until counter is initialized.
+      preferHost: false,
+      counter: 0,
+    });
 
     useLayoutEffect(() => {
-      setRender((c) => {
+      const meta = metaRef.current;
+      setCounter((c) => {
         const next = c + 1;
-        counter = next;
+        meta.counter = next;
 
         return next;
       });
       return () => {
-        setRender((c) => {
+        setCounter((c) => {
           const next = c - 1;
-          counter = next;
+          meta.counter = next;
           if (!next) {
-            preferHost = false;
+            meta.preferHost = false;
           }
           return next;
         });
       };
-    }, [setRender]);
+    }, [setCounter]);
 
     if (!props.__fallback) {
-      preferHost = true;
+      metaRef.current.preferHost = true;
     }
 
     // ensure we don't render fallback and host components at the same time
     if (
       // either before the counters are initialized
-      (!counter && props.__fallback && preferHost) ||
+      (!metaRef.current.counter &&
+        props.__fallback &&
+        metaRef.current.preferHost) ||
       // or after the counters are initialized, and both are rendered
       // (this is the default when host renders as well)
-      (counter > 1 && props.__fallback)
+      (metaRef.current.counter > 1 && props.__fallback)
     ) {
       return null;
     }

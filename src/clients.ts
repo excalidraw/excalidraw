@@ -1,5 +1,16 @@
-import colors from "./colors";
+import {
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
+  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
+  getAllColorsSpecificShade,
+} from "./colors";
 import { AppState } from "./types";
+
+const BG_COLORS = getAllColorsSpecificShade(
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
+);
+const STROKE_COLORS = getAllColorsSpecificShade(
+  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
+);
 
 export const getClientColors = (clientId: string, appState: AppState) => {
   if (appState?.collaborators) {
@@ -11,12 +22,9 @@ export const getClientColors = (clientId: string, appState: AppState) => {
   // Naive way of getting an integer out of the clientId
   const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
 
-  // Skip transparent & gray colors
-  const backgrounds = colors.elementBackground.slice(3);
-  const strokes = colors.elementStroke.slice(3);
   return {
-    background: backgrounds[sum % backgrounds.length],
-    stroke: strokes[sum % strokes.length],
+    background: BG_COLORS[sum % BG_COLORS.length],
+    stroke: STROKE_COLORS[sum % STROKE_COLORS.length],
   };
 };
 

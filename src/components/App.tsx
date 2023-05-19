@@ -316,6 +316,7 @@ const deviceContextInitialValue = {
   isMobile: false,
   isTouchScreen: false,
   canDeviceFitSidebar: false,
+  isLandscape: false,
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 DeviceContext.displayName = "DeviceContext";
@@ -967,6 +968,7 @@ class App extends React.Component<AppProps, AppState> {
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
     this.device = updateObject(this.device, {
+      isLandscape: width > height,
       isSmScreen: width < MQ_SM_MAX_WIDTH,
       isMobile:
         this.allowMobileMode && //zsviczian
@@ -2505,11 +2507,11 @@ class App extends React.Component<AppProps, AppState> {
           (hasBackground(this.state.activeTool.type) ||
             selectedElements.some((element) => hasBackground(element.type)))
         ) {
-          this.setState({ openPopup: "backgroundColorPicker" });
+          this.setState({ openPopup: "elementBackground" });
           event.stopPropagation();
         }
         if (event.key === KEYS.S) {
-          this.setState({ openPopup: "strokeColorPicker" });
+          this.setState({ openPopup: "elementStroke" });
           event.stopPropagation();
         }
       }
