@@ -595,7 +595,7 @@ class App extends React.Component<AppProps, AppState> {
                     left: `${el.x}px`,
                     transform: `rotate(${el.angle}rad)`,
                   }}
-                  src={el.link}
+                  src={el.link??""}
                   title="YouTube video player"
                   allow="accelerometer"
                   autoplay={false}
