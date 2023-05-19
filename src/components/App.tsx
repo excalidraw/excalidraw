@@ -571,15 +571,40 @@ class App extends React.Component<AppProps, AppState> {
 
   private renderFrames() {
     const {scrollX, scrollY, zoom} = this.state;
-    const x = scrollX*zoom.value;
-    const y = scrollY*zoom.value;
+    const x = scrollX * zoom.value;
+    const y = scrollY * zoom.value;
     return (
       <div
         className="excalidraw__iframes"
         style={{
-           transform: `translate(${x}px,${y}px) scale(${zoom.value})`,
+          transform: `translate(${x}px,${y}px) scale(${zoom.value})`,
         }}
-      />
+      >
+        this.scene.getNonDeletedElements()
+          .filter((el) => el.type === "rectangle" && el.link)
+          .map((el) => (
+            <iframe
+              src={el.link}
+              title="YouTube video player"
+              allow="accelerometer
+              autoplay=false
+              clipboardWrite=true
+              encryptedMedia=true
+              gyroscope=true
+              pictureInPicture=true
+              allowfullscreen=true
+              style={{
+                width: `${el.width}px`,
+                height: `${el.height}px`,
+                border: 0,
+                position: "relative",
+                top: `${el.y}px`,
+                left: `${el.x}px`,
+                transform: `rotate(${el.angle}rad)`,
+              }}
+            />
+          );
+      </div>
     );
   }
 
