@@ -569,6 +569,20 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  private renderFrames() {
+    const {scrollX, scrollY, zoom} = this.state;
+    const x = scrollX*zoom.value;
+    const y = scrollY*zoom.value;
+    return (
+      <div
+        className="excalidraw__iframes"
+        style={{
+           transform: `translate(${x}px,${y}px) scale(${zoom.value})`,
+        }}
+      />
+    );
+  }
+
   public render() {
     const selectedElement = getSelectedElements(
       this.scene.getNonDeletedElements(),
@@ -662,6 +676,7 @@ class App extends React.Component<AppProps, AppState> {
                         )}
                         <main>{this.renderCanvas()}</main>
                       </ExcalidrawActionManagerContext.Provider>
+                      {this.renderFrames()}
                     </ExcalidrawElementsContext.Provider>
                   </ExcalidrawAppStateContext.Provider>
                 </ExcalidrawSetAppStateContext.Provider>
