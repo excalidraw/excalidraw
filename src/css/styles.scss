@@ -68,6 +68,14 @@
     position: absolute;
   }
 
+  &__iframes {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 10;
+    transform-origin: top left;
+  }
+
   &.theme--dark {
     // The percentage is inspired by
     // https://material.io/design/color/dark-theme.html#properties, which
