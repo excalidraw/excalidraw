@@ -581,29 +581,33 @@ class App extends React.Component<AppProps, AppState> {
         }}
       >
         this.scene.getNonDeletedElements()
-          .filter((el) => el.type === "rectangle" && el.link)
-          .map((el) => (
-            <iframe
-              src={el.link}
-              title="YouTube video player"
-              allow="accelerometer
-              autoplay=false
-              clipboardWrite=true
-              encryptedMedia=true
-              gyroscope=true
-              pictureInPicture=true
-              allowfullscreen=true
-              style={{
-                width: `${el.width}px`,
-                height: `${el.height}px`,
-                border: 0,
-                position: "relative",
-                top: `${el.y}px`,
-                left: `${el.x}px`,
-                transform: `rotate(${el.angle}rad)`,
-              }}
-            />
-          );
+          .filter((el) => {
+            return el.type === "rectangle" && el.link
+          })
+          .map((el) => {
+            return (
+              <iframe
+                src={el.link}
+                title="YouTube video player"
+                allow="accelerometer
+                autoplay=false
+                clipboardWrite=true
+                encryptedMedia=true
+                gyroscope=true
+                pictureInPicture=true
+                allowfullscreen=true
+                style={{
+                  width: `${el.width}px`,
+                  height: `${el.height}px`,
+                  border: 0,
+                  position: "relative",
+                  top: `${el.y}px`,
+                  left: `${el.x}px`,
+                  transform: `rotate(${el.angle}rad)`,
+                }}
+              />
+            );
+          })
       </div>
     );
   }
