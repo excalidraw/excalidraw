@@ -598,7 +598,7 @@ class App extends React.Component<AppProps, AppState> {
                   src={el.link??""}
                   title="YouTube video player"
                   allow="accelerometer"
-                  allowfullscreen={true}
+                  allowFullScreen={true}
                 />
               );
             })
