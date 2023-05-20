@@ -613,8 +613,8 @@ class App extends React.Component<AppProps, AppState> {
               <div
                 className="excalidraw__iframe-container"
                 style={{
-                  top: `${y}px`,
-                  left: `${x}px`,
+                  top: `${y-this.state.offsetTop}px`,
+                  left: `${x-this.state.offsetLeft}px`,
                   transform: `scale(${scale})`,
                 }}
               >
