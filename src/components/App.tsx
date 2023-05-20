@@ -616,6 +616,8 @@ class App extends React.Component<AppProps, AppState> {
                   top: `${y - this.state.offsetTop}px`,
                   left: `${x - this.state.offsetLeft}px`,
                   transform: `scale(${scale})`,
+                  pointerEvents:
+                    this.state.resizingElement === el ? "none" : "auto",
                 }}
               >
                 <iframe
