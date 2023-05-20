@@ -216,7 +216,7 @@ export type AppState = {
   showHyperlinkPopup: false | "info" | "editor";
   linkOpacity: number; //zsviczian
   trayModeEnabled: boolean; //zsviczian
-  colorPalette: {
+  colorPalette?: {
     canvasBackground: ColorPaletteCustom;
     elementBackground: ColorPaletteCustom;
     elementStroke: ColorPaletteCustom;

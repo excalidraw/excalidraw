@@ -96,7 +96,7 @@ export const getDefaultAppState = (): Omit<
     showHyperlinkPopup: false,
     linkOpacity: 1, //zsviczian
     trayModeEnabled: false, //zsviczian
-    colorPalette: {}, //zsviczian
+    colorPalette: undefined, //zsviczian
     allowPinchZoom: false, //zsviczian
     allowWheelZoom: false, //zsviczian
     pinnedScripts: [], //zsviczian
