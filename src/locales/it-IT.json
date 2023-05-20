@@ -111,7 +111,7 @@
     "increaseFontSize": "Aumenta la dimensione dei caratteri",
     "unbindText": "Scollega testo",
     "bindText": "Associa il testo al container",
-    "createContainerFromText": "",
+    "createContainerFromText": "Avvolgi il testo in un container",
     "link": {
       "edit": "Modifica link",
       "create": "Crea link",
@@ -426,8 +426,8 @@
   "colorPicker": {
     "mostUsedCustomColors": "Colori personalizzati più utilizzati",
     "colors": "Colori",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "shades": "Sfumature",
+    "hexCode": "Codice esadecimale",
+    "noShades": "Nessuna sfumatura disponibile per questo colore"
   }
 }
