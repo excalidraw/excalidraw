@@ -815,3 +815,11 @@ export const composeEventHandlers = <E>(
     }
   };
 };
+
+// youtube embed link or null
+export const getYTEmbedLink = (link?: string | null): string | null => {
+  const ytLink = link?.match(
+    /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(?:embed\/)?([a-zA-Z0-9_-]*)$/,
+  )?.[1];
+  return ytLink ? `https://www.youtube.com/embed/${ytLink}` : null;
+};

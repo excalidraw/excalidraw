@@ -244,6 +244,7 @@ import {
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
+  getYTEmbedLink,
 } from "../utils";
 import {
   ContextMenu,
@@ -601,12 +602,8 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
             );
 
-            const ytLink = el.link?.url?.match(
-              /^https:\/\/youtu\.be\/([a-zA-Z0-9_-]*)$/,
-            )?.[1];
-            const src = ytLink
-              ? `https://www.youtube.com/embed/${ytLink}`
-              : el.link?.url ?? "";
+            const ytLink = getYTEmbedLink(el.link?.url);
+            const src = ytLink ?? el.link?.url ?? "";
 
             const radius = getCornerRadius(
               Math.min(el.width, el.height) - el.strokeWidth,
@@ -1668,12 +1665,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // prefer spreadsheet data over image file (MS Office/Libre Office)
-      if (isSupportedImageFile(file) && !data.spreadsheet) {
-        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          { clientX: cursorX, clientY: cursorY },
-          this.state,
-        );
+      const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+        { clientX: cursorX, clientY: cursorY },
+        this.state,
+      );
 
+      if (isSupportedImageFile(file) && !data.spreadsheet) {
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
@@ -1710,6 +1707,19 @@ class App extends React.Component<AppProps, AppState> {
           retainSeed: isPlainPaste,
         });
       } else if (data.text) {
+        if (
+          !isPlainPaste &&
+          (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(data.text) ||
+            getYTEmbedLink(data.text))
+        ) {
+          const rectangle = this.insertEmbeddedRectangleElement({
+            sceneX,
+            sceneY,
+            link: data.text,
+          });
+          this.setState({ selectedElementIds: { [rectangle.id]: true } });
+          return;
+        }
         this.addTextFromPaste(data.text, isPlainPaste);
       }
       this.setActiveTool({ type: "selection" });
@@ -4438,6 +4448,49 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  //create rectangle element with youtube top left on nearest grid point width / hight 640/360
+  private insertEmbeddedRectangleElement = ({
+    sceneX,
+    sceneY,
+    link,
+  }: {
+    sceneX: number;
+    sceneY: number;
+    link: string;
+  }) => {
+    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
+
+    const ytLink = getYTEmbedLink(link);
+
+    const element = newElement({
+      type: "rectangle",
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      roundness: this.getCurrentItemRoundness("rectangle"),
+      opacity: this.state.currentItemOpacity,
+      locked: false,
+      width: 560,
+      height: ytLink ? 315 : 840,
+      link: {
+        url: ytLink ?? link,
+        embed: true,
+      },
+    });
+
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      element,
+    ]);
+
+    return element;
+  };
+
   private createImageElement = ({
     sceneX,
     sceneY,
@@ -4578,6 +4631,18 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private getCurrentItemRoundness(
+    elementType: "selection" | "rectangle" | "diamond" | "ellipse",
+  ) {
+    return this.state.currentItemRoundness === "round"
+      ? {
+          type: isUsingAdaptiveRadius(elementType)
+            ? ROUNDNESS.ADAPTIVE_RADIUS
+            : ROUNDNESS.PROPORTIONAL_RADIUS,
+        }
+      : null;
+  }
+
   private createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"],
     pointerDownState: PointerDownState,
@@ -4598,14 +4663,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
-      roundness:
-        this.state.currentItemRoundness === "round"
-          ? {
-              type: isUsingAdaptiveRadius(elementType)
-                ? ROUNDNESS.ADAPTIVE_RADIUS
-                : ROUNDNESS.PROPORTIONAL_RADIUS,
-            }
-          : null,
+      roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
     });
 
