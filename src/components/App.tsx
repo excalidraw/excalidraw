@@ -186,7 +186,7 @@ import {
   getGridPoint,
   isPathALoop,
 } from "../math";
-import { renderScene } from "../renderer/renderScene";
+import { isVisibleElement, renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
@@ -575,12 +575,25 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private renderFrames() {
-    const { zoom } = this.state;
+    const scale = this.state.zoom.value;
+    const normalizedWidth = this.state.width;
+    const normalizedHeight = this.state.height;
     return (
       <>
         {this.scene
           .getNonDeletedElements()
-          .filter((el) => el.type === "rectangle" && el.link)
+          .filter(
+            (el) =>
+              el.type === "rectangle" &&
+              el.link &&
+              el.link.embed &&
+              isVisibleElement(
+                el,
+                normalizedWidth,
+                normalizedHeight,
+                this.state,
+              ),
+          )
           .map((el) => {
             const strokeOffset = el.strokeWidth / 2;
             const { x, y } = sceneCoordsToViewportCoords(
@@ -588,12 +601,12 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
             );
 
-            const ytLink = el.link?.match(
+            const ytLink = el.link?.url?.match(
               /^https:\/\/youtu\.be\/([a-zA-Z0-9_-]*)$/,
             )?.[1];
             const src = ytLink
               ? `https://www.youtube.com/embed/${ytLink}`
-              : el.link ?? "";
+              : el.link?.url ?? "";
 
             const radius = getCornerRadius(
               Math.min(el.width, el.height) - el.strokeWidth,
@@ -605,7 +618,7 @@ class App extends React.Component<AppProps, AppState> {
                 style={{
                   top: `${y}px`,
                   left: `${x}px`,
-                  transform: `scale(${zoom.value})`,
+                  transform: `scale(${scale})`,
                 }}
               >
                 <iframe
@@ -3051,7 +3064,7 @@ class App extends React.Component<AppProps, AppState> {
       this.device.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
-      const url = this.hitLinkElement.link;
+      const url = this.hitLinkElement.link?.url;
       if (url) {
         let customEvent;
         if (this.props.onLinkOpen) {

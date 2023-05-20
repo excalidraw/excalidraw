@@ -113,8 +113,8 @@
     "bindText": "Bind text to the container",
     "createContainerFromText": "Wrap text in a container",
     "link": {
-      "edit": "Edit link",
-      "create": "Create link",
+      "edit": "Edit link & embed",
+      "create": "Create link & embed",
       "label": "Link"
     },
     "lineEditor": {
@@ -170,6 +170,7 @@
     "cancel": "Cancel",
     "clear": "Clear",
     "remove": "Remove",
+    "embed": "Toggle embedding",
     "publishLibrary": "Publish",
     "submit": "Submit",
     "confirm": "Confirm"

@@ -140,7 +140,9 @@ const restoreElementWithProperties = <
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
-    link: element.link ?? null,
+    link: typeof element.link === 'string'
+     ? {url: element.link, embed: false}
+     : element.link ?? null,
     locked: element.locked ?? false,
   };
 

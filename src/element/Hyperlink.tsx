@@ -10,7 +10,7 @@ import { NonDeletedExcalidrawElement } from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
-import { FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
+import { EmbedIcon, FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
 import { t } from "../i18n";
 import {
   useCallback,
@@ -58,7 +58,7 @@ export const Hyperlink = ({
 }) => {
   const appState = useExcalidrawAppState();
 
-  const linkVal = element.link || "";
+  const linkVal = element.link?.url || "";
 
   const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -75,7 +75,7 @@ export const Hyperlink = ({
       trackEvent("hyperlink", "create");
     }
 
-    mutateElement(element, { link });
+    mutateElement(element, { link:{url:link, embed:element.link?.embed} });
     setAppState({ showHyperlinkPopup: "info" });
   }, [element, setAppState]);
 
@@ -112,6 +112,13 @@ export const Hyperlink = ({
       }
     };
   }, [appState, element, isEditing, setAppState]);
+
+  const handleEmbed = useCallback(() => {
+    trackEvent("hyperlink", "embed");
+    const oldLink = element.link;
+    if(!oldLink) return;
+    mutateElement(element, { link: {url: oldLink.url,embed: !oldLink.embed } });
+  }, [element]);
 
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
@@ -166,11 +173,11 @@ export const Hyperlink = ({
         />
       ) : (
         <a
-          href={element.link || ""}
+          href={element.link?.url || ""}
           className={clsx("excalidraw-hyperlinkContainer-link", {
             "d-none": isEditing,
           })}
-          target={isLocalLink(element.link) ? "_self" : "_blank"}
+          target={isLocalLink(element.link?.url) ? "_self" : "_blank"}
           onClick={(event) => {
             if (element.link && onLinkOpen) {
               const customEvent = wrapEvent(
@@ -185,7 +192,7 @@ export const Hyperlink = ({
           }}
           rel="noopener noreferrer"
         >
-          {element.link}
+          {element.link?.url}
         </a>
       )}
       <div className="excalidraw-hyperlinkContainer__buttons">
@@ -200,7 +207,18 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
-
+        {linkVal && element.type === "rectangle" && (
+          <ToolButton
+            type="radio"
+            title={t("buttons.embed")}
+            aria-label={t("buttons.embed")}
+            label={t("buttons.embed")}
+            checked={element.link?.embed??false}
+            onPointerDown={handleEmbed}
+            className="excalidraw-hyperlinkContainer--embed"
+            icon={EmbedIcon}
+          />
+        )}
         {linkVal && (
           <ToolButton
             type="button"
@@ -242,7 +260,7 @@ export const normalizeLink = (link: string) => {
   return link;
 };
 
-export const isLocalLink = (link: string | null) => {
+export const isLocalLink = (link: string | null | undefined) => {
   return !!(link?.includes(location.origin) || link?.startsWith("/"));
 };
 
@@ -389,7 +407,7 @@ const renderTooltip = (
 
   tooltipDiv.classList.add("excalidraw-tooltip--visible");
   tooltipDiv.style.maxWidth = "20rem";
-  tooltipDiv.textContent = element.link;
+  tooltipDiv.textContent = element.link?.url;
 
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 
