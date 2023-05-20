@@ -252,8 +252,16 @@ export const actionChangeStrokeColor = register({
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
-        topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
-        palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
+        topPicks={
+          //zsviczian
+          appState.colorPalette?.topPicks?.elementStroke ??
+          DEFAULT_ELEMENT_STROKE_PICKS
+        }
+        palette={
+          //zsviczian
+          appState.colorPalette?.elementStroke ??
+          DEFAULT_ELEMENT_STROKE_COLOR_PALETTE
+        }
         type="elementStroke"
         label={t("labels.stroke")}
         color={getFormValue(
@@ -294,8 +302,16 @@ export const actionChangeBackgroundColor = register({
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
-        topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
-        palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
+        topPicks={
+          //zsviczian
+          appState.colorPalette?.topPicks?.elementBackground ??
+          DEFAULT_ELEMENT_BACKGROUND_PICKS
+        }
+        palette={
+          //zsviczian
+          appState.colorPalette?.elementBackground ??
+          DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE
+        }
         type="elementBackground"
         label={t("labels.background")}
         color={getFormValue(

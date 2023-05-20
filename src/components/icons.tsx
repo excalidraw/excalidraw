@@ -267,7 +267,11 @@ export const ExcalLogo = createIcon(
 
 // custom
 export const SelectionIcon = createIcon(
-  <g stroke="var(--icon-fill-color)" strokeLinecap="round" strokeLinejoin="round">
+  <g
+    stroke="var(--icon-fill-color)"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M6 6l4.153 11.793a0.365 .365 0 0 0 .331 .207a0.366 .366 0 0 0 .332 -.207l2.184 -4.793l4.787 -1.994a0.355 .355 0 0 0 .213 -.323a0.355 .355 0 0 0 -.213 -.323l-11.787 -4.36z" />
     <path d="M13.5 13.5l4.5 4.5" />
@@ -489,7 +493,11 @@ export const TwitterIcon = createIcon(
 );
 
 export const checkIcon = createIcon(
-  <polyline fill="none" stroke="var(--icon-fill-color)" points="20 6 9 17 4 12" />,
+  <polyline
+    fill="none"
+    stroke="var(--icon-fill-color)"
+    points="20 6 9 17 4 12"
+  />,
   {
     width: 24,
     height: 24,
@@ -1266,7 +1274,12 @@ export const EdgeRoundIcon = createIcon(
 );
 
 export const ArrowheadNoneIcon = createIcon(
-  <path d="M6 10H34" stroke="var(--icon-fill-color)" strokeWidth={2} fill="none" />,
+  <path
+    d="M6 10H34"
+    stroke="var(--icon-fill-color)"
+    strokeWidth={2}
+    fill="none"
+  />,
   {
     width: 40,
     height: 20,

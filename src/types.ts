@@ -34,6 +34,7 @@ import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { Merge, ForwardRef, ValueOf } from "./utility-types";
+import { ColorPaletteCustom } from "./colors";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -216,9 +217,14 @@ export type AppState = {
   linkOpacity: number; //zsviczian
   trayModeEnabled: boolean; //zsviczian
   colorPalette: {
-    canvasBackground?: string[];
-    elementBackground?: string[];
-    elementStroke?: string[];
+    canvasBackground: ColorPaletteCustom;
+    elementBackground: ColorPaletteCustom;
+    elementStroke: ColorPaletteCustom;
+    topPicks: {
+      canvasBackground: [string, string, string, string, string];
+      elementStroke: [string, string, string, string, string];
+      elementBackground: [string, string, string, string, string];
+    };
   }; //zsviczian
   allowWheelZoom?: boolean; //zsviczian
   allowPinchZoom?: boolean; //zsviczian

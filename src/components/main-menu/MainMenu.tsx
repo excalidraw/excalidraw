@@ -58,7 +58,10 @@ const MainMenu = Object.assign(
               {device.isMobile && appState.collaborators.size > 0 && (
                 <fieldset className="UserList-Wrapper">
                   <legend>{t("labels.collaborators")}</legend>
-                  <UserList mobile={true} collaborators={appState.collaborators} />
+                  <UserList
+                    mobile={true}
+                    collaborators={appState.collaborators}
+                  />
                 </fieldset>
               )}
             </DropdownMenu.Content>

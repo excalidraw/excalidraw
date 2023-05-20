@@ -191,14 +191,20 @@ export const LibraryDropdownMenuButton: React.FC<{
       : await library.getLatestLibrary();
     download(
       "data:text/plain;charset=utf-8",
-      encodeURIComponent(JSON.stringify({
-        type: "excalidrawlib",
-        version: 2,
-        source: "https://excalidraw.com",
-        libraryItems
-      }, null, "\t")),
+      encodeURIComponent(
+        JSON.stringify(
+          {
+            type: "excalidrawlib",
+            version: 2,
+            source: "https://excalidraw.com",
+            libraryItems,
+          },
+          null,
+          "\t",
+        ),
+      ),
       "my-obsidian-library.excalidrawlib", //zsviczian
-    );/*
+    ); /*
     saveLibraryAsJSON(libraryItems)
       .catch(muteFSAbortError)
       .catch((error) => {
