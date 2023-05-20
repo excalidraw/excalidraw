@@ -43,7 +43,7 @@ import { getShapeForElement } from "../renderer/renderElement";
 import { DRAGGING_THRESHOLD } from "../constants";
 import { Mutable } from "../utility-types";
 
-const editorMidPointsCache: {
+export const editorMidPointsCache: {
   version: number | null;
   points: (Point | null)[];
   zoom: number | null;
