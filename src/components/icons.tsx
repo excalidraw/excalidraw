@@ -397,11 +397,9 @@ export const TrashIcon = createIcon(
 );
 
 export const EmbedIcon = createIcon(
-  <g
-    strokeWidth="1.25"
-  >
-    <polyline points="12 16 18 10 12 4"/>
-    <polyline points="8 4 2 10 8 16"/>
+  <g strokeWidth="1.25">
+    <polyline points="12 16 18 10 12 4" />
+    <polyline points="8 4 2 10 8 16" />
   </g>,
   modifiedTablerIconProps,
 );

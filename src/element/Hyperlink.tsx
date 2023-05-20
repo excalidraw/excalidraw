@@ -10,7 +10,12 @@ import { NonDeletedExcalidrawElement } from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
-import { EmbedIcon, FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
+import {
+  EmbedIcon,
+  FreedrawIcon,
+  LinkIcon,
+  TrashIcon,
+} from "../components/icons";
 import { t } from "../i18n";
 import {
   useCallback,
@@ -75,7 +80,7 @@ export const Hyperlink = ({
       trackEvent("hyperlink", "create");
     }
 
-    mutateElement(element, { link:{url:link, embed:element.link?.embed} });
+    mutateElement(element, { link: { url: link, embed: element.link?.embed } });
     setAppState({ showHyperlinkPopup: "info" });
   }, [element, setAppState]);
 
@@ -116,8 +121,12 @@ export const Hyperlink = ({
   const handleEmbed = useCallback(() => {
     trackEvent("hyperlink", "embed");
     const oldLink = element.link;
-    if(!oldLink) return;
-    mutateElement(element, { link: {url: oldLink.url,embed: !oldLink.embed } });
+    if (!oldLink) {
+      return;
+    }
+    mutateElement(element, {
+      link: { url: oldLink.url, embed: !oldLink.embed },
+    });
   }, [element]);
 
   const handleRemove = useCallback(() => {
@@ -213,7 +222,7 @@ export const Hyperlink = ({
             title={t("buttons.embed")}
             aria-label={t("buttons.embed")}
             label={t("buttons.embed")}
-            checked={element.link?.embed??false}
+            checked={element.link?.embed ?? false}
             onPointerDown={handleEmbed}
             className="excalidraw-hyperlinkContainer--embed"
             icon={EmbedIcon}
