@@ -570,40 +570,46 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private renderFrames() {
-    const {scrollX, scrollY, zoom} = this.state;
-    const x = scrollX * zoom.value;
-    const y = scrollY * zoom.value;
+    const { zoom } = this.state;
     return (
-      <div
-        className="excalidraw__iframes"
-        style={{
-          transform: `translate(${x}px,${y}px) scale(${zoom.value})`,
-        }}
-      >
-        {
-          this.scene.getNonDeletedElements()
-            .filter((el) => el.type === "rectangle" && el.link)
-            .map((el) => {
-              return (
+      <>
+        {this.scene
+          .getNonDeletedElements()
+          .filter((el) => el.type === "rectangle" && el.link)
+          .map((el) => {
+            const strokeOffset = el.strokeWidth / 2;
+            const { x, y } = sceneCoordsToViewportCoords(
+              { sceneX: el.x+strokeOffset, sceneY: el.y+strokeOffset },
+              this.state,
+            );
+            const ytLink = el.link?.match(/^https:\/\/youtu\.be\/([a-zA-Z0-9_-]*)$/)?.[1];
+            const src = ytLink ? `https://www.youtube.com/embed/${ytLink}` : el.link ?? "";
+            return (
+              <div 
+                className="excalidraw__iframe-container"
+                style={{
+                  top: `${y}px`,
+                  left: `${x}px`,
+                  transform: `scale(${zoom.value})`
+                }}
+              >
                 <iframe
+                  className="excalidraw__iframe"
                   style={{
-                    width: `${el.width}px`,
-                    height: `${el.height}px`,
+                    width: `${el.width-el.strokeWidth}px`,
+                    height: `${el.height-el.strokeWidth}px`,
                     border: 0,
-                    position: "relative",
-                    top: `${el.y}px`,
-                    left: `${el.x}px`,
                     transform: `rotate(${el.angle}rad)`,
                   }}
-                  src={el.link??""}
+                  src={src}
                   title="YouTube video player"
                   allow="accelerometer"
                   allowFullScreen={true}
                 />
-              );
-            })
-        }
-      </div>
+              </div>
+            );
+          })}
+      </>
     );
   }
 

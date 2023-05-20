@@ -68,11 +68,14 @@
     position: absolute;
   }
 
-  &__iframes {
+  &__iframe {
+    position: relative;
+    transform-origin: center;
+  }
+
+  &__iframe-container {
     position: absolute;
-    top: 0px;
-    left: 0px;
-    z-index: 10;
+    z-index: 9;
     transform-origin: top left;
   }
 
