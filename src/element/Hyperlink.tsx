@@ -306,7 +306,11 @@ export const actionLink = register({
         type="button"
         icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
-        title={`${t("labels.link.label")} - ${getShortcutKey("CtrlOrCmd+K")}`}
+        title={`${
+          selectedElements[0].type === "rectangle"
+            ? t("labels.link.labelEmbed")
+            : t("labels.link.label")
+        } - ${getShortcutKey("CtrlOrCmd+K")}`}
         onClick={() => updateData(null)}
         selected={selectedElements.length === 1 && !!selectedElements[0].link}
       />
@@ -320,7 +324,11 @@ export const getContextMenuLabel = (
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
   const label = selectedElements[0]!.link
-    ? "labels.link.edit"
+    ? selectedElements[0]!.type === "rectangle"
+      ? "labels.link.editEmbed"
+      : "labels.link.edit"
+    : selectedElements[0]!.type === "rectangle"
+    ? "labels.link.createEmbed"
     : "labels.link.create";
   return label;
 };

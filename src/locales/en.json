@@ -113,9 +113,12 @@
     "bindText": "Bind text to the container",
     "createContainerFromText": "Wrap text in a container",
     "link": {
-      "edit": "Edit link & embed",
-      "create": "Create link & embed",
-      "label": "Link"
+      "edit": "Edit link",
+      "editEmbed": "Edit link & embed",
+      "create": "Create link",
+      "createEmbed": "Create link & embed",
+      "label": "Link",
+      "labelEmbed": "Link & embed"
     },
     "lineEditor": {
       "edit": "Edit line",
