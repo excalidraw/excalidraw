@@ -180,7 +180,12 @@ import {
   isArrowKey,
   KEYS,
 } from "../keys";
-import { distance2d, getGridPoint, isPathALoop } from "../math";
+import {
+  distance2d,
+  getCornerRadius,
+  getGridPoint,
+  isPathALoop,
+} from "../math";
 import { renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
@@ -582,12 +587,18 @@ class App extends React.Component<AppProps, AppState> {
               { sceneX: el.x + strokeOffset, sceneY: el.y + strokeOffset },
               this.state,
             );
+
             const ytLink = el.link?.match(
               /^https:\/\/youtu\.be\/([a-zA-Z0-9_-]*)$/,
             )?.[1];
             const src = ytLink
               ? `https://www.youtube.com/embed/${ytLink}`
               : el.link ?? "";
+
+            const radius = getCornerRadius(
+              Math.min(el.width, el.height) - el.strokeWidth,
+              el,
+            );
             return (
               <div
                 className="excalidraw__iframe-container"
@@ -604,6 +615,7 @@ class App extends React.Component<AppProps, AppState> {
                     height: `${el.height - el.strokeWidth}px`,
                     border: 0,
                     transform: `rotate(${el.angle}rad)`,
+                    borderRadius: `${radius}px`,
                   }}
                   src={src}
                   title="YouTube video player"
