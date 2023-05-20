@@ -1040,7 +1040,7 @@ const renderLinkIcon = (
   context: CanvasRenderingContext2D,
   appState: AppState,
 ) => {
-  if (element.link && !appState.selectedElementIds[element.id]) {
+  if (element.link?.url && !appState.selectedElementIds[element.id]) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const [x, y, width, height] = getLinkHandleFromCoords(
       [x1, y1, x2, y2],

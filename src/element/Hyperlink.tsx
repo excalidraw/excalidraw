@@ -188,7 +188,7 @@ export const Hyperlink = ({
           })}
           target={isLocalLink(element.link?.url) ? "_self" : "_blank"}
           onClick={(event) => {
-            if (element.link && onLinkOpen) {
+            if (element.link?.url && onLinkOpen) {
               const customEvent = wrapEvent(
                 EVENT.EXCALIDRAW_LINK,
                 event.nativeEvent,

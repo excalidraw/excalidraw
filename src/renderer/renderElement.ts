@@ -1141,9 +1141,9 @@ export const renderElementToSvg = (
   let root = svgRoot;
 
   // if the element has a link, create an anchor tag and make that the new root
-  if (element.link) {
+  if (element.link?.url) {
     const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
-    anchorTag.setAttribute("href", element.link);
+    anchorTag.setAttribute("href", element.link.url);
     root.appendChild(anchorTag);
     root = anchorTag;
   }

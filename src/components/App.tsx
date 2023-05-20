@@ -3013,7 +3013,7 @@ class App extends React.Component<AppProps, AppState> {
         hitElementIndex = index;
       }
       return (
-        element.link &&
+        element.link?.url &&
         index <= hitElementIndex &&
         isPointHittingLinkIcon(
           element,
@@ -3379,7 +3379,7 @@ class App extends React.Component<AppProps, AppState> {
       hideHyperlinkToolip();
       if (
         hitElement &&
-        hitElement.link &&
+        hitElement.link?.url &&
         this.state.selectedElementIds[hitElement.id] &&
         !this.state.contextMenu &&
         !this.state.showHyperlinkPopup
@@ -4293,7 +4293,7 @@ class App extends React.Component<AppProps, AppState> {
                       ...prevState.selectedElementIds,
                       [hitElement.id]: true,
                     },
-                    showHyperlinkPopup: hitElement.link ? "info" : false,
+                    showHyperlinkPopup: hitElement.link?.url ? "info" : false,
                   },
                   this.scene.getNonDeletedElements(),
                 );
