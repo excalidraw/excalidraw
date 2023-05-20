@@ -579,25 +579,29 @@ class App extends React.Component<AppProps, AppState> {
           .map((el) => {
             const strokeOffset = el.strokeWidth / 2;
             const { x, y } = sceneCoordsToViewportCoords(
-              { sceneX: el.x+strokeOffset, sceneY: el.y+strokeOffset },
+              { sceneX: el.x + strokeOffset, sceneY: el.y + strokeOffset },
               this.state,
             );
-            const ytLink = el.link?.match(/^https:\/\/youtu\.be\/([a-zA-Z0-9_-]*)$/)?.[1];
-            const src = ytLink ? `https://www.youtube.com/embed/${ytLink}` : el.link ?? "";
+            const ytLink = el.link?.match(
+              /^https:\/\/youtu\.be\/([a-zA-Z0-9_-]*)$/,
+            )?.[1];
+            const src = ytLink
+              ? `https://www.youtube.com/embed/${ytLink}`
+              : el.link ?? "";
             return (
-              <div 
+              <div
                 className="excalidraw__iframe-container"
                 style={{
                   top: `${y}px`,
                   left: `${x}px`,
-                  transform: `scale(${zoom.value})`
+                  transform: `scale(${zoom.value})`,
                 }}
               >
                 <iframe
                   className="excalidraw__iframe"
                   style={{
-                    width: `${el.width-el.strokeWidth}px`,
-                    height: `${el.height-el.strokeWidth}px`,
+                    width: `${el.width - el.strokeWidth}px`,
+                    height: `${el.height - el.strokeWidth}px`,
                     border: 0,
                     transform: `rotate(${el.angle}rad)`,
                   }}
