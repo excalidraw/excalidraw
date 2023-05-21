@@ -630,7 +630,7 @@ class App extends React.Component<AppProps, AppState> {
                     borderRadius: `${radius}px`,
                   }}
                   src={src}
-                  title="YouTube video player"
+                  title="Excalidraw Embedded Content"
                   allow="accelerometer"
                   allowFullScreen={true}
                 />
