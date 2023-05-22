@@ -35,7 +35,6 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getFontString, getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
-import oc from "open-color";
 import { MarkOptional, Mutable } from "../utility-types";
 import {
   detectLineHeight,
@@ -43,6 +42,7 @@ import {
   measureBaseline,
 } from "../element/textElement";
 import { convertToExcalidrawElements } from "../element/newElement";
+import { COLOR_PALETTE } from "../colors";
 
 type RestoredAppState = Omit<
   AppState,

@@ -1,11 +1,6 @@
 @import "open-color/open-color";
 
 .excalidraw {
-  .library-menu-items-container {
-    height: 100%;
-    width: 100%;
-  }
-
   .layer-ui__library {
     display: flex;
     flex-direction: column;
@@ -70,6 +65,16 @@
     align-items: center;
     justify-content: center;
     gap: 0.625rem;
+    position: relative;
+
+    &--at-bottom::before {
+      content: "";
+      width: calc(100% - 1.5rem);
+      height: 1px;
+      position: absolute;
+      top: -1px;
+      background: var(--sidebar-border-color);
+    }
   }
 
   .library-menu-browse-button {
@@ -124,6 +129,22 @@
       box-shadow: var(--library-dropdown-shadow);
       border-radius: var(--border-radius-lg);
       padding: 0.25rem 0.5rem;
+    }
+  }
+
+  .layer-ui__library .library-menu-dropdown-container {
+    position: relative;
+
+    &--in-heading {
+      padding: 0;
+      position: absolute;
+      top: 1rem;
+      right: 0.75rem;
+      z-index: 1;
+
+      .dropdown-menu {
+        top: 100%;
+      }
     }
   }
 }
