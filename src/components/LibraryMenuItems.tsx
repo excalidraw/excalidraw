@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { serializeLibraryAsJSON } from "../data/json";
 import { t } from "../i18n";
 import {
@@ -28,6 +28,8 @@ export default function LibraryMenuItems({
   theme,
   id,
   libraryReturnUrl,
+  onSelectItems,
+  selectedItems,
 }: {
   isLoading: boolean;
   libraryItems: LibraryItems;
@@ -37,15 +39,18 @@ export default function LibraryMenuItems({
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   theme: UIAppState["theme"];
   id: string;
+  selectedItems: LibraryItem["id"][];
+  onSelectItems: (id: LibraryItem["id"][]) => void;
 }) {
-  const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
   const { svgCache } = useLibraryCache();
-
-  const unpublishedItems = libraryItems.filter(
-    (item) => item.status !== "published",
+  const unpublishedItems = useMemo(
+    () => libraryItems.filter((item) => item.status !== "published"),
+    [libraryItems],
   );
-  const publishedItems = libraryItems.filter(
-    (item) => item.status === "published",
+
+  const publishedItems = useMemo(
+    () => libraryItems.filter((item) => item.status === "published"),
+    [libraryItems],
   );
 
   const showBtn = !libraryItems.length && !pendingElements.length;
@@ -59,50 +64,56 @@ export default function LibraryMenuItems({
     LibraryItem["id"] | null
   >(null);
 
-  const onItemSelectToggle = (
-    id: LibraryItem["id"],
-    event: React.MouseEvent,
-  ) => {
-    const shouldSelect = !selectedItems.includes(id);
+  const onItemSelectToggle = useCallback(
+    (id: LibraryItem["id"], event: React.MouseEvent) => {
+      const shouldSelect = !selectedItems.includes(id);
 
-    const orderedItems = [...unpublishedItems, ...publishedItems];
+      const orderedItems = [...unpublishedItems, ...publishedItems];
 
-    if (shouldSelect) {
-      if (event.shiftKey && lastSelectedItem) {
-        const rangeStart = orderedItems.findIndex(
-          (item) => item.id === lastSelectedItem,
-        );
-        const rangeEnd = orderedItems.findIndex((item) => item.id === id);
+      if (shouldSelect) {
+        if (event.shiftKey && lastSelectedItem) {
+          const rangeStart = orderedItems.findIndex(
+            (item) => item.id === lastSelectedItem,
+          );
+          const rangeEnd = orderedItems.findIndex((item) => item.id === id);
 
-        if (rangeStart === -1 || rangeEnd === -1) {
-          setSelectedItems([...selectedItems, id]);
-          return;
+          if (rangeStart === -1 || rangeEnd === -1) {
+            onSelectItems([...selectedItems, id]);
+            return;
+          }
+
+          const selectedItemsMap = arrayToMap(selectedItems);
+          const nextSelectedIds = orderedItems.reduce(
+            (acc: LibraryItem["id"][], item, idx) => {
+              if (
+                (idx >= rangeStart && idx <= rangeEnd) ||
+                selectedItemsMap.has(item.id)
+              ) {
+                acc.push(item.id);
+              }
+              return acc;
+            },
+            [],
+          );
+
+          onSelectItems(nextSelectedIds);
+        } else {
+          onSelectItems([...selectedItems, id]);
         }
-
-        const selectedItemsMap = arrayToMap(selectedItems);
-        const nextSelectedIds = orderedItems.reduce(
-          (acc: LibraryItem["id"][], item, idx) => {
-            if (
-              (idx >= rangeStart && idx <= rangeEnd) ||
-              selectedItemsMap.has(item.id)
-            ) {
-              acc.push(item.id);
-            }
-            return acc;
-          },
-          [],
-        );
-
-        setSelectedItems(nextSelectedIds);
+        setLastSelectedItem(id);
       } else {
-        setSelectedItems([...selectedItems, id]);
+        setLastSelectedItem(null);
+        onSelectItems(selectedItems.filter((_id) => _id !== id));
       }
-      setLastSelectedItem(id);
-    } else {
-      setLastSelectedItem(null);
-      setSelectedItems(selectedItems.filter((_id) => _id !== id));
-    }
-  };
+    },
+    [
+      lastSelectedItem,
+      onSelectItems,
+      publishedItems,
+      selectedItems,
+      unpublishedItems,
+    ],
+  );
 
   const getInsertedElements = useCallback(
     (id: string) => {
@@ -126,22 +137,37 @@ export default function LibraryMenuItems({
     [libraryItems, selectedItems],
   );
 
-  const onItemDrag = (id: LibraryItem["id"], event: React.DragEvent) => {
-    event.dataTransfer.setData(
-      MIME_TYPES.excalidrawlib,
-      serializeLibraryAsJSON(getInsertedElements(id)),
-    );
-  };
+  const onItemDrag = useCallback(
+    (id: LibraryItem["id"], event: React.DragEvent) => {
+      event.dataTransfer.setData(
+        MIME_TYPES.excalidrawlib,
+        serializeLibraryAsJSON(getInsertedElements(id)),
+      );
+    },
+    [getInsertedElements],
+  );
 
-  const isItemSelected = (id: LibraryItem["id"] | null) => {
-    if (!id) {
-      return false;
-    }
+  const isItemSelected = useCallback(
+    (id: LibraryItem["id"] | null) => {
+      if (!id) {
+        return false;
+      }
 
-    return selectedItems.includes(id);
-  };
+      return selectedItems.includes(id);
+    },
+    [selectedItems],
+  );
 
-  const onItemClick = useCallback(
+  const onExcalidrawLibraryItemClick = useCallback(
+    (id: LibraryItem["id"] | null) => {
+      if (id) {
+        onInsertLibraryItems(getInsertedElements(id));
+      }
+    },
+    [getInsertedElements, onInsertLibraryItems],
+  );
+
+  const onPersonalLibraryItemClick = useCallback(
     (id: LibraryItem["id"] | null) => {
       if (!id) {
         onAddToLibrary(pendingElements);
@@ -171,7 +197,7 @@ export default function LibraryMenuItems({
       {!isLibraryEmpty && (
         <LibraryDropdownMenu
           selectedItems={selectedItems}
-          onSelectItems={setSelectedItems}
+          onSelectItems={onSelectItems}
           className="library-menu-dropdown-container--in-heading"
         />
       )}
@@ -224,7 +250,7 @@ export default function LibraryMenuItems({
               ]}
               onItemSelectToggle={onItemSelectToggle}
               onItemDrag={onItemDrag}
-              onClick={onItemClick}
+              onClick={onPersonalLibraryItemClick}
               isItemSelected={isItemSelected}
               svgCache={svgCache}
             />
@@ -244,7 +270,7 @@ export default function LibraryMenuItems({
               items={publishedItems}
               onItemSelectToggle={onItemSelectToggle}
               onItemDrag={onItemDrag}
-              onClick={onItemClick}
+              onClick={onExcalidrawLibraryItemClick}
               isItemSelected={isItemSelected}
               svgCache={svgCache}
             />
@@ -274,7 +300,7 @@ export default function LibraryMenuItems({
           >
             <LibraryDropdownMenu
               selectedItems={selectedItems}
-              onSelectItems={setSelectedItems}
+              onSelectItems={onSelectItems}
             />
           </LibraryMenuControlButtons>
         )}

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import Library, {
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,
@@ -42,7 +42,9 @@ export const LibraryMenuContent = ({
   libraryReturnUrl,
   library,
   id,
-  appState,
+  theme,
+  selectedItems,
+  onSelectItems,
 }: {
   pendingElements: LibraryItem["elements"];
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
@@ -51,7 +53,9 @@ export const LibraryMenuContent = ({
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   library: Library;
   id: string;
-  appState: UIAppState;
+  theme: UIAppState["theme"];
+  selectedItems: LibraryItem["id"][];
+  onSelectItems: (id: LibraryItem["id"][]) => void;
 }) => {
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
 
@@ -80,6 +84,11 @@ export const LibraryMenuContent = ({
     [onAddToLibrary, library, setAppState],
   );
 
+  const libraryItems = useMemo(
+    () => libraryItemsData.libraryItems,
+    [libraryItemsData],
+  );
+
   if (
     libraryItemsData.status === "loading" &&
     !libraryItemsData.isInitialized
@@ -103,7 +112,7 @@ export const LibraryMenuContent = ({
     <LibraryMenuWrapper>
       <LibraryMenuItems
         isLoading={libraryItemsData.status === "loading"}
-        libraryItems={libraryItemsData.libraryItems}
+        libraryItems={libraryItems}
         onAddToLibrary={(elements) =>
           addToLibrary(elements, libraryItemsData.libraryItems)
         }
@@ -111,7 +120,9 @@ export const LibraryMenuContent = ({
         pendingElements={pendingElements}
         id={id}
         libraryReturnUrl={libraryReturnUrl}
-        theme={appState.theme}
+        theme={theme}
+        onSelectItems={onSelectItems}
+        selectedItems={selectedItems}
       />
       {showBtn && (
         <LibraryMenuControlButtons
@@ -119,7 +130,7 @@ export const LibraryMenuContent = ({
           style={{ padding: "16px 12px 0 12px" }}
           id={id}
           libraryReturnUrl={libraryReturnUrl}
-          theme={appState.theme}
+          theme={theme}
         />
       )}
     </LibraryMenuWrapper>
@@ -137,8 +148,21 @@ export const LibraryMenu = () => {
   const setAppState = useExcalidrawSetAppState();
   const elements = useExcalidrawElements();
 
-  const onAddToLibrary = useCallback(() => {
-    // deselect canvas elements
+  const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
+  const memoizedLibrary = useMemo(() => library, [library]);
+  const pendingElements = useMemo(
+    () => getSelectedElements(elements, appState, true),
+    [appState, elements],
+  );
+
+  const onInsertLibraryItems = useCallback(
+    (libraryItems: LibraryItems) => {
+      onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
+    },
+    [onInsertElements],
+  );
+
+  const deselectItems = useCallback(() => {
     setAppState({
       selectedElementIds: {},
       selectedGroupIds: {},
@@ -147,16 +171,16 @@ export const LibraryMenu = () => {
 
   return (
     <LibraryMenuContent
-      pendingElements={getSelectedElements(elements, appState, true)}
-      onInsertLibraryItems={(libraryItems) => {
-        onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
-      }}
-      onAddToLibrary={onAddToLibrary}
+      pendingElements={pendingElements}
+      onInsertLibraryItems={onInsertLibraryItems}
+      onAddToLibrary={deselectItems}
       setAppState={setAppState}
       libraryReturnUrl={appProps.libraryReturnUrl}
-      library={library}
+      library={memoizedLibrary}
       id={id}
-      appState={appState}
+      theme={appState.theme}
+      selectedItems={selectedItems}
+      onSelectItems={setSelectedItems}
     />
   );
 };
