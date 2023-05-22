@@ -49,7 +49,6 @@ import {
 import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
 import { ImportedDataState } from "../data/types";
-import { restoreElementWithProperties } from "../data/restore";
 
 export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
   "rectangle",

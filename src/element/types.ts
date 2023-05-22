@@ -6,7 +6,7 @@ import {
   THEME,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MarkNonNullable, MarkOptional, ValueOf } from "../utility-types";
+import { MarkNonNullable, ValueOf } from "../utility-types";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";

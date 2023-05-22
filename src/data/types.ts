@@ -1,6 +1,5 @@
 import {
   ExcalidrawElement,
-  ExcalidrawGenericElement,
   FontFamilyValues,
   TextAlign,
   VerticalAlign,

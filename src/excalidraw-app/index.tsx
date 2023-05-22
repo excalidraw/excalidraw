@@ -606,6 +606,7 @@ const ExcalidrawWrapper = () => {
 
   const isOffline = useAtomValue(isOfflineAtom);
 
+  //@ts-ignore
   const getInitialData = (): ExcalidrawInitialDataState => {
     return {
       scrollToContent: true,

@@ -42,7 +42,6 @@ import {
   measureBaseline,
 } from "../element/textElement";
 import { convertToExcalidrawElements } from "../element/newElement";
-import { COLOR_PALETTE } from "../colors";
 
 type RestoredAppState = Omit<
   AppState,
