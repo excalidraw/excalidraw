@@ -691,33 +691,36 @@ export const resizeMultipleElements = (
     nw: [pointerX <= anchorX, pointerY <= anchorY],
   };
 
-  // to flip an element:
-  // 1. mirror x,y relative to the anchor over the x/y/both axis (flipFactor)
-  // 2. shift by the width/height/both (flipAdjust) or mirror points in case of
-  //    linear/free draw element
-  // 3. adjust the angle
+  /**
+   * to flip an element:
+   * 1. determine over which axis is the element being flipped
+   *    (could be x, y, or both) indicated by `flipFactorX` & `flipFactorY`
+   * 2. shift element's position by the amount of width or height (or both) or
+   *    mirror points in the case of linear & freedraw elemenets
+   * 3. adjust element angle
+   */
   const [flipFactorX, flipFactorY] = mapDirectionsToPointerPositions[
     direction
   ].map((condition) => (condition ? 1 : -1));
   const isFlippedByX = flipFactorX < 0;
   const isFlippedByY = flipFactorY < 0;
 
-  targetElements.forEach(({ orig: element, latest: latestElement }) => {
-    const width = element.width * scale;
-    const height = element.height * scale;
-    const angle = normalizeAngle(element.angle * flipFactorX * flipFactorY);
+  targetElements.forEach(({ orig: origElement, latest: latestElement }) => {
+    const width = origElement.width * scale;
+    const height = origElement.height * scale;
+    const angle = normalizeAngle(origElement.angle * flipFactorX * flipFactorY);
 
     const isLinearOrFreeDraw =
-      isLinearElement(element) || isFreeDrawElement(element);
-    const offsetX = element.x - anchorX;
-    const offsetY = element.y - anchorY;
-    const flipAdjustX = isFlippedByX && !isLinearOrFreeDraw ? width : 0;
-    const flipAdjustY = isFlippedByY && !isLinearOrFreeDraw ? height : 0;
-    const x = anchorX + flipFactorX * (offsetX * scale + flipAdjustX);
-    const y = anchorY + flipFactorY * (offsetY * scale + flipAdjustY);
+      isLinearElement(origElement) || isFreeDrawElement(origElement);
+    const offsetX = origElement.x - anchorX;
+    const offsetY = origElement.y - anchorY;
+    const shiftX = isFlippedByX && !isLinearOrFreeDraw ? width : 0;
+    const shiftY = isFlippedByY && !isLinearOrFreeDraw ? height : 0;
+    const x = anchorX + flipFactorX * (offsetX * scale + shiftX);
+    const y = anchorY + flipFactorY * (offsetY * scale + shiftY);
 
     const rescaledPoints = rescalePointsInElement(
-      element,
+      origElement,
       width * flipFactorX,
       height * flipFactorY,
       false,
@@ -742,45 +745,49 @@ export const resizeMultipleElements = (
       ...rescaledPoints,
     };
 
-    if (isImageElement(element) && targetElements.length === 1) {
+    if (isImageElement(origElement) && targetElements.length === 1) {
       update.scale = [
-        element.scale[0] * flipFactorX,
-        element.scale[1] * flipFactorY,
+        origElement.scale[0] * flipFactorX,
+        origElement.scale[1] * flipFactorY,
       ];
     }
 
-    if (isTextElement(element)) {
-      const metrics = measureFontSizeFromWidth(element, width, height);
-      update.fontSize = metrics?.size ?? element.fontSize;
-      update.baseline = metrics?.baseline ?? element.baseline;
+    if (isTextElement(origElement)) {
+      const metrics = measureFontSizeFromWidth(origElement, width, height);
+      update.fontSize = metrics?.size ?? origElement.fontSize;
+      update.baseline = metrics?.baseline ?? origElement.baseline;
     }
 
-    // TODO remove this after solving the issue with changing bounds of linear
-    // elements with roughness > 0
-    if (isLinearElement(element) && (isFlippedByX || isFlippedByY)) {
-      const origBounds = getElementPointsCoords(element, element.points);
+    if (isLinearElement(origElement) && (isFlippedByX || isFlippedByY)) {
+      const origBounds = getElementPointsCoords(
+        origElement,
+        origElement.points,
+      );
       const newBounds = getElementPointsCoords(
-        { ...element, x, y },
+        { ...origElement, x, y },
         rescaledPoints.points!,
       );
-      const origXY = [element.x, element.y];
+      const origXY = [origElement.x, origElement.y];
       const newXY = [x, y];
 
-      const calculateCorrenction = (axis: "x" | "y") => {
+      const linearShift = (axis: "x" | "y") => {
         const i = axis === "x" ? 0 : 1;
-        const delta1 =
-          newBounds[i + 2] - newXY[i] - (origXY[i] - origBounds[i]) * scale;
-        const delta2 =
-          (origBounds[i + 2] - origXY[i]) * scale - (newXY[i] - newBounds[i]);
-        return (delta1 + delta2) / 2;
+        return (
+          (newBounds[i + 2] -
+            newXY[i] -
+            (origXY[i] - origBounds[i]) * scale +
+            (origBounds[i + 2] - origXY[i]) * scale -
+            (newXY[i] - newBounds[i])) /
+          2
+        );
       };
 
       if (isFlippedByX) {
-        update.x -= calculateCorrenction("x");
+        update.x -= linearShift("x");
       }
 
       if (isFlippedByY) {
-        update.y -= calculateCorrenction("y");
+        update.y -= linearShift("y");
       }
     }
 
