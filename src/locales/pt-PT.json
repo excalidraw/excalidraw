@@ -395,18 +395,18 @@
   },
   "colors": {
     "transparent": "Transparente",
-    "black": "",
-    "white": "",
-    "red": "",
+    "black": "Preto",
+    "white": "Branco",
+    "red": "Vermelho",
     "pink": "",
     "grape": "",
     "violet": "",
-    "gray": "",
+    "gray": "Cinza",
     "blue": "",
     "cyan": "",
     "teal": "",
-    "green": "",
-    "yellow": "",
+    "green": "Verde",
+    "yellow": "Amarelo",
     "orange": "",
     "bronze": ""
   },
@@ -425,8 +425,8 @@
   },
   "colorPicker": {
     "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
+    "colors": "Cores",
+    "shades": "Tons",
     "hexCode": "",
     "noShades": ""
   }
