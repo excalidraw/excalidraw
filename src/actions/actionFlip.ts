@@ -8,20 +8,6 @@ import { arrayToMap } from "../utils";
 import { CODES, KEYS } from "../keys";
 import { getCommonBoundingBox } from "../element/bounds";
 
-const enableActionFlipHorizontal = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  return true;
-};
-
-const enableActionFlipVertical = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  return true;
-};
-
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
   trackEvent: { category: "element" },
@@ -34,8 +20,6 @@ export const actionFlipHorizontal = register({
   },
   keyTest: (event) => event.shiftKey && event.code === CODES.H,
   contextItemLabel: "labels.flipHorizontal",
-  predicate: (elements, appState) =>
-    enableActionFlipHorizontal(elements, appState),
 });
 
 export const actionFlipVertical = register({
@@ -51,8 +35,6 @@ export const actionFlipVertical = register({
   keyTest: (event) =>
     event.shiftKey && event.code === CODES.V && !event[KEYS.CTRL_OR_CMD],
   contextItemLabel: "labels.flipVertical",
-  predicate: (elements, appState) =>
-    enableActionFlipVertical(elements, appState),
 });
 
 const flipSelectedElements = (
