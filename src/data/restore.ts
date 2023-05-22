@@ -28,6 +28,7 @@ import {
   FONT_FAMILY,
   ROUNDNESS,
   DEFAULT_SIDEBAR,
+  DEFAULT_ELEMENT_PROPS,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -81,7 +82,7 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
-const restoreElementWithProperties = <
+export const restoreElementWithProperties = <
   T extends Required<Omit<ExcalidrawElement, "customData">> & {
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
@@ -112,18 +113,20 @@ const restoreElementWithProperties = <
     versionNonce: element.versionNonce ?? 0,
     isDeleted: element.isDeleted ?? false,
     id: element.id || randomId(),
-    fillStyle: element.fillStyle || "hachure",
-    strokeWidth: element.strokeWidth || 1,
-    strokeStyle: element.strokeStyle ?? "solid",
-    roughness: element.roughness ?? 1,
-    opacity: element.opacity == null ? 100 : element.opacity,
+    fillStyle: element.fillStyle || DEFAULT_ELEMENT_PROPS.fillStyle,
+    strokeWidth: element.strokeWidth || DEFAULT_ELEMENT_PROPS.strokeWidth,
+    strokeStyle: element.strokeStyle ?? DEFAULT_ELEMENT_PROPS.strokeStyle,
+    roughness: element.roughness ?? DEFAULT_ELEMENT_PROPS.roughness,
+    opacity:
+      element.opacity == null ? DEFAULT_ELEMENT_PROPS.opacity : element.opacity,
     angle: element.angle || 0,
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
-    strokeColor: element.strokeColor || oc.black,
-    backgroundColor: element.backgroundColor || "transparent",
-    width: element.width,
-    height: element.height,
+    strokeColor: element.strokeColor || DEFAULT_ELEMENT_PROPS.strokeColor,
+    backgroundColor:
+      element.backgroundColor || DEFAULT_ELEMENT_PROPS.backgroundColor,
+    width: element.width || 0,
+    height: element.height || 0,
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
     roundness: element.roundness
@@ -196,7 +199,6 @@ const restoreElement = (
         lineHeight,
       );
       element = restoreElementWithProperties(element, {
-        type: "text",
         fontSize,
         fontFamily,
         text,

@@ -49,6 +49,7 @@ import {
 import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
 import { ImportedDataState } from "../data/types";
+import { restoreElementWithProperties } from "../data/restore";
 
 export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
   "rectangle",
@@ -103,7 +104,6 @@ const _newElementBase = <T extends ExcalidrawElement>(
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
-  console.log("width", width);
   // assign type to guard against excess properties
   const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
     id: rest.id || randomId(),
@@ -668,8 +668,7 @@ export const convertToExcalidrawElements = (
       return;
     }
     if (!ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)) {
-      //@ts-ignore
-      res.push(element);
+      res.push(element as ExcalidrawElement);
       return;
     }
     //@ts-ignore
@@ -681,12 +680,11 @@ export const convertToExcalidrawElements = (
       let excalidrawElement;
       const { type, ...rest } = element;
       if (element.type === "text") {
-        //@ts-ignore
-        excalidrawElement = newTextElement({
+        excalidrawElement = {
           ...element,
-        });
+        } as ExcalidrawTextElement;
       } else if (type === "arrow" || type === "line") {
-        excalidrawElement = newLinearElement({
+        excalidrawElement = {
           type,
           width: 200,
           height: 24,
@@ -696,10 +694,9 @@ export const convertToExcalidrawElements = (
             [200, 0],
           ],
           ...rest,
-        });
+        } as ExcalidrawLinearElement;
       } else {
-        //@ts-ignore
-        excalidrawElement = newElement({
+        excalidrawElement = {
           ...element,
           width:
             element?.width ||
@@ -711,9 +708,8 @@ export const convertToExcalidrawElements = (
             (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)
               ? 100
               : 0),
-        });
+        } as ExcalidrawGenericElement;
       }
-
       res.push(excalidrawElement);
     }
   });

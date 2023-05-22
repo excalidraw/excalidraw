@@ -91,7 +91,6 @@ export const redrawTextBoundingBox = (
       textElement as ExcalidrawTextElementWithContainer,
     );
     const maxContainerWidth = getBoundTextMaxWidth(container);
-    console.log(metrics, maxContainerWidth, container);
     if (metrics.height > maxContainerHeight) {
       const nextHeight = computeContainerDimensionForBoundText(
         metrics.height,
