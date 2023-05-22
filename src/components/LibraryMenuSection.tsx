@@ -19,14 +19,7 @@ type LibraryOrPendingItem = (
 
 interface Props {
   items: LibraryOrPendingItem;
-  onItemSelectToggle: (id: LibraryItem["id"], event: React.MouseEvent) => void;
-  onItemDrag: (id: LibraryItem["id"], event: React.DragEvent) => void;
-  isItemSelected: (id: LibraryItem["id"] | null) => boolean;
-}
-
-interface LibraryRowProps {
-  items: LibraryOrPendingItem;
-  onClick?: () => void;
+  onClick: (id: LibraryItem["id"] | null) => void;
   onItemSelectToggle: (id: LibraryItem["id"], event: React.MouseEvent) => void;
   onItemDrag: (id: LibraryItem["id"], event: React.DragEvent) => void;
   isItemSelected: (id: LibraryItem["id"] | null) => boolean;
@@ -34,19 +27,19 @@ interface LibraryRowProps {
 
 function LibraryRow({
   items,
-  onClick,
   onItemSelectToggle,
   onItemDrag,
   isItemSelected,
-}: LibraryRowProps) {
+  onClick,
+}: Props) {
   return (
-    <>
+    <Stack.Row gap={1}>
       {items.map((item) => (
         <Stack.Col key={item.id}>
           <LibraryUnit
             elements={item?.elements}
             isPending={!item?.id && !!item?.elements}
-            onClick={onClick || (() => {})}
+            onClick={onClick}
             id={item?.id || null}
             selected={isItemSelected(item.id)}
             onToggle={onItemSelectToggle}
@@ -54,7 +47,7 @@ function LibraryRow({
           />
         </Stack.Col>
       ))}
-    </>
+    </Stack.Row>
   );
 }
 
@@ -63,6 +56,7 @@ function LibraryMenuSection({
   onItemSelectToggle,
   onItemDrag,
   isItemSelected,
+  onClick,
 }: Props) {
   const rows = Math.ceil(items.length / ITEMS_PER_ROW);
   const [, startTransition] = useTransition();
@@ -81,14 +75,13 @@ function LibraryMenuSection({
       {Array.from({ length: rows }).map((_, i) => (
         <React.Fragment key={i}>
           {i < index ? (
-            <Stack.Row gap={1}>
-              <LibraryRow
-                items={items.slice(i * ITEMS_PER_ROW, (i + 1) * ITEMS_PER_ROW)}
-                onItemSelectToggle={onItemSelectToggle}
-                onItemDrag={onItemDrag}
-                isItemSelected={isItemSelected}
-              />
-            </Stack.Row>
+            <LibraryRow
+              items={items.slice(i * ITEMS_PER_ROW, (i + 1) * ITEMS_PER_ROW)}
+              onItemSelectToggle={onItemSelectToggle}
+              onItemDrag={onItemDrag}
+              onClick={onClick}
+              isItemSelected={isItemSelected}
+            />
           ) : (
             <Stack.Row gap={1}>
               <Stack.Col>

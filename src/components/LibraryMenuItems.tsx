@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { serializeLibraryAsJSON } from "../data/json";
 import { t } from "../i18n";
 import {
@@ -138,6 +138,22 @@ const LibraryMenuItems = ({
     return selectedItems.includes(id);
   };
 
+  const onItemClick = useCallback(
+    (id: LibraryItem["id"] | null) => {
+      if (!id) {
+        onAddToLibrary(pendingElements);
+      } else {
+        onInsertLibraryItems(getInsertedElements(id));
+      }
+    },
+    [
+      getInsertedElements,
+      onAddToLibrary,
+      onInsertLibraryItems,
+      pendingElements,
+    ],
+  );
+
   return (
     <div
       className="library-menu-items-container"
@@ -206,6 +222,7 @@ const LibraryMenuItems = ({
                 ]}
                 onItemSelectToggle={onItemSelectToggle}
                 onItemDrag={onItemDrag}
+                onClick={onItemClick}
                 isItemSelected={isItemSelected}
               />
             )}
@@ -225,6 +242,7 @@ const LibraryMenuItems = ({
               items={publishedItems}
               onItemSelectToggle={onItemSelectToggle}
               onItemDrag={onItemDrag}
+              onClick={onItemClick}
               isItemSelected={isItemSelected}
             />
           ) : unpublishedItems.length > 0 ? (

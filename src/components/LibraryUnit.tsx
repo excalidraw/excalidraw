@@ -19,7 +19,7 @@ export const LibraryUnit = ({
   id: LibraryItem["id"] | /** for pending item */ null;
   elements?: LibraryItem["elements"];
   isPending?: boolean;
-  onClick: () => void;
+  onClick: (id: LibraryItem["id"] | null) => void;
   selected: boolean;
   onToggle: (id: string, event: React.MouseEvent) => void;
   onDrag: (id: string, event: React.DragEvent) => void;
@@ -72,7 +72,7 @@ export const LibraryUnit = ({
                 if (id && event.shiftKey) {
                   onToggle(id, event);
                 } else {
-                  onClick();
+                  onClick(id);
                 }
               }
             : undefined
