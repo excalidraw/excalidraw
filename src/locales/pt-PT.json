@@ -398,17 +398,17 @@
     "black": "Preto",
     "white": "Branco",
     "red": "Vermelho",
-    "pink": "",
-    "grape": "",
-    "violet": "",
+    "pink": "Rosa",
+    "grape": "Uva",
+    "violet": "Violeta",
     "gray": "Cinza",
-    "blue": "",
+    "blue": "Azul",
     "cyan": "",
     "teal": "",
     "green": "Verde",
     "yellow": "Amarelo",
-    "orange": "",
-    "bronze": ""
+    "orange": "Laranja",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
