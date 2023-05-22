@@ -606,7 +606,7 @@ const ExcalidrawWrapper = () => {
 
   const isOffline = useAtomValue(isOfflineAtom);
 
-  //@ts-ignore
+  /* eslint-disable */
   const getInitialData = (): ExcalidrawInitialDataState => {
     return {
       scrollToContent: true,
