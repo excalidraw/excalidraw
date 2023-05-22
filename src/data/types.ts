@@ -1,5 +1,7 @@
 import {
+  ExcalidrawBindableElement,
   ExcalidrawElement,
+  ExcalidrawLinearElement,
   FontFamilyValues,
   TextAlign,
   VerticalAlign,
@@ -70,6 +72,22 @@ export interface ImportedDataState {
         | ({
             type: "text";
             text: string;
+          } & ElementConstructorOpts)
+        | ({
+            type: "arrow";
+            label?: {
+              text: string;
+              fontSize?: number;
+              fontFamily?: FontFamilyValues;
+              textAlign?: TextAlign;
+              verticalAlign?: VerticalAlign;
+            } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+            start?: {
+              type: ExcalidrawBindableElement["type"] & ElementConstructorOpts;
+            };
+            end?: {
+              type: ExcalidrawBindableElement["type"] & ElementConstructorOpts;
+            };
           } & ElementConstructorOpts)
       )[]
     | null;

@@ -993,10 +993,8 @@ export const bindTextToContainer = (
   let container;
   if (containerProps.type === "arrow") {
     container = newLinearElement({
-      //@ts-ignore
-      x: 0,
-      //@ts-ignore
-      y: 0,
+      width: containerProps.width || 300,
+      height: containerProps.height || 24,
       //@ts-ignore
       type: containerProps.type,
       //@ts-ignore,
@@ -1011,8 +1009,6 @@ export const bindTextToContainer = (
   } else {
     //@ts-ignore
     container = newElement({
-      x: 0,
-      y: 0,
       ...containerProps,
     });
   }

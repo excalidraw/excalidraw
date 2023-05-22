@@ -12,6 +12,7 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawTextContainer,
+  ExcalidrawBindableElement,
 } from "../element/types";
 import {
   arrayToMap,
@@ -49,6 +50,7 @@ import {
 import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
 import { ImportedDataState } from "../data/types";
+import { bindLinearElement } from "./binding";
 
 export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
   "rectangle",
@@ -670,30 +672,116 @@ export const convertToExcalidrawElements = (
       res.push(element as ExcalidrawElement);
       return;
     }
+    let startBoundElement;
+    let endBoundElement;
     //@ts-ignore
     if (VALID_CONTAINER_TYPES.has(element.type) && element?.label?.text) {
       //@ts-ignore
       const elements = bindTextToContainer(element, element.label);
-      res.push(...elements);
+      const [container, text] = elements;
+
+      if (container.type === "arrow") {
+        //@ts-ignore
+        const { start, end } = element;
+        if (start) {
+          const width = start?.width ?? 100;
+          const height = start?.height ?? 100;
+
+          startBoundElement = newElement({
+            x: start.x || container.x - width,
+            y: start.y || container.y - height / 2,
+            width,
+            height,
+            ...start,
+          }) as ExcalidrawBindableElement;
+          bindLinearElement(
+            container as ExcalidrawLinearElement,
+            startBoundElement,
+            "start",
+          );
+        }
+        if (end) {
+          const height = end?.height ?? 100;
+
+          endBoundElement = newElement({
+            x: end.x || container.x + container.width,
+            y: end.y || container.y - height / 2,
+            width: end?.width ?? 100,
+            height,
+            ...end,
+          }) as ExcalidrawBindableElement;
+          bindLinearElement(
+            container as ExcalidrawLinearElement,
+            endBoundElement,
+            "end",
+          );
+        }
+      }
+      res.push(container);
+      res.push(text);
+      if (startBoundElement) {
+        res.push(startBoundElement);
+      }
+      if (endBoundElement) {
+        res.push(endBoundElement);
+      }
     } else {
       let excalidrawElement;
-      const { type, ...rest } = element;
       if (element.type === "text") {
         excalidrawElement = {
           ...element,
         } as ExcalidrawTextElement;
-      } else if (type === "arrow" || type === "line") {
+        res.push(excalidrawElement);
+      } else if (element.type === "arrow" || element.type === "line") {
+        //@ts-ignore
+        const { start, end, type, endArrowHead, ...rest } = element;
+
         excalidrawElement = {
           type,
           width: 200,
           height: 24,
-          endArrowhead: element.type === "arrow" ? "arrow" : null,
           points: [
             [0, 0],
             [200, 0],
           ],
+          endArrowhead: endArrowHead || type === "arrow" ? "arrow" : null,
           ...rest,
         } as ExcalidrawLinearElement;
+
+        let startBoundElement;
+        let endBoundElement;
+        if (start) {
+          const width = start?.width ?? 100;
+          const height = start?.height ?? 100;
+          startBoundElement = newElement({
+            x: start.x || excalidrawElement.x - width,
+            y: start.y || excalidrawElement.y - height / 2,
+            width,
+            height,
+            ...start,
+          }) as ExcalidrawBindableElement;
+          bindLinearElement(excalidrawElement, startBoundElement, "start");
+        }
+        if (end) {
+          const height = end?.height ?? 100;
+
+          endBoundElement = newElement({
+            x: end.x || excalidrawElement.x + excalidrawElement.width,
+            y: end.y || excalidrawElement.y - height / 2,
+            width: end?.width ?? 100,
+            height,
+            ...end,
+          }) as ExcalidrawBindableElement;
+          bindLinearElement(excalidrawElement, endBoundElement, "end");
+        }
+
+        res.push(excalidrawElement);
+        if (startBoundElement) {
+          res.push(startBoundElement);
+        }
+        if (endBoundElement) {
+          res.push(endBoundElement);
+        }
       } else {
         excalidrawElement = {
           ...element,
@@ -708,8 +796,8 @@ export const convertToExcalidrawElements = (
               ? 100
               : 0),
         } as ExcalidrawGenericElement;
+        res.push(excalidrawElement);
       }
-      res.push(excalidrawElement);
     }
   });
   return res;
