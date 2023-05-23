@@ -51,6 +51,16 @@ function LibraryRow({
   );
 }
 
+const EmptyLibraryRow = ({ showSpinner }: { showSpinner: boolean }) => (
+  <Stack.Row gap={1}>
+    <Stack.Col>
+      <div className={clsx("library-unit")}>
+        {showSpinner && <Spinner synchronized />}
+      </div>
+    </Stack.Col>
+  </Stack.Row>
+);
+
 function LibraryMenuSection({
   items,
   onItemSelectToggle,
@@ -72,27 +82,20 @@ function LibraryMenuSection({
 
   return (
     <>
-      {Array.from({ length: rows }).map((_, i) => (
-        <React.Fragment key={i}>
-          {i < index ? (
-            <LibraryRow
-              items={items.slice(i * ITEMS_PER_ROW, (i + 1) * ITEMS_PER_ROW)}
-              onItemSelectToggle={onItemSelectToggle}
-              onItemDrag={onItemDrag}
-              onClick={onClick}
-              isItemSelected={isItemSelected}
-            />
-          ) : (
-            <Stack.Row gap={1}>
-              <Stack.Col>
-                <div className={clsx("library-unit")}>
-                  {i === index + 1 && <Spinner />}
-                </div>
-              </Stack.Col>
-            </Stack.Row>
-          )}
-        </React.Fragment>
-      ))}
+      {Array.from({ length: rows }).map((_, i) =>
+        i < index ? (
+          <LibraryRow
+            key={i}
+            items={items.slice(i * ITEMS_PER_ROW, (i + 1) * ITEMS_PER_ROW)}
+            onItemSelectToggle={onItemSelectToggle}
+            onItemDrag={onItemDrag}
+            onClick={onClick}
+            isItemSelected={isItemSelected}
+          />
+        ) : (
+          <EmptyLibraryRow key={i} showSpinner={i === index} />
+        ),
+      )}
     </>
   );
 }
