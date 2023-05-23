@@ -803,19 +803,15 @@ export const resizeMultipleElements = (
           : updatedElement.height,
       );
 
-      if (!metrics) {
-        return;
-      }
-
       if (isTextElement(orig)) {
-        update.fontSize = metrics.size;
-        update.baseline = metrics.baseline;
+        update.fontSize = metrics?.size ?? orig.fontSize;
+        update.baseline = metrics?.baseline ?? orig.baseline;
       }
 
       if (boundTextElement) {
         boundTextUpdates = {
-          fontSize: metrics.size,
-          baseline: metrics.baseline,
+          fontSize: metrics?.size ?? boundTextElement.fontSize,
+          baseline: metrics?.baseline ?? boundTextElement.baseline,
         };
       }
     }
