@@ -1,4 +1,5 @@
 import {
+  Arrowhead,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   FontFamilyValues,
@@ -89,6 +90,7 @@ export interface ImportedDataState {
             end?: {
               type: ExcalidrawBindableElement["type"];
             } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+            endArrowhead?: Arrowhead | null;
           } & ElementConstructorOpts)
       )[]
     | null;

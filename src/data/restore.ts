@@ -154,7 +154,6 @@ export const restoreElementWithProperties = <
   if (PRECEDING_ELEMENT_KEY in element) {
     base[PRECEDING_ELEMENT_KEY] = element[PRECEDING_ELEMENT_KEY];
   }
-
   return {
     ...base,
     ...getNormalizedDimensions(base),
@@ -237,7 +236,6 @@ const restoreElement = (
         startArrowhead = null,
         endArrowhead = element.type === "arrow" ? "arrow" : null,
       } = element;
-
       let x = element.x;
       let y = element.y;
       let points = // migrate old arrow model to new one

@@ -733,10 +733,18 @@ export const convertToExcalidrawElements = (
         } as ExcalidrawTextElement;
         res.push(excalidrawElement);
       } else if (element.type === "arrow" || element.type === "line") {
-        //@ts-ignore
-        const { start, end, type, endArrowHead, ...rest } = element;
+        const {
+          //@ts-ignore
+          start,
+          //@ts-ignore
+          end,
+          type,
+          //@ts-ignore
+          endArrowhead = element.type === "arrow" ? "arrow" : null,
+          ...rest
+        } = element;
 
-        excalidrawElement = {
+        excalidrawElement = newLinearElement({
           type,
           width: 200,
           height: 24,
@@ -744,10 +752,16 @@ export const convertToExcalidrawElements = (
             [0, 0],
             [200, 0],
           ],
-          endArrowhead: endArrowHead || type === "arrow" ? "arrow" : null,
+          endArrowhead,
           ...rest,
-        } as ExcalidrawLinearElement;
+        });
 
+        mutateElement(excalidrawElement, {
+          //@ts-ignore
+          startBinding: element?.startBinding || null,
+          //@ts-ignore
+          endBinding: element.endBinding || null,
+        });
         let startBoundElement;
         let endBoundElement;
         if (start) {
