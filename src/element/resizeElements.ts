@@ -828,10 +828,10 @@ export const resizeMultipleElements = (
     });
 
     if (boundTextElement && boundTextUpdates) {
-      if (!isLinearElement(latest)) {
-        mutateElement(boundTextElement, { angle });
-      }
-      mutateElement(boundTextElement, boundTextUpdates);
+      mutateElement(boundTextElement, {
+        ...boundTextUpdates,
+        angle: isLinearElement(latest) ? undefined : angle,
+      });
       handleBindTextResize(latest, transformHandleType);
     }
   }
