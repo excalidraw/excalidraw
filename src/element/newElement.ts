@@ -683,6 +683,12 @@ export const convertToExcalidrawElements = (
       if (container.type === "arrow") {
         //@ts-ignore
         const { start, end } = element;
+        mutateElement(container, {
+          //@ts-ignore
+          startBinding: element?.startBinding || null,
+          //@ts-ignore
+          endBinding: element.endBinding || null,
+        });
         if (start) {
           const width = start?.width ?? 100;
           const height = start?.height ?? 100;
