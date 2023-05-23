@@ -256,28 +256,28 @@
     "bindTextToElement": "ចុច Enter ដើម្បីបន្ថែមអត្ថបទ",
     "deepBoxSelect": "សង្កត់ CtrlOrCmd ដើម្បីជ្រើសរើសយ៉ាងជ្រៅ និងជៀសវាងការអូស",
     "eraserRevert": "សង្កត់ Alt ដើម្បីដកការជ្រើសរើសធាតុដែលត្រូវបានសម្គាល់សម្រាប់ការលុប",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "បើកមុខងារនេះដោយកំណត់ទង់ \"dom.events.asyncClipboard.clipboardItem\" ទៅ \"true\" \nដើម្បីផ្លាស់ប្តូរទង់កម្មវិធីរុករកនៅក្នុង Firefox សូមចូលទៅកាន់ទំព័រ \"about:config\"។"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "មិនអាចបង្ហាញការមើលជាមុនបាន",
+    "canvasTooBig": "បាវអាចមានទំហំធំពេក។",
+    "canvasTooBigTip": "គន្លឹះ៖ ព្យាយាមផ្លាស់ទីធាតុដែលឆ្ងាយបំផុតឱ្យទៅជិតគ្នាបន្តិច។"
   },
   "errorSplash": {
-    "headingMain": "",
-    "clearCanvasMessage": "",
-    "clearCanvasCaveat": "",
-    "trackedToSentry": "",
-    "openIssueMessage": "",
-    "sceneContent": ""
+    "headingMain": "បានជួបប្រទះកំហុសមួយ។ សូមព្យាយាម <button>ផ្ទុកទំព័រឡើងវិញ</button>។",
+    "clearCanvasMessage": "ប្រសិនបើការផ្ទុកឡើងវិញមិនអាចដោះស្រាយកំហុសបានទេ សូមសាកល្បង <button>សម្អាតបាវ។</button>",
+    "clearCanvasCaveat": " នេះនឹងបណ្តាលឱ្យបាត់បង់ការងារ ",
+    "trackedToSentry": "កំហុសជាមួយលេខសម្គាល់ {{eventId}} ត្រូវបានតាមដាននៅលើប្រព័ន្ធរបស់យើង។",
+    "openIssueMessage": "យើងមានការប្រុងប្រយ័ត្នខ្លាំងណាស់ក្នុងការមិនបញ្ចូលព័ត៌មានរបស់ស៊ីនរបស់អ្នកទៅលើកំហុស។ ប្រសិនបើស៊ីនរបស់អ្នកមិនមានលក្ខណៈឯកជនទេ សូមពិចារណាបន្តទៅកាន់ <button>កម្មវិធីតាមដានកំហុសរបស់យើង។</button> សូមបញ្ចូលព័ត៌មានខាងក្រោមដោយចម្លង និងបិទភ្ជាប់វាទៅក្នុងបញ្ហារបស់ GitHub។",
+    "sceneContent": "មាតិកាបាវ៖"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
-    "desc_inProgressIntro": "",
-    "desc_shareLink": "",
+    "desc_intro": "អ្នកអាចអញ្ជើញអ្នកដទៃឱ្យសហការជាមួយអ្នកនៅលើស៊ីនបច្ចុប្បន្ន។",
+    "desc_privacy": "កុំបារម្ភ វគ្គប្រើការអ៊ិនគ្រីបពីចុងដល់ចប់ ដូច្នេះអ្វីដែលអ្នកគូរនឹងនៅតែជាឯកជន។ សូម្បីតែម៉ាស៊ីនមេរបស់យើងក៏នឹងមិនអាចមើលឃើញអ្វីដែលអ្នកកំពុងធ្វើដែរ។",
+    "button_startSession": "ចាប់ផ្តើមវគ្គ",
+    "button_stopSession": "បញ្ឈប់វគ្គ",
+    "desc_inProgressIntro": "វគ្គសហការផ្ទាល់ឥឡូវនេះកំពុងដំណើរការ។",
+    "desc_shareLink": "ចែករំលែកតំណនេះជាមួយអ្នកដែលអ្នកចង់សហការជាមួយ៖",
     "desc_exitSession": "",
     "shareTitle": ""
   },
@@ -339,17 +339,17 @@
     "placeholder": {
       "authorName": "",
       "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "libraryDesc": "ការពិពណ៌នាអំពីបណ្ណាល័យរបស់អ្នក នឹងអនុញ្ញាតឱ្យអ្នក​ផ្សេងយល់ពីការប្រើប្រាស់របស់វា។",
+      "githubHandle": "ឈ្មោះអ្នកប្រើ GitHub (ជាជម្រើស) ដូច្នេះអ្នកអាចកែសម្រួលបណ្ណាល័យបាននៅពេលដាក់ស្នើសម្រាប់ការពិនិត្យ",
+      "twitterHandle": "ឈ្មោះអ្នកប្រើប្រាស់ Twitter (ជាជម្រើស) ដូច្នេះយើងដឹងថាអ្នកណាដែលត្រូវផ្តល់ក្រេឌីតនៅពេលផ្សព្វផ្សាយតាម Twitter",
+      "website": "ភ្ជាប់ទៅគេហទំព័រផ្ទាល់ខ្លួនរបស់អ្នក ឬគេហទំព័រផ្សេងទៀត (ជាជម្រើស)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "ត្រូវបានទាមទារ",
+      "website": "សូមវាយបញ្ចូល URL ​ដែលត្រឹមត្រូវ"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
+    "noteDescription": "ដាក់ស្នើបណ្ណាល័យរបស់អ្នកដើម្បីដាក់បញ្ចូលក្នុង <link>ឃ្លាំងបណ្ណាល័យសាធារណៈ</link> សម្រាប់ឲ្យអ្នកផ្សេងប្រើក្នុងគំនូររបស់ពួកគេ។",
+    "noteGuidelines": "បណ្ណាល័យត្រូវតែអនុម័តដោយដៃជាមុនសិន។ សូមអាន <link>ការណែនាំ</link> មុនពេលដាក់ស្នើ។ ការប្រាស្រ័យទាក់ទងជាបន្តបន្ទាប់ និងការផ្លាស់ប្តូរបណ្ណាល័យទាមទារឱ្យអ្នកមានគណនី GitHub ប៉ុន្តែមិនត្រូវបានទាមទារយ៉ាងតឹងរ៉ឹងទេ។",
     "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
