@@ -14,4 +14,26 @@
     padding: 0 0 0.75rem;
     margin-bottom: 1.5rem;
   }
+
+  .Dialog__close {
+    color: #b8b8b8;
+    margin: 0;
+    position: absolute;
+    top: 12px;
+    right: 8px;
+    border: 0;
+    background-color: transparent;
+    line-height: 0;
+    cursor: pointer;
+
+    @include isMobile {
+      top: 20px;
+      right: 20px;
+    }
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
 }

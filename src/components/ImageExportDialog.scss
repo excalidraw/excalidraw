@@ -1,0 +1,150 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .ImageExportModal {
+    display: flex;
+    flex-direction: row;
+
+    & h3 {
+      font-family: "Assistant";
+      font-style: normal;
+      font-weight: 700;
+      font-size: 1.313rem;
+      line-height: 130%;
+      padding: 0;
+      margin: 0;
+
+      @include isMobile {
+        display: none;
+      }
+    }
+
+    & > h3 {
+      display: none;
+
+      @include isMobile {
+        display: block;
+      }
+    }
+
+    @include isMobile {
+      flex-direction: column;
+    }
+
+    &__preview {
+      display: flex;
+      justify-content: center;
+      flex-grow: 1;
+      align-items: center;
+
+      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
+        left center;
+
+      border: 1px solid #d6d6d6;
+      border-radius: 12px;
+
+      overflow: hidden;
+
+      & > canvas {
+        max-width: calc(100% - 30px * 2);
+        max-height: 25rem;
+      }
+
+      @include isMobile {
+        margin-top: 24px;
+        aspect-ratio: 1/1;
+      }
+    }
+
+    &__settings {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      margin-left: 64px;
+      gap: 14px;
+
+      @include isMobile {
+        margin-left: unset;
+        margin-top: 32px;
+        flex-direction: row;
+        gap: 14px 34px;
+
+        align-content: flex-start;
+      }
+
+      &__row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        @include isMobile {
+          flex-direction: column;
+          align-items: start;
+          justify-content: unset;
+        }
+
+        &__label {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+
+          font-family: "Assistant";
+          font-weight: 600;
+          font-size: 1rem;
+          line-height: 150%;
+
+          & svg {
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+          }
+        }
+      }
+
+      &__buttons {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: row;
+        gap: 11px;
+
+        padding-top: 100px;
+
+        align-items: end;
+
+        @include isMobile {
+          padding-top: 32px;
+        }
+
+        & > button {
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          padding: 8px 16px;
+          gap: 8px;
+
+          height: 40px;
+          border: 0;
+
+          background: #6965db;
+          border-radius: 8px;
+
+          font-family: "Assistant";
+          font-style: normal;
+          font-weight: 600;
+          font-size: 0.75rem;
+          line-height: 100%;
+
+          color: #ffffff;
+
+          & > svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
+    }
+  }
+}

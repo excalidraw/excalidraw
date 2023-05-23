@@ -1,25 +1,35 @@
 import React, { useEffect, useRef, useState } from "react";
+
+import type { ActionManager } from "../actions/manager";
+import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
+
+import {
+  actionExportWithDarkMode,
+  actionChangeExportBackground,
+  actionChangeExportEmbedScene,
+  actionChangeExportScale,
+} from "../actions/actionExport";
 import { probablySupportsClipboardBlob } from "../clipboard";
-import { canvasToBlob } from "../data/blob";
-import { NonDeletedExcalidrawElement } from "../element/types";
-import { t } from "../i18n";
-import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { AppClassProperties, BinaryFiles, UIAppState } from "../types";
-import { Dialog } from "./Dialog";
-import { clipboard } from "./icons";
-import Stack from "./Stack";
-import OpenColor from "open-color";
-import { CheckboxItem } from "./CheckboxItem";
 import {
   DEFAULT_EXPORT_PADDING,
   EXPORT_IMAGE_TYPES,
   isFirefox,
+  EXPORT_SCALES,
 } from "../constants";
-import { nativeFileSystemSupported } from "../data/filesystem";
-import { ActionManager } from "../actions/manager";
+
+import { canvasToBlob } from "../data/blob";
+import { NonDeletedExcalidrawElement } from "../element/types";
+import { t } from "../i18n";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../packages/utils";
 
-import "./ExportDialog.scss";
+import { copyIcon, downloadIcon, helpIcon } from "./icons";
+import { Dialog } from "./Dialog";
+import { RadioGroup } from "./RadioGroup";
+import { Switch } from "./Switch";
+import { Tooltip } from "./Tooltip";
+
+import "./ImageExportDialog.scss";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -36,50 +46,33 @@ export const ErrorCanvasPreview = () => {
   );
 };
 
-export type ExportCB = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  scale?: number,
-) => void;
-
-const ExportButton: React.FC<{
-  color: keyof OpenColor;
-  onClick: () => void;
-  title: string;
-  shade?: number;
-  children?: React.ReactNode;
-}> = ({ children, title, onClick, color, shade = 6 }) => {
-  return (
-    <button
-      className="ExportDialog-imageExportButton"
-      style={{
-        ["--button-color" as any]: OpenColor[color][shade],
-        ["--button-color-darker" as any]: OpenColor[color][shade + 1],
-        ["--button-color-darkest" as any]: OpenColor[color][shade + 2],
-      }}
-      title={title}
-      aria-label={title}
-      onClick={onClick}
-    >
-      {children}
-    </button>
-  );
-};
-
-const ImageExportModal = ({
-  elements,
-  appState,
-  files,
-  actionManager,
-  onExportImage,
-}: {
+type ImageExportModalProps = {
   appState: UIAppState;
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles;
   actionManager: ActionManager;
   onExportImage: AppClassProperties["onExportImage"];
-}) => {
+};
+
+const ImageExportModal = ({
+  appState,
+  elements,
+  files,
+  actionManager,
+  onExportImage,
+}: ImageExportModalProps) => {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
+
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
+  const [exportWithBackground, setExportWithBackground] = useState(
+    appState.exportBackground,
+  );
+  const [exportDarkMode, setExportDarkMode] = useState(
+    appState.exportWithDarkMode,
+  );
+  const [embedScene, setEmbedScene] = useState(appState.exportEmbedScene);
+  const [exportScale, setExportScale] = useState(appState.exportScale);
+
   const previewRef = useRef<HTMLDivElement>(null);
   const [renderError, setRenderError] = useState<Error | null>(null);
 
@@ -101,7 +94,7 @@ const ImageExportModal = ({
       appState,
       files,
       exportPadding: DEFAULT_EXPORT_PADDING,
-      maxWidthOrHeight: maxWidth,
+      maxWidthOrHeight: 360,
     })
       .then((canvas) => {
         setRenderError(null);
@@ -118,89 +111,160 @@ const ImageExportModal = ({
   }, [appState, files, exportedElements]);
 
   return (
-    <div className="ExportDialog">
-      <div className="ExportDialog__preview" ref={previewRef}>
+    <div className="ImageExportModal">
+      <h3>Export image</h3>
+      <div className="ImageExportModal__preview" ref={previewRef}>
         {renderError && <ErrorCanvasPreview />}
       </div>
-      {supportsContextFilters &&
-        actionManager.renderAction("exportWithDarkMode")}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
-            // dunno why this is needed, but when the items wrap it creates
-            // an overflow
-            overflow: "hidden",
-          }}
-        >
-          {actionManager.renderAction("changeExportBackground")}
-          {someElementIsSelected && (
-            <CheckboxItem
+      <div className="ImageExportModal__settings">
+        <h3>Export image</h3>
+        {someElementIsSelected && (
+          <ExportSetting
+            label={t("labels.onlySelected")}
+            name="exportOnlySelected"
+          >
+            <Switch
+              name="exportOnlySelected"
               checked={exportSelected}
-              onChange={(checked) => setExportSelected(checked)}
+              onChange={(checked) => {
+                setExportSelected(checked);
+              }}
+            />
+          </ExportSetting>
+        )}
+        <ExportSetting
+          label={t("labels.withBackground")}
+          name="exportBackgroundSwitch"
+        >
+          <Switch
+            name="exportBackgroundSwitch"
+            checked={exportWithBackground}
+            onChange={(checked) => {
+              setExportWithBackground(checked);
+              actionManager.executeAction(
+                actionChangeExportBackground,
+                "ui",
+                checked,
+              );
+            }}
+          />
+        </ExportSetting>
+        {supportsContextFilters && (
+          <ExportSetting
+            label="Dark Mode"
+            title={t("labels.toggleExportColorScheme")}
+            name="exportDarkModeSwitch"
+          >
+            <Switch
+              name="exportDarkModeSwitch"
+              checked={exportDarkMode}
+              onChange={(checked) => {
+                setExportDarkMode(checked);
+                actionManager.executeAction(
+                  actionExportWithDarkMode,
+                  "ui",
+                  checked,
+                );
+              }}
+            />
+          </ExportSetting>
+        )}
+        <ExportSetting
+          label="Embed"
+          tooltip={t("labels.exportEmbedScene_details")}
+          title={t("labels.exportEmbedScene")}
+          name="exportEmbedSwitch"
+        >
+          <Switch
+            name="exportEmbedSwitch"
+            checked={embedScene}
+            onChange={(checked) => {
+              setEmbedScene(checked);
+              actionManager.executeAction(
+                actionChangeExportEmbedScene,
+                "ui",
+                checked,
+              );
+            }}
+          />
+        </ExportSetting>
+        <ExportSetting label={t("buttons.scale")}>
+          <RadioGroup
+            name="exportScale"
+            value={exportScale}
+            onChange={(scale) => {
+              setExportScale(scale);
+              actionManager.executeAction(actionChangeExportScale, "ui", scale);
+            }}
+            choices={EXPORT_SCALES.map((scale) => ({
+              value: scale,
+              label: `${scale}\u00d7`,
+            }))}
+          />
+        </ExportSetting>
+
+        <div className="ImageExportModal__settings__buttons">
+          <button
+            title={t("buttons.exportToPng")}
+            aria-label={t("buttons.exportToPng")}
+            onClick={() =>
+              onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements)
+            }
+          >
+            {downloadIcon} PNG
+          </button>
+          <button
+            title={t("buttons.exportToSvg")}
+            aria-label={t("buttons.exportToSvg")}
+            onClick={() =>
+              onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements)
+            }
+          >
+            {downloadIcon} SVG
+          </button>
+          {(probablySupportsClipboardBlob || isFirefox) && (
+            <button
+              title={t("buttons.copyPngToClipboard")}
+              aria-label={t("buttons.copyPngToClipboard")}
+              onClick={() =>
+                onExportImage(EXPORT_IMAGE_TYPES.clipboard, exportedElements)
+              }
             >
-              {t("labels.onlySelected")}
-            </CheckboxItem>
+              {copyIcon} Copy to Clipboard
+            </button>
           )}
-          {actionManager.renderAction("changeExportEmbedScene")}
         </div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", marginTop: ".6em" }}>
-        <Stack.Row gap={2}>
-          {actionManager.renderAction("changeExportScale")}
-        </Stack.Row>
-        <p style={{ marginLeft: "1em", userSelect: "none" }}>
-          {t("buttons.scale")}
-        </p>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          margin: ".6em 0",
-        }}
-      >
-        {!nativeFileSystemSupported &&
-          actionManager.renderAction("changeProjectName")}
-      </div>
-      <Stack.Row gap={2} justifyContent="center" style={{ margin: "2em 0" }}>
-        <ExportButton
-          color="indigo"
-          title={t("buttons.exportToPng")}
-          aria-label={t("buttons.exportToPng")}
-          onClick={() =>
-            onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements)
-          }
-        >
-          PNG
-        </ExportButton>
-        <ExportButton
-          color="red"
-          title={t("buttons.exportToSvg")}
-          aria-label={t("buttons.exportToSvg")}
-          onClick={() =>
-            onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements)
-          }
-        >
-          SVG
-        </ExportButton>
-        {/* firefox supports clipboard API under a flag,
-            so let's throw and tell people what they can do */}
-        {(probablySupportsClipboardBlob || isFirefox) && (
-          <ExportButton
-            title={t("buttons.copyPngToClipboard")}
-            onClick={() =>
-              onExportImage(EXPORT_IMAGE_TYPES.clipboard, exportedElements)
-            }
-            color="gray"
-            shade={7}
-          >
-            {clipboard}
-          </ExportButton>
+    </div>
+  );
+};
+
+type ExportSettingProps = {
+  label: React.ReactNode;
+  children: React.ReactNode;
+  tooltip?: string;
+  title?: string;
+  name?: string;
+};
+
+const ExportSetting = ({
+  label,
+  children,
+  tooltip,
+  title,
+  name,
+}: ExportSettingProps) => {
+  return (
+    <div className="ImageExportModal__settings__row" title={title}>
+      <label htmlFor={name} className="ImageExportModal__settings__row__label">
+        {label}
+        {tooltip && (
+          <Tooltip label={tooltip} long={true}>
+            {helpIcon}
+          </Tooltip>
         )}
-      </Stack.Row>
+      </label>
+      {children}
     </div>
   );
 };
@@ -225,7 +289,7 @@ export const ImageExportDialog = ({
   }
 
   return (
-    <Dialog onCloseRequest={onCloseRequest} title={t("buttons.exportImage")}>
+    <Dialog onCloseRequest={onCloseRequest} wide>
       <ImageExportModal
         elements={elements}
         appState={appState}

@@ -1,0 +1,67 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .Switch {
+    position: relative;
+    box-sizing: border-box;
+
+    width: 40px;
+    height: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #d6d6d6;
+    border-radius: 12px;
+
+    transition-property: background, border;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+
+    &:focus-within {
+      box-shadow: 0 0 2px 1px #{$oc-blue-7} !important;
+    }
+
+    &.toggled {
+      background: #6965db;
+      border: 1px solid #6965db;
+    }
+
+    &:before {
+      content: "";
+      box-sizing: border-box;
+      display: block;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+
+      position: absolute;
+
+      top: 4px;
+      left: 4px;
+
+      border-radius: 100%;
+      background: #3d3d3d;
+
+      transition: all 150ms ease-out;
+    }
+
+    &.toggled:before {
+      width: 14px;
+      height: 14px;
+
+      left: 22px;
+      top: 2px;
+
+      background: #ffffff;
+    }
+
+    & input {
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+
+      cursor: pointer;
+    }
+  }
+}

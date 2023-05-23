@@ -1,0 +1,62 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .RadioGroup {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 1px;
+
+    height: 28px;
+
+    background: #ffffff;
+
+    border: 1px solid #d6d6d6;
+    border-radius: 10px;
+
+    &:focus-within {
+      box-shadow: 0 0 2px 1px #{$oc-blue-7} !important;
+    }
+
+    &__choice {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 24px;
+
+      background: #ffffff;
+      color: #6965db;
+
+      border-radius: 8px;
+
+      font-family: "Assistant";
+      font-style: normal;
+      font-weight: 600;
+      font-size: 0.75rem;
+      line-height: 100%;
+
+      letter-spacing: 0.4px;
+
+      transition: all 75ms ease-out;
+
+      &.active {
+        color: #ffffff;
+        background: #6965db;
+      }
+
+      & input {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+
+        cursor: pointer;
+      }
+    }
+  }
+}
