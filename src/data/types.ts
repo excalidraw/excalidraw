@@ -47,6 +47,7 @@ export interface ImportedDataState {
   elements?:
     | readonly (
         | (ExcalidrawElement & {
+            id?: ExcalidrawElement["id"];
             label?: {
               text: string;
               fontSize?: number;
@@ -60,6 +61,7 @@ export interface ImportedDataState {
               typeof ELEMENTS_SUPPORTING_PROGRAMMATIC_API[number],
               "text"
             >;
+            id?: ExcalidrawElement["id"];
             label?: {
               text: string;
               fontSize?: number;
@@ -82,11 +84,11 @@ export interface ImportedDataState {
               verticalAlign?: VerticalAlign;
             } & MarkOptional<ElementConstructorOpts, "x" | "y">;
             start?: {
-              type: ExcalidrawBindableElement["type"] & ElementConstructorOpts;
-            };
+              type: ExcalidrawBindableElement["type"];
+            } & MarkOptional<ElementConstructorOpts, "x" | "y">;
             end?: {
-              type: ExcalidrawBindableElement["type"] & ElementConstructorOpts;
-            };
+              type: ExcalidrawBindableElement["type"];
+            } & MarkOptional<ElementConstructorOpts, "x" | "y">;
           } & ElementConstructorOpts)
       )[]
     | null;

@@ -187,6 +187,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         [
           {
             type: "rectangle",
+            id: "rect-1",
             fillStyle: "hachure",
             strokeWidth: 1,
             strokeStyle: "solid",
@@ -202,6 +203,14 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               type: ROUNDNESS.ADAPTIVE_RADIUS,
               value: 32,
             },
+          },
+
+          {
+            type: "arrow",
+            x: -160,
+            y: 300,
+            start: { type: "rectangle", width: 300, height: 300 },
+            end: { type: "ellipse" },
           },
         ],
         null,
