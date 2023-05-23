@@ -705,22 +705,26 @@ export const resizeMultipleElements = (
   const isFlippedByX = flipFactorX < 0;
   const isFlippedByY = flipFactorY < 0;
 
-  targetElements.forEach(({ orig: origElement, latest: latestElement }) => {
-    const width = origElement.width * scale;
-    const height = origElement.height * scale;
-    const angle = normalizeAngle(origElement.angle * flipFactorX * flipFactorY);
+  for (const { orig, latest } of targetElements) {
+    // bounded text elements are updated along with their container elements
+    if (isTextElement(orig) && isBoundToContainer(orig)) {
+      continue;
+    }
 
-    const isLinearOrFreeDraw =
-      isLinearElement(origElement) || isFreeDrawElement(origElement);
-    const offsetX = origElement.x - anchorX;
-    const offsetY = origElement.y - anchorY;
+    const width = orig.width * scale;
+    const height = orig.height * scale;
+    const angle = normalizeAngle(orig.angle * flipFactorX * flipFactorY);
+
+    const isLinearOrFreeDraw = isLinearElement(orig) || isFreeDrawElement(orig);
+    const offsetX = orig.x - anchorX;
+    const offsetY = orig.y - anchorY;
     const shiftX = isFlippedByX && !isLinearOrFreeDraw ? width : 0;
     const shiftY = isFlippedByY && !isLinearOrFreeDraw ? height : 0;
     const x = anchorX + flipFactorX * (offsetX * scale + shiftX);
     const y = anchorY + flipFactorY * (offsetY * scale + shiftY);
 
     const rescaledPoints = rescalePointsInElement(
-      origElement,
+      orig,
       width * flipFactorX,
       height * flipFactorY,
       false,
@@ -745,29 +749,17 @@ export const resizeMultipleElements = (
       ...rescaledPoints,
     };
 
-    if (isImageElement(origElement) && targetElements.length === 1) {
-      update.scale = [
-        origElement.scale[0] * flipFactorX,
-        origElement.scale[1] * flipFactorY,
-      ];
+    if (isImageElement(orig) && targetElements.length === 1) {
+      update.scale = [orig.scale[0] * flipFactorX, orig.scale[1] * flipFactorY];
     }
 
-    if (isTextElement(origElement)) {
-      const metrics = measureFontSizeFromWidth(origElement, width, height);
-      update.fontSize = metrics?.size ?? origElement.fontSize;
-      update.baseline = metrics?.baseline ?? origElement.baseline;
-    }
-
-    if (isLinearElement(origElement) && (isFlippedByX || isFlippedByY)) {
-      const origBounds = getElementPointsCoords(
-        origElement,
-        origElement.points,
-      );
+    if (isLinearElement(orig) && (isFlippedByX || isFlippedByY)) {
+      const origBounds = getElementPointsCoords(orig, orig.points);
       const newBounds = getElementPointsCoords(
-        { ...origElement, x, y },
+        { ...orig, x, y },
         rescaledPoints.points!,
       );
-      const origXY = [origElement.x, origElement.y];
+      const origXY = [orig.x, orig.y];
       const newXY = [x, y];
 
       const linearShift = (axis: "x" | "y") => {
@@ -791,20 +783,58 @@ export const resizeMultipleElements = (
       }
     }
 
-    mutateElement(latestElement, update);
-    updateBoundElements(latestElement, {
+    let boundTextUpdates: { fontSize: number; baseline: number } | null = null;
+
+    const boundTextElement = getBoundTextElement(latest);
+
+    if (boundTextElement || isTextElement(orig)) {
+      const updatedElement = {
+        ...latest,
+        width,
+        height,
+      };
+      const metrics = measureFontSizeFromWidth(
+        boundTextElement ?? (orig as ExcalidrawTextElement),
+        boundTextElement
+          ? getBoundTextMaxWidth(updatedElement)
+          : updatedElement.width,
+        boundTextElement
+          ? getBoundTextMaxHeight(updatedElement, boundTextElement)
+          : updatedElement.height,
+      );
+
+      if (!metrics) {
+        return;
+      }
+
+      if (isTextElement(orig)) {
+        update.fontSize = metrics.size;
+        update.baseline = metrics.baseline;
+      }
+
+      if (boundTextElement) {
+        boundTextUpdates = {
+          fontSize: metrics.size,
+          baseline: metrics.baseline,
+        };
+      }
+    }
+
+    mutateElement(latest, update);
+
+    updateBoundElements(latest, {
       simultaneouslyUpdated: targetElements.map(({ latest }) => latest),
       newSize: { width, height },
     });
 
-    const boundTextElement = getBoundTextElement(latestElement);
-    if (boundTextElement) {
-      if (!isLinearElement(latestElement)) {
+    if (boundTextElement && boundTextUpdates) {
+      if (!isLinearElement(latest)) {
         mutateElement(boundTextElement, { angle });
       }
-      handleBindTextResize(latestElement, transformHandleType);
+      mutateElement(boundTextElement, boundTextUpdates);
+      handleBindTextResize(latest, transformHandleType);
     }
-  });
+  }
 };
 
 const rotateMultipleElements = (
