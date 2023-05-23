@@ -405,10 +405,10 @@
     "blue": "ពណ៌ខៀវ",
     "cyan": "ពណ៌ផ្ទៃមេឃ",
     "teal": "ពណ៌​ខៀវបៃតង",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "green": "ពណ៌បៃតង",
+    "yellow": "ពណ៌លឿង",
+    "orange": "ពណ៌ទឹកក្រូច",
+    "bronze": "ពណ៌សំរិទ្ធ"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "ពណ៌ផ្ទាល់ខ្លួនដែលប្រើច្រើនបំផុត",
+    "colors": "ពណ៌",
+    "shades": "ស្រមោល",
+    "hexCode": "លេខកូដ hex",
+    "noShades": "មិនមានស្រមោលសម្រាប់ពណ៌នេះទេ"
   }
 }
