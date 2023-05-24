@@ -36,7 +36,7 @@ function LibraryRow({
   onClick,
 }: Props) {
   return (
-    <Stack.Row gap={1}>
+    <Stack.Row className="library-menu-items-container__row">
       {items.map((item) => (
         <Stack.Col key={item.id}>
           <LibraryUnit
