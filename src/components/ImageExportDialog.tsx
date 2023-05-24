@@ -113,15 +113,15 @@ const ImageExportModal = ({
 
   return (
     <div className="ImageExportModal">
-      <h3>Export image</h3>
+      <h3>{t("imageExportDialog.header")}</h3>
       <div className="ImageExportModal__preview" ref={previewRef}>
         {renderError && <ErrorCanvasPreview />}
       </div>
       <div className="ImageExportModal__settings">
-        <h3>Export image</h3>
+        <h3>{t("imageExportDialog.header")}</h3>
         {someElementIsSelected && (
           <ExportSetting
-            label={t("labels.onlySelected")}
+            label={t("imageExportDialog.label.onlySelected")}
             name="exportOnlySelected"
           >
             <Switch
@@ -134,7 +134,7 @@ const ImageExportModal = ({
           </ExportSetting>
         )}
         <ExportSetting
-          label={t("labels.withBackground")}
+          label={t("imageExportDialog.label.withBackground")}
           name="exportBackgroundSwitch"
         >
           <Switch
@@ -152,8 +152,7 @@ const ImageExportModal = ({
         </ExportSetting>
         {supportsContextFilters && (
           <ExportSetting
-            label="Dark Mode"
-            title={t("labels.toggleExportColorScheme")}
+            label={t("imageExportDialog.label.darkMode")}
             name="exportDarkModeSwitch"
           >
             <Switch
@@ -171,9 +170,8 @@ const ImageExportModal = ({
           </ExportSetting>
         )}
         <ExportSetting
-          label="Embed"
-          tooltip={t("labels.exportEmbedScene_details")}
-          title={t("labels.exportEmbedScene")}
+          label={t("imageExportDialog.label.embedScene")}
+          tooltip={t("imageExportDialog.tooltip.embedScene")}
           name="exportEmbedSwitch"
         >
           <Switch
@@ -189,7 +187,10 @@ const ImageExportModal = ({
             }}
           />
         </ExportSetting>
-        <ExportSetting label={t("buttons.scale")}>
+        <ExportSetting
+          label={t("imageExportDialog.label.scale")}
+          name="exportScale"
+        >
           <RadioGroup
             name="exportScale"
             value={exportScale}
@@ -207,34 +208,34 @@ const ImageExportModal = ({
         <div className="ImageExportModal__settings__buttons">
           <Button
             className="ImageExportModal__settings__buttons__button"
-            title={t("buttons.exportToPng")}
-            aria-label={t("buttons.exportToPng")}
+            title={t("imageExportDialog.title.exportToPng")}
+            aria-label={t("imageExportDialog.title.exportToPng")}
             onSelect={() =>
               onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements)
             }
           >
-            {downloadIcon} PNG
+            {downloadIcon} {t("imageExportDialog.button.exportToPng")}
           </Button>
           <Button
             className="ImageExportModal__settings__buttons__button"
-            title={t("buttons.exportToSvg")}
-            aria-label={t("buttons.exportToSvg")}
+            title={t("imageExportDialog.title.exportToSvg")}
+            aria-label={t("imageExportDialog.title.exportToSvg")}
             onSelect={() =>
               onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements)
             }
           >
-            {downloadIcon} SVG
+            {downloadIcon} {t("imageExportDialog.button.exportToSvg")}
           </Button>
           {(probablySupportsClipboardBlob || isFirefox) && (
             <Button
               className="ImageExportModal__settings__buttons__button"
-              title={t("buttons.copyPngToClipboard")}
-              aria-label={t("buttons.copyPngToClipboard")}
+              title={t("imageExportDialog.title.copyPngToClipboard")}
+              aria-label={t("imageExportDialog.title.copyPngToClipboard")}
               onSelect={() =>
                 onExportImage(EXPORT_IMAGE_TYPES.clipboard, exportedElements)
               }
             >
-              {copyIcon} Copy to Clipboard
+              {copyIcon} {t("imageExportDialog.button.copyPngToClipboard")}
             </Button>
           )}
         </div>
@@ -244,10 +245,9 @@ const ImageExportModal = ({
 };
 
 type ExportSettingProps = {
-  label: React.ReactNode;
+  label: string;
   children: React.ReactNode;
   tooltip?: string;
-  title?: string;
   name?: string;
 };
 
@@ -255,11 +255,10 @@ const ExportSetting = ({
   label,
   children,
   tooltip,
-  title,
   name,
 }: ExportSettingProps) => {
   return (
-    <div className="ImageExportModal__settings__setting" title={title}>
+    <div className="ImageExportModal__settings__setting" title={label}>
       <label
         htmlFor={name}
         className="ImageExportModal__settings__setting__label"

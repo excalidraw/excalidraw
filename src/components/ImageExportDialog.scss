@@ -66,6 +66,8 @@
 
       overflow: hidden;
 
+      max-width: 50%;
+
       & > canvas {
         max-width: calc(100% - 30px * 2);
         max-height: 25rem;
@@ -75,6 +77,7 @@
 
       @include isMobile {
         margin-top: 24px;
+        max-width: unset;
       }
     }
 
@@ -82,7 +85,7 @@
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
-      margin-left: 64px;
+      margin-left: 60px;
       gap: 14px;
 
       @include isMobile {
@@ -144,6 +147,7 @@
 
         @include isMobile {
           padding-top: 32px;
+          flex-basis: 100%;
         }
 
         &__button {
