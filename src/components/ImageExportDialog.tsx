@@ -24,6 +24,7 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../packages/utils";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
+import { Button } from "./Button";
 import { Dialog } from "./Dialog";
 import { RadioGroup } from "./RadioGroup";
 import { Switch } from "./Switch";
@@ -94,7 +95,7 @@ const ImageExportModal = ({
       appState,
       files,
       exportPadding: DEFAULT_EXPORT_PADDING,
-      maxWidthOrHeight: 360,
+      maxWidthOrHeight: maxWidth,
     })
       .then((canvas) => {
         setRenderError(null);
@@ -204,34 +205,37 @@ const ImageExportModal = ({
         </ExportSetting>
 
         <div className="ImageExportModal__settings__buttons">
-          <button
+          <Button
+            className="ImageExportModal__settings__buttons__button"
             title={t("buttons.exportToPng")}
             aria-label={t("buttons.exportToPng")}
-            onClick={() =>
+            onSelect={() =>
               onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements)
             }
           >
             {downloadIcon} PNG
-          </button>
-          <button
+          </Button>
+          <Button
+            className="ImageExportModal__settings__buttons__button"
             title={t("buttons.exportToSvg")}
             aria-label={t("buttons.exportToSvg")}
-            onClick={() =>
+            onSelect={() =>
               onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements)
             }
           >
             {downloadIcon} SVG
-          </button>
+          </Button>
           {(probablySupportsClipboardBlob || isFirefox) && (
-            <button
+            <Button
+              className="ImageExportModal__settings__buttons__button"
               title={t("buttons.copyPngToClipboard")}
               aria-label={t("buttons.copyPngToClipboard")}
-              onClick={() =>
+              onSelect={() =>
                 onExportImage(EXPORT_IMAGE_TYPES.clipboard, exportedElements)
               }
             >
               {copyIcon} Copy to Clipboard
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -255,8 +259,11 @@ const ExportSetting = ({
   name,
 }: ExportSettingProps) => {
   return (
-    <div className="ImageExportModal__settings__row" title={title}>
-      <label htmlFor={name} className="ImageExportModal__settings__row__label">
+    <div className="ImageExportModal__settings__setting" title={title}>
+      <label
+        htmlFor={name}
+        className="ImageExportModal__settings__setting__label"
+      >
         {label}
         {tooltip && (
           <Tooltip label={tooltip} long={true}>
@@ -264,7 +271,9 @@ const ExportSetting = ({
           </Tooltip>
         )}
       </label>
-      {children}
+      <div className="ImageExportModal__settings__setting__content">
+        {children}
+      </div>
     </div>
   );
 };

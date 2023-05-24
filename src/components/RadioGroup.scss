@@ -1,23 +1,46 @@
 @import "../css/variables.module";
 
 .excalidraw {
+  --RadioGroup-background: #ffffff;
+  --RadioGroup-border: #d6d6d6;
+
+  --RadioGroup-choice-color-inactive: #6965db;
+  --RadioGroup-choice-color-inactive-hover: #6965db;
+  --RadioGroup-choice-background-inactive: #ffffff;
+  --RadioGroup-choice-background-inactive-hover: #ffffff;
+
+  --RadioGroup-choice-color-active: #ffffff;
+  --RadioGroup-choice-color-active-hover: #ffffff;
+  --RadioGroup-choice-background-active: #6965db;
+  --RadioGroup-choice-background-active-hover: #5b57d1;
+
+  &.theme--dark {
+    --RadioGroup-background: #242424;
+    --RadioGroup-border: #5c5c5c;
+
+    --RadioGroup-choice-color-inactive: #a8a5ff;
+    --RadioGroup-choice-color-inactive-hover: #a8a5ff;
+    --RadioGroup-choice-background-inactive: #242424;
+    --RadioGroup-choice-background-inactive-hover: #242424;
+
+    --RadioGroup-choice-color-active: #242424;
+    --RadioGroup-choice-color-active-hover: #242424;
+    --RadioGroup-choice-background-active: #a8a5ff;
+    --RadioGroup-choice-background-active-hover: #b2aeff;
+  }
+
   .RadioGroup {
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
     align-items: flex-start;
+
     padding: 1px;
-
     height: 28px;
-
-    background: #ffffff;
-
-    border: 1px solid #d6d6d6;
     border-radius: 10px;
 
-    &:focus-within {
-      box-shadow: 0 0 2px 1px #{$oc-blue-7} !important;
-    }
+    background: var(--RadioGroup-background);
+    border: 1px solid var(--RadioGroup-border);
 
     &__choice {
       position: relative;
@@ -27,8 +50,13 @@
       width: 32px;
       height: 24px;
 
-      background: #ffffff;
-      color: #6965db;
+      color: var(--RadioGroup-choice-color-inactive);
+      background: var(--RadioGroup-choice-background-inactive);
+
+      &:hover {
+        color: var(--RadioGroup-choice-color-inactive-hover);
+        background: var(--RadioGroup-choice-background-inactive-hover);
+      }
 
       border-radius: 8px;
 
@@ -43,17 +71,28 @@
       transition: all 75ms ease-out;
 
       &.active {
-        color: #ffffff;
-        background: #6965db;
+        color: var(--RadioGroup-choice-color-active);
+        background: var(--RadioGroup-choice-background-active);
+
+        &:hover {
+          color: var(--RadioGroup-choice-color-active-hover);
+          background: var(--RadioGroup-choice-background-active-hover);
+        }
       }
 
       & input {
+        z-index: 1;
         position: absolute;
-        opacity: 0;
         width: 100%;
         height: 100%;
         margin: 0;
         padding: 0;
+
+        border-radius: 8px;
+
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
 
         cursor: pointer;
       }
