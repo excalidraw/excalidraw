@@ -18,7 +18,7 @@ export const Switch = ({
   disabled = false,
 }: SwitchProps) => {
   return (
-    <div className={clsx("Switch", { toggled: checked, disabled: disabled })}>
+    <div className={clsx("Switch", { toggled: checked, disabled })}>
       <input
         name={name}
         id={name}

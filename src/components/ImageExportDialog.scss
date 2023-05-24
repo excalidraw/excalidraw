@@ -143,7 +143,7 @@
 
         padding-top: 100px;
 
-        align-items: end;
+        align-items: flex-end;
 
         @include isMobile {
           padding-top: 32px;
