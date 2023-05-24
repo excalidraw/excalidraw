@@ -104,24 +104,27 @@ const LibraryMenuItems = ({
     }
   };
 
-  const getInsertedElements = (id: string) => {
-    let targetElements;
-    if (selectedItems.includes(id)) {
-      targetElements = libraryItems.filter((item) =>
-        selectedItems.includes(item.id),
-      );
-    } else {
-      targetElements = libraryItems.filter((item) => item.id === id);
-    }
-    return targetElements.map((item) => {
-      return {
-        ...item,
-        // duplicate each library item before inserting on canvas to confine
-        // ids and bindings to each library item. See #6465
-        elements: duplicateElements(item.elements, { randomizeSeed: true }),
-      };
-    });
-  };
+  const getInsertedElements = useCallback(
+    (id: string) => {
+      let targetElements;
+      if (selectedItems.includes(id)) {
+        targetElements = libraryItems.filter((item) =>
+          selectedItems.includes(item.id),
+        );
+      } else {
+        targetElements = libraryItems.filter((item) => item.id === id);
+      }
+      return targetElements.map((item) => {
+        return {
+          ...item,
+          // duplicate each library item before inserting on canvas to confine
+          // ids and bindings to each library item. See #6465
+          elements: duplicateElements(item.elements, { randomizeSeed: true }),
+        };
+      });
+    },
+    [libraryItems, selectedItems],
+  );
 
   const onItemDrag = (id: LibraryItem["id"], event: React.DragEvent) => {
     event.dataTransfer.setData(
