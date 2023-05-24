@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "투명",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "검정색",
+    "white": "흰색",
+    "red": "빨강색",
+    "pink": "핑크색",
+    "grape": "그레이프",
+    "violet": "바이올렛",
+    "gray": "회색",
+    "blue": "파란색",
+    "cyan": "시안",
+    "teal": "틸",
+    "green": "녹색",
+    "yellow": "노란색",
+    "orange": "주황색",
+    "bronze": "브론즈"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "자주 사용된 커스텀 색상들",
+    "colors": "색상",
+    "shades": "색조",
+    "hexCode": "Hex 코드",
+    "noShades": "이 색상에는 색조가 없습니다"
   }
 }

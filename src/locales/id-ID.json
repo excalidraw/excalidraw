@@ -54,7 +54,7 @@
     "veryLarge": "Sangat besar",
     "solid": "Padat",
     "hachure": "Garis-garis",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Asiran silang",
     "thin": "Lembut",
     "bold": "Tebal",
@@ -111,7 +111,7 @@
     "increaseFontSize": "Besarkan ukuran font",
     "unbindText": "Lepas teks",
     "bindText": "Kunci teks ke kontainer",
-    "createContainerFromText": "",
+    "createContainerFromText": "Bungkus teks dalam kontainer",
     "link": {
       "edit": "Edit tautan",
       "create": "Buat tautan",
@@ -208,10 +208,10 @@
     "collabSaveFailed": "Tidak dapat menyimpan ke dalam basis data server. Jika masih berlanjut, Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "Sepertinya Anda menggunkan peramban Brave dengan pengaturan <bold>Blokir Fingerprinting yang Agresif</bold> diaktifkan.",
+      "line2": "Ini dapat membuat <bold>Elemen Teks</bold> dalam gambar mu.",
+      "line3": "Kami sangat menyarankan mematikan pengaturan ini. Anda dapat mengikuti <link>langkah-langkah ini</link> untuk melakukannya.",
+      "line4": "Jika mematikan pengaturan ini tidak membenarkan tampilan elemen teks, mohon buka\n<issueLink>isu</issueLink> di GitHub kami, atau chat kami di <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
@@ -229,7 +229,7 @@
     "penMode": "Mode pena - mencegah sentuhan",
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
     "eraser": "Penghapus",
-    "hand": ""
+    "hand": "Tangan (alat panning)"
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -237,7 +237,7 @@
     "shapes": "Bentuk"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Untuk memindahkan kanvas, tekan roda mouse atau spacebar sambil menyeret, atau menggunakan alat tangan",
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
@@ -306,8 +306,8 @@
     "doubleClick": "klik-ganda",
     "drag": "seret",
     "editor": "Editor",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Edit titik garis/panah",
+    "editText": "Edit teks / tambah label",
     "github": "Menemukan masalah? Kirimkan",
     "howto": "Ikuti panduan kami",
     "or": "atau",
@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "Transparan",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Hitam",
+    "white": "Putih",
+    "red": "Merah",
+    "pink": "Pink",
+    "grape": "Ungu",
+    "violet": "Violet",
+    "gray": "Abu-abu",
+    "blue": "Biru",
+    "cyan": "Cyan",
+    "teal": "Teal",
+    "green": "Hijau",
+    "yellow": "Kuning",
+    "orange": "Jingga",
+    "bronze": "Tembaga"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Warna yang sering dipakai",
+    "colors": "Warna",
+    "shades": "Nuansa",
+    "hexCode": "Kode hexa",
+    "noShades": "Tidak ada nuansa untuk warna ini"
   }
 }
