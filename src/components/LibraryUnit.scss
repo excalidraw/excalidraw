@@ -23,7 +23,12 @@
 
     &--skeleton {
       border-radius: var(--border-radius-lg);
-      background: linear-gradient(-45deg, #f0f0f0, #ddd, #f0f0f0);
+      background: linear-gradient(
+        -45deg,
+        var(--color-gray-10),
+        var(--color-gray-20),
+        var(--color-gray-10)
+      );
       background-size: 200% 200%;
       animation: library-unit__skeleton-animation 1.5s ease infinite;
     }
