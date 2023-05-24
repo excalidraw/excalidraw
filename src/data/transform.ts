@@ -41,9 +41,11 @@ const bindTextToContainer = (
 ) => {
   let container;
   if (containerProps.type === "arrow") {
+    const width = containerProps.width || 300;
+    const height = containerProps.height || 24;
     container = newLinearElement({
-      width: containerProps.width || 300,
-      height: containerProps.height || 24,
+      width,
+      height,
       //@ts-ignore
       type: containerProps.type,
       //@ts-ignore,
@@ -51,7 +53,7 @@ const bindTextToContainer = (
       //@ts-ignore
       points: [
         [0, 0],
-        [300, 0],
+        [width, height],
       ],
       ...containerProps,
     });
@@ -106,7 +108,6 @@ const bindLinearElementToElement = (
       id?: ExcalidrawGenericElement["id"];
     } & MarkOptional<ElementConstructorOpts, "x" | "y">;
   } & Partial<ExcalidrawLinearElement>,
-  elements: ImportedDataState["elements"],
 ): {
   linearElement: ExcalidrawLinearElement;
   startBoundElement?: ExcalidrawElement;
@@ -119,22 +120,19 @@ const bindLinearElementToElement = (
     endArrowhead = linearElement.type === "arrow" ? "arrow" : null,
     ...rest
   } = linearElement;
-
+  const width = linearElement.width || 300;
+  const height = linearElement.height || 24;
   const excliadrawLinearElement = newLinearElement({
     type,
-    width: 200,
-    height: 24,
+    width,
+    height,
     points: [
       [0, 0],
-      [200, 0],
+      [width, height],
     ],
     endArrowhead,
     ...rest,
   });
-
-  if (!elements || !elements.length) {
-    return { linearElement: excliadrawLinearElement };
-  }
 
   let startBoundElement;
   let endBoundElement;
@@ -148,7 +146,7 @@ const bindLinearElementToElement = (
     const width = start?.width ?? 100;
     const height = start?.height ?? 100;
     const existingElement = start.id
-      ? elements.find((ele) => ele?.id === start.id)
+      ? excalidrawElements.get().find((ele) => ele?.id === start.id)
       : undefined;
     startBoundElement = newElement({
       x: start.x || excliadrawLinearElement.x - width,
@@ -168,7 +166,7 @@ const bindLinearElementToElement = (
   if (end) {
     const height = end?.height ?? 100;
     const existingElement = end.id
-      ? elements.find((ele) => ele?.id === end.id)
+      ? excalidrawElements.get().find((ele) => ele?.id === end.id)
       : undefined;
     endBoundElement = newElement({
       x: end.x || excliadrawLinearElement.x + excliadrawLinearElement.width,
@@ -249,16 +247,13 @@ export const convertToExcalidrawElements = (
 
       if (container.type === "arrow") {
         const { linearElement, startBoundElement, endBoundElement } =
-          bindLinearElementToElement(
-            {
-              ...container,
-              //@ts-ignore
-              start: element?.start,
-              //@ts-ignore
-              end: element?.end,
-            },
-            elements,
-          );
+          bindLinearElementToElement({
+            ...container,
+            //@ts-ignore
+            start: element?.start,
+            //@ts-ignore
+            end: element?.end,
+          });
         container = linearElement;
         excalidrawElements.push(linearElement);
         excalidrawElements.push(startBoundElement);
@@ -274,7 +269,7 @@ export const convertToExcalidrawElements = (
       } else if (element.type === "arrow" || element.type === "line") {
         const { linearElement, startBoundElement, endBoundElement } =
           //@ts-ignore
-          bindLinearElementToElement(element, elements);
+          bindLinearElementToElement(element);
         excalidrawElements.push(linearElement);
         excalidrawElements.push(startBoundElement);
         excalidrawElements.push(endBoundElement);
