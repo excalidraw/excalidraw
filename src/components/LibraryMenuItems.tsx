@@ -14,18 +14,16 @@ import Spinner from "./Spinner";
 import { duplicateElements } from "../element/newElement";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
-
-import "./LibraryMenuItems.scss";
 import LibraryMenuSection from "./LibraryMenuSection";
 
-const LibraryMenuItems = ({
+import "./LibraryMenuItems.scss";
+
+export default function LibraryMenuItems({
   isLoading,
   libraryItems,
   onAddToLibrary,
   onInsertLibraryItems,
   pendingElements,
-  selectedItems,
-  onSelectItems,
   theme,
   id,
   libraryReturnUrl,
@@ -35,12 +33,12 @@ const LibraryMenuItems = ({
   pendingElements: LibraryItem["elements"];
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: (elements: LibraryItem["elements"]) => void;
-  selectedItems: LibraryItem["id"][];
-  onSelectItems: (id: LibraryItem["id"][]) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   theme: UIAppState["theme"];
   id: string;
-}) => {
+}) {
+  const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
+
   const unpublishedItems = libraryItems.filter(
     (item) => item.status !== "published",
   );
@@ -75,7 +73,7 @@ const LibraryMenuItems = ({
         const rangeEnd = orderedItems.findIndex((item) => item.id === id);
 
         if (rangeStart === -1 || rangeEnd === -1) {
-          onSelectItems([...selectedItems, id]);
+          setSelectedItems([...selectedItems, id]);
           return;
         }
 
@@ -93,14 +91,14 @@ const LibraryMenuItems = ({
           [],
         );
 
-        onSelectItems(nextSelectedIds);
+        setSelectedItems(nextSelectedIds);
       } else {
-        onSelectItems([...selectedItems, id]);
+        setSelectedItems([...selectedItems, id]);
       }
       setLastSelectedItem(id);
     } else {
       setLastSelectedItem(null);
-      onSelectItems(selectedItems.filter((_id) => _id !== id));
+      setSelectedItems(selectedItems.filter((_id) => _id !== id));
     }
   };
 
@@ -171,7 +169,7 @@ const LibraryMenuItems = ({
       {!isLibraryEmpty && (
         <LibraryDropdownMenu
           selectedItems={selectedItems}
-          onSelectItems={onSelectItems}
+          onSelectItems={setSelectedItems}
           className="library-menu-dropdown-container--in-heading"
         />
       )}
@@ -272,13 +270,11 @@ const LibraryMenuItems = ({
           >
             <LibraryDropdownMenu
               selectedItems={selectedItems}
-              onSelectItems={onSelectItems}
+              onSelectItems={setSelectedItems}
             />
           </LibraryMenuControlButtons>
         )}
       </Stack.Col>
     </div>
   );
-};
-
-export default LibraryMenuItems;
+}
