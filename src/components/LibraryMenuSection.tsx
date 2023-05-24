@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useTransition } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { LibraryUnit } from "./LibraryUnit";
 import { LibraryItem } from "../types";
 import Stack from "./Stack";
@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { useAtom } from "jotai";
 import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
+import { useTransition } from "../hooks/useTransition";
 
 const ITEMS_PER_ROW = 4;
 const ROWS_RENDERED_PER_BATCH = 6;
