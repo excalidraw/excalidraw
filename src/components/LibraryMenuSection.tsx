@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState, useTransition } from "react";
 import { LibraryUnit } from "./LibraryUnit";
 import { LibraryItem } from "../types";
 import Stack from "./Stack";
-import Spinner from "./Spinner";
 import clsx from "clsx";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { useAtom } from "jotai";
@@ -56,7 +55,7 @@ function LibraryRow({
 
 const EmptyLibraryRow = () => (
   <Stack.Row className="library-menu-items-container__row" gap={1}>
-    {Array.from({ length: ITEMS_PER_ROW }).map((_, index) => (
+    {Array.from({ length: ITEMS_PER_ROW }).map(() => (
       <Stack.Col>
         <div className={clsx("library-unit", "library-unit--skeleton")} />
       </Stack.Col>
