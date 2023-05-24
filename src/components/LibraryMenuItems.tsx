@@ -202,34 +202,32 @@ const LibraryMenuItems = ({
               <Spinner />
             </div>
           )}
-          <div className="library-menu-items-private-library-container">
-            {!pendingElements.length && !unpublishedItems.length ? (
-              <div className="library-menu-items__no-items">
-                <div className="library-menu-items__no-items__label">
-                  {t("library.noItems")}
-                </div>
-                <div className="library-menu-items__no-items__hint">
-                  {publishedItems.length > 0
-                    ? t("library.hint_emptyPrivateLibrary")
-                    : t("library.hint_emptyLibrary")}
-                </div>
+          {!pendingElements.length && !unpublishedItems.length ? (
+            <div className="library-menu-items__no-items">
+              <div className="library-menu-items__no-items__label">
+                {t("library.noItems")}
               </div>
-            ) : (
-              <LibraryMenuSection
-                items={[
-                  // append pending library item
-                  ...(pendingElements.length
-                    ? [{ id: null, elements: pendingElements }]
-                    : []),
-                  ...unpublishedItems,
-                ]}
-                onItemSelectToggle={onItemSelectToggle}
-                onItemDrag={onItemDrag}
-                onClick={onItemClick}
-                isItemSelected={isItemSelected}
-              />
-            )}
-          </div>
+              <div className="library-menu-items__no-items__hint">
+                {publishedItems.length > 0
+                  ? t("library.hint_emptyPrivateLibrary")
+                  : t("library.hint_emptyLibrary")}
+              </div>
+            </div>
+          ) : (
+            <LibraryMenuSection
+              items={[
+                // append pending library item
+                ...(pendingElements.length
+                  ? [{ id: null, elements: pendingElements }]
+                  : []),
+                ...unpublishedItems,
+              ]}
+              onItemSelectToggle={onItemSelectToggle}
+              onItemDrag={onItemDrag}
+              onClick={onItemClick}
+              isItemSelected={isItemSelected}
+            />
+          )}
         </>
 
         <>
