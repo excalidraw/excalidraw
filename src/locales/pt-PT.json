@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "Transparente",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
+    "black": "Preto",
+    "white": "Branco",
+    "red": "Vermelho",
+    "pink": "Rosa",
+    "grape": "Uva",
+    "violet": "Violeta",
+    "gray": "Cinza",
+    "blue": "Azul",
     "cyan": "",
     "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "green": "Verde",
+    "yellow": "Amarelo",
+    "orange": "Laranja",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
@@ -425,8 +425,8 @@
   },
   "colorPicker": {
     "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
+    "colors": "Cores",
+    "shades": "Tons",
     "hexCode": "",
     "noShades": ""
   }
