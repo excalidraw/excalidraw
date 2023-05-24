@@ -8,7 +8,7 @@ import { useAtom } from "jotai";
 import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
 
 const ITEMS_PER_ROW = 4;
-const ROWS_RENDERED_PER_BATCH = 8;
+const ROWS_RENDERED_PER_BATCH = 6;
 const CACHED_ROWS_RENDERED_PER_BATCH = 16;
 
 type LibraryOrPendingItem = (
