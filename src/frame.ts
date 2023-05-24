@@ -1,8 +1,4 @@
-import {
-  getCommonBounds,
-  getElementAbsoluteCoords,
-  getElementBounds,
-} from "./element";
+import { getCommonBounds, getElementAbsoluteCoords } from "./element";
 import {
   ExcalidrawElement,
   ExcalidrawFrameElement,
@@ -19,6 +15,7 @@ import { isFrameElement } from "./element";
 import { moveOneRight } from "./zindex";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import Scene from "./scene/Scene";
+import { getElementLineSegments } from "./element/bounds";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -164,53 +161,17 @@ export class FrameGeometry {
     element: ExcalidrawElement,
     frame: ExcalidrawFrameElement,
   ) {
-    const [fx1, fy1, fx2, fy2] = getElementBounds(frame);
-    const frameSegments: [[number, number], [number, number]][] = [
-      [
-        [fx1, fy1],
-        [fx2, fy1],
-      ],
-      [
-        [fx1, fy1],
-        [fx1, fy2],
-      ],
-      [
-        [fx1, fy2],
-        [fx2, fy2],
-      ],
-      [
-        [fx2, fy1],
-        [fx2, fy2],
-      ],
-    ];
+    const frameLineSegments = getElementLineSegments(frame);
 
-    const [x1, y1, x2, y2] = getElementBounds(element);
-    const elementSegments: [[number, number], [number, number]][] = [
-      [
-        [x1, y1],
-        [x2, y1],
-      ],
-      [
-        [x1, y1],
-        [x1, y2],
-      ],
-      [
-        [x1, y2],
-        [x2, y2],
-      ],
-      [
-        [x2, y1],
-        [x2, y2],
-      ],
-    ];
+    const elementLineSegments = getElementLineSegments(element);
 
-    const intersections = frameSegments.map((frameSegment) =>
-      elementSegments.map((lineSegment) =>
-        this.doLineSegmentsIntersect(frameSegment, lineSegment),
+    const intersecting = frameLineSegments.some((frameLineSegment) =>
+      elementLineSegments.some((elementLineSegment) =>
+        this.doLineSegmentsIntersect(frameLineSegment, elementLineSegment),
       ),
     );
 
-    return intersections.flat().some((intersection) => intersection);
+    return intersecting;
   }
 }
 

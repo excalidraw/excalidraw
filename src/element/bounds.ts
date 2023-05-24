@@ -6,7 +6,7 @@ import {
   NonDeleted,
   ExcalidrawTextElementWithContainer,
 } from "./types";
-import { distance2d, rotate } from "../math";
+import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
@@ -76,6 +76,88 @@ export const getElementAbsoluteCoords = (
     element.y + element.height,
     element.x + element.width / 2,
     element.y + element.height / 2,
+  ];
+};
+
+/**
+ * for a given element, `getElementLineSegments` returns line segments
+ * that can be used for visual collision detection (useful for frames)
+ * as opposed to bounding box collision detection
+ */
+export const getElementLineSegments = (
+  element: ExcalidrawElement,
+): [Point, Point][] => {
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
+
+  const center: Point = [cx, cy];
+
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    const segments: [Point, Point][] = [];
+
+    let i = 0;
+
+    while (i < element.points.length - 1) {
+      segments.push([
+        rotatePoint(
+          [
+            element.points[i][0] + element.x,
+            element.points[i][1] + element.y,
+          ] as Point,
+          center,
+          element.angle,
+        ),
+        rotatePoint(
+          [
+            element.points[i + 1][0] + element.x,
+            element.points[i + 1][1] + element.y,
+          ] as Point,
+          center,
+          element.angle,
+        ),
+      ]);
+      i++;
+    }
+
+    return segments;
+  }
+
+  const nw = rotatePoint([x1, y1], center, element.angle);
+  const ne = rotatePoint([x2, y1], center, element.angle);
+  const sw = rotatePoint([x1, y2], center, element.angle);
+  const se = rotatePoint([x2, y2], center, element.angle);
+
+  if (element.type === "diamond" || element.type === "ellipse") {
+    const n = rotatePoint([cx, y1], center, element.angle);
+    const s = rotatePoint([cx, y2], center, element.angle);
+    const w = rotatePoint([x1, cy], center, element.angle);
+    const e = rotatePoint([x2, cy], center, element.angle);
+
+    if (element.type === "diamond") {
+      return [
+        [n, w],
+        [n, e],
+        [s, w],
+        [s, e],
+      ];
+    }
+
+    return [
+      [n, w],
+      [n, e],
+      [s, w],
+      [s, e],
+      [nw, ne],
+      [sw, se],
+      [nw, sw],
+      [ne, se],
+    ];
+  }
+
+  return [
+    [nw, ne],
+    [sw, se],
+    [nw, sw],
+    [ne, se],
   ];
 };
 
