@@ -1,13 +1,16 @@
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useMemo, useState, useTransition } from "react";
 import { LibraryUnit } from "./LibraryUnit";
 import { LibraryItem } from "../types";
 import Stack from "./Stack";
 import Spinner from "./Spinner";
 import clsx from "clsx";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
+import { useAtom } from "jotai";
+import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
 
 const ITEMS_PER_ROW = 4;
-const ROWS_RENDERED_PER_BATCH = 4;
+const ROWS_RENDERED_PER_BATCH = 8;
+const CACHED_ROWS_RENDERED_PER_BATCH = 16;
 
 type LibraryOrPendingItem = (
   | LibraryItem
@@ -71,14 +74,21 @@ function LibraryMenuSection({
   const rows = Math.ceil(items.length / ITEMS_PER_ROW);
   const [, startTransition] = useTransition();
   const [index, setIndex] = useState(0);
+  const [svgCache] = useAtom(libraryItemSvgsCache);
+
+  const rowsRenderedPerBatch = useMemo(() => {
+    return svgCache.size === 0
+      ? ROWS_RENDERED_PER_BATCH
+      : CACHED_ROWS_RENDERED_PER_BATCH;
+  }, [svgCache]);
 
   useEffect(() => {
     if (index < rows) {
       startTransition(() => {
-        setIndex(index + ROWS_RENDERED_PER_BATCH);
+        setIndex(index + rowsRenderedPerBatch);
       });
     }
-  }, [index, rows, startTransition]);
+  }, [index, rows, startTransition, rowsRenderedPerBatch]);
 
   return (
     <>
