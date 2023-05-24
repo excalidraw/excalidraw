@@ -18,6 +18,7 @@ import {
   TextAlign,
   VerticalAlign,
 } from "../element/types";
+import { randomId } from "../random";
 import { MarkOptional } from "../utility-types";
 import { ImportedDataState } from "./types";
 
@@ -262,9 +263,10 @@ export const convertToExcalidrawElements = (
     } else {
       let excalidrawElement;
       if (element.type === "text") {
-        excalidrawElement = {
+        excalidrawElement = newTextElement({
           ...element,
-        } as ExcalidrawTextElement;
+        });
+
         excalidrawElements.push(excalidrawElement);
       } else if (element.type === "arrow" || element.type === "line") {
         const { linearElement, startBoundElement, endBoundElement } =
@@ -286,6 +288,7 @@ export const convertToExcalidrawElements = (
       } else {
         excalidrawElement = {
           ...element,
+          id: element.id || randomId(),
           width:
             element?.width ||
             (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)

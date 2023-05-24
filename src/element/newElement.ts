@@ -158,7 +158,7 @@ export const newTextElement = (
     fontFamily?: FontFamilyValues;
     textAlign?: TextAlign;
     verticalAlign?: VerticalAlign;
-    containerId?: ExcalidrawTextContainer["id"];
+    containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     strokeWidth?: ExcalidrawTextElement["strokeWidth"];
   } & ElementConstructorOpts,

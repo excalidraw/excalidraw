@@ -3,6 +3,7 @@ import {
   ExcalidrawElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
+  ExcalidrawTextElement,
   FontFamilyValues,
   TextAlign,
   VerticalAlign,
@@ -46,21 +47,8 @@ export interface ImportedDataState {
   source?: string;
   elements?:
     | readonly (
-        | (ExcalidrawElement & {
-            id?: ExcalidrawElement["id"];
-            label?: {
-              text: string;
-              fontSize?: number;
-              fontFamily?: FontFamilyValues;
-              textAlign?: TextAlign;
-              verticalAlign?: VerticalAlign;
-            } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-          } & ElementConstructorOpts)
         | ({
-            type: Exclude<
-              typeof ELEMENTS_SUPPORTING_PROGRAMMATIC_API[number],
-              "text"
-            >;
+            type: Exclude<ExcalidrawElement["type"], "text">;
             id?: ExcalidrawElement["id"];
             label?: {
               text: string;
@@ -73,7 +61,7 @@ export interface ImportedDataState {
         | ({
             type: "text";
             text: string;
-            id?: ExcalidrawBindableElement["id"];
+            id?: ExcalidrawTextElement["id"];
           } & ElementConstructorOpts)
         | ({
             type: ExcalidrawLinearElement["type"];
