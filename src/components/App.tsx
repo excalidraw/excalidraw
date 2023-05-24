@@ -2156,6 +2156,7 @@ class App extends React.Component<AppProps, AppState> {
         event.shiftKey &&
         event[KEYS.CTRL_OR_CMD]
       ) {
+        event.preventDefault();
         this.setState({ openDialog: "imageExport" });
         return;
       }
