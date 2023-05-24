@@ -1,7 +1,8 @@
 import {
-  Arrowhead,
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  ExcalidrawGenericElement,
+  ExcalidrawLinearElement,
   FontFamilyValues,
   TextAlign,
   VerticalAlign,
@@ -15,10 +16,8 @@ import {
 import type { cleanAppStateForExport } from "../appState";
 import { VERSIONS } from "../constants";
 import { MarkOptional } from "../utility-types";
-import {
-  ElementConstructorOpts,
-  ELEMENTS_SUPPORTING_PROGRAMMATIC_API,
-} from "../element/newElement";
+import { ElementConstructorOpts } from "../element/newElement";
+import { ELEMENTS_SUPPORTING_PROGRAMMATIC_API } from "./transform";
 
 export interface ExportedDataState {
   type: string;
@@ -74,9 +73,12 @@ export interface ImportedDataState {
         | ({
             type: "text";
             text: string;
+            id?: ExcalidrawBindableElement["id"];
           } & ElementConstructorOpts)
         | ({
-            type: "arrow";
+            type: ExcalidrawLinearElement["type"];
+            x: number;
+            y: number;
             label?: {
               text: string;
               fontSize?: number;
@@ -85,13 +87,17 @@ export interface ImportedDataState {
               verticalAlign?: VerticalAlign;
             } & MarkOptional<ElementConstructorOpts, "x" | "y">;
             start?: {
-              type: ExcalidrawBindableElement["type"];
+              type: Exclude<
+                ExcalidrawBindableElement["type"],
+                "image" | "selection" | "text"
+              >;
+              id?: ExcalidrawGenericElement["id"];
             } & MarkOptional<ElementConstructorOpts, "x" | "y">;
             end?: {
-              type: ExcalidrawBindableElement["type"];
+              type: ExcalidrawGenericElement["type"];
+              id?: ExcalidrawGenericElement["id"];
             } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-            endArrowhead?: Arrowhead | null;
-          } & ElementConstructorOpts)
+          } & Partial<ExcalidrawLinearElement>)
       )[]
     | null;
   appState?: Readonly<

@@ -41,7 +41,7 @@ import {
   getDefaultLineHeight,
   measureBaseline,
 } from "../element/textElement";
-import { convertToExcalidrawElements } from "../element/newElement";
+import { convertToExcalidrawElements } from "../data/transform";
 
 type RestoredAppState = Omit<
   AppState,

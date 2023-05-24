@@ -12,7 +12,6 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawTextContainer,
-  ExcalidrawBindableElement,
 } from "../element/types";
 import {
   arrayToMap,
@@ -36,8 +35,6 @@ import {
   wrapText,
   getBoundTextMaxWidth,
   getDefaultLineHeight,
-  bindTextToContainer,
-  VALID_CONTAINER_TYPES,
 } from "./textElement";
 import {
   DEFAULT_ELEMENT_PROPS,
@@ -49,17 +46,7 @@ import {
 } from "../constants";
 import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
-import { ImportedDataState } from "../data/types";
-import { bindLinearElement } from "./binding";
 
-export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
-  "rectangle",
-  "ellipse",
-  "diamond",
-  "text",
-  "arrow",
-  "line",
-];
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
   | "width"
@@ -655,170 +642,4 @@ export const duplicateElements = (
   }
 
   return clonedElements;
-};
-
-export const convertToExcalidrawElements = (
-  elements: ImportedDataState["elements"],
-) => {
-  const res: ExcalidrawElement[] = [];
-  if (!elements) {
-    return [];
-  }
-  elements.forEach((element) => {
-    if (!element) {
-      return;
-    }
-    if (!ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)) {
-      res.push(element as ExcalidrawElement);
-      return;
-    }
-    let startBoundElement;
-    let endBoundElement;
-    //@ts-ignore
-    if (VALID_CONTAINER_TYPES.has(element.type) && element?.label?.text) {
-      //@ts-ignore
-      const elements = bindTextToContainer(element, element.label);
-      const [container, text] = elements;
-
-      if (container.type === "arrow") {
-        //@ts-ignore
-        const { start, end } = element;
-        mutateElement(container, {
-          //@ts-ignore
-          startBinding: element?.startBinding || null,
-          //@ts-ignore
-          endBinding: element.endBinding || null,
-        });
-        if (start) {
-          const width = start?.width ?? 100;
-          const height = start?.height ?? 100;
-
-          startBoundElement = newElement({
-            x: start.x || container.x - width,
-            y: start.y || container.y - height / 2,
-            width,
-            height,
-            ...start,
-          }) as ExcalidrawBindableElement;
-          bindLinearElement(
-            container as ExcalidrawLinearElement,
-            startBoundElement,
-            "start",
-          );
-        }
-        if (end) {
-          const height = end?.height ?? 100;
-
-          endBoundElement = newElement({
-            x: end.x || container.x + container.width,
-            y: end.y || container.y - height / 2,
-            width: end?.width ?? 100,
-            height,
-            ...end,
-          }) as ExcalidrawBindableElement;
-          bindLinearElement(
-            container as ExcalidrawLinearElement,
-            endBoundElement,
-            "end",
-          );
-        }
-      }
-      res.push(container);
-      res.push(text);
-      if (startBoundElement) {
-        res.push(startBoundElement);
-      }
-      if (endBoundElement) {
-        res.push(endBoundElement);
-      }
-    } else {
-      let excalidrawElement;
-      if (element.type === "text") {
-        excalidrawElement = {
-          ...element,
-        } as ExcalidrawTextElement;
-        res.push(excalidrawElement);
-      } else if (element.type === "arrow" || element.type === "line") {
-        const {
-          //@ts-ignore
-          start,
-          //@ts-ignore
-          end,
-          type,
-          //@ts-ignore
-          endArrowhead = element.type === "arrow" ? "arrow" : null,
-          ...rest
-        } = element;
-
-        excalidrawElement = newLinearElement({
-          type,
-          width: 200,
-          height: 24,
-          points: [
-            [0, 0],
-            [200, 0],
-          ],
-          endArrowhead,
-          ...rest,
-        });
-
-        mutateElement(excalidrawElement, {
-          //@ts-ignore
-          startBinding: element?.startBinding || null,
-          //@ts-ignore
-          endBinding: element.endBinding || null,
-        });
-        let startBoundElement;
-        let endBoundElement;
-        if (start) {
-          const width = start?.width ?? 100;
-          const height = start?.height ?? 100;
-          startBoundElement = newElement({
-            x: start.x || excalidrawElement.x - width,
-            y: start.y || excalidrawElement.y - height / 2,
-            width,
-            height,
-            ...start,
-          }) as ExcalidrawBindableElement;
-          bindLinearElement(excalidrawElement, startBoundElement, "start");
-        }
-        if (end) {
-          const height = end?.height ?? 100;
-
-          endBoundElement = newElement({
-            x: end.x || excalidrawElement.x + excalidrawElement.width,
-            y: end.y || excalidrawElement.y - height / 2,
-            width: end?.width ?? 100,
-            height,
-            ...end,
-          }) as ExcalidrawBindableElement;
-          bindLinearElement(excalidrawElement, endBoundElement, "end");
-        }
-
-        res.push(excalidrawElement);
-        if (startBoundElement) {
-          res.push(startBoundElement);
-        }
-        if (endBoundElement) {
-          res.push(endBoundElement);
-        }
-      } else {
-        excalidrawElement = {
-          ...element,
-          width:
-            element?.width ||
-            (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)
-              ? 100
-              : 0),
-          height:
-            element?.height ||
-            (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)
-              ? 100
-              : 0),
-        } as ExcalidrawGenericElement;
-        res.push(excalidrawElement);
-      }
-    }
-  });
-  return res;
 };

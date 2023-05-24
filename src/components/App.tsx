@@ -130,7 +130,6 @@ import {
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
-  convertToExcalidrawElements,
   deepCopyElement,
   duplicateElements,
   newFreeDrawElement,
@@ -305,6 +304,7 @@ import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
+import { convertToExcalidrawElements } from "../data/transform";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -2044,6 +2044,8 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.elements) {
+        console.log("HEYYYYYYYY", sceneData.elements);
+
         this.scene.replaceAllElements(
           convertToExcalidrawElements(sceneData.elements),
         );

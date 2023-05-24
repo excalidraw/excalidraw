@@ -1,6 +1,6 @@
 import { decodePngMetadata, decodeSvgMetadata } from "../../data/image";
 import { ImportedDataState } from "../../data/types";
-import { convertToExcalidrawElements } from "../../element/newElement";
+import { convertToExcalidrawElements } from "../../data/transform";
 import * as utils from "../../packages/utils";
 import { API } from "../helpers/api";
 

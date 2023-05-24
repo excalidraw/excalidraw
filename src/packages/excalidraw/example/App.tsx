@@ -207,9 +207,9 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
 
           {
             type: "arrow",
-            x: -160,
-            y: 300,
-            start: { type: "rectangle", width: 300, height: 300 },
+            x: 300,
+            y: 150,
+            start: { type: "rectangle", id: "rect-1" },
             end: { type: "ellipse" },
           },
         ],

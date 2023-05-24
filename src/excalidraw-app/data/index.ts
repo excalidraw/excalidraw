@@ -7,7 +7,7 @@ import {
 import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
-import { convertToExcalidrawElements } from "../../element/newElement";
+import { convertToExcalidrawElements } from "../../data/transform";
 import { isInvisiblySmallElement } from "../../element/sizeHelpers";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import { ExcalidrawElement, FileId } from "../../element/types";

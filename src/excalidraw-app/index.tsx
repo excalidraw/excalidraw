@@ -87,7 +87,7 @@ import { appJotaiStore } from "./app-jotai";
 
 import "./index.scss";
 import { ResolutionType } from "../utility-types";
-import { convertToExcalidrawElements } from "../element/newElement";
+import { convertToExcalidrawElements } from "../data/transform";
 
 polyfill();
 
