@@ -5,13 +5,26 @@ import "./Spinner.scss";
 const Spinner = ({
   size = "1em",
   circleWidth = 8,
+  synchronized = false,
 }: {
   size?: string | number;
   circleWidth?: number;
+  synchronized?: boolean;
 }) => {
+  const mountTime = React.useRef(Date.now());
+  const mountDelay = -(mountTime.current % 1600);
+
   return (
     <div className="Spinner">
-      <svg viewBox="0 0 100 100" style={{ width: size, height: size }}>
+      <svg
+        viewBox="0 0 100 100"
+        style={{
+          width: size,
+          height: size,
+          // fix for remounting causing spinner flicker
+          ["--spinner-delay" as any]: synchronized ? `${mountDelay}ms` : 0,
+        }}
+      >
         <circle
           cx="50"
           cy="50"
