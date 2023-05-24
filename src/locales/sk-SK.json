@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "Priehľadná",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Čierna",
+    "white": "Biela",
+    "red": "Červená",
+    "pink": "Ružová",
+    "grape": "Hroznová fialová",
+    "violet": "Fialová",
+    "gray": "Sivá",
+    "blue": "Modrá",
+    "cyan": "Azúrová",
+    "teal": "Modrozelená",
+    "green": "Zelená",
+    "yellow": "Žltá",
+    "orange": "Oranžová",
+    "bronze": "Bronzová"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Najpoužívanejšie vlastné farby",
+    "colors": "Farby",
+    "shades": "Odtiene",
+    "hexCode": "Hex kód",
+    "noShades": "Pre túto farbu nie sú dostupné žiadne odtiene"
   }
 }

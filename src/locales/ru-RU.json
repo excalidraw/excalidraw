@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "Прозрачный",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Чёрный",
+    "white": "Белый",
+    "red": "Красный",
+    "pink": "Розовый",
+    "grape": "Виноградный",
+    "violet": "Фиолетовый",
+    "gray": "Серый",
+    "blue": "Синий",
+    "cyan": "Голубой",
+    "teal": "Бирюзовый",
+    "green": "Зелёный",
+    "yellow": "Жёлтый",
+    "orange": "Оранжевый",
+    "bronze": "Бронзовый"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Часто используемые пользовательские цвета",
+    "colors": "Цвета",
+    "shades": "Оттенки",
+    "hexCode": "Шестнадцатеричный код",
+    "noShades": "Нет доступных оттенков для этого цвета"
   }
 }
