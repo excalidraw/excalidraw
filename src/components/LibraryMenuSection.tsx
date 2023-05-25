@@ -70,6 +70,7 @@ function LibraryMenuSection({
   onClick,
 }: Props) {
   const rows = Math.ceil(items.length / ITEMS_PER_ROW);
+  const [, startTransition] = useTransition();
   const [index, setIndex] = useState(0);
   const [svgCache] = useAtom(libraryItemSvgsCache);
 
@@ -81,9 +82,11 @@ function LibraryMenuSection({
 
   useEffect(() => {
     if (index < rows) {
-      setIndex(index + rowsRenderedPerBatch);
+      startTransition(() => {
+        setIndex(index + rowsRenderedPerBatch);
+      });
     }
-  }, [index, rows, rowsRenderedPerBatch]);
+  }, [index, rows, startTransition, rowsRenderedPerBatch]);
 
   return (
     <>
