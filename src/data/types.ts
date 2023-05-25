@@ -73,17 +73,38 @@ export interface ImportedDataState {
               textAlign?: TextAlign;
               verticalAlign?: VerticalAlign;
             } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-            start?: {
-              type: Exclude<
-                ExcalidrawBindableElement["type"],
-                "image" | "selection" | "text"
-              >;
-              id?: ExcalidrawGenericElement["id"];
-            } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-            end?: {
-              type: ExcalidrawGenericElement["type"];
-              id?: ExcalidrawGenericElement["id"];
-            } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+            end?:
+              | (
+                  | {
+                      type: Exclude<
+                        ExcalidrawBindableElement["type"],
+                        "image" | "selection" | "text"
+                      >;
+                      id?: ExcalidrawGenericElement["id"];
+                    }
+                  | ({
+                      type: "text";
+                      text: string;
+                      id?: ExcalidrawTextElement["id"];
+                    } & Partial<ExcalidrawTextElement>)
+                ) &
+                  MarkOptional<ElementConstructorOpts, "x" | "y">;
+            start?:
+              | (
+                  | {
+                      type: Exclude<
+                        ExcalidrawBindableElement["type"],
+                        "image" | "selection" | "text"
+                      >;
+                      id?: ExcalidrawGenericElement["id"];
+                    }
+                  | ({
+                      type: "text";
+                      text: string;
+                      id?: ExcalidrawTextElement["id"];
+                    } & Partial<ExcalidrawTextElement>)
+                ) &
+                  MarkOptional<ElementConstructorOpts, "x" | "y">;
           } & Partial<ExcalidrawLinearElement>)
       )[]
     | null;

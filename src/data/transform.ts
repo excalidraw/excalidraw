@@ -57,7 +57,7 @@ const bindTextToContainer = (
   let container;
   if (containerProps.type === "arrow") {
     const width = containerProps.width || 300;
-    const height = containerProps.height || 24;
+    const height = containerProps.height || 0;
     container = newLinearElement({
       width,
       height,
@@ -111,17 +111,38 @@ const bindLinearElementToElement = (
       textAlign?: TextAlign;
       verticalAlign?: VerticalAlign;
     } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-    start?: {
-      type: Exclude<
-        ExcalidrawBindableElement["type"],
-        "image" | "selection" | "text"
-      >;
-      id?: ExcalidrawGenericElement["id"];
-    } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-    end?: {
-      type: ExcalidrawGenericElement["type"];
-      id?: ExcalidrawGenericElement["id"];
-    } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+    start?:
+      | (
+          | {
+              type: Exclude<
+                ExcalidrawBindableElement["type"],
+                "image" | "selection" | "text"
+              >;
+              id?: ExcalidrawGenericElement["id"];
+            }
+          | ({
+              type: "text";
+              text: string;
+              id?: ExcalidrawTextElement["id"];
+            } & Partial<ExcalidrawTextElement>)
+        ) &
+          MarkOptional<ElementConstructorOpts, "x" | "y">;
+    end?:
+      | (
+          | {
+              type: Exclude<
+                ExcalidrawBindableElement["type"],
+                "image" | "selection" | "text"
+              >;
+              id?: ExcalidrawGenericElement["id"];
+            }
+          | ({
+              type: "text";
+              text: string;
+              id?: ExcalidrawTextElement["id"];
+            } & Partial<ExcalidrawTextElement>)
+        ) &
+          MarkOptional<ElementConstructorOpts, "x" | "y">;
   } & Partial<ExcalidrawLinearElement>,
 ): {
   linearElement: ExcalidrawLinearElement;
@@ -163,14 +184,31 @@ const bindLinearElementToElement = (
     const existingElement = start.id
       ? excalidrawElements.get().find((ele) => ele?.id === start.id)
       : undefined;
-    startBoundElement = newElement({
-      x: start.x || excliadrawLinearElement.x - width,
-      y: start.y || excliadrawLinearElement.y - height / 2,
-      width,
-      height,
-      ...existingElement,
-      ...start,
-    });
+    const startX = start.x || excliadrawLinearElement.x - width;
+    const startY = start.y || excliadrawLinearElement.y - height / 2;
+
+    if (start.type === "text") {
+      startBoundElement = newTextElement({
+        x: startX,
+        y: startY,
+        ...existingElement,
+        ...start,
+      });
+      // to position the text correctly when coordinates not provided
+      mutateElement(startBoundElement, {
+        x: start.x || excliadrawLinearElement.x - startBoundElement.width,
+        y: start.y || excliadrawLinearElement.y - startBoundElement.height / 2,
+      });
+    } else {
+      startBoundElement = newElement({
+        x: startX,
+        y: startY,
+        width,
+        height,
+        ...existingElement,
+        ...start,
+      });
+    }
 
     bindLinearElement(
       excliadrawLinearElement,
@@ -180,18 +218,36 @@ const bindLinearElementToElement = (
   }
   if (end) {
     const height = end?.height ?? 100;
+    const width = end?.width ?? 100;
+
     const existingElement = end.id
       ? excalidrawElements.get().find((ele) => ele?.id === end.id)
       : undefined;
-    endBoundElement = newElement({
-      x: end.x || excliadrawLinearElement.x + excliadrawLinearElement.width,
-      y: end.y || excliadrawLinearElement.y - height / 2,
-      width: end?.width ?? 100,
-      height,
-      ...existingElement,
-      ...end,
-    }) as ExcalidrawBindableElement;
+    const endX =
+      end.x || excliadrawLinearElement.x + excliadrawLinearElement.width;
+    const endY = end.y || excliadrawLinearElement.y - height / 2;
 
+    if (end.type === "text") {
+      endBoundElement = newTextElement({
+        x: endX,
+        y: endY,
+        ...existingElement,
+        ...end,
+      });
+      // to position the text correctly when coordinates not provided
+      mutateElement(endBoundElement, {
+        y: end.y || excliadrawLinearElement.y - endBoundElement.height / 2,
+      });
+    } else {
+      endBoundElement = newElement({
+        x: endX,
+        y: endY,
+        width,
+        height,
+        ...existingElement,
+        ...end,
+      }) as ExcalidrawBindableElement;
+    }
     bindLinearElement(
       excliadrawLinearElement,
       endBoundElement as ExcalidrawBindableElement,
