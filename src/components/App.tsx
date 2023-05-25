@@ -2044,8 +2044,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.elements) {
-        console.log("HEYYYYYYYY", sceneData.elements);
-
         this.scene.replaceAllElements(
           convertToExcalidrawElements(sceneData.elements),
         );
