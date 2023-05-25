@@ -18,6 +18,7 @@ import {
 } from "../constants";
 
 import { canvasToBlob } from "../data/blob";
+import { nativeFileSystemSupported } from "../data/filesystem";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
@@ -111,11 +112,28 @@ const ImageExportModal = ({
       });
   }, [appState, files, exportedElements]);
 
+  /**
+   * <ProjectName
+      label={t("labels.fileTitle")}
+      value={appState.name || "Unnamed"}
+      onChange={(name: string) => updateData(name)}
+      isNameEditable={
+        typeof appProps.name === "undefined" && !appState.viewModeEnabled
+      }
+    />
+   */
+
   return (
     <div className="ImageExportModal">
       <h3>{t("imageExportDialog.header")}</h3>
-      <div className="ImageExportModal__preview" ref={previewRef}>
-        {renderError && <ErrorCanvasPreview />}
+      <div className="ImageExportModal__preview">
+        <div className="ImageExportModal__preview__canvas" ref={previewRef}>
+          {renderError && <ErrorCanvasPreview />}
+        </div>
+        <div className="ImageExportModal__preview__filename">
+          {!nativeFileSystemSupported &&
+            actionManager.renderAction("changeProjectName")}
+        </div>
       </div>
       <div className="ImageExportModal__settings">
         <h3>{t("imageExportDialog.header")}</h3>

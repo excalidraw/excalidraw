@@ -2,31 +2,26 @@
 
 .excalidraw {
   --RadioGroup-background: #ffffff;
-  --RadioGroup-border: #d6d6d6;
+  --RadioGroup-border: var(--color-gray-30);
 
-  --RadioGroup-choice-color-inactive: #6965db;
-  --RadioGroup-choice-color-inactive-hover: #6965db;
-  --RadioGroup-choice-background-inactive: #ffffff;
-  --RadioGroup-choice-background-inactive-hover: #ffffff;
+  --RadioGroup-choice-color-off: var(--color-primary);
+  --RadioGroup-choice-background-off: white;
+  --RadioGroup-choice-background-off-hover: var(--color-gray-10);
+  --RadioGroup-choice-background-off-active: var(--color-gray-20);
 
-  --RadioGroup-choice-color-active: #ffffff;
-  --RadioGroup-choice-color-active-hover: #ffffff;
-  --RadioGroup-choice-background-active: #6965db;
-  --RadioGroup-choice-background-active-hover: #5b57d1;
+  --RadioGroup-choice-color-on: white;
+  --RadioGroup-choice-background-on: var(--color-primary);
+  --RadioGroup-choice-background-on-hover: var(--color-primary-darker);
+  --RadioGroup-choice-background-on-active: var(--color-primary-darkest);
 
   &.theme--dark {
-    --RadioGroup-background: #242424;
-    --RadioGroup-border: #5c5c5c;
+    --RadioGroup-background: var(--color-gray-85);
+    --RadioGroup-border: var(--color-gray-70);
 
-    --RadioGroup-choice-color-inactive: #a8a5ff;
-    --RadioGroup-choice-color-inactive-hover: #a8a5ff;
-    --RadioGroup-choice-background-inactive: #242424;
-    --RadioGroup-choice-background-inactive-hover: #242424;
-
-    --RadioGroup-choice-color-active: #242424;
-    --RadioGroup-choice-color-active-hover: #242424;
-    --RadioGroup-choice-background-active: #a8a5ff;
-    --RadioGroup-choice-background-active-hover: #b2aeff;
+    --RadioGroup-choice-background-off: var(--color-gray-85);
+    --RadioGroup-choice-background-off-hover: var(--color-gray-80);
+    --RadioGroup-choice-background-off-active: var(--color-gray-70);
+    --RadioGroup-choice-color-on: var(--color-gray-85);
   }
 
   .RadioGroup {
@@ -35,8 +30,7 @@
     flex-direction: row;
     align-items: flex-start;
 
-    padding: 1px;
-    height: 28px;
+    padding: 2px;
     border-radius: 10px;
 
     background: var(--RadioGroup-background);
@@ -50,13 +44,8 @@
       width: 32px;
       height: 24px;
 
-      color: var(--RadioGroup-choice-color-inactive);
-      background: var(--RadioGroup-choice-background-inactive);
-
-      &:hover {
-        color: var(--RadioGroup-choice-color-inactive-hover);
-        background: var(--RadioGroup-choice-background-inactive-hover);
-      }
+      color: var(--RadioGroup-choice-color-off);
+      background: var(--RadioGroup-choice-background-off);
 
       border-radius: 8px;
 
@@ -65,18 +54,29 @@
       font-weight: 600;
       font-size: 0.75rem;
       line-height: 100%;
-
+      user-select: none;
       letter-spacing: 0.4px;
 
       transition: all 75ms ease-out;
 
+      &:hover {
+        background: var(--RadioGroup-choice-background-off-hover);
+      }
+
+      &:active {
+        background: var(--RadioGroup-choice-background-off-active);
+      }
+
       &.active {
-        color: var(--RadioGroup-choice-color-active);
-        background: var(--RadioGroup-choice-background-active);
+        color: var(--RadioGroup-choice-color-on);
+        background: var(--RadioGroup-choice-background-on);
 
         &:hover {
-          color: var(--RadioGroup-choice-color-active-hover);
-          background: var(--RadioGroup-choice-background-active-hover);
+          background: var(--RadioGroup-choice-background-on-hover);
+        }
+
+        &:active {
+          background: var(--RadioGroup-choice-background-on-active);
         }
       }
 
