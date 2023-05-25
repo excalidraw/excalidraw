@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import Library, {
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,
@@ -43,8 +43,6 @@ export const LibraryMenuContent = ({
   library,
   id,
   appState,
-  selectedItems,
-  onSelectItems,
 }: {
   pendingElements: LibraryItem["elements"];
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
@@ -54,8 +52,6 @@ export const LibraryMenuContent = ({
   library: Library;
   id: string;
   appState: UIAppState;
-  selectedItems: LibraryItem["id"][];
-  onSelectItems: (id: LibraryItem["id"][]) => void;
 }) => {
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
 
@@ -113,8 +109,6 @@ export const LibraryMenuContent = ({
         }
         onInsertLibraryItems={onInsertLibraryItems}
         pendingElements={pendingElements}
-        selectedItems={selectedItems}
-        onSelectItems={onSelectItems}
         id={id}
         libraryReturnUrl={libraryReturnUrl}
         theme={appState.theme}
@@ -143,9 +137,8 @@ export const LibraryMenu = () => {
   const setAppState = useExcalidrawSetAppState();
   const elements = useExcalidrawElements();
 
-  const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
-
-  const deselectItems = useCallback(() => {
+  const onAddToLibrary = useCallback(() => {
+    // deselect canvas elements
     setAppState({
       selectedElementIds: {},
       selectedGroupIds: {},
@@ -158,14 +151,12 @@ export const LibraryMenu = () => {
       onInsertLibraryItems={(libraryItems) => {
         onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
       }}
-      onAddToLibrary={deselectItems}
+      onAddToLibrary={onAddToLibrary}
       setAppState={setAppState}
       libraryReturnUrl={appProps.libraryReturnUrl}
       library={library}
       id={id}
       appState={appState}
-      selectedItems={selectedItems}
-      onSelectItems={setSelectedItems}
     />
   );
 };

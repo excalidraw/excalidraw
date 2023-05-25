@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "Prosojno",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Črna",
+    "white": "Bela",
+    "red": "Rdeča",
+    "pink": "Roza",
+    "grape": "Grozdje",
+    "violet": "Vijolična",
+    "gray": "Siva",
+    "blue": "Modra",
+    "cyan": "Cijan",
+    "teal": "Turkizna",
+    "green": "Zelena",
+    "yellow": "Rumena",
+    "orange": "Oranžna",
+    "bronze": "Bronasta"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Najpogosteje uporabljene barve po meri",
+    "colors": "Barve",
+    "shades": "Odtenki",
+    "hexCode": "Hex koda",
+    "noShades": "Odtenki za to barvo niso na voljo"
   }
 }
