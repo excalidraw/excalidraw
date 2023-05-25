@@ -1,4 +1,9 @@
-import { TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  TEXT_ALIGN,
+  VERTICAL_ALIGN,
+} from "../constants";
 import {
   newElement,
   newLinearElement,
@@ -6,8 +11,17 @@ import {
 } from "../element";
 import { bindLinearElement } from "../element/binding";
 import { mutateElement } from "../element/mutateElement";
-import { ElementConstructorOpts, newTextElement } from "../element/newElement";
-import { VALID_CONTAINER_TYPES } from "../element/textElement";
+import {
+  ElementConstructorOpts,
+  newTextElement,
+  regenerateId,
+} from "../element/newElement";
+import {
+  VALID_CONTAINER_TYPES,
+  getDefaultLineHeight,
+  measureText,
+  normalizeText,
+} from "../element/textElement";
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -18,8 +32,8 @@ import {
   TextAlign,
   VerticalAlign,
 } from "../element/types";
-import { randomId } from "../random";
 import { MarkOptional } from "../utility-types";
+import { getFontString } from "../utils";
 import { ImportedDataState } from "./types";
 
 export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
@@ -212,14 +226,20 @@ const excalidrawElements = (() => {
   };
   const clear = () => {
     res.length = 0;
+    elementMap.clear();
   };
   const get = () => {
     return res;
+  };
+  const hasElementWithId = (id: string) => {
+    const index = elementMap.get(id);
+    return index !== undefined && index >= 0;
   };
   return {
     push,
     clear,
     get,
+    hasElementWithId,
   };
 })();
 
@@ -234,6 +254,15 @@ export const convertToExcalidrawElements = (
     if (!element) {
       return;
     }
+
+    let elementId = element.id || regenerateId(null);
+
+    // To make sure every element has a unique id
+    while (excalidrawElements.hasElementWithId(elementId)) {
+      elementId = regenerateId(elementId);
+    }
+    const elementWithid = { ...element, id: elementId };
+
     if (!ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)) {
       excalidrawElements.push(element as ExcalidrawElement);
 
@@ -242,7 +271,7 @@ export const convertToExcalidrawElements = (
     //@ts-ignore
     if (VALID_CONTAINER_TYPES.has(element.type) && element?.label?.text) {
       //@ts-ignore
-      let [container, text] = bindTextToContainer(element, element.label);
+      let [container, text] = bindTextToContainer(elementWithid, element.label);
       excalidrawElements.push(container);
       excalidrawElements.push(text);
 
@@ -263,15 +292,28 @@ export const convertToExcalidrawElements = (
     } else {
       let excalidrawElement;
       if (element.type === "text") {
-        excalidrawElement = newTextElement({
-          ...element,
-        });
+        const fontFamily = element?.fontFamily || DEFAULT_FONT_FAMILY;
+        const fontSize = element?.fontSize || DEFAULT_FONT_SIZE;
+        const lineHeight =
+          element?.lineHeight || getDefaultLineHeight(fontFamily);
+        const text = element.text ?? "";
+        const normalizedText = normalizeText(text);
+        const metrics = measureText(
+          normalizedText,
+          getFontString({ fontFamily, fontSize }),
+          lineHeight,
+        );
+        excalidrawElement = {
+          width: metrics.width,
+          height: metrics.height,
+          ...elementWithid,
+        };
 
-        excalidrawElements.push(excalidrawElement);
+        excalidrawElements.push(excalidrawElement as ExcalidrawTextElement);
       } else if (element.type === "arrow" || element.type === "line") {
         const { linearElement, startBoundElement, endBoundElement } =
           //@ts-ignore
-          bindLinearElementToElement(element);
+          bindLinearElementToElement(elementWithid);
         excalidrawElements.push(linearElement);
         excalidrawElements.push(startBoundElement);
         excalidrawElements.push(endBoundElement);
@@ -287,8 +329,7 @@ export const convertToExcalidrawElements = (
         }
       } else {
         excalidrawElement = {
-          ...element,
-          id: element.id || randomId(),
+          ...elementWithid,
           width:
             element?.width ||
             (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)

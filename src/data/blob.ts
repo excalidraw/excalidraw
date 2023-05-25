@@ -135,23 +135,20 @@ export const loadSceneOrLibraryFromBlob = async (
   try {
     const data = JSON.parse(contents);
     if (isValidExcalidrawData(data)) {
+      const excaldrawElements = convertToExcalidrawElements(
+        data.elements || [],
+      );
       return {
         type: MIME_TYPES.excalidraw,
         data: restore(
           {
-            elements: clearElementsForExport(
-              convertToExcalidrawElements(data.elements || []),
-            ),
+            elements: clearElementsForExport(excaldrawElements),
             appState: {
               theme: localAppState?.theme,
               fileHandle: fileHandle || blob.handle || null,
               ...cleanAppStateForExport(data.appState || {}),
               ...(localAppState
-                ? calculateScrollCenter(
-                    convertToExcalidrawElements(data.elements || []),
-                    localAppState,
-                    null,
-                  )
+                ? calculateScrollCenter(excaldrawElements, localAppState, null)
                 : {}),
             },
             files: data.files,

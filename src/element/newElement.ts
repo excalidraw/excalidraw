@@ -471,7 +471,7 @@ export const deepCopyElement = <T extends ExcalidrawElement>(
  * utility wrapper to generate new id. In test env it reuses the old + postfix
  * for test assertions.
  */
-const regenerateId = (
+export const regenerateId = (
   /** supply null if no previous id exists */
   previousId: string | null,
 ) => {

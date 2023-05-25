@@ -18,7 +18,6 @@ import type { cleanAppStateForExport } from "../appState";
 import { VERSIONS } from "../constants";
 import { MarkOptional } from "../utility-types";
 import { ElementConstructorOpts } from "../element/newElement";
-import { ELEMENTS_SUPPORTING_PROGRAMMATIC_API } from "./transform";
 
 export interface ExportedDataState {
   type: string;
@@ -62,7 +61,7 @@ export interface ImportedDataState {
             type: "text";
             text: string;
             id?: ExcalidrawTextElement["id"];
-          } & ElementConstructorOpts)
+          } & Partial<ExcalidrawTextElement>)
         | ({
             type: ExcalidrawLinearElement["type"];
             x: number;
