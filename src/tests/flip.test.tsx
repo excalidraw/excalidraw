@@ -195,10 +195,8 @@ const checkElementsBoundingBox = async (
   debugger;
   await waitFor(() => {
     // Check if width and height did not change
-    expect(x1 - toleranceInPx <= x12 && x12 <= x1 + toleranceInPx).toBeTruthy();
-    expect(y1 - toleranceInPx <= y12 && y12 <= y1 + toleranceInPx).toBeTruthy();
-    expect(x2 - toleranceInPx <= x22 && x22 <= x2 + toleranceInPx).toBeTruthy();
-    expect(y2 - toleranceInPx <= y22 && y22 <= y2 + toleranceInPx).toBeTruthy();
+    expect(x2 - x1).toBeCloseTo(x22 - x12, -1);
+    expect(y2 - y1).toBeCloseTo(y22 - y12, -1);
   });
 };
 
@@ -216,14 +214,22 @@ const checkTwoPointsLineHorizontalFlip = async () => {
   h.app.actionManager.executeAction(actionFlipHorizontal);
   const newElement = h.elements[0] as ExcalidrawLinearElement;
   await waitFor(() => {
-    expect(originalElement.points[0][0]).toEqual(
-      newElement.points[0][0] !== 0 ? -newElement.points[0][0] : 0,
+    expect(originalElement.points[0][0]).toBeCloseTo(
+      -newElement.points[0][0],
+      5,
     );
-    expect(originalElement.points[0][1]).toEqual(newElement.points[0][1]);
-    expect(originalElement.points[1][0]).toEqual(
-      newElement.points[1][0] !== 0 ? -newElement.points[1][0] : 0,
+    expect(originalElement.points[0][1]).toBeCloseTo(
+      newElement.points[0][1],
+      5,
     );
-    expect(originalElement.points[1][1]).toEqual(newElement.points[1][1]);
+    expect(originalElement.points[1][0]).toBeCloseTo(
+      -newElement.points[1][0],
+      5,
+    );
+    expect(originalElement.points[1][1]).toBeCloseTo(
+      newElement.points[1][1],
+      5,
+    );
   });
 };
 
@@ -234,14 +240,22 @@ const checkTwoPointsLineVerticalFlip = async () => {
   h.app.actionManager.executeAction(actionFlipVertical);
   const newElement = h.elements[0] as ExcalidrawLinearElement;
   await waitFor(() => {
-    expect(originalElement.points[0][0]).toEqual(
-      newElement.points[0][0] !== 0 ? -newElement.points[0][0] : 0,
+    expect(originalElement.points[0][0]).toBeCloseTo(
+      newElement.points[0][0],
+      5,
     );
-    expect(originalElement.points[0][1]).toEqual(newElement.points[0][1]);
-    expect(originalElement.points[1][0]).toEqual(
-      newElement.points[1][0] !== 0 ? -newElement.points[1][0] : 0,
+    expect(originalElement.points[0][1]).toBeCloseTo(
+      -newElement.points[0][1],
+      5,
     );
-    expect(originalElement.points[1][1]).toEqual(newElement.points[1][1]);
+    expect(originalElement.points[1][0]).toBeCloseTo(
+      newElement.points[1][0],
+      5,
+    );
+    expect(originalElement.points[1][1]).toBeCloseTo(
+      -newElement.points[1][1],
+      5,
+    );
   });
 };
 
@@ -318,7 +332,7 @@ describe("rectangle", () => {
 
   it("flips a rotated rectangle vertically correctly", async () => {
     const originalAngle = (3 * Math.PI) / 4;
-    const expectedAgnle = Math.PI / 4;
+    const expectedAgnle = (5 * Math.PI) / 4;
 
     createAndSelectOneRectangle(originalAngle);
 
@@ -351,7 +365,7 @@ describe("diamond", () => {
 
   it("flips a rotated diamond vertically correctly", async () => {
     const originalAngle = (5 * Math.PI) / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const expectedAngle = (3 * Math.PI) / 4;
 
     createAndSelectOneDiamond(originalAngle);
 
@@ -384,7 +398,7 @@ describe("ellipse", () => {
 
   it("flips a rotated ellipse vertically correctly", async () => {
     const originalAngle = (7 * Math.PI) / 4;
-    const expectedAngle = (5 * Math.PI) / 4;
+    const expectedAngle = Math.PI / 4;
 
     createAndSelectOneEllipse(originalAngle);
 
@@ -429,7 +443,7 @@ describe("arrow", () => {
 
   it("flips a rotated arrow vertically with line inside min/max points bounds", async () => {
     const originalAngle = Math.PI / 4;
-    const expectedAngle = (3 * Math.PI) / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementWithCurveInsideMinMaxPoints("arrow");
     h.app.scene.replaceAllElements([line]);
     h.app.state.selectedElementIds[line.id] = true;
@@ -481,7 +495,7 @@ describe("arrow", () => {
   //TODO: elements with curve outside minMax points have a wrong bounding box!!!
   it.skip("flips a rotated arrow vertically with line outside min/max points bounds", async () => {
     const originalAngle = Math.PI / 4;
-    const expectedAngle = (3 * Math.PI) / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
     mutateElement(line, { angle: originalAngle });
     h.app.scene.replaceAllElements([line]);
@@ -512,7 +526,6 @@ describe("arrow", () => {
 
   it("flips a two points arrow vertically correctly", async () => {
     createAndSelectOneArrow();
-
     await checkTwoPointsLineVerticalFlip();
   });
 });
@@ -581,7 +594,7 @@ describe("line", () => {
   //TODO: elements with curve outside minMax points have a wrong bounding box
   it.skip("flips a rotated line vertically with line outside min/max points bounds", async () => {
     const originalAngle = Math.PI / 4;
-    const expectedAngle = (3 * Math.PI) / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
     mutateElement(line, { angle: originalAngle });
     h.app.scene.replaceAllElements([line]);
@@ -616,7 +629,7 @@ describe("line", () => {
 
   it("flips a rotated line vertically with line inside min/max points bounds", async () => {
     const originalAngle = Math.PI / 4;
-    const expectedAngle = (3 * Math.PI) / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
     h.app.scene.replaceAllElements([line]);
     h.app.state.selectedElementIds[line.id] = true;
@@ -670,7 +683,7 @@ describe("freedraw", () => {
 
   it("flips a rotated drawing vertically correctly", async () => {
     const originalAngle = Math.PI / 4;
-    const expectedAngle = (3 * Math.PI) / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
 
     const draw = createAndReturnOneDraw(originalAngle);
     // select draw, since not done automatically
@@ -718,8 +731,8 @@ describe("image", () => {
     });
 
     await checkVerticalFlip();
-    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([-1, 1]);
-    expect(h.elements[0].angle).toBeCloseTo(Math.PI);
+    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, -1]);
+    expect(h.elements[0].angle).toBeCloseTo(0);
   });
 
   it("flips an rotated image horizontally correctly", async () => {
@@ -742,7 +755,7 @@ describe("image", () => {
 
   it("flips an rotated image vertically correctly", async () => {
     const originalAngle = Math.PI / 4;
-    const expectedAngle = (3 * Math.PI) / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
     //paste image
     await createImage();
     await waitFor(() => {
@@ -757,7 +770,7 @@ describe("image", () => {
     });
 
     await checkRotatedVerticalFlip(expectedAngle);
-    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([-1, 1]);
+    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, -1]);
     expect(h.elements[0].angle).toBeCloseTo(expectedAngle);
   });
 
@@ -772,7 +785,7 @@ describe("image", () => {
     });
 
     await checkVerticalHorizontalFlip();
-    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, 1]);
-    expect(h.elements[0].angle).toBeCloseTo(Math.PI);
+    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([-1, -1]);
+    expect(h.elements[0].angle).toBeCloseTo(0);
   });
 });

@@ -542,7 +542,7 @@ describe("regression tests", () => {
       expect(element.groupIds.length).toBe(1);
     }
 
-    mouse.reset();
+    mouse.moveTo(-10, -10); // the NW resizing handle is at [0, 0], so moving further
     mouse.down();
     mouse.restorePosition(...end);
     mouse.up();

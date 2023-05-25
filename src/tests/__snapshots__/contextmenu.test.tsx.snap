@@ -197,7 +197,6 @@ Object {
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -207,7 +206,6 @@ Object {
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -4594,7 +4592,6 @@ Object {
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -4604,7 +4601,6 @@ Object {
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5144,7 +5140,6 @@ Object {
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5154,7 +5149,6 @@ Object {
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -6003,7 +5997,6 @@ Object {
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -6013,7 +6006,6 @@ Object {
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -6349,7 +6341,6 @@ Object {
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -6359,7 +6350,6 @@ Object {
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
