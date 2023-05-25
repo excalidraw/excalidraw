@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useRef } from "react";
 import Library, {
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,
@@ -27,6 +27,8 @@ import { useUIAppState } from "../context/ui-appState";
 
 import "./LibraryMenu.scss";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
+import { isShallowEqual } from "../utils";
+import { NonDeletedExcalidrawElement } from "../element/types";
 
 export const isLibraryMenuOpenAtom = atom(false);
 
@@ -37,7 +39,7 @@ const LibraryMenuWrapper = ({ children }: { children: React.ReactNode }) => {
 export const LibraryMenuContent = ({
   onInsertLibraryItems,
   pendingElements,
-  onAddToLibrary,
+  onAddToLibraryCallback,
   setAppState,
   libraryReturnUrl,
   library,
@@ -48,7 +50,7 @@ export const LibraryMenuContent = ({
 }: {
   pendingElements: LibraryItem["elements"];
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
-  onAddToLibrary: () => void;
+  onAddToLibraryCallback: () => void;
   setAppState: React.Component<any, UIAppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   library: Library;
@@ -59,29 +61,41 @@ export const LibraryMenuContent = ({
 }) => {
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
 
-  const addToLibrary = useCallback(
-    async (elements: LibraryItem["elements"], libraryItems: LibraryItems) => {
-      trackEvent("element", "addToLibrary", "ui");
-      if (elements.some((element) => element.type === "image")) {
-        return setAppState({
-          errorMessage: "Support for adding images to the library coming soon!",
+  const onAddToLibrary = useCallback(
+    (elements: LibraryItem["elements"]) => {
+      const addToLibrary = async (
+        processedElements: LibraryItem["elements"],
+        libraryItems: LibraryItems,
+      ) => {
+        trackEvent("element", "addToLibrary", "ui");
+        if (processedElements.some((element) => element.type === "image")) {
+          return setAppState({
+            errorMessage:
+              "Support for adding images to the library coming soon!",
+          });
+        }
+        const nextItems: LibraryItems = [
+          {
+            status: "unpublished",
+            elements: processedElements,
+            id: randomId(),
+            created: Date.now(),
+          },
+          ...libraryItems,
+        ];
+        onAddToLibraryCallback();
+        library.setLibrary(nextItems).catch(() => {
+          setAppState({ errorMessage: t("alerts.errorAddingToLibrary") });
         });
-      }
-      const nextItems: LibraryItems = [
-        {
-          status: "unpublished",
-          elements,
-          id: randomId(),
-          created: Date.now(),
-        },
-        ...libraryItems,
-      ];
-      onAddToLibrary();
-      library.setLibrary(nextItems).catch(() => {
-        setAppState({ errorMessage: t("alerts.errorAddingToLibrary") });
-      });
+      };
+      addToLibrary(elements, libraryItemsData.libraryItems);
     },
-    [onAddToLibrary, library, setAppState],
+    [
+      onAddToLibraryCallback,
+      library,
+      setAppState,
+      libraryItemsData.libraryItems,
+    ],
   );
 
   const libraryItems = useMemo(
@@ -113,9 +127,7 @@ export const LibraryMenuContent = ({
       <LibraryMenuItems
         isLoading={libraryItemsData.status === "loading"}
         libraryItems={libraryItems}
-        onAddToLibrary={(elements) =>
-          addToLibrary(elements, libraryItemsData.libraryItems)
-        }
+        onAddToLibrary={onAddToLibrary}
         onInsertLibraryItems={onInsertLibraryItems}
         pendingElements={pendingElements}
         id={id}
@@ -137,6 +149,29 @@ export const LibraryMenuContent = ({
   );
 };
 
+const usePendingElementsMemo = (
+  appState: UIAppState,
+  elements: readonly NonDeletedExcalidrawElement[],
+) => {
+  const create = () => getSelectedElements(elements, appState, true);
+  const val = useRef(create());
+  const prevAppState = useRef<UIAppState>(appState);
+  const prevElements = useRef(elements);
+
+  if (
+    !isShallowEqual(
+      appState.selectedElementIds,
+      prevAppState.current.selectedElementIds,
+    ) ||
+    !isShallowEqual(elements, prevElements.current)
+  ) {
+    val.current = create();
+    prevAppState.current = appState;
+    prevElements.current = elements;
+  }
+  return val.current;
+};
+
 /**
  * This component is meant to be rendered inside <Sidebar.Tab/> inside our
  * <DefaultSidebar/> or host apps Sidebar components.
@@ -147,13 +182,9 @@ export const LibraryMenu = () => {
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
   const elements = useExcalidrawElements();
-
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
   const memoizedLibrary = useMemo(() => library, [library]);
-  const pendingElements = useMemo(
-    () => getSelectedElements(elements, appState, true),
-    [appState, elements],
-  );
+  const pendingElements = usePendingElementsMemo(appState, elements);
 
   const onInsertLibraryItems = useCallback(
     (libraryItems: LibraryItems) => {
@@ -173,7 +204,7 @@ export const LibraryMenu = () => {
     <LibraryMenuContent
       pendingElements={pendingElements}
       onInsertLibraryItems={onInsertLibraryItems}
-      onAddToLibrary={deselectItems}
+      onAddToLibraryCallback={deselectItems}
       setAppState={setAppState}
       libraryReturnUrl={appProps.libraryReturnUrl}
       library={memoizedLibrary}

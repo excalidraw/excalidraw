@@ -53,6 +53,17 @@ export default function LibraryMenuItems({
     [libraryItems],
   );
 
+  const personalItems = useMemo(
+    () => [
+      // append pending library item
+      ...(pendingElements.length
+        ? [{ id: null, elements: pendingElements }]
+        : []),
+      ...unpublishedItems,
+    ],
+    [pendingElements, unpublishedItems],
+  );
+
   const showBtn = !libraryItems.length && !pendingElements.length;
 
   const isLibraryEmpty =
@@ -158,29 +169,17 @@ export default function LibraryMenuItems({
     [selectedItems],
   );
 
-  const onExcalidrawLibraryItemClick = useCallback(
+  const onAddToLibraryClick = useCallback(() => {
+    onAddToLibrary(pendingElements);
+  }, [pendingElements, onAddToLibrary]);
+
+  const onItemClick = useCallback(
     (id: LibraryItem["id"] | null) => {
       if (id) {
         onInsertLibraryItems(getInsertedElements(id));
       }
     },
     [getInsertedElements, onInsertLibraryItems],
-  );
-
-  const onPersonalLibraryItemClick = useCallback(
-    (id: LibraryItem["id"] | null) => {
-      if (!id) {
-        onAddToLibrary(pendingElements);
-      } else {
-        onInsertLibraryItems(getInsertedElements(id));
-      }
-    },
-    [
-      getInsertedElements,
-      onAddToLibrary,
-      onInsertLibraryItems,
-      pendingElements,
-    ],
   );
 
   return (
@@ -241,16 +240,11 @@ export default function LibraryMenuItems({
             </div>
           ) : (
             <LibraryMenuSection
-              items={[
-                // append pending library item
-                ...(pendingElements.length
-                  ? [{ id: null, elements: pendingElements }]
-                  : []),
-                ...unpublishedItems,
-              ]}
+              items={personalItems}
               onItemSelectToggle={onItemSelectToggle}
               onItemDrag={onItemDrag}
-              onClick={onPersonalLibraryItemClick}
+              onClick={onItemClick}
+              onAddToLibrary={onAddToLibraryClick}
               isItemSelected={isItemSelected}
               svgCache={svgCache}
             />
@@ -270,7 +264,7 @@ export default function LibraryMenuItems({
               items={publishedItems}
               onItemSelectToggle={onItemSelectToggle}
               onItemDrag={onItemDrag}
-              onClick={onExcalidrawLibraryItemClick}
+              onClick={onItemClick}
               isItemSelected={isItemSelected}
               svgCache={svgCache}
             />
