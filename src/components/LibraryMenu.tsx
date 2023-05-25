@@ -184,6 +184,7 @@ export const LibraryMenu = () => {
   const elements = useExcalidrawElements();
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
   const memoizedLibrary = useMemo(() => library, [library]);
+  // BUG: pendingElements are still causing some unnecessary rerenders because clicking into canvas returns some ids even when no element is selected.
   const pendingElements = usePendingElementsMemo(appState, elements);
 
   const onInsertLibraryItems = useCallback(
