@@ -14,7 +14,9 @@ import {
   NonDeleted,
   ExcalidrawElement,
   ExcalidrawTextElementWithContainer,
+  ExcalidrawImageElement,
 } from "./types";
+import type { Mutable } from "../utility-types";
 import {
   getElementAbsoluteCoords,
   getCommonBounds,
@@ -705,6 +707,23 @@ export const resizeMultipleElements = (
   const isFlippedByX = flipFactorX < 0;
   const isFlippedByY = flipFactorY < 0;
 
+  const elementsAndUpdates: {
+    element: NonDeletedExcalidrawElement;
+    update: Mutable<
+      Pick<ExcalidrawElement, "x" | "y" | "width" | "height" | "angle">
+    > & {
+      points?: ExcalidrawLinearElement["points"];
+      fontSize?: ExcalidrawTextElement["fontSize"];
+      baseline?: ExcalidrawTextElement["baseline"];
+      scale?: ExcalidrawImageElement["scale"];
+    };
+    boundText: {
+      element: ExcalidrawTextElementWithContainer;
+      fontSize: ExcalidrawTextElement["fontSize"];
+      baseline: ExcalidrawTextElement["baseline"];
+    } | null;
+  }[] = [];
+
   for (const { orig, latest } of targetElements) {
     // bounded text elements are updated along with their container elements
     if (isTextElement(orig) && isBoundToContainer(orig)) {
@@ -730,21 +749,11 @@ export const resizeMultipleElements = (
       false,
     );
 
-    const update: {
-      width: number;
-      height: number;
-      x: number;
-      y: number;
-      angle: number;
-      points?: Point[];
-      fontSize?: number;
-      baseline?: number;
-      scale?: [number, number];
-    } = {
-      width,
-      height,
+    const update: typeof elementsAndUpdates[0]["update"] = {
       x,
       y,
+      width,
+      height,
       angle,
       ...rescaledPoints,
     };
@@ -783,7 +792,7 @@ export const resizeMultipleElements = (
       }
     }
 
-    let boundTextUpdates: { fontSize: number; baseline: number } | null = null;
+    let boundText: typeof elementsAndUpdates[0]["boundText"] = null;
 
     const boundTextElement = getBoundTextElement(latest);
 
@@ -813,28 +822,44 @@ export const resizeMultipleElements = (
       }
 
       if (boundTextElement) {
-        boundTextUpdates = {
+        boundText = {
+          element: boundTextElement,
           fontSize: metrics.size,
           baseline: metrics.baseline,
         };
       }
     }
 
-    mutateElement(latest, update);
+    elementsAndUpdates.push({ element: latest, update, boundText });
+  }
 
-    updateBoundElements(latest, {
-      simultaneouslyUpdated: targetElements.map(({ latest }) => latest),
+  const elementsToUpdate = elementsAndUpdates.map(({ element }) => element);
+
+  for (const { element, update, boundText } of elementsAndUpdates) {
+    const { width, height, angle } = update;
+
+    mutateElement(element, update, false);
+
+    updateBoundElements(element, {
+      simultaneouslyUpdated: elementsToUpdate,
       newSize: { width, height },
     });
 
-    if (boundTextElement && boundTextUpdates) {
-      mutateElement(boundTextElement, {
-        ...boundTextUpdates,
-        angle: isLinearElement(latest) ? undefined : angle,
-      });
-      handleBindTextResize(latest, transformHandleType);
+    if (boundText) {
+      const { element: boundTextElement, ...boundTextUpdates } = boundText;
+      mutateElement(
+        boundTextElement,
+        {
+          ...boundTextUpdates,
+          angle: isLinearElement(element) ? undefined : angle,
+        },
+        false,
+      );
+      handleBindTextResize(element, transformHandleType);
     }
   }
+
+  Scene.getScene(elementsAndUpdates[0].element)?.informMutation();
 };
 
 const rotateMultipleElements = (
