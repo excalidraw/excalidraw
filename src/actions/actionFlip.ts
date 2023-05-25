@@ -7,6 +7,11 @@ import { AppState, PointerDownState } from "../types";
 import { arrayToMap } from "../utils";
 import { CODES, KEYS } from "../keys";
 import { getCommonBoundingBox } from "../element/bounds";
+import {
+  bindOrUnbindSelectedElements,
+  isBindingEnabled,
+  unbindLinearElements,
+} from "../element/binding";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
@@ -75,6 +80,10 @@ const flipElements = (
     flipDirection === "horizontal" ? maxX : minX,
     flipDirection === "horizontal" ? minY : maxY,
   );
+
+  (isBindingEnabled(appState)
+    ? bindOrUnbindSelectedElements
+    : unbindLinearElements)(elements);
 
   return elements;
 };
