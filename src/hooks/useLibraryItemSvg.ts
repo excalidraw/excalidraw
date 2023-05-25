@@ -40,7 +40,7 @@ export const useLibraryItemSvg = (
             const exportedSvg = await exportLibraryItemToSvg(elements);
 
             if (exportedSvg) {
-              setSvgCache(svgCache.set(id, exportedSvg));
+              svgCache.set(id, exportedSvg);
               setSvg(exportedSvg);
             }
           })();
@@ -56,4 +56,20 @@ export const useLibraryItemSvg = (
   }, [id, elements, svgCache, setSvgCache, setSvg]);
 
   return svg;
+};
+
+export const useLibraryCache = () => {
+  const [svgCache] = useAtom(libraryItemSvgsCache);
+
+  const clearLibraryCache = () => svgCache.clear();
+
+  const deleteItemsFromLibraryCache = (items: LibraryItem["id"][]) => {
+    items.forEach((item) => svgCache.delete(item));
+  };
+
+  return {
+    clearLibraryCache,
+    deleteItemsFromLibraryCache,
+    svgCache,
+  };
 };

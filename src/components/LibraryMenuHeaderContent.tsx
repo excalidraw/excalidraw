@@ -24,6 +24,7 @@ import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { useUIAppState } from "../context/ui-appState";
 import clsx from "clsx";
+import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
 const getSelectedItems = (
   libraryItems: LibraryItems,
@@ -280,6 +281,7 @@ export const LibraryDropdownMenu = ({
   className?: string;
 }) => {
   const { library } = useApp();
+  const { clearLibraryCache, deleteItemsFromLibraryCache } = useLibraryCache();
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
 
@@ -293,14 +295,24 @@ export const LibraryDropdownMenu = ({
       library.setLibrary(nextItems).catch(() => {
         setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
       });
+
+      deleteItemsFromLibraryCache(selectedItems);
+
       onSelectItems([]);
     },
-    [library, setAppState, selectedItems, onSelectItems],
+    [
+      library,
+      setAppState,
+      selectedItems,
+      onSelectItems,
+      deleteItemsFromLibraryCache,
+    ],
   );
 
   const resetLibrary = useCallback(() => {
     library.resetLibrary();
-  }, [library]);
+    clearLibraryCache();
+  }, [library, clearLibraryCache]);
 
   return (
     <LibraryDropdownMenuButton
