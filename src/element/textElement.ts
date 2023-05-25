@@ -1,8 +1,6 @@
 import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
-  ExcalidrawGenericElement,
-  ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -22,7 +20,7 @@ import {
 } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
-import { isTextElement, newElement, newTextElement } from ".";
+import { isTextElement } from ".";
 import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 import { AppState } from "../types";
@@ -34,8 +32,7 @@ import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./textWysiwyg";
-import { ExtractSetType, MarkOptional } from "../utility-types";
-import { ElementConstructorOpts, newLinearElement } from "./newElement";
+import { ExtractSetType } from "../utility-types";
 
 export const normalizeText = (text: string) => {
   return (
