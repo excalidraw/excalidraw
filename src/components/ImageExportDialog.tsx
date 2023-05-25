@@ -112,17 +112,6 @@ const ImageExportModal = ({
       });
   }, [appState, files, exportedElements]);
 
-  /**
-   * <ProjectName
-      label={t("labels.fileTitle")}
-      value={appState.name || "Unnamed"}
-      onChange={(name: string) => updateData(name)}
-      isNameEditable={
-        typeof appProps.name === "undefined" && !appState.viewModeEnabled
-      }
-    />
-   */
-
   return (
     <div className="ImageExportModal">
       <h3>{t("imageExportDialog.header")}</h3>
@@ -132,7 +121,9 @@ const ImageExportModal = ({
         </div>
         <div className="ImageExportModal__preview__filename">
           {!nativeFileSystemSupported &&
-            actionManager.renderAction("changeProjectName")}
+            actionManager.renderAction("changeProjectName", {
+              ignoreFocus: true,
+            })}
         </div>
       </div>
       <div className="ImageExportModal__settings">
