@@ -3,22 +3,8 @@
 .excalidraw {
   --ImageExportModal-preview-border: #d6d6d6;
 
-  --ImageExportModal-button-background: #6965db;
-  --ImageExportModal-button-background-hover: #5b57d1;
-  --ImageExportModal-button-background-active: #4a47b1;
-  --ImageExportModal-button-color: #ffffff;
-  --ImageExportModal-button-color-hover: #ffffff;
-  --ImageExportModal-button-color-active: #ffffff;
-
   &.theme--dark {
     --ImageExportModal-preview-border: #5c5c5c;
-
-    --ImageExportModal-button-background: #a8a5ff;
-    --ImageExportModal-button-background-hover: #b2aeff;
-    --ImageExportModal-button-background-active: #beb9ff;
-    --ImageExportModal-button-color: #121212;
-    --ImageExportModal-button-color-hover: #121212;
-    --ImageExportModal-button-color-active: #121212;
   }
 
   .ImageExportModal {
@@ -205,17 +191,16 @@
           transition: 150ms ease-out;
           transition-property: background, color;
 
-          background: var(--ImageExportModal-button-background);
-          color: var(--ImageExportModal-button-color);
+          background: var(--color-primary);
+          color: var(--color-icon-white);
 
           &:hover {
-            background: var(--ImageExportModal-button-background-hover);
-            color: var(--ImageExportModal-button-color-hover);
+            background: var(--color-primary-darker);
+            color: var(--color-icon-white);
           }
 
           &:active {
-            background: var(--ImageExportModal-button-background-active);
-            color: var(--ImageExportModal-button-color-active);
+            background: var(--color-primary-darkest);
           }
 
           & > svg {
