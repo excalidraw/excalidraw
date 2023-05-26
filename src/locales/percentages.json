@@ -30,7 +30,7 @@
   "lv-LV": 90,
   "mr-IN": 90,
   "my-MM": 41,
-  "nb-NO": 96,
+  "nb-NO": 100,
   "nl-NL": 84,
   "nn-NO": 77,
   "oc-FR": 87,
@@ -38,11 +38,11 @@
   "pl-PL": 79,
   "pt-BR": 96,
   "pt-PT": 93,
-  "ro-RO": 96,
+  "ro-RO": 100,
   "ru-RU": 96,
   "si-LK": 9,
   "sk-SK": 96,
-  "sl-SI": 96,
+  "sl-SI": 100,
   "sv-SE": 96,
   "ta-IN": 83,
   "th-TH": 39,
@@ -51,5 +51,5 @@
   "vi-VN": 56,
   "zh-CN": 96,
   "zh-HK": 26,
-  "zh-TW": 96
+  "zh-TW": 100
 }
