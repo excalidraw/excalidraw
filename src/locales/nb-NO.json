@@ -355,27 +355,27 @@
     "removeItemsFromLib": "Fjern valgte elementer fra bibliotek"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Eksporter bilde",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Bakgrunn",
+      "onlySelected": "Kun valgte",
+      "darkMode": "Mørk modus",
+      "embedScene": "Bygg inn scene",
+      "scale": "Skalering",
+      "padding": "Avstand"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Scenedata vil bli lagret i den eksporterte PNG/SVG-filen, slik at scenen kan gjenopprettes fra den.\nDet vil øke den eksporterte filstørrelsen."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Eksporter til PNG",
+      "exportToSvg": "Eksporter til SVG",
+      "copyPngToClipboard": "Kopier PNG til utklippstavlen"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopier til utklippstavle"
     }
   },
   "encrypted": {
