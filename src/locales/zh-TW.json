@@ -355,27 +355,27 @@
     "removeItemsFromLib": "從資料庫移除所選的項目"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "匯出圖片",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "背景",
+      "onlySelected": "僅選取物件",
+      "darkMode": "深色模式",
+      "embedScene": "嵌入場景",
+      "scale": "縮放比例",
+      "padding": "內間距"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "用於回復場景的場景資料會被包含在輸出的 PNG/SVG 檔案中。\n會增加輸出的檔案大小。"
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "輸出成 PNG",
+      "exportToSvg": "輸出成 SVG",
+      "copyPngToClipboard": "複製 PNG 至剪貼簿"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "複製至剪貼簿"
     }
   },
   "encrypted": {
