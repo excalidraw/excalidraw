@@ -44,7 +44,7 @@ export const Modal: React.FC<{
       <div
         className="Modal__background"
         onClick={closeOnClickOutside ? props.onCloseRequest : undefined}
-      ></div>
+      />
       <div
         className="Modal__content"
         style={{ "--max-width": `${props.maxWidth}px` }}

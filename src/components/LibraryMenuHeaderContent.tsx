@@ -106,7 +106,7 @@ export const LibraryDropdownMenuButton: React.FC<{
         onCloseRequest={() => setPublishLibSuccess(null)}
         title={t("publishSuccessDialog.title")}
         className="publish-library-success"
-        small={true}
+        size="small"
       >
         <p>
           <Trans

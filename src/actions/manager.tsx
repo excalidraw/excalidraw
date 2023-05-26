@@ -118,10 +118,13 @@ export class ActionManager {
     return true;
   }
 
-  executeAction(action: Action, source: ActionSource = "api") {
+  executeAction(
+    action: Action,
+    source: ActionSource = "api",
+    value: any = null,
+  ) {
     const elements = this.getElementsIncludingDeleted();
     const appState = this.getAppState();
-    const value = null;
 
     trackAction(action, source, appState, elements, this.app, value);
 
