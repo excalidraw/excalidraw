@@ -355,27 +355,27 @@
     "removeItemsFromLib": "Удалить выбранные объекты из библиотеки"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Экспортировать изображение",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Фон",
+      "onlySelected": "Только выделенное",
+      "darkMode": "Темная тема",
+      "embedScene": "Встроить сцену",
+      "scale": "Масштаб",
+      "padding": "Отступ"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Сцена будет сохранена в PNG/SVG файл так, чтобы всю сцену можно будет восстановить из этого файла. Это увеличит размер файла."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Экспорт в PNG",
+      "exportToSvg": "Экспорт в SVG",
+      "copyPngToClipboard": "Скопировать PNG в буфер обмена"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Скопировать в буфер обмена"
     }
   },
   "encrypted": {
