@@ -355,27 +355,27 @@
     "removeItemsFromLib": "Odstran izbrane elemente iz knjižnice"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Izvozi sliko",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Ozadje",
+      "onlySelected": "Samo izbor",
+      "darkMode": "Temni način",
+      "embedScene": "Vdelaj sceno",
+      "scale": "Povečava",
+      "padding": "Odmik"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Podatki o sceni bodo shranjeni v izvoženo datoteko PNG/SVG, tako da bo sceno mogoče obnoviti iz nje.\nTo bo povečalo velikost izvožene datoteke."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Izvozi v PNG",
+      "exportToSvg": "Izvozi v SVG",
+      "copyPngToClipboard": "Kopiraj PNG v odložišče"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopiraj v odložišče"
     }
   },
   "encrypted": {
