@@ -68,6 +68,7 @@ import {
   FrameGeometry,
   getContainingFrame,
   groupsAreCompletelyOutOfFrame,
+  isElementContainingFrame,
 } from "../frame";
 import Scene from "../scene/Scene";
 
@@ -493,6 +494,7 @@ export const _renderScene = ({
               (element.groupIds.length === 0 &&
                 !(element.type === "text" && element.containerId) &&
                 !elementsAreInFrameBounds([element], containgFrame) &&
+                !isElementContainingFrame(elements, element, containgFrame) &&
                 !FrameGeometry.isElementIntersectingFrame(
                   element,
                   containgFrame,
@@ -503,6 +505,11 @@ export const _renderScene = ({
                 element.containerId &&
                 !elementsAreInFrameBounds(
                   [Scene.getScene(element)?.getElement(element.containerId)!],
+                  containgFrame,
+                ) &&
+                !isElementContainingFrame(
+                  elements,
+                  Scene.getScene(element)?.getElement(element.containerId)!,
                   containgFrame,
                 ) &&
                 !FrameGeometry.isElementIntersectingFrame(

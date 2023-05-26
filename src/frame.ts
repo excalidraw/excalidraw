@@ -185,6 +185,16 @@ export const getElementsCompletelyInFrame = (
       (!element.frameId || element.frameId === frame.id),
   );
 
+export const isElementContainingFrame = (
+  elements: readonly ExcalidrawElement[],
+  element: ExcalidrawElement,
+  frame: ExcalidrawFrameElement,
+) => {
+  return getElementsWithinSelection(elements, element).some(
+    (e) => e.id === frame.id,
+  );
+};
+
 export const getElementsIntersectingFrame = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameElement,
@@ -361,9 +371,12 @@ export const getElementsInResizingFrame = (
   const prevElementsInFrame = getElementsInFrame(allElements, frame.id);
   const nextElementsInFrame = new Set<ExcalidrawElement>(prevElementsInFrame);
 
-  const elementsCompletelyInFrame = new Set(
-    getElementsCompletelyInFrame(allElements, frame),
-  );
+  const elementsCompletelyInFrame = new Set([
+    ...getElementsCompletelyInFrame(allElements, frame),
+    ...prevElementsInFrame.filter((element) =>
+      isElementContainingFrame(allElements, element, frame),
+    ),
+  ]);
 
   const elementsNotCompletelyInFrame = prevElementsInFrame.filter(
     (element) => !elementsCompletelyInFrame.has(element),

@@ -121,35 +121,38 @@ export const getElementLineSegments = (
     return segments;
   }
 
-  const nw = rotatePoint([x1, y1], center, element.angle);
-  const ne = rotatePoint([x2, y1], center, element.angle);
-  const sw = rotatePoint([x1, y2], center, element.angle);
-  const se = rotatePoint([x2, y2], center, element.angle);
+  const [nw, ne, sw, se, n, s, w, e] = (
+    [
+      [x1, y1],
+      [x2, y1],
+      [x1, y2],
+      [x2, y2],
+      [cx, y1],
+      [cx, y2],
+      [x1, cy],
+      [x2, cy],
+    ] as Point[]
+  ).map((point) => rotatePoint(point, center, element.angle));
 
-  if (element.type === "diamond" || element.type === "ellipse") {
-    const n = rotatePoint([cx, y1], center, element.angle);
-    const s = rotatePoint([cx, y2], center, element.angle);
-    const w = rotatePoint([x1, cy], center, element.angle);
-    const e = rotatePoint([x2, cy], center, element.angle);
-
-    if (element.type === "diamond") {
-      return [
-        [n, w],
-        [n, e],
-        [s, w],
-        [s, e],
-      ];
-    }
-
+  if (element.type === "diamond") {
     return [
       [n, w],
       [n, e],
       [s, w],
       [s, e],
-      [nw, ne],
-      [sw, se],
-      [nw, sw],
-      [ne, se],
+    ];
+  }
+
+  if (element.type === "ellipse") {
+    return [
+      [n, w],
+      [n, e],
+      [s, w],
+      [s, e],
+      [n, w],
+      [n, e],
+      [s, w],
+      [s, e],
     ];
   }
 
@@ -158,6 +161,10 @@ export const getElementLineSegments = (
     [sw, se],
     [nw, sw],
     [ne, se],
+    [nw, e],
+    [sw, e],
+    [ne, w],
+    [se, w],
   ];
 };
 
