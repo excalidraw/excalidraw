@@ -362,6 +362,8 @@ export const convertToExcalidrawElements = (
         excalidrawElement = {
           width: metrics.width,
           height: metrics.height,
+          fontFamily,
+          fontSize,
           ...elementWithid,
         };
 

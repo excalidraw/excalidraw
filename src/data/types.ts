@@ -46,9 +46,10 @@ export interface ImportedDataState {
   source?: string;
   elements?:
     | readonly (
+        | ExcalidrawElement
         | ({
-            type: Exclude<ExcalidrawElement["type"], "text">;
-            id?: ExcalidrawElement["id"];
+            type: Exclude<ExcalidrawGenericElement["type"], "selection">;
+            id?: ExcalidrawGenericElement["id"];
             label?: {
               text: string;
               fontSize?: number;
@@ -60,6 +61,8 @@ export interface ImportedDataState {
         | ({
             type: "text";
             text: string;
+            x: number;
+            y: number;
             id?: ExcalidrawTextElement["id"];
           } & Partial<ExcalidrawTextElement>)
         | ({

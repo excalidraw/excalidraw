@@ -212,6 +212,12 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             start: { type: "rectangle", id: "rect-1" },
             end: { type: "ellipse" },
           },
+          {
+            type: "text",
+            x: 300,
+            y: 100,
+            text: "HELLO WORLD!",
+          },
         ],
         null,
       ),
