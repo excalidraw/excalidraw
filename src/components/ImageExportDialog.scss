@@ -16,9 +16,9 @@
     --ImageExportModal-button-background: #a8a5ff;
     --ImageExportModal-button-background-hover: #b2aeff;
     --ImageExportModal-button-background-active: #beb9ff;
-    --ImageExportModal-button-color: #242424;
-    --ImageExportModal-button-color-hover: #242424;
-    --ImageExportModal-button-color-active: #242424;
+    --ImageExportModal-button-color: #121212;
+    --ImageExportModal-button-color-hover: #121212;
+    --ImageExportModal-button-color-active: #121212;
   }
 
   .ImageExportModal {
@@ -57,25 +57,25 @@
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      flex-grow: 1;
-
       align-items: center;
+      height: 360px;
+      width: 55%;
 
-      max-width: 55%;
-      margin-right: 3.5rem;
+      margin-right: 1.5rem;
 
       @include isMobile {
         max-width: unset;
         margin-right: unset;
+
+        width: 100%;
+        height: unset;
+        flex-grow: 1;
       }
 
       &__filename {
-        margin-top: 1rem;
-
-        font-family: "Assistant";
-        font-weight: 600;
-        font-size: 1rem;
-        line-height: 150%;
+        & > input {
+          margin-top: 1rem;
+        }
       }
 
       &__canvas {
@@ -110,8 +110,6 @@
         @include isMobile {
           margin-top: 24px;
           max-width: unset;
-          max-height: 45vh;
-          min-height: 25vh;
         }
       }
     }
@@ -120,7 +118,7 @@
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
-      gap: 14px;
+      gap: 18px;
 
       @include isMobile {
         margin-left: unset;
@@ -175,9 +173,8 @@
         flex-direction: row;
         gap: 11px;
 
-        padding-top: 100px;
-
         align-items: flex-end;
+        align-content: flex-end;
 
         @include isMobile {
           padding-top: 32px;

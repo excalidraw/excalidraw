@@ -8,6 +8,7 @@ import {
   actionChangeExportBackground,
   actionChangeExportEmbedScene,
   actionChangeExportScale,
+  actionChangeProjectName,
 } from "../actions/actionExport";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import {
@@ -32,6 +33,7 @@ import { Switch } from "./Switch";
 import { Tooltip } from "./Tooltip";
 
 import "./ImageExportDialog.scss";
+import { useAppProps } from "./App";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -63,6 +65,9 @@ const ImageExportModal = ({
   actionManager,
   onExportImage,
 }: ImageExportModalProps) => {
+  const appProps = useAppProps();
+  const [projectName, setProjectName] = useState(appState.name);
+
   const someElementIsSelected = isSomeElementSelected(elements, appState);
 
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
@@ -120,10 +125,25 @@ const ImageExportModal = ({
           {renderError && <ErrorCanvasPreview />}
         </div>
         <div className="ImageExportModal__preview__filename">
-          {!nativeFileSystemSupported &&
-            actionManager.renderAction("changeProjectName", {
-              ignoreFocus: true,
-            })}
+          {!nativeFileSystemSupported && (
+            <input
+              type="text"
+              className="TextInput"
+              value={projectName}
+              style={{ width: "30ch" }}
+              disabled={
+                typeof appProps.name !== "undefined" || appState.viewModeEnabled
+              }
+              onChange={(event) => {
+                setProjectName(event.target.value);
+                actionManager.executeAction(
+                  actionChangeProjectName,
+                  "ui",
+                  event.target.value,
+                );
+              }}
+            />
+          )}
         </div>
       </div>
       <div className="ImageExportModal__settings">
