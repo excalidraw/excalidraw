@@ -355,27 +355,27 @@
     "removeItemsFromLib": "Ausgewählte Elemente aus der Bibliothek entfernen"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Bild exportieren",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Hintergrund",
+      "onlySelected": "Nur ausgewählte",
+      "darkMode": "Dunkler Modus",
+      "embedScene": "Szene einbetten",
+      "scale": "Skalierung",
+      "padding": "Abstand"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Die Zeichnungsdaten werden in der exportierten PNG/SVG-Datei gespeichert, sodass das Dokument später weiter bearbeitet werden kann. \nDieses wird die exportierte Datei vergrößern."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Als PNG exportieren",
+      "exportToSvg": "Als SVG exportieren",
+      "copyPngToClipboard": "PNG in die Zwischenablage kopieren"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "In Zwischenablage kopieren"
     }
   },
   "encrypted": {
