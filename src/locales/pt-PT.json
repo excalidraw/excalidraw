@@ -355,12 +355,12 @@
     "removeItemsFromLib": "Remover os itens seleccionados da biblioteca"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exportar imagem",
     "label": {
       "withBackground": "",
       "onlySelected": "",
       "darkMode": "",
-      "embedScene": "",
+      "embedScene": "Cena embutida",
       "scale": "",
       "padding": ""
     },
@@ -368,13 +368,13 @@
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "Exportar em PNG",
+      "exportToSvg": "Exportar em SVG",
       "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": ""
     }
   },
