@@ -98,7 +98,7 @@
 
         & > canvas {
           max-width: calc(100% - 2rem);
-          max-height: 25rem;
+          max-height: calc(100% - 2rem);
 
           filter: none !important;
 
