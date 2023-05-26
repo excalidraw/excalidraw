@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trójkąt",
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
-    "onlySelected": "Tylko wybrane",
-    "withBackground": "Kolor wypełnienia",
-    "exportEmbedScene": "Osadź scenę",
-    "exportEmbedScene_details": "Dane sceny zostaną zapisane w eksportowanym pliku PNG/SVG tak, aby scena mogła zostać z niego przywrócona.\nZwiększy to rozmiar eksportowanego pliku.",
     "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
     "handDrawn": "Odręczny",
     "normal": "Normalny",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Odwróć w poziomie",
     "flipVertical": "Odwróć w pionie",
     "viewMode": "Tryb widoku",
-    "toggleExportColorScheme": "Przełącz schemat kolorów przy eksporcie",
     "share": "Udostępnij",
     "showStroke": "Pokaż próbnik kolorów obrysu",
     "showBackground": "Pokaż próbnik koloru tła",
@@ -140,11 +135,7 @@
     "exportJSON": "Eksportuj do pliku",
     "exportImage": "Eksportuj obraz...",
     "export": "Zapisz jako...",
-    "exportToPng": "Zapisz jako PNG",
-    "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
-    "copyPngToClipboard": "Skopiuj do schowka jako plik PNG",
-    "scale": "Skala",
     "save": "Zapisz do bieżącego pliku",
     "saveAs": "Zapisz jako",
     "load": "Otwórz",
@@ -362,6 +353,30 @@
   "confirmDialog": {
     "resetLibrary": "Zresetuj Bibliotekę",
     "removeItemsFromLib": "Usuń wybrane elementy z biblioteki"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz.",
