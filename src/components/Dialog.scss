@@ -16,19 +16,26 @@
   }
 
   .Dialog__close {
-    color: #b8b8b8;
+    color: var(--color-gray-40);
     margin: 0;
     position: absolute;
-    top: 12px;
-    right: 8px;
+    top: 0.75rem;
+    right: 0.5rem;
     border: 0;
     background-color: transparent;
     line-height: 0;
     cursor: pointer;
 
+    &:hover {
+      color: var(--color-gray-60);
+    }
+    &:active {
+      color: var(--color-gray-40);
+    }
+
     @include isMobile {
-      top: 20px;
-      right: 20px;
+      top: 1.25rem;
+      right: 1.25rem;
     }
 
     svg {
