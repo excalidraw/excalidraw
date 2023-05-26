@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Трикутник",
     "fontSize": "Розмір шрифту",
     "fontFamily": "Шрифт",
-    "onlySelected": "Тільки вибране",
-    "withBackground": "Фон",
-    "exportEmbedScene": "Вбудована сцена",
-    "exportEmbedScene_details": "Дані сцени будуть збережені в експортований файл PNG/SVG. Ця сцена може бути відновленна з нього, однак це збільшить розмір експортованого файлу.",
     "addWatermark": "Додати «Накреслене в Excalidraw»",
     "handDrawn": "Ручний апарат",
     "normal": "Звичайний",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Віддзеркалити горизонтально",
     "flipVertical": "Віддзеркалити вертикально",
     "viewMode": "Режим перегляду",
-    "toggleExportColorScheme": "Переключити колірну схему експорту",
     "share": "Поділитися",
     "showStroke": "Показати палітру для контура",
     "showBackground": "Показати палітру для фону",
@@ -140,11 +135,7 @@
     "exportJSON": "Експорт у файл",
     "exportImage": "Експорт зображення...",
     "export": "Зберегти як...",
-    "exportToPng": "Експортувати в PNG",
-    "exportToSvg": "Експортувати в SVG",
     "copyToClipboard": "Скопіювати до буферу обміну",
-    "copyPngToClipboard": "Скопіювати PNG до буферу обміну",
-    "scale": "Масштаб",
     "save": "Зберегти до поточного файлу",
     "saveAs": "Зберегти як",
     "load": "Відкрити",
@@ -362,6 +353,30 @@
   "confirmDialog": {
     "resetLibrary": "Очистити бібліотеку",
     "removeItemsFromLib": "Видалити вибрані елементи з бібліотеки"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать.",
