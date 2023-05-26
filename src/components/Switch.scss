@@ -69,6 +69,10 @@
       background: var(--Switch-thumb-background);
     }
 
+    &:active:before {
+      width: 12px;
+    }
+
     &.toggled:before {
       width: 14px;
       height: 14px;
@@ -76,6 +80,11 @@
       top: 2px;
 
       background: var(--Switch-track-background);
+    }
+
+    &.toggled:active:before {
+      width: 16px;
+      left: 20px;
     }
 
     &.disabled:before {

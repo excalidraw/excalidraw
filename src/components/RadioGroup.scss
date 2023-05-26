@@ -5,8 +5,8 @@
   --RadioGroup-border: var(--color-gray-30);
 
   --RadioGroup-choice-color-off: var(--color-primary);
+  --RadioGroup-choice-color-off-hover: var(--color-primary-darkest);
   --RadioGroup-choice-background-off: white;
-  --RadioGroup-choice-background-off-hover: var(--color-gray-10);
   --RadioGroup-choice-background-off-active: var(--color-gray-20);
 
   --RadioGroup-choice-color-on: white;
@@ -19,7 +19,6 @@
     --RadioGroup-border: var(--color-gray-70);
 
     --RadioGroup-choice-background-off: var(--color-gray-85);
-    --RadioGroup-choice-background-off-hover: var(--color-gray-80);
     --RadioGroup-choice-background-off-active: var(--color-gray-70);
     --RadioGroup-choice-color-on: var(--color-gray-85);
   }
@@ -30,7 +29,7 @@
     flex-direction: row;
     align-items: flex-start;
 
-    padding: 2px;
+    padding: 3px;
     border-radius: 10px;
 
     background: var(--RadioGroup-background);
@@ -60,7 +59,7 @@
       transition: all 75ms ease-out;
 
       &:hover {
-        background: var(--RadioGroup-choice-background-off-hover);
+        color: var(--RadioGroup-choice-color-off-hover);
       }
 
       &:active {

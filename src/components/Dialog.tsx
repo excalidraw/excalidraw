@@ -21,10 +21,9 @@ import { jotaiScope } from "../jotai";
 export interface DialogProps {
   children: React.ReactNode;
   className?: string;
-  small?: boolean;
-  wide?: boolean;
+  size?: "small" | "regular" | "wide";
   onCloseRequest(): void;
-  title?: React.ReactNode;
+  title: React.ReactNode | false;
   autofocus?: boolean;
   theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
@@ -88,7 +87,9 @@ export const Dialog = (props: DialogProps) => {
     <Modal
       className={clsx("Dialog", props.className)}
       labelledBy="dialog-title"
-      maxWidth={props.wide ? 1024 : props.small ? 550 : 800}
+      maxWidth={
+        props.size === "wide" ? 1024 : props.size === "small" ? 550 : 800
+      }
       onCloseRequest={onClose}
       theme={props.theme}
       closeOnClickOutside={props.closeOnClickOutside}

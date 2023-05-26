@@ -305,7 +305,7 @@ describe("<Excalidraw/>", () => {
       const textInput = document.querySelector(
         ".ImageExportModal .ImageExportModal__preview__filename .TextInput",
       ) as HTMLInputElement;
-      expect(textInput?.textContent).toEqual(name);
+      expect(textInput?.value).toEqual(name);
       expect(textInput?.nodeName).toBe("INPUT");
       expect(textInput?.disabled).toBe(true);
     });
