@@ -85,6 +85,7 @@ const bindTextToContainer = (
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     ...textProps,
     containerId: container.id,
+    strokeColor: textProps.strokeColor || container.strokeColor,
   });
 
   mutateElement(container, {
@@ -157,7 +158,7 @@ const bindLinearElementToElement = (
     ...rest
   } = linearElement;
   const width = linearElement.width || 300;
-  const height = linearElement.height || 24;
+  const height = linearElement.height || 0;
   const excliadrawLinearElement = newLinearElement({
     type,
     width,
