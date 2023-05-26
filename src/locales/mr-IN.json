@@ -40,10 +40,6 @@
     "arrowhead_triangle": "त्रिकोण",
     "fontSize": "अक्षर आकार",
     "fontFamily": "अक्षर समूह",
-    "onlySelected": "नुसता निवडलेला",
-    "withBackground": "पार्श्वभूमी",
-    "exportEmbedScene": "दृश्य रुतवून टाका",
-    "exportEmbedScene_details": "दृश्य डेटा पण एक्सपोर्ट केलेल्या पी-एन-जी/एस-वी-जी फाईलमध्ये जतन केला जाईल जेणेकरून त्यामधून दृश्य परत आणता येईल.\nनिर्यात केलेल्या फाइलचा आकार वाढेल.",
     "addWatermark": "\"एक्सकेलीड्रॉ ने बनवलेलं\" जोडा",
     "handDrawn": "हातानी बनवलेलं",
     "normal": "सामान्य",
@@ -100,7 +96,6 @@
     "flipHorizontal": "आडवं फ्लिप करा",
     "flipVertical": "उभं फ्लिप करा",
     "viewMode": "पहायची पद्धत",
-    "toggleExportColorScheme": "रंग शैली जतन पलटा",
     "share": "सामायिक करा",
     "showStroke": "रेघ रंग निवड यंत्र दाखवा",
     "showBackground": "पार्श्वभूमि: रंग निवड यंत्र दाखवा",
@@ -140,11 +135,7 @@
     "exportJSON": "फ़ाइलमधे बाहेर ठेवा",
     "exportImage": "प्रतिमा निर्यात करा...",
     "export": "येथे सुरक्षित करा...",
-    "exportToPng": "पी-एन-जी स्वरूपात बाहेर ठेवा",
-    "exportToSvg": "एस-वी-जी स्वरूपात बाहेर ठेवा",
     "copyToClipboard": "फळी वर कॉपी करा",
-    "copyPngToClipboard": "PNG रूपे फळी वर कॉपी करा",
-    "scale": "मोजपट्टी",
     "save": "वर्तमान फ़ाइल मधे जतन करा",
     "saveAs": "ह्या नावाने जतन करा",
     "load": "उघडा",
@@ -362,6 +353,30 @@
   "confirmDialog": {
     "resetLibrary": "संग्रह पुनर्स्थित करा",
     "removeItemsFromLib": "निवडलेले आयटम्स संग्रहातून काढा"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "तुमचे चित्रे या टोकापासून त्या टोकापर्यंत कूटबद्धतित आहेत, त्या कारणांनी ऐक्सकैलिड्रॉ सर्वर्स ह्यानां ते पहाणं कधीच जमणार नाही.",
