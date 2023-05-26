@@ -40,10 +40,6 @@
     "arrowhead_triangle": "ਤਿਕੋਣ",
     "fontSize": "ਫੌਂਟ ਅਕਾਰ",
     "fontFamily": "ਫੌਂਟ ਪਰਿਵਾਰ",
-    "onlySelected": "ਸਿਰਫ ਚੁਣੇ ਹੋਏ ਹੀ",
-    "withBackground": "ਬੈਕਗਰਾਉਂਡ",
-    "exportEmbedScene": "ਦ੍ਰਿਸ਼ ਮੜ੍ਹੋ",
-    "exportEmbedScene_details": "ਦ੍ਰਿਸ਼ ਦਾ ਡਾਟਾ ਨਿਰਯਾਤ ਕੀਤੀ PNG/SVG ਫਾਈਲ ਵਿੱਚ ਸਾਂਭ ਦਿੱਤਾ ਜਾਵੇਗਾ ਤਾਂ ਜੋ ਇਸ ਵਿੱਚੋਂ ਦ੍ਰਿਸ਼ ਨੂੰ ਬਹਾਲ ਕੀਤਾ ਜਾ ਸਕੇ। ਇਹ ਨਿਰਯਾਤ ਕੀਤੀ ਜਾਣ ਵਾਲੀ ਫਾਈਲ ਦਾ ਅਕਾਰ ਵਧਾ ਦੇਵੇਗਾ।",
     "addWatermark": "\"Excalidraw ਨਾਲ ਬਣਾਇਆ\" ਜੋੜੋ",
     "handDrawn": "ਹੱਥਲਿਖਤ",
     "normal": "ਆਮ",
@@ -100,7 +96,6 @@
     "flipHorizontal": "ਲੇਟਵੇਂ ਪਾਸੇ ਪਲਟੋ",
     "flipVertical": "ਖੜ੍ਹਵੇਂ ਪਾਸੇ ਪਲਟੋ",
     "viewMode": "ਦੇਖਣ ਵਾਲਾ ਮੋਡ",
-    "toggleExportColorScheme": "ਨਿਰਯਾਤ ਦੇ ਰੰਗਾਂ ਦੀ ਸਕੀਮ ਟਾਗਲ ਕਰੋ",
     "share": "ਸਾਂਝਾ ਕਰੋ",
     "showStroke": "ਰੇਖਾ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
     "showBackground": "ਬੈਕਗਰਾਉਂਡ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
@@ -140,11 +135,7 @@
     "exportJSON": "ਫਾਈਲ ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
     "exportImage": "ਤਸਵੀਰ ਨਿਰਯਾਤ ਕਰੋ...",
     "export": "ਇਸ ਵਿੱਚ ਸਾਂਭੋ...",
-    "exportToPng": "PNG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
-    "exportToSvg": "SVG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
     "copyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕਰੋ",
-    "copyPngToClipboard": "PNG ਨੂੰ ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕਰੋ",
-    "scale": "ਪੈਮਾਇਸ਼",
     "save": "ਮੌਜੂਦਾ ਫਾਈਲ ਵਿੱਚ ਸਾਂਭੋ",
     "saveAs": "ਇਸ ਵਜੋਂ ਸਾਂਭੋ",
     "load": "ਖੋਲ੍ਹੋ",
@@ -362,6 +353,30 @@
   "confirmDialog": {
     "resetLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਰੀਸੈੱਟ ਕਰੋ",
     "removeItemsFromLib": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ ਚੁਣੀਆਂ ਹੋਈਆਂ ਆਈਟਮਾਂ ਹਟਾਓ"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "ਤੁਹਾਡੀ ਡਰਾਇੰਗਾਂ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਟ ਕੀਤੀਆਂ ਹੋਈਆਂ ਹਨ, ਇਸ ਲਈ Excalidraw ਦੇ ਸਰਵਰ ਉਹਨਾਂ ਨੂੰ ਕਦੇ ਵੀ ਨਹੀਂ ਦੇਖਣਗੇ।",
