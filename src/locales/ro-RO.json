@@ -355,27 +355,27 @@
     "removeItemsFromLib": "Elimină elementele selectate din bibliotecă"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exportare imagine",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Fundal",
+      "onlySelected": "Numai selecția",
+      "darkMode": "Mod întunecat",
+      "embedScene": "Încorporare scenă",
+      "scale": "Scală",
+      "padding": "Spațiere"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Datele scenei vor fi salvate în fișierul PNG/SVG exportat, astfel că scena va putea fi restaurată din acesta.\nVa crește dimensiunea fișierului exportat."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportare ca PNG",
+      "exportToSvg": "Exportare ca SVG",
+      "copyPngToClipboard": "Copiere PNG în memoria temporară"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copiere în memoria temporară"
     }
   },
   "encrypted": {
