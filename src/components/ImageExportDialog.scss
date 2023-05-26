@@ -179,6 +179,7 @@
         @include isMobile {
           padding-top: 32px;
           flex-basis: 100%;
+          justify-content: center;
         }
 
         &__button {
