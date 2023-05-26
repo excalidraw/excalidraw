@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trekant",
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Fontfamilie",
-    "onlySelected": "Kun valgte",
-    "withBackground": "Bakgrunn",
-    "exportEmbedScene": "Bygg inn scene",
-    "exportEmbedScene_details": "Scenedata vil bli lagret i den eksporterte PNG/SVG-filen, slik at scenen kan gjenopprettes fra den.\nDet vil øke den eksporterte filstørrelsen.",
     "addWatermark": "Legg til \"Laget med Excalidraw\"",
     "handDrawn": "Håndtegnet",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Snu horisontalt",
     "flipVertical": "Snu vertikalt",
     "viewMode": "Visningsmodus",
-    "toggleExportColorScheme": "Veksle eksport av fargepalett",
     "share": "Del",
     "showStroke": "Vis fargevelger for kantfarge",
     "showBackground": "Vis fargevelger for bakgrunnsfarge",
@@ -140,11 +135,7 @@
     "exportJSON": "Eksporter til fil",
     "exportImage": "Eksporter bilde...",
     "export": "Lagre som...",
-    "exportToPng": "Eksporter til PNG",
-    "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavle",
-    "copyPngToClipboard": "Kopier PNG til utklippstavlen",
-    "scale": "Skalering",
     "save": "Lagre til aktiv fil",
     "saveAs": "Lagre som",
     "load": "Åpne",
@@ -362,6 +353,30 @@
   "confirmDialog": {
     "resetLibrary": "Nullstill bibliotek",
     "removeItemsFromLib": "Fjern valgte elementer fra bibliotek"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem.",
