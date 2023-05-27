@@ -5795,37 +5795,59 @@ class App extends React.Component<AppProps, AppState> {
         extensions: Object.keys(
           IMAGE_MIME_TYPES,
         ) as (keyof typeof IMAGE_MIME_TYPES)[],
+        multiple: true,
       });
 
-      const imageElement = this.createImageElement({
-        sceneX: x,
-        sceneY: y,
-      });
-
-      if (insertOnCanvasDirectly) {
-        this.insertImageElement(imageElement, imageFile);
-        this.initializeImageDimensions(imageElement);
-        this.setState(
-          {
-            selectedElementIds: { [imageElement.id]: true },
-          },
-          () => {
-            this.actionManager.executeAction(actionFinalize);
-          },
-        );
+      if (imageFile.length > 1) {
+        for (let i = 0; i < imageFile.length; i++) {
+          const imageElement = this.createImageElement({
+            sceneX: x,
+            sceneY: y,
+          });
+          this.insertImageElement(imageElement, imageFile[i]);
+          this.initializeImageDimensions(imageElement);
+          this.setState(
+            {
+              selectedElementIds: { [imageElement.id]: true },
+            },
+            () => {
+              this.actionManager.executeAction(actionFinalize);
+            },
+          );
+        }
       } else {
-        this.setState(
-          {
-            pendingImageElementId: imageElement.id,
-          },
-          () => {
-            this.insertImageElement(
-              imageElement,
-              imageFile,
-              /* showCursorImagePreview */ true,
-            );
-          },
-        );
+        const singleImageFile = imageFile[0];
+
+        const imageElement = this.createImageElement({
+          sceneX: x,
+          sceneY: y,
+        });
+
+        if (insertOnCanvasDirectly) {
+          this.insertImageElement(imageElement, singleImageFile);
+          this.initializeImageDimensions(imageElement);
+          this.setState(
+            {
+              selectedElementIds: { [imageElement.id]: true },
+            },
+            () => {
+              this.actionManager.executeAction(actionFinalize);
+            },
+          );
+        } else {
+          this.setState(
+            {
+              pendingImageElementId: imageElement.id,
+            },
+            () => {
+              this.insertImageElement(
+                imageElement,
+                singleImageFile,
+                /* showCursorImagePreview */ true,
+              );
+            },
+          );
+        }
       }
     } catch (error: any) {
       if (error.name !== "AbortError") {
