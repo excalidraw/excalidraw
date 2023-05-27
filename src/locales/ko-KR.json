@@ -410,19 +410,19 @@
   },
   "colors": {
     "transparent": "투명",
-    "black": "검정색",
-    "white": "흰색",
-    "red": "빨강색",
-    "pink": "핑크색",
+    "black": "블랙",
+    "white": "화이트",
+    "red": "레드",
+    "pink": "핑크",
     "grape": "그레이프",
     "violet": "바이올렛",
-    "gray": "회색",
-    "blue": "파란색",
+    "gray": "그레이",
+    "blue": "블루",
     "cyan": "시안",
     "teal": "틸",
-    "green": "녹색",
-    "yellow": "노란색",
-    "orange": "주황색",
+    "green": "그린",
+    "yellow": "옐로우",
+    "orange": "오렌지",
     "bronze": "브론즈"
   },
   "welcomeScreen": {
@@ -439,10 +439,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "자주 사용된 커스텀 색상들",
+    "mostUsedCustomColors": "많이 쓰이는 사용자 색상들",
     "colors": "색상",
     "shades": "색조",
     "hexCode": "Hex 코드",
-    "noShades": "이 색상에는 색조가 없습니다"
+    "noShades": "사용할 수 있는 색조가 없음"
   }
 }
