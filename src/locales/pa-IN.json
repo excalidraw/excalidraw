@@ -347,7 +347,7 @@
     "republishWarning": ""
   },
   "publishSuccessDialog": {
-    "title": "",
+    "title": "ਲਾਇਬ੍ਰੇਰੀ ਜਮ੍ਹਾਂ ਕਰਵਾਈ",
     "content": "ਧੰਨਵਾਦ {{authorName}} ਜੀਉ। ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਸਮੀਖਿਆ ਲਈ ਭੇਜ ਦਿੱਤਾ ਗਿਆ ਹੈ। ਤੁਸੀਂ ਉਸਦੀ ਸਥਿਤੀ <link>ਇੱਥੇ</link> ਦੇਖ ਸਕਦੇ ਹੋ।"
   },
   "confirmDialog": {
@@ -355,12 +355,12 @@
     "removeItemsFromLib": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ ਚੁਣੀਆਂ ਹੋਈਆਂ ਆਈਟਮਾਂ ਹਟਾਓ"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "ਤਸਵੀਰ ਨਿਰਯਾਤ ਕਰੋ",
     "label": {
       "withBackground": "ਪਿਛੋਕੜ",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
+      "onlySelected": "ਸਿਰਫ ਚੁਣੇ ਹੋਏ",
+      "darkMode": "ਡਾਰਕ ਮੋਡ",
+      "embedScene": "ਦ੍ਰਿਸ਼ ਮੜ੍ਹੋ",
       "scale": "ਸਕੇਲ",
       "padding": "ਪੈਡਿੰਗ"
     },
@@ -368,13 +368,13 @@
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
+      "exportToSvg": "SVG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
+      "copyPngToClipboard": "PNG ਨੂੰ ਕਲਿੱਪੋਬਰਡ ‘ਤੇ ਕਾਪੀ ਕਰੋ"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "ਗੱਤੇ 'ਤੇ ਕਾਪੀ ਕਰੋ"
     }
   },
@@ -416,33 +416,33 @@
     "pink": "ਗੁਲਾਬੀ",
     "grape": "ਅੰਗੂਰੀ",
     "violet": "ਜਾਮਣੀ",
-    "gray": "ਗਰੇਅ",
-    "blue": "ਨੀਲੀ",
-    "cyan": "ਨੀਲਾ",
-    "teal": "",
+    "gray": "ਸੁਰਮਈ",
+    "blue": "ਨੀਲਾ",
+    "cyan": "ਫਿਰੋਜੀ",
+    "teal": "ਟੀਲ",
     "green": "ਹਰਾ",
     "yellow": "ਪੀਲਾ",
     "orange": "ਸੰਤਰੀ",
-    "bronze": ""
+    "bronze": "ਕਾਂਸੇਰੰਗਾ"
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
+      "center_heading": "ਤੁਹਾਡਾ ਸਾਰਾ ਡਾਟਾ ਤੁਹਾਡੇ ਲੋਕਲ ਬਰਾਉਜ਼ਰ ਵਿੱਚ ਸਾਂਭਿਆ ਹੋਇਆ ਹੈ।",
       "center_heading_plus": "",
-      "menuHint": ""
+      "menuHint": "ਨਿਰਯਾਤ, ਤਰਜੀਹਾਂ, ਭਾਸ਼ਾਵਾਂ, …"
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
+      "menuHint": "ਨਿਰਯਾਤ, ਤਰਜੀਹਾਂ, ਅਤੇ ਹੋਰ ਵੀ ਬਹੁਤ ਕੁਝ…",
+      "center_heading": "ਡਾਇਆਗ੍ਰਾਮਾਂ। ਕੀਤੀਆਂ। ਸੁਖਾਲੀਆਂ।",
       "toolbarHint": "",
-      "helpHint": ""
+      "helpHint": "ਸ਼ਾਰਟਕੱਟ ਤੇ ਮਦਦ"
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
+    "mostUsedCustomColors": "ਸਭ ਤੋਂ ਵੱਧ ਵਰਤੇ ਜਾਣ ਵਾਲੇ ਕਸਟਮ ਰੰਗ",
     "colors": "ਰੰਗ",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "shades": "ਸ਼ੇਡਾਂ",
+    "hexCode": "ਹੈਕਸ ਕੋਡ",
+    "noShades": "ਇਸ ਰੰਗ ਦੀ ਕੋਈ ਸ਼ੇਡ ਉਪਲਬਧ ਨਹੀਂ ਹੈ"
   }
 }
