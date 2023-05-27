@@ -252,7 +252,7 @@ import {
   dataURLToFile,
   generateIdFromFile,
   getDataURL,
-  getFileFromEvent,
+  getFilesFromEvent,
   isImageFileHandle,
   isSupportedImageFile,
   loadSceneOrLibraryFromBlob,
@@ -6093,80 +6093,86 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     // must be retrieved first, in the same frame
-    const { file, fileHandle } = await getFileFromEvent(event);
+    const { files, fileHandle } = await getFilesFromEvent(event);
 
-    try {
-      if (isSupportedImageFile(file)) {
-        // first attempt to decode scene from the image if it's embedded
-        // ---------------------------------------------------------------------
+    files?.forEach(async (file) => {
+      try {
+        if (isSupportedImageFile(file)) {
+          // first attempt to decode scene from the image if it's embedded
+          // ---------------------------------------------------------------------
 
-        if (file?.type === MIME_TYPES.png || file?.type === MIME_TYPES.svg) {
-          try {
-            const scene = await loadFromBlob(
-              file,
-              this.state,
-              this.scene.getElementsIncludingDeleted(),
-              fileHandle,
-            );
-            this.syncActionResult({
-              ...scene,
-              appState: {
-                ...(scene.appState || this.state),
-                isLoading: false,
-              },
-              replaceFiles: true,
-              commitToHistory: true,
-            });
-            return;
-          } catch (error: any) {
-            if (error.name !== "EncodingError") {
-              throw error;
+          if (file?.type === MIME_TYPES.png || file?.type === MIME_TYPES.svg) {
+            try {
+              const scene = await loadFromBlob(
+                file,
+                this.state,
+                this.scene.getElementsIncludingDeleted(),
+                fileHandle,
+              );
+              this.syncActionResult({
+                ...scene,
+                appState: {
+                  ...(scene.appState || this.state),
+                  isLoading: false,
+                },
+                replaceFiles: true,
+                commitToHistory: true,
+              });
+              return;
+            } catch (error: any) {
+              if (error.name !== "EncodingError") {
+                throw error;
+              }
             }
           }
+
+          // if no scene is embedded or we fail for whatever reason, fall back
+          // to importing as regular image
+          // ---------------------------------------------------------------------
+
+          const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+            event,
+            this.state,
+          );
+
+          const imageElement = this.createImageElement({ sceneX, sceneY });
+          this.insertImageElement(imageElement, file);
+          this.initializeImageDimensions(imageElement);
+          this.setState({ selectedElementIds: { [imageElement.id]: true } });
+
+          return;
         }
 
-        // if no scene is embedded or we fail for whatever reason, fall back
-        // to importing as regular image
-        // ---------------------------------------------------------------------
-
-        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          event,
-          this.state,
+        const libraryJSON = event.dataTransfer.getData(
+          MIME_TYPES.excalidrawlib,
         );
+        if (libraryJSON && typeof libraryJSON === "string") {
+          try {
+            const libraryItems = parseLibraryJSON(libraryJSON);
+            this.addElementsFromPasteOrLibrary({
+              elements: distributeLibraryItemsOnSquareGrid(libraryItems),
+              position: event,
+              files: null,
+            });
+          } catch (error: any) {
+            this.setState({ errorMessage: error.message });
+          }
+          return;
+        }
 
-        const imageElement = this.createImageElement({ sceneX, sceneY });
-        this.insertImageElement(imageElement, file);
-        this.initializeImageDimensions(imageElement);
-        this.setState({ selectedElementIds: { [imageElement.id]: true } });
+        // const file = files?.[0];
 
-        return;
-      }
-    } catch (error: any) {
-      return this.setState({
-        isLoading: false,
-        errorMessage: error.message,
-      });
-    }
-
-    const libraryJSON = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
-    if (libraryJSON && typeof libraryJSON === "string") {
-      try {
-        const libraryItems = parseLibraryJSON(libraryJSON);
-        this.addElementsFromPasteOrLibrary({
-          elements: distributeLibraryItemsOnSquareGrid(libraryItems),
-          position: event,
-          files: null,
-        });
+        if (file) {
+          // atetmpt to parse an excalidraw/excalidrawlib file
+          await this.loadFileToCanvas(file, fileHandle);
+        }
       } catch (error: any) {
-        this.setState({ errorMessage: error.message });
+        return this.setState({
+          isLoading: false,
+          errorMessage: error.message,
+        });
       }
-      return;
-    }
-
-    if (file) {
-      // atetmpt to parse an excalidraw/excalidrawlib file
-      await this.loadFileToCanvas(file, fileHandle);
-    }
+    });
   };
 
   loadFileToCanvas = async (
