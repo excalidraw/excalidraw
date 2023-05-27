@@ -355,27 +355,27 @@
     "removeItemsFromLib": "Odstrániť zvolené položky z knižnice"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exportovať obrázok",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Pozadie",
+      "onlySelected": "Iba vybrané",
+      "darkMode": "Tmavý režim",
+      "embedScene": "Zahrnúť scénu",
+      "scale": "Mierka",
+      "padding": "Odsadenie"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Údaje scény budú uložené do exportovaného PNG/SVG súboru, takže scéna z neho môže byť opäť obnovená.\nBude to mať za následok zvýšenie veľkosti súboru."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportovať do PNG",
+      "exportToSvg": "Exportovať do SVG",
+      "copyPngToClipboard": "Kopírovať PNG do schránky"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopírovať do schránky"
     }
   },
   "encrypted": {
