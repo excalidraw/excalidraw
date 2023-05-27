@@ -355,27 +355,27 @@
     "removeItemsFromLib": "선택한 항목을 라이브러리에서 제거"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "이미지 내보내기",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "배경",
+      "onlySelected": "선택한 항목만",
+      "darkMode": "다크 모드",
+      "embedScene": "화면을 담기",
+      "scale": "크기",
+      "padding": "여백"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "화면 정보가 내보내는 PNG/SVG 파일에 저장되어 이후에 파일에서 화면을 복구할 수 있습니다. 파일 크기가 증가합니다."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG로 내보내기",
+      "exportToSvg": "SVG로 내보내기",
+      "copyPngToClipboard": "클립보드로 PNG 복사"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "클립보드로 복사"
     }
   },
   "encrypted": {
