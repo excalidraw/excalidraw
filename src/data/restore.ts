@@ -34,13 +34,13 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getFontString, getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
-import oc from "open-color";
 import { MarkOptional, Mutable } from "../utility-types";
 import {
   detectLineHeight,
   getDefaultLineHeight,
   measureBaseline,
 } from "../element/textElement";
+import { COLOR_PALETTE } from "../colors";
 
 type RestoredAppState = Omit<
   AppState,
@@ -119,8 +119,8 @@ const restoreElementWithProperties = <
     angle: element.angle || 0,
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
-    strokeColor: element.strokeColor || oc.black,
-    backgroundColor: element.backgroundColor || "transparent",
+    strokeColor: element.strokeColor || COLOR_PALETTE.black,
+    backgroundColor: element.backgroundColor || COLOR_PALETTE.transparent,
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,

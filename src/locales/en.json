@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triangle",
     "fontSize": "Font size",
     "fontFamily": "Font family",
-    "onlySelected": "Only selected",
-    "withBackground": "Background",
-    "exportEmbedScene": "Embed scene",
-    "exportEmbedScene_details": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
     "addWatermark": "Add \"Made with Excalidraw\"",
     "handDrawn": "Hand-drawn",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Flip horizontal",
     "flipVertical": "Flip vertical",
     "viewMode": "View mode",
-    "toggleExportColorScheme": "Toggle export color scheme",
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
@@ -140,11 +135,7 @@
     "exportJSON": "Export to file",
     "exportImage": "Export image...",
     "export": "Save to...",
-    "exportToPng": "Export to PNG",
-    "exportToSvg": "Export to SVG",
     "copyToClipboard": "Copy to clipboard",
-    "copyPngToClipboard": "Copy PNG to clipboard",
-    "scale": "Scale",
     "save": "Save to current file",
     "saveAs": "Save as",
     "load": "Open",
@@ -363,6 +354,30 @@
     "resetLibrary": "Reset library",
     "removeItemsFromLib": "Remove selected items from library"
   },
+  "imageExportDialog": {
+    "header": "Export image",
+    "label": {
+      "withBackground": "Background",
+      "onlySelected": "Only selected",
+      "darkMode": "Dark mode",
+      "embedScene": "Embed scene",
+      "scale": "Scale",
+      "padding": "Padding"
+    },
+    "tooltip": {
+      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size."
+    },
+    "title": {
+      "exportToPng": "Export to PNG",
+      "exportToSvg": "Export to SVG",
+      "copyPngToClipboard": "Copy PNG to clipboard"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copy to clipboard"
+    }
+  },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
     "link": "Blog post on end-to-end encryption in Excalidraw"
@@ -394,51 +409,21 @@
     "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor"
   },
   "colors": {
-    "ffffff": "White",
-    "f8f9fa": "Gray 0",
-    "f1f3f5": "Gray 1",
-    "fff5f5": "Red 0",
-    "fff0f6": "Pink 0",
-    "f8f0fc": "Grape 0",
-    "f3f0ff": "Violet 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Blue 0",
-    "e3fafc": "Cyan 0",
-    "e6fcf5": "Teal 0",
-    "ebfbee": "Green 0",
-    "f4fce3": "Lime 0",
-    "fff9db": "Yellow 0",
-    "fff4e6": "Orange 0",
     "transparent": "Transparent",
-    "ced4da": "Gray 4",
-    "868e96": "Gray 6",
-    "fa5252": "Red 6",
-    "e64980": "Pink 6",
-    "be4bdb": "Grape 6",
-    "7950f2": "Violet 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Blue 6",
-    "15aabf": "Cyan 6",
-    "12b886": "Teal 6",
-    "40c057": "Green 6",
-    "82c91e": "Lime 6",
-    "fab005": "Yellow 6",
-    "fd7e14": "Orange 6",
-    "000000": "Black",
-    "343a40": "Gray 8",
-    "495057": "Gray 7",
-    "c92a2a": "Red 9",
-    "a61e4d": "Pink 9",
-    "862e9c": "Grape 9",
-    "5f3dc4": "Violet 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Blue 9",
-    "0b7285": "Cyan 9",
-    "087f5b": "Teal 9",
-    "2b8a3e": "Green 9",
-    "5c940d": "Lime 9",
-    "e67700": "Yellow 9",
-    "d9480f": "Orange 9"
+    "black": "Black",
+    "white": "White",
+    "red": "Red",
+    "pink": "Pink",
+    "grape": "Grape",
+    "violet": "Violet",
+    "gray": "Gray",
+    "blue": "Blue",
+    "cyan": "Cyan",
+    "teal": "Teal",
+    "green": "Green",
+    "yellow": "Yellow",
+    "orange": "Orange",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
@@ -452,5 +437,12 @@
       "toolbarHint": "Pick a tool & Start drawing!",
       "helpHint": "Shortcuts & help"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "Most used custom colors",
+    "colors": "Colors",
+    "shades": "Shades",
+    "hexCode": "Hex code",
+    "noShades": "No shades available for this color"
   }
 }

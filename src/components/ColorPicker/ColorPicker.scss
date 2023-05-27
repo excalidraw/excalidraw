@@ -1,6 +1,134 @@
-@import "../css/variables.module";
+@import "../../css/variables.module";
 
 .excalidraw {
+  .focus-visible-none {
+    &:focus-visible {
+      outline: none !important;
+    }
+  }
+
+  .color-picker__heading {
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    text-align: left;
+  }
+
+  .color-picker-container {
+    display: grid;
+    grid-template-columns: 1fr 20px 1.625rem;
+    padding: 0.25rem 0px;
+    align-items: center;
+
+    @include isMobile {
+      max-width: 175px;
+    }
+  }
+
+  .color-picker__top-picks {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .color-picker__button {
+    --radius: 0.25rem;
+
+    padding: 0;
+    margin: 0;
+    width: 1.35rem;
+    height: 1.35rem;
+    border: 1px solid var(--color-gray-30);
+    border-radius: var(--radius);
+    filter: var(--theme-filter);
+    background-color: var(--swatch-color);
+    background-position: left center;
+    position: relative;
+    font-family: inherit;
+    box-sizing: border-box;
+
+    &:hover {
+      &::after {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        box-shadow: 0 0 0 1px var(--color-gray-30);
+        border-radius: calc(var(--radius) + 1px);
+        filter: var(--theme-filter);
+      }
+    }
+
+    &.active {
+      .color-picker__button-outline {
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        box-shadow: 0 0 0 1px var(--color-primary-darkest);
+        z-index: 1; // due hover state so this has preference
+        border-radius: calc(var(--radius) + 1px);
+        filter: var(--theme-filter);
+      }
+    }
+
+    &:focus-visible {
+      outline: none;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        bottom: -4px;
+        left: -4px;
+        border: 3px solid var(--focus-highlight-color);
+        border-radius: calc(var(--radius) + 1px);
+      }
+
+      &.active {
+        .color-picker__button-outline {
+          display: none;
+        }
+      }
+    }
+
+    &--large {
+      --radius: 0.5rem;
+      width: 1.875rem;
+      height: 1.875rem;
+    }
+
+    &.is-transparent {
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==");
+    }
+
+    &--no-focus-visible {
+      border: 0;
+      &::after {
+        display: none;
+      }
+      &:focus-visible {
+        outline: none !important;
+      }
+    }
+
+    &.active-color {
+      border-radius: calc(var(--radius) + 1px);
+      width: 1.625rem;
+      height: 1.625rem;
+    }
+  }
+
+  .color-picker__button__hotkey-label {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    filter: none;
+    font-size: 11px;
+  }
+
   .color-picker {
     background: var(--popup-bg-color);
     border: 0 solid transparentize($oc-white, 0.75);
@@ -72,11 +200,17 @@
     }
   }
 
+  .color-picker-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
   .color-picker-content--default {
     padding: 0.5rem;
     display: grid;
-    grid-template-columns: repeat(5, auto);
-    grid-gap: 0.5rem;
+    grid-template-columns: repeat(5, 1.875rem);
+    grid-gap: 0.25rem;
     border-radius: 4px;
 
     &:focus {
@@ -176,6 +310,27 @@
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
       border-radius: var(--border-radius-lg);
     }
+  }
+
+  .color-picker__input-label {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 8px;
+    align-items: center;
+    border: 1px solid var(--default-border-color);
+    border-radius: 8px;
+    padding: 0 12px;
+    margin: 8px;
+    box-sizing: border-box;
+
+    &:focus-within {
+      box-shadow: 0 0 0 1px var(--color-primary-darkest);
+      border-radius: var(--border-radius-lg);
+    }
+  }
+
+  .color-picker__input-hash {
+    padding: 0 0.25rem;
   }
 
   .color-picker-input {

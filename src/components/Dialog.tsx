@@ -21,9 +21,9 @@ import { jotaiScope } from "../jotai";
 export interface DialogProps {
   children: React.ReactNode;
   className?: string;
-  small?: boolean;
+  size?: "small" | "regular" | "wide";
   onCloseRequest(): void;
-  title: React.ReactNode;
+  title: React.ReactNode | false;
   autofocus?: boolean;
   theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
@@ -33,6 +33,7 @@ export const Dialog = (props: DialogProps) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [lastActiveElement] = useState(document.activeElement);
   const { id } = useExcalidrawContainer();
+  const device = useDevice();
 
   useEffect(() => {
     if (!islandNode) {
@@ -86,23 +87,27 @@ export const Dialog = (props: DialogProps) => {
     <Modal
       className={clsx("Dialog", props.className)}
       labelledBy="dialog-title"
-      maxWidth={props.small ? 550 : 800}
+      maxWidth={
+        props.size === "wide" ? 1024 : props.size === "small" ? 550 : 800
+      }
       onCloseRequest={onClose}
       theme={props.theme}
       closeOnClickOutside={props.closeOnClickOutside}
     >
       <Island ref={setIslandNode}>
-        <h2 id={`${id}-dialog-title`} className="Dialog__title">
-          <span className="Dialog__titleContent">{props.title}</span>
-          <button
-            className="Modal__close"
-            onClick={onClose}
-            title={t("buttons.close")}
-            aria-label={t("buttons.close")}
-          >
-            {useDevice().isMobile ? back : CloseIcon}
-          </button>
-        </h2>
+        {props.title && (
+          <h2 id={`${id}-dialog-title`} className="Dialog__title">
+            <span className="Dialog__titleContent">{props.title}</span>
+          </h2>
+        )}
+        <button
+          className="Dialog__close"
+          onClick={onClose}
+          title={t("buttons.close")}
+          aria-label={t("buttons.close")}
+        >
+          {device.isMobile ? back : CloseIcon}
+        </button>
         <div className="Dialog__content">{props.children}</div>
       </Island>
     </Modal>
