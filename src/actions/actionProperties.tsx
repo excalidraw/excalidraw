@@ -1088,4 +1088,23 @@ export const actionChangeArrowhead = register({
       </fieldset>
     );
   },
+}); 
+export const actionTerraform = register({
+  name: "insertTerraform",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) =>
+          newElementWith(el, {
+            terraform: value,
+          }),
+        true,
+      ),
+      appState: { ...appState, currentItemTerraform: value },
+      commitToHistory: true,
+    };
+  },
 });
