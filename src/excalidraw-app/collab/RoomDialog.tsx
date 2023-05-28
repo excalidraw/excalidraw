@@ -180,7 +180,7 @@ const RoomDialog = ({
   };
   return (
     <Dialog
-      small
+      size="small"
       onCloseRequest={handleClose}
       title={t("labels.liveCollaboration")}
       theme={theme}

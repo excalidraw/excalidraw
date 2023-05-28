@@ -111,7 +111,7 @@
     "increaseFontSize": "Aumenta la dimensione dei caratteri",
     "unbindText": "Scollega testo",
     "bindText": "Associa il testo al container",
-    "createContainerFromText": "",
+    "createContainerFromText": "Avvolgi il testo in un container",
     "link": {
       "edit": "Modifica link",
       "create": "Crea link",
@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "Trasparente",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Nero",
+    "white": "Bianco",
+    "red": "Rosso",
+    "pink": "Rosa",
+    "grape": "Uva",
+    "violet": "Viola",
+    "gray": "Grigio",
+    "blue": "Blu",
+    "cyan": "Ciano",
+    "teal": "Verde acqua",
+    "green": "Verde",
+    "yellow": "Giallo",
+    "orange": "Arancio",
+    "bronze": "Bronzo"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Colori personalizzati più utilizzati",
+    "colors": "Colori",
+    "shades": "Sfumature",
+    "hexCode": "Codice esadecimale",
+    "noShades": "Nessuna sfumatura disponibile per questo colore"
   }
 }

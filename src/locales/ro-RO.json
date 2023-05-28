@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "Transparent",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Negru",
+    "white": "Alb",
+    "red": "Roșu",
+    "pink": "Roz",
+    "grape": "Struguriu",
+    "violet": "Violet",
+    "gray": "Gri",
+    "blue": "Albastru",
+    "cyan": "Cyan",
+    "teal": "Cyan-verde",
+    "green": "Verde",
+    "yellow": "Galben",
+    "orange": "Portocaliu",
+    "bronze": "Bronz"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Cele mai utilizate culori personalizate",
+    "colors": "Culori",
+    "shades": "Nuanțe",
+    "hexCode": "Cod hexa",
+    "noShades": "Nu este disponibilă nicio nuanță pentru această culoare"
   }
 }

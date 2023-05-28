@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "Transparent",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Schwarz",
+    "white": "Weiß",
+    "red": "Rot",
+    "pink": "Pink",
+    "grape": "Traube",
+    "violet": "Violett",
+    "gray": "Grau",
+    "blue": "Blau",
+    "cyan": "Cyan",
+    "teal": "Blaugrün",
+    "green": "Grün",
+    "yellow": "Gelb",
+    "orange": "Orange",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Beliebteste benutzerdefinierte Farben",
+    "colors": "Farben",
+    "shades": "Schattierungen",
+    "hexCode": "Hex-Code",
+    "noShades": "Keine Schattierungen für diese Farbe verfügbar"
   }
 }

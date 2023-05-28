@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "Genomskinlig",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Svart",
+    "white": "Vit",
+    "red": "Röd",
+    "pink": "Rosa",
+    "grape": "Lila",
+    "violet": "Violett",
+    "gray": "Grå",
+    "blue": "Blå",
+    "cyan": "Turkos",
+    "teal": "Blågrön",
+    "green": "Grön",
+    "yellow": "Gul",
+    "orange": "Orange",
+    "bronze": "Brons"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Mest frekvent använda anpassade färger",
+    "colors": "Färger",
+    "shades": "Nyanser",
+    "hexCode": "Hex-kod",
+    "noShades": "Inga nyanser tillgängliga för denna färg"
   }
 }
