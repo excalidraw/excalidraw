@@ -271,6 +271,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   roughness: ExcalidrawElement["roughness"];
   opacity: ExcalidrawElement["opacity"];
   locked: ExcalidrawElement["locked"];
+  terraform : ExcalidrawElement["terraform"];
 } = {
   strokeColor: COLOR_PALETTE.black,
   backgroundColor: COLOR_PALETTE.transparent,
@@ -280,6 +281,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   roughness: 1,
   opacity: 100,
   locked: false,
+  terraform: null,
 };
 
 export const LIBRARY_SIDEBAR_TAB = "library";
