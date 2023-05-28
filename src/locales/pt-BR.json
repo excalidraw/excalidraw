@@ -355,27 +355,27 @@
     "removeItemsFromLib": "Remover itens selecionados da biblioteca"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exportar imagem",
     "label": {
       "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
+      "onlySelected": "Somente selecionados",
+      "darkMode": "Modo escuro",
       "embedScene": "",
       "scale": "",
-      "padding": ""
+      "padding": "Margem interna"
     },
     "tooltip": {
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportar como PNG",
+      "exportToSvg": "Exportar como SVG",
+      "copyPngToClipboard": "Copiar PNG para área de transferência"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copiar para a área de transferência"
     }
   },
   "encrypted": {
