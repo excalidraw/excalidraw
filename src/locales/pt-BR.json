@@ -357,15 +357,15 @@
   "imageExportDialog": {
     "header": "Exportar imagem",
     "label": {
-      "withBackground": "",
+      "withBackground": "Fundo",
       "onlySelected": "Somente selecionados",
       "darkMode": "Modo escuro",
-      "embedScene": "",
-      "scale": "",
+      "embedScene": "Incorporar cena",
+      "scale": "Escala",
       "padding": "Margem interna"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Os dados da cena serão salvos no arquivo PNG/SVG exportado para que a cena possa ser restaurada a partir dele.\nIsso aumentará o tamanho do arquivo exportado."
     },
     "title": {
       "exportToPng": "Exportar como PNG",
