@@ -395,20 +395,20 @@
   },
   "colors": {
     "transparent": "透明",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "黑",
+    "white": "白",
+    "red": "紅",
+    "pink": "粉紅",
+    "grape": "深紫",
+    "violet": "藍紫",
+    "gray": "灰",
+    "blue": "藍",
+    "cyan": "青",
+    "teal": "藍綠",
+    "green": "綠",
+    "yellow": "黃",
+    "orange": "橘",
+    "bronze": "銅"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +424,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "最常使用的自訂顏色",
+    "colors": "顏色",
+    "shades": "漸變色",
+    "hexCode": "Hex 碼",
+    "noShades": "沒有此顏色的漸變色"
   }
 }

@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triangle",
     "fontSize": "Font size",
     "fontFamily": "Font family",
-    "onlySelected": "Only selected",
-    "withBackground": "Background",
-    "exportEmbedScene": "Embed scene",
-    "exportEmbedScene_details": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
     "addWatermark": "Add \"Made with Excalidraw\"",
     "handDrawn": "Hand-drawn",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Flip horizontal",
     "flipVertical": "Flip vertical",
     "viewMode": "View mode",
-    "toggleExportColorScheme": "Toggle export color scheme",
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
@@ -140,11 +135,7 @@
     "exportJSON": "Export to file",
     "exportImage": "Export image...",
     "export": "Save to...",
-    "exportToPng": "Export to PNG",
-    "exportToSvg": "Export to SVG",
     "copyToClipboard": "Copy to clipboard",
-    "copyPngToClipboard": "Copy PNG to clipboard",
-    "scale": "Scale",
     "save": "Save to current file",
     "saveAs": "Save as",
     "load": "Open",
@@ -362,6 +353,30 @@
   "confirmDialog": {
     "resetLibrary": "Reset library",
     "removeItemsFromLib": "Remove selected items from library"
+  },
+  "imageExportDialog": {
+    "header": "Export image",
+    "label": {
+      "withBackground": "Background",
+      "onlySelected": "Only selected",
+      "darkMode": "Dark mode",
+      "embedScene": "Embed scene",
+      "scale": "Scale",
+      "padding": "Padding"
+    },
+    "tooltip": {
+      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size."
+    },
+    "title": {
+      "exportToPng": "Export to PNG",
+      "exportToSvg": "Export to SVG",
+      "copyPngToClipboard": "Copy PNG to clipboard"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copy to clipboard"
+    }
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
