@@ -191,7 +191,6 @@ const APP_STATE_STORAGE_CONF = (<
   pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
-  currentItemTerraform: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <
