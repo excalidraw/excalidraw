@@ -56,7 +56,7 @@ export const LibraryDropdownMenuButton: React.FC<{
     jotaiScope,
   );
 
-  const renderRemoveLibAlert = useCallback(() => {
+  const renderRemoveLibAlert = () => {
     const content = selectedItems.length
       ? t("alerts.removeItemsFromsLibrary", { count: selectedItems.length })
       : t("alerts.resetLibrary");
@@ -81,7 +81,7 @@ export const LibraryDropdownMenuButton: React.FC<{
         <p>{content}</p>
       </ConfirmDialog>
     );
-  }, [selectedItems, onRemoveFromLibrary, resetLibrary]);
+  };
 
   const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
 
@@ -137,20 +137,20 @@ export const LibraryDropdownMenuButton: React.FC<{
     );
   }, [setPublishLibSuccess, publishLibSuccess]);
 
-  const onPublishLibSuccess = useCallback(
-    (data: { url: string; authorName: string }, libraryItems: LibraryItems) => {
-      setShowPublishLibraryDialog(false);
-      setPublishLibSuccess({ url: data.url, authorName: data.authorName });
-      const nextLibItems = libraryItems.slice();
-      nextLibItems.forEach((libItem) => {
-        if (selectedItems.includes(libItem.id)) {
-          libItem.status = "published";
-        }
-      });
-      library.setLibrary(nextLibItems);
-    },
-    [setShowPublishLibraryDialog, setPublishLibSuccess, selectedItems, library],
-  );
+  const onPublishLibSuccess = (
+    data: { url: string; authorName: string },
+    libraryItems: LibraryItems,
+  ) => {
+    setShowPublishLibraryDialog(false);
+    setPublishLibSuccess({ url: data.url, authorName: data.authorName });
+    const nextLibItems = libraryItems.slice();
+    nextLibItems.forEach((libItem) => {
+      if (selectedItems.includes(libItem.id)) {
+        libItem.status = "published";
+      }
+    });
+    library.setLibrary(nextLibItems);
+  };
 
   const onLibraryImport = async () => {
     try {
