@@ -28,13 +28,10 @@ import {
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
-  FontFamilyValues,
-  TextAlign,
-  VerticalAlign,
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
 import { getFontString } from "../utils";
-import { ImportedDataState } from "./types";
+import { ImportedDataState, ValidContainer, ValidLinearElement } from "./types";
 
 export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
   "rectangle",
@@ -46,12 +43,7 @@ export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
 ];
 
 const bindTextToContainer = (
-  containerProps:
-    | {
-        type:
-          | Exclude<ExcalidrawGenericElement["type"], "selection">
-          | ExcalidrawLinearElement["type"];
-      } & MarkOptional<ElementConstructorOpts, "x" | "y">,
+  containerProps: ValidContainer | ValidLinearElement,
   textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
 ) => {
   let container;
@@ -61,11 +53,7 @@ const bindTextToContainer = (
     container = newLinearElement({
       width,
       height,
-      //@ts-ignore
-      type: containerProps.type,
-      //@ts-ignore,
-      endArrowhead: containerProps.type === "arrow" ? "arrow" : null,
-      //@ts-ignore
+      endArrowhead: "arrow",
       points: [
         [0, 0],
         [width, height],
@@ -101,50 +89,7 @@ const bindTextToContainer = (
 };
 
 const bindLinearElementToElement = (
-  linearElement: {
-    type: ExcalidrawLinearElement["type"];
-    x: number;
-    y: number;
-    label?: {
-      text: string;
-      fontSize?: number;
-      fontFamily?: FontFamilyValues;
-      textAlign?: TextAlign;
-      verticalAlign?: VerticalAlign;
-    } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-    start?:
-      | (
-          | {
-              type: Exclude<
-                ExcalidrawBindableElement["type"],
-                "image" | "selection" | "text"
-              >;
-              id?: ExcalidrawGenericElement["id"];
-            }
-          | ({
-              type: "text";
-              text: string;
-              id?: ExcalidrawTextElement["id"];
-            } & Partial<ExcalidrawTextElement>)
-        ) &
-          MarkOptional<ElementConstructorOpts, "x" | "y">;
-    end?:
-      | (
-          | {
-              type: Exclude<
-                ExcalidrawBindableElement["type"],
-                "image" | "selection" | "text"
-              >;
-              id?: ExcalidrawGenericElement["id"];
-            }
-          | ({
-              type: "text";
-              text: string;
-              id?: ExcalidrawTextElement["id"];
-            } & Partial<ExcalidrawTextElement>)
-        ) &
-          MarkOptional<ElementConstructorOpts, "x" | "y">;
-  } & Partial<ExcalidrawLinearElement>,
+  linearElement: ValidLinearElement,
 ): {
   linearElement: ExcalidrawLinearElement;
   startBoundElement?: ExcalidrawElement;
@@ -257,9 +202,7 @@ const bindLinearElementToElement = (
   }
   return {
     linearElement: excliadrawLinearElement,
-    //@ts-ignore
     startBoundElement,
-    //@ts-ignore
     endBoundElement,
   };
 };
@@ -318,28 +261,37 @@ export const convertToExcalidrawElements = (
     while (excalidrawElements.hasElementWithId(elementId)) {
       elementId = regenerateId(elementId);
     }
-    const elementWithid = { ...element, id: elementId };
 
     if (!ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)) {
       excalidrawElements.push(element as ExcalidrawElement);
 
       return;
     }
-    //@ts-ignore
-    if (VALID_CONTAINER_TYPES.has(element.type) && element?.label?.text) {
+    const elementWithid = { ...element, id: elementId };
+
+    if (
+      VALID_CONTAINER_TYPES.has(elementWithid.type) &&
       //@ts-ignore
-      let [container, text] = bindTextToContainer(elementWithid, element.label);
+      elementWithid?.label?.text
+    ) {
+      let [container, text] = bindTextToContainer(
+        //@ts-ignore
+        elementWithid,
+        //@ts-ignore
+        elementWithid.label,
+      );
       excalidrawElements.push(container);
       excalidrawElements.push(text);
-
       if (container.type === "arrow") {
+        const originalStart =
+          elementWithid.type === "arrow" ? elementWithid?.start : undefined;
+        const originalEnd =
+          elementWithid.type === "arrow" ? elementWithid?.end : undefined;
         const { linearElement, startBoundElement, endBoundElement } =
           bindLinearElementToElement({
             ...container,
-            //@ts-ignore
-            start: element?.start,
-            //@ts-ignore
-            end: element?.end,
+            start: originalStart,
+            end: originalEnd,
           });
         container = linearElement;
         excalidrawElements.push(linearElement);
@@ -348,12 +300,12 @@ export const convertToExcalidrawElements = (
       }
     } else {
       let excalidrawElement;
-      if (element.type === "text") {
-        const fontFamily = element?.fontFamily || DEFAULT_FONT_FAMILY;
-        const fontSize = element?.fontSize || DEFAULT_FONT_SIZE;
+      if (elementWithid.type === "text") {
+        const fontFamily = elementWithid?.fontFamily || DEFAULT_FONT_FAMILY;
+        const fontSize = elementWithid?.fontSize || DEFAULT_FONT_SIZE;
         const lineHeight =
-          element?.lineHeight || getDefaultLineHeight(fontFamily);
-        const text = element.text ?? "";
+          elementWithid?.lineHeight || getDefaultLineHeight(fontFamily);
+        const text = elementWithid.text ?? "";
         const normalizedText = normalizeText(text);
         const metrics = measureText(
           normalizedText,
@@ -369,34 +321,29 @@ export const convertToExcalidrawElements = (
         };
 
         excalidrawElements.push(excalidrawElement as ExcalidrawTextElement);
-      } else if (element.type === "arrow" || element.type === "line") {
+      } else if (elementWithid.type === "arrow") {
         const { linearElement, startBoundElement, endBoundElement } =
-          //@ts-ignore
           bindLinearElementToElement(elementWithid);
         excalidrawElements.push(linearElement);
         excalidrawElements.push(startBoundElement);
         excalidrawElements.push(endBoundElement);
-        //@ts-ignore
-        if (startBoundElement && !element.start.id) {
-          //@ts-ignore
+        if (startBoundElement && !elementWithid?.start?.id) {
           excalidrawElements.push(startBoundElement);
         }
-        //@ts-ignore
-        if (endBoundElement && !element.end.id) {
-          //@ts-ignore
+        if (endBoundElement && !elementWithid?.end?.id) {
           excalidrawElements.push(endBoundElement);
         }
       } else {
         excalidrawElement = {
           ...elementWithid,
           width:
-            element?.width ||
-            (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)
+            elementWithid?.width ||
+            (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(elementWithid.type)
               ? 100
               : 0),
           height:
-            element?.height ||
-            (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)
+            elementWithid?.height ||
+            (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(elementWithid.type)
               ? 100
               : 0),
         } as ExcalidrawGenericElement;

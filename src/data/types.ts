@@ -1,8 +1,11 @@
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
+  ExcalidrawImageElement,
   ExcalidrawLinearElement,
+  ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
   TextAlign,
@@ -40,24 +43,78 @@ export type LegacyAppState = {
   isSidebarDocked: [boolean, "defaultSidebarDockedPreference"];
 };
 
+export type ValidLinearElement = {
+  type: ExcalidrawLinearElement["type"];
+  x: number;
+  y: number;
+  label?: {
+    text: string;
+    fontSize?: number;
+    fontFamily?: FontFamilyValues;
+    textAlign?: TextAlign;
+    verticalAlign?: VerticalAlign;
+  } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+  end?:
+    | (
+        | {
+            type: Exclude<
+              ExcalidrawBindableElement["type"],
+              "image" | "selection" | "text"
+            >;
+            id?: ExcalidrawGenericElement["id"];
+          }
+        | ({
+            type: "text";
+            text: string;
+            id?: ExcalidrawTextElement["id"];
+          } & Partial<ExcalidrawTextElement>)
+      ) &
+        MarkOptional<ElementConstructorOpts, "x" | "y">;
+  start?:
+    | (
+        | {
+            type: Exclude<
+              ExcalidrawBindableElement["type"],
+              "image" | "selection" | "text"
+            >;
+            id?: ExcalidrawGenericElement["id"];
+          }
+        | ({
+            type: "text";
+            text: string;
+            id?: ExcalidrawTextElement["id"];
+          } & Partial<ExcalidrawTextElement>)
+      ) &
+        MarkOptional<ElementConstructorOpts, "x" | "y">;
+} & Partial<ExcalidrawLinearElement>;
+
+export type ValidContainer =
+  | {
+      type: Exclude<ExcalidrawGenericElement["type"], "selection">;
+      id?: ExcalidrawGenericElement["id"];
+      label?: {
+        text: string;
+        fontSize?: number;
+        fontFamily?: FontFamilyValues;
+        textAlign?: TextAlign;
+        verticalAlign?: VerticalAlign;
+      } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+    } & ElementConstructorOpts;
+
 export interface ImportedDataState {
   type?: string;
   version?: number;
   source?: string;
   elements?:
     | readonly (
-        | ExcalidrawElement
-        | ({
-            type: Exclude<ExcalidrawGenericElement["type"], "selection">;
-            id?: ExcalidrawGenericElement["id"];
-            label?: {
-              text: string;
-              fontSize?: number;
-              fontFamily?: FontFamilyValues;
-              textAlign?: TextAlign;
-              verticalAlign?: VerticalAlign;
-            } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-          } & ElementConstructorOpts)
+        | Extract<
+            ExcalidrawElement,
+            | ExcalidrawSelectionElement
+            | ExcalidrawImageElement
+            | ExcalidrawFreeDrawElement
+          >
+        | ValidContainer
+        | ValidLinearElement
         | ({
             type: "text";
             text: string;
@@ -65,50 +122,6 @@ export interface ImportedDataState {
             y: number;
             id?: ExcalidrawTextElement["id"];
           } & Partial<ExcalidrawTextElement>)
-        | ({
-            type: ExcalidrawLinearElement["type"];
-            x: number;
-            y: number;
-            label?: {
-              text: string;
-              fontSize?: number;
-              fontFamily?: FontFamilyValues;
-              textAlign?: TextAlign;
-              verticalAlign?: VerticalAlign;
-            } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-            end?:
-              | (
-                  | {
-                      type: Exclude<
-                        ExcalidrawBindableElement["type"],
-                        "image" | "selection" | "text"
-                      >;
-                      id?: ExcalidrawGenericElement["id"];
-                    }
-                  | ({
-                      type: "text";
-                      text: string;
-                      id?: ExcalidrawTextElement["id"];
-                    } & Partial<ExcalidrawTextElement>)
-                ) &
-                  MarkOptional<ElementConstructorOpts, "x" | "y">;
-            start?:
-              | (
-                  | {
-                      type: Exclude<
-                        ExcalidrawBindableElement["type"],
-                        "image" | "selection" | "text"
-                      >;
-                      id?: ExcalidrawGenericElement["id"];
-                    }
-                  | ({
-                      type: "text";
-                      text: string;
-                      id?: ExcalidrawTextElement["id"];
-                    } & Partial<ExcalidrawTextElement>)
-                ) &
-                  MarkOptional<ElementConstructorOpts, "x" | "y">;
-          } & Partial<ExcalidrawLinearElement>)
       )[]
     | null;
   appState?: Readonly<
