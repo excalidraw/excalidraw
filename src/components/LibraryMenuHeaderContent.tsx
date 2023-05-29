@@ -287,32 +287,23 @@ export const LibraryDropdownMenu = ({
 
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
 
-  const removeFromLibrary = useCallback(
-    async (libraryItems: LibraryItems) => {
-      const nextItems = libraryItems.filter(
-        (item) => !selectedItems.includes(item.id),
-      );
-      library.setLibrary(nextItems).catch(() => {
-        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
-      });
+  const removeFromLibrary = async (libraryItems: LibraryItems) => {
+    const nextItems = libraryItems.filter(
+      (item) => !selectedItems.includes(item.id),
+    );
+    library.setLibrary(nextItems).catch(() => {
+      setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
+    });
 
-      deleteItemsFromLibraryCache(selectedItems);
+    deleteItemsFromLibraryCache(selectedItems);
 
-      onSelectItems([]);
-    },
-    [
-      library,
-      setAppState,
-      selectedItems,
-      onSelectItems,
-      deleteItemsFromLibraryCache,
-    ],
-  );
+    onSelectItems([]);
+  };
 
-  const resetLibrary = useCallback(() => {
+  const resetLibrary = () => {
     library.resetLibrary();
     clearLibraryCache();
-  }, [library, clearLibraryCache]);
+  };
 
   return (
     <LibraryDropdownMenuButton
