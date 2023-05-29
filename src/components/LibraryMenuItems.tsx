@@ -15,6 +15,7 @@ import { duplicateElements } from "../element/newElement";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
 import LibraryMenuSection from "./LibraryMenuSection";
+import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
 import "./LibraryMenuItems.scss";
 
@@ -38,6 +39,7 @@ export default function LibraryMenuItems({
   id: string;
 }) {
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
+  const { svgCache } = useLibraryCache();
 
   const unpublishedItems = libraryItems.filter(
     (item) => item.status !== "published",
@@ -224,6 +226,7 @@ export default function LibraryMenuItems({
               onItemDrag={onItemDrag}
               onClick={onItemClick}
               isItemSelected={isItemSelected}
+              svgCache={svgCache}
             />
           )}
         </>
@@ -243,6 +246,7 @@ export default function LibraryMenuItems({
               onItemDrag={onItemDrag}
               onClick={onItemClick}
               isItemSelected={isItemSelected}
+              svgCache={svgCache}
             />
           ) : unpublishedItems.length > 0 ? (
             <div
