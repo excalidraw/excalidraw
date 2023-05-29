@@ -44,7 +44,7 @@ export type LegacyAppState = {
 };
 
 export type ValidLinearElement = {
-  type: ExcalidrawLinearElement["type"];
+  type: "arrow" | "line";
   x: number;
   y: number;
   label?: {
@@ -113,6 +113,11 @@ export interface ImportedDataState {
             | ExcalidrawImageElement
             | ExcalidrawFreeDrawElement
           >
+        | ({
+            type: Extract<ExcalidrawLinearElement["type"], "line">;
+            x: number;
+            y: number;
+          } & Partial<ExcalidrawLinearElement>)
         | ValidContainer
         | ValidLinearElement
         | ({

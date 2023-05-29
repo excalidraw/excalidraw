@@ -49,7 +49,7 @@ const DEFAULT_LINEAR_ELEMENT_PROPS = {
 const DEFAULT_DIMENSION = 100;
 
 const bindTextToContainer = (
-  containerProps: ValidContainer | ValidLinearElement,
+  containerProps: ValidContainer | ({ type: "arrow" } & ValidLinearElement),
   textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
 ) => {
   let container;
@@ -67,7 +67,6 @@ const bindTextToContainer = (
       ...containerProps,
     });
   } else {
-    //@ts-ignore
     container = newElement({
       ...containerProps,
     });
@@ -283,7 +282,11 @@ export const convertToExcalidrawElements = (
       elementWithid?.label?.text
     ) {
       let [container, text] = bindTextToContainer(
-        elementWithid,
+        elementWithid as
+          | ValidContainer
+          | ({
+              type: "arrow";
+            } & ValidLinearElement),
         elementWithid?.label,
       );
       excalidrawElements.push(container);
