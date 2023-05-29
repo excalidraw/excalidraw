@@ -17,7 +17,6 @@ import {
   regenerateId,
 } from "../element/newElement";
 import {
-  VALID_CONTAINER_TYPES,
   getDefaultLineHeight,
   measureText,
   normalizeText,
@@ -42,14 +41,21 @@ export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
   "line",
 ];
 
+const DEFAULT_LINEAR_ELEMENT_PROPS = {
+  width: 300,
+  height: 0,
+};
+
+const DEFAULT_DIMENSION = 100;
+
 const bindTextToContainer = (
   containerProps: ValidContainer | ValidLinearElement,
   textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
 ) => {
   let container;
   if (containerProps.type === "arrow") {
-    const width = containerProps.width || 300;
-    const height = containerProps.height || 0;
+    const width = containerProps.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
+    const height = containerProps.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
     container = newLinearElement({
       width,
       height,
@@ -102,8 +108,8 @@ const bindLinearElementToElement = (
     endArrowhead = linearElement.type === "arrow" ? "arrow" : null,
     ...rest
   } = linearElement;
-  const width = linearElement.width || 300;
-  const height = linearElement.height || 0;
+  const width = linearElement.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
+  const height = linearElement.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
   const excliadrawLinearElement = newLinearElement({
     type,
     width,
@@ -125,8 +131,8 @@ const bindLinearElementToElement = (
   });
 
   if (start) {
-    const width = start?.width ?? 100;
-    const height = start?.height ?? 100;
+    const width = start?.width ?? DEFAULT_DIMENSION;
+    const height = start?.height ?? DEFAULT_DIMENSION;
     const existingElement = start.id
       ? excalidrawElements.get().find((ele) => ele?.id === start.id)
       : undefined;
@@ -163,8 +169,8 @@ const bindLinearElementToElement = (
     );
   }
   if (end) {
-    const height = end?.height ?? 100;
-    const width = end?.width ?? 100;
+    const height = end?.height ?? DEFAULT_DIMENSION;
+    const width = end?.width ?? DEFAULT_DIMENSION;
 
     const existingElement = end.id
       ? excalidrawElements.get().find((ele) => ele?.id === end.id)
@@ -270,15 +276,15 @@ export const convertToExcalidrawElements = (
     const elementWithid = { ...element, id: elementId };
 
     if (
-      VALID_CONTAINER_TYPES.has(elementWithid.type) &&
-      //@ts-ignore
+      (elementWithid.type === "rectangle" ||
+        elementWithid.type === "ellipse" ||
+        elementWithid.type === "diamond" ||
+        elementWithid.type === "arrow") &&
       elementWithid?.label?.text
     ) {
       let [container, text] = bindTextToContainer(
-        //@ts-ignore
         elementWithid,
-        //@ts-ignore
-        elementWithid.label,
+        elementWithid?.label,
       );
       excalidrawElements.push(container);
       excalidrawElements.push(text);
@@ -334,8 +340,9 @@ export const convertToExcalidrawElements = (
           excalidrawElements.push(endBoundElement);
         }
       } else if (elementWithid.type === "line") {
-        const width = elementWithid.width || 300;
-        const height = elementWithid.height || 0;
+        const width = elementWithid.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
+        const height =
+          elementWithid.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
         const lineElement = newLinearElement({
           width,
           height,
@@ -349,16 +356,8 @@ export const convertToExcalidrawElements = (
       } else {
         excalidrawElement = {
           ...elementWithid,
-          width:
-            elementWithid?.width ||
-            (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(elementWithid.type)
-              ? 100
-              : 0),
-          height:
-            elementWithid?.height ||
-            (ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(elementWithid.type)
-              ? 100
-              : 0),
+          width: elementWithid?.width || DEFAULT_DIMENSION,
+          height: elementWithid?.height || DEFAULT_DIMENSION,
         } as ExcalidrawGenericElement;
         excalidrawElements.push(excalidrawElement);
       }
