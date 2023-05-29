@@ -102,7 +102,6 @@ export const restoreElementWithProperties = <
   > &
     Partial<Pick<ExcalidrawElement, "type" | "x" | "y">>,
 ): T => {
-  console.log("ELEMENT", element.backgroundColor);
   const base: Pick<T, keyof ExcalidrawElement> & {
     [PRECEDING_ELEMENT_KEY]?: string;
   } = {

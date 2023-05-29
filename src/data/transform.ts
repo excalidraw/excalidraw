@@ -333,6 +333,19 @@ export const convertToExcalidrawElements = (
         if (endBoundElement && !elementWithid?.end?.id) {
           excalidrawElements.push(endBoundElement);
         }
+      } else if (elementWithid.type === "line") {
+        const width = elementWithid.width || 300;
+        const height = elementWithid.height || 0;
+        const lineElement = newLinearElement({
+          width,
+          height,
+          points: [
+            [0, 0],
+            [width, height],
+          ],
+          ...elementWithid,
+        });
+        excalidrawElements.push(lineElement);
       } else {
         excalidrawElement = {
           ...elementWithid,
