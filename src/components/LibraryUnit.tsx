@@ -101,3 +101,5 @@ export const LibraryUnit = memo(
     );
   },
 );
+
+export const EmptyLibraryUnit = () => <div className={clsx("library-unit")} />;

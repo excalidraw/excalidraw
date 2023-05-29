@@ -14,7 +14,10 @@ import Spinner from "./Spinner";
 import { duplicateElements } from "../element/newElement";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
-import LibraryMenuSection from "./LibraryMenuSection";
+import {
+  LibraryMenuSection,
+  LibraryMenuSectionGrid,
+} from "./LibraryMenuSection";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
 import "./LibraryMenuItems.scss";
@@ -51,17 +54,6 @@ export default function LibraryMenuItems({
   const publishedItems = useMemo(
     () => libraryItems.filter((item) => item.status === "published"),
     [libraryItems],
-  );
-
-  const personalItems = useMemo(
-    () => [
-      // append pending library item
-      ...(pendingElements.length
-        ? [{ id: null, elements: pendingElements }]
-        : []),
-      ...unpublishedItems,
-    ],
-    [pendingElements, unpublishedItems],
   );
 
   const showBtn = !libraryItems.length && !pendingElements.length;
@@ -239,15 +231,26 @@ export default function LibraryMenuItems({
               </div>
             </div>
           ) : (
-            <LibraryMenuSection
-              items={personalItems}
-              onItemSelectToggle={onItemSelectToggle}
-              onItemDrag={onItemDrag}
-              onClick={onItemClick}
-              onAddToLibrary={onAddToLibraryClick}
-              isItemSelected={isItemSelected}
-              svgCache={svgCache}
-            />
+            <LibraryMenuSectionGrid>
+              {pendingElements.length > 0 && (
+                <LibraryMenuSection
+                  items={[{ id: null, elements: pendingElements }]}
+                  onItemSelectToggle={onItemSelectToggle}
+                  onItemDrag={onItemDrag}
+                  onClick={onAddToLibraryClick}
+                  isItemSelected={isItemSelected}
+                  svgCache={svgCache}
+                />
+              )}
+              <LibraryMenuSection
+                items={unpublishedItems}
+                onItemSelectToggle={onItemSelectToggle}
+                onItemDrag={onItemDrag}
+                onClick={onItemClick}
+                isItemSelected={isItemSelected}
+                svgCache={svgCache}
+              />
+            </LibraryMenuSectionGrid>
           )}
         </>
 
@@ -260,14 +263,16 @@ export default function LibraryMenuItems({
             </div>
           )}
           {publishedItems.length > 0 ? (
-            <LibraryMenuSection
-              items={publishedItems}
-              onItemSelectToggle={onItemSelectToggle}
-              onItemDrag={onItemDrag}
-              onClick={onItemClick}
-              isItemSelected={isItemSelected}
-              svgCache={svgCache}
-            />
+            <LibraryMenuSectionGrid>
+              <LibraryMenuSection
+                items={publishedItems}
+                onItemSelectToggle={onItemSelectToggle}
+                onItemDrag={onItemDrag}
+                onClick={onItemClick}
+                isItemSelected={isItemSelected}
+                svgCache={svgCache}
+              />
+            </LibraryMenuSectionGrid>
           ) : unpublishedItems.length > 0 ? (
             <div
               style={{
