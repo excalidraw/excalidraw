@@ -5,7 +5,7 @@ import { LibraryItem } from "../types";
 import "./LibraryUnit.scss";
 import { CheckboxItem } from "./CheckboxItem";
 import { PlusIcon } from "./icons";
-import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
+import { SvgCache, useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
 
 export const LibraryUnit = ({
   id,
@@ -15,6 +15,7 @@ export const LibraryUnit = ({
   selected,
   onToggle,
   onDrag,
+  svgCache,
 }: {
   id: LibraryItem["id"] | /** for pending item */ null;
   elements?: LibraryItem["elements"];
@@ -23,9 +24,10 @@ export const LibraryUnit = ({
   selected: boolean;
   onToggle: (id: string, event: React.MouseEvent) => void;
   onDrag: (id: string, event: React.DragEvent) => void;
+  svgCache: SvgCache;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
-  const svg = useLibraryItemSvg(id, elements);
+  const svg = useLibraryItemSvg(id, elements, svgCache);
 
   useEffect(() => {
     const node = ref.current;

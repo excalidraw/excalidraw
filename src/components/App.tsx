@@ -1072,6 +1072,7 @@ class App extends React.Component<AppProps, AppState> {
     this.unmounted = true;
     this.removeEventListeners();
     this.scene.destroy();
+    this.library.destroy();
     clearTimeout(touchTimeout);
     touchTimeout = 0;
   }

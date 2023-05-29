@@ -1,12 +1,13 @@
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { COLOR_PALETTE } from "../colors";
+import { jotaiScope } from "../jotai";
 import { exportToSvg } from "../packages/utils";
 import { LibraryItem } from "../types";
 
-export const libraryItemSvgsCache = atom<Map<LibraryItem["id"], SVGSVGElement>>(
-  new Map(),
-);
+export type SvgCache = Map<LibraryItem["id"], SVGSVGElement>;
+
+export const libraryItemSvgsCache = atom<SvgCache>(new Map());
 
 const exportLibraryItemToSvg = async (elements: LibraryItem["elements"]) => {
   return await exportToSvg({
@@ -22,8 +23,8 @@ const exportLibraryItemToSvg = async (elements: LibraryItem["elements"]) => {
 export const useLibraryItemSvg = (
   id: LibraryItem["id"] | null,
   elements: LibraryItem["elements"] | undefined,
+  svgCache: SvgCache,
 ): SVGSVGElement | undefined => {
-  const [svgCache, setSvgCache] = useAtom(libraryItemSvgsCache);
   const [svg, setSvg] = useState<SVGSVGElement>();
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export const useLibraryItemSvg = (
             const exportedSvg = await exportLibraryItemToSvg(elements);
 
             if (exportedSvg) {
-              setSvgCache(svgCache.set(id, exportedSvg));
+              svgCache.set(id, exportedSvg);
               setSvg(exportedSvg);
             }
           })();
@@ -53,7 +54,23 @@ export const useLibraryItemSvg = (
         })();
       }
     }
-  }, [id, elements, svgCache, setSvgCache, setSvg]);
+  }, [id, elements, svgCache, setSvg]);
 
   return svg;
+};
+
+export const useLibraryCache = () => {
+  const [svgCache] = useAtom(libraryItemSvgsCache, jotaiScope);
+
+  const clearLibraryCache = () => svgCache.clear();
+
+  const deleteItemsFromLibraryCache = (items: LibraryItem["id"][]) => {
+    items.forEach((item) => svgCache.delete(item));
+  };
+
+  return {
+    clearLibraryCache,
+    deleteItemsFromLibraryCache,
+    svgCache,
+  };
 };

@@ -4,8 +4,7 @@ import { LibraryItem } from "../types";
 import Stack from "./Stack";
 import clsx from "clsx";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
-import { useAtom } from "jotai";
-import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
+import { SvgCache } from "../hooks/useLibraryItemSvg";
 import { useTransition } from "../hooks/useTransition";
 
 const ITEMS_PER_ROW = 4;
@@ -26,6 +25,7 @@ interface Props {
   onItemSelectToggle: (id: LibraryItem["id"], event: React.MouseEvent) => void;
   onItemDrag: (id: LibraryItem["id"], event: React.DragEvent) => void;
   isItemSelected: (id: LibraryItem["id"] | null) => boolean;
+  svgCache: SvgCache;
 }
 
 function LibraryRow({
@@ -34,6 +34,7 @@ function LibraryRow({
   onItemDrag,
   isItemSelected,
   onClick,
+  svgCache,
 }: Props) {
   return (
     <Stack.Row className="library-menu-items-container__row">
@@ -47,6 +48,7 @@ function LibraryRow({
             selected={isItemSelected(item.id)}
             onToggle={onItemSelectToggle}
             onDrag={onItemDrag}
+            svgCache={svgCache}
           />
         </Stack.Col>
       ))}
@@ -68,11 +70,11 @@ function LibraryMenuSection({
   onItemDrag,
   isItemSelected,
   onClick,
+  svgCache,
 }: Props) {
   const rows = Math.ceil(items.length / ITEMS_PER_ROW);
   const [, startTransition] = useTransition();
   const [index, setIndex] = useState(0);
-  const [svgCache] = useAtom(libraryItemSvgsCache);
 
   const rowsRenderedPerBatch = useMemo(() => {
     return svgCache.size === 0
@@ -99,6 +101,7 @@ function LibraryMenuSection({
             onItemDrag={onItemDrag}
             onClick={onClick}
             isItemSelected={isItemSelected}
+            svgCache={svgCache}
           />
         ) : (
           <EmptyLibraryRow key={i} />

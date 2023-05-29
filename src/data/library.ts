@@ -22,6 +22,7 @@ import {
   DEFAULT_SIDEBAR,
   LIBRARY_SIDEBAR_TAB,
 } from "../constants";
+import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
 
 export const libraryItemsAtom = atom<{
   status: "loading" | "loaded";
@@ -113,6 +114,20 @@ class Library {
         console.error(error);
       }
     }
+  };
+
+  /** call on excalidraw instance unmount */
+  destroy = () => {
+    this.isInitialized = false;
+    this.updateQueue = [];
+    this.lastLibraryItems = [];
+    jotaiStore.set(libraryItemSvgsCache, new Map());
+    // TODO uncomment after/if we make jotai store scoped to each excal instance
+    // jotaiStore.set(libraryItemsAtom, {
+    //   status: "loading",
+    //   isInitialized: false,
+    //   libraryItems: [],
+    // });
   };
 
   resetLibrary = () => {
