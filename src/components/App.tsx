@@ -4576,8 +4576,11 @@ class App extends React.Component<AppProps, AppState> {
                     nextSelectedElementIds[element.id] = false;
                   });
                 } else if (hitElement.frameId) {
-                  // if hitElements is a normal element, deselect its frame
-                  nextSelectedElementIds[hitElement.frameId] = false;
+                  // if hitElement is in a frame and its frame has been selected
+                  // disable selection for the given element
+                  if (nextSelectedElementIds[hitElement.frameId]) {
+                    nextSelectedElementIds[hitElement.id] = false;
+                  }
                 } else {
                   // hitElement is neither a frame nor an element in a frame
                   // but since hitElement could be in a group with some frames
@@ -4636,39 +4639,39 @@ class App extends React.Component<AppProps, AppState> {
             }
 
             // we're hitting some element inside a frame AND the frame is previously selected
-            if (
-              hitElement.frameId &&
-              someHitElementIsSelected &&
-              this.state.selectedElementIds[hitElement.frameId]
-            ) {
-              this.setState((prevState) => {
-                const nextSelectedElementIds = {
-                  ...prevState.selectedElementIds,
-                  [hitElement.id]: true,
-                  // deselect the frame
-                  [hitElement.frameId!]: false,
-                };
+            // if (
+            //   hitElement.frameId &&
+            //   someHitElementIsSelected &&
+            //   this.state.selectedElementIds[hitElement.frameId]
+            // ) {
+            //   this.setState((prevState) => {
+            //     const nextSelectedElementIds = {
+            //       ...prevState.selectedElementIds,
+            //       [hitElement.id]: true,
+            //       // deselect the frame
+            //       [hitElement.frameId!]: false,
+            //     };
 
-                // deselect groups containing the frame
-                (this.scene.getElement(hitElement.frameId!)?.groupIds ?? [])
-                  .flatMap((gid) =>
-                    getElementsInGroup(this.scene.getNonDeletedElements(), gid),
-                  )
-                  .forEach(
-                    (element) => (nextSelectedElementIds[element.id] = false),
-                  );
+            //     // deselect groups containing the frame
+            //     (this.scene.getElement(hitElement.frameId!)?.groupIds ?? [])
+            //       .flatMap((gid) =>
+            //         getElementsInGroup(this.scene.getNonDeletedElements(), gid),
+            //       )
+            //       .forEach(
+            //         (element) => (nextSelectedElementIds[element.id] = false),
+            //       );
 
-                return selectGroupsForSelectedElements(
-                  {
-                    ...prevState,
-                    selectedElementIds: nextSelectedElementIds,
-                    showHyperlinkPopup: hitElement.link ? "info" : false,
-                  },
-                  this.scene.getNonDeletedElements(),
-                );
-              });
-              pointerDownState.hit.wasAddedToSelection = true;
-            }
+            //     return selectGroupsForSelectedElements(
+            //       {
+            //         ...prevState,
+            //         selectedElementIds: nextSelectedElementIds,
+            //         showHyperlinkPopup: hitElement.link ? "info" : false,
+            //       },
+            //       this.scene.getNonDeletedElements(),
+            //     );
+            //   });
+            //   pointerDownState.hit.wasAddedToSelection = true;
+            // }
           }
         }
 
@@ -6172,9 +6175,40 @@ class App extends React.Component<AppProps, AppState> {
                 );
               });
             }
+          } else if (
+            hitElement.frameId &&
+            this.state.selectedElementIds[hitElement.frameId]
+          ) {
+            // when hitElement is part of a selected frame, deselect the frame
+            // to avoid frame and containing elements selected simultaneously
+            this.setState((prevState) => {
+              const nextSelectedElementIds = {
+                ...prevState.selectedElementIds,
+                [hitElement.id]: true,
+                // deselect the frame
+                [hitElement.frameId!]: false,
+              };
+
+              // deselect groups containing the frame
+              (this.scene.getElement(hitElement.frameId!)?.groupIds ?? [])
+                .flatMap((gid) =>
+                  getElementsInGroup(this.scene.getNonDeletedElements(), gid),
+                )
+                .forEach(
+                  (element) => (nextSelectedElementIds[element.id] = false),
+                );
+
+              return selectGroupsForSelectedElements(
+                {
+                  ...prevState,
+                  selectedElementIds: nextSelectedElementIds,
+                  showHyperlinkPopup: hitElement.link ? "info" : false,
+                },
+                this.scene.getNonDeletedElements(),
+              );
+            });
           } else {
-            // add element to selection while
-            // keeping prev elements selected
+            // add element to selection while keeping prev elements selected
             this.setState((_prevState) => ({
               selectedElementIds: {
                 ..._prevState.selectedElementIds,

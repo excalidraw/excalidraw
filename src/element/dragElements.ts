@@ -23,7 +23,12 @@ export const dragSelectedElements = (
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
 
-  let elementsToUpdate: NonDeletedExcalidrawElement[];
+  // we do not want a frame and its elements to be selected at the same time
+  // but when it happens (due to some bug), we want to avoid updating element
+  // in the frame twice, hence the use of set
+  const elementsToUpdate = new Set<NonDeletedExcalidrawElement>(
+    selectedElements,
+  );
   const frames = selectedElements
     .filter((e) => isFrameElement(e))
     .map((f) => f.id);
@@ -34,9 +39,7 @@ export const dragSelectedElements = (
       .filter((e) => e.frameId !== null)
       .filter((e) => frames.includes(e.frameId!));
 
-    elementsToUpdate = [...selectedElements, ...elementsInFrames];
-  } else {
-    elementsToUpdate = selectedElements;
+    elementsInFrames.forEach((element) => elementsToUpdate.add(element));
   }
 
   elementsToUpdate.forEach((element) => {
@@ -76,7 +79,7 @@ export const dragSelectedElements = (
       }
     }
     updateBoundElements(element, {
-      simultaneouslyUpdated: elementsToUpdate,
+      simultaneouslyUpdated: Array.from(elementsToUpdate),
     });
   });
 };
