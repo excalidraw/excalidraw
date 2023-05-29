@@ -50,7 +50,7 @@
     "veryLarge": "Bardzo duży",
     "solid": "Pełne",
     "hachure": "Linie",
-    "zigzag": "",
+    "zigzag": "Zygzak",
     "crossHatch": "Zakreślone",
     "thin": "Cienkie",
     "bold": "Pogrubione",
@@ -63,7 +63,7 @@
     "cartoonist": "Rysunkowy",
     "fileTitle": "Nazwa pliku",
     "colorPicker": "Paleta kolorów",
-    "canvasColors": "",
+    "canvasColors": "Używane na płótnie",
     "canvasBackground": "Kolor dokumentu",
     "drawingCanvas": "Obszar roboczy",
     "layers": "Warstwy",
@@ -113,8 +113,8 @@
       "label": "Łącze"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Edytuj linię",
+      "exit": "Wyjdź z edytora linii"
     },
     "elementLock": {
       "lock": "Zablokuj",
@@ -127,7 +127,7 @@
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
-    "hint_emptyLibrary": "",
+    "hint_emptyLibrary": "Wybierz element na płótnie, aby go tutaj dodać, lub zainstaluj bibliotekę z poniższego publicznego repozytorium.",
     "hint_emptyPrivateLibrary": "Wybierz element, aby dodać go tutaj."
   },
   "buttons": {
@@ -199,10 +199,10 @@
     "collabSaveFailed": "Nie udało się zapisać w bazie danych. Jeśli problemy nie ustąpią, zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "collabSaveFailed_sizeExceeded": "Nie udało się zapisać w bazie danych — dokument jest za duży. Zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "Wygląda na to, że używasz przeglądarki Brave z włączonym ustawieniem <bold>Agressively Block Fingerprinting</bold>.",
+      "line2": "Może to doprowadzić do złamania <bold>elementów tekstu</bold> na rysunkach.",
+      "line3": "Zdecydowanie zalecamy wyłączenie tego ustawienia. Możesz wykonać <link>te kroki</link>, aby to zrobić.",
+      "line4": "Jeśli wyłączenie tego ustawienia nie naprawia wyświetlania elementów tekstowych, zgłoś <issueLink>problem</issueLink> na naszym GitHubie lub napisz do nas na <discordLink>Discordzie</discordLink>"
     }
   },
   "toolBar": {
@@ -217,10 +217,10 @@
     "text": "Tekst",
     "library": "Biblioteka",
     "lock": "Zablokuj wybrane narzędzie",
-    "penMode": "",
-    "link": "",
+    "penMode": "Tryb pióra — zapobiegaj dotknięciom",
+    "link": "Dodaj/aktualizuj link dla wybranego kształtu",
     "eraser": "Gumka",
-    "hand": ""
+    "hand": "Ręka (narzędzie do przesuwania)"
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -228,7 +228,7 @@
     "shapes": "Kształty"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Aby przesunąć płótno, przytrzymaj kółko myszy lub spację podczas przeciągania, albo użyj narzędzia ręki",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
@@ -240,13 +240,13 @@
     "resizeImage": "Możesz zmienić rozmiar swobodnie trzymając SHIFT,\nprzytrzymaj ALT, aby przeskalować względem środka obiektu",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
     "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "Naciśnij przycisk Delete, aby usunąć punkt. Ctrl/Cmd+D, aby go zduplikować. Przeciągnij, aby go przenieść",
     "lineEditor_nothingSelected": "",
     "placeImage": "Kliknij, aby umieścić obraz, lub kliknij i przeciągnij, aby ustawić jego rozmiar ręcznie",
     "publishLibrary": "Opublikuj własną bibliotekę",
-    "bindTextToElement": "",
+    "bindTextToElement": "Wciśnij enter, aby dodać tekst",
     "deepBoxSelect": "",
-    "eraserRevert": "",
+    "eraserRevert": "Przytrzymaj Alt, aby przywrócić elementy oznaczone do usunięcia",
     "firefox_clipboard_write": ""
   },
   "canvasError": {
@@ -284,7 +284,7 @@
     "link_button": "Wygeneruj link",
     "excalidrawplus_description": "Zapisz scenę do swojego obszaru roboczego Excalidraw+.",
     "excalidrawplus_button": "Eksportuj",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_exportError": "W tej chwili nie można wyeksportować do Excalidraw+..."
   },
   "helpDialog": {
     "blog": "Przeczytaj na naszym blogu",
@@ -297,8 +297,8 @@
     "doubleClick": "podwójne kliknięcie",
     "drag": "przeciągnij",
     "editor": "Edytor",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Edytuj punkty linii/strzałki",
+    "editText": "Edytuj tekst/dodaj etykietę",
     "github": "Znalazłeś problem? Prześlij",
     "howto": "Skorzystaj z instrukcji",
     "or": "lub",
@@ -311,7 +311,7 @@
     "view": "Widok",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
     "zoomToSelection": "Przybliż do zaznaczenia",
-    "toggleElementLock": "",
+    "toggleElementLock": "Zablokuj/odblokuj zaznaczenie",
     "movePageUpDown": "Przesuń stronę w górę/w dół",
     "movePageLeftRight": ""
   },
@@ -342,7 +342,7 @@
     "noteDescription": "<link></link>dla innych osób do wykorzystania w swoich rysunkach.",
     "noteGuidelines": "Biblioteka musi być najpierw zatwierdzona ręcznie. Przeczytaj <link>wytyczne</link>",
     "noteLicense": "Wysyłając zgadzasz się, że biblioteka zostanie opublikowana pod <link>Licencja MIT, </link>w skrócie, każdy może z nich korzystać bez ograniczeń.",
-    "noteItems": "",
+    "noteItems": "Każdy element biblioteki musi mieć własną nazwę, aby był filtrowalny. Uwzględnione zostaną następujące elementy biblioteki:",
     "atleastOneLibItem": "Proszę wybrać co najmniej jeden element biblioteki, by rozpocząć",
     "republishWarning": ""
   },
@@ -355,22 +355,22 @@
     "removeItemsFromLib": "Usuń wybrane elementy z biblioteki"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Eksportuj obraz",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Tło",
+      "onlySelected": "Tylko wybrane",
+      "darkMode": "Tryb ciemny",
+      "embedScene": "Osadź scenę",
+      "scale": "Skala",
+      "padding": "Dopełnienie"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Dane sceny zostaną zapisane w eksportowanym pliku PNG/SVG tak, aby scena mogła zostać z niego przywrócona.\nZwiększy to rozmiar eksportowanego pliku."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Zapisz jako PNG",
+      "exportToSvg": "Zapisz jako SVG",
+      "copyPngToClipboard": "Skopiuj do schowka jako PNG"
     },
     "button": {
       "exportToPng": "PNG",
@@ -411,38 +411,38 @@
   "colors": {
     "transparent": "Przezroczysty",
     "black": "Czarny",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
+    "white": "Biały",
+    "red": "Czerwony",
+    "pink": "Różowy",
+    "grape": "Winogronowy",
     "violet": "Fioletowy",
     "gray": "Szary",
     "blue": "Niebieski",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "cyan": "Cyjanowy",
+    "teal": "Turkusowy",
+    "green": "Zielony",
+    "yellow": "Żółty",
+    "orange": "Pomarańczowy",
+    "bronze": "Brązowy"
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Wszystkie dane są zapisywane lokalnie w przeglądarce.",
+      "center_heading_plus": "Czy zamiast tego chcesz przejść do Excalidraw+?",
+      "menuHint": "Eksportuj, preferencje, języki..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Eksportuj, preferencje i więcej...",
+      "center_heading": "Schematy uproszczone.",
+      "toolbarHint": "Wybierz narzędzie i zacznij rysować!",
+      "helpHint": "Skróty klawiaturowe i pomoc"
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Najczęściej używane kolory",
+    "colors": "Kolory",
+    "shades": "Odcienie",
+    "hexCode": "Kod HEX",
+    "noShades": "Brak dostępnych odcieni dla tego koloru"
   }
 }
