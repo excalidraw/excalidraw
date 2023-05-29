@@ -30,6 +30,9 @@ const alignSelectedElements = (
   const selectedElements = getSelectedElements(
     getNonDeletedElements(elements),
     appState,
+    {
+      includeElementsInFrames: true,
+    },
   );
 
   const updatedElements = alignElements(selectedElements, alignment);

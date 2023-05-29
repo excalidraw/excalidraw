@@ -2,6 +2,7 @@ import { GroupId, ExcalidrawElement, NonDeleted } from "./element/types";
 import { AppState } from "./types";
 import { getSelectedElements } from "./scene";
 import { getBoundTextElement } from "./element/textElement";
+import { isFrameElement } from "./element";
 
 export const selectGroup = (
   groupId: GroupId,
@@ -185,6 +186,9 @@ export const removeFromSelectedGroups = (
   selectedGroupIds: { [groupId: string]: boolean },
 ) => groupIds.filter((groupId) => !selectedGroupIds[groupId]);
 
+/**
+ * maximum groups: group > frame > element
+ */
 export const getMaximumGroups = (
   elements: ExcalidrawElement[],
 ): ExcalidrawElement[][] => {
@@ -193,11 +197,29 @@ export const getMaximumGroups = (
     ExcalidrawElement[]
   >();
 
+  const frames = elements
+    .filter((elements) => isFrameElement(elements))
+    .reduce((acc, frame) => {
+      acc[frame.id] = frame;
+      return acc;
+    }, {} as Record<string, ExcalidrawElement>);
+
   elements.forEach((element: ExcalidrawElement) => {
-    const groupId =
-      element.groupIds.length === 0
-        ? element.id
-        : element.groupIds[element.groupIds.length - 1];
+    let groupId: string;
+
+    if (element.groupIds.length > 0 && !element.frameId) {
+      groupId = element.groupIds[element.groupIds.length - 1];
+    } else if (element.frameId && frames[element.frameId]) {
+      const frameGroupIds = frames[element.frameId].groupIds;
+
+      if (frameGroupIds) {
+        groupId = frameGroupIds[frameGroupIds.length - 1];
+      } else {
+        groupId = element.frameId;
+      }
+    } else {
+      groupId = element.id;
+    }
 
     const currentGroupMembers = groups.get(groupId) || [];
 

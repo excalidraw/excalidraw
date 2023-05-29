@@ -67,8 +67,6 @@ import {
   elementsAreInFrameBounds,
   FrameGeometry,
   getContainingFrame,
-  groupsAreCompletelyOutOfFrame,
-  isElementContainingFrame,
 } from "../frame";
 import Scene from "../scene/Scene";
 
@@ -482,40 +480,7 @@ export const _renderScene = ({
                 element.containerId &&
                 appState.selectedElementIds[element.containerId] &&
                 appState.selectedElementsAreBeingDragged &&
-                !appState.frameToHighlight) ||
-              // group elements, completely out of frame
-              (element.groupIds.length > 0 &&
-                groupsAreCompletelyOutOfFrame(
-                  elements,
-                  element.groupIds,
-                  containgFrame,
-                )) ||
-              // single normal element, completely out of frame
-              (element.groupIds.length === 0 &&
-                !(element.type === "text" && element.containerId) &&
-                !elementsAreInFrameBounds([element], containgFrame) &&
-                !isElementContainingFrame(elements, element, containgFrame) &&
-                !FrameGeometry.isElementIntersectingFrame(
-                  element,
-                  containgFrame,
-                )) ||
-              // single bound text element, container out of frame
-              (element.groupIds.length === 0 &&
-                element.type === "text" &&
-                element.containerId &&
-                !elementsAreInFrameBounds(
-                  [Scene.getScene(element)?.getElement(element.containerId)!],
-                  containgFrame,
-                ) &&
-                !isElementContainingFrame(
-                  elements,
-                  Scene.getScene(element)?.getElement(element.containerId)!,
-                  containgFrame,
-                ) &&
-                !FrameGeometry.isElementIntersectingFrame(
-                  Scene.getScene(element)?.getElement(element.containerId)!,
-                  containgFrame,
-                ))
+                !appState.frameToHighlight)
             ) {
               // do not clip
             } else {

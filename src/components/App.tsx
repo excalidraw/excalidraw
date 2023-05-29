@@ -4048,7 +4048,6 @@ class App extends React.Component<AppProps, AppState> {
         ),
       );
     } else {
-      // handle resizing elements
       getSelectedElements(this.scene.getNonDeletedElements(), this.state)
         .filter((element) => element.type !== "frame" && element.frameId)
         .forEach((element) => {
