@@ -355,27 +355,27 @@
     "removeItemsFromLib": "Ta bort markerade objekt från biblioteket"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exportera bild",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Bakgrund",
+      "onlySelected": "Endast markerade",
+      "darkMode": "Mörkt läge",
+      "embedScene": "Bädda in skiss",
+      "scale": "Skala",
+      "padding": "Utfyllnad"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Skissdata kommer att sparas i den exporterade PNG/SVG-filen så att skissen kan återställas från den.\nKommer att öka exporterad filstorlek."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportera till PNG",
+      "exportToSvg": "Exportera till SVG",
+      "copyPngToClipboard": "Kopiera PNG till urklipp"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopiera till urklipp"
     }
   },
   "encrypted": {
