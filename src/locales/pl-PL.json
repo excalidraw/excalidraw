@@ -106,7 +106,7 @@
     "increaseFontSize": "Zwiększ rozmiar czcionki",
     "unbindText": "Rozłącz tekst",
     "bindText": "Połącz tekst z kontenerem",
-    "createContainerFromText": "Włóż tekst w kontener",
+    "createContainerFromText": "Zawijaj tekst w kontenerze",
     "link": {
       "edit": "Edytuj łącze",
       "create": "Utwórz łącze",
@@ -241,13 +241,13 @@
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
     "lineEditor_info": "Przytrzymaj CtrlOrCmd i kliknij dwukrotnie lub naciśnij CtrlOrCmd + Enter, aby edytować punkty",
     "lineEditor_pointSelected": "Naciśnij przycisk Delete, aby usunąć punkt. Ctrl/Cmd+D, aby go zduplikować. Przeciągnij, aby go przenieść",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_nothingSelected": "Wybierz punkt do edycji (przytrzymaj SHIFT, aby wybrać wiele),\nlub przytrzymaj Alt i kliknij, aby dodać nowe punkty",
     "placeImage": "Kliknij, aby umieścić obraz, lub kliknij i przeciągnij, aby ustawić jego rozmiar ręcznie",
     "publishLibrary": "Opublikuj własną bibliotekę",
     "bindTextToElement": "Wciśnij enter, aby dodać tekst",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "Przytrzymaj CtrlOrCmd, aby wybrać w obrębie grupy i uniknąć przeciągania",
     "eraserRevert": "Przytrzymaj Alt, aby przywrócić elementy oznaczone do usunięcia",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "Ta funkcja może być włączona poprzez ustawienie flagi \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Aby zmienić flagi przeglądarki w Firefox, odwiedź stronę \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
@@ -289,8 +289,8 @@
   "helpDialog": {
     "blog": "Przeczytaj na naszym blogu",
     "click": "kliknięcie",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Wybór w obrębie grupy",
+    "deepBoxSelect": "Wybór w obrębie grupy i unikanie przeciągania",
     "curvedArrow": "Zakrzywiona strzałka",
     "curvedLine": "Zakrzywiona linia",
     "documentation": "Dokumentacja",
@@ -313,7 +313,7 @@
     "zoomToSelection": "Przybliż do zaznaczenia",
     "toggleElementLock": "Zablokuj/odblokuj zaznaczenie",
     "movePageUpDown": "Przesuń stronę w górę/w dół",
-    "movePageLeftRight": ""
+    "movePageLeftRight": "Przenieś stronę w lewo/prawo"
   },
   "clearCanvasDialog": {
     "title": "Wyczyść płótno"
@@ -331,7 +331,7 @@
       "authorName": "Twoje imię lub nazwa użytkownika",
       "libraryName": "Nazwa twojej biblioteki",
       "libraryDesc": "Opis twojej biblioteki, aby pomóc innym zrozumieć jej działanie",
-      "githubHandle": "",
+      "githubHandle": "Uchwyt GitHub (opcjonalny), dzięki czemu możesz edytować bibliotekę po przesłaniu do sprawdzenia",
       "twitterHandle": "Nazwa użytkownika w serwisie Twitter (opcjonalna), aby wiedzieć kogo oznaczyć przy promowaniu na Twitterze",
       "website": "Link do Twojej osobistej strony internetowej lub gdzie indziej (opcjonalnie)"
     },
@@ -344,7 +344,7 @@
     "noteLicense": "Wysyłając zgadzasz się, że biblioteka zostanie opublikowana pod <link>Licencja MIT, </link>w skrócie, każdy może z nich korzystać bez ograniczeń.",
     "noteItems": "Każdy element biblioteki musi mieć własną nazwę, aby był filtrowalny. Uwzględnione zostaną następujące elementy biblioteki:",
     "atleastOneLibItem": "Proszę wybrać co najmniej jeden element biblioteki, by rozpocząć",
-    "republishWarning": ""
+    "republishWarning": "Uwaga: niektóre z wybranych elementów są oznaczone jako już opublikowane/wysłane. Powinieneś ponownie przesłać elementy tylko wtedy, gdy aktualizujesz istniejącą bibliotekę lub zgłoszenie."
   },
   "publishSuccessDialog": {
     "title": "Biblioteka została przesłana",
@@ -380,7 +380,7 @@
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz.",
-    "link": ""
+    "link": "Wpis na blogu dotyczący szyfrowania end-to-end w Excalidraw"
   },
   "stats": {
     "angle": "Kąt",
@@ -406,7 +406,7 @@
     "fileSavedToFilename": "Zapisano jako {filename}",
     "canvas": "płótno",
     "selection": "zaznaczenie",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Użyj {{shortcut}}, aby wkleić jako pojedynczy element,\nlub wklej do istniejącego edytora tekstu"
   },
   "colors": {
     "transparent": "Przezroczysty",
