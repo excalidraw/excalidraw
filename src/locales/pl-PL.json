@@ -373,9 +373,9 @@
       "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Skopiuj do schowka"
     }
   },
   "encrypted": {
@@ -410,14 +410,14 @@
   },
   "colors": {
     "transparent": "Przezroczysty",
-    "black": "",
+    "black": "Czarny",
     "white": "",
     "red": "",
     "pink": "",
     "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
+    "violet": "Fioletowy",
+    "gray": "Szary",
+    "blue": "Niebieski",
     "cyan": "",
     "teal": "",
     "green": "",
