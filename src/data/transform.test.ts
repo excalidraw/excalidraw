@@ -110,9 +110,19 @@ describe("Test Transform", () => {
         strokeStyle: "dotted",
       },
     ];
-    expect(
-      convertToExcalidrawElements(elements as ImportedDataState["elements"]),
-    ).toMatchSnapshot();
+    const excaldrawElements = convertToExcalidrawElements(
+      elements as ImportedDataState["elements"],
+    );
+
+    expect(excaldrawElements.length).toBe(4);
+
+    excaldrawElements.forEach((ele) => {
+      expect(ele).toMatchSnapshot({
+        seed: expect.any(Number),
+        versionNonce: expect.any(Number),
+        id: expect.any(String),
+      });
+    });
   });
 
   it("should transform to text containers when label provided", () => {
@@ -182,9 +192,19 @@ describe("Test Transform", () => {
         },
       },
     ];
-    expect(
-      convertToExcalidrawElements(elements as ImportedDataState["elements"]),
-    ).toMatchSnapshot();
+    const excaldrawElements = convertToExcalidrawElements(
+      elements as ImportedDataState["elements"],
+    );
+
+    expect(excaldrawElements.length).toBe(12);
+
+    excaldrawElements.forEach((ele) => {
+      expect(ele).toMatchSnapshot({
+        seed: expect.any(Number),
+        versionNonce: expect.any(Number),
+        id: expect.any(String),
+      });
+    });
   });
   it("should transform to labelled arrows when label provided for arrows", () => {
     const elements = [
@@ -228,9 +248,19 @@ describe("Test Transform", () => {
         },
       },
     ];
-    expect(
-      convertToExcalidrawElements(elements as ImportedDataState["elements"]),
-    ).toMatchSnapshot();
+    const excaldrawElements = convertToExcalidrawElements(
+      elements as ImportedDataState["elements"],
+    );
+
+    expect(excaldrawElements.length).toBe(8);
+
+    excaldrawElements.forEach((ele) => {
+      expect(ele).toMatchSnapshot({
+        seed: expect.any(Number),
+        versionNonce: expect.any(Number),
+        id: expect.any(String),
+      });
+    });
   });
 
   describe("Test arrow bindings", () => {
@@ -251,9 +281,67 @@ describe("Test Transform", () => {
           },
         },
       ];
-      expect(
-        convertToExcalidrawElements(elements as ImportedDataState["elements"]),
-      ).toMatchSnapshot();
+      const excaldrawElements = convertToExcalidrawElements(
+        elements as ImportedDataState["elements"],
+      );
+
+      expect(excaldrawElements.length).toBe(4);
+      const [arrow, text, rectangle, ellipse] = excaldrawElements;
+      expect(arrow).toMatchObject({
+        type: "arrow",
+        x: 255,
+        y: 239,
+        boundElements: [{ id: text.id, type: "text" }],
+        startBinding: {
+          elementId: rectangle.id,
+          focus: 0,
+          gap: 1,
+        },
+        endBinding: {
+          elementId: ellipse.id,
+          focus: 0,
+        },
+      });
+
+      expect(text).toMatchObject({
+        x: 340,
+        y: 226.5,
+        type: "text",
+        text: "HELLO WORLD!!",
+        containerId: arrow.id,
+      });
+
+      expect(rectangle).toMatchObject({
+        x: 155,
+        y: 189,
+        type: "rectangle",
+        boundElements: [
+          {
+            id: arrow.id,
+            type: "arrow",
+          },
+        ],
+      });
+
+      expect(ellipse).toMatchObject({
+        x: 555,
+        y: 189,
+        type: "ellipse",
+        boundElements: [
+          {
+            id: arrow.id,
+            type: "arrow",
+          },
+        ],
+      });
+
+      excaldrawElements.forEach((ele) => {
+        expect(ele).toMatchSnapshot({
+          seed: expect.any(Number),
+          versionNonce: expect.any(Number),
+          id: expect.any(String),
+        });
+      });
     });
 
     it("should bind arrows to text when start / end provided without ids", () => {
@@ -275,9 +363,70 @@ describe("Test Transform", () => {
           },
         },
       ];
-      expect(
-        convertToExcalidrawElements(elements as ImportedDataState["elements"]),
-      ).toMatchSnapshot();
+
+      const excaldrawElements = convertToExcalidrawElements(
+        elements as ImportedDataState["elements"],
+      );
+
+      expect(excaldrawElements.length).toBe(4);
+
+      const [arrow, text1, text2, text3] = excaldrawElements;
+
+      expect(arrow).toMatchObject({
+        type: "arrow",
+        x: 255,
+        y: 239,
+        boundElements: [{ id: text1.id, type: "text" }],
+        startBinding: {
+          elementId: text2.id,
+          focus: 0,
+          gap: 1,
+        },
+        endBinding: {
+          elementId: text3.id,
+          focus: 0,
+        },
+      });
+
+      expect(text1).toMatchObject({
+        x: 340,
+        y: 226.5,
+        type: "text",
+        text: "HELLO WORLD!!",
+        containerId: arrow.id,
+      });
+
+      expect(text2).toMatchObject({
+        x: 185,
+        y: 226.5,
+        type: "text",
+        boundElements: [
+          {
+            id: arrow.id,
+            type: "arrow",
+          },
+        ],
+      });
+
+      expect(text3).toMatchObject({
+        x: 555,
+        y: 226.5,
+        type: "text",
+        boundElements: [
+          {
+            id: arrow.id,
+            type: "arrow",
+          },
+        ],
+      });
+
+      excaldrawElements.forEach((ele) => {
+        expect(ele).toMatchSnapshot({
+          seed: expect.any(Number),
+          versionNonce: expect.any(Number),
+          id: expect.any(String),
+        });
+      });
     });
 
     it("should bind arrows to existinging shapes when start / end provided with ids", () => {
@@ -333,9 +482,20 @@ describe("Test Transform", () => {
           },
         },
       ];
-      expect(
-        convertToExcalidrawElements(elements as ImportedDataState["elements"]),
-      ).toMatchSnapshot();
+
+      const excaldrawElements = convertToExcalidrawElements(
+        elements as ImportedDataState["elements"],
+      );
+
+      expect(excaldrawElements.length).toBe(5);
+
+      excaldrawElements.forEach((ele) => {
+        expect(ele).toMatchSnapshot({
+          seed: expect.any(Number),
+          versionNonce: expect.any(Number),
+          id: expect.any(String),
+        });
+      });
     });
 
     it("should bind arrows to existing text elements when start / end provided with ids", () => {
@@ -375,9 +535,19 @@ describe("Test Transform", () => {
         },
       ];
 
-      expect(
-        convertToExcalidrawElements(elements as ImportedDataState["elements"]),
-      ).toMatchSnapshot();
+      const excaldrawElements = convertToExcalidrawElements(
+        elements as ImportedDataState["elements"],
+      );
+
+      expect(excaldrawElements.length).toBe(4);
+
+      excaldrawElements.forEach((ele) => {
+        expect(ele).toMatchSnapshot({
+          seed: expect.any(Number),
+          versionNonce: expect.any(Number),
+          id: expect.any(String),
+        });
+      });
     });
   });
 
