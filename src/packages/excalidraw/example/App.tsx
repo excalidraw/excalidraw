@@ -204,7 +204,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               value: 32,
             },
           },
-
           {
             type: "arrow",
             x: 300,
