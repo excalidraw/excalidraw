@@ -166,6 +166,7 @@ import {
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
+  elementsAreInSameGroup,
   editGroupForSelectedElement,
   getElementsInGroup,
   getSelectedGroupIdForElement,
@@ -5944,11 +5945,15 @@ class App extends React.Component<AppProps, AppState> {
                 } else {
                   let shouldRemoveElement = true;
 
-                  element.groupIds.forEach((id) => {
-                    if (groupsToKeep.has(id)) {
-                      shouldRemoveElement = false;
-                    }
-                  });
+                  if (elementsAreInSameGroup([element, topLayerFrame])) {
+                    shouldRemoveElement = true;
+                  } else {
+                    element.groupIds.forEach((id) => {
+                      if (groupsToKeep.has(id)) {
+                        shouldRemoveElement = false;
+                      }
+                    });
+                  }
 
                   if (shouldRemoveElement) {
                     nextElementsInFrame.delete(element);
