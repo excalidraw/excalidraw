@@ -16,6 +16,7 @@ import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
 import LibraryMenuSection from "./LibraryMenuSection";
 import { useScrollPosition } from "../hooks/useScrollPosition";
+import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
 import "./LibraryMenuItems.scss";
 
@@ -48,6 +49,7 @@ export default function LibraryMenuItems({
       libraryContainerRef.current?.scrollTo(0, scrollPosition);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const { svgCache } = useLibraryCache();
 
   const unpublishedItems = libraryItems.filter(
     (item) => item.status !== "published",
@@ -235,6 +237,7 @@ export default function LibraryMenuItems({
               onItemDrag={onItemDrag}
               onClick={onItemClick}
               isItemSelected={isItemSelected}
+              svgCache={svgCache}
             />
           )}
         </>
@@ -254,6 +257,7 @@ export default function LibraryMenuItems({
               onItemDrag={onItemDrag}
               onClick={onItemClick}
               isItemSelected={isItemSelected}
+              svgCache={svgCache}
             />
           ) : unpublishedItems.length > 0 ? (
             <div
