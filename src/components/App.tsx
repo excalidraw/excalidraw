@@ -303,8 +303,6 @@ import {
   getElementsToUpdateForFrame,
   isCursorInFrame,
   bindElementsToFramesAfterDuplication,
-  FrameGeometry,
-  elementsAreInFrameBounds,
   addElementsToFrame,
   replaceAllElementsInFrame,
   removeElementsFromFrame,
@@ -312,6 +310,7 @@ import {
   getElementsInNewFrame,
   getContainingFrame,
   groupsAreCompletelyOutOfFrame,
+  elementOverlapsWithFrame,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
@@ -4063,11 +4062,7 @@ class App extends React.Component<AppProps, AppState> {
                   containingFrame,
                 )) ||
               (element.groupIds.length === 0 &&
-                !elementsAreInFrameBounds([element], containingFrame) &&
-                !FrameGeometry.isElementIntersectingFrame(
-                  element,
-                  containingFrame,
-                ))
+                !elementOverlapsWithFrame(element, containingFrame))
             ) {
               this.scene.replaceAllElements(
                 removeElementsFromFrame(
@@ -5835,13 +5830,7 @@ class App extends React.Component<AppProps, AppState> {
               const frame = getContainingFrame(linearElement);
 
               if (frame && linearElement) {
-                if (
-                  !elementsAreInFrameBounds([linearElement], frame) &&
-                  !FrameGeometry.isElementIntersectingFrame(
-                    linearElement,
-                    frame,
-                  )
-                ) {
+                if (!elementOverlapsWithFrame(linearElement, frame)) {
                   // remove the linear element from all groups
                   // before removing it from the frame as well
                   mutateElement(linearElement, {
@@ -5886,11 +5875,7 @@ class App extends React.Component<AppProps, AppState> {
                   !isFrameElement(element) &&
                   element.frameId !== topLayerFrame.id &&
                   (element.groupIds.length > 0 ||
-                    elementsAreInFrameBounds([element], topLayerFrame) ||
-                    FrameGeometry.isElementIntersectingFrame(
-                      element,
-                      topLayerFrame,
-                    )),
+                    elementOverlapsWithFrame(element, topLayerFrame)),
               ).forEach((element) => nextElementsInFrame.add(element));
 
               // if we are editing a group, then we need to remove the selected
@@ -5920,26 +5905,15 @@ class App extends React.Component<AppProps, AppState> {
               const groupsToKeep = new Set<string>(
                 selectedElements
                   .filter((element) => element.groupIds.length > 0)
-                  .filter(
-                    (element) =>
-                      elementsAreInFrameBounds([element], topLayerFrame) ||
-                      FrameGeometry.isElementIntersectingFrame(
-                        element,
-                        topLayerFrame,
-                      ),
+                  .filter((element) =>
+                    elementOverlapsWithFrame(element, topLayerFrame),
                   )
                   .flatMap((element) => element.groupIds),
               );
 
               selectedElements.forEach((element) => {
                 if (element.groupIds.length === 0) {
-                  if (
-                    !elementsAreInFrameBounds([element], topLayerFrame) &&
-                    !FrameGeometry.isElementIntersectingFrame(
-                      element,
-                      topLayerFrame,
-                    )
-                  ) {
+                  if (!elementOverlapsWithFrame(element, topLayerFrame)) {
                     nextElementsInFrame.delete(element);
                   }
                 } else {
@@ -6009,11 +5983,7 @@ class App extends React.Component<AppProps, AppState> {
                         const frame = getContainingFrame(element);
                         if (
                           frame &&
-                          !elementsAreInFrameBounds([element], frame) &&
-                          !FrameGeometry.isElementIntersectingFrame(
-                            element,
-                            frame,
-                          )
+                          !elementOverlapsWithFrame(element, frame)
                         ) {
                           elementsToRemoveFromFrame.push(element);
                         }

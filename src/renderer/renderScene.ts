@@ -63,11 +63,7 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
-import {
-  elementsAreInFrameBounds,
-  FrameGeometry,
-  getContainingFrame,
-} from "../frame";
+import { elementOverlapsWithFrame, getContainingFrame } from "../frame";
 import Scene from "../scene/Scene";
 
 const hasEmojiSupport = supportsEmoji();
@@ -444,6 +440,22 @@ export const _renderScene = ({
 
     const groupsToBeAddedToFrame = new Set<string>();
 
+    visibleElements.forEach((element) => {
+      if (
+        element.groupIds.length > 0 &&
+        appState.frameToHighlight &&
+        appState.selectedElementIds[element.id] &&
+        (elementOverlapsWithFrame(element, appState.frameToHighlight) ||
+          element.groupIds.find((groupId) =>
+            groupsToBeAddedToFrame.has(groupId),
+          ))
+      ) {
+        element.groupIds.forEach((groupId) =>
+          groupsToBeAddedToFrame.add(groupId),
+        );
+      }
+    });
+
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
     visibleElements.forEach((element) => {
@@ -494,15 +506,11 @@ export const _renderScene = ({
           if (
             appState.frameToHighlight &&
             appState.selectedElementIds[element.id] &&
-            (elementsAreInFrameBounds([element], appState.frameToHighlight) ||
-              FrameGeometry.isElementIntersectingFrame(
-                element,
-                appState.frameToHighlight,
-              ) ||
-              (element.groupIds.length > 0 &&
-                element.groupIds.find((groupId) =>
-                  groupsToBeAddedToFrame.has(groupId),
-                )))
+            ((element.groupIds.length > 0 &&
+              element.groupIds.find((groupId) =>
+                groupsToBeAddedToFrame.has(groupId),
+              )) ||
+              elementOverlapsWithFrame(element, appState.frameToHighlight))
           ) {
             frameClip(appState.frameToHighlight, context, renderConfig);
           }
@@ -521,11 +529,7 @@ export const _renderScene = ({
 
             if (containerElement) {
               if (
-                elementsAreInFrameBounds(
-                  [containerElement],
-                  appState.frameToHighlight,
-                ) ||
-                FrameGeometry.isElementIntersectingFrame(
+                elementOverlapsWithFrame(
                   containerElement,
                   appState.frameToHighlight,
                 )

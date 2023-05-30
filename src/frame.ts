@@ -84,7 +84,7 @@ class LineSegment {
 }
 
 // https://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
-export class FrameGeometry {
+class FrameGeometry {
   private static EPSILON = 0.000001;
 
   private static crossProduct(a: Point, b: Point) {
@@ -218,6 +218,17 @@ export const elementsAreInFrameBounds = (
     selectionY1 <= elementY1 &&
     selectionX2 >= elementX2 &&
     selectionY2 >= elementY2
+  );
+};
+
+export const elementOverlapsWithFrame = (
+  element: ExcalidrawElement,
+  frame: ExcalidrawFrameElement,
+) => {
+  return (
+    elementsAreInFrameBounds([element], frame) ||
+    FrameGeometry.isElementIntersectingFrame(element, frame) ||
+    isElementContainingFrame([frame], element, frame)
   );
 };
 
