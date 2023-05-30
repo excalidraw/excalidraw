@@ -22,7 +22,6 @@
     }
 
     &--skeleton {
-      border-radius: var(--border-radius-lg);
       background: linear-gradient(
         -45deg,
         var(--color-gray-10),
@@ -30,20 +29,18 @@
         var(--color-gray-10)
       );
       background-size: 200% 200%;
-      animation: library-unit__skeleton-animation 1.5s ease infinite;
+      animation: library-unit__skeleton-animation 1.5s ease infinite,
+        library-unit__skeleton-opacity-animation 0.5s linear;
     }
+  }
 
-    @keyframes library-unit__skeleton-animation {
-      0% {
-        background-position: 0% 0%;
-      }
-      50% {
-        background-position: 100% 100%;
-      }
-      100% {
-        background-position: 0% 0%;
-      }
-    }
+  &.theme--dark .library-unit--skeleton {
+    background-image: linear-gradient(
+      -45deg,
+      var(--color-gray-90),
+      var(--color-gray-80),
+      var(--color-gray-90)
+    );
   }
 
   .library-unit__dragger {
@@ -164,6 +161,32 @@
 
     100% {
       transform: scale(0.85);
+    }
+  }
+
+  @keyframes library-unit__skeleton-animation {
+    0% {
+      background-position: 0% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    100% {
+      background-position: 0% 0%;
+    }
+  }
+
+  @keyframes library-unit__skeleton-opacity-animation {
+    0% {
+      opacity: 0;
+    }
+
+    75% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
     }
   }
 }

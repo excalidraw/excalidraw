@@ -15,7 +15,6 @@ export const useScrollPosition = <T extends HTMLElement>(
       return;
     }
 
-    // console.log("2", { element });
     const handleScroll = throttle(() => {
       const { scrollTop } = element;
       setScrollPosition(scrollTop);
