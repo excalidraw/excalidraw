@@ -355,10 +355,10 @@
     "removeItemsFromLib": "Видалити вибрані елементи з бібліотеки"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Експортувати зображення",
     "label": {
       "withBackground": "",
-      "onlySelected": "",
+      "onlySelected": "Тільки вибране",
       "darkMode": "",
       "embedScene": "",
       "scale": "",
@@ -368,13 +368,13 @@
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "Експортувати в PNG",
+      "exportToSvg": "Експортувати у SVG",
       "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": ""
     }
   },
@@ -410,18 +410,18 @@
   },
   "colors": {
     "transparent": "Прозорий",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
+    "black": "Чорний",
+    "white": "Білий",
+    "red": "Червоний",
+    "pink": "Рожевий",
     "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
+    "violet": "Фіолетовий",
+    "gray": "Сірий",
+    "blue": "Синій",
+    "cyan": "Бірюзовий",
     "teal": "",
-    "green": "",
-    "yellow": "",
+    "green": "Зелений",
+    "yellow": "Жовтий",
     "orange": "",
     "bronze": ""
   },
