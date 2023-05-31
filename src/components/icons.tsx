@@ -1579,3 +1579,31 @@ export const helpIcon = createIcon(
   </>,
   tablerIconProps,
 );
+
+export const playerPlayIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M7 4v16l13 -8z"></path>
+  </>,
+  tablerIconProps,
+);
+
+export const playerStopFilledIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path
+      d="M17 4h-10a3 3 0 0 0 -3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3 -3v-10a3 3 0 0 0 -3 -3z"
+      strokeWidth="0"
+      fill="currentColor"
+    ></path>
+  </>,
+  tablerIconProps,
+);
+
+export const tablerCheckIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M5 12l5 5l10 -10"></path>
+  </>,
+  tablerIconProps,
+);

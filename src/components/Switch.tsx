@@ -27,8 +27,8 @@ export const Switch = ({
         checked={checked}
         disabled={disabled}
         onChange={() => onChange(!checked)}
-        onKeyDown={(e) => {
-          if (e.key === " ") {
+        onKeyDown={(event) => {
+          if (event.key === " ") {
             onChange(!checked);
           }
         }}
