@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { serializeLibraryAsJSON } from "../data/json";
 import { t } from "../i18n";
 import {
@@ -18,6 +24,7 @@ import {
   LibraryMenuSection,
   LibraryMenuSectionGrid,
 } from "./LibraryMenuSection";
+import { useScrollPosition } from "../hooks/useScrollPosition";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
 import "./LibraryMenuItems.scss";
@@ -45,6 +52,16 @@ export default function LibraryMenuItems({
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
 }) {
+  const libraryContainerRef = useRef<HTMLDivElement>(null);
+  const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
+
+  // This effect has to be called only on first render, therefore  `scrollPosition` isn't in the dependency array
+  useEffect(() => {
+    if (scrollPosition > 0) {
+      libraryContainerRef.current?.scrollTo(0, scrollPosition);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const { svgCache } = useLibraryCache();
   const unpublishedItems = useMemo(
     () => libraryItems.filter((item) => item.status !== "published"),
@@ -200,6 +217,7 @@ export default function LibraryMenuItems({
           flex: publishedItems.length > 0 ? 1 : "0 1 auto",
           marginBottom: 0,
         }}
+        ref={libraryContainerRef}
       >
         <>
           {!isLibraryEmpty && (

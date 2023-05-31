@@ -59,6 +59,7 @@ export const LibraryUnit = memo(
           "library-unit__active": elements,
           "library-unit--hover": elements && isHovered,
           "library-unit--selected": selected,
+          "library-unit--skeleton": !svg,
         })}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
