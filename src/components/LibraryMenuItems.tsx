@@ -29,6 +29,13 @@ import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
 import "./LibraryMenuItems.scss";
 
+// using an odd number of items per batch so the rendering creates an irregular
+// pattern which looks more organic
+const ITEMS_RENDERED_PER_BATCH = 17;
+// when render outputs cached we can render many more items per batch to
+// speed it up
+const CACHED_ITEMS_RENDERED_PER_BATCH = 64;
+
 export default function LibraryMenuItems({
   isLoading,
   libraryItems,
@@ -191,6 +198,11 @@ export default function LibraryMenuItems({
     [getInsertedElements, onInsertLibraryItems],
   );
 
+  const itemsRenderedPerBatch =
+    svgCache.size >= libraryItems.length
+      ? CACHED_ITEMS_RENDERED_PER_BATCH
+      : ITEMS_RENDERED_PER_BATCH;
+
   return (
     <div
       className="library-menu-items-container"
@@ -252,6 +264,7 @@ export default function LibraryMenuItems({
             <LibraryMenuSectionGrid>
               {pendingElements.length > 0 && (
                 <LibraryMenuSection
+                  itemsRenderedPerBatch={itemsRenderedPerBatch}
                   items={[{ id: null, elements: pendingElements }]}
                   onItemSelectToggle={onItemSelectToggle}
                   onItemDrag={onItemDrag}
@@ -261,6 +274,7 @@ export default function LibraryMenuItems({
                 />
               )}
               <LibraryMenuSection
+                itemsRenderedPerBatch={itemsRenderedPerBatch}
                 items={unpublishedItems}
                 onItemSelectToggle={onItemSelectToggle}
                 onItemDrag={onItemDrag}
@@ -283,6 +297,7 @@ export default function LibraryMenuItems({
           {publishedItems.length > 0 ? (
             <LibraryMenuSectionGrid>
               <LibraryMenuSection
+                itemsRenderedPerBatch={itemsRenderedPerBatch}
                 items={publishedItems}
                 onItemSelectToggle={onItemSelectToggle}
                 onItemDrag={onItemDrag}

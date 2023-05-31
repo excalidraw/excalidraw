@@ -1,12 +1,9 @@
-import React, { memo, ReactNode, useEffect, useMemo, useState } from "react";
+import React, { memo, ReactNode, useEffect, useState } from "react";
 import { EmptyLibraryUnit, LibraryUnit } from "./LibraryUnit";
 import { LibraryItem } from "../types";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { SvgCache } from "../hooks/useLibraryItemSvg";
 import { useTransition } from "../hooks/useTransition";
-
-const ITEMS_RENDERED_PER_BATCH = 17;
-const CACHED_ITEMS_RENDERED_PER_BATCH = 64;
 
 type LibraryOrPendingItem = (
   | LibraryItem
@@ -23,6 +20,7 @@ interface Props {
   onItemDrag: (id: LibraryItem["id"], event: React.DragEvent) => void;
   isItemSelected: (id: LibraryItem["id"] | null) => boolean;
   svgCache: SvgCache;
+  itemsRenderedPerBatch: number;
 }
 
 export const LibraryMenuSectionGrid = ({
@@ -41,15 +39,10 @@ export const LibraryMenuSection = memo(
     isItemSelected,
     onClick,
     svgCache,
+    itemsRenderedPerBatch,
   }: Props) => {
     const [, startTransition] = useTransition();
     const [index, setIndex] = useState(0);
-
-    const itemsRenderedPerBatch = useMemo(() => {
-      return svgCache.size === 0
-        ? ITEMS_RENDERED_PER_BATCH
-        : CACHED_ITEMS_RENDERED_PER_BATCH;
-    }, [svgCache]);
 
     useEffect(() => {
       if (index < items.length) {
