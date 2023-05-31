@@ -39,7 +39,7 @@ const LibraryMenuWrapper = ({ children }: { children: React.ReactNode }) => {
 export const LibraryMenuContent = ({
   onInsertLibraryItems,
   pendingElements,
-  onAddToLibraryCallback,
+  onAddToLibrary,
   setAppState,
   libraryReturnUrl,
   library,
@@ -50,7 +50,7 @@ export const LibraryMenuContent = ({
 }: {
   pendingElements: LibraryItem["elements"];
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
-  onAddToLibraryCallback: () => void;
+  onAddToLibrary: () => void;
   setAppState: React.Component<any, UIAppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   library: Library;
@@ -61,7 +61,7 @@ export const LibraryMenuContent = ({
 }) => {
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
 
-  const onAddToLibrary = useCallback(
+  const _onAddToLibrary = useCallback(
     (elements: LibraryItem["elements"]) => {
       const addToLibrary = async (
         processedElements: LibraryItem["elements"],
@@ -83,19 +83,14 @@ export const LibraryMenuContent = ({
           },
           ...libraryItems,
         ];
-        onAddToLibraryCallback();
+        onAddToLibrary();
         library.setLibrary(nextItems).catch(() => {
           setAppState({ errorMessage: t("alerts.errorAddingToLibrary") });
         });
       };
       addToLibrary(elements, libraryItemsData.libraryItems);
     },
-    [
-      onAddToLibraryCallback,
-      library,
-      setAppState,
-      libraryItemsData.libraryItems,
-    ],
+    [onAddToLibrary, library, setAppState, libraryItemsData.libraryItems],
   );
 
   const libraryItems = useMemo(
@@ -127,7 +122,7 @@ export const LibraryMenuContent = ({
       <LibraryMenuItems
         isLoading={libraryItemsData.status === "loading"}
         libraryItems={libraryItems}
-        onAddToLibrary={onAddToLibrary}
+        onAddToLibrary={_onAddToLibrary}
         onInsertLibraryItems={onInsertLibraryItems}
         pendingElements={pendingElements}
         id={id}
@@ -205,7 +200,7 @@ export const LibraryMenu = () => {
     <LibraryMenuContent
       pendingElements={pendingElements}
       onInsertLibraryItems={onInsertLibraryItems}
-      onAddToLibraryCallback={deselectItems}
+      onAddToLibrary={deselectItems}
       setAppState={setAppState}
       libraryReturnUrl={appProps.libraryReturnUrl}
       library={memoizedLibrary}
