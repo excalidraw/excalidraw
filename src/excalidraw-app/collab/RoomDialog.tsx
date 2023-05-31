@@ -152,7 +152,7 @@ export const RoomModal = ({
               aria-hidden="true"
               className="RoomDialog__active__description__emoji"
             >
-              🔒
+              🔒{" "}
             </span>
             {t("roomDialog.desc_privacy")}
           </p>
