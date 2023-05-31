@@ -12,6 +12,7 @@ type Props = {
   onChange: (value: string) => void;
   label: string;
   isNameEditable: boolean;
+  ignoreFocus?: boolean;
 };
 
 export const ProjectName = (props: Props) => {
@@ -19,7 +20,9 @@ export const ProjectName = (props: Props) => {
   const [fileName, setFileName] = useState<string>(props.value);
 
   const handleBlur = (event: any) => {
-    focusNearestParent(event.target);
+    if (!props.ignoreFocus) {
+      focusNearestParent(event.target);
+    }
     const value = event.target.value;
     if (value !== props.value) {
       props.onChange(value);

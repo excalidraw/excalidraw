@@ -671,8 +671,8 @@ const ExcalidrawWrapper = () => {
             {t("alerts.collabOfflineWarning")}
           </div>
         )}
+        {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       </Excalidraw>
-      {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
         <ErrorDialog onClose={() => setErrorMessage("")}>
           {errorMessage}
