@@ -1,0 +1,84 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .ExcButton {
+    &--primary {
+      color: var(--input-bg-color);
+
+      --accent-color: var(--color-primary);
+      --accent-color-hover: var(--color-primary-darker);
+      --accent-color-active: var(--color-primary-darkest);
+    }
+
+    &--danger {
+      color: var(--input-bg-color);
+
+      --accent-color: var(--color-danger);
+      --accent-color-hover: #d65550;
+      --accent-color-active: #d1413c;
+    }
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+    gap: 0.75rem;
+
+    height: 3rem;
+    padding: 0.5rem 1.5rem;
+
+    border-radius: 0.5rem;
+
+    font-family: "Assistant";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 100%;
+    letter-spacing: 0.4px;
+
+    user-select: none;
+
+    transition: all 150ms ease-out;
+
+    &--filled {
+      background: var(--accent-color);
+      border: 1px solid transparent;
+
+      &:hover {
+        background: var(--accent-color-hover);
+      }
+
+      &:active {
+        background: var(--accent-color-active);
+      }
+    }
+
+    &--outlined,
+    &--icon {
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+      background: transparent;
+
+      &:hover {
+        border: 1px solid var(--accent-color-hover);
+        color: var(--accent-color-hover);
+      }
+
+      &:active {
+        border: 1px solid var(--accent-color-active);
+        color: var(--accent-color-active);
+      }
+    }
+
+    &--icon {
+      padding: 0.5rem 0.75rem;
+      width: 3rem;
+    }
+
+    &__icon {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+}
