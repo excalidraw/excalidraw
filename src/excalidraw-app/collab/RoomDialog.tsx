@@ -60,20 +60,22 @@ export const RoomModal = ({
 }: RoomModalProps) => {
   const { t } = useI18n();
   const [justCopied, setJustCopied] = useState(false);
+  const timerRef = useRef<number>(0);
   const ref = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (justCopied) {
-      const tid = setTimeout(() => setJustCopied(false), 3000);
-
-      return () => clearTimeout(tid);
-    }
-  }, [justCopied]);
 
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
+
       setJustCopied(true);
+
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current);
+      }
+
+      timerRef.current = window.setTimeout(() => {
+        setJustCopied(false);
+      }, 3000);
     } catch (error: any) {
       setErrorMessage(error.message);
     }
@@ -101,7 +103,7 @@ export const RoomModal = ({
         </h3>
         <TextField
           value={username}
-          placeholder="Domestic Narwhal"
+          placeholder="Your name"
           label="Your name"
           onChange={onUsernameChange}
           onKeyDown={(event) => event.key === KEYS.ENTER && handleClose()}
