@@ -29,7 +29,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
     return (
       <div
         className={clsx("ExcTextField", {
-          ["ExcTextField--fullWidth"]: fullWidth,
+          "ExcTextField--fullWidth": fullWidth,
         })}
         onClick={() => {
           innerRef.current?.focus();
@@ -38,7 +38,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
         <div className="ExcTextField__label">{label}</div>
         <div
           className={clsx("ExcTextField__input", {
-            ["ExcTextField__input--readonly"]: readonly,
+            "ExcTextField__input--readonly": readonly,
           })}
         >
           <input
