@@ -23,6 +23,7 @@ export const useScrollPosition = <T extends HTMLElement>(
     element.addEventListener("scroll", handleScroll);
 
     return () => {
+      handleScroll.cancel();
       element.removeEventListener("scroll", handleScroll);
     };
   }, [elementRef, setScrollPosition]);
