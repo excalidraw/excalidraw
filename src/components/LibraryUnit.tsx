@@ -103,4 +103,6 @@ export const LibraryUnit = memo(
   },
 );
 
-export const EmptyLibraryUnit = () => <div className={clsx("library-unit")} />;
+export const EmptyLibraryUnit = () => (
+  <div className="library-unit library-unit--skeleton" />
+);
