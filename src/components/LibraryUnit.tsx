@@ -38,14 +38,13 @@ export const LibraryUnit = memo(
       }
 
       if (svg) {
-        svg.querySelector(".style-fonts")?.remove();
         node.innerHTML = svg.outerHTML;
       }
 
       return () => {
         node.innerHTML = "";
       };
-    }, [elements, svg]);
+    }, [svg]);
 
     const [isHovered, setIsHovered] = useState(false);
     const isMobile = useDevice().isMobile;
