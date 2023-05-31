@@ -61,6 +61,10 @@
         width: 100%;
         align-items: center;
         justify-content: center;
+
+        & svg {
+          filter: var(--theme-filter);
+        }
       }
 
       &__header {
@@ -83,7 +87,7 @@
 
         text-align: center;
 
-        color: var(--color-gray-80);
+        color: var(--text-primary-color);
 
         & strong {
           display: block;
