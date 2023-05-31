@@ -528,8 +528,8 @@ class App extends React.Component<AppProps, AppState> {
         <canvas
           className="excalidraw__canvas"
           style={{
-            width: canvasDOMWidth,
-            height: canvasDOMHeight,
+            width: `${canvasDOMWidth}px`,
+            height: `${canvasDOMHeight}px`,
             cursor: CURSOR_TYPE.GRAB,
           }}
           width={canvasWidth}
@@ -550,8 +550,8 @@ class App extends React.Component<AppProps, AppState> {
       <canvas
         className="excalidraw__canvas"
         style={{
-          width: canvasDOMWidth,
-          height: canvasDOMHeight,
+          width: `${canvasDOMWidth}px`,
+          height: `${canvasDOMHeight}px`,
         }}
         width={canvasWidth}
         height={canvasHeight}
