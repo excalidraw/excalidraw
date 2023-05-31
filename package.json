@@ -96,6 +96,15 @@
   },
   "homepage": ".",
   "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/locales",
+      "<rootDir>/src/packages/excalidraw/dist/",
+      "<rootDir>/src/packages/excalidraw/types",
+      "<rootDir>/src/packages/excalidraw/example"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-fs-access)/)"
     ],
@@ -128,6 +137,7 @@
     "test:typecheck": "tsc",
     "test:update": "yarn test:app --updateSnapshot --watchAll=false",
     "test": "yarn test:app",
+    "test:coverage": "react-scripts test --passWithNoTests --coverage --watchAll",
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
     "release": "node scripts/release.js"
