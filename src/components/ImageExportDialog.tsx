@@ -26,7 +26,6 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../packages/utils";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
-import { Button } from "./Button";
 import { Dialog } from "./Dialog";
 import { RadioGroup } from "./RadioGroup";
 import { Switch } from "./Switch";
@@ -34,6 +33,7 @@ import { Tooltip } from "./Tooltip";
 
 import "./ImageExportDialog.scss";
 import { useAppProps } from "./App";
+import { FilledButton } from "./FilledButton";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -236,37 +236,37 @@ const ImageExportModal = ({
         </ExportSetting>
 
         <div className="ImageExportModal__settings__buttons">
-          <Button
+          <FilledButton
             className="ImageExportModal__settings__buttons__button"
-            title={t("imageExportDialog.title.exportToPng")}
-            aria-label={t("imageExportDialog.title.exportToPng")}
-            onSelect={() =>
+            label={t("imageExportDialog.title.exportToPng")}
+            onClick={() =>
               onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements)
             }
+            startIcon={downloadIcon}
           >
-            {downloadIcon} {t("imageExportDialog.button.exportToPng")}
-          </Button>
-          <Button
+            {t("imageExportDialog.button.exportToPng")}
+          </FilledButton>
+          <FilledButton
             className="ImageExportModal__settings__buttons__button"
-            title={t("imageExportDialog.title.exportToSvg")}
-            aria-label={t("imageExportDialog.title.exportToSvg")}
-            onSelect={() =>
+            label={t("imageExportDialog.title.exportToSvg")}
+            onClick={() =>
               onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements)
             }
+            startIcon={downloadIcon}
           >
-            {downloadIcon} {t("imageExportDialog.button.exportToSvg")}
-          </Button>
+            {t("imageExportDialog.button.exportToSvg")}
+          </FilledButton>
           {(probablySupportsClipboardBlob || isFirefox) && (
-            <Button
+            <FilledButton
               className="ImageExportModal__settings__buttons__button"
-              title={t("imageExportDialog.title.copyPngToClipboard")}
-              aria-label={t("imageExportDialog.title.copyPngToClipboard")}
-              onSelect={() =>
+              label={t("imageExportDialog.title.copyPngToClipboard")}
+              onClick={() =>
                 onExportImage(EXPORT_IMAGE_TYPES.clipboard, exportedElements)
               }
+              startIcon={copyIcon}
             >
-              {copyIcon} {t("imageExportDialog.button.copyPngToClipboard")}
-            </Button>
+              {t("imageExportDialog.button.copyPngToClipboard")}
+            </FilledButton>
           )}
         </div>
       </div>

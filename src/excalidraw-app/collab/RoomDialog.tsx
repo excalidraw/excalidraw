@@ -104,7 +104,7 @@ export const RoomModal = ({
           placeholder="Domestic Narwhal"
           label="Your name"
           onChange={onUsernameChange}
-          onKeyDown={(e) => e.key === KEYS.ENTER && handleClose()}
+          onKeyDown={(event) => event.key === KEYS.ENTER && handleClose()}
         />
         <div className="RoomDialog__active__linkRow">
           <TextField
@@ -115,6 +115,7 @@ export const RoomModal = ({
             value={activeRoomLink}
           />
           <FilledButton
+            size="large"
             variant="icon"
             label="Share"
             startIcon={getShareIcon()}
@@ -124,14 +125,15 @@ export const RoomModal = ({
           <Popover.Root open={justCopied}>
             <Popover.Trigger asChild>
               <FilledButton
+                size="large"
                 label="Copy link"
                 startIcon={copyIcon}
                 onClick={copyRoomLink}
               />
             </Popover.Trigger>
             <Popover.Content
-              onOpenAutoFocus={(e) => e.preventDefault()}
-              onCloseAutoFocus={(e) => e.preventDefault()}
+              onOpenAutoFocus={(event) => event.preventDefault()}
+              onCloseAutoFocus={(event) => event.preventDefault()}
               className="RoomDialog__popover"
               side="top"
               align="end"
@@ -153,6 +155,7 @@ export const RoomModal = ({
 
         <div className="RoomDialog__active__actions">
           <FilledButton
+            size="large"
             variant="outlined"
             color="danger"
             label={t("roomDialog.button_stopSession")}
@@ -183,6 +186,7 @@ export const RoomModal = ({
 
       <div className="RoomDialog__inactive__start_session">
         <FilledButton
+          size="large"
           label={t("roomDialog.button_startSession")}
           startIcon={playerPlayIcon}
           onClick={() => {

@@ -5,6 +5,7 @@ import "./FilledButton.scss";
 
 export type ButtonVariant = "filled" | "outlined" | "icon";
 export type ButtonColor = "primary" | "danger";
+export type ButtonSize = "medium" | "large";
 
 export type FilledButtonProps = {
   label: string;
@@ -14,6 +15,7 @@ export type FilledButtonProps = {
 
   variant?: ButtonVariant;
   color?: ButtonColor;
+  size?: ButtonSize;
   className?: string;
 
   startIcon?: React.ReactNode;
@@ -28,6 +30,7 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
       label,
       variant = "filled",
       color = "primary",
+      size = "medium",
       className,
     },
     ref,
@@ -36,8 +39,9 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
       <button
         className={clsx(
           "ExcButton",
-          `ExcButton--${color}`,
-          `ExcButton--${variant}`,
+          `ExcButton--color-${color}`,
+          `ExcButton--variant-${variant}`,
+          `ExcButton--size-${size}`,
           className,
         )}
         onClick={onClick}

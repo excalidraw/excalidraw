@@ -167,48 +167,6 @@
           flex-basis: 100%;
           justify-content: center;
         }
-
-        &__button {
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          align-items: center;
-          padding: 8px 16px;
-          flex-shrink: 0;
-          width: fit-content;
-          gap: 8px;
-
-          height: 40px;
-          border: 0;
-          border-radius: 8px;
-
-          user-select: none;
-          font-family: "Assistant";
-          font-style: normal;
-          font-weight: 600;
-          font-size: 0.75rem;
-          line-height: 100%;
-          transition: 150ms ease-out;
-          transition-property: background, color;
-
-          background: var(--color-primary);
-          color: var(--color-icon-white);
-
-          &:hover {
-            background: var(--color-primary-darker);
-            color: var(--color-icon-white);
-          }
-
-          &:active {
-            background: var(--color-primary-darkest);
-          }
-
-          & > svg {
-            width: 20px;
-            height: 20px;
-          }
-        }
       }
     }
   }

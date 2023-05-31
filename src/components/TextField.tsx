@@ -47,7 +47,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             value={value}
             placeholder={placeholder}
             ref={innerRef}
-            onChange={(e) => onChange?.(e.target.value)}
+            onChange={(event) => onChange?.(event.target.value)}
             onKeyDown={onKeyDown}
           />
         </div>
