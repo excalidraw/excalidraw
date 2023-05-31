@@ -62,6 +62,7 @@ export const RoomModal = ({
   const [justCopied, setJustCopied] = useState(false);
   const timerRef = useRef<number>(0);
   const ref = useRef<HTMLInputElement>(null);
+  const isShareSupported = "share" in navigator;
 
   const copyRoomLink = async () => {
     try {
@@ -116,14 +117,16 @@ export const RoomModal = ({
             fullWidth
             value={activeRoomLink}
           />
-          <FilledButton
-            size="large"
-            variant="icon"
-            label="Share"
-            startIcon={getShareIcon()}
-            className="RoomDialog__active__share"
-            onClick={shareRoomLink}
-          />
+          {isShareSupported && (
+            <FilledButton
+              size="large"
+              variant="icon"
+              label="Share"
+              startIcon={getShareIcon()}
+              className="RoomDialog__active__share"
+              onClick={shareRoomLink}
+            />
+          )}
           <Popover.Root open={justCopied}>
             <Popover.Trigger asChild>
               <FilledButton
