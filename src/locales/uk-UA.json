@@ -359,8 +359,8 @@
     "label": {
       "withBackground": "",
       "onlySelected": "Тільки вибране",
-      "darkMode": "",
-      "embedScene": "",
+      "darkMode": "Темний режим",
+      "embedScene": "Вбудована сцена",
       "scale": "",
       "padding": ""
     },
@@ -418,12 +418,12 @@
     "violet": "Фіолетовий",
     "gray": "Сірий",
     "blue": "Синій",
-    "cyan": "Бірюзовий",
+    "cyan": "Ціан",
     "teal": "",
     "green": "Зелений",
     "yellow": "Жовтий",
-    "orange": "",
-    "bronze": ""
+    "orange": "Помаранчевий",
+    "bronze": "Бронзовий"
   },
   "welcomeScreen": {
     "app": {
@@ -439,10 +439,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
+    "mostUsedCustomColors": "Найбільш використовувані користувацькі кольори",
+    "colors": "Кольори",
     "shades": "",
-    "hexCode": "",
+    "hexCode": "Hex-код",
     "noShades": ""
   }
 }
