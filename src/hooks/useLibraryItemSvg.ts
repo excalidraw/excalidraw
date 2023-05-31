@@ -39,6 +39,7 @@ export const useLibraryItemSvg = (
           // When there is no svg in cache export it and save to cache
           (async () => {
             const exportedSvg = await exportLibraryItemToSvg(elements);
+            exportedSvg.querySelector(".style-fonts")?.remove();
 
             if (exportedSvg) {
               svgCache.set(id, exportedSvg);

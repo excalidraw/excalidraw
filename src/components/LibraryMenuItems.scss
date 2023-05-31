@@ -73,6 +73,12 @@
       }
     }
 
+    &__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-gap: 1rem;
+    }
+
     .separator {
       width: 100%;
       display: flex;

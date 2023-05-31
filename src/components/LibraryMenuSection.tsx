@@ -1,15 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { LibraryUnit } from "./LibraryUnit";
+import React, { memo, ReactNode, useEffect, useState } from "react";
+import { EmptyLibraryUnit, LibraryUnit } from "./LibraryUnit";
 import { LibraryItem } from "../types";
-import Stack from "./Stack";
-import clsx from "clsx";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { SvgCache } from "../hooks/useLibraryItemSvg";
 import { useTransition } from "../hooks/useTransition";
-
-const ITEMS_PER_ROW = 4;
-const ROWS_RENDERED_PER_BATCH = 6;
-const CACHED_ROWS_RENDERED_PER_BATCH = 16;
 
 type LibraryOrPendingItem = (
   | LibraryItem
@@ -26,91 +20,58 @@ interface Props {
   onItemDrag: (id: LibraryItem["id"], event: React.DragEvent) => void;
   isItemSelected: (id: LibraryItem["id"] | null) => boolean;
   svgCache: SvgCache;
+  itemsRenderedPerBatch: number;
 }
 
-function LibraryRow({
-  items,
-  onItemSelectToggle,
-  onItemDrag,
-  isItemSelected,
-  onClick,
-  svgCache,
-}: Props) {
-  return (
-    <Stack.Row className="library-menu-items-container__row">
-      {items.map((item) => (
-        <Stack.Col key={item.id}>
-          <LibraryUnit
-            elements={item?.elements}
-            isPending={!item?.id && !!item?.elements}
-            onClick={onClick}
-            id={item?.id || null}
-            selected={isItemSelected(item.id)}
-            onToggle={onItemSelectToggle}
-            onDrag={onItemDrag}
-            svgCache={svgCache}
-          />
-        </Stack.Col>
-      ))}
-    </Stack.Row>
-  );
-}
+export const LibraryMenuSectionGrid = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  return <div className="library-menu-items-container__grid">{children}</div>;
+};
 
-const EmptyLibraryRow = () => (
-  <Stack.Row className="library-menu-items-container__row" gap={1}>
-    {Array.from({ length: ITEMS_PER_ROW }).map((_, index) => (
-      <Stack.Col key={index}>
-        <div className={clsx("library-unit", "library-unit--skeleton")} />
-      </Stack.Col>
-    ))}
-  </Stack.Row>
+export const LibraryMenuSection = memo(
+  ({
+    items,
+    onItemSelectToggle,
+    onItemDrag,
+    isItemSelected,
+    onClick,
+    svgCache,
+    itemsRenderedPerBatch,
+  }: Props) => {
+    const [, startTransition] = useTransition();
+    const [index, setIndex] = useState(0);
+
+    useEffect(() => {
+      if (index < items.length) {
+        startTransition(() => {
+          setIndex(index + itemsRenderedPerBatch);
+        });
+      }
+    }, [index, items.length, startTransition, itemsRenderedPerBatch]);
+
+    return (
+      <>
+        {items.map((item, i) => {
+          return i < index ? (
+            <LibraryUnit
+              elements={item?.elements}
+              isPending={!item?.id && !!item?.elements}
+              onClick={onClick}
+              svgCache={svgCache}
+              id={item?.id}
+              selected={isItemSelected(item.id)}
+              onToggle={onItemSelectToggle}
+              onDrag={onItemDrag}
+              key={item?.id ?? i}
+            />
+          ) : (
+            <EmptyLibraryUnit key={i} />
+          );
+        })}
+      </>
+    );
+  },
 );
-
-function LibraryMenuSection({
-  items,
-  onItemSelectToggle,
-  onItemDrag,
-  isItemSelected,
-  onClick,
-  svgCache,
-}: Props) {
-  const rows = Math.ceil(items.length / ITEMS_PER_ROW);
-  const [, startTransition] = useTransition();
-  const [index, setIndex] = useState(0);
-
-  const rowsRenderedPerBatch = useMemo(() => {
-    return svgCache.size === 0
-      ? ROWS_RENDERED_PER_BATCH
-      : CACHED_ROWS_RENDERED_PER_BATCH;
-  }, [svgCache]);
-
-  useEffect(() => {
-    if (index < rows) {
-      startTransition(() => {
-        setIndex(index + rowsRenderedPerBatch);
-      });
-    }
-  }, [index, rows, startTransition, rowsRenderedPerBatch]);
-
-  return (
-    <>
-      {Array.from({ length: rows }).map((_, i) =>
-        i < index ? (
-          <LibraryRow
-            key={i}
-            items={items.slice(i * ITEMS_PER_ROW, (i + 1) * ITEMS_PER_ROW)}
-            onItemSelectToggle={onItemSelectToggle}
-            onItemDrag={onItemDrag}
-            onClick={onClick}
-            isItemSelected={isItemSelected}
-            svgCache={svgCache}
-          />
-        ) : (
-          <EmptyLibraryRow key={i} />
-        ),
-      )}
-    </>
-  );
-}
-
-export default LibraryMenuSection;
