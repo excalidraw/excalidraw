@@ -1,4 +1,4 @@
-import { useOutsideClickHook } from "../../hooks/useOutsideClick";
+import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { Island } from "../Island";
 
 import { useDevice } from "../App";
@@ -24,7 +24,7 @@ const MenuContent = ({
   style?: React.CSSProperties;
 }) => {
   const device = useDevice();
-  const menuRef = useOutsideClickHook(() => {
+  const menuRef = useOutsideClick(() => {
     onClickOutside?.();
   });
 
@@ -48,7 +48,7 @@ const MenuContent = ({
           <Island
             className="dropdown-menu-container"
             padding={2}
-            style={{ zIndex: 1 }}
+            style={{ zIndex: 2 }}
           >
             {children}
           </Island>

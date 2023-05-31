@@ -14,7 +14,15 @@ import { getCommonBoundingBox } from "../element/bounds";
 import { AbortError } from "../errors";
 import { t } from "../i18n";
 import { useEffect, useRef } from "react";
-import { URL_HASH_KEYS, URL_QUERY_KEYS, APP_NAME, EVENT } from "../constants";
+import {
+  URL_HASH_KEYS,
+  URL_QUERY_KEYS,
+  APP_NAME,
+  EVENT,
+  DEFAULT_SIDEBAR,
+  LIBRARY_SIDEBAR_TAB,
+} from "../constants";
+import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
 
 export const libraryItemsAtom = atom<{
   status: "loading" | "loaded";
@@ -108,6 +116,20 @@ class Library {
     }
   };
 
+  /** call on excalidraw instance unmount */
+  destroy = () => {
+    this.isInitialized = false;
+    this.updateQueue = [];
+    this.lastLibraryItems = [];
+    jotaiStore.set(libraryItemSvgsCache, new Map());
+    // TODO uncomment after/if we make jotai store scoped to each excal instance
+    // jotaiStore.set(libraryItemsAtom, {
+    //   status: "loading",
+    //   isInitialized: false,
+    //   libraryItems: [],
+    // });
+  };
+
   resetLibrary = () => {
     return this.setLibrary([]);
   };
@@ -148,7 +170,9 @@ class Library {
     defaultStatus?: "unpublished" | "published";
   }): Promise<LibraryItems> => {
     if (openLibraryMenu) {
-      this.app.setState({ openSidebar: "library" });
+      this.app.setState({
+        openSidebar: { name: DEFAULT_SIDEBAR.name, tab: LIBRARY_SIDEBAR_TAB },
+      });
     }
 
     return this.setLibrary(() => {
@@ -174,6 +198,13 @@ class Library {
               }),
             )
           ) {
+            if (prompt) {
+              // focus container if we've prompted. We focus conditionally
+              // lest `props.autoFocus` is disabled (in which case we should
+              // focus only on user action such as prompt confirm)
+              this.app.focusContainer();
+            }
+
             if (merge) {
               resolve(mergeLibraryItems(this.lastLibraryItems, nextItems));
             } else {
@@ -186,8 +217,6 @@ class Library {
           reject(error);
         }
       });
-    }).finally(() => {
-      this.app.focusContainer();
     });
   };
 

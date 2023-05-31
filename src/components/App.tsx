@@ -33,7 +33,7 @@ import {
   actionBindText,
   actionUngroup,
   actionLink,
-  actionToggleLock,
+  actionToggleElementLock,
   actionToggleLinearEditor,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
@@ -59,6 +59,7 @@ import {
   ELEMENT_TRANSLATE_AMOUNT,
   ENV,
   EVENT,
+  EXPORT_IMAGE_TYPES,
   GRID_SIZE,
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
@@ -82,7 +83,7 @@ import {
   VERTICAL_ALIGN,
   ZOOM_STEP,
 } from "../constants";
-import { loadFromBlob } from "../data";
+import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import {
@@ -210,6 +211,8 @@ import {
   PointerDownState,
   SceneData,
   Device,
+  SidebarName,
+  SidebarTabName,
 } from "../types";
 import {
   debounce,
@@ -235,6 +238,7 @@ import {
   getShortcutKey,
   isTransparent,
   easeToValuesRAF,
+  muteFSAbortError,
 } from "../utils";
 import {
   ContextMenu,
@@ -249,6 +253,7 @@ import {
   generateIdFromFile,
   getDataURL,
   getFileFromEvent,
+  isImageFileHandle,
   isSupportedImageFile,
   loadSceneOrLibraryFromBlob,
   normalizeFile,
@@ -288,6 +293,7 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
+import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
 import {
@@ -299,11 +305,15 @@ import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 
+const AppContext = React.createContext<AppClassProperties>(null!);
+const AppPropsContext = React.createContext<AppProps>(null!);
+
 const deviceContextInitialValue = {
   isSmScreen: false,
   isMobile: false,
   isTouchScreen: false,
   canDeviceFitSidebar: false,
+  isLandscape: false,
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 DeviceContext.displayName = "DeviceContext";
@@ -340,6 +350,8 @@ const ExcalidrawActionManagerContext = React.createContext<ActionManager>(
 );
 ExcalidrawActionManagerContext.displayName = "ExcalidrawActionManagerContext";
 
+export const useApp = () => useContext(AppContext);
+export const useAppProps = () => useContext(AppPropsContext);
 export const useDevice = () => useContext<Device>(DeviceContext);
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
@@ -400,7 +412,7 @@ class App extends React.Component<AppProps, AppState> {
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
-  private id: string;
+  public id: string;
   private history: History;
   private excalidrawContainerValue: {
     container: HTMLDivElement | null;
@@ -438,7 +450,7 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
       showHyperlinkPopup: false,
-      isSidebarDocked: false,
+      defaultSidebarDockedPreference: false,
     };
 
     this.id = nanoid();
@@ -469,7 +481,7 @@ class App extends React.Component<AppProps, AppState> {
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
-        toggleMenu: this.toggleMenu,
+        toggleSidebar: this.toggleSidebar,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -577,101 +589,92 @@ class App extends React.Component<AppProps, AppState> {
           this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
         }
       >
-        <ExcalidrawContainerContext.Provider
-          value={this.excalidrawContainerValue}
-        >
-          <DeviceContext.Provider value={this.device}>
-            <ExcalidrawSetAppStateContext.Provider value={this.setAppState}>
-              <ExcalidrawAppStateContext.Provider value={this.state}>
-                <ExcalidrawElementsContext.Provider
-                  value={this.scene.getNonDeletedElements()}
-                >
-                  <ExcalidrawActionManagerContext.Provider
-                    value={this.actionManager}
-                  >
-                    <LayerUI
-                      canvas={this.canvas}
-                      appState={this.state}
-                      files={this.files}
-                      setAppState={this.setAppState}
-                      actionManager={this.actionManager}
-                      elements={this.scene.getNonDeletedElements()}
-                      onLockToggle={this.toggleLock}
-                      onPenModeToggle={this.togglePenMode}
-                      onHandToolToggle={this.onHandToolToggle}
-                      onInsertElements={(elements) =>
-                        this.addElementsFromPasteOrLibrary({
-                          elements,
-                          position: "center",
-                          files: null,
-                        })
-                      }
-                      langCode={getLanguage().code}
-                      renderTopRightUI={renderTopRightUI}
-                      renderCustomStats={renderCustomStats}
-                      renderCustomSidebar={this.props.renderSidebar}
-                      showExitZenModeBtn={
-                        typeof this.props?.zenModeEnabled === "undefined" &&
-                        this.state.zenModeEnabled
-                      }
-                      libraryReturnUrl={this.props.libraryReturnUrl}
-                      UIOptions={this.props.UIOptions}
-                      focusContainer={this.focusContainer}
-                      library={this.library}
-                      id={this.id}
-                      onImageAction={this.onImageAction}
-                      renderWelcomeScreen={
-                        !this.state.isLoading &&
-                        this.state.showWelcomeScreen &&
-                        this.state.activeTool.type === "selection" &&
-                        !this.scene.getElementsIncludingDeleted().length
-                      }
+        <AppContext.Provider value={this}>
+          <AppPropsContext.Provider value={this.props}>
+            <ExcalidrawContainerContext.Provider
+              value={this.excalidrawContainerValue}
+            >
+              <DeviceContext.Provider value={this.device}>
+                <ExcalidrawSetAppStateContext.Provider value={this.setAppState}>
+                  <ExcalidrawAppStateContext.Provider value={this.state}>
+                    <ExcalidrawElementsContext.Provider
+                      value={this.scene.getNonDeletedElements()}
                     >
-                      {this.props.children}
-                    </LayerUI>
-                    <div className="excalidraw-textEditorContainer" />
-                    <div className="excalidraw-contextMenuContainer" />
-                    {selectedElement.length === 1 &&
-                      !this.state.contextMenu &&
-                      this.state.showHyperlinkPopup && (
-                        <Hyperlink
-                          key={selectedElement[0].id}
-                          element={selectedElement[0]}
+                      <ExcalidrawActionManagerContext.Provider
+                        value={this.actionManager}
+                      >
+                        <LayerUI
+                          canvas={this.canvas}
+                          appState={this.state}
+                          files={this.files}
                           setAppState={this.setAppState}
-                          onLinkOpen={this.props.onLinkOpen}
-                        />
-                      )}
-                    {this.state.toast !== null && (
-                      <Toast
-                        message={this.state.toast.message}
-                        onClose={() => this.setToast(null)}
-                        duration={this.state.toast.duration}
-                        closable={this.state.toast.closable}
-                      />
-                    )}
-                    {this.state.contextMenu && (
-                      <ContextMenu
-                        items={this.state.contextMenu.items}
-                        top={this.state.contextMenu.top}
-                        left={this.state.contextMenu.left}
-                        actionManager={this.actionManager}
-                      />
-                    )}
-                    <main>{this.renderCanvas()}</main>
-                  </ExcalidrawActionManagerContext.Provider>
-                </ExcalidrawElementsContext.Provider>{" "}
-              </ExcalidrawAppStateContext.Provider>
-            </ExcalidrawSetAppStateContext.Provider>
-          </DeviceContext.Provider>
-        </ExcalidrawContainerContext.Provider>
+                          actionManager={this.actionManager}
+                          elements={this.scene.getNonDeletedElements()}
+                          onLockToggle={this.toggleLock}
+                          onPenModeToggle={this.togglePenMode}
+                          onHandToolToggle={this.onHandToolToggle}
+                          langCode={getLanguage().code}
+                          renderTopRightUI={renderTopRightUI}
+                          renderCustomStats={renderCustomStats}
+                          showExitZenModeBtn={
+                            typeof this.props?.zenModeEnabled === "undefined" &&
+                            this.state.zenModeEnabled
+                          }
+                          UIOptions={this.props.UIOptions}
+                          onImageAction={this.onImageAction}
+                          onExportImage={this.onExportImage}
+                          renderWelcomeScreen={
+                            !this.state.isLoading &&
+                            this.state.showWelcomeScreen &&
+                            this.state.activeTool.type === "selection" &&
+                            !this.scene.getElementsIncludingDeleted().length
+                          }
+                        >
+                          {this.props.children}
+                        </LayerUI>
+                        <div className="excalidraw-textEditorContainer" />
+                        <div className="excalidraw-contextMenuContainer" />
+                        {selectedElement.length === 1 &&
+                          !this.state.contextMenu &&
+                          this.state.showHyperlinkPopup && (
+                            <Hyperlink
+                              key={selectedElement[0].id}
+                              element={selectedElement[0]}
+                              setAppState={this.setAppState}
+                              onLinkOpen={this.props.onLinkOpen}
+                            />
+                          )}
+                        {this.state.toast !== null && (
+                          <Toast
+                            message={this.state.toast.message}
+                            onClose={() => this.setToast(null)}
+                            duration={this.state.toast.duration}
+                            closable={this.state.toast.closable}
+                          />
+                        )}
+                        {this.state.contextMenu && (
+                          <ContextMenu
+                            items={this.state.contextMenu.items}
+                            top={this.state.contextMenu.top}
+                            left={this.state.contextMenu.left}
+                            actionManager={this.actionManager}
+                          />
+                        )}
+                        <main>{this.renderCanvas()}</main>
+                      </ExcalidrawActionManagerContext.Provider>
+                    </ExcalidrawElementsContext.Provider>
+                  </ExcalidrawAppStateContext.Provider>
+                </ExcalidrawSetAppStateContext.Provider>
+              </DeviceContext.Provider>
+            </ExcalidrawContainerContext.Provider>
+          </AppPropsContext.Provider>
+        </AppContext.Provider>
       </div>
     );
   }
 
   public focusContainer: AppClassProperties["focusContainer"] = () => {
-    if (this.props.autoFocus) {
-      this.excalidrawContainerRef.current?.focus();
-    }
+    this.excalidrawContainerRef.current?.focus();
   };
 
   public getSceneElementsIncludingDeleted = () => {
@@ -680,6 +683,45 @@ class App extends React.Component<AppProps, AppState> {
 
   public getSceneElements = () => {
     return this.scene.getNonDeletedElements();
+  };
+
+  public onInsertElements = (elements: readonly ExcalidrawElement[]) => {
+    this.addElementsFromPasteOrLibrary({
+      elements,
+      position: "center",
+      files: null,
+    });
+  };
+
+  public onExportImage = async (
+    type: keyof typeof EXPORT_IMAGE_TYPES,
+    elements: readonly NonDeletedExcalidrawElement[],
+  ) => {
+    trackEvent("export", type, "ui");
+    const fileHandle = await exportCanvas(
+      type,
+      elements,
+      this.state,
+      this.files,
+      {
+        exportBackground: this.state.exportBackground,
+        name: this.state.name,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+      },
+    )
+      .catch(muteFSAbortError)
+      .catch((error) => {
+        console.error(error);
+        this.setState({ errorMessage: error.message });
+      });
+
+    if (
+      this.state.exportEmbedScene &&
+      fileHandle &&
+      isImageFileHandle(fileHandle)
+    ) {
+      this.setState({ fileHandle });
+    }
   };
 
   private syncActionResult = withBatchedUpdates(
@@ -906,6 +948,7 @@ class App extends React.Component<AppProps, AppState> {
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
     this.device = updateObject(this.device, {
+      isLandscape: width > height,
       isSmScreen: width < MQ_SM_MAX_WIDTH,
       isMobile:
         width < MQ_MAX_WIDTH_PORTRAIT ||
@@ -951,7 +994,7 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
-    if (this.excalidrawContainerRef.current) {
+    if (this.props.autoFocus && this.excalidrawContainerRef.current) {
       this.focusContainer();
     }
 
@@ -1029,6 +1072,7 @@ class App extends React.Component<AppProps, AppState> {
     this.unmounted = true;
     this.removeEventListeners();
     this.scene.destroy();
+    this.library.destroy();
     clearTimeout(touchTimeout);
     touchTimeout = 0;
   }
@@ -1679,7 +1723,7 @@ class App extends React.Component<AppProps, AppState> {
           openSidebar:
             this.state.openSidebar &&
             this.device.canDeviceFitSidebar &&
-            this.state.isSidebarDocked
+            this.state.defaultSidebarDockedPreference
               ? this.state.openSidebar
               : null,
           selectedElementIds: newElements.reduce(
@@ -2017,30 +2061,24 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * @returns whether the menu was toggled on or off
    */
-  public toggleMenu = (
-    type: "library" | "customSidebar",
-    force?: boolean,
-  ): boolean => {
-    if (type === "customSidebar" && !this.props.renderSidebar) {
-      console.warn(
-        `attempting to toggle "customSidebar", but no "props.renderSidebar" is defined`,
-      );
-      return false;
+  public toggleSidebar = ({
+    name,
+    tab,
+    force,
+  }: {
+    name: SidebarName;
+    tab?: SidebarTabName;
+    force?: boolean;
+  }): boolean => {
+    let nextName;
+    if (force === undefined) {
+      nextName = this.state.openSidebar?.name === name ? null : name;
+    } else {
+      nextName = force ? name : null;
     }
+    this.setState({ openSidebar: nextName ? { name: nextName, tab } : null });
 
-    if (type === "library" || type === "customSidebar") {
-      let nextValue;
-      if (force === undefined) {
-        nextValue = this.state.openSidebar === type ? null : type;
-      } else {
-        nextValue = force ? type : null;
-      }
-      this.setState({ openSidebar: nextValue });
-
-      return !!nextValue;
-    }
-
-    return false;
+    return !!nextName;
   };
 
   private updateCurrentCursorPosition = withBatchedUpdates(
@@ -2119,6 +2157,7 @@ class App extends React.Component<AppProps, AppState> {
         event.shiftKey &&
         event[KEYS.CTRL_OR_CMD]
       ) {
+        event.preventDefault();
         this.setState({ openDialog: "imageExport" });
         return;
       }
@@ -2288,11 +2327,11 @@ class App extends React.Component<AppProps, AppState> {
           (hasBackground(this.state.activeTool.type) ||
             selectedElements.some((element) => hasBackground(element.type)))
         ) {
-          this.setState({ openPopup: "backgroundColorPicker" });
+          this.setState({ openPopup: "elementBackground" });
           event.stopPropagation();
         }
         if (event.key === KEYS.S) {
-          this.setState({ openPopup: "strokeColorPicker" });
+          this.setState({ openPopup: "elementStroke" });
           event.stopPropagation();
         }
       }
@@ -6348,6 +6387,7 @@ class App extends React.Component<AppProps, AppState> {
         copyText,
         CONTEXT_MENU_SEPARATOR,
         actionSelectAll,
+        actionUnlockAllElements,
         CONTEXT_MENU_SEPARATOR,
         actionToggleGridMode,
         actionToggleZenMode,
@@ -6394,7 +6434,7 @@ class App extends React.Component<AppProps, AppState> {
       actionToggleLinearEditor,
       actionLink,
       actionDuplicateSelection,
-      actionToggleLock,
+      actionToggleElementLock,
       CONTEXT_MENU_SEPARATOR,
       actionDeleteSelected,
     ];

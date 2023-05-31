@@ -1,3 +1,4 @@
+import React from "react";
 import {
   PointerType,
   ExcalidrawLinearElement,
@@ -32,7 +33,6 @@ import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { Merge, ForwardRef, ValueOf } from "./utility-types";
-import React from "react";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -93,6 +93,9 @@ export type LastActiveTool =
       customType: string;
     }
   | null;
+
+export type SidebarName = string;
+export type SidebarTabName = string;
 
 export type AppState = {
   contextMenu: {
@@ -159,16 +162,18 @@ export type AppState = {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
-  // mobile-only
   openMenu: "canvas" | "shape" | null;
-  openPopup:
-    | "canvasColorPicker"
-    | "backgroundColorPicker"
-    | "strokeColorPicker"
-    | null;
-  openSidebar: "library" | "customSidebar" | null;
+  openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
+  openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog: "imageExport" | "help" | "jsonExport" | null;
-  isSidebarDocked: boolean;
+  /**
+   * Reflects user preference for whether the default sidebar should be docked.
+   *
+   * NOTE this is only a user preference and does not reflect the actual docked
+   * state of the sidebar, because the host apps can override this through
+   * a DefaultSidebar prop, which is not reflected back to the appState.
+   */
+  defaultSidebarDockedPreference: boolean;
 
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
@@ -208,6 +213,15 @@ export type AppState = {
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
 };
+
+export type UIAppState = Omit<
+  AppState,
+  | "suggestedBindings"
+  | "startBoundElement"
+  | "cursorButton"
+  | "scrollX"
+  | "scrollY"
+>;
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
 
@@ -305,7 +319,7 @@ export interface ExcalidrawProps {
   ) => Promise<boolean> | boolean;
   renderTopRightUI?: (
     isMobile: boolean,
-    appState: AppState,
+    appState: UIAppState,
   ) => JSX.Element | null;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
@@ -316,7 +330,7 @@ export interface ExcalidrawProps {
   name?: string;
   renderCustomStats?: (
     elements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
+    appState: UIAppState,
   ) => JSX.Element;
   UIOptions?: Partial<UIOptions>;
   detectScroll?: boolean;
@@ -335,10 +349,6 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
-  /**
-   * Render function that renders custom <Sidebar /> component.
-   */
-  renderSidebar?: () => JSX.Element | null;
   children?: React.ReactNode;
 }
 
@@ -359,13 +369,13 @@ export type ExportOpts = {
   saveFileToDisk?: boolean;
   onExportToBackend?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
+    appState: UIAppState,
     files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
   ) => void;
   renderCustomUI?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
+    appState: UIAppState,
     files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
   ) => JSX.Element;
@@ -426,6 +436,9 @@ export type AppClassProperties = {
   device: App["device"];
   scene: App["scene"];
   pasteFromClipboard: App["pasteFromClipboard"];
+  id: App["id"];
+  onInsertElements: App["onInsertElements"];
+  onExportImage: App["onExportImage"];
 };
 
 export type PointerDownState = Readonly<{
@@ -517,7 +530,7 @@ export type ExcalidrawImperativeAPI = {
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
-  toggleMenu: InstanceType<typeof App>["toggleMenu"];
+  toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
 };
 
 export type Device = Readonly<{
@@ -525,4 +538,5 @@ export type Device = Readonly<{
   isMobile: boolean;
   isTouchScreen: boolean;
   canDeviceFitSidebar: boolean;
+  isLandscape: boolean;
 }>;

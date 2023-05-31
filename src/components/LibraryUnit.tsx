@@ -1,12 +1,11 @@
 import clsx from "clsx";
-import oc from "open-color";
 import { useEffect, useRef, useState } from "react";
 import { useDevice } from "../components/App";
-import { exportToSvg } from "../packages/utils";
 import { LibraryItem } from "../types";
 import "./LibraryUnit.scss";
 import { CheckboxItem } from "./CheckboxItem";
 import { PlusIcon } from "./icons";
+import { SvgCache, useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
 
 export const LibraryUnit = ({
   id,
@@ -16,42 +15,36 @@ export const LibraryUnit = ({
   selected,
   onToggle,
   onDrag,
+  svgCache,
 }: {
   id: LibraryItem["id"] | /** for pending item */ null;
   elements?: LibraryItem["elements"];
   isPending?: boolean;
-  onClick: () => void;
+  onClick: (id: LibraryItem["id"] | null) => void;
   selected: boolean;
   onToggle: (id: string, event: React.MouseEvent) => void;
   onDrag: (id: string, event: React.DragEvent) => void;
+  svgCache: SvgCache;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
+  const svg = useLibraryItemSvg(id, elements, svgCache);
+
   useEffect(() => {
     const node = ref.current;
+
     if (!node) {
       return;
     }
 
-    (async () => {
-      if (!elements) {
-        return;
-      }
-      const svg = await exportToSvg({
-        elements,
-        appState: {
-          exportBackground: false,
-          viewBackgroundColor: oc.white,
-        },
-        files: null,
-      });
+    if (svg) {
       svg.querySelector(".style-fonts")?.remove();
       node.innerHTML = svg.outerHTML;
-    })();
+    }
 
     return () => {
       node.innerHTML = "";
     };
-  }, [elements]);
+  }, [elements, svg]);
 
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = useDevice().isMobile;
@@ -65,6 +58,7 @@ export const LibraryUnit = ({
         "library-unit__active": elements,
         "library-unit--hover": elements && isHovered,
         "library-unit--selected": selected,
+        "library-unit--skeleton": !svg,
       })}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -81,7 +75,7 @@ export const LibraryUnit = ({
                 if (id && event.shiftKey) {
                   onToggle(id, event);
                 } else {
-                  onClick();
+                  onClick(id);
                 }
               }
             : undefined
