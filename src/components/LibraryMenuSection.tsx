@@ -5,7 +5,7 @@ import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { SvgCache } from "../hooks/useLibraryItemSvg";
 import { useTransition } from "../hooks/useTransition";
 
-const ITEMS_RENDERED_PER_BATCH = 24;
+const ITEMS_RENDERED_PER_BATCH = 17;
 const CACHED_ITEMS_RENDERED_PER_BATCH = 64;
 
 type LibraryOrPendingItem = (
