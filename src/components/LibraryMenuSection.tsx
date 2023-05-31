@@ -58,9 +58,11 @@ function LibraryRow({
 
 const EmptyLibraryRow = () => (
   <Stack.Row className="library-menu-items-container__row" gap={1}>
-    <Stack.Col>
-      <div className={clsx("library-unit")} />
-    </Stack.Col>
+    {Array.from({ length: ITEMS_PER_ROW }).map((_, index) => (
+      <Stack.Col key={index}>
+        <div className={clsx("library-unit", "library-unit--skeleton")} />
+      </Stack.Col>
+    ))}
   </Stack.Row>
 );
 
