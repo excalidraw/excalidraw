@@ -147,7 +147,11 @@ export const RoomModal = ({
         </div>
         <div className="RoomDialog__active__description">
           <p>
-            <span role="img" aria-hidden="true" className="RoomDialog-emoji">
+            <span
+              role="img"
+              aria-hidden="true"
+              className="RoomDialog__active__description__emoji"
+            >
               🔒
             </span>
             {t("roomDialog.desc_privacy")}
