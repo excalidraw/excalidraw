@@ -5,7 +5,7 @@ import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 import { KEYS } from "../../keys";
 
 interface ColorInputProps {
-  color: string | null;
+  color: string;
   onChange: (color: string) => void;
   label: string;
 }

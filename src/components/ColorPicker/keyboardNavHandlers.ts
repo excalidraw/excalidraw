@@ -100,7 +100,7 @@ interface ColorPickerKeyNavHandlerProps {
   e: React.KeyboardEvent;
   activeColorPickerSection: ActiveColorPickerSectionAtomType;
   palette: ColorPaletteCustom;
-  hex: string | null;
+  hex: string;
   onChange: (color: string) => void;
   customColors: string[];
   setActiveColorPickerSection: (

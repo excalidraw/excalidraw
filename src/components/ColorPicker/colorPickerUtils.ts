@@ -39,12 +39,9 @@ export const isCustomColor = ({
   color,
   palette,
 }: {
-  color: string | null;
+  color: string;
   palette: ColorPaletteCustom;
 }) => {
-  if (!color) {
-    return false;
-  }
   const paletteValues = Object.values(palette).flat();
   return !paletteValues.includes(color);
 };

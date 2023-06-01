@@ -12,7 +12,7 @@ import { t } from "../../i18n";
 
 interface PickerColorListProps {
   palette: ColorPaletteCustom;
-  color: string | null;
+  color: string;
   onChange: (color: string) => void;
   label: string;
   activeShade: number;

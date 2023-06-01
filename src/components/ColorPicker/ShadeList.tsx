@@ -10,7 +10,7 @@ import { t } from "../../i18n";
 import { ColorPaletteCustom } from "../../colors";
 
 interface ShadeListProps {
-  hex: string | null;
+  hex: string;
   onChange: (color: string) => void;
   palette: ColorPaletteCustom;
 }

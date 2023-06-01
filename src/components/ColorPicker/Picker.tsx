@@ -23,7 +23,7 @@ import {
 } from "../../colors";
 
 interface PickerProps {
-  color: string | null;
+  color: string;
   onChange: (color: string) => void;
   label: string;
   type: ColorPickerType;
@@ -55,15 +55,14 @@ export const Picker = ({
   );
 
   const colorObj = getColorNameAndShadeFromHex({
-    hex: color || "transparent",
+    hex: color,
     palette,
   });
 
   useEffect(() => {
     if (!activeColorPickerSection) {
       const isCustom = isCustomColor({ color, palette });
-      const isCustomButNotInList =
-        isCustom && !customColors.includes(color || "");
+      const isCustomButNotInList = isCustom && !customColors.includes(color);
 
       setActiveColorPickerSection(
         isCustomButNotInList

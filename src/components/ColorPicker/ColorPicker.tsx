@@ -42,7 +42,7 @@ export const getColor = (color: string): string | null => {
 
 export interface ColorPickerProps {
   type: ColorPickerType;
-  color: string | null;
+  color: string;
   onChange: (color: string) => void;
   label: string;
   elements: readonly ExcalidrawElement[];
@@ -126,7 +126,7 @@ const ColorPickerPopupContent = ({
         {palette ? (
           <Picker
             palette={palette}
-            color={color || null}
+            color={color}
             onChange={(changedColor) => {
               onChange(changedColor);
             }}
@@ -158,7 +158,7 @@ const ColorPickerTrigger = ({
   color,
   type,
 }: {
-  color: string | null;
+  color: string;
   label: string;
   type: ColorPickerType;
 }) => {
