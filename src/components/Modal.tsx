@@ -1,12 +1,11 @@
 import "./Modal.scss";
 
-import React, { useState, useLayoutEffect, useRef } from "react";
+import React from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { KEYS } from "../keys";
-import { useExcalidrawContainer, useDevice } from "./App";
 import { AppState } from "../types";
-import { useUIAppState } from "../context/ui-appState";
+import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 
 export const Modal: React.FC<{
   className?: string;
@@ -18,7 +17,9 @@ export const Modal: React.FC<{
   closeOnClickOutside?: boolean;
 }> = (props) => {
   const { closeOnClickOutside = true } = props;
-  const modalRoot = useBodyRoot();
+  const modalRoot = useCreatePortalContainer({
+    className: "excalidraw-modal-container",
+  });
 
   if (!modalRoot) {
     return null;
@@ -55,42 +56,4 @@ export const Modal: React.FC<{
     </div>,
     modalRoot,
   );
-};
-
-const useBodyRoot = () => {
-  const [div, setDiv] = useState<HTMLDivElement | null>(null);
-
-  const device = useDevice();
-  const { theme } = useUIAppState();
-  const isMobileRef = useRef(device.isMobile);
-  isMobileRef.current = device.isMobile;
-
-  const { container: excalidrawContainer } = useExcalidrawContainer();
-
-  useLayoutEffect(() => {
-    if (div) {
-      div.classList.toggle("excalidraw--mobile", device.isMobile);
-    }
-  }, [div, device.isMobile]);
-
-  useLayoutEffect(() => {
-    const div = document.createElement("div");
-
-    div.classList.add("excalidraw", "excalidraw-modal-container");
-    div.classList.toggle("excalidraw--mobile", isMobileRef.current);
-
-    if (theme === "dark") {
-      div.classList.add("theme--dark");
-      div.classList.add("theme--dark-background-none");
-    }
-    document.body.appendChild(div);
-
-    setDiv(div);
-
-    return () => {
-      document.body.removeChild(div);
-    };
-  }, [excalidrawContainer, theme]);
-
-  return div;
 };
