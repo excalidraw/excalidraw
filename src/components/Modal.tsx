@@ -6,7 +6,7 @@ import clsx from "clsx";
 import { KEYS } from "../keys";
 import { useExcalidrawContainer, useDevice } from "./App";
 import { AppState } from "../types";
-import { THEME } from "../constants";
+import { useUIAppState } from "../context/ui-appState";
 
 export const Modal: React.FC<{
   className?: string;
@@ -17,8 +17,8 @@ export const Modal: React.FC<{
   theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
 }> = (props) => {
-  const { theme = THEME.LIGHT, closeOnClickOutside = true } = props;
-  const modalRoot = useBodyRoot(theme);
+  const { closeOnClickOutside = true } = props;
+  const modalRoot = useBodyRoot();
 
   if (!modalRoot) {
     return null;
@@ -57,10 +57,11 @@ export const Modal: React.FC<{
   );
 };
 
-const useBodyRoot = (theme: AppState["theme"]) => {
+const useBodyRoot = () => {
   const [div, setDiv] = useState<HTMLDivElement | null>(null);
 
   const device = useDevice();
+  const { theme } = useUIAppState();
   const isMobileRef = useRef(device.isMobile);
   isMobileRef.current = device.isMobile;
 
@@ -73,15 +74,12 @@ const useBodyRoot = (theme: AppState["theme"]) => {
   }, [div, device.isMobile]);
 
   useLayoutEffect(() => {
-    const isDarkTheme =
-      !!excalidrawContainer?.classList.contains("theme--dark") ||
-      theme === "dark";
     const div = document.createElement("div");
 
     div.classList.add("excalidraw", "excalidraw-modal-container");
     div.classList.toggle("excalidraw--mobile", isMobileRef.current);
 
-    if (isDarkTheme) {
+    if (theme === "dark") {
       div.classList.add("theme--dark");
       div.classList.add("theme--dark-background-none");
     }
