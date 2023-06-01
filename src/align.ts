@@ -2,6 +2,7 @@ import { ExcalidrawElement } from "./element/types";
 import { newElementWith } from "./element/mutateElement";
 import { BoundingBox, getCommonBoundingBox } from "./element/bounds";
 import { getMaximumGroups } from "./groups";
+import { excludeElementsInFramesFromSelection } from "./scene/selection";
 
 export interface Alignment {
   position: "start" | "center" | "end";
@@ -14,11 +15,13 @@ export const alignElements = (
 ): ExcalidrawElement[] => {
   const groups: ExcalidrawElement[][] = getMaximumGroups(selectedElements);
 
-  const selectionBoundingBox = getCommonBoundingBox(selectedElements);
+  const selectionBoundingBox = getCommonBoundingBox(
+    excludeElementsInFramesFromSelection(selectedElements),
+  );
 
   return groups.flatMap((group) => {
     const translation = calculateTranslation(
-      group,
+      excludeElementsInFramesFromSelection(group),
       selectionBoundingBox,
       alignment,
     );
