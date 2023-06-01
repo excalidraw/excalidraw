@@ -410,20 +410,20 @@
   },
   "colors": {
     "transparent": "",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
+    "black": "काला",
+    "white": "सफ़ेद",
+    "red": "लाल",
+    "pink": "गुलाबी",
+    "grape": "अंगूरी",
+    "violet": "जामुनी",
+    "gray": "गहरा",
+    "blue": "नीला",
+    "cyan": "आसमानी",
     "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "green": "हरा",
+    "yellow": "पीला",
+    "orange": "नारंगी",
+    "bronze": "कांस्य"
   },
   "welcomeScreen": {
     "app": {
@@ -440,9 +440,9 @@
   },
   "colorPicker": {
     "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "colors": "रंग",
+    "shades": "छाया",
+    "hexCode": "हेक्स कोड",
+    "noShades": "इस रंग की कोई छाया उपलब्ध नहीं हैं"
   }
 }
