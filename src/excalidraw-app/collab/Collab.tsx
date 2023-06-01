@@ -76,6 +76,7 @@ export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
 export const isCollaboratingAtom = atom(false);
 export const isOfflineAtom = atom(false);
+export const isCollaborationPausedAtom = atom(false);
 
 interface CollabState {
   errorMessage: string;
@@ -91,9 +92,12 @@ export interface CollabAPI {
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   startCollaboration: CollabInstance["startCollaboration"];
   stopCollaboration: CollabInstance["stopCollaboration"];
+  pauseCollaboration: CollabInstance["pauseCollaboration"];
+  resumeCollaboration: CollabInstance["resumeCollaboration"];
   syncElements: CollabInstance["syncElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
   setUsername: (username: string) => void;
+  isPaused: () => boolean;
 }
 
 interface PublicProps {
@@ -167,6 +171,9 @@ class Collab extends PureComponent<Props, CollabState> {
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
       stopCollaboration: this.stopCollaboration,
       setUsername: this.setUsername,
+      pauseCollaboration: this.pauseCollaboration,
+      resumeCollaboration: this.resumeCollaboration,
+      isPaused: this.isPaused,
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
@@ -308,6 +315,37 @@ class Collab extends PureComponent<Props, CollabState> {
         commitToHistory: false,
       });
     }
+  };
+
+  pauseCollaboration = (callback?: () => void) => {
+    if (this.portal.socket) {
+      this.reportIdle();
+      this.portal.socket.disconnect();
+      this.portal.socketInitialized = false;
+      this.setIsCollaborationPaused(true);
+
+      if (callback) {
+        callback();
+      }
+    }
+  };
+
+  resumeCollaboration = (callback?: () => void) => {
+    if (this.portal.socket) {
+      this.reportActive();
+      this.portal.socket.connect();
+      this.setIsCollaborationPaused(false);
+
+      if (callback) {
+        callback();
+      }
+    }
+  };
+
+  isPaused = () => appJotaiStore.get(isCollaborationPausedAtom)!;
+
+  setIsCollaborationPaused = (isPaused: boolean) => {
+    appJotaiStore.set(isCollaborationPausedAtom, isPaused);
   };
 
   private destroySocketClient = (opts?: { isUnload: boolean }) => {

@@ -37,6 +37,29 @@ class Portal {
     this.roomId = id;
     this.roomKey = key;
 
+    this.initializeSocketListeners();
+
+    return socket;
+  }
+
+  close() {
+    if (!this.socket) {
+      return;
+    }
+    this.queueFileUpload.flush();
+    this.socket.close();
+    this.socket = null;
+    this.roomId = null;
+    this.roomKey = null;
+    this.socketInitialized = false;
+    this.broadcastedElementVersions = new Map();
+  }
+
+  initializeSocketListeners() {
+    if (!this.socket) {
+      return;
+    }
+
     // Initialize socket listeners
     this.socket.on("init-room", () => {
       if (this.socket) {
@@ -54,21 +77,6 @@ class Portal {
     this.socket.on("room-user-change", (clients: string[]) => {
       this.collab.setCollaborators(clients);
     });
-
-    return socket;
-  }
-
-  close() {
-    if (!this.socket) {
-      return;
-    }
-    this.queueFileUpload.flush();
-    this.socket.close();
-    this.socket = null;
-    this.roomId = null;
-    this.roomKey = null;
-    this.socketInitialized = false;
-    this.broadcastedElementVersions = new Map();
   }
 
   isOpen() {
