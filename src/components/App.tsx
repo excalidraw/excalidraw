@@ -366,8 +366,6 @@ export const useExcalidrawActionManager = () =>
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
-let cursorX = 0;
-let cursorY = 0;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
@@ -425,7 +423,7 @@ class App extends React.Component<AppProps, AppState> {
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
-  lastScenePointer: { x: number; y: number } | null = null;
+  lastViewportPosition = { x: 0, y: 0 };
 
   constructor(props: AppProps) {
     super(props);
@@ -1569,7 +1567,10 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
+      const elementUnderCursor = document.elementFromPoint(
+        this.lastViewportPosition.x,
+        this.lastViewportPosition.y,
+      );
       if (
         event &&
         (!(elementUnderCursor instanceof HTMLCanvasElement) ||
@@ -1597,7 +1598,10 @@ class App extends React.Component<AppProps, AppState> {
       // prefer spreadsheet data over image file (MS Office/Libre Office)
       if (isSupportedImageFile(file) && !data.spreadsheet) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          { clientX: cursorX, clientY: cursorY },
+          {
+            clientX: this.lastViewportPosition.x,
+            clientY: this.lastViewportPosition.y,
+          },
           this.state,
         );
 
@@ -1660,13 +1664,13 @@ class App extends React.Component<AppProps, AppState> {
       typeof opts.position === "object"
         ? opts.position.clientX
         : opts.position === "cursor"
-        ? cursorX
+        ? this.lastViewportPosition.x
         : this.state.width / 2 + this.state.offsetLeft;
     const clientY =
       typeof opts.position === "object"
         ? opts.position.clientY
         : opts.position === "cursor"
-        ? cursorY
+        ? this.lastViewportPosition.y
         : this.state.height / 2 + this.state.offsetTop;
 
     const { x, y } = viewportCoordsToSceneCoords(
@@ -1750,7 +1754,10 @@ class App extends React.Component<AppProps, AppState> {
 
   private addTextFromPaste(text: string, isPlainPaste = false) {
     const { x, y } = viewportCoordsToSceneCoords(
-      { clientX: cursorX, clientY: cursorY },
+      {
+        clientX: this.lastViewportPosition.x,
+        clientY: this.lastViewportPosition.y,
+      },
       this.state,
     );
 
@@ -2083,8 +2090,8 @@ class App extends React.Component<AppProps, AppState> {
 
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {
-      cursorX = event.clientX;
-      cursorY = event.clientY;
+      this.lastViewportPosition.x = event.clientX;
+      this.lastViewportPosition.y = event.clientY;
     },
   );
 
@@ -2471,8 +2478,8 @@ class App extends React.Component<AppProps, AppState> {
       this.setState((state) => ({
         ...getStateForZoom(
           {
-            viewportX: cursorX,
-            viewportY: cursorY,
+            viewportX: this.lastViewportPosition.x,
+            viewportY: this.lastViewportPosition.y,
             nextZoom: getNormalizedZoom(initialScale * event.scale),
           },
           state,
@@ -6468,8 +6475,8 @@ class App extends React.Component<AppProps, AppState> {
       this.translateCanvas((state) => ({
         ...getStateForZoom(
           {
-            viewportX: cursorX,
-            viewportY: cursorY,
+            viewportX: this.lastViewportPosition.x,
+            viewportY: this.lastViewportPosition.y,
             nextZoom: getNormalizedZoom(newZoom),
           },
           state,
