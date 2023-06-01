@@ -66,7 +66,6 @@ const ColorPickerPopupContent = ({
   | "color"
   | "onChange"
   | "label"
-  | "label"
   | "elements"
   | "palette"
   | "updateData"
@@ -99,6 +98,8 @@ const ColorPickerPopupContent = ({
           if (container) {
             container.focus();
           }
+
+          updateData({ openPopup: null });
 
           e.preventDefault();
           e.stopPropagation();
