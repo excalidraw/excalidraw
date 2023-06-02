@@ -334,6 +334,7 @@ class Collab extends PureComponent<Props, CollabState> {
     if (this.portal.socket) {
       this.reportActive();
       this.portal.socket.connect();
+      this.portal.socketInitialized = true;
       this.setIsCollaborationPaused(false);
 
       if (callback) {

@@ -476,7 +476,9 @@ const ExcalidrawWrapper = () => {
         event.type === EVENT.FOCUS
       ) {
         syncData();
+      }
 
+      if (event.type === EVENT.VISIBILITY_CHANGE) {
         switch (true) {
           // user switches to another tab
           case document.hidden && collabAPI.isCollaborating():
