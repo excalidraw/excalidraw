@@ -21,6 +21,8 @@ import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
 } from "../../colors";
+import { KEYS } from "../../keys";
+import { EVENT } from "../../constants";
 
 interface PickerProps {
   color: string;
@@ -31,6 +33,8 @@ interface PickerProps {
   palette: ColorPaletteCustom;
   updateData: (formData?: any) => void;
   children?: React.ReactNode;
+  onEyeDropperToggle: (force?: boolean) => void;
+  onEscape: (event: React.KeyboardEvent | KeyboardEvent) => void;
 }
 
 export const Picker = ({
@@ -42,6 +46,8 @@ export const Picker = ({
   palette,
   updateData,
   children,
+  onEyeDropperToggle,
+  onEscape,
 }: PickerProps) => {
   const [customColors] = React.useState(() => {
     if (type === "canvasBackground") {
@@ -94,26 +100,43 @@ export const Picker = ({
     if (colorObj?.shade != null) {
       setActiveShade(colorObj.shade);
     }
-  }, [colorObj]);
+
+    const keyup = (event: KeyboardEvent) => {
+      if (event.key === KEYS.ALT) {
+        onEyeDropperToggle(false);
+      }
+    };
+    document.addEventListener(EVENT.KEYUP, keyup, { capture: true });
+    return () => {
+      document.removeEventListener(EVENT.KEYUP, keyup, { capture: true });
+    };
+  }, [colorObj, onEyeDropperToggle]);
+
+  const pickerRef = React.useRef<HTMLDivElement>(null);
 
   return (
     <div role="dialog" aria-modal="true" aria-label={t("labels.colorPicker")}>
       <div
-        onKeyDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-
-          colorPickerKeyNavHandler({
-            e,
+        ref={pickerRef}
+        onKeyDown={(event) => {
+          const handled = colorPickerKeyNavHandler({
+            event,
             activeColorPickerSection,
             palette,
             color,
             onChange,
+            onEyeDropperToggle,
             customColors,
             setActiveColorPickerSection,
             updateData,
             activeShade,
+            onEscape,
           });
+
+          if (handled) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
         }}
         className="color-picker-content"
         // to allow focusing by clicking but not by tabbing
