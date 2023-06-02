@@ -123,7 +123,8 @@
       "unlockAll": "Alle entsperren"
     },
     "statusPublished": "Veröffentlicht",
-    "sidebarLock": "Seitenleiste offen lassen"
+    "sidebarLock": "Seitenleiste offen lassen",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
