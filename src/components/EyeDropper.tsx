@@ -112,7 +112,7 @@ export const EyeDropper: React.FC<{
       isHoldingPointerDown = true;
       // NOTE we can't event.preventDefault() as that would stop
       // pointermove events
-      // event.stopImmediatePropagation();
+      event.stopImmediatePropagation();
     };
 
     const pointerUpListener = (event: PointerEvent) => {
