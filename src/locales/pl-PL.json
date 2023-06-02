@@ -123,7 +123,8 @@
       "unlockAll": "Odblokuj wszystko"
     },
     "statusPublished": "Opublikowano",
-    "sidebarLock": "Panel boczny zawsze otwarty"
+    "sidebarLock": "Panel boczny zawsze otwarty",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
