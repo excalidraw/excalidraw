@@ -123,7 +123,8 @@
       "unlockAll": "Розблокувати все"
     },
     "statusPublished": "Опубліковано",
-    "sidebarLock": "Не закривати бокове меню"
+    "sidebarLock": "Не закривати бокове меню",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Тут поки пусто...",
