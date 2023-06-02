@@ -9,6 +9,7 @@ import { activeEyeDropperAtom } from "../EyeDropper";
 import clsx from "clsx";
 import { t } from "../../i18n";
 import { useDevice } from "../App";
+import { getShortcutKey } from "../../utils";
 
 interface ColorInputProps {
   color: string;
@@ -112,7 +113,9 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
                     },
               )
             }
-            title={t("labels.eyeDropper")}
+            title={`${t(
+              "labels.eyeDropper",
+            )} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")} `}
           >
             {eyeDropperIcon}
           </div>
