@@ -123,7 +123,8 @@
       "unlockAll": "Ontgrendel alles"
     },
     "statusPublished": "Gepubliceerd",
-    "sidebarLock": "Zijbalk open houden"
+    "sidebarLock": "Zijbalk open houden",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Nog geen items toegevoegd...",
