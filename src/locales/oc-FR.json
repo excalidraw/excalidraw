@@ -123,7 +123,8 @@
       "unlockAll": "Tot desverrolhar"
     },
     "statusPublished": "Publicat",
-    "sidebarLock": "Gardar la barra laterala dobèrta"
+    "sidebarLock": "Gardar la barra laterala dobèrta",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
