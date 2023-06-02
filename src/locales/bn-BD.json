@@ -123,7 +123,8 @@
       "unlockAll": "সব বিচ্ছিন্ন করুন"
     },
     "statusPublished": "প্রকাশিত",
-    "sidebarLock": "লক"
+    "sidebarLock": "লক",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "সংগ্রহে কিছু যোগ করা হয়নি",
