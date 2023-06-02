@@ -208,6 +208,7 @@ const chartXLabels = (
         fontSize: 16,
         textAlign: "center",
         verticalAlign: "top",
+        terraform: "null",
       });
     }) || []
   );
@@ -228,6 +229,7 @@ const chartYLabels = (
     y: y - BAR_GAP,
     text: "0",
     textAlign: "right",
+    terraform: "null",
   });
 
   const maxYLabel = newTextElement({
@@ -238,6 +240,7 @@ const chartYLabels = (
     y: y - BAR_HEIGHT - minYLabel.height / 2,
     text: Math.max(...spreadsheet.values).toLocaleString(),
     textAlign: "right",
+    terraform: "null",
   });
 
   return [minYLabel, maxYLabel];
@@ -265,6 +268,7 @@ const chartLines = (
       [0, 0],
       [chartWidth, 0],
     ],
+    terraform: "null",
   });
 
   const yLine = newLinearElement({
@@ -281,6 +285,7 @@ const chartLines = (
       [0, 0],
       [0, -chartHeight],
     ],
+    terraform: "null",
   });
 
   const maxLine = newLinearElement({
@@ -299,6 +304,7 @@ const chartLines = (
       [0, 0],
       [chartWidth, 0],
     ],
+    terraform: "null",
   });
 
   return [xLine, yLine, maxLine];
@@ -325,6 +331,7 @@ const chartBaseElements = (
         y: y - BAR_HEIGHT - BAR_GAP * 2 - DEFAULT_FONT_SIZE,
         roundness: null,
         textAlign: "center",
+        terraform: "null",
       })
     : null;
 

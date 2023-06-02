@@ -93,6 +93,7 @@ export const getDefaultAppState = (): Omit<
     pendingImageElementId: null,
     showHyperlinkPopup: false,
     selectedLinearElement: null,
+    currentItemTerraform: DEFAULT_ELEMENT_PROPS.terraform,
   };
 };
 
