@@ -123,7 +123,8 @@
       "unlockAll": "すべてのロックを解除"
     },
     "statusPublished": "公開済み",
-    "sidebarLock": "サイドバーを開いたままにする"
+    "sidebarLock": "サイドバーを開いたままにする",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "まだアイテムが追加されていません…",
