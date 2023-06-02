@@ -123,7 +123,8 @@
       "unlockAll": "Lås upp alla"
     },
     "statusPublished": "Publicerad",
-    "sidebarLock": "Håll sidofältet öppet"
+    "sidebarLock": "Håll sidofältet öppet",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Inga objekt tillagda ännu...",
