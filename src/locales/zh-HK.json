@@ -40,10 +40,6 @@
     "arrowhead_triangle": "三角箭嘴",
     "fontSize": "字型大小",
     "fontFamily": "字體",
-    "onlySelected": "只匯出已選取的物件",
-    "withBackground": "連同背景色一併匯出",
-    "exportEmbedScene": "嵌入畫布內容",
-    "exportEmbedScene_details": "雖然使用「嵌入畫布內容」匯出的 PNG 或 SVG 檔案大小會有所增加，但是你可以透過匯入包含畫布內容的存檔來回復及繼續編輯。",
     "addWatermark": "加入「使用 Excalidraw 製圖」水印",
     "handDrawn": "手繪體",
     "normal": "電腦字體",
@@ -100,7 +96,6 @@
     "flipHorizontal": "左右反轉",
     "flipVertical": "上下反轉",
     "viewMode": "唯讀模式",
-    "toggleExportColorScheme": "",
     "share": "",
     "showStroke": "",
     "showBackground": "",
@@ -128,7 +123,8 @@
       "unlockAll": ""
     },
     "statusPublished": "",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +136,7 @@
     "exportJSON": "",
     "exportImage": "",
     "export": "",
-    "exportToPng": "",
-    "exportToSvg": "",
     "copyToClipboard": "",
-    "copyPngToClipboard": "",
-    "scale": "",
     "save": "",
     "saveAs": "",
     "load": "",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "",
     "removeItemsFromLib": ""
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "",

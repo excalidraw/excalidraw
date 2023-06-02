@@ -40,10 +40,6 @@
     "arrowhead_triangle": "三角",
     "fontSize": "フォントの大きさ",
     "fontFamily": "フォントの種類",
-    "onlySelected": "選択中のみ",
-    "withBackground": "背景",
-    "exportEmbedScene": "埋め込みシーン",
-    "exportEmbedScene_details": "シーンデータはエクスポートされたPNG/SVGファイルに保存され、シーンを復元することができます。\nエクスポートされたファイルのサイズは増加します。",
     "addWatermark": "\"Made with Excalidraw\"と表示",
     "handDrawn": "手描き風",
     "normal": "普通",
@@ -100,7 +96,6 @@
     "flipHorizontal": "水平方向に反転",
     "flipVertical": "垂直方向に反転",
     "viewMode": "閲覧モード",
-    "toggleExportColorScheme": "エクスポートカラースキームの切り替え",
     "share": "共有",
     "showStroke": "ストロークカラーピッカーを表示",
     "showBackground": "背景色ピッカーを表示",
@@ -128,7 +123,8 @@
       "unlockAll": "すべてのロックを解除"
     },
     "statusPublished": "公開済み",
-    "sidebarLock": "サイドバーを開いたままにする"
+    "sidebarLock": "サイドバーを開いたままにする",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "まだアイテムが追加されていません…",
@@ -140,11 +136,7 @@
     "exportJSON": "ファイルへエクスポート",
     "exportImage": "画像のエクスポート...",
     "export": "名前を付けて保存...",
-    "exportToPng": "PNG にエクスポート",
-    "exportToSvg": "SVG にエクスポート",
     "copyToClipboard": "クリップボードにコピー",
-    "copyPngToClipboard": "クリップボードにPNGをコピー",
-    "scale": "スケール",
     "save": "現在のファイルに保存",
     "saveAs": "名前を付けて保存",
     "load": "開く",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "ライブラリをリセット",
     "removeItemsFromLib": "選択したアイテムをライブラリから削除"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。",

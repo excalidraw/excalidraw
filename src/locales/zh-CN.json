@@ -40,10 +40,6 @@
     "arrowhead_triangle": "三角箭头",
     "fontSize": "字体大小",
     "fontFamily": "字体",
-    "onlySelected": "仅选中",
-    "withBackground": "背景",
-    "exportEmbedScene": "包含画布数据",
-    "exportEmbedScene_details": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
     "handDrawn": "手写",
     "normal": "普通",
@@ -100,7 +96,6 @@
     "flipHorizontal": "水平翻转",
     "flipVertical": "垂直翻转",
     "viewMode": "查看模式",
-    "toggleExportColorScheme": "切换导出配色方案",
     "share": "分享",
     "showStroke": "显示描边颜色选择器",
     "showBackground": "显示背景颜色选择器",
@@ -128,7 +123,8 @@
       "unlockAll": "全部解锁"
     },
     "statusPublished": "已发布",
-    "sidebarLock": "侧边栏常驻"
+    "sidebarLock": "侧边栏常驻",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "尚未添加任何项目……",
@@ -140,11 +136,7 @@
     "exportJSON": "导出为文件",
     "exportImage": "导出图片...",
     "export": "保存到...",
-    "exportToPng": "导出为 PNG",
-    "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
-    "copyPngToClipboard": "复制 PNG 到剪切板",
-    "scale": "缩放",
     "save": "保存至当前文件",
     "saveAs": "保存为",
     "load": "打开",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "重置素材库",
     "removeItemsFromLib": "从素材库中删除选中的项目"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "您的绘图采用端到端加密，其内容对于 Excalidraw 服务器是不可见的。",

@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Трикутник",
     "fontSize": "Розмір шрифту",
     "fontFamily": "Шрифт",
-    "onlySelected": "Тільки вибране",
-    "withBackground": "Фон",
-    "exportEmbedScene": "Вбудована сцена",
-    "exportEmbedScene_details": "Дані сцени будуть збережені в експортований файл PNG/SVG. Ця сцена може бути відновленна з нього, однак це збільшить розмір експортованого файлу.",
     "addWatermark": "Додати «Накреслене в Excalidraw»",
     "handDrawn": "Ручний апарат",
     "normal": "Звичайний",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Віддзеркалити горизонтально",
     "flipVertical": "Віддзеркалити вертикально",
     "viewMode": "Режим перегляду",
-    "toggleExportColorScheme": "Переключити колірну схему експорту",
     "share": "Поділитися",
     "showStroke": "Показати палітру для контура",
     "showBackground": "Показати палітру для фону",
@@ -128,7 +123,8 @@
       "unlockAll": "Розблокувати все"
     },
     "statusPublished": "Опубліковано",
-    "sidebarLock": "Не закривати бокове меню"
+    "sidebarLock": "Не закривати бокове меню",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Тут поки пусто...",
@@ -140,11 +136,7 @@
     "exportJSON": "Експорт у файл",
     "exportImage": "Експорт зображення...",
     "export": "Зберегти як...",
-    "exportToPng": "Експортувати в PNG",
-    "exportToSvg": "Експортувати в SVG",
     "copyToClipboard": "Скопіювати до буферу обміну",
-    "copyPngToClipboard": "Скопіювати PNG до буферу обміну",
-    "scale": "Масштаб",
     "save": "Зберегти до поточного файлу",
     "saveAs": "Зберегти як",
     "load": "Відкрити",
@@ -363,6 +355,30 @@
     "resetLibrary": "Очистити бібліотеку",
     "removeItemsFromLib": "Видалити вибрані елементи з бібліотеки"
   },
+  "imageExportDialog": {
+    "header": "Експортувати зображення",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "Тільки вибране",
+      "darkMode": "Темний режим",
+      "embedScene": "Вбудована сцена",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "Експортувати в PNG",
+      "exportToSvg": "Експортувати у SVG",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": ""
+    }
+  },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать.",
     "link": "Допис у блозі на наскрізному шифруванні в Excalidraw"
@@ -395,20 +411,20 @@
   },
   "colors": {
     "transparent": "Прозорий",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
+    "black": "Чорний",
+    "white": "Білий",
+    "red": "Червоний",
+    "pink": "Рожевий",
     "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
+    "violet": "Фіолетовий",
+    "gray": "Сірий",
+    "blue": "Синій",
+    "cyan": "Ціан",
     "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "green": "Зелений",
+    "yellow": "Жовтий",
+    "orange": "Помаранчевий",
+    "bronze": "Бронзовий"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +440,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
+    "mostUsedCustomColors": "Найбільш використовувані користувацькі кольори",
+    "colors": "Кольори",
     "shades": "",
-    "hexCode": "",
+    "hexCode": "Hex-код",
     "noShades": ""
   }
 }
