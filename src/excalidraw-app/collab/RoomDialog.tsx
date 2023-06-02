@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 
 import { copyTextToSystemClipboard } from "../../clipboard";
-import { AppState } from "../../types";
 import { trackEvent } from "../../analytics";
 import { getFrame } from "../../utils";
 import { useI18n } from "../../i18n";
@@ -46,7 +45,6 @@ export type RoomModalProps = {
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
   setErrorMessage: (message: string) => void;
-  theme: AppState["theme"];
 };
 
 export const RoomModal = ({
@@ -210,12 +208,7 @@ export const RoomModal = ({
 
 const RoomDialog = (props: RoomModalProps) => {
   return (
-    <Dialog
-      size="small"
-      onCloseRequest={props.handleClose}
-      title={false}
-      theme={props.theme}
-    >
+    <Dialog size="small" onCloseRequest={props.handleClose} title={false}>
       <div className="RoomDialog">
         <RoomModal {...props} />
       </div>

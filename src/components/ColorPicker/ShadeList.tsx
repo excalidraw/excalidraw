@@ -3,21 +3,21 @@ import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
 import {
   activeColorPickerSectionAtom,
-  getColorNameAndShadeFromHex,
+  getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
 import HotkeyLabel from "./HotkeyLabel";
 import { t } from "../../i18n";
 import { ColorPaletteCustom } from "../../colors";
 
 interface ShadeListProps {
-  hex: string | null;
+  hex: string;
   onChange: (color: string) => void;
   palette: ColorPaletteCustom;
 }
 
 export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
-  const colorObj = getColorNameAndShadeFromHex({
-    hex: hex || "transparent",
+  const colorObj = getColorNameAndShadeFromColor({
+    color: hex || "transparent",
     palette,
   });
 
