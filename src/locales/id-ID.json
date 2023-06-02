@@ -123,7 +123,8 @@
       "unlockAll": "Lepas semua"
     },
     "statusPublished": "Telah terbit",
-    "sidebarLock": "Biarkan sidebar tetap terbuka"
+    "sidebarLock": "Biarkan sidebar tetap terbuka",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
