@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trekant",
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Fontfamilie",
-    "onlySelected": "Kun valgte",
-    "withBackground": "Bakgrunn",
-    "exportEmbedScene": "Bygg inn scene",
-    "exportEmbedScene_details": "Scenedata vil bli lagret i den eksporterte PNG/SVG-filen, slik at scenen kan gjenopprettes fra den.\nDet vil øke den eksporterte filstørrelsen.",
     "addWatermark": "Legg til \"Laget med Excalidraw\"",
     "handDrawn": "Håndtegnet",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Snu horisontalt",
     "flipVertical": "Snu vertikalt",
     "viewMode": "Visningsmodus",
-    "toggleExportColorScheme": "Veksle eksport av fargepalett",
     "share": "Del",
     "showStroke": "Vis fargevelger for kantfarge",
     "showBackground": "Vis fargevelger for bakgrunnsfarge",
@@ -128,7 +123,8 @@
       "unlockAll": "Lås opp alle"
     },
     "statusPublished": "Publisert",
-    "sidebarLock": "Holde sidemenyen åpen"
+    "sidebarLock": "Holde sidemenyen åpen",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Ingen elementer lagt til ennå...",
@@ -140,11 +136,7 @@
     "exportJSON": "Eksporter til fil",
     "exportImage": "Eksporter bilde...",
     "export": "Lagre som...",
-    "exportToPng": "Eksporter til PNG",
-    "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavle",
-    "copyPngToClipboard": "Kopier PNG til utklippstavlen",
-    "scale": "Skalering",
     "save": "Lagre til aktiv fil",
     "saveAs": "Lagre som",
     "load": "Åpne",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Nullstill bibliotek",
     "removeItemsFromLib": "Fjern valgte elementer fra bibliotek"
+  },
+  "imageExportDialog": {
+    "header": "Eksporter bilde",
+    "label": {
+      "withBackground": "Bakgrunn",
+      "onlySelected": "Kun valgte",
+      "darkMode": "Mørk modus",
+      "embedScene": "Bygg inn scene",
+      "scale": "Skalering",
+      "padding": "Avstand"
+    },
+    "tooltip": {
+      "embedScene": "Scenedata vil bli lagret i den eksporterte PNG/SVG-filen, slik at scenen kan gjenopprettes fra den.\nDet vil øke den eksporterte filstørrelsen."
+    },
+    "title": {
+      "exportToPng": "Eksporter til PNG",
+      "exportToSvg": "Eksporter til SVG",
+      "copyPngToClipboard": "Kopier PNG til utklippstavlen"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopier til utklippstavle"
+    }
   },
   "encrypted": {
     "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem.",

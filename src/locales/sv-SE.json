@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triangel",
     "fontSize": "Teckenstorlek",
     "fontFamily": "Teckensnitt",
-    "onlySelected": "Endast markering",
-    "withBackground": "Bakgrund",
-    "exportEmbedScene": "Bädda in skiss",
-    "exportEmbedScene_details": "Skissdata kommer att sparas i den exporterade PNG/SVG-filen så att skissen kan återställas från den.\nKommer att öka exporterad filstorlek.",
     "addWatermark": "Lägg till \"Skapad med Excalidraw\"",
     "handDrawn": "Handritad",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Vänd horisontellt",
     "flipVertical": "Vänd vertikalt",
     "viewMode": "Visningsläge",
-    "toggleExportColorScheme": "Växla färgschema för export",
     "share": "Dela",
     "showStroke": "Visa färgväljare för linjefärg",
     "showBackground": "Visa färgväljare för bakgrundsfärg",
@@ -128,7 +123,8 @@
       "unlockAll": "Lås upp alla"
     },
     "statusPublished": "Publicerad",
-    "sidebarLock": "Håll sidofältet öppet"
+    "sidebarLock": "Håll sidofältet öppet",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Inga objekt tillagda ännu...",
@@ -140,11 +136,7 @@
     "exportJSON": "Exportera till fil",
     "exportImage": "Exportera bild...",
     "export": "Spara till...",
-    "exportToPng": "Exportera till PNG",
-    "exportToSvg": "Exportera till SVG",
     "copyToClipboard": "Kopiera till urklipp",
-    "copyPngToClipboard": "Kopiera PNG till urklipp",
-    "scale": "Skala",
     "save": "Spara till aktuell fil",
     "saveAs": "Spara som",
     "load": "Öppna",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Återställ bibliotek",
     "removeItemsFromLib": "Ta bort markerade objekt från biblioteket"
+  },
+  "imageExportDialog": {
+    "header": "Exportera bild",
+    "label": {
+      "withBackground": "Bakgrund",
+      "onlySelected": "Endast markerade",
+      "darkMode": "Mörkt läge",
+      "embedScene": "Bädda in skiss",
+      "scale": "Skala",
+      "padding": "Utfyllnad"
+    },
+    "tooltip": {
+      "embedScene": "Skissdata kommer att sparas i den exporterade PNG/SVG-filen så att skissen kan återställas från den.\nKommer att öka exporterad filstorlek."
+    },
+    "title": {
+      "exportToPng": "Exportera till PNG",
+      "exportToSvg": "Exportera till SVG",
+      "copyPngToClipboard": "Kopiera PNG till urklipp"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopiera till urklipp"
+    }
   },
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem.",

@@ -40,10 +40,6 @@
     "arrowhead_triangle": "삼각형",
     "fontSize": "글자 크기",
     "fontFamily": "글꼴",
-    "onlySelected": "선택한 항목만",
-    "withBackground": "배경",
-    "exportEmbedScene": "화면을 담기",
-    "exportEmbedScene_details": "화면 정보가 내보내는 PNG/SVG 파일에 저장되어 이후에 파일에서 화면을 복구할 수 있습니다. 파일 크기가 증가합니다.",
     "addWatermark": "\"Made with Excalidraw\" 추가",
     "handDrawn": "손글씨",
     "normal": "일반",
@@ -100,7 +96,6 @@
     "flipHorizontal": "좌우반전",
     "flipVertical": "상하반전",
     "viewMode": "보기 모드",
-    "toggleExportColorScheme": "내보내기의 색상 테마 전환하기",
     "share": "공유",
     "showStroke": "윤곽선 색상 선택기 열기",
     "showBackground": "배경 색상 선택기 열기",
@@ -128,7 +123,8 @@
       "unlockAll": "모두 잠금 해제"
     },
     "statusPublished": "게시됨",
-    "sidebarLock": "사이드바 유지"
+    "sidebarLock": "사이드바 유지",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "추가된 아이템 없음",
@@ -140,11 +136,7 @@
     "exportJSON": "파일로 내보내기",
     "exportImage": "이미지 내보내기",
     "export": "다른 이름으로 저장...",
-    "exportToPng": "PNG로 내보내기",
-    "exportToSvg": "SVG로 내보내기",
     "copyToClipboard": "클립보드로 복사",
-    "copyPngToClipboard": "클립보드로 PNG 이미지 복사",
-    "scale": "크기",
     "save": "현재 파일에 저장",
     "saveAs": "다른 이름으로 저장",
     "load": "열기",
@@ -363,6 +355,30 @@
     "resetLibrary": "라이브러리 리셋",
     "removeItemsFromLib": "선택한 항목을 라이브러리에서 제거"
   },
+  "imageExportDialog": {
+    "header": "이미지 내보내기",
+    "label": {
+      "withBackground": "배경",
+      "onlySelected": "선택한 항목만",
+      "darkMode": "다크 모드",
+      "embedScene": "화면을 담기",
+      "scale": "크기",
+      "padding": "여백"
+    },
+    "tooltip": {
+      "embedScene": "화면 정보가 내보내는 PNG/SVG 파일에 저장되어 이후에 파일에서 화면을 복구할 수 있습니다. 파일 크기가 증가합니다."
+    },
+    "title": {
+      "exportToPng": "PNG로 내보내기",
+      "exportToSvg": "SVG로 내보내기",
+      "copyPngToClipboard": "클립보드로 PNG 복사"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "클립보드로 복사"
+    }
+  },
   "encrypted": {
     "tooltip": "그림은 종단 간 암호화되므로 Excalidraw의 서버는 절대로 내용을 알 수 없습니다.",
     "link": "Excalidraw의 종단 간 암호화에 대한 블로그 포스트"
@@ -395,19 +411,19 @@
   },
   "colors": {
     "transparent": "투명",
-    "black": "검정색",
-    "white": "흰색",
-    "red": "빨강색",
-    "pink": "핑크색",
+    "black": "블랙",
+    "white": "화이트",
+    "red": "레드",
+    "pink": "핑크",
     "grape": "그레이프",
     "violet": "바이올렛",
-    "gray": "회색",
-    "blue": "파란색",
+    "gray": "그레이",
+    "blue": "블루",
     "cyan": "시안",
     "teal": "틸",
-    "green": "녹색",
-    "yellow": "노란색",
-    "orange": "주황색",
+    "green": "그린",
+    "yellow": "옐로우",
+    "orange": "오렌지",
     "bronze": "브론즈"
   },
   "welcomeScreen": {
@@ -424,10 +440,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "자주 사용된 커스텀 색상들",
+    "mostUsedCustomColors": "많이 쓰이는 사용자 색상들",
     "colors": "색상",
     "shades": "색조",
     "hexCode": "Hex 코드",
-    "noShades": "이 색상에는 색조가 없습니다"
+    "noShades": "사용할 수 있는 색조가 없음"
   }
 }
