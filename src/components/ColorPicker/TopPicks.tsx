@@ -9,7 +9,7 @@ import {
 interface TopPicksProps {
   onChange: (color: string) => void;
   type: ColorPickerType;
-  activeColor: string | null;
+  activeColor: string;
   topPicks?: readonly string[];
 }
 

@@ -2,15 +2,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getColor } from "./ColorPicker";
 import { useAtom } from "jotai";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import { eyeDropperIcon } from "../icons";
+import { jotaiScope } from "../../jotai";
 import { KEYS } from "../../keys";
+import { activeEyeDropperAtom } from "../EyeDropper";
+import clsx from "clsx";
+import { t } from "../../i18n";
+import { useDevice } from "../App";
+import { getShortcutKey } from "../../utils";
 
 interface ColorInputProps {
-  color: string | null;
+  color: string;
   onChange: (color: string) => void;
   label: string;
 }
 
 export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
+  const device = useDevice();
   const [innerValue, setInnerValue] = useState(color);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
@@ -34,7 +42,7 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const divRef = useRef<HTMLDivElement>(null);
+  const eyeDropperTriggerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -42,8 +50,19 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
     }
   }, [activeSection]);
 
+  const [eyeDropperState, setEyeDropperState] = useAtom(
+    activeEyeDropperAtom,
+    jotaiScope,
+  );
+
+  useEffect(() => {
+    return () => {
+      setEyeDropperState(null);
+    };
+  }, [setEyeDropperState]);
+
   return (
-    <label className="color-picker__input-label">
+    <div className="color-picker__input-label">
       <div className="color-picker__input-hash">#</div>
       <input
         ref={activeSection === "hex" ? inputRef : undefined}
@@ -60,16 +79,48 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
         }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
-        onKeyDown={(e) => {
-          if (e.key === KEYS.TAB) {
+        onKeyDown={(event) => {
+          if (event.key === KEYS.TAB) {
             return;
+          } else if (event.key === KEYS.ESCAPE) {
+            eyeDropperTriggerRef.current?.focus();
           }
-          if (e.key === KEYS.ESCAPE) {
-            divRef.current?.focus();
-          }
-          e.stopPropagation();
+          event.stopPropagation();
         }}
       />
-    </label>
+      {/* TODO reenable on mobile with a better UX */}
+      {!device.isMobile && (
+        <>
+          <div
+            style={{
+              width: "1px",
+              height: "1.25rem",
+              backgroundColor: "var(--default-border-color)",
+            }}
+          />
+          <div
+            ref={eyeDropperTriggerRef}
+            className={clsx("excalidraw-eye-dropper-trigger", {
+              selected: eyeDropperState,
+            })}
+            onClick={() =>
+              setEyeDropperState((s) =>
+                s
+                  ? null
+                  : {
+                      keepOpenOnAlt: false,
+                      onSelect: (color) => onChange(color),
+                    },
+              )
+            }
+            title={`${t(
+              "labels.eyeDropper",
+            )} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")} `}
+          >
+            {eyeDropperIcon}
+          </div>
+        </>
+      )}
+    </div>
   );
 };

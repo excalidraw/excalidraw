@@ -34,7 +34,7 @@
     "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
     "image-blob-reduce": "3.0.1",
-    "jotai": "1.6.4",
+    "jotai": "1.13.1",
     "lodash.throttle": "4.1.1",
     "nanoid": "3.3.3",
     "open-color": "1.9.1",

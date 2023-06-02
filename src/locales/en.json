@@ -123,7 +123,8 @@
       "unlockAll": "Unlock all"
     },
     "statusPublished": "Published",
-    "sidebarLock": "Keep sidebar open"
+    "sidebarLock": "Keep sidebar open",
+    "eyeDropper": "Pick color from canvas"
   },
   "library": {
     "noItems": "No items added yet...",

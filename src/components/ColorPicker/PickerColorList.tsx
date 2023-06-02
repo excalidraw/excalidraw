@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import {
   activeColorPickerSectionAtom,
   colorPickerHotkeyBindings,
-  getColorNameAndShadeFromHex,
+  getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
 import HotkeyLabel from "./HotkeyLabel";
 import { ColorPaletteCustom } from "../../colors";
@@ -12,7 +12,7 @@ import { t } from "../../i18n";
 
 interface PickerColorListProps {
   palette: ColorPaletteCustom;
-  color: string | null;
+  color: string;
   onChange: (color: string) => void;
   label: string;
   activeShade: number;
@@ -25,8 +25,8 @@ const PickerColorList = ({
   label,
   activeShade,
 }: PickerColorListProps) => {
-  const colorObj = getColorNameAndShadeFromHex({
-    hex: color || "transparent",
+  const colorObj = getColorNameAndShadeFromColor({
+    color: color || "transparent",
     palette,
   });
   const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
