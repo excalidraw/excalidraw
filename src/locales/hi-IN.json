@@ -123,7 +123,8 @@
       "unlockAll": "सब ताले के बाहर निकाले"
     },
     "statusPublished": "प्रकाशित",
-    "sidebarLock": "साइडबार खुला रखे."
+    "sidebarLock": "साइडबार खुला रखे.",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "अभी तक कोई आइटम जोडा नहीं गया.",
