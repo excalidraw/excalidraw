@@ -497,7 +497,7 @@ const ExcalidrawWrapper = () => {
           case !document.hidden && collabAPI.isPaused():
             excalidrawAPI.setToast({
               message: t("toast.reconnectRoomServer"),
-              duration: 100000,
+              duration: Infinity,
               closable: true,
             });
 

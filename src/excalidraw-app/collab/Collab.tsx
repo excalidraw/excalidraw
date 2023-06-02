@@ -335,11 +335,13 @@ class Collab extends PureComponent<Props, CollabState> {
       this.reportActive();
       this.portal.socket.connect();
       this.portal.socketInitialized = true;
-      this.setIsCollaborationPaused(false);
-
-      if (callback) {
-        callback();
-      }
+      this.portal.socket.emit(WS_SCENE_EVENT_TYPES.INIT);
+      this.portal.socket.once("client-broadcast", () => {
+        this.setIsCollaborationPaused(false);
+        if (callback) {
+          callback();
+        }
+      });
     }
   };
 
