@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
 import {
   activeColorPickerSectionAtom,
-  getColorNameAndShadeFromHex,
+  getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
 import HotkeyLabel from "./HotkeyLabel";
 import { t } from "../../i18n";
@@ -16,8 +16,8 @@ interface ShadeListProps {
 }
 
 export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
-  const colorObj = getColorNameAndShadeFromHex({
-    hex: hex || "transparent",
+  const colorObj = getColorNameAndShadeFromColor({
+    color: hex || "transparent",
     palette,
   });
 

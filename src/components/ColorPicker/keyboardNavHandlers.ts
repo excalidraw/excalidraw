@@ -10,7 +10,7 @@ import { ValueOf } from "../../utility-types";
 import {
   ActiveColorPickerSectionAtomType,
   colorPickerHotkeyBindings,
-  getColorNameAndShadeFromHex,
+  getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
 
 const arrowHandler = (
@@ -100,7 +100,7 @@ interface ColorPickerKeyNavHandlerProps {
   e: React.KeyboardEvent;
   activeColorPickerSection: ActiveColorPickerSectionAtomType;
   palette: ColorPaletteCustom;
-  hex: string;
+  color: string;
   onChange: (color: string) => void;
   customColors: string[];
   setActiveColorPickerSection: (
@@ -114,7 +114,7 @@ export const colorPickerKeyNavHandler = ({
   e,
   activeColorPickerSection,
   palette,
-  hex,
+  color,
   onChange,
   customColors,
   setActiveColorPickerSection,
@@ -126,7 +126,7 @@ export const colorPickerKeyNavHandler = ({
     return;
   }
 
-  const colorObj = getColorNameAndShadeFromHex({ hex, palette });
+  const colorObj = getColorNameAndShadeFromColor({ color, palette });
 
   if (e.key === KEYS.TAB) {
     const sectionsMap: Record<
@@ -168,8 +168,8 @@ export const colorPickerKeyNavHandler = ({
         Object.entries(palette) as [string, ValueOf<ColorPalette>][]
       ).find(([name, shades]) => {
         if (Array.isArray(shades)) {
-          return shades.includes(hex);
-        } else if (shades === hex) {
+          return shades.includes(color);
+        } else if (shades === color) {
           return name;
         }
         return null;

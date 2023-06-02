@@ -12,7 +12,7 @@ import PickerHeading from "./PickerHeading";
 import {
   ColorPickerType,
   activeColorPickerSectionAtom,
-  getColorNameAndShadeFromHex,
+  getColorNameAndShadeFromColor,
   getMostUsedCustomColors,
   isCustomColor,
 } from "./colorPickerUtils";
@@ -54,8 +54,8 @@ export const Picker = ({
     activeColorPickerSectionAtom,
   );
 
-  const colorObj = getColorNameAndShadeFromHex({
-    hex: color,
+  const colorObj = getColorNameAndShadeFromColor({
+    color,
     palette,
   });
 
@@ -107,7 +107,7 @@ export const Picker = ({
             e,
             activeColorPickerSection,
             palette,
-            hex: color,
+            color,
             onChange,
             customColors,
             setActiveColorPickerSection,
