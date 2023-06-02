@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Üçgen",
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
-    "onlySelected": "Sadece seçilen",
-    "withBackground": "Arka plan",
-    "exportEmbedScene": "Gömülü sahne",
-    "exportEmbedScene_details": "Sahne verileri, sahnenin geri yüklenebilmesi için dışa aktarılan PNG/SVG dosyasına kaydedilecektir.\nDışa aktarılan dosya boyutunu artıracaktır.",
     "addWatermark": "\"Excalidraw ile yapıldı\" yazısını ekle",
     "handDrawn": "El-yazısı",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Yatay döndür",
     "flipVertical": "Dikey döndür",
     "viewMode": "Görünüm modu",
-    "toggleExportColorScheme": "Renk şemasını dışa aktar/aktarma",
     "share": "Paylaş",
     "showStroke": "Kontur için renk seçiciyi göster",
     "showBackground": "Arkaplan için renk seçiciyi göster",
@@ -128,7 +123,8 @@
       "unlockAll": "Hepsinin kilidini kaldır"
     },
     "statusPublished": "Yayınlandı",
-    "sidebarLock": "Kenar çubuğu açık kalsın"
+    "sidebarLock": "Kenar çubuğu açık kalsın",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Öğe eklenmedi...",
@@ -140,11 +136,7 @@
     "exportJSON": "Dosyaya aktar",
     "exportImage": "Resimleri dışa aktar...",
     "export": "Şuraya kaydet...",
-    "exportToPng": "PNG olarak dışa aktar",
-    "exportToSvg": "SVG olarak dışa aktar",
     "copyToClipboard": "Panoya kopyala",
-    "copyPngToClipboard": "PNG'yi panoya kopyala",
-    "scale": "Ölçek",
     "save": "Geçerli dosyaya kaydet",
     "saveAs": "Farklı kaydet",
     "load": "Aç",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Kütüphaneyi sıfırla",
     "removeItemsFromLib": "Seçilen ögeleri kütüphaneden kaldır"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez.",

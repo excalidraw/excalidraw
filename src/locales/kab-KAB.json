@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Akerdis",
     "fontSize": "Tiddi n tsefsit",
     "fontFamily": "Tawacult n tsefsiyin",
-    "onlySelected": "Tafrayt kan",
-    "withBackground": "Agilal",
-    "exportEmbedScene": "Sleɣ asayes",
-    "exportEmbedScene_details": "Asayes ad yettwasekles deg ufaylu n usifeḍ PNG/SVG akken akken ad yili wamek ara d-yettwarr seg-s usayes. Ayagi ad isimɣur tiddi n ufaylu n usifeḍ.",
     "addWatermark": "Seddu \"Yettwaxdem s Excalidraw\"",
     "handDrawn": "Asuneɣ s ufus",
     "normal": "Amagnu",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Tuttya taglawant",
     "flipVertical": "Tuttya tubdidt",
     "viewMode": "Askar n tmuɣli",
-    "toggleExportColorScheme": "Sermed/sens asifeḍ usentel n yini",
     "share": "Bḍu",
     "showStroke": "Beqqeḍ amelqaḍ n yini n yizirig",
     "showBackground": "Beqqeḍ amelqaḍ n yini n ugilal",
@@ -128,7 +123,8 @@
       "unlockAll": "Serreḥ akk"
     },
     "statusPublished": "Yeffeɣ-d",
-    "sidebarLock": "Eǧǧ afeggag n yidis yeldi"
+    "sidebarLock": "Eǧǧ afeggag n yidis yeldi",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Ulac iferdisen yettwarnan yakan...",
@@ -140,11 +136,7 @@
     "exportJSON": "Sifeḍ afaylu",
     "exportImage": "Sifeḍ tugna...",
     "export": "Sekles di...",
-    "exportToPng": "Sifeḍ ɣer PNG",
-    "exportToSvg": "Sifeḍ ɣer SVG",
     "copyToClipboard": "Nɣel ɣer tecfawit",
-    "copyPngToClipboard": "Nɣel PNG ɣer tecfawit",
-    "scale": "Taskala",
     "save": "Sekles deg ufaylu amiran",
     "saveAs": "Sekles am",
     "load": "Ldi",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Ales awennez n temkarḍit",
     "removeItemsFromLib": "Kkes iferdisen yettafernen si temkarḍit"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Unuɣen-inek (m) ttuwgelhnen seg yixef s ixef dɣa iqeddacen n Excalidraw werǧin ad ten-walin. ",

@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Треугольник",
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифтов",
-    "onlySelected": "Только выбранные",
-    "withBackground": "Фон",
-    "exportEmbedScene": "Встроить сцену",
-    "exportEmbedScene_details": "Сцена будет сохранена в PNG/SVG файл так, чтобы всю сцену можно будет восстановить из этого файла. Это увеличит размер файла.",
     "addWatermark": "Добавить «Создано в Excalidraw»",
     "handDrawn": "От руки",
     "normal": "Обычный",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Переворот по горизонтали",
     "flipVertical": "Переворот по вертикали",
     "viewMode": "Вид",
-    "toggleExportColorScheme": "Экспортировать цветовую схему",
     "share": "Поделиться",
     "showStroke": "Показать выбор цвета обводки",
     "showBackground": "Показать выбор цвета фона",
@@ -128,7 +123,8 @@
       "unlockAll": "Разблокировать все"
     },
     "statusPublished": "Опубликовано",
-    "sidebarLock": "Держать боковую панель открытой"
+    "sidebarLock": "Держать боковую панель открытой",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
@@ -140,11 +136,7 @@
     "exportJSON": "Сохранить в",
     "exportImage": "Экспортировать изображение...",
     "export": "Сохранить как...",
-    "exportToPng": "Экспорт в PNG",
-    "exportToSvg": "Экспорт в SVG",
     "copyToClipboard": "Скопировать в буфер обмена",
-    "copyPngToClipboard": "Скопировать PNG в буфер обмена",
-    "scale": "Масштаб",
     "save": "Сохранить в текущий файл",
     "saveAs": "Сохранить как",
     "load": "Открыть",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Сброс библиотеки",
     "removeItemsFromLib": "Удалить выбранные объекты из библиотеки"
+  },
+  "imageExportDialog": {
+    "header": "Экспортировать изображение",
+    "label": {
+      "withBackground": "Фон",
+      "onlySelected": "Только выделенное",
+      "darkMode": "Темная тема",
+      "embedScene": "Встроить сцену",
+      "scale": "Масштаб",
+      "padding": "Отступ"
+    },
+    "tooltip": {
+      "embedScene": "Сцена будет сохранена в PNG/SVG файл так, чтобы всю сцену можно будет восстановить из этого файла. Это увеличит размер файла."
+    },
+    "title": {
+      "exportToPng": "Экспорт в PNG",
+      "exportToSvg": "Экспорт в SVG",
+      "copyPngToClipboard": "Скопировать PNG в буфер обмена"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Скопировать в буфер обмена"
+    }
   },
   "encrypted": {
     "tooltip": "Ваши данные защищены сквозным (End-to-end) шифрованием. Серверы Excalidraw никогда не получат доступ к ним.",

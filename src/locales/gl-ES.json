@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triángulo",
     "fontSize": "Tamaño da fonte",
     "fontFamily": "Tipo de fonte",
-    "onlySelected": "Só seleccionados",
-    "withBackground": "Fondo",
-    "exportEmbedScene": "Inserir escena",
-    "exportEmbedScene_details": "Os datos da escena serán gardados no ficheiro PNG/SVG exportado polo que a escena poderá ser restaurada dende el. Isto aumentará o tamaño do ficheiro exportado.",
     "addWatermark": "Engadir \"Feito con Excalidraw\"",
     "handDrawn": "Debuxado a man",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Virar horizontalmente",
     "flipVertical": "Virar verticalmente",
     "viewMode": "Modo de visualización",
-    "toggleExportColorScheme": "Alternar esquema de cores de exportación",
     "share": "Compartir",
     "showStroke": "Mostrar selector de cores do trazo",
     "showBackground": "Mostrar selector de cores do fondo",
@@ -128,7 +123,8 @@
       "unlockAll": "Desbloquear todo"
     },
     "statusPublished": "Publicado",
-    "sidebarLock": "Manter a barra lateral aberta"
+    "sidebarLock": "Manter a barra lateral aberta",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Aínda non hai elementos engadidos...",
@@ -140,11 +136,7 @@
     "exportJSON": "Exportar a arquivo",
     "exportImage": "Exportar imaxe...",
     "export": "Gardar en...",
-    "exportToPng": "Exportar a PNG",
-    "exportToSvg": "Exportar a SVG",
     "copyToClipboard": "Copiar ao portapapeis",
-    "copyPngToClipboard": "Copiar PNG ao portapapeis",
-    "scale": "Escala",
     "save": "Gardar no ficheiro actual",
     "saveAs": "Gardar como",
     "load": "Abrir",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Restablecer biblioteca",
     "removeItemsFromLib": "Eliminar os elementos seleccionados da biblioteca"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Os teus debuxos están cifrados de punto a punto, polo que os servidores de Excalidraw nunca os verán.",

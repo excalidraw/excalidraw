@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trikotnik",
     "fontSize": "Velikost pisave",
     "fontFamily": "Družina pisave",
-    "onlySelected": "Samo izbor",
-    "withBackground": "Ozadje",
-    "exportEmbedScene": "Vdelaj sceno",
-    "exportEmbedScene_details": "Podatki o sceni bodo shranjeni v izvoženo datoteko PNG/SVG, tako da bo sceno mogoče obnoviti iz nje.\nTo bo povečalo velikost izvožene datoteke.",
     "addWatermark": "Dodaj \"Izdelano z Excalidraw\"",
     "handDrawn": "Ročno narisano",
     "normal": "Običajno",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Obrni vodoravno",
     "flipVertical": "Obrni navpično",
     "viewMode": "Način ogleda",
-    "toggleExportColorScheme": "Preklopi barvno shemo izvoza",
     "share": "Deli",
     "showStroke": "Prikaži izbirnik barv poteze",
     "showBackground": "Prikaži izbirnik barv ozadja",
@@ -128,7 +123,8 @@
       "unlockAll": "Odkleni vse"
     },
     "statusPublished": "Objavljeno",
-    "sidebarLock": "Obdrži stransko vrstico odprto"
+    "sidebarLock": "Obdrži stransko vrstico odprto",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
@@ -140,11 +136,7 @@
     "exportJSON": "Izvozi v datoteko",
     "exportImage": "Izvozi sliko...",
     "export": "Shrani v...",
-    "exportToPng": "Izvozi v PNG",
-    "exportToSvg": "Izvozi v SVG",
     "copyToClipboard": "Kopiraj v odložišče",
-    "copyPngToClipboard": "Kopiraj PNG v odložišče",
-    "scale": "Povečava",
     "save": "Shrani v trenutno datoteko",
     "saveAs": "Shrani kot",
     "load": "Odpri",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Ponastavi knjižnico",
     "removeItemsFromLib": "Odstran izbrane elemente iz knjižnice"
+  },
+  "imageExportDialog": {
+    "header": "Izvozi sliko",
+    "label": {
+      "withBackground": "Ozadje",
+      "onlySelected": "Samo izbor",
+      "darkMode": "Temni način",
+      "embedScene": "Vdelaj sceno",
+      "scale": "Povečava",
+      "padding": "Odmik"
+    },
+    "tooltip": {
+      "embedScene": "Podatki o sceni bodo shranjeni v izvoženo datoteko PNG/SVG, tako da bo sceno mogoče obnoviti iz nje.\nTo bo povečalo velikost izvožene datoteke."
+    },
+    "title": {
+      "exportToPng": "Izvozi v PNG",
+      "exportToSvg": "Izvozi v SVG",
+      "copyPngToClipboard": "Kopiraj PNG v odložišče"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopiraj v odložišče"
+    }
   },
   "encrypted": {
     "tooltip": "Vaše risbe so šifrirane od konca do konca, tako da jih strežniki Excalidraw nikoli ne bodo videli.",

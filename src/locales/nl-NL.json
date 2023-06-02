@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Driehoek",
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
-    "onlySelected": "Enkel geselecteerde",
-    "withBackground": "Achtergrond",
-    "exportEmbedScene": "Scène insluiten",
-    "exportEmbedScene_details": "Scènegegevens worden in het geëxporteerde PNG/SVG-bestand opgeslagen zodat de scène kan worden hersteld.\nDe grootte van de geëxporteerde bestanden zal toenemen.",
     "addWatermark": "Voeg \"Gemaakt met Excalidraw\" toe",
     "handDrawn": "Handgetekend",
     "normal": "Normaal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Horizontaal spiegelen",
     "flipVertical": "Verticaal spiegelen",
     "viewMode": "Weergavemodus",
-    "toggleExportColorScheme": "Kleurenschema exporteren aan/uit",
     "share": "Deel",
     "showStroke": "Toon lijn kleur kiezer",
     "showBackground": "Toon achtergrondkleur kiezer",
@@ -128,7 +123,8 @@
       "unlockAll": "Ontgrendel alles"
     },
     "statusPublished": "Gepubliceerd",
-    "sidebarLock": "Zijbalk open houden"
+    "sidebarLock": "Zijbalk open houden",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Nog geen items toegevoegd...",
@@ -140,11 +136,7 @@
     "exportJSON": "Exporteren naar bestand",
     "exportImage": "Exporteer afbeelding...",
     "export": "Sla op...",
-    "exportToPng": "Exporteren naar PNG",
-    "exportToSvg": "Exporteren naar SVG",
     "copyToClipboard": "Kopieer",
-    "copyPngToClipboard": "Kopieer als PNG",
-    "scale": "Schaal",
     "save": "Opslaan naar huidige bestand",
     "saveAs": "Opslaan als",
     "load": "Open",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Reset bibliotheek",
     "removeItemsFromLib": "Verwijder geselecteerde items uit bibliotheek"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent.",

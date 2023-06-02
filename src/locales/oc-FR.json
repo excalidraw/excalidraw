@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triangle",
     "fontSize": "Talha polissa",
     "fontFamily": "Familha de polissa",
-    "onlySelected": "Seleccion sonque",
-    "withBackground": "Rèireplan",
-    "exportEmbedScene": "Scèna embarcada",
-    "exportEmbedScene_details": "Las donadas de scèna seràn enregistradas dins lo fichièr PNG/SVG exportat, per que la scèna pòsca èsser restaurada a partir d’aqueste fichièr.\nAumentarà la talha del fichièr exportat.",
     "addWatermark": "Apondre « Fabricat amb Excalidraw »",
     "handDrawn": "A la man levada",
     "normal": "Normala",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Virar orizontalament",
     "flipVertical": "Virar verticalament",
     "viewMode": "Mòde de vista",
-    "toggleExportColorScheme": "Alternar l’esquèma de color d’expòrt",
     "share": "Partejar",
     "showStroke": "Mostrar lo selector de color de contorn",
     "showBackground": "Mostrar lo selector de color de fons",
@@ -128,7 +123,8 @@
       "unlockAll": "Tot desverrolhar"
     },
     "statusPublished": "Publicat",
-    "sidebarLock": "Gardar la barra laterala dobèrta"
+    "sidebarLock": "Gardar la barra laterala dobèrta",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
@@ -140,11 +136,7 @@
     "exportJSON": "Exportar en fichièr",
     "exportImage": "Exportar imatges...",
     "export": "Enregistrar dins...",
-    "exportToPng": "Exportar en PNG",
-    "exportToSvg": "Exportar en SVG",
     "copyToClipboard": "Copiar al quichapapièrs",
-    "copyPngToClipboard": "Copiar PNG al quichapapièrs",
-    "scale": "Escala",
     "save": "Salvar al fichièr actual",
     "saveAs": "Enregistrar jos",
     "load": "Dobrir",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Reïnicializar la bibliotèca",
     "removeItemsFromLib": "Tirar los elements seleccionats de la bibliotèca"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai.",

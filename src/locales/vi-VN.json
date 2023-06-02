@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Tam giác",
     "fontSize": "Cỡ chữ",
     "fontFamily": "Phông chữ",
-    "onlySelected": "Chỉ lựa chọn",
-    "withBackground": "Nền",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
     "addWatermark": "Làm với Excalidraw\"",
     "handDrawn": "Vẽ tay",
     "normal": "Bình thường",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Lật ngang",
     "flipVertical": "Lật dọc",
     "viewMode": "Chế độ xem",
-    "toggleExportColorScheme": "",
     "share": "Chia sẻ",
     "showStroke": "Hiển thị chọn màu",
     "showBackground": "Hiện thị chọn màu nền",
@@ -128,7 +123,8 @@
       "unlockAll": "Mở khóa tất cả"
     },
     "statusPublished": "Đã đăng tải",
-    "sidebarLock": "Giữ thanh bên luôn mở"
+    "sidebarLock": "Giữ thanh bên luôn mở",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Chưa có món nào...",
@@ -140,11 +136,7 @@
     "exportJSON": "Xuất ra tập tin",
     "exportImage": "Xuất file ảnh...",
     "export": "Lưu vào...",
-    "exportToPng": "Xuất ra tập tin PNG",
-    "exportToSvg": "Xuất ra tập tin SVG",
     "copyToClipboard": "Sao chép vào bộ nhớ tạm",
-    "copyPngToClipboard": "Sao chép PNG vào bộ nhớ",
-    "scale": "Co giãn",
     "save": "Lưu vào tập tin hiện tại",
     "saveAs": "Lưu thành",
     "load": "Mở",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "",
     "removeItemsFromLib": "Xóa món đã chọn khỏi thư viện"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "",

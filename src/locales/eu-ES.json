@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Hirukia",
     "fontSize": "Letra-tamaina",
     "fontFamily": "Letra-tipoa",
-    "onlySelected": "Hautapena soilik",
-    "withBackground": "Atzeko planoa",
-    "exportEmbedScene": "Txertatu eszena",
-    "exportEmbedScene_details": "Eszenaren datuak esportatutako PNG/SVG fitxategian gordeko dira, eszena bertatik berrezartzeko.\nEsportatutako fitxategien tamaina handituko da.",
     "addWatermark": "Gehitu \"Excalidraw bidez egina\"",
     "handDrawn": "Eskuz marraztua",
     "normal": "Normala",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Irauli horizontalki",
     "flipVertical": "Irauli bertikalki",
     "viewMode": "Ikuspegia",
-    "toggleExportColorScheme": "Aldatu esportatzeko kolorearen eszena",
     "share": "Partekatu",
     "showStroke": "Erakutsi marraren kolore-hautatzailea",
     "showBackground": "Erakutsi atzeko planoaren kolore-hautatzailea",
@@ -128,7 +123,8 @@
       "unlockAll": "Desblokeatu guztiak"
     },
     "statusPublished": "Argitaratua",
-    "sidebarLock": "Mantendu alboko barra irekita"
+    "sidebarLock": "Mantendu alboko barra irekita",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Oraindik ez da elementurik gehitu...",
@@ -140,11 +136,7 @@
     "exportJSON": "Esportatu fitxategira",
     "exportImage": "Esportatu irudia...",
     "export": "Gorde hemen...",
-    "exportToPng": "Esportatu PNG gisa",
-    "exportToSvg": "Esportatu SVG gisa",
     "copyToClipboard": "Kopiatu arbelera",
-    "copyPngToClipboard": "Kopiatu PNG arbelera",
-    "scale": "Eskala",
     "save": "Gorde uneko fitxategian",
     "saveAs": "Gorde honela",
     "load": "Ireki",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Leheneratu liburutegia",
     "removeItemsFromLib": "Kendu hautatutako elementuak liburutegitik"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Zure marrazkiak muturretik muturrera enkriptatu dira, beraz Excalidraw-ren zerbitzariek ezingo dituzte ikusi.",

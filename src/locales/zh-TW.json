@@ -40,10 +40,6 @@
     "arrowhead_triangle": "三角形",
     "fontSize": "字型大小",
     "fontFamily": "字體集",
-    "onlySelected": "僅選取物件",
-    "withBackground": "含有背景",
-    "exportEmbedScene": "嵌入場景",
-    "exportEmbedScene_details": "用於回復場景的場景資料會被包含在輸出的 PNG/SVG 檔案中。\n會增加輸出的檔案大小。",
     "addWatermark": "加上 \"Made with Excalidraw\" 浮水印",
     "handDrawn": "手寫",
     "normal": "一般",
@@ -100,7 +96,6 @@
     "flipHorizontal": "水平翻轉",
     "flipVertical": "垂直翻轉",
     "viewMode": "檢視模式",
-    "toggleExportColorScheme": "切換輸出配色",
     "share": "共享",
     "showStroke": "顯示線條檢色器",
     "showBackground": "顯示背景檢色器",
@@ -128,7 +123,8 @@
       "unlockAll": "全部解鎖"
     },
     "statusPublished": "已發布",
-    "sidebarLock": "側欄維持開啟"
+    "sidebarLock": "側欄維持開啟",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "尚未加入任何物件...",
@@ -140,11 +136,7 @@
     "exportJSON": "匯出至檔案",
     "exportImage": "匯出圖片",
     "export": "儲存至...",
-    "exportToPng": "輸出成 PNG",
-    "exportToSvg": "輸出成 SVG",
     "copyToClipboard": "複製至剪貼簿",
-    "copyPngToClipboard": "複製 PNG 至剪貼簿",
-    "scale": "縮放比例",
     "save": "儲存目前檔案",
     "saveAs": "儲存為",
     "load": "開啟",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "重設資料庫",
     "removeItemsFromLib": "從資料庫移除所選的項目"
+  },
+  "imageExportDialog": {
+    "header": "匯出圖片",
+    "label": {
+      "withBackground": "背景",
+      "onlySelected": "僅選取物件",
+      "darkMode": "深色模式",
+      "embedScene": "嵌入場景",
+      "scale": "縮放比例",
+      "padding": "內間距"
+    },
+    "tooltip": {
+      "embedScene": "用於回復場景的場景資料會被包含在輸出的 PNG/SVG 檔案中。\n會增加輸出的檔案大小。"
+    },
+    "title": {
+      "exportToPng": "輸出成 PNG",
+      "exportToSvg": "輸出成 SVG",
+      "copyPngToClipboard": "複製 PNG 至剪貼簿"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "複製至剪貼簿"
+    }
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。",

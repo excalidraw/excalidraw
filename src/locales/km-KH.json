@@ -40,10 +40,6 @@
     "arrowhead_triangle": "ត្រីកោណ",
     "fontSize": "ទំហំពុម្ពអក្សរ",
     "fontFamily": "ក្រុម​ពុម្ពអក្សរ",
-    "onlySelected": "យកផ្នែកដែលត្រូវបានជ្រើសរើស​ប៉ុណ្ណោះ",
-    "withBackground": "ផ្ទៃខាងក្រោយ",
-    "exportEmbedScene": "ស៊ីនដែលត្រូវបានបង្កប់",
-    "exportEmbedScene_details": "ទិន្នន័យរបស់ស៊ីននឹងត្រូវបានរក្សាទុកទៅក្នុងឯកសារ PNG​ ឬ SVG ដូច្នេះស៊ីនអាចស្ដារឡើងវិញពីឯកសារនេះ ប៉ុន្តែទំហំឯកសារដែលនឹងត្រូវបាននាំចេញនេះនឹងកាន់តែធំ។",
     "addWatermark": "បន្ថែមវ៉ាត់ធើម៉ាក \"Made with Excalidraw\"",
     "handDrawn": "គូរដោយដៃ",
     "normal": "ធម្មតា",
@@ -100,7 +96,6 @@
     "flipHorizontal": "ត្រឡប់​ដោយ​ផ្ដេក",
     "flipVertical": "ត្រឡប់​ដោយ​បញ្ឈរ",
     "viewMode": "ម៉ូដ​បង្ហាញ",
-    "toggleExportColorScheme": "បិទ/បើក​ពណ៌​ចម្រុះ​នាំចេញ",
     "share": "ចែករំលែក",
     "showStroke": "បង្ហាញឧបករណ៍ជ្រើសរើសពណ៌ខ្វាច់",
     "showBackground": "បង្ហាញឧបករណ៍ជ្រើសរើសពណ៌ផ្ទៃខាងក្រោយ",
@@ -128,7 +123,8 @@
       "unlockAll": "ដោះសោទាំងអស់"
     },
     "statusPublished": "ត្រូវបានបោះពុម្ពផ្សាយ",
-    "sidebarLock": "ទុករបារចំហៀងបើក"
+    "sidebarLock": "ទុករបារចំហៀងបើក",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "មិនទាន់មានធាតុបន្ថែមទេ...",
@@ -140,11 +136,7 @@
     "exportJSON": "នាំចេញជាឯកសារ",
     "exportImage": "នាំរូបភាពចេញ",
     "export": "រក្សាទុក​នៅ...",
-    "exportToPng": "នាំចេញជា PNG",
-    "exportToSvg": "នាំចេញជា SVG",
     "copyToClipboard": "ចម្លងទៅក្តារតម្បៀតខ្ទាស់",
-    "copyPngToClipboard": "ចម្លង PNG ទៅក្តារតម្បៀតខ្ទាស់",
-    "scale": "មាត្រដ្ឋាន",
     "save": "រក្សាទុកទៅឯកសារបច្ចុប្បន្ន",
     "saveAs": "រក្សាទុក​ជា",
     "load": "បើក",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "កំណត់បណ្ណាល័យឡើងវិញ",
     "removeItemsFromLib": "លុបធាតុដែលបានជ្រើសរើសចេញពីបណ្ណាល័យ"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "គំនូររបស់អ្នកត្រូវបានអ៊ិនគ្រីបពីចុងដល់ចប់ ដូច្នេះម៉ាស៊ីនមេរបស់ Excalidraw នឹងមិនឃើញពួកវាទេ។",

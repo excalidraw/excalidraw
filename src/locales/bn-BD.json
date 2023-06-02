@@ -40,10 +40,6 @@
     "arrowhead_triangle": "ত্রিভূজ",
     "fontSize": "লেখনীর মাত্রা",
     "fontFamily": "লেখনীর হরফ",
-    "onlySelected": "শুধুমাত্র সিলেক্টকৃত",
-    "withBackground": "পটভূমি সমেত",
-    "exportEmbedScene": "দৃশ্য",
-    "exportEmbedScene_details": "সিনের ডেটা এক্সপোর্টকৃত পীএনজী বা এসভীজী ফাইলের মধ্যে সেভ করা হবে যাতে করে পরবর্তী সময়ে আপনি এডিট করতে পারেন। তবে এতে ফাইলের সাইজ বাড়বে",
     "addWatermark": "এক্সক্যালিড্র দ্বারা প্রস্তুত",
     "handDrawn": "হাতে আঁকা",
     "normal": "স্বাভাবিক",
@@ -100,7 +96,6 @@
     "flipHorizontal": "অনুভূমিক আবর্তন",
     "flipVertical": "উলম্ব আবর্তন",
     "viewMode": "দৃশ্য",
-    "toggleExportColorScheme": "",
     "share": "ভাগ করুন",
     "showStroke": "",
     "showBackground": "",
@@ -128,7 +123,8 @@
       "unlockAll": "সব বিচ্ছিন্ন করুন"
     },
     "statusPublished": "প্রকাশিত",
-    "sidebarLock": "লক"
+    "sidebarLock": "লক",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "সংগ্রহে কিছু যোগ করা হয়নি",
@@ -140,11 +136,7 @@
     "exportJSON": "জেসন নিবদ্ধ করুন",
     "exportImage": "",
     "export": "",
-    "exportToPng": "পীএনজী ছবির মতন নিবদ্ধ করুন",
-    "exportToSvg": "এসভীজী ছবির মতন নিবদ্ধ করুন",
     "copyToClipboard": "ক্লিপবোর্ডে কপি করুন",
-    "copyPngToClipboard": "পীএনজী ছবির মতন ক্লিপবোর্ডে কপি করুন",
-    "scale": "মাপ",
     "save": "জমা করুন",
     "saveAs": "অন্যভাবে জমা করুন",
     "load": "",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "",
     "removeItemsFromLib": ""
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "",

@@ -40,10 +40,6 @@
     "arrowhead_triangle": "مثلث",
     "fontSize": "حجم الخط",
     "fontFamily": "نوع الخط",
-    "onlySelected": "المحدد فقط",
-    "withBackground": "الخلفية",
-    "exportEmbedScene": "تضمين المشهد",
-    "exportEmbedScene_details": "سيتم حفظ بيانات المشهد في ملف PNG/SVG المصدّر بحيث يمكن استعادة المشهد منه.\nسيزيد حجم الملف المصدر.",
     "addWatermark": "إضافة \"مصنوعة بواسطة Excalidraw\"",
     "handDrawn": "رسم باليد",
     "normal": "عادي",
@@ -100,7 +96,6 @@
     "flipHorizontal": "قلب عامودي",
     "flipVertical": "قلب أفقي",
     "viewMode": "نمط العرض",
-    "toggleExportColorScheme": "تبديل نظام ألوان الصادرات",
     "share": "مشاركة",
     "showStroke": "إظهار منتقي لون الخط",
     "showBackground": "إظهار منتقي لون الخلفية",
@@ -128,7 +123,8 @@
       "unlockAll": "فتح الكل"
     },
     "statusPublished": "نُشر",
-    "sidebarLock": "إبقاء الشريط الجانبي مفتوح"
+    "sidebarLock": "إبقاء الشريط الجانبي مفتوح",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "لا توجد عناصر أضيفت بعد...",
@@ -140,11 +136,7 @@
     "exportJSON": "صدر الملف",
     "exportImage": "تصدير الصورة...",
     "export": "حفظ إلى...",
-    "exportToPng": "تصدير بصيغة PNG",
-    "exportToSvg": "تصدير بصيغة SVG",
     "copyToClipboard": "نسخ إلى الحافظة",
-    "copyPngToClipboard": "نسخ الـ PNG إلى الحافظة",
-    "scale": "مقاس",
     "save": "احفظ للملف الحالي",
     "saveAs": "حفظ كـ",
     "load": "فتح",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "إعادة ضبط المكتبة",
     "removeItemsFromLib": "إزالة العناصر المحددة من المكتبة"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "رسوماتك مشفرة من النهاية إلى النهاية حتى أن خوادم Excalidraw لن تراها أبدا.",

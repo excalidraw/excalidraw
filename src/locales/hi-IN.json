@@ -40,10 +40,6 @@
     "arrowhead_triangle": "त्रिकोण",
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
-    "onlySelected": "केवल चयनित",
-    "withBackground": "पृष्ठभूमि",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "निर्यात एम्बेड दृश्य विवरण",
     "addWatermark": "ऐड \"मेड विथ एक्सकैलिडराव\"",
     "handDrawn": "हाथ से बनाया हुआ",
     "normal": "साधारण",
@@ -100,7 +96,6 @@
     "flipHorizontal": "दायें बायें पलटे",
     "flipVertical": "ऊपर नीचे पलटे",
     "viewMode": "अलग अलग देखें",
-    "toggleExportColorScheme": "",
     "share": "शेयर करें",
     "showStroke": "",
     "showBackground": "पृष्ठभूमि रंग वरक़ दिखाये",
@@ -128,7 +123,8 @@
       "unlockAll": "सब ताले के बाहर निकाले"
     },
     "statusPublished": "प्रकाशित",
-    "sidebarLock": "साइडबार खुला रखे."
+    "sidebarLock": "साइडबार खुला रखे.",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "अभी तक कोई आइटम जोडा नहीं गया.",
@@ -140,11 +136,7 @@
     "exportJSON": "",
     "exportImage": "प्रतिमा निर्यात करे...",
     "export": "यंहा सुरक्षित करे...",
-    "exportToPng": "पीएनजी के रूप में निर्यात करे",
-    "exportToSvg": "Svg के रूप में निर्यात करे",
     "copyToClipboard": "क्लिपबोर्ड पर प्रतिलिपि बनाएँ",
-    "copyPngToClipboard": "क्लिपबोर्ड पर कॉपी करें,पीएनजी के रूप में",
-    "scale": "पैमाना",
     "save": "",
     "saveAs": "सेव करे इस तरह",
     "load": "खोलें",
@@ -208,10 +200,10 @@
     "collabSaveFailed": "किसी कारण वश अंदरूनी डेटाबेस में सहेजा नहीं जा सका। यदि समस्या बनी रहती है, तो किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।",
     "collabSaveFailed_sizeExceeded": "लगता है कि पृष्ठ तल काफ़ी बड़ा है, इस्कारण अंदरूनी डेटाबेस में सहेजा नहीं जा सका। किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "लगता है कि आप Brave ब्राउज़र का उपयोग कर रहे और साथ में <bold>आक्रामक उँगलियो के छाप </bold> का चयन किया हुवा है",
+      "line2": "यह आपके चित्रों के <bold>पाठ तत्वों</bold>को खंडित कर सकता हैं",
+      "line3": "हमें आपसे ठोस आग्रह है की आप सेट्टिंग में इस विकल्प का चयन ना करे.<link> इस अनुक्रम </link> का पालन करके इसका पता लगा सकते हैं",
+      "line4": "यदि इस सेटिंग्स को अक्षम करने पर भी पृष्ठ ठीक नहीं दिखता हो तो, हमारे GitHub पर एक <issueLink>मुद्दा प्रस्तुत</issueLink> करे, या हमें <discordLink>डिस्कोर्ड</discordLink> पर लिखित सम्पर्क करें"
     }
   },
   "toolBar": {
@@ -363,6 +355,30 @@
     "resetLibrary": "",
     "removeItemsFromLib": ""
   },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
+  },
   "encrypted": {
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।",
     "link": ""
@@ -395,20 +411,20 @@
   },
   "colors": {
     "transparent": "",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "काला",
+    "white": "सफ़ेद",
+    "red": "लाल",
+    "pink": "गुलाबी",
+    "grape": "अंगूरी",
+    "violet": "जामुनी",
+    "gray": "गहरा",
+    "blue": "नीला",
+    "cyan": "आसमानी",
+    "teal": "हरा-नीला",
+    "green": "हरा",
+    "yellow": "पीला",
+    "orange": "नारंगी",
+    "bronze": "कांस्य"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +440,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "अधिकांश उपयोगित रंग",
+    "colors": "रंग",
+    "shades": "छाया",
+    "hexCode": "हेक्स कोड",
+    "noShades": "इस रंग की कोई छाया उपलब्ध नहीं हैं"
   }
 }

@@ -40,10 +40,6 @@
     "arrowhead_triangle": "سێگۆشە",
     "fontSize": "قەبارەی فۆنت",
     "fontFamily": "خێزانی فۆنت",
-    "onlySelected": "تەنها دیاریکراوەکان",
-    "withBackground": "باکگراوند",
-    "exportEmbedScene": "ئیمبێدکردنی دیمەنەکە",
-    "exportEmbedScene_details": "هەنداردەکراو بۆ ئەوەی دیمەنەکە بتوانرێت بگەڕێنرێتەوە لێی (PNG/SVG) داتای دیمەنەکە هەڵدەگیرێت وەکو فایلی\nقەبارەی فایلە هەناردەکراوەکان زیاد دەکات.",
     "addWatermark": "زیادبکە \"Made with Excalidraw\"",
     "handDrawn": "دەست کێشراو",
     "normal": "ئاسایی",
@@ -100,7 +96,6 @@
     "flipHorizontal": "هەڵگەڕانەوەی ئاسۆیی",
     "flipVertical": "هەڵگەڕانەوەی ستونی",
     "viewMode": "دۆخی بینین",
-    "toggleExportColorScheme": "گۆڕینی بارکردنی هێلکاری ڕەنگەکان",
     "share": "هاوبەشی پێکردن",
     "showStroke": "ڕەنگهەڵگری هێڵکار نیشانبدە",
     "showBackground": "ڕەنگهەڵگری باکگراوند نیشانبدە",
@@ -128,7 +123,8 @@
       "unlockAll": "کردنەوەی قفلی هەمووی"
     },
     "statusPublished": "بڵاوکراوەتەوە",
-    "sidebarLock": "هێشتنەوەی شریتی لا بە کراوەیی"
+    "sidebarLock": "هێشتنەوەی شریتی لا بە کراوەیی",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "هێشتا هیچ بڕگەیەک زیاد نەکراوە...",
@@ -140,11 +136,7 @@
     "exportJSON": "هەناردەکردن بۆ فایل",
     "exportImage": "وێنە هەناردە بکە...",
     "export": "پاشەکەوت بکە بۆ...",
-    "exportToPng": "هەناردەکردن بۆ PNG",
-    "exportToSvg": "هەناردەکردن بۆ SVG",
     "copyToClipboard": "له‌به‌ری بگره‌وه‌ بۆ ته‌خته‌نووس",
-    "copyPngToClipboard": "لەبەرگرتنەوەی PNG بۆ تەختەنوس",
-    "scale": "پێوەر",
     "save": "پاشەکەوت بکە بۆ فایلی بەردەست",
     "saveAs": "پاشەکەوتکردن وەک",
     "load": "بکەرەوە",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "ڕێکخستنەوەی کتێبخانە",
     "removeItemsFromLib": "لابردنی ئایتمە دیاریکراوەکان لە کتێبخانە"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "وێنەکێشانەکانت لە کۆتاییەوە بۆ کۆتایی کۆد کراون بۆیە سێرڤەرەکانی ئێکسکالیدرا هەرگیز نایانبینن.",

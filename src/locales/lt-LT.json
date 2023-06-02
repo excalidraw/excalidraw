@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trikampis",
     "fontSize": "Šrifto dydis",
     "fontFamily": "Šriftas",
-    "onlySelected": "Tik pasirinktus",
-    "withBackground": "Fonas",
-    "exportEmbedScene": "Įterpti sceną",
-    "exportEmbedScene_details": "Scenos duomenys bus išsaugoti eksportuotame PNG/SVG faile taip, jog vėliau scena galėtu būti iš jo atkurta.\nTai padydins eksportuoto failo dydį.",
     "addWatermark": "Sukurta su Excalidraw",
     "handDrawn": "Ranka rašytas",
     "normal": "Normalus",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Apversti horizontaliai",
     "flipVertical": "Apversti vertikaliai",
     "viewMode": "",
-    "toggleExportColorScheme": "",
     "share": "Dalintis",
     "showStroke": "",
     "showBackground": "",
@@ -128,7 +123,8 @@
       "unlockAll": ""
     },
     "statusPublished": "",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +136,7 @@
     "exportJSON": "Eksportuoti į failą",
     "exportImage": "",
     "export": "",
-    "exportToPng": "Eksportuoti į PNG",
-    "exportToSvg": "Eksportuoti į SVG",
     "copyToClipboard": "Kopijuoti į iškarpinę",
-    "copyPngToClipboard": "Kopijuoti PNG į iškarpinę",
-    "scale": "",
     "save": "",
     "saveAs": "Išsaugoti kaip",
     "load": "",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Atstatyti biblioteką",
     "removeItemsFromLib": "Pašalinti pasirinktus elementus iš bibliotekos"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "",

@@ -40,10 +40,6 @@
     "arrowhead_triangle": "",
     "fontSize": "ขนาดตัวอักษร",
     "fontFamily": "แบบตัวอักษร",
-    "onlySelected": "เฉพาะที่เลือก",
-    "withBackground": "พื้นหลัง",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
     "addWatermark": "เพิ่มลายน้ำ \"สร้างด้วย Excalidraw\"",
     "handDrawn": "ลายมือ",
     "normal": "ปกติ",
@@ -100,7 +96,6 @@
     "flipHorizontal": "พลิกแนวนอน",
     "flipVertical": "พลิกแนวตั้ง",
     "viewMode": "โหมดมุมมอง",
-    "toggleExportColorScheme": "",
     "share": "แชร์",
     "showStroke": "",
     "showBackground": "",
@@ -128,7 +123,8 @@
       "unlockAll": "ปลดล็อกทั้งหมด"
     },
     "statusPublished": "เผยแพร่",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +136,7 @@
     "exportJSON": "ส่งออกไปยังไฟล์",
     "exportImage": "ส่งออกเป็นรูปภาพ",
     "export": "บันทึกไปยัง",
-    "exportToPng": "ส่งออกไปเป็น PNG",
-    "exportToSvg": "ส่งออกไปเป็น SVG",
     "copyToClipboard": "คัดลอกไปยังคลิปบอร์ด",
-    "copyPngToClipboard": "คัดลอก PNG ไปยังคลิปบอร์ด",
-    "scale": "อัตราส่วน",
     "save": "",
     "saveAs": "",
     "load": "เปิด",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "",
     "removeItemsFromLib": ""
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "",

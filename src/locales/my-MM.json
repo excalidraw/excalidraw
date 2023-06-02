@@ -40,10 +40,6 @@
     "arrowhead_triangle": "",
     "fontSize": "စာလုံးအရွယ်",
     "fontFamily": "စာလုံးပုံစံ",
-    "onlySelected": "ရွေးထားသလောက်",
-    "withBackground": "",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "ထုတ်ယူလိုက်သော PNG/SVG ထဲမြင်ကွင်းအချက်အလက်များပါဝင်သဖြင့် ပြန်လည်ရယူနိုင်သော်လည်း ဖိုင်အရွယ်အစားကြီးပါမည်။",
     "addWatermark": "\"Excalidraw ဖြင့်ဖန်တီးသည်။\" စာသားထည့်",
     "handDrawn": "လက်ရေး",
     "normal": "ပုံမှန်",
@@ -100,7 +96,6 @@
     "flipHorizontal": "",
     "flipVertical": "",
     "viewMode": "",
-    "toggleExportColorScheme": "",
     "share": "",
     "showStroke": "",
     "showBackground": "",
@@ -128,7 +123,8 @@
       "unlockAll": ""
     },
     "statusPublished": "",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +136,7 @@
     "exportJSON": "",
     "exportImage": "",
     "export": "",
-    "exportToPng": "PNG ထုတ်",
-    "exportToSvg": "SVG ထုတ်",
     "copyToClipboard": "ကူးယူ",
-    "copyPngToClipboard": "PNG ကူးယူ",
-    "scale": "စကေး",
     "save": "",
     "saveAs": "ပြောင်းသိမ်း",
     "load": "",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "",
     "removeItemsFromLib": ""
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။",

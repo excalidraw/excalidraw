@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trojúhelník",
     "fontSize": "Velikost písma",
     "fontFamily": "Písmo",
-    "onlySelected": "Pouze vybrané",
-    "withBackground": "Pozadí",
-    "exportEmbedScene": "Vložit scénu",
-    "exportEmbedScene_details": "Data scény budou uložena do exportovaného souboru PNG/SVG tak, aby z něj mohla být scéna obnovena.\nZvýší se velikost exportovaného souboru.",
     "addWatermark": "Přidat \"Vyrobeno s Excalidraw\"",
     "handDrawn": "Od ruky",
     "normal": "Normální",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Převrátit vodorovně",
     "flipVertical": "Převrátit svisle",
     "viewMode": "Náhled",
-    "toggleExportColorScheme": "Přepnout exportování barevného schématu",
     "share": "Sdílet",
     "showStroke": "Zobrazit výběr barvy",
     "showBackground": "Zobrazit výběr barev pozadí",
@@ -128,7 +123,8 @@
       "unlockAll": "Odemknout vše"
     },
     "statusPublished": "Zveřejněno",
-    "sidebarLock": "Ponechat postranní panel otevřený"
+    "sidebarLock": "Ponechat postranní panel otevřený",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Dosud neexistují žádné položky...",
@@ -140,11 +136,7 @@
     "exportJSON": "Exportovat do souboru",
     "exportImage": "Exportovat obrázek...",
     "export": "Uložit jako...",
-    "exportToPng": "Exportovat do PNG",
-    "exportToSvg": "Exportovat do SVG",
     "copyToClipboard": "Kopírovat do schránky",
-    "copyPngToClipboard": "Kopírovat PNG do schránky",
-    "scale": "Měřítko",
     "save": "Uložit do aktuálního souboru",
     "saveAs": "Uložit jako",
     "load": "Otevřít",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "",
     "removeItemsFromLib": ""
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "",
