@@ -123,7 +123,8 @@
       "unlockAll": "Deblocare toate"
     },
     "statusPublished": "Publicat",
-    "sidebarLock": "Păstrează deschisă bara laterală"
+    "sidebarLock": "Păstrează deschisă bara laterală",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
