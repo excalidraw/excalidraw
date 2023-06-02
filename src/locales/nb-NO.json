@@ -123,7 +123,8 @@
       "unlockAll": "Lås opp alle"
     },
     "statusPublished": "Publisert",
-    "sidebarLock": "Holde sidemenyen åpen"
+    "sidebarLock": "Holde sidemenyen åpen",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Ingen elementer lagt til ennå...",
