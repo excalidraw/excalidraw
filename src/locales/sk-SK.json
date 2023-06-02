@@ -123,7 +123,8 @@
       "unlockAll": "Odomknúť všetko"
     },
     "statusPublished": "Zverejnené",
-    "sidebarLock": "Nechať bočný panel otvorený"
+    "sidebarLock": "Nechať bočný panel otvorený",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Zatiaľ neboli pridané žiadne položky...",
