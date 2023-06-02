@@ -123,7 +123,8 @@
       "unlockAll": "Desbloquear todo"
     },
     "statusPublished": "Publicado",
-    "sidebarLock": "Manter a barra lateral aberta"
+    "sidebarLock": "Manter a barra lateral aberta",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Aínda non hai elementos engadidos...",
