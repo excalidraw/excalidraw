@@ -123,7 +123,8 @@
       "unlockAll": "全部解鎖"
     },
     "statusPublished": "已發布",
-    "sidebarLock": "側欄維持開啟"
+    "sidebarLock": "側欄維持開啟",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "尚未加入任何物件...",
