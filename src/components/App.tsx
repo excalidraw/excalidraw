@@ -309,7 +309,6 @@ import {
   getElementsInResizingFrame,
   getElementsInNewFrame,
   getContainingFrame,
-  groupsAreCompletelyOutOfFrame,
   elementOverlapsWithFrame,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
@@ -4009,10 +4008,6 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.lastPointerUp = event;
 
-    this.setState({
-      selectedElementsAreBeingDragged: false,
-    });
-
     if (this.device.isTouchScreen) {
       const scenePointer = viewportCoordsToSceneCoords(
         { clientX: event.clientX, clientY: event.clientY },
@@ -4032,69 +4027,6 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
       this.redirectToLink(event, this.device.isTouchScreen);
-    }
-
-    if (this.state.draggingElement?.type === "frame") {
-      // the newly created element is a frame element
-      this.scene.replaceAllElements(
-        addElementsToFrame(
-          this.scene.getElementsIncludingDeleted(),
-          getElementsInNewFrame(
-            this.scene.getNonDeletedElements(),
-            this.state.draggingElement,
-            this.state,
-          ),
-          this.state.draggingElement,
-        ),
-      );
-    } else {
-      getSelectedElements(this.scene.getNonDeletedElements(), this.state)
-        .filter((element) => element.type !== "frame" && element.frameId)
-        .forEach((element) => {
-          const containingFrame = getContainingFrame(element);
-
-          if (containingFrame) {
-            if (
-              (element.groupIds.length > 0 &&
-                groupsAreCompletelyOutOfFrame(
-                  this.scene.getNonDeletedElements(),
-                  element.groupIds,
-                  containingFrame,
-                )) ||
-              (element.groupIds.length === 0 &&
-                !elementOverlapsWithFrame(element, containingFrame))
-            ) {
-              this.scene.replaceAllElements(
-                removeElementsFromFrame(
-                  this.scene.getNonDeletedElements(),
-                  [element],
-                  this.state,
-                ),
-              );
-            }
-          }
-        });
-
-      // handle resizing frames
-      const selectedFrames = getSelectedElements(
-        this.scene.getNonDeletedElements(),
-        this.state,
-      ).filter(
-        (element) => element.type === "frame",
-      ) as ExcalidrawFrameElement[];
-      for (const frame of selectedFrames) {
-        replaceAllElementsInFrame(
-          this.scene.getElementsIncludingDeleted(),
-          getElementsInResizingFrame(
-            this.scene.getNonDeletedElements(),
-            frame,
-            this.state,
-          ),
-          frame,
-          this.state,
-        );
-      }
-      this.scene.informMutation();
     }
 
     this.removePointer(event);
@@ -5588,6 +5520,10 @@ class App extends React.Component<AppProps, AppState> {
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
+      this.setState({
+        selectedElementsAreBeingDragged: false,
+      });
+
       // Handle end of dragging a point of a linear element, might close a loop
       // and sets binding element
       if (this.state.editingLinearElement) {
@@ -6004,6 +5940,20 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
+        if (draggingElement.type === "frame") {
+          this.scene.replaceAllElements(
+            addElementsToFrame(
+              this.scene.getElementsIncludingDeleted(),
+              getElementsInNewFrame(
+                this.scene.getNonDeletedElements(),
+                draggingElement,
+                this.state,
+              ),
+              draggingElement,
+            ),
+          );
+        }
+
         mutateElement(
           draggingElement,
           getNormalizedDimensions(draggingElement),
@@ -6019,6 +5969,26 @@ class App extends React.Component<AppProps, AppState> {
           this.scene
             .getElementsIncludingDeleted()
             .filter((el) => el.id !== resizingElement.id),
+        );
+      }
+
+      // handle resizing frames
+      const selectedFrames = getSelectedElements(
+        this.scene.getNonDeletedElements(),
+        this.state,
+      ).filter(
+        (element) => element.type === "frame",
+      ) as ExcalidrawFrameElement[];
+      for (const frame of selectedFrames) {
+        replaceAllElementsInFrame(
+          this.scene.getElementsIncludingDeleted(),
+          getElementsInResizingFrame(
+            this.scene.getNonDeletedElements(),
+            frame,
+            this.state,
+          ),
+          frame,
+          this.state,
         );
       }
 
