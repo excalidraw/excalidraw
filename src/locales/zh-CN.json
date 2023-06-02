@@ -123,7 +123,8 @@
       "unlockAll": "全部解锁"
     },
     "statusPublished": "已发布",
-    "sidebarLock": "侧边栏常驻"
+    "sidebarLock": "侧边栏常驻",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "尚未添加任何项目……",
