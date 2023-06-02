@@ -123,7 +123,8 @@
       "unlockAll": "Atbrīvot visu"
     },
     "statusPublished": "Publicēts",
-    "sidebarLock": "Paturēt atvērtu sānjoslu"
+    "sidebarLock": "Paturēt atvērtu sānjoslu",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Neviena vienība vēl nav pievienota...",
