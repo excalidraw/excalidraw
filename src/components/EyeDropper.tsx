@@ -77,8 +77,8 @@ export const EyeDropper: React.FC<{
       colorPreviewDiv.style.left = `${clientX + 20}px`;
 
       const pixel = ctx.getImageData(
-        clientX * window.devicePixelRatio,
-        clientY * window.devicePixelRatio,
+        clientX * window.devicePixelRatio - appState.offsetLeft,
+        clientY * window.devicePixelRatio - appState.offsetTop,
         1,
         1,
       ).data;
@@ -182,6 +182,8 @@ export const EyeDropper: React.FC<{
     swapPreviewOnAlt,
     previewType,
     excalidrawContainer,
+    appState.offsetLeft,
+    appState.offsetTop,
   ]);
 
   const ref = useRef<HTMLDivElement>(null);
