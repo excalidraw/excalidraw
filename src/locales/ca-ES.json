@@ -123,7 +123,8 @@
       "unlockAll": "Desbloca-ho tot"
     },
     "statusPublished": "Publicat",
-    "sidebarLock": "Manté la barra lateral oberta"
+    "sidebarLock": "Manté la barra lateral oberta",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Encara no s'hi han afegit elements...",
