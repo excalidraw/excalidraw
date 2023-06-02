@@ -123,7 +123,8 @@
       "unlockAll": "Odkleni vse"
     },
     "statusPublished": "Objavljeno",
-    "sidebarLock": "Obdrži stransko vrstico odprto"
+    "sidebarLock": "Obdrži stransko vrstico odprto",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
