@@ -123,7 +123,8 @@
       "unlockAll": "باز کردن قفل همه"
     },
     "statusPublished": "منتشر شده",
-    "sidebarLock": "باز نگه داشتن سایدبار"
+    "sidebarLock": "باز نگه داشتن سایدبار",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "آیتمی به اینجا اضافه نشده...",
