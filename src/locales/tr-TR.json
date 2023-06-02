@@ -123,7 +123,8 @@
       "unlockAll": "Hepsinin kilidini kaldır"
     },
     "statusPublished": "Yayınlandı",
-    "sidebarLock": "Kenar çubuğu açık kalsın"
+    "sidebarLock": "Kenar çubuğu açık kalsın",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Öğe eklenmedi...",
