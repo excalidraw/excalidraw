@@ -123,7 +123,8 @@
       "unlockAll": "ដោះសោទាំងអស់"
     },
     "statusPublished": "ត្រូវបានបោះពុម្ពផ្សាយ",
-    "sidebarLock": "ទុករបារចំហៀងបើក"
+    "sidebarLock": "ទុករបារចំហៀងបើក",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "មិនទាន់មានធាតុបន្ថែមទេ...",
