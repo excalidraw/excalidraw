@@ -52,6 +52,7 @@ export type ActionName =
   | "gridMode"
   | "zenMode"
   | "stats"
+  | "filterSelectionByShape"
   | "changeStrokeColor"
   | "changeBackgroundColor"
   | "changeFillStyle"

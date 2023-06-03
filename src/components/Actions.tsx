@@ -86,6 +86,7 @@ export const SelectedShapeActions = ({
 
   return (
     <div className="panelColumn">
+      {renderAction("filterSelectionByShape")}
       <div>
         {((hasStrokeColor(appState.activeTool.type) &&
           appState.activeTool.type !== "image" &&
@@ -97,15 +98,12 @@ export const SelectedShapeActions = ({
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
       {showFillIcons && renderAction("changeFillStyle")}
-
       {(hasStrokeWidth(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
         renderAction("changeStrokeWidth")}
-
       {(appState.activeTool.type === "freedraw" ||
         targetElements.some((element) => element.type === "freedraw")) &&
         renderAction("changeStrokeShape")}
-
       {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>
@@ -113,12 +111,10 @@ export const SelectedShapeActions = ({
           {renderAction("changeSloppiness")}
         </>
       )}
-
       {(canChangeRoundness(appState.activeTool.type) ||
         targetElements.some((element) => canChangeRoundness(element.type))) && (
         <>{renderAction("changeRoundness")}</>
       )}
-
       {(hasText(appState.activeTool.type) ||
         targetElements.some((element) => hasText(element.type))) && (
         <>
@@ -130,16 +126,13 @@ export const SelectedShapeActions = ({
             renderAction("changeTextAlign")}
         </>
       )}
-
       {shouldAllowVerticalAlign(targetElements) &&
         renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(appState.activeTool.type) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
       )}
-
       {renderAction("changeOpacity")}
-
       <fieldset>
         <legend>{t("labels.layers")}</legend>
         <div className="buttonList">
@@ -149,7 +142,6 @@ export const SelectedShapeActions = ({
           {renderAction("bringForward")}
         </div>
       </fieldset>
-
       {targetElements.length > 1 && !isSingleElementBoundContainer && (
         <fieldset>
           <legend>{t("labels.align")}</legend>

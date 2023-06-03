@@ -45,6 +45,9 @@ import {
   TextAlignCenterIcon,
   TextAlignRightIcon,
   FillZigZagIcon,
+  RectangleIcon,
+  DiamondIcon,
+  EllipseIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -205,6 +208,68 @@ const changeFontSize = (
 };
 
 // -----------------------------------------------------------------------------
+
+export const filterSelectionByShape = register({
+  name: "filterSelectionByShape",
+  trackEvent: false,
+  perform: (elements, appState: AppState, value) => {
+    const selectedElementIds = arrayToMap(
+      getSelectedElements(elements, appState, false),
+    );
+    for (const [id, element] of selectedElementIds.entries()) {
+      if (element.type !== value) {
+        appState.selectedElementIds[id] = false;
+      }
+    }
+    return {
+      elements,
+      appState: { ...appState, currentShapeFilter: value },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <>
+      <fieldset>
+        <legend>{t("labels.shapeFilter")}</legend>
+        <ButtonIconSelect
+          group="shape-filter"
+          options={[
+            {
+              value: "rectangle",
+              text: t("toolBar.rectangle"),
+              icon: RectangleIcon,
+            },
+            {
+              value: "diamond",
+              text: t("toolBar.diamond"),
+              icon: DiamondIcon,
+            },
+            {
+              value: "ellipse",
+              text: t("toolBar.ellipse"),
+              icon: EllipseIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => element.type,
+            appState.currentShapeFilter,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+      <div
+        style={{
+          width: "100%",
+          height: 1,
+          backgroundColor: "var(--default-border-color)",
+          margin: "0 auto",
+        }}
+      />
+    </>
+  ),
+});
 
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
