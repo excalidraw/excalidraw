@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trekant",
     "fontSize": "Skriftstorleik",
     "fontFamily": "Skrifttype",
-    "onlySelected": "Kun valde",
-    "withBackground": "Bakgrunn",
-    "exportEmbedScene": "Bygg inn scene",
-    "exportEmbedScene_details": "Scenedata vert lagra i den eksporterte PNG- eller SVG-fila slik at scena kan bli gjenopprettast frå den. Dette vil auke eksportert filstorleik.",
     "addWatermark": "Legg til «Laga med Excalidraw»",
     "handDrawn": "Handteikna",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Vipp vassrett",
     "flipVertical": "Vipp loddrett",
     "viewMode": "Visningsmodus",
-    "toggleExportColorScheme": "Veksle eksport av fargepalett",
     "share": "Del",
     "showStroke": "Vis fargeveljar for linjer",
     "showBackground": "Vis fargeveljar for bakgrunn",
@@ -128,7 +123,8 @@
       "unlockAll": ""
     },
     "statusPublished": "",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +136,7 @@
     "exportJSON": "Eksporter til fil",
     "exportImage": "",
     "export": "",
-    "exportToPng": "Eksporter til PNG",
-    "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavla",
-    "copyPngToClipboard": "Kopier PNG til utklippstavla",
-    "scale": "Skaler",
     "save": "Lagre til noverande fil",
     "saveAs": "Lagre som",
     "load": "",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Tilbakestill bibliotek",
     "removeItemsFromLib": "Fjern valde element frå biblioteket"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei.",
