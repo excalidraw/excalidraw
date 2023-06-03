@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trekant",
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Skrifttypefamilie",
-    "onlySelected": "Kun valgte",
-    "withBackground": "Baggrund",
-    "exportEmbedScene": "Indlejr scene",
-    "exportEmbedScene_details": "Scene data vil blive gemt i den eksporterede PNG/SVG-fil, så scenen kan gendannes fra den.\nDette vil øge den eksporterede filstørrelse.",
     "addWatermark": "Tilføj \"Lavet med Excalidraw\"",
     "handDrawn": "Hånd-tegnet",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "",
     "flipVertical": "",
     "viewMode": "",
-    "toggleExportColorScheme": "",
     "share": "Del",
     "showStroke": "",
     "showBackground": "",
@@ -128,7 +123,8 @@
       "unlockAll": ""
     },
     "statusPublished": "",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +136,7 @@
     "exportJSON": "",
     "exportImage": "",
     "export": "",
-    "exportToPng": "",
-    "exportToSvg": "",
     "copyToClipboard": "Kopier til klippebord",
-    "copyPngToClipboard": "Kopier PNG til klippebord",
-    "scale": "",
     "save": "",
     "saveAs": "Gem som",
     "load": "",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "",
     "removeItemsFromLib": ""
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "",

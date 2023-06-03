@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triangolo",
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
-    "onlySelected": "Solo selezionati",
-    "withBackground": "Sfondo",
-    "exportEmbedScene": "Includi scena",
-    "exportEmbedScene_details": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato.",
     "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
     "handDrawn": "A mano libera",
     "normal": "Normale",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Capovolgi orizzontalmente",
     "flipVertical": "Capovolgi verticalmente",
     "viewMode": "Modalità visualizzazione",
-    "toggleExportColorScheme": "Cambia lo schema di colori in esportazione",
     "share": "Condividi",
     "showStroke": "Mostra selettore colore del tratto",
     "showBackground": "Mostra selettore colore di sfondo",
@@ -128,7 +123,8 @@
       "unlockAll": "Sblocca tutto"
     },
     "statusPublished": "Pubblicato",
-    "sidebarLock": "Mantieni aperta la barra laterale"
+    "sidebarLock": "Mantieni aperta la barra laterale",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Nessun elemento ancora aggiunto...",
@@ -140,11 +136,7 @@
     "exportJSON": "Esporta su file",
     "exportImage": "Esporta immagine...",
     "export": "Salva in...",
-    "exportToPng": "Esporta come PNG",
-    "exportToSvg": "Esporta come SVG",
     "copyToClipboard": "Copia negli appunti",
-    "copyPngToClipboard": "Copia PNG negli appunti",
-    "scale": "Scala",
     "save": "Salva sul file corrente",
     "saveAs": "Salva con nome",
     "load": "Apri",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Ripristina la libreria",
     "removeItemsFromLib": "Rimuovi gli elementi selezionati dalla libreria"
+  },
+  "imageExportDialog": {
+    "header": "Esporta immagine",
+    "label": {
+      "withBackground": "Sfondo",
+      "onlySelected": "Solo selezionato",
+      "darkMode": "Tema scuro",
+      "embedScene": "",
+      "scale": "Scala",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "Esporta come PNG",
+      "exportToSvg": "Esporta come SVG",
+      "copyPngToClipboard": "Copia PNG negli appunti"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copia negli appunti"
+    }
   },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere.",

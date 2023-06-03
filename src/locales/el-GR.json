@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Τρίγωνο",
     "fontSize": "Μέγεθος γραμματοσειράς",
     "fontFamily": "Γραμματοσειρά",
-    "onlySelected": "Μόνο τα Επιλεγμένα",
-    "withBackground": "Φόντο",
-    "exportEmbedScene": "Ενσωμάτωση σκηνής",
-    "exportEmbedScene_details": "Τα δεδομένα σκηνής θα αποθηκευτούν στο αρχείο PNG/SVG προς εξαγωγή ώστε η σκηνή να είναι δυνατό να αποκατασταθεί από αυτό.\nΘα αυξήσει το μέγεθος του αρχείου προς εξαγωγή.",
     "addWatermark": "Προσθήκη \"Φτιαγμένο με Excalidraw\"",
     "handDrawn": "Σχεδιασμένο στο χέρι",
     "normal": "Κανονική",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Οριζόντια αναστροφή",
     "flipVertical": "Κατακόρυφη αναστροφή",
     "viewMode": "Λειτουργία προβολής",
-    "toggleExportColorScheme": "Εναλλαγή εξαγωγής θέματος χρωμάτων",
     "share": "Κοινοποίηση",
     "showStroke": "Εμφάνιση επιλογέα χρωμάτων πινελιάς",
     "showBackground": "Εμφάνιση επιλογέα χρώματος φόντου",
@@ -128,7 +123,8 @@
       "unlockAll": "Ξεκλείδωμα όλων"
     },
     "statusPublished": "Δημοσιευμένο",
-    "sidebarLock": "Κρατήστε την πλαϊνή μπάρα ανοιχτή"
+    "sidebarLock": "Κρατήστε την πλαϊνή μπάρα ανοιχτή",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Δεν έχουν προστεθεί αντικείμενα ακόμη...",
@@ -140,11 +136,7 @@
     "exportJSON": "Εξαγωγή σε αρχείο",
     "exportImage": "Εξαγωγή εικόνας...",
     "export": "Αποθήκευση ως...",
-    "exportToPng": "Εξαγωγή σε PNG",
-    "exportToSvg": "Εξαγωγή σε SVG",
     "copyToClipboard": "Αντιγραφή στο πρόχειρο",
-    "copyPngToClipboard": "Αντιγραφή PNG στο πρόχειρο",
-    "scale": "Κλίμακα",
     "save": "Αποθήκευση στο τρέχον αρχείο",
     "saveAs": "Αποθήκευση ως",
     "load": "Άνοιγμα",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Καθαρισμός βιβλιοθήκης",
     "removeItemsFromLib": "Αφαίρεση επιλεγμένων αντικειμένων από τη βιβλιοθήκη"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Τα σχέδιά σου είναι κρυπτογραφημένα από άκρο σε άκρο, έτσι δεν θα είναι ποτέ ορατά μέσα από τους διακομιστές του Excalidraw.",

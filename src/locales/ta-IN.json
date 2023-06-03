@@ -40,10 +40,6 @@
     "arrowhead_triangle": "முக்கோணம்",
     "fontSize": "எழுத்துரு அளவு",
     "fontFamily": "எழுத்துரு குடும்பம்",
-    "onlySelected": "தேர்ந்ததை மட்டும்",
-    "withBackground": "பின்புலம்",
-    "exportEmbedScene": "காட்சியை உட்பொதி",
-    "exportEmbedScene_details": "காட்சி தரவு ஏற்றுமதி செய்யப்பட்ட PNG/SVG கோப்பினுள் சேமிக்கப்படும் இதனால் காட்சியை அதிலிருந்து மீட்டெடுக்க முடியும். ஏற்றுமதி செய்யப்பட்ட கோப்பின் அளவை அதிகரிக்கும்.",
     "addWatermark": "\"எக்ஸ்கேலிட்ரா கொண்டு ஆனது\"-ஐச் சேர்",
     "handDrawn": "கையால்-வரைந்த",
     "normal": "இயல்பு",
@@ -100,7 +96,6 @@
     "flipHorizontal": "கிடைமட்டமாக புரட்டு",
     "flipVertical": "செங்குத்தாக புரட்டு",
     "viewMode": "பார்வை பயன்முறை",
-    "toggleExportColorScheme": "",
     "share": "பகிர்",
     "showStroke": "கீறல் நிற எடுப்பானைக் காட்டு",
     "showBackground": "பின்னணி நிற எடுப்பானைக் காட்டு",
@@ -128,7 +123,8 @@
       "unlockAll": "எல்லாம் பூட்டவிழ்"
     },
     "statusPublished": "வெளியிடப்பட்டது",
-    "sidebarLock": "பக்கப்பட்டையைத் திறந்தே வை"
+    "sidebarLock": "பக்கப்பட்டையைத் திறந்தே வை",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "இதுவரை உருப்படிகள் சேரக்கப்படவில்லை...",
@@ -140,11 +136,7 @@
     "exportJSON": "கோப்புக்கு ஏற்றுமதிசெய்",
     "exportImage": "",
     "export": "இதில் சேமி...",
-    "exportToPng": "PNGக்கு ஏற்றுமதிசெய்",
-    "exportToSvg": "SVGக்கு ஏற்றுமதிசெய்",
     "copyToClipboard": "நகலகத்திற்கு நகலெடு",
-    "copyPngToClipboard": "PNGஐ நகலகத்திற்கு நகலெடு",
-    "scale": "அளவு",
     "save": "தற்போதைய கோப்புக்குச் சேமி",
     "saveAs": "இப்படி சேமி",
     "load": "திற",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "நூலகத்தை அகரமாக்கு",
     "removeItemsFromLib": "நூலகத்திலிருந்து தேர்ந்தெடுத்த உருப்படிகளை நீக்கு"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "உம் சித்திரங்கள் இருமுனை மறையாக்கம் செய்யப்பட்டவையாதலால் எக்ஸ்கேலிட்ராவின் சேவையகங்கள் அவற்றை ஒருபோதும் பார்க்கா.",
