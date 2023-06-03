@@ -98,13 +98,15 @@ export const redrawTextBoundingBox = (
       mutateElement(container, { height: nextHeight });
       updateOriginalContainerCache(container.id, nextHeight);
     }
-    const updatedTextElement = {
-      ...textElement,
-      ...boundTextUpdates,
-    } as ExcalidrawTextElementWithContainer;
-    const { x, y } = computeBoundTextPosition(container, updatedTextElement);
-    boundTextUpdates.x = x;
-    boundTextUpdates.y = y;
+    if (!isArrowElement(container)) {
+      const updatedTextElement = {
+        ...textElement,
+        ...boundTextUpdates,
+      } as ExcalidrawTextElementWithContainer;
+      const { x, y } = computeBoundTextPosition(container, updatedTextElement);
+      boundTextUpdates.x = x;
+      boundTextUpdates.y = y;
+    }
   }
 
   mutateElement(textElement, boundTextUpdates);
@@ -793,7 +795,11 @@ export const shouldAllowVerticalAlign = (
     const hasBoundContainer = isBoundToContainer(element);
     if (hasBoundContainer) {
       const container = getContainerElement(element);
-      if (isTextElement(element) && isArrowElement(container)) {
+      if (
+        isTextElement(element) &&
+        isArrowElement(container) &&
+        container.points.length > 2
+      ) {
         return false;
       }
       return true;

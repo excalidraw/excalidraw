@@ -733,6 +733,7 @@ describe("Test Linear Elements", () => {
         containerId: container.id,
         width: 30,
         height: 20,
+        verticalAlign: VERTICAL_ALIGN.MIDDLE,
       }) as ExcalidrawTextElementWithContainer;
 
       container = {
@@ -1108,9 +1109,17 @@ describe("Test Linear Elements", () => {
       `);
     });
 
-    it("should not render vertical align tool when element selected", () => {
-      createTwoPointerLinearElement("arrow");
-      const arrow = h.elements[0] as ExcalidrawLinearElement;
+    it("should render vertical align tool when element selected only for two pointer arrow", () => {
+      let arrow = createTwoPointerLinearElement("arrow");
+
+      createBoundTextElement(DEFAULT_TEXT, arrow);
+      API.setSelectedElements([arrow]);
+
+      expect(queryByTestId(container, "align-top")).not.toBeNull();
+      expect(queryByTestId(container, "align-middle")).not.toBeNull();
+      expect(queryByTestId(container, "align-bottom")).not.toBeNull();
+
+      arrow = createThreePointerLinearElement("arrow");
 
       createBoundTextElement(DEFAULT_TEXT, arrow);
       API.setSelectedElements([arrow]);
