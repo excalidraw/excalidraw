@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Dreieck",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
-    "onlySelected": "Nur ausgewählte",
-    "withBackground": "Hintergrund",
-    "exportEmbedScene": "Szene einbetten",
-    "exportEmbedScene_details": "Die Zeichnungsdaten werden in der exportierten PNG/SVG-Datei gespeichert, sodass das Dokument später weiter bearbeitet werden kann. \nDieses wird die exportierte Datei vergrößern.",
     "addWatermark": "\"Made with Excalidraw\" hinzufügen",
     "handDrawn": "Handgezeichnet",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Horizontal spiegeln",
     "flipVertical": "Vertikal spiegeln",
     "viewMode": "Ansichtsmodus",
-    "toggleExportColorScheme": "Farbschema für Export umschalten",
     "share": "Teilen",
     "showStroke": "Auswahl für Strichfarbe anzeigen",
     "showBackground": "Hintergrundfarbe auswählen",
@@ -128,7 +123,8 @@
       "unlockAll": "Alle entsperren"
     },
     "statusPublished": "Veröffentlicht",
-    "sidebarLock": "Seitenleiste offen lassen"
+    "sidebarLock": "Seitenleiste offen lassen",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
@@ -140,11 +136,7 @@
     "exportJSON": "In Datei exportieren",
     "exportImage": "Exportiere Bild...",
     "export": "Speichern als...",
-    "exportToPng": "Als PNG exportieren",
-    "exportToSvg": "Als SVG exportieren",
     "copyToClipboard": "In Zwischenablage kopieren",
-    "copyPngToClipboard": "PNG in die Zwischenablage kopieren",
-    "scale": "Skalierung",
     "save": "In aktueller Datei speichern",
     "saveAs": "Speichern unter",
     "load": "Öffnen",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Bibliothek zurücksetzen",
     "removeItemsFromLib": "Ausgewählte Elemente aus der Bibliothek entfernen"
+  },
+  "imageExportDialog": {
+    "header": "Bild exportieren",
+    "label": {
+      "withBackground": "Hintergrund",
+      "onlySelected": "Nur ausgewählte",
+      "darkMode": "Dunkler Modus",
+      "embedScene": "Szene einbetten",
+      "scale": "Skalierung",
+      "padding": "Abstand"
+    },
+    "tooltip": {
+      "embedScene": "Die Zeichnungsdaten werden in der exportierten PNG/SVG-Datei gespeichert, sodass das Dokument später weiter bearbeitet werden kann. \nDieses wird die exportierte Datei vergrößern."
+    },
+    "title": {
+      "exportToPng": "Als PNG exportieren",
+      "exportToSvg": "Als SVG exportieren",
+      "copyPngToClipboard": "PNG in die Zwischenablage kopieren"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "In Zwischenablage kopieren"
+    }
   },
   "encrypted": {
     "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals.",

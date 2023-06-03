@@ -1,3 +1,4 @@
+import { KEYS } from "../../keys";
 import {
   ColorPickerColor,
   ColorPalette,
@@ -5,12 +6,11 @@ import {
   COLORS_PER_ROW,
   COLOR_PALETTE,
 } from "../../colors";
-import { KEYS } from "../../keys";
 import { ValueOf } from "../../utility-types";
 import {
   ActiveColorPickerSectionAtomType,
   colorPickerHotkeyBindings,
-  getColorNameAndShadeFromHex,
+  getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
 
 const arrowHandler = (
@@ -55,6 +55,9 @@ interface HotkeyHandlerProps {
   activeShade: number;
 }
 
+/**
+ * @returns true if the event was handled
+ */
 const hotkeyHandler = ({
   e,
   colorObj,
@@ -63,7 +66,7 @@ const hotkeyHandler = ({
   customColors,
   setActiveColorPickerSection,
   activeShade,
-}: HotkeyHandlerProps) => {
+}: HotkeyHandlerProps): boolean => {
   if (colorObj?.shade != null) {
     // shift + numpad is extremely messed up on windows apparently
     if (
@@ -73,6 +76,7 @@ const hotkeyHandler = ({
       const newShade = Number(e.code.slice(-1)) - 1;
       onChange(palette[colorObj.colorName][newShade]);
       setActiveColorPickerSection("shades");
+      return true;
     }
   }
 
@@ -81,6 +85,7 @@ const hotkeyHandler = ({
     if (c) {
       onChange(customColors[Number(e.key) - 1]);
       setActiveColorPickerSection("custom");
+      return true;
     }
   }
 
@@ -93,14 +98,16 @@ const hotkeyHandler = ({
       : paletteValue;
     onChange(r);
     setActiveColorPickerSection("baseColors");
+    return true;
   }
+  return false;
 };
 
 interface ColorPickerKeyNavHandlerProps {
-  e: React.KeyboardEvent;
+  event: React.KeyboardEvent;
   activeColorPickerSection: ActiveColorPickerSectionAtomType;
   palette: ColorPaletteCustom;
-  hex: string | null;
+  color: string;
   onChange: (color: string) => void;
   customColors: string[];
   setActiveColorPickerSection: (
@@ -108,27 +115,49 @@ interface ColorPickerKeyNavHandlerProps {
   ) => void;
   updateData: (formData?: any) => void;
   activeShade: number;
+  onEyeDropperToggle: (force?: boolean) => void;
+  onEscape: (event: React.KeyboardEvent | KeyboardEvent) => void;
 }
 
+/**
+ * @returns true if the event was handled
+ */
 export const colorPickerKeyNavHandler = ({
-  e,
+  event,
   activeColorPickerSection,
   palette,
-  hex,
+  color,
   onChange,
   customColors,
   setActiveColorPickerSection,
   updateData,
   activeShade,
-}: ColorPickerKeyNavHandlerProps) => {
-  if (e.key === KEYS.ESCAPE || !hex) {
-    updateData({ openPopup: null });
-    return;
+  onEyeDropperToggle,
+  onEscape,
+}: ColorPickerKeyNavHandlerProps): boolean => {
+  if (event[KEYS.CTRL_OR_CMD]) {
+    return false;
   }
 
-  const colorObj = getColorNameAndShadeFromHex({ hex, palette });
+  if (event.key === KEYS.ESCAPE) {
+    onEscape(event);
+    return true;
+  }
 
-  if (e.key === KEYS.TAB) {
+  // checkt using `key` to ignore combos with Alt modifier
+  if (event.key === KEYS.ALT) {
+    onEyeDropperToggle(true);
+    return true;
+  }
+
+  if (event.key === KEYS.I) {
+    onEyeDropperToggle();
+    return true;
+  }
+
+  const colorObj = getColorNameAndShadeFromColor({ color, palette });
+
+  if (event.key === KEYS.TAB) {
     const sectionsMap: Record<
       NonNullable<ActiveColorPickerSectionAtomType>,
       boolean
@@ -147,7 +176,7 @@ export const colorPickerKeyNavHandler = ({
     }, [] as ActiveColorPickerSectionAtomType[]);
 
     const activeSectionIndex = sections.indexOf(activeColorPickerSection);
-    const indexOffset = e.shiftKey ? -1 : 1;
+    const indexOffset = event.shiftKey ? -1 : 1;
     const nextSectionIndex =
       activeSectionIndex + indexOffset > sections.length - 1
         ? 0
@@ -168,8 +197,8 @@ export const colorPickerKeyNavHandler = ({
         Object.entries(palette) as [string, ValueOf<ColorPalette>][]
       ).find(([name, shades]) => {
         if (Array.isArray(shades)) {
-          return shades.includes(hex);
-        } else if (shades === hex) {
+          return shades.includes(color);
+        } else if (shades === color) {
           return name;
         }
         return null;
@@ -180,29 +209,34 @@ export const colorPickerKeyNavHandler = ({
       }
     }
 
-    e.preventDefault();
-    e.stopPropagation();
+    event.preventDefault();
+    event.stopPropagation();
 
-    return;
+    return true;
   }
 
-  hotkeyHandler({
-    e,
-    colorObj,
-    onChange,
-    palette,
-    customColors,
-    setActiveColorPickerSection,
-    activeShade,
-  });
+  if (
+    hotkeyHandler({
+      e: event,
+      colorObj,
+      onChange,
+      palette,
+      customColors,
+      setActiveColorPickerSection,
+      activeShade,
+    })
+  ) {
+    return true;
+  }
 
   if (activeColorPickerSection === "shades") {
     if (colorObj) {
       const { shade } = colorObj;
-      const newShade = arrowHandler(e.key, shade, COLORS_PER_ROW);
+      const newShade = arrowHandler(event.key, shade, COLORS_PER_ROW);
 
       if (newShade !== undefined) {
         onChange(palette[colorObj.colorName][newShade]);
+        return true;
       }
     }
   }
@@ -214,7 +248,7 @@ export const colorPickerKeyNavHandler = ({
       const indexOfColorName = colorNames.indexOf(colorName);
 
       const newColorIndex = arrowHandler(
-        e.key,
+        event.key,
         indexOfColorName,
         colorNames.length,
       );
@@ -228,15 +262,16 @@ export const colorPickerKeyNavHandler = ({
             ? newColorNameValue[activeShade]
             : newColorNameValue,
         );
+        return true;
       }
     }
   }
 
   if (activeColorPickerSection === "custom") {
-    const indexOfColor = customColors.indexOf(hex);
+    const indexOfColor = customColors.indexOf(color);
 
     const newColorIndex = arrowHandler(
-      e.key,
+      event.key,
       indexOfColor,
       customColors.length,
     );
@@ -244,6 +279,9 @@ export const colorPickerKeyNavHandler = ({
     if (newColorIndex !== undefined) {
       const newColor = customColors[newColorIndex];
       onChange(newColor);
+      return true;
     }
   }
+
+  return false;
 };

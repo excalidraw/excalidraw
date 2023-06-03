@@ -59,6 +59,7 @@ export enum EVENT {
   GESTURE_START = "gesturestart",
   GESTURE_CHANGE = "gesturechange",
   POINTER_MOVE = "pointermove",
+  POINTER_DOWN = "pointerdown",
   POINTER_UP = "pointerup",
   STATE_CHANGE = "statechange",
   WHEEL = "wheel",

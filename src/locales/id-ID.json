@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Segitiga",
     "fontSize": "Ukuran font",
     "fontFamily": "Jenis font",
-    "onlySelected": "Hanya yang Dipilih",
-    "withBackground": "Latar",
-    "exportEmbedScene": "Sematkan pemandangan",
-    "exportEmbedScene_details": "Data pemandangan akan disimpan dalam file PNG/SVG yang diekspor, sehingga pemandangan itu dapat dipulihkan darinya.\nAkan membesarkan ukuran file yang diekspor.",
     "addWatermark": "Tambahkan \"Dibuat dengan Excalidraw\"",
     "handDrawn": "Tulisan tangan",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Balikkan horizontal",
     "flipVertical": "Balikkan vertikal",
     "viewMode": "Mode tampilan",
-    "toggleExportColorScheme": "Ubah skema warna ekspor",
     "share": "Bagikan",
     "showStroke": "Tampilkan garis pengambil warna",
     "showBackground": "Tampilkan latar pengambil warna",
@@ -128,7 +123,8 @@
       "unlockAll": "Lepas semua"
     },
     "statusPublished": "Telah terbit",
-    "sidebarLock": "Biarkan sidebar tetap terbuka"
+    "sidebarLock": "Biarkan sidebar tetap terbuka",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
@@ -140,11 +136,7 @@
     "exportJSON": "Ekspor ke file",
     "exportImage": "Ekspor gambar...",
     "export": "Simpan ke...",
-    "exportToPng": "Ekspor ke PNG",
-    "exportToSvg": "Ekspor ke SVG",
     "copyToClipboard": "Salin ke Papan Klip",
-    "copyPngToClipboard": "Salin PNG ke papan klip",
-    "scale": "Skala",
     "save": "Simpan ke file sekarang",
     "saveAs": "Simpan sebagai",
     "load": "Buka",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Reset pustaka",
     "removeItemsFromLib": "Hapus item yang dipilih dari pustaka"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya.",

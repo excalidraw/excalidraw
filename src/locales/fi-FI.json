@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Kolmio",
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
-    "onlySelected": "Vain valitut",
-    "withBackground": "Taustalla",
-    "exportEmbedScene": "Upota työ",
-    "exportEmbedScene_details": "Teoksen tiedot tallennetaan PNG/SVG-tiedostoon, jolloin teoksen voi palauttaa siitä. Kasvattaa tallennetun tiedoston kokoa.",
     "addWatermark": "Lisää \"Tehty Excalidrawilla\"",
     "handDrawn": "Käsinpiirretty",
     "normal": "Tavallinen",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Käännä vaakasuunnassa",
     "flipVertical": "Käännä pystysuunnassa",
     "viewMode": "Katselutila",
-    "toggleExportColorScheme": "Vaihda viennin väriteema",
     "share": "Jaa",
     "showStroke": "Näytä viivan värin valitsin",
     "showBackground": "Näytä taustavärin valitsin",
@@ -128,7 +123,8 @@
       "unlockAll": "Poista lukitus kaikista"
     },
     "statusPublished": "Julkaistu",
-    "sidebarLock": "Pidä sivupalkki avoinna"
+    "sidebarLock": "Pidä sivupalkki avoinna",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Kirjastossa ei ole vielä yhtään kohdetta...",
@@ -140,11 +136,7 @@
     "exportJSON": "Vie tiedostoon",
     "exportImage": "Vie kuva...",
     "export": "Tallenna nimellä...",
-    "exportToPng": "Vie PNG-tiedostona",
-    "exportToSvg": "Vie SVG-tiedostona",
     "copyToClipboard": "Kopioi leikepöydälle",
-    "copyPngToClipboard": "Kopioi PNG-tiedosto leikepöydälle",
-    "scale": "Koko",
     "save": "Tallenna nykyiseen tiedostoon",
     "saveAs": "Tallenna nimellä",
     "load": "Avaa",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Tyhjennä kirjasto",
     "removeItemsFromLib": "Poista valitut kohteet kirjastosta"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä-päähän-salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä.",
