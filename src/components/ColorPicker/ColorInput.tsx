@@ -119,18 +119,6 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
           event.stopPropagation();
         }}
       />
-      <input //zsviczian
-        type="color"
-        onChange={(event) => changeColor(event.target.value + opacity)}
-        value={hexColor(innerValue || "")}
-        onBlur={() => setInnerValue(color)}
-        style={{
-          marginTop: "auto",
-          marginLeft: "5px",
-          marginBottom: "auto",
-          marginRight: "-0.625rem",
-        }}
-      />
       {/* TODO reenable on mobile with a better UX */}
       {!device.isMobile && (
         <>
@@ -138,7 +126,7 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
             style={{
               width: "1px",
               height: "1.25rem",
-              backgroundColor: "var(--default-border-color)",
+              backgroundColor: "var(--icon-fill-color)", //zsviczian was: --default-border-color
             }}
           />
           <div
@@ -164,6 +152,18 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
           </div>
         </>
       )}
+      <input //zsviczian
+        type="color"
+        onChange={(event) => changeColor(event.target.value + opacity)}
+        value={hexColor(innerValue || "")}
+        onBlur={() => setInnerValue(color)}
+        style={{
+          marginTop: "auto",
+          marginLeft: "4px",
+          marginBottom: "auto",
+          marginRight: "-0.625rem",
+        }}
+      />
     </div>
   );
 };

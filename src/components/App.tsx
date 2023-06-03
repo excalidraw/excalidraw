@@ -306,8 +306,8 @@ import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
-export let showFourthFont: boolean = false;
 import { activeEyeDropperAtom } from "./EyeDropper";
+export let showFourthFont: boolean = false;
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);

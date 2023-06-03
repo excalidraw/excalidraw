@@ -18,7 +18,10 @@ import {
   isEraserActive,
   isHandToolActive,
 } from "../appState";
-import { DEFAULT_CANVAS_BACKGROUND_PICKS, DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE } from "../colors";
+import {
+  DEFAULT_CANVAS_BACKGROUND_PICKS,
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
+} from "../colors";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",

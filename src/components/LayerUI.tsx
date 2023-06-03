@@ -315,10 +315,10 @@ const LayerUI = ({
     );
   };
 
-  const isTrayModeOrMobile =
-    device.isMobile ||
-    (!(appState.viewModeEnabled || appState.zenModeEnabled) &&
-      appState.trayModeEnabled); //zsviczian
+  const isTrayMode =
+    !(appState.viewModeEnabled || appState.zenModeEnabled) &&
+    appState.trayModeEnabled; //zsviczian
+  const isTrayModeOrMobile = device.isMobile || isTrayMode; //zsviczian
   const renderSidebars = () => {
     return (
       <DefaultSidebar
@@ -407,7 +407,8 @@ const LayerUI = ({
           }
         />
       )}
-      {isTrayModeOrMobile && !eyeDropperState && ( //zsviczian changed from !device.isMobile
+      {((isTrayMode && !device.isMobile) || //zsviczian Added isTrayMode condition
+        (device.isMobile && !eyeDropperState)) && (
         <MobileMenu
           appState={appState}
           elements={elements}
