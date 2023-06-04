@@ -560,6 +560,7 @@ class Collab extends PureComponent<Props, CollabState> {
                 elements: reconciledElements,
                 scrollToContent: true,
               });
+              this.onPauseCollaborationChange(PauseCollaborationState.SYNC);
             }
             break;
           }
