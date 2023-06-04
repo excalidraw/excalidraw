@@ -1,6 +1,6 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import { ExcalidrawImperativeAPI } from "../../types";
+import { ExcalidrawImperativeAPI, PauseCollaborationState } from "../../types";
 import { ErrorDialog } from "../../components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../constants";
 import { ImportedDataState } from "../../data/types";
@@ -24,6 +24,7 @@ import {
   FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
   LOAD_IMAGES_TIMEOUT,
+  PAUSE_COLLABORATION_TIMEOUT,
   WS_SCENE_EVENT_TYPES,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
@@ -92,8 +93,6 @@ export interface CollabAPI {
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   startCollaboration: CollabInstance["startCollaboration"];
   stopCollaboration: CollabInstance["stopCollaboration"];
-  pauseCollaboration: CollabInstance["pauseCollaboration"];
-  resumeCollaboration: CollabInstance["resumeCollaboration"];
   syncElements: CollabInstance["syncElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
   setUsername: (username: string) => void;
@@ -112,6 +111,7 @@ class Collab extends PureComponent<Props, CollabState> {
   excalidrawAPI: Props["excalidrawAPI"];
   activeIntervalId: number | null;
   idleTimeoutId: number | null;
+  pauseTimeoutId: number | null;
 
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
@@ -153,6 +153,7 @@ class Collab extends PureComponent<Props, CollabState> {
     this.excalidrawAPI = props.excalidrawAPI;
     this.activeIntervalId = null;
     this.idleTimeoutId = null;
+    this.pauseTimeoutId = null;
   }
 
   componentDidMount() {
@@ -171,8 +172,6 @@ class Collab extends PureComponent<Props, CollabState> {
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
       stopCollaboration: this.stopCollaboration,
       setUsername: this.setUsername,
-      pauseCollaboration: this.pauseCollaboration,
-      resumeCollaboration: this.resumeCollaboration,
       isPaused: this.isPaused,
     };
 
@@ -213,6 +212,10 @@ class Collab extends PureComponent<Props, CollabState> {
     if (this.idleTimeoutId) {
       window.clearTimeout(this.idleTimeoutId);
       this.idleTimeoutId = null;
+    }
+    if (this.pauseTimeoutId) {
+      window.clearTimeout(this.pauseTimeoutId);
+      this.pauseTimeoutId = null;
     }
   }
 
@@ -317,31 +320,44 @@ class Collab extends PureComponent<Props, CollabState> {
     }
   };
 
-  pauseCollaboration = (callback?: () => void) => {
-    if (this.portal.socket) {
-      this.reportIdle();
-      this.portal.socket.disconnect();
-      this.portal.socketInitialized = false;
-      this.setIsCollaborationPaused(true);
+  onPauseCollaborationChange = (state: PauseCollaborationState) => {
+    switch (state) {
+      case PauseCollaborationState.PAUSE: {
+        if (this.portal.socket) {
+          this.portal.socket.disconnect();
+          this.portal.socketInitialized = false;
+          this.setIsCollaborationPaused(true);
 
-      if (callback) {
-        callback();
-      }
-    }
-  };
-
-  resumeCollaboration = (callback?: () => void) => {
-    if (this.portal.socket) {
-      this.reportActive();
-      this.portal.socket.connect();
-      this.portal.socketInitialized = true;
-      this.portal.socket.emit(WS_SCENE_EVENT_TYPES.INIT);
-      this.portal.socket.once("client-broadcast", () => {
-        this.setIsCollaborationPaused(false);
-        if (callback) {
-          callback();
+          this.excalidrawAPI.updateScene({
+            appState: { viewModeEnabled: true },
+          });
         }
-      });
+        break;
+      }
+      case PauseCollaborationState.RESUME: {
+        if (this.portal.socket && this.isPaused()) {
+          this.portal.socket.connect();
+          this.portal.socketInitialized = true;
+          this.portal.socket.emit(WS_SCENE_EVENT_TYPES.INIT);
+
+          this.excalidrawAPI.setToast({
+            message: t("toast.reconnectRoomServer"),
+            duration: Infinity,
+            closable: false,
+          });
+        }
+        break;
+      }
+      case PauseCollaborationState.SYNC: {
+        if (this.isPaused()) {
+          this.setIsCollaborationPaused(false);
+
+          this.excalidrawAPI.updateScene({
+            appState: { viewModeEnabled: false },
+          });
+          this.excalidrawAPI.setToast(null);
+        }
+      }
     }
   };
 
@@ -550,6 +566,7 @@ class Collab extends PureComponent<Props, CollabState> {
             this.handleRemoteSceneUpdate(
               this.reconcileElements(decryptedData.payload.elements),
             );
+            this.onPauseCollaborationChange(PauseCollaborationState.SYNC);
             break;
           case "MOUSE_LOCATION": {
             const { pointer, button, username, selectedElementIds } =
@@ -737,6 +754,10 @@ class Collab extends PureComponent<Props, CollabState> {
         window.clearInterval(this.activeIntervalId);
         this.activeIntervalId = null;
       }
+      this.pauseTimeoutId = window.setTimeout(
+        () => this.onPauseCollaborationChange(PauseCollaborationState.PAUSE),
+        PAUSE_COLLABORATION_TIMEOUT,
+      );
       this.onIdleStateChange(UserIdleState.AWAY);
     } else {
       this.idleTimeoutId = window.setTimeout(this.reportIdle, IDLE_THRESHOLD);
@@ -745,6 +766,11 @@ class Collab extends PureComponent<Props, CollabState> {
         ACTIVE_THRESHOLD,
       );
       this.onIdleStateChange(UserIdleState.ACTIVE);
+      if (this.pauseTimeoutId) {
+        window.clearTimeout(this.pauseTimeoutId);
+        this.onPauseCollaborationChange(PauseCollaborationState.RESUME);
+        this.pauseTimeoutId = null;
+      }
     }
   };
 

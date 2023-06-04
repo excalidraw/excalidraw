@@ -46,7 +46,6 @@ import {
 } from "../utils";
 import {
   FIREBASE_STORAGE_PREFIXES,
-  PAUSE_COLLABORATION_TIMEOUT,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
@@ -294,10 +293,6 @@ const ExcalidrawWrapper = () => {
     getInitialLibraryItems: getLibraryItemsFromStorage,
   });
 
-  const pauseCollaborationTimeoutRef = useRef<ReturnType<
-    typeof setTimeout
-  > | null>(null);
-
   useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
       return;
@@ -476,47 +471,6 @@ const ExcalidrawWrapper = () => {
         event.type === EVENT.FOCUS
       ) {
         syncData();
-      }
-
-      if (event.type === EVENT.VISIBILITY_CHANGE) {
-        switch (true) {
-          // user switches to another tab
-          case document.hidden && collabAPI.isCollaborating():
-            if (!pauseCollaborationTimeoutRef.current) {
-              pauseCollaborationTimeoutRef.current = setTimeout(() => {
-                collabAPI.pauseCollaboration(() =>
-                  excalidrawAPI.updateScene({
-                    appState: { viewModeEnabled: true },
-                  }),
-                );
-              }, PAUSE_COLLABORATION_TIMEOUT);
-            }
-            break;
-
-          // user returns to the tab with Excalidraw
-          case !document.hidden && collabAPI.isPaused():
-            excalidrawAPI.setToast({
-              message: t("toast.reconnectRoomServer"),
-              duration: Infinity,
-              closable: true,
-            });
-
-            collabAPI.resumeCollaboration(() => {
-              excalidrawAPI.updateScene({
-                appState: { viewModeEnabled: false },
-              });
-              excalidrawAPI.setToast(null);
-            });
-            break;
-
-          // user returns and timeout hasn't fired yet
-          case !document.hidden && Boolean(pauseCollaborationTimeoutRef):
-            if (pauseCollaborationTimeoutRef.current) {
-              clearTimeout(pauseCollaborationTimeoutRef.current);
-              pauseCollaborationTimeoutRef.current = null;
-            }
-            break;
-        }
       }
     };
 
