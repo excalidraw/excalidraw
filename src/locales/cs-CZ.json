@@ -278,7 +278,7 @@
   },
   "exportDialog": {
     "disk_title": "Uložit na disk",
-    "disk_details": "",
+    "disk_details": "Exportovat data scény do souboru, ze kterého můžete importovat později.",
     "disk_button": "Uložit do souboru",
     "link_title": "Odkaz pro sdílení",
     "link_details": "Exportovat jako odkaz pouze pro čtení.",
@@ -290,18 +290,18 @@
   "helpDialog": {
     "blog": "Přečtěte si náš blog",
     "click": "kliknutí",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Hluboký výběr",
+    "deepBoxSelect": "Hluboký výběr uvnitř boxu a zabránění táhnnutí",
     "curvedArrow": "Zakřivená šipka",
     "curvedLine": "Zakřivená čára",
     "documentation": "Dokumentace",
     "doubleClick": "dvojklik",
     "drag": "tažení",
     "editor": "Editor",
-    "editLineArrowPoints": "",
-    "editText": "",
-    "github": "",
-    "howto": "",
+    "editLineArrowPoints": "Upravit body linií/šipek",
+    "editText": "Upravit text / přidat popis",
+    "github": "Našel jsi problém? Nahlaš ho",
+    "howto": "Sledujte naše návody",
     "or": "nebo",
     "preventBinding": "Zabránit vázání šipky",
     "tools": "Nástroje",
@@ -313,8 +313,8 @@
     "zoomToFit": "Přiblížit na zobrazení všech prvků",
     "zoomToSelection": "Přiblížit na výběr",
     "toggleElementLock": "Zamknout/odemknout výběr",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Posunout stránku nahoru/dolů",
+    "movePageLeftRight": "Přesunout stránku doleva/doprava"
   },
   "clearCanvasDialog": {
     "title": "Vymazat plátno"
@@ -342,46 +342,46 @@
     },
     "noteDescription": "Odešlete svou knihovnu, pro zařazení do <link>veřejného úložiště knihoven</link>, odkud ji budou moci při kreslení využít i ostatní uživatelé.",
     "noteGuidelines": "Knihovna musí být nejdříve ručně schválena. Přečtěte si prosím <link>pokyny</link>",
-    "noteLicense": "",
-    "noteItems": "",
-    "atleastOneLibItem": "",
-    "republishWarning": ""
+    "noteLicense": "Odesláním souhlasíte s tím, že knihovna bude zveřejněna pod <link>MIT licencí</link>, stručně řečeno, kdokoli ji může používat bez omezení.",
+    "noteItems": "Každá položka knihovny musí mít svůj vlastní název, aby byla filtrovatelná. Následující položky knihovny budou zahrnuty:",
+    "atleastOneLibItem": "Vyberte alespoň jednu položku knihovny, kterou chcete začít",
+    "republishWarning": "Poznámka: některé z vybraných položek jsou označeny jako již zveřejněné/odeslané. Položky byste měli znovu odeslat pouze při aktualizaci existující knihovny nebo podání."
   },
   "publishSuccessDialog": {
     "title": "Knihovna byla odeslána",
-    "content": ""
+    "content": "Děkujeme vám {{authorName}}. Vaše knihovna byla odeslána k posouzení. Stav můžete sledovat <link>zde</link>"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Resetovat knihovnu",
+    "removeItemsFromLib": "Odstranit vybrané položky z knihovny"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exportovat obrázek",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Pozadí",
+      "onlySelected": "Pouze vybrané",
+      "darkMode": "Tmavý režim",
+      "embedScene": "Vložit scénu",
+      "scale": "Měřítko",
+      "padding": "Odsazení"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Data scény budou uložena do exportovaného souboru PNG/SVG tak, aby z něj mohla být scéna obnovena.\nZvýší se velikost exportovaného souboru."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportovat do PNG",
+      "exportToSvg": "Exportovat do SVG",
+      "copyPngToClipboard": "Kopírovat PNG do schránky"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopírovat do schránky"
     }
   },
   "encrypted": {
-    "tooltip": "",
-    "link": ""
+    "tooltip": "Vaše kresby jsou end-to-end šifrované, takže servery Excalidraw je nikdy neuvidí.",
+    "link": "Blog příspěvek na end-to-end šifrování v Excalidraw"
   },
   "stats": {
     "angle": "Úhel",
@@ -402,48 +402,48 @@
     "addedToLibrary": "Přidáno do knihovny",
     "copyStyles": "Styly byly zkopírovány.",
     "copyToClipboard": "Zkopírováno do schránky.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "{{exportSelection}} zkopírován do schránky jako PNG\n({{exportColorScheme}})",
     "fileSaved": "Soubor byl uložen.",
     "fileSavedToFilename": "Uloženo do {filename}",
     "canvas": "plátno",
     "selection": "výběr",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Pomocí {{shortcut}} vložte jako jeden prvek,\nnebo vložte do existujícího textového editoru"
   },
   "colors": {
     "transparent": "Průhledná",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Černá",
+    "white": "Bílá",
+    "red": "Červená",
+    "pink": "Růžová",
+    "grape": "Vínová",
+    "violet": "Fialová",
+    "gray": "Šedá",
+    "blue": "Modrá",
+    "cyan": "Azurová",
+    "teal": "Modrozelená",
+    "green": "Zelená",
+    "yellow": "Žlutá",
+    "orange": "Oranžová",
+    "bronze": "Bronzová"
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Všechna vaše data jsou uložena lokálně ve vašem prohlížeči.",
+      "center_heading_plus": "Chcete místo toho přejít na Excalidraw+?",
+      "menuHint": "Export, nastavení, jazyky, ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Export, nastavení a další...",
+      "center_heading": "Diagramy. Vytvořeny. Jednoduše.",
+      "toolbarHint": "Vyberte nástroj a začněte kreslit!",
+      "helpHint": "Zkratky a pomoc"
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Nejpoužívanější vlastní barvy",
+    "colors": "Barvy",
+    "shades": "Stíny",
+    "hexCode": "Hex kód",
+    "noShades": "Pro tuto barvu nejsou k dispozici žádné odstíny"
   }
 }
