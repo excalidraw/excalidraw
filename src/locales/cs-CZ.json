@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Vložit",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Vložit jako prostý text",
     "pasteCharts": "Vložit grafy",
     "selectAll": "Vybrat vše",
     "multiSelect": "Přidat prvek do výběru",
@@ -49,9 +49,9 @@
     "large": "Velké",
     "veryLarge": "Velmi velké",
     "solid": "Plný",
-    "hachure": "",
-    "zigzag": "",
-    "crossHatch": "",
+    "hachure": "Hachure",
+    "zigzag": "Klikatě",
+    "crossHatch": "Křížový šrafování",
     "thin": "Tenký",
     "bold": "Tlustý",
     "left": "Vlevo",
@@ -60,7 +60,7 @@
     "extraBold": "Extra tlustý",
     "architect": "Architekt",
     "artist": "Umělec",
-    "cartoonist": "",
+    "cartoonist": "Kartoonista",
     "fileTitle": "Název souboru",
     "colorPicker": "Výběr barvy",
     "canvasColors": "Použito na plátně",
@@ -106,7 +106,7 @@
     "increaseFontSize": "Zvětšit písmo",
     "unbindText": "Zrušit vazbu textu",
     "bindText": "Vázat text s kontejnerem",
-    "createContainerFromText": "",
+    "createContainerFromText": "Zabalit text do kontejneru",
     "link": {
       "edit": "Upravit odkaz",
       "create": "Vytvořit odkaz",
@@ -124,7 +124,7 @@
     },
     "statusPublished": "Zveřejněno",
     "sidebarLock": "Ponechat postranní panel otevřený",
-    "eyeDropper": ""
+    "eyeDropper": "Vyberte barvu z plátna"
   },
   "library": {
     "noItems": "Dosud neexistují žádné položky...",
@@ -177,14 +177,14 @@
     "decryptFailed": "Nelze dešifrovat data.",
     "uploadedSecurly": "Nahrávání je zabezpečeno koncovým šifrováním, což znamená, že server Excalidraw ani třetí strany nemohou obsah přečíst.",
     "loadSceneOverridePrompt": "Načítání externího výkresu nahradí váš existující obsah. Přejete si pokračovat?",
-    "collabStopOverridePrompt": "",
+    "collabStopOverridePrompt": "Zastavení relace přepíše vaše předchozí, lokálně uložené kresby. Jste si jisti?\n\n(Pokud chcete zachovat místní kresbu, jednoduše zavřete kartu prohlížeče)",
     "errorAddingToLibrary": "Položku nelze přidat do knihovny",
     "errorRemovingFromLibrary": "Položku nelze odstranit z knihovny",
     "confirmAddLibrary": "Tímto přidáte {{numShapes}} tvarů do tvé knihovny. Jste si jisti?",
     "imageDoesNotContainScene": "Zdá se, že tento obrázek neobsahuje žádná data o scéně. Zapnuli jste při exportu vkládání scény?",
-    "cannotRestoreFromImage": "",
-    "invalidSceneUrl": "",
-    "resetLibrary": "",
+    "cannotRestoreFromImage": "Scénu nelze obnovit z tohoto souboru obrázku",
+    "invalidSceneUrl": "Nelze importovat scénu z zadané URL. Je buď poškozená, nebo neobsahuje platná JSON data Excalidraw.",
+    "resetLibrary": "Tímto vymažete vaši knihovnu. Jste si jisti?",
     "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": "",
     "collabOfflineWarning": ""
