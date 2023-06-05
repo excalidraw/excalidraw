@@ -14,6 +14,7 @@ import {
 } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
 import {
+  getFrame,
   preventUnload,
   resolvablePromise,
   withBatchedUpdates,
@@ -94,6 +95,7 @@ export interface CollabAPI {
   syncElements: CollabInstance["syncElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
   setUsername: (username: string) => void;
+  isDisabled: () => boolean;
 }
 
 interface PublicProps {
@@ -108,6 +110,7 @@ class Collab extends PureComponent<Props, CollabState> {
   excalidrawAPI: Props["excalidrawAPI"];
   activeIntervalId: number | null;
   idleTimeoutId: number | null;
+  isDisabled: boolean;
 
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
@@ -149,6 +152,7 @@ class Collab extends PureComponent<Props, CollabState> {
     this.excalidrawAPI = props.excalidrawAPI;
     this.activeIntervalId = null;
     this.idleTimeoutId = null;
+    this.isDisabled = getFrame() === "iframe";
   }
 
   componentDidMount() {
@@ -165,6 +169,7 @@ class Collab extends PureComponent<Props, CollabState> {
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
       stopCollaboration: this.stopCollaboration,
       setUsername: this.setUsername,
+      isDisabled: () => this.isDisabled,
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
@@ -380,7 +385,7 @@ class Collab extends PureComponent<Props, CollabState> {
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
-    if (this.portal.socket) {
+    if (this.portal.socket || this.isDisabled) {
       return null;
     }
 

@@ -649,7 +649,7 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
         theme={theme}
         renderTopRightUI={(isMobile) => {
-          if (isMobile) {
+          if (isMobile || !collabAPI || collabAPI?.isDisabled()) {
             return null;
           }
           return (
