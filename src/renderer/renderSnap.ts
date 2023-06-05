@@ -1,6 +1,9 @@
 import oc from "open-color";
 import { RenderConfig } from "../scene/types";
 import { Snaps, getSnapLineEndPointsCoords } from "../snapping";
+import { ExcalidrawElement } from "../element/types";
+import { getElementsHandleCoordinates } from "../element/bounds";
+import * as GA from "../ga";
 
 interface RenderSnapOptions {
   renderConfig: RenderConfig;
@@ -9,18 +12,21 @@ interface RenderSnapOptions {
 
 export const renderSnap = (
   { renderConfig, context }: RenderSnapOptions,
-  { snaps }: { snaps: Snaps },
+  snaps: Snaps,
+  selectedElements: ExcalidrawElement[],
 ) => {
   context.save();
 
   context.lineWidth = 1 / renderConfig.zoom.value;
 
-  for (const { snapLine, point } of snaps) {
+  for (const { snapLine, direction } of snaps) {
     context.strokeStyle = renderConfig.selectionColor ?? oc.black;
+
+    const handles = getElementsHandleCoordinates(selectedElements);
 
     const { from, to } = getSnapLineEndPointsCoords({
       line: snapLine.line,
-      points: [point, ...snapLine.points],
+      points: [GA.point(...handles[direction]), ...snapLine.points],
     });
 
     context.beginPath();

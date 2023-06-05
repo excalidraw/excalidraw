@@ -593,7 +593,8 @@ export const _renderScene = ({
             renderConfig,
             context,
           },
-          { snaps: appState.snaps ?? [] },
+          appState.snaps ?? [],
+          locallySelectedElements,
         );
       }
 
