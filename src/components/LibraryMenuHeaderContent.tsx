@@ -24,6 +24,7 @@ import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { useUIAppState } from "../context/ui-appState";
 import clsx from "clsx";
+import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
 const getSelectedItems = (
   libraryItems: LibraryItems,
@@ -55,7 +56,7 @@ export const LibraryDropdownMenuButton: React.FC<{
     jotaiScope,
   );
 
-  const renderRemoveLibAlert = useCallback(() => {
+  const renderRemoveLibAlert = () => {
     const content = selectedItems.length
       ? t("alerts.removeItemsFromsLibrary", { count: selectedItems.length })
       : t("alerts.resetLibrary");
@@ -80,7 +81,7 @@ export const LibraryDropdownMenuButton: React.FC<{
         <p>{content}</p>
       </ConfirmDialog>
     );
-  }, [selectedItems, onRemoveFromLibrary, resetLibrary]);
+  };
 
   const [showRemoveLibAlert, setShowRemoveLibAlert] = useState(false);
 
@@ -106,7 +107,7 @@ export const LibraryDropdownMenuButton: React.FC<{
         onCloseRequest={() => setPublishLibSuccess(null)}
         title={t("publishSuccessDialog.title")}
         className="publish-library-success"
-        small={true}
+        size="small"
       >
         <p>
           <Trans
@@ -136,20 +137,20 @@ export const LibraryDropdownMenuButton: React.FC<{
     );
   }, [setPublishLibSuccess, publishLibSuccess]);
 
-  const onPublishLibSuccess = useCallback(
-    (data: { url: string; authorName: string }, libraryItems: LibraryItems) => {
-      setShowPublishLibraryDialog(false);
-      setPublishLibSuccess({ url: data.url, authorName: data.authorName });
-      const nextLibItems = libraryItems.slice();
-      nextLibItems.forEach((libItem) => {
-        if (selectedItems.includes(libItem.id)) {
-          libItem.status = "published";
-        }
-      });
-      library.setLibrary(nextLibItems);
-    },
-    [setShowPublishLibraryDialog, setPublishLibSuccess, selectedItems, library],
-  );
+  const onPublishLibSuccess = (
+    data: { url: string; authorName: string },
+    libraryItems: LibraryItems,
+  ) => {
+    setShowPublishLibraryDialog(false);
+    setPublishLibSuccess({ url: data.url, authorName: data.authorName });
+    const nextLibItems = libraryItems.slice();
+    nextLibItems.forEach((libItem) => {
+      if (selectedItems.includes(libItem.id)) {
+        libItem.status = "published";
+      }
+    });
+    library.setLibrary(nextLibItems);
+  };
 
   const onLibraryImport = async () => {
     try {
@@ -280,27 +281,29 @@ export const LibraryDropdownMenu = ({
   className?: string;
 }) => {
   const { library } = useApp();
+  const { clearLibraryCache, deleteItemsFromLibraryCache } = useLibraryCache();
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
 
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
 
-  const removeFromLibrary = useCallback(
-    async (libraryItems: LibraryItems) => {
-      const nextItems = libraryItems.filter(
-        (item) => !selectedItems.includes(item.id),
-      );
-      library.setLibrary(nextItems).catch(() => {
-        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
-      });
-      onSelectItems([]);
-    },
-    [library, setAppState, selectedItems, onSelectItems],
-  );
+  const removeFromLibrary = async (libraryItems: LibraryItems) => {
+    const nextItems = libraryItems.filter(
+      (item) => !selectedItems.includes(item.id),
+    );
+    library.setLibrary(nextItems).catch(() => {
+      setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
+    });
 
-  const resetLibrary = useCallback(() => {
+    deleteItemsFromLibraryCache(selectedItems);
+
+    onSelectItems([]);
+  };
+
+  const resetLibrary = () => {
     library.resetLibrary();
-  }, [library]);
+    clearLibraryCache();
+  };
 
   return (
     <LibraryDropdownMenuButton

@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { serializeLibraryAsJSON } from "../data/json";
-import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { t } from "../i18n";
 import {
   ExcalidrawProps,
@@ -8,202 +13,71 @@ import {
   LibraryItems,
   UIAppState,
 } from "../types";
-import { arrayToMap, chunk } from "../utils";
-import { LibraryUnit } from "./LibraryUnit";
+import { arrayToMap } from "../utils";
 import Stack from "./Stack";
 import { MIME_TYPES } from "../constants";
 import Spinner from "./Spinner";
 import { duplicateElements } from "../element/newElement";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
+import {
+  LibraryMenuSection,
+  LibraryMenuSectionGrid,
+} from "./LibraryMenuSection";
+import { useScrollPosition } from "../hooks/useScrollPosition";
+import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
 import "./LibraryMenuItems.scss";
 
-const CELLS_PER_ROW = 4;
+// using an odd number of items per batch so the rendering creates an irregular
+// pattern which looks more organic
+const ITEMS_RENDERED_PER_BATCH = 17;
+// when render outputs cached we can render many more items per batch to
+// speed it up
+const CACHED_ITEMS_RENDERED_PER_BATCH = 64;
 
-const LibraryMenuItems = ({
+export default function LibraryMenuItems({
   isLoading,
   libraryItems,
   onAddToLibrary,
   onInsertLibraryItems,
   pendingElements,
-  selectedItems,
-  onSelectItems,
   theme,
   id,
   libraryReturnUrl,
+  onSelectItems,
+  selectedItems,
 }: {
   isLoading: boolean;
   libraryItems: LibraryItems;
   pendingElements: LibraryItem["elements"];
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: (elements: LibraryItem["elements"]) => void;
-  selectedItems: LibraryItem["id"][];
-  onSelectItems: (id: LibraryItem["id"][]) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   theme: UIAppState["theme"];
   id: string;
-}) => {
-  const [lastSelectedItem, setLastSelectedItem] = useState<
-    LibraryItem["id"] | null
-  >(null);
+  selectedItems: LibraryItem["id"][];
+  onSelectItems: (id: LibraryItem["id"][]) => void;
+}) {
+  const libraryContainerRef = useRef<HTMLDivElement>(null);
+  const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
 
-  const onItemSelectToggle = (
-    id: LibraryItem["id"],
-    event: React.MouseEvent,
-  ) => {
-    const shouldSelect = !selectedItems.includes(id);
-
-    const orderedItems = [...unpublishedItems, ...publishedItems];
-
-    if (shouldSelect) {
-      if (event.shiftKey && lastSelectedItem) {
-        const rangeStart = orderedItems.findIndex(
-          (item) => item.id === lastSelectedItem,
-        );
-        const rangeEnd = orderedItems.findIndex((item) => item.id === id);
-
-        if (rangeStart === -1 || rangeEnd === -1) {
-          onSelectItems([...selectedItems, id]);
-          return;
-        }
-
-        const selectedItemsMap = arrayToMap(selectedItems);
-        const nextSelectedIds = orderedItems.reduce(
-          (acc: LibraryItem["id"][], item, idx) => {
-            if (
-              (idx >= rangeStart && idx <= rangeEnd) ||
-              selectedItemsMap.has(item.id)
-            ) {
-              acc.push(item.id);
-            }
-            return acc;
-          },
-          [],
-        );
-
-        onSelectItems(nextSelectedIds);
-      } else {
-        onSelectItems([...selectedItems, id]);
-      }
-      setLastSelectedItem(id);
-    } else {
-      setLastSelectedItem(null);
-      onSelectItems(selectedItems.filter((_id) => _id !== id));
+  // This effect has to be called only on first render, therefore  `scrollPosition` isn't in the dependency array
+  useEffect(() => {
+    if (scrollPosition > 0) {
+      libraryContainerRef.current?.scrollTo(0, scrollPosition);
     }
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const getInsertedElements = (id: string) => {
-    let targetElements;
-    if (selectedItems.includes(id)) {
-      targetElements = libraryItems.filter((item) =>
-        selectedItems.includes(item.id),
-      );
-    } else {
-      targetElements = libraryItems.filter((item) => item.id === id);
-    }
-    return targetElements.map((item) => {
-      return {
-        ...item,
-        // duplicate each library item before inserting on canvas to confine
-        // ids and bindings to each library item. See #6465
-        elements: duplicateElements(item.elements, { randomizeSeed: true }),
-      };
-    });
-  };
-
-  const createLibraryItemCompo = (params: {
-    item:
-      | LibraryItem
-      | /* pending library item */ {
-          id: null;
-          elements: readonly NonDeleted<ExcalidrawElement>[];
-        }
-      | null;
-    onClick?: () => void;
-    key: string;
-  }) => {
-    return (
-      <Stack.Col key={params.key}>
-        <LibraryUnit
-          elements={params.item?.elements}
-          isPending={!params.item?.id && !!params.item?.elements}
-          onClick={params.onClick || (() => {})}
-          id={params.item?.id || null}
-          selected={!!params.item?.id && selectedItems.includes(params.item.id)}
-          onToggle={onItemSelectToggle}
-          onDrag={(id, event) => {
-            event.dataTransfer.setData(
-              MIME_TYPES.excalidrawlib,
-              serializeLibraryAsJSON(getInsertedElements(id)),
-            );
-          }}
-        />
-      </Stack.Col>
-    );
-  };
-
-  const renderLibrarySection = (
-    items: (
-      | LibraryItem
-      | /* pending library item */ {
-          id: null;
-          elements: readonly NonDeleted<ExcalidrawElement>[];
-        }
-    )[],
-  ) => {
-    const _items = items.map((item) => {
-      if (item.id) {
-        return createLibraryItemCompo({
-          item,
-          onClick: () => onInsertLibraryItems(getInsertedElements(item.id)),
-          key: item.id,
-        });
-      }
-      return createLibraryItemCompo({
-        key: "__pending__item__",
-        item,
-        onClick: () => onAddToLibrary(pendingElements),
-      });
-    });
-
-    // ensure we render all empty cells if no items are present
-    let rows = chunk(_items, CELLS_PER_ROW);
-    if (!rows.length) {
-      rows = [[]];
-    }
-
-    return rows.map((rowItems, index, rows) => {
-      if (index === rows.length - 1) {
-        // pad row with empty cells
-        rowItems = rowItems.concat(
-          new Array(CELLS_PER_ROW - rowItems.length)
-            .fill(null)
-            .map((_, index) => {
-              return createLibraryItemCompo({
-                key: `empty_${index}`,
-                item: null,
-              });
-            }),
-        );
-      }
-      return (
-        <Stack.Row
-          align="center"
-          key={index}
-          className="library-menu-items-container__row"
-        >
-          {rowItems}
-        </Stack.Row>
-      );
-    });
-  };
-
-  const unpublishedItems = libraryItems.filter(
-    (item) => item.status !== "published",
+  const { svgCache } = useLibraryCache();
+  const unpublishedItems = useMemo(
+    () => libraryItems.filter((item) => item.status !== "published"),
+    [libraryItems],
   );
-  const publishedItems = libraryItems.filter(
-    (item) => item.status === "published",
+
+  const publishedItems = useMemo(
+    () => libraryItems.filter((item) => item.status === "published"),
+    [libraryItems],
   );
 
   const showBtn = !libraryItems.length && !pendingElements.length;
@@ -212,6 +86,122 @@ const LibraryMenuItems = ({
     !pendingElements.length &&
     !unpublishedItems.length &&
     !publishedItems.length;
+
+  const [lastSelectedItem, setLastSelectedItem] = useState<
+    LibraryItem["id"] | null
+  >(null);
+
+  const onItemSelectToggle = useCallback(
+    (id: LibraryItem["id"], event: React.MouseEvent) => {
+      const shouldSelect = !selectedItems.includes(id);
+
+      const orderedItems = [...unpublishedItems, ...publishedItems];
+
+      if (shouldSelect) {
+        if (event.shiftKey && lastSelectedItem) {
+          const rangeStart = orderedItems.findIndex(
+            (item) => item.id === lastSelectedItem,
+          );
+          const rangeEnd = orderedItems.findIndex((item) => item.id === id);
+
+          if (rangeStart === -1 || rangeEnd === -1) {
+            onSelectItems([...selectedItems, id]);
+            return;
+          }
+
+          const selectedItemsMap = arrayToMap(selectedItems);
+          const nextSelectedIds = orderedItems.reduce(
+            (acc: LibraryItem["id"][], item, idx) => {
+              if (
+                (idx >= rangeStart && idx <= rangeEnd) ||
+                selectedItemsMap.has(item.id)
+              ) {
+                acc.push(item.id);
+              }
+              return acc;
+            },
+            [],
+          );
+
+          onSelectItems(nextSelectedIds);
+        } else {
+          onSelectItems([...selectedItems, id]);
+        }
+        setLastSelectedItem(id);
+      } else {
+        setLastSelectedItem(null);
+        onSelectItems(selectedItems.filter((_id) => _id !== id));
+      }
+    },
+    [
+      lastSelectedItem,
+      onSelectItems,
+      publishedItems,
+      selectedItems,
+      unpublishedItems,
+    ],
+  );
+
+  const getInsertedElements = useCallback(
+    (id: string) => {
+      let targetElements;
+      if (selectedItems.includes(id)) {
+        targetElements = libraryItems.filter((item) =>
+          selectedItems.includes(item.id),
+        );
+      } else {
+        targetElements = libraryItems.filter((item) => item.id === id);
+      }
+      return targetElements.map((item) => {
+        return {
+          ...item,
+          // duplicate each library item before inserting on canvas to confine
+          // ids and bindings to each library item. See #6465
+          elements: duplicateElements(item.elements, { randomizeSeed: true }),
+        };
+      });
+    },
+    [libraryItems, selectedItems],
+  );
+
+  const onItemDrag = useCallback(
+    (id: LibraryItem["id"], event: React.DragEvent) => {
+      event.dataTransfer.setData(
+        MIME_TYPES.excalidrawlib,
+        serializeLibraryAsJSON(getInsertedElements(id)),
+      );
+    },
+    [getInsertedElements],
+  );
+
+  const isItemSelected = useCallback(
+    (id: LibraryItem["id"] | null) => {
+      if (!id) {
+        return false;
+      }
+
+      return selectedItems.includes(id);
+    },
+    [selectedItems],
+  );
+
+  const onAddToLibraryClick = useCallback(() => {
+    onAddToLibrary(pendingElements);
+  }, [pendingElements, onAddToLibrary]);
+
+  const onItemClick = useCallback(
+    (id: LibraryItem["id"] | null) => {
+      if (id) {
+        onInsertLibraryItems(getInsertedElements(id));
+      }
+    },
+    [getInsertedElements, onInsertLibraryItems],
+  );
+
+  const itemsRenderedPerBatch =
+    svgCache.size >= libraryItems.length
+      ? CACHED_ITEMS_RENDERED_PER_BATCH
+      : ITEMS_RENDERED_PER_BATCH;
 
   return (
     <div
@@ -239,6 +229,7 @@ const LibraryMenuItems = ({
           flex: publishedItems.length > 0 ? 1 : "0 1 auto",
           marginBottom: 0,
         }}
+        ref={libraryContainerRef}
       >
         <>
           {!isLibraryEmpty && (
@@ -258,28 +249,41 @@ const LibraryMenuItems = ({
               <Spinner />
             </div>
           )}
-          <div className="library-menu-items-private-library-container">
-            {!pendingElements.length && !unpublishedItems.length ? (
-              <div className="library-menu-items__no-items">
-                <div className="library-menu-items__no-items__label">
-                  {t("library.noItems")}
-                </div>
-                <div className="library-menu-items__no-items__hint">
-                  {publishedItems.length > 0
-                    ? t("library.hint_emptyPrivateLibrary")
-                    : t("library.hint_emptyLibrary")}
-                </div>
+          {!pendingElements.length && !unpublishedItems.length ? (
+            <div className="library-menu-items__no-items">
+              <div className="library-menu-items__no-items__label">
+                {t("library.noItems")}
               </div>
-            ) : (
-              renderLibrarySection([
-                // append pending library item
-                ...(pendingElements.length
-                  ? [{ id: null, elements: pendingElements }]
-                  : []),
-                ...unpublishedItems,
-              ])
-            )}
-          </div>
+              <div className="library-menu-items__no-items__hint">
+                {publishedItems.length > 0
+                  ? t("library.hint_emptyPrivateLibrary")
+                  : t("library.hint_emptyLibrary")}
+              </div>
+            </div>
+          ) : (
+            <LibraryMenuSectionGrid>
+              {pendingElements.length > 0 && (
+                <LibraryMenuSection
+                  itemsRenderedPerBatch={itemsRenderedPerBatch}
+                  items={[{ id: null, elements: pendingElements }]}
+                  onItemSelectToggle={onItemSelectToggle}
+                  onItemDrag={onItemDrag}
+                  onClick={onAddToLibraryClick}
+                  isItemSelected={isItemSelected}
+                  svgCache={svgCache}
+                />
+              )}
+              <LibraryMenuSection
+                itemsRenderedPerBatch={itemsRenderedPerBatch}
+                items={unpublishedItems}
+                onItemSelectToggle={onItemSelectToggle}
+                onItemDrag={onItemDrag}
+                onClick={onItemClick}
+                isItemSelected={isItemSelected}
+                svgCache={svgCache}
+              />
+            </LibraryMenuSectionGrid>
+          )}
         </>
 
         <>
@@ -291,7 +295,17 @@ const LibraryMenuItems = ({
             </div>
           )}
           {publishedItems.length > 0 ? (
-            renderLibrarySection(publishedItems)
+            <LibraryMenuSectionGrid>
+              <LibraryMenuSection
+                itemsRenderedPerBatch={itemsRenderedPerBatch}
+                items={publishedItems}
+                onItemSelectToggle={onItemSelectToggle}
+                onItemDrag={onItemDrag}
+                onClick={onItemClick}
+                isItemSelected={isItemSelected}
+                svgCache={svgCache}
+              />
+            </LibraryMenuSectionGrid>
           ) : unpublishedItems.length > 0 ? (
             <div
               style={{
@@ -325,6 +339,4 @@ const LibraryMenuItems = ({
       </Stack.Col>
     </div>
   );
-};
-
-export default LibraryMenuItems;
+}

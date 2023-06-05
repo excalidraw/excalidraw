@@ -40,10 +40,6 @@
     "arrowhead_triangle": "משולש",
     "fontSize": "גודל גופן",
     "fontFamily": "גופן",
-    "onlySelected": "רק מה שנבחר",
-    "withBackground": "רקע",
-    "exportEmbedScene": "הטמעה של מידע הסצנה",
-    "exportEmbedScene_details": "הייצוא יבוצע לקובץ מסוג PNG/SVG כדי שהמידע על הסצנה ישמר בו וניתן יהיה לבצע שחזור ממנו.\nיגדיל את גודל הקובץ של הייצוא.",
     "addWatermark": "הוסף \"נוצר באמצעות Excalidraw\"",
     "handDrawn": "ציור יד",
     "normal": "רגיל",
@@ -100,7 +96,6 @@
     "flipHorizontal": "הפוך אופקית",
     "flipVertical": "הפוך אנכית",
     "viewMode": "מצב תצוגה",
-    "toggleExportColorScheme": "מתג ערכת צבעים לייצוא",
     "share": "שתף",
     "showStroke": "הצג בוחר צבע מברשת",
     "showBackground": "הצג בוחר צבע רקע",
@@ -128,7 +123,8 @@
       "unlockAll": "שחרור הכול"
     },
     "statusPublished": "פורסם",
-    "sidebarLock": "שמור את סרגל הצד פתוח"
+    "sidebarLock": "שמור את סרגל הצד פתוח",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "עוד לא הוספת דברים...",
@@ -140,11 +136,7 @@
     "exportJSON": "ייצא לקובץ",
     "exportImage": "ייצוא התמונה...",
     "export": "שמור ל...",
-    "exportToPng": "יצא ל PNG",
-    "exportToSvg": "יצא ל SVG",
     "copyToClipboard": "העתק ללוח",
-    "copyPngToClipboard": "העתק PNG ללוח",
-    "scale": "קנה מידה",
     "save": "שמור לקובץ נוכחי",
     "saveAs": "שמירה בשם",
     "load": "פתח",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "איפוס ספריה",
     "removeItemsFromLib": "הסר את הפריטים הנבחרים מהספריה"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "הציורים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם.",

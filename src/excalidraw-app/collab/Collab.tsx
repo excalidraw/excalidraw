@@ -834,7 +834,6 @@ class Collab extends PureComponent<Props, CollabState> {
             setErrorMessage={(errorMessage) => {
               this.setState({ errorMessage });
             }}
-            theme={this.excalidrawAPI.getAppState().theme}
           />
         )}
         {errorMessage && (

@@ -15,6 +15,7 @@ $duration: 1.6s;
 
     svg {
       animation: rotate $duration linear infinite;
+      animation-delay: var(--spinner-delay);
       transform-origin: center center;
     }
 

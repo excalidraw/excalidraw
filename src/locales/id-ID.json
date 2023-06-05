@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Segitiga",
     "fontSize": "Ukuran font",
     "fontFamily": "Jenis font",
-    "onlySelected": "Hanya yang Dipilih",
-    "withBackground": "Latar",
-    "exportEmbedScene": "Sematkan pemandangan",
-    "exportEmbedScene_details": "Data pemandangan akan disimpan dalam file PNG/SVG yang diekspor, sehingga pemandangan itu dapat dipulihkan darinya.\nAkan membesarkan ukuran file yang diekspor.",
     "addWatermark": "Tambahkan \"Dibuat dengan Excalidraw\"",
     "handDrawn": "Tulisan tangan",
     "normal": "Normal",
@@ -54,7 +50,7 @@
     "veryLarge": "Sangat besar",
     "solid": "Padat",
     "hachure": "Garis-garis",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Asiran silang",
     "thin": "Lembut",
     "bold": "Tebal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Balikkan horizontal",
     "flipVertical": "Balikkan vertikal",
     "viewMode": "Mode tampilan",
-    "toggleExportColorScheme": "Ubah skema warna ekspor",
     "share": "Bagikan",
     "showStroke": "Tampilkan garis pengambil warna",
     "showBackground": "Tampilkan latar pengambil warna",
@@ -111,7 +106,7 @@
     "increaseFontSize": "Besarkan ukuran font",
     "unbindText": "Lepas teks",
     "bindText": "Kunci teks ke kontainer",
-    "createContainerFromText": "",
+    "createContainerFromText": "Bungkus teks dalam kontainer",
     "link": {
       "edit": "Edit tautan",
       "create": "Buat tautan",
@@ -128,7 +123,8 @@
       "unlockAll": "Lepas semua"
     },
     "statusPublished": "Telah terbit",
-    "sidebarLock": "Biarkan sidebar tetap terbuka"
+    "sidebarLock": "Biarkan sidebar tetap terbuka",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
@@ -140,11 +136,7 @@
     "exportJSON": "Ekspor ke file",
     "exportImage": "Ekspor gambar...",
     "export": "Simpan ke...",
-    "exportToPng": "Ekspor ke PNG",
-    "exportToSvg": "Ekspor ke SVG",
     "copyToClipboard": "Salin ke Papan Klip",
-    "copyPngToClipboard": "Salin PNG ke papan klip",
-    "scale": "Skala",
     "save": "Simpan ke file sekarang",
     "saveAs": "Simpan sebagai",
     "load": "Buka",
@@ -208,10 +200,10 @@
     "collabSaveFailed": "Tidak dapat menyimpan ke dalam basis data server. Jika masih berlanjut, Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "Sepertinya Anda menggunkan peramban Brave dengan pengaturan <bold>Blokir Fingerprinting yang Agresif</bold> diaktifkan.",
+      "line2": "Ini dapat membuat <bold>Elemen Teks</bold> dalam gambar mu.",
+      "line3": "Kami sangat menyarankan mematikan pengaturan ini. Anda dapat mengikuti <link>langkah-langkah ini</link> untuk melakukannya.",
+      "line4": "Jika mematikan pengaturan ini tidak membenarkan tampilan elemen teks, mohon buka\n<issueLink>isu</issueLink> di GitHub kami, atau chat kami di <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
@@ -229,7 +221,7 @@
     "penMode": "Mode pena - mencegah sentuhan",
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
     "eraser": "Penghapus",
-    "hand": ""
+    "hand": "Tangan (alat panning)"
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -237,7 +229,7 @@
     "shapes": "Bentuk"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Untuk memindahkan kanvas, tekan roda mouse atau spacebar sambil menyeret, atau menggunakan alat tangan",
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
@@ -306,8 +298,8 @@
     "doubleClick": "klik-ganda",
     "drag": "seret",
     "editor": "Editor",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Edit titik garis/panah",
+    "editText": "Edit teks / tambah label",
     "github": "Menemukan masalah? Kirimkan",
     "howto": "Ikuti panduan kami",
     "or": "atau",
@@ -363,6 +355,30 @@
     "resetLibrary": "Reset pustaka",
     "removeItemsFromLib": "Hapus item yang dipilih dari pustaka"
   },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
+  },
   "encrypted": {
     "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya.",
     "link": "Pos blog tentang enkripsi ujung ke ujung di Excalidraw"
@@ -395,20 +411,20 @@
   },
   "colors": {
     "transparent": "Transparan",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Hitam",
+    "white": "Putih",
+    "red": "Merah",
+    "pink": "Pink",
+    "grape": "Ungu",
+    "violet": "Violet",
+    "gray": "Abu-abu",
+    "blue": "Biru",
+    "cyan": "Cyan",
+    "teal": "Teal",
+    "green": "Hijau",
+    "yellow": "Kuning",
+    "orange": "Jingga",
+    "bronze": "Tembaga"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +440,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Warna yang sering dipakai",
+    "colors": "Warna",
+    "shades": "Nuansa",
+    "hexCode": "Kode hexa",
+    "noShades": "Tidak ada nuansa untuk warna ini"
   }
 }
