@@ -2216,25 +2216,6 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.executeAction(actionToggleHandTool);
   };
 
-  /**
-   * Zooms on canvas viewport center
-   */
-  zoomCanvas = (
-    /** decimal fraction between 0.1 (10% zoom) and 30 (3000% zoom) */
-    value: number,
-  ) => {
-    this.setState({
-      ...getStateForZoom(
-        {
-          viewportX: this.state.width / 2 + this.state.offsetLeft,
-          viewportY: this.state.height / 2 + this.state.offsetTop,
-          nextZoom: getNormalizedZoom(value),
-        },
-        this.state,
-      ),
-    });
-  };
-
   private cancelInProgresAnimation: (() => void) | null = null;
 
   scrollToContent = (
@@ -2283,19 +2264,44 @@ class App extends React.Component<AppProps, AppState> {
     if (opts?.animate) {
       const origScrollX = this.state.scrollX;
       const origScrollY = this.state.scrollY;
+      const origZoom = this.state.zoom.value;
 
-      // zoom animation could become problematic on scenes with large number
-      // of elements, setting it to its final value to improve user experience.
-      //
-      // using zoomCanvas() to zoom on current viewport center
-      this.zoomCanvas(zoom.value);
-
-      const cancel = easeToValuesRAF(
-        [origScrollX, origScrollY],
-        [scrollX, scrollY],
-        (scrollX, scrollY) => this.setState({ scrollX, scrollY }),
-        { duration: opts?.duration ?? 500 },
+      const nextZoom = getStateForZoom(
+        {
+          viewportX: this.state.width / 2 + this.state.offsetLeft,
+          viewportY: this.state.height / 2 + this.state.offsetTop,
+          nextZoom: getNormalizedZoom(zoom.value),
+        },
+        this.state,
       );
+      const nextZoomValue = nextZoom.zoom.value;
+
+      const cancel = easeToValuesRAF({
+        fromValues: {
+          scrollX: origScrollX,
+          scrollY: origScrollY,
+          zoom: origZoom,
+        },
+        toValues: { scrollX, scrollY, zoom: nextZoomValue },
+        onStep: ({ scrollX, scrollY, zoom }) => {
+          this.setState({
+            scrollX,
+            scrollY,
+            zoom: { value: zoom },
+          });
+        },
+        onStart: () => {
+          this.setState({ shouldCacheIgnoreZoom: true });
+        },
+        onEnd: () => {
+          this.setState({ shouldCacheIgnoreZoom: false });
+        },
+        onCancel: () => {
+          this.setState({ shouldCacheIgnoreZoom: false });
+        },
+        duration: opts?.duration ?? 500,
+      });
+
       this.cancelInProgresAnimation = () => {
         cancel();
         this.cancelInProgresAnimation = null;
