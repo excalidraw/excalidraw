@@ -26,6 +26,17 @@ ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 const tab = "    ";
 const mouse = new Pointer("mouse");
 
+const getTextEditor = () => {
+  return document.querySelector(
+    ".excalidraw-textEditorContainer > textarea",
+  ) as HTMLTextAreaElement;
+};
+
+const updateTextEditor = (editor: HTMLTextAreaElement, value: string) => {
+  fireEvent.change(editor, { target: { value } });
+  editor.dispatchEvent(new Event("input"));
+};
+
 describe("textWysiwyg", () => {
   describe("start text editing", () => {
     const { h } = window;
@@ -190,9 +201,7 @@ describe("textWysiwyg", () => {
 
       mouse.clickAt(text.x + 50, text.y + 50);
 
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
 
       expect(editor).not.toBe(null);
       expect(h.state.editingElement?.id).toBe(text.id);
@@ -214,9 +223,7 @@ describe("textWysiwyg", () => {
 
       mouse.doubleClickAt(text.x + 50, text.y + 50);
 
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
 
       expect(editor).not.toBe(null);
       expect(h.state.editingElement?.id).toBe(text.id);
@@ -243,9 +250,7 @@ describe("textWysiwyg", () => {
       textElement = UI.createElement("text");
 
       mouse.clickOn(textElement);
-      textarea = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      )!;
+      textarea = getTextEditor();
     });
 
     afterAll(() => {
@@ -455,17 +460,11 @@ describe("textWysiwyg", () => {
       UI.clickTool("text");
       mouse.clickAt(750, 300);
 
-      textarea = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      )!;
-      fireEvent.change(textarea, {
-        target: {
-          value:
-            "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
-        },
-      });
-
-      textarea.dispatchEvent(new Event("input"));
+      textarea = getTextEditor();
+      updateTextEditor(
+        textarea,
+        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+      );
       await new Promise((cb) => setTimeout(cb, 0));
       textarea.blur();
       expect(textarea.style.width).toBe("792px");
@@ -513,11 +512,9 @@ describe("textWysiwyg", () => {
         { id: text.id, type: "text" },
       ]);
       mouse.down();
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
 
-      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      updateTextEditor(editor, "Hello World!");
 
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
@@ -543,11 +540,9 @@ describe("textWysiwyg", () => {
       ]);
       expect(text.angle).toBe(rectangle.angle);
       mouse.down();
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
 
-      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      updateTextEditor(editor, "Hello World!");
 
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
@@ -572,9 +567,7 @@ describe("textWysiwyg", () => {
       API.setSelectedElements([diamond]);
       Keyboard.keyPress(KEYS.ENTER);
 
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
 
       await new Promise((r) => setTimeout(r, 0));
       const value = new Array(1000).fill("1").join("\n");
@@ -587,9 +580,7 @@ describe("textWysiwyg", () => {
       expect(diamond.height).toBe(50020);
 
       // Clearing text to simulate height decrease
-      expect(() =>
-        fireEvent.input(editor, { target: { value: "" } }),
-      ).not.toThrow();
+      expect(() => updateTextEditor(editor, "")).not.toThrow();
 
       expect(diamond.height).toBe(70);
     });
@@ -611,9 +602,7 @@ describe("textWysiwyg", () => {
       expect(text.type).toBe("text");
       expect(text.containerId).toBe(null);
       mouse.down();
-      let editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      let editor = getTextEditor();
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
 
@@ -628,11 +617,9 @@ describe("textWysiwyg", () => {
       expect(text.containerId).toBe(rectangle.id);
 
       mouse.down();
-      editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      editor = getTextEditor();
 
-      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      updateTextEditor(editor, "Hello World!");
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
 
@@ -652,13 +639,11 @@ describe("textWysiwyg", () => {
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.type).toBe("text");
       expect(text.containerId).toBe(rectangle.id);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
 
       await new Promise((r) => setTimeout(r, 0));
 
-      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      updateTextEditor(editor, "Hello World!");
       editor.blur();
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
@@ -689,11 +674,8 @@ describe("textWysiwyg", () => {
         { id: text.id, type: "text" },
       ]);
       mouse.down();
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
-
-      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      const editor = getTextEditor();
+      updateTextEditor(editor, "Hello World!");
 
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
@@ -717,17 +699,9 @@ describe("textWysiwyg", () => {
         freedraw.y + freedraw.height / 2,
       );
 
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
-
-      fireEvent.change(editor, {
-        target: {
-          value: "Hello World!",
-        },
-      });
+      const editor = getTextEditor();
+      updateTextEditor(editor, "Hello World!");
       fireEvent.keyDown(editor, { key: KEYS.ESCAPE });
-      editor.dispatchEvent(new Event("input"));
 
       expect(freedraw.boundElements).toBe(null);
       expect(h.elements[1].type).toBe("text");
@@ -759,11 +733,9 @@ describe("textWysiwyg", () => {
       expect(text.type).toBe("text");
       expect(text.containerId).toBe(null);
       mouse.down();
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
 
-      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      updateTextEditor(editor, "Hello World!");
 
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
@@ -776,17 +748,12 @@ describe("textWysiwyg", () => {
 
       UI.clickTool("text");
       mouse.clickAt(20, 30);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
 
-      fireEvent.change(editor, {
-        target: {
-          value: "Excalidraw is an opensource virtual collaborative whiteboard",
-        },
-      });
-
-      editor.dispatchEvent(new Event("input"));
+      updateTextEditor(
+        editor,
+        "Excalidraw is an opensource virtual collaborative whiteboard",
+      );
       await new Promise((cb) => setTimeout(cb, 0));
       expect(h.elements.length).toBe(2);
       expect(h.elements[1].type).toBe("text");
@@ -826,12 +793,10 @@ describe("textWysiwyg", () => {
       mouse.down();
 
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      let editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      let editor = getTextEditor();
 
       await new Promise((r) => setTimeout(r, 0));
-      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      updateTextEditor(editor, "Hello World!");
       editor.blur();
       expect(text.fontFamily).toEqual(FONT_FAMILY.Virgil);
       UI.clickTool("text");
@@ -841,9 +806,7 @@ describe("textWysiwyg", () => {
         rectangle.y + rectangle.height / 2,
       );
       mouse.down();
-      editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      editor = getTextEditor();
 
       editor.select();
       fireEvent.click(screen.getByTitle(/code/i));
@@ -876,17 +839,9 @@ describe("textWysiwyg", () => {
 
       Keyboard.keyDown(KEYS.ENTER);
       let text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      let editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      let editor = getTextEditor();
 
-      fireEvent.change(editor, {
-        target: {
-          value: "Hello World!",
-        },
-      });
-
-      editor.dispatchEvent(new Event("input"));
+      updateTextEditor(editor, "Hello World!");
 
       await new Promise((cb) => setTimeout(cb, 0));
       editor.blur();
@@ -905,17 +860,8 @@ describe("textWysiwyg", () => {
       mouse.select(rectangle);
       Keyboard.keyPress(KEYS.ENTER);
 
-      editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
-
-      fireEvent.change(editor, {
-        target: {
-          value: "Hello",
-        },
-      });
-
-      editor.dispatchEvent(new Event("input"));
+      editor = getTextEditor();
+      updateTextEditor(editor, "Hello");
 
       await new Promise((r) => setTimeout(r, 0));
 
@@ -943,13 +889,11 @@ describe("textWysiwyg", () => {
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.containerId).toBe(rectangle.id);
 
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
 
       await new Promise((r) => setTimeout(r, 0));
 
-      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      updateTextEditor(editor, "Hello World!");
       editor.blur();
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
@@ -982,11 +926,9 @@ describe("textWysiwyg", () => {
       // Bind first text
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.containerId).toBe(rectangle.id);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
       await new Promise((r) => setTimeout(r, 0));
-      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      updateTextEditor(editor, "Hello World!");
       editor.blur();
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
@@ -1005,11 +947,9 @@ describe("textWysiwyg", () => {
     it("should respect text alignment when resizing", async () => {
       Keyboard.keyPress(KEYS.ENTER);
 
-      let editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      let editor = getTextEditor();
       await new Promise((r) => setTimeout(r, 0));
-      fireEvent.change(editor, { target: { value: "Hello" } });
+      updateTextEditor(editor, "Hello");
       editor.blur();
 
       // should center align horizontally and vertically by default
@@ -1024,9 +964,7 @@ describe("textWysiwyg", () => {
       mouse.select(rectangle);
       Keyboard.keyPress(KEYS.ENTER);
 
-      editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      editor = getTextEditor();
 
       editor.select();
 
@@ -1049,9 +987,7 @@ describe("textWysiwyg", () => {
 
       mouse.select(rectangle);
       Keyboard.keyPress(KEYS.ENTER);
-      editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      editor = getTextEditor();
 
       editor.select();
 
@@ -1089,11 +1025,9 @@ describe("textWysiwyg", () => {
       expect(text.type).toBe("text");
       expect(text.containerId).toBe(rectangle.id);
       mouse.down();
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
 
-      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      updateTextEditor(editor, "Hello World!");
 
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
@@ -1106,11 +1040,9 @@ describe("textWysiwyg", () => {
     it("should scale font size correctly when resizing using shift", async () => {
       Keyboard.keyPress(KEYS.ENTER);
 
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
       await new Promise((r) => setTimeout(r, 0));
-      fireEvent.change(editor, { target: { value: "Hello" } });
+      updateTextEditor(editor, "Hello");
       editor.blur();
       const textElement = h.elements[1] as ExcalidrawTextElement;
       expect(rectangle.width).toBe(90);
@@ -1128,11 +1060,9 @@ describe("textWysiwyg", () => {
     it("should bind text correctly when container duplicated with alt-drag", async () => {
       Keyboard.keyPress(KEYS.ENTER);
 
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
       await new Promise((r) => setTimeout(r, 0));
-      fireEvent.change(editor, { target: { value: "Hello" } });
+      updateTextEditor(editor, "Hello");
       editor.blur();
       expect(h.elements.length).toBe(2);
 
@@ -1162,11 +1092,9 @@ describe("textWysiwyg", () => {
 
     it("undo should work", async () => {
       Keyboard.keyPress(KEYS.ENTER);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
       await new Promise((r) => setTimeout(r, 0));
-      fireEvent.change(editor, { target: { value: "Hello" } });
+      updateTextEditor(editor, "Hello");
       editor.blur();
       expect(rectangle.boundElements).toStrictEqual([
         { id: h.elements[1].id, type: "text" },
@@ -1201,12 +1129,10 @@ describe("textWysiwyg", () => {
 
     it("should not allow bound text with only whitespaces", async () => {
       Keyboard.keyPress(KEYS.ENTER);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
       await new Promise((r) => setTimeout(r, 0));
 
-      fireEvent.change(editor, { target: { value: "   " } });
+      updateTextEditor(editor, "   ");
       editor.blur();
       expect(rectangle.boundElements).toStrictEqual([]);
       expect(h.elements[1].isDeleted).toBe(true);
@@ -1225,9 +1151,9 @@ describe("textWysiwyg", () => {
         type: "text",
         text: "Online whiteboard collaboration made easy",
       });
+
       h.elements = [container, text];
       API.setSelectedElements([container, text]);
-
       fireEvent.contextMenu(GlobalTestState.canvas, {
         button: 2,
         clientX: 20,
@@ -1258,11 +1184,9 @@ describe("textWysiwyg", () => {
     it("should reset the container height cache when resizing", async () => {
       Keyboard.keyPress(KEYS.ENTER);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
-      let editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      let editor = getTextEditor();
       await new Promise((r) => setTimeout(r, 0));
-      fireEvent.change(editor, { target: { value: "Hello" } });
+      updateTextEditor(editor, "Hello");
       editor.blur();
 
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
@@ -1272,9 +1196,7 @@ describe("textWysiwyg", () => {
       mouse.select(rectangle);
       Keyboard.keyPress(KEYS.ENTER);
 
-      editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      editor = getTextEditor();
 
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
@@ -1287,12 +1209,8 @@ describe("textWysiwyg", () => {
       Keyboard.keyPress(KEYS.ENTER);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
 
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
-
-      await new Promise((r) => setTimeout(r, 0));
-      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      const editor = getTextEditor();
+      updateTextEditor(editor, "Hello World!");
       editor.blur();
 
       mouse.select(rectangle);
@@ -1316,12 +1234,8 @@ describe("textWysiwyg", () => {
       Keyboard.keyPress(KEYS.ENTER);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
 
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
-
-      await new Promise((r) => setTimeout(r, 0));
-      fireEvent.change(editor, { target: { value: "Hello World!" } });
+      const editor = getTextEditor();
+      updateTextEditor(editor, "Hello World!");
       editor.blur();
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
@@ -1352,17 +1266,12 @@ describe("textWysiwyg", () => {
 
       beforeEach(async () => {
         Keyboard.keyPress(KEYS.ENTER);
-        editor = document.querySelector(
-          ".excalidraw-textEditorContainer > textarea",
-        ) as HTMLTextAreaElement;
-        await new Promise((r) => setTimeout(r, 0));
-        fireEvent.change(editor, { target: { value: "Hello" } });
+        editor = getTextEditor();
+        updateTextEditor(editor, "Hello");
         editor.blur();
         mouse.select(rectangle);
         Keyboard.keyPress(KEYS.ENTER);
-        editor = document.querySelector(
-          ".excalidraw-textEditorContainer > textarea",
-        ) as HTMLTextAreaElement;
+        editor = getTextEditor();
         editor.select();
       });
 
@@ -1473,17 +1382,12 @@ describe("textWysiwyg", () => {
     it("should wrap text in a container when wrap text in container triggered from context menu", async () => {
       UI.clickTool("text");
       mouse.clickAt(20, 30);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = getTextEditor();
 
-      fireEvent.change(editor, {
-        target: {
-          value: "Excalidraw is an opensource virtual collaborative whiteboard",
-        },
-      });
-
-      editor.dispatchEvent(new Event("input"));
+      updateTextEditor(
+        editor,
+        "Excalidraw is an opensource virtual collaborative whiteboard",
+      );
       await new Promise((cb) => setTimeout(cb, 0));
 
       editor.select();
