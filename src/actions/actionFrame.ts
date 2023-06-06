@@ -1,5 +1,6 @@
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
+import { removeAllElementsFromFrame } from "../frame";
 import { getElementsInFrame } from "../frame";
 import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
@@ -67,12 +68,8 @@ export const actionRemoveAllElementsInFrame = register({
     )[0];
 
     if (selectedFrame && selectedFrame.type === "frame") {
-      const elementsInFrame = new Set(
-        getElementsInFrame(elements, selectedFrame.id),
-      );
-
       return {
-        elements: elements.filter((element) => !elementsInFrame.has(element)),
+        elements: removeAllElementsFromFrame(elements, selectedFrame, appState),
         appState: {
           ...appState,
           selectedElementIds: {
