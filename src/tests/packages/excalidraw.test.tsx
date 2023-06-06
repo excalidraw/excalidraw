@@ -220,7 +220,6 @@ describe("<Excalidraw/>", () => {
                   style={{ height: "2rem" }}
                   onClick={() => window.alert("custom menu item")}
                 >
-                  {" "}
                   custom item
                 </button>
               </MainMenu.ItemCustom>
@@ -291,7 +290,7 @@ describe("<Excalidraw/>", () => {
       toggleMenu(container);
       fireEvent.click(queryByTestId(container, "image-export-button")!);
       const textInput: HTMLInputElement | null = document.querySelector(
-        ".ExportDialog .ProjectName .TextInput",
+        ".ImageExportModal .ImageExportModal__preview__filename .TextInput",
       );
       expect(textInput?.value).toContain(`${t("labels.untitled")}`);
       expect(textInput?.nodeName).toBe("INPUT");
@@ -304,10 +303,11 @@ describe("<Excalidraw/>", () => {
       toggleMenu(container);
       await fireEvent.click(queryByTestId(container, "image-export-button")!);
       const textInput = document.querySelector(
-        ".ExportDialog .ProjectName .TextInput--readonly",
-      );
-      expect(textInput?.textContent).toEqual(name);
-      expect(textInput?.nodeName).toBe("SPAN");
+        ".ImageExportModal .ImageExportModal__preview__filename .TextInput",
+      ) as HTMLInputElement;
+      expect(textInput?.value).toEqual(name);
+      expect(textInput?.nodeName).toBe("INPUT");
+      expect(textInput?.disabled).toBe(true);
     });
   });
 
@@ -345,7 +345,6 @@ describe("<Excalidraw/>", () => {
                 style={{ height: "2rem" }}
                 onClick={() => window.alert("custom menu item")}
               >
-                {" "}
                 custom menu item
               </button>
             </MainMenu.ItemCustom>

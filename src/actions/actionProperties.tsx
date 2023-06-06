@@ -1,7 +1,13 @@
 import { AppState } from "../../src/types";
+import {
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_PICKS,
+  DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
+  DEFAULT_ELEMENT_STROKE_PICKS,
+} from "../colors";
 import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
-import { ColorPicker } from "../components/ColorPicker";
+import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
 // TODO barnabasmolnar/editor-redesign
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
@@ -116,8 +122,8 @@ const getFormValue = function <T>(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
-  defaultValue?: T,
-): T | null {
+  defaultValue: T,
+): T {
   const editingElement = appState.editingElement;
   const nonDeletedElements = getNonDeletedElements(elements);
   return (
@@ -129,7 +135,7 @@ const getFormValue = function <T>(
           getAttribute,
         )
       : defaultValue) ??
-    null
+    defaultValue
   );
 };
 
@@ -229,10 +235,12 @@ export const actionChangeStrokeColor = register({
       commitToHistory: !!value.currentItemStrokeColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, appProps }) => (
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
+        topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
+        palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
         type="elementStroke"
         label={t("labels.stroke")}
         color={getFormValue(
@@ -242,12 +250,9 @@ export const actionChangeStrokeColor = register({
           appState.currentItemStrokeColor,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
-        isActive={appState.openPopup === "strokeColorPicker"}
-        setActive={(active) =>
-          updateData({ openPopup: active ? "strokeColorPicker" : null })
-        }
         elements={elements}
         appState={appState}
+        updateData={updateData}
       />
     </>
   ),
@@ -272,10 +277,12 @@ export const actionChangeBackgroundColor = register({
       commitToHistory: !!value.currentItemBackgroundColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, appProps }) => (
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
+        topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
+        palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
         type="elementBackground"
         label={t("labels.background")}
         color={getFormValue(
@@ -285,12 +292,9 @@ export const actionChangeBackgroundColor = register({
           appState.currentItemBackgroundColor,
         )}
         onChange={(color) => updateData({ currentItemBackgroundColor: color })}
-        isActive={appState.openPopup === "backgroundColorPicker"}
-        setActive={(active) =>
-          updateData({ openPopup: active ? "backgroundColorPicker" : null })
-        }
         elements={elements}
         appState={appState}
+        updateData={updateData}
       />
     </>
   ),
@@ -810,6 +814,7 @@ export const actionChangeTextAlign = register({
     );
   },
 });
+
 export const actionChangeVerticalAlign = register({
   name: "changeVerticalAlign",
   trackEvent: { category: "element" },
@@ -864,16 +869,21 @@ export const actionChangeVerticalAlign = register({
               testId: "align-bottom",
             },
           ]}
-          value={getFormValue(elements, appState, (element) => {
-            if (isTextElement(element) && element.containerId) {
-              return element.verticalAlign;
-            }
-            const boundTextElement = getBoundTextElement(element);
-            if (boundTextElement) {
-              return boundTextElement.verticalAlign;
-            }
-            return null;
-          })}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => {
+              if (isTextElement(element) && element.containerId) {
+                return element.verticalAlign;
+              }
+              const boundTextElement = getBoundTextElement(element);
+              if (boundTextElement) {
+                return boundTextElement.verticalAlign;
+              }
+              return null;
+            },
+            VERTICAL_ALIGN.MIDDLE,
+          )}
           onChange={(value) => updateData(value)}
         />
       </fieldset>

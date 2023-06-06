@@ -1,44 +1,39 @@
-import { getClientInitials } from "../clients";
+import { getNameInitial } from "../clients";
 
 describe("getClientInitials", () => {
   it("returns substring if one name provided", () => {
-    const result = getClientInitials("Alan");
-    expect(result).toBe("A");
+    expect(getNameInitial("Alan")).toBe("A");
   });
 
   it("returns initials", () => {
-    const result = getClientInitials("John Doe");
-    expect(result).toBe("J");
+    expect(getNameInitial("John Doe")).toBe("J");
   });
 
   it("returns correct initials if many names provided", () => {
-    const result = getClientInitials("John Alan Doe");
-    expect(result).toBe("J");
+    expect(getNameInitial("John Alan Doe")).toBe("J");
   });
 
   it("returns single initial if 1 letter provided", () => {
-    const result = getClientInitials("z");
-    expect(result).toBe("Z");
+    expect(getNameInitial("z")).toBe("Z");
   });
 
   it("trims trailing whitespace", () => {
-    const result = getClientInitials("  q    ");
-    expect(result).toBe("Q");
+    expect(getNameInitial("  q    ")).toBe("Q");
   });
 
   it('returns "?" if falsey value provided', () => {
-    let result = getClientInitials("");
-    expect(result).toBe("?");
-
-    result = getClientInitials(undefined);
-    expect(result).toBe("?");
-
-    result = getClientInitials(null);
-    expect(result).toBe("?");
+    expect(getNameInitial("")).toBe("?");
+    expect(getNameInitial(undefined)).toBe("?");
+    expect(getNameInitial(null)).toBe("?");
   });
 
   it('returns "?" when value is blank', () => {
-    const result = getClientInitials(" ");
-    expect(result).toBe("?");
+    expect(getNameInitial(" ")).toBe("?");
+  });
+
+  it("works with multibyte strings", () => {
+    expect(getNameInitial("😀")).toBe("😀");
+    // but doesn't work with emoji ZWJ sequences
+    expect(getNameInitial("👨‍👩‍👦")).toBe("👨");
   });
 });

@@ -106,7 +106,7 @@ export const PasteChartDialog = ({
 
   return (
     <Dialog
-      small
+      size="small"
       onCloseRequest={handleClose}
       title={t("labels.pasteCharts")}
       className={"PasteChartDialog"}
