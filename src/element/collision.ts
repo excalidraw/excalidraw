@@ -35,7 +35,7 @@ import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
 import { hasBoundTextElement, isImageElement } from "./typeChecks";
 import { isTextElement } from ".";
-import { isTransparent } from "../utils";
+import { isTransparent, isIFrame } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
 import { getBoundTextElement } from "./textElement";
 import { Mutable } from "../utility-types";
@@ -51,7 +51,7 @@ const isElementDraggableFromInside = (
     return true;
   }
   const isDraggableFromInside =
-    !isTransparent(element.backgroundColor) || hasBoundTextElement(element);
+    !isTransparent(element.backgroundColor) || hasBoundTextElement(element) || isIFrame(element);
   if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
   }

@@ -547,10 +547,11 @@ export const _renderScene = ({
               dashed: !!renderConfig.remoteSelectedElementIds[element.id],
               cx,
               cy,
+              activeFrame: appState.activeIFrameElement === element,
             });
           }
           return acc;
-        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; dashed?: boolean; cx: number; cy: number }[]);
+        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; dashed?: boolean; cx: number; cy: number; activeFrame: boolean }[]);
 
         const addSelectionForGroupId = (groupId: GroupId) => {
           const groupElements = getElementsInGroup(elements, groupId);
@@ -566,6 +567,7 @@ export const _renderScene = ({
             dashed: true,
             cx: elementX1 + (elementX2 - elementX1) / 2,
             cy: elementY1 + (elementY2 - elementY1) / 2,
+            activeFrame: false,
           });
         };
 
@@ -887,6 +889,7 @@ const renderSelectionBorder = (
     dashed?: boolean;
     cx: number;
     cy: number;
+    activeFrame: boolean;
   },
   padding = DEFAULT_SPACING * 2,
 ) => {
@@ -900,6 +903,7 @@ const renderSelectionBorder = (
     cx,
     cy,
     dashed,
+    activeFrame,
   } = elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
@@ -910,7 +914,7 @@ const renderSelectionBorder = (
 
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
-  context.lineWidth = 1 / renderConfig.zoom.value;
+  context.lineWidth = (activeFrame ? 4 : 1) / renderConfig.zoom.value;
 
   const count = selectionColors.length;
   for (let index = 0; index < count; ++index) {

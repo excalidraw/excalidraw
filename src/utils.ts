@@ -10,7 +10,7 @@ import {
   THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import { FontFamilyValues, FontString } from "./element/types";
+import { ExcalidrawElement, ExcalidrawGenericElement, FontFamilyValues, FontString } from "./element/types";
 import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
@@ -819,7 +819,9 @@ export const composeEventHandlers = <E>(
 // youtube embed link or null
 export const getYTEmbedLink = (link?: string | null): string | null => {
   const ytLink = link?.match(
-    /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(?:embed\/)?([a-zA-Z0-9_-]*)$/,
+    /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(?:embed\/|watch\?v=)?([a-zA-Z0-9_-]+)[^\s]*$/,
   )?.[1];
   return ytLink ? `https://www.youtube.com/embed/${ytLink}` : null;
 };
+
+export const isIFrame = (element: ExcalidrawGenericElement | ExcalidrawElement): boolean => Boolean(element.link?.embed);

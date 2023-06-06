@@ -245,6 +245,7 @@ import {
   easeToValuesRAF,
   muteFSAbortError,
   getYTEmbedLink,
+  isIFrame,
 } from "../utils";
 import {
   ContextMenu,
@@ -587,13 +588,7 @@ class App extends React.Component<AppProps, AppState> {
             (el) =>
               el.type === "rectangle" &&
               el.link &&
-              el.link.embed &&
-              isVisibleElement(
-                el,
-                normalizedWidth,
-                normalizedHeight,
-                this.state,
-              ),
+              el.link.embed
           )
           .map((el) => {
             const strokeOffset = el.strokeWidth / 2;
@@ -604,6 +599,8 @@ class App extends React.Component<AppProps, AppState> {
 
             const ytLink = getYTEmbedLink(el.link?.url);
             const src = ytLink ?? el.link?.url ?? "";
+            const isVisible = isVisibleElement( el, normalizedWidth, normalizedHeight, this.state);
+            const isSelected = this.state.activeIFrameElement === el;
 
             const radius = getCornerRadius(
               Math.min(el.width, el.height) - el.strokeWidth,
@@ -616,8 +613,7 @@ class App extends React.Component<AppProps, AppState> {
                   top: `${y - this.state.offsetTop}px`,
                   left: `${x - this.state.offsetLeft}px`,
                   transform: `scale(${scale})`,
-                  pointerEvents:
-                    this.state.resizingElement === el ? "none" : "auto",
+                  pointerEvents: isSelected ? "auto" : "none",
                 }}
               >
                 <iframe
@@ -628,6 +624,7 @@ class App extends React.Component<AppProps, AppState> {
                     border: 0,
                     transform: `rotate(${el.angle}rad)`,
                     borderRadius: `${radius}px`,
+                    display: isVisible ? "block" : "none",
                   }}
                   src={src}
                   title="Excalidraw Embedded Content"
@@ -1613,6 +1610,7 @@ class App extends React.Component<AppProps, AppState> {
     if (event.touches.length === 2) {
       this.setState({
         selectedElementIds: {},
+        activeIFrameElement: null,
       });
     }
   };
@@ -2448,6 +2446,7 @@ class App extends React.Component<AppProps, AppState> {
           selectedElementIds: {},
           selectedGroupIds: {},
           editingGroupId: null,
+          activeIFrameElement: null,
         });
       }
       isHoldingSpace = false;
@@ -2493,6 +2492,7 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
+        activeIFrameElement: null,
       });
     } else {
       this.setState({ activeTool: nextActiveTool });
@@ -2528,6 +2528,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.isTouchScreenMultiTouchGesture()) {
       this.setState({
         selectedElementIds: {},
+        activeIFrameElement: null,
       });
     }
     gesture.initialScale = this.state.zoom.value;
@@ -2679,6 +2680,7 @@ class App extends React.Component<AppProps, AppState> {
       selectedElementIds: {},
       selectedGroupIds: {},
       editingGroupId: null,
+      activeIFrameElement: null,
     });
   }
 
@@ -3002,12 +3004,18 @@ class App extends React.Component<AppProps, AppState> {
           sceneY = midPoint.y;
         }
       }
-      this.startTextEditing({
-        sceneX,
-        sceneY,
-        insertAtParentCenter: !event.altKey,
-        container,
-      });
+      if(isIFrame(container as ExcalidrawGenericElement)) {
+        this.setState({
+          activeIFrameElement: container,
+        })
+      } else {
+        this.startTextEditing({
+          sceneX,
+          sceneY,
+          insertAtParentCenter: !event.altKey,
+          container,
+        });
+      }
     }
   };
 
@@ -4119,6 +4127,7 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
+        activeIFrameElement: null,
       });
     }
   };
@@ -4287,6 +4296,7 @@ class App extends React.Component<AppProps, AppState> {
                 selectedElementIds: {},
                 selectedGroupIds: {},
                 editingGroupId: null,
+                activeIFrameElement: null,
               });
             }
 
@@ -5086,6 +5096,7 @@ class App extends React.Component<AppProps, AppState> {
               selectedElementIds: {},
               selectedGroupIds: {},
               editingGroupId: null,
+              activeIFrameElement: null,
             });
           }
         }
@@ -5623,6 +5634,7 @@ class App extends React.Component<AppProps, AppState> {
             selectedElementIds: {},
             selectedGroupIds: {},
             editingGroupId: null,
+            activeIFrameElement: null,
           });
         }
         return;
@@ -6168,6 +6180,7 @@ class App extends React.Component<AppProps, AppState> {
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: {},
+      activeIFrameElement: null,
       selectedGroupIds: {},
       // Continue editing the same group if the user selected a different
       // element from it
@@ -6180,6 +6193,7 @@ class App extends React.Component<AppProps, AppState> {
     }));
     this.setState({
       selectedElementIds: {},
+      activeIFrameElement: null,
       previousSelectedElementIds: this.state.selectedElementIds,
     });
   }
@@ -6460,6 +6474,7 @@ class App extends React.Component<AppProps, AppState> {
       // rotating
       isResizing: transformHandleType && transformHandleType !== "rotation",
       isRotating: transformHandleType === "rotation",
+      activeIFrameElement: null,
     });
     const pointerCoords = pointerDownState.lastCoords;
     const [resizeX, resizeY] = getGridPoint(
