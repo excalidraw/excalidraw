@@ -152,7 +152,7 @@ class Collab extends PureComponent<Props, CollabState> {
     this.excalidrawAPI = props.excalidrawAPI;
     this.activeIntervalId = null;
     this.idleTimeoutId = null;
-    this.isDisabled = !isRunningInIframe();
+    this.isDisabled = isRunningInIframe();
   }
 
   componentDidMount() {
