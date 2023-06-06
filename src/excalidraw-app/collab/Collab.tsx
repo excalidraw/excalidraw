@@ -14,7 +14,7 @@ import {
 } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
 import {
-  getFrame,
+  isRunningInIframe,
   preventUnload,
   resolvablePromise,
   withBatchedUpdates,
@@ -152,14 +152,18 @@ class Collab extends PureComponent<Props, CollabState> {
     this.excalidrawAPI = props.excalidrawAPI;
     this.activeIntervalId = null;
     this.idleTimeoutId = null;
-    this.isDisabled = getFrame() === "iframe";
+    this.isDisabled = !isRunningInIframe();
   }
 
   componentDidMount() {
-    window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
-    window.addEventListener("online", this.onOfflineStatusToggle);
-    window.addEventListener("offline", this.onOfflineStatusToggle);
-    window.addEventListener(EVENT.UNLOAD, this.onUnload);
+    if (!this.isDisabled) {
+      window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
+      window.addEventListener("online", this.onOfflineStatusToggle);
+      window.addEventListener("offline", this.onOfflineStatusToggle);
+      window.addEventListener(EVENT.UNLOAD, this.onUnload);
+
+      this.onOfflineStatusToggle();
+    }
 
     const collabAPI: CollabAPI = {
       isCollaborating: this.isCollaborating,
@@ -173,7 +177,6 @@ class Collab extends PureComponent<Props, CollabState> {
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
-    this.onOfflineStatusToggle();
 
     if (
       process.env.NODE_ENV === ENV.TEST ||
@@ -386,6 +389,9 @@ class Collab extends PureComponent<Props, CollabState> {
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
     if (this.portal.socket || this.isDisabled) {
+      console.error(
+        "Attempted to start collaboration while is collaboration disabled",
+      );
       return null;
     }
 

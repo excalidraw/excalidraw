@@ -741,6 +741,8 @@ export const getFrame = () => {
   }
 };
 
+export const isRunningInIframe = () => getFrame() === "iframe";
+
 export const isPromiseLike = (
   value: any,
 ): value is Promise<ResolutionType<typeof value>> => {
