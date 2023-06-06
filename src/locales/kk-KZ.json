@@ -40,10 +40,6 @@
     "arrowhead_triangle": "",
     "fontSize": "Қаріп өлшемі",
     "fontFamily": "Қаріп тобы",
-    "onlySelected": "",
-    "withBackground": "",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
     "addWatermark": "",
     "handDrawn": "",
     "normal": "Қалыпты",
@@ -100,7 +96,6 @@
     "flipHorizontal": "",
     "flipVertical": "",
     "viewMode": "",
-    "toggleExportColorScheme": "",
     "share": "",
     "showStroke": "",
     "showBackground": "",
@@ -128,7 +123,8 @@
       "unlockAll": ""
     },
     "statusPublished": "",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +136,7 @@
     "exportJSON": "",
     "exportImage": "",
     "export": "",
-    "exportToPng": "",
-    "exportToSvg": "",
     "copyToClipboard": "",
-    "copyPngToClipboard": "",
-    "scale": "",
     "save": "",
     "saveAs": "",
     "load": "",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "",
     "removeItemsFromLib": ""
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Сіздің сызбаларыңыз өтпелі шифрлеу арқылы шифрланған, сондықтан Excalidraw серверлері оларды ешқашан көрмейді.",

@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trojuholník",
     "fontSize": "Veľkosť písma",
     "fontFamily": "Písmo",
-    "onlySelected": "Iba vybrané",
-    "withBackground": "Pozadie",
-    "exportEmbedScene": "Zahrnúť scénu",
-    "exportEmbedScene_details": "Údaje scény budú uložené do exportovaného PNG/SVG súboru, takže scéna z neho môže byť opäť obnovená.\nBude to mať za následok zvýšenie veľkosti súboru.",
     "addWatermark": "Pridať \"Vytvorené s Excalidraw\"",
     "handDrawn": "Ručne písané",
     "normal": "Normálne",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Prevrátiť vodorovne",
     "flipVertical": "Prevrátiť zvislo",
     "viewMode": "Režim zobrazenia",
-    "toggleExportColorScheme": "Prepnúť exportovanie farebnej schémy",
     "share": "Zdieľať",
     "showStroke": "Zobraziť výber farby pre obrys",
     "showBackground": "Zobraziť výber farby pre pozadie",
@@ -128,7 +123,8 @@
       "unlockAll": "Odomknúť všetko"
     },
     "statusPublished": "Zverejnené",
-    "sidebarLock": "Nechať bočný panel otvorený"
+    "sidebarLock": "Nechať bočný panel otvorený",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Zatiaľ neboli pridané žiadne položky...",
@@ -140,11 +136,7 @@
     "exportJSON": "Exportovať do súboru",
     "exportImage": "Exportovať obrázok...",
     "export": "Uložiť do...",
-    "exportToPng": "Exportovať do PNG",
-    "exportToSvg": "Exportovať do SVG",
     "copyToClipboard": "Kopírovať do schránky",
-    "copyPngToClipboard": "Kopírovať PNG do schránky",
-    "scale": "Mierka",
     "save": "Uložiť do aktuálneho súboru",
     "saveAs": "Uložiť ako",
     "load": "Otvoriť",
@@ -363,6 +355,30 @@
     "resetLibrary": "Obnoviť knižnicu",
     "removeItemsFromLib": "Odstrániť zvolené položky z knižnice"
   },
+  "imageExportDialog": {
+    "header": "Exportovať obrázok",
+    "label": {
+      "withBackground": "Pozadie",
+      "onlySelected": "Iba vybrané",
+      "darkMode": "Tmavý režim",
+      "embedScene": "Zahrnúť scénu",
+      "scale": "Mierka",
+      "padding": "Odsadenie"
+    },
+    "tooltip": {
+      "embedScene": "Údaje scény budú uložené do exportovaného PNG/SVG súboru, takže scéna z neho môže byť opäť obnovená.\nBude to mať za následok zvýšenie veľkosti súboru."
+    },
+    "title": {
+      "exportToPng": "Exportovať do PNG",
+      "exportToSvg": "Exportovať do SVG",
+      "copyPngToClipboard": "Kopírovať PNG do schránky"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopírovať do schránky"
+    }
+  },
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať.",
     "link": "Blog o end-to-end šifrovaní v Excalidraw"
@@ -395,20 +411,20 @@
   },
   "colors": {
     "transparent": "Priehľadná",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Čierna",
+    "white": "Biela",
+    "red": "Červená",
+    "pink": "Ružová",
+    "grape": "Hroznová fialová",
+    "violet": "Fialová",
+    "gray": "Sivá",
+    "blue": "Modrá",
+    "cyan": "Azúrová",
+    "teal": "Modrozelená",
+    "green": "Zelená",
+    "yellow": "Žltá",
+    "orange": "Oranžová",
+    "bronze": "Bronzová"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +440,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Najpoužívanejšie vlastné farby",
+    "colors": "Farby",
+    "shades": "Odtiene",
+    "hexCode": "Hex kód",
+    "noShades": "Pre túto farbu nie sú dostupné žiadne odtiene"
   }
 }

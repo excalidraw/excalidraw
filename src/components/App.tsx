@@ -311,6 +311,7 @@ import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
+import { activeEyeDropperAtom } from "./EyeDropper";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -373,8 +374,6 @@ export const useExcalidrawActionManager = () =>
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
-let cursorX = 0;
-let cursorY = 0;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
@@ -432,7 +431,7 @@ class App extends React.Component<AppProps, AppState> {
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
-  lastScenePointer: { x: number; y: number } | null = null;
+  lastViewportPosition = { x: 0, y: 0 };
 
   constructor(props: AppProps) {
     super(props);
@@ -703,6 +702,7 @@ class App extends React.Component<AppProps, AppState> {
                         </LayerUI>
                         <div className="excalidraw-textEditorContainer" />
                         <div className="excalidraw-contextMenuContainer" />
+                        <div className="excalidraw-eye-dropper-container" />
                         {selectedElement.length === 1 &&
                           !this.state.contextMenu &&
                           this.state.showHyperlinkPopup && (
@@ -794,6 +794,49 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private openEyeDropper = ({ type }: { type: "stroke" | "background" }) => {
+    jotaiStore.set(activeEyeDropperAtom, {
+      swapPreviewOnAlt: true,
+      previewType: type === "stroke" ? "strokeColor" : "backgroundColor",
+      onSelect: (color, event) => {
+        const shouldUpdateStrokeColor =
+          (type === "background" && event.altKey) ||
+          (type === "stroke" && !event.altKey);
+        const selectedElements = getSelectedElements(
+          this.scene.getElementsIncludingDeleted(),
+          this.state,
+        );
+        if (
+          !selectedElements.length ||
+          this.state.activeTool.type !== "selection"
+        ) {
+          if (shouldUpdateStrokeColor) {
+            this.setState({
+              currentItemStrokeColor: color,
+            });
+          } else {
+            this.setState({
+              currentItemBackgroundColor: color,
+            });
+          }
+        } else {
+          this.updateScene({
+            elements: this.scene.getElementsIncludingDeleted().map((el) => {
+              if (this.state.selectedElementIds[el.id]) {
+                return newElementWith(el, {
+                  [shouldUpdateStrokeColor ? "strokeColor" : "backgroundColor"]:
+                    color,
+                });
+              }
+              return el;
+            }),
+          });
+        }
+      },
+      keepOpenOnAlt: false,
+    });
+  };
+
   private syncActionResult = withBatchedUpdates(
     (actionResult: ActionResult) => {
       if (this.unmounted || actionResult === false) {
@@ -852,6 +895,14 @@ class App extends React.Component<AppProps, AppState> {
         if (typeof this.props.name !== "undefined") {
           name = this.props.name;
         }
+
+        editingElement =
+          editingElement || actionResult.appState?.editingElement || null;
+
+        if (editingElement?.isDeleted) {
+          editingElement = null;
+        }
+
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
@@ -862,8 +913,7 @@ class App extends React.Component<AppProps, AppState> {
               // or programmatically from the host, so it will need to be
               // rewritten later
               contextMenu: null,
-              editingElement:
-                editingElement || actionResult.appState?.editingElement || null,
+              editingElement,
               viewModeEnabled,
               zenModeEnabled,
               gridSize,
@@ -1142,6 +1192,7 @@ class App extends React.Component<AppProps, AppState> {
     this.unmounted = true;
     this.removeEventListeners();
     this.scene.destroy();
+    this.library.destroy();
     clearTimeout(touchTimeout);
     touchTimeout = 0;
   }
@@ -1371,6 +1422,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state.editingLinearElement &&
           this.actionManager.executeAction(actionFinalize);
       });
+    }
+
+    // failsafe in case the state is being updated in incorrect order resulting
+    // in the editingElement being now a deleted element
+    if (this.state.editingElement?.isDeleted) {
+      this.setState({ editingElement: null });
     }
 
     if (
@@ -1639,7 +1696,10 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
+      const elementUnderCursor = document.elementFromPoint(
+        this.lastViewportPosition.x,
+        this.lastViewportPosition.y,
+      );
       if (
         event &&
         (!(elementUnderCursor instanceof HTMLCanvasElement) ||
@@ -1665,10 +1725,14 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // prefer spreadsheet data over image file (MS Office/Libre Office)
-      const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-        { clientX: cursorX, clientY: cursorY },
-        this.state,
-      );
+      if (isSupportedImageFile(file) && !data.spreadsheet) {
+        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+          {
+            clientX: this.lastViewportPosition.x,
+            clientY: this.lastViewportPosition.y,
+          },
+          this.state,
+        );
 
       if (isSupportedImageFile(file) && !data.spreadsheet) {
         const imageElement = this.createImageElement({ sceneX, sceneY });
@@ -1743,13 +1807,13 @@ class App extends React.Component<AppProps, AppState> {
       typeof opts.position === "object"
         ? opts.position.clientX
         : opts.position === "cursor"
-        ? cursorX
+        ? this.lastViewportPosition.x
         : this.state.width / 2 + this.state.offsetLeft;
     const clientY =
       typeof opts.position === "object"
         ? opts.position.clientY
         : opts.position === "cursor"
-        ? cursorY
+        ? this.lastViewportPosition.y
         : this.state.height / 2 + this.state.offsetTop;
 
     const { x, y } = viewportCoordsToSceneCoords(
@@ -1833,7 +1897,10 @@ class App extends React.Component<AppProps, AppState> {
 
   private addTextFromPaste(text: string, isPlainPaste = false) {
     const { x, y } = viewportCoordsToSceneCoords(
-      { clientX: cursorX, clientY: cursorY },
+      {
+        clientX: this.lastViewportPosition.x,
+        clientY: this.lastViewportPosition.y,
+      },
       this.state,
     );
 
@@ -2166,8 +2233,8 @@ class App extends React.Component<AppProps, AppState> {
 
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {
-      cursorX = event.clientX;
-      cursorY = event.clientY;
+      this.lastViewportPosition.x = event.clientX;
+      this.lastViewportPosition.y = event.clientY;
     },
   );
 
@@ -2240,6 +2307,7 @@ class App extends React.Component<AppProps, AppState> {
         event.shiftKey &&
         event[KEYS.CTRL_OR_CMD]
       ) {
+        event.preventDefault();
         this.setState({ openDialog: "imageExport" });
         return;
       }
@@ -2424,6 +2492,20 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
       }
+
+      // eye dropper
+      // -----------------------------------------------------------------------
+      const lowerCased = event.key.toLocaleLowerCase();
+      const isPickingStroke = lowerCased === KEYS.S && event.shiftKey;
+      const isPickingBackground =
+        event.key === KEYS.I || (lowerCased === KEYS.G && event.shiftKey);
+
+      if (isPickingStroke || isPickingBackground) {
+        this.openEyeDropper({
+          type: isPickingStroke ? "stroke" : "background",
+        });
+      }
+      // -----------------------------------------------------------------------
     },
   );
 
@@ -2556,8 +2638,8 @@ class App extends React.Component<AppProps, AppState> {
       this.setState((state) => ({
         ...getStateForZoom(
           {
-            viewportX: cursorX,
-            viewportY: cursorY,
+            viewportX: this.lastViewportPosition.x,
+            viewportY: this.lastViewportPosition.y,
             nextZoom: getNormalizedZoom(initialScale * event.scale),
           },
           state,
@@ -6615,8 +6697,8 @@ class App extends React.Component<AppProps, AppState> {
       this.translateCanvas((state) => ({
         ...getStateForZoom(
           {
-            viewportX: cursorX,
-            viewportY: cursorY,
+            viewportX: this.lastViewportPosition.x,
+            viewportY: this.lastViewportPosition.y,
             nextZoom: getNormalizedZoom(newZoom),
           },
           state,

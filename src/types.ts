@@ -440,6 +440,7 @@ export type AppClassProperties = {
   id: App["id"];
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
+  lastViewportPosition: App["lastViewportPosition"];
 };
 
 export type PointerDownState = Readonly<{

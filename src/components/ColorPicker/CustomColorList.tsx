@@ -6,7 +6,7 @@ import HotkeyLabel from "./HotkeyLabel";
 
 interface CustomColorListProps {
   colors: string[];
-  color: string | null;
+  color: string;
   onChange: (color: string) => void;
   label: string;
 }
