@@ -585,9 +585,9 @@ class App extends React.Component<AppProps, AppState> {
           .getNonDeletedElements()
           .filter((el) => el.type === "rectangle" && el.link && el.link.embed)
           .map((el) => {
-            const strokeOffset = el.strokeWidth / 2;
+            const strokeOffset = 0; //el.strokeWidth / 2;
             const { x, y } = sceneCoordsToViewportCoords(
-              { sceneX: el.x + strokeOffset, sceneY: el.y + strokeOffset },
+              { sceneX: el.x, sceneY: el.y},
               this.state,
             );
 
@@ -602,15 +602,15 @@ class App extends React.Component<AppProps, AppState> {
             const isSelected = this.state.activeIFrameElement === el;
 
             const radius = getCornerRadius(
-              Math.min(el.width, el.height) - el.strokeWidth,
+              Math.min(el.width, el.height) - strokeOffset * 2,
               el,
             );
             return (
               <div
                 className="excalidraw__iframe-container"
                 style={{
-                  top: `${y - this.state.offsetTop}px`,
-                  left: `${x - this.state.offsetLeft}px`,
+                  top: `${y - this.state.offsetTop + strokeOffset}px`,
+                  left: `${x - this.state.offsetLeft + strokeOffset}px`,
                   transform: `scale(${scale})`,
                   pointerEvents: isSelected ? "auto" : "none",
                 }}
@@ -618,8 +618,8 @@ class App extends React.Component<AppProps, AppState> {
                 <iframe
                   className="excalidraw__iframe"
                   style={{
-                    width: `${el.width - el.strokeWidth}px`,
-                    height: `${el.height - el.strokeWidth}px`,
+                    width: `${el.width - strokeOffset * 2}px`,
+                    height: `${el.height - strokeOffset * 2}px`,
                     border: 0,
                     transform: `rotate(${el.angle}rad)`,
                     borderRadius: `${radius}px`,
