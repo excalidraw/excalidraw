@@ -5,7 +5,11 @@ import {
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
-import { getElementsInFrame } from "../frame";
+import {
+  elementOverlapsWithFrame,
+  getContainingFrame,
+  getElementsInFrame,
+} from "../frame";
 
 /**
  * Frames and their containing elements are not to be selected at the same time.
@@ -60,6 +64,14 @@ export const getElementsWithinSelection = (
   elementsInSelection = excludeElementsInFrames
     ? excludeElementsInFramesFromSelection(elementsInSelection)
     : elementsInSelection;
+
+  elementsInSelection = elementsInSelection.filter((element) => {
+    if (element.frameId) {
+      return elementOverlapsWithFrame(element, getContainingFrame(element)!);
+    }
+
+    return true;
+  });
 
   return elementsInSelection;
 };
