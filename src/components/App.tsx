@@ -825,6 +825,14 @@ class App extends React.Component<AppProps, AppState> {
         if (typeof this.props.name !== "undefined") {
           name = this.props.name;
         }
+
+        editingElement =
+          editingElement || actionResult.appState?.editingElement || null;
+
+        if (editingElement?.isDeleted) {
+          editingElement = null;
+        }
+
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
@@ -835,8 +843,7 @@ class App extends React.Component<AppProps, AppState> {
               // or programmatically from the host, so it will need to be
               // rewritten later
               contextMenu: null,
-              editingElement:
-                editingElement || actionResult.appState?.editingElement || null,
+              editingElement,
               viewModeEnabled,
               zenModeEnabled,
               gridSize,
@@ -1345,6 +1352,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state.editingLinearElement &&
           this.actionManager.executeAction(actionFinalize);
       });
+    }
+
+    // failsafe in case the state is being updated in incorrect order resulting
+    // in the editingElement being now a deleted element
+    if (this.state.editingElement?.isDeleted) {
+      this.setState({ editingElement: null });
     }
 
     if (

@@ -1,4 +1,4 @@
-import { isTransparent, isWritableElement } from "../../utils";
+import { isInteractive, isTransparent, isWritableElement } from "../../utils";
 import { ExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
 import { TopPicks } from "./TopPicks";
@@ -121,11 +121,14 @@ const ColorPickerPopupContent = ({
           }
         }}
         onCloseAutoFocus={(e) => {
-          e.preventDefault();
           e.stopPropagation();
+          // prevents focusing the trigger
+          e.preventDefault();
 
-          // return focus to excalidraw container
-          if (container) {
+          // return focus to excalidraw container unless
+          // user focuses an interactive element, such as a button, or
+          // enters the text editor by clicking on canvas with the text tool
+          if (container && !isInteractive(document.activeElement)) {
             container.focus();
           }
 

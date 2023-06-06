@@ -60,6 +60,13 @@ export const isInputLike = (
   target instanceof HTMLTextAreaElement ||
   target instanceof HTMLSelectElement;
 
+export const isInteractive = (target: Element | EventTarget | null) => {
+  return (
+    isInputLike(target) ||
+    (target instanceof Element && !!target.closest("label, button"))
+  );
+};
+
 export const isWritableElement = (
   target: Element | EventTarget | null,
 ): target is
