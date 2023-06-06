@@ -1139,27 +1139,46 @@ describe("textWysiwyg", () => {
     });
 
     it("should restore original container height and clear cache once text is unbind", async () => {
-      const originalRectHeight = rectangle.height;
-      expect(rectangle.height).toBe(originalRectHeight);
+      const container = API.createElement({
+        type: "rectangle",
+        height: 75,
+        width: 90,
+      });
+      const originalRectHeight = container.height;
+      expect(container.height).toBe(originalRectHeight);
 
-      Keyboard.keyPress(KEYS.ENTER);
-      const editor = getTextEditor();
-      await new Promise((r) => setTimeout(r, 0));
-      updateTextEditor(editor, "Online whiteboard collaboration made easy");
-      editor.blur();
-      expect(rectangle.height).toBe(185);
-      mouse.select(rectangle);
+      const text = API.createElement({
+        type: "text",
+        text: "Online whiteboard collaboration made easy",
+      });
+
+      h.elements = [container, text];
+      API.setSelectedElements([container, text]);
       fireEvent.contextMenu(GlobalTestState.canvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
       });
-      const contextMenu = document.querySelector(".context-menu");
+      let contextMenu = document.querySelector(".context-menu");
+
+      fireEvent.click(
+        queryByText(contextMenu as HTMLElement, "Bind text to the container")!,
+      );
+
+      expect((h.elements[1] as ExcalidrawTextElementWithContainer).text).toBe(
+        "Online \nwhitebo\nard \ncollabo\nration \nmade \neasy",
+      );
+      fireEvent.contextMenu(GlobalTestState.canvas, {
+        button: 2,
+        clientX: 20,
+        clientY: 30,
+      });
+      contextMenu = document.querySelector(".context-menu");
       fireEvent.click(queryByText(contextMenu as HTMLElement, "Unbind text")!);
       expect(h.elements[0].boundElements).toEqual([]);
-      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(null);
+      expect(getOriginalContainerHeightFromCache(container.id)).toBe(null);
 
-      expect(rectangle.height).toBe(originalRectHeight);
+      expect(container.height).toBe(originalRectHeight);
     });
 
     it("should reset the container height cache when resizing", async () => {

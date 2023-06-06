@@ -20,15 +20,13 @@ import {
   isTestEnv,
 } from "../utils";
 import { randomInteger, randomId } from "../random";
-import { bumpVersion, mutateElement, newElementWith } from "./mutateElement";
+import { bumpVersion, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
-  getBoundTextElementOffset,
-  getContainerDims,
   getContainerElement,
   measureText,
   normalizeText,
@@ -44,7 +42,6 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
 
 type ElementConstructorOpts = MarkOptional<
@@ -211,8 +208,6 @@ const getAdjustedDimensions = (
   height: number;
   baseline: number;
 } => {
-  const container = getContainerElement(element);
-
   const {
     width: nextWidth,
     height: nextHeight,
@@ -268,27 +263,6 @@ const getAdjustedDimensions = (
     );
   }
 
-  // make sure container dimensions are set properly when
-  // text editor overflows beyond viewport dimensions
-  if (container) {
-    const boundTextElementPadding = getBoundTextElementOffset(element);
-
-    const containerDims = getContainerDims(container);
-    let height = containerDims.height;
-    let width = containerDims.width;
-    if (nextHeight > height - boundTextElementPadding * 2) {
-      height = nextHeight + boundTextElementPadding * 2;
-    }
-    if (nextWidth > width - boundTextElementPadding * 2) {
-      width = nextWidth + boundTextElementPadding * 2;
-    }
-    if (
-      !isArrowElement(container) &&
-      (height !== containerDims.height || width !== containerDims.width)
-    ) {
-      mutateElement(container, { height, width });
-    }
-  }
   return {
     width: nextWidth,
     height: nextHeight,
