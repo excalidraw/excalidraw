@@ -587,7 +587,7 @@ class App extends React.Component<AppProps, AppState> {
           .map((el) => {
             const strokeOffset = 0; //el.strokeWidth / 2;
             const { x, y } = sceneCoordsToViewportCoords(
-              { sceneX: el.x, sceneY: el.y},
+              { sceneX: el.x, sceneY: el.y },
               this.state,
             );
 
