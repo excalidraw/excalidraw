@@ -51,7 +51,9 @@ const isElementDraggableFromInside = (
     return true;
   }
   const isDraggableFromInside =
-    !isTransparent(element.backgroundColor) || hasBoundTextElement(element) || isIFrame(element);
+    !isTransparent(element.backgroundColor) ||
+    hasBoundTextElement(element) ||
+    isIFrame(element);
   if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
   }

@@ -583,12 +583,7 @@ class App extends React.Component<AppProps, AppState> {
       <>
         {this.scene
           .getNonDeletedElements()
-          .filter(
-            (el) =>
-              el.type === "rectangle" &&
-              el.link &&
-              el.link.embed
-          )
+          .filter((el) => el.type === "rectangle" && el.link && el.link.embed)
           .map((el) => {
             const strokeOffset = el.strokeWidth / 2;
             const { x, y } = sceneCoordsToViewportCoords(
@@ -598,7 +593,12 @@ class App extends React.Component<AppProps, AppState> {
 
             const ytLink = getYTEmbedLink(el.link?.url);
             const src = ytLink ?? el.link?.url ?? "";
-            const isVisible = isVisibleElement( el, normalizedWidth, normalizedHeight, this.state);
+            const isVisible = isVisibleElement(
+              el,
+              normalizedWidth,
+              normalizedHeight,
+              this.state,
+            );
             const isSelected = this.state.activeIFrameElement === el;
 
             const radius = getCornerRadius(
@@ -1724,16 +1724,15 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      // prefer spreadsheet data over image file (MS Office/Libre Office)
-      if (isSupportedImageFile(file) && !data.spreadsheet) {
-        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          {
-            clientX: this.lastViewportPosition.x,
-            clientY: this.lastViewportPosition.y,
-          },
-          this.state,
-        );
+      const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+        {
+          clientX: this.lastViewportPosition.x,
+          clientY: this.lastViewportPosition.y,
+        },
+        this.state,
+      );
 
+      // prefer spreadsheet data over image file (MS Office/Libre Office)
       if (isSupportedImageFile(file) && !data.spreadsheet) {
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
@@ -3086,10 +3085,10 @@ class App extends React.Component<AppProps, AppState> {
           sceneY = midPoint.y;
         }
       }
-      if(isIFrame(container as ExcalidrawGenericElement)) {
+      if (isIFrame(container as ExcalidrawGenericElement)) {
         this.setState({
           activeIFrameElement: container,
-        })
+        });
       } else {
         this.startTextEditing({
           sceneX,
