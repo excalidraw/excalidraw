@@ -1010,6 +1010,8 @@ describe("textWysiwyg", () => {
       ) as HTMLTextAreaElement;
       await new Promise((r) => setTimeout(r, 0));
       fireEvent.change(editor, { target: { value: "Hello" } });
+      editor.dispatchEvent(new Event("input"));
+
       editor.blur();
 
       // should center align horizontally and vertically by default
@@ -1279,6 +1281,7 @@ describe("textWysiwyg", () => {
 
       await new Promise((r) => setTimeout(r, 0));
       fireEvent.change(editor, { target: { value: "Hello World!" } });
+      editor.dispatchEvent(new Event("input"));
       editor.blur();
 
       mouse.select(rectangle);
@@ -1308,6 +1311,7 @@ describe("textWysiwyg", () => {
 
       await new Promise((r) => setTimeout(r, 0));
       fireEvent.change(editor, { target: { value: "Hello World!" } });
+      editor.dispatchEvent(new Event("input"));
       editor.blur();
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
@@ -1343,6 +1347,7 @@ describe("textWysiwyg", () => {
         ) as HTMLTextAreaElement;
         await new Promise((r) => setTimeout(r, 0));
         fireEvent.change(editor, { target: { value: "Hello" } });
+        editor.dispatchEvent(new Event("input"));
         editor.blur();
         mouse.select(rectangle);
         Keyboard.keyPress(KEYS.ENTER);
