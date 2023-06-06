@@ -32,6 +32,7 @@ import {
   ExcalidrawImperativeAPI,
   BinaryFiles,
   ExcalidrawInitialDataState,
+  UIAppState,
 } from "../types";
 import {
   debounce,
@@ -550,7 +551,7 @@ const ExcalidrawWrapper = () => {
 
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
+    appState: Partial<AppState>,
     files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
   ) => {
@@ -581,7 +582,7 @@ const ExcalidrawWrapper = () => {
 
   const renderCustomStats = (
     elements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
+    appState: UIAppState,
   ) => {
     return (
       <CustomStats
@@ -670,8 +671,8 @@ const ExcalidrawWrapper = () => {
             {t("alerts.collabOfflineWarning")}
           </div>
         )}
+        {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       </Excalidraw>
-      {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
         <ErrorDialog onClose={() => setErrorMessage("")}>
           {errorMessage}

@@ -31,8 +31,8 @@ import {
   normalizeText,
   redrawTextBoundingBox,
   wrapText,
-  getMaxContainerHeight,
-  getMaxContainerWidth,
+  getBoundTextMaxHeight,
+  getBoundTextMaxWidth,
   computeContainerDimensionForBoundText,
   detectLineHeight,
 } from "./textElement";
@@ -204,8 +204,11 @@ export const textWysiwyg = ({
           }
         }
 
-        maxWidth = getMaxContainerWidth(container);
-        maxHeight = getMaxContainerHeight(container);
+        maxWidth = getBoundTextMaxWidth(container);
+        maxHeight = getBoundTextMaxHeight(
+          container,
+          updatedTextElement as ExcalidrawTextElementWithContainer,
+        );
 
         // autogrow container height if text exceeds
         if (!isArrowElement(container) && textElementHeight > maxHeight) {
@@ -250,7 +253,6 @@ export const textWysiwyg = ({
       const initialSelectionStart = editable.selectionStart;
       const initialSelectionEnd = editable.selectionEnd;
       const initialLength = editable.value.length;
-      editable.value = updatedTextElement.originalText;
 
       // restore cursor position after value updated so it doesn't
       // go to the end of text when container auto expanded
@@ -354,6 +356,7 @@ export const textWysiwyg = ({
     overflowWrap: "break-word",
     boxSizing: "content-box",
   });
+  editable.value = element.originalText;
   updateWysiwygStyle();
 
   if (onChange) {
@@ -376,13 +379,13 @@ export const textWysiwyg = ({
         const wrappedText = wrapText(
           `${editable.value}${data}`,
           font,
-          getMaxContainerWidth(container),
+          getBoundTextMaxWidth(container),
         );
         const { width } = measureText(
           wrappedText,
           font,
           element.lineHeight,
-          getMaxContainerWidth(container),
+          getBoundTextMaxWidth(container),
         );
         editable.style.width = `${width}px`;
       }
@@ -398,13 +401,13 @@ export const textWysiwyg = ({
         const wrappedText = wrapText(
           normalizeText(editable.value),
           font,
-          getMaxContainerWidth(container!),
+          getBoundTextMaxWidth(container!),
         );
         const { width, height } = measureText(
           wrappedText,
           font,
           updatedTextElement.lineHeight,
-          getMaxContainerWidth(container!),
+          getBoundTextMaxWidth(container!),
         );
         editable.style.width = `${width}px`;
         editable.style.height = `${height}px`;
@@ -638,20 +641,46 @@ export const textWysiwyg = ({
     // in that same tick.
     const target = event?.target;
 
-    const isTargetColorPicker =
-      target instanceof HTMLInputElement &&
-      target.closest(".color-picker-input") &&
-      isWritableElement(target);
+    const isTargetPickerTrigger =
+      target instanceof HTMLElement &&
+      target.classList.contains("active-color");
 
     setTimeout(() => {
       editable.onblur = handleSubmit;
-      if (target && isTargetColorPicker) {
-        target.onblur = () => {
-          editable.focus();
+
+      if (isTargetPickerTrigger) {
+        const callback = (
+          mutationList: MutationRecord[],
+          observer: MutationObserver,
+        ) => {
+          const radixIsRemoved = mutationList.find(
+            (mutation) =>
+              mutation.removedNodes.length > 0 &&
+              (mutation.removedNodes[0] as HTMLElement).dataset
+                ?.radixPopperContentWrapper !== undefined,
+          );
+
+          if (radixIsRemoved) {
+            // should work without this in theory
+            // and i think it does actually but radix probably somewhere,
+            // somehow sets the focus elsewhere
+            setTimeout(() => {
+              editable.focus();
+            });
+
+            observer.disconnect();
+          }
         };
+
+        const observer = new MutationObserver(callback);
+
+        observer.observe(document.querySelector(".excalidraw-container")!, {
+          childList: true,
+        });
       }
+
       // case: clicking on the same property → no change → no update → no focus
-      if (!isTargetColorPicker) {
+      if (!isTargetPickerTrigger) {
         editable.focus();
       }
     });
@@ -659,16 +688,16 @@ export const textWysiwyg = ({
 
   // prevent blur when changing properties from the menu
   const onPointerDown = (event: MouseEvent) => {
-    const isTargetColorPicker =
-      event.target instanceof HTMLInputElement &&
-      event.target.closest(".color-picker-input") &&
-      isWritableElement(event.target);
+    const isTargetPickerTrigger =
+      event.target instanceof HTMLElement &&
+      event.target.classList.contains("active-color");
+
     if (
       ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
         event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
         !isWritableElement(event.target)) ||
-      isTargetColorPicker
+      isTargetPickerTrigger
     ) {
       editable.onblur = null;
       window.addEventListener("pointerup", bindBlurEvent);
@@ -682,7 +711,7 @@ export const textWysiwyg = ({
   const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
     updateWysiwygStyle();
     const isColorPickerActive = !!document.activeElement?.closest(
-      ".color-picker-input",
+      ".color-picker-content",
     );
     if (!isColorPickerActive) {
       editable.focus();

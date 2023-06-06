@@ -1,4 +1,4 @@
-import { ColorPicker } from "../components/ColorPicker";
+import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
@@ -19,6 +19,7 @@ import {
   isEraserActive,
   isHandToolActive,
 } from "../appState";
+import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -35,24 +36,21 @@ export const actionChangeViewBackgroundColor = register({
       commitToHistory: !!value.viewBackgroundColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData, appProps }) => {
     // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
-      <div style={{ position: "relative" }}>
-        <ColorPicker
-          label={t("labels.canvasBackground")}
-          type="canvasBackground"
-          color={appState.viewBackgroundColor}
-          onChange={(color) => updateData({ viewBackgroundColor: color })}
-          isActive={appState.openPopup === "canvasColorPicker"}
-          setActive={(active) =>
-            updateData({ openPopup: active ? "canvasColorPicker" : null })
-          }
-          data-testid="canvas-background-picker"
-          elements={elements}
-          appState={appState}
-        />
-      </div>
+      <ColorPicker
+        palette={null}
+        topPicks={DEFAULT_CANVAS_BACKGROUND_PICKS}
+        label={t("labels.canvasBackground")}
+        type="canvasBackground"
+        color={appState.viewBackgroundColor}
+        onChange={(color) => updateData({ viewBackgroundColor: color })}
+        data-testid="canvas-background-picker"
+        elements={elements}
+        appState={appState}
+        updateData={updateData}
+      />
     );
   },
 });

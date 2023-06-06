@@ -1,4 +1,4 @@
-import oc from "open-color";
+import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
@@ -58,7 +58,7 @@ export const getDefaultAppState = (): Omit<
     fileHandle: null,
     gridSize: null,
     isBindingEnabled: true,
-    isSidebarDocked: false,
+    defaultSidebarDockedPreference: false,
     isLoading: false,
     isResizing: false,
     isRotating: false,
@@ -84,7 +84,7 @@ export const getDefaultAppState = (): Omit<
     startBoundElement: null,
     suggestedBindings: [],
     toast: null,
-    viewBackgroundColor: oc.white,
+    viewBackgroundColor: COLOR_PALETTE.white,
     zenModeEnabled: false,
     zoom: {
       value: 1 as NormalizedZoomValue,
@@ -150,7 +150,11 @@ const APP_STATE_STORAGE_CONF = (<
   gridSize: { browser: true, export: true, server: true },
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: false, export: false, server: false },
-  isSidebarDocked: { browser: true, export: false, server: false },
+  defaultSidebarDockedPreference: {
+    browser: true,
+    export: false,
+    server: false,
+  },
   isLoading: { browser: false, export: false, server: false },
   isResizing: { browser: false, export: false, server: false },
   isRotating: { browser: false, export: false, server: false },

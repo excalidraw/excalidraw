@@ -2,7 +2,7 @@ import React from "react";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 
-import { AppState, ExportOpts, BinaryFiles } from "../types";
+import { ExportOpts, BinaryFiles, UIAppState } from "../types";
 import { Dialog } from "./Dialog";
 import { exportToFileIcon, LinkIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
@@ -28,7 +28,7 @@ const JSONExportModal = ({
   exportOpts,
   canvas,
 }: {
-  appState: AppState;
+  appState: UIAppState;
   files: BinaryFiles;
   elements: readonly NonDeletedExcalidrawElement[];
   actionManager: ActionManager;
@@ -96,12 +96,12 @@ export const JSONExportDialog = ({
   setAppState,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
-  appState: AppState;
+  appState: UIAppState;
   files: BinaryFiles;
   actionManager: ActionManager;
   exportOpts: ExportOpts;
   canvas: HTMLCanvasElement | null;
-  setAppState: React.Component<any, AppState>["setState"];
+  setAppState: React.Component<any, UIAppState>["setState"];
 }) => {
   const handleClose = React.useCallback(() => {
     setAppState({ openDialog: null });

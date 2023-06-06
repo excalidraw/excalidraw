@@ -13,9 +13,39 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Features
+
+- Sidebar component now supports tabs — for more detailed description of new behavior and breaking changes, see the linked PR. [#6213](https://github.com/excalidraw/excalidraw/pull/6213)
+- Exposed `DefaultSidebar` component to allow modifying the default sidebar, such as adding custom tabs to it. [#6213](https://github.com/excalidraw/excalidraw/pull/6213)
+
+  #### BREAKING CHANGES
+
+  - `props.renderSidebar` is removed in favor of rendering as `children`.
+  - `appState.isSidebarDocked` replaced with `appState.defaultSidebarDockedPreference` with slightly different semantics, and relating only to the default sidebar. You need to handle `docked` state for your custom sidebars yourself.
+  - Sidebar `props.dockable` is removed. To indicate dockability, supply `props.onDock()` alongside setting `props.docked`.
+  - `Sidebar.Header` is no longer rendered by default. You need to render it yourself.
+  - `props.onClose` replaced with `props.onStateChange`.
+  - `restore()`/`restoreAppState()` now retains `appState.openSidebar` regardless of docked state.
+
+## 0.15.2 (2023-04-20)
+
 ### Docs
 
 - Fix docs link in readme [#6486](https://github.com/excalidraw/excalidraw/pull/6486)
+
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Fixes
+
+- Rotate the text element when binding to a rotated container [#6477](https://github.com/excalidraw/excalidraw/pull/6477)
+
+- Support breaking words containing hyphen - [#6014](https://github.com/excalidraw/excalidraw/pull/6014)
+
+- Incorrect background fill button active state [#6491](https://github.com/excalidraw/excalidraw/pull/6491)
+
+---
 
 ## 0.15.1 (2023-04-18)
 
