@@ -1178,7 +1178,7 @@ const renderFrameHighlight = (
   const height = y2 - y1;
 
   context.strokeStyle = "rgb(0,118,255)";
-  context.lineWidth = FRAME_STYLE.strokeWidth * 2;
+  context.lineWidth = (FRAME_STYLE.strokeWidth * 2) / renderConfig.zoom.value;
 
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
