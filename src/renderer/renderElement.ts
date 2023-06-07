@@ -938,20 +938,14 @@ export const renderElement = (
         );
         context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
-        // render from 0.5px offset  to get 1px wide line
-        // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
-        // TODO can be be improved by offseting to the negative when user selects
-        // from right to left
-        const offset = 0.5 / renderConfig.zoom.value;
-
-        context.lineWidth = 1 / renderConfig.zoom.value;
+        context.lineWidth = 2 / renderConfig.zoom.value;
         context.strokeStyle = FRAME_STYLE.strokeColor;
 
         if (FRAME_STYLE.radius && context.roundRect) {
           context.beginPath();
           context.roundRect(
-            offset,
-            offset,
+            0,
+            0,
             element.width,
             element.height,
             FRAME_STYLE.radius / renderConfig.zoom.value,
@@ -959,7 +953,7 @@ export const renderElement = (
           context.stroke();
           context.closePath();
         } else {
-          context.strokeRect(offset, offset, element.width, element.height);
+          context.strokeRect(0, 0, element.width, element.height);
         }
 
         context.restore();

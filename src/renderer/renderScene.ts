@@ -337,9 +337,18 @@ const frameClip = (
     frame.x + renderConfig.scrollX,
     frame.y + renderConfig.scrollY,
   );
-  const offset = 0.5 / renderConfig.zoom.value;
   context.beginPath();
-  context.rect(offset, offset, frame.width, frame.height);
+  if (context.roundRect && !renderConfig.isExporting) {
+    context.roundRect(
+      0,
+      0,
+      frame.width,
+      frame.height,
+      FRAME_STYLE.radius / renderConfig.zoom.value,
+    );
+  } else {
+    context.rect(0, 0, frame.width, frame.height);
+  }
   context.clip();
   context.translate(
     -(frame.x + renderConfig.scrollX),
