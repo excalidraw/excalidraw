@@ -834,8 +834,8 @@ export const getYTEmbedLink = (link?: string | null): string | null => {
     /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(?:embed\/|watch\?v=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/,
   );
   const id = ytLink?.[1];
-  const time = ytLink?.[2];
-  const target = id ? `${id}${time ? "?t=" + time : ""}` : null;
+  const time = ytLink?.[2] ? `?t=${ytLink?.[2]}` : ``;
+  const target = id ? `${id}${time}` : null;
   return target ? `https://www.youtube.com/embed/${target}` : null;
 };
 
