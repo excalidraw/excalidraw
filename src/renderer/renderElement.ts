@@ -37,7 +37,6 @@ import {
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
-  TEXT_ALIGN,
 } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
@@ -47,7 +46,6 @@ import {
   getLineHeightInPx,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
-  getLineWidth,
   getSpacesOffsetForLine,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
