@@ -977,3 +977,22 @@ export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
   }
   return DEFAULT_LINE_HEIGHT[DEFAULT_FONT_FAMILY];
 };
+
+export const getSpacesOffsetForLine = (
+  element: ExcalidrawTextElement,
+  line: string,
+  font: FontString,
+) => {
+  const container = getContainerElement(element);
+  const trailingSpacesWidth =
+    getLineWidth(line, font) - getLineWidth(line.trimEnd(), font);
+  const maxWidth = container ? getBoundTextMaxWidth(container) : element.width;
+  const availableWidth = maxWidth - getLineWidth(line.trimEnd(), font);
+  let spacesOffset = 0;
+  if (element.textAlign === TEXT_ALIGN.CENTER) {
+    spacesOffset = -Math.min(trailingSpacesWidth / 2, availableWidth / 2);
+  } else if (element.textAlign === TEXT_ALIGN.RIGHT) {
+    spacesOffset = -Math.min(availableWidth, trailingSpacesWidth);
+  }
+  return spacesOffset;
+};

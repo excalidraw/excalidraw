@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isSafari } from "../constants";
+import { CLASSES, TEXT_ALIGN, isSafari } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -196,6 +196,8 @@ export const textWysiwyg = ({
         }
 
         maxWidth = getBoundTextMaxWidth(container);
+        textElementWidth = Math.min(textElementWidth, maxWidth);
+
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -230,7 +232,16 @@ export const textWysiwyg = ({
           coordY = y;
         }
       }
-      const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
+      let spacesOffset = 0;
+      if (updatedTextElement.textAlign === TEXT_ALIGN.CENTER) {
+        spacesOffset = Math.max(0, updatedTextElement.width / 2 - maxWidth / 2);
+      } else if (updatedTextElement.textAlign === TEXT_ALIGN.RIGHT) {
+        spacesOffset = Math.max(0, updatedTextElement.width - maxWidth);
+      }
+      const [viewportX, viewportY] = getViewportCoords(
+        coordX + spacesOffset,
+        coordY,
+      );
       const initialSelectionStart = editable.selectionStart;
       const initialSelectionEnd = editable.selectionEnd;
       const initialLength = editable.value.length;
