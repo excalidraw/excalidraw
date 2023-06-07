@@ -5406,6 +5406,22 @@ class App extends React.Component<AppProps, AppState> {
             );
             this.scene.replaceAllElements(nextSceneElements);
           }
+
+          // highlight elements that are to be added to frames as frames are dragged
+          this.setState({
+            elementsToHighlight: selectedElements
+              .filter((element) => isFrameElement(element))
+              .flatMap((frame) =>
+                getElementsWithinSelection(
+                  this.scene.getNonDeletedElements(),
+                  frame,
+                  true,
+                ).filter(
+                  (element) => !element.frameId && !isFrameElement(element),
+                ),
+              ),
+          });
+
           return;
         }
       }
