@@ -152,8 +152,8 @@ export const exportToSvg = async (
 
   const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
-  const offsetX = -minX + exportPadding;
-  const offsetY = -minY + exportPadding;
+  const offsetX = -minX + (onlyExportingSingleFrame ? 0 : exportPadding);
+  const offsetY = -minY + (onlyExportingSingleFrame ? 0 : exportPadding);
 
   const exportingFrame =
     isExportingWholeCanvas || !onlyExportingSingleFrame
