@@ -13,6 +13,7 @@ import { isPathALoop, getCornerRadius } from "../math";
 import { generateFreeDrawShape } from "../renderer/renderElement";
 import { isTransparent, assertNever } from "../utils";
 import { simplify } from "points-on-curve";
+import { ROUGHNESS } from "../constants";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -46,7 +47,8 @@ export const generateRoughOptions = (
     hachureGap: element.strokeWidth * 4,
     roughness: element.roughness,
     stroke: element.strokeColor,
-    preserveVertices: continuousPath,
+    preserveVertices:
+      continuousPath || element.roughness < ROUGHNESS.cartoonist,
   };
 
   switch (element.type) {

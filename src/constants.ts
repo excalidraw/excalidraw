@@ -296,6 +296,12 @@ export const ROUNDNESS = {
  * collaboration */
 export const PRECEDING_ELEMENT_KEY = "__precedingElement__";
 
+export const ROUGHNESS = {
+  architect: 0,
+  artist: 1,
+  cartoonist: 2,
+} as const;
+
 export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: ExcalidrawElement["strokeColor"];
   backgroundColor: ExcalidrawElement["backgroundColor"];
@@ -311,7 +317,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   fillStyle: "hachure",
   strokeWidth: 1,
   strokeStyle: "solid",
-  roughness: 1,
+  roughness: ROUGHNESS.artist,
   opacity: 100,
   locked: false,
 };
