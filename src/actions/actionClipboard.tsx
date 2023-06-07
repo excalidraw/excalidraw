@@ -127,6 +127,7 @@ export const actionCopyAsPng = register({
       appState,
       {
         includeBoundTextElement: true,
+        includeElementsInFrames: true,
       },
     );
     try {
