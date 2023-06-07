@@ -5406,22 +5406,6 @@ class App extends React.Component<AppProps, AppState> {
             );
             this.scene.replaceAllElements(nextSceneElements);
           }
-
-          // highlight elements that are to be added to frames as frames are dragged
-          this.setState({
-            elementsToHighlight: selectedElements
-              .filter((element) => isFrameElement(element))
-              .flatMap((frame) =>
-                getElementsWithinSelection(
-                  this.scene.getNonDeletedElements(),
-                  frame,
-                  true,
-                ).filter(
-                  (element) => !element.frameId && !isFrameElement(element),
-                ),
-              ),
-          });
-
           return;
         }
       }
@@ -6096,23 +6080,26 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // handle resizing frames
-      const selectedFrames = getSelectedElements(
-        this.scene.getNonDeletedElements(),
-        this.state,
-      ).filter(
-        (element) => element.type === "frame",
-      ) as ExcalidrawFrameElement[];
-      for (const frame of selectedFrames) {
-        replaceAllElementsInFrame(
-          this.scene.getElementsIncludingDeleted(),
-          getElementsInResizingFrame(
-            this.scene.getNonDeletedElements(),
+      if (pointerDownState.resize.isResizing) {
+        const selectedFrames = getSelectedElements(
+          this.scene.getNonDeletedElements(),
+          this.state,
+        ).filter(
+          (element) => element.type === "frame",
+        ) as ExcalidrawFrameElement[];
+
+        for (const frame of selectedFrames) {
+          replaceAllElementsInFrame(
+            this.scene.getElementsIncludingDeleted(),
+            getElementsInResizingFrame(
+              this.scene.getNonDeletedElements(),
+              frame,
+              this.state,
+            ),
             frame,
             this.state,
-          ),
-          frame,
-          this.state,
-        );
+          );
+        }
       }
 
       // Code below handles selection when element(s) weren't
