@@ -315,7 +315,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: COLOR_PALETTE.black,
   backgroundColor: COLOR_PALETTE.transparent,
   fillStyle: "hachure",
-  strokeWidth: 1,
+  strokeWidth: 2,
   strokeStyle: "solid",
   roughness: ROUGHNESS.artist,
   opacity: 100,
