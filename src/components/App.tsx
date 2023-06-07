@@ -612,24 +612,34 @@ class App extends React.Component<AppProps, AppState> {
                   top: `${y - this.state.offsetTop + strokeOffset}px`,
                   left: `${x - this.state.offsetLeft + strokeOffset}px`,
                   transform: `scale(${scale})`,
-                  pointerEvents: isSelected ? "auto" : "none",
+                  display: isVisible ? "block" : "none",
+                  pointerEvents: "none",
                 }}
               >
-                <iframe
-                  className="excalidraw__iframe"
+                <div
                   style={{
                     width: `${el.width - strokeOffset * 2}px`,
                     height: `${el.height - strokeOffset * 2}px`,
                     border: 0,
                     transform: `rotate(${el.angle}rad)`,
                     borderRadius: `${radius}px`,
-                    display: isVisible ? "block" : "none",
+                    pointerEvents: isSelected ? "auto" : "none",
                   }}
-                  src={src}
-                  title="Excalidraw Embedded Content"
-                  allow="accelerometer"
-                  allowFullScreen={true}
-                />
+                >
+                  <iframe
+                    className="excalidraw__iframe"
+                    style={{
+                      width: `100%`,
+                      height: `100%`,
+                      border: 0,
+                      borderRadius: `${radius}px`,
+                    }}
+                    src={src}
+                    title="Excalidraw Embedded Content"
+                    allow="accelerometer"
+                    allowFullScreen={true}
+                  />
+                </div>
               </div>
             );
           })}
