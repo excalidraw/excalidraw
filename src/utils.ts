@@ -841,4 +841,4 @@ export const getYTEmbedLink = (link?: string | null): string | null => {
 
 export const isIFrame = (
   element: ExcalidrawGenericElement | ExcalidrawElement,
-): boolean => Boolean(element.link?.embed);
+): boolean => Boolean(element?.link?.embed);

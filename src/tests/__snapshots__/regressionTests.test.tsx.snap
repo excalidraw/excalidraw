@@ -2,6 +2,7 @@
 
 exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -538,6 +539,7 @@ exports[`given element A and group of elements B and given both are selected whe
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -1080,6 +1082,7 @@ exports[`given element A and group of elements B and given both are selected whe
 
 exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -1987,6 +1990,7 @@ exports[`regression tests Cmd/Ctrl-click exclusively select element under pointe
 
 exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -2217,6 +2221,7 @@ exports[`regression tests Drags selected element when hitting only bounding box 
 
 exports[`regression tests adjusts z order when grouping: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -2750,6 +2755,7 @@ exports[`regression tests adjusts z order when grouping: [end of test] number of
 
 exports[`regression tests alt-drag duplicates an element: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -3039,6 +3045,7 @@ exports[`regression tests alt-drag duplicates an element: [end of test] number o
 
 exports[`regression tests arrow keys: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -3223,6 +3230,7 @@ exports[`regression tests arrow keys: [end of test] number of renders 1`] = `21`
 
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -3739,6 +3747,7 @@ exports[`regression tests can drag element that covers another element, while an
 
 exports[`regression tests change the properties of a shape: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -4049,6 +4058,7 @@ exports[`regression tests change the properties of a shape: [end of test] number
 
 exports[`regression tests click on an element and drag it: [dragged] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -4279,6 +4289,7 @@ exports[`regression tests click on an element and drag it: [dragged] number of r
 
 exports[`regression tests click on an element and drag it: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -4555,6 +4566,7 @@ exports[`regression tests click on an element and drag it: [end of test] number 
 
 exports[`regression tests click to select a shape: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -4843,6 +4855,7 @@ exports[`regression tests click to select a shape: [end of test] number of rende
 
 exports[`regression tests click-drag to select a group: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -5261,6 +5274,7 @@ exports[`regression tests click-drag to select a group: [end of test] number of 
 
 exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -5602,6 +5616,7 @@ exports[`regression tests deselects group of selected elements on pointer down w
 
 exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -5916,6 +5931,7 @@ exports[`regression tests deselects group of selected elements on pointer up whe
 
 exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -6154,6 +6170,7 @@ exports[`regression tests deselects selected element on pointer down when pointe
 
 exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -6340,6 +6357,7 @@ exports[`regression tests deselects selected element, on pointer up, when click 
 
 exports[`regression tests double click to edit a group: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -6868,6 +6886,7 @@ exports[`regression tests double click to edit a group: [end of test] number of 
 
 exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -7233,6 +7252,7 @@ exports[`regression tests drags selected elements from point inside common bound
 
 exports[`regression tests draw every type of shape: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -9585,6 +9605,7 @@ exports[`regression tests draw every type of shape: [end of test] number of rend
 
 exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -10004,6 +10025,7 @@ exports[`regression tests given a group of selected elements with an element tha
 
 exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -10295,6 +10317,7 @@ exports[`regression tests given a selected element A and a not selected element 
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -10543,6 +10566,7 @@ exports[`regression tests given selected element A with lower z-index than unsel
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -10864,6 +10888,7 @@ exports[`regression tests given selected element A with lower z-index than unsel
 
 exports[`regression tests key 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -11048,6 +11073,7 @@ exports[`regression tests key 2 selects rectangle tool: [end of test] number of 
 
 exports[`regression tests key 3 selects diamond tool: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -11232,6 +11258,7 @@ exports[`regression tests key 3 selects diamond tool: [end of test] number of re
 
 exports[`regression tests key 4 selects ellipse tool: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -11416,6 +11443,7 @@ exports[`regression tests key 4 selects ellipse tool: [end of test] number of re
 
 exports[`regression tests key 5 selects arrow tool: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -11653,6 +11681,7 @@ exports[`regression tests key 5 selects arrow tool: [end of test] number of rend
 
 exports[`regression tests key 6 selects line tool: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -11890,6 +11919,7 @@ exports[`regression tests key 6 selects line tool: [end of test] number of rende
 
 exports[`regression tests key 7 selects freedraw tool: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -12118,6 +12148,7 @@ exports[`regression tests key 7 selects freedraw tool: [end of test] number of r
 
 exports[`regression tests key a selects arrow tool: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -12355,6 +12386,7 @@ exports[`regression tests key a selects arrow tool: [end of test] number of rend
 
 exports[`regression tests key d selects diamond tool: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -12539,6 +12571,7 @@ exports[`regression tests key d selects diamond tool: [end of test] number of re
 
 exports[`regression tests key l selects line tool: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -12776,6 +12809,7 @@ exports[`regression tests key l selects line tool: [end of test] number of rende
 
 exports[`regression tests key o selects ellipse tool: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -12960,6 +12994,7 @@ exports[`regression tests key o selects ellipse tool: [end of test] number of re
 
 exports[`regression tests key p selects freedraw tool: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -13188,6 +13223,7 @@ exports[`regression tests key p selects freedraw tool: [end of test] number of r
 
 exports[`regression tests key r selects rectangle tool: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -13372,6 +13408,7 @@ exports[`regression tests key r selects rectangle tool: [end of test] number of 
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -14211,6 +14248,7 @@ exports[`regression tests make a group and duplicate it: [end of test] number of
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -14500,6 +14538,7 @@ exports[`regression tests noop interaction after undo shouldn't create history e
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -14611,6 +14650,7 @@ exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1
 
 exports[`regression tests rerenders UI on language change: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -14720,6 +14760,7 @@ exports[`regression tests rerenders UI on language change: [end of test] number 
 
 exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -14907,6 +14948,7 @@ exports[`regression tests shift click on selected element should deselect it on 
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -15275,6 +15317,7 @@ exports[`regression tests shift-click to multiselect, then drag: [end of test] n
 
 exports[`regression tests should group elements and ungroup them: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -15907,6 +15950,7 @@ exports[`regression tests should group elements and ungroup them: [end of test] 
 
 exports[`regression tests should show fill icons when element has non transparent background: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -16134,6 +16178,7 @@ exports[`regression tests should show fill icons when element has non transparen
 
 exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -17097,6 +17142,7 @@ exports[`regression tests single-clicking on a subgroup of a selected group shou
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -17206,6 +17252,7 @@ exports[`regression tests spacebar + drag scrolls the canvas: [end of test] numb
 
 exports[`regression tests supports nested groups: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -18065,6 +18112,7 @@ exports[`regression tests supports nested groups: [end of test] number of render
 
 exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -18537,6 +18585,7 @@ exports[`regression tests switches from group of selected elements to another el
 
 exports[`regression tests switches selected element on pointer down: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -18878,6 +18927,7 @@ exports[`regression tests switches selected element on pointer down: [end of tes
 
 exports[`regression tests two-finger scroll works: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -18989,6 +19039,7 @@ exports[`regression tests two-finger scroll works: [end of test] number of rende
 
 exports[`regression tests undo/redo drawing an element: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -19560,6 +19611,7 @@ exports[`regression tests undo/redo drawing an element: [end of test] number of 
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
@@ -19669,6 +19721,7 @@ exports[`regression tests updates fontSize & fontFamily appState: [end of test] 
 
 exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
