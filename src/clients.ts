@@ -16,15 +16,15 @@ export const getClientColors = (userId: string) => {
   return color;
 };
 
-const generateUniqueColor = (assignedCollors: number): Colors => {
-  if (assignedCollors === 0) {
+const generateUniqueColor = (assignedCollorsSize: number): Colors => {
+  if (assignedCollorsSize === 0) {
     return {
       background: "#1b1b1f",
       stroke: oc.white,
       text: oc.white,
     };
   }
-  const hue = (colorAssignments.size * (360 / goldenRatio)) % 360; // Calculate the angle based on the golden ratio and size
+  const hue = (assignedCollorsSize * (360 / goldenRatio)) % 360; // Calculate the angle based on the golden ratio and size
 
   const saturation = 100;
   const lightness = 80;
