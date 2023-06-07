@@ -1,30 +1,38 @@
-import {
-  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
-  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
-  getAllColorsSpecificShade,
-} from "./colors";
-import { AppState } from "./types";
+import oc from "open-color";
 
-const BG_COLORS = getAllColorsSpecificShade(
-  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
-);
-const STROKE_COLORS = getAllColorsSpecificShade(
-  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
-);
+type Colors = { background: string; stroke: string; text: string };
 
-export const getClientColors = (clientId: string, appState: AppState) => {
-  if (appState?.collaborators) {
-    const currentUser = appState.collaborators.get(clientId);
-    if (currentUser?.color) {
-      return currentUser.color;
-    }
+const colorAssignments = new Map<string, Colors>();
+const goldenRatio = (1 + Math.sqrt(5)) / 2;
+
+export const getClientColors = (userId: string) => {
+  if (colorAssignments.has(userId)) {
+    // If the color for the user is already assigned, return it
+    return colorAssignments.get(userId)!;
   }
-  // Naive way of getting an integer out of the clientId
-  const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
+  // Generate a new color for the user with the largest possible hue distance
+  const color = generateUniqueColor(colorAssignments.size);
+  colorAssignments.set(userId, color);
+  return color;
+};
+
+const generateUniqueColor = (assignedCollors: number): Colors => {
+  if (assignedCollors === 0) {
+    return {
+      background: "#1b1b1f",
+      stroke: oc.white,
+      text: oc.white,
+    };
+  }
+  const hue = (colorAssignments.size * (360 / goldenRatio)) % 360; // Calculate the angle based on the golden ratio and size
+
+  const saturation = 100;
+  const lightness = 80;
 
   return {
-    background: BG_COLORS[sum % BG_COLORS.length],
-    stroke: STROKE_COLORS[sum % STROKE_COLORS.length],
+    background: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+    stroke: oc.white,
+    text: "#1b1b1f",
   };
 };
 

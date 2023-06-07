@@ -527,7 +527,7 @@ export const _renderScene = ({
             selectionColors.push(
               ...renderConfig.remoteSelectedElementIds[element.id].map(
                 (socketId) => {
-                  const { background } = getClientColors(socketId, appState);
+                  const { background } = getClientColors(socketId);
                   return background;
                 },
               ),
@@ -647,7 +647,7 @@ export const _renderScene = ({
       x -= appState.offsetLeft;
       y -= appState.offsetTop;
 
-      const width = 9;
+      const width = 11;
       const height = 14;
 
       const isOutOfBounds =
@@ -661,10 +661,10 @@ export const _renderScene = ({
       y = Math.max(y, 0);
       y = Math.min(y, normalizedCanvasHeight - height);
 
-      const { background, stroke } = getClientColors(clientId, appState);
+      const { background, stroke, text } = getClientColors(clientId);
 
       context.save();
-      context.strokeStyle = stroke;
+      context.strokeStyle = background;
       context.fillStyle = background;
 
       const userState = renderConfig.remotePointerUserStates[clientId];
@@ -686,19 +686,38 @@ export const _renderScene = ({
         context.beginPath();
         context.arc(x, y, 15, 0, 2 * Math.PI, false);
         context.lineWidth = 1;
-        context.strokeStyle = stroke;
+        context.strokeStyle = background;
         context.stroke();
         context.closePath();
       }
 
+      // Background (white outline) for arrow
+      context.fillStyle = stroke;
+      context.strokeStyle = stroke;
+      context.lineWidth = 6;
+      context.lineJoin = "round";
       context.beginPath();
       context.moveTo(x, y);
-      context.lineTo(x + 1, y + 14);
+      context.lineTo(x + 0, y + 14);
       context.lineTo(x + 4, y + 9);
-      context.lineTo(x + 9, y + 10);
-      context.lineTo(x, y);
-      context.fill();
+      context.lineTo(x + 11, y + 8);
+      context.closePath();
       context.stroke();
+      context.fill();
+
+      // Arrow
+      context.fillStyle = background;
+      context.strokeStyle = background;
+      context.lineWidth = 2;
+      context.lineJoin = "round";
+      context.beginPath();
+      context.moveTo(x, y);
+      context.lineTo(x + 0, y + 14);
+      context.lineTo(x + 4, y + 9);
+      context.lineTo(x + 11, y + 8);
+      context.closePath();
+      context.stroke();
+      context.fill();
 
       const username = renderConfig.remotePointerUsernames[clientId];
 
@@ -714,9 +733,11 @@ export const _renderScene = ({
       }`;
 
       if (!isOutOfBounds && usernameAndIdleState) {
-        const offsetX = x + width;
-        const offsetY = y + height;
-        const paddingHorizontal = 4;
+        context.font = "600 12px sans-serif"; // font has to be set before context.measureText()
+
+        const offsetX = x + width / 2;
+        const offsetY = y + height + 2;
+        const paddingHorizontal = 8;
         const paddingVertical = 4;
         const measure = context.measureText(usernameAndIdleState);
         const measureHeight =
@@ -733,11 +754,11 @@ export const _renderScene = ({
             boxY,
             boxWidth,
             boxHeight,
-            4 / renderConfig.zoom.value,
+            8 / renderConfig.zoom.value,
           );
           context.fillStyle = background;
           context.fill();
-          context.fillStyle = stroke;
+          context.strokeStyle = stroke;
           context.stroke();
         } else {
           // Border
@@ -747,7 +768,7 @@ export const _renderScene = ({
           context.fillStyle = background;
           context.fillRect(offsetX, offsetY, boxWidth - 2, boxHeight - 2);
         }
-        context.fillStyle = oc.white;
+        context.fillStyle = text;
 
         context.fillText(
           usernameAndIdleState,

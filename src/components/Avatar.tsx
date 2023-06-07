@@ -8,14 +8,21 @@ type AvatarProps = {
   color: string;
   border: string;
   name: string;
+  textColor: string;
   src?: string;
 };
 
-export const Avatar = ({ color, onClick, name, src }: AvatarProps) => {
+export const Avatar = ({
+  color,
+  textColor,
+  onClick,
+  name,
+  src,
+}: AvatarProps) => {
   const shortName = getNameInitial(name);
   const [error, setError] = useState(false);
   const loadImg = !error && src;
-  const style = loadImg ? undefined : { background: color };
+  const style = loadImg ? undefined : { background: color, color: textColor };
   return (
     <div className="Avatar" style={style} onClick={onClick}>
       {loadImg ? (
