@@ -773,7 +773,9 @@ class App extends React.Component<AppProps, AppState> {
             }px`,
             zIndex: 2,
             fontSize: "14px",
-            color: "var(--color-gray-70)",
+            color: isDarkTheme
+              ? "var(--color-gray-60)"
+              : "var(--color-gray-50)",
             width: "max-content",
             maxWidth: `${x2 - x1 + FRAME_NAME_EDIT_PADDING * 2}px`,
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
