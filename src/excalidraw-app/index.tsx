@@ -87,6 +87,11 @@ import { appJotaiStore } from "./app-jotai";
 
 import "./index.scss";
 import { ResolutionType } from "../utility-types";
+import { ShareableLinkDialog } from "../components/ShareableLinkDialog";
+import { openConfirmModal } from "../components/OverwriteConfirm/state";
+import { OverwriteConfirmDialog } from "../components/OverwriteConfirm/Dialog";
+import Trans from "../components/Trans";
+import { Action } from "../components/OverwriteConfirm/Actions";
 
 polyfill();
 
@@ -96,6 +101,18 @@ const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {},
 });
+
+const shareableLinkModal = {
+  title: t("overwriteConfirmationDialog.header.shareable_link"),
+  description: (
+    <Trans
+      i18nKey="overwriteConfirmationDialog.description.shareable_link"
+      bold={(text) => <strong>{text}</strong>}
+      br={() => <br />}
+    />
+  ),
+  actionLabel: t("overwriteConfirmationDialog.button.confirm"),
+};
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
@@ -128,7 +145,7 @@ const initializeScene = async (opts: {
       // don't prompt for collab scenes because we don't override local storage
       roomLinkData ||
       // otherwise, prompt whether user wants to override current scene
-      window.confirm(t("alerts.loadSceneOverridePrompt"))
+      (await openConfirmModal(shareableLinkModal))
     ) {
       if (jsonBackendMatch) {
         scene = await loadScene(
@@ -549,6 +566,10 @@ const ExcalidrawWrapper = () => {
     }
   };
 
+  const [latestShareableLink, setLatestShareableLink] = useState<string | null>(
+    null,
+  );
+
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: Partial<AppState>,
@@ -560,7 +581,7 @@ const ExcalidrawWrapper = () => {
     }
     if (canvas) {
       try {
-        await exportToBackend(
+        const { url, error } = await exportToBackend(
           exportedElements,
           {
             ...appState,
@@ -570,6 +591,14 @@ const ExcalidrawWrapper = () => {
           },
           files,
         );
+
+        if (error) {
+          setErrorMessage(`${error}`); //TODO
+        }
+
+        if (url) {
+          setLatestShareableLink(url);
+        }
       } catch (error: any) {
         if (error.name !== "AbortError") {
           const { width, height } = canvas;
@@ -664,12 +693,36 @@ const ExcalidrawWrapper = () => {
           setCollabDialogShown={setCollabDialogShown}
           isCollaborating={isCollaborating}
         />
+        <OverwriteConfirmDialog>
+          <OverwriteConfirmDialog.Title />
+          <OverwriteConfirmDialog.Description />
+          <OverwriteConfirmDialog.Actions>
+            <OverwriteConfirmDialog.Actions.SaveToDisk />
+            <OverwriteConfirmDialog.Actions.ExportToImage />
+            <Action
+              title="Excalidraw+"
+              actionLabel="Export to Excalidraw+"
+              onClick={() => {
+                // TODO: How to get elements, appState and files here?
+              }}
+            >
+              Save the scene to your Excalidraw+ workspace.
+            </Action>
+          </OverwriteConfirmDialog.Actions>
+        </OverwriteConfirmDialog>
         <AppWelcomeScreen setCollabDialogShown={setCollabDialogShown} />
         <AppFooter />
         {isCollaborating && isOffline && (
           <div className="collab-offline-warning">
             {t("alerts.collabOfflineWarning")}
           </div>
+        )}
+        {latestShareableLink && (
+          <ShareableLinkDialog
+            link={latestShareableLink}
+            onCloseRequest={() => setLatestShareableLink(null)}
+            setErrorMessage={setErrorMessage}
+          />
         )}
         {excalidrawAPI && <Collab excalidrawAPI={excalidrawAPI} />}
       </Excalidraw>

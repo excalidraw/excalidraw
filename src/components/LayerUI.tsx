@@ -41,6 +41,7 @@ import { jotaiScope } from "../jotai";
 import { Provider, useAtomValue } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
+import { OverwriteConfirmDialog } from "./OverwriteConfirm/Dialog";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
@@ -50,6 +51,7 @@ import { DefaultSidebar } from "./DefaultSidebar";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
+import { actionSaveFileToDisk } from "../actions";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -95,6 +97,19 @@ const DefaultMainMenu: React.FC<{
       <MainMenu.DefaultItems.ToggleTheme />
       <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>
+  );
+};
+
+const DefaultOverwriteConfirmDialog = () => {
+  return (
+    <OverwriteConfirmDialog __fallback>
+      <OverwriteConfirmDialog.Title />
+      <OverwriteConfirmDialog.Description />
+      <OverwriteConfirmDialog.Actions>
+        <OverwriteConfirmDialog.Actions.SaveToDisk />
+        <OverwriteConfirmDialog.Actions.ExportToImage />
+      </OverwriteConfirmDialog.Actions>
+    </OverwriteConfirmDialog>
   );
 };
 
@@ -342,6 +357,7 @@ const LayerUI = ({
       >
         {t("toolBar.library")}
       </DefaultSidebar.Trigger>
+      <DefaultOverwriteConfirmDialog />
       {/* ------------------------------------------------------------------ */}
 
       {appState.isLoading && <LoadingMessage delay={250} />}
@@ -358,6 +374,7 @@ const LayerUI = ({
         />
       )}
       <ActiveConfirmDialog />
+      <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
       {renderJSONExportDialog()}
       {appState.pasteDialog.shown && (

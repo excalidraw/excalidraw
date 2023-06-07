@@ -2,20 +2,108 @@
 
 .excalidraw {
   .ExcButton {
-    &--color-primary {
-      color: var(--input-bg-color);
+    --text-color: transparent;
+    --border-color: transparent;
+    --back-color: transparent;
 
-      --accent-color: var(--color-primary);
-      --accent-color-hover: var(--color-primary-darker);
-      --accent-color-active: var(--color-primary-darkest);
+    color: var(--text-color);
+    background-color: var(--back-color);
+    border-color: var(--border-color);
+
+    &--color-primary {
+      &.ExcButton--variant-filled {
+        --text-color: var(--input-bg-color);
+        --back-color: var(--color-primary);
+
+        &:hover {
+          --back-color: var(--color-primary-darker);
+        }
+
+        &:active {
+          --back-color: var(--color-primary-darkest);
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-primary);
+        --border-color: var(--color-primary);
+        --back-color: var(--input-bg-color);
+
+        &:hover {
+          --text-color: var(--color-primary-darker);
+          --border-color: var(--color-primary-darker);
+        }
+
+        &:active {
+          --text-color: var(--color-primary-darkest);
+          --border-color: var(--color-primary-darkest);
+        }
+      }
     }
 
     &--color-danger {
-      color: var(--input-bg-color);
+      &.ExcButton--variant-filled {
+        --text-color: var(--input-bg-color);
+        --back-color: var(--color-danger);
 
-      --accent-color: var(--color-danger);
-      --accent-color-hover: #d65550;
-      --accent-color-active: #d1413c;
+        &:hover {
+          --back-color: #d65550;
+        }
+
+        &:active {
+          --back-color: #d1413c;
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-danger);
+        --border-color: var(--color-danger);
+        --back-color: var(--input-bg-color);
+
+        &:hover {
+          --text-color: #d65550;
+          --border-color: #d65550;
+        }
+
+        &:active {
+          --text-color: #d1413c;
+          --border-color: #d1413c;
+        }
+      }
+    }
+
+    &--color-muted {
+      &.ExcButton--variant-filled {
+        --text-color: var(--input-bg-color);
+        --back-color: var(--color-gray-50);
+
+        &:hover {
+          --back-color: var(--color-gray-60);
+        }
+
+        &:active {
+          --back-color: var(--color-gray-80);
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-gray-80);
+        --border-color: var(--color-gray-30);
+        --back-color: var(--input-bg-color);
+
+        &:hover {
+          --text-color: var(--color-gray-100);
+          --border-color: var(--color-gray-60);
+        }
+
+        &:active {
+          --text-color: var(--color-gray-100);
+          --border-color: var(--color-gray-100);
+        }
+      }
     }
 
     display: flex;
@@ -25,6 +113,8 @@
     flex-wrap: nowrap;
 
     border-radius: 0.5rem;
+    border-width: 1px;
+    border-style: solid;
 
     font-family: "Assistant";
 
@@ -50,36 +140,6 @@
       gap: 0.5rem;
 
       letter-spacing: normal;
-    }
-
-    &--variant-filled {
-      background: var(--accent-color);
-      border: 1px solid transparent;
-
-      &:hover {
-        background: var(--accent-color-hover);
-      }
-
-      &:active {
-        background: var(--accent-color-active);
-      }
-    }
-
-    &--variant-outlined,
-    &--variant-icon {
-      border: 1px solid var(--accent-color);
-      color: var(--accent-color);
-      background: transparent;
-
-      &:hover {
-        border: 1px solid var(--accent-color-hover);
-        color: var(--accent-color-hover);
-      }
-
-      &:active {
-        border: 1px solid var(--accent-color-active);
-        color: var(--accent-color-active);
-      }
     }
 
     &--variant-icon {

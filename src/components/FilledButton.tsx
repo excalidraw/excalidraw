@@ -4,7 +4,7 @@ import clsx from "clsx";
 import "./FilledButton.scss";
 
 export type ButtonVariant = "filled" | "outlined" | "icon";
-export type ButtonColor = "primary" | "danger";
+export type ButtonColor = "primary" | "danger" | "muted";
 export type ButtonSize = "medium" | "large";
 
 export type FilledButtonProps = {

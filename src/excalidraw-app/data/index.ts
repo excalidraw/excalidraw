@@ -327,14 +327,16 @@ export const exportToBackend = async (
         files: filesToUpload,
       });
 
-      window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
+      return { url: urlString };
     } else if (json.error_class === "RequestTooLargeError") {
       window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));
-    } else {
-      window.alert(t("alerts.couldNotCreateShareableLink"));
+      return { error: json.error_class };
     }
+
+    return { error: json };
   } catch (error: any) {
     console.error(error);
     window.alert(t("alerts.couldNotCreateShareableLink"));
+    return { error };
   }
 };
