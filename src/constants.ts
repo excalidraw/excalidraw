@@ -95,7 +95,7 @@ export const THEME = {
 };
 
 export const FRAME_STYLE = {
-  strokeColor: "#ccc" as ExcalidrawElement["strokeColor"],
+  strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
   strokeWidth: 1 as ExcalidrawElement["strokeWidth"],
   strokeStyle: "solid" as ExcalidrawElement["strokeStyle"],
   fillStyle: "solid" as ExcalidrawElement["fillStyle"],
