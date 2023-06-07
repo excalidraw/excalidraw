@@ -11,9 +11,16 @@ const shouldLock = (elements: readonly ExcalidrawElement[]) =>
 export const actionToggleElementLock = register({
   name: "toggleElementLock",
   trackEvent: { category: "element" },
+  predicate: (elements, appState) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    return !selectedElements.some(
+      (element) => element.locked && element.frameId,
+    );
+  },
   perform: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState, {
       includeBoundTextElement: true,
+      includeElementsInFrames: true,
     });
 
     if (!selectedElements.length) {
@@ -43,7 +50,7 @@ export const actionToggleElementLock = register({
     const selected = getSelectedElements(elements, appState, {
       includeBoundTextElement: false,
     });
-    if (selected.length === 1) {
+    if (selected.length === 1 && selected[0].type !== "frame") {
       return selected[0].locked
         ? "labels.elementLock.unlock"
         : "labels.elementLock.lock";
