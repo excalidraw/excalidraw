@@ -781,6 +781,7 @@ class App extends React.Component<AppProps, AppState> {
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
+            cursor: CURSOR_TYPE.MOVE,
             // disable all interaction (e.g. cursor change) when in view
             // mode
             pointerEvents: this.state.viewModeEnabled ? "none" : "all",
