@@ -155,10 +155,27 @@ export const exportToSvg = async (
   const offsetX = -minX + exportPadding;
   const offsetY = -minY + exportPadding;
 
-  const frames =
-    isExportingWholeCanvas && !onlyExportingSingleFrame
-      ? []
-      : elements.filter((element) => element.type === "frame");
+  const exportingFrame =
+    isExportingWholeCanvas || !onlyExportingSingleFrame
+      ? undefined
+      : elements.find((element) => element.type === "frame");
+
+  let exportingFrameClipPath = "";
+  if (exportingFrame) {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(exportingFrame);
+    const cx = (x2 - x1) / 2 - (exportingFrame.x - x1);
+    const cy = (y2 - y1) / 2 - (exportingFrame.y - y1);
+
+    exportingFrameClipPath = `<clipPath id=${exportingFrame.id}>
+            <rect transform="translate(${exportingFrame.x + offsetX} ${
+      exportingFrame.y + offsetY
+    }) rotate(${exportingFrame.angle} ${cx} ${cy})"
+          width="${exportingFrame.width}"
+          height="${exportingFrame.height}"
+          >
+          </rect>
+        </clipPath>`;
+  }
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
@@ -174,28 +191,10 @@ export const exportToSvg = async (
         src: url("${assetPath}Cascadia.woff2");
       }
     </style>
-    ${frames.map((frame) => {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame);
-      const cx = (x2 - x1) / 2 - (frame.x - x1);
-      const cy = (y2 - y1) / 2 - (frame.y - y1);
-
-      return `<clipPath id=${frame.id}>
-          <rect transform="translate(${frame.x + offsetX} ${
-        frame.y + offsetY
-      }) rotate(${frame.angle} ${cx} ${cy})"
-        width="${frame.width}"
-        height="${frame.height}"
-        >
-        </rect>
-      </clipPath>`;
-    })}
+    ${exportingFrameClipPath}
   </defs>
   `;
 
-  const exportedFrameIds = frames.reduce((acc, frame) => {
-    acc[frame.id] = true;
-    return acc;
-  }, {} as Record<string, true>);
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
@@ -212,7 +211,7 @@ export const exportToSvg = async (
     offsetX,
     offsetY,
     exportWithDarkMode: appState.exportWithDarkMode,
-    exportedFrameIds,
+    exportingFrameId: exportingFrame?.id || null,
   });
 
   return svgRoot;

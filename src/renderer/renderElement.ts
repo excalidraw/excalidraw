@@ -1159,10 +1159,10 @@ const maybeWrapNodesInFrameClipPath = (
   element: NonDeletedExcalidrawElement,
   root: SVGElement,
   nodes: SVGElement[],
-  exportedFrameIds?: { [id: string]: boolean },
+  exportedFrameId?: string | null,
 ) => {
   const frame = getContainingFrame(element);
-  if (frame && exportedFrameIds?.[frame.id]) {
+  if (frame && frame.id === exportedFrameId) {
     const g = root.ownerDocument!.createElementNS(SVG_NS, "g");
     g.setAttributeNS(SVG_NS, "clip-path", `url(#${frame.id})`);
     nodes.forEach((node) => g.appendChild(node));
@@ -1180,7 +1180,7 @@ export const renderElementToSvg = (
   offsetX: number,
   offsetY: number,
   exportWithDarkMode?: boolean,
-  exportedFrameIds?: { [id: string]: boolean },
+  exportingFrameId?: string | null,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   let cx = (x2 - x1) / 2 - (element.x - x1);
@@ -1248,7 +1248,7 @@ export const renderElementToSvg = (
         element,
         root,
         [node],
-        exportedFrameIds,
+        exportingFrameId,
       );
 
       g ? root.appendChild(g) : root.appendChild(node);
@@ -1336,7 +1336,7 @@ export const renderElementToSvg = (
         element,
         root,
         [group, maskPath],
-        exportedFrameIds,
+        exportingFrameId,
       );
       if (g) {
         root.appendChild(g);
@@ -1373,7 +1373,7 @@ export const renderElementToSvg = (
         element,
         root,
         [node],
-        exportedFrameIds,
+        exportingFrameId,
       );
 
       g ? root.appendChild(g) : root.appendChild(node);
@@ -1442,7 +1442,7 @@ export const renderElementToSvg = (
           element,
           root,
           [g],
-          exportedFrameIds,
+          exportingFrameId,
         );
         clipG ? root.appendChild(clipG) : root.appendChild(g);
       }
@@ -1503,7 +1503,7 @@ export const renderElementToSvg = (
           element,
           root,
           [node],
-          exportedFrameIds,
+          exportingFrameId,
         );
 
         g ? root.appendChild(g) : root.appendChild(node);

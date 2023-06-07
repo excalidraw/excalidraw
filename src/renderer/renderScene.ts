@@ -1362,12 +1362,12 @@ export const renderSceneToSvg = (
     offsetX = 0,
     offsetY = 0,
     exportWithDarkMode = false,
-    exportedFrameIds = {},
+    exportingFrameId = null,
   }: {
     offsetX?: number;
     offsetY?: number;
     exportWithDarkMode?: boolean;
-    exportedFrameIds?: { [id: string]: boolean };
+    exportingFrameId?: string | null;
   } = {},
 ) => {
   if (!svgRoot) {
@@ -1386,7 +1386,7 @@ export const renderSceneToSvg = (
           element.x + offsetX,
           element.y + offsetY,
           exportWithDarkMode,
-          exportedFrameIds,
+          exportingFrameId,
         );
       } catch (error: any) {
         console.error(error);
