@@ -20,6 +20,7 @@ import {
   isHandToolActive,
 } from "../appState";
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
+import { excludeElementsInFramesFromSelection } from "../scene/selection";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -234,8 +235,10 @@ export const zoomToFitElements = (
 
   const commonBounds =
     zoomToSelection && selectedElements.length > 0
-      ? getCommonBounds(selectedElements)
-      : getCommonBounds(nonDeletedElements);
+      ? getCommonBounds(excludeElementsInFramesFromSelection(selectedElements))
+      : getCommonBounds(
+          excludeElementsInFramesFromSelection(nonDeletedElements),
+        );
 
   const newZoom = {
     value: zoomValueToFitBoundsOnViewport(commonBounds, {
