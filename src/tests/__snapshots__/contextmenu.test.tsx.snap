@@ -265,6 +265,7 @@ Object {
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -4817,6 +4818,7 @@ Object {
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -5393,6 +5395,7 @@ Object {
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -6285,6 +6288,7 @@ Object {
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
@@ -6652,6 +6656,7 @@ Object {
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
+        "predicate": [Function],
         "trackEvent": Object {
           "category": "element",
         },
