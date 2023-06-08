@@ -117,7 +117,7 @@ export type ActionName =
   | "toggleEraserTool"
   | "toggleHandTool"
   | "selectAllElementsInFrame"
-  | "removeAllElementsInFrame"
+  | "removeAllElementsFromFrame"
   | "toggleFrameRendering"
   | "setFrameAsActiveTool"
   | "createContainerFromText"

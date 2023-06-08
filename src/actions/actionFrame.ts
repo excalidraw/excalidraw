@@ -58,8 +58,8 @@ export const actionSelectAllElementsInFrame = register({
   predicate: (elements, appState) => enableFrameAction(elements, appState),
 });
 
-export const actionRemoveAllElementsInFrame = register({
-  name: "removeAllElementsInFrame",
+export const actionRemoveAllElementsFromFrame = register({
+  name: "removeAllElementsFromFrame",
   trackEvent: { category: "history" },
   perform: (elements, appState) => {
     const selectedFrame = getSelectedElements(

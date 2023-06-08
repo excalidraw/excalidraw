@@ -318,7 +318,7 @@ import {
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
 import {
-  actionRemoveAllElementsInFrame,
+  actionRemoveAllElementsFromFrame,
   actionSelectAllElementsInFrame,
 } from "../actions/actionFrame";
 import {
@@ -7275,7 +7275,7 @@ class App extends React.Component<AppProps, AppState> {
       actionCopy,
       actionPaste,
       actionSelectAllElementsInFrame,
-      actionRemoveAllElementsInFrame,
+      actionRemoveAllElementsFromFrame,
       CONTEXT_MENU_SEPARATOR,
       ...options,
       CONTEXT_MENU_SEPARATOR,
