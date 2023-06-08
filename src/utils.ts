@@ -839,7 +839,7 @@ export const getEmbedLink = (
     return null;
   }
 
-  let type = "generic";
+  let type: "video" | "generic" = "generic";
   let aspectRatio = { w: 560, h: 840 };
   const ytLink = link.match(
     /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(?:embed\/|watch\?v=|shorts\/)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/,
