@@ -2216,6 +2216,25 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.executeAction(actionToggleHandTool);
   };
 
+  /**
+   * Zooms on canvas viewport center
+   */
+  zoomCanvas = (
+    /** decimal fraction between 0.1 (10% zoom) and 30 (3000% zoom) */
+    value: number,
+  ) => {
+    this.setState({
+      ...getStateForZoom(
+        {
+          viewportX: this.state.width / 2 + this.state.offsetLeft,
+          viewportY: this.state.height / 2 + this.state.offsetTop,
+          nextZoom: getNormalizedZoom(value),
+        },
+        this.state,
+      ),
+    });
+  };
+
   private cancelInProgresAnimation: (() => void) | null = null;
 
   scrollToContent = (
@@ -2266,23 +2285,13 @@ class App extends React.Component<AppProps, AppState> {
       const origScrollY = this.state.scrollY;
       const origZoom = this.state.zoom.value;
 
-      const nextZoom = getStateForZoom(
-        {
-          viewportX: this.state.width / 2 + this.state.offsetLeft,
-          viewportY: this.state.height / 2 + this.state.offsetTop,
-          nextZoom: getNormalizedZoom(zoom.value),
-        },
-        this.state,
-      );
-      const nextZoomValue = nextZoom.zoom.value;
-
       const cancel = easeToValuesRAF({
         fromValues: {
           scrollX: origScrollX,
           scrollY: origScrollY,
           zoom: origZoom,
         },
-        toValues: { scrollX, scrollY, zoom: nextZoomValue },
+        toValues: { scrollX, scrollY, zoom: zoom.value },
         onStep: ({ scrollX, scrollY, zoom }) => {
           this.setState({
             scrollX,
