@@ -69,7 +69,7 @@ describe("isCustomColor", () => {
 });
 
 describe("getMostUsedCustomColors", () => {
-  const elements = [
+  const elements:readonly any[] = [
     {
       type: "rectangle",
       id: "1",
@@ -109,7 +109,6 @@ describe("getMostUsedCustomColors", () => {
   it("should return the most used custom colors for element background", () => {
     const type = "elementBackground";
 
-    // @ts-ignore
     const result = getMostUsedCustomColors(elements, type, palette);
 
     expect(result).toEqual(["#FF0000"]);
@@ -118,7 +117,6 @@ describe("getMostUsedCustomColors", () => {
   it("should return the most used custom colors for element stroke", () => {
     const type = "elementStroke";
 
-    // @ts-ignore
     const result = getMostUsedCustomColors(elements, type, palette);
 
     expect(result).toEqual(["#00FF00"]);
@@ -136,7 +134,6 @@ describe("getMostUsedCustomColors", () => {
   it("should handle empty palette correctly", () => {
     const type = "elementBackground";
     const emptyPalette = {};
-    // @ts-ignore
     const result = getMostUsedCustomColors(elements, type, emptyPalette);
 
     expect(result).toEqual([]);
