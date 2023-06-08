@@ -14,6 +14,7 @@ export const actionAddToLibrary = register({
       appState,
       {
         includeBoundTextElement: true,
+        includeElementsInFrames: true,
       },
     );
     if (selectedElements.some((element) => element.type === "image")) {

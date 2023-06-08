@@ -151,6 +151,7 @@ const usePendingElementsMemo = (
   const create = () =>
     getSelectedElements(elements, appState, {
       includeBoundTextElement: true,
+      includeElementsInFrames: true,
     });
   const val = useRef(create());
   const prevAppState = useRef<UIAppState>(appState);
