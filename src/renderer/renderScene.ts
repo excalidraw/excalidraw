@@ -668,8 +668,13 @@ export const _renderScene = ({
       context.fillStyle = background;
 
       const userState = renderConfig.remotePointerUserStates[clientId];
-      if (isOutOfBounds || userState === UserIdleState.AWAY) {
-        context.globalAlpha = 0.48;
+      const isInactive =
+        isOutOfBounds ||
+        userState === UserIdleState.IDLE ||
+        userState === UserIdleState.AWAY;
+
+      if (isInactive) {
+        context.globalAlpha = 0.3;
       }
 
       if (
@@ -711,7 +716,7 @@ export const _renderScene = ({
       context.lineWidth = 2;
       context.lineJoin = "round";
       context.beginPath();
-      if (isOutOfBounds || userState === UserIdleState.AWAY) {
+      if (isInactive) {
         context.moveTo(x - 1, y - 1);
         context.lineTo(x - 1, y + 15);
         context.lineTo(x + 5, y + 10);
@@ -728,27 +733,16 @@ export const _renderScene = ({
         context.stroke();
       }
 
-      const username = renderConfig.remotePointerUsernames[clientId];
+      const username = renderConfig.remotePointerUsernames[clientId] || "";
 
-      let idleState = "";
-      if (userState === UserIdleState.AWAY) {
-        idleState = hasEmojiSupport ? "⚫️" : ` (${UserIdleState.AWAY})`;
-      } else if (userState === UserIdleState.IDLE) {
-        idleState = hasEmojiSupport ? "💤" : ` (${UserIdleState.IDLE})`;
-      }
-
-      const usernameAndIdleState = `${username || ""}${
-        idleState ? ` ${idleState}` : ""
-      }`;
-
-      if (!isOutOfBounds && usernameAndIdleState) {
+      if (!isOutOfBounds && username) {
         context.font = "600 12px sans-serif"; // font has to be set before context.measureText()
 
         const offsetX = x + width / 2;
         const offsetY = y + height + 2;
         const paddingHorizontal = 8;
         const paddingVertical = 4;
-        const measure = context.measureText(usernameAndIdleState);
+        const measure = context.measureText(username);
         const measureHeight =
           measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
 
@@ -780,7 +774,7 @@ export const _renderScene = ({
         context.fillStyle = oc.black;
 
         context.fillText(
-          usernameAndIdleState,
+          username,
           offsetX + paddingHorizontal,
           offsetY + paddingVertical + measure.actualBoundingBoxAscent,
         );
