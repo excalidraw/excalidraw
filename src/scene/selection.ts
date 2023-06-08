@@ -66,8 +66,10 @@ export const getElementsWithinSelection = (
     : elementsInSelection;
 
   elementsInSelection = elementsInSelection.filter((element) => {
-    if (element.frameId) {
-      return elementOverlapsWithFrame(element, getContainingFrame(element)!);
+    const containingFrame = getContainingFrame(element);
+
+    if (containingFrame) {
+      return elementOverlapsWithFrame(element, containingFrame);
     }
 
     return true;
