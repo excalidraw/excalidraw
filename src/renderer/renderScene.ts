@@ -48,11 +48,7 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import {
-  viewportCoordsToSceneCoords,
-  supportsEmoji,
-  throttleRAF,
-} from "../utils";
+import { viewportCoordsToSceneCoords, throttleRAF } from "../utils";
 import { UserIdleState } from "../types";
 import { THEME_FILTER } from "../constants";
 import {
@@ -61,7 +57,6 @@ import {
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
 
-const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
 
 const strokeRectWithRotation = (
@@ -159,7 +154,6 @@ const strokeGrid = (
 
 const renderSingleLinearPoint = (
   context: CanvasRenderingContext2D,
-  appState: AppState,
   renderConfig: RenderConfig,
   point: Point,
   radius: number,
@@ -206,14 +200,7 @@ const renderLinearPointHandles = (
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
-    renderSingleLinearPoint(
-      context,
-      appState,
-      renderConfig,
-      point,
-      radius,
-      isSelected,
-    );
+    renderSingleLinearPoint(context, renderConfig, point, radius, isSelected);
   });
 
   //Rendering segment mid points
@@ -237,7 +224,6 @@ const renderLinearPointHandles = (
       if (appState.editingLinearElement) {
         renderSingleLinearPoint(
           context,
-          appState,
           renderConfig,
           segmentMidPoint,
           radius,
@@ -248,7 +234,6 @@ const renderLinearPointHandles = (
         highlightPoint(segmentMidPoint, context, renderConfig);
         renderSingleLinearPoint(
           context,
-          appState,
           renderConfig,
           segmentMidPoint,
           radius,
@@ -258,7 +243,6 @@ const renderLinearPointHandles = (
     } else if (appState.editingLinearElement || points.length === 2) {
       renderSingleLinearPoint(
         context,
-        appState,
         renderConfig,
         segmentMidPoint,
         POINT_HANDLE_SIZE / 2,
@@ -1173,7 +1157,7 @@ export const renderSceneToSvg = (
     return;
   }
   // render elements
-  elements.forEach((element, index) => {
+  elements.forEach((element) => {
     if (!element.isDeleted) {
       try {
         renderElementToSvg(
