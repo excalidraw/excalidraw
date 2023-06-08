@@ -12,19 +12,14 @@ import {
   isBindingEnabled,
   unbindLinearElements,
 } from "../element/binding";
-import {
-  elementOverlapsWithFrame,
-  getContainingFrame,
-  removeElementsFromFrame,
-} from "../frame";
-import { getElementsInGroup } from "../groups";
+import { updateFrameMembershipOfSelectedElements } from "../frame";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
-      elements: updateFrameAfterFlipping(
+      elements: updateFrameMembershipOfSelectedElements(
         flipSelectedElements(elements, appState, "horizontal"),
         appState,
       ),
@@ -41,7 +36,7 @@ export const actionFlipVertical = register({
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
-      elements: updateFrameAfterFlipping(
+      elements: updateFrameMembershipOfSelectedElements(
         flipSelectedElements(elements, appState, "vertical"),
         appState,
       ),
@@ -101,54 +96,4 @@ const flipElements = (
     : unbindLinearElements)(elements);
 
   return elements;
-};
-
-const updateFrameAfterFlipping = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  let nextElements = [...elements];
-  const selectedElements = getSelectedElements(elements, appState);
-  const groupsToRemove = new Set<string>();
-
-  for (const element of selectedElements) {
-    const containgFrame = getContainingFrame(element);
-
-    if (containgFrame) {
-      if (
-        element.groupIds.length > 0 &&
-        !element.groupIds.some((gid) => groupsToRemove.has(gid))
-      ) {
-        const allElementsInGroup = Array.from(
-          new Set(
-            element.groupIds.flatMap((gid) =>
-              getElementsInGroup(elements, gid),
-            ),
-          ),
-        );
-        if (
-          !allElementsInGroup.some((element) =>
-            elementOverlapsWithFrame(element, containgFrame),
-          )
-        ) {
-          nextElements = removeElementsFromFrame(
-            nextElements,
-            allElementsInGroup,
-            appState,
-          );
-          element.groupIds.forEach((gid) => groupsToRemove.add(gid));
-        }
-      } else if (element.groupIds.length === 0) {
-        if (!elementOverlapsWithFrame(element, containgFrame)) {
-          nextElements = removeElementsFromFrame(
-            nextElements,
-            [element],
-            appState,
-          );
-        }
-      }
-    }
-  }
-
-  return nextElements;
 };

@@ -504,8 +504,20 @@ export const getElementsInNewFrame = (
   return [...elementsToBeAddedSet];
 };
 
-export const getContainingFrame = (element: ExcalidrawElement) => {
+export const getContainingFrame = (
+  element: ExcalidrawElement,
+  /**
+   * Optionally an elements map, in case the elements aren't in the Scene yet.
+   * Takes precedence over Scene elements, even if the element exists
+   * in Scene elements and not the supplied elements map.
+   */
+  elementsMap?: Map<string, ExcalidrawElement>,
+) => {
   if (element.frameId) {
+    if (elementsMap) {
+      return (elementsMap.get(element.frameId) ||
+        null) as null | ExcalidrawFrameElement;
+    }
     return (
       (Scene.getScene(element)?.getElement(
         element.frameId,
@@ -625,4 +637,57 @@ export const replaceAllElementsInFrame = (
     nextElementsInFrame,
     frame,
   );
+};
+
+/** does not mutate elements, but return new ones */
+export const updateFrameMembershipOfSelectedElements = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  let nextElements = [...elements];
+  const selectedElements = getSelectedElements(elements, appState);
+  const groupsToRemove = new Set<string>();
+
+  const elementsMap = arrayToMap(elements);
+
+  for (const element of selectedElements) {
+    const containgFrame = getContainingFrame(element, elementsMap);
+
+    if (containgFrame) {
+      if (
+        element.groupIds.length > 0 &&
+        !element.groupIds.some((gid) => groupsToRemove.has(gid))
+      ) {
+        const allElementsInGroup = Array.from(
+          new Set(
+            element.groupIds.flatMap((gid) =>
+              getElementsInGroup(elements, gid),
+            ),
+          ),
+        );
+        if (
+          !allElementsInGroup.some((element) =>
+            elementOverlapsWithFrame(element, containgFrame),
+          )
+        ) {
+          nextElements = removeElementsFromFrame(
+            nextElements,
+            allElementsInGroup,
+            appState,
+          );
+          element.groupIds.forEach((gid) => groupsToRemove.add(gid));
+        }
+      } else if (element.groupIds.length === 0) {
+        if (!elementOverlapsWithFrame(element, containgFrame)) {
+          nextElements = removeElementsFromFrame(
+            nextElements,
+            [element],
+            appState,
+          );
+        }
+      }
+    }
+  }
+
+  return nextElements;
 };

@@ -10,6 +10,7 @@ import {
 import { ToolButton } from "../components/ToolButton";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
+import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
@@ -46,8 +47,9 @@ const alignSelectedElements = (
 
   const updatedElementsMap = arrayToMap(updatedElements);
 
-  return elements.map(
-    (element) => updatedElementsMap.get(element.id) || element,
+  return updateFrameMembershipOfSelectedElements(
+    elements.map((element) => updatedElementsMap.get(element.id) || element),
+    appState,
   );
 };
 
