@@ -126,18 +126,20 @@ export const Hyperlink = ({
     }
     const { width, height } = element;
     const embedLink = getEmbedLink(element.link.url);
-    const ar = embedLink.aspectRatio.w / embedLink.aspectRatio.h;
+    const ar = embedLink
+      ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
+      : 1;
 
     mutateElement(element, {
       link: { url: element.link.url, embed: !element.link.embed },
       width:
-        embedLink.type === "video"
+        embedLink?.type === "video"
           ? width > height
             ? width
             : height * ar
           : width,
       height:
-        embedLink.type === "video"
+        embedLink?.type === "video"
           ? width > height
             ? width / ar
             : height
