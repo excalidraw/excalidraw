@@ -493,15 +493,12 @@ export const _renderScene = ({
           if (containgFrame) {
             if (
               // selected element is being dragged and the cursor is outside the frame
-              (appState.selectedElementIds[element.id] &&
-                appState.selectedElementsAreBeingDragged &&
-                appState.frameToHighlight !== containgFrame) ||
-              // bound text element of the above elements
-              (element.type === "text" &&
-                element.containerId &&
-                appState.selectedElementIds[element.containerId] &&
-                appState.selectedElementsAreBeingDragged &&
-                !appState.frameToHighlight)
+              (appState.selectedElementIds[element.id] ||
+                (element.type === "text" &&
+                  element.containerId &&
+                  appState.selectedElementIds[element.containerId])) &&
+              appState.selectedElementsAreBeingDragged &&
+              appState.frameToHighlight !== containgFrame
             ) {
               // do not clip
             } else {
