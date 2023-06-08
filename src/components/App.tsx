@@ -605,6 +605,22 @@ class App extends React.Component<AppProps, AppState> {
               Math.min(el.width, el.height) - strokeOffset * 2,
               el,
             );
+
+            const width = el.width - strokeOffset * 2;
+            const height = el.height - strokeOffset * 2;
+            const self = this;
+            const handleOverlayClick = (
+              event: React.TouchEvent | React.PointerEvent | React.MouseEvent,
+            ) => {
+              if (isSelected) {
+                return;
+              }
+              self.setState({
+                activeIFrameElement: el,
+                selectedElementIds: { [el.id]: true },
+              });
+            };
+
             return (
               <div
                 className="excalidraw__iframe-container"
@@ -618,8 +634,8 @@ class App extends React.Component<AppProps, AppState> {
               >
                 <div
                   style={{
-                    width: `${el.width - strokeOffset * 2}px`,
-                    height: `${el.height - strokeOffset * 2}px`,
+                    width: `${width}px`,
+                    height: `${height}px`,
                     border: 0,
                     transform: `rotate(${el.angle}rad)`,
                     borderRadius: `${radius}px`,
@@ -633,11 +649,32 @@ class App extends React.Component<AppProps, AppState> {
                       height: `100%`,
                       border: 0,
                       borderRadius: `${radius}px`,
+                      position: "absolute",
+                      left: 0,
+                      top: 0,
                     }}
                     src={src}
                     title="Excalidraw Embedded Content"
                     allow="accelerometer"
                     allowFullScreen={true}
+                  />
+                  <div
+                    onClick={handleOverlayClick}
+                    onPointerDown={handleOverlayClick}
+                    onTouchStart={handleOverlayClick}
+                    onMouseDown={handleOverlayClick}
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: `${width / 4}px`,
+                      height: `${height / 4}px`,
+                      borderRadius: "50%",
+                      borderStyle: "none",
+                      cursor: "pointer",
+                      pointerEvents: isSelected ? "none" : "auto",
+                    }}
                   />
                 </div>
               </div>

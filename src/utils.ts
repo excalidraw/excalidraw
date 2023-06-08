@@ -851,6 +851,31 @@ export const getEmbedLink = (
     type = "video";
     link = `https://www.youtube.com/embed/${target}`;
     aspectRatio = isPortrait ? { w: 315, h: 560 } : { w: 560, h: 315 };
+    return { link, aspectRatio, type };
+  }
+
+  const vimeoLink = link.match(
+    /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?vimeo\.com\/(\d+)$/,
+  );
+  const vimeoPlayer = link.match(
+    /^(?:http(?:s)?:\/\/)?(?:player\.)?vimeo\.com\/video\/(\d+)$/,
+  );
+  if (vimeoLink?.[1] || vimeoPlayer?.[1]) {
+    const target = vimeoLink?.[1] || vimeoPlayer?.[1];
+    type = "video";
+    link = `https://player.vimeo.com/video/${target}`;
+    aspectRatio = { w: 560, h: 315 };
+    return { link, aspectRatio, type };
+  }
+
+  const twitterLink = link.match(
+    /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com\//,
+  );
+  if (twitterLink) {
+    type = "generic";
+    link = `https://twitframe.com/show?url=${encodeURIComponent(link)}`;
+    aspectRatio = { w: 550, h: 550 };
+    return { link, aspectRatio, type };
   }
 
   return { link, aspectRatio, type };
