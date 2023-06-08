@@ -52,7 +52,7 @@ Object {
       },
       Object {
         "contextItemLabel": "labels.removeAllElementsFromFrame",
-        "name": "removeAllElementsInFrame",
+        "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": Object {
@@ -4605,7 +4605,7 @@ Object {
       },
       Object {
         "contextItemLabel": "labels.removeAllElementsFromFrame",
-        "name": "removeAllElementsInFrame",
+        "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": Object {
@@ -5182,7 +5182,7 @@ Object {
       },
       Object {
         "contextItemLabel": "labels.removeAllElementsFromFrame",
-        "name": "removeAllElementsInFrame",
+        "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": Object {
@@ -6075,7 +6075,7 @@ Object {
       },
       Object {
         "contextItemLabel": "labels.removeAllElementsFromFrame",
-        "name": "removeAllElementsInFrame",
+        "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": Object {
@@ -6443,7 +6443,7 @@ Object {
       },
       Object {
         "contextItemLabel": "labels.removeAllElementsFromFrame",
-        "name": "removeAllElementsInFrame",
+        "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": Object {
