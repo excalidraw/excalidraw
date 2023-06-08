@@ -11,12 +11,18 @@ export const getClientColors = (userId: string) => {
     return colorAssignments.get(userId)!;
   }
   // Generate a new color for the user with the largest possible hue distance
-  const color = generateUniqueColor(colorAssignments.size);
+  const color = generateUniqueColors(colorAssignments.size);
   colorAssignments.set(userId, color);
   return color;
 };
 
-const generateUniqueColor = (assignedCollorsSize: number): Colors => {
+/**
+ * Generate a unique color for a user based on the golden ratio.
+ *
+ * Generates a color with the largest possible hue distance from all other colors. Colors are generated based on number of assigned colors and should be unique up to several hundereds.
+ */
+const generateUniqueColors = (assignedCollorsSize: number): Colors => {
+  // First collaberator gets black color
   if (assignedCollorsSize === 0) {
     return {
       background: "#1b1b1f",
@@ -24,7 +30,8 @@ const generateUniqueColor = (assignedCollorsSize: number): Colors => {
       text: oc.white,
     };
   }
-  const hue = (assignedCollorsSize * (360 / goldenRatio)) % 360; // Calculate the angle based on the golden ratio and size
+  // Calculate the angle based on the golden ratio and number of assigned colors
+  const hue = (assignedCollorsSize * (360 / goldenRatio)) % 360;
 
   const saturation = 100;
   const lightness = 80;
