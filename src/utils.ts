@@ -866,7 +866,7 @@ export const getEmbedLink = (
           w: 560,
           h: 840,
         },
-        originalLink: "generic",
+        type: "generic",
       };
 };
 
