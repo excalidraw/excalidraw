@@ -16,7 +16,17 @@ import { register } from "./register";
 const enableActionGroup = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-) => getSelectedElements(getNonDeletedElements(elements), appState).length > 1;
+) => {
+  const selectedElements = getSelectedElements(
+    getNonDeletedElements(elements),
+    appState,
+  );
+  return (
+    selectedElements.length > 1 &&
+    // TODO enable distributing frames when implemented properly
+    !selectedElements.some((el) => el.type === "frame")
+  );
+};
 
 const distributeSelectedElements = (
   elements: readonly ExcalidrawElement[],
