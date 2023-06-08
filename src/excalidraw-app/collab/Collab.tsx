@@ -14,7 +14,6 @@ import {
 } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
 import {
-  isRunningInIframe,
   preventUnload,
   resolvablePromise,
   withBatchedUpdates,
@@ -95,7 +94,6 @@ export interface CollabAPI {
   syncElements: CollabInstance["syncElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
   setUsername: (username: string) => void;
-  isDisabled: () => boolean;
 }
 
 interface PublicProps {
@@ -110,7 +108,6 @@ class Collab extends PureComponent<Props, CollabState> {
   excalidrawAPI: Props["excalidrawAPI"];
   activeIntervalId: number | null;
   idleTimeoutId: number | null;
-  isDisabled: boolean;
 
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
@@ -152,18 +149,15 @@ class Collab extends PureComponent<Props, CollabState> {
     this.excalidrawAPI = props.excalidrawAPI;
     this.activeIntervalId = null;
     this.idleTimeoutId = null;
-    this.isDisabled = isRunningInIframe();
   }
 
   componentDidMount() {
-    if (!this.isDisabled) {
-      window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
-      window.addEventListener("online", this.onOfflineStatusToggle);
-      window.addEventListener("offline", this.onOfflineStatusToggle);
-      window.addEventListener(EVENT.UNLOAD, this.onUnload);
+    window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
+    window.addEventListener("online", this.onOfflineStatusToggle);
+    window.addEventListener("offline", this.onOfflineStatusToggle);
+    window.addEventListener(EVENT.UNLOAD, this.onUnload);
 
-      this.onOfflineStatusToggle();
-    }
+    this.onOfflineStatusToggle();
 
     const collabAPI: CollabAPI = {
       isCollaborating: this.isCollaborating,
@@ -173,7 +167,6 @@ class Collab extends PureComponent<Props, CollabState> {
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
       stopCollaboration: this.stopCollaboration,
       setUsername: this.setUsername,
-      isDisabled: () => this.isDisabled,
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
@@ -388,7 +381,7 @@ class Collab extends PureComponent<Props, CollabState> {
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
-    if (this.portal.socket || this.isDisabled) {
+    if (this.portal.socket) {
       console.error(
         "Attempted to start collaboration while is collaboration disabled",
       );
