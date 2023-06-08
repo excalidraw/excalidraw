@@ -1,7 +1,7 @@
 import { AppState, ExcalidrawProps, Point, UIAppState } from "../types";
 import {
   getShortcutKey,
-  getYTEmbedLink,
+  getEmbedLink,
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
   wrapEvent,
@@ -121,17 +121,27 @@ export const Hyperlink = ({
 
   const handleEmbed = useCallback(() => {
     trackEvent("hyperlink", "embed");
-    const oldLink = element.link;
-    const { width, height } = element;
-    const ytLink = getYTEmbedLink(oldLink?.url);
-
-    if (!oldLink) {
+    if (!element.link) {
       return;
     }
+    const { width, height } = element;
+    const embedLink = getEmbedLink(element.link.url);
+    const ar = embedLink.aspectRatio.w / embedLink.aspectRatio.h;
+
     mutateElement(element, {
-      link: { url: oldLink.url, embed: !oldLink.embed },
-      width: ytLink ? (width > height ? width : (height * 16) / 9) : width,
-      height: ytLink ? (width > height ? (width * 9) / 16 : height) : height,
+      link: { url: element.link.url, embed: !element.link.embed },
+      width:
+        embedLink.type === "video"
+          ? width > height
+            ? width
+            : height * ar
+          : width,
+      height:
+        embedLink.type === "video"
+          ? width > height
+            ? width / ar
+            : height
+          : height,
     });
   }, [element]);
 
