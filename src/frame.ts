@@ -534,6 +534,11 @@ export const addElementsToFrame = (
 
   let nextElements = allElements.slice();
 
+  const frameBoundary = findIndex(
+    nextElements,
+    (element) => element.frameId === frame.id,
+  );
+
   for (const element of _elementsToAdd) {
     // only necessary if the element is not already in the frame
     if (element.frameId !== frame.id) {
@@ -551,9 +556,9 @@ export const addElementsToFrame = (
       if (elementIndex < frameIndex) {
         nextElements = [
           ...nextElements.slice(0, elementIndex),
-          ...nextElements.slice(elementIndex + 1, frameIndex),
+          ...nextElements.slice(elementIndex + 1, frameBoundary),
           element,
-          ...nextElements.slice(frameIndex),
+          ...nextElements.slice(frameBoundary),
         ];
       } else {
         nextElements = [
