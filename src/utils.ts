@@ -828,15 +828,46 @@ export const composeEventHandlers = <E>(
   };
 };
 
-// youtube embed link or null
-export const getYTEmbedLink = (link?: string | null): string | null => {
-  const ytLink = link?.match(
+export const getEmbedLink = (
+  link?: string | null,
+): {
+  link: string;
+  aspectRatio: { w: number; h: number };
+  type: "video" | "generic";
+} | null => {
+  if (!link) {
+    return null;
+  }
+
+  const ytLink = link.match(
     /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(?:embed\/|watch\?v=|shorts\/)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/,
   );
   const id = ytLink?.[1];
   const time = ytLink?.[2] ? `?t=${ytLink?.[2]}` : ``;
   const target = id ? `${id}${time}` : null;
-  return target ? `https://www.youtube.com/embed/${target}` : null;
+  const isPortrait = link.includes("shorts");
+  return target
+    ? {
+        link: `https://www.youtube.com/embed/${target}`,
+        aspectRatio: isPortrait
+          ? {
+              w: 315,
+              h: 560,
+            }
+          : {
+              w: 560,
+              h: 315,
+            },
+        type: "video",
+      }
+    : {
+        link,
+        aspectRatio: {
+          w: 560,
+          h: 840,
+        },
+        originalLink: "generic",
+      };
 };
 
 export const isIFrame = (
