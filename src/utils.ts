@@ -831,7 +831,7 @@ export const composeEventHandlers = <E>(
 // youtube embed link or null
 export const getYTEmbedLink = (link?: string | null): string | null => {
   const ytLink = link?.match(
-    /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(?:embed\/|watch\?v=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/,
+    /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(?:embed\/|watch\?v=|shorts\/)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/,
   );
   const id = ytLink?.[1];
   const time = ytLink?.[2] ? `?t=${ytLink?.[2]}` : ``;
