@@ -34,13 +34,11 @@ export const actionGoToCollaborator = register({
   PanelComponent: ({ updateData, data }) => {
     const [clientId, collaborator] = data as [string, Collaborator];
 
-    const { background, stroke, text } = getClientColors(clientId);
+    const background = getClientColors(clientId);
 
     return (
       <Avatar
         color={background}
-        textColor={text}
-        border={stroke}
         onClick={() => updateData(collaborator.pointer)}
         name={collaborator.username || ""}
         src={collaborator.avatarUrl}

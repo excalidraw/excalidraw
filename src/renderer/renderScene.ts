@@ -527,7 +527,7 @@ export const _renderScene = ({
             selectionColors.push(
               ...renderConfig.remoteSelectedElementIds[element.id].map(
                 (socketId) => {
-                  const { background } = getClientColors(socketId);
+                  const background = getClientColors(socketId);
                   return background;
                 },
               ),
@@ -661,7 +661,7 @@ export const _renderScene = ({
       y = Math.max(y, 0);
       y = Math.min(y, normalizedCanvasHeight - height);
 
-      const { background, stroke, text } = getClientColors(clientId);
+      const background = getClientColors(clientId);
 
       context.save();
       context.strokeStyle = background;
@@ -692,8 +692,8 @@ export const _renderScene = ({
       }
 
       // Background (white outline) for arrow
-      context.fillStyle = stroke;
-      context.strokeStyle = stroke;
+      context.fillStyle = oc.white;
+      context.strokeStyle = oc.white;
       context.lineWidth = 6;
       context.lineJoin = "round";
       context.beginPath();
@@ -758,17 +758,17 @@ export const _renderScene = ({
           );
           context.fillStyle = background;
           context.fill();
-          context.strokeStyle = stroke;
+          context.strokeStyle = oc.white;
           context.stroke();
         } else {
           // Border
-          context.fillStyle = stroke;
+          context.fillStyle = oc.white;
           context.fillRect(boxX, boxY, boxWidth, boxHeight);
           // Background
           context.fillStyle = background;
           context.fillRect(offsetX, offsetY, boxWidth - 2, boxHeight - 2);
         }
-        context.fillStyle = text;
+        context.fillStyle = oc.black;
 
         context.fillText(
           usernameAndIdleState,

@@ -1,8 +1,4 @@
-import oc from "open-color";
-
-type Colors = { background: string; stroke: string; text: string };
-
-const colorAssignments = new Map<string, Colors>();
+const colorAssignments = new Map<string, string>();
 const goldenRatio = (1 + Math.sqrt(5)) / 2;
 
 export const getClientColors = (userId: string) => {
@@ -11,7 +7,7 @@ export const getClientColors = (userId: string) => {
     return colorAssignments.get(userId)!;
   }
   // Generate a new color for the user with the largest possible hue distance
-  const color = generateUniqueColors(colorAssignments.size);
+  const color = generateUniqueColor(colorAssignments.size);
   colorAssignments.set(userId, color);
   return color;
 };
@@ -21,26 +17,14 @@ export const getClientColors = (userId: string) => {
  *
  * Generates a color with the largest possible hue distance from all other colors. Colors are generated based on number of assigned colors and should be unique up to several hundereds.
  */
-const generateUniqueColors = (assignedCollorsSize: number): Colors => {
-  // First collaberator gets black color
-  if (assignedCollorsSize === 0) {
-    return {
-      background: "#1b1b1f",
-      stroke: oc.white,
-      text: oc.white,
-    };
-  }
+const generateUniqueColor = (assignedCollorsSize: number) => {
   // Calculate the angle based on the golden ratio and number of assigned colors
   const hue = (assignedCollorsSize * (360 / goldenRatio)) % 360;
 
   const saturation = 100;
   const lightness = 80;
 
-  return {
-    background: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-    stroke: oc.white,
-    text: "#1b1b1f",
-  };
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
 /**
