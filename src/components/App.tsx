@@ -244,7 +244,7 @@ import {
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
-  getYTEmbedLink,
+  getEmbedLink,
   isIFrame,
 } from "../utils";
 import {
@@ -591,8 +591,8 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
             );
 
-            const ytLink = getYTEmbedLink(el.link?.url);
-            const src = ytLink ?? el.link?.url ?? "";
+            const embedLink = getEmbedLink(el.link?.url);
+            const src = embedLink?.link ?? "";
             const isVisible = isVisibleElement(
               el,
               normalizedWidth,
@@ -1783,13 +1783,16 @@ class App extends React.Component<AppProps, AppState> {
         if (
           !isPlainPaste &&
           (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(data.text) ||
-            getYTEmbedLink(data.text))
+            getEmbedLink(data.text)?.type === "video")
         ) {
           const rectangle = this.insertEmbeddedRectangleElement({
             sceneX,
             sceneY,
             link: data.text,
           });
+          if (!rectangle) {
+            return;
+          }
           this.setState({ selectedElementIds: { [rectangle.id]: true } });
           return;
         }
@@ -4563,7 +4566,11 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
 
-    const ytLink = getYTEmbedLink(link);
+    const embedLink = getEmbedLink(link);
+
+    if (!embedLink) {
+      return;
+    }
 
     const element = newElement({
       type: "rectangle",
@@ -4578,10 +4585,10 @@ class App extends React.Component<AppProps, AppState> {
       roundness: this.getCurrentItemRoundness("rectangle"),
       opacity: this.state.currentItemOpacity,
       locked: false,
-      width: 560,
-      height: ytLink ? 315 : 840,
+      width: embedLink.aspectRatio.w,
+      height: embedLink.aspectRatio.h,
       link: {
-        url: ytLink ?? link,
+        url: embedLink.link,
         embed: true,
       },
     });
