@@ -878,6 +878,16 @@ export const getEmbedLink = (
     return { link, aspectRatio, type };
   }
 
+  const figmaLink = link.startsWith("https://www.figma.com/file/");
+  if (figmaLink) {
+    type = "generic";
+    link = `https://www.figma.com/embed?embed_host=share&url=${encodeURIComponent(
+      link,
+    )}`;
+    aspectRatio = { w: 550, h: 550 };
+    return { link, aspectRatio, type };
+  }
+
   return { link, aspectRatio, type };
 };
 
