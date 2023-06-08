@@ -745,11 +745,12 @@ export const _renderScene = ({
         const measure = context.measureText(username);
         const measureHeight =
           measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
+        const finalHeight = Math.max(measureHeight, 12);
 
         const boxX = offsetX - 1;
         const boxY = offsetY - 1;
         const boxWidth = measure.width + 2 * paddingHorizontal + 2;
-        const boxHeight = measureHeight + 2 * paddingVertical + 2;
+        const boxHeight = finalHeight + 2 * paddingVertical + 2;
         if (context.roundRect) {
           context.beginPath();
           context.roundRect(
@@ -776,7 +777,10 @@ export const _renderScene = ({
         context.fillText(
           username,
           offsetX + paddingHorizontal,
-          offsetY + paddingVertical + measure.actualBoundingBoxAscent,
+          offsetY +
+            paddingVertical +
+            measure.actualBoundingBoxAscent +
+            Math.floor((finalHeight - measureHeight) / 2),
         );
       }
 
