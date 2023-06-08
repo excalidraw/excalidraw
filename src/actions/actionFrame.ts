@@ -106,10 +106,6 @@ export const actionToggleFrameRendering = register({
   },
   contextItemLabel: "labels.toggleFrameRendering",
   checked: (appState: AppState) => appState.shouldRenderFrames,
-  // keyTest: (event) =>
-  //   event.key.toLocaleLowerCase() === KEYS.F &&
-  //   event[KEYS.CTRL_OR_CMD] &&
-  //   event.shiftKey,
 });
 
 export const actionSetFrameAsActiveTool = register({
