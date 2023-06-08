@@ -8,7 +8,7 @@ import { AppState } from "../types";
 import { setCursorForShape, updateActiveTool } from "../utils";
 import { register } from "./register";
 
-const enableFrameAction = (
+const isSingleFrameSelected = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
@@ -55,7 +55,7 @@ export const actionSelectAllElementsInFrame = register({
     };
   },
   contextItemLabel: "labels.selectAllElementsInFrame",
-  predicate: (elements, appState) => enableFrameAction(elements, appState),
+  predicate: (elements, appState) => isSingleFrameSelected(elements, appState),
 });
 
 export const actionRemoveAllElementsFromFrame = register({
@@ -87,7 +87,7 @@ export const actionRemoveAllElementsFromFrame = register({
     };
   },
   contextItemLabel: "labels.removeAllElementsFromFrame",
-  predicate: (elements, appState) => enableFrameAction(elements, appState),
+  predicate: (elements, appState) => isSingleFrameSelected(elements, appState),
 });
 
 export const actionToggleFrameRendering = register({
