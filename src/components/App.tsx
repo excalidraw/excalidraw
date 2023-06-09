@@ -5877,11 +5877,14 @@ class App extends React.Component<AppProps, AppState> {
 
             if (
               topLayerFrame &&
-              // note, this will also adding non-frame elements dragged
-              // alongside any frames (but we'd have to also filter out
-              // elements inside the dragging frame, so let's leave it for now)
-              !selectedElements.some((element) => element.type === "frame")
+              !this.state.selectedElementIds[topLayerFrame.id]
             ) {
+              const selectedFrames = new Set(
+                selectedElements
+                  .filter((element) => isFrameElement(element))
+                  .map((frame) => frame.id),
+              );
+
               const groupsToBeAddedToFrame = new Set<string>();
               selectedElements.forEach((element) => {
                 if (
@@ -5904,6 +5907,8 @@ class App extends React.Component<AppProps, AppState> {
               selectedElements.forEach((element) => {
                 if (
                   element.frameId !== topLayerFrame.id &&
+                  !isFrameElement(element) &&
+                  (!element.frameId || !selectedFrames.has(element.frameId)) &&
                   (elementOverlapsWithFrame(element, topLayerFrame) ||
                     (element.groupIds.length > 0 &&
                       !element.groupIds.some((gid) => groupsAdded.has(gid)) &&
@@ -5911,19 +5916,27 @@ class App extends React.Component<AppProps, AppState> {
                         groupsToBeAddedToFrame.has(gid),
                       )))
                 ) {
-                  Array.from(
+                  const allElementsInGroup = Array.from(
                     new Set(
                       element.groupIds.flatMap((gid) =>
                         getElementsInGroup(nextElements, gid),
                       ),
                     ),
-                  ).forEach((element) => {
+                  );
+
+                  if (
+                    !allElementsInGroup.some((element) =>
+                      isFrameElement(element),
+                    )
+                  ) {
+                    allElementsInGroup.forEach((element) => {
+                      elementsToAdd.add(element);
+                    });
+
+                    element.groupIds.forEach((gid) => groupsAdded.add(gid));
+
                     elementsToAdd.add(element);
-                  });
-
-                  element.groupIds.forEach((gid) => groupsAdded.add(gid));
-
-                  elementsToAdd.add(element);
+                  }
                 }
               });
 
