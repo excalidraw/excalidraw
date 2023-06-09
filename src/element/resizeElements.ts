@@ -890,25 +890,22 @@ const rotateMultipleElements = (
       centerY,
       centerAngle + origAngle - element.angle,
     );
+
     mutateElement(element, {
       x: element.x + (rotatedCX - cx),
       y: element.y + (rotatedCY - cy),
       angle: normalizeAngle(centerAngle + origAngle),
     });
+
     updateBoundElements(element, { simultaneouslyUpdated: elements });
-    const boundTextElementId = getBoundTextElementId(element);
-    if (boundTextElementId) {
-      const textElement =
-        Scene.getScene(element)?.getElement<ExcalidrawTextElementWithContainer>(
-          boundTextElementId,
-        );
-      if (textElement && !isArrowElement(element)) {
-        mutateElement(textElement, {
-          x: textElement.x + (rotatedCX - cx),
-          y: textElement.y + (rotatedCY - cy),
-          angle: normalizeAngle(centerAngle + origAngle),
-        });
-      }
+
+    const boundText = getBoundTextElement(element);
+    if (boundText && !isArrowElement(element)) {
+      mutateElement(boundText, {
+        x: boundText.x + (rotatedCX - cx),
+        y: boundText.y + (rotatedCY - cy),
+        angle: normalizeAngle(centerAngle + origAngle),
+      });
     }
   });
 };
