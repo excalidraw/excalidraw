@@ -5877,7 +5877,10 @@ class App extends React.Component<AppProps, AppState> {
 
             if (
               topLayerFrame &&
-              !this.state.selectedElementIds[topLayerFrame.id]
+              // note, this will also adding non-frame elements dragged
+              // alongside any frames (but we'd have to also filter out
+              // elements inside the dragging frame, so let's leave it for now)
+              !selectedElements.some((element) => element.type === "frame")
             ) {
               const groupsToBeAddedToFrame = new Set<string>();
               selectedElements.forEach((element) => {
