@@ -71,6 +71,7 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
+import { getRandomUsername } from "@excalidraw/random-username";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
@@ -117,7 +118,7 @@ class Collab extends PureComponent<Props, CollabState> {
     super(props);
     this.state = {
       errorMessage: "",
-      username: importUsernameFromLocalStorage() || "",
+      username: importUsernameFromLocalStorage() || this.generateUsername(),
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
@@ -814,6 +815,13 @@ class Collab extends PureComponent<Props, CollabState> {
   onUsernameChange = (username: string) => {
     this.setUsername(username);
     saveUsernameToLocalStorage(username);
+  };
+
+  private generateUsername = () => {
+    const username = getRandomUsername();
+    this.onUsernameChange(username);
+
+    return username;
   };
 
   render() {
