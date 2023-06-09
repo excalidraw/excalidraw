@@ -883,6 +883,7 @@ const rotateMultipleElements = (
     centerAngle += SHIFT_LOCKING_ANGLE / 2;
     centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
   }
+
   elements
     .filter((element) => element.type !== "frame")
     .forEach((element) => {
@@ -899,25 +900,32 @@ const rotateMultipleElements = (
         centerY,
         centerAngle + origAngle - element.angle,
       );
-      mutateElement(element, {
-        x: element.x + (rotatedCX - cx),
-        y: element.y + (rotatedCY - cy),
-        angle: normalizeAngle(centerAngle + origAngle),
-      });
-      const boundTextElementId = getBoundTextElementId(element);
-      if (boundTextElementId) {
-        const textElement = Scene.getScene(element)!.getElement(
-          boundTextElementId,
-        ) as ExcalidrawTextElementWithContainer;
-        if (!isArrowElement(element)) {
-          mutateElement(textElement, {
-            x: textElement.x + (rotatedCX - cx),
-            y: textElement.y + (rotatedCY - cy),
+      mutateElement(
+        element,
+        {
+          x: element.x + (rotatedCX - cx),
+          y: element.y + (rotatedCY - cy),
+          angle: normalizeAngle(centerAngle + origAngle),
+        },
+        false,
+      );
+      updateBoundElements(element, { simultaneouslyUpdated: elements });
+
+      const boundText = getBoundTextElement(element);
+      if (boundText && !isArrowElement(element)) {
+        mutateElement(
+          boundText,
+          {
+            x: boundText.x + (rotatedCX - cx),
+            y: boundText.y + (rotatedCY - cy),
             angle: normalizeAngle(centerAngle + origAngle),
-          });
-        }
+          },
+          false,
+        );
       }
     });
+
+  Scene.getScene(elements[0])?.informMutation();
 };
 
 export const getResizeOffsetXY = (
