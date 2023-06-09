@@ -895,6 +895,7 @@ const rotateMultipleElements = (
       y: element.y + (rotatedCY - cy),
       angle: normalizeAngle(centerAngle + origAngle),
     });
+    updateBoundElements(element, { simultaneouslyUpdated: elements });
     const boundTextElementId = getBoundTextElementId(element);
     if (boundTextElementId) {
       const textElement =
