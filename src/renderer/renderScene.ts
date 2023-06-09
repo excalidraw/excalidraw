@@ -724,8 +724,8 @@ export const _renderScene = ({
 
         const offsetX = x + width / 2;
         const offsetY = y + height + 2;
-        const paddingHorizontal = 8;
-        const paddingVertical = 4;
+        const paddingHorizontal = 5;
+        const paddingVertical = 3;
         const measure = context.measureText(username);
         const measureHeight =
           measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
@@ -733,17 +733,11 @@ export const _renderScene = ({
 
         const boxX = offsetX - 1;
         const boxY = offsetY - 1;
-        const boxWidth = measure.width + 2 * paddingHorizontal + 2;
-        const boxHeight = finalHeight + 2 * paddingVertical + 2;
+        const boxWidth = measure.width + 2 + paddingHorizontal * 2 + 2;
+        const boxHeight = finalHeight + 2 + paddingVertical * 2 + 2;
         if (context.roundRect) {
           context.beginPath();
-          context.roundRect(
-            boxX,
-            boxY,
-            boxWidth,
-            boxHeight,
-            8 / renderConfig.zoom.value,
-          );
+          context.roundRect(boxX, boxY, boxWidth, boxHeight, 8);
           context.fillStyle = background;
           context.fill();
           context.strokeStyle = oc.white;
@@ -760,11 +754,12 @@ export const _renderScene = ({
 
         context.fillText(
           username,
-          offsetX + paddingHorizontal,
+          offsetX + paddingHorizontal + 1,
           offsetY +
             paddingVertical +
             measure.actualBoundingBoxAscent +
-            Math.floor((finalHeight - measureHeight) / 2),
+            Math.floor((finalHeight - measureHeight) / 2) +
+            1,
         );
       }
 
