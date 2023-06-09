@@ -891,23 +891,33 @@ const rotateMultipleElements = (
       centerAngle + origAngle - element.angle,
     );
 
-    mutateElement(element, {
-      x: element.x + (rotatedCX - cx),
-      y: element.y + (rotatedCY - cy),
-      angle: normalizeAngle(centerAngle + origAngle),
-    });
+    mutateElement(
+      element,
+      {
+        x: element.x + (rotatedCX - cx),
+        y: element.y + (rotatedCY - cy),
+        angle: normalizeAngle(centerAngle + origAngle),
+      },
+      false,
+    );
 
     updateBoundElements(element, { simultaneouslyUpdated: elements });
 
     const boundText = getBoundTextElement(element);
     if (boundText && !isArrowElement(element)) {
-      mutateElement(boundText, {
-        x: boundText.x + (rotatedCX - cx),
-        y: boundText.y + (rotatedCY - cy),
-        angle: normalizeAngle(centerAngle + origAngle),
-      });
+      mutateElement(
+        boundText,
+        {
+          x: boundText.x + (rotatedCX - cx),
+          y: boundText.y + (rotatedCY - cy),
+          angle: normalizeAngle(centerAngle + origAngle),
+        },
+        false,
+      );
     }
   });
+
+  Scene.getScene(elements[0])?.informMutation();
 };
 
 export const getResizeOffsetXY = (
