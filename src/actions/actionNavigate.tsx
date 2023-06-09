@@ -1,4 +1,4 @@
-import { getClientColors } from "../clients";
+import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
 import { centerScrollOn } from "../scene/scroll";
 import { Collaborator } from "../types";
@@ -34,7 +34,7 @@ export const actionGoToCollaborator = register({
   PanelComponent: ({ updateData, data }) => {
     const [clientId, collaborator] = data as [string, Collaborator];
 
-    const background = getClientColors(clientId);
+    const background = getClientColor(clientId);
 
     return (
       <Avatar

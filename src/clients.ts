@@ -1,28 +1,29 @@
-const colorAssignments = new Map<string, string>();
-const goldenRatio = (1 + Math.sqrt(5)) / 2;
-
-export const getClientColors = (userId: string) => {
-  if (colorAssignments.has(userId)) {
-    // If the color for the user is already assigned, return it
-    return colorAssignments.get(userId)!;
+function hashToInteger(id: string) {
+  let hash = 0;
+  if (id.length === 0) {
+    return hash;
   }
-  // Generate a new color for the user with the largest possible hue distance
-  const color = generateUniqueColor(colorAssignments.size);
-  colorAssignments.set(userId, color);
-  return color;
-};
+  for (let i = 0; i < id.length; i++) {
+    const char = id.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+  }
+  return hash;
+}
 
-/**
- * Generate a unique color for a user based on the golden ratio.
- *
- * Generates a color with the largest possible hue distance from all other colors. Colors are generated based on number of assigned colors and should be unique up to several hundereds.
- */
-const generateUniqueColor = (assignedCollorsSize: number) => {
-  // Calculate the angle based on the golden ratio and number of assigned colors
-  const hue = (assignedCollorsSize * (360 / goldenRatio)) % 360;
-
+export const getClientColor = (
+  /**
+   * any uniquely identifying key, such as user id or socket id
+   */
+  id: string,
+) => {
+  // to get more even distribution in case `id` is not uniformly distributed to
+  // begin with, we hash it
+  const hash = Math.abs(hashToInteger(id));
+  // we want to get a multiple of 10 number in the range of 0-360 (in other
+  // words a hue value of step size 10). There are 37 such values including 0.
+  const hue = (hash % 37) * 10;
   const saturation = 100;
-  const lightness = 80;
+  const lightness = 83;
 
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
