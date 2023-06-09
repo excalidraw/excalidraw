@@ -81,6 +81,7 @@ import {
   THEME,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
+  YTPLAYER,
   ZOOM_STEP,
 } from "../constants";
 import { exportCanvas, loadFromBlob } from "../data";
@@ -396,7 +397,7 @@ const gesture: Gesture = {
   initialDistance: null,
   initialScale: null,
 };
-
+const youtubeContainers = new Map<string, number>();
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"] = null;
   rc: RoughCanvas | null = null;
@@ -575,6 +576,28 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  private onWindowMessage(event: MessageEvent) {
+    if (event.origin !== "https://www.youtube.com") {
+      return;
+    }
+    let data = null;
+    try {
+      data = JSON.parse(event.data);
+    } catch (e) {}
+
+    if (
+      data &&
+      data.event === "infoDelivery" &&
+      data.info &&
+      data.id &&
+      typeof data.info.playerState === "number"
+    ) {
+      const id = data.id;
+      const playerState = data.info.playerState;
+      youtubeContainers.set(id, playerState);
+    }
+  }
+
   private renderFrames() {
     const scale = this.state.zoom.value;
     const normalizedWidth = this.state.width;
@@ -619,6 +642,35 @@ class App extends React.Component<AppProps, AppState> {
                 activeIFrameElement: el,
                 selectedElementIds: { [el.id]: true },
               });
+
+              const iframe = event.currentTarget.parentElement?.querySelector(
+                ".excalidraw__iframe",
+              ) as HTMLIFrameElement | null;
+
+              if (iframe && iframe.contentWindow && src.includes("youtube")) {
+                const state = youtubeContainers.get(el.id);
+                if (!state) {
+                  youtubeContainers.set(el.id, YTPLAYER.UNSTARTED);
+                  iframe.contentWindow.postMessage(
+                    `{"event":"listening","id":"${el.id}"}`,
+                    "*",
+                  );
+                }
+                switch (state) {
+                  case YTPLAYER.PLAYING:
+                  case YTPLAYER.BUFFERING:
+                    iframe.contentWindow?.postMessage(
+                      '{"event":"command","func":"pauseVideo","args":""}',
+                      "*",
+                    );
+                    break;
+                  default:
+                    iframe.contentWindow?.postMessage(
+                      '{"event":"command","func":"playVideo","args":""}',
+                      "*",
+                    );
+                }
+              }
             };
 
             return (
@@ -655,7 +707,7 @@ class App extends React.Component<AppProps, AppState> {
                     }}
                     src={src}
                     title="Excalidraw Embedded Content"
-                    allow="accelerometer"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen={true}
                   />
                   <div
@@ -1302,6 +1354,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     this.detachIsMobileMqHandler?.();
+    window.removeEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
   }
 
   private addEventListeners() {
@@ -1372,6 +1425,7 @@ class App extends React.Component<AppProps, AppState> {
       this.disableEvent,
       false,
     );
+    window.addEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {

@@ -845,8 +845,8 @@ export const getEmbedLink = (
     /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(?:embed\/|watch\?v=|shorts\/)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/,
   );
   if (ytLink?.[1]) {
-    const time = ytLink[2] ? `?t=${ytLink[2]}` : ``;
-    const target = `${ytLink[1]}${time}`;
+    const time = ytLink[2] ? `&t=${ytLink[2]}` : ``;
+    const target = `${ytLink[1]}?enablejsapi=1${time}`;
     const isPortrait = link.includes("shorts");
     type = "video";
     link = `https://www.youtube.com/embed/${target}`;
