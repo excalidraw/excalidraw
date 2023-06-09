@@ -167,7 +167,6 @@ import {
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
-  elementsAreInSameGroup,
   editGroupForSelectedElement,
   getElementsInGroup,
   getSelectedGroupIdForElement,
@@ -304,7 +303,6 @@ import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
 import {
   getElementsInFrame,
-  getElementsToUpdateForFrame,
   isCursorInFrame,
   bindElementsToFramesAfterDuplication,
   addElementsToFrame,
@@ -314,6 +312,7 @@ import {
   getElementsInNewFrame,
   getContainingFrame,
   elementOverlapsWithFrame,
+  updateFrameMembershipOfSelectedElements,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
@@ -5856,6 +5855,7 @@ class App extends React.Component<AppProps, AppState> {
               }
             }
           } else {
+            // update the relationships between selected elements and frames
             const topLayerFrame =
               this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
@@ -5863,152 +5863,65 @@ class App extends React.Component<AppProps, AppState> {
               this.scene.getNonDeletedElements(),
               this.state,
             );
+            let nextElements = updateFrameMembershipOfSelectedElements(
+              this.scene.getElementsIncludingDeleted(),
+              this.state,
+            );
 
             if (topLayerFrame) {
-              const prevElementsInFrame = new Set(
-                getElementsInFrame(
-                  this.scene.getNonDeletedElements(),
-                  topLayerFrame.id,
-                ),
-              );
-
-              const nextElementsInFrame = new Set(
-                Array.from(prevElementsInFrame),
-              );
-
-              // add new elements
-              getElementsToUpdateForFrame(
-                selectedElements,
-                (element) =>
-                  !isFrameElement(element) &&
-                  element.frameId !== topLayerFrame.id &&
-                  (element.groupIds.length > 0 ||
-                    elementOverlapsWithFrame(element, topLayerFrame)),
-              ).forEach((element) => nextElementsInFrame.add(element));
-
-              // if we are editing a group, then we need to remove the selected
-              // elements from the editing group as well
-              if (this.state.editingGroupId) {
-                selectedElements.forEach((element) => {
-                  // element must be a new addition to the frame
-                  // which means that we need to remove it from the editing group
-                  // and also from any outer groups
-                  if (
-                    !prevElementsInFrame.has(element) &&
-                    nextElementsInFrame.has(element)
-                  ) {
-                    const index = element.groupIds.indexOf(
-                      this.state.editingGroupId!,
-                    );
-                    if (index !== -1) {
-                      mutateElement(element, {
-                        groupIds: element.groupIds.slice(0, index),
-                      });
-                    }
-                  }
-                });
-              }
-
-              // remove some selected elements from the frame if needed
-              const groupsToKeep = new Set<string>(
-                selectedElements
-                  .filter((element) => element.groupIds.length > 0)
-                  .filter((element) =>
-                    elementOverlapsWithFrame(element, topLayerFrame),
-                  )
-                  .flatMap((element) => element.groupIds),
-              );
-
+              const groupsToBeAddedToFrame = new Set<string>();
               selectedElements.forEach((element) => {
-                if (element.groupIds.length === 0) {
-                  if (!elementOverlapsWithFrame(element, topLayerFrame)) {
-                    nextElementsInFrame.delete(element);
-                  }
-                } else {
-                  let shouldRemoveElement = true;
-
-                  if (elementsAreInSameGroup([element, topLayerFrame])) {
-                    shouldRemoveElement = true;
-                  } else {
-                    element.groupIds.forEach((id) => {
-                      if (groupsToKeep.has(id)) {
-                        shouldRemoveElement = false;
-                      }
-                    });
-                  }
-
-                  if (shouldRemoveElement) {
-                    nextElementsInFrame.delete(element);
-                  }
+                if (
+                  element.frameId !== topLayerFrame.id &&
+                  element.groupIds.length > 0 &&
+                  (elementOverlapsWithFrame(element, topLayerFrame) ||
+                    element.groupIds.find((groupId) =>
+                      groupsToBeAddedToFrame.has(groupId),
+                    ))
+                ) {
+                  element.groupIds.forEach((groupId) =>
+                    groupsToBeAddedToFrame.add(groupId),
+                  );
                 }
               });
 
-              this.scene.replaceAllElements(
-                replaceAllElementsInFrame(
-                  this.scene.getElementsIncludingDeleted(),
-                  [...nextElementsInFrame],
-                  topLayerFrame,
-                  this.state,
-                ),
-              );
-            } else {
-              const elementsToRemoveFromFrame = getElementsToUpdateForFrame(
-                selectedElements,
-                (element) =>
-                  !isFrameElement(element) && element.frameId !== null,
-              );
+              const elementsToAdd = new Set<ExcalidrawElement>();
+              const groupsAdded = new Set<string>();
 
-              if (elementsToRemoveFromFrame.length > 0) {
-                // if we are editing a group, then we need to remove these
-                // elements from the editing group and any outer groups as well
-
-                if (this.state.editingGroupId) {
-                  // some group elements might not be visible after parts of
-                  // their groups are dragged outside of the frame
-                  const groupIdsToCheck = new Set<string>();
-
-                  elementsToRemoveFromFrame.forEach((element) => {
-                    const index = element.groupIds.indexOf(
-                      this.state.editingGroupId!,
-                    );
-
-                    const removedGroupIds = element.groupIds.slice(index);
-                    removedGroupIds.forEach((gid) => groupIdsToCheck.add(gid));
-
-                    mutateElement(element, {
-                      groupIds: element.groupIds.slice(0, index),
-                    });
+              selectedElements.forEach((element) => {
+                if (
+                  element.frameId !== topLayerFrame.id &&
+                  (elementOverlapsWithFrame(element, topLayerFrame) ||
+                    (element.groupIds.length > 0 &&
+                      !element.groupIds.some((gid) => groupsAdded.has(gid)) &&
+                      element.groupIds.some((gid) =>
+                        groupsToBeAddedToFrame.has(gid),
+                      )))
+                ) {
+                  Array.from(
+                    new Set(
+                      element.groupIds.flatMap((gid) =>
+                        getElementsInGroup(nextElements, gid),
+                      ),
+                    ),
+                  ).forEach((element) => {
+                    elementsToAdd.add(element);
                   });
 
-                  groupIdsToCheck.forEach((gid) => {
-                    const elementsInGroup = getElementsInGroup(
-                      this.scene.getNonDeletedElements(),
-                      gid,
-                    );
+                  element.groupIds.forEach((gid) => groupsAdded.add(gid));
 
-                    elementsInGroup.forEach((element) => {
-                      if (element.frameId) {
-                        const frame = getContainingFrame(element);
-                        if (
-                          frame &&
-                          !elementOverlapsWithFrame(element, frame)
-                        ) {
-                          elementsToRemoveFromFrame.push(element);
-                        }
-                      }
-                    });
-                  });
+                  elementsToAdd.add(element);
                 }
+              });
 
-                this.scene.replaceAllElements(
-                  removeElementsFromFrame(
-                    this.scene.getElementsIncludingDeleted(),
-                    elementsToRemoveFromFrame,
-                    this.state,
-                  ),
-                );
-              }
+              nextElements = addElementsToFrame(
+                nextElements,
+                [...elementsToAdd],
+                topLayerFrame,
+              );
             }
+
+            this.scene.replaceAllElements(nextElements);
           }
         }
 
