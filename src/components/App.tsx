@@ -5868,7 +5868,10 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
             );
 
-            if (topLayerFrame) {
+            if (
+              topLayerFrame &&
+              !this.state.selectedElementIds[topLayerFrame.id]
+            ) {
               const groupsToBeAddedToFrame = new Set<string>();
               selectedElements.forEach((element) => {
                 if (
