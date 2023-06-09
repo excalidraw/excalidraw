@@ -313,6 +313,7 @@ import {
   getContainingFrame,
   elementOverlapsWithFrame,
   updateFrameMembershipOfSelectedElements,
+  omitGroupsContainingFrames,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
@@ -5885,64 +5886,17 @@ class App extends React.Component<AppProps, AppState> {
                   .map((frame) => frame.id),
               );
 
-              const groupsToBeAddedToFrame = new Set<string>();
-              selectedElements.forEach((element) => {
-                if (
-                  element.frameId !== topLayerFrame.id &&
-                  element.groupIds.length > 0 &&
-                  (elementOverlapsWithFrame(element, topLayerFrame) ||
-                    element.groupIds.find((groupId) =>
-                      groupsToBeAddedToFrame.has(groupId),
-                    ))
-                ) {
-                  element.groupIds.forEach((groupId) =>
-                    groupsToBeAddedToFrame.add(groupId),
-                  );
-                }
-              });
-
-              const elementsToAdd = new Set<ExcalidrawElement>();
-              const groupsAdded = new Set<string>();
-
-              selectedElements.forEach((element) => {
-                if (
-                  element.frameId !== topLayerFrame.id &&
+              const elementsToAdd = omitGroupsContainingFrames(
+                selectedElements,
+              ).filter(
+                (element) =>
                   !isFrameElement(element) &&
-                  (!element.frameId || !selectedFrames.has(element.frameId)) &&
-                  (elementOverlapsWithFrame(element, topLayerFrame) ||
-                    (element.groupIds.length > 0 &&
-                      !element.groupIds.some((gid) => groupsAdded.has(gid)) &&
-                      element.groupIds.some((gid) =>
-                        groupsToBeAddedToFrame.has(gid),
-                      )))
-                ) {
-                  const allElementsInGroup = Array.from(
-                    new Set(
-                      element.groupIds.flatMap((gid) =>
-                        getElementsInGroup(nextElements, gid),
-                      ),
-                    ),
-                  );
-
-                  if (
-                    !allElementsInGroup.some((element) =>
-                      isFrameElement(element),
-                    )
-                  ) {
-                    allElementsInGroup.forEach((element) => {
-                      elementsToAdd.add(element);
-                    });
-
-                    element.groupIds.forEach((gid) => groupsAdded.add(gid));
-
-                    elementsToAdd.add(element);
-                  }
-                }
-              });
+                  (!element.frameId || !selectedFrames.has(element.frameId)),
+              );
 
               nextElements = addElementsToFrame(
                 nextElements,
-                [...elementsToAdd],
+                elementsToAdd,
                 topLayerFrame,
               );
             }
@@ -5952,14 +5906,18 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (draggingElement.type === "frame") {
+          const elementsInsideFrame = omitGroupsContainingFrames(
+            getElementsInNewFrame(
+              this.scene.getNonDeletedElements(),
+              draggingElement,
+              this.state,
+            ),
+          );
+
           this.scene.replaceAllElements(
             addElementsToFrame(
               this.scene.getElementsIncludingDeleted(),
-              getElementsInNewFrame(
-                this.scene.getNonDeletedElements(),
-                draggingElement,
-                this.state,
-              ),
+              elementsInsideFrame,
               draggingElement,
             ),
           );

@@ -691,3 +691,32 @@ export const updateFrameMembershipOfSelectedElements = (
 
   return nextElements;
 };
+
+/**
+ * filters out elements that are inside groups that contain a frame element
+ * anywhere in the group tree
+ */
+export const omitGroupsContainingFrames = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  const uniqueGroupIds = new Set<string>();
+  for (const el of elements) {
+    const topMostGroupId = el.groupIds[el.groupIds.length - 1];
+    if (topMostGroupId) {
+      uniqueGroupIds.add(topMostGroupId);
+    }
+  }
+
+  const rejectedGroupIds = new Set<string>();
+  for (const groupId of uniqueGroupIds) {
+    if (
+      getElementsInGroup(elements, groupId).some((el) => isFrameElement(el))
+    ) {
+      rejectedGroupIds.add(groupId);
+    }
+  }
+
+  return elements.filter(
+    (el) => !rejectedGroupIds.has(el.groupIds[el.groupIds.length - 1]),
+  );
+};
