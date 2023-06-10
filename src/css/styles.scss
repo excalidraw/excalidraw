@@ -79,6 +79,16 @@
     transform-origin: top left;
   }
 
+  &__iframe-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border-style: none;
+    cursor: pointer;
+  }
+
   &.theme--dark {
     // The percentage is inspired by
     // https://material.io/design/color/dark-theme.html#properties, which

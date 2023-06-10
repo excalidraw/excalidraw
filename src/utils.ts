@@ -863,7 +863,7 @@ export const getEmbedLink = (
   if (vimeoLink?.[1] || vimeoPlayer?.[1]) {
     const target = vimeoLink?.[1] || vimeoPlayer?.[1];
     type = "video";
-    link = `https://player.vimeo.com/video/${target}`;
+    link = `https://player.vimeo.com/video/${target}?api=1`;
     aspectRatio = { w: 560, h: 315 };
     return { link, aspectRatio, type };
   }

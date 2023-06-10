@@ -381,6 +381,7 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+const youtubeContainers = new Map<string, number>();
 
 // remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
@@ -397,7 +398,7 @@ const gesture: Gesture = {
   initialDistance: null,
   initialScale: null,
 };
-const youtubeContainers = new Map<string, number>();
+
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"] = null;
   rc: RoughCanvas | null = null;
@@ -577,24 +578,46 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private onWindowMessage(event: MessageEvent) {
-    if (event.origin !== "https://www.youtube.com") {
+    if (
+      event.origin !== "https://player.vimeo.com" &&
+      event.origin !== "https://www.youtube.com"
+    ) {
       return;
     }
+
     let data = null;
     try {
       data = JSON.parse(event.data);
     } catch (e) {}
+    if (!data) {
+      return;
+    }
 
-    if (
-      data &&
-      data.event === "infoDelivery" &&
-      data.info &&
-      data.id &&
-      typeof data.info.playerState === "number"
-    ) {
-      const id = data.id;
-      const playerState = data.info.playerState;
-      youtubeContainers.set(id, playerState);
+    switch (event.origin) {
+      case "https://player.vimeo.com":
+        const source = event.source as Window;
+        if (data.method === "paused") {
+          source?.postMessage(
+            JSON.stringify({
+              method: data.value ? "play" : "pause",
+              value: true,
+            }),
+            "*",
+          );
+        }
+        break;
+      case "https://www.youtube.com":
+        if (
+          data.event === "infoDelivery" &&
+          data.info &&
+          data.id &&
+          typeof data.info.playerState === "number"
+        ) {
+          const id = data.id;
+          const playerState = data.info.playerState;
+          youtubeContainers.set(id, playerState);
+        }
+        break;
     }
   }
 
@@ -652,7 +675,10 @@ class App extends React.Component<AppProps, AppState> {
                 if (!state) {
                   youtubeContainers.set(el.id, YTPLAYER.UNSTARTED);
                   iframe.contentWindow.postMessage(
-                    `{"event":"listening","id":"${el.id}"}`,
+                    JSON.stringify({
+                      event: "listening",
+                      id: el.id,
+                    }),
                     "*",
                   );
                 }
@@ -660,16 +686,37 @@ class App extends React.Component<AppProps, AppState> {
                   case YTPLAYER.PLAYING:
                   case YTPLAYER.BUFFERING:
                     iframe.contentWindow?.postMessage(
-                      '{"event":"command","func":"pauseVideo","args":""}',
+                      JSON.stringify({
+                        event: "command",
+                        func: "pauseVideo",
+                        args: "",
+                      }),
                       "*",
                     );
                     break;
                   default:
                     iframe.contentWindow?.postMessage(
-                      '{"event":"command","func":"playVideo","args":""}',
+                      JSON.stringify({
+                        event: "command",
+                        func: "playVideo",
+                        args: "",
+                      }),
                       "*",
                     );
                 }
+              }
+
+              if (
+                iframe &&
+                iframe.contentWindow &&
+                src.includes("player.vimeo.com")
+              ) {
+                iframe.contentWindow.postMessage(
+                  JSON.stringify({
+                    method: "paused",
+                  }),
+                  "*",
+                );
               }
             };
 
@@ -711,20 +758,14 @@ class App extends React.Component<AppProps, AppState> {
                     allowFullScreen={true}
                   />
                   <div
+                    className="excalidraw__iframe-overlay"
                     onClick={handleOverlayClick}
                     onPointerDown={handleOverlayClick}
                     onTouchStart={handleOverlayClick}
                     onMouseDown={handleOverlayClick}
                     style={{
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
                       width: `${width / 4}px`,
                       height: `${height / 4}px`,
-                      borderRadius: "50%",
-                      borderStyle: "none",
-                      cursor: "pointer",
                       pointerEvents: isSelected ? "none" : "auto",
                     }}
                   />
