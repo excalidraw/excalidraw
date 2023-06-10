@@ -5887,6 +5887,7 @@ class App extends React.Component<AppProps, AppState> {
               );
 
               const elementsToAdd = omitGroupsContainingFrames(
+                nextElements,
                 selectedElements,
               ).filter(
                 (element) =>
@@ -5907,6 +5908,7 @@ class App extends React.Component<AppProps, AppState> {
 
         if (draggingElement.type === "frame") {
           const elementsInsideFrame = omitGroupsContainingFrames(
+            this.scene.getElementsIncludingDeleted(),
             getElementsInNewFrame(
               this.scene.getNonDeletedElements(),
               draggingElement,

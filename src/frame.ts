@@ -470,38 +470,10 @@ export const getElementsInNewFrame = (
   frame: ExcalidrawFrameElement,
   appState: AppState,
 ) => {
-  const elementsCompletelyInFrame = getElementsCompletelyInFrame(
+  return omitGroupsContainingFrames(
     allElements,
-    frame,
+    getElementsCompletelyInFrame(allElements, frame),
   );
-
-  const individualElements = elementsCompletelyInFrame.filter(
-    (element) => element.groupIds.length === 0,
-  );
-  const elementsToBeAddedSet = new Set<ExcalidrawElement>(individualElements);
-
-  // for elements that are completely in the frame
-  // if they are part of a group, then we add the elements to the frame
-  // only if their commond bounds is inside the frame
-  const groupElements = elementsCompletelyInFrame.filter(
-    (element) => element.groupIds.length > 0,
-  );
-
-  const groupIds = selectGroupsFromGivenElements(groupElements, appState);
-
-  for (const [id, isSelected] of Object.entries(groupIds)) {
-    if (isSelected) {
-      const elementsInGroup = getElementsInGroup(allElements, id);
-
-      if (elementsAreInFrameBounds(elementsInGroup, frame)) {
-        for (const element of elementsInGroup) {
-          elementsToBeAddedSet.add(element);
-        }
-      }
-    }
-  }
-
-  return [...elementsToBeAddedSet];
 };
 
 export const getContainingFrame = (
@@ -695,28 +667,34 @@ export const updateFrameMembershipOfSelectedElements = (
 /**
  * filters out elements that are inside groups that contain a frame element
  * anywhere in the group tree
+ *
+ * elementsToFilter doesn't need to contain all elements in a particular group
  */
 export const omitGroupsContainingFrames = (
-  elements: readonly ExcalidrawElement[],
+  allElements: readonly ExcalidrawElement[],
+  elementsToFilter: readonly ExcalidrawElement[],
 ) => {
-  const uniqueGroupIds = new Set<string>();
-  for (const el of elements) {
-    const topMostGroupId = el.groupIds[el.groupIds.length - 1];
-    if (topMostGroupId) {
-      uniqueGroupIds.add(topMostGroupId);
-    }
-  }
-
+  const elementsToAdd = new Set<ExcalidrawElement>(elementsToFilter);
   const rejectedGroupIds = new Set<string>();
-  for (const groupId of uniqueGroupIds) {
+
+  for (const element of elementsToFilter) {
     if (
-      getElementsInGroup(elements, groupId).some((el) => isFrameElement(el))
+      element.groupIds.length > 0 &&
+      !element.groupIds.some((gid) => rejectedGroupIds.has(gid))
     ) {
-      rejectedGroupIds.add(groupId);
+      const allElementsInGroup = Array.from(
+        new Set(
+          element.groupIds.flatMap((gid) =>
+            getElementsInGroup(allElements, gid),
+          ),
+        ),
+      );
+
+      if (allElementsInGroup.some((element) => isFrameElement(element))) {
+        allElementsInGroup.forEach((element) => elementsToAdd.delete(element));
+      }
     }
   }
 
-  return elements.filter(
-    (el) => !rejectedGroupIds.has(el.groupIds[el.groupIds.length - 1]),
-  );
+  return Array.from(elementsToAdd);
 };
