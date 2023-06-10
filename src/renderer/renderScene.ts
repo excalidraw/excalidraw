@@ -467,7 +467,10 @@ export const _renderScene = ({
             const label = newTextElement({
               x: element.x + element.width / 2,
               y: element.y + element.height / 2,
-              strokeColor: "black",
+              strokeColor:
+                element.strokeColor !== "transparent"
+                  ? element.strokeColor
+                  : "black",
               backgroundColor: "transparent",
               text: element.link.url,
               textAlign: "center",
