@@ -631,7 +631,6 @@ class App extends React.Component<AppProps, AppState> {
           .getNonDeletedElements()
           .filter((el) => el.type === "rectangle" && el.link && el.link.embed)
           .map((el) => {
-            const strokeOffset = 0; //el.strokeWidth / 2;
             const { x, y } = sceneCoordsToViewportCoords(
               { sceneX: el.x, sceneY: el.y },
               this.state,
@@ -647,13 +646,8 @@ class App extends React.Component<AppProps, AppState> {
             );
             const isSelected = this.state.activeIFrameElement === el;
 
-            const radius = getCornerRadius(
-              Math.min(el.width, el.height) - strokeOffset * 2,
-              el,
-            );
+            const radius = getCornerRadius(Math.min(el.width, el.height), el);
 
-            const width = el.width - strokeOffset * 2;
-            const height = el.height - strokeOffset * 2;
             const self = this;
             const handleOverlayClick = (
               event: React.TouchEvent | React.PointerEvent | React.MouseEvent,
@@ -670,7 +664,11 @@ class App extends React.Component<AppProps, AppState> {
                 ".excalidraw__iframe",
               ) as HTMLIFrameElement | null;
 
-              if (iframe && iframe.contentWindow && src.includes("youtube")) {
+              if (!iframe?.contentWindow) {
+                return;
+              }
+
+              if (src.includes("youtube")) {
                 const state = youtubeContainers.get(el.id);
                 if (!state) {
                   youtubeContainers.set(el.id, YTPLAYER.UNSTARTED);
@@ -706,14 +704,10 @@ class App extends React.Component<AppProps, AppState> {
                 }
               }
 
-              if (
-                iframe &&
-                iframe.contentWindow &&
-                src.includes("player.vimeo.com")
-              ) {
+              if (src.includes("player.vimeo.com")) {
                 iframe.contentWindow.postMessage(
                   JSON.stringify({
-                    method: "paused",
+                    method: "paused", //video play/pause in onWindowMessage handler
                   }),
                   "*",
                 );
@@ -724,8 +718,8 @@ class App extends React.Component<AppProps, AppState> {
               <div
                 className="excalidraw__iframe-container"
                 style={{
-                  top: `${y - this.state.offsetTop + strokeOffset}px`,
-                  left: `${x - this.state.offsetLeft + strokeOffset}px`,
+                  top: `${y - this.state.offsetTop}px`,
+                  left: `${x - this.state.offsetLeft}px`,
                   transform: `scale(${scale})`,
                   display: isVisible ? "block" : "none",
                   pointerEvents: "none",
@@ -733,8 +727,8 @@ class App extends React.Component<AppProps, AppState> {
               >
                 <div
                   style={{
-                    width: `${width}px`,
-                    height: `${height}px`,
+                    width: `${el.width}px`,
+                    height: `${el.height}px`,
                     border: 0,
                     transform: `rotate(${el.angle}rad)`,
                     borderRadius: `${radius}px`,
@@ -764,8 +758,8 @@ class App extends React.Component<AppProps, AppState> {
                     onTouchStart={handleOverlayClick}
                     onMouseDown={handleOverlayClick}
                     style={{
-                      width: `${width / 4}px`,
-                      height: `${height / 4}px`,
+                      width: `${el.width / 4}px`,
+                      height: `${el.height / 4}px`,
                       pointerEvents: isSelected ? "none" : "auto",
                     }}
                   />

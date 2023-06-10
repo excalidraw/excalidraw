@@ -54,12 +54,17 @@ import {
   throttleRAF,
 } from "../utils";
 import { UserIdleState } from "../types";
-import { THEME_FILTER } from "../constants";
+import { THEME_FILTER, VERTICAL_ALIGN } from "../constants";
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
+import {
+  getBoundTextElement,
+  getContainerElement,
+} from "../element/textElement";
+import { newTextElement } from "../element";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -314,6 +319,24 @@ const renderLinearElementPointHighlight = (
   context.restore();
 };
 
+const isIframeElement = (element: NonDeletedExcalidrawElement): Boolean => {
+  if (element.type === "rectangle" && element.link && element.link.embed) {
+    return true;
+  }
+  if (element.type === "text") {
+    const container = getContainerElement(element);
+    if (
+      container &&
+      container.type === "rectangle" &&
+      container.link &&
+      container.link.embed
+    ) {
+      return true;
+    }
+  }
+  return false;
+};
+
 export const _renderScene = ({
   elements,
   appState,
@@ -407,25 +430,59 @@ export const _renderScene = ({
 
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
-    visibleElements.forEach((element) => {
-      try {
-        renderElement(element, rc, context, renderConfig, appState);
-        // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
-        // ShapeCache returns empty hence making sure that we get the
-        // correct element from visible elements
-        if (appState.editingLinearElement?.elementId === element.id) {
-          if (element) {
-            editingLinearElement =
-              element as NonDeleted<ExcalidrawLinearElement>;
+    visibleElements
+      .filter((el) => !isIframeElement(el))
+      .forEach((element) => {
+        try {
+          renderElement(element, rc, context, renderConfig, appState);
+          // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
+          // ShapeCache returns empty hence making sure that we get the
+          // correct element from visible elements
+          if (appState.editingLinearElement?.elementId === element.id) {
+            if (element) {
+              editingLinearElement =
+                element as NonDeleted<ExcalidrawLinearElement>;
+            }
           }
+          if (!isExporting) {
+            renderLinkIcon(element, context, appState);
+          }
+        } catch (error: any) {
+          console.error(error);
         }
-        if (!isExporting) {
-          renderLinkIcon(element, context, appState);
+      });
+
+    // render iFrames on top
+    visibleElements
+      .filter((el) => isIframeElement(el))
+      .forEach((element) => {
+        try {
+          renderElement(element, rc, context, renderConfig, appState);
+          if (
+            isExporting &&
+            element.type === "rectangle" &&
+            element.link?.url &&
+            !getBoundTextElement(element)
+          ) {
+            const label = newTextElement({
+              x: element.x + element.width / 2,
+              y: element.y + element.height / 2,
+              strokeColor: "black",
+              backgroundColor: "transparent",
+              text: element.link.url,
+              textAlign: "center",
+              verticalAlign: VERTICAL_ALIGN.MIDDLE,
+              angle: element.angle ?? 0,
+            });
+            renderElement(label, rc, context, renderConfig, appState);
+          }
+          if (!isExporting) {
+            renderLinkIcon(element, context, appState);
+          }
+        } catch (error: any) {
+          console.error(error);
         }
-      } catch (error: any) {
-        console.error(error);
-      }
-    });
+      });
 
     if (editingLinearElement) {
       renderLinearPointHandles(
@@ -1149,21 +1206,44 @@ export const renderSceneToSvg = (
     return;
   }
   // render elements
-  elements.forEach((element, index) => {
-    if (!element.isDeleted) {
-      try {
-        renderElementToSvg(
-          element,
-          rsvg,
-          svgRoot,
-          files,
-          element.x + offsetX,
-          element.y + offsetY,
-          exportWithDarkMode,
-        );
-      } catch (error: any) {
-        console.error(error);
+  elements
+    .filter((el) => !isIframeElement(el))
+    .forEach((element, index) => {
+      if (!element.isDeleted) {
+        try {
+          renderElementToSvg(
+            element,
+            rsvg,
+            svgRoot,
+            files,
+            element.x + offsetX,
+            element.y + offsetY,
+            exportWithDarkMode,
+          );
+        } catch (error: any) {
+          console.error(error);
+        }
       }
-    }
-  });
+    });
+
+  // render iFrames on top
+  elements
+    .filter((el) => isIframeElement(el))
+    .forEach((element, index) => {
+      if (!element.isDeleted) {
+        try {
+          renderElementToSvg(
+            element,
+            rsvg,
+            svgRoot,
+            files,
+            element.x + offsetX,
+            element.y + offsetY,
+            exportWithDarkMode,
+          );
+        } catch (error: any) {
+          console.error(error);
+        }
+      }
+    });
 };

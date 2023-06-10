@@ -428,6 +428,15 @@ export const generateRoughOptions = (
         element.backgroundColor === "transparent"
           ? undefined
           : element.backgroundColor;
+      if (
+        element.type === "rectangle" &&
+        element.link &&
+        element.link.embed &&
+        !options.fill
+      ) {
+        options.fill = "gray";
+        options.fillStyle = "solid";
+      }
       if (element.type === "ellipse") {
         options.curveFitting = 1;
       }
@@ -1175,6 +1184,35 @@ export const renderElementToSvg = (
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
+      if (element.type === "rectangle" && element.link && element.link.embed) {
+        const radius = getCornerRadius(
+          Math.min(element.width, element.height),
+          element,
+        );
+        const foreignObject = svgRoot.ownerDocument!.createElementNS(
+          SVG_NS,
+          "foreignObject",
+        );
+        foreignObject.style.width = `${element.width}px`;
+        foreignObject.style.height = `${element.height}px`;
+        foreignObject.style.border = "none";
+        const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
+        div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        div.style.width = "100%";
+        div.style.height = "100%";
+        const iframe = div.ownerDocument!.createElement("iframe");
+        iframe.src = element.link.url ?? "";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        iframe.style.borderRadius = `${radius}px`;
+        iframe.style.top = "0";
+        iframe.style.left = "0";
+        iframe.allowFullscreen = true;
+        div.appendChild(iframe);
+        foreignObject.appendChild(div);
+        node.appendChild(foreignObject);
+      }
       root.appendChild(node);
       break;
     }
@@ -1350,6 +1388,15 @@ export const renderElementToSvg = (
     }
     default: {
       if (isTextElement(element)) {
+        const container = getContainerElement(element);
+        if (
+          container &&
+          container.type === "rectangle" &&
+          container.link &&
+          container.link.embed
+        ) {
+          break;
+        }
         const opacity = element.opacity / 100;
         const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
         if (opacity !== 1) {
