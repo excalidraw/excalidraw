@@ -13,6 +13,9 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### iFrame Site Whitelist
+- Set `props.iframeURLWhitelist` to allow additional sites to be added as iFrames. The default list includes: YouTube, Vimeo, Figma, Excalidraw, Twitter. The prop takes a `RegExp[]` array. Set the prop to `[/.*/]` if you want to allow all sites.
+
 ### Features
 
 - Sidebar component now supports tabs — for more detailed description of new behavior and breaking changes, see the linked PR. [#6213](https://github.com/excalidraw/excalidraw/pull/6213)
