@@ -302,7 +302,7 @@ import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
 import {
-  getElementsInFrame,
+  getFrameElements,
   isCursorInFrame,
   bindElementsToFramesAfterDuplication,
   addElementsToFrame,
@@ -4610,7 +4610,7 @@ class App extends React.Component<AppProps, AppState> {
 
                 // if hitElement is frame, deselect all of its elements if they are selected
                 if (hitElement.type === "frame") {
-                  getElementsInFrame(
+                  getFrameElements(
                     previouslySelectedElements,
                     hitElement.id,
                   ).forEach((element) => {
@@ -7042,7 +7042,7 @@ class App extends React.Component<AppProps, AppState> {
     >();
 
     selectedFrames.forEach((frame) => {
-      const elementsInFrame = getElementsInFrame(
+      const elementsInFrame = getFrameElements(
         this.scene.getNonDeletedElements(),
         frame.id,
       );
@@ -7075,7 +7075,7 @@ class App extends React.Component<AppProps, AppState> {
       this.maybeSuggestBindingForAll(selectedElements);
 
       selectedFrames.forEach((frame) => {
-        const elementsInFrame = getElementsInFrame(
+        const elementsInFrame = getFrameElements(
           this.scene.getNonDeletedElements(),
           frame.id,
         );

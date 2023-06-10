@@ -330,16 +330,16 @@ export const getAllFrameElementsMapFromAppState = (
         frameSelected: selectedElements.has(element.id),
         elements: frameElementsMap.has(element.id)
           ? frameElementsMap.get(element.id)?.elements ??
-            getElementsInFrame(elements, element.id)
-          : getElementsInFrame(elements, element.id),
+            getFrameElements(elements, element.id)
+          : getFrameElements(elements, element.id),
       });
     } else if (element.frameId) {
       frameElementsMap.set(element.frameId, {
         frameSelected: false,
         elements: frameElementsMap.has(element.frameId)
           ? frameElementsMap.get(element.id)?.elements ??
-            getElementsInFrame(elements, element.frameId)
-          : getElementsInFrame(elements, element.frameId),
+            getFrameElements(elements, element.frameId)
+          : getFrameElements(elements, element.frameId),
       });
     }
   }
@@ -369,7 +369,7 @@ export const getElementsToUpdateForFrame = (
   return elementsToUpdate;
 };
 
-export const getElementsInFrame = (
+export const getFrameElements = (
   elements: readonly ExcalidrawElement[],
   frameId: string,
 ) => elements.filter((element) => element.frameId === frameId);
@@ -379,7 +379,7 @@ export const getElementsInResizingFrame = (
   frame: ExcalidrawFrameElement,
   appState: AppState,
 ): ExcalidrawElement[] => {
-  const prevElementsInFrame = getElementsInFrame(allElements, frame.id);
+  const prevElementsInFrame = getFrameElements(allElements, frame.id);
   const nextElementsInFrame = new Set<ExcalidrawElement>(prevElementsInFrame);
 
   const elementsCompletelyInFrame = new Set([
@@ -594,7 +594,7 @@ export const removeAllElementsFromFrame = (
   frame: ExcalidrawFrameElement,
   appState: AppState,
 ) => {
-  const elementsInFrame = getElementsInFrame(allElements, frame.id);
+  const elementsInFrame = getFrameElements(allElements, frame.id);
   return removeElementsFromFrame(allElements, elementsInFrame, appState);
 };
 

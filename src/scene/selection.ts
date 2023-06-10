@@ -8,7 +8,7 @@ import { isBoundToContainer } from "../element/typeChecks";
 import {
   elementOverlapsWithFrame,
   getContainingFrame,
-  getElementsInFrame,
+  getFrameElements,
 } from "../frame";
 
 /**
@@ -129,7 +129,7 @@ export const getSelectedElements = (
     const elementsToInclude: ExcalidrawElement[] = [];
     selectedElements.forEach((element) => {
       if (element.type === "frame") {
-        getElementsInFrame(elements, element.id).forEach((e) =>
+        getFrameElements(elements, element.id).forEach((e) =>
           elementsToInclude.push(e),
         );
       }
