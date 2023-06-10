@@ -828,6 +828,14 @@ export const composeEventHandlers = <E>(
   };
 };
 
+const YOUTUBE_REG =
+  /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(?:embed\/|watch\?v=|shorts\/)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
+const VIMEO_REG =
+  /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?(\d+)(?:\?.*)?$/;
+const TWITTER_REG = /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
+const FIGMA_REG = /^https:\/\/www\.figma\.com/;
+const EXCALIDRAW_REG = /^https:\/\/excalidraw.com/;
+
 export const getEmbedLink = (
   link?: string | null,
 ): {
@@ -841,9 +849,7 @@ export const getEmbedLink = (
 
   let type: "video" | "generic" = "generic";
   let aspectRatio = { w: 560, h: 840 };
-  const ytLink = link.match(
-    /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(?:embed\/|watch\?v=|shorts\/)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/,
-  );
+  const ytLink = link.match(YOUTUBE_REG);
   if (ytLink?.[1]) {
     const time = ytLink[2] ? `&t=${ytLink[2]}` : ``;
     const target = `${ytLink[1]}?enablejsapi=1${time}`;
@@ -854,23 +860,16 @@ export const getEmbedLink = (
     return { link, aspectRatio, type };
   }
 
-  const vimeoLink = link.match(
-    /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?vimeo\.com\/(\d+)$/,
-  );
-  const vimeoPlayer = link.match(
-    /^(?:http(?:s)?:\/\/)?(?:player\.)?vimeo\.com\/video\/(\d+)$/,
-  );
-  if (vimeoLink?.[1] || vimeoPlayer?.[1]) {
-    const target = vimeoLink?.[1] || vimeoPlayer?.[1];
+  const vimeoLink = link.match(VIMEO_REG);
+  if (vimeoLink?.[1]) {
+    const target = vimeoLink?.[1];
     type = "video";
     link = `https://player.vimeo.com/video/${target}?api=1`;
     aspectRatio = { w: 560, h: 315 };
     return { link, aspectRatio, type };
   }
 
-  const twitterLink = link.match(
-    /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com\//,
-  );
+  const twitterLink = link.match(TWITTER_REG);
   if (twitterLink) {
     type = "generic";
     link = `https://twitframe.com/show?url=${encodeURIComponent(link)}`;
@@ -878,7 +877,7 @@ export const getEmbedLink = (
     return { link, aspectRatio, type };
   }
 
-  const figmaLink = link.startsWith("https://www.figma.com/file/");
+  const figmaLink = link.match(FIGMA_REG);
   if (figmaLink) {
     type = "generic";
     link = `https://www.figma.com/embed?embed_host=share&url=${encodeURIComponent(
@@ -889,6 +888,25 @@ export const getEmbedLink = (
   }
 
   return { link, aspectRatio, type };
+};
+
+export const isURLOnWhiteList = (
+  url: string,
+  validators?: RegExp[],
+): Boolean => {
+  validators = validators ?? [];
+  for (const validator of validators) {
+    if (url.match(validator)) {
+      return true;
+    }
+  }
+  return Boolean(
+    url.match(YOUTUBE_REG) ||
+      url.match(VIMEO_REG) ||
+      url.match(TWITTER_REG) ||
+      url.match(FIGMA_REG) ||
+      url.match(EXCALIDRAW_REG),
+  );
 };
 
 export const isIFrame = (

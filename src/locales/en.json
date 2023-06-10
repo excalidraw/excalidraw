@@ -411,7 +411,8 @@
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
     "selection": "selection",
-    "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor"
+    "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor",
+    "unableToEmbed": "Embedding this url is currently not allowed. Raise an issue on GitHub to request the url whitelisted"
   },
   "colors": {
     "transparent": "Transparent",

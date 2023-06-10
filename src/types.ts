@@ -351,6 +351,7 @@ export interface ExcalidrawProps {
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
   children?: React.ReactNode;
+  iframeURLWhitelist?: RegExp[];
 }
 
 export type SceneData = {

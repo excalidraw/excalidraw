@@ -247,6 +247,7 @@ import {
   muteFSAbortError,
   getEmbedLink,
   isIFrame,
+  isURLOnWhiteList,
 } from "../utils";
 import {
   ContextMenu,
@@ -845,6 +846,8 @@ class App extends React.Component<AppProps, AppState> {
                               element={selectedElement[0]}
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
+                              iframeURLWhitelist={this.props.iframeURLWhitelist}
+                              setToast={this.setToast}
                             />
                           )}
                         {this.state.toast !== null && (
@@ -1908,6 +1911,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.text) {
         if (
           !isPlainPaste &&
+          isURLOnWhiteList(data.text, this.props.iframeURLWhitelist) &&
           (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(data.text) ||
             getEmbedLink(data.text)?.type === "video")
         ) {

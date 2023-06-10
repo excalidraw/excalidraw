@@ -5,6 +5,7 @@ import {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
   wrapEvent,
+  isURLOnWhiteList,
 } from "../utils";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
@@ -57,10 +58,16 @@ export const Hyperlink = ({
   element,
   setAppState,
   onLinkOpen,
+  iframeURLWhitelist,
+  setToast,
 }: {
   element: NonDeletedExcalidrawElement;
   setAppState: React.Component<any, AppState>["setState"];
   onLinkOpen: ExcalidrawProps["onLinkOpen"];
+  iframeURLWhitelist: ExcalidrawProps["iframeURLWhitelist"];
+  setToast: (
+    toast: { message: string; closable?: boolean; duration?: number } | null,
+  ) => void;
 }) => {
   const appState = useExcalidrawAppState();
 
@@ -121,9 +128,22 @@ export const Hyperlink = ({
 
   const handleEmbed = useCallback(() => {
     trackEvent("hyperlink", "embed");
-    if (!element.link) {
+    if (!element.link || !element.link.url) {
       return;
     }
+
+    if (element.link.embed) {
+      mutateElement(element, {
+        link: { url: element.link.url, embed: !element.link.embed },
+      });
+      return;
+    }
+
+    if (!isURLOnWhiteList(element.link?.url, iframeURLWhitelist)) {
+      setToast({ message: t("toast.unableToEmbed"), closable: true });
+      return;
+    }
+
     const { width, height } = element;
     const embedLink = getEmbedLink(element.link.url);
     const ar = embedLink
@@ -145,7 +165,7 @@ export const Hyperlink = ({
             : height
           : height,
     });
-  }, [element]);
+  }, [element, iframeURLWhitelist, setToast]);
 
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
