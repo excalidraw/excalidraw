@@ -310,37 +310,19 @@ export const getFrameElementsMapFromElements = (
   return frameElementsMap;
 };
 
-export const getAllFrameElementsMapFromAppState = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
+/**
+ * Returns a map of frameId to frame elements. Includes empty frames.
+ */
+export const groupByFrames = (elements: readonly ExcalidrawElement[]) => {
   const frameElementsMap = new Map<
     ExcalidrawElement["id"],
-    {
-      frameSelected: boolean;
-      elements: ExcalidrawElement[];
-    }
+    ExcalidrawElement[]
   >();
 
-  const selectedElements = arrayToMap(getSelectedElements(elements, appState));
-
   for (const element of elements) {
-    if (isFrameElement(element)) {
-      frameElementsMap.set(element.id, {
-        frameSelected: selectedElements.has(element.id),
-        elements: frameElementsMap.has(element.id)
-          ? frameElementsMap.get(element.id)?.elements ??
-            getFrameElements(elements, element.id)
-          : getFrameElements(elements, element.id),
-      });
-    } else if (element.frameId) {
-      frameElementsMap.set(element.frameId, {
-        frameSelected: false,
-        elements: frameElementsMap.has(element.frameId)
-          ? frameElementsMap.get(element.id)?.elements ??
-            getFrameElements(elements, element.frameId)
-          : getFrameElements(elements, element.frameId),
-      });
+    const frameId = isFrameElement(element) ? element.id : element.frameId;
+    if (frameId && !frameElementsMap.has(frameId)) {
+      frameElementsMap.set(frameId, getFrameElements(elements, frameId));
     }
   }
 
