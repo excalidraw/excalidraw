@@ -18,6 +18,10 @@ type ElementKey = ExcalidrawElement | ElementIdKey;
 type SceneStateCallback = () => void;
 type SceneStateCallbackRemover = () => void;
 
+// ideally this would be a branded type but it'd be insanely hard to work with
+// in our codebase
+export type ExcalidrawElementsIncludingDeleted = readonly ExcalidrawElement[];
+
 const isIdKey = (elementKey: ElementKey): elementKey is ElementIdKey => {
   if (typeof elementKey === "string") {
     return true;

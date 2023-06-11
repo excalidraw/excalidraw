@@ -14,7 +14,7 @@ import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
 import { moveOneRight } from "./zindex";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
-import Scene from "./scene/Scene";
+import Scene, { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
 import { getElementLineSegments } from "./element/bounds";
 
 // --------------------------- Frame State ------------------------------------
@@ -313,7 +313,7 @@ export const getFrameElementsMapFromElements = (
 /**
  * Returns a map of frameId to frame elements. Includes empty frames.
  */
-export const groupByFrames = (elements: readonly ExcalidrawElement[]) => {
+export const groupByFrames = (elements: ExcalidrawElementsIncludingDeleted) => {
   const frameElementsMap = new Map<
     ExcalidrawElement["id"],
     ExcalidrawElement[]
@@ -352,12 +352,12 @@ export const getElementsToUpdateForFrame = (
 };
 
 export const getFrameElements = (
-  elements: readonly ExcalidrawElement[],
+  allElements: ExcalidrawElementsIncludingDeleted,
   frameId: string,
-) => elements.filter((element) => element.frameId === frameId);
+) => allElements.filter((element) => element.frameId === frameId);
 
 export const getElementsInResizingFrame = (
-  allElements: readonly ExcalidrawElement[],
+  allElements: ExcalidrawElementsIncludingDeleted,
   frame: ExcalidrawFrameElement,
   appState: AppState,
 ): ExcalidrawElement[] => {
@@ -448,9 +448,8 @@ export const getElementsInResizingFrame = (
 };
 
 export const getElementsInNewFrame = (
-  allElements: readonly ExcalidrawElement[],
+  allElements: ExcalidrawElementsIncludingDeleted,
   frame: ExcalidrawFrameElement,
-  appState: AppState,
 ) => {
   return omitGroupsContainingFrames(
     allElements,
@@ -483,7 +482,7 @@ export const getContainingFrame = (
 
 // --------------------------- Frame Operations -------------------------------
 export const addElementsToFrame = (
-  allElements: readonly ExcalidrawElement[],
+  allElements: ExcalidrawElementsIncludingDeleted,
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameElement,
 ) => {
@@ -536,7 +535,7 @@ export const addElementsToFrame = (
 };
 
 export const removeElementsFromFrame = (
-  allElements: readonly ExcalidrawElement[],
+  allElements: ExcalidrawElementsIncludingDeleted,
   elementsToRemove: NonDeletedExcalidrawElement[],
   appState: AppState,
 ) => {
@@ -572,7 +571,7 @@ export const removeElementsFromFrame = (
 };
 
 export const removeAllElementsFromFrame = (
-  allElements: readonly ExcalidrawElement[],
+  allElements: ExcalidrawElementsIncludingDeleted,
   frame: ExcalidrawFrameElement,
   appState: AppState,
 ) => {
@@ -581,7 +580,7 @@ export const removeAllElementsFromFrame = (
 };
 
 export const replaceAllElementsInFrame = (
-  allElements: readonly ExcalidrawElement[],
+  allElements: ExcalidrawElementsIncludingDeleted,
   nextElementsInFrame: ExcalidrawElement[],
   frame: ExcalidrawFrameElement,
   appState: AppState,
@@ -595,14 +594,14 @@ export const replaceAllElementsInFrame = (
 
 /** does not mutate elements, but return new ones */
 export const updateFrameMembershipOfSelectedElements = (
-  elements: readonly ExcalidrawElement[],
+  allElements: ExcalidrawElementsIncludingDeleted,
   appState: AppState,
 ) => {
-  let nextElements = [...elements];
-  const selectedElements = getSelectedElements(elements, appState);
+  let nextElements = allElements.slice();
+  const selectedElements = getSelectedElements(allElements, appState);
   const groupsToRemove = new Set<string>();
 
-  const elementsMap = arrayToMap(elements);
+  const elementsMap = arrayToMap(allElements);
 
   for (const element of selectedElements) {
     const containgFrame = getContainingFrame(element, elementsMap);
@@ -615,7 +614,7 @@ export const updateFrameMembershipOfSelectedElements = (
         const allElementsInGroup = Array.from(
           new Set(
             element.groupIds.flatMap((gid) =>
-              getElementsInGroup(elements, gid),
+              getElementsInGroup(allElements, gid),
             ),
           ),
         );
@@ -651,7 +650,7 @@ export const updateFrameMembershipOfSelectedElements = (
  * anywhere in the group tree
  */
 export const omitGroupsContainingFrames = (
-  allElements: readonly ExcalidrawElement[],
+  allElements: ExcalidrawElementsIncludingDeleted,
   /** subset of elements you want to filter. Optional perf optimization so we
    * don't have to filter all elements unnecessarily
    */
