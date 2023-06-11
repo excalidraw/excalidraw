@@ -291,24 +291,6 @@ export const groupsAreCompletelyOutOfFrame = (
 };
 
 // --------------------------- Frame Utils ------------------------------------
-export const getFrameElementsMapFromElements = (
-  elements: readonly ExcalidrawElement[],
-) => {
-  const frameElementsMap = new Map<
-    ExcalidrawFrameElement["id"],
-    ExcalidrawElement[]
-  >();
-  for (const element of elements) {
-    if (element.frameId) {
-      frameElementsMap.set(element.frameId, [
-        ...(frameElementsMap.get(element.frameId) ?? []),
-        element,
-      ]);
-    }
-  }
-
-  return frameElementsMap;
-};
 
 /**
  * Returns a map of frameId to frame elements. Includes empty frames.
