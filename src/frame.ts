@@ -649,34 +649,32 @@ export const updateFrameMembershipOfSelectedElements = (
 /**
  * filters out elements that are inside groups that contain a frame element
  * anywhere in the group tree
- *
- * elementsToFilter doesn't need to contain all elements in a particular group
  */
 export const omitGroupsContainingFrames = (
   allElements: readonly ExcalidrawElement[],
-  elementsToFilter: readonly ExcalidrawElement[],
+  /** subset of elements you want to filter. Optional perf optimization so we
+   * don't have to filter all elements unnecessarily
+   */
+  selectedElements?: readonly ExcalidrawElement[],
 ) => {
-  const elementsToAdd = new Set<ExcalidrawElement>(elementsToFilter);
-  const rejectedGroupIds = new Set<string>();
-
-  for (const element of elementsToFilter) {
-    if (
-      element.groupIds.length > 0 &&
-      !element.groupIds.some((gid) => rejectedGroupIds.has(gid))
-    ) {
-      const allElementsInGroup = Array.from(
-        new Set(
-          element.groupIds.flatMap((gid) =>
-            getElementsInGroup(allElements, gid),
-          ),
-        ),
-      );
-
-      if (allElementsInGroup.some((element) => isFrameElement(element))) {
-        allElementsInGroup.forEach((element) => elementsToAdd.delete(element));
-      }
+  const uniqueGroupIds = new Set<string>();
+  for (const el of selectedElements || allElements) {
+    const topMostGroupId = el.groupIds[el.groupIds.length - 1];
+    if (topMostGroupId) {
+      uniqueGroupIds.add(topMostGroupId);
     }
   }
 
-  return Array.from(elementsToAdd);
+  const rejectedGroupIds = new Set<string>();
+  for (const groupId of uniqueGroupIds) {
+    if (
+      getElementsInGroup(allElements, groupId).some((el) => isFrameElement(el))
+    ) {
+      rejectedGroupIds.add(groupId);
+    }
+  }
+
+  return (selectedElements || allElements).filter(
+    (el) => !rejectedGroupIds.has(el.groupIds[el.groupIds.length - 1]),
+  );
 };

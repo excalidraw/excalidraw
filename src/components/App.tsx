@@ -5965,13 +5965,9 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (draggingElement.type === "frame") {
-          const elementsInsideFrame = omitGroupsContainingFrames(
+          const elementsInsideFrame = getElementsInNewFrame(
             this.scene.getElementsIncludingDeleted(),
-            getElementsInNewFrame(
-              this.scene.getNonDeletedElements(),
-              draggingElement,
-              this.state,
-            ),
+            draggingElement,
           );
 
           this.scene.replaceAllElements(
