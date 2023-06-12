@@ -133,6 +133,7 @@ const bindLinearElementToElement = (
   if (start) {
     const width = start?.width ?? DEFAULT_DIMENSION;
     const height = start?.height ?? DEFAULT_DIMENSION;
+
     let existingElement;
     if (start.id) {
       existingElement = excalidrawElements
@@ -157,6 +158,11 @@ const bindLinearElementToElement = (
           text = existingElement.text;
         } else if (start.type === "text") {
           text = start.text;
+        }
+        if (!text) {
+          console.error(
+            `No text found for start binding text element for ${excliadrawLinearElement.id}`,
+          );
         }
         startBoundElement = newTextElement({
           x: startX,
@@ -220,6 +226,12 @@ const bindLinearElementToElement = (
         } else if (end.type === "text") {
           text = end.text;
         }
+
+        if (!text) {
+          console.error(
+            `No text found for end binding text element for ${excliadrawLinearElement.id}`,
+          );
+        }
         endBoundElement = newTextElement({
           x: endX,
           y: endY,
@@ -262,7 +274,7 @@ const excalidrawElements = (() => {
   const res: ExcalidrawElement[] = [];
   const elementMap = new Map<string, number>();
 
-  const push = (ele?: ExcalidrawElement) => {
+  const add = (ele?: ExcalidrawElement) => {
     if (!ele) {
       return;
     }
@@ -287,7 +299,7 @@ const excalidrawElements = (() => {
     return index !== undefined && index >= 0;
   };
   return {
-    push,
+    add,
     clear,
     get,
     hasElementWithId,
@@ -310,7 +322,7 @@ export const convertToExcalidrawElements = (
     }
 
     if (!ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)) {
-      excalidrawElements.push(element as ExcalidrawElement);
+      excalidrawElements.add(element as ExcalidrawElement);
 
       return;
     }
@@ -331,8 +343,9 @@ export const convertToExcalidrawElements = (
             } & ValidLinearElement),
         elementWithid?.label,
       );
-      excalidrawElements.push(container);
-      excalidrawElements.push(text);
+      excalidrawElements.add(container);
+      excalidrawElements.add(text);
+
       if (container.type === "arrow") {
         const originalStart =
           elementWithid.type === "arrow" ? elementWithid?.start : undefined;
@@ -345,9 +358,9 @@ export const convertToExcalidrawElements = (
             end: originalEnd,
           });
         container = linearElement;
-        excalidrawElements.push(linearElement);
-        excalidrawElements.push(startBoundElement);
-        excalidrawElements.push(endBoundElement);
+        excalidrawElements.add(linearElement);
+        excalidrawElements.add(startBoundElement);
+        excalidrawElements.add(endBoundElement);
       }
     } else {
       let excalidrawElement;
@@ -371,13 +384,13 @@ export const convertToExcalidrawElements = (
           ...elementWithid,
         };
 
-        excalidrawElements.push(excalidrawElement as ExcalidrawTextElement);
+        excalidrawElements.add(excalidrawElement as ExcalidrawTextElement);
       } else if (elementWithid.type === "arrow") {
         const { linearElement, startBoundElement, endBoundElement } =
           bindLinearElementToElement(elementWithid);
-        excalidrawElements.push(linearElement);
-        excalidrawElements.push(startBoundElement);
-        excalidrawElements.push(endBoundElement);
+        excalidrawElements.add(linearElement);
+        excalidrawElements.add(startBoundElement);
+        excalidrawElements.add(endBoundElement);
       } else if (elementWithid.type === "line") {
         const width = elementWithid.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
         const height =
@@ -391,14 +404,14 @@ export const convertToExcalidrawElements = (
           ],
           ...elementWithid,
         });
-        excalidrawElements.push(lineElement);
+        excalidrawElements.add(lineElement);
       } else {
         excalidrawElement = {
           ...elementWithid,
           width: elementWithid?.width || DEFAULT_DIMENSION,
           height: elementWithid?.height || DEFAULT_DIMENSION,
         } as ExcalidrawGenericElement;
-        excalidrawElements.push(excalidrawElement);
+        excalidrawElements.add(excalidrawElement);
       }
     }
   });
