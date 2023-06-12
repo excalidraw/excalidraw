@@ -462,7 +462,6 @@ describe("Test Transform", () => {
             height: 300,
           },
           end: {
-            type: "ellipse",
             id: "ellipse-1",
           },
         },
@@ -473,11 +472,9 @@ describe("Test Transform", () => {
           width: 400,
           strokeColor: "#e67700",
           start: {
-            type: "diamond",
             id: "diamond-1",
           },
           end: {
-            type: "ellipse",
             id: "ellipse-1",
           },
         },
@@ -525,11 +522,9 @@ describe("Test Transform", () => {
             text: "HELLO WORLD!!",
           },
           start: {
-            type: "text",
             id: "text-1",
           },
           end: {
-            type: "rectangle",
             id: "rect-1",
           },
         },
