@@ -382,9 +382,6 @@ class Collab extends PureComponent<Props, CollabState> {
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
     if (this.portal.socket) {
-      console.error(
-        "Attempted to start collaboration while is collaboration disabled",
-      );
       return null;
     }
 
