@@ -1,6 +1,6 @@
 import polyfill from "../polyfill";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
@@ -238,7 +238,7 @@ export const appLangCodeAtom = atom(
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [langCode, setLangCode] = useAtom(appLangCodeAtom);
-  const isCollabDisabled = useMemo(() => isRunningInIframe(), []);
+  const isCollabDisabled = isRunningInIframe();
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -274,7 +274,7 @@ const ExcalidrawWrapper = () => {
   });
 
   useEffect(() => {
-    if (!excalidrawAPI) {
+    if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
       return;
     }
 
