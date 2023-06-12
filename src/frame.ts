@@ -179,10 +179,12 @@ export const getElementsCompletelyInFrame = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameElement,
 ) =>
-  getElementsWithinSelection(elements, frame, false).filter(
+  omitGroupsContainingFrames(
+    getElementsWithinSelection(elements, frame, false),
+  ).filter(
     (element) =>
-      element.type !== "frame" &&
-      (!element.frameId || element.frameId === frame.id),
+      (element.type !== "frame" && !element.frameId) ||
+      element.frameId === frame.id,
   );
 
 export const isElementContainingFrame = (
@@ -567,10 +569,12 @@ export const replaceAllElementsInFrame = (
   frame: ExcalidrawFrameElement,
   appState: AppState,
 ) => {
-  return addElementsToFrame(
-    removeAllElementsFromFrame(allElements, frame, appState),
-    nextElementsInFrame,
-    frame,
+  return omitGroupsContainingFrames(
+    addElementsToFrame(
+      removeAllElementsFromFrame(allElements, frame, appState),
+      nextElementsInFrame,
+      frame,
+    ),
   );
 };
 
