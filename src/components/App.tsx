@@ -4406,12 +4406,6 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
       if (pointerDownState.resize.handleType) {
-        setCursor(
-          this.canvas,
-          getCursorForResizingElement({
-            transformHandleType: pointerDownState.resize.handleType,
-          }),
-        );
         pointerDownState.resize.isResizing = true;
         pointerDownState.resize.offset = tupleToCoors(
           getResizeOffsetXY(
