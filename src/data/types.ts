@@ -56,34 +56,66 @@ export type ValidLinearElement = {
   } & MarkOptional<ElementConstructorOpts, "x" | "y">;
   end?:
     | (
-        | {
-            type: Exclude<
-              ExcalidrawBindableElement["type"],
-              "image" | "selection" | "text"
-            >;
-            id?: ExcalidrawGenericElement["id"];
-          }
-        | ({
-            type: "text";
-            text: string;
-            id?: ExcalidrawTextElement["id"];
-          } & Partial<ExcalidrawTextElement>)
+        | (
+            | {
+                type: Exclude<
+                  ExcalidrawBindableElement["type"],
+                  "image" | "selection" | "text"
+                >;
+                id?: ExcalidrawGenericElement["id"];
+              }
+            | {
+                id: ExcalidrawGenericElement["id"];
+                type?: Exclude<
+                  ExcalidrawBindableElement["type"],
+                  "image" | "selection" | "text"
+                >;
+              }
+          )
+        | ((
+            | {
+                type: "text";
+                text: string;
+              }
+            | {
+                type?: "text";
+                id: ExcalidrawTextElement["id"];
+                text: string;
+              }
+          ) &
+            Partial<ExcalidrawTextElement>)
       ) &
         MarkOptional<ElementConstructorOpts, "x" | "y">;
   start?:
     | (
-        | {
-            type: Exclude<
-              ExcalidrawBindableElement["type"],
-              "image" | "selection" | "text"
-            >;
-            id?: ExcalidrawGenericElement["id"];
-          }
-        | ({
-            type: "text";
-            text: string;
-            id?: ExcalidrawTextElement["id"];
-          } & Partial<ExcalidrawTextElement>)
+        | (
+            | {
+                type: Exclude<
+                  ExcalidrawBindableElement["type"],
+                  "image" | "selection" | "text"
+                >;
+                id?: ExcalidrawGenericElement["id"];
+              }
+            | {
+                id: ExcalidrawGenericElement["id"];
+                type?: Exclude<
+                  ExcalidrawBindableElement["type"],
+                  "image" | "selection" | "text"
+                >;
+              }
+          )
+        | ((
+            | {
+                type: "text";
+                text: string;
+              }
+            | {
+                type?: "text";
+                id: ExcalidrawTextElement["id"];
+                text: string;
+              }
+          ) &
+            Partial<ExcalidrawTextElement>)
       ) &
         MarkOptional<ElementConstructorOpts, "x" | "y">;
 } & Partial<ExcalidrawLinearElement>;

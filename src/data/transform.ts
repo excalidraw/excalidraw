@@ -25,6 +25,7 @@ import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawGenericElement,
+  ExcalidrawImageElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
 } from "../element/types";
@@ -132,72 +133,116 @@ const bindLinearElementToElement = (
   if (start) {
     const width = start?.width ?? DEFAULT_DIMENSION;
     const height = start?.height ?? DEFAULT_DIMENSION;
-    const existingElement = start.id
-      ? excalidrawElements.get().find((ele) => ele?.id === start.id)
-      : undefined;
-    const startX = start.x || excliadrawLinearElement.x - width;
-    const startY = start.y || excliadrawLinearElement.y - height / 2;
-
-    if (start.type === "text") {
-      startBoundElement = newTextElement({
-        x: startX,
-        y: startY,
-        ...existingElement,
-        ...start,
-      });
-      // to position the text correctly when coordinates not provided
-      mutateElement(startBoundElement, {
-        x: start.x || excliadrawLinearElement.x - startBoundElement.width,
-        y: start.y || excliadrawLinearElement.y - startBoundElement.height / 2,
-      });
-    } else {
-      startBoundElement = newElement({
-        x: startX,
-        y: startY,
-        width,
-        height,
-        ...existingElement,
-        ...start,
-      });
+    let existingElement;
+    if (start.id) {
+      existingElement = excalidrawElements
+        .get()
+        .find((ele) => ele?.id === start.id) as Exclude<
+        ExcalidrawBindableElement,
+        ExcalidrawImageElement
+      >;
+      if (!existingElement) {
+        console.error(`No element for start binding with id ${start.id} found`);
+      }
     }
 
-    bindLinearElement(
-      excliadrawLinearElement,
-      startBoundElement as ExcalidrawBindableElement,
-      "start",
-    );
+    const startX = start.x || excliadrawLinearElement.x - width;
+    const startY = start.y || excliadrawLinearElement.y - height / 2;
+    const startType = existingElement ? existingElement.type : start.type;
+
+    if (startType) {
+      if (startType === "text") {
+        let text = "";
+        if (existingElement && existingElement.type === "text") {
+          text = existingElement.text;
+        } else if (start.type === "text") {
+          text = start.text;
+        }
+        startBoundElement = newTextElement({
+          x: startX,
+          y: startY,
+          type: "text",
+          ...existingElement,
+          ...start,
+          text,
+        });
+        // to position the text correctly when coordinates not provided
+        mutateElement(startBoundElement, {
+          x: start.x || excliadrawLinearElement.x - startBoundElement.width,
+          y:
+            start.y || excliadrawLinearElement.y - startBoundElement.height / 2,
+        });
+      } else {
+        startBoundElement = newElement({
+          x: startX,
+          y: startY,
+          width,
+          height,
+          ...existingElement,
+          ...start,
+          type: startType,
+        });
+      }
+
+      bindLinearElement(
+        excliadrawLinearElement,
+        startBoundElement as ExcalidrawBindableElement,
+        "start",
+      );
+    }
   }
   if (end) {
     const height = end?.height ?? DEFAULT_DIMENSION;
     const width = end?.width ?? DEFAULT_DIMENSION;
 
-    const existingElement = end.id
-      ? excalidrawElements.get().find((ele) => ele?.id === end.id)
-      : undefined;
+    let existingElement;
+    if (end.id) {
+      existingElement = excalidrawElements
+        .get()
+        .find((ele) => ele?.id === end.id) as Exclude<
+        ExcalidrawBindableElement,
+        ExcalidrawImageElement
+      >;
+      if (!existingElement) {
+        console.error(`No element for end binding with id ${end.id} found`);
+      }
+    }
     const endX =
       end.x || excliadrawLinearElement.x + excliadrawLinearElement.width;
     const endY = end.y || excliadrawLinearElement.y - height / 2;
+    const endType = existingElement ? existingElement.type : end.type;
 
-    if (end.type === "text") {
-      endBoundElement = newTextElement({
-        x: endX,
-        y: endY,
-        ...existingElement,
-        ...end,
-      });
-      // to position the text correctly when coordinates not provided
-      mutateElement(endBoundElement, {
-        y: end.y || excliadrawLinearElement.y - endBoundElement.height / 2,
-      });
-    } else {
-      endBoundElement = newElement({
-        x: endX,
-        y: endY,
-        width,
-        height,
-        ...existingElement,
-        ...end,
-      }) as ExcalidrawBindableElement;
+    if (endType) {
+      if (endType === "text") {
+        let text = "";
+        if (existingElement && existingElement.type === "text") {
+          text = existingElement.text;
+        } else if (end.type === "text") {
+          text = end.text;
+        }
+        endBoundElement = newTextElement({
+          x: endX,
+          y: endY,
+          type: "text",
+          ...existingElement,
+          ...end,
+          text,
+        });
+        // to position the text correctly when coordinates not provided
+        mutateElement(endBoundElement, {
+          y: end.y || excliadrawLinearElement.y - endBoundElement.height / 2,
+        });
+      } else {
+        endBoundElement = newElement({
+          x: endX,
+          y: endY,
+          width,
+          height,
+          ...existingElement,
+          ...end,
+          type: endType,
+        }) as ExcalidrawBindableElement;
+      }
     }
     bindLinearElement(
       excliadrawLinearElement,
