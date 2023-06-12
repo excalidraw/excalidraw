@@ -182,10 +182,6 @@ class Collab extends PureComponent<Props, CollabState> {
         },
       });
     }
-
-    if (!this.state.username) {
-      this.generateRandomUsername();
-    }
   }
 
   onOfflineStatusToggle = () => {
@@ -384,6 +380,13 @@ class Collab extends PureComponent<Props, CollabState> {
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
+    if (!this.state.username) {
+      import("@excalidraw/random-username").then(({ getRandomUsername }) => {
+        const username = getRandomUsername();
+        this.onUsernameChange(username);
+      });
+    }
+
     if (this.portal.socket) {
       return null;
     }
@@ -818,13 +821,6 @@ class Collab extends PureComponent<Props, CollabState> {
   onUsernameChange = (username: string) => {
     this.setUsername(username);
     saveUsernameToLocalStorage(username);
-  };
-
-  private generateRandomUsername = () => {
-    import("@excalidraw/random-username").then(({ getRandomUsername }) => {
-      const username = getRandomUsername();
-      this.onUsernameChange(username);
-    });
   };
 
   render() {
