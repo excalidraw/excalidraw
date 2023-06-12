@@ -206,6 +206,7 @@ describe("Test Transform", () => {
       });
     });
   });
+
   it("should transform to labelled arrows when label provided for arrows", () => {
     const elements = [
       {
@@ -429,7 +430,7 @@ describe("Test Transform", () => {
       });
     });
 
-    it("should bind arrows to existinging shapes when start / end provided with ids", () => {
+    it("should bind arrows to existing shapes when start / end provided with ids", () => {
       const elements = [
         {
           type: "ellipse",
@@ -506,13 +507,11 @@ describe("Test Transform", () => {
           strokeColor: "#c2255c",
         },
         {
-          type: "rectangle",
+          type: "text",
+          id: "text-2",
           x: 560,
-          y: 139,
-          id: "rect-1",
-          width: 100,
-          height: 200,
-          backgroundColor: "#bac8ff",
+          y: 239,
+          text: "Whats up ?",
         },
         {
           type: "arrow",
@@ -525,7 +524,7 @@ describe("Test Transform", () => {
             id: "text-1",
           },
           end: {
-            id: "rect-1",
+            id: "text-2",
           },
         },
       ];
@@ -542,6 +541,62 @@ describe("Test Transform", () => {
           versionNonce: expect.any(Number),
           id: expect.any(String),
         });
+      });
+    });
+
+    it("should bind arrows to existing elements if ids are correct", () => {
+      const elements = [
+        {
+          x: 100,
+          y: 239,
+          type: "text",
+          text: "HEYYYYY",
+          id: "text-1",
+          strokeColor: "#c2255c",
+        },
+        {
+          type: "rectangle",
+          x: 560,
+          y: 139,
+          id: "rect-1",
+          width: 100,
+          height: 200,
+          backgroundColor: "#bac8ff",
+        },
+        {
+          type: "arrow",
+          x: 255,
+          y: 239,
+          label: {
+            text: "HELLO WORLD!!",
+          },
+          start: {
+            id: "text-13",
+          },
+          end: {
+            id: "rect-11",
+          },
+        },
+      ];
+
+      const excaldrawElements = convertToExcalidrawElements(
+        elements as ImportedDataState["elements"],
+      );
+
+      expect(excaldrawElements.length).toBe(4);
+      const [, , arrow] = excaldrawElements;
+      expect(arrow).toMatchObject({
+        type: "arrow",
+        x: 255,
+        y: 239,
+        boundElements: [
+          {
+            id: "id46",
+            type: "text",
+          },
+        ],
+        startBinding: null,
+        endBinding: null,
       });
     });
   });

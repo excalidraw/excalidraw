@@ -243,12 +243,13 @@ const bindLinearElementToElement = (
           type: endType,
         }) as ExcalidrawBindableElement;
       }
+
+      bindLinearElement(
+        excliadrawLinearElement,
+        endBoundElement as ExcalidrawBindableElement,
+        "end",
+      );
     }
-    bindLinearElement(
-      excliadrawLinearElement,
-      endBoundElement as ExcalidrawBindableElement,
-      "end",
-    );
   }
   return {
     linearElement: excliadrawLinearElement,
@@ -301,10 +302,6 @@ export const convertToExcalidrawElements = (
     return [];
   }
   elements.forEach((element) => {
-    if (!element) {
-      return;
-    }
-
     let elementId = element.id || regenerateId(null);
 
     // To make sure every element has a unique id
@@ -381,12 +378,6 @@ export const convertToExcalidrawElements = (
         excalidrawElements.push(linearElement);
         excalidrawElements.push(startBoundElement);
         excalidrawElements.push(endBoundElement);
-        if (startBoundElement && !elementWithid?.start?.id) {
-          excalidrawElements.push(startBoundElement);
-        }
-        if (endBoundElement && !elementWithid?.end?.id) {
-          excalidrawElements.push(endBoundElement);
-        }
       } else if (elementWithid.type === "line") {
         const width = elementWithid.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
         const height =
