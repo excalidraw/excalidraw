@@ -743,12 +743,7 @@ export const _renderScene = ({
           context.strokeStyle = oc.white;
           context.stroke();
         } else {
-          // Border
-          context.fillStyle = oc.white;
-          context.fillRect(boxX, boxY, boxWidth, boxHeight);
-          // Background
-          context.fillStyle = background;
-          context.fillRect(offsetX, offsetY, boxWidth - 2, boxHeight - 2);
+          roundRect(context, boxX, boxY, boxWidth, boxHeight, 8, oc.white);
         }
         context.fillStyle = oc.black;
 
@@ -759,7 +754,7 @@ export const _renderScene = ({
             paddingVertical +
             measure.actualBoundingBoxAscent +
             Math.floor((finalHeight - measureHeight) / 2) +
-            1,
+            2,
         );
       }
 

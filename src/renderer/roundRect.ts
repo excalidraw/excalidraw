@@ -15,6 +15,7 @@ export const roundRect = (
   width: number,
   height: number,
   radius: number,
+  strokeColor?: string,
 ) => {
   context.beginPath();
   context.moveTo(x + radius, y);
@@ -33,5 +34,8 @@ export const roundRect = (
   context.quadraticCurveTo(x, y, x + radius, y);
   context.closePath();
   context.fill();
+  if (strokeColor) {
+    context.strokeStyle = strokeColor;
+  }
   context.stroke();
 };
