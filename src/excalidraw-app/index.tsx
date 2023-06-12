@@ -385,8 +385,8 @@ const ExcalidrawWrapper = () => {
         return;
       }
       if (
-        (!document.hidden && collabAPI && !collabAPI.isCollaborating()) ||
-        (!document.hidden && isCollabDisabled)
+        !document.hidden &&
+        ((collabAPI && !collabAPI.isCollaborating()) || isCollabDisabled)
       ) {
         // don't sync if local state is newer or identical to browser state
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
