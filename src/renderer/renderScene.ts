@@ -754,7 +754,7 @@ export const _renderScene = ({
             paddingVertical +
             measure.actualBoundingBoxAscent +
             Math.floor((finalHeight - measureHeight) / 2) +
-            1,
+            2,
         );
       }
 
