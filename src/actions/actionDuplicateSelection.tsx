@@ -147,7 +147,18 @@ const duplicateElements = (
       if (element.groupIds.length || boundTextElement || isElementAFrame) {
         const groupId = getSelectedGroupForElement(appState, element);
         if (groupId) {
-          const groupElements = getElementsInGroup(sortedElements, groupId);
+          // TODO:
+          // remove `.flatMap...`
+          // if the elements in a frame are grouped when the frame is grouped
+          const groupElements = getElementsInGroup(
+            sortedElements,
+            groupId,
+          ).flatMap((element) =>
+            isFrameElement(element)
+              ? [...getFrameElements(elements, element.id), element]
+              : [element],
+          );
+
           elementsWithClones.push(
             ...markAsProcessed([
               ...groupElements,
