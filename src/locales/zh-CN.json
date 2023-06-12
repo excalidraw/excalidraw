@@ -124,7 +124,7 @@
     },
     "statusPublished": "已发布",
     "sidebarLock": "侧边栏常驻",
-    "eyeDropper": ""
+    "eyeDropper": "从画布上取色"
   },
   "library": {
     "noItems": "尚未添加任何项目……",
@@ -266,12 +266,12 @@
   "roomDialog": {
     "desc_intro": "你可以邀请其他人到目前的画面中与你协作。",
     "desc_privacy": "别担心，该会话使用端到端加密，无论绘制什么都将保持私密，甚至连我们的服务器也无法查看。",
-    "button_startSession": "启动会议",
-    "button_stopSession": "结束会议",
-    "desc_inProgressIntro": "实时协作会议正在进行。",
+    "button_startSession": "开始会话",
+    "button_stopSession": "结束会话",
+    "desc_inProgressIntro": "实时协作会话进行中。",
     "desc_shareLink": "分享此链接给你要协作的用户",
-    "desc_exitSession": "停止会话将中断您在与房间的连接，但您依然可以在本地继续使用画布. 请注意，这不会影响到其他用户, 他们仍可以在他们的版本上继续协作。",
-    "shareTitle": "加入 Excalidraw 实时协作会议"
+    "desc_exitSession": "停止会话将中断您与房间的连接，但您依然可以在本地继续使用画布。请注意，这不会影响到其他用户，他们仍可以在他们的版本上继续协作。",
+    "shareTitle": "加入 Excalidraw 实时协作会话"
   },
   "errorDialog": {
     "title": "错误"
@@ -356,27 +356,27 @@
     "removeItemsFromLib": "从素材库中删除选中的项目"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "导出图片",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "背景",
+      "onlySelected": "仅选中",
+      "darkMode": "深色模式",
+      "embedScene": "包含画布数据",
+      "scale": "缩放比例",
+      "padding": "内边距"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出文件的大小。"
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "导出为 PNG",
+      "exportToSvg": "导出为 SVG",
+      "copyPngToClipboard": "复制 PNG 到剪切板"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "复制到剪贴板"
     }
   },
   "encrypted": {
