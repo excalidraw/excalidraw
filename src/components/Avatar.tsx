@@ -6,7 +6,6 @@ import { getNameInitial } from "../clients";
 type AvatarProps = {
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   color: string;
-  border: string;
   name: string;
   src?: string;
 };
