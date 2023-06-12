@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triangle",
     "fontSize": "Font size",
     "fontFamily": "Font family",
-    "onlySelected": "Only selected",
-    "withBackground": "Background",
-    "exportEmbedScene": "Embed scene",
-    "exportEmbedScene_details": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
     "addWatermark": "Add \"Made with Excalidraw\"",
     "handDrawn": "Hand-drawn",
     "normal": "Normal",
@@ -54,6 +50,7 @@
     "veryLarge": "Very large",
     "solid": "Solid",
     "hachure": "Hachure",
+    "zigzag": "Zigzag",
     "crossHatch": "Cross-hatch",
     "thin": "Thin",
     "bold": "Bold",
@@ -99,7 +96,6 @@
     "flipHorizontal": "Flip horizontal",
     "flipVertical": "Flip vertical",
     "viewMode": "View mode",
-    "toggleExportColorScheme": "Toggle export color scheme",
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
@@ -110,6 +106,7 @@
     "increaseFontSize": "Increase font size",
     "unbindText": "Unbind text",
     "bindText": "Bind text to the container",
+    "createContainerFromText": "Wrap text in a container",
     "link": {
       "edit": "Edit link",
       "create": "Create link",
@@ -119,7 +116,6 @@
       "edit": "Edit line",
       "exit": "Exit line editor"
     },
-
     "elementLock": {
       "lock": "Lock",
       "unlock": "Unlock",
@@ -127,7 +123,8 @@
       "unlockAll": "Unlock all"
     },
     "statusPublished": "Published",
-    "sidebarLock": "Keep sidebar open"
+    "sidebarLock": "Keep sidebar open",
+    "eyeDropper": "Pick color from canvas"
   },
   "library": {
     "noItems": "No items added yet...",
@@ -139,11 +136,7 @@
     "exportJSON": "Export to file",
     "exportImage": "Export image...",
     "export": "Save to...",
-    "exportToPng": "Export to PNG",
-    "exportToSvg": "Export to SVG",
     "copyToClipboard": "Copy to clipboard",
-    "copyPngToClipboard": "Copy PNG to clipboard",
-    "scale": "Scale",
     "save": "Save to current file",
     "saveAs": "Save as",
     "load": "Open",
@@ -205,7 +198,13 @@
     "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
     "importLibraryError": "Couldn't load library",
     "collabSaveFailed": "Couldn't save to the backend database. If problems persist, you should save your file locally to ensure you don't lose your work.",
-    "collabSaveFailed_sizeExceeded": "Couldn't save to the backend database, the canvas seems to be too big. You should save the file locally to ensure you don't lose your work."
+    "collabSaveFailed_sizeExceeded": "Couldn't save to the backend database, the canvas seems to be too big. You should save the file locally to ensure you don't lose your work.",
+    "brave_measure_text_error": {
+      "line1": "Looks like you are using Brave browser with the <bold>Aggressively Block Fingerprinting</bold> setting enabled.",
+      "line2": "This could result in breaking the <bold>Text Elements</bold> in your drawings.",
+      "line3": "We strongly recommend disabling this setting. You can follow <link>these steps</link> on how to do so.",
+      "line4": "If disabling this setting doesn't fix the display of text elements, please open an <issueLink>issue</issueLink> on our GitHub, or write us on <discordLink>Discord</discordLink>"
+    }
   },
   "toolBar": {
     "selection": "Selection",
@@ -257,16 +256,11 @@
     "canvasTooBigTip": "Tip: try moving the farthest elements a bit closer together."
   },
   "errorSplash": {
-    "headingMain_pre": "Encountered an error. Try ",
-    "headingMain_button": "reloading the page.",
-    "clearCanvasMessage": "If reloading doesn't work, try ",
-    "clearCanvasMessage_button": "clearing the canvas.",
+    "headingMain": "Encountered an error. Try <button>reloading the page</button>.",
+    "clearCanvasMessage": "If reloading doesn't work, try <button>clearing the canvas</button>.",
     "clearCanvasCaveat": " This will result in loss of work ",
-    "trackedToSentry_pre": "The error with identifier ",
-    "trackedToSentry_post": " was tracked on our system.",
-    "openIssueMessage_pre": "We were very cautious not to include your scene information on the error. If your scene is not private, please consider following up on our ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Please include information below by copying and pasting into the GitHub issue.",
+    "trackedToSentry": "The error with identifier {{eventId}} was tracked on our system.",
+    "openIssueMessage": "We were very cautious not to include your scene information on the error. If your scene is not private, please consider following up on our <button>bug tracker</button>. Please include information below by copying and pasting into the GitHub issue.",
     "sceneContent": "Scene content:"
   },
   "roomDialog": {
@@ -304,7 +298,8 @@
     "doubleClick": "double-click",
     "drag": "drag",
     "editor": "Editor",
-    "editSelectedShape": "Edit selected shape (text/arrow/line)",
+    "editLineArrowPoints": "Edit line/arrow points",
+    "editText": "Edit text / add label",
     "github": "Found an issue? Submit",
     "howto": "Follow our guides",
     "or": "or",
@@ -345,33 +340,44 @@
       "required": "Required",
       "website": "Enter a valid URL"
     },
-    "noteDescription": {
-      "pre": "Submit your library to be included in the ",
-      "link": "public library repository",
-      "post": "for other people to use in their drawings."
-    },
-    "noteGuidelines": {
-      "pre": "The library needs to be manually approved first. Please read the ",
-      "link": "guidelines",
-      "post": " before submitting. You will need a GitHub account to communicate and make changes if requested, but it is not strictly required."
-    },
-    "noteLicense": {
-      "pre": "By submitting, you agree the library will be published under the ",
-      "link": "MIT License, ",
-      "post": "which in short means anyone can use them without restrictions."
-    },
+    "noteDescription": "Submit your library to be included in the <link>public library repository</link> for other people to use in their drawings.",
+    "noteGuidelines": "The library needs to be manually approved first. Please read the <link>guidelines</link> before submitting. You will need a GitHub account to communicate and make changes if requested, but it is not strictly required.",
+    "noteLicense": "By submitting, you agree the library will be published under the <link>MIT License</link>, which in short means anyone can use them without restrictions.",
     "noteItems": "Each library item must have its own name so it's filterable. The following library items will be included:",
     "atleastOneLibItem": "Please select at least one library item to get started",
     "republishWarning": "Note: some of the selected items are marked as already published/submitted. You should only resubmit items when updating an existing library or submission."
   },
   "publishSuccessDialog": {
     "title": "Library submitted",
-    "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",
-    "link": "here"
+    "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status <link>here</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Reset library",
     "removeItemsFromLib": "Remove selected items from library"
+  },
+  "imageExportDialog": {
+    "header": "Export image",
+    "label": {
+      "withBackground": "Background",
+      "onlySelected": "Only selected",
+      "darkMode": "Dark mode",
+      "embedScene": "Embed scene",
+      "scale": "Scale",
+      "padding": "Padding"
+    },
+    "tooltip": {
+      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size."
+    },
+    "title": {
+      "exportToPng": "Export to PNG",
+      "exportToSvg": "Export to SVG",
+      "copyPngToClipboard": "Copy PNG to clipboard"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copy to clipboard"
+    }
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
@@ -404,51 +410,21 @@
     "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor"
   },
   "colors": {
-    "ffffff": "White",
-    "f8f9fa": "Gray 0",
-    "f1f3f5": "Gray 1",
-    "fff5f5": "Red 0",
-    "fff0f6": "Pink 0",
-    "f8f0fc": "Grape 0",
-    "f3f0ff": "Violet 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Blue 0",
-    "e3fafc": "Cyan 0",
-    "e6fcf5": "Teal 0",
-    "ebfbee": "Green 0",
-    "f4fce3": "Lime 0",
-    "fff9db": "Yellow 0",
-    "fff4e6": "Orange 0",
     "transparent": "Transparent",
-    "ced4da": "Gray 4",
-    "868e96": "Gray 6",
-    "fa5252": "Red 6",
-    "e64980": "Pink 6",
-    "be4bdb": "Grape 6",
-    "7950f2": "Violet 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Blue 6",
-    "15aabf": "Cyan 6",
-    "12b886": "Teal 6",
-    "40c057": "Green 6",
-    "82c91e": "Lime 6",
-    "fab005": "Yellow 6",
-    "fd7e14": "Orange 6",
-    "000000": "Black",
-    "343a40": "Gray 8",
-    "495057": "Gray 7",
-    "c92a2a": "Red 9",
-    "a61e4d": "Pink 9",
-    "862e9c": "Grape 9",
-    "5f3dc4": "Violet 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Blue 9",
-    "0b7285": "Cyan 9",
-    "087f5b": "Teal 9",
-    "2b8a3e": "Green 9",
-    "5c940d": "Lime 9",
-    "e67700": "Yellow 9",
-    "d9480f": "Orange 9"
+    "black": "Black",
+    "white": "White",
+    "red": "Red",
+    "pink": "Pink",
+    "grape": "Grape",
+    "violet": "Violet",
+    "gray": "Gray",
+    "blue": "Blue",
+    "cyan": "Cyan",
+    "teal": "Teal",
+    "green": "Green",
+    "yellow": "Yellow",
+    "orange": "Orange",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
@@ -462,5 +438,12 @@
       "toolbarHint": "Pick a tool & Start drawing!",
       "helpHint": "Shortcuts & help"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "Most used custom colors",
+    "colors": "Colors",
+    "shades": "Shades",
+    "hexCode": "Hex code",
+    "noShades": "No shades available for this color"
   }
 }

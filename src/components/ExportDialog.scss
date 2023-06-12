@@ -9,6 +9,10 @@
     text-align: center;
     padding: var(--preview-padding);
     margin-bottom: calc(var(--space-factor) * 3);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .ExportDialog__preview canvas {

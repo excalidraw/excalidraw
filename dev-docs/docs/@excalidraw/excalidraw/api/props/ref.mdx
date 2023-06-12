@@ -1,6 +1,19 @@
 # ref
+
 <pre>
-<a href="https://reactjs.org/docs/refs-and-the-dom.html#creating-refs">createRef</a> &#124; <a href="https://reactjs.org/docs/hooks-reference.html#useref">useRef</a> &#124; <a href="https://reactjs.org/docs/refs-and-the-dom.html#callback-refs">callbackRef</a> &#124; <br/>&#123; current: &#123; readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L460">resolvablePromise</a> } }
+  <a href="https://reactjs.org/docs/refs-and-the-dom.html#creating-refs">
+    createRef
+  </a>{" "}
+  &#124;{" "}
+  <a href="https://reactjs.org/docs/hooks-reference.html#useref">useRef</a>{" "}
+  &#124;{" "}
+  <a href="https://reactjs.org/docs/refs-and-the-dom.html#callback-refs">
+    callbackRef
+  </a>{" "}
+  &#124; <br />
+  &#123; current: &#123; readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L460">
+    resolvablePromise
+  </a> } }
 </pre>
 
 You can pass a `ref` when you want to access some excalidraw APIs. We expose the below APIs:
@@ -139,7 +152,9 @@ function App() {
   return (
     <div style={{ height: "500px" }}>
       <p style={{ fontSize: "16px" }}> Click to update the scene</p>
-      <button className="custom-button" onClick={updateScene}>Update Scene</button>
+      <button className="custom-button" onClick={updateScene}>
+        Update Scene
+      </button>
       <Excalidraw ref={(api) => setExcalidrawAPI(api)} />
     </div>
   );
@@ -187,7 +202,8 @@ function App() {
   return (
     <div style={{ height: "500px" }}>
       <p style={{ fontSize: "16px" }}> Click to update the library items</p>
-      <button className="custom-button"
+      <button
+        className="custom-button"
         onClick={() => {
           const libraryItems = [
             {
@@ -205,10 +221,8 @@ function App() {
           ];
           excalidrawAPI.updateLibrary({
             libraryItems,
-            openLibraryMenu: true
-
+            openLibraryMenu: true,
           });
-         
         }}
       >
         Update Library
@@ -250,7 +264,7 @@ Resets the scene. If `resetLoadingState` is passed as true then it will also for
 
 <pre>
   () =>{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
     ExcalidrawElement[]
   </a>
 </pre>
@@ -261,7 +275,7 @@ Returns all the elements including the deleted in the scene.
 
 <pre>
   () => NonDeleted&#60;
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
     ExcalidrawElement
   </a>
   []&#62;
@@ -293,18 +307,31 @@ This is the history API. history.clear() will clear the history.
 ## scrollToContent
 
 <pre>
-  (target?:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">
+  (<br />
+  {"  "}
+  target?:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
     ExcalidrawElement
   </a>{" "}
   &#124;{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
     ExcalidrawElement
   </a>
-  []) => void
+  [],
+  <br />
+  {"  "}opts?: &#123; fitToContent?: boolean; animate?: boolean; duration?: number
+  &#125;
+  <br />) => void
 </pre>
 
-Scroll the nearest element out of the elements supplied to the center. Defaults to the elements on the scene.
+Scroll the nearest element out of the elements supplied to the center of the viewport. Defaults to the elements on the scene.
+
+| Attribute | type | default | Description |
+| --- | --- | --- | --- |
+| target | <code>ExcalidrawElement &#124; ExcalidrawElement[]</code> | All scene elements | The element(s) to scroll to. |
+| opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. |
+| opts.animate | boolean | false | Whether to animate between starting and ending position. Note that for larger scenes the animation may not be smooth due to performance issues. |
+| opts.duration | number | 500 | Duration of the animation if `opts.animate` is `true`. |
 
 ## refresh
 
@@ -323,7 +350,7 @@ For any other cases if the position of excalidraw is updated (example due to scr
 This API can be used to show the toast with custom message.
 
 ```tsx
-({ message: string, closable?:boolean,duration?:number 
+({ message: string, closable?:boolean,duration?:number
   } | null) => void
 ```
 
@@ -358,15 +385,18 @@ This API can be used to get the files present in the scene. It may contain files
 
 This API has the below signature. It sets the `tool` passed in param as the active tool.
 
-
 <pre>
-(tool: <br/>  &#123; type: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/shapes.tsx#L15">SHAPES</a>[number]["value"]&#124; "eraser" &#125; &#124;<br/>  &#123; type: "custom"; customType: string &#125;) => void
+  (tool: <br /> &#123; type:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/shapes.tsx#L15">
+    SHAPES
+  </a>
+  [number]["value"]&#124; "eraser" &#125; &#124;
+  <br /> &#123; type: "custom"; customType: string &#125;) => void
 </pre>
 
 ## setCursor
 
-This API can be used to customise the mouse cursor on the canvas and has the below signature.   
-It sets the mouse cursor to the cursor passed in param.
+This API can be used to customise the mouse cursor on the canvas and has the below signature. It sets the mouse cursor to the cursor passed in param.
 
 ```tsx
 (cursor: string) => void

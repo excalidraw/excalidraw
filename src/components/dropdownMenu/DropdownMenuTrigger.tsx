@@ -1,5 +1,6 @@
 import clsx from "clsx";
-import { useDevice, useExcalidrawAppState } from "../App";
+import { useUIAppState } from "../../context/ui-appState";
+import { useDevice } from "../App";
 import { Button } from "../Button";
 
 const MenuTrigger = ({
@@ -11,7 +12,7 @@ const MenuTrigger = ({
   children: React.ReactNode;
   onToggle: () => void;
 }) => {
-  const appState = useExcalidrawAppState();
+  const appState = useUIAppState();
   const device = useDevice();
   const classNames = clsx(
     `dropdown-menu-button ${className}`,

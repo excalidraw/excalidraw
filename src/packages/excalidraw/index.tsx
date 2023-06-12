@@ -24,7 +24,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     isCollaborating = false,
     onPointerUpdate,
     renderTopRightUI,
-    renderSidebar,
     langCode = defaultLang.code,
     viewModeEnabled,
     zenModeEnabled,
@@ -47,6 +46,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
 
   const canvasActions = props.UIOptions?.canvasActions;
 
+  // FIXME normalize/set defaults in parent component so that the memo resolver
+  // compares the same values
   const UIOptions: AppProps["UIOptions"] = {
     ...props.UIOptions,
     canvasActions: {
@@ -87,8 +88,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   }, []);
 
   return (
-    <InitializeApp langCode={langCode} theme={theme}>
-      <Provider unstable_createStore={() => jotaiStore} scope={jotaiScope}>
+    <Provider unstable_createStore={() => jotaiStore} scope={jotaiScope}>
+      <InitializeApp langCode={langCode} theme={theme}>
         <App
           onChange={onChange}
           initialData={initialData}
@@ -114,12 +115,11 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
-          renderSidebar={renderSidebar}
         >
           {children}
         </App>
-      </Provider>
-    </InitializeApp>
+      </InitializeApp>
+    </Provider>
   );
 };
 
@@ -198,7 +198,7 @@ export {
   isInvisiblySmallElement,
   getNonDeletedElements,
 } from "../../element";
-export { defaultLang, languages } from "../../i18n";
+export { defaultLang, useI18n, languages } from "../../i18n";
 export {
   restore,
   restoreAppState,
@@ -245,3 +245,5 @@ export { MainMenu };
 export { useDevice } from "../../components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
+
+export { DefaultSidebar } from "../../components/DefaultSidebar";

@@ -1,5 +1,6 @@
 import { isDarwin } from "../constants";
 import { t } from "../i18n";
+import { SubtypeOf } from "../utility-types";
 import { getShortcutKey } from "../utils";
 import { ActionName } from "./types";
 
@@ -33,7 +34,7 @@ export type ShortcutName =
       | "flipHorizontal"
       | "flipVertical"
       | "hyperlink"
-      | "toggleLock"
+      | "toggleElementLock"
     >
   | "saveScene"
   | "imageExport";
@@ -79,7 +80,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   flipVertical: [getShortcutKey("Shift+V")],
   viewMode: [getShortcutKey("Alt+R")],
   hyperlink: [getShortcutKey("CtrlOrCmd+K")],
-  toggleLock: [getShortcutKey("CtrlOrCmd+Shift+L")],
+  toggleElementLock: [getShortcutKey("CtrlOrCmd+Shift+L")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName) => {

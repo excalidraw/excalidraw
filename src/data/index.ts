@@ -89,7 +89,9 @@ export const exportCanvas = async (
     return await fileSave(blob, {
       description: "Export to PNG",
       name,
-      extension: appState.exportEmbedScene ? "excalidraw.png" : "png",
+      // FIXME reintroduce `excalidraw.png` when most people upgrade away
+      // from 111.0.5563.64 (arm64), see #6349
+      extension: /* appState.exportEmbedScene ? "excalidraw.png" : */ "png",
       fileHandle,
     });
   } else if (type === "clipboard") {

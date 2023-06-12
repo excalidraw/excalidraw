@@ -237,6 +237,15 @@ export class UI {
     fireEvent.click(element);
   };
 
+  static clickOnTestId = (testId: string) => {
+    const element = document.querySelector(`[data-testid='${testId}']`);
+    // const element = GlobalTestState.renderResult.queryByTestId(testId);
+    if (!element) {
+      throw new Error(`No element with testid "${testId}" found`);
+    }
+    fireEvent.click(element);
+  };
+
   /**
    * Creates an Excalidraw element, and returns a proxy that wraps it so that
    * accessing props will return the latest ones from the object existing in
@@ -321,6 +330,6 @@ export class UI {
   static queryContextMenu = () => {
     return GlobalTestState.renderResult.container.querySelector(
       ".context-menu",
-    );
+    ) as HTMLElement | null;
   };
 }

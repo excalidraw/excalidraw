@@ -1,5 +1,6 @@
 import { ROUNDNESS } from "../constants";
 import { AppState } from "../types";
+import { MarkNonNullable } from "../utility-types";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -137,9 +138,9 @@ export const isExcalidrawElement = (element: any): boolean => {
 
 export const hasBoundTextElement = (
   element: ExcalidrawElement | null,
-): element is ExcalidrawBindableElement => {
+): element is MarkNonNullable<ExcalidrawBindableElement, "boundElements"> => {
   return (
-    isBindableElement(element) &&
+    isTextBindableContainer(element) &&
     !!element.boundElements?.some(({ type }) => type === "text")
   );
 };

@@ -70,7 +70,7 @@ import { decryptData } from "../../data/encryption";
 import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
-import { jotaiStore } from "../../jotai";
+import { appJotaiStore } from "../app-jotai";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
@@ -157,6 +157,8 @@ class Collab extends PureComponent<Props, CollabState> {
     window.addEventListener("offline", this.onOfflineStatusToggle);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
 
+    this.onOfflineStatusToggle();
+
     const collabAPI: CollabAPI = {
       isCollaborating: this.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
@@ -167,8 +169,7 @@ class Collab extends PureComponent<Props, CollabState> {
       setUsername: this.setUsername,
     };
 
-    jotaiStore.set(collabAPIAtom, collabAPI);
-    this.onOfflineStatusToggle();
+    appJotaiStore.set(collabAPIAtom, collabAPI);
 
     if (
       process.env.NODE_ENV === ENV.TEST ||
@@ -185,7 +186,7 @@ class Collab extends PureComponent<Props, CollabState> {
   }
 
   onOfflineStatusToggle = () => {
-    jotaiStore.set(isOfflineAtom, !window.navigator.onLine);
+    appJotaiStore.set(isOfflineAtom, !window.navigator.onLine);
   };
 
   componentWillUnmount() {
@@ -208,10 +209,10 @@ class Collab extends PureComponent<Props, CollabState> {
     }
   }
 
-  isCollaborating = () => jotaiStore.get(isCollaboratingAtom)!;
+  isCollaborating = () => appJotaiStore.get(isCollaboratingAtom)!;
 
   private setIsCollaborating = (isCollaborating: boolean) => {
-    jotaiStore.set(isCollaboratingAtom, isCollaborating);
+    appJotaiStore.set(isCollaboratingAtom, isCollaborating);
   };
 
   private onUnload = () => {
@@ -380,6 +381,13 @@ class Collab extends PureComponent<Props, CollabState> {
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
+    if (!this.state.username) {
+      import("@excalidraw/random-username").then(({ getRandomUsername }) => {
+        const username = getRandomUsername();
+        this.onUsernameChange(username);
+      });
+    }
+
     if (this.portal.socket) {
       return null;
     }
@@ -610,7 +618,7 @@ class Collab extends PureComponent<Props, CollabState> {
     const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
 
-    remoteElements = restoreElements(remoteElements, null, false);
+    remoteElements = restoreElements(remoteElements, null);
 
     const reconciledElements = _reconcileElements(
       localElements,
@@ -804,7 +812,7 @@ class Collab extends PureComponent<Props, CollabState> {
   );
 
   handleClose = () => {
-    jotaiStore.set(collabDialogShownAtom, false);
+    appJotaiStore.set(collabDialogShownAtom, false);
   };
 
   setUsername = (username: string) => {
@@ -834,14 +842,12 @@ class Collab extends PureComponent<Props, CollabState> {
             setErrorMessage={(errorMessage) => {
               this.setState({ errorMessage });
             }}
-            theme={this.excalidrawAPI.getAppState().theme}
           />
         )}
         {errorMessage && (
-          <ErrorDialog
-            message={errorMessage}
-            onClose={() => this.setState({ errorMessage: "" })}
-          />
+          <ErrorDialog onClose={() => this.setState({ errorMessage: "" })}>
+            {errorMessage}
+          </ErrorDialog>
         )}
       </>
     );

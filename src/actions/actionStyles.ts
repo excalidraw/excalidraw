@@ -12,7 +12,10 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
-import { getBoundTextElement } from "../element/textElement";
+import {
+  getBoundTextElement,
+  getDefaultLineHeight,
+} from "../element/textElement";
 import {
   hasBoundTextElement,
   canApplyRoundnessTypeToElement,
@@ -92,12 +95,18 @@ export const actionPasteStyles = register({
           });
 
           if (isTextElement(newElement)) {
+            const fontSize =
+              elementStylesToCopyFrom?.fontSize || DEFAULT_FONT_SIZE;
+            const fontFamily =
+              elementStylesToCopyFrom?.fontFamily || DEFAULT_FONT_FAMILY;
             newElement = newElementWith(newElement, {
-              fontSize: elementStylesToCopyFrom?.fontSize || DEFAULT_FONT_SIZE,
-              fontFamily:
-                elementStylesToCopyFrom?.fontFamily || DEFAULT_FONT_FAMILY,
+              fontSize,
+              fontFamily,
               textAlign:
                 elementStylesToCopyFrom?.textAlign || DEFAULT_TEXT_ALIGN,
+              lineHeight:
+                elementStylesToCopyFrom.lineHeight ||
+                getDefaultLineHeight(fontFamily),
             });
             let container = null;
             if (newElement.containerId) {

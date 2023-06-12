@@ -155,6 +155,9 @@
     margin: 1px;
   }
 
+  .welcome-screen-menu-item:focus-visible,
+  .dropdown-menu-item:focus-visible,
+  button:focus-visible,
   .buttonList label:focus-within,
   input:focus-visible {
     outline: transparent;
@@ -351,6 +354,7 @@
     border-radius: var(--space-factor);
     border: 1px solid var(--button-gray-2);
     font-size: 0.8rem;
+    font-family: inherit;
     outline: none;
     appearance: none;
     background-image: var(--dropdown-icon);
@@ -410,6 +414,7 @@
     bottom: 30px;
     transform: translateX(-50%);
     pointer-events: all;
+    font-family: inherit;
 
     &:hover {
       background-color: var(--button-hover-bg);
@@ -530,6 +535,11 @@
   // (doesn't work in Firefox)
   ::-webkit-scrollbar {
     width: 3px;
+    height: 3px;
+  }
+
+  select::-webkit-scrollbar {
+    width: 10px;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -561,14 +571,14 @@
       border-radius: 0;
     }
 
-    .library-button {
+    .default-sidebar-trigger {
       border: 0;
     }
   }
 
   .App-toolbar--mobile {
-    overflow-x: hidden;
-    max-width: 100vw;
+    overflow-x: auto;
+    max-width: 90vw;
 
     .ToolIcon__keybinding {
       display: none;

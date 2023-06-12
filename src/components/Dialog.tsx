@@ -12,20 +12,19 @@ import "./Dialog.scss";
 import { back, CloseIcon } from "./icons";
 import { Island } from "./Island";
 import { Modal } from "./Modal";
-import { AppState } from "../types";
 import { queryFocusableElements } from "../utils";
 import { useSetAtom } from "jotai";
-import { isLibraryMenuOpenAtom } from "./LibraryMenuHeaderContent";
+import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+import { jotaiScope } from "../jotai";
 import { Button } from "./Button";
 
 export interface DialogProps {
   children: React.ReactNode;
   className?: string;
-  small?: boolean;
+  size?: "small" | "regular" | "wide";
   onCloseRequest(): void;
-  title: React.ReactNode;
+  title: React.ReactNode | false;
   autofocus?: boolean;
-  theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
 }
 
@@ -33,6 +32,7 @@ export const Dialog = (props: DialogProps) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [lastActiveElement] = useState(document.activeElement);
   const { id } = useExcalidrawContainer();
+  const device = useDevice();
 
   useEffect(() => {
     if (!islandNode) {
@@ -73,7 +73,7 @@ export const Dialog = (props: DialogProps) => {
   }, [islandNode, props.autofocus]);
 
   const setAppState = useExcalidrawSetAppState();
-  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
+  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom, jotaiScope);
 
   const onClose = () => {
     setAppState({ openMenu: null });
@@ -86,23 +86,26 @@ export const Dialog = (props: DialogProps) => {
     <Modal
       className={clsx("Dialog", props.className)}
       labelledBy="dialog-title"
-      maxWidth={props.small ? 550 : 800}
+      maxWidth={
+        props.size === "wide" ? 1024 : props.size === "small" ? 550 : 800
+      }
       onCloseRequest={onClose}
-      theme={props.theme}
       closeOnClickOutside={props.closeOnClickOutside}
     >
       <Island ref={setIslandNode}>
-        <h2 id={`${id}-dialog-title`} className="Dialog__title">
-          <span className="Dialog__titleContent">{props.title}</span>
-          <Button
-            onSelect={onClose}
-            className="Modal__close"
-            title={t("buttons.close")}
-            aria-label={t("buttons.close")}
-          >
-            {useDevice().isMobile ? back : CloseIcon}
-          </Button>
-        </h2>
+        {props.title && (
+          <h2 id={`${id}-dialog-title`} className="Dialog__title">
+            <span className="Dialog__titleContent">{props.title}</span>
+          </h2>
+        )}
+        <Button
+          onSelect={onClose}
+          className="Dialog__close"
+          title={t("buttons.close")}
+          aria-label={t("buttons.close")}
+        >
+          {device.isMobile ? back : CloseIcon}
+        </Button>
         <div className="Dialog__content">{props.children}</div>
       </Island>
     </Modal>

@@ -30,6 +30,7 @@ import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
+import { KEYS } from "../../../keys";
 
 declare global {
   interface Window {
@@ -55,9 +56,9 @@ type PointerDownState = {
     y: number;
   };
 };
+
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
-
 const {
   exportToCanvas,
   exportToSvg,
@@ -80,7 +81,13 @@ const COMMENT_ICON_DIMENSION = 32;
 const COMMENT_INPUT_HEIGHT = 50;
 const COMMENT_INPUT_WIDTH = 150;
 
-export default function App() {
+export interface AppProps {
+  appTitle: string;
+  useCustom: (api: ExcalidrawImperativeAPI | null, customArgs?: any[]) => void;
+  customArgs?: any[];
+}
+
+export default function App({ appTitle, useCustom, customArgs }: AppProps) {
   const appRef = useRef<any>(null);
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
@@ -107,6 +114,8 @@ export default function App() {
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
 
+  useCustom(excalidrawAPI, customArgs);
+
   useHandleLibrary({ excalidrawAPI });
 
   useEffect(() => {
@@ -114,7 +123,7 @@ export default function App() {
       return;
     }
     const fetchData = async () => {
-      const res = await fetch("/rocket.jpeg");
+      const res = await fetch("/images/rocket.jpeg");
       const imageData = await res.blob();
       const reader = new FileReader();
       reader.readAsDataURL(imageData);
@@ -150,11 +159,10 @@ export default function App() {
           />
         )}
         <button
-          onClick={() => alert("This is dummy top right UI")}
+          onClick={() => alert("This is an empty top right UI")}
           style={{ height: "2.5rem" }}
         >
-          {" "}
-          Click me{" "}
+          Click me
         </button>
       </>
     );
@@ -397,7 +405,7 @@ export default function App() {
           }}
         >
           <div className="comment-avatar">
-            <img src="doremon.png" alt="doremon" />
+            <img src="images/doremon.png" alt="doremon" />
           </div>
         </div>
       );
@@ -477,21 +485,12 @@ export default function App() {
         }}
         onBlur={saveComment}
         onKeyDown={(event) => {
-          if (!event.shiftKey && event.key === "Enter") {
+          if (!event.shiftKey && event.key === KEYS.ENTER) {
             event.preventDefault();
             saveComment();
           }
         }}
       />
-    );
-  };
-
-  const renderSidebar = () => {
-    return (
-      <Sidebar>
-        <Sidebar.Header>Custom header!</Sidebar.Header>
-        Custom sidebar!
-      </Sidebar>
     );
   };
 
@@ -523,9 +522,11 @@ export default function App() {
       </MainMenu>
     );
   };
+
   return (
     <div className="App" ref={appRef}>
-      <h1> Excalidraw Example</h1>
+      <h1>{appTitle}</h1>
+      {/* TODO fix type */}
       <ExampleSidebar>
         <div className="button-wrapper">
           <button onClick={loadSceneOrLibrary}>Load Scene or Library</button>
@@ -611,15 +612,15 @@ export default function App() {
                   const collaborators = new Map();
                   collaborators.set("id1", {
                     username: "Doremon",
-                    avatarUrl: "doremon.png",
+                    avatarUrl: "images/doremon.png",
                   });
                   collaborators.set("id2", {
                     username: "Excalibot",
-                    avatarUrl: "excalibot.png",
+                    avatarUrl: "images/excalibot.png",
                   });
                   collaborators.set("id3", {
                     username: "Pika",
-                    avatarUrl: "pika.jpeg",
+                    avatarUrl: "images/pika.jpeg",
                   });
                   collaborators.set("id4", {
                     username: "fallback",
@@ -660,23 +661,6 @@ export default function App() {
           </div>
         </div>
         <div className="excalidraw-wrapper">
-          <div
-            style={{
-              position: "absolute",
-              left: "50%",
-              bottom: "20px",
-              display: "flex",
-              zIndex: 9999999999999999,
-              padding: "5px 10px",
-              transform: "translateX(-50%)",
-              background: "rgba(255, 255, 255, 0.8)",
-              gap: "1rem",
-            }}
-          >
-            <button onClick={() => excalidrawAPI?.toggleMenu("customSidebar")}>
-              Toggle Custom Sidebar
-            </button>
-          </div>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
             initialData={initialStatePromiseRef.current.promise}
@@ -698,7 +682,6 @@ export default function App() {
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
-            renderSidebar={renderSidebar}
           >
             {excalidrawAPI && (
               <Footer>
@@ -706,6 +689,30 @@ export default function App() {
               </Footer>
             )}
             <WelcomeScreen />
+            <Sidebar name="custom">
+              <Sidebar.Tabs>
+                <Sidebar.Header />
+                <Sidebar.Tab tab="one">Tab one!</Sidebar.Tab>
+                <Sidebar.Tab tab="two">Tab two!</Sidebar.Tab>
+                <Sidebar.TabTriggers>
+                  <Sidebar.TabTrigger tab="one">One</Sidebar.TabTrigger>
+                  <Sidebar.TabTrigger tab="two">Two</Sidebar.TabTrigger>
+                </Sidebar.TabTriggers>
+              </Sidebar.Tabs>
+            </Sidebar>
+            <Sidebar.Trigger
+              name="custom"
+              tab="one"
+              style={{
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
+                bottom: "20px",
+                zIndex: 9999999999999999,
+              }}
+            >
+              Toggle Custom Sidebar
+            </Sidebar.Trigger>
             {renderMenu()}
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
