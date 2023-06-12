@@ -157,6 +157,8 @@ class Collab extends PureComponent<Props, CollabState> {
     window.addEventListener("offline", this.onOfflineStatusToggle);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
 
+    this.onOfflineStatusToggle();
+
     const collabAPI: CollabAPI = {
       isCollaborating: this.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
@@ -168,7 +170,6 @@ class Collab extends PureComponent<Props, CollabState> {
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
-    this.onOfflineStatusToggle();
 
     if (
       process.env.NODE_ENV === ENV.TEST ||
