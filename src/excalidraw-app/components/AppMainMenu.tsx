@@ -6,6 +6,7 @@ import { LanguageList } from "./LanguageList";
 export const AppMainMenu: React.FC<{
   setCollabDialogShown: (toggle: boolean) => any;
   isCollaborating: boolean;
+  isCollabEnabled: boolean;
 }> = React.memo((props) => {
   return (
     <MainMenu>
@@ -13,10 +14,12 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
-      <MainMenu.DefaultItems.LiveCollaborationTrigger
-        isCollaborating={props.isCollaborating}
-        onSelect={() => props.setCollabDialogShown(true)}
-      />
+      {props.isCollabEnabled && (
+        <MainMenu.DefaultItems.LiveCollaborationTrigger
+          isCollaborating={props.isCollaborating}
+          onSelect={() => props.setCollabDialogShown(true)}
+        />
+      )}
 
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
