@@ -383,6 +383,7 @@ let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
 const youtubeContainers = new Map<string, number>();
+let app: App | null = null;
 
 // remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
@@ -438,6 +439,7 @@ class App extends React.Component<AppProps, AppState> {
 
   constructor(props: AppProps) {
     super(props);
+    app = this;
     const defaultAppState = getDefaultAppState();
     const {
       excalidrawRef,
@@ -596,8 +598,19 @@ class App extends React.Component<AppProps, AppState> {
 
     switch (event.origin) {
       case "https://player.vimeo.com":
-        const source = event.source as Window;
+        //Allowing for multiple instances of Excalidraw running in the window
         if (data.method === "paused") {
+          let source: Window | null = null;
+          const iframes =
+            app?.excalidrawContainerRef?.current?.querySelectorAll("iframe");
+          if (!iframes) {
+            break;
+          }
+          for (const iframe of iframes) {
+            if (iframe.contentWindow === event.source) {
+              source = iframe.contentWindow;
+            }
+          }
           source?.postMessage(
             JSON.stringify({
               method: data.value ? "play" : "pause",

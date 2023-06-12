@@ -391,6 +391,7 @@ export const invalidateShapeForElement = (element: ExcalidrawElement) =>
 export const generateRoughOptions = (
   element: ExcalidrawElement,
   continuousPath = false,
+  isIFrame: boolean = false,
 ): Options => {
   const options: Options = {
     seed: element.seed,
@@ -432,10 +433,15 @@ export const generateRoughOptions = (
         element.type === "rectangle" &&
         element.link &&
         element.link.embed &&
-        !options.fill
+        !options.fill &&
+        !isIFrame
       ) {
         options.fill = "gray";
         options.fillStyle = "solid";
+      }
+      if (isIFrame) {
+        options.fill = "transparent";
+        options.stroke = "transparent";
       }
       if (element.type === "ellipse") {
         options.curveFitting = 1;
@@ -469,6 +475,7 @@ export const generateRoughOptions = (
 const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
+  isIFrame: boolean = false,
 ) => {
   let shape = shapeCache.get(element);
 
@@ -489,7 +496,7 @@ const generateElementShape = (
             } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
               h - r
             } L 0 ${r} Q 0 0, ${r} 0`,
-            generateRoughOptions(element, true),
+            generateRoughOptions(element, true, isIFrame),
           );
         } else {
           shape = generator.rectangle(
@@ -1124,6 +1131,7 @@ export const renderElementToSvg = (
   offsetX: number,
   offsetY: number,
   exportWithDarkMode?: boolean,
+  isIFrame: boolean = false,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   let cx = (x2 - x1) / 2 - (element.x - x1);
@@ -1166,7 +1174,7 @@ export const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      generateElementShape(element, generator);
+      generateElementShape(element, generator, isIFrame);
       const node = roughSVGDrawWithPrecision(
         rsvg,
         getShapeForElement(element)!,
@@ -1184,7 +1192,7 @@ export const renderElementToSvg = (
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
-      if (element.type === "rectangle" && element.link && element.link.embed) {
+      if (isIFrame) {
         const radius = getCornerRadius(
           Math.min(element.width, element.height),
           element,
@@ -1201,7 +1209,7 @@ export const renderElementToSvg = (
         div.style.width = "100%";
         div.style.height = "100%";
         const iframe = div.ownerDocument!.createElement("iframe");
-        iframe.src = element.link.url ?? "";
+        iframe.src = element.link?.url ?? "";
         iframe.style.width = "100%";
         iframe.style.height = "100%";
         iframe.style.border = "none";
@@ -1388,15 +1396,6 @@ export const renderElementToSvg = (
     }
     default: {
       if (isTextElement(element)) {
-        const container = getContainerElement(element);
-        if (
-          container &&
-          container.type === "rectangle" &&
-          container.link &&
-          container.link.embed
-        ) {
-          break;
-        }
         const opacity = element.opacity / 100;
         const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
         if (opacity !== 1) {

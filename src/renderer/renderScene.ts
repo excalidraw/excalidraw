@@ -337,6 +337,22 @@ const isIframeElement = (element: NonDeletedExcalidrawElement): Boolean => {
   return false;
 };
 
+const createPlaceholderiFrameLabel = (
+  element: NonDeletedExcalidrawElement,
+): ExcalidrawElement => {
+  return newTextElement({
+    x: element.x + element.width / 2,
+    y: element.y + element.height / 2,
+    strokeColor:
+      element.strokeColor !== "transparent" ? element.strokeColor : "black",
+    backgroundColor: "transparent",
+    text: element.link?.url ?? "",
+    textAlign: "center",
+    verticalAlign: VERTICAL_ALIGN.MIDDLE,
+    angle: element.angle ?? 0,
+  });
+};
+
 export const _renderScene = ({
   elements,
   appState,
@@ -464,19 +480,7 @@ export const _renderScene = ({
             element.link?.url &&
             !getBoundTextElement(element)
           ) {
-            const label = newTextElement({
-              x: element.x + element.width / 2,
-              y: element.y + element.height / 2,
-              strokeColor:
-                element.strokeColor !== "transparent"
-                  ? element.strokeColor
-                  : "black",
-              backgroundColor: "transparent",
-              text: element.link.url,
-              textAlign: "center",
-              verticalAlign: VERTICAL_ALIGN.MIDDLE,
-              angle: element.angle ?? 0,
-            });
+            const label = createPlaceholderiFrameLabel(element);
             renderElement(label, rc, context, renderConfig, appState);
           }
           if (!isExporting) {
@@ -1232,7 +1236,7 @@ export const renderSceneToSvg = (
   // render iFrames on top
   elements
     .filter((el) => isIframeElement(el))
-    .forEach((element, index) => {
+    .forEach((element) => {
       if (!element.isDeleted) {
         try {
           renderElementToSvg(
@@ -1243,6 +1247,40 @@ export const renderSceneToSvg = (
             element.x + offsetX,
             element.y + offsetY,
             exportWithDarkMode,
+          );
+          if (element.type === "rectangle" && element.link?.url) {
+            if (!getBoundTextElement(element)) {
+              const label = createPlaceholderiFrameLabel(element);
+              renderElementToSvg(
+                label,
+                rsvg,
+                svgRoot,
+                files,
+                label.x + offsetX,
+                label.y + offsetY,
+                exportWithDarkMode,
+              );
+            }
+          }
+        } catch (error: any) {
+          console.error(error);
+        }
+      }
+    });
+  elements
+    .filter((el) => el.type === "rectangle" && el.link?.embed)
+    .forEach((element) => {
+      if (!element.isDeleted) {
+        try {
+          renderElementToSvg(
+            { ...element },
+            rsvg,
+            svgRoot,
+            files,
+            element.x + offsetX,
+            element.y + offsetY,
+            exportWithDarkMode,
+            true,
           );
         } catch (error: any) {
           console.error(error);
