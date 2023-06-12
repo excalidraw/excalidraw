@@ -1,4 +1,5 @@
 import { NonDeletedExcalidrawElement } from "../element/types";
+import { isIFrame } from "../utils";
 
 export const hasBackground = (type: string) =>
   type === "rectangle" ||
@@ -62,7 +63,15 @@ export const getElementsAtPosition = (
 ) => {
   // The parameter elements comes ordered from lower z-index to higher.
   // We want to preserve that order on the returned array.
-  return elements.filter(
-    (element) => !element.isDeleted && isAtPositionFn(element),
-  );
+  return elements
+    .filter(
+      (element) =>
+        !element.isDeleted && !isIFrame(element) && isAtPositionFn(element),
+    )
+    .concat(
+      elements.filter(
+        (element) =>
+          !element.isDeleted && isIFrame(element) && isAtPositionFn(element),
+      ),
+    );
 };
