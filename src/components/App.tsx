@@ -5871,53 +5871,58 @@ class App extends React.Component<AppProps, AppState> {
               this.scene.getNonDeletedElements(),
               this.state,
             );
-            let nextElements = updateFrameMembershipOfSelectedElements(
-              this.scene.getElementsIncludingDeleted(),
-              this.state,
-            );
+            let nextElements = this.scene.getElementsIncludingDeleted();
 
             const updateGroupIdsAfterEditingGroup = (
               elements: ExcalidrawElement[],
             ) => {
-              for (const element of elements) {
-                const index = element.groupIds.indexOf(
-                  this.state.editingGroupId!,
-                );
+              if (elements.length > 0) {
+                for (const element of elements) {
+                  const index = element.groupIds.indexOf(
+                    this.state.editingGroupId!,
+                  );
 
-                mutateElement(
-                  element,
-                  {
-                    groupIds: element.groupIds.slice(0, index),
-                  },
-                  false,
-                );
-              }
-
-              nextElements.forEach((element) => {
-                if (
-                  element.groupIds.length &&
-                  getElementsInGroup(
-                    nextElements,
-                    element.groupIds[element.groupIds.length - 1],
-                  ).length < 2
-                ) {
                   mutateElement(
                     element,
                     {
-                      groupIds: [],
+                      groupIds: element.groupIds.slice(0, index),
                     },
                     false,
                   );
                 }
-              });
+
+                nextElements.forEach((element) => {
+                  if (
+                    element.groupIds.length &&
+                    getElementsInGroup(
+                      nextElements,
+                      element.groupIds[element.groupIds.length - 1],
+                    ).length < 2
+                  ) {
+                    mutateElement(
+                      element,
+                      {
+                        groupIds: [],
+                      },
+                      false,
+                    );
+                  }
+                });
+
+                this.setState({
+                  editingGroupId: null,
+                });
+              }
             };
 
             if (
               topLayerFrame &&
               !this.state.selectedElementIds[topLayerFrame.id]
             ) {
-              const elementsToAdd = selectedElements.filter((element) =>
-                isElementInFrame(element, nextElements, this.state),
+              const elementsToAdd = selectedElements.filter(
+                (element) =>
+                  element.frameId !== topLayerFrame.id &&
+                  isElementInFrame(element, nextElements, this.state),
               );
 
               if (this.state.editingGroupId) {
@@ -5933,15 +5938,18 @@ class App extends React.Component<AppProps, AppState> {
               if (this.state.editingGroupId) {
                 const elementsToRemove = selectedElements.filter(
                   (element) =>
+                    element.frameId &&
                     !isElementInFrame(element, nextElements, this.state),
                 );
+
                 updateGroupIdsAfterEditingGroup(elementsToRemove);
               }
             }
 
-            this.setState({
-              editingGroupId: null,
-            });
+            nextElements = updateFrameMembershipOfSelectedElements(
+              this.scene.getElementsIncludingDeleted(),
+              this.state,
+            );
 
             this.scene.replaceAllElements(nextElements);
           }
