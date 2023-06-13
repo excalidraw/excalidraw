@@ -3,7 +3,9 @@ import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 import HotkeyLabel from "./HotkeyLabel";
-
+import { useUIAppState } from "../../context/ui-appState";
+import { THEME } from "../../constants";
+import { BRIGHT_YELLOW } from "../../colors";
 interface CustomColorListProps {
   colors: string[];
   color: string;
@@ -20,8 +22,10 @@ export const CustomColorList = ({
   const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
+  const appState = useUIAppState();
 
   const btnRef = useRef<HTMLButtonElement>(null);
+  const isYellow = '#ffff00'
 
   useEffect(() => {
     if (btnRef.current) {
@@ -32,6 +36,7 @@ export const CustomColorList = ({
   return (
     <div className="color-picker-content--default">
       {colors.map((c, i) => {
+        const styleColor = c === isYellow && appState.theme === THEME.DARK ? BRIGHT_YELLOW : c;
         return (
           <button
             ref={color === c ? btnRef : undefined}
@@ -50,7 +55,7 @@ export const CustomColorList = ({
             }}
             title={c}
             aria-label={label}
-            style={{ "--swatch-color": c }}
+            style={{ "--swatch-color": styleColor }}
             key={i}
           >
             <div className="color-picker__button-outline" />

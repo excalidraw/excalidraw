@@ -167,4 +167,5 @@ export const getAllColorsSpecificShade = (index: 0 | 1 | 2 | 3 | 4) =>
 export const rgbToHex = (r: number, g: number, b: number) =>
   `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 
+export const BRIGHT_YELLOW = "#FF7F00";
 // -----------------------------------------------------------------------------

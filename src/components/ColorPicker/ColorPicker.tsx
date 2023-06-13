@@ -10,7 +10,7 @@ import {
   ColorPickerType,
 } from "./colorPickerUtils";
 import { useDevice, useExcalidrawContainer } from "../App";
-import { ColorTuple, COLOR_PALETTE, ColorPaletteCustom } from "../../colors";
+import { ColorTuple, COLOR_PALETTE, ColorPaletteCustom, BRIGHT_YELLOW } from "../../colors";
 import PickerHeading from "./PickerHeading";
 import { t } from "../../i18n";
 import clsx from "clsx";
@@ -18,7 +18,8 @@ import { jotaiScope } from "../../jotai";
 import { ColorInput } from "./ColorInput";
 import { useRef } from "react";
 import { activeEyeDropperAtom } from "../EyeDropper";
-
+import { useUIAppState } from "../../context/ui-appState";
+import { THEME } from "../../constants";
 import "./ColorPicker.scss";
 
 const isValidColor = (color: string) => {
@@ -219,14 +220,17 @@ const ColorPickerTrigger = ({
   label: string;
   type: ColorPickerType;
 }) => {
+  const appState = useUIAppState();
+  const isYellow = '#ffff00';
+  const styleColor = color === isYellow && appState.theme === THEME.DARK ? BRIGHT_YELLOW : color;
   return (
     <Popover.Trigger
       type="button"
       className={clsx("color-picker__button active-color", {
-        "is-transparent": color === "transparent" || !color,
+        "is-transparent": styleColor === "transparent" || !styleColor,
       })}
       aria-label={label}
-      style={color ? { "--swatch-color": color } : undefined}
+      style={color ? { "--swatch-color": styleColor } : undefined}
       title={
         type === "elementStroke"
           ? t("labels.showStroke")
