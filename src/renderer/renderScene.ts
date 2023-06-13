@@ -62,6 +62,7 @@ import {
   getTextWidth,
 } from "../element/textElement";
 import { newTextElement } from "../element";
+import "./roundRect.polyfill";
 
 export const DEFAULT_SPACING = 2;
 
