@@ -48,21 +48,20 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import { viewportCoordsToSceneCoords, throttleRAF, getFontString } from "../utils";
+import { viewportCoordsToSceneCoords, throttleRAF } from "../utils";
 import { UserIdleState } from "../types";
-import { FONT_FAMILY, THEME_FILTER, VERTICAL_ALIGN } from "../constants";
+import { THEME_FILTER } from "../constants";
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
-import { isLinearElement } from "../element/typeChecks";
-import {
-  getBoundTextElement,
-  getContainerElement,
-  getTextWidth,
-} from "../element/textElement";
-import { newTextElement } from "../element";
+import { isIFrameElement, isLinearElement } from "../element/typeChecks";
+import { getBoundTextElement } from "../element/textElement";
 import "./roundRect.polyfill";
+import {
+  isIFrameOrFrameLabel,
+  createPlaceholderiFrameLabel,
+} from "../element/iframe";
 
 export const DEFAULT_SPACING = 2;
 
@@ -305,39 +304,6 @@ const renderLinearElementPointHighlight = (
   context.restore();
 };
 
-const isIframeElement = (element: NonDeletedExcalidrawElement): Boolean => {
-  if (element.type === "iframe") {
-    return true;
-  }
-  if (element.type === "text") {
-    const container = getContainerElement(element);
-    if (container && container.type === "iframe") {
-      return true;
-    }
-  }
-  return false;
-};
-
-const createPlaceholderiFrameLabel = (
-  element: NonDeletedExcalidrawElement,
-): ExcalidrawElement => {
-  const text = element.link ?? "";
-  const fontSize = element.width/text.length;
-  return newTextElement({
-    x: element.x + element.width / 2,
-    y: element.y + element.height / 2,
-    strokeColor:
-      element.strokeColor !== "transparent" ? element.strokeColor : "black",
-    backgroundColor: "transparent",
-    fontFamily: FONT_FAMILY.Helvetica,
-    fontSize,
-    text,
-    textAlign: "center",
-    verticalAlign: VERTICAL_ALIGN.MIDDLE,
-    angle: element.angle ?? 0,
-  });
-};
-
 export const _renderScene = ({
   elements,
   appState,
@@ -432,7 +398,7 @@ export const _renderScene = ({
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
     visibleElements
-      .filter((el) => !isIframeElement(el))
+      .filter((el) => !isIFrameOrFrameLabel(el))
       .forEach((element) => {
         try {
           renderElement(element, rc, context, renderConfig, appState);
@@ -455,7 +421,7 @@ export const _renderScene = ({
 
     // render iFrames on top
     visibleElements
-      .filter((el) => isIframeElement(el))
+      .filter((el) => isIFrameOrFrameLabel(el))
       .forEach((element) => {
         try {
           renderElement(element, rc, context, renderConfig, appState);
@@ -1217,8 +1183,8 @@ export const renderSceneToSvg = (
   }
   // render elements
   elements
-    .filter((el) => !isIframeElement(el))
-    .forEach((element, index) => {
+    .filter((el) => !isIFrameOrFrameLabel(el))
+    .forEach((element) => {
       if (!element.isDeleted) {
         try {
           renderElementToSvg(
@@ -1238,7 +1204,7 @@ export const renderSceneToSvg = (
 
   // render iFrames on top
   elements
-    .filter((el) => isIframeElement(el))
+    .filter((el) => isIFrameElement(el))
     .forEach((element) => {
       if (!element.isDeleted) {
         try {
@@ -1250,40 +1216,6 @@ export const renderSceneToSvg = (
             element.x + offsetX,
             element.y + offsetY,
             exportWithDarkMode,
-          );
-          if (element.type === "iframe") {
-            if (!getBoundTextElement(element)) {
-              const label = createPlaceholderiFrameLabel(element);
-              renderElementToSvg(
-                label,
-                rsvg,
-                svgRoot,
-                files,
-                label.x + offsetX,
-                label.y + offsetY,
-                exportWithDarkMode,
-              );
-            }
-          }
-        } catch (error: any) {
-          console.error(error);
-        }
-      }
-    });
-  elements
-    .filter((el) => el.type === "iframe")
-    .forEach((element) => {
-      if (!element.isDeleted) {
-        try {
-          renderElementToSvg(
-            { ...element },
-            rsvg,
-            svgRoot,
-            files,
-            element.x + offsetX,
-            element.y + offsetY,
-            exportWithDarkMode,
-            true,
           );
         } catch (error: any) {
           console.error(error);

@@ -1,12 +1,11 @@
 import { AppState, ExcalidrawProps, Point, UIAppState } from "../types";
 import {
   getShortcutKey,
-  getEmbedLink,
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
   wrapEvent,
-  isURLOnWhiteList,
 } from "../utils";
+import { getEmbedLink, isURLOnWhiteList } from "./iframe";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
 

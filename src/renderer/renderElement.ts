@@ -49,6 +49,7 @@ import {
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { createPlaceholderiFrameLabel } from "../element/iframe";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -393,7 +394,6 @@ export const invalidateShapeForElement = (element: ExcalidrawElement) =>
 export const generateRoughOptions = (
   element: ExcalidrawElement,
   continuousPath = false,
-  isIFrame: boolean = false,
 ): Options => {
   const options: Options = {
     seed: element.seed,
@@ -432,13 +432,9 @@ export const generateRoughOptions = (
         element.backgroundColor === "transparent"
           ? undefined
           : element.backgroundColor;
-      if (isIFrameElement(element) && !options.fill && !isIFrame) {
+      if (isIFrameElement(element) && !options.fill) {
         options.fill = "gray";
         options.fillStyle = "solid";
-      }
-      if (isIFrame) {
-        options.fill = "transparent";
-        options.stroke = "transparent";
       }
       if (element.type === "ellipse") {
         options.curveFitting = 1;
@@ -472,7 +468,6 @@ export const generateRoughOptions = (
 const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
-  isIFrame: boolean = false,
 ) => {
   let shape = shapeCache.get(element);
 
@@ -494,7 +489,7 @@ const generateElementShape = (
             } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
               h - r
             } L 0 ${r} Q 0 0, ${r} 0`,
-            generateRoughOptions(element, true, isIFrame),
+            generateRoughOptions(element, true),
           );
         } else {
           shape = generator.rectangle(
@@ -1132,6 +1127,7 @@ export const renderElementToSvg = (
   exportWithDarkMode?: boolean,
   isIFrame: boolean = false,
 ) => {
+  const offset = { x: offsetX, y: offsetY };
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   let cx = (x2 - x1) / 2 - (element.x - x1);
   let cy = (y2 - y1) / 2 - (element.y - y1);
@@ -1173,7 +1169,7 @@ export const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      generateElementShape(element, generator, isIFrame);
+      generateElementShape(element, generator);
       const node = roughSVGDrawWithPrecision(
         rsvg,
         getShapeForElement(element)!,
@@ -1195,7 +1191,8 @@ export const renderElementToSvg = (
       break;
     }
     case "iframe": {
-      generateElementShape(element, generator, isIFrame);
+      // render placeholder rectangle
+      generateElementShape(element, generator);
       const node = roughSVGDrawWithPrecision(
         rsvg,
         getShapeForElement(element)!,
@@ -1213,36 +1210,65 @@ export const renderElementToSvg = (
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
-      if (isIFrame) {
-        const radius = getCornerRadius(
-          Math.min(element.width, element.height),
-          element,
-        );
-        const foreignObject = svgRoot.ownerDocument!.createElementNS(
-          SVG_NS,
-          "foreignObject",
-        );
-        foreignObject.style.width = `${element.width}px`;
-        foreignObject.style.height = `${element.height}px`;
-        foreignObject.style.border = "none";
-        const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
-        div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-        div.style.width = "100%";
-        div.style.height = "100%";
-        const iframe = div.ownerDocument!.createElement("iframe");
-        iframe.src = element.link ?? "";
-        iframe.style.width = "100%";
-        iframe.style.height = "100%";
-        iframe.style.border = "none";
-        iframe.style.borderRadius = `${radius}px`;
-        iframe.style.top = "0";
-        iframe.style.left = "0";
-        iframe.allowFullscreen = true;
-        div.appendChild(iframe);
-        foreignObject.appendChild(div);
-        node.appendChild(foreignObject);
-      }
       root.appendChild(node);
+
+      // render iframe ALT label
+      const label: ExcalidrawElement =
+        getBoundTextElement(element) ?? createPlaceholderiFrameLabel(element);
+      renderElementToSvg(
+        label,
+        rsvg,
+        root,
+        files,
+        label.x + offset.x - element.x,
+        label.y + offset.y - element.y,
+        exportWithDarkMode,
+      );
+
+      // render iframe
+      const iframeNode = roughSVGDrawWithPrecision(
+        rsvg,
+        getShapeForElement(element)!,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
+      iframeNode.setAttribute("stroke-linecap", "round");
+      iframeNode.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      while (iframeNode.firstChild) {
+        iframeNode.removeChild(iframeNode.firstChild);
+      }
+      const radius = getCornerRadius(
+        Math.min(element.width, element.height),
+        element,
+      );
+      const foreignObject = svgRoot.ownerDocument!.createElementNS(
+        SVG_NS,
+        "foreignObject",
+      );
+      foreignObject.style.width = `${element.width}px`;
+      foreignObject.style.height = `${element.height}px`;
+      foreignObject.style.border = "none";
+      const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
+      div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+      div.style.width = "100%";
+      div.style.height = "100%";
+      const iframe = div.ownerDocument!.createElement("iframe");
+      iframe.src = element.link ?? "";
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.border = "none";
+      iframe.style.borderRadius = `${radius}px`;
+      iframe.style.top = "0";
+      iframe.style.left = "0";
+      iframe.allowFullscreen = true;
+      div.appendChild(iframe);
+      foreignObject.appendChild(div);
+      iframeNode.appendChild(foreignObject);
+      root.appendChild(iframeNode);
       break;
     }
     case "line":

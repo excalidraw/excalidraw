@@ -246,9 +246,8 @@ import {
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
-  getEmbedLink,
-  isURLOnWhiteList,
 } from "../utils";
+import { getEmbedLink, isURLOnWhiteList } from "../element/iframe";
 import {
   ContextMenu,
   ContextMenuItems,
