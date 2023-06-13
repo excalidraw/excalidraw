@@ -56,6 +56,7 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
+import "./roundRect.polyfill";
 
 export const DEFAULT_SPACING = 2;
 
