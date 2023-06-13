@@ -569,10 +569,23 @@ export const updateFrameMembershipOfSelectedElements = (
   appState: AppState,
 ) => {
   const selectedElements = getSelectedElements(allElements, appState);
+  const elementsToFilter = new Set<ExcalidrawElement>(selectedElements);
+
+  if (appState.editingGroupId) {
+    for (const element of selectedElements) {
+      if (element.groupIds.length === 0) {
+        elementsToFilter.add(element);
+      } else {
+        element.groupIds
+          .flatMap((gid) => getElementsInGroup(allElements, gid))
+          .forEach((element) => elementsToFilter.add(element));
+      }
+    }
+  }
 
   const elementsToRemove = new Set<ExcalidrawElement>();
 
-  selectedElements.forEach((element) => {
+  elementsToFilter.forEach((element) => {
     if (
       !isFrameElement(element) &&
       !isElementInFrame(element, allElements, appState)
@@ -647,16 +660,30 @@ export const isElementInFrame = (
       return elementOverlapsWithFrame(_element, frame);
     }
 
-    const allElementsInGroup = element.groupIds.flatMap((gid) =>
-      getElementsInGroup(allElements, gid),
+    const allElementsInGroup = new Set(
+      element.groupIds.flatMap((gid) => getElementsInGroup(allElements, gid)),
     );
 
-    if (
-      allElementsInGroup.some((elementInGroup) =>
-        isFrameElement(elementInGroup),
-      )
-    ) {
-      return false;
+    if (appState.editingGroupId && appState.selectedElementsAreBeingDragged) {
+      const selectedElements = new Set(
+        getSelectedElements(allElements, appState),
+      );
+
+      const editingGroupOverlapsFrame = appState.frameToHighlight !== null;
+
+      if (editingGroupOverlapsFrame) {
+        return true;
+      }
+
+      selectedElements.forEach((selectedElement) => {
+        allElementsInGroup.delete(selectedElement);
+      });
+    }
+
+    for (const elementInGroup of allElementsInGroup) {
+      if (isFrameElement(elementInGroup)) {
+        return false;
+      }
     }
 
     for (const elementInGroup of allElementsInGroup) {

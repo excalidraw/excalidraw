@@ -5893,6 +5893,45 @@ class App extends React.Component<AppProps, AppState> {
                 elementsToAdd,
                 topLayerFrame,
               );
+            } else if (!topLayerFrame) {
+              // update group id
+              if (this.state.editingGroupId) {
+                const elementsToRemoveFromFrame = selectedElements.filter(
+                  (element) =>
+                    !isElementInFrame(element, nextElements, this.state),
+                );
+
+                const groupIdsToCheck = new Set<string>();
+
+                elementsToRemoveFromFrame.forEach((element) => {
+                  const index = element.groupIds.indexOf(
+                    this.state.editingGroupId!,
+                  );
+
+                  const removedGroupIds = element.groupIds.slice(index);
+                  removedGroupIds.forEach((gid) => groupIdsToCheck.add(gid));
+
+                  mutateElement(element, {
+                    groupIds: element.groupIds.slice(0, index),
+                  });
+                });
+
+                groupIdsToCheck.forEach((gid) => {
+                  const elementsInGroup = getElementsInGroup(
+                    this.scene.getNonDeletedElements(),
+                    gid,
+                  );
+
+                  elementsInGroup.forEach((element) => {
+                    if (element.frameId) {
+                      const frame = getContainingFrame(element);
+                      if (frame && !elementOverlapsWithFrame(element, frame)) {
+                        elementsToRemoveFromFrame.push(element);
+                      }
+                    }
+                  });
+                });
+              }
             }
 
             this.scene.replaceAllElements(nextElements);
