@@ -140,10 +140,7 @@ const restoreElementWithProperties = <
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
-    link:
-      typeof element.link === "string"
-        ? { url: element.link, embed: false }
-        : element.link ?? null,
+    link: element.link ?? null,
     locked: element.locked ?? false,
   };
 
@@ -272,6 +269,7 @@ const restoreElement = (
     case "ellipse":
       return restoreElementWithProperties(element, {});
     case "rectangle":
+    case "iframe":
       return restoreElementWithProperties(element, {});
     case "diamond":
       return restoreElementWithProperties(element, {});

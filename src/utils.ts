@@ -10,12 +10,7 @@ import {
   THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import {
-  ExcalidrawElement,
-  ExcalidrawGenericElement,
-  FontFamilyValues,
-  FontString,
-} from "./element/types";
+import { FontFamilyValues, FontString } from "./element/types";
 import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
@@ -910,7 +905,3 @@ export const isURLOnWhiteList = (
       url.match(EXCALIDRAW_REG),
   );
 };
-
-export const isIFrame = (
-  element: ExcalidrawGenericElement | ExcalidrawElement,
-): boolean => Boolean(element?.link?.embed);

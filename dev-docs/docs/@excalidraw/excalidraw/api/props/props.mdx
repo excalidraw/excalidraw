@@ -149,7 +149,7 @@ const history = useHistory();
 // a new tab/window
 const onLinkOpen: ExcalidrawProps["onLinkOpen"] = useCallback(
   (element, event) => {
-    const link = element.link?.url;
+    const link = element.link;
     const { nativeEvent } = event.detail;
     const isNewTab = nativeEvent.ctrlKey || nativeEvent.metaKey;
     const isNewWindow = nativeEvent.shiftKey;

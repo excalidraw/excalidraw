@@ -15,6 +15,7 @@ import {
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
+  isIFrameElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -256,6 +257,7 @@ const drawElementOnCanvas = (
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
     case "rectangle":
+    case "iframe":
     case "diamond":
     case "ellipse": {
       context.lineJoin = "round";
@@ -422,6 +424,7 @@ export const generateRoughOptions = (
 
   switch (element.type) {
     case "rectangle":
+    case "iframe":
     case "diamond":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
@@ -429,13 +432,7 @@ export const generateRoughOptions = (
         element.backgroundColor === "transparent"
           ? undefined
           : element.backgroundColor;
-      if (
-        element.type === "rectangle" &&
-        element.link &&
-        element.link.embed &&
-        !options.fill &&
-        !isIFrame
-      ) {
+      if (isIFrameElement(element) && !options.fill && !isIFrame) {
         options.fill = "gray";
         options.fillStyle = "solid";
       }
@@ -486,6 +483,7 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
+      case "iframe":
         if (element.roundness) {
           const w = element.width;
           const h = element.height;
@@ -965,7 +963,8 @@ export const renderElement = (
     case "line":
     case "arrow":
     case "image":
-    case "text": {
+    case "text":
+    case "iframe": {
       generateElementShape(element, generator);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -1158,9 +1157,9 @@ export const renderElementToSvg = (
   let root = svgRoot;
 
   // if the element has a link, create an anchor tag and make that the new root
-  if (element.link?.url) {
+  if (element.link) {
     const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
-    anchorTag.setAttribute("href", element.link.url);
+    anchorTag.setAttribute("href", element.link);
     root.appendChild(anchorTag);
     root = anchorTag;
   }
@@ -1174,6 +1173,28 @@ export const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
+      generateElementShape(element, generator, isIFrame);
+      const node = roughSVGDrawWithPrecision(
+        rsvg,
+        getShapeForElement(element)!,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
+      const opacity = element.opacity / 100;
+      if (opacity !== 1) {
+        node.setAttribute("stroke-opacity", `${opacity}`);
+        node.setAttribute("fill-opacity", `${opacity}`);
+      }
+      node.setAttribute("stroke-linecap", "round");
+      node.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      root.appendChild(node);
+      break;
+    }
+    case "iframe": {
       generateElementShape(element, generator, isIFrame);
       const node = roughSVGDrawWithPrecision(
         rsvg,
@@ -1209,7 +1230,7 @@ export const renderElementToSvg = (
         div.style.width = "100%";
         div.style.height = "100%";
         const iframe = div.ownerDocument!.createElement("iframe");
-        iframe.src = element.link?.url ?? "";
+        iframe.src = element.link ?? "";
         iframe.style.width = "100%";
         iframe.style.height = "100%";
         iframe.style.border = "none";

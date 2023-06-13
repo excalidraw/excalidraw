@@ -231,7 +231,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
       }>,
     ) => {
-      const link = element.link?.url!;
+      const link = element.link!;
       const { nativeEvent } = event.detail;
       const isNewTab = nativeEvent.ctrlKey || nativeEvent.metaKey;
       const isNewWindow = nativeEvent.shiftKey;

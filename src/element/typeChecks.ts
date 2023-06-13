@@ -4,6 +4,7 @@ import { MarkNonNullable } from "../utility-types";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
+  ExcalidrawIFrameElement,
   ExcalidrawLinearElement,
   ExcalidrawBindableElement,
   ExcalidrawGenericElement,
@@ -23,7 +24,8 @@ export const isGenericElement = (
     (element.type === "selection" ||
       element.type === "rectangle" ||
       element.type === "diamond" ||
-      element.type === "ellipse")
+      element.type === "ellipse" ||
+      element.type === "iframe")
   );
 };
 
@@ -37,6 +39,12 @@ export const isImageElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawImageElement => {
   return !!element && element.type === "image";
+};
+
+export const isIFrameElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawIFrameElement => {
+  return !!element && element.type === "iframe";
 };
 
 export const isTextElement = (
@@ -70,7 +78,7 @@ export const isArrowElement = (
 };
 
 export const isLinearElementType = (
-  elementType: AppState["activeTool"]["type"],
+  elementType: AppState["activeTool"]["type"] | "iframe",
 ): boolean => {
   return (
     elementType === "arrow" || elementType === "line" // || elementType === "freedraw"
@@ -89,7 +97,7 @@ export const isBindingElement = (
 };
 
 export const isBindingElementType = (
-  elementType: AppState["activeTool"]["type"],
+  elementType: AppState["activeTool"]["type"] | "iframe",
 ): boolean => {
   return elementType === "arrow";
 };
@@ -105,6 +113,7 @@ export const isBindableElement = (
       element.type === "diamond" ||
       element.type === "ellipse" ||
       element.type === "image" ||
+      element.type === "iframe" ||
       (element.type === "text" && !element.containerId))
   );
 };
@@ -120,6 +129,7 @@ export const isTextBindableContainer = (
       element.type === "diamond" ||
       element.type === "ellipse" ||
       element.type === "image" ||
+      element.type === "iframe" ||
       isArrowElement(element))
   );
 };
@@ -129,6 +139,7 @@ export const isExcalidrawElement = (element: any): boolean => {
     element?.type === "text" ||
     element?.type === "diamond" ||
     element?.type === "rectangle" ||
+    element?.type === "iframe" ||
     element?.type === "ellipse" ||
     element?.type === "arrow" ||
     element?.type === "freedraw" ||

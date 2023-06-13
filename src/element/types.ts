@@ -62,10 +62,7 @@ type _ExcalidrawElementBase = Readonly<{
     | null;
   /** epoch (ms) timestamp of last element update */
   updated: number;
-  link: {
-    url: string | null;
-    embed?: boolean | null;
-  } | null;
+  link: string | null;
   locked: boolean;
   customData?: Record<string, any>;
 }>;
@@ -85,6 +82,11 @@ export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
 export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
   type: "ellipse";
 };
+
+export type ExcalidrawIFrameElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "iframe";
+  }>;
 
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
   Readonly<{
@@ -108,7 +110,8 @@ export type ExcalidrawGenericElement =
   | ExcalidrawSelectionElement
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
-  | ExcalidrawEllipseElement;
+  | ExcalidrawEllipseElement
+  | ExcalidrawIFrameElement;
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
@@ -151,14 +154,16 @@ export type ExcalidrawBindableElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawIFrameElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawImageElement
-  | ExcalidrawArrowElement;
+  | ExcalidrawArrowElement
+  | ExcalidrawIFrameElement;
 
 export type ExcalidrawTextElementWithContainer = {
   containerId: ExcalidrawTextContainer["id"];

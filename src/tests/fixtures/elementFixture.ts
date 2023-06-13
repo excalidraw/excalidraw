@@ -41,5 +41,5 @@ export const diamondFixture: ExcalidrawElement = {
 export const rectangleWithLinkFixture: ExcalidrawElement = {
   ...elementBase,
   type: "rectangle",
-  link: { url: "excalidraw.com" },
+  link: "excalidraw.com",
 };

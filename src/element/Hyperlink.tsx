@@ -40,6 +40,7 @@ import { getElementAbsoluteCoords } from "./";
 import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
 import { useExcalidrawAppState } from "../components/App";
+import { isIFrameElement } from "./typeChecks";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -71,7 +72,7 @@ export const Hyperlink = ({
 }) => {
   const appState = useExcalidrawAppState();
 
-  const linkVal = element.link?.url || "";
+  const linkVal = element.link || "";
 
   const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -88,7 +89,7 @@ export const Hyperlink = ({
       trackEvent("hyperlink", "create");
     }
 
-    mutateElement(element, { link: { url: link, embed: element.link?.embed } });
+    mutateElement(element, { link });
     setAppState({ showHyperlinkPopup: "info" });
   }, [element, setAppState]);
 
@@ -128,30 +129,32 @@ export const Hyperlink = ({
 
   const handleEmbed = useCallback(() => {
     trackEvent("hyperlink", "embed");
-    if (!element.link || !element.link.url) {
+    if (!element.link) {
       return;
     }
 
-    if (element.link.embed) {
+    if (element.type === "iframe") {
       mutateElement(element, {
-        link: { url: element.link.url, embed: !element.link.embed },
+        //@ts-ignore
+        type: "rectangle",
       });
       return;
     }
 
-    if (!isURLOnWhiteList(element.link?.url, iframeURLWhitelist)) {
+    if (!isURLOnWhiteList(element.link, iframeURLWhitelist)) {
       setToast({ message: t("toast.unableToEmbed"), closable: true });
       return;
     }
 
     const { width, height } = element;
-    const embedLink = getEmbedLink(element.link.url);
+    const embedLink = getEmbedLink(element.link);
     const ar = embedLink
       ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
       : 1;
 
     mutateElement(element, {
-      link: { url: element.link.url, embed: !element.link.embed },
+      //@ts-ignore
+      type: "iframe",
       width:
         embedLink?.type === "video"
           ? width > height
@@ -220,13 +223,13 @@ export const Hyperlink = ({
         />
       ) : (
         <a
-          href={element.link?.url || ""}
+          href={element.link || ""}
           className={clsx("excalidraw-hyperlinkContainer-link", {
             "d-none": isEditing,
           })}
-          target={isLocalLink(element.link?.url) ? "_self" : "_blank"}
+          target={isLocalLink(element.link) ? "_self" : "_blank"}
           onClick={(event) => {
-            if (element.link?.url && onLinkOpen) {
+            if (element.link && onLinkOpen) {
               const customEvent = wrapEvent(
                 EVENT.EXCALIDRAW_LINK,
                 event.nativeEvent,
@@ -239,7 +242,7 @@ export const Hyperlink = ({
           }}
           rel="noopener noreferrer"
         >
-          {element.link?.url}
+          {element.link}
         </a>
       )}
       <div className="excalidraw-hyperlinkContainer__buttons">
@@ -254,13 +257,14 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
-        {linkVal && element.type === "rectangle" && (
+        {((linkVal && element.type === "rectangle") ||
+          isIFrameElement(element)) && (
           <ToolButton
             type="radio"
             title={t("buttons.embed")}
             aria-label={t("buttons.embed")}
             label={t("buttons.embed")}
-            checked={element.link?.embed ?? false}
+            checked={isIFrameElement(element)}
             onPointerDown={handleEmbed}
             className="excalidraw-hyperlinkContainer--embed"
             icon={EmbedIcon}
@@ -462,7 +466,7 @@ const renderTooltip = (
 
   tooltipDiv.classList.add("excalidraw-tooltip--visible");
   tooltipDiv.style.maxWidth = "20rem";
-  tooltipDiv.textContent = element.link?.url;
+  tooltipDiv.textContent = element.link;
 
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
 

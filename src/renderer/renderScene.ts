@@ -48,9 +48,9 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import { viewportCoordsToSceneCoords, throttleRAF } from "../utils";
+import { viewportCoordsToSceneCoords, throttleRAF, getFontString } from "../utils";
 import { UserIdleState } from "../types";
-import { THEME_FILTER, VERTICAL_ALIGN } from "../constants";
+import { FONT_FAMILY, THEME_FILTER, VERTICAL_ALIGN } from "../constants";
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
@@ -59,6 +59,7 @@ import { isLinearElement } from "../element/typeChecks";
 import {
   getBoundTextElement,
   getContainerElement,
+  getTextWidth,
 } from "../element/textElement";
 import { newTextElement } from "../element";
 
@@ -304,17 +305,12 @@ const renderLinearElementPointHighlight = (
 };
 
 const isIframeElement = (element: NonDeletedExcalidrawElement): Boolean => {
-  if (element.type === "rectangle" && element.link && element.link.embed) {
+  if (element.type === "iframe") {
     return true;
   }
   if (element.type === "text") {
     const container = getContainerElement(element);
-    if (
-      container &&
-      container.type === "rectangle" &&
-      container.link &&
-      container.link.embed
-    ) {
+    if (container && container.type === "iframe") {
       return true;
     }
   }
@@ -324,13 +320,17 @@ const isIframeElement = (element: NonDeletedExcalidrawElement): Boolean => {
 const createPlaceholderiFrameLabel = (
   element: NonDeletedExcalidrawElement,
 ): ExcalidrawElement => {
+  const text = element.link ?? "";
+  const fontSize = element.width/text.length;
   return newTextElement({
     x: element.x + element.width / 2,
     y: element.y + element.height / 2,
     strokeColor:
       element.strokeColor !== "transparent" ? element.strokeColor : "black",
     backgroundColor: "transparent",
-    text: element.link?.url ?? "",
+    fontFamily: FONT_FAMILY.Helvetica,
+    fontSize,
+    text,
     textAlign: "center",
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     angle: element.angle ?? 0,
@@ -460,8 +460,7 @@ export const _renderScene = ({
           renderElement(element, rc, context, renderConfig, appState);
           if (
             isExporting &&
-            element.type === "rectangle" &&
-            element.link?.url &&
+            element.type === "iframe" &&
             !getBoundTextElement(element)
           ) {
             const label = createPlaceholderiFrameLabel(element);
@@ -1041,6 +1040,7 @@ const renderBindingHighlightForBindableElement = (
     case "rectangle":
     case "text":
     case "image":
+    case "iframe":
       strokeRectWithRotation(
         context,
         x1 - padding,
@@ -1110,7 +1110,7 @@ const renderLinkIcon = (
   context: CanvasRenderingContext2D,
   appState: AppState,
 ) => {
-  if (element.link?.url && !appState.selectedElementIds[element.id]) {
+  if (element.link && !appState.selectedElementIds[element.id]) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const [x, y, width, height] = getLinkHandleFromCoords(
       [x1, y1, x2, y2],
@@ -1250,7 +1250,7 @@ export const renderSceneToSvg = (
             element.y + offsetY,
             exportWithDarkMode,
           );
-          if (element.type === "rectangle" && element.link?.url) {
+          if (element.type === "iframe") {
             if (!getBoundTextElement(element)) {
               const label = createPlaceholderiFrameLabel(element);
               renderElementToSvg(
@@ -1270,7 +1270,7 @@ export const renderSceneToSvg = (
       }
     });
   elements
-    .filter((el) => el.type === "rectangle" && el.link?.embed)
+    .filter((el) => el.type === "iframe")
     .forEach((element) => {
       if (!element.isDeleted) {
         try {

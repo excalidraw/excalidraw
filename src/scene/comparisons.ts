@@ -1,8 +1,9 @@
+import { isIFrameElement } from "../element/typeChecks";
 import { NonDeletedExcalidrawElement } from "../element/types";
-import { isIFrame } from "../utils";
 
 export const hasBackground = (type: string) =>
   type === "rectangle" ||
+  type === "iframe" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "line" ||
@@ -12,6 +13,7 @@ export const hasStrokeColor = (type: string) => type !== "image";
 
 export const hasStrokeWidth = (type: string) =>
   type === "rectangle" ||
+  type === "iframe" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "freedraw" ||
@@ -20,6 +22,7 @@ export const hasStrokeWidth = (type: string) =>
 
 export const hasStrokeStyle = (type: string) =>
   type === "rectangle" ||
+  type === "iframe" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "arrow" ||
@@ -27,6 +30,7 @@ export const hasStrokeStyle = (type: string) =>
 
 export const canChangeRoundness = (type: string) =>
   type === "rectangle" ||
+  type === "iframe" ||
   type === "arrow" ||
   type === "line" ||
   type === "diamond";
@@ -66,12 +70,16 @@ export const getElementsAtPosition = (
   return elements
     .filter(
       (element) =>
-        !element.isDeleted && !isIFrame(element) && isAtPositionFn(element),
+        !element.isDeleted &&
+        !isIFrameElement(element) &&
+        isAtPositionFn(element),
     )
     .concat(
       elements.filter(
         (element) =>
-          !element.isDeleted && isIFrame(element) && isAtPositionFn(element),
+          !element.isDeleted &&
+          isIFrameElement(element) &&
+          isAtPositionFn(element),
       ),
     );
 };

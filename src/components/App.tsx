@@ -142,6 +142,7 @@ import {
   isBindingElementType,
   isBoundToContainer,
   isImageElement,
+  isIFrameElement,
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
@@ -246,7 +247,6 @@ import {
   easeToValuesRAF,
   muteFSAbortError,
   getEmbedLink,
-  isIFrame,
   isURLOnWhiteList,
 } from "../utils";
 import {
@@ -643,14 +643,14 @@ class App extends React.Component<AppProps, AppState> {
       <>
         {this.scene
           .getNonDeletedElements()
-          .filter((el) => el.type === "rectangle" && el.link && el.link.embed)
+          .filter((el) => isIFrameElement(el))
           .map((el) => {
             const { x, y } = sceneCoordsToViewportCoords(
               { sceneX: el.x, sceneY: el.y },
               this.state,
             );
 
-            const embedLink = getEmbedLink(el.link?.url);
+            const embedLink = getEmbedLink(el.link);
             const src = embedLink?.link ?? "";
             const isVisible = isVisibleElement(
               el,
@@ -3241,7 +3241,7 @@ class App extends React.Component<AppProps, AppState> {
           sceneY = midPoint.y;
         }
       }
-      if (isIFrame(container as ExcalidrawGenericElement)) {
+      if (isIFrameElement(container as ExcalidrawGenericElement)) {
         this.setState({
           activeIFrameElement: container,
         });
@@ -3270,7 +3270,7 @@ class App extends React.Component<AppProps, AppState> {
         hitElementIndex = index;
       }
       return (
-        element.link?.url &&
+        element.link &&
         index <= hitElementIndex &&
         isPointHittingLinkIcon(
           element,
@@ -3321,7 +3321,7 @@ class App extends React.Component<AppProps, AppState> {
       this.device.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
-      const url = this.hitLinkElement.link?.url;
+      const url = this.hitLinkElement.link;
       if (url) {
         let customEvent;
         if (this.props.onLinkOpen) {
@@ -3636,7 +3636,7 @@ class App extends React.Component<AppProps, AppState> {
       hideHyperlinkToolip();
       if (
         hitElement &&
-        hitElement.link?.url &&
+        hitElement.link &&
         this.state.selectedElementIds[hitElement.id] &&
         !this.state.contextMenu &&
         !this.state.showHyperlinkPopup
@@ -4546,7 +4546,7 @@ class App extends React.Component<AppProps, AppState> {
                       ...prevState.selectedElementIds,
                       [hitElement.id]: true,
                     },
-                    showHyperlinkPopup: hitElement.link?.url ? "info" : false,
+                    showHyperlinkPopup: hitElement.link ? "info" : false,
                   },
                   this.scene.getNonDeletedElements(),
                 );
@@ -4710,7 +4710,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const element = newElement({
-      type: "rectangle",
+      type: "iframe",
       x: gridX,
       y: gridY,
       strokeColor: this.state.currentItemStrokeColor,
@@ -4724,10 +4724,7 @@ class App extends React.Component<AppProps, AppState> {
       locked: false,
       width: embedLink.aspectRatio.w,
       height: embedLink.aspectRatio.h,
-      link: {
-        url: embedLink.link,
-        embed: true,
-      },
+      link: embedLink.link,
     });
 
     this.scene.replaceAllElements([
@@ -4879,7 +4876,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private getCurrentItemRoundness(
-    elementType: "selection" | "rectangle" | "diamond" | "ellipse",
+    elementType: "selection" | "rectangle" | "diamond" | "ellipse" | "iframe",
   ) {
     return this.state.currentItemRoundness === "round"
       ? {
