@@ -5877,6 +5877,42 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
             );
 
+            const updateGroupIdsAfterEditingGroup = (
+              elements: ExcalidrawElement[],
+            ) => {
+              for (const element of elements) {
+                const index = element.groupIds.indexOf(
+                  this.state.editingGroupId!,
+                );
+
+                mutateElement(
+                  element,
+                  {
+                    groupIds: element.groupIds.slice(0, index),
+                  },
+                  false,
+                );
+              }
+
+              nextElements.forEach((element) => {
+                if (
+                  element.groupIds.length &&
+                  getElementsInGroup(
+                    nextElements,
+                    element.groupIds[element.groupIds.length - 1],
+                  ).length < 2
+                ) {
+                  mutateElement(
+                    element,
+                    {
+                      groupIds: [],
+                    },
+                    false,
+                  );
+                }
+              });
+            };
+
             if (
               topLayerFrame &&
               !this.state.selectedElementIds[topLayerFrame.id]
@@ -5888,51 +5924,28 @@ class App extends React.Component<AppProps, AppState> {
                 isElementInFrame(element, nextElements, this.state),
               );
 
+              if (this.state.editingGroupId) {
+                updateGroupIdsAfterEditingGroup(elementsToAdd);
+              }
+
               nextElements = addElementsToFrame(
                 nextElements,
                 elementsToAdd,
                 topLayerFrame,
               );
             } else if (!topLayerFrame) {
-              // update group id
               if (this.state.editingGroupId) {
-                const elementsToRemoveFromFrame = selectedElements.filter(
+                const elementsToRemove = selectedElements.filter(
                   (element) =>
                     !isElementInFrame(element, nextElements, this.state),
                 );
-
-                const groupIdsToCheck = new Set<string>();
-
-                elementsToRemoveFromFrame.forEach((element) => {
-                  const index = element.groupIds.indexOf(
-                    this.state.editingGroupId!,
-                  );
-
-                  const removedGroupIds = element.groupIds.slice(index);
-                  removedGroupIds.forEach((gid) => groupIdsToCheck.add(gid));
-
-                  mutateElement(element, {
-                    groupIds: element.groupIds.slice(0, index),
-                  });
-                });
-
-                groupIdsToCheck.forEach((gid) => {
-                  const elementsInGroup = getElementsInGroup(
-                    this.scene.getNonDeletedElements(),
-                    gid,
-                  );
-
-                  elementsInGroup.forEach((element) => {
-                    if (element.frameId) {
-                      const frame = getContainingFrame(element);
-                      if (frame && !elementOverlapsWithFrame(element, frame)) {
-                        elementsToRemoveFromFrame.push(element);
-                      }
-                    }
-                  });
-                });
+                updateGroupIdsAfterEditingGroup(elementsToRemove);
               }
             }
+
+            this.setState({
+              editingGroupId: null,
+            });
 
             this.scene.replaceAllElements(nextElements);
           }
