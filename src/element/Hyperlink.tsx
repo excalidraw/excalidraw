@@ -54,6 +54,8 @@ EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
 
 let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
 
+const iframeLinkCache = new Map<string, string>();
+
 export const Hyperlink = ({
   element,
   setAppState,
@@ -129,10 +131,14 @@ export const Hyperlink = ({
   const handleEmbed = useCallback(() => {
     trackEvent("hyperlink", "embed");
     if (!element.link) {
+      if (iframeLinkCache.has(element.id)) {
+        iframeLinkCache.delete(element.id);
+      }
       return;
     }
 
     if (isIFrameElement(element)) {
+      iframeLinkCache.set(element.id, element.link);
       mutateElement(element, {
         //@ts-ignore
         type: "rectangle",
@@ -150,23 +156,30 @@ export const Hyperlink = ({
     const ar = embedLink
       ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
       : 1;
-
+    const hasLinkChanged = iframeLinkCache.get(element.id) !== element.link;
     mutateElement(element, {
       //@ts-ignore
       type: "iframe",
-      width:
-        embedLink?.type === "video"
-          ? width > height
-            ? width
-            : height * ar
-          : width,
-      height:
-        embedLink?.type === "video"
-          ? width > height
-            ? width / ar
-            : height
-          : height,
+      ...(hasLinkChanged
+        ? {
+            width:
+              embedLink?.type === "video"
+                ? width > height
+                  ? width
+                  : height * ar
+                : width,
+            height:
+              embedLink?.type === "video"
+                ? width > height
+                  ? width / ar
+                  : height
+                : height,
+          }
+        : {}),
     });
+    if (iframeLinkCache.has(element.id)) {
+      iframeLinkCache.delete(element.id);
+    }
   }, [element, iframeURLWhitelist, setToast]);
 
   const handleRemove = useCallback(() => {
