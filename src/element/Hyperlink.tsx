@@ -27,7 +27,10 @@ import {
 } from "react";
 import clsx from "clsx";
 import { KEYS } from "../keys";
-import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
+import {
+  DEFAULT_LINK_SIZE,
+  invalidateShapeForElement,
+} from "../renderer/renderElement";
 import { rotate } from "../math";
 import { EVENT, HYPERLINK_TOOLTIP_DELAY, MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
@@ -143,6 +146,7 @@ export const Hyperlink = ({
         //@ts-ignore
         type: "rectangle",
       });
+      invalidateShapeForElement(element);
       return;
     }
 
@@ -177,6 +181,7 @@ export const Hyperlink = ({
           }
         : {}),
     });
+    invalidateShapeForElement(element);
     if (iframeLinkCache.has(element.id)) {
       iframeLinkCache.delete(element.id);
     }

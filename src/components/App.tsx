@@ -4723,7 +4723,7 @@ class App extends React.Component<AppProps, AppState> {
       locked: false,
       width: embedLink.aspectRatio.w,
       height: embedLink.aspectRatio.h,
-      link: embedLink.link,
+      link,
     });
 
     this.scene.replaceAllElements([
