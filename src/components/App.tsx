@@ -7118,6 +7118,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.maybeSuggestBindingForAll(selectedElements);
 
+      const elementsToHighlight = new Set<ExcalidrawElement>();
       selectedFrames.forEach((frame) => {
         const elementsInFrame = getFrameElements(
           this.scene.getNonDeletedElements(),
@@ -7152,13 +7153,15 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        this.setState({
-          elementsToHighlight: getElementsInResizingFrame(
-            this.scene.getNonDeletedElements(),
-            frame,
-            this.state,
-          ),
-        });
+        getElementsInResizingFrame(
+          this.scene.getNonDeletedElements(),
+          frame,
+          this.state,
+        ).forEach((element) => elementsToHighlight.add(element));
+      });
+
+      this.setState({
+        elementsToHighlight: [...elementsToHighlight],
       });
 
       return true;
