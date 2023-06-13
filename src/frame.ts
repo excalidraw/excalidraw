@@ -468,7 +468,10 @@ export const addElementsToFrame = (
 
   let nextElements = allElements.slice();
 
-  for (const element of _elementsToAdd) {
+  for (const element of omitGroupsContainingFrames(
+    allElements,
+    _elementsToAdd,
+  )) {
     // only necessary if the element is not already in the frame
     if (element.frameId !== frame.id) {
       mutateElement(
@@ -554,12 +557,10 @@ export const replaceAllElementsInFrame = (
   frame: ExcalidrawFrameElement,
   appState: AppState,
 ) => {
-  return omitGroupsContainingFrames(
-    addElementsToFrame(
-      removeAllElementsFromFrame(allElements, frame, appState),
-      nextElementsInFrame,
-      frame,
-    ),
+  return addElementsToFrame(
+    removeAllElementsFromFrame(allElements, frame, appState),
+    nextElementsInFrame,
+    frame,
   );
 };
 

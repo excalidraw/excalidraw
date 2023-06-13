@@ -313,7 +313,6 @@ import {
   getContainingFrame,
   elementOverlapsWithFrame,
   updateFrameMembershipOfSelectedElements,
-  omitGroupsContainingFrames,
   isElementInFrame,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
@@ -5917,10 +5916,7 @@ class App extends React.Component<AppProps, AppState> {
               topLayerFrame &&
               !this.state.selectedElementIds[topLayerFrame.id]
             ) {
-              const elementsToAdd = omitGroupsContainingFrames(
-                nextElements,
-                selectedElements,
-              ).filter((element) =>
+              const elementsToAdd = selectedElements.filter((element) =>
                 isElementInFrame(element, nextElements, this.state),
               );
 
@@ -5984,20 +5980,25 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
-      // handle resizing frames
+      // handle frame membership for resizing frames and/or selected elements
       if (pointerDownState.resize.isResizing) {
+        let nextElements = updateFrameMembershipOfSelectedElements(
+          this.scene.getElementsIncludingDeleted(),
+          this.state,
+        );
+
         const selectedFrames = getSelectedElements(
-          this.scene.getNonDeletedElements(),
+          this.scene.getElementsIncludingDeleted(),
           this.state,
         ).filter(
           (element) => element.type === "frame",
         ) as ExcalidrawFrameElement[];
 
         for (const frame of selectedFrames) {
-          replaceAllElementsInFrame(
-            this.scene.getElementsIncludingDeleted(),
+          nextElements = replaceAllElementsInFrame(
+            nextElements,
             getElementsInResizingFrame(
-              this.scene.getNonDeletedElements(),
+              this.scene.getElementsIncludingDeleted(),
               frame,
               this.state,
             ),
@@ -6005,6 +6006,8 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           );
         }
+
+        this.scene.replaceAllElements(nextElements);
       }
 
       // Code below handles selection when element(s) weren't
