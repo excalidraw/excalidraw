@@ -7,7 +7,7 @@ import { ExcalidrawElement, NonDeletedExcalidrawElement } from "./types";
 const YOUTUBE_REG =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(?:embed\/|watch\?v=|shorts\/)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
 const VIMEO_REG =
-  /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^\?\s]+)(?:\?.*)?$/;
+  /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
 const TWITTER_REG = /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
 const FIGMA_REG = /^https:\/\/www\.figma\.com/;
 const EXCALIDRAW_REG = /^https:\/\/excalidraw.com/;
