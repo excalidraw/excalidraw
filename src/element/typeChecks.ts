@@ -167,7 +167,8 @@ export const isBoundToContainer = (
   );
 };
 
-export const isUsingAdaptiveRadius = (type: string) => type === "rectangle";
+export const isUsingAdaptiveRadius = (type: string) =>
+  type === "rectangle" || type === "iframe";
 
 export const isUsingProportionalRadius = (type: string) =>
   type === "line" || type === "arrow" || type === "diamond";
@@ -208,7 +209,7 @@ export const getDefaultRoundnessTypeForElement = (
     };
   }
 
-  if (element.type === "rectangle") {
+  if (element.type === "rectangle" || element.type === "iframe") {
     return {
       type: ROUNDNESS.ADAPTIVE_RADIUS,
     };

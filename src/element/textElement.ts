@@ -862,6 +862,7 @@ const VALID_CONTAINER_TYPES = new Set([
   "diamond",
   "image",
   "arrow",
+  "iframe",
 ]);
 
 export const isValidTextContainer = (element: ExcalidrawElement) =>

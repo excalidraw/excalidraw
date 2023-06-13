@@ -67,19 +67,10 @@ export const getElementsAtPosition = (
 ) => {
   // The parameter elements comes ordered from lower z-index to higher.
   // We want to preserve that order on the returned array.
-  return elements
-    .filter(
-      (element) =>
-        !element.isDeleted &&
-        !isIFrameElement(element) &&
-        isAtPositionFn(element),
-    )
-    .concat(
-      elements.filter(
-        (element) =>
-          !element.isDeleted &&
-          isIFrameElement(element) &&
-          isAtPositionFn(element),
-      ),
-    );
+  const elsAtPos = elements.filter(
+    (element) => !element.isDeleted && isAtPositionFn(element),
+  );
+  return elsAtPos
+    .filter((element) => !isIFrameElement(element))
+    .concat(elsAtPos.filter((element) => isIFrameElement(element)));
 };

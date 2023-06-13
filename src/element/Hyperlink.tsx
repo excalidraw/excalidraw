@@ -132,7 +132,7 @@ export const Hyperlink = ({
       return;
     }
 
-    if (element.type === "iframe") {
+    if (isIFrameElement(element)) {
       mutateElement(element, {
         //@ts-ignore
         type: "rectangle",

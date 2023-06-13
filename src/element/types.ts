@@ -109,9 +109,9 @@ export type InitializedExcalidrawImageElement = MarkNonNullable<
 export type ExcalidrawGenericElement =
   | ExcalidrawSelectionElement
   | ExcalidrawRectangleElement
+  | ExcalidrawIFrameElement
   | ExcalidrawDiamondElement
-  | ExcalidrawEllipseElement
-  | ExcalidrawIFrameElement;
+  | ExcalidrawEllipseElement;
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain

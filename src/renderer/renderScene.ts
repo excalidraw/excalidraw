@@ -427,7 +427,7 @@ export const _renderScene = ({
           renderElement(element, rc, context, renderConfig, appState);
           if (
             isExporting &&
-            element.type === "iframe" &&
+            isIFrameElement(element) &&
             !getBoundTextElement(element)
           ) {
             const label = createPlaceholderiFrameLabel(element);

@@ -88,7 +88,7 @@ export const isURLOnWhiteList = (
 export const isIFrameOrFrameLabel = (
   element: NonDeletedExcalidrawElement,
 ): Boolean => {
-  if (element.type === "iframe") {
+  if (isIFrameElement(element)) {
     return true;
   }
   if (element.type === "text") {
