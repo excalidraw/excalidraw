@@ -1,5 +1,10 @@
 import ReactDOM from "react-dom";
-import { render, waitFor, GlobalTestState } from "./test-utils";
+import {
+  render,
+  waitFor,
+  GlobalTestState,
+  createPasteEvent,
+} from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import ExcalidrawApp from "../excalidraw-app";
 import { KEYS } from "../keys";
@@ -9,6 +14,8 @@ import {
 } from "../element/textElement";
 import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";
+import { API } from "./helpers/api";
+import { copyToClipboard } from "../clipboard";
 
 const { h } = window;
 
@@ -35,38 +42,28 @@ const setClipboardText = (text: string) => {
   });
 };
 
-const sendPasteEvent = () => {
-  const clipboardEvent = new Event("paste", {
-    bubbles: true,
-    cancelable: true,
-    composed: true,
-  });
-
-  // set `clipboardData` properties.
-  // @ts-ignore
-  clipboardEvent.clipboardData = {
-    getData: () => window.navigator.clipboard.readText(),
-    files: [],
-  };
-
+const sendPasteEvent = (text?: string) => {
+  const clipboardEvent = createPasteEvent(
+    text || (() => window.navigator.clipboard.readText()),
+  );
   document.dispatchEvent(clipboardEvent);
 };
 
-const pasteWithCtrlCmdShiftV = () => {
+const pasteWithCtrlCmdShiftV = (text?: string) => {
   Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
     //triggering keydown with an empty clipboard
     Keyboard.keyPress(KEYS.V);
     //triggering paste event with faked clipboard
-    sendPasteEvent();
+    sendPasteEvent(text);
   });
 };
 
-const pasteWithCtrlCmdV = () => {
+const pasteWithCtrlCmdV = (text?: string) => {
   Keyboard.withModifierKeys({ ctrl: true }, () => {
     //triggering keydown with an empty clipboard
     Keyboard.keyPress(KEYS.V);
     //triggering paste event with faked clipboard
-    sendPasteEvent();
+    sendPasteEvent(text);
   });
 };
 
@@ -86,6 +83,32 @@ beforeEach(async () => {
   setClipboardText("");
   Object.assign(document, {
     elementFromPoint: () => GlobalTestState.canvas,
+  });
+});
+
+describe("general paste behavior", () => {
+  it("should randomize seed on paste", async () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    const clipboardJSON = (await copyToClipboard([rectangle], null))!;
+
+    pasteWithCtrlCmdV(clipboardJSON);
+
+    await waitFor(() => {
+      expect(h.elements.length).toBe(1);
+      expect(h.elements[0].seed).not.toBe(rectangle.seed);
+    });
+  });
+
+  it("should retain seed on shift-paste", async () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    const clipboardJSON = (await copyToClipboard([rectangle], null))!;
+
+    // assert we don't randomize seed on shift-paste
+    pasteWithCtrlCmdShiftV(clipboardJSON);
+    await waitFor(() => {
+      expect(h.elements.length).toBe(1);
+      expect(h.elements[0].seed).toBe(rectangle.seed);
+    });
   });
 });
 

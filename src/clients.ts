@@ -1,28 +1,40 @@
-import colors from "./colors";
-import { AppState } from "./types";
-
-export const getClientColors = (clientId: string, appState: AppState) => {
-  if (appState?.collaborators) {
-    const currentUser = appState.collaborators.get(clientId);
-    if (currentUser?.color) {
-      return currentUser.color;
-    }
+function hashToInteger(id: string) {
+  let hash = 0;
+  if (id.length === 0) {
+    return hash;
   }
-  // Naive way of getting an integer out of the clientId
-  const sum = clientId.split("").reduce((a, str) => a + str.charCodeAt(0), 0);
+  for (let i = 0; i < id.length; i++) {
+    const char = id.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+  }
+  return hash;
+}
 
-  // Skip transparent & gray colors
-  const backgrounds = colors.elementBackground.slice(3);
-  const strokes = colors.elementStroke.slice(3);
-  return {
-    background: backgrounds[sum % backgrounds.length],
-    stroke: strokes[sum % strokes.length],
-  };
+export const getClientColor = (
+  /**
+   * any uniquely identifying key, such as user id or socket id
+   */
+  id: string,
+) => {
+  // to get more even distribution in case `id` is not uniformly distributed to
+  // begin with, we hash it
+  const hash = Math.abs(hashToInteger(id));
+  // we want to get a multiple of 10 number in the range of 0-360 (in other
+  // words a hue value of step size 10). There are 37 such values including 0.
+  const hue = (hash % 37) * 10;
+  const saturation = 100;
+  const lightness = 83;
+
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
-export const getClientInitials = (userName?: string | null) => {
-  if (!userName?.trim()) {
-    return "?";
-  }
-  return userName.trim()[0].toUpperCase();
+/**
+ * returns first char, capitalized
+ */
+export const getNameInitial = (name?: string | null) => {
+  // first char can be a surrogate pair, hence using codePointAt
+  const firstCodePoint = name?.trim()?.codePointAt(0);
+  return (
+    firstCodePoint ? String.fromCodePoint(firstCodePoint) : "?"
+  ).toUpperCase();
 };

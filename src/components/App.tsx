@@ -33,7 +33,7 @@ import {
   actionBindText,
   actionUngroup,
   actionLink,
-  actionToggleLock,
+  actionToggleElementLock,
   actionToggleLinearEditor,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
@@ -59,7 +59,9 @@ import {
   ELEMENT_TRANSLATE_AMOUNT,
   ENV,
   EVENT,
+  EXPORT_IMAGE_TYPES,
   GRID_SIZE,
+  IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
   isAndroid,
   isBrave,
@@ -81,7 +83,7 @@ import {
   VERTICAL_ALIGN,
   ZOOM_STEP,
 } from "../constants";
-import { loadFromBlob } from "../data";
+import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import {
@@ -127,7 +129,11 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
+import {
+  deepCopyElement,
+  duplicateElements,
+  newFreeDrawElement,
+} from "../element/newElement";
 import {
   hasBoundTextElement,
   isArrowElement,
@@ -205,6 +211,8 @@ import {
   PointerDownState,
   SceneData,
   Device,
+  SidebarName,
+  SidebarTabName,
 } from "../types";
 import {
   debounce,
@@ -230,6 +238,7 @@ import {
   getShortcutKey,
   isTransparent,
   easeToValuesRAF,
+  muteFSAbortError,
 } from "../utils";
 import {
   ContextMenu,
@@ -244,6 +253,7 @@ import {
   generateIdFromFile,
   getDataURL,
   getFileFromEvent,
+  isImageFileHandle,
   isSupportedImageFile,
   loadSceneOrLibraryFromBlob,
   normalizeFile,
@@ -283,6 +293,7 @@ import {
   isLocalLink,
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
+import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
 import {
@@ -291,14 +302,19 @@ import {
 } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
-import { actionCreateContainerFromText } from "../actions/actionBoundText";
+import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
+import { activeEyeDropperAtom } from "./EyeDropper";
+
+const AppContext = React.createContext<AppClassProperties>(null!);
+const AppPropsContext = React.createContext<AppProps>(null!);
 
 const deviceContextInitialValue = {
   isSmScreen: false,
   isMobile: false,
   isTouchScreen: false,
   canDeviceFitSidebar: false,
+  isLandscape: false,
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 DeviceContext.displayName = "DeviceContext";
@@ -335,6 +351,8 @@ const ExcalidrawActionManagerContext = React.createContext<ActionManager>(
 );
 ExcalidrawActionManagerContext.displayName = "ExcalidrawActionManagerContext";
 
+export const useApp = () => useContext(AppContext);
+export const useAppProps = () => useContext(AppPropsContext);
 export const useDevice = () => useContext<Device>(DeviceContext);
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
@@ -349,8 +367,6 @@ export const useExcalidrawActionManager = () =>
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
-let cursorX = 0;
-let cursorY = 0;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
@@ -395,7 +411,7 @@ class App extends React.Component<AppProps, AppState> {
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
-  private id: string;
+  public id: string;
   private history: History;
   private excalidrawContainerValue: {
     container: HTMLDivElement | null;
@@ -408,7 +424,7 @@ class App extends React.Component<AppProps, AppState> {
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDown: React.PointerEvent<HTMLCanvasElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
-  lastScenePointer: { x: number; y: number } | null = null;
+  lastViewportPosition = { x: 0, y: 0 };
 
   constructor(props: AppProps) {
     super(props);
@@ -433,7 +449,7 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
       showHyperlinkPopup: false,
-      isSidebarDocked: false,
+      defaultSidebarDockedPreference: false,
     };
 
     this.id = nanoid();
@@ -464,7 +480,7 @@ class App extends React.Component<AppProps, AppState> {
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
-        toggleMenu: this.toggleMenu,
+        toggleSidebar: this.toggleSidebar,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -572,101 +588,93 @@ class App extends React.Component<AppProps, AppState> {
           this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
         }
       >
-        <ExcalidrawContainerContext.Provider
-          value={this.excalidrawContainerValue}
-        >
-          <DeviceContext.Provider value={this.device}>
-            <ExcalidrawSetAppStateContext.Provider value={this.setAppState}>
-              <ExcalidrawAppStateContext.Provider value={this.state}>
-                <ExcalidrawElementsContext.Provider
-                  value={this.scene.getNonDeletedElements()}
-                >
-                  <ExcalidrawActionManagerContext.Provider
-                    value={this.actionManager}
-                  >
-                    <LayerUI
-                      canvas={this.canvas}
-                      appState={this.state}
-                      files={this.files}
-                      setAppState={this.setAppState}
-                      actionManager={this.actionManager}
-                      elements={this.scene.getNonDeletedElements()}
-                      onLockToggle={this.toggleLock}
-                      onPenModeToggle={this.togglePenMode}
-                      onHandToolToggle={this.onHandToolToggle}
-                      onInsertElements={(elements) =>
-                        this.addElementsFromPasteOrLibrary({
-                          elements,
-                          position: "center",
-                          files: null,
-                        })
-                      }
-                      langCode={getLanguage().code}
-                      renderTopRightUI={renderTopRightUI}
-                      renderCustomStats={renderCustomStats}
-                      renderCustomSidebar={this.props.renderSidebar}
-                      showExitZenModeBtn={
-                        typeof this.props?.zenModeEnabled === "undefined" &&
-                        this.state.zenModeEnabled
-                      }
-                      libraryReturnUrl={this.props.libraryReturnUrl}
-                      UIOptions={this.props.UIOptions}
-                      focusContainer={this.focusContainer}
-                      library={this.library}
-                      id={this.id}
-                      onImageAction={this.onImageAction}
-                      renderWelcomeScreen={
-                        !this.state.isLoading &&
-                        this.state.showWelcomeScreen &&
-                        this.state.activeTool.type === "selection" &&
-                        !this.scene.getElementsIncludingDeleted().length
-                      }
+        <AppContext.Provider value={this}>
+          <AppPropsContext.Provider value={this.props}>
+            <ExcalidrawContainerContext.Provider
+              value={this.excalidrawContainerValue}
+            >
+              <DeviceContext.Provider value={this.device}>
+                <ExcalidrawSetAppStateContext.Provider value={this.setAppState}>
+                  <ExcalidrawAppStateContext.Provider value={this.state}>
+                    <ExcalidrawElementsContext.Provider
+                      value={this.scene.getNonDeletedElements()}
                     >
-                      {this.props.children}
-                    </LayerUI>
-                    <div className="excalidraw-textEditorContainer" />
-                    <div className="excalidraw-contextMenuContainer" />
-                    {selectedElement.length === 1 &&
-                      !this.state.contextMenu &&
-                      this.state.showHyperlinkPopup && (
-                        <Hyperlink
-                          key={selectedElement[0].id}
-                          element={selectedElement[0]}
+                      <ExcalidrawActionManagerContext.Provider
+                        value={this.actionManager}
+                      >
+                        <LayerUI
+                          canvas={this.canvas}
+                          appState={this.state}
+                          files={this.files}
                           setAppState={this.setAppState}
-                          onLinkOpen={this.props.onLinkOpen}
-                        />
-                      )}
-                    {this.state.toast !== null && (
-                      <Toast
-                        message={this.state.toast.message}
-                        onClose={() => this.setToast(null)}
-                        duration={this.state.toast.duration}
-                        closable={this.state.toast.closable}
-                      />
-                    )}
-                    {this.state.contextMenu && (
-                      <ContextMenu
-                        items={this.state.contextMenu.items}
-                        top={this.state.contextMenu.top}
-                        left={this.state.contextMenu.left}
-                        actionManager={this.actionManager}
-                      />
-                    )}
-                    <main>{this.renderCanvas()}</main>
-                  </ExcalidrawActionManagerContext.Provider>
-                </ExcalidrawElementsContext.Provider>{" "}
-              </ExcalidrawAppStateContext.Provider>
-            </ExcalidrawSetAppStateContext.Provider>
-          </DeviceContext.Provider>
-        </ExcalidrawContainerContext.Provider>
+                          actionManager={this.actionManager}
+                          elements={this.scene.getNonDeletedElements()}
+                          onLockToggle={this.toggleLock}
+                          onPenModeToggle={this.togglePenMode}
+                          onHandToolToggle={this.onHandToolToggle}
+                          langCode={getLanguage().code}
+                          renderTopRightUI={renderTopRightUI}
+                          renderCustomStats={renderCustomStats}
+                          showExitZenModeBtn={
+                            typeof this.props?.zenModeEnabled === "undefined" &&
+                            this.state.zenModeEnabled
+                          }
+                          UIOptions={this.props.UIOptions}
+                          onImageAction={this.onImageAction}
+                          onExportImage={this.onExportImage}
+                          renderWelcomeScreen={
+                            !this.state.isLoading &&
+                            this.state.showWelcomeScreen &&
+                            this.state.activeTool.type === "selection" &&
+                            !this.scene.getElementsIncludingDeleted().length
+                          }
+                        >
+                          {this.props.children}
+                        </LayerUI>
+                        <div className="excalidraw-textEditorContainer" />
+                        <div className="excalidraw-contextMenuContainer" />
+                        <div className="excalidraw-eye-dropper-container" />
+                        {selectedElement.length === 1 &&
+                          !this.state.contextMenu &&
+                          this.state.showHyperlinkPopup && (
+                            <Hyperlink
+                              key={selectedElement[0].id}
+                              element={selectedElement[0]}
+                              setAppState={this.setAppState}
+                              onLinkOpen={this.props.onLinkOpen}
+                            />
+                          )}
+                        {this.state.toast !== null && (
+                          <Toast
+                            message={this.state.toast.message}
+                            onClose={() => this.setToast(null)}
+                            duration={this.state.toast.duration}
+                            closable={this.state.toast.closable}
+                          />
+                        )}
+                        {this.state.contextMenu && (
+                          <ContextMenu
+                            items={this.state.contextMenu.items}
+                            top={this.state.contextMenu.top}
+                            left={this.state.contextMenu.left}
+                            actionManager={this.actionManager}
+                          />
+                        )}
+                        <main>{this.renderCanvas()}</main>
+                      </ExcalidrawActionManagerContext.Provider>
+                    </ExcalidrawElementsContext.Provider>
+                  </ExcalidrawAppStateContext.Provider>
+                </ExcalidrawSetAppStateContext.Provider>
+              </DeviceContext.Provider>
+            </ExcalidrawContainerContext.Provider>
+          </AppPropsContext.Provider>
+        </AppContext.Provider>
       </div>
     );
   }
 
   public focusContainer: AppClassProperties["focusContainer"] = () => {
-    if (this.props.autoFocus) {
-      this.excalidrawContainerRef.current?.focus();
-    }
+    this.excalidrawContainerRef.current?.focus();
   };
 
   public getSceneElementsIncludingDeleted = () => {
@@ -675,6 +683,88 @@ class App extends React.Component<AppProps, AppState> {
 
   public getSceneElements = () => {
     return this.scene.getNonDeletedElements();
+  };
+
+  public onInsertElements = (elements: readonly ExcalidrawElement[]) => {
+    this.addElementsFromPasteOrLibrary({
+      elements,
+      position: "center",
+      files: null,
+    });
+  };
+
+  public onExportImage = async (
+    type: keyof typeof EXPORT_IMAGE_TYPES,
+    elements: readonly NonDeletedExcalidrawElement[],
+  ) => {
+    trackEvent("export", type, "ui");
+    const fileHandle = await exportCanvas(
+      type,
+      elements,
+      this.state,
+      this.files,
+      {
+        exportBackground: this.state.exportBackground,
+        name: this.state.name,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+      },
+    )
+      .catch(muteFSAbortError)
+      .catch((error) => {
+        console.error(error);
+        this.setState({ errorMessage: error.message });
+      });
+
+    if (
+      this.state.exportEmbedScene &&
+      fileHandle &&
+      isImageFileHandle(fileHandle)
+    ) {
+      this.setState({ fileHandle });
+    }
+  };
+
+  private openEyeDropper = ({ type }: { type: "stroke" | "background" }) => {
+    jotaiStore.set(activeEyeDropperAtom, {
+      swapPreviewOnAlt: true,
+      previewType: type === "stroke" ? "strokeColor" : "backgroundColor",
+      onSelect: (color, event) => {
+        const shouldUpdateStrokeColor =
+          (type === "background" && event.altKey) ||
+          (type === "stroke" && !event.altKey);
+        const selectedElements = getSelectedElements(
+          this.scene.getElementsIncludingDeleted(),
+          this.state,
+        );
+        if (
+          !selectedElements.length ||
+          this.state.activeTool.type !== "selection"
+        ) {
+          if (shouldUpdateStrokeColor) {
+            this.setState({
+              currentItemStrokeColor: color,
+            });
+          } else {
+            this.setState({
+              currentItemBackgroundColor: color,
+            });
+          }
+        } else {
+          this.updateScene({
+            elements: this.scene.getElementsIncludingDeleted().map((el) => {
+              if (this.state.selectedElementIds[el.id]) {
+                return newElementWith(el, {
+                  [shouldUpdateStrokeColor ? "strokeColor" : "backgroundColor"]:
+                    color,
+                });
+              }
+              return el;
+            }),
+          });
+        }
+      },
+      keepOpenOnAlt: false,
+    });
   };
 
   private syncActionResult = withBatchedUpdates(
@@ -735,6 +825,14 @@ class App extends React.Component<AppProps, AppState> {
         if (typeof this.props.name !== "undefined") {
           name = this.props.name;
         }
+
+        editingElement =
+          editingElement || actionResult.appState?.editingElement || null;
+
+        if (editingElement?.isDeleted) {
+          editingElement = null;
+        }
+
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
@@ -745,8 +843,7 @@ class App extends React.Component<AppProps, AppState> {
               // or programmatically from the host, so it will need to be
               // rewritten later
               contextMenu: null,
-              editingElement:
-                editingElement || actionResult.appState?.editingElement || null,
+              editingElement,
               viewModeEnabled,
               zenModeEnabled,
               gridSize,
@@ -901,6 +998,7 @@ class App extends React.Component<AppProps, AppState> {
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
     this.device = updateObject(this.device, {
+      isLandscape: width > height,
       isSmScreen: width < MQ_SM_MAX_WIDTH,
       isMobile:
         width < MQ_MAX_WIDTH_PORTRAIT ||
@@ -946,7 +1044,7 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
-    if (this.excalidrawContainerRef.current) {
+    if (this.props.autoFocus && this.excalidrawContainerRef.current) {
       this.focusContainer();
     }
 
@@ -1024,6 +1122,7 @@ class App extends React.Component<AppProps, AppState> {
     this.unmounted = true;
     this.removeEventListeners();
     this.scene.destroy();
+    this.library.destroy();
     clearTimeout(touchTimeout);
     touchTimeout = 0;
   }
@@ -1253,6 +1352,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state.editingLinearElement &&
           this.actionManager.executeAction(actionFinalize);
       });
+    }
+
+    // failsafe in case the state is being updated in incorrect order resulting
+    // in the editingElement being now a deleted element
+    if (this.state.editingElement?.isDeleted) {
+      this.setState({ editingElement: null });
     }
 
     if (
@@ -1520,7 +1625,10 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
+      const elementUnderCursor = document.elementFromPoint(
+        this.lastViewportPosition.x,
+        this.lastViewportPosition.y,
+      );
       if (
         event &&
         (!(elementUnderCursor instanceof HTMLCanvasElement) ||
@@ -1548,7 +1656,10 @@ class App extends React.Component<AppProps, AppState> {
       // prefer spreadsheet data over image file (MS Office/Libre Office)
       if (isSupportedImageFile(file) && !data.spreadsheet) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          { clientX: cursorX, clientY: cursorY },
+          {
+            clientX: this.lastViewportPosition.x,
+            clientY: this.lastViewportPosition.y,
+          },
           this.state,
         );
 
@@ -1585,6 +1696,7 @@ class App extends React.Component<AppProps, AppState> {
           elements: data.elements,
           files: data.files || null,
           position: "cursor",
+          retainSeed: isPlainPaste,
         });
       } else if (data.text) {
         this.addTextFromPaste(data.text, isPlainPaste);
@@ -1598,6 +1710,7 @@ class App extends React.Component<AppProps, AppState> {
     elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
     position: { clientX: number; clientY: number } | "cursor" | "center";
+    retainSeed?: boolean;
   }) => {
     const elements = restoreElements(opts.elements, null);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
@@ -1609,13 +1722,13 @@ class App extends React.Component<AppProps, AppState> {
       typeof opts.position === "object"
         ? opts.position.clientX
         : opts.position === "cursor"
-        ? cursorX
+        ? this.lastViewportPosition.x
         : this.state.width / 2 + this.state.offsetLeft;
     const clientY =
       typeof opts.position === "object"
         ? opts.position.clientY
         : opts.position === "cursor"
-        ? cursorY
+        ? this.lastViewportPosition.y
         : this.state.height / 2 + this.state.offsetTop;
 
     const { x, y } = viewportCoordsToSceneCoords(
@@ -1625,35 +1738,25 @@ class App extends React.Component<AppProps, AppState> {
 
     const dx = x - elementsCenterX;
     const dy = y - elementsCenterY;
-    const groupIdMap = new Map();
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.state.gridSize);
 
-    const oldIdToDuplicatedId = new Map();
-    const newElements = elements.map((element) => {
-      const newElement = duplicateElement(
-        this.state.editingGroupId,
-        groupIdMap,
-        element,
-        {
+    const newElements = duplicateElements(
+      elements.map((element) => {
+        return newElementWith(element, {
           x: element.x + gridX - minX,
           y: element.y + gridY - minY,
-        },
-      );
-      oldIdToDuplicatedId.set(element.id, newElement.id);
-      return newElement;
-    });
+        });
+      }),
+      {
+        randomizeSeed: !opts.retainSeed,
+      },
+    );
 
-    bindTextToShapeAfterDuplication(newElements, elements, oldIdToDuplicatedId);
     const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
     ];
-    fixBindingsAfterDuplication(nextElements, elements, oldIdToDuplicatedId);
-
-    if (opts.files) {
-      this.files = { ...this.files, ...opts.files };
-    }
 
     this.scene.replaceAllElements(nextElements);
 
@@ -1663,6 +1766,10 @@ class App extends React.Component<AppProps, AppState> {
         redrawTextBoundingBox(newElement, container);
       }
     });
+
+    if (opts.files) {
+      this.files = { ...this.files, ...opts.files };
+    }
 
     this.history.resumeRecording();
 
@@ -1678,7 +1785,7 @@ class App extends React.Component<AppProps, AppState> {
           openSidebar:
             this.state.openSidebar &&
             this.device.canDeviceFitSidebar &&
-            this.state.isSidebarDocked
+            this.state.defaultSidebarDockedPreference
               ? this.state.openSidebar
               : null,
           selectedElementIds: newElements.reduce(
@@ -1705,7 +1812,10 @@ class App extends React.Component<AppProps, AppState> {
 
   private addTextFromPaste(text: string, isPlainPaste = false) {
     const { x, y } = viewportCoordsToSceneCoords(
-      { clientX: cursorX, clientY: cursorY },
+      {
+        clientX: this.lastViewportPosition.x,
+        clientY: this.lastViewportPosition.y,
+      },
       this.state,
     );
 
@@ -2016,36 +2126,30 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * @returns whether the menu was toggled on or off
    */
-  public toggleMenu = (
-    type: "library" | "customSidebar",
-    force?: boolean,
-  ): boolean => {
-    if (type === "customSidebar" && !this.props.renderSidebar) {
-      console.warn(
-        `attempting to toggle "customSidebar", but no "props.renderSidebar" is defined`,
-      );
-      return false;
+  public toggleSidebar = ({
+    name,
+    tab,
+    force,
+  }: {
+    name: SidebarName;
+    tab?: SidebarTabName;
+    force?: boolean;
+  }): boolean => {
+    let nextName;
+    if (force === undefined) {
+      nextName = this.state.openSidebar?.name === name ? null : name;
+    } else {
+      nextName = force ? name : null;
     }
+    this.setState({ openSidebar: nextName ? { name: nextName, tab } : null });
 
-    if (type === "library" || type === "customSidebar") {
-      let nextValue;
-      if (force === undefined) {
-        nextValue = this.state.openSidebar === type ? null : type;
-      } else {
-        nextValue = force ? type : null;
-      }
-      this.setState({ openSidebar: nextValue });
-
-      return !!nextValue;
-    }
-
-    return false;
+    return !!nextName;
   };
 
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {
-      cursorX = event.clientX;
-      cursorY = event.clientY;
+      this.lastViewportPosition.x = event.clientX;
+      this.lastViewportPosition.y = event.clientY;
     },
   );
 
@@ -2118,6 +2222,7 @@ class App extends React.Component<AppProps, AppState> {
         event.shiftKey &&
         event[KEYS.CTRL_OR_CMD]
       ) {
+        event.preventDefault();
         this.setState({ openDialog: "imageExport" });
         return;
       }
@@ -2287,11 +2392,11 @@ class App extends React.Component<AppProps, AppState> {
           (hasBackground(this.state.activeTool.type) ||
             selectedElements.some((element) => hasBackground(element.type)))
         ) {
-          this.setState({ openPopup: "backgroundColorPicker" });
+          this.setState({ openPopup: "elementBackground" });
           event.stopPropagation();
         }
         if (event.key === KEYS.S) {
-          this.setState({ openPopup: "strokeColorPicker" });
+          this.setState({ openPopup: "elementStroke" });
           event.stopPropagation();
         }
       }
@@ -2302,6 +2407,20 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
       }
+
+      // eye dropper
+      // -----------------------------------------------------------------------
+      const lowerCased = event.key.toLocaleLowerCase();
+      const isPickingStroke = lowerCased === KEYS.S && event.shiftKey;
+      const isPickingBackground =
+        event.key === KEYS.I || (lowerCased === KEYS.G && event.shiftKey);
+
+      if (isPickingStroke || isPickingBackground) {
+        this.openEyeDropper({
+          type: isPickingStroke ? "stroke" : "background",
+        });
+      }
+      // -----------------------------------------------------------------------
     },
   );
 
@@ -2431,8 +2550,8 @@ class App extends React.Component<AppProps, AppState> {
       this.setState((state) => ({
         ...getStateForZoom(
           {
-            viewportX: cursorX,
-            viewportY: cursorY,
+            viewportX: this.lastViewportPosition.x,
+            viewportY: this.lastViewportPosition.y,
             nextZoom: getNormalizedZoom(initialScale * event.scale),
           },
           state,
@@ -2737,7 +2856,6 @@ class App extends React.Component<AppProps, AppState> {
           strokeStyle: this.state.currentItemStrokeStyle,
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
-          roundness: null,
           text: "",
           fontSize,
           fontFamily,
@@ -2749,8 +2867,8 @@ class App extends React.Component<AppProps, AppState> {
             : DEFAULT_VERTICAL_ALIGN,
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
-          locked: false,
           lineHeight,
+          angle: container?.angle ?? 0,
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {
@@ -3500,6 +3618,43 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ contextMenu: null });
     }
 
+    this.updateGestureOnPointerDown(event);
+
+    // if dragging element is freedraw and another pointerdown event occurs
+    // a second finger is on the screen
+    // discard the freedraw element if it is very short because it is likely
+    // just a spike, otherwise finalize the freedraw element when the second
+    // finger is lifted
+    if (
+      event.pointerType === "touch" &&
+      this.state.draggingElement &&
+      this.state.draggingElement.type === "freedraw"
+    ) {
+      const element = this.state.draggingElement as ExcalidrawFreeDrawElement;
+      this.updateScene({
+        ...(element.points.length < 10
+          ? {
+              elements: this.scene
+                .getElementsIncludingDeleted()
+                .filter((el) => el.id !== element.id),
+            }
+          : {}),
+        appState: {
+          draggingElement: null,
+          editingElement: null,
+          startBoundElement: null,
+          suggestedBindings: [],
+          selectedElementIds: Object.keys(this.state.selectedElementIds)
+            .filter((key) => key !== element.id)
+            .reduce((obj: { [id: string]: boolean }, key) => {
+              obj[key] = this.state.selectedElementIds[key];
+              return obj;
+            }, {}),
+        },
+      });
+      return;
+    }
+
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)
@@ -3538,8 +3693,6 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton: "down",
     });
     this.savePointer(event.clientX, event.clientY, "down");
-
-    this.updateGestureOnPointerDown(event);
 
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
@@ -4002,12 +4155,6 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
       if (pointerDownState.resize.handleType) {
-        setCursor(
-          this.canvas,
-          getCursorForResizingElement({
-            transformHandleType: pointerDownState.resize.handleType,
-          }),
-        );
         pointerDownState.resize.isResizing = true;
         pointerDownState.resize.offset = tupleToCoors(
           getResizeOffsetXY(
@@ -4691,7 +4838,12 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.drag.hasOccurred = true;
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
-        if (selectedElements.length > 0 && !pointerDownState.withCmdOrCtrl) {
+        // Checking for editingElement to avoid jump while editing on mobile #6503
+        if (
+          selectedElements.length > 0 &&
+          !pointerDownState.withCmdOrCtrl &&
+          !this.state.editingElement
+        ) {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
             pointerCoords.y - pointerDownState.drag.offset.y,
@@ -5714,7 +5866,9 @@ class App extends React.Component<AppProps, AppState> {
 
       const imageFile = await fileOpen({
         description: "Image",
-        extensions: ["jpg", "png", "svg", "gif"],
+        extensions: Object.keys(
+          IMAGE_MIME_TYPES,
+        ) as (keyof typeof IMAGE_MIME_TYPES)[],
       });
 
       const imageElement = this.createImageElement({
@@ -6306,6 +6460,7 @@ class App extends React.Component<AppProps, AppState> {
         copyText,
         CONTEXT_MENU_SEPARATOR,
         actionSelectAll,
+        actionUnlockAllElements,
         CONTEXT_MENU_SEPARATOR,
         actionToggleGridMode,
         actionToggleZenMode,
@@ -6336,7 +6491,7 @@ class App extends React.Component<AppProps, AppState> {
       actionGroup,
       actionUnbindText,
       actionBindText,
-      actionCreateContainerFromText,
+      actionWrapTextInContainer,
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,
@@ -6352,7 +6507,7 @@ class App extends React.Component<AppProps, AppState> {
       actionToggleLinearEditor,
       actionLink,
       actionDuplicateSelection,
-      actionToggleLock,
+      actionToggleElementLock,
       CONTEXT_MENU_SEPARATOR,
       actionDeleteSelected,
     ];
@@ -6386,8 +6541,8 @@ class App extends React.Component<AppProps, AppState> {
       this.translateCanvas((state) => ({
         ...getStateForZoom(
           {
-            viewportX: cursorX,
-            viewportY: cursorY,
+            viewportX: this.lastViewportPosition.x,
+            viewportY: this.lastViewportPosition.y,
             nextZoom: getNormalizedZoom(newZoom),
           },
           state,

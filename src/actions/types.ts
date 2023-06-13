@@ -111,11 +111,12 @@ export type ActionName =
   | "unbindText"
   | "hyperlink"
   | "bindText"
-  | "toggleLock"
+  | "unlockAllElements"
+  | "toggleElementLock"
   | "toggleLinearEditor"
   | "toggleEraserTool"
   | "toggleHandTool"
-  | "createContainerFromText";
+  | "wrapTextInContainer";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

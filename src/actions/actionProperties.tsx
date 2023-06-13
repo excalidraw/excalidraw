@@ -1,6 +1,13 @@
 import { AppState } from "../../src/types";
+import {
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_PICKS,
+  DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
+  DEFAULT_ELEMENT_STROKE_PICKS,
+} from "../colors";
+import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
-import { ColorPicker } from "../components/ColorPicker";
+import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
 // TODO barnabasmolnar/editor-redesign
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
@@ -37,6 +44,7 @@ import {
   TextAlignLeftIcon,
   TextAlignCenterIcon,
   TextAlignRightIcon,
+  FillZigZagIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -82,7 +90,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import { arrayToMap } from "../utils";
+import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
@@ -111,8 +119,8 @@ const getFormValue = function <T>(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
-  defaultValue?: T,
-): T | null {
+  defaultValue: T,
+): T {
   const editingElement = appState.editingElement;
   const nonDeletedElements = getNonDeletedElements(elements);
   return (
@@ -124,7 +132,7 @@ const getFormValue = function <T>(
           getAttribute,
         )
       : defaultValue) ??
-    null
+    defaultValue
   );
 };
 
@@ -224,10 +232,12 @@ export const actionChangeStrokeColor = register({
       commitToHistory: !!value.currentItemStrokeColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, appProps }) => (
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
+        topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
+        palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
         type="elementStroke"
         label={t("labels.stroke")}
         color={getFormValue(
@@ -237,12 +247,9 @@ export const actionChangeStrokeColor = register({
           appState.currentItemStrokeColor,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
-        isActive={appState.openPopup === "strokeColorPicker"}
-        setActive={(active) =>
-          updateData({ openPopup: active ? "strokeColorPicker" : null })
-        }
         elements={elements}
         appState={appState}
+        updateData={updateData}
       />
     </>
   ),
@@ -267,10 +274,12 @@ export const actionChangeBackgroundColor = register({
       commitToHistory: !!value.currentItemBackgroundColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, appProps }) => (
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
+        topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
+        palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
         type="elementBackground"
         label={t("labels.background")}
         color={getFormValue(
@@ -280,12 +289,9 @@ export const actionChangeBackgroundColor = register({
           appState.currentItemBackgroundColor,
         )}
         onChange={(color) => updateData({ currentItemBackgroundColor: color })}
-        isActive={appState.openPopup === "backgroundColorPicker"}
-        setActive={(active) =>
-          updateData({ openPopup: active ? "backgroundColorPicker" : null })
-        }
         elements={elements}
         appState={appState}
+        updateData={updateData}
       />
     </>
   ),
@@ -294,7 +300,12 @@ export const actionChangeBackgroundColor = register({
 export const actionChangeFillStyle = register({
   name: "changeFillStyle",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
+    trackEvent(
+      "element",
+      "changeFillStyle",
+      `${value} (${app.device.isMobile ? "mobile" : "desktop"})`,
+    );
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -305,40 +316,57 @@ export const actionChangeFillStyle = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.fill")}</legend>
-      <ButtonIconSelect
-        options={[
-          {
-            value: "hachure",
-            text: t("labels.hachure"),
-            icon: FillHachureIcon,
-          },
-          {
-            value: "cross-hatch",
-            text: t("labels.crossHatch"),
-            icon: FillCrossHatchIcon,
-          },
-          {
-            value: "solid",
-            text: t("labels.solid"),
-            icon: FillSolidIcon,
-          },
-        ]}
-        group="fill"
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => element.fillStyle,
-          appState.currentItemFillStyle,
-        )}
-        onChange={(value) => {
-          updateData(value);
-        }}
-      />
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    const allElementsZigZag =
+      selectedElements.length > 0 &&
+      selectedElements.every((el) => el.fillStyle === "zigzag");
+
+    return (
+      <fieldset>
+        <legend>{t("labels.fill")}</legend>
+        <ButtonIconSelect
+          type="button"
+          options={[
+            {
+              value: "hachure",
+              text: `${
+                allElementsZigZag ? t("labels.zigzag") : t("labels.hachure")
+              } (${getShortcutKey("Alt-Click")})`,
+              icon: allElementsZigZag ? FillZigZagIcon : FillHachureIcon,
+              active: allElementsZigZag ? true : undefined,
+            },
+            {
+              value: "cross-hatch",
+              text: t("labels.crossHatch"),
+              icon: FillCrossHatchIcon,
+            },
+            {
+              value: "solid",
+              text: t("labels.solid"),
+              icon: FillSolidIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => element.fillStyle,
+            appState.currentItemFillStyle,
+          )}
+          onClick={(value, event) => {
+            const nextValue =
+              event.altKey &&
+              value === "hachure" &&
+              selectedElements.every((el) => el.fillStyle === "hachure")
+                ? "zigzag"
+                : value;
+
+            updateData(nextValue);
+          }}
+        />
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeStrokeWidth = register({
@@ -783,6 +811,7 @@ export const actionChangeTextAlign = register({
     );
   },
 });
+
 export const actionChangeVerticalAlign = register({
   name: "changeVerticalAlign",
   trackEvent: { category: "element" },
@@ -837,16 +866,21 @@ export const actionChangeVerticalAlign = register({
               testId: "align-bottom",
             },
           ]}
-          value={getFormValue(elements, appState, (element) => {
-            if (isTextElement(element) && element.containerId) {
-              return element.verticalAlign;
-            }
-            const boundTextElement = getBoundTextElement(element);
-            if (boundTextElement) {
-              return boundTextElement.verticalAlign;
-            }
-            return null;
-          })}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => {
+              if (isTextElement(element) && element.containerId) {
+                return element.verticalAlign;
+              }
+              const boundTextElement = getBoundTextElement(element);
+              if (boundTextElement) {
+                return boundTextElement.verticalAlign;
+              }
+              return null;
+            },
+            VERTICAL_ALIGN.MIDDLE,
+          )}
           onChange={(value) => updateData(value)}
         />
       </fieldset>

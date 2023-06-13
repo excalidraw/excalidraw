@@ -3,9 +3,9 @@ import { usersIcon } from "../icons";
 import { Button } from "../Button";
 
 import clsx from "clsx";
-import { useExcalidrawAppState } from "../App";
 
 import "./LiveCollaborationTrigger.scss";
+import { useUIAppState } from "../../context/ui-appState";
 
 const LiveCollaborationTrigger = ({
   isCollaborating,
@@ -15,7 +15,7 @@ const LiveCollaborationTrigger = ({
   isCollaborating: boolean;
   onSelect: () => void;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
-  const appState = useExcalidrawAppState();
+  const appState = useUIAppState();
 
   return (
     <Button

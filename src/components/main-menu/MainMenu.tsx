@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  useDevice,
-  useExcalidrawAppState,
-  useExcalidrawSetAppState,
-} from "../App";
+import { useDevice, useExcalidrawSetAppState } from "../App";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 
 import * as DefaultItems from "./DefaultItems";
@@ -13,7 +9,8 @@ import { t } from "../../i18n";
 import { HamburgerMenuIcon } from "../icons";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { composeEventHandlers } from "../../utils";
-import { useTunnels } from "../context/tunnels";
+import { useTunnels } from "../../context/tunnels";
+import { useUIAppState } from "../../context/ui-appState";
 
 const MainMenu = Object.assign(
   withInternalFallback(
@@ -28,16 +25,16 @@ const MainMenu = Object.assign(
        */
       onSelect?: (event: Event) => void;
     }) => {
-      const { mainMenuTunnel } = useTunnels();
+      const { MainMenuTunnel } = useTunnels();
       const device = useDevice();
-      const appState = useExcalidrawAppState();
+      const appState = useUIAppState();
       const setAppState = useExcalidrawSetAppState();
       const onClickOutside = device.isMobile
         ? undefined
         : () => setAppState({ openMenu: null });
 
       return (
-        <mainMenuTunnel.In>
+        <MainMenuTunnel.In>
           <DropdownMenu open={appState.openMenu === "canvas"}>
             <DropdownMenu.Trigger
               onToggle={() => {
@@ -66,7 +63,7 @@ const MainMenu = Object.assign(
               )}
             </DropdownMenu.Content>
           </DropdownMenu>
-        </mainMenuTunnel.In>
+        </MainMenuTunnel.In>
       );
     },
   ),
