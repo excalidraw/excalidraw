@@ -63,8 +63,11 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import { isLinearElement } from "../element/typeChecks";
-import { elementOverlapsWithFrame, getContainingFrame } from "../frame";
-import Scene from "../scene/Scene";
+import {
+  elementOverlapsWithFrame,
+  getTargetFrame,
+  isElementInFrame,
+} from "../frame";
 
 const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
@@ -479,74 +482,13 @@ export const _renderScene = ({
           ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
             (!renderConfig.isExporting && appState.shouldRenderFrames))
         ) {
-          const containgFrame = getContainingFrame(element);
-
-          // --------- clipping ----------
-          // step 1: save context so we can remove the clip path afterwards
           context.save();
 
-          // --------- clipping ----------
-          // step 2: clip according to different states (frame, elements, appState)
+          const frame = getTargetFrame(element, appState);
 
-          // element is in some frame
-          // we decide if we need to clip the element based on its state
-          if (containgFrame) {
-            if (
-              // selected element is being dragged and the cursor is outside the frame
-              (appState.selectedElementIds[element.id] ||
-                (element.type === "text" &&
-                  element.containerId &&
-                  appState.selectedElementIds[element.containerId])) &&
-              appState.selectedElementsAreBeingDragged &&
-              appState.frameToHighlight !== containgFrame
-            ) {
-              // do not clip
-            } else {
-              // clip for all other cases
-              frameClip(containgFrame, context, renderConfig);
-            }
+          if (frame && isElementInFrame(element, elements, appState)) {
+            frameClip(frame, context, renderConfig);
           }
-
-          // element is not in any frame yet
-          // CLIP: elements that are being dragged to a frame
-          if (
-            appState.frameToHighlight &&
-            appState.selectedElementIds[element.id] &&
-            ((element.groupIds.length > 0 &&
-              element.groupIds.find((groupId) =>
-                groupsToBeAddedToFrame.has(groupId),
-              )) ||
-              elementOverlapsWithFrame(element, appState.frameToHighlight))
-          ) {
-            frameClip(appState.frameToHighlight, context, renderConfig);
-          }
-
-          // bound text element of an element that is not in the frame yet
-          // clip when the container element is going to be added to the frame
-          else if (
-            appState.frameToHighlight &&
-            element.type === "text" &&
-            element.containerId &&
-            appState.selectedElementIds[element.containerId]
-          ) {
-            const containerElement = Scene.getScene(element)?.getElement(
-              element.containerId,
-            );
-
-            if (containerElement) {
-              if (
-                elementOverlapsWithFrame(
-                  containerElement,
-                  appState.frameToHighlight,
-                )
-              ) {
-                frameClip(appState.frameToHighlight, context, renderConfig);
-              }
-            }
-          }
-
-          // --------- clipping ----------
-          // step 3: render element and restore context
           renderElement(element, rc, context, renderConfig, appState);
           context.restore();
         } else {

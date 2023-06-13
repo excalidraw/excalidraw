@@ -314,7 +314,7 @@ import {
   elementOverlapsWithFrame,
   updateFrameMembershipOfSelectedElements,
   omitGroupsContainingFrames,
-  getElementsToUpdateForFrame,
+  isElementInFrame,
 } from "../frame";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
@@ -5881,19 +5881,11 @@ class App extends React.Component<AppProps, AppState> {
               topLayerFrame &&
               !this.state.selectedElementIds[topLayerFrame.id]
             ) {
-              const selectedFrames = new Set(
-                selectedElements
-                  .filter((element) => isFrameElement(element))
-                  .map((frame) => frame.id),
-              );
-
               const elementsToAdd = omitGroupsContainingFrames(
                 nextElements,
                 selectedElements,
-              ).filter(
-                (element) =>
-                  !isFrameElement(element) &&
-                  (!element.frameId || !selectedFrames.has(element.frameId)),
+              ).filter((element) =>
+                isElementInFrame(element, nextElements, this.state),
               );
 
               nextElements = addElementsToFrame(
@@ -5901,63 +5893,6 @@ class App extends React.Component<AppProps, AppState> {
                 elementsToAdd,
                 topLayerFrame,
               );
-            } else {
-              const elementsToRemoveFromFrame = getElementsToUpdateForFrame(
-                selectedElements,
-                (element) =>
-                  !isFrameElement(element) && element.frameId !== null,
-              );
-
-              if (elementsToRemoveFromFrame.length > 0) {
-                // if we are editing a group, then we need to remove these
-                // elements from the editing group and any outer groups as well
-
-                if (this.state.editingGroupId) {
-                  // some group elements might not be visible after parts of
-                  // their groups are dragged outside of the frame
-                  const groupIdsToCheck = new Set<string>();
-
-                  elementsToRemoveFromFrame.forEach((element) => {
-                    const index = element.groupIds.indexOf(
-                      this.state.editingGroupId!,
-                    );
-
-                    const removedGroupIds = element.groupIds.slice(index);
-                    removedGroupIds.forEach((gid) => groupIdsToCheck.add(gid));
-
-                    mutateElement(element, {
-                      groupIds: element.groupIds.slice(0, index),
-                    });
-                  });
-
-                  groupIdsToCheck.forEach((gid) => {
-                    const elementsInGroup = getElementsInGroup(
-                      this.scene.getNonDeletedElements(),
-                      gid,
-                    );
-
-                    elementsInGroup.forEach((element) => {
-                      if (element.frameId) {
-                        const frame = getContainingFrame(element);
-                        if (
-                          frame &&
-                          !elementOverlapsWithFrame(element, frame)
-                        ) {
-                          elementsToRemoveFromFrame.push(element);
-                        }
-                      }
-                    });
-                  });
-                }
-
-                this.scene.replaceAllElements(
-                  removeElementsFromFrame(
-                    this.scene.getElementsIncludingDeleted(),
-                    elementsToRemoveFromFrame,
-                    this.state,
-                  ),
-                );
-              }
             }
 
             this.scene.replaceAllElements(nextElements);
