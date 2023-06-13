@@ -69,7 +69,7 @@ describe("isCustomColor", () => {
 });
 
 describe("getMostUsedCustomColors", () => {
-  const elements:readonly any[] = [
+  const elements: readonly any[] = [
     {
       type: "rectangle",
       id: "1",
