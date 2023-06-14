@@ -413,7 +413,9 @@ export const getElementsInResizingFrame = (
     }
   }
 
-  return [...nextElementsInFrame];
+  return [...nextElementsInFrame].filter((element) => {
+    return !(isTextElement(element) && element.containerId);
+  });
 };
 
 export const getElementsInNewFrame = (
@@ -657,14 +659,17 @@ export const isElementInFrame = (
   appState: AppState,
 ) => {
   const frame = getTargetFrame(element, appState);
+  const _element = isTextElement(element)
+    ? getContainerElement(element) || element
+    : element;
 
   if (frame) {
-    if (element.groupIds.length === 0) {
-      return elementOverlapsWithFrame(element, frame);
+    if (_element.groupIds.length === 0) {
+      return elementOverlapsWithFrame(_element, frame);
     }
 
     const allElementsInGroup = new Set(
-      element.groupIds.flatMap((gid) => getElementsInGroup(allElements, gid)),
+      _element.groupIds.flatMap((gid) => getElementsInGroup(allElements, gid)),
     );
 
     if (appState.editingGroupId && appState.selectedElementsAreBeingDragged) {
