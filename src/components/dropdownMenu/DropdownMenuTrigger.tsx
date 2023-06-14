@@ -6,12 +6,13 @@ const MenuTrigger = ({
   children,
   onToggle,
   title,
+  ...rest
 }: {
   className?: string;
   children: React.ReactNode;
   onToggle: () => void;
   title?: string;
-}) => {
+} & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">) => {
   const device = useDevice();
   const classNames = clsx(
     `dropdown-menu-button ${className}`,
@@ -28,6 +29,7 @@ const MenuTrigger = ({
       type="button"
       data-testid="dropdown-menu-button"
       title={title}
+      {...rest}
     >
       {children}
     </button>
