@@ -124,6 +124,8 @@
     },
     "statusPublished": "Publisert",
     "sidebarLock": "Holde sidemenyen åpen",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": "Velg farge fra lerretet"
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Pennemodus - forhindre berøring",
     "link": "Legg til / oppdater link for en valgt figur",
     "eraser": "Viskelær",
-    "hand": "Hånd (panoreringsverktøy)"
+    "frame": "",
+    "hand": "Hånd (panoreringsverktøy)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",
