@@ -322,7 +322,7 @@ class Collab extends PureComponent<Props, CollabState> {
 
   onPauseCollaborationChange = (state: PauseCollaborationState) => {
     switch (state) {
-      case PauseCollaborationState.PAUSE: {
+      case PauseCollaborationState.PAUSED: {
         if (this.portal.socket) {
           this.portal.socket.disconnect();
           this.portal.socketInitialized = false;
@@ -334,10 +334,9 @@ class Collab extends PureComponent<Props, CollabState> {
         }
         break;
       }
-      case PauseCollaborationState.RESUME: {
+      case PauseCollaborationState.RESUMED: {
         if (this.portal.socket && this.isPaused()) {
           this.portal.socket.connect();
-          this.portal.socketInitialized = true;
           this.portal.socket.emit(WS_SCENE_EVENT_TYPES.INIT);
 
           this.excalidrawAPI.setToast({
@@ -349,7 +348,7 @@ class Collab extends PureComponent<Props, CollabState> {
         }
         break;
       }
-      case PauseCollaborationState.SYNC: {
+      case PauseCollaborationState.SYNCED: {
         if (this.isPaused()) {
           this.setIsCollaborationPaused(false);
 
@@ -560,7 +559,7 @@ class Collab extends PureComponent<Props, CollabState> {
                 elements: reconciledElements,
                 scrollToContent: true,
               });
-              this.onPauseCollaborationChange(PauseCollaborationState.SYNC);
+              this.onPauseCollaborationChange(PauseCollaborationState.SYNCED);
             }
             break;
           }
@@ -568,7 +567,6 @@ class Collab extends PureComponent<Props, CollabState> {
             this.handleRemoteSceneUpdate(
               this.reconcileElements(decryptedData.payload.elements),
             );
-            this.onPauseCollaborationChange(PauseCollaborationState.SYNC);
             break;
           case "MOUSE_LOCATION": {
             const { pointer, button, username, selectedElementIds } =
@@ -757,7 +755,7 @@ class Collab extends PureComponent<Props, CollabState> {
         this.activeIntervalId = null;
       }
       this.pauseTimeoutId = window.setTimeout(
-        () => this.onPauseCollaborationChange(PauseCollaborationState.PAUSE),
+        () => this.onPauseCollaborationChange(PauseCollaborationState.PAUSED),
         PAUSE_COLLABORATION_TIMEOUT,
       );
       this.onIdleStateChange(UserIdleState.AWAY);
@@ -770,7 +768,7 @@ class Collab extends PureComponent<Props, CollabState> {
       this.onIdleStateChange(UserIdleState.ACTIVE);
       if (this.pauseTimeoutId) {
         window.clearTimeout(this.pauseTimeoutId);
-        this.onPauseCollaborationChange(PauseCollaborationState.RESUME);
+        this.onPauseCollaborationChange(PauseCollaborationState.RESUMED);
         this.pauseTimeoutId = null;
       }
     }

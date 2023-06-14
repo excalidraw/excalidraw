@@ -377,9 +377,9 @@ export enum UserIdleState {
 }
 
 export enum PauseCollaborationState {
-  PAUSE = "pause",
-  RESUME = "resume",
-  SYNC = "sync",
+  PAUSED = "paused",
+  RESUMED = "resumed",
+  SYNCED = "synced",
 }
 
 export type ExportOpts = {
