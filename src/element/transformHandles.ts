@@ -44,6 +44,14 @@ export const OMIT_SIDES_FOR_MULTIPLE_ELEMENTS = {
   w: true,
 };
 
+export const OMIT_SIDES_FOR_FRAME = {
+  e: true,
+  s: true,
+  n: true,
+  w: true,
+  rotation: true,
+};
+
 const OMIT_SIDES_FOR_TEXT_ELEMENT = {
   e: true,
   s: true,

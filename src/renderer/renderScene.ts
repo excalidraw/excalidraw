@@ -46,6 +46,7 @@ import {
   isBindingEnabled,
 } from "../element/binding";
 import {
+  OMIT_SIDES_FOR_FRAME,
   shouldShowBoundingBox,
   TransformHandles,
   TransformHandleType,
@@ -61,7 +62,7 @@ import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
-import { isLinearElement } from "../element/typeChecks";
+import { isFrameElement, isLinearElement } from "../element/typeChecks";
 import {
   elementOverlapsWithFrame,
   getTargetFrame,
@@ -458,6 +459,7 @@ export const _renderScene = ({
 
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
+
     visibleElements.forEach((element) => {
       try {
         // - when exporting the whole canvas, we DO NOT apply clipping
@@ -545,6 +547,9 @@ export const _renderScene = ({
     }
 
     const locallySelectedElements = getSelectedElements(elements, appState);
+    const isFrameSelected = locallySelectedElements.some((element) =>
+      isFrameElement(element),
+    );
 
     // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
     // ShapeCache returns empty hence making sure that we get the
@@ -714,7 +719,9 @@ export const _renderScene = ({
           0,
           renderConfig.zoom,
           "mouse",
-          OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+          isFrameSelected
+            ? OMIT_SIDES_FOR_FRAME
+            : OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
         );
         if (locallySelectedElements.some((element) => !element.locked)) {
           renderTransformHandles(context, renderConfig, transformHandles, 0);

@@ -7066,7 +7066,16 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.getNonDeletedElements(),
       this.state,
     );
+    const selectedFrames = selectedElements.filter(
+      (element) => element.type === "frame",
+    ) as ExcalidrawFrameElement[];
+
     const transformHandleType = pointerDownState.resize.handleType;
+
+    if (selectedFrames.length > 0 && transformHandleType === "rotation") {
+      return false;
+    }
+
     this.setState({
       // TODO: rename this state field to "isScaling" to distinguish
       // it from the generic "isResizing" which includes scaling and
@@ -7080,10 +7089,6 @@ class App extends React.Component<AppProps, AppState> {
       pointerCoords.y - pointerDownState.resize.offset.y,
       this.state.gridSize,
     );
-
-    const selectedFrames = selectedElements.filter(
-      (element) => element.type === "frame",
-    ) as ExcalidrawFrameElement[];
 
     const frameElementsOffsetsMap = new Map<
       string,
