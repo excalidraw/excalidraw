@@ -206,7 +206,7 @@ export const isPointInPolygon = (
 
 // Returns whether `q` lies inside the segment/rectangle defined by `p` and `r`.
 // This is an approximation to "does `q` lie on a segment `pr`" check.
-const isPointWithinBounds = (p: Point, q: Point, r: Point) => {
+export const isPointWithinBounds = (p: Point, q: Point, r: Point) => {
   return (
     q[0] <= Math.max(p[0], r[0]) &&
     q[0] >= Math.min(p[0], r[0]) &&
