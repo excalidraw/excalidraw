@@ -68,7 +68,7 @@ import {
   getTargetFrame,
   isElementInFrame,
 } from "../frame";
-import "./roundRect.polyfill";
+import "canvas-roundrect-polyfill";
 
 export const DEFAULT_SPACING = 2;
 
