@@ -861,6 +861,7 @@ class App extends React.Component<AppProps, AppState> {
                             !this.state.isLoading &&
                             this.state.showWelcomeScreen &&
                             this.state.activeTool.type === "selection" &&
+                            !this.state.zenModeEnabled &&
                             !this.scene.getElementsIncludingDeleted().length
                           }
                         >
