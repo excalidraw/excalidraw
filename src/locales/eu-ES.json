@@ -124,6 +124,8 @@
     },
     "statusPublished": "Argitaratua",
     "sidebarLock": "Mantendu alboko barra irekita",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Luma modua - ukipena saihestu",
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma",
-    "hand": "Eskua (panoratze tresna)"
+    "frame": "",
+    "hand": "Eskua (panoratze tresna)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
