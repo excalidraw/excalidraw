@@ -468,12 +468,13 @@ export const addElementsToFrame = (
 
   let nextElements = allElements.slice();
 
+  const frameBoundary = findIndex(nextElements, (e) => e.frameId === frame.id);
+
   for (const element of omitGroupsContainingFrames(
     allElements,
     _elementsToAdd,
   )) {
-    // only necessary if the element is not already in the frame
-    if (element.frameId !== frame.id) {
+    if (element.frameId !== frame.id && !isFrameElement(element)) {
       mutateElement(
         element,
         {
@@ -485,12 +486,12 @@ export const addElementsToFrame = (
       const frameIndex = findIndex(nextElements, (e) => e.id === frame.id);
       const elementIndex = findIndex(nextElements, (e) => e.id === element.id);
 
-      if (elementIndex < frameIndex) {
+      if (elementIndex < frameBoundary) {
         nextElements = [
           ...nextElements.slice(0, elementIndex),
-          ...nextElements.slice(elementIndex + 1, frameIndex),
+          ...nextElements.slice(elementIndex + 1, frameBoundary),
           element,
-          ...nextElements.slice(frameIndex),
+          ...nextElements.slice(frameBoundary),
         ];
       } else {
         nextElements = [
