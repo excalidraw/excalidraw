@@ -210,9 +210,7 @@ export const loadLibraryFromBlob = async (
   return parseLibraryJSON(await parseFileContents(blob), defaultStatus);
 };
 
-export const canvasToBlob = async (
-  canvas: HTMLCanvasElement,
-): Promise<Blob> => {
+const _canvasToBlob = async (canvas: HTMLCanvasElement): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     try {
       canvas.toBlob((blob) => {
@@ -230,6 +228,80 @@ export const canvasToBlob = async (
       reject(error);
     }
   });
+};
+
+export const canvasToBlob = async (
+  canvas: HTMLCanvasElement,
+): Promise<Blob> => {
+  const chunkSize = 8000; // Adjust the chunk size according to your requirements
+
+  const chunkBlobs: Blob[] = []; // Array to hold the generated image chunk Blobs
+
+  console.log("canvas", canvas.width, canvas.height);
+
+  // Split the canvas into chunks and generate the image chunks
+  for (let x = 0; x < canvas.width; x += chunkSize) {
+    for (let y = 0; y < canvas.height; y += chunkSize) {
+      const chunkCanvas = document.createElement("canvas");
+      chunkCanvas.width = chunkSize;
+      chunkCanvas.height = chunkSize;
+      const chunkContext = chunkCanvas.getContext("2d");
+
+      if (!chunkContext) {
+        throw new Error("Could not get context");
+      }
+
+      // Copy the portion of the main canvas into the chunk canvas
+      chunkContext.drawImage(
+        canvas,
+        x,
+        y,
+        chunkSize,
+        chunkSize,
+        0,
+        0,
+        chunkSize,
+        chunkSize,
+      );
+
+      console.log(x, y, chunkSize);
+
+      // Convert the chunk canvas to a Blob
+      const blob = await _canvasToBlob(chunkCanvas);
+      chunkBlobs.push(blob);
+
+      chunkCanvas.remove();
+    }
+  }
+
+  // Convert each Blob into an ArrayBuffer and concatenate them
+  const arrayBuffers = await Promise.all(
+    chunkBlobs.map((blob) => {
+      return new Promise<ArrayBuffer>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (reader.result instanceof ArrayBuffer) {
+            resolve(reader.result);
+          } else {
+            throw new Error("Failed to read ArrayBuffer");
+          }
+        };
+        reader.readAsArrayBuffer(blob);
+      });
+    }),
+  );
+  const totalLength = arrayBuffers.reduce(
+    (length, buffer) => length + buffer.byteLength,
+    0,
+  );
+  const concatenatedBuffer = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const buffer of arrayBuffers) {
+    concatenatedBuffer.set(new Uint8Array(buffer), offset);
+    offset += buffer.byteLength;
+  }
+
+  return new Blob([concatenatedBuffer], { type: "image/png" });
 };
 
 /** generates SHA-1 digest from supplied file (if not supported, falls back

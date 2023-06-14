@@ -74,8 +74,11 @@ export const exportCanvas = async (
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);
 
+  console.log("tempCanvas", tempCanvas.width, tempCanvas.height);
+
   if (type === "png") {
     let blob = await canvasToBlob(tempCanvas);
+    console.log("final blob size", blob.size);
     tempCanvas.remove();
     if (appState.exportEmbedScene) {
       blob = await (
