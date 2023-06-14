@@ -28,6 +28,7 @@
     "@testing-library/react": "12.1.5",
     "@tldraw/vec": "1.7.1",
     "browser-fs-access": "0.29.1",
+    "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",
     "cross-env": "7.0.3",
     "fake-indexeddb": "3.1.7",
@@ -107,7 +108,7 @@
       "<rootDir>/src/packages/excalidraw/example"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-fs-access)/)"
+      "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-fs-access|canvas-roundrect-polyfill)/)"
     ],
     "resetMocks": false
   },
