@@ -249,6 +249,7 @@ export const actionWrapTextInContainer = register({
             "rectangle",
           ),
           groupIds: textElement.groupIds,
+          frameId: textElement.frameId,
         });
 
         // update bindings

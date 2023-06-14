@@ -124,6 +124,8 @@
     },
     "statusPublished": "Published",
     "sidebarLock": "Keep sidebar open",
+    "selectAllElementsInFrame": "Select all elements in frame",
+    "removeAllElementsFromFrame": "Remove all elements from frame",
     "eyeDropper": "Pick color from canvas"
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Pen mode - prevent touch",
     "link": "Add/ Update link for a selected shape",
     "eraser": "Eraser",
-    "hand": "Hand (panning tool)"
+    "frame": "Frame tool",
+    "hand": "Hand (panning tool)",
+    "extraTools": "More tools"
   },
   "headings": {
     "canvasActions": "Canvas actions",
