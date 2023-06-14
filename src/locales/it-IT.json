@@ -124,6 +124,8 @@
     },
     "statusPublished": "Pubblicato",
     "sidebarLock": "Mantieni aperta la barra laterale",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Modalità penna - previene il tocco",
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
     "eraser": "Gomma",
-    "hand": "Mano (strumento di panoramica)"
+    "frame": "",
+    "hand": "Mano (strumento di panoramica)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
