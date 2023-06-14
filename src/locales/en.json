@@ -224,7 +224,8 @@
     "link": "Add/ Update link for a selected shape",
     "eraser": "Eraser",
     "frame": "Frame tool",
-    "hand": "Hand (panning tool)"
+    "hand": "Hand (panning tool)",
+    "extraTools": "More tools"
   },
   "headings": {
     "canvasActions": "Canvas actions",

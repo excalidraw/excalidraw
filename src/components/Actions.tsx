@@ -321,6 +321,7 @@ export const ShapesSwitcher = ({
           <DropdownMenu.Trigger
             className="App-toolbar__extra-tools-trigger"
             onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
+            title={t("toolBar.extraTools")}
           >
             {extraToolsIcon}
           </DropdownMenu.Trigger>

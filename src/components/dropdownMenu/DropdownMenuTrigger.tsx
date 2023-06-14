@@ -5,10 +5,12 @@ const MenuTrigger = ({
   className = "",
   children,
   onToggle,
+  title,
 }: {
   className?: string;
   children: React.ReactNode;
   onToggle: () => void;
+  title?: string;
 }) => {
   const device = useDevice();
   const classNames = clsx(
@@ -25,6 +27,7 @@ const MenuTrigger = ({
       onClick={onToggle}
       type="button"
       data-testid="dropdown-menu-button"
+      title={title}
     >
       {children}
     </button>
