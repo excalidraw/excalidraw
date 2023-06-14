@@ -124,6 +124,8 @@
     },
     "statusPublished": "بڵاوکراوەتەوە",
     "sidebarLock": "هێشتنەوەی شریتی لا بە کراوەیی",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "شێوازی قەڵەم - دەست لێدان ڕابگرە",
     "link": "زیادکردن/ نوێکردنەوەی لینک بۆ شێوەی دیاریکراو",
     "eraser": "سڕەر",
-    "hand": "دەست (ئامرازی پانکردن)"
+    "frame": "",
+    "hand": "دەست (ئامرازی پانکردن)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "کردارەکانی تابلۆ",
