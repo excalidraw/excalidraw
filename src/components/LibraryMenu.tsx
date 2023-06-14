@@ -148,7 +148,11 @@ const usePendingElementsMemo = (
   appState: UIAppState,
   elements: readonly NonDeletedExcalidrawElement[],
 ) => {
-  const create = () => getSelectedElements(elements, appState, true);
+  const create = () =>
+    getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+      includeElementsInFrames: true,
+    });
   const val = useRef(create());
   const prevAppState = useRef<UIAppState>(appState);
   const prevElements = useRef(elements);

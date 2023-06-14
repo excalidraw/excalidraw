@@ -20,6 +20,7 @@ import {
   hasBoundTextElement,
   canApplyRoundnessTypeToElement,
   getDefaultRoundnessTypeForElement,
+  isFrameElement,
 } from "../element/typeChecks";
 import { getSelectedElements } from "../scene";
 
@@ -64,7 +65,9 @@ export const actionPasteStyles = register({
       return { elements, commitToHistory: false };
     }
 
-    const selectedElements = getSelectedElements(elements, appState, true);
+    const selectedElements = getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    });
     const selectedElementIds = selectedElements.map((element) => element.id);
     return {
       elements: elements.map((element) => {
@@ -124,6 +127,13 @@ export const actionPasteStyles = register({
             newElement = newElementWith(newElement, {
               startArrowhead: elementStylesToCopyFrom.startArrowhead,
               endArrowhead: elementStylesToCopyFrom.endArrowhead,
+            });
+          }
+
+          if (isFrameElement(element)) {
+            newElement = newElementWith(newElement, {
+              roundness: null,
+              backgroundColor: "transparent",
             });
           }
 

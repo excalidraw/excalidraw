@@ -2,15 +2,25 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
+  ExcalidrawFrameElement,
 } from "../element/types";
-import { getNonDeletedElements, isNonDeletedElement } from "../element";
+import {
+  getNonDeletedElements,
+  getNonDeletedFrames,
+  isNonDeletedElement,
+} from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { isFrameElement } from "../element/typeChecks";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
 
 type SceneStateCallback = () => void;
 type SceneStateCallbackRemover = () => void;
+
+// ideally this would be a branded type but it'd be insanely hard to work with
+// in our codebase
+export type ExcalidrawElementsIncludingDeleted = readonly ExcalidrawElement[];
 
 const isIdKey = (elementKey: ElementKey): elementKey is ElementIdKey => {
   if (typeof elementKey === "string") {
@@ -55,6 +65,8 @@ class Scene {
 
   private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
   private elements: readonly ExcalidrawElement[] = [];
+  private nonDeletedFrames: readonly NonDeleted<ExcalidrawFrameElement>[] = [];
+  private frames: readonly ExcalidrawFrameElement[] = [];
   private elementsMap = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
 
   getElementsIncludingDeleted() {
@@ -63,6 +75,14 @@ class Scene {
 
   getNonDeletedElements(): readonly NonDeletedExcalidrawElement[] {
     return this.nonDeletedElements;
+  }
+
+  getFramesIncludingDeleted() {
+    return this.frames;
+  }
+
+  getNonDeletedFrames(): readonly NonDeleted<ExcalidrawFrameElement>[] {
+    return this.nonDeletedFrames;
   }
 
   getElement<T extends ExcalidrawElement>(id: T["id"]): T | null {
@@ -110,12 +130,19 @@ class Scene {
 
   replaceAllElements(nextElements: readonly ExcalidrawElement[]) {
     this.elements = nextElements;
+    const nextFrames: ExcalidrawFrameElement[] = [];
     this.elementsMap.clear();
     nextElements.forEach((element) => {
+      if (isFrameElement(element)) {
+        nextFrames.push(element);
+      }
       this.elementsMap.set(element.id, element);
       Scene.mapElementToScene(element, this);
     });
     this.nonDeletedElements = getNonDeletedElements(this.elements);
+    this.frames = nextFrames;
+    this.nonDeletedFrames = getNonDeletedFrames(this.frames);
+
     this.informMutation();
   }
 
@@ -164,6 +191,29 @@ class Scene {
     ];
     this.replaceAllElements(nextElements);
   }
+
+  insertElementsAtIndex(elements: ExcalidrawElement[], index: number) {
+    if (!Number.isFinite(index) || index < 0) {
+      throw new Error(
+        "insertElementAtIndex can only be called with index >= 0",
+      );
+    }
+    const nextElements = [
+      ...this.elements.slice(0, index),
+      ...elements,
+      ...this.elements.slice(index),
+    ];
+
+    this.replaceAllElements(nextElements);
+  }
+
+  addNewElement = (element: ExcalidrawElement) => {
+    if (element.frameId) {
+      this.insertElementAtIndex(element, this.getElementIndex(element.frameId));
+    } else {
+      this.replaceAllElements([...this.elements, element]);
+    }
+  };
 
   getElementIndex(elementId: string) {
     return this.elements.findIndex((element) => element.id === elementId);

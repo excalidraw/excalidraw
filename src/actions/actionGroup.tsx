@@ -17,9 +17,19 @@ import {
 import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
 import { ToolButton } from "../components/ToolButton";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawFrameElement,
+  ExcalidrawTextElement,
+} from "../element/types";
 import { AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
+import {
+  getElementsInResizingFrame,
+  groupByFrames,
+  removeElementsFromFrame,
+  replaceAllElementsInFrame,
+} from "../frame";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -45,7 +55,9 @@ const enableActionGroup = (
   const selectedElements = getSelectedElements(
     getNonDeletedElements(elements),
     appState,
-    true,
+    {
+      includeBoundTextElement: true,
+    },
   );
   return (
     selectedElements.length >= 2 && !allElementsInSameGroup(selectedElements)
@@ -55,11 +67,13 @@ const enableActionGroup = (
 export const actionGroup = register({
   name: "group",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
-      true,
+      {
+        includeBoundTextElement: true,
+      },
     );
     if (selectedElements.length < 2) {
       // nothing to group
@@ -86,9 +100,31 @@ export const actionGroup = register({
         return { appState, elements, commitToHistory: false };
       }
     }
+
+    let nextElements = [...elements];
+
+    // this includes the case where we are grouping elements inside a frame
+    // and elements outside that frame
+    const groupingElementsFromDifferentFrames =
+      new Set(selectedElements.map((element) => element.frameId)).size > 1;
+    // when it happens, we want to remove elements that are in the frame
+    // and are going to be grouped from the frame (mouthful, I know)
+    if (groupingElementsFromDifferentFrames) {
+      const frameElementsMap = groupByFrames(selectedElements);
+
+      frameElementsMap.forEach((elementsInFrame, frameId) => {
+        nextElements = removeElementsFromFrame(
+          nextElements,
+          elementsInFrame,
+          appState,
+        );
+      });
+    }
+
     const newGroupId = randomId();
     const selectElementIds = arrayToMap(selectedElements);
-    const updatedElements = elements.map((element) => {
+
+    nextElements = nextElements.map((element) => {
       if (!selectElementIds.get(element.id)) {
         return element;
       }
@@ -102,17 +138,16 @@ export const actionGroup = register({
     });
     // keep the z order within the group the same, but move them
     // to the z order of the highest element in the layer stack
-    const elementsInGroup = getElementsInGroup(updatedElements, newGroupId);
+    const elementsInGroup = getElementsInGroup(nextElements, newGroupId);
     const lastElementInGroup = elementsInGroup[elementsInGroup.length - 1];
-    const lastGroupElementIndex =
-      updatedElements.lastIndexOf(lastElementInGroup);
-    const elementsAfterGroup = updatedElements.slice(lastGroupElementIndex + 1);
-    const elementsBeforeGroup = updatedElements
+    const lastGroupElementIndex = nextElements.lastIndexOf(lastElementInGroup);
+    const elementsAfterGroup = nextElements.slice(lastGroupElementIndex + 1);
+    const elementsBeforeGroup = nextElements
       .slice(0, lastGroupElementIndex)
       .filter(
         (updatedElement) => !isElementInGroup(updatedElement, newGroupId),
       );
-    const updatedElementsInOrder = [
+    nextElements = [
       ...elementsBeforeGroup,
       ...elementsInGroup,
       ...elementsAfterGroup,
@@ -122,9 +157,9 @@ export const actionGroup = register({
       appState: selectGroup(
         newGroupId,
         { ...appState, selectedGroupIds: {} },
-        getNonDeletedElements(updatedElementsInOrder),
+        getNonDeletedElements(nextElements),
       ),
-      elements: updatedElementsInOrder,
+      elements: nextElements,
       commitToHistory: true,
     };
   },
@@ -148,14 +183,23 @@ export const actionGroup = register({
 export const actionUngroup = register({
   name: "ungroup",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     const groupIds = getSelectedGroupIds(appState);
     if (groupIds.length === 0) {
       return { appState, elements, commitToHistory: false };
     }
 
+    let nextElements = [...elements];
+
+    const selectedElements = getSelectedElements(nextElements, appState);
+    const frames = selectedElements
+      .filter((element) => element.frameId)
+      .map((element) =>
+        app.scene.getElement(element.frameId!),
+      ) as ExcalidrawFrameElement[];
+
     const boundTextElementIds: ExcalidrawTextElement["id"][] = [];
-    const nextElements = elements.map((element) => {
+    nextElements = nextElements.map((element) => {
       if (isBoundToContainer(element)) {
         boundTextElementIds.push(element.id);
       }
@@ -176,13 +220,23 @@ export const actionUngroup = register({
       getNonDeletedElements(nextElements),
     );
 
+    frames.forEach((frame) => {
+      if (frame) {
+        nextElements = replaceAllElementsInFrame(
+          nextElements,
+          getElementsInResizingFrame(nextElements, frame, appState),
+          frame,
+          appState,
+        );
+      }
+    });
+
     // remove binded text elements from selection
     boundTextElementIds.forEach(
       (id) => (updateAppState.selectedElementIds[id] = false),
     );
     return {
       appState: updateAppState,
-
       elements: nextElements,
       commitToHistory: true,
     };

@@ -7,7 +7,8 @@ export const hasBackground = (type: string) =>
   type === "line" ||
   type === "freedraw";
 
-export const hasStrokeColor = (type: string) => type !== "image";
+export const hasStrokeColor = (type: string) =>
+  type !== "image" && type !== "frame";
 
 export const hasStrokeWidth = (type: string) =>
   type === "rectangle" ||

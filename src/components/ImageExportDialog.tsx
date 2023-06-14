@@ -84,7 +84,10 @@ const ImageExportModal = ({
   const [renderError, setRenderError] = useState<Error | null>(null);
 
   const exportedElements = exportSelected
-    ? getSelectedElements(elements, appState, true)
+    ? getSelectedElements(elements, appState, {
+        includeBoundTextElement: true,
+        includeElementsInFrames: true,
+      })
     : elements;
 
   useEffect(() => {

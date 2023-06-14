@@ -102,8 +102,11 @@ const changeProperty = (
   includeBoundText = false,
 ) => {
   const selectedElementIds = arrayToMap(
-    getSelectedElements(elements, appState, includeBoundText),
+    getSelectedElements(elements, appState, {
+      includeBoundTextElement: includeBoundText,
+    }),
   );
+
   return elements.map((element) => {
     if (
       selectedElementIds.get(element.id) ||

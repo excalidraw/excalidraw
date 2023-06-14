@@ -94,6 +94,17 @@ export const THEME = {
   DARK: "dark",
 };
 
+export const FRAME_STYLE = {
+  strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
+  strokeWidth: 1 as ExcalidrawElement["strokeWidth"],
+  strokeStyle: "solid" as ExcalidrawElement["strokeStyle"],
+  fillStyle: "solid" as ExcalidrawElement["fillStyle"],
+  roughness: 0 as ExcalidrawElement["roughness"],
+  roundness: null as ExcalidrawElement["roundness"],
+  backgroundColor: "transparent" as ExcalidrawElement["backgroundColor"],
+  radius: 8,
+};
+
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
 export const DEFAULT_FONT_SIZE = 20;

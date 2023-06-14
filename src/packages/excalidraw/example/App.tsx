@@ -205,6 +205,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             height: 141.9765625,
             seed: 1968410350,
             groupIds: [],
+            frameId: null,
             boundElements: null,
             locked: false,
             link: null,

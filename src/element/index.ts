@@ -2,6 +2,7 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
+  ExcalidrawFrameElement,
 } from "./types";
 import { isInvisiblySmallElement } from "./sizeHelpers";
 import { isLinearElementType } from "./typeChecks";
@@ -49,7 +50,11 @@ export {
   getDragOffsetXY,
   dragNewElement,
 } from "./dragElements";
-export { isTextElement, isExcalidrawElement } from "./typeChecks";
+export {
+  isTextElement,
+  isExcalidrawElement,
+  isFrameElement,
+} from "./typeChecks";
 export { textWysiwyg } from "./textWysiwyg";
 export { redrawTextBoundingBox } from "./textElement";
 export {
@@ -73,6 +78,13 @@ export const getNonDeletedElements = (elements: readonly ExcalidrawElement[]) =>
   elements.filter(
     (element) => !element.isDeleted,
   ) as readonly NonDeletedExcalidrawElement[];
+
+export const getNonDeletedFrames = (
+  frames: readonly ExcalidrawFrameElement[],
+) =>
+  frames.filter(
+    (frame) => !frame.isDeleted,
+  ) as readonly NonDeleted<ExcalidrawFrameElement>[];
 
 export const isNonDeletedElement = <T extends ExcalidrawElement>(
   element: T,

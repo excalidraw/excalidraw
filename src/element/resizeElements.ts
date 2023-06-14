@@ -27,6 +27,7 @@ import {
 import {
   isArrowElement,
   isBoundToContainer,
+  isFrameElement,
   isFreeDrawElement,
   isImageElement,
   isLinearElement,
@@ -160,12 +161,17 @@ const rotateSingleElement = (
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
-  let angle = (5 * Math.PI) / 2 + Math.atan2(pointerY - cy, pointerX - cx);
-  if (shouldRotateWithDiscreteAngle) {
-    angle += SHIFT_LOCKING_ANGLE / 2;
-    angle -= angle % SHIFT_LOCKING_ANGLE;
+  let angle: number;
+  if (isFrameElement(element)) {
+    angle = 0;
+  } else {
+    angle = (5 * Math.PI) / 2 + Math.atan2(pointerY - cy, pointerX - cx);
+    if (shouldRotateWithDiscreteAngle) {
+      angle += SHIFT_LOCKING_ANGLE / 2;
+      angle -= angle % SHIFT_LOCKING_ANGLE;
+    }
+    angle = normalizeAngle(angle);
   }
-  angle = normalizeAngle(angle);
   const boundTextElementId = getBoundTextElementId(element);
 
   mutateElement(element, { angle });
@@ -877,45 +883,47 @@ const rotateMultipleElements = (
     centerAngle += SHIFT_LOCKING_ANGLE / 2;
     centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
   }
-  elements.forEach((element) => {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    const cx = (x1 + x2) / 2;
-    const cy = (y1 + y2) / 2;
-    const origAngle =
-      pointerDownState.originalElements.get(element.id)?.angle ?? element.angle;
-    const [rotatedCX, rotatedCY] = rotate(
-      cx,
-      cy,
-      centerX,
-      centerY,
-      centerAngle + origAngle - element.angle,
-    );
 
-    mutateElement(
-      element,
-      {
-        x: element.x + (rotatedCX - cx),
-        y: element.y + (rotatedCY - cy),
-        angle: normalizeAngle(centerAngle + origAngle),
-      },
-      false,
-    );
-
-    updateBoundElements(element, { simultaneouslyUpdated: elements });
-
-    const boundText = getBoundTextElement(element);
-    if (boundText && !isArrowElement(element)) {
+  elements
+    .filter((element) => element.type !== "frame")
+    .forEach((element) => {
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+      const cx = (x1 + x2) / 2;
+      const cy = (y1 + y2) / 2;
+      const origAngle =
+        pointerDownState.originalElements.get(element.id)?.angle ??
+        element.angle;
+      const [rotatedCX, rotatedCY] = rotate(
+        cx,
+        cy,
+        centerX,
+        centerY,
+        centerAngle + origAngle - element.angle,
+      );
       mutateElement(
-        boundText,
+        element,
         {
-          x: boundText.x + (rotatedCX - cx),
-          y: boundText.y + (rotatedCY - cy),
+          x: element.x + (rotatedCX - cx),
+          y: element.y + (rotatedCY - cy),
           angle: normalizeAngle(centerAngle + origAngle),
         },
         false,
       );
-    }
-  });
+      updateBoundElements(element, { simultaneouslyUpdated: elements });
+
+      const boundText = getBoundTextElement(element);
+      if (boundText && !isArrowElement(element)) {
+        mutateElement(
+          boundText,
+          {
+            x: boundText.x + (rotatedCX - cx),
+            y: boundText.y + (rotatedCY - cy),
+            angle: normalizeAngle(centerAngle + origAngle),
+          },
+          false,
+        );
+      }
+    });
 
   Scene.getScene(elements[0])?.informMutation();
 };
