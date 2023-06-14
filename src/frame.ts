@@ -493,7 +493,7 @@ export const addElementsToFrame = (
           element,
           ...nextElements.slice(frameBoundary),
         ];
-      } else {
+      } else if (elementIndex > frameIndex) {
         nextElements = [
           ...nextElements.slice(0, frameIndex),
           element,
@@ -640,10 +640,14 @@ export const getTargetFrame = (
   element: ExcalidrawElement,
   appState: AppState,
 ) => {
-  return appState.selectedElementIds[element.id] &&
+  const _element = isTextElement(element)
+    ? getContainerElement(element) || element
+    : element;
+
+  return appState.selectedElementIds[_element.id] &&
     appState.selectedElementsAreBeingDragged
     ? appState.frameToHighlight
-    : getContainingFrame(element);
+    : getContainingFrame(_element);
 };
 
 // given an element, return if the element is in some frame
@@ -652,14 +656,11 @@ export const isElementInFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
   appState: AppState,
 ) => {
-  const _element = isTextElement(element)
-    ? getContainerElement(element) || element
-    : element;
-  const frame = getTargetFrame(_element, appState);
+  const frame = getTargetFrame(element, appState);
 
   if (frame) {
     if (element.groupIds.length === 0) {
-      return elementOverlapsWithFrame(_element, frame);
+      return elementOverlapsWithFrame(element, frame);
     }
 
     const allElementsInGroup = new Set(
