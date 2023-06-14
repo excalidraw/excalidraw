@@ -15,6 +15,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   roughness: 1,
   opacity: 100,
   groupIds: [],
+  frameId: null,
   roundness: null,
   seed: 1041657908,
   version: 120,

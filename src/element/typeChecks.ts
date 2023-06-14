@@ -13,6 +13,7 @@ import {
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextContainer,
+  ExcalidrawFrameElement,
   RoundnessType,
 } from "./types";
 
@@ -51,6 +52,12 @@ export const isTextElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawTextElement => {
   return element != null && element.type === "text";
+};
+
+export const isFrameElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawFrameElement => {
+  return element != null && element.type === "frame";
 };
 
 export const isFreeDrawElement = (

@@ -10,6 +10,7 @@ import {
   NonDeleted,
   GroupId,
   ExcalidrawBindableElement,
+  ExcalidrawFrameElement,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -36,6 +37,7 @@ import {
   isSelectedViaGroup,
   getSelectedGroupIds,
   getElementsInGroup,
+  selectGroupsFromGivenElements,
 } from "../groups";
 import { maxBindingGap } from "../element/collision";
 import {
@@ -44,24 +46,38 @@ import {
   isBindingEnabled,
 } from "../element/binding";
 import {
+  OMIT_SIDES_FOR_FRAME,
   shouldShowBoundingBox,
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import { viewportCoordsToSceneCoords, throttleRAF } from "../utils";
+import {
+  viewportCoordsToSceneCoords,
+  throttleRAF,
+  isOnlyExportingSingleFrame,
+} from "../utils";
 import { UserIdleState } from "../types";
-import { THEME_FILTER } from "../constants";
+import { FRAME_STYLE, THEME_FILTER } from "../constants";
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
-import { isIFrameElement, isLinearElement } from "../element/typeChecks";
+import {
+  isIFrameElement,
+  isFrameElement,
+  isLinearElement,
+} from "../element/typeChecks";
 import { getBoundTextElement } from "../element/textElement";
-import "./roundRect.polyfill";
 import {
   isIFrameOrFrameLabel,
   createPlaceholderiFrameLabel,
 } from "../element/iframe";
+import {
+  elementOverlapsWithFrame,
+  getTargetFrame,
+  isElementInFrame,
+} from "../frame";
+import "canvas-roundrect-polyfill";
 
 export const DEFAULT_SPACING = 2;
 
@@ -75,6 +91,8 @@ const strokeRectWithRotation = (
   cy: number,
   angle: number,
   fill: boolean = false,
+  /** should account for zoom */
+  radius: number = 0,
 ) => {
   context.save();
   context.translate(cx, cy);
@@ -82,7 +100,14 @@ const strokeRectWithRotation = (
   if (fill) {
     context.fillRect(x - cx, y - cy, width, height);
   }
-  context.strokeRect(x - cx, y - cy, width, height);
+  if (radius && context.roundRect) {
+    context.beginPath();
+    context.roundRect(x - cx, y - cy, width, height, radius);
+    context.stroke();
+    context.closePath();
+  } else {
+    context.strokeRect(x - cx, y - cy, width, height);
+  }
   context.restore();
 };
 
@@ -304,6 +329,34 @@ const renderLinearElementPointHighlight = (
   context.restore();
 };
 
+const frameClip = (
+  frame: ExcalidrawFrameElement,
+  context: CanvasRenderingContext2D,
+  renderConfig: RenderConfig,
+) => {
+  context.translate(
+    frame.x + renderConfig.scrollX,
+    frame.y + renderConfig.scrollY,
+  );
+  context.beginPath();
+  if (context.roundRect && !renderConfig.isExporting) {
+    context.roundRect(
+      0,
+      0,
+      frame.width,
+      frame.height,
+      FRAME_STYLE.radius / renderConfig.zoom.value,
+    );
+  } else {
+    context.rect(0, 0, frame.width, frame.height);
+  }
+  context.clip();
+  context.translate(
+    -(frame.x + renderConfig.scrollX),
+    -(frame.y + renderConfig.scrollY),
+  );
+};
+
 export const _renderScene = ({
   elements,
   appState,
@@ -395,13 +448,53 @@ export const _renderScene = ({
       }),
     );
 
+    const groupsToBeAddedToFrame = new Set<string>();
+
+    visibleElements.forEach((element) => {
+      if (
+        element.groupIds.length > 0 &&
+        appState.frameToHighlight &&
+        appState.selectedElementIds[element.id] &&
+        (elementOverlapsWithFrame(element, appState.frameToHighlight) ||
+          element.groupIds.find((groupId) =>
+            groupsToBeAddedToFrame.has(groupId),
+          ))
+      ) {
+        element.groupIds.forEach((groupId) =>
+          groupsToBeAddedToFrame.add(groupId),
+        );
+      }
+    });
+
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
+
     visibleElements
       .filter((el) => !isIFrameOrFrameLabel(el))
       .forEach((element) => {
         try {
-          renderElement(element, rc, context, renderConfig, appState);
+          // - when exporting the whole canvas, we DO NOT apply clipping
+          // - when we are exporting a particular frame, apply clipping
+          //   if the containing frame is not selected, apply clipping
+          const frameId = element.frameId || appState.frameToHighlight?.id;
+
+          if (
+            frameId &&
+            ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
+              (!renderConfig.isExporting && appState.shouldRenderFrames))
+          ) {
+            context.save();
+
+            const frame = getTargetFrame(element, appState);
+  
+            if (frame && isElementInFrame(element, elements, appState)) {
+              frameClip(frame, context, renderConfig);
+            }
+            renderElement(element, rc, context, renderConfig, appState);
+            context.restore();
+          } else {
+            renderElement(element, rc, context, renderConfig, appState);
+          }
           // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
           // ShapeCache returns empty hence making sure that we get the
           // correct element from visible elements
@@ -409,7 +502,6 @@ export const _renderScene = ({
             if (element) {
               editingLinearElement =
                 element as NonDeleted<ExcalidrawLinearElement>;
-            }
           }
           if (!isExporting) {
             renderLinkIcon(element, context, appState);
@@ -472,7 +564,24 @@ export const _renderScene = ({
           renderBindingHighlight(context, renderConfig, suggestedBinding!);
         });
     }
+
+    if (appState.frameToHighlight) {
+      renderFrameHighlight(context, renderConfig, appState.frameToHighlight);
+    }
+
+    if (appState.elementsToHighlight) {
+      renderElementsBoxHighlight(
+        context,
+        renderConfig,
+        appState.elementsToHighlight,
+        appState,
+      );
+    }
+
     const locallySelectedElements = getSelectedElements(elements, appState);
+    const isFrameSelected = locallySelectedElements.some((element) =>
+      isFrameElement(element),
+    );
 
     // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
     // ShapeCache returns empty hence making sure that we get the
@@ -644,7 +753,9 @@ export const _renderScene = ({
           0,
           renderConfig.zoom,
           "mouse",
-          OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+          isFrameSelected
+            ? OMIT_SIDES_FOR_FRAME
+            : OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
         );
         if (locallySelectedElements.some((element) => !element.locked)) {
           renderTransformHandles(context, renderConfig, transformHandles, 0);
@@ -1008,6 +1119,7 @@ const renderBindingHighlightForBindableElement = (
     case "text":
     case "image":
     case "iframe":
+    case "frame":
       strokeRectWithRotation(
         context,
         x1 - padding,
@@ -1043,6 +1155,82 @@ const renderBindingHighlightForBindableElement = (
       );
       break;
   }
+};
+
+const renderFrameHighlight = (
+  context: CanvasRenderingContext2D,
+  renderConfig: RenderConfig,
+  frame: NonDeleted<ExcalidrawFrameElement>,
+) => {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame);
+  const width = x2 - x1;
+  const height = y2 - y1;
+
+  context.strokeStyle = "rgb(0,118,255)";
+  context.lineWidth = (FRAME_STYLE.strokeWidth * 2) / renderConfig.zoom.value;
+
+  context.save();
+  context.translate(renderConfig.scrollX, renderConfig.scrollY);
+  strokeRectWithRotation(
+    context,
+    x1,
+    y1,
+    width,
+    height,
+    x1 + width / 2,
+    y1 + height / 2,
+    frame.angle,
+    false,
+    FRAME_STYLE.radius / renderConfig.zoom.value,
+  );
+  context.restore();
+};
+
+const renderElementsBoxHighlight = (
+  context: CanvasRenderingContext2D,
+  renderConfig: RenderConfig,
+  elements: NonDeleted<ExcalidrawElement>[],
+  appState: AppState,
+) => {
+  const individualElements = elements.filter(
+    (element) => element.groupIds.length === 0,
+  );
+
+  const elementsInGroups = elements.filter(
+    (element) => element.groupIds.length > 0,
+  );
+
+  const getSelectionFromElements = (elements: ExcalidrawElement[]) => {
+    const [elementX1, elementY1, elementX2, elementY2] =
+      getCommonBounds(elements);
+    return {
+      angle: 0,
+      elementX1,
+      elementX2,
+      elementY1,
+      elementY2,
+      selectionColors: ["rgb(0,118,255)"],
+      dashed: false,
+      cx: elementX1 + (elementX2 - elementX1) / 2,
+      cy: elementY1 + (elementY2 - elementY1) / 2,
+    };
+  };
+
+  const getSelectionForGroupId = (groupId: GroupId) => {
+    const groupElements = getElementsInGroup(elements, groupId);
+    return getSelectionFromElements(groupElements);
+  };
+
+  Object.entries(selectGroupsFromGivenElements(elementsInGroups, appState))
+    .filter(([id, isSelected]) => isSelected)
+    .map(([id, isSelected]) => id)
+    .map((groupId) => getSelectionForGroupId(groupId))
+    .concat(
+      individualElements.map((element) => getSelectionFromElements([element])),
+    )
+    .forEach((selection) =>
+      renderSelectionBorder(context, renderConfig, selection),
+    );
 };
 
 const renderBindingHighlightForSuggestedPointBinding = (
@@ -1172,15 +1360,18 @@ export const renderSceneToSvg = (
     offsetX = 0,
     offsetY = 0,
     exportWithDarkMode = false,
+    exportingFrameId = null,
   }: {
     offsetX?: number;
     offsetY?: number;
     exportWithDarkMode?: boolean;
+    exportingFrameId?: string | null;
   } = {},
 ) => {
   if (!svgRoot) {
     return;
   }
+
   // render elements
   elements
     .filter((el) => !isIFrameOrFrameLabel(el))
@@ -1195,10 +1386,26 @@ export const renderSceneToSvg = (
             element.x + offsetX,
             element.y + offsetY,
             exportWithDarkMode,
+            exportingFrameId,
           );
         } catch (error: any) {
           console.error(error);
         }
+  elements.forEach((element) => {
+    if (!element.isDeleted) {
+      try {
+        renderElementToSvg(
+          element,
+          rsvg,
+          svgRoot,
+          files,
+          element.x + offsetX,
+          element.y + offsetY,
+          exportWithDarkMode,
+          exportingFrameId,
+        );
+      } catch (error: any) {
+        console.error(error);
       }
     });
 
@@ -1216,6 +1423,7 @@ export const renderSceneToSvg = (
             element.x + offsetX,
             element.y + offsetY,
             exportWithDarkMode,
+            exportingFrameId,
           );
         } catch (error: any) {
           console.error(error);
