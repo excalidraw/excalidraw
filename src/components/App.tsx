@@ -6296,6 +6296,14 @@ class App extends React.Component<AppProps, AppState> {
         return newElementWith(ele, {
           opacity: pointerDownState.elementIdsToErase[ele.containerId].opacity,
         });
+      } else if (
+        ele.frameId &&
+        pointerDownState.elementIdsToErase[ele.frameId] &&
+        pointerDownState.elementIdsToErase[ele.frameId].erase
+      ) {
+        return newElementWith(ele, {
+          opacity: pointerDownState.elementIdsToErase[ele.frameId].opacity,
+        });
       }
       return ele;
     });
@@ -6314,6 +6322,12 @@ class App extends React.Component<AppProps, AppState> {
         isBoundToContainer(ele) &&
         pointerDownState.elementIdsToErase[ele.containerId] &&
         pointerDownState.elementIdsToErase[ele.containerId].erase
+      ) {
+        return newElementWith(ele, { isDeleted: true });
+      } else if (
+        ele.frameId &&
+        pointerDownState.elementIdsToErase[ele.frameId] &&
+        pointerDownState.elementIdsToErase[ele.frameId].erase
       ) {
         return newElementWith(ele, { isDeleted: true });
       }
