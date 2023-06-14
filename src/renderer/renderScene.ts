@@ -480,13 +480,13 @@ export const _renderScene = ({
 
           if (
             frameId &&
-            ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
-              (!renderConfig.isExporting && appState.shouldRenderFrames))
+            ((isExporting && isOnlyExportingSingleFrame(elements)) ||
+              (!isExporting && appState.shouldRenderFrames))
           ) {
             context.save();
 
             const frame = getTargetFrame(element, appState);
-  
+
             if (frame && isElementInFrame(element, elements, appState)) {
               frameClip(frame, context, renderConfig);
             }
@@ -502,9 +502,10 @@ export const _renderScene = ({
             if (element) {
               editingLinearElement =
                 element as NonDeleted<ExcalidrawLinearElement>;
-          }
-          if (!isExporting) {
-            renderLinkIcon(element, context, appState);
+            }
+            if (!isExporting) {
+              renderLinkIcon(element, context, appState);
+            }
           }
         } catch (error: any) {
           console.error(error);
@@ -516,17 +517,42 @@ export const _renderScene = ({
       .filter((el) => isIFrameOrFrameLabel(el))
       .forEach((element) => {
         try {
-          renderElement(element, rc, context, renderConfig, appState);
+          const render = () => {
+            renderElement(element, rc, context, renderConfig, appState);
+            if (
+              isExporting &&
+              isIFrameElement(element) &&
+              !getBoundTextElement(element)
+            ) {
+              const label = createPlaceholderiFrameLabel(element);
+              renderElement(label, rc, context, renderConfig, appState);
+            }
+            if (!isExporting) {
+              renderLinkIcon(element, context, appState);
+            }
+          };
+
+          // - when exporting the whole canvas, we DO NOT apply clipping
+          // - when we are exporting a particular frame, apply clipping
+          //   if the containing frame is not selected, apply clipping
+          const frameId = element.frameId || appState.frameToHighlight?.id;
+
           if (
-            isExporting &&
-            isIFrameElement(element) &&
-            !getBoundTextElement(element)
+            frameId &&
+            ((isExporting && isOnlyExportingSingleFrame(elements)) ||
+              (!isExporting && appState.shouldRenderFrames))
           ) {
-            const label = createPlaceholderiFrameLabel(element);
-            renderElement(label, rc, context, renderConfig, appState);
-          }
-          if (!isExporting) {
-            renderLinkIcon(element, context, appState);
+            context.save();
+
+            const frame = getTargetFrame(element, appState);
+
+            if (frame && isElementInFrame(element, elements, appState)) {
+              frameClip(frame, context, renderConfig);
+            }
+            render();
+            context.restore();
+          } else {
+            render();
           }
         } catch (error: any) {
           console.error(error);
@@ -1213,6 +1239,7 @@ const renderElementsBoxHighlight = (
       dashed: false,
       cx: elementX1 + (elementX2 - elementX1) / 2,
       cy: elementY1 + (elementY2 - elementY1) / 2,
+      activeFrame: false,
     };
   };
 
@@ -1391,21 +1418,6 @@ export const renderSceneToSvg = (
         } catch (error: any) {
           console.error(error);
         }
-  elements.forEach((element) => {
-    if (!element.isDeleted) {
-      try {
-        renderElementToSvg(
-          element,
-          rsvg,
-          svgRoot,
-          files,
-          element.x + offsetX,
-          element.y + offsetY,
-          exportWithDarkMode,
-          exportingFrameId,
-        );
-      } catch (error: any) {
-        console.error(error);
       }
     });
 

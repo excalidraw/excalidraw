@@ -610,7 +610,6 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-
   private onWindowMessage(event: MessageEvent) {
     if (
       event.origin !== "https://player.vimeo.com" &&
