@@ -93,9 +93,20 @@ export const Hyperlink = ({
       trackEvent("hyperlink", "create");
     }
 
-    mutateElement(element, { link });
+    if (isIFrameElement(element) && !isURLOnWhiteList(link)) {
+      setToast({ message: t("toast.unableToEmbed"), closable: true });
+      element.link && iframeLinkCache.set(element.id, element.link);
+      mutateElement(element, {
+        //@ts-ignore
+        type: "rectangle",
+        link,
+      });
+      invalidateShapeForElement(element);
+    } else {
+      mutateElement(element, { link });
+    }
     setAppState({ showHyperlinkPopup: "info" });
-  }, [element, setAppState]);
+  }, [element, setAppState, setToast]);
 
   useLayoutEffect(() => {
     return () => {
