@@ -717,12 +717,7 @@ class App extends React.Component<AppProps, AppState> {
               // for some inexplicable reason, `onBlur` triggered on ESC
               // does not reset `state.editingFrame` despite being called,
               // and we need to reset it here as well
-              if (event.key === KEYS.ESCAPE) {
-                reset();
-              }
-            }}
-            onKeyUp={(event) => {
-              if (event.key === KEYS.ENTER) {
+              if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
                 reset();
               }
             }}
@@ -2607,6 +2602,10 @@ class App extends React.Component<AppProps, AppState> {
             });
             event.preventDefault();
             return;
+          } else if (isFrameElement(selectedElement)) {
+            this.setState({
+              editingFrame: selectedElement.id,
+            });
           }
         }
       } else if (
