@@ -47,8 +47,18 @@ export const getElementsWithinSelection = (
     getElementAbsoluteCoords(selection);
 
   let elementsInSelection = elements.filter((element) => {
-    const [elementX1, elementY1, elementX2, elementY2] =
+    let [elementX1, elementY1, elementX2, elementY2] =
       getElementBounds(element);
+
+    const containingFrame = getContainingFrame(element);
+    if (containingFrame) {
+      const [fx1, fy1, fx2, fy2] = getElementBounds(containingFrame);
+
+      elementX1 = Math.max(fx1, elementX1);
+      elementY1 = Math.max(fy1, elementY1);
+      elementX2 = Math.min(fx2, elementX2);
+      elementY2 = Math.min(fy2, elementY2);
+    }
 
     return (
       element.locked === false &&
