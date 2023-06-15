@@ -108,6 +108,8 @@
     background-color: var(--island-bg-color);
     width: var(--lg-button-size);
     height: var(--lg-button-size);
+    margin: 0; //zsviczian
+    padding: 0; //zsviczian
 
     svg {
       width: var(--lg-icon-size);

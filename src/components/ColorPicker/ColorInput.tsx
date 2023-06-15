@@ -61,7 +61,7 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
     style.color = color;
     if (!!style.color) {
       const digits = style.color.match(
-        /^[^\d]*(\d*)[^\d]*(\d*)[^\d]*(\d*)[^\d]*([\d\.]*)?/,
+        /^[^\d]*(\d*)[^\d]*(\d*)[^\d]*(\d*)[^\d]*([\d.]*)?/,
       );
       if (!digits) {
         return "#000000";

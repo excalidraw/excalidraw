@@ -217,7 +217,9 @@ export const actionChangeStrokeColor = register({
   trackEvent: false,
   perform: (elements, appState, value) => {
     //zsviczian added containers
-    const containers = getSelectedElements(elements, appState, false)
+    const containers = getSelectedElements(elements, appState, {
+      includeBoundTextElement: false,
+    })
       .filter((el) => el.boundElements)
       .map((el) => el.id);
     return {

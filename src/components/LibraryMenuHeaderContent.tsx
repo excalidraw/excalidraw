@@ -4,7 +4,7 @@ import Trans from "./Trans";
 import { jotaiScope } from "../jotai";
 import { LibraryItem, LibraryItems, UIAppState } from "../types";
 import { useApp, useExcalidrawSetAppState } from "./App";
-import { saveLibraryAsJSON } from "../data/json";
+//import { saveLibraryAsJSON } from "../data/json"; //zsviczian
 import Library, { libraryItemsAtom } from "../data/library";
 import {
   DotsIcon,
@@ -15,7 +15,7 @@ import {
 } from "./icons";
 import { ToolButton } from "./ToolButton";
 import { fileOpen } from "../data/filesystem";
-import { muteFSAbortError } from "../utils";
+//import { muteFSAbortError } from "../utils"; //zsiczian
 import { useAtom } from "jotai";
 import ConfirmDialog from "./ConfirmDialog";
 import PublishLibrary from "./PublishLibrary";

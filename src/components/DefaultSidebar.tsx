@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { DEFAULT_SIDEBAR, LIBRARY_SIDEBAR_TAB } from "../constants";
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
-import { t } from "../i18n";
+//import { t } from "../i18n"; //zsviczian
 import { MarkOptional, Merge } from "../utility-types";
 import { composeEventHandlers } from "../utils";
 import { useExcalidrawSetAppState } from "./App";

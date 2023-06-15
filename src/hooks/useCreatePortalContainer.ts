@@ -45,7 +45,13 @@ export const useCreatePortalContainer = (opts?: {
     return () => {
       container.removeChild(div);
     };
-  }, [excalidrawContainer, theme, opts?.className, opts?.parentSelector]);
+  }, [
+    excalidrawContainer,
+    theme,
+    opts?.className,
+    opts?.parentSelector,
+    opts?.style,
+  ]); //zsviczian added opts?.style
 
   return div;
 };
