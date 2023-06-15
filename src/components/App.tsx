@@ -7594,6 +7594,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
       const { deltaX, deltaY } = event;
       // note that event.ctrlKey is necessary to handle pinch zooming
       if (event.metaKey || event.ctrlKey) {
@@ -7605,6 +7606,8 @@ class App extends React.Component<AppProps, AppState> {
           delta = MAX_STEP * sign;
         }
 =======
+=======
+>>>>>>> parent of ea7c75c5 (resolve merge errors)
     const { deltaX, deltaY } = event;
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (
@@ -7619,6 +7622,9 @@ class App extends React.Component<AppProps, AppState> {
       if (absDelta > MAX_STEP) {
         delta = MAX_STEP * sign;
       }
+<<<<<<< HEAD
+>>>>>>> parent of ea7c75c5 (resolve merge errors)
+=======
 >>>>>>> parent of ea7c75c5 (resolve merge errors)
 
         let newZoom = this.state.zoom.value - delta / 100;
