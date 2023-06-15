@@ -106,12 +106,16 @@ class GetMathProps {
 }
 const getMathProps = new GetMathProps();
 
-const getStartDelimiter = (useTex: boolean): string => {
-  return useTex ? "\\(" : "`";
+const deEscapeTex = (text: string, mathProps: MathProps): string => {
+  return mathProps.useTex ? text.replaceAll("\\$", "$") : text;
 };
 
-const getEndDelimiter = (useTex: boolean): string => {
-  return useTex ? "\\)" : "`";
+const getStartDelimiter = (useTex: boolean, desktop = false): string => {
+  return useTex ? (desktop ? "\\(" : "$") : "`";
+};
+
+const getEndDelimiter = (useTex: boolean, desktop = false): string => {
+  return useTex ? (desktop ? "\\)" : "$") : "`";
 };
 
 const mathJax = {} as {
@@ -279,8 +283,17 @@ const roundDec = (x: number, n: number) => {
 };
 
 const splitMath = (text: string, mathProps: MathProps) => {
-  const startDelimiter = getStartDelimiter(mathProps.useTex);
-  const endDelimiter = getEndDelimiter(mathProps.useTex);
+  const desktopStartDelimiter = getStartDelimiter(mathProps.useTex, true);
+  const desktopEndDelimiter = getEndDelimiter(mathProps.useTex, true);
+  const webStartDelimiter = getStartDelimiter(mathProps.useTex);
+  const webEndDelimiter = getEndDelimiter(mathProps.useTex);
+
+  const desktopStyle = text.indexOf(desktopStartDelimiter) >= 0;
+  const startDelimiter = desktopStyle
+    ? desktopStartDelimiter
+    : webStartDelimiter;
+  const endDelimiter = desktopStyle ? desktopEndDelimiter : webEndDelimiter;
+
   let curIndex = 0;
   let oldIndex = 0;
   const array = [];
@@ -298,7 +311,14 @@ const splitMath = (text: string, mathProps: MathProps) => {
           ? endDelimiter.length
           : 0
         : startDelimiter.length);
-    curIndex = text.indexOf(inText ? startDelimiter : endDelimiter, oldIndex);
+    const delim = inText ? startDelimiter : endDelimiter;
+    curIndex = text.indexOf(delim, oldIndex);
+    // Avoid splitting at escaped "$" characters
+    if (!desktopStyle) {
+      while (curIndex > 0 && text.charAt(curIndex - 1) === "\\") {
+        curIndex = text.indexOf(delim, curIndex + 1);
+      }
+    }
     if (curIndex >= oldIndex || (curIndex < 0 && oldIndex > 0)) {
       inText = !inText;
       array.push(
@@ -318,8 +338,8 @@ const joinMath = (
   mathProps: MathProps,
   isMathJaxLoaded: boolean,
 ) => {
-  const startDelimiter = getStartDelimiter(mathProps.useTex);
-  const endDelimiter = getEndDelimiter(mathProps.useTex);
+  const startDelimiter = getStartDelimiter(mathProps.useTex, true);
+  const endDelimiter = getEndDelimiter(mathProps.useTex, true);
   let inText = true;
   let joined = "";
   for (let index = 0; index < text.length; index++) {
@@ -529,8 +549,9 @@ const markupText = (
         markup[index].push(math.svg);
         aria[index].push(math.aria);
       } else {
-        markup[index].push(lineArray[i]);
-        aria[index].push(lineArray[i]);
+        const text = deEscapeTex(lineArray[i], mathProps);
+        markup[index].push(text);
+        aria[index].push(text);
       }
     }
     if (lineArray.length === 0) {
@@ -585,7 +606,7 @@ const measureMarkup = (
       container.appendChild(markup[i] as Element);
     } else {
       // Append as text
-      container.append(markup[i]);
+      container.append(deEscapeTex(markup[i] as string, mathProps));
     }
   }
 
