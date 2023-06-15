@@ -94,7 +94,6 @@ export const redrawTextBoundingBox = (
       nextHeight = computeContainerDimensionForBoundText(
         metrics.height,
         container.type,
-        container.customData?.legacyTextWrap, //zsviczian
       );
       mutateElement(container, { height: nextHeight });
       updateOriginalContainerCache(container.id, nextHeight);
@@ -206,7 +205,6 @@ export const handleBindTextResize = (
       containerHeight = computeContainerDimensionForBoundText(
         nextHeight,
         container.type,
-        container.customData?.legacyTextWrap, //zsviczian
       );
 
       const diff = containerHeight - containerDims.height;
@@ -738,15 +736,13 @@ export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
   let offsetX = BOUND_TEXT_PADDING;
   let offsetY = BOUND_TEXT_PADDING;
 
-  const legacy = container.customData?.legacyTextWrap; //zsviczian
-
-  if (container.type === "ellipse" && !legacy) {
+  if (container.type === "ellipse") {
     // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6172
     offsetX += (container.width / 2) * (1 - Math.sqrt(2) / 2);
     offsetY += (container.height / 2) * (1 - Math.sqrt(2) / 2);
   }
   // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6265
-  if (container.type === "diamond" && !legacy) {
+  if (container.type === "diamond") {
     offsetX += container.width / 4;
     offsetY += container.height / 4;
   }
@@ -877,20 +873,17 @@ export const isValidTextContainer = (element: ExcalidrawElement) =>
 export const computeContainerDimensionForBoundText = (
   dimension: number,
   containerType: ExtractSetType<typeof VALID_CONTAINER_TYPES>,
-  legacy: boolean = false, //zsviczian
 ) => {
   dimension = Math.ceil(dimension);
   const padding = BOUND_TEXT_PADDING * 2;
 
-  if (containerType === "ellipse" && !legacy) {
-    //zsviczian
+  if (containerType === "ellipse") {
     return Math.round(((dimension + padding) / Math.sqrt(2)) * 2);
   }
   if (containerType === "arrow") {
     return dimension + padding * 8;
   }
-  if (containerType === "diamond" && !legacy) {
-    //zsviczian
+  if (containerType === "diamond") {
     return 2 * (dimension + padding);
   }
   return dimension + padding;
@@ -902,15 +895,13 @@ export const getBoundTextMaxWidth = (container: ExcalidrawElement) => {
     return width - BOUND_TEXT_PADDING * 8 * 2;
   }
 
-  const legacy = container.customData?.legacyTextWrap; //zsviczian
-
-  if (container.type === "ellipse" && !legacy) {
+  if (container.type === "ellipse") {
     // The width of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse -https://github.com/excalidraw/excalidraw/pull/6172
     return Math.round((width / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
   }
-  if (container.type === "diamond" && !legacy) {
+  if (container.type === "diamond") {
     // The width of the largest rectangle inscribed inside a rhombus is
     // Math.round(width / 2) - https://github.com/excalidraw/excalidraw/pull/6265
     return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
@@ -930,16 +921,13 @@ export const getBoundTextMaxHeight = (
     }
     return height;
   }
-
-  const legacy = container.customData?.legacyTextWrap; //zsviczian
-
-  if (container.type === "ellipse" && !legacy) {
+  if (container.type === "ellipse") {
     // The height of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.height / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse - https://github.com/excalidraw/excalidraw/pull/6172
     return Math.round((height / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
   }
-  if (container.type === "diamond" && !legacy) {
+  if (container.type === "diamond") {
     // The height of the largest rectangle inscribed inside a rhombus is
     // Math.round(height / 2) - https://github.com/excalidraw/excalidraw/pull/6265
     return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
@@ -978,8 +966,6 @@ const DEFAULT_LINE_HEIGHT = {
   [FONT_FAMILY.Helvetica]: 1.15 as ExcalidrawTextElement["lineHeight"],
   // ~1.2 is the average for Virgil in WebKit and Blink, and kinda Gecko too
   [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
-  //zsviczian Average of the 3 fonts
-  [FONT_FAMILY.LocalFont]: 1.2 as ExcalidrawTextElement["lineHeight"],
 };
 
 export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {

@@ -20,7 +20,7 @@ import {
   getUpdatedTimestamp,
   isTestEnv,
 } from "../utils";
-import { randomInteger, randomId, obsidianId } from "../random";
+import { randomInteger, randomId } from "../random";
 import { bumpVersion, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
@@ -89,13 +89,12 @@ const _newElementBase = <T extends ExcalidrawElement>(
     boundElements = null,
     link = null,
     locked = DEFAULT_ELEMENT_PROPS.locked,
-    customData, //zsviczian
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
   // assign type to guard against excess properties
   const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
-    id: rest.id || (type === "text" ? obsidianId() : randomId()), //zsviczian
+    id: rest.id || randomId(),
     type,
     x,
     y,
@@ -120,7 +119,6 @@ const _newElementBase = <T extends ExcalidrawElement>(
     updated: getUpdatedTimestamp(),
     link,
     locked,
-    ...(customData ? { customData } : {}), //zsviczian
   };
   return element;
 };
@@ -172,7 +170,6 @@ const getTextElementPositionOffsets = (
 export const newTextElement = (
   opts: {
     text: string;
-    rawText: string;
     fontSize?: number;
     fontFamily?: FontFamilyValues;
     textAlign?: TextAlign;
@@ -187,7 +184,6 @@ export const newTextElement = (
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
   const lineHeight = opts.lineHeight || getDefaultLineHeight(fontFamily);
   const text = normalizeText(opts.text);
-  const rawText = normalizeText(opts.rawText); //zsviczian
   const metrics = measureText(
     text,
     getFontString({ fontFamily, fontSize }),
@@ -204,7 +200,6 @@ export const newTextElement = (
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
       text,
-      rawText, //zsviczian
       fontSize,
       fontFamily,
       textAlign,
@@ -323,21 +318,15 @@ export const updateTextElement = (
     text,
     isDeleted,
     originalText,
-    rawText,
-    link,
   }: {
     text: string;
     isDeleted?: boolean;
     originalText: string;
-    rawText?: string;
-    link?: string;
   },
 ): ExcalidrawTextElement => {
   return newElementWith(textElement, {
-    rawText: rawText ?? originalText, //zsviczian should this be rather originalText??
-    originalText, //zsviczian
+    originalText,
     isDeleted: isDeleted ?? textElement.isDeleted,
-    ...(link ? { link } : {}), //zsviczian
     ...refreshTextDimensions(textElement, originalText),
   });
 };
@@ -518,7 +507,7 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
 ): Readonly<TElement> => {
   let copy = deepCopyElement(element);
 
-  copy.id = copy.type === "text" ? obsidianId() : regenerateId(copy.id); //zsviczian
+  copy.id = regenerateId(copy.id);
   copy.boundElements = null;
   copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();

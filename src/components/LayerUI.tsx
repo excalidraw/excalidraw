@@ -201,9 +201,6 @@ const LayerUI = ({
       elements,
     );
 
-    if (appState.viewModeEnabled) {
-      return null;
-    } //zsviczian
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
@@ -234,14 +231,7 @@ const LayerUI = ({
                         <HintViewer
                           appState={appState}
                           elements={elements}
-                          isMobile={
-                            device.isMobile ||
-                            (!(
-                              appState.viewModeEnabled ||
-                              appState.zenModeEnabled
-                            ) &&
-                              appState.trayModeEnabled)
-                          } //zsviczian
+                          isMobile={device.isMobile}
                           device={device}
                         />
                         {heading}
@@ -296,8 +286,7 @@ const LayerUI = ({
             )}
           >
             <UserList collaborators={appState.collaborators} />
-            {!appState.viewModeEnabled && //zsviczian
-              renderTopRightUI?.(device.isMobile, appState)}
+            {renderTopRightUI?.(device.isMobile, appState)}
             {!appState.viewModeEnabled &&
               // hide button when sidebar docked
               (!isSidebarDocked ||
@@ -310,10 +299,6 @@ const LayerUI = ({
     );
   };
 
-  const isTrayMode =
-    !(appState.viewModeEnabled || appState.zenModeEnabled) &&
-    appState.trayModeEnabled; //zsviczian
-  const isTrayModeOrMobile = device.isMobile || isTrayMode; //zsviczian
   const renderSidebars = () => {
     return (
       <DefaultSidebar
@@ -356,7 +341,7 @@ const LayerUI = ({
         }}
         tab={DEFAULT_SIDEBAR.defaultTab}
       >
-        {/*t("toolBar.library") //zsviczian */}
+        {t("toolBar.library")}
       </DefaultSidebar.Trigger>
       {/* ------------------------------------------------------------------ */}
 
@@ -402,8 +387,7 @@ const LayerUI = ({
           }
         />
       )}
-      {((isTrayMode && !device.isMobile) || //zsviczian Added isTrayMode condition
-        (device.isMobile && !eyeDropperState)) && (
+      {device.isMobile && !eyeDropperState && (
         <MobileMenu
           appState={appState}
           elements={elements}
@@ -423,8 +407,7 @@ const LayerUI = ({
           renderWelcomeScreen={renderWelcomeScreen}
         />
       )}
-
-      {!isTrayModeOrMobile && ( //zsviczian changed from !device.isMobile
+      {!device.isMobile && (
         <>
           <div
             className={clsx("layer-ui__wrapper", {

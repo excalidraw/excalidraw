@@ -100,7 +100,6 @@ export class API {
     opacity?: ExcalidrawGenericElement["opacity"];
     // text props
     text?: T extends "text" ? ExcalidrawTextElement["text"] : never;
-    rawText?: T extends "text" ? ExcalidrawTextElement["rawText"] : never;
     fontSize?: T extends "text" ? ExcalidrawTextElement["fontSize"] : never;
     fontFamily?: T extends "text" ? ExcalidrawTextElement["fontFamily"] : never;
     textAlign?: T extends "text" ? ExcalidrawTextElement["textAlign"] : never;
@@ -193,7 +192,6 @@ export class API {
         element = newTextElement({
           ...base,
           text: rest.text || "test",
-          rawText: rest.rawText || "test", //zsviczian
           fontSize,
           fontFamily,
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,

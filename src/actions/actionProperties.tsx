@@ -9,7 +9,6 @@ import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
-import { showFourthFont } from "../components/App";
 // TODO barnabasmolnar/editor-redesign
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
 // ArrowHead icons
@@ -30,7 +29,6 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
-  StrokeWidthThinIcon,
   StrokeWidthBaseIcon,
   StrokeWidthBoldIcon,
   StrokeWidthExtraBoldIcon,
@@ -43,7 +41,6 @@ import {
   FreedrawIcon,
   FontFamilyNormalIcon,
   FontFamilyCodeIcon,
-  FontFamilyLocalFontIcon,
   TextAlignLeftIcon,
   TextAlignCenterIcon,
   TextAlignRightIcon,
@@ -216,27 +213,12 @@ export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   trackEvent: false,
   perform: (elements, appState, value) => {
-    //zsviczian added containers
-    const containers = getSelectedElements(elements, appState, {
-      includeBoundTextElement: false,
-    })
-      .filter((el) => el.boundElements)
-      .map((el) => el.id);
     return {
       ...(value.currentItemStrokeColor && {
         elements: changeProperty(
           elements,
           appState,
           (el) => {
-            if (
-              //zsviczian
-              isTextElement(el) &&
-              el.containerId &&
-              containers.includes(el.containerId) &&
-              getContainerElement(el)?.strokeColor !== el.strokeColor
-            ) {
-              return el;
-            }
             return hasStrokeColor(el.type)
               ? newElementWith(el, {
                   strokeColor: value.currentItemStrokeColor,
@@ -257,16 +239,8 @@ export const actionChangeStrokeColor = register({
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
-        topPicks={
-          //zsviczian
-          appState.colorPalette?.topPicks?.elementStroke ??
-          DEFAULT_ELEMENT_STROKE_PICKS
-        }
-        palette={
-          //zsviczian
-          appState.colorPalette?.elementStroke ??
-          DEFAULT_ELEMENT_STROKE_COLOR_PALETTE
-        }
+        topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
+        palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
         type="elementStroke"
         label={t("labels.stroke")}
         color={getFormValue(
@@ -307,16 +281,8 @@ export const actionChangeBackgroundColor = register({
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
-        topPicks={
-          //zsviczian
-          appState.colorPalette?.topPicks?.elementBackground ??
-          DEFAULT_ELEMENT_BACKGROUND_PICKS
-        }
-        palette={
-          //zsviczian
-          appState.colorPalette?.elementBackground ??
-          DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE
-        }
+        topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
+        palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
         type="elementBackground"
         label={t("labels.background")}
         color={getFormValue(
@@ -426,11 +392,6 @@ export const actionChangeStrokeWidth = register({
       <ButtonIconSelect
         group="stroke-width"
         options={[
-          {
-            value: 0.5,
-            text: t("labels.extraThin"),
-            icon: StrokeWidthThinIcon,
-          },
           {
             value: 1,
             text: t("labels.thin"),
@@ -747,15 +708,6 @@ export const actionChangeFontFamily = register({
         text: t("labels.code"),
         icon: FontFamilyCodeIcon,
       },
-      ...(showFourthFont
-        ? [
-            {
-              value: FONT_FAMILY.LocalFont,
-              text: t("labels.localFont"),
-              icon: FontFamilyLocalFontIcon,
-            },
-          ]
-        : []),
     ];
 
     return (

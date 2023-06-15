@@ -11,8 +11,8 @@ import { isDarwin, isFirefox, isWindows } from "../constants";
 const Header = () => (
   <div className="HelpDialog__header">
     <a
-      className="HelpDialog__btn" //zsviczian
-      href="https://github.com/zsviczian/obsidian-excalidraw-plugin/#readme"
+      className="HelpDialog__btn"
+      href="https://github.com/excalidraw/excalidraw#documentation"
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -21,16 +21,16 @@ const Header = () => (
     </a>
     <a
       className="HelpDialog__btn"
-      href="https://www.youtube.com/@VisualPKM" //zsviczian
+      href="https://blog.excalidraw.com"
       target="_blank"
       rel="noopener noreferrer"
     >
-      {"Visual PKM YouTube"}
+      {t("helpDialog.blog")}
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
     </a>
     <a
-      className="HelpDialog__btn" //zsviczian
-      href="https://github.com/zsviczian/obsidian-excalidraw-plugin/issues"
+      className="HelpDialog__btn"
+      href="https://github.com/excalidraw/excalidraw/issues"
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -253,10 +253,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("helpDialog.movePageLeftRight")}
               shortcuts={["Shift+PgUp/PgDn"]}
             />
-            <Shortcut //zsviczian
-              label={t("buttons.fullScreen")}
-              shortcuts={["F11 + Command Palette Action"]}
-            />
+            <Shortcut label={t("buttons.fullScreen")} shortcuts={["F"]} />
             <Shortcut
               label={t("buttons.zenMode")}
               shortcuts={[getShortcutKey("Alt+Z")]}

@@ -15,12 +15,10 @@ export const Modal: React.FC<{
   labelledBy: string;
   theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
-  style: string; //zsviczian
 }> = (props) => {
-  const { closeOnClickOutside = true, style } = props; //zsviczian added style for Dynamic Styles
+  const { closeOnClickOutside = true } = props;
   const modalRoot = useCreatePortalContainer({
     className: "excalidraw-modal-container",
-    style, //zsviczian
   });
 
   if (!modalRoot) {

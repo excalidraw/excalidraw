@@ -1,5 +1,5 @@
 import { Random } from "roughjs/bin/math";
-import { nanoid, customAlphabet } from "nanoid"; //zsviczian
+import { nanoid } from "nanoid";
 import { isTestEnv } from "./utils";
 
 let random = new Random(Date.now());
@@ -13,7 +13,3 @@ export const reseed = (seed: number) => {
 };
 
 export const randomId = () => (isTestEnv() ? `id${testIdBase++}` : nanoid());
-export const obsidianId = customAlphabet(
-  "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  8,
-); //zsviczian: added size

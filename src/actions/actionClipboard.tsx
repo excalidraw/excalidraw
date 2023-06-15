@@ -28,7 +28,7 @@ export const actionCopy = register({
     };
   },
   predicate: (elements, appState, appProps, app) => {
-    return true; //app.device.isMobile && !!navigator.clipboard; //zsviczian
+    return app.device.isMobile && !!navigator.clipboard;
   },
   contextItemLabel: "labels.copy",
   // don't supply a shortcut since we handle this conditionally via onCopy event
@@ -45,7 +45,7 @@ export const actionPaste = register({
     };
   },
   predicate: (elements, appState, appProps, app) => {
-    return true; //app.device.isMobile && !!navigator.clipboard; //zsviczian
+    return app.device.isMobile && !!navigator.clipboard;
   },
   contextItemLabel: "labels.paste",
   // don't supply a shortcut since we handle this conditionally via onCopy event

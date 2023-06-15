@@ -62,6 +62,7 @@
   }
 
   .context-menu-item:hover {
+    color: var(--popup-bg-color);
     background-color: var(--select-highlight-color);
 
     &.dangerous {
@@ -93,6 +94,5 @@
   .context-menu-item-separator {
     border: none;
     border-top: 1px solid $oc-gray-5;
-    margin: 0; //zsviczian
   }
 }

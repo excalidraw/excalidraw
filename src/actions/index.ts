@@ -28,7 +28,6 @@ export {
   actionResetZoom,
   actionZoomToFit,
   actionToggleTheme,
-  zoomToFitElements,
 } from "./actionCanvas";
 
 export { actionFinalize } from "./actionFinalize";

@@ -3,13 +3,13 @@ import { AppState, Device, ExcalidrawProps, UIAppState } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
-import { getNonDeletedElements, showSelectedShapeActions } from "../element";
+import { showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
-import { calculateScrollCenter, isSomeElementSelected } from "../scene";
-import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
+import { calculateScrollCenter } from "../scene";
+import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockButton } from "./LockButton";
@@ -72,12 +72,7 @@ export const MobileMenu = ({
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
               <Stack.Row gap={1} className="App-toolbar-container">
-                <Island
-                  padding={1}
-                  className={`App-toolbar${
-                    device.isMobile ? " App-toolbar--mobile" : "" //zsviczian
-                  }`}
-                >
+                <Island padding={1} className="App-toolbar App-toolbar--mobile">
                   {heading}
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
@@ -93,9 +88,8 @@ export const MobileMenu = ({
                     />
                   </Stack.Row>
                 </Island>
+                {renderTopRightUI && renderTopRightUI(true, appState)}
                 <div className="mobile-misc-tools-container">
-                  {!appState.viewModeEnabled && //zsviczian
-                    renderTopRightUI?.(true, appState)}
                   {!appState.viewModeEnabled && (
                     <DefaultSidebarTriggerTunnel.Out />
                   )}
@@ -135,46 +129,23 @@ export const MobileMenu = ({
 
   const renderAppToolbar = () => {
     if (appState.viewModeEnabled) {
-      return; //zsviczian
-      /*return (
+      return (
         <div className="App-toolbar-content">
           <MainMenuTunnel.Out />
         </div>
-      );*/
+      );
     }
-
-    //zsviczian fix mobile menu button positions
-    const showEditMenu = showSelectedShapeActions(
-      appState,
-      getNonDeletedElements(elements),
-    );
-    const showElAction = isSomeElementSelected(
-      getNonDeletedElements(elements),
-      appState,
-    );
 
     return (
       <div className="App-toolbar-content">
         <MainMenuTunnel.Out />
-        {showEditMenu ? ( //zsviczian
-          actionManager.renderAction("toggleEditMenu")
-        ) : (
-          <div className="ToolIcon__icon" aria-hidden="true" />
-        )}
+        {actionManager.renderAction("toggleEditMenu")}
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
-        {showElAction || appState.multiElement ? ( //zsviczian
-          actionManager.renderAction(
-            appState.multiElement ? "finalize" : "duplicateSelection",
-          )
-        ) : (
-          <div className="ToolIcon__icon" aria-hidden="true" />
+        {actionManager.renderAction(
+          appState.multiElement ? "finalize" : "duplicateSelection",
         )}
-        {showElAction ? ( //zsviczian
-          actionManager.renderAction("deleteSelectedElements")
-        ) : (
-          <div className="ToolIcon__icon" aria-hidden="true" />
-        )}
+        {actionManager.renderAction("deleteSelectedElements")}
       </div>
     );
   };
@@ -197,7 +168,7 @@ export const MobileMenu = ({
       <div
         className="App-bottom-bar"
         style={{
-          marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN, //* 2, zsviczian
+          marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
           marginLeft: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
           marginRight: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
         }}
@@ -232,17 +203,6 @@ export const MobileMenu = ({
               )}
           </footer>
         </Island>
-        {appState.trayModeEnabled ? ( //zsviczian display zoom menu in tray mode
-          <Island padding={1} style={{ marginLeft: `4px` }}>
-            <ZoomActions
-              renderAction={actionManager.renderAction}
-              zoom={appState.zoom}
-              trayMode={true}
-            />
-          </Island>
-        ) : (
-          ""
-        )}
       </div>
     </>
   );

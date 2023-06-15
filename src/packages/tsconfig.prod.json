@@ -4,8 +4,6 @@
     "module": "es2015",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "jsx": "react-jsx",
-    "sourceMap": false,
-    "allowJs": true
+    "jsx": "react"
   }
 }

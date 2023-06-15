@@ -14,9 +14,7 @@ export const actionToggleGridMode = register({
     return {
       appState: {
         ...appState,
-        gridSize: this.checked!(appState)
-          ? null
-          : appState.previousGridSize ?? GRID_SIZE, //zsviczian
+        gridSize: this.checked!(appState) ? null : GRID_SIZE,
       },
       commitToHistory: false,
     };

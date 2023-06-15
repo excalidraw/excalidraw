@@ -28,7 +28,7 @@ import { trackEvent } from "../analytics";
 import { hasBoundTextElement } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
-// import { Tooltip } from "./Tooltip"; //zsviczian
+import { Tooltip } from "./Tooltip";
 import {
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
@@ -309,20 +309,12 @@ export const ShapesSwitcher = ({
             const nextActiveTool = updateActiveTool(appState, {
               type: "frame",
             });
-
             setAppState({
               activeTool: nextActiveTool,
               multiElement: null,
               selectedElementIds: {},
               activeIFrameElement: null,
             });
-            setTimeout(() =>
-              setAppState({
-                activeTool: nextActiveTool,
-                multiElement: null,
-                selectedElementIds: {},
-              }),
-            ); //zsviczian added setTimeout wrapper because tools wouldn't select on first click
           }}
         />
       ) : (
@@ -366,16 +358,11 @@ export const ShapesSwitcher = ({
 export const ZoomActions = ({
   renderAction,
   zoom,
-  trayMode = false, //zsviczian
 }: {
   renderAction: ActionManager["renderAction"];
   zoom: Zoom;
-  trayMode?: boolean; //zsviczian note also changes to Stack.Col and Stack.Row
 }) => (
-  <Stack.Col
-    gap={1}
-    className={clsx("zoom-actions", { "tray-zoom": trayMode })}
-  >
+  <Stack.Col gap={1} className="zoom-actions">
     <Stack.Row align="center">
       {renderAction("zoomOut")}
       {renderAction("resetZoom")}
@@ -393,10 +380,10 @@ export const UndoRedoActions = ({
 }) => (
   <div className={`undo-redo-buttons ${className}`}>
     <div className="undo-button-container">
-      {renderAction("undo") /* //zsviczian */}
+      <Tooltip label={t("buttons.undo")}>{renderAction("undo")}</Tooltip>
     </div>
     <div className="redo-button-container">
-      {renderAction("redo") /* //zsviczian */}
+      <Tooltip label={t("buttons.redo")}> {renderAction("redo")}</Tooltip>
     </div>
   </div>
 );

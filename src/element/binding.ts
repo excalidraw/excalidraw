@@ -45,9 +45,7 @@ export const shouldEnableBindingForPointerEvent = (
 };
 
 export const isBindingEnabled = (appState: AppState): boolean => {
-  return appState.invertBindingBehaviour //zsviczian
-    ? !appState.isBindingEnabled
-    : appState.isBindingEnabled;
+  return appState.isBindingEnabled;
 };
 
 const getNonDeletedElements = (

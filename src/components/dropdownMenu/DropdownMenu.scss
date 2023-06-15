@@ -29,7 +29,7 @@
     }
 
     .dropdown-menu-container {
-      background-color: var(--island-bg-color); //zsviczian
+      background-color: #fff !important;
       max-height: calc(100vh - 150px);
       overflow-y: auto;
       --gap: 2;
@@ -71,7 +71,7 @@
       }
 
       &:hover {
-        background-color: var(--button-hover) !important; //zsviczian
+        background-color: var(--button-hover-bg);
         text-decoration: none;
       }
 
@@ -99,7 +99,7 @@
     }
 
     .dropdown-menu-container {
-      background-color: var(--island-bg-color); //zsviczian
+      background-color: var(--color-gray-90) !important;
     }
   }
 
@@ -108,8 +108,6 @@
     background-color: var(--island-bg-color);
     width: var(--lg-button-size);
     height: var(--lg-button-size);
-    margin: 0; //zsviczian
-    padding: 0; //zsviczian
 
     svg {
       width: var(--lg-icon-size);

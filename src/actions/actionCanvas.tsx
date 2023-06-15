@@ -12,16 +12,14 @@ import { getStateForZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
 import { getShortcutKey, setCursor, updateActiveTool } from "../utils";
 import { register } from "./register";
+import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
 import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
 } from "../appState";
-import {
-  DEFAULT_CANVAS_BACKGROUND_PICKS,
-  DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
-} from "../colors";
+import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { Bounds } from "../element/bounds";
 
@@ -44,16 +42,8 @@ export const actionChangeViewBackgroundColor = register({
     // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
       <ColorPicker
-        topPicks={
-          //zsviczian
-          appState.colorPalette?.topPicks?.canvasBackground ??
-          DEFAULT_CANVAS_BACKGROUND_PICKS
-        }
-        palette={
-          //zsviczian
-          appState.colorPalette?.canvasBackground ??
-          DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE
-        }
+        palette={null}
+        topPicks={DEFAULT_CANVAS_BACKGROUND_PICKS}
         label={t("labels.canvasBackground")}
         type="canvasBackground"
         color={appState.viewBackgroundColor}
@@ -97,12 +87,6 @@ export const actionClearCanvas = register({
           appState.activeTool.type === "image"
             ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
-        colorPalette: appState.colorPalette, //zsviczian
-        trayModeEnabled: appState.trayModeEnabled, //zsviczian
-        allowPinchZoom: appState.allowPinchZoom, //zsviczian
-        allowWheelZoom: appState.allowWheelZoom, //zsviczian
-        pinnedScripts: appState.pinnedScripts, //zsviczian
-        customPens: appState.customPens, //zsviczian
       },
       commitToHistory: true,
     };
@@ -204,19 +188,19 @@ export const actionResetZoom = register({
     };
   },
   PanelComponent: ({ updateData, appState }) => (
-    // zsviczian <Tooltip label={t("buttons.resetZoom")} style={{ display: "none" }}>
-    <ToolButton
-      type="button"
-      className="reset-zoom-button zoom-button"
-      title={t("buttons.resetZoom")}
-      aria-label={t("buttons.resetZoom")}
-      onClick={() => {
-        updateData(null);
-      }}
-    >
-      {(appState.zoom.value * 100).toFixed(0)}%
-    </ToolButton>
-    //</Tooltip>
+    <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
+      <ToolButton
+        type="button"
+        className="reset-zoom-button zoom-button"
+        title={t("buttons.resetZoom")}
+        aria-label={t("buttons.resetZoom")}
+        onClick={() => {
+          updateData(null);
+        }}
+      >
+        {(appState.zoom.value * 100).toFixed(0)}%
+      </ToolButton>
+    </Tooltip>
   ),
   keyTest: (event) =>
     (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
@@ -226,7 +210,6 @@ export const actionResetZoom = register({
 const zoomValueToFitBoundsOnViewport = (
   bounds: Bounds,
   viewportDimensions: { width: number; height: number },
-  maxZoom: number = 1, //zsviczian
 ) => {
   const [x1, y1, x2, y2] = bounds;
   const commonBoundsWidth = x2 - x1;
@@ -238,7 +221,7 @@ const zoomValueToFitBoundsOnViewport = (
     Math.floor(smallestZoomValue / ZOOM_STEP) * ZOOM_STEP;
   const clampedZoomValueToFitElements = Math.min(
     Math.max(zoomAdjustedToSteps, MIN_ZOOM),
-    maxZoom, //zsviczian
+    1,
   );
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
@@ -247,8 +230,6 @@ export const zoomToFitElements = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   zoomToSelection: boolean,
-  maxZoom: number = 1, //zsviczian
-  margin: number = 0, //zsviczian
 ) => {
   const nonDeletedElements = getNonDeletedElements(elements);
   const selectedElements = getSelectedElements(nonDeletedElements, appState);
@@ -261,14 +242,10 @@ export const zoomToFitElements = (
         );
 
   const newZoom = {
-    value: zoomValueToFitBoundsOnViewport(
-      commonBounds,
-      {
-        width: appState.width - appState.width * margin,
-        height: appState.height - appState.height * margin,
-      },
-      maxZoom,
-    ),
+    value: zoomValueToFitBoundsOnViewport(commonBounds, {
+      width: appState.width,
+      height: appState.height,
+    }),
   };
 
   const [x1, y1, x2, y2] = commonBounds;
@@ -318,14 +295,7 @@ export const actionToggleTheme = register({
   name: "toggleTheme",
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (_, appState, value, app) => {
-    //zsviczian
-    if (app.props.onThemeChange) {
-      //zsviczian
-      app.props.onThemeChange(
-        value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
-      );
-    }
+  perform: (_, appState, value) => {
     return {
       appState: {
         ...appState,
