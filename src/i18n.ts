@@ -151,7 +151,8 @@ const findPartsForData = (data: any, parts: string[]) => {
 
 export const t = (
   path: string,
-  replacement?: { [key: string]: string | number },
+  replacement?: { [key: string]: string | number } | null,
+  fallback?: string,
 ) => {
   if (currentLang.code.startsWith(TEST_LANG_CODE)) {
     const name = replacement
@@ -163,7 +164,8 @@ export const t = (
   const parts = path.split(".");
   let translation =
     findPartsForData(currentLangData, parts) ||
-    findPartsForData(fallbackLangData, parts);
+    findPartsForData(fallbackLangData, parts) ||
+    fallback;
   const auxData = Array<Object>().concat(
     auxCurrentLangData,
     auxFallbackLangData,
@@ -172,7 +174,13 @@ export const t = (
     translation = translation || findPartsForData(auxData[i], parts);
   }
   if (translation === undefined) {
-    throw new Error(`Can't find translation for ${path}`);
+    const errorMessage = `Can't find translation for ${path}`;
+    // in production, don't blow up the app on a missing translation key
+    if (process.env.NODE_ENV === "production") {
+      console.warn(errorMessage);
+      return "";
+    }
+    throw new Error(errorMessage);
   }
 
   if (replacement) {

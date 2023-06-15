@@ -21,7 +21,9 @@ export const actionToggleLinearEditor = register({
     const selectedElement = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
-      true,
+      {
+        includeBoundTextElement: true,
+      },
     )[0] as ExcalidrawLinearElement;
 
     const editingLinearElement =
@@ -40,7 +42,9 @@ export const actionToggleLinearEditor = register({
     const selectedElement = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
-      true,
+      {
+        includeBoundTextElement: true,
+      },
     )[0] as ExcalidrawLinearElement;
     return appState.editingLinearElement?.elementId === selectedElement.id
       ? "labels.lineEditor.exit"

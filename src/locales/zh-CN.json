@@ -40,10 +40,6 @@
     "arrowhead_triangle": "三角箭头",
     "fontSize": "字体大小",
     "fontFamily": "字体",
-    "onlySelected": "仅选中",
-    "withBackground": "背景",
-    "exportEmbedScene": "包含画布数据",
-    "exportEmbedScene_details": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
     "handDrawn": "手写",
     "normal": "普通",
@@ -100,7 +96,6 @@
     "flipHorizontal": "水平翻转",
     "flipVertical": "垂直翻转",
     "viewMode": "查看模式",
-    "toggleExportColorScheme": "切换导出配色方案",
     "share": "分享",
     "showStroke": "显示描边颜色选择器",
     "showBackground": "显示背景颜色选择器",
@@ -128,7 +123,8 @@
       "unlockAll": "全部解锁"
     },
     "statusPublished": "已发布",
-    "sidebarLock": "侧边栏常驻"
+    "sidebarLock": "侧边栏常驻",
+    "eyeDropper": "从画布上取色"
   },
   "library": {
     "noItems": "尚未添加任何项目……",
@@ -140,11 +136,7 @@
     "exportJSON": "导出为文件",
     "exportImage": "导出图片...",
     "export": "保存到...",
-    "exportToPng": "导出为 PNG",
-    "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
-    "copyPngToClipboard": "复制 PNG 到剪切板",
-    "scale": "缩放",
     "save": "保存至当前文件",
     "saveAs": "保存为",
     "load": "打开",
@@ -274,12 +266,12 @@
   "roomDialog": {
     "desc_intro": "你可以邀请其他人到目前的画面中与你协作。",
     "desc_privacy": "别担心，该会话使用端到端加密，无论绘制什么都将保持私密，甚至连我们的服务器也无法查看。",
-    "button_startSession": "启动会议",
-    "button_stopSession": "结束会议",
-    "desc_inProgressIntro": "实时协作会议正在进行。",
+    "button_startSession": "开始会话",
+    "button_stopSession": "结束会话",
+    "desc_inProgressIntro": "实时协作会话进行中。",
     "desc_shareLink": "分享此链接给你要协作的用户",
-    "desc_exitSession": "停止会话将中断您在与房间的连接，但您依然可以在本地继续使用画布. 请注意，这不会影响到其他用户, 他们仍可以在他们的版本上继续协作。",
-    "shareTitle": "加入 Excalidraw 实时协作会议"
+    "desc_exitSession": "停止会话将中断您与房间的连接，但您依然可以在本地继续使用画布。请注意，这不会影响到其他用户，他们仍可以在他们的版本上继续协作。",
+    "shareTitle": "加入 Excalidraw 实时协作会话"
   },
   "errorDialog": {
     "title": "错误"
@@ -363,6 +355,30 @@
     "resetLibrary": "重置素材库",
     "removeItemsFromLib": "从素材库中删除选中的项目"
   },
+  "imageExportDialog": {
+    "header": "导出图片",
+    "label": {
+      "withBackground": "背景",
+      "onlySelected": "仅选中",
+      "darkMode": "深色模式",
+      "embedScene": "包含画布数据",
+      "scale": "缩放比例",
+      "padding": "内边距"
+    },
+    "tooltip": {
+      "embedScene": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出文件的大小。"
+    },
+    "title": {
+      "exportToPng": "导出为 PNG",
+      "exportToSvg": "导出为 SVG",
+      "copyPngToClipboard": "复制 PNG 到剪切板"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "复制到剪贴板"
+    }
+  },
   "encrypted": {
     "tooltip": "您的绘图采用端到端加密，其内容对于 Excalidraw 服务器是不可见的。",
     "link": "Excalidraw 中关于端到端加密的博客"
@@ -394,51 +410,21 @@
     "pasteAsSingleElement": "使用 {{shortcut}} 粘贴为单个元素，\n或粘贴到现有的文本编辑器里"
   },
   "colors": {
-    "ffffff": "白",
-    "f8f9fa": "灰 0",
-    "f1f3f5": "灰 1",
-    "fff5f5": "红 0",
-    "fff0f6": "粉红 0",
-    "f8f0fc": "紫红 0",
-    "f3f0ff": "蓝紫 0",
-    "edf2ff": "靛蓝 0",
-    "e7f5ff": "蓝 0",
-    "e3fafc": "青 0",
-    "e6fcf5": "蓝绿 0",
-    "ebfbee": "绿 0",
-    "f4fce3": "柠檬绿 0",
-    "fff9db": "黄 0",
-    "fff4e6": "橙 0",
     "transparent": "透明",
-    "ced4da": "灰 4",
-    "868e96": "灰 6",
-    "fa5252": "红 6",
-    "e64980": "粉红 6",
-    "be4bdb": "紫红 6",
-    "7950f2": "蓝紫 6",
-    "4c6ef5": "靛蓝 6",
-    "228be6": "蓝 6",
-    "15aabf": "青 6",
-    "12b886": "蓝绿 6",
-    "40c057": "绿 6",
-    "82c91e": "柠檬绿 6",
-    "fab005": "黄 6",
-    "fd7e14": "橙 6",
-    "000000": "黑",
-    "343a40": "灰 8",
-    "495057": "灰 7",
-    "c92a2a": "红 9",
-    "a61e4d": "粉红 9",
-    "862e9c": "紫红 9",
-    "5f3dc4": "蓝紫 9",
-    "364fc7": "靛蓝 9",
-    "1864ab": "蓝 9",
-    "0b7285": "青 9",
-    "087f5b": "蓝绿 9",
-    "2b8a3e": "绿 9",
-    "5c940d": "柠檬绿 9",
-    "e67700": "黄 9",
-    "d9480f": "橙 9"
+    "black": "黑",
+    "white": "白",
+    "red": "红",
+    "pink": "粉红",
+    "grape": "紫红",
+    "violet": "蓝紫",
+    "gray": "灰",
+    "blue": "蓝",
+    "cyan": "青",
+    "teal": "蓝绿",
+    "green": "绿",
+    "yellow": "黄",
+    "orange": "橙",
+    "bronze": "古铜"
   },
   "welcomeScreen": {
     "app": {
@@ -452,5 +438,12 @@
       "toolbarHint": "选择工具并开始绘图！",
       "helpHint": "快捷键和帮助"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "常用自定义颜色",
+    "colors": "颜色",
+    "shades": "色调明暗",
+    "hexCode": "十六进制值",
+    "noShades": "此颜色没有可用的明暗变化"
   }
 }

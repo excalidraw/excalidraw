@@ -40,10 +40,6 @@
     "arrowhead_triangle": "삼각형",
     "fontSize": "글자 크기",
     "fontFamily": "글꼴",
-    "onlySelected": "선택한 항목만",
-    "withBackground": "배경",
-    "exportEmbedScene": "화면을 담기",
-    "exportEmbedScene_details": "화면 정보가 내보내는 PNG/SVG 파일에 저장되어 이후에 파일에서 화면을 복구할 수 있습니다. 파일 크기가 증가합니다.",
     "addWatermark": "\"Made with Excalidraw\" 추가",
     "handDrawn": "손글씨",
     "normal": "일반",
@@ -100,7 +96,6 @@
     "flipHorizontal": "좌우반전",
     "flipVertical": "상하반전",
     "viewMode": "보기 모드",
-    "toggleExportColorScheme": "내보내기의 색상 테마 전환하기",
     "share": "공유",
     "showStroke": "윤곽선 색상 선택기 열기",
     "showBackground": "배경 색상 선택기 열기",
@@ -128,7 +123,8 @@
       "unlockAll": "모두 잠금 해제"
     },
     "statusPublished": "게시됨",
-    "sidebarLock": "사이드바 유지"
+    "sidebarLock": "사이드바 유지",
+    "eyeDropper": "캔버스에서 색상 고르기"
   },
   "library": {
     "noItems": "추가된 아이템 없음",
@@ -140,11 +136,7 @@
     "exportJSON": "파일로 내보내기",
     "exportImage": "이미지 내보내기",
     "export": "다른 이름으로 저장...",
-    "exportToPng": "PNG로 내보내기",
-    "exportToSvg": "SVG로 내보내기",
     "copyToClipboard": "클립보드로 복사",
-    "copyPngToClipboard": "클립보드로 PNG 이미지 복사",
-    "scale": "크기",
     "save": "현재 파일에 저장",
     "saveAs": "다른 이름으로 저장",
     "load": "열기",
@@ -363,6 +355,30 @@
     "resetLibrary": "라이브러리 리셋",
     "removeItemsFromLib": "선택한 항목을 라이브러리에서 제거"
   },
+  "imageExportDialog": {
+    "header": "이미지 내보내기",
+    "label": {
+      "withBackground": "배경",
+      "onlySelected": "선택한 항목만",
+      "darkMode": "다크 모드",
+      "embedScene": "화면을 담기",
+      "scale": "크기",
+      "padding": "여백"
+    },
+    "tooltip": {
+      "embedScene": "화면 정보가 내보내는 PNG/SVG 파일에 저장되어 이후에 파일에서 화면을 복구할 수 있습니다. 파일 크기가 증가합니다."
+    },
+    "title": {
+      "exportToPng": "PNG로 내보내기",
+      "exportToSvg": "SVG로 내보내기",
+      "copyPngToClipboard": "클립보드로 PNG 복사"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "클립보드로 복사"
+    }
+  },
   "encrypted": {
     "tooltip": "그림은 종단 간 암호화되므로 Excalidraw의 서버는 절대로 내용을 알 수 없습니다.",
     "link": "Excalidraw의 종단 간 암호화에 대한 블로그 포스트"
@@ -394,51 +410,21 @@
     "pasteAsSingleElement": "단일 요소로 붙여넣거나, 기존 텍스트 에디터에 붙여넣으려면 {{shortcut}} 을 사용하세요."
   },
   "colors": {
-    "ffffff": "화이트",
-    "f8f9fa": "회색 0",
-    "f1f3f5": "회색 1",
-    "fff5f5": "빨강색 0",
-    "fff0f6": "핑크색 0",
-    "f8f0fc": "그레이프 0",
-    "f3f0ff": "바이올렛 0",
-    "edf2ff": "남색 0",
-    "e7f5ff": "파란색 0",
-    "e3fafc": "청록색 0",
-    "e6fcf5": "틸 0",
-    "ebfbee": "녹색 0",
-    "f4fce3": "라임 0",
-    "fff9db": "노란색 0",
-    "fff4e6": "주황색 0",
     "transparent": "투명",
-    "ced4da": "회색 4",
-    "868e96": "회색 6",
-    "fa5252": "빨강색 6",
-    "e64980": "핑크색 6",
-    "be4bdb": "그레이프 6",
-    "7950f2": "바이올렛 6",
-    "4c6ef5": "남색 6",
-    "228be6": "파란색 6",
-    "15aabf": "청록색 6",
-    "12b886": "틸 6",
-    "40c057": "녹색 6",
-    "82c91e": "라임 6",
-    "fab005": "노란색 6",
-    "fd7e14": "주황색 6",
-    "000000": "검정색",
-    "343a40": "회색 8",
-    "495057": "회색 7",
-    "c92a2a": "빨강색 9",
-    "a61e4d": "핑크색 9",
-    "862e9c": "그레이프 9",
-    "5f3dc4": "바이올렛 9",
-    "364fc7": "남색 9",
-    "1864ab": "파란색 9",
-    "0b7285": "청록색 9",
-    "087f5b": "틸 9",
-    "2b8a3e": "녹색 9",
-    "5c940d": "라임 9",
-    "e67700": "노란색 9",
-    "d9480f": "주황색 9"
+    "black": "블랙",
+    "white": "화이트",
+    "red": "레드",
+    "pink": "핑크",
+    "grape": "그레이프",
+    "violet": "바이올렛",
+    "gray": "그레이",
+    "blue": "블루",
+    "cyan": "시안",
+    "teal": "틸",
+    "green": "그린",
+    "yellow": "옐로우",
+    "orange": "오렌지",
+    "bronze": "브론즈"
   },
   "welcomeScreen": {
     "app": {
@@ -452,5 +438,12 @@
       "toolbarHint": "도구를 선택하고, 그리세요!",
       "helpHint": "단축키 & 도움말"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "많이 쓰이는 사용자 색상들",
+    "colors": "색상",
+    "shades": "색조",
+    "hexCode": "Hex 코드",
+    "noShades": "사용할 수 있는 색조가 없음"
   }
 }

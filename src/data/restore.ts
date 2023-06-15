@@ -35,13 +35,13 @@ import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import { isValidSubtype } from "../subtypes";
-import oc from "open-color";
 import { MarkOptional, Mutable } from "../utility-types";
 import {
   detectLineHeight,
   getDefaultLineHeight,
   measureTextElement,
 } from "../element/textElement";
+import { COLOR_PALETTE } from "../colors";
 
 type RestoredAppState = Omit<
   AppState,
@@ -63,6 +63,7 @@ export const AllowedExcalidrawActiveTools: Record<
   freedraw: true,
   eraser: false,
   custom: true,
+  frame: true,
   hand: true,
 };
 
@@ -121,12 +122,13 @@ const restoreElementWithProperties = <
     angle: element.angle || 0,
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
-    strokeColor: element.strokeColor || oc.black,
-    backgroundColor: element.backgroundColor || "transparent",
+    strokeColor: element.strokeColor || COLOR_PALETTE.black,
+    backgroundColor: element.backgroundColor || COLOR_PALETTE.transparent,
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
+    frameId: element.frameId ?? null,
     roundness: element.roundness
       ? element.roundness
       : element.strokeSharpness === "round"
@@ -273,6 +275,10 @@ const restoreElement = (
       return restoreElementWithProperties(element, {});
     case "diamond":
       return restoreElementWithProperties(element, {});
+    case "frame":
+      return restoreElementWithProperties(element, {
+        name: element.name ?? null,
+      });
 
     // Don't use default case so as to catch a missing an element type case.
     // We also don't want to throw, but instead return void so we filter

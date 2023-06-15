@@ -26,7 +26,7 @@ export const actionChangeProjectName = register({
   perform: (_elements, appState, value) => {
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
-  PanelComponent: ({ appState, updateData, appProps }) => (
+  PanelComponent: ({ appState, updateData, appProps, data }) => (
     <ProjectName
       label={t("labels.fileTitle")}
       value={appState.name || "Unnamed"}
@@ -34,6 +34,7 @@ export const actionChangeProjectName = register({
       isNameEditable={
         typeof appProps.name === "undefined" && !appState.viewModeEnabled
       }
+      ignoreFocus={data?.ignoreFocus ?? false}
     />
   ),
 });

@@ -157,6 +157,8 @@ class Collab extends PureComponent<Props, CollabState> {
     window.addEventListener("offline", this.onOfflineStatusToggle);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
 
+    this.onOfflineStatusToggle();
+
     const collabAPI: CollabAPI = {
       isCollaborating: this.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
@@ -168,7 +170,6 @@ class Collab extends PureComponent<Props, CollabState> {
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
-    this.onOfflineStatusToggle();
 
     if (
       process.env.NODE_ENV === ENV.TEST ||
@@ -380,6 +381,13 @@ class Collab extends PureComponent<Props, CollabState> {
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
+    if (!this.state.username) {
+      import("@excalidraw/random-username").then(({ getRandomUsername }) => {
+        const username = getRandomUsername();
+        this.onUsernameChange(username);
+      });
+    }
+
     if (this.portal.socket) {
       return null;
     }
@@ -834,7 +842,6 @@ class Collab extends PureComponent<Props, CollabState> {
             setErrorMessage={(errorMessage) => {
               this.setState({ errorMessage });
             }}
-            theme={this.excalidrawAPI.getAppState().theme}
           />
         )}
         {errorMessage && (

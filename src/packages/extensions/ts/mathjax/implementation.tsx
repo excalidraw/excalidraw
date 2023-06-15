@@ -1479,12 +1479,17 @@ const createMathActions = () => {
     name: "changeMathOnly",
     perform: (elements, appState, mathOnly: boolean | null) => {
       if (mathOnly === null) {
-        mathOnly = getFormValue(elements, appState, (element) => {
-          const el = hasBoundTextElement(element)
-            ? getBoundTextElement(element)
-            : element;
-          return isMathElement(el) && el.customData?.mathOnly;
-        });
+        mathOnly = getFormValue(
+          elements,
+          appState,
+          (element) => {
+            const el = hasBoundTextElement(element)
+              ? getBoundTextElement(element)
+              : element;
+            return isMathElement(el) && el.customData?.mathOnly;
+          },
+          null,
+        );
         if (mathOnly === null) {
           mathOnly = getMathProps.getMathOnly(appState);
         }

@@ -35,6 +35,7 @@ import { getDefaultAppState } from "../appState";
 import { getSubtypeMethods } from "../subtypes";
 import {
   BOUND_TEXT_PADDING,
+  FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
@@ -49,6 +50,7 @@ import {
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { getContainingFrame } from "../frame";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -93,6 +95,7 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetX: number;
   canvasOffsetY: number;
   boundTextElementVersion: number | null;
+  containingFrameOpacity: number;
 }
 
 const cappedElementCanvasSize = (
@@ -208,6 +211,7 @@ const generateElementCanvas = (
     canvasOffsetX,
     canvasOffsetY,
     boundTextElementVersion: getBoundTextElement(element)?.version || null,
+    containingFrameOpacity: getContainingFrame(element)?.opacity || 100,
   };
 };
 
@@ -254,7 +258,8 @@ const drawElementOnCanvas = (
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
 ) => {
-  context.globalAlpha = element.opacity / 100;
+  context.globalAlpha =
+    ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
   const map = getSubtypeMethods(element.subtype);
   if (map?.render) {
     map.render(element, context);
@@ -476,7 +481,7 @@ const generateElementShape = (
     elementWithCanvasCache.delete(element);
 
     switch (element.type) {
-      case "rectangle":
+      case "rectangle": {
         if (element.roundness) {
           const w = element.width;
           const h = element.height;
@@ -501,6 +506,7 @@ const generateElementShape = (
         setShapeForElement(element, shape);
 
         break;
+      }
       case "diamond": {
         const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
           getDiamondPoints(element);
@@ -724,12 +730,14 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.zoomValue !== zoom.value &&
     !renderConfig?.shouldCacheIgnoreZoom;
   const boundTextElementVersion = getBoundTextElement(element)?.version || null;
+  const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
 
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== renderConfig.theme ||
-    prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion
+    prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
+    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
@@ -904,25 +912,59 @@ export const renderElement = (
   const generator = rc.generator;
   switch (element.type) {
     case "selection": {
-      context.save();
-      context.translate(
-        element.x + renderConfig.scrollX,
-        element.y + renderConfig.scrollY,
-      );
-      context.fillStyle = "rgba(0, 0, 200, 0.04)";
+      // do not render selection when exporting
+      if (!renderConfig.isExporting) {
+        context.save();
+        context.translate(
+          element.x + renderConfig.scrollX,
+          element.y + renderConfig.scrollY,
+        );
+        context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
-      // render from 0.5px offset  to get 1px wide line
-      // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
-      // TODO can be be improved by offseting to the negative when user selects
-      // from right to left
-      const offset = 0.5 / renderConfig.zoom.value;
+        // render from 0.5px offset  to get 1px wide line
+        // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
+        // TODO can be be improved by offseting to the negative when user selects
+        // from right to left
+        const offset = 0.5 / renderConfig.zoom.value;
 
-      context.fillRect(offset, offset, element.width, element.height);
-      context.lineWidth = 1 / renderConfig.zoom.value;
-      context.strokeStyle = "rgb(105, 101, 219)";
-      context.strokeRect(offset, offset, element.width, element.height);
+        context.fillRect(offset, offset, element.width, element.height);
+        context.lineWidth = 1 / renderConfig.zoom.value;
+        context.strokeStyle = " rgb(105, 101, 219)";
+        context.strokeRect(offset, offset, element.width, element.height);
 
-      context.restore();
+        context.restore();
+      }
+      break;
+    }
+    case "frame": {
+      if (!renderConfig.isExporting && appState.shouldRenderFrames) {
+        context.save();
+        context.translate(
+          element.x + renderConfig.scrollX,
+          element.y + renderConfig.scrollY,
+        );
+        context.fillStyle = "rgba(0, 0, 200, 0.04)";
+
+        context.lineWidth = 2 / renderConfig.zoom.value;
+        context.strokeStyle = FRAME_STYLE.strokeColor;
+
+        if (FRAME_STYLE.radius && context.roundRect) {
+          context.beginPath();
+          context.roundRect(
+            0,
+            0,
+            element.width,
+            element.height,
+            FRAME_STYLE.radius / renderConfig.zoom.value,
+          );
+          context.stroke();
+          context.closePath();
+        } else {
+          context.strokeRect(0, 0, element.width, element.height);
+        }
+
+        context.restore();
+      }
       break;
     }
     case "freedraw": {
@@ -1114,6 +1156,23 @@ const roughSVGDrawWithPrecision = (
   return rsvg.draw(pshape);
 };
 
+const maybeWrapNodesInFrameClipPath = (
+  element: NonDeletedExcalidrawElement,
+  root: SVGElement,
+  nodes: SVGElement[],
+  exportedFrameId?: string | null,
+) => {
+  const frame = getContainingFrame(element);
+  if (frame && frame.id === exportedFrameId) {
+    const g = root.ownerDocument!.createElementNS(SVG_NS, "g");
+    g.setAttributeNS(SVG_NS, "clip-path", `url(#${frame.id})`);
+    nodes.forEach((node) => g.appendChild(node));
+    return g;
+  }
+
+  return null;
+};
+
 export const renderElementToSvg = (
   element: NonDeletedExcalidrawElement,
   rsvg: RoughSVG,
@@ -1122,6 +1181,7 @@ export const renderElementToSvg = (
   offsetX: number,
   offsetY: number,
   exportWithDarkMode?: boolean,
+  exportingFrameId?: string | null,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   let cx = (x2 - x1) / 2 - (element.x - x1);
@@ -1160,6 +1220,9 @@ export const renderElementToSvg = (
     map.renderSvg(svgRoot, root, element, { offsetX, offsetY });
     return;
   }
+  const opacity =
+    ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
+
   switch (element.type) {
     case "selection": {
       // Since this is used only during editing experience, which is canvas based,
@@ -1175,7 +1238,6 @@ export const renderElementToSvg = (
         getShapeForElement(element)!,
         MAX_DECIMALS_FOR_SVG_EXPORT,
       );
-      const opacity = element.opacity / 100;
       if (opacity !== 1) {
         node.setAttribute("stroke-opacity", `${opacity}`);
         node.setAttribute("fill-opacity", `${opacity}`);
@@ -1187,7 +1249,15 @@ export const renderElementToSvg = (
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
-      root.appendChild(node);
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [node],
+        exportingFrameId,
+      );
+
+      g ? root.appendChild(g) : root.appendChild(node);
       break;
     }
     case "line":
@@ -1240,7 +1310,6 @@ export const renderElementToSvg = (
       if (boundText) {
         group.setAttribute("mask", `url(#mask-${element.id})`);
       }
-      const opacity = element.opacity / 100;
       group.setAttribute("stroke-linecap", "round");
 
       getShapeForElement(element)!.forEach((shape) => {
@@ -1268,14 +1337,24 @@ export const renderElementToSvg = (
         }
         group.appendChild(node);
       });
-      root.appendChild(group);
-      root.append(maskPath);
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [group, maskPath],
+        exportingFrameId,
+      );
+      if (g) {
+        root.appendChild(g);
+      } else {
+        root.appendChild(group);
+        root.append(maskPath);
+      }
       break;
     }
     case "freedraw": {
       generateElementShape(element, generator);
       generateFreeDrawShape(element);
-      const opacity = element.opacity / 100;
       const shape = getShapeForElement(element);
       const node = shape
         ? roughSVGDrawWithPrecision(rsvg, shape, MAX_DECIMALS_FOR_SVG_EXPORT)
@@ -1295,7 +1374,15 @@ export const renderElementToSvg = (
       path.setAttribute("fill", element.strokeColor);
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
-      root.appendChild(node);
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [node],
+        exportingFrameId,
+      );
+
+      g ? root.appendChild(g) : root.appendChild(node);
       break;
     }
     case "image": {
@@ -1331,6 +1418,7 @@ export const renderElementToSvg = (
 
         use.setAttribute("width", `${width}`);
         use.setAttribute("height", `${height}`);
+        use.setAttribute("opacity", `${opacity}`);
 
         // We first apply `scale` transforms (horizontal/vertical mirroring)
         // on the <use> element, then apply translation and rotation
@@ -1356,13 +1444,22 @@ export const renderElementToSvg = (
           }) rotate(${degree} ${cx} ${cy})`,
         );
 
-        root.appendChild(g);
+        const clipG = maybeWrapNodesInFrameClipPath(
+          element,
+          root,
+          [g],
+          exportingFrameId,
+        );
+        clipG ? root.appendChild(clipG) : root.appendChild(g);
       }
+      break;
+    }
+    // frames are not rendered and only acts as a container
+    case "frame": {
       break;
     }
     default: {
       if (isTextElement(element)) {
-        const opacity = element.opacity / 100;
         const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
         if (opacity !== 1) {
           node.setAttribute("stroke-opacity", `${opacity}`);
@@ -1407,7 +1504,15 @@ export const renderElementToSvg = (
           text.setAttribute("dominant-baseline", "text-before-edge");
           node.appendChild(text);
         }
-        root.appendChild(node);
+
+        const g = maybeWrapNodesInFrameClipPath(
+          element,
+          root,
+          [node],
+          exportingFrameId,
+        );
+
+        g ? root.appendChild(g) : root.appendChild(node);
       } else {
         // @ts-ignore
         throw new Error(`Unimplemented type ${element.type}`);

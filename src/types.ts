@@ -15,6 +15,7 @@ import {
   ExcalidrawImageElement,
   Theme,
   StrokeRoundness,
+  ExcalidrawFrameElement,
 } from "./element/types";
 import { Action } from "./actions/types";
 import { SHAPES } from "./shapes";
@@ -92,7 +93,7 @@ export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
 export type LastActiveTool =
   | {
-      type: typeof SHAPES[number]["value"] | "eraser" | "hand";
+      type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame";
       customType: null;
     }
   | {
@@ -120,6 +121,10 @@ export type AppState = {
   isBindingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
+  frameToHighlight: NonDeleted<ExcalidrawFrameElement> | null;
+  shouldRenderFrames: boolean;
+  editingFrame: string | null;
+  elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   // element being edited, but not necessarily added to elements array yet
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
@@ -137,7 +142,7 @@ export type AppState = {
     locked: boolean;
   } & (
     | {
-        type: typeof SHAPES[number]["value"] | "eraser" | "hand";
+        type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame";
         customType: null;
       }
     | {
@@ -174,11 +179,7 @@ export type AppState = {
   isRotating: boolean;
   zoom: Zoom;
   openMenu: "canvas" | "shape" | null;
-  openPopup:
-    | "canvasColorPicker"
-    | "backgroundColorPicker"
-    | "strokeColorPicker"
-    | null;
+  openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog: "imageExport" | "help" | "jsonExport" | null;
   /**
@@ -193,6 +194,7 @@ export type AppState = {
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
+  selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
   toast: { message: string; closable?: boolean; duration?: number } | null;
   zenModeEnabled: boolean;
@@ -454,6 +456,7 @@ export type AppClassProperties = {
   id: App["id"];
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
+  lastViewportPosition: App["lastViewportPosition"];
 };
 
 export type PointerDownState = Readonly<{
@@ -551,6 +554,12 @@ export type ExcalidrawImperativeAPI = {
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
+  /**
+   * Disables rendering of frames (including element clipping), but currently
+   * the frames are still interactive in edit mode. As such, this API should be
+   * used in conjunction with view mode (props.viewModeEnabled).
+   */
+  toggleFrameRendering: InstanceType<typeof App>["toggleFrameRendering"];
 };
 
 export type Device = Readonly<{
@@ -558,4 +567,24 @@ export type Device = Readonly<{
   isMobile: boolean;
   isTouchScreen: boolean;
   canDeviceFitSidebar: boolean;
+  isLandscape: boolean;
 }>;
+
+type FrameNameBounds = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  angle: number;
+};
+
+export type FrameNameBoundsCache = {
+  get: (frameElement: ExcalidrawFrameElement) => FrameNameBounds | null;
+  _cache: Map<
+    string,
+    FrameNameBounds & {
+      zoom: AppState["zoom"]["value"];
+      versionNonce: ExcalidrawFrameElement["versionNonce"];
+    }
+  >;
+};

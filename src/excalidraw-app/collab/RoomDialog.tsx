@@ -1,22 +1,27 @@
-import React, { useRef } from "react";
+import { useRef, useState } from "react";
+import * as Popover from "@radix-ui/react-popover";
+
 import { copyTextToSystemClipboard } from "../../clipboard";
+import { trackEvent } from "../../analytics";
+import { getFrame } from "../../utils";
+import { useI18n } from "../../i18n";
+import { KEYS } from "../../keys";
+
 import { Dialog } from "../../components/Dialog";
 import {
-  clipboard,
-  start,
-  stop,
+  copyIcon,
+  playerPlayIcon,
+  playerStopFilledIcon,
   share,
   shareIOS,
   shareWindows,
+  tablerCheckIcon,
 } from "../../components/icons";
-import { ToolButton } from "../../components/ToolButton";
+import { TextField } from "../../components/TextField";
+import { FilledButton } from "../../components/FilledButton";
+
+import { ReactComponent as CollabImage } from "../../assets/lock.svg";
 import "./RoomDialog.scss";
-import Stack from "../../components/Stack";
-import { AppState } from "../../types";
-import { trackEvent } from "../../analytics";
-import { getFrame } from "../../utils";
-import DialogActionButton from "../../components/DialogActionButton";
-import { useI18n } from "../../i18n";
 
 const getShareIcon = () => {
   const navigator = window.navigator as any;
@@ -32,16 +37,7 @@ const getShareIcon = () => {
   return share;
 };
 
-const RoomDialog = ({
-  handleClose,
-  activeRoomLink,
-  username,
-  onUsernameChange,
-  onRoomCreate,
-  onRoomDestroy,
-  setErrorMessage,
-  theme,
-}: {
+export type RoomModalProps = {
   handleClose: () => void;
   activeRoomLink: string;
   username: string;
@@ -49,20 +45,41 @@ const RoomDialog = ({
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
   setErrorMessage: (message: string) => void;
-  theme: AppState["theme"];
-}) => {
+};
+
+export const RoomModal = ({
+  activeRoomLink,
+  onRoomCreate,
+  onRoomDestroy,
+  setErrorMessage,
+  username,
+  onUsernameChange,
+  handleClose,
+}: RoomModalProps) => {
   const { t } = useI18n();
-  const roomLinkInput = useRef<HTMLInputElement>(null);
+  const [justCopied, setJustCopied] = useState(false);
+  const timerRef = useRef<number>(0);
+  const ref = useRef<HTMLInputElement>(null);
+  const isShareSupported = "share" in navigator;
 
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
+
+      setJustCopied(true);
+
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current);
+      }
+
+      timerRef.current = window.setTimeout(() => {
+        setJustCopied(false);
+      }, 3000);
     } catch (error: any) {
       setErrorMessage(error.message);
     }
-    if (roomLinkInput.current) {
-      roomLinkInput.current.select();
-    }
+
+    ref.current?.select();
   };
 
   const shareRoomLink = async () => {
@@ -77,112 +94,124 @@ const RoomDialog = ({
     }
   };
 
-  const selectInput = (event: React.MouseEvent<HTMLInputElement>) => {
-    if (event.target !== document.activeElement) {
-      event.preventDefault();
-      (event.target as HTMLInputElement).select();
-    }
-  };
-
-  const renderRoomDialog = () => {
+  if (activeRoomLink) {
     return (
-      <div className="RoomDialog-modal">
-        {!activeRoomLink && (
-          <>
-            <p>{t("roomDialog.desc_intro")}</p>
-            <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
-            <div className="RoomDialog-sessionStartButtonContainer">
-              <DialogActionButton
-                label={t("roomDialog.button_startSession")}
-                onClick={() => {
-                  trackEvent("share", "room creation", `ui (${getFrame()})`);
-                  onRoomCreate();
-                }}
-              >
-                {start}
-              </DialogActionButton>
-            </div>
-          </>
-        )}
-        {activeRoomLink && (
-          <>
-            <p>{t("roomDialog.desc_inProgressIntro")}</p>
-            <p>{t("roomDialog.desc_shareLink")}</p>
-            <div className="RoomDialog-linkContainer">
-              <Stack.Row gap={2}>
-                {"share" in navigator ? (
-                  <ToolButton
-                    className="RoomDialog__button"
-                    type="button"
-                    icon={getShareIcon()}
-                    title={t("labels.share")}
-                    aria-label={t("labels.share")}
-                    onClick={shareRoomLink}
-                  />
-                ) : null}
-                <ToolButton
-                  className="RoomDialog__button"
-                  type="button"
-                  icon={clipboard}
-                  title={t("labels.copy")}
-                  aria-label={t("labels.copy")}
-                  onClick={copyRoomLink}
-                />
-              </Stack.Row>
-              <input
-                type="text"
-                value={activeRoomLink}
-                readOnly={true}
-                className="RoomDialog-link"
-                ref={roomLinkInput}
-                onPointerDown={selectInput}
+      <>
+        <h3 className="RoomDialog__active__header">
+          {t("labels.liveCollaboration")}
+        </h3>
+        <TextField
+          value={username}
+          placeholder="Your name"
+          label="Your name"
+          onChange={onUsernameChange}
+          onKeyDown={(event) => event.key === KEYS.ENTER && handleClose()}
+        />
+        <div className="RoomDialog__active__linkRow">
+          <TextField
+            ref={ref}
+            label="Link"
+            readonly
+            fullWidth
+            value={activeRoomLink}
+          />
+          {isShareSupported && (
+            <FilledButton
+              size="large"
+              variant="icon"
+              label="Share"
+              startIcon={getShareIcon()}
+              className="RoomDialog__active__share"
+              onClick={shareRoomLink}
+            />
+          )}
+          <Popover.Root open={justCopied}>
+            <Popover.Trigger asChild>
+              <FilledButton
+                size="large"
+                label="Copy link"
+                startIcon={copyIcon}
+                onClick={copyRoomLink}
               />
-            </div>
-            <div className="RoomDialog-usernameContainer">
-              <label className="RoomDialog-usernameLabel" htmlFor="username">
-                {t("labels.yourName")}
-              </label>
-              <input
-                type="text"
-                id="username"
-                value={username.trim() || ""}
-                className="RoomDialog-username TextInput"
-                onChange={(event) => onUsernameChange(event.target.value)}
-                onKeyPress={(event) => event.key === "Enter" && handleClose()}
-              />
-            </div>
-            <p>
-              <span role="img" aria-hidden="true" className="RoomDialog-emoji">
-                {"🔒"}
-              </span>
-              {t("roomDialog.desc_privacy")}
-            </p>
-            <p>{t("roomDialog.desc_exitSession")}</p>
-            <div className="RoomDialog-sessionStartButtonContainer">
-              <DialogActionButton
-                actionType="danger"
-                label={t("roomDialog.button_stopSession")}
-                onClick={() => {
-                  trackEvent("share", "room closed");
-                  onRoomDestroy();
-                }}
-              >
-                {stop}
-              </DialogActionButton>
-            </div>
-          </>
-        )}
-      </div>
+            </Popover.Trigger>
+            <Popover.Content
+              onOpenAutoFocus={(event) => event.preventDefault()}
+              onCloseAutoFocus={(event) => event.preventDefault()}
+              className="RoomDialog__popover"
+              side="top"
+              align="end"
+              sideOffset={5.5}
+            >
+              {tablerCheckIcon} copied
+            </Popover.Content>
+          </Popover.Root>
+        </div>
+        <div className="RoomDialog__active__description">
+          <p>
+            <span
+              role="img"
+              aria-hidden="true"
+              className="RoomDialog__active__description__emoji"
+            >
+              🔒{" "}
+            </span>
+            {t("roomDialog.desc_privacy")}
+          </p>
+          <p>{t("roomDialog.desc_exitSession")}</p>
+        </div>
+
+        <div className="RoomDialog__active__actions">
+          <FilledButton
+            size="large"
+            variant="outlined"
+            color="danger"
+            label={t("roomDialog.button_stopSession")}
+            startIcon={playerStopFilledIcon}
+            onClick={() => {
+              trackEvent("share", "room closed");
+              onRoomDestroy();
+            }}
+          />
+        </div>
+      </>
     );
-  };
+  }
+
   return (
-    <Dialog
-      small
-      onCloseRequest={handleClose}
-      title={t("labels.liveCollaboration")}
-      theme={theme}
-    >
-      {renderRoomDialog()}
+    <>
+      <div className="RoomDialog__inactive__illustration">
+        <CollabImage />
+      </div>
+      <div className="RoomDialog__inactive__header">
+        {t("labels.liveCollaboration")}
+      </div>
+
+      <div className="RoomDialog__inactive__description">
+        <strong>{t("roomDialog.desc_intro")}</strong>
+        {t("roomDialog.desc_privacy")}
+      </div>
+
+      <div className="RoomDialog__inactive__start_session">
+        <FilledButton
+          size="large"
+          label={t("roomDialog.button_startSession")}
+          startIcon={playerPlayIcon}
+          onClick={() => {
+            trackEvent("share", "room creation", `ui (${getFrame()})`);
+            onRoomCreate();
+          }}
+        />
+      </div>
+    </>
+  );
+};
+
+const RoomDialog = (props: RoomModalProps) => {
+  return (
+    <Dialog size="small" onCloseRequest={props.handleClose} title={false}>
+      <div className="RoomDialog">
+        <RoomModal {...props} />
+      </div>
     </Dialog>
   );
 };

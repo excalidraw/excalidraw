@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triangle",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
-    "onlySelected": "Només seleccionats",
-    "withBackground": "Fons",
-    "exportEmbedScene": "Insereix l'escena",
-    "exportEmbedScene_details": "Les dades de l’escena es desaran al fitxer PNG/SVG de manera que es pugui restaurar l’escena.\nAugmentarà la mida del fitxer exportat.",
     "addWatermark": "Afegeix-hi «Fet amb Excalidraw»",
     "handDrawn": "Dibuixat a mà",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Capgira horitzontalment",
     "flipVertical": "Capgira verticalment",
     "viewMode": "Mode de visualització",
-    "toggleExportColorScheme": "Canvia l'esquema de colors de l'exportació",
     "share": "Comparteix",
     "showStroke": "Mostra el selector de color del traç",
     "showBackground": "Mostra el selector de color de fons",
@@ -128,7 +123,8 @@
       "unlockAll": "Desbloca-ho tot"
     },
     "statusPublished": "Publicat",
-    "sidebarLock": "Manté la barra lateral oberta"
+    "sidebarLock": "Manté la barra lateral oberta",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Encara no s'hi han afegit elements...",
@@ -140,11 +136,7 @@
     "exportJSON": "Exporta a un fitxer",
     "exportImage": "Exporta la imatge...",
     "export": "Guardar a...",
-    "exportToPng": "Exporta a PNG",
-    "exportToSvg": "Exporta a SNG",
     "copyToClipboard": "Copia al porta-retalls",
-    "copyPngToClipboard": "Copia el PNG al porta-retalls",
-    "scale": "Escala",
     "save": "Desa al fitxer actual",
     "saveAs": "Anomena i desa",
     "load": "Obrir",
@@ -363,6 +355,30 @@
     "resetLibrary": "Restableix la biblioteca",
     "removeItemsFromLib": "Suprimeix els elements seleccionats de la llibreria"
   },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
+  },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai.",
     "link": "Article del blog sobre encriptació d'extrem a extrem a Excalidraw"
@@ -394,51 +410,21 @@
     "pasteAsSingleElement": "Fer servir {{shortcut}} per enganxar com un sol element,\no enganxeu-lo en un editor de text existent"
   },
   "colors": {
-    "ffffff": "Blanc",
-    "f8f9fa": "Gris 0",
-    "f1f3f5": "Gris 1",
-    "fff5f5": "Vermell 0",
-    "fff0f6": "Rosa 0",
-    "f8f0fc": "Malva 0",
-    "f3f0ff": "Violat 0",
-    "edf2ff": "Indi 0",
-    "e7f5ff": "Blau 0",
-    "e3fafc": "Cian 0",
-    "e6fcf5": "Xarxet 0",
-    "ebfbee": "Verd 0",
-    "f4fce3": "Llima 0",
-    "fff9db": "Groc 0",
-    "fff4e6": "Taronja 0",
     "transparent": "Transparent",
-    "ced4da": "Gris 4",
-    "868e96": "Gris 6",
-    "fa5252": "Vermell 6",
-    "e64980": "Rosa 6",
-    "be4bdb": "Malva 6",
-    "7950f2": "Violat 6",
-    "4c6ef5": "Indi 6",
-    "228be6": "Blau 6",
-    "15aabf": "Cian 6",
-    "12b886": "Xarxet 6",
-    "40c057": "Verd 6",
-    "82c91e": "Llima 6",
-    "fab005": "Groc 6",
-    "fd7e14": "Taronja 6",
-    "000000": "Negre",
-    "343a40": "Gris 8",
-    "495057": "Gris 7",
-    "c92a2a": "Vermell 9",
-    "a61e4d": "Rosa 9",
-    "862e9c": "Malva 9",
-    "5f3dc4": "Violat 9",
-    "364fc7": "Indi 9",
-    "1864ab": "Blau 9",
-    "0b7285": "Cian 9",
-    "087f5b": "Xarxet 9",
-    "2b8a3e": "Verd 9",
-    "5c940d": "Llima 9",
-    "e67700": "Groc 9",
-    "d9480f": "Taronja 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -452,5 +438,12 @@
       "toolbarHint": "Selecciona una eina i comença a dibuixar!",
       "helpHint": "Dreceres i ajuda"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }
