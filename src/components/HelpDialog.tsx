@@ -12,7 +12,7 @@ const Header = () => (
   <div className="HelpDialog__header">
     <a
       className="HelpDialog__btn"
-      href="https://github.com/excalidraw/excalidraw#documentation"
+      href="https://docs.excalidraw.com"
       target="_blank"
       rel="noopener noreferrer"
     >
