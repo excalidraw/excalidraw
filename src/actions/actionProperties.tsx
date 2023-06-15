@@ -102,8 +102,11 @@ const changeProperty = (
   includeBoundText = false,
 ) => {
   const selectedElementIds = arrayToMap(
-    getSelectedElements(elements, appState, includeBoundText),
+    getSelectedElements(elements, appState, {
+      includeBoundTextElement: includeBoundText,
+    }),
   );
+
   return elements.map((element) => {
     if (
       selectedElementIds.get(element.id) ||
@@ -119,8 +122,8 @@ const getFormValue = function <T>(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
-  defaultValue?: T,
-): T | null {
+  defaultValue: T,
+): T {
   const editingElement = appState.editingElement;
   const nonDeletedElements = getNonDeletedElements(elements);
   return (
@@ -132,7 +135,7 @@ const getFormValue = function <T>(
           getAttribute,
         )
       : defaultValue) ??
-    null
+    defaultValue
   );
 };
 
@@ -811,6 +814,7 @@ export const actionChangeTextAlign = register({
     );
   },
 });
+
 export const actionChangeVerticalAlign = register({
   name: "changeVerticalAlign",
   trackEvent: { category: "element" },
@@ -865,16 +869,21 @@ export const actionChangeVerticalAlign = register({
               testId: "align-bottom",
             },
           ]}
-          value={getFormValue(elements, appState, (element) => {
-            if (isTextElement(element) && element.containerId) {
-              return element.verticalAlign;
-            }
-            const boundTextElement = getBoundTextElement(element);
-            if (boundTextElement) {
-              return boundTextElement.verticalAlign;
-            }
-            return null;
-          })}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => {
+              if (isTextElement(element) && element.containerId) {
+                return element.verticalAlign;
+              }
+              const boundTextElement = getBoundTextElement(element);
+              if (boundTextElement) {
+                return boundTextElement.verticalAlign;
+              }
+              return null;
+            },
+            VERTICAL_ALIGN.MIDDLE,
+          )}
           onChange={(value) => updateData(value)}
         />
       </fieldset>

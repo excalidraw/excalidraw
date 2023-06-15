@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Háromszög",
     "fontSize": "Betűméret",
     "fontFamily": "Betűkészlet család",
-    "onlySelected": "Csak a kijelölt",
-    "withBackground": "Háttér",
-    "exportEmbedScene": "Jelenet beágyazása",
-    "exportEmbedScene_details": "A jelenetet leíró adatok hozzá lesznek adva a PNG/SVG fájlhoz, így a jelenetet vissza lehet majd tölteni belőle. Ez megnöveli a fájl méretét.",
     "addWatermark": "Add hozzá, hogy \"Excalidraw-val készült\"",
     "handDrawn": "Kézzel rajzolt",
     "normal": "Normál",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Vízszintes tükrözés",
     "flipVertical": "Függőleges tükrözés",
     "viewMode": "Nézet",
-    "toggleExportColorScheme": "Exportált színséma váltása",
     "share": "Megosztás",
     "showStroke": "Körvonal színválasztó megjelenítése",
     "showBackground": "Háttérszín-választó megjelenítése",
@@ -128,7 +123,8 @@
       "unlockAll": ""
     },
     "statusPublished": "",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +136,7 @@
     "exportJSON": "Exportálás fájlba",
     "exportImage": "",
     "export": "",
-    "exportToPng": "Exportálás PNG-be",
-    "exportToSvg": "Exportálás SVG-be",
     "copyToClipboard": "Vágólapra másolás",
-    "copyPngToClipboard": "PNG másolása a vágólapra",
-    "scale": "Nagyítás",
     "save": "Mentés az aktuális fájlba",
     "saveAs": "Mentés másként",
     "load": "",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Könyvtár alaphelyzetbe állítása",
     "removeItemsFromLib": "A kiválasztott elemek eltávolítása a könyvtárból"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "A rajzaidat végpontok közötti titkosítással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni.",

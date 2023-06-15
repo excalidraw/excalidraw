@@ -38,7 +38,7 @@ import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
-import { Provider, useAtomValue } from "jotai";
+import { Provider, useAtom, useAtomValue } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/Dialog";
@@ -48,6 +48,7 @@ import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { LibraryIcon } from "./icons";
 import { UIAppStateContext } from "../context/ui-appState";
 import { DefaultSidebar } from "./DefaultSidebar";
+import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -135,6 +136,11 @@ const LayerUI = ({
   const device = useDevice();
   const tunnels = useInitializeTunnels();
 
+  const [eyeDropperState, setEyeDropperState] = useAtom(
+    activeEyeDropperAtom,
+    jotaiScope,
+  );
+
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
       return null;
@@ -213,12 +219,7 @@ const LayerUI = ({
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
-          <Stack.Col
-            gap={6}
-            className={clsx("App-menu_top__left", {
-              "disable-pointerEvents": appState.zenModeEnabled,
-            })}
-          >
+          <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
             {renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
@@ -263,7 +264,7 @@ const LayerUI = ({
                             title={t("toolBar.lock")}
                           />
 
-                          <div className="App-toolbar__divider"></div>
+                          <div className="App-toolbar__divider" />
 
                           <HandButton
                             checked={isHandToolActive(appState)}
@@ -366,6 +367,21 @@ const LayerUI = ({
           {appState.errorMessage}
         </ErrorDialog>
       )}
+      {eyeDropperState && !device.isMobile && (
+        <EyeDropper
+          swapPreviewOnAlt={eyeDropperState.swapPreviewOnAlt}
+          previewType={eyeDropperState.previewType}
+          onCancel={() => {
+            setEyeDropperState(null);
+          }}
+          onSelect={(color, event) => {
+            setEyeDropperState((state) => {
+              return state?.keepOpenOnAlt && event.altKey ? state : null;
+            });
+            eyeDropperState?.onSelect?.(color, event);
+          }}
+        />
+      )}
       {appState.openDialog === "help" && (
         <HelpDialog
           onClose={() => {
@@ -388,7 +404,7 @@ const LayerUI = ({
           }
         />
       )}
-      {device.isMobile && (
+      {device.isMobile && !eyeDropperState && (
         <MobileMenu
           appState={appState}
           elements={elements}

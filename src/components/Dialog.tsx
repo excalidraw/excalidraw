@@ -12,7 +12,6 @@ import "./Dialog.scss";
 import { back, CloseIcon } from "./icons";
 import { Island } from "./Island";
 import { Modal } from "./Modal";
-import { AppState } from "../types";
 import { queryFocusableElements } from "../utils";
 import { useSetAtom } from "jotai";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
@@ -25,7 +24,6 @@ export interface DialogProps {
   onCloseRequest(): void;
   title: React.ReactNode | false;
   autofocus?: boolean;
-  theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
 }
 
@@ -91,7 +89,6 @@ export const Dialog = (props: DialogProps) => {
         props.size === "wide" ? 1024 : props.size === "small" ? 550 : 800
       }
       onCloseRequest={onClose}
-      theme={props.theme}
       closeOnClickOutside={props.closeOnClickOutside}
     >
       <Island ref={setIslandNode}>

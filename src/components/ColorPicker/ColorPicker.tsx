@@ -1,4 +1,4 @@
-import { isTransparent } from "../../utils";
+import { isInteractive, isTransparent, isWritableElement } from "../../utils";
 import { ExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
 import { TopPicks } from "./TopPicks";
@@ -12,12 +12,14 @@ import {
 import { useDevice, useExcalidrawContainer } from "../App";
 import { ColorTuple, COLOR_PALETTE, ColorPaletteCustom } from "../../colors";
 import PickerHeading from "./PickerHeading";
-import { ColorInput } from "./ColorInput";
 import { t } from "../../i18n";
 import clsx from "clsx";
+import { jotaiScope } from "../../jotai";
+import { ColorInput } from "./ColorInput";
+import { useRef } from "react";
+import { activeEyeDropperAtom } from "../EyeDropper";
 
 import "./ColorPicker.scss";
-import React from "react";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -40,9 +42,9 @@ export const getColor = (color: string): string | null => {
     : null;
 };
 
-export interface ColorPickerProps {
+interface ColorPickerProps {
   type: ColorPickerType;
-  color: string | null;
+  color: string;
   onChange: (color: string) => void;
   label: string;
   elements: readonly ExcalidrawElement[];
@@ -66,12 +68,16 @@ const ColorPickerPopupContent = ({
   | "color"
   | "onChange"
   | "label"
-  | "label"
   | "elements"
   | "palette"
   | "updateData"
 >) => {
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
+
+  const [eyeDropperState, setEyeDropperState] = useAtom(
+    activeEyeDropperAtom,
+    jotaiScope,
+  );
 
   const { container } = useExcalidrawContainer();
   const { isMobile, isLandscape } = useDevice();
@@ -88,21 +94,45 @@ const ColorPickerPopupContent = ({
       />
     </div>
   );
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  const focusPickerContent = () => {
+    popoverRef.current
+      ?.querySelector<HTMLDivElement>(".color-picker-content")
+      ?.focus();
+  };
 
   return (
     <Popover.Portal container={container}>
       <Popover.Content
+        ref={popoverRef}
         className="focus-visible-none"
         data-prevent-outside-click
+        onFocusOutside={(event) => {
+          focusPickerContent();
+          event.preventDefault();
+        }}
+        onPointerDownOutside={(event) => {
+          if (eyeDropperState) {
+            // prevent from closing if we click outside the popover
+            // while eyedropping (e.g. click when clicking the sidebar;
+            // the eye-dropper-backdrop is prevented downstream)
+            event.preventDefault();
+          }
+        }}
         onCloseAutoFocus={(e) => {
-          // return focus to excalidraw container
-          if (container) {
+          e.stopPropagation();
+          // prevents focusing the trigger
+          e.preventDefault();
+
+          // return focus to excalidraw container unless
+          // user focuses an interactive element, such as a button, or
+          // enters the text editor by clicking on canvas with the text tool
+          if (container && !isInteractive(document.activeElement)) {
             container.focus();
           }
 
-          e.preventDefault();
-          e.stopPropagation();
-
+          updateData({ openPopup: null });
           setActiveColorPickerSection(null);
         }}
         side={isMobile && !isLandscape ? "bottom" : "right"}
@@ -125,9 +155,37 @@ const ColorPickerPopupContent = ({
         {palette ? (
           <Picker
             palette={palette}
-            color={color || null}
+            color={color}
             onChange={(changedColor) => {
               onChange(changedColor);
+            }}
+            onEyeDropperToggle={(force) => {
+              setEyeDropperState((state) => {
+                if (force) {
+                  state = state || {
+                    keepOpenOnAlt: true,
+                    onSelect: onChange,
+                  };
+                  state.keepOpenOnAlt = true;
+                  return state;
+                }
+
+                return force === false || state
+                  ? null
+                  : {
+                      keepOpenOnAlt: false,
+                      onSelect: onChange,
+                    };
+              });
+            }}
+            onEscape={(event) => {
+              if (eyeDropperState) {
+                setEyeDropperState(null);
+              } else if (isWritableElement(event.target)) {
+                focusPickerContent();
+              } else {
+                updateData({ openPopup: null });
+              }
             }}
             label={label}
             type={type}
@@ -157,7 +215,7 @@ const ColorPickerTrigger = ({
   color,
   type,
 }: {
-  color: string | null;
+  color: string;
   label: string;
   type: ColorPickerType;
 }) => {

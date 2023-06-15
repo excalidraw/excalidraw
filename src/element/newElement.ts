@@ -12,6 +12,7 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawTextContainer,
+  ExcalidrawFrameElement,
 } from "../element/types";
 import {
   arrayToMap,
@@ -20,15 +21,13 @@ import {
   isTestEnv,
 } from "../utils";
 import { randomInteger, randomId } from "../random";
-import { bumpVersion, mutateElement, newElementWith } from "./mutateElement";
+import { bumpVersion, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
-  getBoundTextElementOffset,
-  getContainerDims,
   getContainerElement,
   measureText,
   normalizeText,
@@ -44,7 +43,6 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
 
 type ElementConstructorOpts = MarkOptional<
@@ -53,6 +51,7 @@ type ElementConstructorOpts = MarkOptional<
   | "height"
   | "angle"
   | "groupIds"
+  | "frameId"
   | "boundElements"
   | "seed"
   | "version"
@@ -85,6 +84,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     height = 0,
     angle = 0,
     groupIds = [],
+    frameId = null,
     roundness = null,
     boundElements = null,
     link = null,
@@ -109,6 +109,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     roughness,
     opacity,
     groupIds,
+    frameId,
     roundness,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
@@ -128,6 +129,21 @@ export const newElement = (
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
+
+export const newFrameElement = (
+  opts: ElementConstructorOpts,
+): NonDeleted<ExcalidrawFrameElement> => {
+  const frameElement = newElementWith(
+    {
+      ..._newElementBase<ExcalidrawFrameElement>("frame", opts),
+      type: "frame",
+      name: null,
+    },
+    {},
+  );
+
+  return frameElement;
+};
 
 /** computes element x/y offset based on textAlign/verticalAlign */
 const getTextElementPositionOffsets = (
@@ -161,6 +177,7 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"];
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     strokeWidth?: ExcalidrawTextElement["strokeWidth"];
+    isFrameName?: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -195,6 +212,7 @@ export const newTextElement = (
       containerId: opts.containerId || null,
       originalText: text,
       lineHeight,
+      isFrameName: opts.isFrameName || false,
     },
     {},
   );
@@ -211,8 +229,6 @@ const getAdjustedDimensions = (
   height: number;
   baseline: number;
 } => {
-  const container = getContainerElement(element);
-
   const {
     width: nextWidth,
     height: nextHeight,
@@ -268,27 +284,6 @@ const getAdjustedDimensions = (
     );
   }
 
-  // make sure container dimensions are set properly when
-  // text editor overflows beyond viewport dimensions
-  if (container) {
-    const boundTextElementPadding = getBoundTextElementOffset(element);
-
-    const containerDims = getContainerDims(container);
-    let height = containerDims.height;
-    let width = containerDims.width;
-    if (nextHeight > height - boundTextElementPadding * 2) {
-      height = nextHeight + boundTextElementPadding * 2;
-    }
-    if (nextWidth > width - boundTextElementPadding * 2) {
-      width = nextWidth + boundTextElementPadding * 2;
-    }
-    if (
-      !isArrowElement(container) &&
-      (height !== containerDims.height || width !== containerDims.width)
-    ) {
-      mutateElement(container, { height, width });
-    }
-  }
   return {
     width: nextWidth,
     height: nextHeight,
@@ -636,6 +631,10 @@ export const duplicateElements = (
             elementId: newEndBindingId,
           }
         : null;
+    }
+
+    if (clonedElement.frameId) {
+      clonedElement.frameId = maybeGetNewId(clonedElement.frameId);
     }
 
     clonedElements.push(clonedElement);

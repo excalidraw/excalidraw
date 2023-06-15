@@ -59,6 +59,7 @@ export enum EVENT {
   GESTURE_START = "gesturestart",
   GESTURE_CHANGE = "gesturechange",
   POINTER_MOVE = "pointermove",
+  POINTER_DOWN = "pointerdown",
   POINTER_UP = "pointerup",
   STATE_CHANGE = "statechange",
   WHEEL = "wheel",
@@ -91,6 +92,17 @@ export const FONT_FAMILY = {
 export const THEME = {
   LIGHT: "light",
   DARK: "dark",
+};
+
+export const FRAME_STYLE = {
+  strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
+  strokeWidth: 1 as ExcalidrawElement["strokeWidth"],
+  strokeStyle: "solid" as ExcalidrawElement["strokeStyle"],
+  fillStyle: "solid" as ExcalidrawElement["fillStyle"],
+  roughness: 0 as ExcalidrawElement["roughness"],
+  roundness: null as ExcalidrawElement["roundness"],
+  backgroundColor: "transparent" as ExcalidrawElement["backgroundColor"],
+  radius: 8,
 };
 
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";

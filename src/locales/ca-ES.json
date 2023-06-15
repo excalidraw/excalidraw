@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triangle",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
-    "onlySelected": "Només seleccionats",
-    "withBackground": "Fons",
-    "exportEmbedScene": "Insereix l'escena",
-    "exportEmbedScene_details": "Les dades de l’escena es desaran al fitxer PNG/SVG de manera que es pugui restaurar l’escena.\nAugmentarà la mida del fitxer exportat.",
     "addWatermark": "Afegeix-hi «Fet amb Excalidraw»",
     "handDrawn": "Dibuixat a mà",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Capgira horitzontalment",
     "flipVertical": "Capgira verticalment",
     "viewMode": "Mode de visualització",
-    "toggleExportColorScheme": "Canvia l'esquema de colors de l'exportació",
     "share": "Comparteix",
     "showStroke": "Mostra el selector de color del traç",
     "showBackground": "Mostra el selector de color de fons",
@@ -128,7 +123,8 @@
       "unlockAll": "Desbloca-ho tot"
     },
     "statusPublished": "Publicat",
-    "sidebarLock": "Manté la barra lateral oberta"
+    "sidebarLock": "Manté la barra lateral oberta",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Encara no s'hi han afegit elements...",
@@ -140,11 +136,7 @@
     "exportJSON": "Exporta a un fitxer",
     "exportImage": "Exporta la imatge...",
     "export": "Guardar a...",
-    "exportToPng": "Exporta a PNG",
-    "exportToSvg": "Exporta a SNG",
     "copyToClipboard": "Copia al porta-retalls",
-    "copyPngToClipboard": "Copia el PNG al porta-retalls",
-    "scale": "Escala",
     "save": "Desa al fitxer actual",
     "saveAs": "Anomena i desa",
     "load": "Obrir",
@@ -362,6 +354,30 @@
   "confirmDialog": {
     "resetLibrary": "Restableix la biblioteca",
     "removeItemsFromLib": "Suprimeix els elements seleccionats de la llibreria"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai.",
