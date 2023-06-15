@@ -8,6 +8,7 @@ export const SYNC_BROWSER_TABS_TIMEOUT = 50;
 export const CURSOR_SYNC_TIMEOUT = 33; // ~30fps
 export const DELETED_ELEMENT_TIMEOUT = 24 * 60 * 60 * 1000; // 1 day
 export const PAUSE_COLLABORATION_TIMEOUT = 30000;
+export const RESUME_FALLBACK_TIMEOUT = 5000;
 
 export const FILE_UPLOAD_MAX_BYTES = 3 * 1024 * 1024; // 3 MiB
 // 1 year (https://stackoverflow.com/a/25201898/927631)

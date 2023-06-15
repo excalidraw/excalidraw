@@ -27,10 +27,12 @@ import {
   PAUSE_COLLABORATION_TIMEOUT,
   WS_SCENE_EVENT_TYPES,
   SYNC_FULL_SCENE_INTERVAL_MS,
+  RESUME_FALLBACK_TIMEOUT,
 } from "../app_constants";
 import {
   generateCollaborationLinkData,
   getCollaborationLink,
+  getCollaborationLinkData,
   getCollabServer,
   getSyncableElements,
   SocketUpdateDataSource,
@@ -320,6 +322,8 @@ class Collab extends PureComponent<Props, CollabState> {
     }
   };
 
+  fallbackResumeTimeout: null | ReturnType<typeof setTimeout> = null;
+
   onPauseCollaborationChange = (state: PauseCollaborationState) => {
     switch (state) {
       case PauseCollaborationState.PAUSED: {
@@ -345,7 +349,37 @@ class Collab extends PureComponent<Props, CollabState> {
             spinner: true,
             closable: false,
           });
+
+          // Fallback to fetch data from firebase when reconnecting to scene without collaborators
+          const fallbackResumeHandler = async () => {
+            const roomLinkData = getCollaborationLinkData(
+              this.state.activeRoomLink,
+            );
+            if (!roomLinkData) {
+              return;
+            }
+            const elements = await loadFromFirebase(
+              roomLinkData.roomId,
+              roomLinkData.roomKey,
+              this.portal.socket,
+            );
+            if (elements) {
+              this.setLastBroadcastedOrReceivedSceneVersion(
+                getSceneVersion(elements),
+              );
+
+              this.excalidrawAPI.updateScene({
+                elements,
+              });
+            }
+            this.onPauseCollaborationChange(PauseCollaborationState.SYNCED);
+          };
+          this.fallbackResumeTimeout = setTimeout(
+            fallbackResumeHandler,
+            RESUME_FALLBACK_TIMEOUT,
+          );
         }
+
         break;
       }
       case PauseCollaborationState.SYNCED: {
@@ -356,6 +390,11 @@ class Collab extends PureComponent<Props, CollabState> {
             appState: { viewModeEnabled: false },
           });
           this.excalidrawAPI.setToast(null);
+
+          if (this.fallbackResumeTimeout) {
+            clearTimeout(this.fallbackResumeTimeout);
+            this.fallbackResumeTimeout = null;
+          }
         }
       }
     }
