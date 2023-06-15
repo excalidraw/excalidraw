@@ -1,10 +1,12 @@
 import React from "react";
 import { FilledButton } from "../FilledButton";
 import {
+  useApp,
   useExcalidrawActionManager,
   useExcalidrawAppState,
   useExcalidrawContainer,
   useExcalidrawElements,
+  useExcalidrawSetAppState,
 } from "../App";
 import { actionSaveFileToDisk } from "../../actions";
 
@@ -36,14 +38,16 @@ export const Action = ({
     </div>
   );
 };
+
 export const ExportToImage = () => {
+  const setAppState = useExcalidrawSetAppState();
+
   return (
     <Action
       title="Export as image"
       actionLabel="Export as image"
       onClick={() => {
-        // TODO: figure out how to get the necessary data here
-        // onExportToBackend(elements, appState, files, canvas)
+        setAppState({ openDialog: "imageExport" });
       }}
     >
       Export the scene data as a image from which you can import later.

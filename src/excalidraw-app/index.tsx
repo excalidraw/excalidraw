@@ -68,7 +68,10 @@ import {
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
 import { restore, restoreAppState, RestoredDataState } from "../data/restore";
-import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
+import {
+  ExportToExcalidrawPlus,
+  exportToExcalidrawPlus,
+} from "./components/ExportToExcalidrawPlus";
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
@@ -699,15 +702,21 @@ const ExcalidrawWrapper = () => {
           <OverwriteConfirmDialog.Actions>
             <OverwriteConfirmDialog.Actions.SaveToDisk />
             <OverwriteConfirmDialog.Actions.ExportToImage />
-            <Action
-              title="Excalidraw+"
-              actionLabel="Export to Excalidraw+"
-              onClick={() => {
-                // TODO: How to get elements, appState and files here?
-              }}
-            >
-              Save the scene to your Excalidraw+ workspace.
-            </Action>
+            {excalidrawAPI && (
+              <Action
+                title="Excalidraw+"
+                actionLabel="Export to Excalidraw+"
+                onClick={() => {
+                  exportToExcalidrawPlus(
+                    excalidrawAPI?.getSceneElements(),
+                    excalidrawAPI?.getAppState(),
+                    excalidrawAPI?.getFiles(),
+                  );
+                }}
+              >
+                Save the scene to your Excalidraw+ workspace.
+              </Action>
+            )}
           </OverwriteConfirmDialog.Actions>
         </OverwriteConfirmDialog>
         <AppWelcomeScreen setCollabDialogShown={setCollabDialogShown} />
