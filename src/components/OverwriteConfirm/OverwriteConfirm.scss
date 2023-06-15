@@ -29,7 +29,7 @@
 
       padding: 2.5rem;
 
-      background: #fff0f0;
+      background: var(--color-danger-background);
       border-radius: 0.5rem;
 
       font-family: "Assistant";
@@ -38,7 +38,7 @@
       font-size: 1rem;
       line-height: 150%;
 
-      color: #700000;
+      color: var(--color-danger-text);
 
       &__icon {
         box-sizing: border-box;
@@ -46,7 +46,7 @@
         align-items: center;
         justify-content: center;
         border-radius: 1.5rem;
-        background: #ffdad6;
+        background: var(--color-danger-background-darker);
         width: 2.75rem;
         height: 2.75rem;
 
@@ -76,7 +76,7 @@
         flex-basis: 50%;
         flex-grow: 0;
 
-        border: 1px solid var(--color-gray-20);
+        border: 1px solid var(--color-muted);
         border-radius: 0.75rem;
 
         &__content {

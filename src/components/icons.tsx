@@ -1617,7 +1617,7 @@ export const alertTriangleIcon = createIcon(
   </>,
   tablerIconProps,
 );
-        
+
 export const eyeDropperIcon = createIcon(
   <g strokeWidth={1.25}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>

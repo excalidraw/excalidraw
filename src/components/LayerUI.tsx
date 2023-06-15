@@ -41,7 +41,7 @@ import { jotaiScope } from "../jotai";
 import { Provider, useAtom, useAtomValue } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
-import { OverwriteConfirmDialog } from "./OverwriteConfirm/Dialog";
+import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
@@ -52,7 +52,6 @@ import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
-import { actionSaveFileToDisk } from "../actions";
 
 interface LayerUIProps {
   actionManager: ActionManager;

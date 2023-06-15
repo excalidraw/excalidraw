@@ -1,13 +1,6 @@
 import React from "react";
 import { FilledButton } from "../FilledButton";
-import {
-  useApp,
-  useExcalidrawActionManager,
-  useExcalidrawAppState,
-  useExcalidrawContainer,
-  useExcalidrawElements,
-  useExcalidrawSetAppState,
-} from "../App";
+import { useExcalidrawActionManager, useExcalidrawSetAppState } from "../App";
 import { actionSaveFileToDisk } from "../../actions";
 
 export type ActionProps = {

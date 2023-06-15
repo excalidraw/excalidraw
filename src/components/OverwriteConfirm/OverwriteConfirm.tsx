@@ -4,9 +4,9 @@ import { useAtom } from "jotai";
 import { useTunnels } from "../../context/tunnels";
 import { Dialog } from "../Dialog";
 import { withInternalFallback } from "../hoc/withInternalFallback";
-import { overwriteConfirmState } from "./state";
+import { overwriteConfirmState } from "./OverwriteConfirmState";
 
-import { Actions } from "./Actions";
+import { Actions } from "./OverwriteConfirmActions";
 import { jotaiScope } from "../../jotai";
 
 import "./OverwriteConfirm.scss";

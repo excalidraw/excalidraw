@@ -92,10 +92,10 @@ import { appJotaiStore } from "./app-jotai";
 import "./index.scss";
 import { ResolutionType } from "../utility-types";
 import { ShareableLinkDialog } from "../components/ShareableLinkDialog";
-import { openConfirmModal } from "../components/OverwriteConfirm/state";
-import { OverwriteConfirmDialog } from "../components/OverwriteConfirm/Dialog";
+import { openConfirmModal } from "../components/OverwriteConfirm/OverwriteConfirmState";
+import { OverwriteConfirmDialog } from "../components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../components/Trans";
-import { Action } from "../components/OverwriteConfirm/Actions";
+import { Action } from "../components/OverwriteConfirm/OverwriteConfirmActions";
 
 polyfill();
 
