@@ -7588,11 +7588,12 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleWheel = withBatchedUpdates(
     (event: WheelEvent | React.WheelEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      if (isPanning) {
-        return;
-      }
+    event.preventDefault();
+    if (isPanning) {
+      return;
+    }
 
+<<<<<<< HEAD
       const { deltaX, deltaY } = event;
       // note that event.ctrlKey is necessary to handle pinch zooming
       if (event.metaKey || event.ctrlKey) {
@@ -7603,6 +7604,22 @@ class App extends React.Component<AppProps, AppState> {
         if (absDelta > MAX_STEP) {
           delta = MAX_STEP * sign;
         }
+=======
+    const { deltaX, deltaY } = event;
+    // note that event.ctrlKey is necessary to handle pinch zooming
+    if (
+      //zsviczian
+      ((event.metaKey || event.ctrlKey) && !this.state.allowWheelZoom) ||
+      (!(event.metaKey || event.ctrlKey) && this.state.allowWheelZoom)
+    ) {
+      const sign = Math.sign(deltaY);
+      const MAX_STEP = ZOOM_STEP * 100;
+      const absDelta = Math.abs(deltaY);
+      let delta = deltaY;
+      if (absDelta > MAX_STEP) {
+        delta = MAX_STEP * sign;
+      }
+>>>>>>> parent of ea7c75c5 (resolve merge errors)
 
         let newZoom = this.state.zoom.value - delta / 100;
         // increase zoom steps the more zoomed-in we are (applies to >100% only)

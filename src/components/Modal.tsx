@@ -4,6 +4,11 @@ import React from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { KEYS } from "../keys";
+import {
+  useExcalidrawContainer,
+  useDevice,
+  useExcalidrawAppState,
+} from "./App";
 import { AppState } from "../types";
 import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 

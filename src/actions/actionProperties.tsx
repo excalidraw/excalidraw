@@ -213,6 +213,13 @@ export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   trackEvent: false,
   perform: (elements, appState, value) => {
+<<<<<<< HEAD
+=======
+    //zsviczian added containers
+    const containers = getSelectedElements(elements, appState, false)
+      .filter((el) => el.boundElements)
+      .map((el) => el.id);
+>>>>>>> parent of ea7c75c5 (resolve merge errors)
     return {
       ...(value.currentItemStrokeColor && {
         elements: changeProperty(
