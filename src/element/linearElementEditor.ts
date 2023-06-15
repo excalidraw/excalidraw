@@ -594,7 +594,7 @@ export class LinearElementEditor {
   }
 
   static handlePointerDown(
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
     appState: AppState,
     history: History,
     scenePointer: { x: number; y: number },

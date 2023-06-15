@@ -22,6 +22,8 @@ import {
   DEFAULT_CANVAS_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
 } from "../colors";
+import { excludeElementsInFramesFromSelection } from "../scene/selection";
+import { Bounds } from "../element/bounds";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -222,7 +224,7 @@ export const actionResetZoom = register({
 });
 
 const zoomValueToFitBoundsOnViewport = (
-  bounds: [number, number, number, number],
+  bounds: Bounds,
   viewportDimensions: { width: number; height: number },
   maxZoom: number = 1, //zsviczian
 ) => {
@@ -253,8 +255,10 @@ export const zoomToFitElements = (
 
   const commonBounds =
     zoomToSelection && selectedElements.length > 0
-      ? getCommonBounds(selectedElements)
-      : getCommonBounds(nonDeletedElements);
+      ? getCommonBounds(excludeElementsInFramesFromSelection(selectedElements))
+      : getCommonBounds(
+          excludeElementsInFramesFromSelection(nonDeletedElements),
+        );
 
   const newZoom = {
     value: zoomValueToFitBoundsOnViewport(

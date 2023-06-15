@@ -116,6 +116,11 @@ export type ActionName =
   | "toggleLinearEditor"
   | "toggleEraserTool"
   | "toggleHandTool"
+  | "selectAllElementsInFrame"
+  | "removeAllElementsFromFrame"
+  | "toggleFrameRendering"
+  | "setFrameAsActiveTool"
+  | "createContainerFromText"
   | "wrapTextInContainer";
 
 export type PanelComponentProps = {

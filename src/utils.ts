@@ -10,7 +10,11 @@ import {
   THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import { FontFamilyValues, FontString } from "./element/types";
+import {
+  FontFamilyValues,
+  FontString,
+  NonDeletedExcalidrawElement,
+} from "./element/types";
 import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
@@ -299,7 +303,7 @@ export const distance = (x: number, y: number) => Math.abs(x - y);
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: (
-    | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" }
+    | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame" }
     | { type: "custom"; customType: string }
   ) & { lastActiveToolBeforeEraser?: LastActiveTool },
 ): AppState["activeTool"] => {
@@ -748,6 +752,8 @@ export const getFrame = () => {
   }
 };
 
+export const isRunningInIframe = () => getFrame() === "iframe";
+
 export const isPromiseLike = (
   value: any,
 ): value is Promise<ResolutionType<typeof value>> => {
@@ -821,4 +827,17 @@ export const composeEventHandlers = <E>(
       return ourEventHandler?.(event);
     }
   };
+};
+
+export const isOnlyExportingSingleFrame = (
+  elements: readonly NonDeletedExcalidrawElement[],
+) => {
+  const frames = elements.filter((element) => element.type === "frame");
+
+  return (
+    frames.length === 1 &&
+    elements.every(
+      (element) => element.type === "frame" || element.frameId === frames[0].id,
+    )
+  );
 };
