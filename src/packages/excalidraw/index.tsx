@@ -43,6 +43,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onScrollChange,
     children,
     iframeURLWhitelist,
+    renderCustomIFrame,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -117,6 +118,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
           iframeURLWhitelist={iframeURLWhitelist}
+          renderCustomIFrame={renderCustomIFrame}
         >
           {children}
         </App>

@@ -16,6 +16,7 @@ import {
   Theme,
   StrokeRoundness,
   ExcalidrawFrameElement,
+  ExcalidrawRectangleElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -358,6 +359,11 @@ export interface ExcalidrawProps {
   onScrollChange?: (scrollX: number, scrollY: number) => void;
   children?: React.ReactNode;
   iframeURLWhitelist?: RegExp[];
+  renderCustomIFrame?: (
+    element: NonDeletedExcalidrawElement,
+    radius: number,
+    appState: UIAppState,
+  ) => JSX.Element | null;
 }
 
 export type SceneData = {

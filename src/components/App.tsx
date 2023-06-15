@@ -227,6 +227,7 @@ import {
   FrameNameBoundsCache,
   SidebarName,
   SidebarTabName,
+  UIAppState,
 } from "../types";
 import {
   debounce,
@@ -665,7 +666,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private renderFrames() {
+  private renderIFrames() {
     const scale = this.state.zoom.value;
     const normalizedWidth = this.state.width;
     const normalizedHeight = this.state.height;
@@ -779,22 +780,22 @@ class App extends React.Component<AppProps, AppState> {
                     pointerEvents: isSelected ? "auto" : "none",
                   }}
                 >
-                  <iframe
-                    className="excalidraw__iframe"
-                    style={{
-                      width: `100%`,
-                      height: `100%`,
-                      border: 0,
-                      borderRadius: `${radius}px`,
-                      position: "absolute",
-                      left: 0,
-                      top: 0,
-                    }}
-                    src={src}
-                    title="Excalidraw Embedded Content"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen={true}
-                  />
+                  {this.props.renderCustomIFrame?.(
+                    el,
+                    radius,
+                    this.state as UIAppState,
+                  ) ?? (
+                    <iframe
+                      className="excalidraw__iframe"
+                      style={{
+                        borderRadius: `${radius}px`,
+                      }}
+                      src={src}
+                      title="Excalidraw Embedded Content"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen={true}
+                    />
+                  )}
                   <div
                     className="excalidraw__iframe-overlay"
                     onClick={handleOverlayClick}
@@ -1113,7 +1114,7 @@ class App extends React.Component<AppProps, AppState> {
                         <main>{this.renderCanvas()}</main>
                         {this.renderFrameNames()}
                       </ExcalidrawActionManagerContext.Provider>
-                      {this.renderFrames()}
+                      {this.renderIFrames()}
                     </ExcalidrawElementsContext.Provider>
                   </ExcalidrawAppStateContext.Provider>
                 </ExcalidrawSetAppStateContext.Provider>

@@ -69,8 +69,9 @@
   }
 
   &__iframe {
-    position: relative;
-    transform-origin: center;
+    width: 100%;
+    height: 100%;
+    border: 0;
   }
 
   &__iframe-container {
