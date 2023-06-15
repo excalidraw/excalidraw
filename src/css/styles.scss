@@ -78,6 +78,7 @@
     position: absolute;
     z-index: 2;
     transform-origin: top left;
+    pointer-events: none;
   }
 
   &__iframe-overlay {

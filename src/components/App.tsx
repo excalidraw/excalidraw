@@ -767,7 +767,6 @@ class App extends React.Component<AppProps, AppState> {
                   left: `${x - this.state.offsetLeft}px`,
                   transform: `scale(${scale})`,
                   display: isVisible ? "block" : "none",
-                  pointerEvents: "none",
                 }}
               >
                 <div
