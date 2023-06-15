@@ -9,7 +9,7 @@ type HelpButtonProps = {
 
 export const HelpButton = (props: HelpButtonProps) => (
   <button
-    className="help-icon"
+    className="ToolIcon__icon help-icon" //zsviczian (added ToolIcon__icon)
     onClick={props.onClick}
     type="button"
     title={`${t("helpDialog.title")} — ?`}

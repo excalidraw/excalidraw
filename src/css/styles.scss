@@ -235,9 +235,9 @@
     pointer-events: none;
 
     > .Island {
-      width: 100%;
+      /*width: 100%; //zsviczian*/
       max-width: 100%;
-      min-width: 100%;
+      /*min-width: 100%; //zsviczian*/
       box-sizing: border-box;
       max-height: 100%;
       display: flex;
@@ -268,7 +268,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px;
+    padding: 6px; //zsviczian
   }
 
   .App-mobile-menu {
@@ -416,12 +416,12 @@
 
   .disable-zen-mode {
     border-radius: var(--border-radius-lg);
-    background-color: var(--color-gray-20);
+    background-color: var(--island-bg-color); //zsviczian
     border: 1px solid var(--color-gray-30);
     padding: 10px 20px;
 
     &:hover {
-      background-color: var(--color-gray-30);
+      background-color: var(--color-primary-light); //zsviczian
     }
   }
 
@@ -525,6 +525,16 @@
     }
   }
 
+  /*zsviczian*/
+  textarea.excalidraw-wysiwyg {
+    border: none;
+    outline: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
   input[type="text"],
   textarea:not(.excalidraw-wysiwyg) {
     color: var(--text-primary-color);
@@ -604,7 +614,7 @@
     max-width: 90vw;
 
     .ToolIcon__keybinding {
-      display: none;
+      display: block; //zsviczian
     }
   }
   .UserList-Wrapper {

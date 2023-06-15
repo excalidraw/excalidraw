@@ -709,6 +709,11 @@ Check out the [release notes](https://github.com/excalidraw/excalidraw/releases/
 
 ## 0.9.0 (2021-07-10)
 
+- Added `onDrop: (event: React.DragEvent<HTMLDivElement>) => Promise<boolean> | boolean` callback. This callback is triggered if passed when something is dropped into the scene. You can use this callback in case you want to do something additional when the drop event occurs. This callback must return a boolean value or a Promise<boolean> value. In case you want to prevent the excalidraw drop action you must return `false`, it will stop the native excalidraw onDrop flow (nothing will be added into the scene).
+- Added `onBeforeTextEdit` and `onBeforeTextSubmit` callback functions.
+  - The `onBeforeTextEdit: (textElement: ExcalidrawTextElement) => string` callback is triggered when a text element is about to be edited. The string returned will replace the element's text. If null is returned, the TextElement will not be changed. Use this to pre-process text before editing.
+  - The `onBeforeTextSubmit: (textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string` callback is triggered when the editing of a TextElement is finished, but right before the result is submitted. The string returned will replace the text element's text. Use this to post-process text after editing has finished.
+
 Check out the [release notes](https://github.com/excalidraw/excalidraw/releases/tag/v0.9.0)
 
 ## 0.8.0 (2021-05-15)

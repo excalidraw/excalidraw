@@ -45,7 +45,7 @@ export const createIcon = (
       style={style}
       {...rest}
     >
-      {typeof d === "string" ? <path fill="currentColor" d={d} /> : d}
+      {typeof d === "string" ? <path fill="var(--icon-fill-color)" d={d} /> : d}
     </svg>
   );
 };
@@ -55,7 +55,7 @@ const tablerIconProps: Opts = {
   height: 24,
   fill: "none",
   strokeWidth: 2,
-  stroke: "currentColor",
+  stroke: "var(--icon-fill-color)", //zsviczian
   strokeLinecap: "round",
   strokeLinejoin: "round",
 } as const;
@@ -64,7 +64,7 @@ const modifiedTablerIconProps: Opts = {
   width: 20,
   height: 20,
   fill: "none",
-  stroke: "currentColor",
+  stroke: "var(--icon-fill-color)", //zsviczian
   strokeLinecap: "round",
   strokeLinejoin: "round",
 } as const;
@@ -133,12 +133,12 @@ export const UnlockedIcon = createIcon(
   <g>
     <path
       d="M13.542 8.542H6.458a2.5 2.5 0 0 0-2.5 2.5v3.75a2.5 2.5 0 0 0 2.5 2.5h7.084a2.5 2.5 0 0 0 2.5-2.5v-3.75a2.5 2.5 0 0 0-2.5-2.5Z"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)" //zsviczian
       strokeWidth="1.25"
     />
     <path
       d="M10 13.958a1.042 1.042 0 1 0 0-2.083 1.042 1.042 0 0 0 0 2.083Z"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)" //zsviczian
       strokeWidth="1.25"
     />
     <mask
@@ -160,7 +160,7 @@ export const UnlockedIcon = createIcon(
       <path
         stroke="none"
         d="M5.149 9.561v1.25h2.5v-1.25h-2.5Zm5.06-7.894V.417v1.25Zm2.559 3.508v1.25h2.5v-1.25h-2.5ZM7.648 8.51V5.175h-2.5V8.51h2.5Zm0-3.334c0-.564.243-1.128.713-1.561L6.668 1.775c-.959.883-1.52 2.104-1.52 3.4h2.5Zm.713-1.561a2.732 2.732 0 0 1 1.847-.697v-2.5c-1.31 0-2.585.478-3.54 1.358L8.36 3.614Zm1.847-.697c.71 0 1.374.26 1.847.697l1.694-1.839a5.231 5.231 0 0 0-3.54-1.358v2.5Zm1.847.697c.47.433.713.997.713 1.561h2.5c0-1.296-.56-2.517-1.52-3.4l-1.693 1.839Z"
-        fill="currentColor"
+        fill="var(--icon-fill-color)" //zsviczian
       />
     </g>
   </g>,
@@ -182,7 +182,7 @@ export const WelcomeScreenMenuArrow = createIcon(
   <>
     <path
       d="M38.5 83.5c-14-2-17.833-10.473-21-22.5C14.333 48.984 12 22 12 12.5"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)" //zsviczian
       strokeWidth={2}
       strokeLinecap="round"
     />
@@ -190,11 +190,11 @@ export const WelcomeScreenMenuArrow = createIcon(
       fillRule="evenodd"
       clipRule="evenodd"
       d="m12.005 10.478 7.905 14.423L6 25.75l6.005-15.273Z"
-      fill="currentColor"
+      fill="var(--icon-fill-color)" //zsviczian
     />
     <path
       d="M12.005 10.478c1.92 3.495 3.838 7 7.905 14.423m-7.905-14.423c3.11 5.683 6.23 11.368 7.905 14.423m0 0c-3.68.226-7.35.455-13.91.85m13.91-.85c-5.279.33-10.566.647-13.91.85m0 0c1.936-4.931 3.882-9.86 6.005-15.273M6 25.75c2.069-5.257 4.135-10.505 6.005-15.272"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)" //zsviczian
       strokeWidth={2}
       strokeLinecap="round"
     />
@@ -207,7 +207,7 @@ export const WelcomeScreenHelpArrow = createIcon(
   <>
     <path
       d="M18.026 1.232c-5.268 13.125-5.548 33.555 3.285 42.311 8.823 8.75 33.31 12.304 42.422 13.523"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)" //zsviczian
       strokeWidth={2}
       strokeLinecap="round"
     />
@@ -215,11 +215,11 @@ export const WelcomeScreenHelpArrow = createIcon(
       fillRule="evenodd"
       clipRule="evenodd"
       d="m72.181 59.247-13.058-10-2.948 13.62 16.006-3.62Z"
-      fill="currentColor"
+      fill="var(--icon-fill-color)" //zsviczian
     />
     <path
       d="M72.181 59.247c-3.163-2.429-6.337-4.856-13.058-10m13.058 10c-5.145-3.936-10.292-7.882-13.058-10m0 0c-.78 3.603-1.563 7.196-2.948 13.62m2.948-13.62c-1.126 5.168-2.24 10.346-2.948 13.62m0 0c5.168-1.166 10.334-2.343 16.006-3.62m-16.006 3.62c5.51-1.248 11.01-2.495 16.006-3.62"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)" //zsviczian
       strokeWidth={2}
       strokeLinecap="round"
     />
@@ -232,7 +232,7 @@ export const WelcomeScreenTopToolbarArrow = createIcon(
   <>
     <path
       d="M1 77c14-2 31.833-11.973 35-24 3.167-12.016-6-35-9.5-43.5"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)" //zsviczian
       strokeWidth={2}
       strokeLinecap="round"
     />
@@ -240,11 +240,11 @@ export const WelcomeScreenTopToolbarArrow = createIcon(
       fillRule="evenodd"
       clipRule="evenodd"
       d="m24.165 1.093-2.132 16.309 13.27-4.258-11.138-12.05Z"
-      fill="currentColor"
+      fill="var(--icon-fill-color)" //zsviczian
     />
     <path
       d="M24.165 1.093c-.522 3.953-1.037 7.916-2.132 16.309m2.131-16.309c-.835 6.424-1.68 12.854-2.13 16.308m0 0c3.51-1.125 7.013-2.243 13.27-4.257m-13.27 4.257c5.038-1.608 10.08-3.232 13.27-4.257m0 0c-3.595-3.892-7.197-7.777-11.14-12.05m11.14 12.05c-3.837-4.148-7.667-8.287-11.14-12.05"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)" //zsviczian
       strokeWidth={2}
       strokeLinecap="round"
     />
@@ -254,7 +254,7 @@ export const WelcomeScreenTopToolbarArrow = createIcon(
 
 // custom
 export const ExcalLogo = createIcon(
-  <g fill="currentColor">
+  <g fill="var(--icon-fill-color)">
     <path d="M24.296 12.214c0 .112-.134.224-.291.224-.135 0-.516.629-.808 1.392-.897 2.335-9.867 20.096-9.89 19.534 0-.292-.134-.494-.359-.494-.313 0-.358.18-.224 1.055.135 1.01.045 1.236-3.14 7.432-1.793 3.525-3.722 7.208-4.282 8.196-.584 1.032-1.032 2.155-1.077 2.626-.067.809.022.92 1.973 2.605 1.122.988 2.557 2.223 3.185 2.784 2.826 2.582 4.149 3.615 4.508 3.547.538-.09 8.858-8.823 8.88-9.317 0-.225-.403-3.638-.897-7.59-.852-6.735-1.66-14.616-1.57-15.38.068-.47-.269-2.85-.516-3.884-.201-.808-.112-1.145 1.503-4.827.942-2.178 2.176-4.85 2.714-5.928.515-1.077.964-2.02.964-2.088 0-.067-.157-.112-.336-.112-.18 0-.337.09-.337.225Zm-5.158 16.772c.247 1.572.74 5.344 1.099 8.375.695 5.568 1.503 11.742 1.727 13.314.135.786.045.943-1.413 2.56-2.534 2.851-5.225 5.658-6.145 6.376l-.852.674-4.373-4.086c-4.037-3.728-4.373-4.11-4.127-4.558a5154.2 5154.2 0 0 1 2.535-4.626 727.864 727.864 0 0 0 3.678-6.78c.784-1.46 1.502-2.717 1.637-2.785.156-.09.201 2.178.156 7.006-.09 7.207-.067 7.23.651 7.072.09 0 .157-3.637.157-8.06V35.43l2.355-4.715c1.3-2.605 2.377-4.693 2.422-4.67.045.022.27 1.347.493 2.94ZM9.562 1.818C7.903 3.143 5.346 5.388 3.328 7.32L1.735 8.823l.292 1.976c.157 1.078.449 3.188.628 4.67.202 1.482.404 2.874.47 3.077.09.269 0 .404-.246.404-.426 0-.449-.113.718 3.592.286.952.577 1.903.875 2.851.044.158.224.225.425.158.202-.09.314-.27.247-.427-.067-.18.045-.36.224-.427.247-.09.225-.269-.157-.92-.605-1.01-2.152-9.633-2.242-12.416-.067-1.976-.067-1.999.762-3.121.808-1.1 2.67-2.762 5.54-4.873.807-.605 1.614-1.28 1.839-1.504.336-.404.493-.292 3.319 2.717 1.637 1.729 3.453 3.502 4.037 3.952l1.076.808-.83 1.75c-.448.944-2.265 4.581-4.059 8.04-3.745 7.274-2.983 6.578-7.333 6.645l-2.826.023-.942 1.077c-.987 1.146-1.121 1.572-.65 2.29.18.248.313.652.313.898 0 .405.157.472 1.055.517.56.023 1.076.09 1.144.157.067.068.156 1.46.224 3.098l.09 2.965-1.503 3.232C1.735 45.422.749 47.891.749 48.7c0 .427.09.786.18.786.224 0 .224-.022 9.35-19.085a4398.495 4398.495 0 0 1 8.927-18.546c.672-1.369 1.278-2.626 1.323-2.806.045-.202-1.503-1.751-3.97-3.93-2.22-1.975-4.171-3.772-4.35-3.974-.516-.628-1.279-.426-2.647.674ZM8.441 31.231c-.18.472-.65 1.46-1.031 2.2-.629 1.258-.696 1.303-.853.786-.09-.314-.157-1.235-.18-2.066-.022-1.639-.067-1.616 1.817-1.728L8.8 30.4l-.358.831Zm1.884-3.592c-1.032 1.998-1.077 2.02-3.903 2.155-2.489.135-2.533.112-2.533-.36 0-.269-.09-.628-.203-.808-.134-.202-.044-.56.27-1.055l.493-.763H6.69c1.234-.023 2.647-.113 3.14-.202.494-.09.92-.135.965-.113.045.023-.18.54-.471 1.146Zm-.09-20.477c-.404.292-.516.584-.516 1.325 0 .875.067 1.01.673 1.257.605.247.763.224 1.458-.247.92-.629.941-.786.269-1.796-.583-.876-1.166-1.033-1.884-.54Z" />
     <path
       fillRule="evenodd"
@@ -267,7 +267,11 @@ export const ExcalLogo = createIcon(
 
 // custom
 export const SelectionIcon = createIcon(
-  <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+  <g
+    stroke="var(--icon-fill-color)"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M6 6l4.153 11.793a0.365 .365 0 0 0 .331 .207a0.366 .366 0 0 0 .332 -.207l2.184 -4.793l4.787 -1.994a0.355 .355 0 0 0 .213 -.323a0.355 .355 0 0 0 -.213 -.323l-11.787 -4.36z" />
     <path d="M13.5 13.5l4.5 4.5" />
@@ -419,14 +423,14 @@ export const MoonIcon = createIcon(
   <path
     clipRule="evenodd"
     d="M10 2.5h.328a6.25 6.25 0 0 0 6.6 10.372A7.5 7.5 0 1 1 10 2.493V2.5Z"
-    stroke="currentColor"
+    stroke="var(--icon-fill-color)" //zsviczian
   />,
   modifiedTablerIconProps,
 );
 
 export const SunIcon = createIcon(
   <g
-    stroke="currentColor"
+    stroke="var(--icon-fill-color)" //zsviczian
     strokeWidth="1.25"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -497,7 +501,11 @@ export const TwitterIcon = createIcon(
 );
 
 export const checkIcon = createIcon(
-  <polyline fill="none" stroke="currentColor" points="20 6 9 17 4 12" />,
+  <polyline
+    fill="none"
+    stroke="var(--icon-fill-color)"
+    points="20 6 9 17 4 12"
+  />,
   {
     width: 24,
     height: 24,
@@ -613,12 +621,12 @@ export const shareIOS = createIcon(
 export const shareWindows = createIcon(
   <>
     <path
-      fill="currentColor"
+      fill="var(--icon-fill-color)" //zsviczian
       d="M40 5.6v6.1l-4.1.7c-8.9 1.4-16.5 6.9-20.6 15C13 32 10.9 43 12.4 43c.4 0 2.4-1.3 4.4-3 5-3.9 12.1-7 18.2-7.7l5-.6v12.8l11.2-11.3L62.5 22 51.2 10.8 40-.5v6.1zm10.2 22.6L44 34.5v-6.8l-6.9.6c-3.9.3-9.8 1.7-13.2 3.1-3.5 1.4-6.5 2.4-6.7 2.2-.9-1 3-7.5 6.4-10.8C28 18.6 34.4 16 40.1 16c3.7 0 3.9-.1 3.9-3.2V9.5l6.2 6.3 6.3 6.2-6.3 6.2z"
     />
     <path
-      stroke="currentColor"
-      fill="currentColor"
+      stroke="var(--icon-fill-color)" //zsviczian
+      fill="var(--icon-fill-color)" //zsviczian
       d="M0 36v20h48v-6.2c0-6 0-6.1-2-4.3-1.1 1-2 2.9-2 4.2V52H4V34c0-17.3-.1-18-2-18s-2 .7-2 20z"
     />
   </>,
@@ -629,9 +637,9 @@ export const shareWindows = createIcon(
 // Storybook is licensed under MIT https://github.com/storybookjs/storybook/blob/next/LICENSE
 export const resetZoom = createIcon(
   <path
-    stroke="currentColor"
+    stroke="var(--icon-fill-color)" //zsviczian
     strokeWidth="40"
-    fill="currentColor"
+    fill="var(--icon-fill-color)" //zsviczian
     d="M148 560a318 318 0 0 0 522 110 316 316 0 0 0 0-450 316 316 0 0 0-450 0c-11 11-21 22-30 34v4h47c25 0 46 21 46 46s-21 45-46 45H90c-13 0-25-6-33-14-9-9-14-20-14-33V156c0-25 20-45 45-45s45 20 45 45v32l1 1a401 401 0 0 1 623 509l212 212a42 42 0 0 1-59 59L698 757A401 401 0 0 1 65 570a42 42 0 0 1 83-10z"
   />,
   { width: 1024 },
@@ -641,14 +649,14 @@ export const BringForwardIcon = createIcon(
   <>
     <g
       clipPath="url(#a)"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)" //zsviczian
       strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
       <path
         d="M13.889 4.167H8.333c-.767 0-1.389.622-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.767-.622-1.39-1.39-1.39Z"
-        fill="currentColor"
+        fill="var(--icon-fill-color)" //zsviczian
       />
       <path d="M12.5 12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388" />
     </g>
@@ -665,7 +673,7 @@ export const SendBackwardIcon = createIcon(
   <>
     <g
       clipPath="url(#a)"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)" //zsviczian
       strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -674,7 +682,7 @@ export const SendBackwardIcon = createIcon(
         fillRule="evenodd"
         clipRule="evenodd"
         d="M6.944 12.5H12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388"
-        fill="currentColor"
+        fill="var(--icon-fill-color)" //zsviczian
       />
       <path d="M13.889 4.167H8.333c-.767 0-1.389.621-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.768-.622-1.39-1.39-1.39Z" />
     </g>
@@ -689,10 +697,10 @@ export const SendBackwardIcon = createIcon(
 
 export const BringToFrontIcon = createIcon(
   <>
-    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+    <g clipPath="url(#a)" stroke="var(--icon-fill-color)" strokeWidth="1.25">
       <path
         d="M8.775 6.458h2.45a2.316 2.316 0 0 1 2.317 2.316v2.452a2.316 2.316 0 0 1-2.316 2.316H8.774a2.316 2.316 0 0 1-2.317-2.316V8.774a2.316 2.316 0 0 1 2.317-2.316Z"
-        fill="currentColor"
+        fill="var(--icon-fill-color)"
       />
       <path d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316ZM12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z" />
     </g>
@@ -710,12 +718,12 @@ export const SendToBackIcon = createIcon(
     <g clipPath="url(#a)">
       <path
         d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)"
         strokeWidth="1.25"
       />
       <path
         d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)"
         strokeWidth="1.25"
       />
       <mask id="SendToBackIcon" fill="#fff">
@@ -729,16 +737,16 @@ export const SendToBackIcon = createIcon(
         fillRule="evenodd"
         clipRule="evenodd"
         d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
-        fill="currentColor"
+        fill="var(--icon-fill-color)"
       />
       <path
         d="M9.167 5.833h1.25v-1.25h-1.25v1.25Zm5 5h1.25v-1.25h-1.25v1.25Zm-3.334 3.334h-1.25v1.25h1.25v-1.25Zm-5-5h-1.25v1.25h1.25v-1.25Zm2.084-3.334v2.06h2.5v-2.06h-2.5Zm0 2.06a4.191 4.191 0 0 0 4.19 4.19v-2.5a1.691 1.691 0 0 1-1.69-1.69h-2.5Zm4.19 4.19h2.06v-2.5h-2.06v2.5Zm.81-1.25v.393h2.5v-.393h-2.5Zm0 .393c0 .933-.758 1.69-1.691 1.69v2.5a4.191 4.191 0 0 0 4.19-4.19h-2.5Zm-1.691 1.69h-.393v2.5h.393v-2.5Zm.857 1.25v-2.058h-2.5v2.059h2.5Zm0-2.058a4.191 4.191 0 0 0-4.19-4.191v2.5c.933 0 1.69.757 1.69 1.69h2.5Zm-4.19-4.191h-2.06v2.5h2.06v-2.5Zm-.81 1.25v-.393h-2.5v.393h2.5Zm0-.393c0-.934.758-1.69 1.692-1.69v-2.5a4.191 4.191 0 0 0-4.192 4.19h2.5Zm1.692-1.69h.392v-2.5h-.392v2.5Z"
-        fill="currentColor"
+        fill="var(--icon-fill-color)"
         mask="url(#SendToBackIcon)"
       />
       <path
         d="M12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)"
         strokeWidth="1.25"
       />
     </g>
@@ -759,7 +767,7 @@ export const SendToBackIcon = createIcon(
 //
 export const AlignTopIcon = createIcon(
   <>
-    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+    <g clipPath="url(#a)" stroke="var(--icon-fill-color)" strokeWidth="1.25">
       <path
         d="M3.333 3.333h13.334"
         strokeLinecap="round"
@@ -778,7 +786,7 @@ export const AlignTopIcon = createIcon(
 
 export const AlignBottomIcon = createIcon(
   <>
-    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+    <g clipPath="url(#a)" stroke="var(--icon-fill-color)" strokeWidth="1.25">
       <path
         d="M3.333 16.667h13.334"
         strokeLinecap="round"
@@ -797,7 +805,7 @@ export const AlignBottomIcon = createIcon(
 
 export const AlignLeftIcon = createIcon(
   <>
-    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+    <g clipPath="url(#a)" stroke="var(--icon-fill-color)" strokeWidth="1.25">
       <path
         d="M3.333 3.333v13.334"
         strokeLinecap="round"
@@ -816,7 +824,7 @@ export const AlignLeftIcon = createIcon(
 
 export const AlignRightIcon = createIcon(
   <>
-    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+    <g clipPath="url(#a)" stroke="var(--icon-fill-color)" strokeWidth="1.25">
       <path
         d="M16.667 3.333v13.334"
         strokeLinecap="round"
@@ -835,7 +843,7 @@ export const AlignRightIcon = createIcon(
 
 export const DistributeHorizontallyIcon = createIcon(
   <>
-    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+    <g clipPath="url(#a)" stroke="var(--icon-fill-color)" strokeWidth="1.25">
       <path
         d="M16.667 3.333v13.334M3.333 3.333v13.334"
         strokeLinecap="round"
@@ -854,7 +862,7 @@ export const DistributeHorizontallyIcon = createIcon(
 
 export const DistributeVerticallyIcon = createIcon(
   <>
-    <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">
+    <g clipPath="url(#a)" stroke="var(--icon-fill-color)" strokeWidth="1.25">
       <path
         d="M3.333 3.333h13.334M3.333 16.667h13.334"
         strokeLinecap="round"
@@ -872,7 +880,7 @@ export const DistributeVerticallyIcon = createIcon(
 );
 
 export const CenterVerticallyIcon = createIcon(
-  <g stroke="currentColor" strokeWidth="1.25">
+  <g stroke="var(--icon-fill-color)" strokeWidth="1.25">
     <path d="M1.667 10h2.916" strokeLinecap="round" strokeLinejoin="round" />
     <path d="M8.333 10h3.334" strokeLinejoin="round" />
     <path d="M15.417 10h2.916" strokeLinecap="round" strokeLinejoin="round" />
@@ -882,7 +890,7 @@ export const CenterVerticallyIcon = createIcon(
 );
 
 export const CenterHorizontallyIcon = createIcon(
-  <g stroke="currentColor" strokeWidth="1.25">
+  <g stroke="var(--icon-fill-color)" strokeWidth="1.25">
     <path d="M10 18.333v-2.916" strokeLinecap="round" strokeLinejoin="round" />
     <path d="M10 11.667V8.333" strokeLinejoin="round" />
     <path d="M10 4.583V1.667" strokeLinecap="round" strokeLinejoin="round" />
@@ -915,7 +923,7 @@ export const CloseIcon = createIcon(
   <>
     <g
       clipPath="url(#a)"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)"
       strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -1027,7 +1035,7 @@ export const FillHachureIcon = createIcon(
   <>
     <path
       d="M5.879 2.625h8.242a3.254 3.254 0 0 1 3.254 3.254v8.242a3.254 3.254 0 0 1-3.254 3.254H5.88a3.254 3.254 0 0 1-3.254-3.254V5.88a3.254 3.254 0 0 1 3.254-3.254Z"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)"
       strokeWidth="1.25"
     />
     <mask
@@ -1041,15 +1049,15 @@ export const FillHachureIcon = createIcon(
     >
       <path
         d="M5.879 2.625h8.242a3.254 3.254 0 0 1 3.254 3.254v8.242a3.254 3.254 0 0 1-3.254 3.254H5.88a3.254 3.254 0 0 1-3.254-3.254V5.88a3.254 3.254 0 0 1 3.254-3.254Z"
-        fill="currentColor"
-        stroke="currentColor"
+        fill="var(--icon-fill-color)"
+        stroke="var(--icon-fill-color)"
         strokeWidth="1.25"
       />
     </mask>
     <g mask="url(#FillHachureIcon)">
       <path
         d="M2.258 15.156 15.156 2.258M7.324 20.222 20.222 7.325m-20.444 5.35L12.675-.222m-8.157 18.34L17.416 5.22"
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)"
         strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -1064,7 +1072,7 @@ export const FillCrossHatchIcon = createIcon(
     <g clipPath="url(#a)">
       <path
         d="M5.879 2.625h8.242a3.254 3.254 0 0 1 3.254 3.254v8.242a3.254 3.254 0 0 1-3.254 3.254H5.88a3.254 3.254 0 0 1-3.254-3.254V5.88a3.254 3.254 0 0 1 3.254-3.254Z"
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)"
         strokeWidth="1.25"
       />
       <mask
@@ -1078,7 +1086,7 @@ export const FillCrossHatchIcon = createIcon(
       >
         <path
           d="M2.426 15.044 15.044 2.426M7.383 20 20 7.383M0 12.617 12.617 0m-7.98 17.941L17.256 5.324m-2.211 12.25L2.426 4.956M20 12.617 7.383 0m5.234 20L0 7.383m17.941 7.98L5.324 2.745"
-          stroke="currentColor"
+          stroke="var(--icon-fill-color)"
           strokeWidth="1.25"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -1087,7 +1095,7 @@ export const FillCrossHatchIcon = createIcon(
       <g mask="url(#FillCrossHatchIcon)">
         <path
           d="M14.121 2H5.88A3.879 3.879 0 0 0 2 5.879v8.242A3.879 3.879 0 0 0 5.879 18h8.242A3.879 3.879 0 0 0 18 14.121V5.88A3.879 3.879 0 0 0 14.121 2Z"
-          fill="currentColor"
+          fill="var(--icon-fill-color)"
         />
       </g>
     </g>
@@ -1105,7 +1113,7 @@ export const FillSolidIcon = createIcon(
     <g clipPath="url(#a)">
       <path
         d="M4.91 2.625h10.18a2.284 2.284 0 0 1 2.285 2.284v10.182a2.284 2.284 0 0 1-2.284 2.284H4.909a2.284 2.284 0 0 1-2.284-2.284V4.909a2.284 2.284 0 0 1 2.284-2.284Z"
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)"
         strokeWidth="1.25"
       />
     </g>
@@ -1115,15 +1123,29 @@ export const FillSolidIcon = createIcon(
       </clipPath>
     </defs>
   </>,
-  { ...modifiedTablerIconProps, fill: "currentColor" },
+  { ...modifiedTablerIconProps, fill: "var(--icon-fill-color)" },
+);
+
+export const StrokeWidthThinIcon = createIcon(
+  //zsviczian
+  <>
+    <path
+      d="M4.167 10h11.666"
+      stroke="var(--icon-fill-color)"
+      strokeWidth="0.75" //zsviczian
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </>,
+  modifiedTablerIconProps,
 );
 
 export const StrokeWidthBaseIcon = createIcon(
   <>
     <path
       d="M4.167 10h11.666"
-      stroke="currentColor"
-      strokeWidth="1.25"
+      stroke="var(--icon-fill-color)"
+      strokeWidth="2.25" //zsviczian
       strokeLinecap="round"
       strokeLinejoin="round"
     />
@@ -1134,8 +1156,8 @@ export const StrokeWidthBaseIcon = createIcon(
 export const StrokeWidthBoldIcon = createIcon(
   <path
     d="M5 10h10"
-    stroke="currentColor"
-    strokeWidth="2.5"
+    stroke="var(--icon-fill-color)"
+    strokeWidth="3.5" //zsviczian
     strokeLinecap="round"
     strokeLinejoin="round"
   />,
@@ -1145,8 +1167,8 @@ export const StrokeWidthBoldIcon = createIcon(
 export const StrokeWidthExtraBoldIcon = createIcon(
   <path
     d="M5 10h10"
-    stroke="currentColor"
-    strokeWidth="3.75"
+    stroke="var(--icon-fill-color)"
+    strokeWidth="5.75" //zsviczian
     strokeLinecap="round"
     strokeLinejoin="round"
   />,
@@ -1238,7 +1260,7 @@ export const EdgeSharpIcon = createIcon(
 export const EdgeRoundIcon = createIcon(
   <g
     strokeWidth="1.5"
-    stroke="currentColor"
+    stroke="var(--icon-fill-color)"
     strokeLinecap="round"
     strokeLinejoin="round"
   >
@@ -1260,7 +1282,12 @@ export const EdgeRoundIcon = createIcon(
 );
 
 export const ArrowheadNoneIcon = createIcon(
-  <path d="M6 10H34" stroke="currentColor" strokeWidth={2} fill="none" />,
+  <path
+    d="M6 10H34"
+    stroke="var(--icon-fill-color)"
+    strokeWidth={2}
+    fill="none"
+  />,
   {
     width: 40,
     height: 20,
@@ -1272,7 +1299,7 @@ export const ArrowheadArrowIcon = React.memo(
     createIcon(
       <g
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)"
         strokeWidth={2}
         fill="none"
       >
@@ -1287,8 +1314,8 @@ export const ArrowheadDotIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
-        stroke="currentColor"
-        fill="currentColor"
+        stroke="var(--icon-fill-color)"
+        fill="var(--icon-fill-color)"
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
       >
         <path d="M32 10L6 10" strokeWidth={2} />
@@ -1304,7 +1331,7 @@ export const ArrowheadBarIcon = React.memo(
       <g transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}>
         <path
           d="M34 10H5.99996M34 10L34 5M34 10L34 15"
-          stroke="currentColor"
+          stroke="var(--icon-fill-color)"
           strokeWidth={2}
           fill="none"
         />
@@ -1317,8 +1344,8 @@ export const ArrowheadTriangleIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
-        stroke="currentColor"
-        fill="currentColor"
+        stroke="var(--icon-fill-color)"
+        fill="var(--icon-fill-color)"
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
       >
         <path d="M32 10L6 10" strokeWidth={2} />
@@ -1333,7 +1360,7 @@ export const FontSizeSmallIcon = createIcon(
     <g clipPath="url(#a)">
       <path
         d="M14.167 6.667a3.333 3.333 0 0 0-3.334-3.334H9.167a3.333 3.333 0 0 0 0 6.667h1.666a3.333 3.333 0 0 1 0 6.667H9.167a3.333 3.333 0 0 1-3.334-3.334"
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)"
         strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -1353,7 +1380,7 @@ export const FontSizeMediumIcon = createIcon(
     <g clipPath="url(#a)">
       <path
         d="M5 16.667V3.333L10 15l5-11.667v13.334"
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)"
         strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -1373,7 +1400,7 @@ export const FontSizeLargeIcon = createIcon(
     <g clipPath="url(#a)">
       <path
         d="M5.833 3.333v13.334h8.334"
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)"
         strokeWidth="1.25"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -1392,7 +1419,7 @@ export const FontSizeExtraLargeIcon = createIcon(
   <>
     <path
       d="m1.667 3.333 6.666 13.334M8.333 3.333 1.667 16.667M11.667 3.333v13.334h6.666"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)"
       strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -1404,7 +1431,7 @@ export const FontSizeExtraLargeIcon = createIcon(
 export const FontFamilyNormalIcon = createIcon(
   <>
     <g
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)"
       strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -1419,7 +1446,7 @@ export const FontFamilyCodeIcon = createIcon(
   <>
     <g
       clipPath="url(#a)"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)"
       strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -1435,9 +1462,23 @@ export const FontFamilyCodeIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const FontFamilyLocalFontIcon = createIcon(
+  //zsviczian
+  <>
+    <g
+      stroke="var(--icon-fill-color)"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m 151.43258,8.7863685 q -7.87381,6.7489805 -14.62279,12.3731315 0,11.248301 0,23.621433 8.99864,35.994564 13.49796,76.488447 -4.49932,7.87381 -11.2483,13.49796 -16.87245,1.12483 -29.24559,-3.37449 -6.74898,-4.49932 -10.123467,-11.2483 -7.87381,-2.24966 -15.747621,0 -6.748981,1.12483 -11.248302,5.62415 l -16.872451,16.87245 q -11.248302,2.24966 -19.122113,8.99864 -6.74898,6.74899 -6.74898,17.99729 2.24966,3.37449 4.49932,7.87381 2.24966,4.49932 2.24966,12.37313 -16.872452,31.49524 -30.3704131,65.24015 -2.2496602,23.62143 0,47.24286 6.7489811,10.12347 15.7476221,20.24694 10.123471,4.49932 20.246942,13.49797 25.871093,4.49932 53.991846,8.99864 23.621437,-5.62415 50.617357,-5.62415 3.37449,2.24966 6.74898,5.62415 0,25.87109 0,55.11667 1.12483,19.12211 5.62415,38.24423 v 61.86565 q 2.24966,5.62415 8.99864,8.99864 10.12347,0 19.12211,-3.37449 3.37449,2.24966 10.12347,2.24966 7.87382,-13.49796 17.99729,-24.74626 5.62415,-34.86973 7.87381,-70.8643 -5.62415,-40.49388 -5.62415,-82.1126 l 7.87381,-7.87381 h 16.87245 q 21.37177,-8.99864 44.9932,-13.49796 14.6228,-7.87381 30.37042,-15.74762 3.37449,-1.12483 8.99864,-1.12483 11.2483,-10.12347 23.62143,-22.4966 2.24966,-6.74898 6.74898,-12.37313 V 230.3779 q 4.49932,-14.62279 6.74898,-30.37041 4.49932,-11.2483 10.12347,-20.24694 2.24966,-17.99728 2.24966,-37.1194 -5.62415,-7.87381 -7.87381,-15.74762 -6.74898,-6.74898 -13.49796,-13.49796 -11.2483,-6.74898 -20.24694,-10.12347 -46.11804,-4.499321 -92.23607,0 -10.12347,4.49932 -22.4966,4.49932 -6.74898,-2.24966 -10.12347,-7.873811 2.24966,-23.621433 2.24966,-46.118035 -5.62415,-8.998641 -4.49932,-19.122113 Q 203.17477,22.28433 195.30095,13.285689 187.42714,3.1622179 178.4285,2.0373877 164.93054,5.4118781 151.43258,8.7863685 Z M 136.80979,175.26123 q 7.87381,2.24966 11.2483,12.37313 -1.12483,39.36905 1.12483,80.98777 4.49932,6.74898 3.37449,15.74762 -5.62415,6.74898 -12.37313,11.2483 -17.99728,1.12483 -33.74491,5.62415 -19.122108,0 -37.11939,-1.12483 -6.748981,-4.49932 -11.248301,-7.87381 -1.12483,-14.62279 1.12483,-29.24558 16.872452,-30.37042 28.120753,-62.99049 4.499321,-7.87381 11.248301,-13.49796 14.622787,-3.37449 29.245587,-5.62415 4.49932,-3.37449 8.99864,-5.62415 z M 283.0377,146.01564 q 8.99865,-1.12483 17.99729,2.24966 4.49932,2.24966 8.99864,7.87382 2.24966,8.99864 1.12483,20.24694 -6.74898,11.2483 -10.12347,22.4966 -4.49932,25.87109 -10.12348,52.86702 -24.74626,11.2483 -47.24286,24.74626 -10.12347,2.24966 -19.12211,4.49932 l -10.12347,-10.12347 q 0,-44.99321 3.37449,-84.36226 -3.37449,-13.49796 -6.74898,-23.62143 4.49932,-6.74898 12.37313,-11.24831 29.24558,-3.37449 59.61599,-5.62415 z M 638.74,93.24 766.76,221.26 488.77,499.25 374.63,511.85 c -15.28,1.69 -28.19,-11.23 -26.49,-26.51 l 12.7,-114.22 z M 845.94,74.18 785.83,14.07 c -18.75,-18.75 -49.16,-18.75 -67.91,0 l -56.55,56.55 128.02,128.02 56.55,-56.55 c 18.75,-18.76 18.75,-49.16 0,-67.91 z" />
+    </g>
+  </>,
+);
+
 export const TextAlignLeftIcon = createIcon(
   <g
-    stroke="currentColor"
+    stroke="var(--icon-fill-color)"
     fill="none"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -1453,7 +1494,7 @@ export const TextAlignLeftIcon = createIcon(
 
 export const TextAlignCenterIcon = createIcon(
   <g
-    stroke="currentColor"
+    stroke="var(--icon-fill-color)"
     fill="none"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -1468,7 +1509,7 @@ export const TextAlignCenterIcon = createIcon(
 
 export const TextAlignRightIcon = createIcon(
   <g
-    stroke="currentColor"
+    stroke="var(--icon-fill-color)"
     fill="none"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -1486,7 +1527,7 @@ export const TextAlignTopIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
     <g
       strokeWidth="1.5"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)"
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -1504,7 +1545,7 @@ export const TextAlignBottomIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
     <g
       strokeWidth="2"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)"
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -1522,7 +1563,7 @@ export const TextAlignMiddleIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
     <g
       strokeWidth="1.5"
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)"
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -1539,7 +1580,7 @@ export const TextAlignMiddleIcon = React.memo(({ theme }: { theme: Theme }) =>
 export const publishIcon = createIcon(
   <path
     d="M537.6 226.6c4.1-10.7 6.4-22.4 6.4-34.6 0-53-43-96-96-96-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32c-88.4 0-160 71.6-160 160 0 2.7.1 5.4.2 8.1C40.2 219.8 0 273.2 0 336c0 79.5 64.5 144 144 144h368c70.7 0 128-57.3 128-128 0-61.9-44-113.6-102.4-125.4zM393.4 288H328v112c0 8.8-7.2 16-16 16h-48c-8.8 0-16-7.2-16-16V288h-65.4c-14.3 0-21.4-17.2-11.3-27.3l105.4-105.4c6.2-6.2 16.4-6.2 22.6 0l105.4 105.4c10.1 10.1 2.9 27.3-11.3 27.3z"
-    fill="currentColor"
+    fill="var(--icon-fill-color)"
   />,
   { width: 640, height: 512 },
 );

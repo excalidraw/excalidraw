@@ -3,7 +3,7 @@
 .excalidraw {
   &.excalidraw-modal-container {
     position: absolute;
-    z-index: 10;
+    z-index: 15; //zsviczian
   }
 
   .Modal {
@@ -24,7 +24,7 @@
   }
 
   .Modal__background {
-    position: fixed;
+    position: absolute; //zsviczian was fixed
     top: 0;
     left: 0;
     right: 0;

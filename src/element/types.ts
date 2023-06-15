@@ -144,6 +144,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     fontSize: number;
     fontFamily: FontFamilyValues;
     text: string;
+    rawText: string;
     baseline: number;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;

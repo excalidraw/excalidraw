@@ -27,7 +27,7 @@ const DropdownMenuItem = ({
       onClick={handleClick}
       type="button"
       className={getDropdownMenuItemClassName(className)}
-      title={rest.title ?? rest["aria-label"]}
+      aria-label={rest.title ?? rest["aria-label"]} //zsviczian
     >
       <MenuItemContent icon={icon} shortcut={shortcut}>
         {children}

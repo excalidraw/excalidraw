@@ -49,6 +49,7 @@ const elements = [
     opacity: 100,
     seed: 1683771448,
     text: "test",
+    rawText: "test",
     font: "20px Virgil",
     baseline: 22,
   },

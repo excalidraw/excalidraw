@@ -20,7 +20,7 @@
     pointer-events: none;
     width: 3rem;
     height: 3rem;
-    position: fixed;
+    position: absolute; //zsviczian was fixed
     z-index: 999999;
     border-radius: 1rem;
     border: 1px solid var(--default-border-color);
@@ -31,7 +31,7 @@
     width: 1.25rem;
     height: 1.25rem;
     cursor: pointer;
-    padding: 4px;
+    //padding: 4px; //zsviczian
     margin-right: -4px;
     margin-left: -2px;
     border-radius: 0.5rem;
