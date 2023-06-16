@@ -1431,7 +1431,9 @@ export const renderSceneToSvg = (
     .forEach((element) => {
       if (!element.isDeleted) {
         try {
-          invalidateShapeForElement(element);
+          if (element.backgroundColor === "transparent") {
+            invalidateShapeForElement(element); //add gray placeholder background
+          }
           renderElementToSvg(
             element,
             rsvg,
@@ -1442,6 +1444,9 @@ export const renderSceneToSvg = (
             exportWithDarkMode,
             exportingFrameId,
           );
+          if (element.backgroundColor === "transparent") {
+            invalidateShapeForElement(element); //revert to transparent
+          }
         } catch (error: any) {
           console.error(error);
         }
