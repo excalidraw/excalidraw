@@ -187,8 +187,8 @@ export class ActionManager {
     action: Action,
     opts?: {
       elements?: readonly ExcalidrawElement[];
-      noPredicates?: boolean;
       data?: Record<string, any>;
+      noPredicates?: boolean;
     },
   ): boolean => {
     const elements = opts?.elements ?? this.getElementsIncludingDeleted();
