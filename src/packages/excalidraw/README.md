@@ -43,3 +43,7 @@ Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/
 ## API
 
 Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api)
+
+## Contributing
+
+Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/contributing)
