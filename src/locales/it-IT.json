@@ -225,7 +225,7 @@
     "eraser": "Gomma",
     "frame": "",
     "hand": "Mano (strumento di panoramica)",
-    "extraTools": ""
+    "extraTools": "Altri strumenti"
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
@@ -365,12 +365,12 @@
       "withBackground": "Sfondo",
       "onlySelected": "Solo selezionato",
       "darkMode": "Tema scuro",
-      "embedScene": "",
+      "embedScene": "Includi scena",
       "scale": "Scala",
       "padding": ""
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato."
     },
     "title": {
       "exportToPng": "Esporta come PNG",
