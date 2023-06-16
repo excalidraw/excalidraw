@@ -522,7 +522,13 @@ export const _renderScene = ({
       .forEach((element) => {
         try {
           const render = () => {
-            renderElement(element, rc, context, renderConfig, appState);
+            if (isExporting && isIFrameElement(element)) {
+              invalidateShapeForElement(element); //add gray placeholder background
+              renderElement(element, rc, context, renderConfig, appState);
+              invalidateShapeForElement(element); //revert to transparent
+            } else {
+              renderElement(element, rc, context, renderConfig, appState);
+            }
             if (
               isExporting &&
               isIFrameElement(element) &&

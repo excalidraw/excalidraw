@@ -758,7 +758,7 @@ class App extends React.Component<AppProps, AppState> {
               }
             };
 
-            const borderWidth = el.strokeWidth / scale;
+            const borderWidth = el.strokeWidth;
 
             return (
               <div
@@ -773,8 +773,8 @@ class App extends React.Component<AppProps, AppState> {
               >
                 <div
                   style={{
-                    width: `${el.width - 2 * borderWidth}px`,
-                    height: `${el.height - 2 * borderWidth}px`,
+                    width: `${el.width}px`,
+                    height: `${el.height}px`,
                     borderWidth: `${borderWidth}px`,
                     borderStyle: "solid",
                     borderColor: el.strokeColor,
