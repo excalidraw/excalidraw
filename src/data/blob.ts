@@ -13,7 +13,7 @@ import { FileSystemHandle, nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
 import { restore, restoreLibraryItems } from "./restore";
 import { ImportedLibraryData } from "./types";
-import { PNG } from "pngjs/browser";
+import UPNG from "upng-js";
 
 const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
@@ -234,81 +234,26 @@ const _canvasToBlob = async (canvas: HTMLCanvasElement): Promise<Blob> => {
 export const canvasToBlob = async (
   canvas: HTMLCanvasElement,
 ): Promise<Blob> => {
-  const tileWidth = 1000;
-  const tileHeight = 1000;
-  const tileDataArray: Uint8ClampedArray[][] = []; // Two-dimensional array to store tile data
-
-  const { width: canvasWidth, height: canvasHeight } = canvas;
-
   const ctx = canvas.getContext("2d");
 
   if (!ctx) {
     throw new Error("No canvas context");
   }
 
-  // Function to process each tile
-  function processTile(tileX: number, tileY: number) {
-    // Calculate the starting and ending coordinates for the tile
-    const startX = tileX * tileWidth;
-    const startY = tileY * tileHeight;
-    const endX = Math.min(startX + tileWidth, canvasWidth);
-    const endY = Math.min(startY + tileHeight, canvasHeight);
+  console.time("getImageData");
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  console.timeEnd("getImageData");
 
-    // Get the image data for the tile directly from the main canvas
-    const imageData = ctx!.getImageData(
-      startX,
-      startY,
-      endX - startX,
-      endY - startY,
-    ).data;
+  console.time("encode");
+  const pngData = UPNG.encode(
+    [imageData.buffer],
+    canvas.width,
+    canvas.height,
+    0,
+  );
+  console.timeEnd("encode");
 
-    // Store the tile data in the two-dimensional array
-    tileDataArray[tileY] = tileDataArray[tileY] || [];
-    tileDataArray[tileY][tileX] = imageData;
-  }
-
-  console.time("tiling");
-  // Iterate over the tiles and process each one
-  for (let tileY = 0; tileY < canvasHeight / tileHeight; tileY++) {
-    for (let tileX = 0; tileX < canvasWidth / tileWidth; tileX++) {
-      processTile(tileX, tileY);
-    }
-  }
-  console.timeEnd("tiling");
-
-  console.time("create png");
-  // Create a new PNG image with the final dimensions
-  const finalImage = new PNG({ width: canvasWidth, height: canvasHeight });
-  console.timeEnd("create png");
-
-  console.time("concat tiles");
-  // Merge the tiles into the final image
-  for (let tileY = 0; tileY < canvasHeight / tileHeight; tileY++) {
-    for (let tileX = 0; tileX < canvasWidth / tileWidth; tileX++) {
-      const imageData = tileDataArray[tileY][tileX];
-      const destX = tileX * tileWidth;
-      const destY = tileY * tileHeight;
-
-      // Copy the pixels from the tile to the final image
-      for (let y = 0; y < tileHeight; y++) {
-        for (let x = 0; x < tileWidth; x++) {
-          const index = (y * tileWidth + x) * 4;
-          const destIndex = ((destY + y) * canvasWidth + destX + x) * 4;
-          finalImage.data[destIndex] = imageData[index];
-          finalImage.data[destIndex + 1] = imageData[index + 1];
-          finalImage.data[destIndex + 2] = imageData[index + 2];
-          finalImage.data[destIndex + 3] = imageData[index + 3];
-        }
-      }
-    }
-  }
-  console.timeEnd("concat tiles");
-
-  console.time("create buffer");
-  const buffer = PNG.sync.write(finalImage);
-  console.timeEnd("create buffer");
-
-  return new Blob([buffer], { type: "image/png" });
+  return new Blob([pngData], { type: "image/png" });
 };
 
 /** generates SHA-1 digest from supplied file (if not supported, falls back

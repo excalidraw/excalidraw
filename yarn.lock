@@ -2714,13 +2714,6 @@
   resolved "https://registry.yarnpkg.com/@types/pica/-/pica-5.1.3.tgz#5ef64529a1f83f7d6586a8bf75a8a00be32aca02"
   integrity sha512-13SEyETRE5psd9bE0AmN+0M1tannde2fwHfLVaVIljkbL9V0OfFvKwCicyeDvVYLkmjQWEydbAlsDsmjrdyTOg==
 
-"@types/pngjs@6.0.1":
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/@types/pngjs/-/pngjs-6.0.1.tgz#c711ec3fbbf077fed274ecccaf85dd4673130072"
-  integrity sha512-J39njbdW1U/6YyVXvC9+1iflZghP8jgRf2ndYghdJb5xL49LYDB+1EuAxfbuJ2IBbWIL3AjHPQhgaTxT3YaYeg==
-  dependencies:
-    "@types/node" "*"
-
 "@types/prettier@^2.1.5":
   version "2.7.2"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.7.2.tgz#6c2324641cc4ba050a8c710b2b251b377581fbf0"
@@ -2857,6 +2850,11 @@
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.3.tgz#a136f83b0758698df454e328759dbd3d44555311"
   integrity sha512-NfQ4gyz38SL8sDNrSixxU2Os1a5xcdFxipAFxYEuLUlvU2uDwS4NUpsImcf1//SlWItCVMMLiylsxbmNMToV/g==
+
+"@types/upng-js@2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@types/upng-js/-/upng-js-2.1.2.tgz#4680f700c3003eaf958b92418c6e19521bb1e034"
+  integrity sha512-sxCnLDEmGFDcnrdSMml3/mDSbfSAvt86Ld32J6Ac75Og7GzzmwHbUnJNTue74tfQC/3PPD/W0jG2dQuF9v6UOg==
 
 "@types/ws@^8.5.1":
   version "8.5.4"
@@ -8041,7 +8039,7 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
-pako@1.0.11:
+pako@1.0.11, pako@^1.0.5:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.11.tgz#6c9599d340d54dfd3946380252a35705a6b992bf"
   integrity sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==
@@ -8233,11 +8231,6 @@ png-chunks-extract@1.0.0:
   integrity sha512-ZiVwF5EJ0DNZyzAqld8BP1qyJBaGOFaq9zl579qfbkcmOwWLLO4I9L8i2O4j3HkI6/35i0nKG2n+dZplxiT89Q==
   dependencies:
     crc-32 "^0.3.0"
-
-pngjs@7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/pngjs/-/pngjs-7.0.0.tgz#a8b7446020ebbc6ac739db6c5415a65d17090e26"
-  integrity sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==
 
 points-on-curve@0.2.0, points-on-curve@^0.2.0:
   version "0.2.0"
@@ -10568,6 +10561,13 @@ update-browserslist-db@^1.0.10:
   dependencies:
     escalade "^3.1.1"
     picocolors "^1.0.0"
+
+upng-js@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/upng-js/-/upng-js-2.1.0.tgz#7176e73973db361ca95d0fa14f958385db6b9dd2"
+  integrity sha512-d3xzZzpMP64YkjP5pr8gNyvBt7dLk/uGI67EctzDuVp4lCZyVMo0aJO6l/VDlgbInJYDY6cnClLoBp29eKWI6g==
+  dependencies:
+    pako "^1.0.5"
 
 uri-js@^4.2.2:
   version "4.4.1"
