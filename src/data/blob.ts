@@ -13,6 +13,7 @@ import { FileSystemHandle, nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
 import { restore, restoreLibraryItems } from "./restore";
 import { ImportedLibraryData } from "./types";
+import { PNG } from "pngjs/browser";
 
 const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
@@ -233,75 +234,71 @@ const _canvasToBlob = async (canvas: HTMLCanvasElement): Promise<Blob> => {
 export const canvasToBlob = async (
   canvas: HTMLCanvasElement,
 ): Promise<Blob> => {
-  const chunkSize = 8000; // Adjust the chunk size according to your requirements
+  const tileWidth = 1000;
+  const tileHeight = 1000;
+  const tileDataArray: Uint8ClampedArray[][] = []; // Two-dimensional array to store tile data
 
-  const chunkBlobs: Blob[] = []; // Array to hold the generated image chunk Blobs
+  const { width: canvasWidth, height: canvasHeight } = canvas;
 
-  console.log("canvas", canvas.width, canvas.height);
+  const ctx = canvas.getContext("2d");
 
-  // Split the canvas into chunks and generate the image chunks
-  for (let x = 0; x < canvas.width; x += chunkSize) {
-    for (let y = 0; y < canvas.height; y += chunkSize) {
-      const chunkCanvas = document.createElement("canvas");
-      chunkCanvas.width = chunkSize;
-      chunkCanvas.height = chunkSize;
-      const chunkContext = chunkCanvas.getContext("2d");
+  if (!ctx) {
+    throw new Error("No canvas context");
+  }
 
-      if (!chunkContext) {
-        throw new Error("Could not get context");
-      }
+  // Function to process each tile
+  function processTile(tileX: number, tileY: number) {
+    // Calculate the starting and ending coordinates for the tile
+    const startX = tileX * tileWidth;
+    const startY = tileY * tileHeight;
+    const endX = Math.min(startX + tileWidth, canvasWidth);
+    const endY = Math.min(startY + tileHeight, canvasHeight);
 
-      // Copy the portion of the main canvas into the chunk canvas
-      chunkContext.drawImage(
-        canvas,
-        x,
-        y,
-        chunkSize,
-        chunkSize,
-        0,
-        0,
-        chunkSize,
-        chunkSize,
-      );
+    // Get the image data for the tile directly from the main canvas
+    const imageData = ctx!.getImageData(
+      startX,
+      startY,
+      endX - startX,
+      endY - startY,
+    ).data;
 
-      console.log(x, y, chunkSize);
+    // Store the tile data in the two-dimensional array
+    tileDataArray[tileY] = tileDataArray[tileY] || [];
+    tileDataArray[tileY][tileX] = imageData;
+  }
 
-      // Convert the chunk canvas to a Blob
-      const blob = await _canvasToBlob(chunkCanvas);
-      chunkBlobs.push(blob);
-
-      chunkCanvas.remove();
+  // Iterate over the tiles and process each one
+  for (let tileY = 0; tileY < canvasHeight / tileHeight; tileY++) {
+    for (let tileX = 0; tileX < canvasWidth / tileWidth; tileX++) {
+      processTile(tileX, tileY);
     }
   }
 
-  // Convert each Blob into an ArrayBuffer and concatenate them
-  const arrayBuffers = await Promise.all(
-    chunkBlobs.map((blob) => {
-      return new Promise<ArrayBuffer>((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          if (reader.result instanceof ArrayBuffer) {
-            resolve(reader.result);
-          } else {
-            throw new Error("Failed to read ArrayBuffer");
-          }
-        };
-        reader.readAsArrayBuffer(blob);
-      });
-    }),
-  );
-  const totalLength = arrayBuffers.reduce(
-    (length, buffer) => length + buffer.byteLength,
-    0,
-  );
-  const concatenatedBuffer = new Uint8Array(totalLength);
-  let offset = 0;
-  for (const buffer of arrayBuffers) {
-    concatenatedBuffer.set(new Uint8Array(buffer), offset);
-    offset += buffer.byteLength;
+  // Create a new PNG image with the final dimensions
+  const finalImage = new PNG({ width: canvasWidth, height: canvasHeight });
+
+  // Merge the tiles into the final image
+  for (let tileY = 0; tileY < canvasHeight / tileHeight; tileY++) {
+    for (let tileX = 0; tileX < canvasWidth / tileWidth; tileX++) {
+      const imageData = tileDataArray[tileY][tileX];
+      const destX = tileX * tileWidth;
+      const destY = tileY * tileHeight;
+      for (let y = 0; y < tileHeight; y++) {
+        for (let x = 0; x < tileWidth; x++) {
+          const index = (y * tileWidth + x) * 4;
+          const destIndex = ((destY + y) * canvasWidth + destX + x) * 4;
+          finalImage.data[destIndex] = imageData[index];
+          finalImage.data[destIndex + 1] = imageData[index + 1];
+          finalImage.data[destIndex + 2] = imageData[index + 2];
+          finalImage.data[destIndex + 3] = imageData[index + 3];
+        }
+      }
+    }
   }
 
-  return new Blob([concatenatedBuffer], { type: "image/png" });
+  const buffer = PNG.sync.write(finalImage);
+
+  return new Blob([buffer], { type: "image/png" });
 };
 
 /** generates SHA-1 digest from supplied file (if not supported, falls back

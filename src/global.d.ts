@@ -120,3 +120,7 @@ declare module "image-blob-reduce" {
   const reduce: ImageBlobReduce.ImageBlobReduceStatic;
   export = reduce;
 }
+
+declare module "pngjs/browser" {
+  export { PNG } from "pngjs";
+}
