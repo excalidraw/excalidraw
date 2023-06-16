@@ -29,7 +29,8 @@ export const canChangeRoundness = (type: string) =>
   type === "rectangle" ||
   type === "arrow" ||
   type === "line" ||
-  type === "diamond";
+  type === "diamond" ||
+  type === "image";
 
 export const hasText = (type: string) => type === "text";
 

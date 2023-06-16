@@ -251,6 +251,7 @@ const drawImagePlaceholder = (
     size,
   );
 };
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -300,17 +301,35 @@ const drawElementOnCanvas = (
       const img = isInitializedImageElement(element)
         ? renderConfig.imageCache.get(element.fileId)?.image
         : undefined;
+      context.save();
+      const { width, height } = element;
+      if (element.roundness) {
+        const r = getCornerRadius(Math.min(width, height), element) / 4;
+        context.beginPath();
+        context.moveTo(r, 0);
+        context.lineTo(width - r, 0);
+        context.quadraticCurveTo(width, 0, width, r);
+        context.lineTo(width, height - r);
+        context.quadraticCurveTo(width, height, width - r, height);
+        context.lineTo(r, height);
+        context.quadraticCurveTo(0, height, 0, height - r);
+        context.lineTo(0, r);
+        context.quadraticCurveTo(0, 0, r, 0);
+        context.closePath();
+        context.clip();
+      }
       if (img != null && !(img instanceof Promise)) {
         context.drawImage(
           img,
           0 /* hardcoded for the selection box*/,
           0,
-          element.width,
-          element.height,
+          width,
+          height,
         );
       } else {
         drawImagePlaceholder(element, context, renderConfig.zoom.value);
       }
+      context.restore();
       break;
     }
     default: {
@@ -1390,7 +1409,14 @@ export const renderElementToSvg = (
           image.setAttribute("width", "100%");
           image.setAttribute("height", "100%");
           image.setAttribute("href", fileData.dataURL);
-
+          if (element.roundness) {
+            const r =
+              getCornerRadius(
+                Math.min(element.width, element.height),
+                element,
+              ) / 4;
+            image.setAttribute("clip-path", `inset(0% round ${r}px)`);
+          }
           symbol.appendChild(image);
 
           root.prepend(symbol);
