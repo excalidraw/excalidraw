@@ -399,6 +399,7 @@ export const invalidateShapeForElement = (element: ExcalidrawElement) =>
 export const generateRoughOptions = (
   element: ExcalidrawElement,
   continuousPath = false,
+  isExporting: boolean = false,
 ): Options => {
   const options: Options = {
     seed: element.seed,
@@ -437,8 +438,8 @@ export const generateRoughOptions = (
         element.backgroundColor === "transparent"
           ? undefined
           : element.backgroundColor;
-      if (isIFrameElement(element) && !options.fill) {
-        options.fill = "gray";
+      if (isExporting && isIFrameElement(element) && !options.fill) {
+        options.fill = "#d3d3d3";
         options.fillStyle = "solid";
       }
       if (element.type === "ellipse") {
@@ -473,6 +474,7 @@ export const generateRoughOptions = (
 const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
+  isExporting: boolean = false,
 ) => {
   let shape = shapeCache.get(element);
 
@@ -494,7 +496,7 @@ const generateElementShape = (
             } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
               h - r
             } L 0 ${r} Q 0 0, ${r} 0`,
-            generateRoughOptions(element, true),
+            generateRoughOptions(element, true, isExporting),
           );
         } else {
           shape = generator.rectangle(
@@ -502,7 +504,7 @@ const generateElementShape = (
             0,
             element.width,
             element.height,
-            generateRoughOptions(element),
+            generateRoughOptions(element, false, isExporting),
           );
         }
         setShapeForElement(element, shape);
@@ -1002,7 +1004,7 @@ export const renderElement = (
     case "image":
     case "text":
     case "iframe": {
-      generateElementShape(element, generator);
+      generateElementShape(element, generator, renderConfig.isExporting);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
         const cx = (x1 + x2) / 2 + renderConfig.scrollX;
@@ -1261,7 +1263,7 @@ export const renderElementToSvg = (
     }
     case "iframe": {
       // render placeholder rectangle
-      generateElementShape(element, generator);
+      generateElementShape(element, generator, true);
       const node = roughSVGDrawWithPrecision(
         rsvg,
         getShapeForElement(element)!,

@@ -30,7 +30,11 @@ import {
 } from "../scene/scrollbars";
 import { getSelectedElements } from "../scene/selection";
 
-import { renderElement, renderElementToSvg } from "./renderElement";
+import {
+  invalidateShapeForElement,
+  renderElement,
+  renderElementToSvg,
+} from "./renderElement";
 import { getClientColor } from "../clients";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -1427,6 +1431,7 @@ export const renderSceneToSvg = (
     .forEach((element) => {
       if (!element.isDeleted) {
         try {
+          invalidateShapeForElement(element);
           renderElementToSvg(
             element,
             rsvg,
