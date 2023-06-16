@@ -44,7 +44,7 @@
 
     &--color-danger {
       &.ExcButton--variant-filled {
-        --text-color: var(--input-bg-color);
+        --text-color: var(--text-primary-color);
         --back-color: var(--color-danger);
 
         &:hover {
@@ -123,7 +123,7 @@
     transition: all 150ms ease-out;
 
     &--size-large {
-      font-weight: 400;
+      font-weight: 600;
       font-size: 0.875rem;
       height: 3rem;
       padding: 0.5rem 1.5rem;
@@ -145,6 +145,10 @@
     &--variant-icon {
       padding: 0.5rem 0.75rem;
       width: 3rem;
+    }
+
+    &--fullWidth {
+      width: 100%;
     }
 
     &__icon {

@@ -1,6 +1,10 @@
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { useI18n } from "../../i18n";
-import { useExcalidrawSetAppState, useExcalidrawActionManager } from "../App";
+import {
+  useExcalidrawSetAppState,
+  useExcalidrawActionManager,
+  useExcalidrawElements,
+} from "../App";
 import {
   ExportIcon,
   ExportImageIcon,
@@ -29,19 +33,35 @@ import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { jotaiScope } from "../../jotai";
 import { useUIAppState } from "../../context/ui-appState";
+import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
+import { overwriteConfirmDialog } from "../OverwriteConfirm/OverwriteConfirm";
 
 export const LoadScene = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
+  const elements = useExcalidrawElements();
 
   if (!actionManager.isActionEnabled(actionLoadScene)) {
     return null;
   }
 
+  const handleSelect = async () => {
+    if (
+      !elements.length ||
+      (await openConfirmModal({
+        ...overwriteConfirmDialog,
+        title: t("buttons.load"),
+        actionLabel: t("buttons.load"),
+      }))
+    ) {
+      actionManager.executeAction(actionLoadScene);
+    }
+  };
+
   return (
     <DropdownMenuItem
       icon={LoadIcon}
-      onSelect={() => actionManager.executeAction(actionLoadScene)}
+      onSelect={handleSelect}
       data-testid="load-button"
       shortcut={getShortcutFromShortcutName("loadScene")}
       aria-label={t("buttons.load")}

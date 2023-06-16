@@ -26,6 +26,8 @@ export const Action = ({
         variant="outlined"
         color="muted"
         label={actionLabel}
+        size="large"
+        fullWidth
         onClick={onClick}
       />
     </div>
