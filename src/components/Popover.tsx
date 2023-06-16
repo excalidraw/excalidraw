@@ -29,11 +29,19 @@ export const Popover = ({
 }: Props) => {
   const popoverRef = useRef<HTMLDivElement>(null);
 
-  const container = popoverRef.current;
-
   useEffect(() => {
+    const container = popoverRef.current;
+
     if (!container) {
       return;
+    }
+
+    // focus popover only if the caller didn't focus on something else nested
+    // within the popover, which should take precedence. Fixes cases
+    // like color picker listening to keydown events on containers nested
+    // in the popover.
+    if (!container.contains(document.activeElement)) {
+      container.focus();
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -44,15 +52,23 @@ export const Popover = ({
           (element) => element === activeElement,
         );
 
-        if (currentIndex === 0 && event.shiftKey) {
-          focusableElements[focusableElements.length - 1].focus();
+        if (activeElement === container) {
+          if (event.shiftKey) {
+            focusableElements[focusableElements.length - 1]?.focus();
+          } else {
+            focusableElements[0].focus();
+          }
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        } else if (currentIndex === 0 && event.shiftKey) {
+          focusableElements[focusableElements.length - 1]?.focus();
           event.preventDefault();
           event.stopImmediatePropagation();
         } else if (
           currentIndex === focusableElements.length - 1 &&
           !event.shiftKey
         ) {
-          focusableElements[0].focus();
+          focusableElements[0]?.focus();
           event.preventDefault();
           event.stopImmediatePropagation();
         }
@@ -62,35 +78,59 @@ export const Popover = ({
     container.addEventListener("keydown", handleKeyDown);
 
     return () => container.removeEventListener("keydown", handleKeyDown);
-  }, [container]);
+  }, []);
+
+  const lastInitializedPosRef = useRef<{ top: number; left: number } | null>(
+    null,
+  );
 
   // ensure the popover doesn't overflow the viewport
   useLayoutEffect(() => {
-    if (fitInViewport && popoverRef.current) {
-      const element = popoverRef.current;
-      const { x, y, width, height } = element.getBoundingClientRect();
+    if (fitInViewport && popoverRef.current && top != null && left != null) {
+      const container = popoverRef.current;
+      const { width, height } = container.getBoundingClientRect();
 
-      //Position correctly when clicked on rightmost part or the bottom part of viewport
-      if (x + width - offsetLeft > viewportWidth) {
-        element.style.left = `${viewportWidth - width - 10}px`;
+      // hack for StrictMode so this effect only runs once for
+      // the same top/left position, otherwise
+      // we'd potentically reposition twice (once for viewport overflow)
+      // and once for top/left position afterwards
+      if (
+        lastInitializedPosRef.current?.top === top &&
+        lastInitializedPosRef.current?.left === left
+      ) {
+        return;
       }
-      if (y + height - offsetTop > viewportHeight) {
-        element.style.top = `${viewportHeight - height}px`;
-      }
+      lastInitializedPosRef.current = { top, left };
 
-      //Resize to fit viewport on smaller screens
-      if (height >= viewportHeight) {
-        element.style.height = `${viewportHeight - 20}px`;
-        element.style.top = "10px";
-        element.style.overflowY = "scroll";
-      }
       if (width >= viewportWidth) {
-        element.style.width = `${viewportWidth}px`;
-        element.style.left = "0px";
-        element.style.overflowX = "scroll";
+        container.style.width = `${viewportWidth}px`;
+        container.style.left = "0px";
+        container.style.overflowX = "scroll";
+      } else if (left + width - offsetLeft > viewportWidth) {
+        container.style.left = `${viewportWidth - width - 10}px`;
+      } else {
+        container.style.left = `${left}px`;
+      }
+
+      if (height >= viewportHeight) {
+        container.style.height = `${viewportHeight - 20}px`;
+        container.style.top = "10px";
+        container.style.overflowY = "scroll";
+      } else if (top + height - offsetTop > viewportHeight) {
+        container.style.top = `${viewportHeight - height}px`;
+      } else {
+        container.style.top = `${top}px`;
       }
     }
-  }, [fitInViewport, viewportWidth, viewportHeight, offsetLeft, offsetTop]);
+  }, [
+    top,
+    left,
+    fitInViewport,
+    viewportWidth,
+    viewportHeight,
+    offsetLeft,
+    offsetTop,
+  ]);
 
   useEffect(() => {
     if (onCloseRequest) {
@@ -105,7 +145,7 @@ export const Popover = ({
   }, [onCloseRequest]);
 
   return (
-    <div className="popover" style={{ top, left }} ref={popoverRef}>
+    <div className="popover" ref={popoverRef} tabIndex={-1}>
       {children}
     </div>
   );

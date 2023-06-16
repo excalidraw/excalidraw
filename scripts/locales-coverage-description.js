@@ -2,6 +2,9 @@ const fs = require("fs");
 
 const THRESSHOLD = 85;
 
+// we're using BCP 47 language tags as keys
+// e.g. https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1
+
 const crowdinMap = {
   "ar-SA": "en-ar",
   "bg-BG": "en-bg",
@@ -52,6 +55,7 @@ const crowdinMap = {
   "kk-KZ": "en-kk",
   "vi-VN": "en-vi",
   "mr-IN": "en-mr",
+  "th-TH": "en-th",
 };
 
 const flags = {
@@ -104,6 +108,7 @@ const flags = {
   "eu-ES": "🇪🇦",
   "vi-VN": "🇻🇳",
   "mr-IN": "🇮🇳",
+  "th-TH": "🇹🇭",
 };
 
 const languages = {
@@ -156,6 +161,7 @@ const languages = {
   "zh-TW": "繁體中文",
   "vi-VN": "Tiếng Việt",
   "mr-IN": "मराठी",
+  "th-TH": "ภาษาไทย",
 };
 
 const percentages = fs.readFileSync(

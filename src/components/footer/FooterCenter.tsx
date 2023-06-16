@@ -1,18 +1,22 @@
 import clsx from "clsx";
-import { useExcalidrawAppState } from "../App";
+import { useTunnels } from "../../context/tunnels";
 import "./FooterCenter.scss";
+import { useUIAppState } from "../../context/ui-appState";
 
 const FooterCenter = ({ children }: { children?: React.ReactNode }) => {
-  const appState = useExcalidrawAppState();
+  const { FooterCenterTunnel } = useTunnels();
+  const appState = useUIAppState();
   return (
-    <div
-      className={clsx("footer-center zen-mode-transition", {
-        "layer-ui__wrapper__footer-left--transition-bottom":
-          appState.zenModeEnabled,
-      })}
-    >
-      {children}
-    </div>
+    <FooterCenterTunnel.In>
+      <div
+        className={clsx("footer-center zen-mode-transition", {
+          "layer-ui__wrapper__footer-left--transition-bottom":
+            appState.zenModeEnabled,
+        })}
+      >
+        {children}
+      </div>
+    </FooterCenterTunnel.In>
   );
 };
 

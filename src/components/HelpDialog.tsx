@@ -164,12 +164,18 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("toolBar.eraser")}
               shortcuts={[KEYS.E, KEYS["0"]]}
             />
+            <Shortcut label={t("toolBar.frame")} shortcuts={[KEYS.F]} />
             <Shortcut
-              label={t("helpDialog.editSelectedShape")}
-              shortcuts={[
-                getShortcutKey("CtrlOrCmd+Enter"),
-                getShortcutKey(`CtrlOrCmd + ${t("helpDialog.doubleClick")}`),
-              ]}
+              label={t("labels.eyeDropper")}
+              shortcuts={[KEYS.I, "Shift+S", "Shift+G"]}
+            />
+            <Shortcut
+              label={t("helpDialog.editLineArrowPoints")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+Enter")]}
+            />
+            <Shortcut
+              label={t("helpDialog.editText")}
+              shortcuts={[getShortcutKey("Enter")]}
             />
             <Shortcut
               label={t("helpDialog.textNewLine")}
@@ -274,28 +280,20 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             caption={t("helpDialog.editor")}
           >
             <Shortcut
-              label={t("labels.selectAll")}
-              shortcuts={[getShortcutKey("CtrlOrCmd+A")]}
-            />
-            <Shortcut
-              label={t("labels.multiSelect")}
-              shortcuts={[getShortcutKey(`Shift+${t("helpDialog.click")}`)]}
-            />
-            <Shortcut
-              label={t("helpDialog.deepSelect")}
-              shortcuts={[getShortcutKey(`CtrlOrCmd+${t("helpDialog.click")}`)]}
-            />
-            <Shortcut
-              label={t("helpDialog.deepBoxSelect")}
-              shortcuts={[getShortcutKey(`CtrlOrCmd+${t("helpDialog.drag")}`)]}
-            />
-            <Shortcut
               label={t("labels.moveCanvas")}
               shortcuts={[
                 getShortcutKey(`Space+${t("helpDialog.drag")}`),
                 getShortcutKey(`Wheel+${t("helpDialog.drag")}`),
               ]}
               isOr={true}
+            />
+            <Shortcut
+              label={t("buttons.clearReset")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+Delete")]}
+            />
+            <Shortcut
+              label={t("labels.delete")}
+              shortcuts={[getShortcutKey("Delete")]}
             />
             <Shortcut
               label={t("labels.cut")}
@@ -313,6 +311,22 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("labels.pasteAsPlaintext")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Shift+V")]}
             />
+            <Shortcut
+              label={t("labels.selectAll")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+A")]}
+            />
+            <Shortcut
+              label={t("labels.multiSelect")}
+              shortcuts={[getShortcutKey(`Shift+${t("helpDialog.click")}`)]}
+            />
+            <Shortcut
+              label={t("helpDialog.deepSelect")}
+              shortcuts={[getShortcutKey(`CtrlOrCmd+${t("helpDialog.click")}`)]}
+            />
+            <Shortcut
+              label={t("helpDialog.deepBoxSelect")}
+              shortcuts={[getShortcutKey(`CtrlOrCmd+${t("helpDialog.drag")}`)]}
+            />
             {/* firefox supports clipboard API under a flag, so we'll
                 show users what they can do in the error message */}
             {(probablySupportsClipboardBlob || isFirefox) && (
@@ -328,10 +342,6 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut
               label={t("labels.pasteStyles")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Alt+V")]}
-            />
-            <Shortcut
-              label={t("labels.delete")}
-              shortcuts={[getShortcutKey("Delete")]}
             />
             <Shortcut
               label={t("labels.sendToBack")}

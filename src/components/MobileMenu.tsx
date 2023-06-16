@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  AppState,
-  Device,
-  ExcalidrawProps,
-  UIWelcomeScreenComponents,
-} from "../types";
+import { AppState, Device, ExcalidrawProps, UIAppState } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -18,15 +13,15 @@ import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockButton } from "./LockButton";
-import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
+import { useTunnels } from "../context/tunnels";
 
 type MobileMenuProps = {
-  appState: AppState;
+  appState: UIAppState;
   actionManager: ActionManager;
   renderJSONExportDialog: () => React.ReactNode;
   renderImageExportDialog: () => React.ReactNode;
@@ -40,13 +35,12 @@ type MobileMenuProps = {
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
-    appState: AppState,
+    appState: UIAppState,
   ) => JSX.Element | null;
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderSidebars: () => JSX.Element | null;
   device: Device;
-  renderMenu: () => React.ReactNode;
-  welcomeScreenCenter: UIWelcomeScreenComponents["Center"];
+  renderWelcomeScreen: boolean;
 };
 
 export const MobileMenu = ({
@@ -63,13 +57,17 @@ export const MobileMenu = ({
   renderCustomStats,
   renderSidebars,
   device,
-  renderMenu,
-  welcomeScreenCenter,
+  renderWelcomeScreen,
 }: MobileMenuProps) => {
+  const {
+    WelcomeScreenCenterTunnel,
+    MainMenuTunnel,
+    DefaultSidebarTriggerTunnel,
+  } = useTunnels();
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
-        {welcomeScreenCenter}
+        {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
         <Section heading="shapes">
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
@@ -93,11 +91,7 @@ export const MobileMenu = ({
                 {renderTopRightUI && renderTopRightUI(true, appState)}
                 <div className="mobile-misc-tools-container">
                   {!appState.viewModeEnabled && (
-                    <LibraryButton
-                      appState={appState}
-                      setAppState={setAppState}
-                      isMobile
-                    />
+                    <DefaultSidebarTriggerTunnel.Out />
                   )}
                   <PenModeButton
                     checked={appState.penMode}
@@ -135,12 +129,16 @@ export const MobileMenu = ({
 
   const renderAppToolbar = () => {
     if (appState.viewModeEnabled) {
-      return <div className="App-toolbar-content">{renderMenu()}</div>;
+      return (
+        <div className="App-toolbar-content">
+          <MainMenuTunnel.Out />
+        </div>
+      );
     }
 
     return (
       <div className="App-toolbar-content">
-        {renderMenu()}
+        <MainMenuTunnel.Out />
         {actionManager.renderAction("toggleEditMenu")}
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
@@ -191,13 +189,13 @@ export const MobileMenu = ({
             {renderAppToolbar()}
             {appState.scrolledOutside &&
               !appState.openMenu &&
-              appState.openSidebar !== "library" && (
+              !appState.openSidebar && (
                 <button
                   className="scroll-back-to-content"
                   onClick={() => {
-                    setAppState({
+                    setAppState((appState) => ({
                       ...calculateScrollCenter(elements, appState, canvas),
-                    });
+                    }));
                   }}
                 >
                   {t("buttons.scrollBackToContent")}

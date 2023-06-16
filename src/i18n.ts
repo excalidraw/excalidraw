@@ -1,6 +1,8 @@
 import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 import { ENV } from "./constants";
+import { jotaiScope, jotaiStore } from "./jotai";
+import { atom, useAtomValue } from "jotai";
 
 const COMPLETION_THRESHOLD = 85;
 
@@ -12,60 +14,61 @@ export interface Language {
 
 export const defaultLang = { code: "en", label: "English" };
 
-const allLanguages: Language[] = [
-  { code: "ar-SA", label: "العربية", rtl: true },
-  { code: "bg-BG", label: "Български" },
-  { code: "ca-ES", label: "Català" },
-  { code: "cs-CZ", label: "Česky" },
-  { code: "de-DE", label: "Deutsch" },
-  { code: "el-GR", label: "Ελληνικά" },
-  { code: "es-ES", label: "Español" },
-  { code: "eu-ES", label: "Euskara" },
-  { code: "fa-IR", label: "فارسی", rtl: true },
-  { code: "fi-FI", label: "Suomi" },
-  { code: "fr-FR", label: "Français" },
-  { code: "gl-ES", label: "Galego" },
-  { code: "he-IL", label: "עברית", rtl: true },
-  { code: "hi-IN", label: "हिन्दी" },
-  { code: "hu-HU", label: "Magyar" },
-  { code: "id-ID", label: "Bahasa Indonesia" },
-  { code: "it-IT", label: "Italiano" },
-  { code: "ja-JP", label: "日本語" },
-  { code: "kab-KAB", label: "Taqbaylit" },
-  { code: "kk-KZ", label: "Қазақ тілі" },
-  { code: "ko-KR", label: "한국어" },
-  { code: "ku-TR", label: "Kurdî" },
-  { code: "lt-LT", label: "Lietuvių" },
-  { code: "lv-LV", label: "Latviešu" },
-  { code: "my-MM", label: "Burmese" },
-  { code: "nb-NO", label: "Norsk bokmål" },
-  { code: "nl-NL", label: "Nederlands" },
-  { code: "nn-NO", label: "Norsk nynorsk" },
-  { code: "oc-FR", label: "Occitan" },
-  { code: "pa-IN", label: "ਪੰਜਾਬੀ" },
-  { code: "pl-PL", label: "Polski" },
-  { code: "pt-BR", label: "Português Brasileiro" },
-  { code: "pt-PT", label: "Português" },
-  { code: "ro-RO", label: "Română" },
-  { code: "ru-RU", label: "Русский" },
-  { code: "sk-SK", label: "Slovenčina" },
-  { code: "sv-SE", label: "Svenska" },
-  { code: "sl-SI", label: "Slovenščina" },
-  { code: "tr-TR", label: "Türkçe" },
-  { code: "uk-UA", label: "Українська" },
-  { code: "zh-CN", label: "简体中文" },
-  { code: "zh-TW", label: "繁體中文" },
-  { code: "vi-VN", label: "Tiếng Việt" },
-  { code: "mr-IN", label: "मराठी" },
-].concat([defaultLang]);
-
-export const languages: Language[] = allLanguages
-  .sort((left, right) => (left.label > right.label ? 1 : -1))
-  .filter(
-    (lang) =>
-      (percentages as Record<string, number>)[lang.code] >=
-      COMPLETION_THRESHOLD,
-  );
+export const languages: Language[] = [
+  defaultLang,
+  ...[
+    { code: "ar-SA", label: "العربية", rtl: true },
+    { code: "bg-BG", label: "Български" },
+    { code: "ca-ES", label: "Català" },
+    { code: "cs-CZ", label: "Česky" },
+    { code: "de-DE", label: "Deutsch" },
+    { code: "el-GR", label: "Ελληνικά" },
+    { code: "es-ES", label: "Español" },
+    { code: "eu-ES", label: "Euskara" },
+    { code: "fa-IR", label: "فارسی", rtl: true },
+    { code: "fi-FI", label: "Suomi" },
+    { code: "fr-FR", label: "Français" },
+    { code: "gl-ES", label: "Galego" },
+    { code: "he-IL", label: "עברית", rtl: true },
+    { code: "hi-IN", label: "हिन्दी" },
+    { code: "hu-HU", label: "Magyar" },
+    { code: "id-ID", label: "Bahasa Indonesia" },
+    { code: "it-IT", label: "Italiano" },
+    { code: "ja-JP", label: "日本語" },
+    { code: "kab-KAB", label: "Taqbaylit" },
+    { code: "kk-KZ", label: "Қазақ тілі" },
+    { code: "ko-KR", label: "한국어" },
+    { code: "ku-TR", label: "Kurdî" },
+    { code: "lt-LT", label: "Lietuvių" },
+    { code: "lv-LV", label: "Latviešu" },
+    { code: "my-MM", label: "Burmese" },
+    { code: "nb-NO", label: "Norsk bokmål" },
+    { code: "nl-NL", label: "Nederlands" },
+    { code: "nn-NO", label: "Norsk nynorsk" },
+    { code: "oc-FR", label: "Occitan" },
+    { code: "pa-IN", label: "ਪੰਜਾਬੀ" },
+    { code: "pl-PL", label: "Polski" },
+    { code: "pt-BR", label: "Português Brasileiro" },
+    { code: "pt-PT", label: "Português" },
+    { code: "ro-RO", label: "Română" },
+    { code: "ru-RU", label: "Русский" },
+    { code: "sk-SK", label: "Slovenčina" },
+    { code: "sv-SE", label: "Svenska" },
+    { code: "sl-SI", label: "Slovenščina" },
+    { code: "tr-TR", label: "Türkçe" },
+    { code: "uk-UA", label: "Українська" },
+    { code: "zh-CN", label: "简体中文" },
+    { code: "zh-TW", label: "繁體中文" },
+    { code: "vi-VN", label: "Tiếng Việt" },
+    { code: "mr-IN", label: "मराठी" },
+  ]
+    .filter(
+      (lang) =>
+        (percentages as Record<string, number>)[lang.code] >=
+        COMPLETION_THRESHOLD,
+    )
+    .sort((left, right) => (left.label > right.label ? 1 : -1)),
+];
 
 const TEST_LANG_CODE = "__test__";
 if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
@@ -99,6 +102,8 @@ export const setLanguage = async (lang: Language) => {
       currentLangData = fallbackLangData;
     }
   }
+
+  jotaiStore.set(editorLangCodeAtom, lang.code);
 };
 
 export const getLanguage = () => currentLang;
@@ -119,7 +124,8 @@ const findPartsForData = (data: any, parts: string[]) => {
 
 export const t = (
   path: string,
-  replacement?: { [key: string]: string | number },
+  replacement?: { [key: string]: string | number } | null,
+  fallback?: string,
 ) => {
   if (currentLang.code.startsWith(TEST_LANG_CODE)) {
     const name = replacement
@@ -131,9 +137,16 @@ export const t = (
   const parts = path.split(".");
   let translation =
     findPartsForData(currentLangData, parts) ||
-    findPartsForData(fallbackLangData, parts);
+    findPartsForData(fallbackLangData, parts) ||
+    fallback;
   if (translation === undefined) {
-    throw new Error(`Can't find translation for ${path}`);
+    const errorMessage = `Can't find translation for ${path}`;
+    // in production, don't blow up the app on a missing translation key
+    if (process.env.NODE_ENV === "production") {
+      console.warn(errorMessage);
+      return "";
+    }
+    throw new Error(errorMessage);
   }
 
   if (replacement) {
@@ -142,4 +155,16 @@ export const t = (
     }
   }
   return translation;
+};
+
+/** @private atom used solely to rerender components using `useI18n` hook */
+const editorLangCodeAtom = atom(defaultLang.code);
+
+// Should be used in components that fall under these cases:
+// - component is rendered as an <Excalidraw> child
+// - component is rendered internally by <Excalidraw>, but the component
+//   is memoized w/o being updated on `langCode`, `AppState`, or `UIAppState`
+export const useI18n = () => {
+  const langCode = useAtomValue(editorLangCodeAtom, jotaiScope);
+  return { t, langCode };
 };

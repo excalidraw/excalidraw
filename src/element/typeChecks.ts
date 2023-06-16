@@ -1,5 +1,6 @@
 import { ROUNDNESS } from "../constants";
 import { AppState } from "../types";
+import { MarkNonNullable } from "../utility-types";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -11,6 +12,7 @@ import {
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextContainer,
+  ExcalidrawFrameElement,
   RoundnessType,
 } from "./types";
 
@@ -42,6 +44,12 @@ export const isTextElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawTextElement => {
   return element != null && element.type === "text";
+};
+
+export const isFrameElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawFrameElement => {
+  return element != null && element.type === "frame";
 };
 
 export const isFreeDrawElement = (
@@ -137,9 +145,9 @@ export const isExcalidrawElement = (element: any): boolean => {
 
 export const hasBoundTextElement = (
   element: ExcalidrawElement | null,
-): element is ExcalidrawBindableElement => {
+): element is MarkNonNullable<ExcalidrawBindableElement, "boundElements"> => {
   return (
-    isBindableElement(element) &&
+    isTextBindableContainer(element) &&
     !!element.boundElements?.some(({ type }) => type === "text")
   );
 };

@@ -11,6 +11,7 @@ import {
 } from "../actions";
 import { AppState } from "../types";
 import { API } from "./helpers/api";
+import { selectGroupsForSelectedElements } from "../groups";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -34,6 +35,7 @@ const populateElements = (
     height?: number;
     containerId?: string;
   }[],
+  appState?: Partial<AppState>,
 ) => {
   const selectedElementIds: any = {};
 
@@ -84,6 +86,11 @@ const populateElements = (
   });
 
   h.setState({
+    ...selectGroupsForSelectedElements(
+      { ...h.state, ...appState, selectedElementIds },
+      h.elements,
+    ),
+    ...appState,
     selectedElementIds,
   });
 
@@ -111,11 +118,7 @@ const assertZindex = ({
   appState?: Partial<AppState>;
   operations: [Actions, string[]][];
 }) => {
-  const selectedElementIds = populateElements(elements);
-
-  h.setState({
-    editingGroupId: appState?.editingGroupId || null,
-  });
+  const selectedElementIds = populateElements(elements, appState);
 
   operations.forEach(([action, expected]) => {
     h.app.actionManager.executeAction(action);
@@ -884,9 +887,6 @@ describe("z-index manipulation", () => {
       { id: "A", groupIds: ["g1"], isSelected: true },
       { id: "B", groupIds: ["g1"], isSelected: true },
     ]);
-    h.setState({
-      selectedGroupIds: { g1: true },
-    });
     h.app.actionManager.executeAction(actionDuplicateSelection);
     expect(h.elements).toMatchObject([
       { id: "A" },
@@ -908,9 +908,6 @@ describe("z-index manipulation", () => {
       { id: "B", groupIds: ["g1"], isSelected: true },
       { id: "C" },
     ]);
-    h.setState({
-      selectedGroupIds: { g1: true },
-    });
     h.app.actionManager.executeAction(actionDuplicateSelection);
     expect(h.elements).toMatchObject([
       { id: "A" },
@@ -933,9 +930,6 @@ describe("z-index manipulation", () => {
       { id: "B", groupIds: ["g1"], isSelected: true },
       { id: "C", isSelected: true },
     ]);
-    h.setState({
-      selectedGroupIds: { g1: true },
-    });
     h.app.actionManager.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
@@ -952,9 +946,6 @@ describe("z-index manipulation", () => {
       { id: "C", groupIds: ["g2"], isSelected: true },
       { id: "D", groupIds: ["g2"], isSelected: true },
     ]);
-    h.setState({
-      selectedGroupIds: { g1: true, g2: true },
-    });
     h.app.actionManager.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
@@ -967,14 +958,16 @@ describe("z-index manipulation", () => {
       "D_copy",
     ]);
 
-    populateElements([
-      { id: "A", groupIds: ["g1", "g2"], isSelected: true },
-      { id: "B", groupIds: ["g1", "g2"], isSelected: true },
-      { id: "C", groupIds: ["g2"], isSelected: true },
-    ]);
-    h.setState({
-      selectedGroupIds: { g1: true },
-    });
+    populateElements(
+      [
+        { id: "A", groupIds: ["g1", "g2"], isSelected: true },
+        { id: "B", groupIds: ["g1", "g2"], isSelected: true },
+        { id: "C", groupIds: ["g2"], isSelected: true },
+      ],
+      {
+        selectedGroupIds: { g1: true },
+      },
+    );
     h.app.actionManager.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
@@ -985,14 +978,16 @@ describe("z-index manipulation", () => {
       "C_copy",
     ]);
 
-    populateElements([
-      { id: "A", groupIds: ["g1", "g2"], isSelected: true },
-      { id: "B", groupIds: ["g1", "g2"], isSelected: true },
-      { id: "C", groupIds: ["g2"], isSelected: true },
-    ]);
-    h.setState({
-      selectedGroupIds: { g2: true },
-    });
+    populateElements(
+      [
+        { id: "A", groupIds: ["g1", "g2"], isSelected: true },
+        { id: "B", groupIds: ["g1", "g2"], isSelected: true },
+        { id: "C", groupIds: ["g2"], isSelected: true },
+      ],
+      {
+        selectedGroupIds: { g2: true },
+      },
+    );
     h.app.actionManager.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
@@ -1003,17 +998,19 @@ describe("z-index manipulation", () => {
       "C_copy",
     ]);
 
-    populateElements([
-      { id: "A", groupIds: ["g1", "g2"], isSelected: true },
-      { id: "B", groupIds: ["g1", "g2"], isSelected: true },
-      { id: "C", groupIds: ["g2"], isSelected: true },
-      { id: "D", groupIds: ["g3", "g4"], isSelected: true },
-      { id: "E", groupIds: ["g3", "g4"], isSelected: true },
-      { id: "F", groupIds: ["g4"], isSelected: true },
-    ]);
-    h.setState({
-      selectedGroupIds: { g2: true, g4: true },
-    });
+    populateElements(
+      [
+        { id: "A", groupIds: ["g1", "g2"], isSelected: true },
+        { id: "B", groupIds: ["g1", "g2"], isSelected: true },
+        { id: "C", groupIds: ["g2"], isSelected: true },
+        { id: "D", groupIds: ["g3", "g4"], isSelected: true },
+        { id: "E", groupIds: ["g3", "g4"], isSelected: true },
+        { id: "F", groupIds: ["g4"], isSelected: true },
+      ],
+      {
+        selectedGroupIds: { g2: true, g4: true },
+      },
+    );
     h.app.actionManager.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
@@ -1030,11 +1027,14 @@ describe("z-index manipulation", () => {
       "F_copy",
     ]);
 
-    populateElements([
-      { id: "A", groupIds: ["g1", "g2"], isSelected: true },
-      { id: "B", groupIds: ["g1", "g2"] },
-      { id: "C", groupIds: ["g2"] },
-    ]);
+    populateElements(
+      [
+        { id: "A", groupIds: ["g1", "g2"], isSelected: true },
+        { id: "B", groupIds: ["g1", "g2"] },
+        { id: "C", groupIds: ["g2"] },
+      ],
+      { editingGroupId: "g1" },
+    );
     h.app.actionManager.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
@@ -1043,11 +1043,14 @@ describe("z-index manipulation", () => {
       "C",
     ]);
 
-    populateElements([
-      { id: "A", groupIds: ["g1", "g2"] },
-      { id: "B", groupIds: ["g1", "g2"], isSelected: true },
-      { id: "C", groupIds: ["g2"] },
-    ]);
+    populateElements(
+      [
+        { id: "A", groupIds: ["g1", "g2"] },
+        { id: "B", groupIds: ["g1", "g2"], isSelected: true },
+        { id: "C", groupIds: ["g2"] },
+      ],
+      { editingGroupId: "g1" },
+    );
     h.app.actionManager.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
@@ -1056,11 +1059,14 @@ describe("z-index manipulation", () => {
       "C",
     ]);
 
-    populateElements([
-      { id: "A", groupIds: ["g1", "g2"], isSelected: true },
-      { id: "B", groupIds: ["g1", "g2"], isSelected: true },
-      { id: "C", groupIds: ["g2"], isSelected: true },
-    ]);
+    populateElements(
+      [
+        { id: "A", groupIds: ["g1", "g2"], isSelected: true },
+        { id: "B", groupIds: ["g1", "g2"], isSelected: true },
+        { id: "C", groupIds: ["g2"] },
+      ],
+      { editingGroupId: "g1" },
+    );
     h.app.actionManager.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
@@ -1068,7 +1074,42 @@ describe("z-index manipulation", () => {
       "B",
       "B_copy",
       "C",
+    ]);
+  });
+
+  it("duplicating incorrectly interleaved elements (group elements should be together) should still produce reasonable result", () => {
+    populateElements([
+      { id: "A", groupIds: ["g1"], isSelected: true },
+      { id: "B" },
+      { id: "C", groupIds: ["g1"], isSelected: true },
+    ]);
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      "A",
+      "C",
+      "A_copy",
       "C_copy",
+      "B",
+    ]);
+  });
+
+  it("group-selected duplication should includes deleted elements that weren't selected on account of being deleted", () => {
+    populateElements([
+      { id: "A", groupIds: ["g1"], isDeleted: true },
+      { id: "B", groupIds: ["g1"], isSelected: true },
+      { id: "C", groupIds: ["g1"], isSelected: true },
+      { id: "D" },
+    ]);
+    expect(h.state.selectedGroupIds).toEqual({ g1: true });
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      "A",
+      "B",
+      "C",
+      "A_copy",
+      "B_copy",
+      "C_copy",
+      "D",
     ]);
   });
 

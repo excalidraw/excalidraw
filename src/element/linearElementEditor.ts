@@ -41,6 +41,7 @@ import { shouldRotateWithDiscreteAngle } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { getShapeForElement } from "../renderer/renderElement";
 import { DRAGGING_THRESHOLD } from "../constants";
+import { Mutable } from "../utility-types";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -593,7 +594,7 @@ export class LinearElementEditor {
   }
 
   static handlePointerDown(
-    event: React.PointerEvent<HTMLCanvasElement>,
+    event: React.PointerEvent<HTMLElement>,
     appState: AppState,
     history: History,
     scenePointer: { x: number; y: number },

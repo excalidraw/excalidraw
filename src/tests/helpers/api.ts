@@ -19,6 +19,7 @@ import { newFreeDrawElement, newImageElement } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { isLinearElementType } from "../../element/typeChecks";
+import { Mutable } from "../../utility-types";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -36,8 +37,12 @@ export class API {
 
   static getSelectedElements = (
     includeBoundTextElement: boolean = false,
+    includeElementsInFrames: boolean = false,
   ): ExcalidrawElement[] => {
-    return getSelectedElements(h.elements, h.state, includeBoundTextElement);
+    return getSelectedElements(h.elements, h.state, {
+      includeBoundTextElement,
+      includeElementsInFrames,
+    });
   };
 
   static getSelectedElement = (): ExcalidrawElement => {
@@ -110,6 +115,9 @@ export class API {
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
     status?: T extends "image" ? ExcalidrawImageElement["status"] : never;
+    startBinding?: T extends "arrow"
+      ? ExcalidrawLinearElement["startBinding"]
+      : never;
     endBinding?: T extends "arrow"
       ? ExcalidrawLinearElement["endBinding"]
       : never;
@@ -137,6 +145,7 @@ export class API {
       | "versionNonce"
       | "isDeleted"
       | "groupIds"
+      | "frameId"
       | "link"
       | "updated"
     > = {
@@ -177,11 +186,13 @@ export class API {
         });
         break;
       case "text":
+        const fontSize = rest.fontSize ?? appState.currentItemFontSize;
+        const fontFamily = rest.fontFamily ?? appState.currentItemFontFamily;
         element = newTextElement({
           ...base,
           text: rest.text || "test",
-          fontSize: rest.fontSize ?? appState.currentItemFontSize,
-          fontFamily: rest.fontFamily ?? appState.currentItemFontFamily,
+          fontSize,
+          fontFamily,
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
           containerId: rest.containerId ?? undefined,
@@ -205,7 +216,10 @@ export class API {
           type,
           startArrowhead: null,
           endArrowhead: null,
-          points: rest.points ?? [],
+          points: rest.points ?? [
+            [0, 0],
+            [100, 100],
+          ],
         });
         break;
       case "image":
@@ -219,6 +233,10 @@ export class API {
           scale: rest.scale || [1, 1],
         });
         break;
+    }
+    if (element.type === "arrow") {
+      element.startBinding = rest.startBinding ?? null;
+      element.endBinding = rest.endBinding ?? null;
     }
     if (id) {
       element.id = id;

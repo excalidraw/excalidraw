@@ -1,76 +1,40 @@
-import {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-  RefObject,
-  forwardRef,
-} from "react";
+import React, { useState, useCallback, useMemo, useRef } from "react";
 import Library, {
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,
 } from "../data/library";
 import { t } from "../i18n";
 import { randomId } from "../random";
-import { LibraryItems, LibraryItem, AppState, ExcalidrawProps } from "../types";
-
-import "./LibraryMenu.scss";
+import {
+  LibraryItems,
+  LibraryItem,
+  ExcalidrawProps,
+  UIAppState,
+} from "../types";
 import LibraryMenuItems from "./LibraryMenuItems";
-import { EVENT } from "../constants";
-import { KEYS } from "../keys";
 import { trackEvent } from "../analytics";
-import { useAtom } from "jotai";
+import { atom, useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 import Spinner from "./Spinner";
 import {
-  useDevice,
+  useApp,
+  useAppProps,
   useExcalidrawElements,
   useExcalidrawSetAppState,
 } from "./App";
-import { Sidebar } from "./Sidebar/Sidebar";
 import { getSelectedElements } from "../scene";
+import { useUIAppState } from "../context/ui-appState";
+
+import "./LibraryMenu.scss";
+import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
+import { isShallowEqual } from "../utils";
 import { NonDeletedExcalidrawElement } from "../element/types";
-import { LibraryMenuHeader } from "./LibraryMenuHeaderContent";
-import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
 
-const useOnClickOutside = (
-  ref: RefObject<HTMLElement>,
-  cb: (event: MouseEvent) => void,
-) => {
-  useEffect(() => {
-    const listener = (event: MouseEvent) => {
-      if (!ref.current) {
-        return;
-      }
+export const isLibraryMenuOpenAtom = atom(false);
 
-      if (
-        event.target instanceof Element &&
-        (ref.current.contains(event.target) ||
-          !document.body.contains(event.target))
-      ) {
-        return;
-      }
-
-      cb(event);
-    };
-    document.addEventListener("pointerdown", listener, false);
-
-    return () => {
-      document.removeEventListener("pointerdown", listener);
-    };
-  }, [ref, cb]);
+const LibraryMenuWrapper = ({ children }: { children: React.ReactNode }) => {
+  return <div className="layer-ui__library">{children}</div>;
 };
-
-const LibraryMenuWrapper = forwardRef<
-  HTMLDivElement,
-  { children: React.ReactNode }
->(({ children }, ref) => {
-  return (
-    <div ref={ref} className="layer-ui__library">
-      {children}
-    </div>
-  );
-});
 
 export const LibraryMenuContent = ({
   onInsertLibraryItems,
@@ -80,46 +44,58 @@ export const LibraryMenuContent = ({
   libraryReturnUrl,
   library,
   id,
-  appState,
+  theme,
   selectedItems,
   onSelectItems,
 }: {
   pendingElements: LibraryItem["elements"];
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: () => void;
-  setAppState: React.Component<any, AppState>["setState"];
+  setAppState: React.Component<any, UIAppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   library: Library;
   id: string;
-  appState: AppState;
+  theme: UIAppState["theme"];
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
 }) => {
   const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
 
-  const addToLibrary = useCallback(
-    async (elements: LibraryItem["elements"], libraryItems: LibraryItems) => {
-      trackEvent("element", "addToLibrary", "ui");
-      if (elements.some((element) => element.type === "image")) {
-        return setAppState({
-          errorMessage: "Support for adding images to the library coming soon!",
+  const _onAddToLibrary = useCallback(
+    (elements: LibraryItem["elements"]) => {
+      const addToLibrary = async (
+        processedElements: LibraryItem["elements"],
+        libraryItems: LibraryItems,
+      ) => {
+        trackEvent("element", "addToLibrary", "ui");
+        if (processedElements.some((element) => element.type === "image")) {
+          return setAppState({
+            errorMessage:
+              "Support for adding images to the library coming soon!",
+          });
+        }
+        const nextItems: LibraryItems = [
+          {
+            status: "unpublished",
+            elements: processedElements,
+            id: randomId(),
+            created: Date.now(),
+          },
+          ...libraryItems,
+        ];
+        onAddToLibrary();
+        library.setLibrary(nextItems).catch(() => {
+          setAppState({ errorMessage: t("alerts.errorAddingToLibrary") });
         });
-      }
-      const nextItems: LibraryItems = [
-        {
-          status: "unpublished",
-          elements,
-          id: randomId(),
-          created: Date.now(),
-        },
-        ...libraryItems,
-      ];
-      onAddToLibrary();
-      library.setLibrary(nextItems).catch(() => {
-        setAppState({ errorMessage: t("alerts.errorAddingToLibrary") });
-      });
+      };
+      addToLibrary(elements, libraryItemsData.libraryItems);
     },
-    [onAddToLibrary, library, setAppState],
+    [onAddToLibrary, library, setAppState, libraryItemsData.libraryItems],
+  );
+
+  const libraryItems = useMemo(
+    () => libraryItemsData.libraryItems,
+    [libraryItemsData],
   );
 
   if (
@@ -145,94 +121,77 @@ export const LibraryMenuContent = ({
     <LibraryMenuWrapper>
       <LibraryMenuItems
         isLoading={libraryItemsData.status === "loading"}
-        libraryItems={libraryItemsData.libraryItems}
-        onAddToLibrary={(elements) =>
-          addToLibrary(elements, libraryItemsData.libraryItems)
-        }
+        libraryItems={libraryItems}
+        onAddToLibrary={_onAddToLibrary}
         onInsertLibraryItems={onInsertLibraryItems}
         pendingElements={pendingElements}
-        selectedItems={selectedItems}
-        onSelectItems={onSelectItems}
         id={id}
         libraryReturnUrl={libraryReturnUrl}
-        theme={appState.theme}
+        theme={theme}
+        onSelectItems={onSelectItems}
+        selectedItems={selectedItems}
       />
       {showBtn && (
-        <LibraryMenuBrowseButton
+        <LibraryMenuControlButtons
+          className="library-menu-control-buttons--at-bottom"
+          style={{ padding: "16px 12px 0 12px" }}
           id={id}
           libraryReturnUrl={libraryReturnUrl}
-          theme={appState.theme}
+          theme={theme}
         />
       )}
     </LibraryMenuWrapper>
   );
 };
 
-export const LibraryMenu: React.FC<{
-  appState: AppState;
-  onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
-  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
-  focusContainer: () => void;
-  library: Library;
-  id: string;
-}> = ({
-  appState,
-  onInsertElements,
-  libraryReturnUrl,
-  focusContainer,
-  library,
-  id,
-}) => {
+const usePendingElementsMemo = (
+  appState: UIAppState,
+  elements: readonly NonDeletedExcalidrawElement[],
+) => {
+  const create = () =>
+    getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+      includeElementsInFrames: true,
+    });
+  const val = useRef(create());
+  const prevAppState = useRef<UIAppState>(appState);
+  const prevElements = useRef(elements);
+
+  if (
+    !isShallowEqual(
+      appState.selectedElementIds,
+      prevAppState.current.selectedElementIds,
+    ) ||
+    !isShallowEqual(elements, prevElements.current)
+  ) {
+    val.current = create();
+    prevAppState.current = appState;
+    prevElements.current = elements;
+  }
+  return val.current;
+};
+
+/**
+ * This component is meant to be rendered inside <Sidebar.Tab/> inside our
+ * <DefaultSidebar/> or host apps Sidebar components.
+ */
+export const LibraryMenu = () => {
+  const { library, id, onInsertElements } = useApp();
+  const appProps = useAppProps();
+  const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
   const elements = useExcalidrawElements();
-  const device = useDevice();
-
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
-  const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
+  const memoizedLibrary = useMemo(() => library, [library]);
+  // BUG: pendingElements are still causing some unnecessary rerenders because clicking into canvas returns some ids even when no element is selected.
+  const pendingElements = usePendingElementsMemo(appState, elements);
 
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  const closeLibrary = useCallback(() => {
-    const isDialogOpen = !!document.querySelector(".Dialog");
-
-    // Prevent closing if any dialog is open
-    if (isDialogOpen) {
-      return;
-    }
-    setAppState({ openSidebar: null });
-  }, [setAppState]);
-
-  useOnClickOutside(
-    ref,
-    useCallback(
-      (event) => {
-        // If click on the library icon, do nothing so that LibraryButton
-        // can toggle library menu
-        if ((event.target as Element).closest(".ToolIcon__library")) {
-          return;
-        }
-        if (!appState.isSidebarDocked || !device.canDeviceFitSidebar) {
-          closeLibrary();
-        }
-      },
-      [closeLibrary, appState.isSidebarDocked, device.canDeviceFitSidebar],
-    ),
+  const onInsertLibraryItems = useCallback(
+    (libraryItems: LibraryItems) => {
+      onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
+    },
+    [onInsertElements],
   );
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === KEYS.ESCAPE &&
-        (!appState.isSidebarDocked || !device.canDeviceFitSidebar)
-      ) {
-        closeLibrary();
-      }
-    };
-    document.addEventListener(EVENT.KEYDOWN, handleKeyDown);
-    return () => {
-      document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
-    };
-  }, [closeLibrary, appState.isSidebarDocked, device.canDeviceFitSidebar]);
 
   const deselectItems = useCallback(() => {
     setAppState({
@@ -241,69 +200,18 @@ export const LibraryMenu: React.FC<{
     });
   }, [setAppState]);
 
-  const removeFromLibrary = useCallback(
-    async (libraryItems: LibraryItems) => {
-      const nextItems = libraryItems.filter(
-        (item) => !selectedItems.includes(item.id),
-      );
-      library.setLibrary(nextItems).catch(() => {
-        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
-      });
-      setSelectedItems([]);
-    },
-    [library, setAppState, selectedItems, setSelectedItems],
-  );
-
-  const resetLibrary = useCallback(() => {
-    library.resetLibrary();
-    focusContainer();
-  }, [library, focusContainer]);
-
   return (
-    <Sidebar
-      __isInternal
-      // necessary to remount when switching between internal
-      // and custom (host app) sidebar, so that the `props.onClose`
-      // is colled correctly
-      key="library"
-      className="layer-ui__library-sidebar"
-      initialDockedState={appState.isSidebarDocked}
-      onDock={(docked) => {
-        trackEvent(
-          "library",
-          `toggleLibraryDock (${docked ? "dock" : "undock"})`,
-          `sidebar (${device.isMobile ? "mobile" : "desktop"})`,
-        );
-      }}
-      ref={ref}
-    >
-      <Sidebar.Header className="layer-ui__library-header">
-        <LibraryMenuHeader
-          appState={appState}
-          setAppState={setAppState}
-          selectedItems={selectedItems}
-          onSelectItems={setSelectedItems}
-          library={library}
-          onRemoveFromLibrary={() =>
-            removeFromLibrary(libraryItemsData.libraryItems)
-          }
-          resetLibrary={resetLibrary}
-        />
-      </Sidebar.Header>
-      <LibraryMenuContent
-        pendingElements={getSelectedElements(elements, appState, true)}
-        onInsertLibraryItems={(libraryItems) => {
-          onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
-        }}
-        onAddToLibrary={deselectItems}
-        setAppState={setAppState}
-        libraryReturnUrl={libraryReturnUrl}
-        library={library}
-        id={id}
-        appState={appState}
-        selectedItems={selectedItems}
-        onSelectItems={setSelectedItems}
-      />
-    </Sidebar>
+    <LibraryMenuContent
+      pendingElements={pendingElements}
+      onInsertLibraryItems={onInsertLibraryItems}
+      onAddToLibrary={deselectItems}
+      setAppState={setAppState}
+      libraryReturnUrl={appProps.libraryReturnUrl}
+      library={memoizedLibrary}
+      id={id}
+      theme={appState.theme}
+      selectedItems={selectedItems}
+      onSelectItems={setSelectedItems}
+    />
   );
 };

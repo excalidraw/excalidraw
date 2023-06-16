@@ -1,4 +1,4 @@
-import { ColorPicker } from "../components/ColorPicker";
+import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
@@ -19,6 +19,9 @@ import {
   isEraserActive,
   isHandToolActive,
 } from "../appState";
+import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
+import { excludeElementsInFramesFromSelection } from "../scene/selection";
+import { Bounds } from "../element/bounds";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -35,24 +38,21 @@ export const actionChangeViewBackgroundColor = register({
       commitToHistory: !!value.viewBackgroundColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData, appProps }) => {
     // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
-      <div style={{ position: "relative" }}>
-        <ColorPicker
-          label={t("labels.canvasBackground")}
-          type="canvasBackground"
-          color={appState.viewBackgroundColor}
-          onChange={(color) => updateData({ viewBackgroundColor: color })}
-          isActive={appState.openPopup === "canvasColorPicker"}
-          setActive={(active) =>
-            updateData({ openPopup: active ? "canvasColorPicker" : null })
-          }
-          data-testid="canvas-background-picker"
-          elements={elements}
-          appState={appState}
-        />
-      </div>
+      <ColorPicker
+        palette={null}
+        topPicks={DEFAULT_CANVAS_BACKGROUND_PICKS}
+        label={t("labels.canvasBackground")}
+        type="canvasBackground"
+        color={appState.viewBackgroundColor}
+        onChange={(color) => updateData({ viewBackgroundColor: color })}
+        data-testid="canvas-background-picker"
+        elements={elements}
+        appState={appState}
+        updateData={updateData}
+      />
     );
   },
 });
@@ -208,7 +208,7 @@ export const actionResetZoom = register({
 });
 
 const zoomValueToFitBoundsOnViewport = (
-  bounds: [number, number, number, number],
+  bounds: Bounds,
   viewportDimensions: { width: number; height: number },
 ) => {
   const [x1, y1, x2, y2] = bounds;
@@ -226,7 +226,7 @@ const zoomValueToFitBoundsOnViewport = (
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
 
-const zoomToFitElements = (
+export const zoomToFitElements = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   zoomToSelection: boolean,
@@ -236,8 +236,10 @@ const zoomToFitElements = (
 
   const commonBounds =
     zoomToSelection && selectedElements.length > 0
-      ? getCommonBounds(selectedElements)
-      : getCommonBounds(nonDeletedElements);
+      ? getCommonBounds(excludeElementsInFramesFromSelection(selectedElements))
+      : getCommonBounds(
+          excludeElementsInFramesFromSelection(nonDeletedElements),
+        );
 
   const newZoom = {
     value: zoomValueToFitBoundsOnViewport(commonBounds, {

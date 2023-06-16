@@ -10,6 +10,7 @@ import {
   NonDeleted,
   GroupId,
   ExcalidrawBindableElement,
+  ExcalidrawFrameElement,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -30,12 +31,13 @@ import {
 import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
-import { getClientColors } from "../clients";
+import { getClientColor } from "../clients";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   isSelectedViaGroup,
   getSelectedGroupIds,
   getElementsInGroup,
+  selectGroupsFromGivenElements,
 } from "../groups";
 import { maxBindingGap } from "../element/collision";
 import {
@@ -44,24 +46,30 @@ import {
   isBindingEnabled,
 } from "../element/binding";
 import {
+  OMIT_SIDES_FOR_FRAME,
   shouldShowBoundingBox,
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
 import {
   viewportCoordsToSceneCoords,
-  supportsEmoji,
   throttleRAF,
+  isOnlyExportingSingleFrame,
 } from "../utils";
 import { UserIdleState } from "../types";
-import { THEME_FILTER } from "../constants";
+import { FRAME_STYLE, THEME_FILTER } from "../constants";
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
-import { isLinearElement } from "../element/typeChecks";
+import { isFrameElement, isLinearElement } from "../element/typeChecks";
+import {
+  elementOverlapsWithFrame,
+  getTargetFrame,
+  isElementInFrame,
+} from "../frame";
+import "canvas-roundrect-polyfill";
 
-const hasEmojiSupport = supportsEmoji();
 export const DEFAULT_SPACING = 2;
 
 const strokeRectWithRotation = (
@@ -74,6 +82,8 @@ const strokeRectWithRotation = (
   cy: number,
   angle: number,
   fill: boolean = false,
+  /** should account for zoom */
+  radius: number = 0,
 ) => {
   context.save();
   context.translate(cx, cy);
@@ -81,7 +91,14 @@ const strokeRectWithRotation = (
   if (fill) {
     context.fillRect(x - cx, y - cy, width, height);
   }
-  context.strokeRect(x - cx, y - cy, width, height);
+  if (radius && context.roundRect) {
+    context.beginPath();
+    context.roundRect(x - cx, y - cy, width, height, radius);
+    context.stroke();
+    context.closePath();
+  } else {
+    context.strokeRect(x - cx, y - cy, width, height);
+  }
   context.restore();
 };
 
@@ -159,7 +176,6 @@ const strokeGrid = (
 
 const renderSingleLinearPoint = (
   context: CanvasRenderingContext2D,
-  appState: AppState,
   renderConfig: RenderConfig,
   point: Point,
   radius: number,
@@ -206,14 +222,7 @@ const renderLinearPointHandles = (
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
-    renderSingleLinearPoint(
-      context,
-      appState,
-      renderConfig,
-      point,
-      radius,
-      isSelected,
-    );
+    renderSingleLinearPoint(context, renderConfig, point, radius, isSelected);
   });
 
   //Rendering segment mid points
@@ -237,7 +246,6 @@ const renderLinearPointHandles = (
       if (appState.editingLinearElement) {
         renderSingleLinearPoint(
           context,
-          appState,
           renderConfig,
           segmentMidPoint,
           radius,
@@ -248,7 +256,6 @@ const renderLinearPointHandles = (
         highlightPoint(segmentMidPoint, context, renderConfig);
         renderSingleLinearPoint(
           context,
-          appState,
           renderConfig,
           segmentMidPoint,
           radius,
@@ -258,7 +265,6 @@ const renderLinearPointHandles = (
     } else if (appState.editingLinearElement || points.length === 2) {
       renderSingleLinearPoint(
         context,
-        appState,
         renderConfig,
         segmentMidPoint,
         POINT_HANDLE_SIZE / 2,
@@ -312,6 +318,34 @@ const renderLinearElementPointHighlight = (
 
   highlightPoint(point, context, renderConfig);
   context.restore();
+};
+
+const frameClip = (
+  frame: ExcalidrawFrameElement,
+  context: CanvasRenderingContext2D,
+  renderConfig: RenderConfig,
+) => {
+  context.translate(
+    frame.x + renderConfig.scrollX,
+    frame.y + renderConfig.scrollY,
+  );
+  context.beginPath();
+  if (context.roundRect && !renderConfig.isExporting) {
+    context.roundRect(
+      0,
+      0,
+      frame.width,
+      frame.height,
+      FRAME_STYLE.radius / renderConfig.zoom.value,
+    );
+  } else {
+    context.rect(0, 0, frame.width, frame.height);
+  }
+  context.clip();
+  context.translate(
+    -(frame.x + renderConfig.scrollX),
+    -(frame.y + renderConfig.scrollY),
+  );
 };
 
 export const _renderScene = ({
@@ -405,11 +439,51 @@ export const _renderScene = ({
       }),
     );
 
+    const groupsToBeAddedToFrame = new Set<string>();
+
+    visibleElements.forEach((element) => {
+      if (
+        element.groupIds.length > 0 &&
+        appState.frameToHighlight &&
+        appState.selectedElementIds[element.id] &&
+        (elementOverlapsWithFrame(element, appState.frameToHighlight) ||
+          element.groupIds.find((groupId) =>
+            groupsToBeAddedToFrame.has(groupId),
+          ))
+      ) {
+        element.groupIds.forEach((groupId) =>
+          groupsToBeAddedToFrame.add(groupId),
+        );
+      }
+    });
+
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
+
     visibleElements.forEach((element) => {
       try {
-        renderElement(element, rc, context, renderConfig, appState);
+        // - when exporting the whole canvas, we DO NOT apply clipping
+        // - when we are exporting a particular frame, apply clipping
+        //   if the containing frame is not selected, apply clipping
+        const frameId = element.frameId || appState.frameToHighlight?.id;
+
+        if (
+          frameId &&
+          ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
+            (!renderConfig.isExporting && appState.shouldRenderFrames))
+        ) {
+          context.save();
+
+          const frame = getTargetFrame(element, appState);
+
+          if (frame && isElementInFrame(element, elements, appState)) {
+            frameClip(frame, context, renderConfig);
+          }
+          renderElement(element, rc, context, renderConfig, appState);
+          context.restore();
+        } else {
+          renderElement(element, rc, context, renderConfig, appState);
+        }
         // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
         // ShapeCache returns empty hence making sure that we get the
         // correct element from visible elements
@@ -458,7 +532,24 @@ export const _renderScene = ({
           renderBindingHighlight(context, renderConfig, suggestedBinding!);
         });
     }
+
+    if (appState.frameToHighlight) {
+      renderFrameHighlight(context, renderConfig, appState.frameToHighlight);
+    }
+
+    if (appState.elementsToHighlight) {
+      renderElementsBoxHighlight(
+        context,
+        renderConfig,
+        appState.elementsToHighlight,
+        appState,
+      );
+    }
+
     const locallySelectedElements = getSelectedElements(elements, appState);
+    const isFrameSelected = locallySelectedElements.some((element) =>
+      isFrameElement(element),
+    );
 
     // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
     // ShapeCache returns empty hence making sure that we get the
@@ -527,7 +618,7 @@ export const _renderScene = ({
             selectionColors.push(
               ...renderConfig.remoteSelectedElementIds[element.id].map(
                 (socketId) => {
-                  const { background } = getClientColors(socketId, appState);
+                  const background = getClientColor(socketId);
                   return background;
                 },
               ),
@@ -628,7 +719,9 @@ export const _renderScene = ({
           0,
           renderConfig.zoom,
           "mouse",
-          OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+          isFrameSelected
+            ? OMIT_SIDES_FOR_FRAME
+            : OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
         );
         if (locallySelectedElements.some((element) => !element.locked)) {
           renderTransformHandles(context, renderConfig, transformHandles, 0);
@@ -647,7 +740,7 @@ export const _renderScene = ({
       x -= appState.offsetLeft;
       y -= appState.offsetTop;
 
-      const width = 9;
+      const width = 11;
       const height = 14;
 
       const isOutOfBounds =
@@ -661,15 +754,20 @@ export const _renderScene = ({
       y = Math.max(y, 0);
       y = Math.min(y, normalizedCanvasHeight - height);
 
-      const { background, stroke } = getClientColors(clientId, appState);
+      const background = getClientColor(clientId);
 
       context.save();
-      context.strokeStyle = stroke;
+      context.strokeStyle = background;
       context.fillStyle = background;
 
       const userState = renderConfig.remotePointerUserStates[clientId];
-      if (isOutOfBounds || userState === UserIdleState.AWAY) {
-        context.globalAlpha = 0.48;
+      const isInactive =
+        isOutOfBounds ||
+        userState === UserIdleState.IDLE ||
+        userState === UserIdleState.AWAY;
+
+      if (isInactive) {
+        context.globalAlpha = 0.3;
       }
 
       if (
@@ -686,73 +784,86 @@ export const _renderScene = ({
         context.beginPath();
         context.arc(x, y, 15, 0, 2 * Math.PI, false);
         context.lineWidth = 1;
-        context.strokeStyle = stroke;
+        context.strokeStyle = background;
         context.stroke();
         context.closePath();
       }
 
+      // Background (white outline) for arrow
+      context.fillStyle = oc.white;
+      context.strokeStyle = oc.white;
+      context.lineWidth = 6;
+      context.lineJoin = "round";
       context.beginPath();
       context.moveTo(x, y);
-      context.lineTo(x + 1, y + 14);
+      context.lineTo(x + 0, y + 14);
       context.lineTo(x + 4, y + 9);
-      context.lineTo(x + 9, y + 10);
-      context.lineTo(x, y);
-      context.fill();
+      context.lineTo(x + 11, y + 8);
+      context.closePath();
       context.stroke();
+      context.fill();
 
-      const username = renderConfig.remotePointerUsernames[clientId];
-
-      let idleState = "";
-      if (userState === UserIdleState.AWAY) {
-        idleState = hasEmojiSupport ? "⚫️" : ` (${UserIdleState.AWAY})`;
-      } else if (userState === UserIdleState.IDLE) {
-        idleState = hasEmojiSupport ? "💤" : ` (${UserIdleState.IDLE})`;
+      // Arrow
+      context.fillStyle = background;
+      context.strokeStyle = background;
+      context.lineWidth = 2;
+      context.lineJoin = "round";
+      context.beginPath();
+      if (isInactive) {
+        context.moveTo(x - 1, y - 1);
+        context.lineTo(x - 1, y + 15);
+        context.lineTo(x + 5, y + 10);
+        context.lineTo(x + 12, y + 9);
+        context.closePath();
+        context.fill();
+      } else {
+        context.moveTo(x, y);
+        context.lineTo(x + 0, y + 14);
+        context.lineTo(x + 4, y + 9);
+        context.lineTo(x + 11, y + 8);
+        context.closePath();
+        context.fill();
+        context.stroke();
       }
 
-      const usernameAndIdleState = `${username || ""}${
-        idleState ? ` ${idleState}` : ""
-      }`;
+      const username = renderConfig.remotePointerUsernames[clientId] || "";
 
-      if (!isOutOfBounds && usernameAndIdleState) {
-        const offsetX = x + width;
-        const offsetY = y + height;
-        const paddingHorizontal = 4;
-        const paddingVertical = 4;
-        const measure = context.measureText(usernameAndIdleState);
+      if (!isOutOfBounds && username) {
+        context.font = "600 12px sans-serif"; // font has to be set before context.measureText()
+
+        const offsetX = x + width / 2;
+        const offsetY = y + height + 2;
+        const paddingHorizontal = 5;
+        const paddingVertical = 3;
+        const measure = context.measureText(username);
         const measureHeight =
           measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
+        const finalHeight = Math.max(measureHeight, 12);
 
         const boxX = offsetX - 1;
         const boxY = offsetY - 1;
-        const boxWidth = measure.width + 2 * paddingHorizontal + 2;
-        const boxHeight = measureHeight + 2 * paddingVertical + 2;
+        const boxWidth = measure.width + 2 + paddingHorizontal * 2 + 2;
+        const boxHeight = finalHeight + 2 + paddingVertical * 2 + 2;
         if (context.roundRect) {
           context.beginPath();
-          context.roundRect(
-            boxX,
-            boxY,
-            boxWidth,
-            boxHeight,
-            4 / renderConfig.zoom.value,
-          );
+          context.roundRect(boxX, boxY, boxWidth, boxHeight, 8);
           context.fillStyle = background;
           context.fill();
-          context.fillStyle = stroke;
+          context.strokeStyle = oc.white;
           context.stroke();
         } else {
-          // Border
-          context.fillStyle = stroke;
-          context.fillRect(boxX, boxY, boxWidth, boxHeight);
-          // Background
-          context.fillStyle = background;
-          context.fillRect(offsetX, offsetY, boxWidth - 2, boxHeight - 2);
+          roundRect(context, boxX, boxY, boxWidth, boxHeight, 8, oc.white);
         }
-        context.fillStyle = oc.white;
+        context.fillStyle = oc.black;
 
         context.fillText(
-          usernameAndIdleState,
-          offsetX + paddingHorizontal,
-          offsetY + paddingVertical + measure.actualBoundingBoxAscent,
+          username,
+          offsetX + paddingHorizontal + 1,
+          offsetY +
+            paddingVertical +
+            measure.actualBoundingBoxAscent +
+            Math.floor((finalHeight - measureHeight) / 2) +
+            2,
         );
       }
 
@@ -971,6 +1082,7 @@ const renderBindingHighlightForBindableElement = (
     case "rectangle":
     case "text":
     case "image":
+    case "frame":
       strokeRectWithRotation(
         context,
         x1 - padding,
@@ -1006,6 +1118,82 @@ const renderBindingHighlightForBindableElement = (
       );
       break;
   }
+};
+
+const renderFrameHighlight = (
+  context: CanvasRenderingContext2D,
+  renderConfig: RenderConfig,
+  frame: NonDeleted<ExcalidrawFrameElement>,
+) => {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame);
+  const width = x2 - x1;
+  const height = y2 - y1;
+
+  context.strokeStyle = "rgb(0,118,255)";
+  context.lineWidth = (FRAME_STYLE.strokeWidth * 2) / renderConfig.zoom.value;
+
+  context.save();
+  context.translate(renderConfig.scrollX, renderConfig.scrollY);
+  strokeRectWithRotation(
+    context,
+    x1,
+    y1,
+    width,
+    height,
+    x1 + width / 2,
+    y1 + height / 2,
+    frame.angle,
+    false,
+    FRAME_STYLE.radius / renderConfig.zoom.value,
+  );
+  context.restore();
+};
+
+const renderElementsBoxHighlight = (
+  context: CanvasRenderingContext2D,
+  renderConfig: RenderConfig,
+  elements: NonDeleted<ExcalidrawElement>[],
+  appState: AppState,
+) => {
+  const individualElements = elements.filter(
+    (element) => element.groupIds.length === 0,
+  );
+
+  const elementsInGroups = elements.filter(
+    (element) => element.groupIds.length > 0,
+  );
+
+  const getSelectionFromElements = (elements: ExcalidrawElement[]) => {
+    const [elementX1, elementY1, elementX2, elementY2] =
+      getCommonBounds(elements);
+    return {
+      angle: 0,
+      elementX1,
+      elementX2,
+      elementY1,
+      elementY2,
+      selectionColors: ["rgb(0,118,255)"],
+      dashed: false,
+      cx: elementX1 + (elementX2 - elementX1) / 2,
+      cy: elementY1 + (elementY2 - elementY1) / 2,
+    };
+  };
+
+  const getSelectionForGroupId = (groupId: GroupId) => {
+    const groupElements = getElementsInGroup(elements, groupId);
+    return getSelectionFromElements(groupElements);
+  };
+
+  Object.entries(selectGroupsFromGivenElements(elementsInGroups, appState))
+    .filter(([id, isSelected]) => isSelected)
+    .map(([id, isSelected]) => id)
+    .map((groupId) => getSelectionForGroupId(groupId))
+    .concat(
+      individualElements.map((element) => getSelectionFromElements([element])),
+    )
+    .forEach((selection) =>
+      renderSelectionBorder(context, renderConfig, selection),
+    );
 };
 
 const renderBindingHighlightForSuggestedPointBinding = (
@@ -1089,7 +1277,7 @@ const renderLinkIcon = (
   }
 };
 
-const isVisibleElement = (
+export const isVisibleElement = (
   element: ExcalidrawElement,
   canvasWidth: number,
   canvasHeight: number,
@@ -1135,17 +1323,20 @@ export const renderSceneToSvg = (
     offsetX = 0,
     offsetY = 0,
     exportWithDarkMode = false,
+    exportingFrameId = null,
   }: {
     offsetX?: number;
     offsetY?: number;
     exportWithDarkMode?: boolean;
+    exportingFrameId?: string | null;
   } = {},
 ) => {
   if (!svgRoot) {
     return;
   }
+
   // render elements
-  elements.forEach((element, index) => {
+  elements.forEach((element) => {
     if (!element.isDeleted) {
       try {
         renderElementToSvg(
@@ -1156,6 +1347,7 @@ export const renderSceneToSvg = (
           element.x + offsetX,
           element.y + offsetY,
           exportWithDarkMode,
+          exportingFrameId,
         );
       } catch (error: any) {
         console.error(error);

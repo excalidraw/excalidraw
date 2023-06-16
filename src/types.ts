@@ -1,3 +1,4 @@
+import React from "react";
 import {
   PointerType,
   ExcalidrawLinearElement,
@@ -14,6 +15,7 @@ import {
   ExcalidrawImageElement,
   Theme,
   StrokeRoundness,
+  ExcalidrawFrameElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -29,8 +31,9 @@ import { isOverScrollBars } from "./scene";
 import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
-import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
+import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
+import { Merge, ForwardRef, ValueOf } from "./utility-types";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -58,7 +61,7 @@ export type DataURL = string & { _brand: "DataURL" };
 
 export type BinaryFileData = {
   mimeType:
-    | typeof ALLOWED_IMAGE_MIME_TYPES[number]
+    | ValueOf<typeof IMAGE_MIME_TYPES>
     // future user or unknown file type
     | typeof MIME_TYPES.binary;
   id: FileId;
@@ -83,7 +86,7 @@ export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
 export type LastActiveTool =
   | {
-      type: typeof SHAPES[number]["value"] | "eraser" | "hand";
+      type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame";
       customType: null;
     }
   | {
@@ -91,6 +94,9 @@ export type LastActiveTool =
       customType: string;
     }
   | null;
+
+export type SidebarName = string;
+export type SidebarTabName = string;
 
 export type AppState = {
   contextMenu: {
@@ -100,7 +106,7 @@ export type AppState = {
   } | null;
   showWelcomeScreen: boolean;
   isLoading: boolean;
-  errorMessage: string | null;
+  errorMessage: React.ReactNode;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
@@ -108,6 +114,10 @@ export type AppState = {
   isBindingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
+  frameToHighlight: NonDeleted<ExcalidrawFrameElement> | null;
+  shouldRenderFrames: boolean;
+  editingFrame: string | null;
+  elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   // element being edited, but not necessarily added to elements array yet
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
@@ -121,7 +131,7 @@ export type AppState = {
     locked: boolean;
   } & (
     | {
-        type: typeof SHAPES[number]["value"] | "eraser" | "hand";
+        type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame";
         customType: null;
       }
     | {
@@ -157,20 +167,23 @@ export type AppState = {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
-  // mobile-only
   openMenu: "canvas" | "shape" | null;
-  openPopup:
-    | "canvasColorPicker"
-    | "backgroundColorPicker"
-    | "strokeColorPicker"
-    | null;
-  openSidebar: "library" | "customSidebar" | null;
+  openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
+  openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog: "imageExport" | "help" | "jsonExport" | null;
-  isSidebarDocked: boolean;
+  /**
+   * Reflects user preference for whether the default sidebar should be docked.
+   *
+   * NOTE this is only a user preference and does not reflect the actual docked
+   * state of the sidebar, because the host apps can override this through
+   * a DefaultSidebar prop, which is not reflected back to the appState.
+   */
+  defaultSidebarDockedPreference: boolean;
 
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
+  selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
   toast: { message: string; closable?: boolean; duration?: number } | null;
   zenModeEnabled: boolean;
@@ -206,6 +219,15 @@ export type AppState = {
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
 };
+
+export type UIAppState = Omit<
+  AppState,
+  | "suggestedBindings"
+  | "startBoundElement"
+  | "cursorButton"
+  | "scrollX"
+  | "scrollY"
+>;
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
 
@@ -303,7 +325,7 @@ export interface ExcalidrawProps {
   ) => Promise<boolean> | boolean;
   renderTopRightUI?: (
     isMobile: boolean,
-    appState: AppState,
+    appState: UIAppState,
   ) => JSX.Element | null;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
@@ -314,7 +336,7 @@ export interface ExcalidrawProps {
   name?: string;
   renderCustomStats?: (
     elements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
+    appState: UIAppState,
   ) => JSX.Element;
   UIOptions?: Partial<UIOptions>;
   detectScroll?: boolean;
@@ -333,10 +355,6 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
-  /**
-   * Render function that renders custom <Sidebar /> component.
-   */
-  renderSidebar?: () => JSX.Element | null;
   children?: React.ReactNode;
 }
 
@@ -357,13 +375,13 @@ export type ExportOpts = {
   saveFileToDisk?: boolean;
   onExportToBackend?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
+    appState: UIAppState,
     files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
   ) => void;
   renderCustomUI?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
+    appState: UIAppState,
     files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
   ) => JSX.Element;
@@ -385,15 +403,16 @@ type CanvasActions = Partial<{
 
 type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
-  welcomeScreen: boolean;
   canvasActions: CanvasActions;
+  /** @deprecated does nothing. Will be removed in 0.15 */
+  welcomeScreen?: boolean;
 }>;
 
 export type AppProps = Merge<
   ExcalidrawProps,
   {
     UIOptions: Merge<
-      MarkRequired<UIOptions, "welcomeScreen">,
+      UIOptions,
       {
         canvasActions: Required<CanvasActions> & { export: ExportOpts };
       }
@@ -416,13 +435,17 @@ export type AppClassProperties = {
     FileId,
     {
       image: HTMLImageElement | Promise<HTMLImageElement>;
-      mimeType: typeof ALLOWED_IMAGE_MIME_TYPES[number];
+      mimeType: ValueOf<typeof IMAGE_MIME_TYPES>;
     }
   >;
   files: BinaryFiles;
   device: App["device"];
   scene: App["scene"];
   pasteFromClipboard: App["pasteFromClipboard"];
+  id: App["id"];
+  onInsertElements: App["onInsertElements"];
+  onExportImage: App["onExportImage"];
+  lastViewportPosition: App["lastViewportPosition"];
 };
 
 export type PointerDownState = Readonly<{
@@ -515,7 +538,13 @@ export type ExcalidrawImperativeAPI = {
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
-  toggleMenu: InstanceType<typeof App>["toggleMenu"];
+  toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
+  /**
+   * Disables rendering of frames (including element clipping), but currently
+   * the frames are still interactive in edit mode. As such, this API should be
+   * used in conjunction with view mode (props.viewModeEnabled).
+   */
+  toggleFrameRendering: InstanceType<typeof App>["toggleFrameRendering"];
 };
 
 export type Device = Readonly<{
@@ -523,34 +552,24 @@ export type Device = Readonly<{
   isMobile: boolean;
   isTouchScreen: boolean;
   canDeviceFitSidebar: boolean;
+  isLandscape: boolean;
 }>;
 
-export type UIChildrenComponents = {
-  [k in "FooterCenter" | "Menu" | "WelcomeScreen"]?: React.ReactElement<
-    { children?: React.ReactNode },
-    React.JSXElementConstructor<any>
-  >;
+type FrameNameBounds = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  angle: number;
 };
 
-export type UIWelcomeScreenComponents = {
-  [k in
-    | "Center"
-    | "MenuHint"
-    | "ToolbarHint"
-    | "HelpHint"]?: React.ReactElement<
-    { children?: React.ReactNode },
-    React.JSXElementConstructor<any>
-  >;
-};
-
-export type UIWelcomeScreenCenterComponents = {
-  [k in
-    | "Logo"
-    | "Heading"
-    | "Menu"
-    | "MenuItemLoadScene"
-    | "MenuItemHelp"]?: React.ReactElement<
-    { children?: React.ReactNode },
-    React.JSXElementConstructor<any>
+export type FrameNameBoundsCache = {
+  get: (frameElement: ExcalidrawFrameElement) => FrameNameBounds | null;
+  _cache: Map<
+    string,
+    FrameNameBounds & {
+      zoom: AppState["zoom"]["value"];
+      versionNonce: ExcalidrawFrameElement["versionNonce"];
+    }
   >;
 };
