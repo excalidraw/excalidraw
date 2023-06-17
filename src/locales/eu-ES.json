@@ -124,9 +124,9 @@
     },
     "statusPublished": "Argitaratua",
     "sidebarLock": "Mantendu alboko barra irekita",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Hautatu markoko elementu guztiak",
+    "removeAllElementsFromFrame": "Kendu markoko elementu guztiak",
+    "eyeDropper": "Aukeratu kolorea oihaletik"
   },
   "library": {
     "noItems": "Oraindik ez da elementurik gehitu...",
@@ -223,9 +223,9 @@
     "penMode": "Luma modua - ukipena saihestu",
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma",
-    "frame": "",
+    "frame": "Markoren tresna",
     "hand": "Eskua (panoratze tresna)",
-    "extraTools": ""
+    "extraTools": "Tresna gehiago"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -360,14 +360,14 @@
     "removeItemsFromLib": "Kendu hautatutako elementuak liburutegitik"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Esportatu irudia",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Atzeko planoa",
+      "onlySelected": "Hautapena soilik",
+      "darkMode": "Modu iluna",
+      "embedScene": "Txertatu eszena",
+      "scale": "Eskala",
+      "padding": "Betegarria"
     },
     "tooltip": {
       "embedScene": ""
