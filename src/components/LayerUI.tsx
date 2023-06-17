@@ -1,18 +1,23 @@
 import clsx from "clsx";
 import React from "react";
 import { ActionManager } from "../actions/manager";
-import { CLASSES, LIBRARY_SIDEBAR_WIDTH } from "../constants";
-import { exportCanvas } from "../data";
+import { CLASSES, DEFAULT_SIDEBAR, LIBRARY_SIDEBAR_WIDTH } from "../constants";
 import { isTextElement, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
-import { ExportType } from "../scene/types";
-import { AppProps, AppState, ExcalidrawProps, BinaryFiles } from "../types";
-import { isShallowEqual, muteFSAbortError } from "../utils";
+import {
+  AppProps,
+  AppState,
+  ExcalidrawProps,
+  BinaryFiles,
+  UIAppState,
+  AppClassProperties,
+} from "../types";
+import { capitalizeString, isShallowEqual } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { ErrorDialog } from "./ErrorDialog";
-import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
+import { ImageExportDialog } from "./ImageExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HintViewer } from "./HintViewer";
 import { Island } from "./Island";
@@ -24,32 +29,32 @@ import { Section } from "./Section";
 import { HelpDialog } from "./HelpDialog";
 import Stack from "./Stack";
 import { UserList } from "./UserList";
-import Library from "../data/library";
 import { JSONExportDialog } from "./JSONExportDialog";
-import { LibraryButton } from "./LibraryButton";
-import { isImageFileHandle } from "../data/blob";
-import { LibraryMenu } from "./LibraryMenu";
-
-import "./LayerUI.scss";
-import "./Toolbar.scss";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
 import { useDevice } from "../components/App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
-import { hostSidebarCountersAtom } from "./Sidebar/Sidebar";
+import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
-import { Provider, useAtom } from "jotai";
+import { Provider, useAtom, useAtomValue } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
-import { TunnelsContext, useInitializeTunnels } from "./context/tunnels";
+import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
+import { LibraryIcon } from "./icons";
+import { UIAppStateContext } from "../context/ui-appState";
+import { DefaultSidebar } from "./DefaultSidebar";
+import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
+
+import "./LayerUI.scss";
+import "./Toolbar.scss";
 
 interface LayerUIProps {
   actionManager: ActionManager;
-  appState: AppState;
+  appState: UIAppState;
   files: BinaryFiles;
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
@@ -57,18 +62,13 @@ interface LayerUIProps {
   onLockToggle: () => void;
   onHandToolToggle: () => void;
   onPenModeToggle: () => void;
-  onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
-  renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
-  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   UIOptions: AppProps["UIOptions"];
-  focusContainer: () => void;
-  library: Library;
-  id: string;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
+  onExportImage: AppClassProperties["onExportImage"];
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
 }
@@ -109,22 +109,22 @@ const LayerUI = ({
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
-  onInsertElements,
   showExitZenModeBtn,
   renderTopRightUI,
   renderCustomStats,
-  renderCustomSidebar,
-  libraryReturnUrl,
   UIOptions,
-  focusContainer,
-  library,
-  id,
   onImageAction,
+  onExportImage,
   renderWelcomeScreen,
   children,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
+
+  const [eyeDropperState, setEyeDropperState] = useAtom(
+    activeEyeDropperAtom,
+    jotaiScope,
+  );
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -149,46 +149,14 @@ const LayerUI = ({
       return null;
     }
 
-    const createExporter =
-      (type: ExportType): ExportCB =>
-      async (exportedElements) => {
-        trackEvent("export", type, "ui");
-        const fileHandle = await exportCanvas(
-          type,
-          exportedElements,
-          appState,
-          files,
-          {
-            exportBackground: appState.exportBackground,
-            name: appState.name,
-            viewBackgroundColor: appState.viewBackgroundColor,
-          },
-        )
-          .catch(muteFSAbortError)
-          .catch((error) => {
-            console.error(error);
-            setAppState({ errorMessage: error.message });
-          });
-
-        if (
-          appState.exportEmbedScene &&
-          fileHandle &&
-          isImageFileHandle(fileHandle)
-        ) {
-          setAppState({ fileHandle });
-        }
-      };
-
     return (
       <ImageExportDialog
         elements={elements}
         appState={appState}
-        setAppState={setAppState}
         files={files}
         actionManager={actionManager}
-        onExportToPng={createExporter("png")}
-        onExportToSvg={createExporter("svg")}
-        onExportToClipboard={createExporter("clipboard")}
+        onExportImage={onExportImage}
+        onCloseRequest={() => setAppState({ openDialog: null })}
       />
     );
   };
@@ -197,8 +165,8 @@ const LayerUI = ({
     <div style={{ position: "relative" }}>
       {/* wrapping to Fragment stops React from occasionally complaining
                 about identical Keys */}
-      <tunnels.mainMenuTunnel.Out />
-      {renderWelcomeScreen && <tunnels.welcomeScreenMenuHintTunnel.Out />}
+      <tunnels.MainMenuTunnel.Out />
+      {renderWelcomeScreen && <tunnels.WelcomeScreenMenuHintTunnel.Out />}
     </div>
   );
 
@@ -236,12 +204,7 @@ const LayerUI = ({
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
-          <Stack.Col
-            gap={6}
-            className={clsx("App-menu_top__left", {
-              "disable-pointerEvents": appState.zenModeEnabled,
-            })}
-          >
+          <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
             {renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
@@ -250,7 +213,7 @@ const LayerUI = ({
               {(heading: React.ReactNode) => (
                 <div style={{ position: "relative" }}>
                   {renderWelcomeScreen && (
-                    <tunnels.welcomeScreenToolbarHintTunnel.Out />
+                    <tunnels.WelcomeScreenToolbarHintTunnel.Out />
                   )}
                   <Stack.Col gap={4} align="start">
                     <Stack.Row
@@ -286,7 +249,7 @@ const LayerUI = ({
                             title={t("toolBar.lock")}
                           />
 
-                          <div className="App-toolbar__divider"></div>
+                          <div className="App-toolbar__divider" />
 
                           <HandButton
                             checked={isHandToolActive(appState)}
@@ -324,9 +287,12 @@ const LayerUI = ({
           >
             <UserList collaborators={appState.collaborators} />
             {renderTopRightUI?.(device.isMobile, appState)}
-            {!appState.viewModeEnabled && (
-              <LibraryButton appState={appState} setAppState={setAppState} />
-            )}
+            {!appState.viewModeEnabled &&
+              // hide button when sidebar docked
+              (!isSidebarDocked ||
+                appState.openSidebar?.name !== DEFAULT_SIDEBAR.name) && (
+                <tunnels.DefaultSidebarTriggerTunnel.Out />
+              )}
           </div>
         </div>
       </FixedSideContainer>
@@ -334,21 +300,21 @@ const LayerUI = ({
   };
 
   const renderSidebars = () => {
-    return appState.openSidebar === "customSidebar" ? (
-      renderCustomSidebar?.() || null
-    ) : appState.openSidebar === "library" ? (
-      <LibraryMenu
-        appState={appState}
-        onInsertElements={onInsertElements}
-        libraryReturnUrl={libraryReturnUrl}
-        focusContainer={focusContainer}
-        library={library}
-        id={id}
+    return (
+      <DefaultSidebar
+        __fallback
+        onDock={(docked) => {
+          trackEvent(
+            "sidebar",
+            `toggleDock (${docked ? "dock" : "undock"})`,
+            `(${device.isMobile ? "mobile" : "desktop"})`,
+          );
+        }}
       />
-    ) : null;
+    );
   };
 
-  const [hostSidebarCounters] = useAtom(hostSidebarCountersAtom, jotaiScope);
+  const isSidebarDocked = useAtomValue(isSidebarDockedAtom, jotaiScope);
 
   const layerUIJSX = (
     <>
@@ -358,8 +324,25 @@ const LayerUI = ({
       {children}
       {/* render component fallbacks. Can be rendered anywhere as they'll be
           tunneled away. We only render tunneled components that actually
-          have defaults when host do not render anything. */}
+        have defaults when host do not render anything. */}
       <DefaultMainMenu UIOptions={UIOptions} />
+      <DefaultSidebar.Trigger
+        __fallback
+        icon={LibraryIcon}
+        title={capitalizeString(t("toolBar.library"))}
+        onToggle={(open) => {
+          if (open) {
+            trackEvent(
+              "sidebar",
+              `${DEFAULT_SIDEBAR.name} (open)`,
+              `button (${device.isMobile ? "mobile" : "desktop"})`,
+            );
+          }
+        }}
+        tab={DEFAULT_SIDEBAR.defaultTab}
+      >
+        {t("toolBar.library")}
+      </DefaultSidebar.Trigger>
       {/* ------------------------------------------------------------------ */}
 
       {appState.isLoading && <LoadingMessage delay={250} />}
@@ -367,6 +350,21 @@ const LayerUI = ({
         <ErrorDialog onClose={() => setAppState({ errorMessage: null })}>
           {appState.errorMessage}
         </ErrorDialog>
+      )}
+      {eyeDropperState && !device.isMobile && (
+        <EyeDropper
+          swapPreviewOnAlt={eyeDropperState.swapPreviewOnAlt}
+          previewType={eyeDropperState.previewType}
+          onCancel={() => {
+            setEyeDropperState(null);
+          }}
+          onSelect={(color, event) => {
+            setEyeDropperState((state) => {
+              return state?.keepOpenOnAlt && event.altKey ? state : null;
+            });
+            eyeDropperState?.onSelect?.(color, event);
+          }}
+        />
       )}
       {appState.openDialog === "help" && (
         <HelpDialog
@@ -382,7 +380,6 @@ const LayerUI = ({
         <PasteChartDialog
           setAppState={setAppState}
           appState={appState}
-          onInsertChart={onInsertElements}
           onClose={() =>
             setAppState({
               pasteDialog: { shown: false, data: null },
@@ -390,7 +387,7 @@ const LayerUI = ({
           }
         />
       )}
-      {device.isMobile && (
+      {device.isMobile && !eyeDropperState && (
         <MobileMenu
           appState={appState}
           elements={elements}
@@ -410,7 +407,6 @@ const LayerUI = ({
           renderWelcomeScreen={renderWelcomeScreen}
         />
       )}
-
       {!device.isMobile && (
         <>
           <div
@@ -422,15 +418,14 @@ const LayerUI = ({
                   !isTextElement(appState.editingElement)),
             })}
             style={
-              ((appState.openSidebar === "library" &&
-                appState.isSidebarDocked) ||
-                hostSidebarCounters.docked) &&
+              appState.openSidebar &&
+              isSidebarDocked &&
               device.canDeviceFitSidebar
                 ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
                 : {}
             }
           >
-            {renderWelcomeScreen && <tunnels.welcomeScreenCenterTunnel.Out />}
+            {renderWelcomeScreen && <tunnels.WelcomeScreenCenterTunnel.Out />}
             {renderFixedSideContainer()}
             <Footer
               appState={appState}
@@ -453,9 +448,9 @@ const LayerUI = ({
               <button
                 className="scroll-back-to-content"
                 onClick={() => {
-                  setAppState({
+                  setAppState((appState) => ({
                     ...calculateScrollCenter(elements, appState, canvas),
-                  });
+                  }));
                 }}
               >
                 {t("buttons.scrollBackToContent")}
@@ -469,19 +464,25 @@ const LayerUI = ({
   );
 
   return (
-    <Provider scope={tunnels.jotaiScope}>
-      <TunnelsContext.Provider value={tunnels}>
-        {layerUIJSX}
-      </TunnelsContext.Provider>
-    </Provider>
+    <UIAppStateContext.Provider value={appState}>
+      <Provider scope={tunnels.jotaiScope}>
+        <TunnelsContext.Provider value={tunnels}>
+          {layerUIJSX}
+        </TunnelsContext.Provider>
+      </Provider>
+    </UIAppStateContext.Provider>
   );
 };
 
-const stripIrrelevantAppStateProps = (
-  appState: AppState,
-): Partial<AppState> => {
-  const { suggestedBindings, startBoundElement, cursorButton, ...ret } =
-    appState;
+const stripIrrelevantAppStateProps = (appState: AppState): UIAppState => {
+  const {
+    suggestedBindings,
+    startBoundElement,
+    cursorButton,
+    scrollX,
+    scrollY,
+    ...ret
+  } = appState;
   return ret;
 };
 
@@ -491,24 +492,19 @@ const areEqual = (prevProps: LayerUIProps, nextProps: LayerUIProps) => {
     return false;
   }
 
-  const {
-    canvas: _prevCanvas,
-    // not stable, but shouldn't matter in our case
-    onInsertElements: _prevOnInsertElements,
-    appState: prevAppState,
-    ...prev
-  } = prevProps;
-  const {
-    canvas: _nextCanvas,
-    onInsertElements: _nextOnInsertElements,
-    appState: nextAppState,
-    ...next
-  } = nextProps;
+  const { canvas: _prevCanvas, appState: prevAppState, ...prev } = prevProps;
+  const { canvas: _nextCanvas, appState: nextAppState, ...next } = nextProps;
 
   return (
     isShallowEqual(
-      stripIrrelevantAppStateProps(prevAppState),
-      stripIrrelevantAppStateProps(nextAppState),
+      // asserting AppState because we're being passed the whole AppState
+      // but resolve to only the UI-relevant props
+      stripIrrelevantAppStateProps(prevAppState as AppState),
+      stripIrrelevantAppStateProps(nextAppState as AppState),
+      {
+        selectedElementIds: isShallowEqual,
+        selectedGroupIds: isShallowEqual,
+      },
     ) && isShallowEqual(prev, next)
   );
 };

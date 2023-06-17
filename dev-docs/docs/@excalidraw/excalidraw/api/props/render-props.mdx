@@ -3,7 +3,7 @@
 ## renderTopRightUI
 
 <pre>
-  (isMobile: boolean, appState:{" "}
+  (isMobile: boolean, appState:
   <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">
     AppState
   </a>
@@ -29,8 +29,7 @@ function App() {
               }}
               onClick={() => window.alert("This is dummy top right UI")}
             >
-              {" "}
-              Click me{" "}
+              Click me
             </button>
           );
         }}
@@ -55,8 +54,7 @@ function App() {
       <Excalidraw
         renderCustomStats={() => (
           <p style={{ color: "#70b1ec", fontWeight: "bold" }}>
-            {" "}
-            Dummy stats will be shown here{" "}
+            Dummy stats will be shown here
           </p>
         )}
       />
@@ -105,8 +103,7 @@ function App() {
   return (
     <div style={{ height: "500px" }}>
       <button className="custom-button" onClick={() => excalidrawAPI.toggleMenu("customSidebar")}>
-        {" "}
-        Toggle Custom Sidebar{" "}
+        Toggle Custom Sidebar
       </button>
       <Excalidraw
         UIOptions={{ dockedSidebarBreakpoint: 100 }}

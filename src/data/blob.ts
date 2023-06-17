@@ -155,7 +155,7 @@ export const loadSceneOrLibraryFromBlob = async (
           },
           localAppState,
           localElements,
-          { repairBindings: true, refreshDimensions: true },
+          { repairBindings: true, refreshDimensions: false },
         ),
       };
     } else if (isValidLibrary(data)) {

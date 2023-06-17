@@ -1,10 +1,6 @@
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { useI18n } from "../../i18n";
-import {
-  useExcalidrawAppState,
-  useExcalidrawSetAppState,
-  useExcalidrawActionManager,
-} from "../App";
+import { useExcalidrawSetAppState, useExcalidrawActionManager } from "../App";
 import {
   ExportIcon,
   ExportImageIcon,
@@ -32,6 +28,7 @@ import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { jotaiScope } from "../../jotai";
+import { useUIAppState } from "../../context/ui-appState";
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -139,7 +136,7 @@ ClearCanvas.displayName = "ClearCanvas";
 
 export const ToggleTheme = () => {
   const { t } = useI18n();
-  const appState = useExcalidrawAppState();
+  const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
 
   if (!actionManager.isActionEnabled(actionToggleTheme)) {
@@ -172,7 +169,7 @@ ToggleTheme.displayName = "ToggleTheme";
 
 export const ChangeCanvasBackground = () => {
   const { t } = useI18n();
-  const appState = useExcalidrawAppState();
+  const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
 
   if (appState.viewModeEnabled) {

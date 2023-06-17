@@ -10,7 +10,7 @@ import { API } from "../helpers/api";
 import { getDefaultAppState } from "../../appState";
 import { ImportedDataState } from "../../data/types";
 import { NormalizedZoomValue } from "../../types";
-import { FONT_FAMILY, ROUNDNESS } from "../../constants";
+import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "../../constants";
 import { newElementWith } from "../../element/mutateElement";
 
 describe("restoreElements", () => {
@@ -452,6 +452,29 @@ describe("restoreAppState", () => {
 
       expect(restoredAppState.zoom).toMatchObject(getDefaultAppState().zoom);
     });
+  });
+
+  it("should handle appState.openSidebar legacy values", () => {
+    expect(restore.restoreAppState({}, null).openSidebar).toBe(null);
+    expect(
+      restore.restoreAppState({ openSidebar: "library" } as any, null)
+        .openSidebar,
+    ).toEqual({ name: DEFAULT_SIDEBAR.name });
+    expect(
+      restore.restoreAppState({ openSidebar: "xxx" } as any, null).openSidebar,
+    ).toEqual({ name: DEFAULT_SIDEBAR.name });
+    // while "library" was our legacy sidebar name, we can't assume it's legacy
+    // value as it may be some host app's custom sidebar name ¯\_(ツ)_/¯
+    expect(
+      restore.restoreAppState({ openSidebar: { name: "library" } } as any, null)
+        .openSidebar,
+    ).toEqual({ name: "library" });
+    expect(
+      restore.restoreAppState(
+        { openSidebar: { name: DEFAULT_SIDEBAR.name, tab: "ola" } } as any,
+        null,
+      ).openSidebar,
+    ).toEqual({ name: DEFAULT_SIDEBAR.name, tab: "ola" });
   });
 });
 
