@@ -58,6 +58,8 @@ describe("crop element", () => {
       eastCropAmount: 0,
       northCropAmount: 0,
       southCropAmount: 0,
+
+      frameId: null,
     };
 
     stateAtCropStart = { ...element };

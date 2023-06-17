@@ -117,7 +117,7 @@ export type ActionName =
   | "toggleEraserTool"
   | "toggleHandTool"
   | "wrapTextInContainer"
-  | "cropImage";
+  | "cropImage"
   | "selectAllElementsInFrame"
   | "removeAllElementsFromFrame"
   | "toggleFrameRendering"
