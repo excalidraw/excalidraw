@@ -30,7 +30,11 @@ import {
 } from "../scene/scrollbars";
 import { getSelectedElements } from "../scene/selection";
 
-import { renderElement, renderElementToSvg } from "./renderElement";
+import {
+  invalidateShapeForElement,
+  renderElement,
+  renderElementToSvg,
+} from "./renderElement";
 import { getClientColor } from "../clients";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -62,7 +66,16 @@ import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
-import { isFrameElement, isLinearElement } from "../element/typeChecks";
+import {
+  isIFrameElement,
+  isFrameElement,
+  isLinearElement,
+} from "../element/typeChecks";
+import { getBoundTextElement } from "../element/textElement";
+import {
+  isIFrameOrFrameLabel,
+  createPlaceholderiFrameLabel,
+} from "../element/iframe";
 import {
   elementOverlapsWithFrame,
   getTargetFrame,
@@ -460,46 +473,101 @@ export const _renderScene = ({
     let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
       undefined;
 
-    visibleElements.forEach((element) => {
-      try {
-        // - when exporting the whole canvas, we DO NOT apply clipping
-        // - when we are exporting a particular frame, apply clipping
-        //   if the containing frame is not selected, apply clipping
-        const frameId = element.frameId || appState.frameToHighlight?.id;
+    visibleElements
+      .filter((el) => !isIFrameOrFrameLabel(el))
+      .forEach((element) => {
+        try {
+          // - when exporting the whole canvas, we DO NOT apply clipping
+          // - when we are exporting a particular frame, apply clipping
+          //   if the containing frame is not selected, apply clipping
+          const frameId = element.frameId || appState.frameToHighlight?.id;
 
-        if (
-          frameId &&
-          ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
-            (!renderConfig.isExporting && appState.shouldRenderFrames))
-        ) {
-          context.save();
+          if (
+            frameId &&
+            ((isExporting && isOnlyExportingSingleFrame(elements)) ||
+              (!isExporting && appState.shouldRenderFrames))
+          ) {
+            context.save();
 
-          const frame = getTargetFrame(element, appState);
+            const frame = getTargetFrame(element, appState);
 
-          if (frame && isElementInFrame(element, elements, appState)) {
-            frameClip(frame, context, renderConfig);
+            if (frame && isElementInFrame(element, elements, appState)) {
+              frameClip(frame, context, renderConfig);
+            }
+            renderElement(element, rc, context, renderConfig, appState);
+            context.restore();
+          } else {
+            renderElement(element, rc, context, renderConfig, appState);
           }
-          renderElement(element, rc, context, renderConfig, appState);
-          context.restore();
-        } else {
-          renderElement(element, rc, context, renderConfig, appState);
-        }
-        // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
-        // ShapeCache returns empty hence making sure that we get the
-        // correct element from visible elements
-        if (appState.editingLinearElement?.elementId === element.id) {
-          if (element) {
-            editingLinearElement =
-              element as NonDeleted<ExcalidrawLinearElement>;
+          // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
+          // ShapeCache returns empty hence making sure that we get the
+          // correct element from visible elements
+          if (appState.editingLinearElement?.elementId === element.id) {
+            if (element) {
+              editingLinearElement =
+                element as NonDeleted<ExcalidrawLinearElement>;
+            }
+            if (!isExporting) {
+              renderLinkIcon(element, context, appState);
+            }
           }
+        } catch (error: any) {
+          console.error(error);
         }
-        if (!isExporting) {
-          renderLinkIcon(element, context, appState);
+      });
+
+    // render iFrames on top
+    visibleElements
+      .filter((el) => isIFrameOrFrameLabel(el))
+      .forEach((element) => {
+        try {
+          const render = () => {
+            if (isExporting && isIFrameElement(element)) {
+              invalidateShapeForElement(element); //add gray placeholder background
+              renderElement(element, rc, context, renderConfig, appState);
+              invalidateShapeForElement(element); //revert to transparent
+            } else {
+              renderElement(element, rc, context, renderConfig, appState);
+            }
+            if (
+              isExporting &&
+              isIFrameElement(element) &&
+              !getBoundTextElement(element)
+            ) {
+              const label = createPlaceholderiFrameLabel(element);
+              renderElement(label, rc, context, renderConfig, appState);
+            }
+            if (!isExporting) {
+              renderLinkIcon(element, context, appState);
+            }
+          };
+
+          // - when exporting the whole canvas, we DO NOT apply clipping
+          // - when we are exporting a particular frame, apply clipping
+          //   if the containing frame is not selected, apply clipping
+          const frameId = element.frameId || appState.frameToHighlight?.id;
+
+          if (
+            frameId &&
+            ((isExporting && isOnlyExportingSingleFrame(elements)) ||
+              (!isExporting && appState.shouldRenderFrames))
+          ) {
+            context.save();
+
+            const frame = getTargetFrame(element, appState);
+
+            if (frame && isElementInFrame(element, elements, appState)) {
+              frameClip(frame, context, renderConfig);
+            }
+            render();
+            context.restore();
+          } else {
+            render();
+          }
+        } catch (error: any) {
+          console.error(error);
         }
-      } catch (error: any) {
-        console.error(error);
-      }
-    });
+      });
 
     if (editingLinearElement) {
       renderLinearPointHandles(
@@ -638,10 +706,11 @@ export const _renderScene = ({
               dashed: !!renderConfig.remoteSelectedElementIds[element.id],
               cx,
               cy,
+              activeiFrame: appState.activeIFrameElement === element,
             });
           }
           return acc;
-        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; dashed?: boolean; cx: number; cy: number }[]);
+        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; dashed?: boolean; cx: number; cy: number; activeiFrame: boolean }[]);
 
         const addSelectionForGroupId = (groupId: GroupId) => {
           const groupElements = getElementsInGroup(elements, groupId);
@@ -657,6 +726,7 @@ export const _renderScene = ({
             dashed: true,
             cx: elementX1 + (elementX2 - elementX1) / 2,
             cy: elementY1 + (elementY2 - elementY1) / 2,
+            activeiFrame: false,
           });
         };
 
@@ -998,6 +1068,7 @@ const renderSelectionBorder = (
     dashed?: boolean;
     cx: number;
     cy: number;
+    activeiFrame: boolean;
   },
   padding = DEFAULT_SPACING * 2,
 ) => {
@@ -1011,6 +1082,7 @@ const renderSelectionBorder = (
     cx,
     cy,
     dashed,
+    activeiFrame,
   } = elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
@@ -1021,7 +1093,7 @@ const renderSelectionBorder = (
 
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
-  context.lineWidth = 1 / renderConfig.zoom.value;
+  context.lineWidth = (activeiFrame ? 4 : 1) / renderConfig.zoom.value;
 
   const count = selectionColors.length;
   for (let index = 0; index < count; ++index) {
@@ -1082,6 +1154,7 @@ const renderBindingHighlightForBindableElement = (
     case "rectangle":
     case "text":
     case "image":
+    case "iframe":
     case "frame":
       strokeRectWithRotation(
         context,
@@ -1176,6 +1249,7 @@ const renderElementsBoxHighlight = (
       dashed: false,
       cx: elementX1 + (elementX2 - elementX1) / 2,
       cy: elementY1 + (elementY2 - elementY1) / 2,
+      activeiFrame: false,
     };
   };
 
@@ -1336,22 +1410,52 @@ export const renderSceneToSvg = (
   }
 
   // render elements
-  elements.forEach((element) => {
-    if (!element.isDeleted) {
-      try {
-        renderElementToSvg(
-          element,
-          rsvg,
-          svgRoot,
-          files,
-          element.x + offsetX,
-          element.y + offsetY,
-          exportWithDarkMode,
-          exportingFrameId,
-        );
-      } catch (error: any) {
-        console.error(error);
+  elements
+    .filter((el) => !isIFrameOrFrameLabel(el))
+    .forEach((element) => {
+      if (!element.isDeleted) {
+        try {
+          renderElementToSvg(
+            element,
+            rsvg,
+            svgRoot,
+            files,
+            element.x + offsetX,
+            element.y + offsetY,
+            exportWithDarkMode,
+            exportingFrameId,
+          );
+        } catch (error: any) {
+          console.error(error);
+        }
       }
-    }
-  });
+    });
+
+  // render iFrames on top
+  elements
+    .filter((el) => isIFrameElement(el))
+    .forEach((element) => {
+      if (!element.isDeleted) {
+        try {
+          if (element.backgroundColor === "transparent") {
+            invalidateShapeForElement(element); //add gray placeholder background
+          }
+          renderElementToSvg(
+            element,
+            rsvg,
+            svgRoot,
+            files,
+            element.x + offsetX,
+            element.y + offsetY,
+            exportWithDarkMode,
+            exportingFrameId,
+          );
+          if (element.backgroundColor === "transparent") {
+            invalidateShapeForElement(element); //revert to transparent
+          }
+        } catch (error: any) {
+          console.error(error);
+        }
+      }
+    });
 };

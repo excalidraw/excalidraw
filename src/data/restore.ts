@@ -271,6 +271,7 @@ const restoreElement = (
     case "ellipse":
       return restoreElementWithProperties(element, {});
     case "rectangle":
+    case "iframe":
       return restoreElementWithProperties(element, {});
     case "diamond":
       return restoreElementWithProperties(element, {});

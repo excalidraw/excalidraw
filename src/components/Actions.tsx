@@ -313,6 +313,7 @@ export const ShapesSwitcher = ({
               activeTool: nextActiveTool,
               multiElement: null,
               selectedElementIds: {},
+              activeIFrameElement: null,
             });
           }}
         />

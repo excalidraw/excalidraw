@@ -5,12 +5,18 @@ import {
   viewportCoordsToSceneCoords,
   wrapEvent,
 } from "../utils";
+import { getEmbedLink, isURLOnWhiteList } from "./iframe";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
-import { FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
+import {
+  EmbedIcon,
+  FreedrawIcon,
+  LinkIcon,
+  TrashIcon,
+} from "../components/icons";
 import { t } from "../i18n";
 import {
   useCallback,
@@ -21,7 +27,10 @@ import {
 } from "react";
 import clsx from "clsx";
 import { KEYS } from "../keys";
-import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
+import {
+  DEFAULT_LINK_SIZE,
+  invalidateShapeForElement,
+} from "../renderer/renderElement";
 import { rotate } from "../math";
 import { EVENT, HYPERLINK_TOOLTIP_DELAY, MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
@@ -33,6 +42,7 @@ import { getElementAbsoluteCoords } from "./";
 import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
 import { useExcalidrawAppState } from "../components/App";
+import { isIFrameElement } from "./typeChecks";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -47,14 +57,22 @@ EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
 
 let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
 
+const iframeLinkCache = new Map<string, string>();
+
 export const Hyperlink = ({
   element,
   setAppState,
   onLinkOpen,
+  iframeURLWhitelist,
+  setToast,
 }: {
   element: NonDeletedExcalidrawElement;
   setAppState: React.Component<any, AppState>["setState"];
   onLinkOpen: ExcalidrawProps["onLinkOpen"];
+  iframeURLWhitelist: ExcalidrawProps["iframeURLWhitelist"];
+  setToast: (
+    toast: { message: string; closable?: boolean; duration?: number } | null,
+  ) => void;
 }) => {
   const appState = useExcalidrawAppState();
 
@@ -75,9 +93,20 @@ export const Hyperlink = ({
       trackEvent("hyperlink", "create");
     }
 
-    mutateElement(element, { link });
+    if (isIFrameElement(element) && !isURLOnWhiteList(link)) {
+      setToast({ message: t("toast.unableToEmbed"), closable: true });
+      element.link && iframeLinkCache.set(element.id, element.link);
+      mutateElement(element, {
+        //@ts-ignore
+        type: "rectangle",
+        link,
+      });
+      invalidateShapeForElement(element);
+    } else {
+      mutateElement(element, { link });
+    }
     setAppState({ showHyperlinkPopup: "info" });
-  }, [element, setAppState]);
+  }, [element, setAppState, setToast]);
 
   useLayoutEffect(() => {
     return () => {
@@ -112,6 +141,62 @@ export const Hyperlink = ({
       }
     };
   }, [appState, element, isEditing, setAppState]);
+
+  const handleEmbed = useCallback(() => {
+    trackEvent("hyperlink", "embed");
+    if (!element.link) {
+      if (iframeLinkCache.has(element.id)) {
+        iframeLinkCache.delete(element.id);
+      }
+      return;
+    }
+
+    if (isIFrameElement(element)) {
+      iframeLinkCache.set(element.id, element.link);
+      mutateElement(element, {
+        //@ts-ignore
+        type: "rectangle",
+      });
+      invalidateShapeForElement(element);
+      return;
+    }
+
+    if (!isURLOnWhiteList(element.link, iframeURLWhitelist)) {
+      setToast({ message: t("toast.unableToEmbed"), closable: true });
+      return;
+    }
+
+    const { width, height } = element;
+    const embedLink = getEmbedLink(element.link);
+    const ar = embedLink
+      ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
+      : 1;
+    const hasLinkChanged = iframeLinkCache.get(element.id) !== element.link;
+    mutateElement(element, {
+      //@ts-ignore
+      type: "iframe",
+      ...(hasLinkChanged
+        ? {
+            width:
+              embedLink?.type === "video"
+                ? width > height
+                  ? width
+                  : height * ar
+                : width,
+            height:
+              embedLink?.type === "video"
+                ? width > height
+                  ? width / ar
+                  : height
+                : height,
+          }
+        : {}),
+    });
+    invalidateShapeForElement(element);
+    if (iframeLinkCache.has(element.id)) {
+      iframeLinkCache.delete(element.id);
+    }
+  }, [element, iframeURLWhitelist, setToast]);
 
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
@@ -200,7 +285,19 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
-
+        {((linkVal && element.type === "rectangle") ||
+          isIFrameElement(element)) && (
+          <ToolButton
+            type="radio"
+            title={t("buttons.embed")}
+            aria-label={t("buttons.embed")}
+            label={t("buttons.embed")}
+            checked={isIFrameElement(element)}
+            onPointerDown={handleEmbed}
+            className="excalidraw-hyperlinkContainer--embed"
+            icon={EmbedIcon}
+          />
+        )}
         {linkVal && (
           <ToolButton
             type="button"
@@ -242,7 +339,7 @@ export const normalizeLink = (link: string) => {
   return link;
 };
 
-export const isLocalLink = (link: string | null) => {
+export const isLocalLink = (link: string | null | undefined) => {
   return !!(link?.includes(location.origin) || link?.startsWith("/"));
 };
 
@@ -279,7 +376,11 @@ export const actionLink = register({
         type="button"
         icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
-        title={`${t("labels.link.label")} - ${getShortcutKey("CtrlOrCmd+K")}`}
+        title={`${
+          selectedElements[0].type === "rectangle"
+            ? t("labels.link.labelEmbed")
+            : t("labels.link.label")
+        } - ${getShortcutKey("CtrlOrCmd+K")}`}
         onClick={() => updateData(null)}
         selected={selectedElements.length === 1 && !!selectedElements[0].link}
       />
@@ -293,7 +394,11 @@ export const getContextMenuLabel = (
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
   const label = selectedElements[0]!.link
-    ? "labels.link.edit"
+    ? selectedElements[0]!.type === "rectangle"
+      ? "labels.link.editEmbed"
+      : "labels.link.edit"
+    : selectedElements[0]!.type === "rectangle"
+    ? "labels.link.createEmbed"
     : "labels.link.create";
   return label;
 };

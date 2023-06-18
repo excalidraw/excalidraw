@@ -2,6 +2,7 @@
 
 exports[`exportToSvg with default arguments 1`] = `
 Object {
+  "activeIFrameElement": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,

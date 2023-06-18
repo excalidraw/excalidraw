@@ -1,7 +1,9 @@
+import { isIFrameElement } from "../element/typeChecks";
 import { NonDeletedExcalidrawElement } from "../element/types";
 
 export const hasBackground = (type: string) =>
   type === "rectangle" ||
+  type === "iframe" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "line" ||
@@ -12,6 +14,7 @@ export const hasStrokeColor = (type: string) =>
 
 export const hasStrokeWidth = (type: string) =>
   type === "rectangle" ||
+  type === "iframe" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "freedraw" ||
@@ -20,6 +23,7 @@ export const hasStrokeWidth = (type: string) =>
 
 export const hasStrokeStyle = (type: string) =>
   type === "rectangle" ||
+  type === "iframe" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "arrow" ||
@@ -27,6 +31,7 @@ export const hasStrokeStyle = (type: string) =>
 
 export const canChangeRoundness = (type: string) =>
   type === "rectangle" ||
+  type === "iframe" ||
   type === "arrow" ||
   type === "line" ||
   type === "diamond";
@@ -63,7 +68,10 @@ export const getElementsAtPosition = (
 ) => {
   // The parameter elements comes ordered from lower z-index to higher.
   // We want to preserve that order on the returned array.
-  return elements.filter(
+  const elsAtPos = elements.filter(
     (element) => !element.isDeleted && isAtPositionFn(element),
   );
+  return elsAtPos
+    .filter((element) => !isIFrameElement(element))
+    .concat(elsAtPos.filter((element) => isIFrameElement(element)));
 };

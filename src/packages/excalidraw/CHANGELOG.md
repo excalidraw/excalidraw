@@ -13,6 +13,28 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### iFrame Site Whitelist
+
+- Set `props.iframeURLWhitelist` to allow additional sites to be added as iFrames. The default list includes: YouTube, Vimeo, Figma, Excalidraw, Twitter. The prop takes a `RegExp[]` array. Set the prop to `[/.*/]` if you want to allow all sites.
+
+### renderCustomIFrame
+
+```tsx
+(element: NonDeletedExcalidrawElement, radius: number, appState: UIAppState) => JSX.Element | null;`
+```
+
+The renderCustomIFrame function allows you to customize the rendering of a JSX component instead of using the default iFrame. By setting props.renderCustomIFrame, you can provide a custom implementation for rendering the element.
+
+#### Parameters:
+
+- element (NonDeletedExcalidrawElement): The element to be rendered.
+- radius (number): The calculated border radius in pixels.
+- appState (UIAppState): The current state of the UI.
+
+#### Return value:
+
+JSX.Element | null: The JSX component representing the custom rendering, or null if the default iFrame should be rendered.
+
 ### Features
 
 - Sidebar component now supports tabs — for more detailed description of new behavior and breaking changes, see the linked PR. [#6213](https://github.com/excalidraw/excalidraw/pull/6213)

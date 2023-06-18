@@ -83,6 +83,7 @@ import {
   THEME_FILTER,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
+  YTPLAYER,
   ZOOM_STEP,
 } from "../constants";
 import { exportCanvas, loadFromBlob } from "../data";
@@ -145,6 +146,7 @@ import {
   isBoundToContainer,
   isFrameElement,
   isImageElement,
+  isIFrameElement,
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
@@ -185,7 +187,13 @@ import {
   isArrowKey,
   KEYS,
 } from "../keys";
-import { distance2d, getGridPoint, isPathALoop } from "../math";
+
+import {
+  distance2d,
+  getCornerRadius,
+  getGridPoint,
+  isPathALoop,
+} from "../math";
 import { isVisibleElement, renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
@@ -219,6 +227,7 @@ import {
   FrameNameBoundsCache,
   SidebarName,
   SidebarTabName,
+  UIAppState,
 } from "../types";
 import {
   debounce,
@@ -246,6 +255,7 @@ import {
   easeToValuesRAF,
   muteFSAbortError,
 } from "../utils";
+import { getEmbedLink, isURLOnWhiteList } from "../element/iframe";
 import {
   ContextMenu,
   ContextMenuItems,
@@ -398,6 +408,8 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+const youtubeContainers = new Map<string, number>();
+let app: App | null = null;
 
 // remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
@@ -453,6 +465,7 @@ class App extends React.Component<AppProps, AppState> {
 
   constructor(props: AppProps) {
     super(props);
+    app = this;
     const defaultAppState = getDefaultAppState();
     const {
       excalidrawRef,
@@ -595,6 +608,214 @@ class App extends React.Component<AppProps, AppState> {
       >
         {t("labels.drawingCanvas")}
       </canvas>
+    );
+  }
+
+  private onWindowMessage(event: MessageEvent) {
+    if (
+      event.origin !== "https://player.vimeo.com" &&
+      event.origin !== "https://www.youtube.com"
+    ) {
+      return;
+    }
+
+    let data = null;
+    try {
+      data = JSON.parse(event.data);
+    } catch (e) {}
+    if (!data) {
+      return;
+    }
+
+    switch (event.origin) {
+      case "https://player.vimeo.com":
+        //Allowing for multiple instances of Excalidraw running in the window
+        if (data.method === "paused") {
+          let source: Window | null = null;
+          const iframes =
+            app?.excalidrawContainerRef?.current?.querySelectorAll("iframe");
+          if (!iframes) {
+            break;
+          }
+          for (const iframe of iframes) {
+            if (iframe.contentWindow === event.source) {
+              source = iframe.contentWindow;
+            }
+          }
+          source?.postMessage(
+            JSON.stringify({
+              method: data.value ? "play" : "pause",
+              value: true,
+            }),
+            "*",
+          );
+        }
+        break;
+      case "https://www.youtube.com":
+        if (
+          data.event === "infoDelivery" &&
+          data.info &&
+          data.id &&
+          typeof data.info.playerState === "number"
+        ) {
+          const id = data.id;
+          const playerState = data.info.playerState;
+          youtubeContainers.set(id, playerState);
+        }
+        break;
+    }
+  }
+
+  private renderIFrames() {
+    const scale = this.state.zoom.value;
+    const normalizedWidth = this.state.width;
+    const normalizedHeight = this.state.height;
+    return (
+      <>
+        {this.scene
+          .getNonDeletedElements()
+          .filter((el) => isIFrameElement(el))
+          .map((el) => {
+            const { x, y } = sceneCoordsToViewportCoords(
+              { sceneX: el.x, sceneY: el.y },
+              this.state,
+            );
+            const embedLink = getEmbedLink(el.link);
+            const src = embedLink?.link ?? "";
+            const isVisible = isVisibleElement(
+              el,
+              normalizedWidth,
+              normalizedHeight,
+              this.state,
+            );
+            const isSelected = this.state.activeIFrameElement === el;
+
+            const radius = getCornerRadius(Math.min(el.width, el.height), el);
+
+            const self = this;
+            const handleOverlayClick = (
+              event: React.TouchEvent | React.PointerEvent | React.MouseEvent,
+            ) => {
+              if (isSelected) {
+                return;
+              }
+              self.setState({
+                activeIFrameElement: el,
+                selectedElementIds: { [el.id]: true },
+              });
+
+              const iframe = event.currentTarget.parentElement?.querySelector(
+                ".excalidraw__iframe",
+              ) as HTMLIFrameElement | null;
+
+              if (!iframe?.contentWindow) {
+                return;
+              }
+
+              if (src.includes("youtube")) {
+                const state = youtubeContainers.get(el.id);
+                if (!state) {
+                  youtubeContainers.set(el.id, YTPLAYER.UNSTARTED);
+                  iframe.contentWindow.postMessage(
+                    JSON.stringify({
+                      event: "listening",
+                      id: el.id,
+                    }),
+                    "*",
+                  );
+                }
+                switch (state) {
+                  case YTPLAYER.PLAYING:
+                  case YTPLAYER.BUFFERING:
+                    iframe.contentWindow?.postMessage(
+                      JSON.stringify({
+                        event: "command",
+                        func: "pauseVideo",
+                        args: "",
+                      }),
+                      "*",
+                    );
+                    break;
+                  default:
+                    iframe.contentWindow?.postMessage(
+                      JSON.stringify({
+                        event: "command",
+                        func: "playVideo",
+                        args: "",
+                      }),
+                      "*",
+                    );
+                }
+              }
+
+              if (src.includes("player.vimeo.com")) {
+                iframe.contentWindow.postMessage(
+                  JSON.stringify({
+                    method: "paused", //video play/pause in onWindowMessage handler
+                  }),
+                  "*",
+                );
+              }
+            };
+
+            const borderWidth = el.strokeWidth;
+
+            return (
+              <div
+                className="excalidraw__iframe-container"
+                style={{
+                  top: `${y - this.state.offsetTop}px`,
+                  left: `${x - this.state.offsetLeft}px`,
+                  transform: `scale(${scale})`,
+                  display: isVisible ? "block" : "none",
+                  opacity: el.opacity / 100,
+                }}
+              >
+                <div
+                  style={{
+                    width: `${el.width}px`,
+                    height: `${el.height}px`,
+                    borderWidth: `${borderWidth}px`,
+                    borderStyle: "solid",
+                    borderColor: el.strokeColor,
+                    transform: `rotate(${el.angle}rad)`,
+                    borderRadius: `${radius}px`,
+                    pointerEvents: isSelected ? "auto" : "none",
+                  }}
+                >
+                  {this.props.renderCustomIFrame?.(
+                    el,
+                    radius,
+                    this.state as UIAppState,
+                  ) ?? (
+                    <iframe
+                      className="excalidraw__iframe"
+                      style={{
+                        borderRadius: `${radius}px`,
+                      }}
+                      src={src}
+                      title="Excalidraw Embedded Content"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen={true}
+                    />
+                  )}
+                  <div
+                    className="excalidraw__iframe-overlay"
+                    onClick={handleOverlayClick}
+                    onPointerDown={handleOverlayClick}
+                    onTouchStart={handleOverlayClick}
+                    onMouseDown={handleOverlayClick}
+                    style={{
+                      width: `${el.width / 4}px`,
+                      height: `${el.height / 4}px`,
+                      pointerEvents: isSelected ? "none" : "auto",
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+      </>
     );
   }
 
@@ -873,6 +1094,8 @@ class App extends React.Component<AppProps, AppState> {
                               element={selectedElement[0]}
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
+                              iframeURLWhitelist={this.props.iframeURLWhitelist}
+                              setToast={this.setToast}
                             />
                           )}
                         {this.state.toast !== null && (
@@ -894,6 +1117,7 @@ class App extends React.Component<AppProps, AppState> {
                         <main>{this.renderCanvas()}</main>
                         {this.renderFrameNames()}
                       </ExcalidrawActionManagerContext.Provider>
+                      {this.renderIFrames()}
                     </ExcalidrawElementsContext.Provider>
                   </ExcalidrawAppStateContext.Provider>
                 </ExcalidrawSetAppStateContext.Provider>
@@ -1417,6 +1641,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     this.detachIsMobileMqHandler?.();
+    window.removeEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
   }
 
   private addEventListeners() {
@@ -1487,6 +1712,7 @@ class App extends React.Component<AppProps, AppState> {
       this.disableEvent,
       false,
     );
+    window.addEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
@@ -1829,6 +2055,7 @@ class App extends React.Component<AppProps, AppState> {
     if (event.touches.length === 2) {
       this.setState({
         selectedElementIds: {},
+        activeIFrameElement: null,
       });
     }
   };
@@ -1885,16 +2112,16 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+        {
+          clientX: this.lastViewportPosition.x,
+          clientY: this.lastViewportPosition.y,
+        },
+        this.state,
+      );
+
       // prefer spreadsheet data over image file (MS Office/Libre Office)
       if (isSupportedImageFile(file) && !data.spreadsheet) {
-        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          {
-            clientX: this.lastViewportPosition.x,
-            clientY: this.lastViewportPosition.y,
-          },
-          this.state,
-        );
-
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
@@ -1931,6 +2158,23 @@ class App extends React.Component<AppProps, AppState> {
           retainSeed: isPlainPaste,
         });
       } else if (data.text) {
+        if (
+          !isPlainPaste &&
+          isURLOnWhiteList(data.text, this.props.iframeURLWhitelist) &&
+          (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(data.text) ||
+            getEmbedLink(data.text)?.type === "video")
+        ) {
+          const rectangle = this.insertEmbeddedRectangleElement({
+            sceneX,
+            sceneY,
+            link: data.text,
+          });
+          if (!rectangle) {
+            return;
+          }
+          this.setState({ selectedElementIds: { [rectangle.id]: true } });
+          return;
+        }
         this.addTextFromPaste(data.text, isPlainPaste);
       }
       this.setActiveTool({ type: "selection" });
@@ -2708,6 +2952,7 @@ class App extends React.Component<AppProps, AppState> {
           selectedElementIds: {},
           selectedGroupIds: {},
           editingGroupId: null,
+          activeIFrameElement: null,
         });
       }
       isHoldingSpace = false;
@@ -2753,6 +2998,7 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
+        activeIFrameElement: null,
       });
     } else {
       this.setState({ activeTool: nextActiveTool });
@@ -2788,6 +3034,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.isTouchScreenMultiTouchGesture()) {
       this.setState({
         selectedElementIds: {},
+        activeIFrameElement: null,
       });
     }
     gesture.initialScale = this.state.zoom.value;
@@ -2939,6 +3186,7 @@ class App extends React.Component<AppProps, AppState> {
       selectedElementIds: {},
       selectedGroupIds: {},
       editingGroupId: null,
+      activeIFrameElement: null,
     });
   }
 
@@ -3275,12 +3523,18 @@ class App extends React.Component<AppProps, AppState> {
           sceneY = midPoint.y;
         }
       }
-      this.startTextEditing({
-        sceneX,
-        sceneY,
-        insertAtParentCenter: !event.altKey,
-        container,
-      });
+      if (isIFrameElement(container as ExcalidrawGenericElement)) {
+        this.setState({
+          activeIFrameElement: container,
+        });
+      } else {
+        this.startTextEditing({
+          sceneX,
+          sceneY,
+          insertAtParentCenter: !event.altKey,
+          container,
+        });
+      }
     }
   };
 
@@ -4421,6 +4675,7 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
+        activeIFrameElement: null,
       });
     }
   };
@@ -4583,6 +4838,7 @@ class App extends React.Component<AppProps, AppState> {
                 selectedElementIds: {},
                 selectedGroupIds: {},
                 editingGroupId: null,
+                activeIFrameElement: null,
               });
             }
 
@@ -4819,6 +5075,50 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  //create rectangle element with youtube top left on nearest grid point width / hight 640/360
+  private insertEmbeddedRectangleElement = ({
+    sceneX,
+    sceneY,
+    link,
+  }: {
+    sceneX: number;
+    sceneY: number;
+    link: string;
+  }) => {
+    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
+
+    const embedLink = getEmbedLink(link);
+
+    if (!embedLink) {
+      return;
+    }
+
+    const element = newElement({
+      type: "iframe",
+      x: gridX,
+      y: gridY,
+      strokeColor: "transparent",
+      backgroundColor: "transparent",
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      roundness: this.getCurrentItemRoundness("iframe"),
+      opacity: this.state.currentItemOpacity,
+      locked: false,
+      width: embedLink.aspectRatio.w,
+      height: embedLink.aspectRatio.h,
+      link,
+    });
+
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      element,
+    ]);
+
+    return element;
+  };
+
   private createImageElement = ({
     sceneX,
     sceneY,
@@ -4969,6 +5269,18 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private getCurrentItemRoundness(
+    elementType: "selection" | "rectangle" | "diamond" | "ellipse" | "iframe",
+  ) {
+    return this.state.currentItemRoundness === "round"
+      ? {
+          type: isUsingAdaptiveRadius(elementType)
+            ? ROUNDNESS.ADAPTIVE_RADIUS
+            : ROUNDNESS.PROPORTIONAL_RADIUS,
+        }
+      : null;
+  }
+
   private createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"],
     pointerDownState: PointerDownState,
@@ -4995,14 +5307,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
-      roundness:
-        this.state.currentItemRoundness === "round"
-          ? {
-              type: isUsingAdaptiveRadius(elementType)
-                ? ROUNDNESS.ADAPTIVE_RADIUS
-                : ROUNDNESS.PROPORTIONAL_RADIUS,
-            }
-          : null,
+      roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
     });
@@ -5477,6 +5782,7 @@ class App extends React.Component<AppProps, AppState> {
               selectedElementIds: {},
               selectedGroupIds: {},
               editingGroupId: null,
+              activeIFrameElement: null,
             });
           }
         }
@@ -6228,6 +6534,7 @@ class App extends React.Component<AppProps, AppState> {
             selectedElementIds: {},
             selectedGroupIds: {},
             editingGroupId: null,
+            activeIFrameElement: null,
           });
         }
         return;
@@ -6784,6 +7091,7 @@ class App extends React.Component<AppProps, AppState> {
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: {},
+      activeIFrameElement: null,
       selectedGroupIds: {},
       // Continue editing the same group if the user selected a different
       // element from it
@@ -6796,6 +7104,7 @@ class App extends React.Component<AppProps, AppState> {
     }));
     this.setState({
       selectedElementIds: {},
+      activeIFrameElement: null,
       previousSelectedElementIds: this.state.selectedElementIds,
     });
   }
@@ -7096,6 +7405,7 @@ class App extends React.Component<AppProps, AppState> {
       // rotating
       isResizing: transformHandleType && transformHandleType !== "rotation",
       isRotating: transformHandleType === "rotation",
+      activeIFrameElement: null,
     });
     const pointerCoords = pointerDownState.lastCoords;
     const [resizeX, resizeY] = getGridPoint(
