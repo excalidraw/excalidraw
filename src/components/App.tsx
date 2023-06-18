@@ -762,6 +762,7 @@ class App extends React.Component<AppProps, AppState> {
 
             return (
               <div
+                key={el.id}
                 className="excalidraw__iframe-container"
                 style={{
                   top: `${y - this.state.offsetTop}px`,

@@ -41,7 +41,7 @@ import { getElementAbsoluteCoords } from "./";
 
 import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
-import { useExcalidrawAppState } from "../components/App";
+import { useAppProps, useExcalidrawAppState } from "../components/App";
 import { isIFrameElement } from "./typeChecks";
 
 const CONTAINER_WIDTH = 320;
@@ -75,6 +75,7 @@ export const Hyperlink = ({
   ) => void;
 }) => {
   const appState = useExcalidrawAppState();
+  const appProps = useAppProps();
 
   const linkVal = element.link || "";
 
@@ -93,7 +94,10 @@ export const Hyperlink = ({
       trackEvent("hyperlink", "create");
     }
 
-    if (isIFrameElement(element) && !isURLOnWhiteList(link)) {
+    if (
+      isIFrameElement(element) &&
+      !isURLOnWhiteList(link, appProps.iframeURLWhitelist)
+    ) {
       setToast({ message: t("toast.unableToEmbed"), closable: true });
       element.link && iframeLinkCache.set(element.id, element.link);
       mutateElement(element, {
