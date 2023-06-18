@@ -128,7 +128,7 @@ const LayerUI = ({
 
   useEffect(() => {
     document.title = `${appState?.name} | Excalidraw | Hand-drawn look & feel • Collaborative • Secure`;
-  }, []);
+  }, [appState?.name]);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
