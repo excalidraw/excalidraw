@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React from "react";
+import React, { useEffect } from "react";
 import { ActionManager } from "../actions/manager";
 import { CLASSES, DEFAULT_SIDEBAR, LIBRARY_SIDEBAR_WIDTH } from "../constants";
 import { isTextElement, showSelectedShapeActions } from "../element";
@@ -126,6 +126,10 @@ const LayerUI = ({
     jotaiScope,
   );
 
+  useEffect(() => {
+    document.title = `${appState?.name} | Excalidraw | Hand-drawn look & feel • Collaborative • Secure`;
+  }, [appState?.name]);
+
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
       return null;
@@ -200,7 +204,6 @@ const LayerUI = ({
       appState,
       elements,
     );
-
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
