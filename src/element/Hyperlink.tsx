@@ -110,7 +110,7 @@ export const Hyperlink = ({
       mutateElement(element, { link });
     }
     setAppState({ showHyperlinkPopup: "info" });
-  }, [element, setAppState, setToast]);
+  }, [element, setAppState, setToast, appProps.iframeURLWhitelist]);
 
   useLayoutEffect(() => {
     return () => {
