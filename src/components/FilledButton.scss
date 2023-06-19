@@ -60,16 +60,16 @@
       &.ExcButton--variant-icon {
         --text-color: var(--color-danger);
         --border-color: var(--color-danger);
-        --back-color: var(--input-bg-color);
+        --back-color: transparent;
 
         &:hover {
-          --text-color: var(--color-danger-darker);
-          --border-color: var(--color-danger-darker);
+          --text-color: var(--color-danger-darkest);
+          --border-color: var(--color-danger-darkest);
         }
 
         &:active {
-          --text-color: var(--color-danger-darkest);
-          --border-color: var(--color-danger-darkest);
+          --text-color: var(--color-danger-darker);
+          --border-color: var(--color-danger-darker);
         }
       }
     }
