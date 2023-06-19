@@ -453,29 +453,29 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "Экспортировать как изображение",
+        "button": "Экспортировать как изображение",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "Сохранить на диск",
+        "button": "Сохранить на диск",
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
+        "title": "Excalidraw+",
+        "button": "Экспорт в Excalidraw+",
         "description": ""
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "Загрузить из файла",
+        "button": "Загрузить из файла",
         "description": ""
       },
       "shareableLink": {
-        "title": "",
+        "title": "Загрузить по ссылке",
         "button": "",
         "description": ""
       }
