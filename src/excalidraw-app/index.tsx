@@ -589,7 +589,7 @@ const ExcalidrawWrapper = () => {
     }
     if (canvas) {
       try {
-        const { url, error } = await exportToBackend(
+        const { url, errorMessage } = await exportToBackend(
           exportedElements,
           {
             ...appState,
@@ -600,12 +600,8 @@ const ExcalidrawWrapper = () => {
           files,
         );
 
-        if (error) {
-          if (error === "RequestTooLargeError") {
-            setErrorMessage(t("alerts.couldNotCreateShareableLinkTooBig"));
-          } else {
-            setErrorMessage(t("alerts.couldNotCreateShareableLink"));
-          }
+        if (errorMessage) {
+          setErrorMessage(errorMessage);
         }
 
         if (url) {

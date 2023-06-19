@@ -282,11 +282,15 @@ export const loadScene = async (
   };
 };
 
+type ExportToBackendResult =
+  | { url: null; errorMessage: string }
+  | { url: string; errorMessage: null };
+
 export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
   appState: Partial<AppState>,
   files: BinaryFiles,
-) => {
+): Promise<ExportToBackendResult> => {
   const encryptionKey = await generateEncryptionKey("string");
 
   const payload = await compressData(
@@ -327,14 +331,18 @@ export const exportToBackend = async (
         files: filesToUpload,
       });
 
-      return { url: urlString };
+      return { url: urlString, errorMessage: null };
     } else if (json.error_class === "RequestTooLargeError") {
-      return { error: json.error_class };
+      return {
+        url: null,
+        errorMessage: t("alerts.couldNotCreateShareableLinkTooBig"),
+      };
     }
 
-    return { error: json };
+    return { url: null, errorMessage: t("alerts.couldNotCreateShareableLink") };
   } catch (error: any) {
     console.error(error);
-    return { error };
+
+    return { url: null, errorMessage: t("alerts.couldNotCreateShareableLink") };
   }
 };
