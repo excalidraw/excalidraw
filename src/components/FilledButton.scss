@@ -106,6 +106,38 @@
       }
     }
 
+    &--color-warning {
+      &.ExcButton--variant-filled {
+        --text-color: black;
+        --back-color: var(--color-warning);
+
+        &:hover {
+          --back-color: var(--color-warning-darker);
+        }
+
+        &:active {
+          --back-color: var(--color-warning-darkest);
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-warning);
+        --border-color: var(--color-warning);
+        --back-color: var(--input-bg-color);
+
+        &:hover {
+          --text-color: var(--color-warning-darker);
+          --border-color: var(--color-warning-darker);
+        }
+
+        &:active {
+          --text-color: var(--color-warning-darkest);
+          --border-color: var(--color-warning-darkest);
+        }
+      }
+    }
+
     display: flex;
     justify-content: center;
     align-items: center;

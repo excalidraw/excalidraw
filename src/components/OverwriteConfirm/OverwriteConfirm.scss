@@ -61,6 +61,19 @@
           height: 1.5rem;
         }
       }
+
+      &.OverwriteConfirm__Description--color-warning {
+        background: var(--color-warning-background);
+        color: var(--color-warning-color);
+
+        .OverwriteConfirm__Description__icon {
+          background: var(--color-warning-icon-background);
+
+          svg {
+            color: var(--color-warning-icon-color);
+          }
+        }
+      }
     }
 
     &__Actions {

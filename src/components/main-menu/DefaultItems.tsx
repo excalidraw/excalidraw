@@ -51,6 +51,7 @@ export const LoadScene = () => {
       (await openConfirmModal({
         title: t("overwriteConfirm.modal.loadFromFile.title"),
         actionLabel: t("overwriteConfirm.modal.loadFromFile.button"),
+        color: "warning",
         description: (
           <Trans
             i18nKey="overwriteConfirm.modal.loadFromFile.description"

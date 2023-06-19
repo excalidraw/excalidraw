@@ -3,12 +3,10 @@ import { useAtom } from "jotai";
 
 import { useTunnels } from "../../context/tunnels";
 import { jotaiScope } from "../../jotai";
-import { t } from "../../i18n";
 import { Dialog } from "../Dialog";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { overwriteConfirmState } from "./OverwriteConfirmState";
 
-import Trans from "../Trans";
 import { FilledButton } from "../FilledButton";
 import { alertTriangleIcon } from "../icons";
 import { Actions } from "./OverwriteConfirmActions";
@@ -25,7 +23,7 @@ const Title = () => {
 };
 
 const Description = () => {
-  const [{ description, actionLabel, onConfirm }, setState] = useAtom(
+  const [{ description, actionLabel, onConfirm, color }, setState] = useAtom(
     overwriteConfirmState,
     jotaiScope,
   );
@@ -36,14 +34,16 @@ const Description = () => {
   };
 
   return (
-    <div className="OverwriteConfirm__Description">
+    <div
+      className={`OverwriteConfirm__Description OverwriteConfirm__Description--color-${color}`}
+    >
       <div className="OverwriteConfirm__Description__icon">
         {alertTriangleIcon}
       </div>
       <div>{description}</div>
       <div className="OverwriteConfirm__Description__spacer"></div>
       <FilledButton
-        color="danger"
+        color={color}
         size="large"
         label={actionLabel!}
         onClick={handleConfirm}

@@ -9,6 +9,7 @@ export type OverwriteConfirmState = {
   title?: string;
   description?: React.ReactNode;
   actionLabel?: string;
+  color?: "danger" | "warning";
 
   onConfirm?: () => void;
   onReject?: () => void;
@@ -23,10 +24,12 @@ export async function openConfirmModal({
   title,
   description,
   actionLabel,
+  color,
 }: {
   title: string;
   description: React.ReactNode;
   actionLabel: string;
+  color?: "danger" | "warning";
 }) {
   return new Promise<boolean>((resolve) => {
     jotaiStore.set(overwriteConfirmState, {
@@ -37,6 +40,7 @@ export async function openConfirmModal({
       title,
       description,
       actionLabel,
+      color: color ?? "danger",
     });
   });
 }
