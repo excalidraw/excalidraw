@@ -601,7 +601,11 @@ const ExcalidrawWrapper = () => {
         );
 
         if (error) {
-          setErrorMessage(`${error}`); //TODO
+          if (error === "RequestTooLargeError") {
+            setErrorMessage(t("alerts.couldNotCreateShareableLinkTooBig"));
+          } else {
+            setErrorMessage(t("alerts.couldNotCreateShareableLink"));
+          }
         }
 
         if (url) {
