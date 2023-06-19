@@ -449,5 +449,36 @@
     "shades": "Nuansa",
     "hexCode": "Kode hexa",
     "noShades": "Tidak ada nuansa untuk warna ini"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }
