@@ -75,6 +75,7 @@
 
         .OverwriteConfirm__Description__icon {
           background: var(--color-warning-icon-background);
+          flex: 0 0 auto;
 
           svg {
             color: var(--color-warning-icon-color);
@@ -108,8 +109,6 @@
           height: 100%;
           font-size: 0.875rem;
           text-align: center;
-
-          margin-bottom: 1rem;
         }
 
         h4 {

@@ -3,6 +3,7 @@ import { FilledButton } from "../FilledButton";
 import { useExcalidrawActionManager, useExcalidrawSetAppState } from "../App";
 import { actionSaveFileToDisk } from "../../actions";
 import { useI18n } from "../../i18n";
+import { actionChangeExportEmbedScene } from "../../actions/actionExport";
 
 export type ActionProps = {
   title: string;
@@ -37,6 +38,7 @@ export const Action = ({
 
 export const ExportToImage = () => {
   const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
   const setAppState = useExcalidrawSetAppState();
 
   return (
@@ -44,6 +46,7 @@ export const ExportToImage = () => {
       title={t("overwriteConfirm.action.exportToImage.title")}
       actionLabel={t("overwriteConfirm.action.exportToImage.button")}
       onClick={() => {
+        actionManager.executeAction(actionChangeExportEmbedScene, "ui", true);
         setAppState({ openDialog: "imageExport" });
       }}
     >
