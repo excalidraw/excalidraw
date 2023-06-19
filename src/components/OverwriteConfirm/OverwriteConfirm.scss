@@ -1,3 +1,5 @@
+@import "../../css/variables.module";
+
 .excalidraw {
   .OverwriteConfirm {
     display: flex;
@@ -25,6 +27,11 @@
       align-items: center;
       width: 100%;
       gap: 1rem;
+
+      @include isMobile {
+        flex-direction: column;
+        text-align: center;
+      }
 
       padding: 2.5rem;
 
@@ -83,6 +90,10 @@
       justify-items: stretch;
       justify-content: center;
       gap: 1.5rem;
+
+      @include isMobile {
+        flex-direction: column;
+      }
 
       &__Action {
         display: flex;
