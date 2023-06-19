@@ -204,12 +204,7 @@ const LayerUI = ({
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
-          <Stack.Col
-            gap={6}
-            className={clsx("App-menu_top__left", {
-              "disable-pointerEvents": appState.zenModeEnabled,
-            })}
-          >
+          <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
             {renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
@@ -254,7 +249,7 @@ const LayerUI = ({
                             title={t("toolBar.lock")}
                           />
 
-                          <div className="App-toolbar__divider"></div>
+                          <div className="App-toolbar__divider" />
 
                           <HandButton
                             checked={isHandToolActive(appState)}

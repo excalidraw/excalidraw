@@ -12,7 +12,7 @@ const Header = () => (
   <div className="HelpDialog__header">
     <a
       className="HelpDialog__btn"
-      href="https://github.com/excalidraw/excalidraw#documentation"
+      href="https://docs.excalidraw.com"
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -164,6 +164,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("toolBar.eraser")}
               shortcuts={[KEYS.E, KEYS["0"]]}
             />
+            <Shortcut label={t("toolBar.frame")} shortcuts={[KEYS.F]} />
             <Shortcut
               label={t("labels.eyeDropper")}
               shortcuts={[KEYS.I, "Shift+S", "Shift+G"]}

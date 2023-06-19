@@ -2,7 +2,7 @@ import { KEYS } from "../keys";
 import { register } from "./register";
 import { ExcalidrawElement } from "../element/types";
 import { duplicateElement, getNonDeletedElements } from "../element";
-import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { arrayToMap, getShortcutKey } from "../utils";
@@ -20,9 +20,17 @@ import {
   bindTextToShapeAfterDuplication,
   getBoundTextElement,
 } from "../element/textElement";
-import { isBoundToContainer } from "../element/typeChecks";
+import { isBoundToContainer, isFrameElement } from "../element/typeChecks";
 import { normalizeElementOrder } from "../element/sortElements";
 import { DuplicateIcon } from "../components/icons";
+import {
+  bindElementsToFramesAfterDuplication,
+  getFrameElements,
+} from "../frame";
+import {
+  excludeElementsInFramesFromSelection,
+  getSelectedElements,
+} from "../scene/selection";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -94,8 +102,11 @@ const duplicateElements = (
     return newElement;
   };
 
-  const selectedElementIds = arrayToMap(
-    getSelectedElements(sortedElements, appState, true),
+  const idsOfElementsToDuplicate = arrayToMap(
+    getSelectedElements(sortedElements, appState, {
+      includeBoundTextElement: true,
+      includeElementsInFrames: true,
+    }),
   );
 
   // Ids of elements that have already been processed so we don't push them
@@ -129,12 +140,25 @@ const duplicateElements = (
     }
 
     const boundTextElement = getBoundTextElement(element);
-    if (selectedElementIds.get(element.id)) {
-      // if a group or a container/bound-text, duplicate atomically
-      if (element.groupIds.length || boundTextElement) {
+    const isElementAFrame = isFrameElement(element);
+
+    if (idsOfElementsToDuplicate.get(element.id)) {
+      // if a group or a container/bound-text or frame, duplicate atomically
+      if (element.groupIds.length || boundTextElement || isElementAFrame) {
         const groupId = getSelectedGroupForElement(appState, element);
         if (groupId) {
-          const groupElements = getElementsInGroup(sortedElements, groupId);
+          // TODO:
+          // remove `.flatMap...`
+          // if the elements in a frame are grouped when the frame is grouped
+          const groupElements = getElementsInGroup(
+            sortedElements,
+            groupId,
+          ).flatMap((element) =>
+            isFrameElement(element)
+              ? [...getFrameElements(elements, element.id), element]
+              : [element],
+          );
+
           elementsWithClones.push(
             ...markAsProcessed([
               ...groupElements,
@@ -156,10 +180,34 @@ const duplicateElements = (
           );
           continue;
         }
+        if (isElementAFrame) {
+          const elementsInFrame = getFrameElements(sortedElements, element.id);
+
+          elementsWithClones.push(
+            ...markAsProcessed([
+              ...elementsInFrame,
+              element,
+              ...elementsInFrame.map((e) => duplicateAndOffsetElement(e)),
+              duplicateAndOffsetElement(element),
+            ]),
+          );
+
+          continue;
+        }
       }
-      elementsWithClones.push(
-        ...markAsProcessed([element, duplicateAndOffsetElement(element)]),
-      );
+      // since elements in frames have a lower z-index than the frame itself,
+      // they will be looped first and if their frames are selected as well,
+      // they will have been copied along with the frame atomically in the
+      // above branch, so we must skip those elements here
+      //
+      // now, for elements do not belong any frames or elements whose frames
+      // are selected (or elements that are left out from the above
+      // steps for whatever reason) we (should at least) duplicate them here
+      if (!element.frameId || !idsOfElementsToDuplicate.has(element.frameId)) {
+        elementsWithClones.push(
+          ...markAsProcessed([element, duplicateAndOffsetElement(element)]),
+        );
+      }
     } else {
       elementsWithClones.push(...markAsProcessed([element]));
     }
@@ -200,6 +248,14 @@ const duplicateElements = (
     oldElements,
     oldIdToDuplicatedId,
   );
+  bindElementsToFramesAfterDuplication(
+    finalElements,
+    oldElements,
+    oldIdToDuplicatedId,
+  );
+
+  const nextElementsToSelect =
+    excludeElementsInFramesFromSelection(newElements);
 
   return {
     elements: finalElements,
@@ -207,7 +263,7 @@ const duplicateElements = (
       {
         ...appState,
         selectedGroupIds: {},
-        selectedElementIds: newElements.reduce(
+        selectedElementIds: nextElementsToSelect.reduce(
           (acc: Record<ExcalidrawElement["id"], true>, element) => {
             if (!isBoundToContainer(element)) {
               acc[element.id] = true;
