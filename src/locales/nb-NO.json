@@ -453,31 +453,31 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Eksporter som bilde",
+        "button": "Eksporter som bilde",
+        "description": "Eksporter scene-dataene til en fil som du kan importere fra senere."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Lagre til disk",
+        "button": "Lagre til disk",
+        "description": "Eksporter scene-dataene til en fil som du kan importere fra senere."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Eksporter til Excalidraw+",
+        "description": "Lagre scenen til ditt Excalidraw+-arbeidsområde."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Last inn fra fil",
+        "button": "Last inn fra fil",
+        "description": "Å laste fra en fil vil <bold>erstatte ditt eksisterende innhold</bold>.<br></br>Du kan sikkerhetskopiere tegningen din først ved å bruke en av valgene under."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Last inn fra lenke",
+        "button": "Erstatt innholdet mitt",
+        "description": "Lasting av ekstern tegning vil <bold>erstatte ditt eksisterende innhold</bold>.<br></br>Du kan sikkerhetskopiere tegningen din først ved å bruke en av valgene nedenfor."
       }
     }
   }
