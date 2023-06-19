@@ -69,7 +69,10 @@ import {
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
 import { restore, restoreAppState, RestoredDataState } from "../data/restore";
-import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
+import {
+  ExportToExcalidrawPlus,
+  exportToExcalidrawPlus,
+} from "./components/ExportToExcalidrawPlus";
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
@@ -88,6 +91,10 @@ import { appJotaiStore } from "./app-jotai";
 
 import "./index.scss";
 import { ResolutionType } from "../utility-types";
+import { ShareableLinkDialog } from "../components/ShareableLinkDialog";
+import { openConfirmModal } from "../components/OverwriteConfirm/OverwriteConfirmState";
+import { OverwriteConfirmDialog } from "../components/OverwriteConfirm/OverwriteConfirm";
+import Trans from "../components/Trans";
 
 polyfill();
 
@@ -97,6 +104,19 @@ const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {},
 });
+
+const shareableLinkConfirmDialog = {
+  title: t("overwriteConfirm.modal.shareableLink.title"),
+  description: (
+    <Trans
+      i18nKey="overwriteConfirm.modal.shareableLink.description"
+      bold={(text) => <strong>{text}</strong>}
+      br={() => <br />}
+    />
+  ),
+  actionLabel: t("overwriteConfirm.modal.shareableLink.button"),
+  color: "danger",
+} as const;
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
@@ -129,7 +149,7 @@ const initializeScene = async (opts: {
       // don't prompt for collab scenes because we don't override local storage
       roomLinkData ||
       // otherwise, prompt whether user wants to override current scene
-      window.confirm(t("alerts.loadSceneOverridePrompt"))
+      (await openConfirmModal(shareableLinkConfirmDialog))
     ) {
       if (jsonBackendMatch) {
         scene = await loadScene(
@@ -168,7 +188,7 @@ const initializeScene = async (opts: {
       const data = await loadFromBlob(await request.blob(), null, null);
       if (
         !scene.elements.length ||
-        window.confirm(t("alerts.loadSceneOverridePrompt"))
+        (await openConfirmModal(shareableLinkConfirmDialog))
       ) {
         return { scene: data, isExternalScene };
       }
@@ -554,6 +574,10 @@ const ExcalidrawWrapper = () => {
     }
   };
 
+  const [latestShareableLink, setLatestShareableLink] = useState<string | null>(
+    null,
+  );
+
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: Partial<AppState>,
@@ -565,7 +589,7 @@ const ExcalidrawWrapper = () => {
     }
     if (canvas) {
       try {
-        await exportToBackend(
+        const { url, errorMessage } = await exportToBackend(
           exportedElements,
           {
             ...appState,
@@ -575,6 +599,14 @@ const ExcalidrawWrapper = () => {
           },
           files,
         );
+
+        if (errorMessage) {
+          setErrorMessage(errorMessage);
+        }
+
+        if (url) {
+          setLatestShareableLink(url);
+        }
       } catch (error: any) {
         if (error.name !== "AbortError") {
           const { width, height } = canvas;
@@ -674,21 +706,47 @@ const ExcalidrawWrapper = () => {
           setCollabDialogShown={setCollabDialogShown}
           isCollabEnabled={!isCollabDisabled}
         />
+        <OverwriteConfirmDialog>
+          <OverwriteConfirmDialog.Actions.ExportToImage />
+          <OverwriteConfirmDialog.Actions.SaveToDisk />
+          {excalidrawAPI && (
+            <OverwriteConfirmDialog.Action
+              title={t("overwriteConfirm.action.excalidrawPlus.title")}
+              actionLabel={t("overwriteConfirm.action.excalidrawPlus.button")}
+              onClick={() => {
+                exportToExcalidrawPlus(
+                  excalidrawAPI.getSceneElements(),
+                  excalidrawAPI.getAppState(),
+                  excalidrawAPI.getFiles(),
+                );
+              }}
+            >
+              {t("overwriteConfirm.action.excalidrawPlus.description")}
+            </OverwriteConfirmDialog.Action>
+          )}
+        </OverwriteConfirmDialog>
         <AppFooter />
         {isCollaborating && isOffline && (
           <div className="collab-offline-warning">
             {t("alerts.collabOfflineWarning")}
           </div>
         )}
+        {latestShareableLink && (
+          <ShareableLinkDialog
+            link={latestShareableLink}
+            onCloseRequest={() => setLatestShareableLink(null)}
+            setErrorMessage={setErrorMessage}
+          />
+        )}
         {excalidrawAPI && !isCollabDisabled && (
           <Collab excalidrawAPI={excalidrawAPI} />
         )}
+        {errorMessage && (
+          <ErrorDialog onClose={() => setErrorMessage("")}>
+            {errorMessage}
+          </ErrorDialog>
+        )}
       </Excalidraw>
-      {errorMessage && (
-        <ErrorDialog onClose={() => setErrorMessage("")}>
-          {errorMessage}
-        </ErrorDialog>
-      )}
     </div>
   );
 };

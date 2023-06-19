@@ -1,4 +1,10 @@
-import { forwardRef, useRef, useImperativeHandle, KeyboardEvent } from "react";
+import {
+  forwardRef,
+  useRef,
+  useImperativeHandle,
+  KeyboardEvent,
+  useLayoutEffect,
+} from "react";
 import clsx from "clsx";
 
 import "./TextField.scss";
@@ -12,6 +18,7 @@ export type TextFieldProps = {
 
   readonly?: boolean;
   fullWidth?: boolean;
+  selectOnRender?: boolean;
 
   label?: string;
   placeholder?: string;
@@ -19,12 +26,27 @@ export type TextFieldProps = {
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
   (
-    { value, onChange, label, fullWidth, placeholder, readonly, onKeyDown },
+    {
+      value,
+      onChange,
+      label,
+      fullWidth,
+      placeholder,
+      readonly,
+      selectOnRender,
+      onKeyDown,
+    },
     ref,
   ) => {
     const innerRef = useRef<HTMLInputElement | null>(null);
 
     useImperativeHandle(ref, () => innerRef.current!);
+
+    useLayoutEffect(() => {
+      if (selectOnRender) {
+        innerRef.current?.select();
+      }
+    }, [selectOnRender]);
 
     return (
       <div

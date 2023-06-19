@@ -16,7 +16,7 @@ import { MIME_TYPES } from "../../constants";
 import { trackEvent } from "../../analytics";
 import { getFrame } from "../../utils";
 
-const exportToExcalidrawPlus = async (
+export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: Partial<AppState>,
   files: BinaryFiles,

@@ -449,5 +449,36 @@
     "shades": "Shades",
     "hexCode": "Hex code",
     "noShades": "No shades available for this color"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Export as image",
+        "button": "Export as image",
+        "description": "Export the scene data as an image from which you can import later."
+      },
+      "saveToDisk": {
+        "title": "Save to disk",
+        "button": "Save to disk",
+        "description": "Export the scene data to a file from which you can import later."
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Export to Excalidraw+",
+        "description": "Save the scene to your Excalidraw+ workspace."
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Load from file",
+        "button": "Load from file",
+        "description": "Loading from a file will <bold>replace your existing content</bold>.<br></br>You can back up your drawing first using one of the options below."
+      },
+      "shareableLink": {
+        "title": "Load from link",
+        "button": "Replace my content",
+        "description": "Loading external drawing will <bold>replace your existing content</bold>.<br></br>You can back up your drawing first by using one of the options below."
+      }
+    }
   }
 }

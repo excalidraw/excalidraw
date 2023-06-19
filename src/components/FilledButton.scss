@@ -2,20 +2,140 @@
 
 .excalidraw {
   .ExcButton {
-    &--color-primary {
-      color: var(--input-bg-color);
+    --text-color: transparent;
+    --border-color: transparent;
+    --back-color: transparent;
 
-      --accent-color: var(--color-primary);
-      --accent-color-hover: var(--color-primary-darker);
-      --accent-color-active: var(--color-primary-darkest);
+    color: var(--text-color);
+    background-color: var(--back-color);
+    border-color: var(--border-color);
+
+    &--color-primary {
+      &.ExcButton--variant-filled {
+        --text-color: var(--input-bg-color);
+        --back-color: var(--color-primary);
+
+        &:hover {
+          --back-color: var(--color-primary-darker);
+        }
+
+        &:active {
+          --back-color: var(--color-primary-darkest);
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-primary);
+        --border-color: var(--color-primary);
+        --back-color: var(--input-bg-color);
+
+        &:hover {
+          --text-color: var(--color-primary-darker);
+          --border-color: var(--color-primary-darker);
+        }
+
+        &:active {
+          --text-color: var(--color-primary-darkest);
+          --border-color: var(--color-primary-darkest);
+        }
+      }
     }
 
     &--color-danger {
-      color: var(--input-bg-color);
+      &.ExcButton--variant-filled {
+        --text-color: var(--color-danger-text);
+        --back-color: var(--color-danger-dark);
 
-      --accent-color: var(--color-danger);
-      --accent-color-hover: #d65550;
-      --accent-color-active: #d1413c;
+        &:hover {
+          --back-color: var(--color-danger-darker);
+        }
+
+        &:active {
+          --back-color: var(--color-danger-darkest);
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-danger);
+        --border-color: var(--color-danger);
+        --back-color: transparent;
+
+        &:hover {
+          --text-color: var(--color-danger-darkest);
+          --border-color: var(--color-danger-darkest);
+        }
+
+        &:active {
+          --text-color: var(--color-danger-darker);
+          --border-color: var(--color-danger-darker);
+        }
+      }
+    }
+
+    &--color-muted {
+      &.ExcButton--variant-filled {
+        --text-color: var(--island-bg-color);
+        --back-color: var(--color-gray-50);
+
+        &:hover {
+          --back-color: var(--color-gray-60);
+        }
+
+        &:active {
+          --back-color: var(--color-gray-80);
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-muted-background);
+        --border-color: var(--color-muted);
+        --back-color: var(--island-bg-color);
+
+        &:hover {
+          --text-color: var(--color-muted-background-darker);
+          --border-color: var(--color-muted-darker);
+        }
+
+        &:active {
+          --text-color: var(--color-muted-background-darker);
+          --border-color: var(--color-muted-darkest);
+        }
+      }
+    }
+
+    &--color-warning {
+      &.ExcButton--variant-filled {
+        --text-color: black;
+        --back-color: var(--color-warning-dark);
+
+        &:hover {
+          --back-color: var(--color-warning-darker);
+        }
+
+        &:active {
+          --back-color: var(--color-warning-darkest);
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-warning-dark);
+        --border-color: var(--color-warning-dark);
+        --back-color: var(--input-bg-color);
+
+        &:hover {
+          --text-color: var(--color-warning-darker);
+          --border-color: var(--color-warning-darker);
+        }
+
+        &:active {
+          --text-color: var(--color-warning-darkest);
+          --border-color: var(--color-warning-darkest);
+        }
+      }
     }
 
     display: flex;
@@ -25,6 +145,8 @@
     flex-wrap: nowrap;
 
     border-radius: 0.5rem;
+    border-width: 1px;
+    border-style: solid;
 
     font-family: "Assistant";
 
@@ -33,9 +155,9 @@
     transition: all 150ms ease-out;
 
     &--size-large {
-      font-weight: 400;
+      font-weight: 600;
       font-size: 0.875rem;
-      height: 3rem;
+      min-height: 3rem;
       padding: 0.5rem 1.5rem;
       gap: 0.75rem;
 
@@ -45,46 +167,20 @@
     &--size-medium {
       font-weight: 600;
       font-size: 0.75rem;
-      height: 2.5rem;
+      min-height: 2.5rem;
       padding: 0.5rem 1rem;
       gap: 0.5rem;
 
       letter-spacing: normal;
     }
 
-    &--variant-filled {
-      background: var(--accent-color);
-      border: 1px solid transparent;
-
-      &:hover {
-        background: var(--accent-color-hover);
-      }
-
-      &:active {
-        background: var(--accent-color-active);
-      }
-    }
-
-    &--variant-outlined,
-    &--variant-icon {
-      border: 1px solid var(--accent-color);
-      color: var(--accent-color);
-      background: transparent;
-
-      &:hover {
-        border: 1px solid var(--accent-color-hover);
-        color: var(--accent-color-hover);
-      }
-
-      &:active {
-        border: 1px solid var(--accent-color-active);
-        color: var(--accent-color-active);
-      }
-    }
-
     &--variant-icon {
       padding: 0.5rem 0.75rem;
       width: 3rem;
+    }
+
+    &--fullWidth {
+      width: 100%;
     }
 
     &__icon {

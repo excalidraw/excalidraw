@@ -4,7 +4,7 @@ import clsx from "clsx";
 import "./FilledButton.scss";
 
 export type ButtonVariant = "filled" | "outlined" | "icon";
-export type ButtonColor = "primary" | "danger";
+export type ButtonColor = "primary" | "danger" | "warning" | "muted";
 export type ButtonSize = "medium" | "large";
 
 export type FilledButtonProps = {
@@ -17,6 +17,7 @@ export type FilledButtonProps = {
   color?: ButtonColor;
   size?: ButtonSize;
   className?: string;
+  fullWidth?: boolean;
 
   startIcon?: React.ReactNode;
 };
@@ -31,6 +32,7 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
       variant = "filled",
       color = "primary",
       size = "medium",
+      fullWidth,
       className,
     },
     ref,
@@ -42,6 +44,7 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
           `ExcButton--color-${color}`,
           `ExcButton--variant-${variant}`,
           `ExcButton--size-${size}`,
+          { "ExcButton--fullWidth": fullWidth },
           className,
         )}
         onClick={onClick}

@@ -6,7 +6,7 @@
     Roboto, Helvetica, Arial, sans-serif;
   font-family: var(--ui-font);
   position: fixed;
-  z-index: 1000;
+  z-index: var(--zIndex-popup);
 
   padding: 8px;
   border-radius: 6px;
