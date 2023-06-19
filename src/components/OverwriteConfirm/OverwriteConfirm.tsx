@@ -5,7 +5,7 @@ import { useTunnels } from "../../context/tunnels";
 import { jotaiScope } from "../../jotai";
 import { Dialog } from "../Dialog";
 import { withInternalFallback } from "../hoc/withInternalFallback";
-import { overwriteConfirmState } from "./OverwriteConfirmState";
+import { overwriteConfirmStateAtom } from "./OverwriteConfirmState";
 
 import { FilledButton } from "../FilledButton";
 import { alertTriangleIcon } from "../icons";
@@ -17,35 +17,46 @@ export type OverwriteConfirmDialogProps = {
 };
 
 const Title = () => {
-  const [{ title }] = useAtom(overwriteConfirmState, jotaiScope);
-
-  return <h3>{title}</h3>;
-};
-
-const Description = () => {
-  const [{ description, actionLabel, onConfirm, color }, setState] = useAtom(
-    overwriteConfirmState,
+  const [overwriteConfirmState] = useAtom(
+    overwriteConfirmStateAtom,
     jotaiScope,
   );
 
+  if (!overwriteConfirmState.active) {
+    return null;
+  }
+
+  return <h3>{overwriteConfirmState.title}</h3>;
+};
+
+const Description = () => {
+  const [overwriteConfirmState, setState] = useAtom(
+    overwriteConfirmStateAtom,
+    jotaiScope,
+  );
+
+  if (!overwriteConfirmState.active) {
+    return null;
+  }
+
   const handleConfirm = () => {
+    overwriteConfirmState.onConfirm();
     setState((state) => ({ ...state, active: false }));
-    onConfirm?.();
   };
 
   return (
     <div
-      className={`OverwriteConfirm__Description OverwriteConfirm__Description--color-${color}`}
+      className={`OverwriteConfirm__Description OverwriteConfirm__Description--color-${overwriteConfirmState.color}`}
     >
       <div className="OverwriteConfirm__Description__icon">
         {alertTriangleIcon}
       </div>
-      <div>{description}</div>
+      <div>{overwriteConfirmState.description}</div>
       <div className="OverwriteConfirm__Description__spacer"></div>
       <FilledButton
-        color={color}
+        color={overwriteConfirmState.color}
         size="large"
-        label={actionLabel!}
+        label={overwriteConfirmState.actionLabel}
         onClick={handleConfirm}
       />
     </div>
@@ -57,17 +68,17 @@ const OverwriteConfirmDialog = Object.assign(
     "OverwriteConfirmDialog",
     ({ children }: OverwriteConfirmDialogProps) => {
       const { OverwriteConfirmDialogTunnel } = useTunnels();
-      const [{ active, onClose }, setState] = useAtom(
-        overwriteConfirmState,
+      const [overwriteConfirmState, setState] = useAtom(
+        overwriteConfirmStateAtom,
         jotaiScope,
       );
 
-      if (!active) {
+      if (!overwriteConfirmState.active) {
         return null;
       }
 
       const handleClose = () => {
-        onClose?.();
+        overwriteConfirmState.onClose();
         setState((state) => ({ ...state, active: false }));
       };
 

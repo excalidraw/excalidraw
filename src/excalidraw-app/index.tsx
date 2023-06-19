@@ -116,7 +116,8 @@ const shareableLinkConfirmDialog = {
     />
   ),
   actionLabel: t("overwriteConfirm.modal.shareableLink.button"),
-};
+  color: "danger",
+} as const;
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;

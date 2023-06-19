@@ -2,22 +2,22 @@ import { atom } from "jotai";
 import { jotaiStore } from "../../jotai";
 import React from "react";
 
-export type OverwriteConfirmState = {
-  active: boolean;
+export type OverwriteConfirmState =
+  | {
+      active: true;
+      title: string;
+      description: React.ReactNode;
+      actionLabel: string;
+      color: "danger" | "warning";
 
-  onClose?: () => void;
-  title?: string;
-  description?: React.ReactNode;
-  actionLabel?: string;
-  color?: "danger" | "warning";
+      onClose: () => void;
+      onConfirm: () => void;
+      onReject: () => void;
+    }
+  | { active: false };
 
-  onConfirm?: () => void;
-  onReject?: () => void;
-};
-
-export const overwriteConfirmState = atom<OverwriteConfirmState>({
+export const overwriteConfirmStateAtom = atom<OverwriteConfirmState>({
   active: false,
-  onClose: () => {},
 });
 
 export async function openConfirmModal({
@@ -29,10 +29,10 @@ export async function openConfirmModal({
   title: string;
   description: React.ReactNode;
   actionLabel: string;
-  color?: "danger" | "warning";
+  color: "danger" | "warning";
 }) {
   return new Promise<boolean>((resolve) => {
-    jotaiStore.set(overwriteConfirmState, {
+    jotaiStore.set(overwriteConfirmStateAtom, {
       active: true,
       onConfirm: () => resolve(true),
       onClose: () => resolve(false),
@@ -40,7 +40,7 @@ export async function openConfirmModal({
       title,
       description,
       actionLabel,
-      color: color ?? "danger",
+      color,
     });
   });
 }
