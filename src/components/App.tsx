@@ -7187,26 +7187,6 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    if (event.dataTransfer.types.includes("text/plain")) {
-      const text = event.dataTransfer.getData("text");
-      if (
-        text &&
-        isURLOnWhiteList(text, this.props.iframeURLWhitelist) &&
-        (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
-          getEmbedLink(text)?.type === "video")
-      ) {
-        const rectangle = this.insertEmbeddedRectangleElement({
-          sceneX,
-          sceneY,
-          link: text,
-        });
-        if (rectangle) {
-          this.setState({ selectedElementIds: { [rectangle.id]: true } });
-          return;
-        }
-      }
-    }
-
     const libraryJSON = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
     if (libraryJSON && typeof libraryJSON === "string") {
       try {
@@ -7225,6 +7205,25 @@ class App extends React.Component<AppProps, AppState> {
     if (file) {
       // atetmpt to parse an excalidraw/excalidrawlib file
       await this.loadFileToCanvas(file, fileHandle);
+    }
+
+    if (event.dataTransfer?.types?.includes("text/plain")) {
+      const text = event.dataTransfer?.getData("text");
+      if (
+        text &&
+        isURLOnWhiteList(text, this.props.iframeURLWhitelist) &&
+        (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
+          getEmbedLink(text)?.type === "video")
+      ) {
+        const rectangle = this.insertEmbeddedRectangleElement({
+          sceneX,
+          sceneY,
+          link: text,
+        });
+        if (rectangle) {
+          this.setState({ selectedElementIds: { [rectangle.id]: true } });
+        }
+      }
     }
   };
 
