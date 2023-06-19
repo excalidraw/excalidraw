@@ -458,8 +458,8 @@
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "Guardar no disco",
+        "button": "Guardar no disco",
         "description": ""
       },
       "excalidrawPlus": {
@@ -470,8 +470,8 @@
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "Carregar a partir de ficheiro",
+        "button": "Carregar a partir de ficheiro",
         "description": ""
       },
       "shareableLink": {
