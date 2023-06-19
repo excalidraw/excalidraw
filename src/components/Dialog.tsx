@@ -30,7 +30,7 @@ export interface DialogProps {
 }
 
 function getDialogSize(size: DialogSize): number {
-  if (typeof size === "number") {
+  if (size && typeof size === "number") {
     return size;
   }
 
