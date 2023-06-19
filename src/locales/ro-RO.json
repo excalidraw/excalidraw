@@ -453,31 +453,31 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Exportare ca imagine",
+        "button": "Exportare ca imagine",
+        "description": "Exportă datele scenei ca fișier din care poți importa mai târziu."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Salvare pe disc",
+        "button": "Salvare pe disc",
+        "description": "Exportă datele scenei pe un fișier din care poți importa mai târziu."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Exportare în Excalidraw+",
+        "description": "Salvează scena în spațiul de lucru Excalidraw+."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Încărcare din fișier",
+        "button": "Încărcare din fișier",
+        "description": "Încărcarea dintr-un fișier va <bold>înlocui conținutul existent</bold>.<br></br>Poți face mai întâi o copie de rezervă a desenului folosind una dintre opțiunile de mai jos."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Încărcare din lnk",
+        "button": "Înlocuiește conținutul meu",
+        "description": "Încărcarea unui desen extern va <bold>înlocui conținutul existent</bold>.<br></br>Poți face mai întâi o copie de rezervă a desenului folosind una dintre opțiunile de mai jos."
       }
     }
   }
