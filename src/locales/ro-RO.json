@@ -449,5 +449,36 @@
     "shades": "Nuanțe",
     "hexCode": "Cod hexa",
     "noShades": "Nu este disponibilă nicio nuanță pentru această culoare"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }
