@@ -109,7 +109,7 @@
     &--color-warning {
       &.ExcButton--variant-filled {
         --text-color: black;
-        --back-color: var(--color-warning);
+        --back-color: var(--color-warning-dark);
 
         &:hover {
           --back-color: var(--color-warning-darker);
@@ -122,8 +122,8 @@
 
       &.ExcButton--variant-outlined,
       &.ExcButton--variant-icon {
-        --text-color: var(--color-warning);
-        --border-color: var(--color-warning);
+        --text-color: var(--color-warning-dark);
+        --border-color: var(--color-warning-dark);
         --back-color: var(--input-bg-color);
 
         &:hover {

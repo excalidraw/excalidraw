@@ -99,8 +99,9 @@
   --color-gray-100: #121212;
 
   --color-warning: #fceeca;
-  --color-warning-darker: #ffce50;
-  --color-warning-darkest: #ce9911;
+  --color-warning-dark: #f5c354;
+  --color-warning-darker: #f3ab2c;
+  --color-warning-darkest: #ec8b14;
   --color-text-warning: var(--text-primary-color);
 
   --color-danger: #db6965;
@@ -111,8 +112,8 @@
   --color-danger-icon-background: #ffdad6;
   --color-danger-color: #700000;
   --color-danger-icon-color: #700000;
-  --color-warning-background: #fbffe2;
-  --color-warning-icon-background: var(--color-warning);
+  --color-warning-background: var(--color-warning);
+  --color-warning-icon-background: var(--color-warning-dark);
   --color-warning-color: var(--text-primary-color);
   --color-warning-icon-color: var(--text-primary-color);
 
@@ -204,8 +205,8 @@
     --color-danger-icon-background: #672120;
     --color-danger-color: #261919;
     --color-danger-icon-color: #fbcbcc;
-    --color-warning-background: #fbffe2;
-    --color-warning-icon-background: var(--color-warning);
+    --color-warning-background: var(--color-warning);
+    --color-warning-icon-background: var(--color-warning-dark);
     --color-warning-color: var(--color-gray-80);
     --color-warning-icon-color: var(--color-gray-80);
 
