@@ -5,6 +5,10 @@
   --zIndex-canvas: 1;
   --zIndex-wysiwyg: 2;
   --zIndex-layerUI: 3;
+
+  --zIndex-modal: 1000;
+  --zIndex-popup: 1001;
+  --zIndex-toast: 999999;
 }
 
 .excalidraw {

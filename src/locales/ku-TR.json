@@ -71,7 +71,7 @@
     "language": "زمان",
     "liveCollaboration": "هاوکاریکردنی زیندو...",
     "duplicateSelection": "لەبەرگرتنەوە",
-    "untitled": "بێ-ناو",
+    "untitled": "بێ ناونیشان",
     "name": "ناو",
     "yourName": "ناوەکەت",
     "madeWithExcalidraw": "دروستکراوە بە Excalidraw",
@@ -124,7 +124,9 @@
     },
     "statusPublished": "بڵاوکراوەتەوە",
     "sidebarLock": "هێشتنەوەی شریتی لا بە کراوەیی",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "هەموو توخمەکانی ناو چوارچێوەکە دیاری بکە",
+    "removeAllElementsFromFrame": "هەموو توخمەکانی ناو چوارچێوەکە لابەرە",
+    "eyeDropper": "ڕەنگێک لەسەر تابلۆکە هەڵبژێرە"
   },
   "library": {
     "noItems": "هێشتا هیچ بڕگەیەک زیاد نەکراوە...",
@@ -221,7 +223,9 @@
     "penMode": "شێوازی قەڵەم - دەست لێدان ڕابگرە",
     "link": "زیادکردن/ نوێکردنەوەی لینک بۆ شێوەی دیاریکراو",
     "eraser": "سڕەر",
-    "hand": "دەست (ئامرازی پانکردن)"
+    "frame": "ئامرازی چوارچێوە",
+    "hand": "دەست (ئامرازی پانکردن)",
+    "extraTools": "ئامرازی زیاتر"
   },
   "headings": {
     "canvasActions": "کردارەکانی تابلۆ",
@@ -356,27 +360,27 @@
     "removeItemsFromLib": "لابردنی ئایتمە دیاریکراوەکان لە کتێبخانە"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "وێنە هەناردە بکە",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "پاشبنەما",
+      "onlySelected": "تەنها دیاریکراوەکان",
+      "darkMode": "دۆخی تاریک",
+      "embedScene": "دیمەنەکە بەکاربهێنەرەوە",
+      "scale": "قەبارە",
+      "padding": "بۆشایی"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "داتاکانی دیمەنەکە لە فایلە هەناردەکراوەکەی PNG/SVG هەڵدەگیرێن بۆ ئەوەی دیمەنەکە لێیەوە بگەڕێتەوە.\nقەبارەی پەڕگەی هەناردەکراو زیاد دەکات."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "هەناردە بکە وەک PNG",
+      "exportToSvg": "هەناردە بکە وەک SVG",
+      "copyPngToClipboard": "لەبەربگرەوە بۆ سەر تەختەنوس"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "له‌به‌ری بگره‌وه‌ بۆ ته‌خته‌نووس"
     }
   },
   "encrypted": {
@@ -411,20 +415,20 @@
   },
   "colors": {
     "transparent": "ڕوون",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "ڕەش",
+    "white": "سپی",
+    "red": "سور",
+    "pink": "پەمەیی",
+    "grape": "مێوژی",
+    "violet": "مۆری کاڵ",
+    "gray": "خۆڵەمێشی",
+    "blue": "شین",
+    "cyan": "شینی ئاسمانی",
+    "teal": "شەدری",
+    "green": "سه‌وز",
+    "yellow": "زەرد",
+    "orange": "پرتەقاڵی",
+    "bronze": "برۆنزی"
   },
   "welcomeScreen": {
     "app": {
@@ -440,10 +444,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "زۆرترین ڕەنگە باوە بەکارهاتووەکان",
+    "colors": "ڕەنگەکان",
+    "shades": "سێبەرەکان",
+    "hexCode": "کۆدی هێکس",
+    "noShades": "هیچ سێبەرێک بۆ ئەم ڕەنگە بەردەست نییە"
   }
 }

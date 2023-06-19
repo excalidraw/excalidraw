@@ -3303,7 +3303,10 @@ class App extends React.Component<AppProps, AppState> {
         container,
       );
     if (container && parentCenterPosition) {
-      shouldBindToContainer = true;
+      const boundTextElementToContainer = getBoundTextElement(container);
+      if (!boundTextElementToContainer) {
+        shouldBindToContainer = true;
+      }
     }
     let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
 
