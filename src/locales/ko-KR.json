@@ -449,5 +449,36 @@
     "shades": "색조",
     "hexCode": "Hex 코드",
     "noShades": "사용할 수 있는 색조가 없음"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }
