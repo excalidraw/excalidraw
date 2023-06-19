@@ -453,31 +453,31 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Izvozi kot sliko",
+        "button": "Izvozi kot sliko",
+        "description": "Izvozite podatke scene kot sliko, iz katere jo lahko pozneje uvozite."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Shrani na disk",
+        "button": "Shrani na disk",
+        "description": "Izvozite podatke scene v datoteko, iz katere jo lahko pozneje uvozite."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Izvozi v Excalidraw+",
+        "description": "Shrani sceno v svoj delovni prostor Excalidraw+."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Naloži iz datoteke",
+        "button": "Naloži iz datoteke",
+        "description": "Nalaganje iz datoteke bo <bold>prepisalo vašo obstoječo vsebino</bold>.<br></br>Svojo risbo lahko najprej varnostno kopirate z eno od spodnjih možnosti."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Naloži iz povezave",
+        "button": "Zamenjaj mojo vsebino",
+        "description": "Nalaganje zunanje risbe bo <bold>prepisalo vašo obstoječo vsebino</bold>.<br></br>Svojo risbo lahko najprej varnostno kopirate z eno od spodnjih možnosti."
       }
     }
   }
