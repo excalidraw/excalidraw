@@ -7131,6 +7131,10 @@ class App extends React.Component<AppProps, AppState> {
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     // must be retrieved first, in the same frame
     const { file, fileHandle } = await getFileFromEvent(event);
+    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+    );
 
     try {
       if (isSupportedImageFile(file)) {
@@ -7166,11 +7170,6 @@ class App extends React.Component<AppProps, AppState> {
         // to importing as regular image
         // ---------------------------------------------------------------------
 
-        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          event,
-          this.state,
-        );
-
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
@@ -7193,13 +7192,6 @@ class App extends React.Component<AppProps, AppState> {
         (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
           getEmbedLink(text)?.type === "video")
       ) {
-        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          {
-            clientX: event.clientX,
-            clientY: event.clientY,
-          },
-          this.state,
-        );
         const rectangle = this.insertEmbeddedRectangleElement({
           sceneX,
           sceneY,
