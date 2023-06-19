@@ -34,7 +34,7 @@ import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { jotaiScope } from "../../jotai";
 import { useUIAppState } from "../../context/ui-appState";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
-import { overwriteConfirmDialog } from "../OverwriteConfirm/OverwriteConfirm";
+import Trans from "../Trans";
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -49,9 +49,15 @@ export const LoadScene = () => {
     if (
       !elements.length ||
       (await openConfirmModal({
-        ...overwriteConfirmDialog,
-        title: t("buttons.load"),
-        actionLabel: t("buttons.load"),
+        title: t("overwriteConfirm.modal.loadFromFile.title"),
+        actionLabel: t("overwriteConfirm.modal.loadFromFile.button"),
+        description: (
+          <Trans
+            i18nKey="overwriteConfirm.modal.loadFromFile.description"
+            bold={(text) => <strong>{text}</strong>}
+            br={() => <br />}
+          />
+        ),
       }))
     ) {
       actionManager.executeAction(actionLoadScene);

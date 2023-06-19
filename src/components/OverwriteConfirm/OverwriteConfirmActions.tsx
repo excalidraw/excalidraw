@@ -2,6 +2,7 @@ import React from "react";
 import { FilledButton } from "../FilledButton";
 import { useExcalidrawActionManager, useExcalidrawSetAppState } from "../App";
 import { actionSaveFileToDisk } from "../../actions";
+import { useI18n } from "../../i18n";
 
 export type ActionProps = {
   title: string;
@@ -35,33 +36,35 @@ export const Action = ({
 };
 
 export const ExportToImage = () => {
+  const { t } = useI18n();
   const setAppState = useExcalidrawSetAppState();
 
   return (
     <Action
-      title="Export as image"
-      actionLabel="Export as image"
+      title={t("overwriteConfirm.action.exportToImage.title")}
+      actionLabel={t("overwriteConfirm.action.exportToImage.button")}
       onClick={() => {
         setAppState({ openDialog: "imageExport" });
       }}
     >
-      Export the scene data as a image from which you can import later.
+      {t("overwriteConfirm.action.exportToImage.description")}
     </Action>
   );
 };
 
 export const SaveToDisk = () => {
+  const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
 
   return (
     <Action
-      title="Save to disk"
-      actionLabel="Save to disk"
+      title={t("overwriteConfirm.action.saveToDisk.title")}
+      actionLabel={t("overwriteConfirm.action.saveToDisk.button")}
       onClick={() => {
         actionManager.executeAction(actionSaveFileToDisk, "ui");
       }}
     >
-      Export the scene data to a file from which you can import later.
+      {t("overwriteConfirm.action.saveToDisk.description")}
     </Action>
   );
 };

@@ -37,7 +37,7 @@
       font-size: 1rem;
       line-height: 150%;
 
-      color: var(--color-danger-text);
+      color: var(--color-danger-color);
 
       &__spacer {
         flex-grow: 1;
@@ -49,13 +49,14 @@
         align-items: center;
         justify-content: center;
         border-radius: 2.5rem;
-        background: var(--color-danger-background-darker);
+        background: var(--color-danger-icon-background);
         width: 3.5rem;
         height: 3.5rem;
 
         padding: 0.75rem;
 
         svg {
+          color: var(--color-danger-icon-color);
           width: 1.5rem;
           height: 1.5rem;
         }
@@ -81,13 +82,13 @@
         flex-basis: 50%;
         flex-grow: 0;
 
-        border: 1px solid var(--color-muted);
-        border-radius: 0.75rem;
 
         &__content {
           height: 100%;
           font-size: 0.875rem;
           text-align: center;
+
+          margin-bottom: 1rem;
         }
 
         h4 {

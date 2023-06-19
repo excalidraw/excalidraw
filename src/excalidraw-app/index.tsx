@@ -93,11 +93,9 @@ import "./index.scss";
 import { ResolutionType } from "../utility-types";
 import { ShareableLinkDialog } from "../components/ShareableLinkDialog";
 import { openConfirmModal } from "../components/OverwriteConfirm/OverwriteConfirmState";
-import {
-  OverwriteConfirmDialog,
-  overwriteConfirmDialog,
-} from "../components/OverwriteConfirm/OverwriteConfirm";
+import { OverwriteConfirmDialog } from "../components/OverwriteConfirm/OverwriteConfirm";
 import { Action } from "../components/OverwriteConfirm/OverwriteConfirmActions";
+import Trans from "../components/Trans";
 
 polyfill();
 
@@ -107,6 +105,18 @@ const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {},
 });
+
+const shareableLinkConfirmDialog = {
+  title: t("overwriteConfirm.modal.shareableLink.title"),
+  description: (
+    <Trans
+      i18nKey="overwriteConfirm.modal.shareableLink.description"
+      bold={(text) => <strong>{text}</strong>}
+      br={() => <br />}
+    />
+  ),
+  actionLabel: t("overwriteConfirm.modal.shareableLink.button"),
+};
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
@@ -139,7 +149,7 @@ const initializeScene = async (opts: {
       // don't prompt for collab scenes because we don't override local storage
       roomLinkData ||
       // otherwise, prompt whether user wants to override current scene
-      (await openConfirmModal(overwriteConfirmDialog))
+      (await openConfirmModal(shareableLinkConfirmDialog))
     ) {
       if (jsonBackendMatch) {
         scene = await loadScene(
@@ -178,7 +188,7 @@ const initializeScene = async (opts: {
       const data = await loadFromBlob(await request.blob(), null, null);
       if (
         !scene.elements.length ||
-        (await openConfirmModal(overwriteConfirmDialog))
+        (await openConfirmModal(shareableLinkConfirmDialog))
       ) {
         return { scene: data, isExternalScene };
       }
@@ -704,8 +714,8 @@ const ExcalidrawWrapper = () => {
             <OverwriteConfirmDialog.Actions.SaveToDisk />
             {excalidrawAPI && (
               <Action
-                title="Excalidraw+"
-                actionLabel="Export to Excalidraw+"
+                title={t("overwriteConfirm.action.excalidrawPlus.title")}
+                actionLabel={t("overwriteConfirm.action.excalidrawPlus.button")}
                 onClick={() => {
                   exportToExcalidrawPlus(
                     excalidrawAPI.getSceneElements(),
@@ -714,7 +724,7 @@ const ExcalidrawWrapper = () => {
                   );
                 }}
               >
-                Save the scene to your Excalidraw+ workspace.
+                {t("overwriteConfirm.action.excalidrawPlus.description")}
               </Action>
             )}
           </OverwriteConfirmDialog.Actions>

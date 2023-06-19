@@ -87,16 +87,4 @@ const OverwriteConfirmDialog = Object.assign(
   },
 );
 
-const overwriteConfirmDialog = {
-  title: t("overwriteConfirmationDialog.header.shareable_link"),
-  description: (
-    <Trans
-      i18nKey="overwriteConfirmationDialog.description.shareable_link"
-      bold={(text) => <strong>{text}</strong>}
-      br={() => <br />}
-    />
-  ),
-  actionLabel: t("overwriteConfirmationDialog.button.confirm"),
-};
-
-export { OverwriteConfirmDialog, overwriteConfirmDialog };
+export { OverwriteConfirmDialog };
