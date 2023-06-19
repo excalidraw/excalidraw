@@ -124,7 +124,9 @@
     },
     "statusPublished": "Argitaratua",
     "sidebarLock": "Mantendu alboko barra irekita",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Hautatu markoko elementu guztiak",
+    "removeAllElementsFromFrame": "Kendu markoko elementu guztiak",
+    "eyeDropper": "Aukeratu kolorea oihaletik"
   },
   "library": {
     "noItems": "Oraindik ez da elementurik gehitu...",
@@ -221,7 +223,9 @@
     "penMode": "Luma modua - ukipena saihestu",
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma",
-    "hand": "Eskua (panoratze tresna)"
+    "frame": "Marko tresna",
+    "hand": "Eskua (panoratze tresna)",
+    "extraTools": "Tresna gehiago"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -356,27 +360,27 @@
     "removeItemsFromLib": "Kendu hautatutako elementuak liburutegitik"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Esportatu irudia",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Atzeko planoa",
+      "onlySelected": "Hautapena soilik",
+      "darkMode": "Modu iluna",
+      "embedScene": "Txertatu eszena",
+      "scale": "Eskala",
+      "padding": "Betegarria"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Eszenaren datuak esportatutako PNG/SVG fitxategian gordeko dira, eszena bertatik berrezartzeko.\nEsportatutako fitxategien tamaina handituko da."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Esportatu PNG gisa",
+      "exportToSvg": "Esportatu SVG gisa",
+      "copyPngToClipboard": "Kopiatu PNG arbelera"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopiatu arbelean"
     }
   },
   "encrypted": {
@@ -411,20 +415,20 @@
   },
   "colors": {
     "transparent": "Gardena",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Beltza",
+    "white": "Zuria",
+    "red": "Gorria",
+    "pink": "Arrosa",
+    "grape": "Mahats kolorea",
+    "violet": "Bioleta",
+    "gray": "Grisa",
+    "blue": "Urdina",
+    "cyan": "Ziana",
+    "teal": "Berde urdinxka",
+    "green": "Berdea",
+    "yellow": "Horia",
+    "orange": "Laranja",
+    "bronze": "Brontzea"
   },
   "welcomeScreen": {
     "app": {
@@ -440,10 +444,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Gehien erabilitako kolore pertsonalizatuak",
+    "colors": "Koloreak",
+    "shades": "Ñabardurak",
+    "hexCode": "Hez kodea",
+    "noShades": "Kolore honetarako ez dago ñabardurarik eskuragarri"
   }
 }
