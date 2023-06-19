@@ -453,31 +453,31 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Als Bild exportieren",
+        "button": "Als Bild exportieren",
+        "description": "Exportiere die Zeichnungsdaten als ein Bild, von dem Du später importieren kannst."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Auf Festplatte speichern",
+        "button": "Auf Festplatte speichern",
+        "description": "Exportiere die Zeichnungsdaten in eine Datei, von der Du später importieren kannst."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Export nach Excalidraw+",
+        "description": "Speichere die Szene in deinem Excalidraw+-Arbeitsbereich."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Aus Datei laden",
+        "button": "Aus Datei laden",
+        "description": "Das Laden aus einer Datei wird <bold>Deinen vorhandenen Inhalt ersetzen</bold>.<br></br>Du kannst Deine Zeichnung zuerst mit einer der folgenden Optionen sichern."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Aus Link laden",
+        "button": "Meinen Inhalt ersetzen",
+        "description": "Das Laden einer externen Zeichnung wird <bold>Deinen vorhandenen Inhalt ersetzen</bold>.<br></br>Du kannst Deine Zeichnung zuerst mit einer der folgenden Optionen sichern."
       }
     }
   }
