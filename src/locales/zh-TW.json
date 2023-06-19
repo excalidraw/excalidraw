@@ -449,5 +449,36 @@
     "shades": "漸變色",
     "hexCode": "Hex 碼",
     "noShades": "沒有此顏色的漸變色"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }
