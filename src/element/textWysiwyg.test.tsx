@@ -1460,7 +1460,7 @@ describe("textWysiwyg", () => {
       );
     });
 
-    it("shouldn't bind to container if container has bound text vertically not centered and text tool is used", async () => {
+    it("shouldn't bind to container if container has bound text not centered and text tool is used", async () => {
       expect(h.elements.length).toBe(1);
 
       Keyboard.keyPress(KEYS.ENTER);
