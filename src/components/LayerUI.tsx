@@ -103,12 +103,8 @@ const DefaultMainMenu: React.FC<{
 const DefaultOverwriteConfirmDialog = () => {
   return (
     <OverwriteConfirmDialog __fallback>
-      <OverwriteConfirmDialog.Title />
-      <OverwriteConfirmDialog.Description />
-      <OverwriteConfirmDialog.Actions>
-        <OverwriteConfirmDialog.Actions.SaveToDisk />
-        <OverwriteConfirmDialog.Actions.ExportToImage />
-      </OverwriteConfirmDialog.Actions>
+      <OverwriteConfirmDialog.Actions.SaveToDisk />
+      <OverwriteConfirmDialog.Actions.ExportToImage />
     </OverwriteConfirmDialog>
   );
 };

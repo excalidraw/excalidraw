@@ -94,7 +94,6 @@ import { ResolutionType } from "../utility-types";
 import { ShareableLinkDialog } from "../components/ShareableLinkDialog";
 import { openConfirmModal } from "../components/OverwriteConfirm/OverwriteConfirmState";
 import { OverwriteConfirmDialog } from "../components/OverwriteConfirm/OverwriteConfirm";
-import { Action } from "../components/OverwriteConfirm/OverwriteConfirmActions";
 import Trans from "../components/Trans";
 
 polyfill();
@@ -708,27 +707,23 @@ const ExcalidrawWrapper = () => {
           isCollabEnabled={!isCollabDisabled}
         />
         <OverwriteConfirmDialog>
-          <OverwriteConfirmDialog.Title />
-          <OverwriteConfirmDialog.Description />
-          <OverwriteConfirmDialog.Actions>
-            <OverwriteConfirmDialog.Actions.ExportToImage />
-            <OverwriteConfirmDialog.Actions.SaveToDisk />
-            {excalidrawAPI && (
-              <Action
-                title={t("overwriteConfirm.action.excalidrawPlus.title")}
-                actionLabel={t("overwriteConfirm.action.excalidrawPlus.button")}
-                onClick={() => {
-                  exportToExcalidrawPlus(
-                    excalidrawAPI.getSceneElements(),
-                    excalidrawAPI.getAppState(),
-                    excalidrawAPI.getFiles(),
-                  );
-                }}
-              >
-                {t("overwriteConfirm.action.excalidrawPlus.description")}
-              </Action>
-            )}
-          </OverwriteConfirmDialog.Actions>
+          <OverwriteConfirmDialog.Actions.ExportToImage />
+          <OverwriteConfirmDialog.Actions.SaveToDisk />
+          {excalidrawAPI && (
+            <OverwriteConfirmDialog.Action
+              title={t("overwriteConfirm.action.excalidrawPlus.title")}
+              actionLabel={t("overwriteConfirm.action.excalidrawPlus.button")}
+              onClick={() => {
+                exportToExcalidrawPlus(
+                  excalidrawAPI.getSceneElements(),
+                  excalidrawAPI.getAppState(),
+                  excalidrawAPI.getFiles(),
+                );
+              }}
+            >
+              {t("overwriteConfirm.action.excalidrawPlus.description")}
+            </OverwriteConfirmDialog.Action>
+          )}
         </OverwriteConfirmDialog>
         <AppFooter />
         {isCollaborating && isOffline && (
