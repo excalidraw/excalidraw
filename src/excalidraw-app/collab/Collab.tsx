@@ -374,10 +374,30 @@ class Collab extends PureComponent<Props, CollabState> {
             }
             this.onPauseCollaborationChange(PauseCollaborationState.SYNCED);
           };
+
+          // Set timeout to fallback to fetch data from firebase
           this.fallbackResumeTimeout = setTimeout(
             fallbackResumeHandler,
             RESUME_FALLBACK_TIMEOUT,
           );
+
+          // When no users are in the room, we fallback to fetch data from firebase immediately and clear fallback timeout
+          this.portal.socket.on("first-in-room", () => {
+            if (this.portal.socket) {
+              this.portal.socket.off("first-in-room");
+            }
+
+            fallbackResumeHandler();
+
+            if (this.fallbackResumeTimeout) {
+              clearTimeout(this.fallbackResumeTimeout);
+            }
+          });
+        }
+
+        // Clear pause timeout if exists
+        if (this.pauseTimeoutId) {
+          clearTimeout(this.pauseTimeoutId);
         }
 
         break;
