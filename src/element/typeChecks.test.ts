@@ -30,15 +30,6 @@ describe("Test TypeChecks", () => {
           }),
         ),
       ).toBeTruthy();
-
-      expect(
-        hasBoundTextElement(
-          API.createElement({
-            type: "image",
-            boundElements: [{ type: "text", id: "text-id" }],
-          }),
-        ),
-      ).toBeTruthy();
     });
 
     it("should return false for text bindable containers without bound text", () => {
@@ -62,5 +53,14 @@ describe("Test TypeChecks", () => {
         ),
       ).toBeFalsy();
     });
+
+    expect(
+      hasBoundTextElement(
+        API.createElement({
+          type: "image",
+          boundElements: [{ type: "text", id: "text-id" }],
+        }),
+      ),
+    ).toBeFalsy();
   });
 });
