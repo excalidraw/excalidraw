@@ -124,6 +124,8 @@
     },
     "statusPublished": "Publié",
     "sidebarLock": "Maintenir la barre latérale ouverte",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Mode stylo - évite le toucher",
     "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
     "eraser": "Gomme",
-    "hand": "Mains (outil de déplacement de la vue)"
+    "frame": "",
+    "hand": "Mains (outil de déplacement de la vue)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Actions du canevas",

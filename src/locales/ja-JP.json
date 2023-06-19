@@ -124,6 +124,8 @@
     },
     "statusPublished": "公開済み",
     "sidebarLock": "サイドバーを開いたままにする",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "ペンモード - タッチ防止",
     "link": "選択した図形のリンクを追加/更新",
     "eraser": "消しゴム",
-    "hand": "手 (パンニングツール)"
+    "frame": "",
+    "hand": "手 (パンニングツール)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "キャンバス操作",

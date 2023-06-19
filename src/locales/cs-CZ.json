@@ -124,6 +124,8 @@
     },
     "statusPublished": "Zveřejněno",
     "sidebarLock": "Ponechat postranní panel otevřený",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": "Vyberte barvu z plátna"
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Režim Pera - zabránit dotyku",
     "link": "Přidat/aktualizovat odkaz pro vybraný tvar",
     "eraser": "Guma",
-    "hand": "Ruka (nástroj pro posouvání)"
+    "frame": "",
+    "hand": "Ruka (nástroj pro posouvání)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Akce plátna",

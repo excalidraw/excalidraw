@@ -124,6 +124,8 @@
     },
     "statusPublished": "Опубліковано",
     "sidebarLock": "Не закривати бокове меню",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Режим пера - запобігання дотику",
     "link": "Додати/Оновити посилання для вибраної форми",
     "eraser": "Очищувач",
-    "hand": "Рука (інструмент для панорамування)"
+    "frame": "",
+    "hand": "Рука (інструмент для панорамування)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Дії з полотном",

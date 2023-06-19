@@ -124,6 +124,8 @@
     },
     "statusPublished": "Publicado",
     "sidebarLock": "Manter a barra lateral aberta",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Modo caneta - impedir toque",
     "link": "Acrescentar/ Adicionar ligação para uma forma seleccionada",
     "eraser": "Borracha",
-    "hand": "Mão (ferramenta de movimento da tela)"
+    "frame": "",
+    "hand": "Mão (ferramenta de movimento da tela)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Ações da área de desenho",

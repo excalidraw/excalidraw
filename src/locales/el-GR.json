@@ -124,6 +124,8 @@
     },
     "statusPublished": "Δημοσιευμένο",
     "sidebarLock": "Κρατήστε την πλαϊνή μπάρα ανοιχτή",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Λειτουργία μολυβιού - αποτροπή αφής",
     "link": "Προσθήκη/ Ενημέρωση συνδέσμου για ένα επιλεγμένο σχήμα",
     "eraser": "Γόμα",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Ενέργειες καμβά",

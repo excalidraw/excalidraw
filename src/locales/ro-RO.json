@@ -124,6 +124,8 @@
     },
     "statusPublished": "Publicat",
     "sidebarLock": "Păstrează deschisă bara laterală",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": "Alegere culoare din pânză"
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Mod stilou – împiedică atingerea",
     "link": "Adăugare/actualizare URL pentru forma selectată",
     "eraser": "Radieră",
-    "hand": "Mână (instrument de panoramare)"
+    "frame": "",
+    "hand": "Mână (instrument de panoramare)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",

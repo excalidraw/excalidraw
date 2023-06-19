@@ -124,6 +124,8 @@
     },
     "statusPublished": "வெளியிடப்பட்டது",
     "sidebarLock": "பக்கப்பட்டையைத் திறந்தே வை",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": "கித்தானிலிருந்து நிறம் தேர்ந்தெடு"
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "",
     "link": "தேர்தெடுத்த வடிவத்திற்குத் தொடுப்பைச் சேர்/ புதுப்பி",
     "eraser": "அழிப்பி",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "கித்தான் செயல்கள்",

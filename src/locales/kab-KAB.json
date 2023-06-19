@@ -124,6 +124,8 @@
     },
     "statusPublished": "Yeffeɣ-d",
     "sidebarLock": "Eǧǧ afeggag n yidis yeldi",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Askar n yimru - gdel tanalit",
     "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen",
     "eraser": "Sfeḍ",
-    "hand": "Afus (afecku n usmutti n tmuɣli)"
+    "frame": "",
+    "hand": "Afus (afecku n usmutti n tmuɣli)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Tigawin n teɣzut n usuneɣ",

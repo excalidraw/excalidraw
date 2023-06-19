@@ -124,6 +124,8 @@
     },
     "statusPublished": "",
     "sidebarLock": "",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Rašyklio režimas - neleisti prisilietimų",
     "link": "Pridėti / Atnaujinti pasirinktos figūros nuorodą",
     "eraser": "Trintukas",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Veiksmai su drobe",

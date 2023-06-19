@@ -124,6 +124,8 @@
     },
     "statusPublished": "Opublikowano",
     "sidebarLock": "Panel boczny zawsze otwarty",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": "Wybierz kolor z płótna"
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Tryb pióra — zapobiegaj dotknięciom",
     "link": "Dodaj/aktualizuj link dla wybranego kształtu",
     "eraser": "Gumka",
-    "hand": "Ręka (narzędzie do przesuwania)"
+    "frame": "",
+    "hand": "Ręka (narzędzie do przesuwania)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Narzędzia",

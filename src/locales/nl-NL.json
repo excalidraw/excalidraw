@@ -124,6 +124,8 @@
     },
     "statusPublished": "Gepubliceerd",
     "sidebarLock": "Zijbalk open houden",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Pen modus - Blokkeer aanraken",
     "link": "Link toevoegen / bijwerken voor een geselecteerde vorm",
     "eraser": "Gum",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Canvasacties",
