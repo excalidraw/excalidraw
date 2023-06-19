@@ -75,6 +75,7 @@
 
         .OverwriteConfirm__Description__icon {
           background: var(--color-warning-icon-background);
+          flex: 0 0 auto;
 
           svg {
             color: var(--color-warning-icon-color);
