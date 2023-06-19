@@ -44,8 +44,8 @@
 
     &--color-danger {
       &.ExcButton--variant-filled {
-        --text-color: black;
-        --back-color: var(--color-danger);
+        --text-color: var(--color-danger-icon-color);
+        --back-color: var(--color-danger-dark);
 
         &:hover {
           --back-color: var(--color-danger-darker);
