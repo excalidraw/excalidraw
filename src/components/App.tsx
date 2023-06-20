@@ -462,6 +462,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDown: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
+  private iFrameRefs: { [key: string]: HTMLIFrameElement } = {};
 
   constructor(props: AppProps) {
     super(props);
@@ -666,156 +667,154 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  private updateIFrameRef(id: string, ref: HTMLIFrameElement | null) {
+    if (ref) {
+      this.iFrameRefs[id] = ref;
+    }
+  }
+
+  private getIFrameElementById(id: string): HTMLIFrameElement | undefined {
+    return this.iFrameRefs[id];
+  }
+
+  private handleIFrameCenterClick(element: NonDeletedExcalidrawElement) {
+    if (this.state.activeIFrameElement === element) {
+      return;
+    }
+
+    this.setState({
+      activeIFrameElement: element,
+      selectedElementIds: { [element.id]: true },
+    });
+
+    const iframe = this.getIFrameElementById(element.id);
+
+    if (!iframe?.contentWindow) {
+      return;
+    }
+
+    if (iframe.src.includes("youtube")) {
+      const state = youtubeContainers.get(element.id);
+      if (!state) {
+        youtubeContainers.set(element.id, YTPLAYER.UNSTARTED);
+        iframe.contentWindow.postMessage(
+          JSON.stringify({
+            event: "listening",
+            id: element.id,
+          }),
+          "*",
+        );
+      }
+      switch (state) {
+        case YTPLAYER.PLAYING:
+        case YTPLAYER.BUFFERING:
+          iframe.contentWindow?.postMessage(
+            JSON.stringify({
+              event: "command",
+              func: "pauseVideo",
+              args: "",
+            }),
+            "*",
+          );
+          break;
+        default:
+          iframe.contentWindow?.postMessage(
+            JSON.stringify({
+              event: "command",
+              func: "playVideo",
+              args: "",
+            }),
+            "*",
+          );
+      }
+    }
+
+    if (iframe.src.includes("player.vimeo.com")) {
+      iframe.contentWindow.postMessage(
+        JSON.stringify({
+          method: "paused", //video play/pause in onWindowMessage handler
+        }),
+        "*",
+      );
+    }
+  }
+
   private renderIFrames() {
     const scale = this.state.zoom.value;
     const normalizedWidth = this.state.width;
     const normalizedHeight = this.state.height;
+    const iFrameElements = this.scene
+      .getNonDeletedElements()
+      .filter((el) => isIFrameElement(el));
+    Object.keys(this.iFrameRefs).forEach((key) => {
+      if (!iFrameElements.some((el) => el.id === key)) {
+        delete this.iFrameRefs[key];
+      }
+    });
     return (
       <>
-        {this.scene
-          .getNonDeletedElements()
-          .filter((el) => isIFrameElement(el))
-          .map((el) => {
-            const { x, y } = sceneCoordsToViewportCoords(
-              { sceneX: el.x, sceneY: el.y },
-              this.state,
-            );
-            const embedLink = getEmbedLink(el.link);
-            const src = embedLink?.link ?? "";
-            const isVisible = isVisibleElement(
-              el,
-              normalizedWidth,
-              normalizedHeight,
-              this.state,
-            );
-            const isSelected = this.state.activeIFrameElement === el;
+        {iFrameElements.map((el) => {
+          const { x, y } = sceneCoordsToViewportCoords(
+            { sceneX: el.x, sceneY: el.y },
+            this.state,
+          );
+          const embedLink = getEmbedLink(el.link);
+          const src = embedLink?.link ?? "";
+          const isVisible = isVisibleElement(
+            el,
+            normalizedWidth,
+            normalizedHeight,
+            this.state,
+          );
+          const isSelected = this.state.activeIFrameElement === el;
+          const radius = getCornerRadius(Math.min(el.width, el.height), el);
+          const borderWidth = el.strokeWidth;
 
-            const radius = getCornerRadius(Math.min(el.width, el.height), el);
-
-            const self = this;
-            const handleOverlayClick = (
-              event: React.TouchEvent | React.PointerEvent | React.MouseEvent,
-            ) => {
-              if (isSelected) {
-                return;
-              }
-              self.setState({
-                activeIFrameElement: el,
-                selectedElementIds: { [el.id]: true },
-              });
-
-              const iframe = event.currentTarget.parentElement?.querySelector(
-                ".excalidraw__iframe",
-              ) as HTMLIFrameElement | null;
-
-              if (!iframe?.contentWindow) {
-                return;
-              }
-
-              if (src.includes("youtube")) {
-                const state = youtubeContainers.get(el.id);
-                if (!state) {
-                  youtubeContainers.set(el.id, YTPLAYER.UNSTARTED);
-                  iframe.contentWindow.postMessage(
-                    JSON.stringify({
-                      event: "listening",
-                      id: el.id,
-                    }),
-                    "*",
-                  );
-                }
-                switch (state) {
-                  case YTPLAYER.PLAYING:
-                  case YTPLAYER.BUFFERING:
-                    iframe.contentWindow?.postMessage(
-                      JSON.stringify({
-                        event: "command",
-                        func: "pauseVideo",
-                        args: "",
-                      }),
-                      "*",
-                    );
-                    break;
-                  default:
-                    iframe.contentWindow?.postMessage(
-                      JSON.stringify({
-                        event: "command",
-                        func: "playVideo",
-                        args: "",
-                      }),
-                      "*",
-                    );
-                }
-              }
-
-              if (src.includes("player.vimeo.com")) {
-                iframe.contentWindow.postMessage(
-                  JSON.stringify({
-                    method: "paused", //video play/pause in onWindowMessage handler
-                  }),
-                  "*",
-                );
-              }
-            };
-
-            const borderWidth = el.strokeWidth;
-
-            return (
+          return (
+            <div
+              key={el.id}
+              className="excalidraw__iframe-container"
+              style={{
+                top: `${y - this.state.offsetTop}px`,
+                left: `${x - this.state.offsetLeft}px`,
+                transform: `scale(${scale})`,
+                display: isVisible ? "block" : "none",
+                opacity: el.opacity / 100,
+              }}
+            >
               <div
-                key={el.id}
-                className="excalidraw__iframe-container"
                 style={{
-                  top: `${y - this.state.offsetTop}px`,
-                  left: `${x - this.state.offsetLeft}px`,
-                  transform: `scale(${scale})`,
-                  display: isVisible ? "block" : "none",
-                  opacity: el.opacity / 100,
+                  width: `${el.width}px`,
+                  height: `${el.height}px`,
+                  borderWidth: `${borderWidth}px`,
+                  borderStyle: "solid",
+                  borderColor: el.strokeColor,
+                  transform: `rotate(${el.angle}rad)`,
+                  borderRadius: `${radius}px`,
+                  pointerEvents: isSelected ? "auto" : "none",
                 }}
               >
-                <div
-                  style={{
-                    width: `${el.width}px`,
-                    height: `${el.height}px`,
-                    borderWidth: `${borderWidth}px`,
-                    borderStyle: "solid",
-                    borderColor: el.strokeColor,
-                    transform: `rotate(${el.angle}rad)`,
-                    borderRadius: `${radius}px`,
-                    pointerEvents: isSelected ? "auto" : "none",
-                  }}
-                >
-                  {this.props.renderCustomIFrame?.(
-                    el,
-                    radius,
-                    this.state as UIAppState,
-                  ) ?? (
-                    <iframe
-                      className="excalidraw__iframe"
-                      style={{
-                        borderRadius: `${radius}px`,
-                      }}
-                      src={src}
-                      title="Excalidraw Embedded Content"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen={true}
-                    />
-                  )}
-                  <div
-                    className="excalidraw__iframe-overlay"
-                    onClick={handleOverlayClick}
-                    onPointerDown={handleOverlayClick}
-                    onTouchStart={handleOverlayClick}
-                    onMouseDown={handleOverlayClick}
+                {this.props.renderCustomIFrame?.(
+                  el,
+                  radius,
+                  this.state as UIAppState,
+                ) ?? (
+                  <iframe
+                    ref={(ref) => this.updateIFrameRef(el.id, ref)}
+                    className="excalidraw__iframe"
                     style={{
-                      width: `${el.width / 4}px`,
-                      height: `${el.height / 4}px`,
-                      pointerEvents: isSelected ? "none" : "auto",
+                      borderRadius: `${radius}px`,
                     }}
+                    src={src}
+                    title="Excalidraw Embedded Content"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen={true}
                   />
-                </div>
+                )}
               </div>
-            );
-          })}
+            </div>
+          );
+        })}
       </>
     );
   }
@@ -4815,6 +4814,29 @@ class App extends React.Component<AppProps, AppState> {
           });
           // If we click on something
         } else if (hitElement != null) {
+          if (
+            !event.altKey &&
+            !event.shiftKey &&
+            !event.metaKey &&
+            !event.ctrlKey &&
+            hitElement.type === "iframe" &&
+            this.state.activeIFrameElement !== hitElement
+          ) {
+            if (
+              pointerDownState.origin.x >=
+                hitElement.x + hitElement.width / 3 &&
+              pointerDownState.origin.x <=
+                hitElement.x + (2 * hitElement.width) / 3 &&
+              pointerDownState.origin.y >=
+                hitElement.y + hitElement.height / 3 &&
+              pointerDownState.origin.y <=
+                hitElement.y + (2 * hitElement.height) / 3
+            ) {
+              this.handleIFrameCenterClick(hitElement);
+              return true;
+            }
+          }
+
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
           if (event[KEYS.CTRL_OR_CMD]) {
             if (!this.state.selectedElementIds[hitElement.id]) {
