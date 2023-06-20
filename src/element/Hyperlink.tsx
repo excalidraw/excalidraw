@@ -444,6 +444,26 @@ export const isPointHittingLinkIcon = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   [x, y]: Point,
+) => {
+  const threshold = 4 / appState.zoom.value;
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
+    [x1, y1, x2, y2],
+    element.angle,
+    appState,
+  );
+  const hitLink =
+    x > linkX - threshold &&
+    x < linkX + threshold + linkWidth &&
+    y > linkY - threshold &&
+    y < linkY + linkHeight + threshold;
+  return hitLink;
+};
+
+export const isPointHittingLink = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+  [x, y]: Point,
   isMobile: boolean,
 ) => {
   if (!element.link || appState.selectedElementIds[element.id]) {
@@ -457,19 +477,7 @@ export const isPointHittingLinkIcon = (
   ) {
     return true;
   }
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-
-  const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
-    [x1, y1, x2, y2],
-    element.angle,
-    appState,
-  );
-  const hitLink =
-    x > linkX - threshold &&
-    x < linkX + threshold + linkWidth &&
-    y > linkY - threshold &&
-    y < linkY + linkHeight + threshold;
-  return hitLink;
+  return isPointHittingLinkIcon(element, appState, [x, y]);
 };
 
 let HYPERLINK_TOOLTIP_TIMEOUT_ID: number | null = null;

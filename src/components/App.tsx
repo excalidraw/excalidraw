@@ -305,8 +305,9 @@ import {
   showHyperlinkTooltip,
   hideHyperlinkToolip,
   Hyperlink,
-  isPointHittingLinkIcon,
+  isPointHittingLink,
   isLocalLink,
+  isPointHittingLinkIcon,
 } from "../element/Hyperlink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
@@ -677,15 +678,24 @@ class App extends React.Component<AppProps, AppState> {
     return this.iFrameRefs[id];
   }
 
-  private handleIFrameCenterClick(element: NonDeletedExcalidrawElement) {
+  private handleIFrameCenterClick(
+    element: NonDeletedExcalidrawElement,
+    select: boolean = true,
+  ) {
     if (this.state.activeIFrameElement === element) {
       return;
     }
 
-    this.setState({
-      activeIFrameElement: element,
-      selectedElementIds: { [element.id]: true },
-    });
+    if (select) {
+      this.setState({
+        activeIFrameElement: element,
+        selectedElementIds: { [element.id]: true },
+      });
+    } else {
+      this.setState({
+        activeIFrameElement: element,
+      });
+    }
 
     const iframe = this.getIFrameElementById(element.id);
 
@@ -737,6 +747,27 @@ class App extends React.Component<AppProps, AppState> {
         "*",
       );
     }
+  }
+
+  private isIFrameCenter(
+    el: NonDeletedExcalidrawElement | null,
+    event: React.PointerEvent<HTMLElement>,
+    sceneX: number,
+    sceneY: number,
+  ) {
+    return (
+      el &&
+      !event.altKey &&
+      !event.shiftKey &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      el.type === "iframe" &&
+      this.state.activeIFrameElement !== el &&
+      sceneX >= el.x + el.width / 3 &&
+      sceneX <= el.x + (2 * el.width) / 3 &&
+      sceneY >= el.y + el.height / 3 &&
+      sceneY <= el.y + (2 * el.height) / 3
+    );
   }
 
   private renderIFrames() {
@@ -1646,6 +1677,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private addEventListeners() {
     this.removeEventListeners();
+    window.addEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
     document.addEventListener(EVENT.POINTER_UP, this.removePointer); // #3553
     document.addEventListener(EVENT.COPY, this.onCopy);
     this.excalidrawContainerRef.current?.addEventListener(
@@ -1712,7 +1744,6 @@ class App extends React.Component<AppProps, AppState> {
       this.disableEvent,
       false,
     );
-    window.addEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
@@ -3557,7 +3588,7 @@ class App extends React.Component<AppProps, AppState> {
       return (
         element.link &&
         index <= hitElementIndex &&
-        isPointHittingLinkIcon(
+        isPointHittingLink(
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
@@ -3589,7 +3620,7 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerDown!,
       this.state,
     );
-    const lastPointerDownHittingLinkIcon = isPointHittingLinkIcon(
+    const lastPointerDownHittingLinkIcon = isPointHittingLink(
       this.hitLinkElement,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
@@ -3599,7 +3630,7 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerUp!,
       this.state,
     );
-    const lastPointerUpHittingLinkIcon = isPointHittingLinkIcon(
+    const lastPointerUpHittingLinkIcon = isPointHittingLink(
       this.hitLinkElement,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
@@ -3967,7 +3998,13 @@ class App extends React.Component<AppProps, AppState> {
             )) &&
           !hitElement?.locked
         ) {
-          setCursor(this.canvas, CURSOR_TYPE.MOVE);
+          if (
+            this.isIFrameCenter(hitElement, event, scenePointerX, scenePointerY)
+          ) {
+            setCursor(this.canvas, CURSOR_TYPE.POINTER);
+          } else {
+            setCursor(this.canvas, CURSOR_TYPE.MOVE);
+          }
         }
       } else {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
@@ -4385,11 +4422,11 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.lastPointerUp = event;
 
+    const scenePointer = viewportCoordsToSceneCoords(
+      { clientX: event.clientX, clientY: event.clientY },
+      this.state,
+    );
     if (this.device.isTouchScreen) {
-      const scenePointer = viewportCoordsToSceneCoords(
-        { clientX: event.clientX, clientY: event.clientY },
-        this.state,
-      );
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
         scenePointer.y,
@@ -4403,7 +4440,19 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event, this.device.isTouchScreen);
+      if (
+        this.hitLinkElement.type === "iframe" &&
+        !isPointHittingLinkIcon(this.hitLinkElement, this.state, [
+          scenePointer.x,
+          scenePointer.y,
+        ])
+      ) {
+        this.handleIFrameCenterClick(this.hitLinkElement, false);
+      } else {
+        this.redirectToLink(event, this.device.isTouchScreen);
+      }
+    } else if (this.state.viewModeEnabled) {
+      this.setState({ activeIFrameElement: null });
     }
 
     this.removePointer(event);
@@ -4815,26 +4864,15 @@ class App extends React.Component<AppProps, AppState> {
           // If we click on something
         } else if (hitElement != null) {
           if (
-            !event.altKey &&
-            !event.shiftKey &&
-            !event.metaKey &&
-            !event.ctrlKey &&
-            hitElement.type === "iframe" &&
-            this.state.activeIFrameElement !== hitElement
+            this.isIFrameCenter(
+              hitElement,
+              event,
+              pointerDownState.origin.x,
+              pointerDownState.origin.y,
+            )
           ) {
-            if (
-              pointerDownState.origin.x >=
-                hitElement.x + hitElement.width / 3 &&
-              pointerDownState.origin.x <=
-                hitElement.x + (2 * hitElement.width) / 3 &&
-              pointerDownState.origin.y >=
-                hitElement.y + hitElement.height / 3 &&
-              pointerDownState.origin.y <=
-                hitElement.y + (2 * hitElement.height) / 3
-            ) {
-              this.handleIFrameCenterClick(hitElement);
-              return true;
-            }
+            this.handleIFrameCenterClick(hitElement);
+            return true;
           }
 
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
