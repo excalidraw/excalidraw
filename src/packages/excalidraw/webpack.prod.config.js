@@ -51,6 +51,10 @@ module.exports = {
 
         use: [
           {
+            loader: "import-meta-loader",
+            options: {},
+          },
+          {
             loader: "ts-loader",
             options: {
               transpileOnly: true,

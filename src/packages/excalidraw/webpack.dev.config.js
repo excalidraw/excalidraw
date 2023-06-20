@@ -48,6 +48,10 @@ module.exports = {
           /node_modules\/(?!(browser-fs-access|canvas-roundrect-polyfill))/,
         use: [
           {
+            loader: "import-meta-loader",
+            options: {},
+          },
+          {
             loader: "ts-loader",
             options: {
               transpileOnly: true,
