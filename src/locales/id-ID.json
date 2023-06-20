@@ -126,7 +126,7 @@
     "sidebarLock": "Biarkan sidebar tetap terbuka",
     "selectAllElementsInFrame": "Pilih semua elemen di bingkai",
     "removeAllElementsFromFrame": "Hapus semua elemen dari bingkai",
-    "eyeDropper": ""
+    "eyeDropper": "Ambil warna dari kanvas"
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
@@ -223,9 +223,9 @@
     "penMode": "Mode pena - mencegah sentuhan",
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
     "eraser": "Penghapus",
-    "frame": "",
+    "frame": "Alat bingkai",
     "hand": "Tangan (alat panning)",
-    "extraTools": ""
+    "extraTools": "Alat-alat lain"
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -360,14 +360,14 @@
     "removeItemsFromLib": "Hapus item yang dipilih dari pustaka"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Ekspor gambar",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Latar",
+      "onlySelected": "Hanya yang dipilih",
+      "darkMode": "Mode gelap",
+      "embedScene": "Sematkan pemandangan",
+      "scale": "Skala",
+      "padding": "Lapisan"
     },
     "tooltip": {
       "embedScene": ""
