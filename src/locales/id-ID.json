@@ -124,8 +124,8 @@
     },
     "statusPublished": "Telah terbit",
     "sidebarLock": "Biarkan sidebar tetap terbuka",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "Pilih semua elemen di bingkai",
+    "removeAllElementsFromFrame": "Hapus semua elemen dari bingkai",
     "eyeDropper": ""
   },
   "library": {
