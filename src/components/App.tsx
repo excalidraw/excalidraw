@@ -806,21 +806,21 @@ class App extends React.Component<AppProps, AppState> {
               key={el.id}
               className="excalidraw__iframe-container"
               style={{
-                top: `${y - this.state.offsetTop}px`,
-                left: `${x - this.state.offsetLeft}px`,
-                transform: `scale(${scale})`,
+                top: isVisible ? `${y - this.state.offsetTop}px` : 0,
+                left: isVisible ? `${x - this.state.offsetLeft}px` : 0,
+                transform: isVisible ? `scale(${scale})` : "none",
                 display: isVisible ? "block" : "none",
                 opacity: el.opacity / 100,
               }}
             >
               <div
                 style={{
-                  width: `${el.width}px`,
-                  height: `${el.height}px`,
+                  width: isVisible ? `${el.width}px` : 0,
+                  height: isVisible ? `${el.height}px` : 0,
                   borderWidth: `${borderWidth}px`,
                   borderStyle: "solid",
                   borderColor: el.strokeColor,
-                  transform: `rotate(${el.angle}rad)`,
+                  transform: isVisible ? `rotate(${el.angle}rad)` : "none",
                   borderRadius: `${radius}px`,
                   pointerEvents: isSelected ? "auto" : "none",
                 }}
