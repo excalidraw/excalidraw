@@ -1,7 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import svgrPlugin from "vite-plugin-svgr";
-import envCompatible from "vite-plugin-env-compatible";
 import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { VitePWA } from "vite-plugin-pwa";
 
@@ -13,9 +12,6 @@ export default defineConfig({
   plugins: [
     react(),
     svgrPlugin(),
-    envCompatible({ prefix: "REACT_APP" }),
-    // This is needed in order to use the same env API format that CRA uses with the EJS templating
-    // Vite by default uses import.meta.env
     ViteEjsPlugin((config) => {
       const esmEnvironment = loadEnv(config.mode, "./");
       const templatingEnvs = {

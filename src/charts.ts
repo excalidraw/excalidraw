@@ -384,7 +384,7 @@ const chartTypeBar = (
       y,
       groupId,
       backgroundColor,
-      process.env.NODE_ENV === ENV.DEVELOPMENT,
+      import.meta.env.DEV,
     ),
   ];
 };
@@ -473,7 +473,7 @@ const chartTypeLine = (
       y,
       groupId,
       backgroundColor,
-      process.env.NODE_ENV === ENV.DEVELOPMENT,
+      import.meta.env.DEV,
     ),
     line,
     ...lines,

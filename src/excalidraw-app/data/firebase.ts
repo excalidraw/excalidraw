@@ -21,10 +21,12 @@ import { ResolutionType } from "../../utility-types";
 
 let FIREBASE_CONFIG: Record<string, any>;
 try {
-  FIREBASE_CONFIG = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
+  FIREBASE_CONFIG = JSON.parse(import.meta.env.VITE_APP_FIREBASE_CONFIG);
 } catch (error: any) {
   console.warn(
-    `Error JSON parsing firebase config. Supplied value: ${process.env.REACT_APP_FIREBASE_CONFIG}`,
+    `Error JSON parsing firebase config. Supplied value: ${
+      import.meta.env.VITE_APP_FIREBASE_CONFIG
+    }`,
   );
   FIREBASE_CONFIG = {};
 }
