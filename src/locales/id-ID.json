@@ -370,17 +370,17 @@
       "padding": "Lapisan"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Data pemandangan akan disimpan dalam file PNG/SVG yang diekspor sehingga pemandangan itu dapat dipulihkan darinya.\nAkan membesarkan ukuran file yang diekspor."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Ekspor ke PNG",
+      "exportToSvg": "Ekspor ke SVG",
+      "copyPngToClipboard": "Salin PNG ke papan klip"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Salin ke papan klip"
     }
   },
   "encrypted": {
@@ -453,31 +453,31 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Ekspor sebagai gambar",
+        "button": "Ekspor sebagai gambar",
+        "description": "Ekspor data pemandangan sebagai gambar yang dapat anda impor nanti."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Simpan ke disk",
+        "button": "Simpan ke disk",
+        "description": "Ekspor data pemandangan ke file yang dapat Anda dapat impor nanti."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Ekspor ke Excalidraw+",
+        "description": "Simpan pemandangan ke ruang kerja Excalidraw+ Anda."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Muat dari file",
+        "button": "Muat dari file",
+        "description": "Memuat dari file yang akan <bold>menggantikan konten Anda sekarang</bold>.<br></br>Anda dapat mencadangkan gambar anda dulu menggunakan opsi-opsi ini."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Muat dari link",
+        "button": "Ganti konten saya",
+        "description": "Memuat dari file yang akan <bold>menggantikan konten Anda sekarang</bold>.<br></br>Anda dapat mencadangkan gambar anda dulu menggunakan opsi-opsi ini."
       }
     }
   }
