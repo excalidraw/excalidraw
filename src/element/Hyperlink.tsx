@@ -5,7 +5,7 @@ import {
   viewportCoordsToSceneCoords,
   wrapEvent,
 } from "../utils";
-import { getEmbedLink, isURLOnWhiteList } from "./iframe";
+import { getEmbedLink, hideActionForIFrame, isURLOnWhiteList } from "./iframe";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
 
@@ -225,7 +225,7 @@ export const Hyperlink = ({
     return null;
   }
 
-  if (isIFrameElement(element) && !appProps.iframeURLWhitelist) {
+  if (hideActionForIFrame(element, appProps)) {
     return null;
   }
 
@@ -375,15 +375,18 @@ export const actionLink = register({
     getContextMenuLabel(elements, appState),
   predicate: (elements, appState, appProps) => {
     const selectedElements = getSelectedElements(elements, appState);
-    return Boolean(
-      selectedElements.length === 1 &&
-        (!isIFrameElement(selectedElements[0]) || appProps.iframeURLWhitelist),
-    );
+    if (selectedElements.length === 1) {
+      if (hideActionForIFrame(selectedElements[0], appProps)) {
+        return false;
+      }
+      return true;
+    }
+    return false;
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => {
     const selectedElements = getSelectedElements(elements, appState);
 
-    if (isIFrameElement(selectedElements[0]) && !appProps.iframeURLWhitelist) {
+    if (hideActionForIFrame(selectedElements[0], appProps)) {
       return null;
     }
 

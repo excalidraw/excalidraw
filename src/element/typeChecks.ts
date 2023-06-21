@@ -43,7 +43,7 @@ export const isImageElement = (
 };
 
 export const isIFrameElement = (
-  element: ExcalidrawElement | null,
+  element: ExcalidrawElement | null | undefined,
 ): element is ExcalidrawIFrameElement => {
   return !!element && element.type === "iframe";
 };

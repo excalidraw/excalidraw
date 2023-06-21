@@ -1,4 +1,5 @@
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
+import { ExcalidrawProps } from "../types";
 import { newTextElement } from "./newElement";
 import { getContainerElement } from "./textElement";
 import { isIFrameElement } from "./typeChecks";
@@ -65,6 +66,11 @@ export const getEmbedLink = (
 
   return { link, aspectRatio, type };
 };
+
+export const hideActionForIFrame = (
+  element: ExcalidrawElement | undefined,
+  props: ExcalidrawProps,
+) => isIFrameElement(element) && !props.iframeURLWhitelist;
 
 export const isURLOnWhiteList = (
   url: string,

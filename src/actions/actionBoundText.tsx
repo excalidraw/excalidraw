@@ -5,6 +5,7 @@ import {
   TEXT_ALIGN,
 } from "../constants";
 import { getNonDeletedElements, isTextElement, newElement } from "../element";
+import { hideActionForIFrame } from "../element/iframe";
 import { mutateElement } from "../element/mutateElement";
 import {
   computeBoundTextPosition,
@@ -92,7 +93,7 @@ export const actionBindText = register({
   name: "bindText",
   contextItemLabel: "labels.bindText",
   trackEvent: { category: "element" },
-  predicate: (elements, appState) => {
+  predicate: (elements, appState, appProps) => {
     const selectedElements = getSelectedElements(elements, appState);
 
     if (selectedElements.length === 2) {
@@ -105,6 +106,9 @@ export const actionBindText = register({
         bindingContainer = selectedElements[0];
       } else if (isTextBindableContainer(selectedElements[1])) {
         bindingContainer = selectedElements[1];
+      }
+      if (hideActionForIFrame(bindingContainer, appProps)) {
+        return false;
       }
       if (
         textElement &&
