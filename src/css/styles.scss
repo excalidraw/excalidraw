@@ -5,6 +5,10 @@
   --zIndex-canvas: 1;
   --zIndex-wysiwyg: 2;
   --zIndex-layerUI: 3;
+
+  --zIndex-modal: 1000;
+  --zIndex-popup: 1001;
+  --zIndex-toast: 999999;
 }
 
 .excalidraw {
@@ -536,6 +540,10 @@
   ::-webkit-scrollbar {
     width: 3px;
     height: 3px;
+  }
+
+  select::-webkit-scrollbar {
+    width: 10px;
   }
 
   ::-webkit-scrollbar-thumb {

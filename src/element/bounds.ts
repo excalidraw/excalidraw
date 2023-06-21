@@ -6,7 +6,7 @@ import {
   NonDeleted,
   ExcalidrawTextElementWithContainer,
 } from "./types";
-import { distance2d, rotate } from "../math";
+import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
@@ -25,6 +25,14 @@ import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { Mutable } from "../utility-types";
 import { TransformHandleDirection } from "./transformHandles";
+
+export type RectangleBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  angle: number;
+};
 
 type MaybeQuadraticSolution = [number | null, number | null] | false;
 
@@ -111,6 +119,8 @@ export class ElementBounds {
   }
 }
 
+// Scene -> Scene coords, but in x1,x2,y1,y2 format.
+//
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
 export const getElementAbsoluteCoords = (
@@ -172,6 +182,111 @@ export const getElementsHandleCoordinates = (
     w: [minX, minY + height / 2],
     e: [maxX, minY + height / 2],
   };
+};
+
+/*
+ * for a given element, `getElementLineSegments` returns line segments
+ * that can be used for visual collision detection (useful for frames)
+ * as opposed to bounding box collision detection
+ */
+export const getElementLineSegments = (
+  element: ExcalidrawElement,
+): [Point, Point][] => {
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
+
+  const center: Point = [cx, cy];
+
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    const segments: [Point, Point][] = [];
+
+    let i = 0;
+
+    while (i < element.points.length - 1) {
+      segments.push([
+        rotatePoint(
+          [
+            element.points[i][0] + element.x,
+            element.points[i][1] + element.y,
+          ] as Point,
+          center,
+          element.angle,
+        ),
+        rotatePoint(
+          [
+            element.points[i + 1][0] + element.x,
+            element.points[i + 1][1] + element.y,
+          ] as Point,
+          center,
+          element.angle,
+        ),
+      ]);
+      i++;
+    }
+
+    return segments;
+  }
+
+  const [nw, ne, sw, se, n, s, w, e] = (
+    [
+      [x1, y1],
+      [x2, y1],
+      [x1, y2],
+      [x2, y2],
+      [cx, y1],
+      [cx, y2],
+      [x1, cy],
+      [x2, cy],
+    ] as Point[]
+  ).map((point) => rotatePoint(point, center, element.angle));
+
+  if (element.type === "diamond") {
+    return [
+      [n, w],
+      [n, e],
+      [s, w],
+      [s, e],
+    ];
+  }
+
+  if (element.type === "ellipse") {
+    return [
+      [n, w],
+      [n, e],
+      [s, w],
+      [s, e],
+      [n, w],
+      [n, e],
+      [s, w],
+      [s, e],
+    ];
+  }
+
+  return [
+    [nw, ne],
+    [sw, se],
+    [nw, sw],
+    [ne, se],
+    [nw, e],
+    [sw, e],
+    [ne, w],
+    [se, w],
+  ];
+};
+
+/**
+ * Scene -> Scene coords, but in x1,x2,y1,y2 format.
+ *
+ * Rectangle here means any rectangular frame, not an excalidraw element.
+ */
+export const getRectangleBoxAbsoluteCoords = (boxSceneCoords: RectangleBox) => {
+  return [
+    boxSceneCoords.x,
+    boxSceneCoords.y,
+    boxSceneCoords.x + boxSceneCoords.width,
+    boxSceneCoords.y + boxSceneCoords.height,
+    boxSceneCoords.x + boxSceneCoords.width / 2,
+    boxSceneCoords.y + boxSceneCoords.height / 2,
+  ];
 };
 
 export const pointRelativeTo = (
@@ -562,10 +677,9 @@ const getLinearElementRotatedBounds = (
 export const getElementBounds = (element: ExcalidrawElement): Bounds => {
   return ElementBounds.getBounds(element);
 };
-
 export const getCommonBounds = (
   elements: readonly ExcalidrawElement[],
-): [number, number, number, number] => {
+): Bounds => {
   if (!elements.length) {
     return [0, 0, 0, 0];
   }
@@ -683,7 +797,7 @@ export const getClosestElementBounds = (
   return getElementBounds(closestElement);
 };
 
-export interface Box {
+export interface BoundingBox {
   minX: number;
   minY: number;
   maxX: number;
@@ -696,7 +810,7 @@ export interface Box {
 
 export const getCommonBoundingBox = (
   elements: ExcalidrawElement[] | readonly NonDeleted<ExcalidrawElement>[],
-): Box => {
+): BoundingBox => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   return {
     minX,

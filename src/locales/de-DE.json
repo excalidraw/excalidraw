@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Dreieck",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
-    "onlySelected": "Nur ausgewählte",
-    "withBackground": "Hintergrund",
-    "exportEmbedScene": "Szene einbetten",
-    "exportEmbedScene_details": "Die Zeichnungsdaten werden in der exportierten PNG/SVG-Datei gespeichert, sodass das Dokument später weiter bearbeitet werden kann. \nDieses wird die exportierte Datei vergrößern.",
     "addWatermark": "\"Made with Excalidraw\" hinzufügen",
     "handDrawn": "Handgezeichnet",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Horizontal spiegeln",
     "flipVertical": "Vertikal spiegeln",
     "viewMode": "Ansichtsmodus",
-    "toggleExportColorScheme": "Farbschema für Export umschalten",
     "share": "Teilen",
     "showStroke": "Auswahl für Strichfarbe anzeigen",
     "showBackground": "Hintergrundfarbe auswählen",
@@ -128,7 +123,10 @@
       "unlockAll": "Alle entsperren"
     },
     "statusPublished": "Veröffentlicht",
-    "sidebarLock": "Seitenleiste offen lassen"
+    "sidebarLock": "Seitenleiste offen lassen",
+    "selectAllElementsInFrame": "Alle Elemente im Rahmen auswählen",
+    "removeAllElementsFromFrame": "Alle Elemente aus dem Rahmen entfernen",
+    "eyeDropper": "Farbe von der Zeichenfläche auswählen"
   },
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
@@ -140,11 +138,7 @@
     "exportJSON": "In Datei exportieren",
     "exportImage": "Exportiere Bild...",
     "export": "Speichern als...",
-    "exportToPng": "Als PNG exportieren",
-    "exportToSvg": "Als SVG exportieren",
     "copyToClipboard": "In Zwischenablage kopieren",
-    "copyPngToClipboard": "PNG in die Zwischenablage kopieren",
-    "scale": "Skalierung",
     "save": "In aktueller Datei speichern",
     "saveAs": "Speichern unter",
     "load": "Öffnen",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "Keine Speicherung in der Backend-Datenbank möglich. Wenn die Probleme weiterhin bestehen, solltest Du Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
     "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
     "brave_measure_text_error": {
-      "start": "Sieht so aus, als ob du den Brave Browser benutzt mit der",
-      "aggressive_block_fingerprint": "\"Fingerprinting aggressiv blockieren\"",
-      "setting_enabled": "Einstellung aktiviert",
-      "break": "Dies könnte zur inkorrekten Darstellung der",
-      "text_elements": "Textelemente",
-      "in_your_drawings": "in deinen Zeichnungen führen",
-      "strongly_recommend": "Wir empfehlen dringend, diese Einstellung zu deaktivieren. Du kannst",
-      "steps": "diesen Schritten entsprechend",
-      "how": "folgen",
-      "disable_setting": " Wenn die Deaktivierung dieser Einstellung nicht zu einer korrekten Textdarstellung führt, öffne bitte einen",
-      "issue": "Issue",
-      "write": "auf GitHub, oder schreibe uns auf",
-      "discord": "Discord"
+      "line1": "Sieht so aus, als ob Du den Brave-Browser verwendest und die <bold>aggressive Blockierung von Fingerabdrücken</bold> aktiviert hast.",
+      "line2": "Dies könnte dazu führen, dass die <bold>Textelemente</bold> in Ihren Zeichnungen zerstört werden.",
+      "line3": "Wir empfehlen dringend, diese Einstellung zu deaktivieren. Dazu kannst Du <link>diesen Schritten</link> folgen.",
+      "line4": "Wenn die Deaktivierung dieser Einstellung die fehlerhafte Anzeige von Textelementen nicht behebt, öffne bitte ein <issueLink>Ticket</issueLink> auf unserem GitHub oder schreibe uns auf <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Stift-Modus - Berührung verhindern",
     "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
     "eraser": "Radierer",
-    "hand": "Hand (Schwenkwerkzeug)"
+    "frame": "Rahmenwerkzeug",
+    "hand": "Hand (Schwenkwerkzeug)",
+    "extraTools": "Weitere Werkzeuge"
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Tipp: Schiebe die am weitesten entfernten Elemente ein wenig näher zusammen."
   },
   "errorSplash": {
-    "headingMain_pre": "Es ist ein Fehler aufgetreten. Versuche ",
-    "headingMain_button": "die Seite neu zu laden.",
-    "clearCanvasMessage": "Wenn das Neuladen nicht funktioniert, versuche ",
-    "clearCanvasMessage_button": "die Zeichenfläche zu löschen.",
+    "headingMain": "Es ist ein Fehler aufgetreten. Versuche <button>die Seite neu zu laden.</button>",
+    "clearCanvasMessage": "Wenn das Neuladen nicht funktioniert, versuche <button>die Zeichenfläche zu löschen.</button>",
     "clearCanvasCaveat": " Dies wird zum Verlust von Daten führen ",
-    "trackedToSentry_pre": "Der Fehler mit der Kennung ",
-    "trackedToSentry_post": " wurde in unserem System registriert.",
-    "openIssueMessage_pre": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in die Fehlerinformationen aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren ",
-    "openIssueMessage_button": "Bug-Tracker.",
-    "openIssueMessage_post": " Bitte teile die unten stehenden Informationen mit uns im GitHub Issue (Kopieren und Einfügen).",
+    "trackedToSentry": "Der Fehler mit der Kennung {{eventId}} wurde in unserem System registriert.",
+    "openIssueMessage": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in die Fehlerinformationen aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren <button>Bug-Tracker</button>. Bitte teile die unten stehenden Informationen mit uns im GitHub Issue (Kopieren und Einfügen).",
     "sceneContent": "Zeichnungsinhalt:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "Erforderlich",
       "website": "Gültige URL eingeben"
     },
-    "noteDescription": {
-      "pre": "Sende deine Bibliothek ein, um in die ",
-      "link": "öffentliche Bibliotheks-Repository aufgenommen zu werden",
-      "post": "damit andere Nutzer sie in ihren Zeichnungen verwenden können."
-    },
-    "noteGuidelines": {
-      "pre": "Die Bibliothek muss zuerst manuell freigegeben werden. Bitte lies die ",
-      "link": "Richtlinien",
-      "post": " vor dem Absenden. Du benötigst ein GitHub-Konto, um zu kommunizieren und Änderungen vorzunehmen, falls erforderlich, aber es ist nicht unbedingt erforderlich."
-    },
-    "noteLicense": {
-      "pre": "Mit dem Absenden stimmst du zu, dass die Bibliothek unter der ",
-      "link": "MIT-Lizenz, ",
-      "post": "die zusammengefasst beinhaltet, dass jeder sie ohne Einschränkungen nutzen kann."
-    },
+    "noteDescription": "Sende deine Bibliothek ein, um in die <link>öffentliche Bibliotheks-Repository aufgenommen zu werden</link>damit andere Nutzer sie in ihren Zeichnungen verwenden können.",
+    "noteGuidelines": "Die Bibliothek muss zuerst manuell freigegeben werden. Bitte lies die <link>Richtlinien</link> vor dem Absenden. Du benötigst ein GitHub-Konto, um zu kommunizieren und Änderungen vorzunehmen, falls erforderlich, aber es ist nicht unbedingt erforderlich.",
+    "noteLicense": "Mit dem Absenden stimmst du zu, dass die Bibliothek unter der <link>MIT-Lizenz, </link>die zusammengefasst beinhaltet, dass jeder sie ohne Einschränkungen nutzen kann.",
     "noteItems": "Jedes Bibliothekselement muss einen eigenen Namen haben, damit es gefiltert werden kann. Die folgenden Bibliothekselemente werden hinzugefügt:",
     "atleastOneLibItem": "Bitte wähle mindestens ein Bibliothekselement aus, um zu beginnen",
     "republishWarning": "Hinweis: Einige der ausgewählten Elemente sind bereits als veröffentlicht/eingereicht markiert. Du solltest Elemente nur erneut einreichen, wenn Du eine existierende Bibliothek oder Einreichung aktualisierst."
   },
   "publishSuccessDialog": {
     "title": "Bibliothek übermittelt",
-    "content": "Vielen Dank {{authorName}}. Deine Bibliothek wurde zur Überprüfung eingereicht. Du kannst den Status verfolgen",
-    "link": "hier"
+    "content": "Vielen Dank {{authorName}}. Deine Bibliothek wurde zur Überprüfung eingereicht. Du kannst den Status verfolgen<link>hier</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Bibliothek zurücksetzen",
     "removeItemsFromLib": "Ausgewählte Elemente aus der Bibliothek entfernen"
+  },
+  "imageExportDialog": {
+    "header": "Bild exportieren",
+    "label": {
+      "withBackground": "Hintergrund",
+      "onlySelected": "Nur ausgewählte",
+      "darkMode": "Dunkler Modus",
+      "embedScene": "Szene einbetten",
+      "scale": "Skalierung",
+      "padding": "Abstand"
+    },
+    "tooltip": {
+      "embedScene": "Die Zeichnungsdaten werden in der exportierten PNG/SVG-Datei gespeichert, sodass das Dokument später weiter bearbeitet werden kann. \nDieses wird die exportierte Datei vergrößern."
+    },
+    "title": {
+      "exportToPng": "Als PNG exportieren",
+      "exportToSvg": "Als SVG exportieren",
+      "copyPngToClipboard": "PNG in die Zwischenablage kopieren"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "In Zwischenablage kopieren"
+    }
   },
   "encrypted": {
     "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "Verwende {{shortcut}} , um als einzelnes Element\neinzufügen oder in einen existierenden Texteditor einzufügen"
   },
   "colors": {
-    "ffffff": "Weiß",
-    "f8f9fa": "Grau 0",
-    "f1f3f5": "Grau 1",
-    "fff5f5": "Rot 0",
-    "fff0f6": "Pink 0",
-    "f8f0fc": "Traube 0",
-    "f3f0ff": "Violett 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Blau 0",
-    "e3fafc": "Cyan 0",
-    "e6fcf5": "Teal 0",
-    "ebfbee": "Grün 0",
-    "f4fce3": "Hellgrün 0",
-    "fff9db": "Gelb 0",
-    "fff4e6": "Orange 0",
     "transparent": "Transparent",
-    "ced4da": "Grau 4",
-    "868e96": "Grau 6",
-    "fa5252": "Rot 6",
-    "e64980": "Pink 6",
-    "be4bdb": "Traube 6",
-    "7950f2": "Violett 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Blau 6",
-    "15aabf": "Cyan 6",
-    "12b886": "Teal 6",
-    "40c057": "Grün 6",
-    "82c91e": "Hellgrün 6",
-    "fab005": "Gelb 6",
-    "fd7e14": "Orange 6",
-    "000000": "Schwarz",
-    "343a40": "Grau 8",
-    "495057": "Grau 7",
-    "c92a2a": "Rot 9",
-    "a61e4d": "Pink 9",
-    "862e9c": "Traube 9",
-    "5f3dc4": "Violett 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Blau 9",
-    "0b7285": "Cyan 9",
-    "087f5b": "Teal 9",
-    "2b8a3e": "Grün 9",
-    "5c940d": "Hellgrün 9",
-    "e67700": "Gelb 9",
-    "d9480f": "Orange 9"
+    "black": "Schwarz",
+    "white": "Weiß",
+    "red": "Rot",
+    "pink": "Pink",
+    "grape": "Traube",
+    "violet": "Violett",
+    "gray": "Grau",
+    "blue": "Blau",
+    "cyan": "Cyan",
+    "teal": "Blaugrün",
+    "green": "Grün",
+    "yellow": "Gelb",
+    "orange": "Orange",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "Wähle ein Werkzeug & beginne zu zeichnen!",
       "helpHint": "Kurzbefehle & Hilfe"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "Beliebteste benutzerdefinierte Farben",
+    "colors": "Farben",
+    "shades": "Schattierungen",
+    "hexCode": "Hex-Code",
+    "noShades": "Keine Schattierungen für diese Farbe verfügbar"
   }
 }

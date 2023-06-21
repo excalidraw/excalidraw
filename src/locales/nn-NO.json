@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trekant",
     "fontSize": "Skriftstorleik",
     "fontFamily": "Skrifttype",
-    "onlySelected": "Kun valde",
-    "withBackground": "Bakgrunn",
-    "exportEmbedScene": "Bygg inn scene",
-    "exportEmbedScene_details": "Scenedata vert lagra i den eksporterte PNG- eller SVG-fila slik at scena kan bli gjenopprettast frå den. Dette vil auke eksportert filstorleik.",
     "addWatermark": "Legg til «Laga med Excalidraw»",
     "handDrawn": "Handteikna",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Vipp vassrett",
     "flipVertical": "Vipp loddrett",
     "viewMode": "Visningsmodus",
-    "toggleExportColorScheme": "Veksle eksport av fargepalett",
     "share": "Del",
     "showStroke": "Vis fargeveljar for linjer",
     "showBackground": "Vis fargeveljar for bakgrunn",
@@ -128,7 +123,10 @@
       "unlockAll": ""
     },
     "statusPublished": "",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +138,7 @@
     "exportJSON": "Eksporter til fil",
     "exportImage": "",
     "export": "",
-    "exportToPng": "Eksporter til PNG",
-    "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavla",
-    "copyPngToClipboard": "Kopier PNG til utklippstavla",
-    "scale": "Skaler",
     "save": "Lagre til noverande fil",
     "saveAs": "Lagre som",
     "load": "",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "",
     "link": "Legg til/ oppdater lenke til valt figur",
     "eraser": "Viskelêr",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Handlingar: lerret",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Tips: prøv å flytte elementa som er lengst frå kvarandre, litt nærare kvarandre."
   },
   "errorSplash": {
-    "headingMain_pre": "Ein feil oppstod. Prøv ",
-    "headingMain_button": "å laste sida på nytt.",
-    "clearCanvasMessage": "Om ny sidelasting ikkje fungerer, prøv ",
-    "clearCanvasMessage_button": "å tømme lerretet.",
+    "headingMain": "Ein feil oppstod. Prøv <button>å laste sida på nytt.</button>",
+    "clearCanvasMessage": "Om ny sidelasting ikkje fungerer, prøv <button>å tømme lerretet.</button>",
     "clearCanvasCaveat": " Dette vil føre til tap av arbeid ",
-    "trackedToSentry_pre": "Feilen med identifikator ",
-    "trackedToSentry_post": " vart logga i systemet vårt.",
-    "openIssueMessage_pre": "Vi er veldig nøye med å ikkje inkludere scene-opplysingane dine i feilmeldinga. Viss scena di ikkje er privat kan du vurdere å følge opp i ",
-    "openIssueMessage_button": "feilrapporteringssystemet vårt.",
-    "openIssueMessage_post": " Ta med opplysingane nedanfor ved å kopiere og lime inn i GitHub-saka.",
+    "trackedToSentry": "Feilen med identifikator {{eventId}} vart logga i systemet vårt.",
+    "openIssueMessage": "Vi er veldig nøye med å ikkje inkludere scene-opplysingane dine i feilmeldinga. Viss scena di ikkje er privat kan du vurdere å følge opp i <button>feilrapporteringssystemet vårt.</button> Ta med opplysingane nedanfor ved å kopiere og lime inn i GitHub-saka.",
     "sceneContent": "Scene-innhald:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "Kravt",
       "website": "Fyll inn ein gyldig URL"
     },
-    "noteDescription": {
-      "pre": "Send inn biblioteket ditt til inkludering i ",
-      "link": "den offentlege bibliotek-kjeldekoda",
-      "post": "slik at andre kan bruke det i teikningane deira."
-    },
-    "noteGuidelines": {
-      "pre": "Biblioteket må godkjennast manuelt fyrst. Ver vennleg å lese ",
-      "link": "retningslinjene",
-      "post": " før du sender inn. Du kjem til å trenge ein GitHub-konto for å kommunisere og gjere endringar dersom kravt, men det er ikkje strengt naudsynt."
-    },
-    "noteLicense": {
-      "pre": "Ved å sende inn godkjenner du at biblioteket vert publisert under ",
-      "link": "MIT-lisensen, ",
-      "post": "som kort sagt betyr at kven som helst kan bruke det utan avgrensingar."
-    },
+    "noteDescription": "Send inn biblioteket ditt til inkludering i <link>den offentlege bibliotek-kjeldekoda</link>slik at andre kan bruke det i teikningane deira.",
+    "noteGuidelines": "Biblioteket må godkjennast manuelt fyrst. Ver vennleg å lese <link>retningslinjene</link> før du sender inn. Du kjem til å trenge ein GitHub-konto for å kommunisere og gjere endringar dersom kravt, men det er ikkje strengt naudsynt.",
+    "noteLicense": "Ved å sende inn godkjenner du at biblioteket vert publisert under <link>MIT-lisensen, </link>som kort sagt betyr at kven som helst kan bruke det utan avgrensingar.",
     "noteItems": "Kvart bibliotekselement må ha eit eige namn, slik at det er mogleg å filtrere. Dei følgande bibliotekselementa blir inkludert:",
     "atleastOneLibItem": "Ver vennleg å markere minst eitt bibliotekselement for å starte",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliotek innsendt",
-    "content": "Tusen takk {{authorName}}! Biblioteket ditt har blitt sendt inn til gjennomgang. Du kan halde styr på status",
-    "link": "her"
+    "content": "Tusen takk {{authorName}}! Biblioteket ditt har blitt sendt inn til gjennomgang. Du kan halde styr på status<link>her</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Tilbakestill bibliotek",
     "removeItemsFromLib": "Fjern valde element frå biblioteket"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": ""
   },
   "colors": {
-    "ffffff": "Kvit",
-    "f8f9fa": "Grå 0",
-    "f1f3f5": "Grå 1",
-    "fff5f5": "Raud 0",
-    "fff0f6": "Rosa 0",
-    "f8f0fc": "Drue 0",
-    "f3f0ff": "Fiolett 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Blå 0",
-    "e3fafc": "Turkis 0",
-    "e6fcf5": "Blågrøn 0",
-    "ebfbee": "Grøn 0",
-    "f4fce3": "Limegrøn 0",
-    "fff9db": "Gul 0",
-    "fff4e6": "Oransje 0",
     "transparent": "Gjennomsiktig",
-    "ced4da": "Grå 4",
-    "868e96": "Grå 6",
-    "fa5252": "Raud 6",
-    "e64980": "Rosa 6",
-    "be4bdb": "Drue 6",
-    "7950f2": "Fiolett 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Blå 6",
-    "15aabf": "Turkis 6",
-    "12b886": "Blågrøn 6",
-    "40c057": "Grøn 6",
-    "82c91e": "Limegrøn 6",
-    "fab005": "Gul 6",
-    "fd7e14": "Oransje 6",
-    "000000": "Svart",
-    "343a40": "Grå 8",
-    "495057": "Grå 7",
-    "c92a2a": "Raud 9",
-    "a61e4d": "Rosa 9",
-    "862e9c": "Drue 9",
-    "5f3dc4": "Fiolett 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Blå 9",
-    "0b7285": "Turkis 9",
-    "087f5b": "Blågrøn 9",
-    "2b8a3e": "Grøn 9",
-    "5c940d": "Limegrøn 9",
-    "e67700": "Gul 9",
-    "d9480f": "Oransj 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "",
       "helpHint": ""
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

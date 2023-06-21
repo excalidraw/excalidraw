@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "./element/types";
 import { newElementWith } from "./element/mutateElement";
-import { Box, getCommonBoundingBox } from "./element/bounds";
+import { BoundingBox, getCommonBoundingBox } from "./element/bounds";
 import { getMaximumGroups } from "./groups";
 
 export interface Alignment {
@@ -33,7 +33,7 @@ export const alignElements = (
 
 const calculateTranslation = (
   group: ExcalidrawElement[],
-  selectionBoundingBox: Box,
+  selectionBoundingBox: BoundingBox,
   { axis, position }: Alignment,
 ): { x: number; y: number } => {
   const groupBoundingBox = getCommonBoundingBox(group);

@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Üçgen",
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
-    "onlySelected": "Sadece seçilen",
-    "withBackground": "Arka plan",
-    "exportEmbedScene": "Gömülü sahne",
-    "exportEmbedScene_details": "Sahne verileri, sahnenin geri yüklenebilmesi için dışa aktarılan PNG/SVG dosyasına kaydedilecektir.\nDışa aktarılan dosya boyutunu artıracaktır.",
     "addWatermark": "\"Excalidraw ile yapıldı\" yazısını ekle",
     "handDrawn": "El-yazısı",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Yatay döndür",
     "flipVertical": "Dikey döndür",
     "viewMode": "Görünüm modu",
-    "toggleExportColorScheme": "Renk şemasını dışa aktar/aktarma",
     "share": "Paylaş",
     "showStroke": "Kontur için renk seçiciyi göster",
     "showBackground": "Arkaplan için renk seçiciyi göster",
@@ -128,7 +123,10 @@
       "unlockAll": "Hepsinin kilidini kaldır"
     },
     "statusPublished": "Yayınlandı",
-    "sidebarLock": "Kenar çubuğu açık kalsın"
+    "sidebarLock": "Kenar çubuğu açık kalsın",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Öğe eklenmedi...",
@@ -140,11 +138,7 @@
     "exportJSON": "Dosyaya aktar",
     "exportImage": "Resimleri dışa aktar...",
     "export": "Şuraya kaydet...",
-    "exportToPng": "PNG olarak dışa aktar",
-    "exportToSvg": "SVG olarak dışa aktar",
     "copyToClipboard": "Panoya kopyala",
-    "copyPngToClipboard": "PNG'yi panoya kopyala",
-    "scale": "Ölçek",
     "save": "Geçerli dosyaya kaydet",
     "saveAs": "Farklı kaydet",
     "load": "Aç",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "Backend veritabanına kaydedilemedi. Eğer problem devam ederse, çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
     "collabSaveFailed_sizeExceeded": "Backend veritabanına kaydedilemedi; tuval çok büyük. Çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
     "brave_measure_text_error": {
-      "start": "Görünüşe göre Brave gezginini",
-      "aggressive_block_fingerprint": "Agresif parmakizi bloklama",
-      "setting_enabled": "ayarları etkin şeklide kullanıyor gibisiniz",
-      "break": "Bu bir takım sorunlara yol açabilir",
-      "text_elements": "Metin elementlerinde bozulma",
-      "in_your_drawings": "çizimlerde bozulma gibi",
-      "strongly_recommend": "Bu ayarı devre dışı bırakmanızı şiddetle öneririz. Şu adımları",
-      "steps": "takip ederek",
-      "how": "nasıl yapılacağını",
-      "disable_setting": " Yapabilirsiniz. Eğer devre dışı bırakmak işe yaramazsa, lütfen",
-      "issue": "konu hakkında",
-      "write": "github'da sorun belirtin, ya da bize",
-      "discord": "Discord üzerinden iletin"
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Kalem modu - dokunmayı engelle",
     "link": "Seçilen şekil için bağlantı Ekle/Güncelle",
     "eraser": "Silgi",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Tuval eylemleri",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "İpucu: En uzaktaki elemanları birbirine yakınlaştırmayı deneyin."
   },
   "errorSplash": {
-    "headingMain_pre": "Hata oluştu. Lütfen ",
-    "headingMain_button": "sayfayı yenilemeyi deneyin.",
-    "clearCanvasMessage": "Yenileme sonrası sorun devam ediyorsa, lütfen ",
-    "clearCanvasMessage_button": "çizim alanını temizlemeyi deneyin.",
+    "headingMain": "Hata oluştu. Lütfen <button>sayfayı yenilemeyi deneyin.</button>",
+    "clearCanvasMessage": "Yenileme sonrası sorun devam ediyorsa, lütfen <button>çizim alanını temizlemeyi deneyin.</button>",
     "clearCanvasCaveat": " Bu, yaptığınız değişiklikleri sıfırlayacak ",
-    "trackedToSentry_pre": "Tanımlayıcı ile ilgili hata ",
-    "trackedToSentry_post": " sistemimize yakalandı.",
-    "openIssueMessage_pre": "Sahne bilginizi hata mesajına yansıtmamak için oldukça dikkatli davrandık. Eğer sahneniz gizli değilse hatayı lütfen şuradan takip edin ",
-    "openIssueMessage_button": "hata takibi.",
-    "openIssueMessage_post": " Lütfen aşağıya GitHub sorununa kopyalayarak ve yapıştırarak bilgi ekleyin.",
+    "trackedToSentry": "Tanımlayıcı ile ilgili hata {{eventId}} sistemimize yakalandı.",
+    "openIssueMessage": "Sahne bilginizi hata mesajına yansıtmamak için oldukça dikkatli davrandık. Eğer sahneniz gizli değilse hatayı lütfen şuradan takip edin <button>hata takibi.</button> Lütfen aşağıya GitHub sorununa kopyalayarak ve yapıştırarak bilgi ekleyin.",
     "sceneContent": "Sahne içeriği:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "Gerekli",
       "website": "Geçerli bir URL girin"
     },
-    "noteDescription": {
-      "pre": "Submit your library to be included in the ",
-      "link": "genel kütüphane reposu",
-      "post": "diğer insanlar çizimlerinde kullanabilsin diye."
-    },
-    "noteGuidelines": {
-      "pre": "Önce kütüphane elle onaylanmalı. şunu okuyun ",
-      "link": "yönergeler",
-      "post": " onaylamadan önce. gerekli olması halinde iletişim kurmak için ve değişiklik için Github hesabı gerekli, ama çok da illaki olmalı değil."
-    },
-    "noteLicense": {
-      "pre": "Bunu onaylayarak, kütüğhanenin şu lisansla yayınlanmasını onaylıyorsunuz ",
-      "link": "MIT Lisans, ",
-      "post": "ki bu kısaca herkesin onu kısıtlama olmaksızın kullanabileceği anlamına gelmektedir."
-    },
+    "noteDescription": "Submit your library to be included in the <link>genel kütüphane reposu</link>diğer insanlar çizimlerinde kullanabilsin diye.",
+    "noteGuidelines": "Önce kütüphane elle onaylanmalı. şunu okuyun <link>yönergeler</link> onaylamadan önce. gerekli olması halinde iletişim kurmak için ve değişiklik için Github hesabı gerekli, ama çok da illaki olmalı değil.",
+    "noteLicense": "Bunu onaylayarak, kütüğhanenin şu lisansla yayınlanmasını onaylıyorsunuz <link>MIT Lisans, </link>ki bu kısaca herkesin onu kısıtlama olmaksızın kullanabileceği anlamına gelmektedir.",
     "noteItems": "Her kütüphane kendi ismine sahip olmalı ki tarama yapabilelim. Şu kütüphane ögeleri dahil edilecek:",
     "atleastOneLibItem": "Lütfen başlamak için en az bir tane kütüphane ögesi seçin",
     "republishWarning": "Not: seçilen ögelerden bir kısmı zaten yayınlanmış/gönderilmiş. Yalnızca mevcut kütüphane ve gönderileri güncellerken yeniden gönderme işlemi yapmalısınız."
   },
   "publishSuccessDialog": {
     "title": "Kütüphane gönderildi",
-    "content": "Teşekkürler {{authorName}}. Kütüphaneniz gözden geçirme için alındı. Durumu takip edebilirsiniz",
-    "link": "burada"
+    "content": "Teşekkürler {{authorName}}. Kütüphaneniz gözden geçirme için alındı. Durumu takip edebilirsiniz<link>burada</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Kütüphaneyi sıfırla",
     "removeItemsFromLib": "Seçilen ögeleri kütüphaneden kaldır"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "Tekil obje olarak yapıştırmak için veya var olan bir metin editörüne yapıştırmak için {{shortcut}} kullanın"
   },
   "colors": {
-    "ffffff": "Beyaz",
-    "f8f9fa": "Gri 0",
-    "f1f3f5": "Gri 1",
-    "fff5f5": "Kırmızı 0",
-    "fff0f6": "Pembe 0",
-    "f8f0fc": "Koyu Mor 0",
-    "f3f0ff": "Mor 0",
-    "edf2ff": "Çivit 0",
-    "e7f5ff": "Mavi 0",
-    "e3fafc": "Camgöbeği 0",
-    "e6fcf5": "Deniz Mavisi 0",
-    "ebfbee": "Yeşil 0",
-    "f4fce3": "Yeşil 0",
-    "fff9db": "Sarı 0",
-    "fff4e6": "Turuncu 0",
     "transparent": "Şeffaf",
-    "ced4da": "Gri 4",
-    "868e96": "Gri 6",
-    "fa5252": "Kırmızı 6",
-    "e64980": "Pembe 6",
-    "be4bdb": "Koyu Mor 6",
-    "7950f2": "Mor 6",
-    "4c6ef5": "Çivit 6",
-    "228be6": "Mavi 6",
-    "15aabf": "Camgöbeği 6",
-    "12b886": "Deniz Mavisi 6",
-    "40c057": "Yeşil 6",
-    "82c91e": "Green 6",
-    "fab005": "Sarı 6",
-    "fd7e14": "Turuncu 6",
-    "000000": "Siyah",
-    "343a40": "Gri 8",
-    "495057": "Gri 7",
-    "c92a2a": "Kırmızı 9",
-    "a61e4d": "Pembe 9",
-    "862e9c": "Koyu Mor 9",
-    "5f3dc4": "Mor 9",
-    "364fc7": "Çivit 9",
-    "1864ab": "Mavi 9",
-    "0b7285": "Camgöbeği 9",
-    "087f5b": "Deniz Mavisi 9",
-    "2b8a3e": "Yeşil 9",
-    "5c940d": "Yeşil 9",
-    "e67700": "Sarı 9",
-    "d9480f": "Turuncu 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "Bir araç seçin ve çizime başlayın!",
       "helpHint": "Kısayollar & yardım"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

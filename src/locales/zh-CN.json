@@ -16,7 +16,7 @@
     "bringToFront": "置于顶层",
     "sendBackward": "下移一层",
     "delete": "删除",
-    "copyStyles": "复制样式",
+    "copyStyles": "拷贝样式",
     "pasteStyles": "粘贴样式",
     "stroke": "描边",
     "background": "背景",
@@ -40,10 +40,6 @@
     "arrowhead_triangle": "三角箭头",
     "fontSize": "字体大小",
     "fontFamily": "字体",
-    "onlySelected": "仅选中",
-    "withBackground": "背景",
-    "exportEmbedScene": "包含画布数据",
-    "exportEmbedScene_details": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
     "handDrawn": "手写",
     "normal": "普通",
@@ -54,7 +50,7 @@
     "veryLarge": "加大",
     "solid": "实心",
     "hachure": "线条",
-    "zigzag": "",
+    "zigzag": "之字形折线",
     "crossHatch": "交叉线条",
     "thin": "细",
     "bold": "粗",
@@ -100,7 +96,6 @@
     "flipHorizontal": "水平翻转",
     "flipVertical": "垂直翻转",
     "viewMode": "查看模式",
-    "toggleExportColorScheme": "切换导出配色方案",
     "share": "分享",
     "showStroke": "显示描边颜色选择器",
     "showBackground": "显示背景颜色选择器",
@@ -128,7 +123,10 @@
       "unlockAll": "全部解锁"
     },
     "statusPublished": "已发布",
-    "sidebarLock": "侧边栏常驻"
+    "sidebarLock": "侧边栏常驻",
+    "selectAllElementsInFrame": "选择画框中的所有元素",
+    "removeAllElementsFromFrame": "删除画框中的所有元素",
+    "eyeDropper": "从画布上取色"
   },
   "library": {
     "noItems": "尚未添加任何项目……",
@@ -140,11 +138,7 @@
     "exportJSON": "导出为文件",
     "exportImage": "导出图片...",
     "export": "保存到...",
-    "exportToPng": "导出为 PNG",
-    "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
-    "copyPngToClipboard": "复制 PNG 到剪切板",
-    "scale": "缩放",
     "save": "保存至当前文件",
     "saveAs": "保存为",
     "load": "打开",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "无法保存到后端数据库。如果问题持续存在，您应该保存文件到本地，以确保您的工作不会丢失。",
     "collabSaveFailed_sizeExceeded": "无法保存到后端数据库，画布似乎过大。您应该保存文件到本地，以确保您的工作不会丢失。",
     "brave_measure_text_error": {
-      "start": "看起来您正在使用 Brave 浏览器并启用了",
-      "aggressive_block_fingerprint": "积极阻止指纹识别",
-      "setting_enabled": "设置",
-      "break": "这可能会破坏绘图中的",
-      "text_elements": "文本元素",
-      "in_your_drawings": " ",
-      "strongly_recommend": "我们强烈建议禁用此设置。您可以按照",
-      "steps": "这些步骤",
-      "how": "来设置",
-      "disable_setting": " 如果禁用此设置无法修复文本元素的显示，请在 GitHub 提交一个",
-      "issue": "issue",
-      "write": "，或者通过",
-      "discord": "Discord 反馈"
+      "line1": "您似乎正在使用 Brave 浏览器并启用了<bold>积极阻止指纹识别</bold>的设置。",
+      "line2": "这可能会破坏绘图中的 <bold>文本元素</bold>。",
+      "line3": "我们强烈建议禁用此设置。您可以按照<link>这些步骤</link>来设置。",
+      "line4": "如果禁用此设置无法修复文本元素的显示，请在 GitHub 上提交一个 <issueLink>issue</issueLink> ，或者在 <discordLink>Discord</discordLink> 上反馈"
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "笔模式 – 避免误触",
     "link": "为选中的形状添加/更新链接",
     "eraser": "橡皮",
-    "hand": "抓手（平移工具）"
+    "frame": "画框工具",
+    "hand": "抓手（平移工具）",
+    "extraTools": "更多工具"
   },
   "headings": {
     "canvasActions": "画布动作",
@@ -273,27 +260,22 @@
     "canvasTooBigTip": "提示：尝试将最远的元素移动到和其它元素更近一些。"
   },
   "errorSplash": {
-    "headingMain_pre": "遇到异常。请尝试",
-    "headingMain_button": "重新加载页面。",
-    "clearCanvasMessage": "如果重新加载页面无效, 请尝试",
-    "clearCanvasMessage_button": "清除画布。",
+    "headingMain": "遇到异常。请尝试<button>重新加载页面</button>。",
+    "clearCanvasMessage": "如果重新加载页面无效，请尝试<button>清除画布</button>。",
     "clearCanvasCaveat": "这会造成当前工作丢失",
-    "trackedToSentry_pre": "带有标识符的错误",
-    "trackedToSentry_post": "已在我们的系统中跟踪",
-    "openIssueMessage_pre": "我们非常谨慎地处理错误信息，您的画布内容不会被包含在错误报告中。如果您的画布内容不需要保持私密，请考虑使用我们的",
-    "openIssueMessage_button": "错误追踪器。",
-    "openIssueMessage_post": " 请复制并粘贴以下信息到 GitHub Issue 中。",
+    "trackedToSentry": "标识符为{{eventId}}的错误已在我们的系统中被记录",
+    "openIssueMessage": "我们非常谨慎地处理错误信息，您的画布内容不会被包含在错误报告中。如果您的画布内容不需要保持私密，请考虑在我们的 <button>bug 跟踪系统</button>上提供更多信息。请复制粘贴以下信息到 GitHub Issue 中。",
     "sceneContent": "画布内容:"
   },
   "roomDialog": {
     "desc_intro": "你可以邀请其他人到目前的画面中与你协作。",
-    "desc_privacy": "别担心, 该会话使用端到端加密, 无论绘制什么都将保持私密，甚至连我们的服务器也无法查看。",
-    "button_startSession": "启动会议",
-    "button_stopSession": "结束会议",
-    "desc_inProgressIntro": "实时协作会议正在进行。",
+    "desc_privacy": "别担心，该会话使用端到端加密，无论绘制什么都将保持私密，甚至连我们的服务器也无法查看。",
+    "button_startSession": "开始会话",
+    "button_stopSession": "结束会话",
+    "desc_inProgressIntro": "实时协作会话进行中。",
     "desc_shareLink": "分享此链接给你要协作的用户",
-    "desc_exitSession": "停止会话将中断您在与房间的连接，但您依然可以在本地继续使用画布. 请注意，这不会影响到其他用户, 他们仍可以在他们的版本上继续协作。",
-    "shareTitle": "加入 Excalidraw 实时协作会议"
+    "desc_exitSession": "停止会话将中断您与房间的连接，但您依然可以在本地继续使用画布。请注意，这不会影响到其他用户，他们仍可以在他们的版本上继续协作。",
+    "shareTitle": "加入 Excalidraw 实时协作会话"
   },
   "errorDialog": {
     "title": "错误"
@@ -362,36 +344,47 @@
       "required": "必填",
       "website": "输入一个有效的URL"
     },
-    "noteDescription": {
-      "pre": "提交后，您的素材库将被包含在 ",
-      "link": "公共素材库广场",
-      "post": "以供其他人在绘图中使用。"
-    },
-    "noteGuidelines": {
-      "pre": "提交的素材库需先经人工审核。在提交之前，请先阅读 ",
-      "link": "指南",
-      "post": " 。后续沟通和对库的修改需要 GitHub 账号，但这不是必须的。"
-    },
-    "noteLicense": {
-      "pre": "提交即表明您已同意素材库将遵循 ",
-      "link": "MIT 许可证， ",
-      "post": "简而言之，任何人都可以不受限制地使用它们。"
-    },
+    "noteDescription": "提交后，您的素材库将被包含在<link>公共素材库广场</link>以供其他人在绘图中使用。",
+    "noteGuidelines": "提交的素材库需先经人工审核。在提交之前，请先阅读<link>指南</link> 。后续沟通和对库的修改需要 GitHub 账号，但这不是必须的。",
+    "noteLicense": "提交即表明您已同意素材库将遵循 <link>MIT 许可证</link>，简而言之，任何人都可以不受限制地使用它们。",
     "noteItems": "素材库中每个项目都有各自的名称以供筛选。以下项目将被包含：",
     "atleastOneLibItem": "请选择至少一个素材库以开始",
     "republishWarning": "注意：部分选中的项目已经发布或提交。请仅在更新已有或已提交的素材库时重复提交项目。"
   },
   "publishSuccessDialog": {
     "title": "素材库已提交",
-    "content": "谢谢你 {{authorName}}。您的素材库已被提交审核。跟进此次提交的状态请点击",
-    "link": "此处"
+    "content": "谢谢你 {{authorName}}。您的素材库已被提交审核。请点击<link>此处</link>跟进此次提交的状态"
   },
   "confirmDialog": {
     "resetLibrary": "重置素材库",
     "removeItemsFromLib": "从素材库中删除选中的项目"
   },
+  "imageExportDialog": {
+    "header": "导出图片",
+    "label": {
+      "withBackground": "背景",
+      "onlySelected": "仅选中",
+      "darkMode": "深色模式",
+      "embedScene": "包含画布数据",
+      "scale": "缩放比例",
+      "padding": "内边距"
+    },
+    "tooltip": {
+      "embedScene": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出文件的大小。"
+    },
+    "title": {
+      "exportToPng": "导出为 PNG",
+      "exportToSvg": "导出为 SVG",
+      "copyPngToClipboard": "复制 PNG 到剪切板"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "复制到剪贴板"
+    }
+  },
   "encrypted": {
-    "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
+    "tooltip": "您的绘图采用端到端加密，其内容对于 Excalidraw 服务器是不可见的。",
     "link": "Excalidraw 中关于端到端加密的博客"
   },
   "stats": {
@@ -411,7 +404,7 @@
   },
   "toast": {
     "addedToLibrary": "添加到素材库中",
-    "copyStyles": "复制样式",
+    "copyStyles": "样式已拷贝。",
     "copyToClipboard": "已复制到剪切板。",
     "copyToClipboardAsPng": "已将 {{exportSelection}} 作为 PNG 复制到剪贴板\n({{exportColorScheme}})",
     "fileSaved": "文件已保存。",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "使用 {{shortcut}} 粘贴为单个元素，\n或粘贴到现有的文本编辑器里"
   },
   "colors": {
-    "ffffff": "白",
-    "f8f9fa": "灰 0",
-    "f1f3f5": "灰 1",
-    "fff5f5": "红 0",
-    "fff0f6": "粉红 0",
-    "f8f0fc": "紫红 0",
-    "f3f0ff": "蓝紫 0",
-    "edf2ff": "靛蓝 0",
-    "e7f5ff": "蓝 0",
-    "e3fafc": "青 0",
-    "e6fcf5": "蓝绿 0",
-    "ebfbee": "绿 0",
-    "f4fce3": "柠檬绿 0",
-    "fff9db": "黄 0",
-    "fff4e6": "橙 0",
     "transparent": "透明",
-    "ced4da": "灰 4",
-    "868e96": "灰 6",
-    "fa5252": "红 6",
-    "e64980": "粉红 6",
-    "be4bdb": "紫红 6",
-    "7950f2": "蓝紫 6",
-    "4c6ef5": "靛蓝 6",
-    "228be6": "蓝 6",
-    "15aabf": "青 6",
-    "12b886": "蓝绿 6",
-    "40c057": "绿 6",
-    "82c91e": "柠檬绿 6",
-    "fab005": "黄 6",
-    "fd7e14": "橙 6",
-    "000000": "黑",
-    "343a40": "灰 8",
-    "495057": "灰 7",
-    "c92a2a": "红 9",
-    "a61e4d": "粉红 9",
-    "862e9c": "紫红 9",
-    "5f3dc4": "蓝紫 9",
-    "364fc7": "靛蓝 9",
-    "1864ab": "蓝 9",
-    "0b7285": "青 9",
-    "087f5b": "蓝绿 9",
-    "2b8a3e": "绿 9",
-    "5c940d": "柠檬绿 9",
-    "e67700": "黄 9",
-    "d9480f": "橙 9"
+    "black": "黑",
+    "white": "白",
+    "red": "红",
+    "pink": "粉红",
+    "grape": "紫红",
+    "violet": "蓝紫",
+    "gray": "灰",
+    "blue": "蓝",
+    "cyan": "青",
+    "teal": "蓝绿",
+    "green": "绿",
+    "yellow": "黄",
+    "orange": "橙",
+    "bronze": "古铜"
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "选择工具并开始绘图！",
       "helpHint": "快捷键和帮助"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "常用自定义颜色",
+    "colors": "颜色",
+    "shades": "色调明暗",
+    "hexCode": "十六进制值",
+    "noShades": "此颜色没有可用的明暗变化"
   }
 }

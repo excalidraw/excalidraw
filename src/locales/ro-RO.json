@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triunghi",
     "fontSize": "Dimensiune font",
     "fontFamily": "Familia de fonturi",
-    "onlySelected": "Numai selecția",
-    "withBackground": "Fundal",
-    "exportEmbedScene": "Încorporare scenă",
-    "exportEmbedScene_details": "Datele scenei vor fi salvate în fișierul PNG/SVG exportat, astfel că scena va putea fi restaurată din acesta.\nVa crește dimensiunea fișierului exportat.",
     "addWatermark": "Adaugă „Realizat cu Excalidraw”",
     "handDrawn": "Scris de mână",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Răsturnare orizontală",
     "flipVertical": "Răsturnare verticală",
     "viewMode": "Mod de vizualizare",
-    "toggleExportColorScheme": "Comutare schemă de culori de export",
     "share": "Distribuie",
     "showStroke": "Afișare selector culoare contur",
     "showBackground": "Afișare selector culoare fundal",
@@ -128,7 +123,10 @@
       "unlockAll": "Deblocare toate"
     },
     "statusPublished": "Publicat",
-    "sidebarLock": "Păstrează deschisă bara laterală"
+    "sidebarLock": "Păstrează deschisă bara laterală",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": "Alegere culoare din pânză"
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
@@ -140,11 +138,7 @@
     "exportJSON": "Exportare la fișiere",
     "exportImage": "Exportare imagine...",
     "export": "Salvare în...",
-    "exportToPng": "Exportare ca PNG",
-    "exportToSvg": "Exportare ca SVG",
     "copyToClipboard": "Copiere în memoria temporară",
-    "copyPngToClipboard": "Copiere PNG în memoria temporară",
-    "scale": "Scală",
     "save": "Salvare în fișierul curent",
     "saveAs": "Salvare ca",
     "load": "Deschidere",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "Nu s-a putut salva în baza de date la nivel de server. Dacă problemele persistă, ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
     "collabSaveFailed_sizeExceeded": "Nu s-a putut salva în baza de date la nivel de server, întrucât se pare că pânza este prea mare. Ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
     "brave_measure_text_error": {
-      "start": "Se pare că folosești navigatorul Brave cu",
-      "aggressive_block_fingerprint": "setarea „Blocați amprentarea” în modul strict",
-      "setting_enabled": "activată",
-      "break": "Acest lucru ar putea duce la întreruperea",
-      "text_elements": "elementelor de text",
-      "in_your_drawings": "din desenele tale",
-      "strongly_recommend": "Recomandăm insistent dezactivarea acestei setări. Poți urma",
-      "steps": "acești pași",
-      "how": "pentru efectuarea procedurii",
-      "disable_setting": " Dacă dezactivarea acestei setări nu remediază afișarea elementelor de text, deschide",
-      "issue": "un tichet cu probleme",
-      "write": "pe pagina noastră de GitHub sau scrie-ne pe",
-      "discord": "Discord"
+      "line1": "Se pare că folosești navigatorul Brave cu opțiunea <bold>strictă pentru blocarea amprentării</bold>.",
+      "line2": "Acest lucru poate duce la întreruperea <bold>elementelor text</bold> din desene.",
+      "line3": "Îți recomandăm ferm să dezactivezi această setare. Poți urma <link>acești pași</link> pentru a face acest lucru.",
+      "line4": "Dacă dezactivarea acestei setări nu duce la remedierea afișării elementelor text, deschide un tichet de <issueLink>problemă</issueLink> pe pagina noastră de GitHub sau scrie-ne pe <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Mod stilou – împiedică atingerea",
     "link": "Adăugare/actualizare URL pentru forma selectată",
     "eraser": "Radieră",
-    "hand": "Mână (instrument de panoramare)"
+    "frame": "",
+    "hand": "Mână (instrument de panoramare)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Sfat: încearcă să apropii puțin mai mult elementele cele mai îndepărtate."
   },
   "errorSplash": {
-    "headingMain_pre": "A apărut o eroare. Încearcă ",
-    "headingMain_button": "să reîncarci pagina.",
-    "clearCanvasMessage": "Dacă reîncărcarea nu funcționează, încearcă ",
-    "clearCanvasMessage_button": "să golești pânza.",
+    "headingMain": "A apărut o eroare. Încearcă <button>să reîncarci pagina</button>.",
+    "clearCanvasMessage": "Dacă reîncărcarea nu funcționează, încearcă <button>să ștergi pânza</button>.",
     "clearCanvasCaveat": " Acest lucru va duce la pierderea progresului ",
-    "trackedToSentry_pre": "Eroarea cu identificatorul ",
-    "trackedToSentry_post": " a fost urmărită în sistemul nostru.",
-    "openIssueMessage_pre": "Am luat măsuri de precauție pentru a nu include informații despre scenă în eroare. Dacă scena nu este privată, te rugăm să ne oferi mai multe informații în ",
-    "openIssueMessage_button": "monitorul nostru pentru erori.",
-    "openIssueMessage_post": " Te rugăm să incluzi informațiile de mai jos prin copierea și lipirea în problema GitHub.",
+    "trackedToSentry": "Eroarea cu identificatorul {{eventId}} a fost urmărită în sistemul nostru.",
+    "openIssueMessage": "Am luat măsuri de precauție pentru a nu include informații despre scenă în eroare. Dacă scena nu este privată, oferă-ne mai multe informații în <button>monitorul nostru pentru erori</button>. Include informațiile de mai jos copiindu-le și lipindu-le în tichetul cu problemă de pe GitHub.",
     "sceneContent": "Conținutul scenei:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "Obligatoriu",
       "website": "Introdu un URL valid"
     },
-    "noteDescription": {
-      "pre": "Trimite-ți biblioteca pentru fi inclus în ",
-      "link": "depozitul de biblioteci publice",
-      "post": "pentru utilizarea de către alte persoane în desenele lor."
-    },
-    "noteGuidelines": {
-      "pre": "Biblioteca trebuie aprobată manual. Citește ",
-      "link": "orientările",
-      "post": " înainte de trimitere. Vei avea nevoie de un cont GitHub pentru a comunica și efectua modificări, dacă este cazul, însă nu este strict necesar."
-    },
-    "noteLicense": {
-      "pre": "Prin trimiterea bibliotecii, ești de acord că aceasta va fi publicată sub ",
-      "link": "Licența MIT, ",
-      "post": "care, pe scurt, înseamnă că oricine o poate folosi fără restricții."
-    },
+    "noteDescription": "Trimite-ți biblioteca pentru a fi inclusă în <link>depozitul de biblioteci publice</link> în vederea utilizării de către alte persoane în desenele lor.",
+    "noteGuidelines": "Biblioteca trebuie aprobată manual mai întâi. Citește <link>orientările</link> înainte de trimitere. Vei avea nevoie de un cont GitHub pentru a comunica și efectua modificări, dacă este cazul, însă nu este strict necesar.",
+    "noteLicense": "Prin trimiterea bibliotecii, ești de acord că aceasta va fi publicată sub <link>Licența MIT, </link>care, pe scurt, înseamnă că oricine o poate folosi fără restricții.",
     "noteItems": "Fiecare element din bibliotecă trebuie să aibă propriul nume astfel încât să fie filtrabil. Următoarele elemente din bibliotecă vor fi incluse:",
     "atleastOneLibItem": "Selectează cel puțin un element din bibliotecă pentru a începe",
     "republishWarning": "Observație: unele dintre elementele selectate sunt marcate ca fiind deja publicate/trimise. Ar trebui să retrimiți elemente numai atunci când actualizezi o trimitere sau o bibliotecă existentă."
   },
   "publishSuccessDialog": {
     "title": "Bibliotecă trimisă",
-    "content": "Îți mulțumim, {{authorName}}. Biblioteca ta a fost trimisă spre revizuire. Poți urmări starea",
-    "link": "aici"
+    "content": "Îți mulțumim, {{authorName}}. Biblioteca a fost trimisă spre revizuire. Poți urmări starea <link>aici</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Resetare bibliotecă",
     "removeItemsFromLib": "Elimină elementele selectate din bibliotecă"
+  },
+  "imageExportDialog": {
+    "header": "Exportare imagine",
+    "label": {
+      "withBackground": "Fundal",
+      "onlySelected": "Numai selecția",
+      "darkMode": "Mod întunecat",
+      "embedScene": "Încorporare scenă",
+      "scale": "Scală",
+      "padding": "Spațiere"
+    },
+    "tooltip": {
+      "embedScene": "Datele scenei vor fi salvate în fișierul PNG/SVG exportat, astfel că scena va putea fi restaurată din acesta.\nVa crește dimensiunea fișierului exportat."
+    },
+    "title": {
+      "exportToPng": "Exportare ca PNG",
+      "exportToSvg": "Exportare ca SVG",
+      "copyPngToClipboard": "Copiere PNG în memoria temporară"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copiere în memoria temporară"
+    }
   },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "Folosește {{shortcut}} pentru a insera ca un singur element\nsau insera într-un editor de text existent"
   },
   "colors": {
-    "ffffff": "Alb",
-    "f8f9fa": "Gri 0",
-    "f1f3f5": "Gri 1",
-    "fff5f5": "Roșu 0",
-    "fff0f6": "Roz 0",
-    "f8f0fc": "Struguriu 0",
-    "f3f0ff": "Violet 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Albastru 0",
-    "e3fafc": "Cyan 0",
-    "e6fcf5": "Cyan-verde",
-    "ebfbee": "Verde 0",
-    "f4fce3": "Verde-limetă",
-    "fff9db": "Galben 0",
-    "fff4e6": "Portocaliu 0",
     "transparent": "Transparent",
-    "ced4da": "Gri 4",
-    "868e96": "Gri 6",
-    "fa5252": "Roșu 6",
-    "e64980": "Roz 6",
-    "be4bdb": "Struguriu 6",
-    "7950f2": "Violet 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Albastru 6",
-    "15aabf": "Cyan 6",
-    "12b886": "Cyan-verde 6",
-    "40c057": "Verde 6",
-    "82c91e": "Verde-limetă 6",
-    "fab005": "Galben 6",
-    "fd7e14": "Portocaliu 6",
-    "000000": "Negru",
-    "343a40": "Gri 8",
-    "495057": "Gri 7",
-    "c92a2a": "Roșu 9",
-    "a61e4d": "Roz 9",
-    "862e9c": "Struguriu 9",
-    "5f3dc4": "Violet 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Albastru 9",
-    "0b7285": "Cyan 9",
-    "087f5b": "Cyan-verde 9",
-    "2b8a3e": "Verde 9",
-    "5c940d": "Verde-limetă 9",
-    "e67700": "Galben 9",
-    "d9480f": "Portocaliu 9"
+    "black": "Negru",
+    "white": "Alb",
+    "red": "Roșu",
+    "pink": "Roz",
+    "grape": "Struguriu",
+    "violet": "Violet",
+    "gray": "Gri",
+    "blue": "Albastru",
+    "cyan": "Cyan",
+    "teal": "Cyan-verde",
+    "green": "Verde",
+    "yellow": "Galben",
+    "orange": "Portocaliu",
+    "bronze": "Bronz"
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "Alege un instrument și începe să desenezi!",
       "helpHint": "Comenzi rapide și ajutor"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "Cele mai utilizate culori personalizate",
+    "colors": "Culori",
+    "shades": "Nuanțe",
+    "hexCode": "Cod hexa",
+    "noShades": "Nu este disponibilă nicio nuanță pentru această culoare"
   }
 }

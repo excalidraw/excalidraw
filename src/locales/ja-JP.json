@@ -40,10 +40,6 @@
     "arrowhead_triangle": "三角",
     "fontSize": "フォントの大きさ",
     "fontFamily": "フォントの種類",
-    "onlySelected": "選択中のみ",
-    "withBackground": "背景",
-    "exportEmbedScene": "埋め込みシーン",
-    "exportEmbedScene_details": "シーンデータはエクスポートされたPNG/SVGファイルに保存され、シーンを復元することができます。\nエクスポートされたファイルのサイズは増加します。",
     "addWatermark": "\"Made with Excalidraw\"と表示",
     "handDrawn": "手描き風",
     "normal": "普通",
@@ -100,7 +96,6 @@
     "flipHorizontal": "水平方向に反転",
     "flipVertical": "垂直方向に反転",
     "viewMode": "閲覧モード",
-    "toggleExportColorScheme": "エクスポートカラースキームの切り替え",
     "share": "共有",
     "showStroke": "ストロークカラーピッカーを表示",
     "showBackground": "背景色ピッカーを表示",
@@ -128,7 +123,10 @@
       "unlockAll": "すべてのロックを解除"
     },
     "statusPublished": "公開済み",
-    "sidebarLock": "サイドバーを開いたままにする"
+    "sidebarLock": "サイドバーを開いたままにする",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "まだアイテムが追加されていません…",
@@ -140,11 +138,7 @@
     "exportJSON": "ファイルへエクスポート",
     "exportImage": "画像のエクスポート...",
     "export": "名前を付けて保存...",
-    "exportToPng": "PNG にエクスポート",
-    "exportToSvg": "SVG にエクスポート",
     "copyToClipboard": "クリップボードにコピー",
-    "copyPngToClipboard": "クリップボードにPNGをコピー",
-    "scale": "スケール",
     "save": "現在のファイルに保存",
     "saveAs": "名前を付けて保存",
     "load": "開く",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
     "collabSaveFailed_sizeExceeded": "キャンバスが大きすぎるため、バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "設定が有効化されました",
-      "break": "",
-      "text_elements": "テキスト要素",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": "Discord"
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "ペンモード - タッチ防止",
     "link": "選択した図形のリンクを追加/更新",
     "eraser": "消しゴム",
-    "hand": "手 (パンニングツール)"
+    "frame": "",
+    "hand": "手 (パンニングツール)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "キャンバス操作",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "ヒント: 最も遠い要素をもう少し近づけてみてください。"
   },
   "errorSplash": {
-    "headingMain_pre": "エラーが発生しました。もう一度やり直してください。 ",
-    "headingMain_button": "ページを再読み込みする。",
-    "clearCanvasMessage": "再読み込みがうまくいかない場合は、 ",
-    "clearCanvasMessage_button": "キャンバスを消去しています",
+    "headingMain": "エラーが発生しました。もう一度やり直してください。 <button>ページを再読み込みする。</button>",
+    "clearCanvasMessage": "再読み込みがうまくいかない場合は、 <button>キャンバスを消去しています</button>",
     "clearCanvasCaveat": " これにより作業が失われます ",
-    "trackedToSentry_pre": "識別子のエラー ",
-    "trackedToSentry_post": " が我々のシステムで追跡されました。",
-    "openIssueMessage_pre": "エラーに関するシーン情報を含めないように非常に慎重に設定しました。もしあなたのシーンがプライベートでない場合は、私たちのフォローアップを検討してください。 ",
-    "openIssueMessage_button": "バグ報告",
-    "openIssueMessage_post": " GitHub のIssueに以下の情報をコピーして貼り付けてください。",
+    "trackedToSentry": "識別子のエラー {{eventId}} が我々のシステムで追跡されました。",
+    "openIssueMessage": "エラーに関するシーン情報を含めないように非常に慎重に設定しました。もしあなたのシーンがプライベートでない場合は、私たちのフォローアップを検討してください。 <button>バグ報告</button> GitHub のIssueに以下の情報をコピーして貼り付けてください。",
     "sceneContent": "シーンの内容:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "必須項目",
       "website": "有効な URL を入力してください"
     },
-    "noteDescription": {
-      "pre": "以下に含めるライブラリを提出してください ",
-      "link": "公開ライブラリのリポジトリ",
-      "post": "他の人が作図に使えるようにするためです"
-    },
-    "noteGuidelines": {
-      "pre": "最初にライブラリを手動で承認する必要があります。次をお読みください ",
-      "link": "ガイドライン",
-      "post": " 送信する前に、GitHubアカウントが必要になりますが、必須ではありません。"
-    },
-    "noteLicense": {
-      "pre": "提出することにより、ライブラリが次の下で公開されることに同意します： ",
-      "link": "MIT ライセンス ",
-      "post": "つまり誰でも制限なく使えるということです"
-    },
+    "noteDescription": "以下に含めるライブラリを提出してください <link>公開ライブラリのリポジトリ</link>他の人が作図に使えるようにするためです",
+    "noteGuidelines": "最初にライブラリを手動で承認する必要があります。次をお読みください <link>ガイドライン</link> 送信する前に、GitHubアカウントが必要になりますが、必須ではありません。",
+    "noteLicense": "提出することにより、ライブラリが次の下で公開されることに同意します： <link>MIT ライセンス </link>つまり誰でも制限なく使えるということです",
     "noteItems": "各ライブラリ項目は、フィルタリングのために独自の名前を持つ必要があります。以下のライブラリアイテムが含まれます:",
     "atleastOneLibItem": "開始するには少なくとも1つのライブラリ項目を選択してください",
     "republishWarning": "注意: 選択された項目の中には、すでに公開/投稿済みと表示されているものがあります。既存のライブラリや投稿を更新する場合のみ、アイテムを再投稿してください。"
   },
   "publishSuccessDialog": {
     "title": "ライブラリを送信しました",
-    "content": "{{authorName}} さん、ありがとうございます。あなたのライブラリはレビューのために提出されました。状況を追跡できます。",
-    "link": "こちら"
+    "content": "{{authorName}} さん、ありがとうございます。あなたのライブラリはレビューのために提出されました。状況を追跡できます。<link>こちら</link>"
   },
   "confirmDialog": {
     "resetLibrary": "ライブラリをリセット",
     "removeItemsFromLib": "選択したアイテムをライブラリから削除"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "{{shortcut}} を使用して単一の要素として貼り付けるか、\n既存のテキストエディタに貼り付け"
   },
   "colors": {
-    "ffffff": "ホワイト",
-    "f8f9fa": "グレー 0",
-    "f1f3f5": "グレー 1",
-    "fff5f5": "レッド 0",
-    "fff0f6": "ピンク 0",
-    "f8f0fc": "グレープ 0",
-    "f3f0ff": "バイオレット 0",
-    "edf2ff": "インディゴ 0",
-    "e7f5ff": "ブルー 0",
-    "e3fafc": "シアン 0",
-    "e6fcf5": "ティール 0",
-    "ebfbee": "グリーン 0",
-    "f4fce3": "ライム 0",
-    "fff9db": "イエロー 0",
-    "fff4e6": "オレンジ 0",
     "transparent": "透明",
-    "ced4da": "グレー 4",
-    "868e96": "グレー 6",
-    "fa5252": "レッド 6",
-    "e64980": "ピンク 6",
-    "be4bdb": "グレープ 6",
-    "7950f2": "バイオレット 6",
-    "4c6ef5": "インディゴ 6",
-    "228be6": "ブルー 6",
-    "15aabf": "シアン 6",
-    "12b886": "ティール 6",
-    "40c057": "グリーン 6",
-    "82c91e": "ライム 6",
-    "fab005": "イエロー 6",
-    "fd7e14": "オレンジ 6",
-    "000000": "ブラック",
-    "343a40": "グレー 8",
-    "495057": "グレー 7",
-    "c92a2a": "レッド 9",
-    "a61e4d": "ピンク 9",
-    "862e9c": "グレープ 9",
-    "5f3dc4": "バイオレット 9",
-    "364fc7": "インディゴ 9",
-    "1864ab": "ブルー 9",
-    "0b7285": "シアン 9",
-    "087f5b": "ティール 9",
-    "2b8a3e": "グリーン 9",
-    "5c940d": "ライム 9",
-    "e67700": "イエロー 9",
-    "d9480f": "オレンジ 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "ツールを選んで描き始めよう！",
       "helpHint": "ショートカットとヘルプ"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

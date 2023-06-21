@@ -40,10 +40,6 @@
     "arrowhead_triangle": "삼각형",
     "fontSize": "글자 크기",
     "fontFamily": "글꼴",
-    "onlySelected": "선택한 항목만",
-    "withBackground": "배경",
-    "exportEmbedScene": "화면을 담기",
-    "exportEmbedScene_details": "화면 정보가 내보내는 PNG/SVG 파일에 저장되어 이후에 파일에서 화면을 복구할 수 있습니다. 파일 크기가 증가합니다.",
     "addWatermark": "\"Made with Excalidraw\" 추가",
     "handDrawn": "손글씨",
     "normal": "일반",
@@ -100,7 +96,6 @@
     "flipHorizontal": "좌우반전",
     "flipVertical": "상하반전",
     "viewMode": "보기 모드",
-    "toggleExportColorScheme": "내보내기의 색상 테마 전환하기",
     "share": "공유",
     "showStroke": "윤곽선 색상 선택기 열기",
     "showBackground": "배경 색상 선택기 열기",
@@ -128,7 +123,10 @@
       "unlockAll": "모두 잠금 해제"
     },
     "statusPublished": "게시됨",
-    "sidebarLock": "사이드바 유지"
+    "sidebarLock": "사이드바 유지",
+    "selectAllElementsInFrame": "프레임의 모든 요소 선택",
+    "removeAllElementsFromFrame": "프레임의 모든 요소 삭제",
+    "eyeDropper": "캔버스에서 색상 고르기"
   },
   "library": {
     "noItems": "추가된 아이템 없음",
@@ -140,11 +138,7 @@
     "exportJSON": "파일로 내보내기",
     "exportImage": "이미지 내보내기",
     "export": "다른 이름으로 저장...",
-    "exportToPng": "PNG로 내보내기",
-    "exportToSvg": "SVG로 내보내기",
     "copyToClipboard": "클립보드로 복사",
-    "copyPngToClipboard": "클립보드로 PNG 이미지 복사",
-    "scale": "크기",
     "save": "현재 파일에 저장",
     "saveAs": "다른 이름으로 저장",
     "load": "열기",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "데이터베이스에 저장하지 못했습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
     "collabSaveFailed_sizeExceeded": "데이터베이스에 저장하지 못했습니다. 캔버스가 너무 큰 거 같습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
     "brave_measure_text_error": {
-      "start": "귀하께서는",
-      "aggressive_block_fingerprint": "강력한 지문 차단",
-      "setting_enabled": "설정이 활성화된 Brave browser를 사용하고 계신 것 같습니다",
-      "break": "이 기능으로 인해 화이트보드의",
-      "text_elements": "텍스트 요소들이",
-      "in_your_drawings": "손상될 수 있습니다",
-      "strongly_recommend": "해당 기능을 설정에서 비활성화하는 것을 강력히 권장 드립니다. 비활성화 방법에 대해서는",
-      "steps": "이 게시글을",
-      "how": "참고해주세요.",
-      "disable_setting": " 만약 이 설정을 껐음에도 텍스트 요소들이 올바르게 표시되지 않는다면, 저희",
-      "issue": "Github에 이슈를",
-      "write": "올려주시거나",
-      "discord": "Discord에 제보해주세요"
+      "line1": "귀하께서는 <bold>강력한 지문 차단 설정</bold>이 활성화된 Brave browser를 사용하고 계신 것 같습니다.",
+      "line2": "이 기능으로 인해 화이트보드의 <bold>텍스트 요소들</bold>이 손상될 수 있습니다.",
+      "line3": "저희는 해당 기능을 비활성화하는 것을 강력히 권장 드립니다. 비활성화 방법에 대해서는 <link>이 게시글</link>을 참고해주세요.",
+      "line4": "만약 이 설정을 껐음에도 텍스트 요소들이 올바르게 표시되지 않는다면, 저희 Github에 <issueLink>이슈</issueLink>를 올려주시거나 <discordLink>Discord</discordLink>로 알려주세요."
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "펜 모드 - 터치 방지",
     "link": "선택한 도형에 대해서 링크를 추가/업데이트",
     "eraser": "지우개",
-    "hand": "손 (패닝 도구)"
+    "frame": "프레임 도구",
+    "hand": "손 (패닝 도구)",
+    "extraTools": "다른 도구"
   },
   "headings": {
     "canvasActions": "캔버스 동작",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "팁: 멀리 있는 요소들을 좀 더 가까이로 붙여 보세요."
   },
   "errorSplash": {
-    "headingMain_pre": "오류가 발생했습니다. ",
-    "headingMain_button": "페이지 새로고침",
-    "clearCanvasMessage": "새로고침으로 해결되지 않을 경우, ",
-    "clearCanvasMessage_button": "캔버스 비우기",
+    "headingMain": "오류가 발생했습니다. <button>페이지 새로고침</button>",
+    "clearCanvasMessage": "새로고침으로 해결되지 않을 경우, <button>캔버스 비우기</button>",
     "clearCanvasCaveat": " 작업 내용을 잃게 됩니다 ",
-    "trackedToSentry_pre": "오류 ",
-    "trackedToSentry_post": " 가 시스템에서 발견되었습니다.",
-    "openIssueMessage_pre": "저희는 화면 정보를 오류에 포함하지 않도록 매우 주의하고 있습니다. 혹시 화면에 민감한 내용이 없다면 이곳에 업로드를 고려해주세요.",
-    "openIssueMessage_button": "버그 트래커",
-    "openIssueMessage_post": " 아래 정보를 GitHub 이슈에 복사 및 붙여넣기해 주세요.",
+    "trackedToSentry": "오류 {{eventId}} 가 시스템에서 발견되었습니다.",
+    "openIssueMessage": "저희는 화면 정보를 오류에 포함하지 않도록 매우 주의하고 있습니다. 혹시 화면에 민감한 내용이 없다면 이곳에 업로드를 고려해주세요.<button>버그 트래커</button> 아래 정보를 GitHub 이슈에 복사 및 붙여넣기해 주세요.",
     "sceneContent": "화면 내용:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "필수사항",
       "website": "유효한 URL을 입력하세요"
     },
-    "noteDescription": {
-      "pre": "당신의 라이브러리를 제출하여 ",
-      "link": "공개 라이브러리 저장소",
-      "post": "에서 다른 사람들의 그림에 사용할 수 있도록 하세요."
-    },
-    "noteGuidelines": {
-      "pre": "라이브러리는 먼저 수동으로 승인되어야 합니다. 제출하기 전에 ",
-      "link": "가이드라인",
-      "post": "을 먼저 읽어보세요. 의견을 공유하거나 변경사항을 만들기 위해선 GitHub 계정이 필요하지만, 반드시 필요하진 않습니다."
-    },
-    "noteLicense": {
-      "pre": "제출함으로써, 당신은 라이브러리가 ",
-      "link": "MIT 라이선스 ",
-      "post": "하에 배포됨을, 즉 아무나 제약 없이 사용할 수 있음에 동의합니다."
-    },
+    "noteDescription": "당신의 라이브러리를 제출하여 <link>공개 라이브러리 저장소</link>에서 다른 사람들의 그림에 사용할 수 있도록 하세요.",
+    "noteGuidelines": "라이브러리는 먼저 수동으로 승인되어야 합니다. 제출하기 전에 <link>가이드라인</link>을 먼저 읽어보세요. 의견을 공유하거나 변경사항을 만들기 위해선 GitHub 계정이 필요하지만, 반드시 필요하진 않습니다.",
+    "noteLicense": "제출함으로써, 당신은 라이브러리가 <link>MIT 라이선스 </link>하에 배포됨을, 즉 아무나 제약 없이 사용할 수 있음에 동의합니다.",
     "noteItems": "각각의 라이브러리는 분류할 수 있도록 고유한 이름을 가져야 합니다. 다음의 라이브러리 항목이 포함됩니다:",
     "atleastOneLibItem": "최소한 하나의 라이브러리를 선택해주세요",
     "republishWarning": "참고: 선택된 항목의 일부는 이미 제출/게시되었습니다. 기존의 라이브러리나 제출물을 업데이트하는 경우에만 제출하세요."
   },
   "publishSuccessDialog": {
     "title": "라이브러리 제출됨",
-    "content": "{{authorName}}님 감사합니다. 당신의 라이브러리가 심사를 위해 제출되었습니다. 진행 상황을",
-    "link": "여기에서 확인하실 수 있습니다."
+    "content": "{{authorName}}님 감사합니다. 당신의 라이브러리가 심사를 위해 제출되었습니다. 진행 상황을<link>여기에서 확인하실 수 있습니다.</link>"
   },
   "confirmDialog": {
     "resetLibrary": "라이브러리 리셋",
     "removeItemsFromLib": "선택한 항목을 라이브러리에서 제거"
+  },
+  "imageExportDialog": {
+    "header": "이미지 내보내기",
+    "label": {
+      "withBackground": "배경",
+      "onlySelected": "선택한 항목만",
+      "darkMode": "다크 모드",
+      "embedScene": "화면을 담기",
+      "scale": "크기",
+      "padding": "여백"
+    },
+    "tooltip": {
+      "embedScene": "화면 정보가 내보내는 PNG/SVG 파일에 저장되어 이후에 파일에서 화면을 복구할 수 있습니다. 파일 크기가 증가합니다."
+    },
+    "title": {
+      "exportToPng": "PNG로 내보내기",
+      "exportToSvg": "SVG로 내보내기",
+      "copyPngToClipboard": "클립보드로 PNG 복사"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "클립보드로 복사"
+    }
   },
   "encrypted": {
     "tooltip": "그림은 종단 간 암호화되므로 Excalidraw의 서버는 절대로 내용을 알 수 없습니다.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "단일 요소로 붙여넣거나, 기존 텍스트 에디터에 붙여넣으려면 {{shortcut}} 을 사용하세요."
   },
   "colors": {
-    "ffffff": "화이트",
-    "f8f9fa": "회색 0",
-    "f1f3f5": "회색 1",
-    "fff5f5": "빨강색 0",
-    "fff0f6": "핑크색 0",
-    "f8f0fc": "그레이프 0",
-    "f3f0ff": "바이올렛 0",
-    "edf2ff": "남색 0",
-    "e7f5ff": "파란색 0",
-    "e3fafc": "청록색 0",
-    "e6fcf5": "틸 0",
-    "ebfbee": "녹색 0",
-    "f4fce3": "라임 0",
-    "fff9db": "노란색 0",
-    "fff4e6": "주황색 0",
     "transparent": "투명",
-    "ced4da": "회색 4",
-    "868e96": "회색 6",
-    "fa5252": "빨강색 6",
-    "e64980": "핑크색 6",
-    "be4bdb": "그레이프 6",
-    "7950f2": "바이올렛 6",
-    "4c6ef5": "남색 6",
-    "228be6": "파란색 6",
-    "15aabf": "청록색 6",
-    "12b886": "틸 6",
-    "40c057": "녹색 6",
-    "82c91e": "라임 6",
-    "fab005": "노란색 6",
-    "fd7e14": "주황색 6",
-    "000000": "검정색",
-    "343a40": "회색 8",
-    "495057": "회색 7",
-    "c92a2a": "빨강색 9",
-    "a61e4d": "핑크색 9",
-    "862e9c": "그레이프 9",
-    "5f3dc4": "바이올렛 9",
-    "364fc7": "남색 9",
-    "1864ab": "파란색 9",
-    "0b7285": "청록색 9",
-    "087f5b": "틸 9",
-    "2b8a3e": "녹색 9",
-    "5c940d": "라임 9",
-    "e67700": "노란색 9",
-    "d9480f": "주황색 9"
+    "black": "블랙",
+    "white": "화이트",
+    "red": "레드",
+    "pink": "핑크",
+    "grape": "그레이프",
+    "violet": "바이올렛",
+    "gray": "그레이",
+    "blue": "블루",
+    "cyan": "시안",
+    "teal": "틸",
+    "green": "그린",
+    "yellow": "옐로우",
+    "orange": "오렌지",
+    "bronze": "브론즈"
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "도구를 선택하고, 그리세요!",
       "helpHint": "단축키 & 도움말"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "많이 쓰이는 사용자 색상들",
+    "colors": "색상",
+    "shades": "색조",
+    "hexCode": "Hex 코드",
+    "noShades": "사용할 수 있는 색조가 없음"
   }
 }

@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trikotnik",
     "fontSize": "Velikost pisave",
     "fontFamily": "Družina pisave",
-    "onlySelected": "Samo izbor",
-    "withBackground": "Ozadje",
-    "exportEmbedScene": "Vdelaj sceno",
-    "exportEmbedScene_details": "Podatki o sceni bodo shranjeni v izvoženo datoteko PNG/SVG, tako da bo sceno mogoče obnoviti iz nje.\nTo bo povečalo velikost izvožene datoteke.",
     "addWatermark": "Dodaj \"Izdelano z Excalidraw\"",
     "handDrawn": "Ročno narisano",
     "normal": "Običajno",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Obrni vodoravno",
     "flipVertical": "Obrni navpično",
     "viewMode": "Način ogleda",
-    "toggleExportColorScheme": "Preklopi barvno shemo izvoza",
     "share": "Deli",
     "showStroke": "Prikaži izbirnik barv poteze",
     "showBackground": "Prikaži izbirnik barv ozadja",
@@ -128,7 +123,10 @@
       "unlockAll": "Odkleni vse"
     },
     "statusPublished": "Objavljeno",
-    "sidebarLock": "Obdrži stransko vrstico odprto"
+    "sidebarLock": "Obdrži stransko vrstico odprto",
+    "selectAllElementsInFrame": "Izberi vse elemente v okvirju",
+    "removeAllElementsFromFrame": "Izbriši vse elemente v okvirju",
+    "eyeDropper": "Izberi barvo s platna"
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
@@ -140,11 +138,7 @@
     "exportJSON": "Izvozi v datoteko",
     "exportImage": "Izvozi sliko...",
     "export": "Shrani v...",
-    "exportToPng": "Izvozi v PNG",
-    "exportToSvg": "Izvozi v SVG",
     "copyToClipboard": "Kopiraj v odložišče",
-    "copyPngToClipboard": "Kopiraj PNG v odložišče",
-    "scale": "Povečava",
     "save": "Shrani v trenutno datoteko",
     "saveAs": "Shrani kot",
     "load": "Odpri",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "Ni bilo mogoče shraniti v zaledno bazo podatkov. Če se težave nadaljujejo, shranite datoteko lokalno, da ne boste izgubili svojega dela.",
     "collabSaveFailed_sizeExceeded": "Ni bilo mogoče shraniti v zaledno bazo podatkov, zdi se, da je platno preveliko. Datoteko shranite lokalno, da ne izgubite svojega dela.",
     "brave_measure_text_error": {
-      "start": "Videti je, da uporabljate brskalnik Brave z omogočeno nastavitvijo",
-      "aggressive_block_fingerprint": "Agresivno blokiranje prstnih odtisov",
-      "setting_enabled": " ",
-      "break": "To bi lahko povzročilo motnje v obnašanju",
-      "text_elements": "besedilnih elementov",
-      "in_your_drawings": "v vaših risbah",
-      "strongly_recommend": "Močno priporočamo, da onemogočite to nastavitev. Sledite",
-      "steps": "tem korakom,",
-      "how": "kako to storiti",
-      "disable_setting": " Če onemogočanje te nastavitve ne popravi prikaza besedilnih elementov, odprite",
-      "issue": "vprašanje",
-      "write": "na našem GitHubu ali nam pišite na",
-      "discord": "Discord"
+      "line1": "Videti je, da uporabljate brskalnik Brave z omogočeno nastavitvijo <bold>Agresivno blokiranje prstnih odtisov</bold>.",
+      "line2": "To bi lahko povzročilo motnje v obnašanju <bold>besedilnih elementov</bold> v vaših risbah.",
+      "line3": "Močno priporočamo, da onemogočite to nastavitev. Sledite <link>tem korakom</link>, kako to storiti.",
+      "line4": "Če onemogočanje te nastavitve ne popravi prikaza besedilnih elementov, odprite <issueLink>vprašanje</issueLink> na našem GitHubu ali nam pišite na <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Način peresa - prepreči dotik",
     "link": "Dodaj/posodobi povezavo za izbrano obliko",
     "eraser": "Radirka",
-    "hand": "Roka (orodje za premikanje)"
+    "frame": "Okvir",
+    "hand": "Roka (orodje za premikanje)",
+    "extraTools": "Več orodij"
   },
   "headings": {
     "canvasActions": "Dejanja za platno",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Nasvet: poskusite premakniti najbolj oddaljene elemente nekoliko bližje skupaj."
   },
   "errorSplash": {
-    "headingMain_pre": "Prišlo je do napake. Poskusite ",
-    "headingMain_button": "ponovno naložiti stran.",
-    "clearCanvasMessage": "Če ponovno nalaganje ne deluje, poskusite ",
-    "clearCanvasMessage_button": "počistiti platno.",
+    "headingMain": "Prišlo je do napake. Poskusite <button>ponovno naložiti stran.</button>",
+    "clearCanvasMessage": "Če ponovno nalaganje ne deluje, poskusite <button>počistiti platno.</button>",
     "clearCanvasCaveat": " To bo povzročilo izgubo dela ",
-    "trackedToSentry_pre": "Napaka z identifikatorjem ",
-    "trackedToSentry_post": " smo zabeležili v naš sistem.",
-    "openIssueMessage_pre": "Zelo smo bili previdni, da v podatke o napaki nismo vključili vaših podatkov o sceni. Če vaša scena ni zasebna, vas prosimo, da napišete več podrobnosti na našem ",
-    "openIssueMessage_button": "sledilniku hroščev.",
-    "openIssueMessage_post": " Prosimo, vključite spodnje informacije tako, da jih kopirate in prilepite v GitHub vprašanje.",
+    "trackedToSentry": "Napaka z identifikatorjem {{eventId}} smo zabeležili v naš sistem.",
+    "openIssueMessage": "Zelo smo bili previdni, da v podatke o napaki nismo vključili vaših podatkov o sceni. Če vaša scena ni zasebna, vas prosimo, da napišete več podrobnosti na našem <button>sledilniku hroščev.</button> Prosimo, vključite spodnje informacije tako, da jih kopirate in prilepite v GitHub vprašanje.",
     "sceneContent": "Vsebina scene:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "Obvezno",
       "website": "Vnesite veljaven URL"
     },
-    "noteDescription": {
-      "pre": "Predložite svojo knjižnico, da bo vključena v ",
-      "link": "javno skladišče knjižnic,",
-      "post": "da jih drugi lahko uporabljajo v svojih risbah."
-    },
-    "noteGuidelines": {
-      "pre": "Knjižnica mora biti najprej ročno odobrena. Prosimo vas, da pred oddajanjem preberete naše ",
-      "link": "smernice.",
-      "post": "Za komunikacijo in spreminjanje po potrebi boste potrebovali račun GitHub, vendar to ni obvezno."
-    },
-    "noteLicense": {
-      "pre": "Z oddajo se strinjate, da bo knjižnica objavljena pod ",
-      "link": "licenco MIT, ",
-      "post": "kar na kratko pomeni, da jo lahko kdorkoli uporablja brez omejitev."
-    },
+    "noteDescription": "Predložite svojo knjižnico, da bo vključena v <link>javno skladišče knjižnic,</link>da jih drugi lahko uporabljajo v svojih risbah.",
+    "noteGuidelines": "Knjižnica mora biti najprej ročno odobrena. Prosimo vas, da pred oddajanjem preberete naše <link>smernice.</link>Za komunikacijo in spreminjanje po potrebi boste potrebovali račun GitHub, vendar to ni obvezno.",
+    "noteLicense": "Z oddajo se strinjate, da bo knjižnica objavljena pod <link>licenco MIT, </link>kar na kratko pomeni, da jo lahko kdorkoli uporablja brez omejitev.",
     "noteItems": "Vsak element knjižnice mora imeti svoje ime, tako da ga je mogoče filtrirati. Vključeni bodo naslednji elementi knjižnice:",
     "atleastOneLibItem": "Za začetek izberite vsaj en element knjižnice",
     "republishWarning": "Opomba: nekateri izbrani predmeti so označeni kot že objavljeni/oddani. Elemente lahko znova oddate samo, ko posodabljate obstoječo knjižnico ali oddajo."
   },
   "publishSuccessDialog": {
     "title": "Knjižnica oddana",
-    "content": "{{authorName}}, hvala. Vaša knjižnica je bila poslana v pregled. Stanje lahko spremljate",
-    "link": "tukaj"
+    "content": "{{authorName}}, hvala. Vaša knjižnica je bila poslana v pregled. Stanje lahko spremljate<link>tukaj</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Ponastavi knjižnico",
     "removeItemsFromLib": "Odstran izbrane elemente iz knjižnice"
+  },
+  "imageExportDialog": {
+    "header": "Izvozi sliko",
+    "label": {
+      "withBackground": "Ozadje",
+      "onlySelected": "Samo izbor",
+      "darkMode": "Temni način",
+      "embedScene": "Vdelaj sceno",
+      "scale": "Povečava",
+      "padding": "Odmik"
+    },
+    "tooltip": {
+      "embedScene": "Podatki o sceni bodo shranjeni v izvoženo datoteko PNG/SVG, tako da bo sceno mogoče obnoviti iz nje.\nTo bo povečalo velikost izvožene datoteke."
+    },
+    "title": {
+      "exportToPng": "Izvozi v PNG",
+      "exportToSvg": "Izvozi v SVG",
+      "copyPngToClipboard": "Kopiraj PNG v odložišče"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopiraj v odložišče"
+    }
   },
   "encrypted": {
     "tooltip": "Vaše risbe so šifrirane od konca do konca, tako da jih strežniki Excalidraw nikoli ne bodo videli.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "Uporabite {{shortcut}}, da prilepite kot en element,\n ali prilepite v obstoječ urejevalnik besedil"
   },
   "colors": {
-    "ffffff": "Bela",
-    "f8f9fa": "Siva 0",
-    "f1f3f5": "Siva 1",
-    "fff5f5": "Rdeča 0",
-    "fff0f6": "Roza 0",
-    "f8f0fc": "Grozdje 0",
-    "f3f0ff": "Vijolična 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Modra 0",
-    "e3fafc": "Cijan 0",
-    "e6fcf5": "Modrozelena 0",
-    "ebfbee": "Zelena 0",
-    "f4fce3": "Limeta 0",
-    "fff9db": "Rumena 0",
-    "fff4e6": "Oranžna 0",
     "transparent": "Prosojno",
-    "ced4da": "Siva 4",
-    "868e96": "Siva 6",
-    "fa5252": "Rdeča 6",
-    "e64980": "Roza 6",
-    "be4bdb": "Grozdje 6",
-    "7950f2": "Vijolična 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Modra 6",
-    "15aabf": "Cijan 6",
-    "12b886": "Modrozelena 6",
-    "40c057": "Zelena 6",
-    "82c91e": "Limeta 6",
-    "fab005": "Rumena 6",
-    "fd7e14": "Oranžna 6",
-    "000000": "Črna",
-    "343a40": "Siva 8",
-    "495057": "Siva 7",
-    "c92a2a": "Rdeča 9",
-    "a61e4d": "Roza 9",
-    "862e9c": "Grozdje 9",
-    "5f3dc4": "Vijolična 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Modra 9",
-    "0b7285": "Cijan 9",
-    "087f5b": "Modrozelena 9",
-    "2b8a3e": "Zelena 9",
-    "5c940d": "Limeta 9",
-    "e67700": "Rumena 9",
-    "d9480f": "Oranžna 9"
+    "black": "Črna",
+    "white": "Bela",
+    "red": "Rdeča",
+    "pink": "Roza",
+    "grape": "Grozdje",
+    "violet": "Vijolična",
+    "gray": "Siva",
+    "blue": "Modra",
+    "cyan": "Cijan",
+    "teal": "Turkizna",
+    "green": "Zelena",
+    "yellow": "Rumena",
+    "orange": "Oranžna",
+    "bronze": "Bronasta"
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "Izberi orodje in začni z risanjem!",
       "helpHint": "Bližnjice in pomoč"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "Najpogosteje uporabljene barve po meri",
+    "colors": "Barve",
+    "shades": "Odtenki",
+    "hexCode": "Hex koda",
+    "noShades": "Odtenki za to barvo niso na voljo"
   }
 }

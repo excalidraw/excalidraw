@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trikampis",
     "fontSize": "Šrifto dydis",
     "fontFamily": "Šriftas",
-    "onlySelected": "Tik pasirinktus",
-    "withBackground": "Fonas",
-    "exportEmbedScene": "Įterpti sceną",
-    "exportEmbedScene_details": "Scenos duomenys bus išsaugoti eksportuotame PNG/SVG faile taip, jog vėliau scena galėtu būti iš jo atkurta.\nTai padydins eksportuoto failo dydį.",
     "addWatermark": "Sukurta su Excalidraw",
     "handDrawn": "Ranka rašytas",
     "normal": "Normalus",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Apversti horizontaliai",
     "flipVertical": "Apversti vertikaliai",
     "viewMode": "",
-    "toggleExportColorScheme": "",
     "share": "Dalintis",
     "showStroke": "",
     "showBackground": "",
@@ -128,7 +123,10 @@
       "unlockAll": ""
     },
     "statusPublished": "",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +138,7 @@
     "exportJSON": "Eksportuoti į failą",
     "exportImage": "",
     "export": "",
-    "exportToPng": "Eksportuoti į PNG",
-    "exportToSvg": "Eksportuoti į SVG",
     "copyToClipboard": "Kopijuoti į iškarpinę",
-    "copyPngToClipboard": "Kopijuoti PNG į iškarpinę",
-    "scale": "",
     "save": "",
     "saveAs": "Išsaugoti kaip",
     "load": "",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Rašyklio režimas - neleisti prisilietimų",
     "link": "Pridėti / Atnaujinti pasirinktos figūros nuorodą",
     "eraser": "Trintukas",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Veiksmai su drobe",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": ""
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
+    "headingMain": "",
     "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "",
     "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": ""
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "Privalomas",
       "website": "Įveskite teisingą nuorodą (URL)"
     },
-    "noteDescription": {
-      "pre": "Pateik savo biblioteką, jog ji galėtų būti įtraukta į ",
-      "link": "",
-      "post": "jog kiti žmonės galėtų tai naudoti savo piešiniuose."
-    },
-    "noteGuidelines": {
-      "pre": "Visų pirma, biblioteka turi būti rankiniu būdu patvirtinta. Prašome paskaityti ",
-      "link": "gairės",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "MIT licencija, ",
-      "post": ""
-    },
+    "noteDescription": "Pateik savo biblioteką, jog ji galėtų būti įtraukta į <link></link>jog kiti žmonės galėtų tai naudoti savo piešiniuose.",
+    "noteGuidelines": "Visų pirma, biblioteka turi būti rankiniu būdu patvirtinta. Prašome paskaityti <link>gairės</link>",
+    "noteLicense": "<link>MIT licencija, </link>",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Biblioteka pateikta",
-    "content": "Ačiū {{authorName}}. Tavo biblioteka buvo pateikta peržiūrai. Gali sekti būseną",
-    "link": "čia"
+    "content": "Ačiū {{authorName}}. Tavo biblioteka buvo pateikta peržiūrai. Gali sekti būseną<link>čia</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Atstatyti biblioteką",
     "removeItemsFromLib": "Pašalinti pasirinktus elementus iš bibliotekos"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": ""
   },
   "colors": {
-    "ffffff": "Balta",
-    "f8f9fa": "Pilka 0",
-    "f1f3f5": "Pilka 1",
-    "fff5f5": "Raudona 0",
-    "fff0f6": "Rožinė 0",
-    "f8f0fc": "",
-    "f3f0ff": "Violetinė 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Mėlyna 0",
-    "e3fafc": "",
-    "e6fcf5": "",
-    "ebfbee": "Žalia 0",
-    "f4fce3": "",
-    "fff9db": "Geltona 0",
-    "fff4e6": "Oranžinė 0",
     "transparent": "Permatoma",
-    "ced4da": "Pilka 4",
-    "868e96": "Pilka 6",
-    "fa5252": "Raudona 6",
-    "e64980": "Rožinė 6",
-    "be4bdb": "",
-    "7950f2": "Violetinė 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Mėlyna 6",
-    "15aabf": "",
-    "12b886": "",
-    "40c057": "Žalia 6",
-    "82c91e": "",
-    "fab005": "Geltona 6",
-    "fd7e14": "Oranžinė 6",
-    "000000": "Juoda",
-    "343a40": "Pilna 8",
-    "495057": "Pilka 7",
-    "c92a2a": "Raudona 9",
-    "a61e4d": "Rožinė 9",
-    "862e9c": "",
-    "5f3dc4": "Violetinė 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Mėlyna 9",
-    "0b7285": "",
-    "087f5b": "",
-    "2b8a3e": "Žalia 9",
-    "5c940d": "",
-    "e67700": "Geltona 9",
-    "d9480f": "Oranžinė 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "",
       "helpHint": ""
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

@@ -1,7 +1,7 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
 import { ExcalidrawElement, FontFamilyValues } from "./element/types";
-import oc from "open-color";
+import { COLOR_PALETTE } from "./colors";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
@@ -59,6 +59,7 @@ export enum EVENT {
   GESTURE_START = "gesturestart",
   GESTURE_CHANGE = "gesturechange",
   POINTER_MOVE = "pointermove",
+  POINTER_DOWN = "pointerdown",
   POINTER_UP = "pointerup",
   STATE_CHANGE = "statechange",
   WHEEL = "wheel",
@@ -91,6 +92,17 @@ export const FONT_FAMILY = {
 export const THEME = {
   LIGHT: "light",
   DARK: "dark",
+};
+
+export const FRAME_STYLE = {
+  strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
+  strokeWidth: 1 as ExcalidrawElement["strokeWidth"],
+  strokeStyle: "solid" as ExcalidrawElement["strokeStyle"],
+  fillStyle: "solid" as ExcalidrawElement["fillStyle"],
+  roughness: 0 as ExcalidrawElement["roughness"],
+  roundness: null as ExcalidrawElement["roundness"],
+  backgroundColor: "transparent" as ExcalidrawElement["backgroundColor"],
+  radius: 8,
 };
 
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
@@ -129,6 +141,12 @@ export const MIME_TYPES = {
   binary: "application/octet-stream",
   // image
   ...IMAGE_MIME_TYPES,
+} as const;
+
+export const EXPORT_IMAGE_TYPES = {
+  png: "png",
+  svg: "svg",
+  clipboard: "clipboard",
 } as const;
 
 export const EXPORT_DATA_TYPES = {
@@ -266,8 +284,8 @@ export const DEFAULT_ELEMENT_PROPS: {
   opacity: ExcalidrawElement["opacity"];
   locked: ExcalidrawElement["locked"];
 } = {
-  strokeColor: oc.black,
-  backgroundColor: "transparent",
+  strokeColor: COLOR_PALETTE.black,
+  backgroundColor: COLOR_PALETTE.transparent,
   fillStyle: "hachure",
   strokeWidth: 1,
   strokeStyle: "solid",

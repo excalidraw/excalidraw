@@ -79,7 +79,9 @@ export const getSnaps = ({
   event: PointerEvent;
   dragOffset: { x: number; y: number };
 }): Snaps | null => {
-  const selectedElements = getSelectedElements(elements, appState, true);
+  const selectedElements = getSelectedElements(elements, appState, {
+    includeBoundTextElement: true,
+  });
 
   if (!isSnappingEnabled({ appState, event, selectedElements })) {
     return null;

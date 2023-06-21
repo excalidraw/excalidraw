@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triângulo",
     "fontSize": "Tamanho da fonte",
     "fontFamily": "Família da fontes",
-    "onlySelected": "Somente a seleção",
-    "withBackground": "Fundo",
-    "exportEmbedScene": "Cena embutida",
-    "exportEmbedScene_details": "Os dados da cena serão guardados no ficheiro PNG/SVG exportado para que a cena possa ser restaurada.\nIrá aumentar o tamanho do ficheiro exportado.",
     "addWatermark": "Adicionar \"Feito com Excalidraw\"",
     "handDrawn": "Manuscrito",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Inverter horizontalmente",
     "flipVertical": "Inverter verticalmente",
     "viewMode": "Modo de visualização",
-    "toggleExportColorScheme": "Alternar esquema de cores de exportação",
     "share": "Partilhar",
     "showStroke": "Mostrar seletor de cores do traço",
     "showBackground": "Mostrar seletor de cores do fundo",
@@ -128,7 +123,10 @@
       "unlockAll": "Desbloquear todos"
     },
     "statusPublished": "Publicado",
-    "sidebarLock": "Manter a barra lateral aberta"
+    "sidebarLock": "Manter a barra lateral aberta",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Ainda não foram adicionados nenhuns itens...",
@@ -140,11 +138,7 @@
     "exportJSON": "Exportar para ficheiro",
     "exportImage": "Exportar imagem...",
     "export": "Guardar para...",
-    "exportToPng": "Exportar em PNG",
-    "exportToSvg": "Exportar em SVG",
     "copyToClipboard": "Copiar para o clipboard",
-    "copyPngToClipboard": "Copiar PNG para área de transferência",
-    "scale": "Escala",
     "save": "Guardar no ficheiro atual",
     "saveAs": "Guardar como",
     "load": "Abrir",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "Não foi possível guardar na base de dados de backend. Se os problemas persistirem, guarde o ficheiro localmente para garantir que não perde o seu trabalho.",
     "collabSaveFailed_sizeExceeded": "Não foi possível guardar na base de dados de backend, o ecrã parece estar muito grande. Deve guardar o ficheiro localmente para garantir que não perde o seu trabalho.",
     "brave_measure_text_error": {
-      "start": "Parece que está a usar o navegador Brave com o",
-      "aggressive_block_fingerprint": "Bloqueio Agressivo via Impressão Digital",
-      "setting_enabled": "activo",
-      "break": "Isso pode desconfigurar os",
-      "text_elements": "Elementos de Texto",
-      "in_your_drawings": "nos seus desenhos",
-      "strongly_recommend": "Recomendamos fortemente a desactivação desta configuração. Pode seguir",
-      "steps": "os seguintes passos",
-      "how": "para saber como o fazer",
-      "disable_setting": " Se desactivar esta configuração não consertar a exibição de elementos de texto, por favor, abra um",
-      "issue": "problema",
-      "write": "no nosso GitHub ou então escreva-nos no",
-      "discord": "Discord"
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Modo caneta - impedir toque",
     "link": "Acrescentar/ Adicionar ligação para uma forma seleccionada",
     "eraser": "Borracha",
-    "hand": "Mão (ferramenta de movimento da tela)"
+    "frame": "",
+    "hand": "Mão (ferramenta de movimento da tela)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Ações da área de desenho",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Dica: tente aproximar um pouco os elementos mais distantes."
   },
   "errorSplash": {
-    "headingMain_pre": "Foi encontrado um erro. Tente ",
-    "headingMain_button": "recarregar a página.",
-    "clearCanvasMessage": "Se a recarga não funcionar, tente ",
-    "clearCanvasMessage_button": "a limpar a área de desenho.",
+    "headingMain": "Foi encontrado um erro. Tente <button>recarregar a página.</button>",
+    "clearCanvasMessage": "Se a recarga não funcionar, tente <button>a limpar a área de desenho.</button>",
     "clearCanvasCaveat": " Isso resultará em perda de trabalho ",
-    "trackedToSentry_pre": "O erro com o identificador ",
-    "trackedToSentry_post": " foi rastreado no nosso sistema.",
-    "openIssueMessage_pre": "Fomos muito cautelosos para não incluir suas informações de cena no erro. Se sua cena não for privada, por favor, considere seguir nosso ",
-    "openIssueMessage_button": "rastreador de bugs.",
-    "openIssueMessage_post": " Por favor, inclua informações abaixo, copiando e colando no relatório de erros no GitHub.",
+    "trackedToSentry": "O erro com o identificador {{eventId}} foi rastreado no nosso sistema.",
+    "openIssueMessage": "Fomos muito cautelosos para não incluir suas informações de cena no erro. Se sua cena não for privada, por favor, considere seguir nosso <button>rastreador de bugs.</button> Por favor, inclua informações abaixo, copiando e colando no relatório de erros no GitHub.",
     "sceneContent": "Conteúdo da cena:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "Obrigatório",
       "website": "Introduza um URL válido"
     },
-    "noteDescription": {
-      "pre": "Envie a sua biblioteca para ser incluída no ",
-      "link": "repositório de bibliotecas públicas",
-      "post": "para outras pessoas a poderem usar nos seus próprios desenhos."
-    },
-    "noteGuidelines": {
-      "pre": "A biblioteca precisa ser aprovada manualmente primeiro. Por favor, leia ",
-      "link": "orientações",
-      "post": " antes de enviar. Vai precisar de uma conta no GitHub para comunicar e fazer alterações se solicitado, mas não é estritamente necessária."
-    },
-    "noteLicense": {
-      "pre": "Ao enviar, concorda que a biblioteca será publicada sob a ",
-      "link": "Licença MIT, ",
-      "post": "o que significa, de forma resumida, que qualquer pessoa pode utilizá-la sem restrições."
-    },
+    "noteDescription": "Envie a sua biblioteca para ser incluída no <link>repositório de bibliotecas públicas</link>para outras pessoas a poderem usar nos seus próprios desenhos.",
+    "noteGuidelines": "A biblioteca precisa ser aprovada manualmente primeiro. Por favor, leia <link>orientações</link> antes de enviar. Vai precisar de uma conta no GitHub para comunicar e fazer alterações se solicitado, mas não é estritamente necessária.",
+    "noteLicense": "Ao enviar, concorda que a biblioteca será publicada sob a <link>Licença MIT, </link>o que significa, de forma resumida, que qualquer pessoa pode utilizá-la sem restrições.",
     "noteItems": "Cada item da biblioteca deve ter o seu próprio nome para que este seja pesquisável com filtros. Os seguintes itens da biblioteca serão incluídos:",
     "atleastOneLibItem": "Por favor, seleccione pelo menos um item da biblioteca para começar",
     "republishWarning": "Nota: alguns dos itens seleccionados estão marcados como já publicados/enviados. Só deve reenviar itens ao actualizar uma biblioteca existente ou submissão."
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",
-    "content": "Obrigado {{authorName}}. A sua biblioteca foi enviada para análise. Pode acompanhar o status",
-    "link": "aqui"
+    "content": "Obrigado {{authorName}}. A sua biblioteca foi enviada para análise. Pode acompanhar o status<link>aqui</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Repor a biblioteca",
     "removeItemsFromLib": "Remover os itens seleccionados da biblioteca"
+  },
+  "imageExportDialog": {
+    "header": "Exportar imagem",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "Cena embutida",
+      "scale": "",
+      "padding": "Espaçamento"
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "Exportar em PNG",
+      "exportToSvg": "Exportar em SVG",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Os seus desenhos são encriptados de ponta-a-ponta, por isso os servidores do Excalidraw nunca os verão.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "Usar {{shortcut}} para colar como um único elemento,\nou colar num editor de texto existente"
   },
   "colors": {
-    "ffffff": "Branco",
-    "f8f9fa": "Cinza 0",
-    "f1f3f5": "Cinza 1",
-    "fff5f5": "Vermelho 0",
-    "fff0f6": "Rosa 0",
-    "f8f0fc": "Uva 0",
-    "f3f0ff": "Violeta 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Azul 0",
-    "e3fafc": "Ciano 0",
-    "e6fcf5": "Verde-azulado 0",
-    "ebfbee": "Verde 0",
-    "f4fce3": "Lima 0",
-    "fff9db": "Amarelo 0",
-    "fff4e6": "Laranja 0",
     "transparent": "Transparente",
-    "ced4da": "Cinza 4",
-    "868e96": "Cinza 6",
-    "fa5252": "Vermelho 6",
-    "e64980": "Rosa 6",
-    "be4bdb": "Uva 6",
-    "7950f2": "Violeta 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Azul 6",
-    "15aabf": "Ciano 6",
-    "12b886": "Verde-azulado 6",
-    "40c057": "Verde 6",
-    "82c91e": "Lima 6",
-    "fab005": "Amarelo 6",
-    "fd7e14": "Laranja 6",
-    "000000": "Preto",
-    "343a40": "Cinza 8",
-    "495057": "Cinza 7",
-    "c92a2a": "Vermelho 9",
-    "a61e4d": "Rosa 9",
-    "862e9c": "Uva 9",
-    "5f3dc4": "Violeta 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Azul 9",
-    "0b7285": "Ciano 9",
-    "087f5b": "Verde-azulado 9",
-    "2b8a3e": "Verde 9",
-    "5c940d": "Lima 9",
-    "e67700": "Amarelo 9",
-    "d9480f": "Laranja 9"
+    "black": "Preto",
+    "white": "Branco",
+    "red": "Vermelho",
+    "pink": "Rosa",
+    "grape": "Uva",
+    "violet": "Violeta",
+    "gray": "Cinza",
+    "blue": "Azul",
+    "cyan": "",
+    "teal": "",
+    "green": "Verde",
+    "yellow": "Amarelo",
+    "orange": "Laranja",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "Escolha uma ferramenta e comece a desenhar!",
       "helpHint": "Atalhos e ajuda"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "Cores",
+    "shades": "Tons",
+    "hexCode": "",
+    "noShades": ""
   }
 }

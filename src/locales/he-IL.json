@@ -40,10 +40,6 @@
     "arrowhead_triangle": "משולש",
     "fontSize": "גודל גופן",
     "fontFamily": "גופן",
-    "onlySelected": "רק מה שנבחר",
-    "withBackground": "רקע",
-    "exportEmbedScene": "הטמעה של מידע הסצנה",
-    "exportEmbedScene_details": "הייצוא יבוצע לקובץ מסוג PNG/SVG כדי שהמידע על הסצנה ישמר בו וניתן יהיה לבצע שחזור ממנו.\nיגדיל את גודל הקובץ של הייצוא.",
     "addWatermark": "הוסף \"נוצר באמצעות Excalidraw\"",
     "handDrawn": "ציור יד",
     "normal": "רגיל",
@@ -100,7 +96,6 @@
     "flipHorizontal": "הפוך אופקית",
     "flipVertical": "הפוך אנכית",
     "viewMode": "מצב תצוגה",
-    "toggleExportColorScheme": "מתג ערכת צבעים לייצוא",
     "share": "שתף",
     "showStroke": "הצג בוחר צבע מברשת",
     "showBackground": "הצג בוחר צבע רקע",
@@ -128,7 +123,10 @@
       "unlockAll": "שחרור הכול"
     },
     "statusPublished": "פורסם",
-    "sidebarLock": "שמור את סרגל הצד פתוח"
+    "sidebarLock": "שמור את סרגל הצד פתוח",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "עוד לא הוספת דברים...",
@@ -140,11 +138,7 @@
     "exportJSON": "ייצא לקובץ",
     "exportImage": "ייצוא התמונה...",
     "export": "שמור ל...",
-    "exportToPng": "יצא ל PNG",
-    "exportToSvg": "יצא ל SVG",
     "copyToClipboard": "העתק ללוח",
-    "copyPngToClipboard": "העתק PNG ללוח",
-    "scale": "קנה מידה",
     "save": "שמור לקובץ נוכחי",
     "saveAs": "שמירה בשם",
     "load": "פתח",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "לא הצלחתי להתחבר למסד הנתונים האחורי. אם הבעיה ממשיכה, כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך.",
     "collabSaveFailed_sizeExceeded": "לא הצלחתי לשמור למסד הנתונים האחורי, נראה שהקנבס שלך גדול מדי. כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך.",
     "brave_measure_text_error": {
-      "start": "נראה שאתה משתמש בדפדפן Brave עם ה-",
-      "aggressive_block_fingerprint": "חסימת Fingerprinting אגרסיבית",
-      "setting_enabled": "ההגדרה מופעלת",
-      "break": "זה יכול לגרום לבעיה ב-",
-      "text_elements": "רכיבי טקסט",
-      "in_your_drawings": "בציורים שלך",
-      "strongly_recommend": "אנו ממליצים בחום לנטרל את ההגדרה הזו. אתה יכול לעקוב",
-      "steps": "הצעדים הבאים",
-      "how": "כיצד לעשות את זה",
-      "disable_setting": " אם נטרול ההגדרה לא מתקן את תצוגת רכיבי הטקסט, אנא פתח",
-      "issue": "בעיה",
-      "write": "ב- GitHub שלנו, או כתוב לנו ב-",
-      "discord": "Discord"
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "מצב עט - מנע נגיעה",
     "link": "הוספה/עדכון קישור של הצורה שנבחרה",
     "eraser": "מחק",
-    "hand": "יד (כלי הזזה)"
+    "frame": "",
+    "hand": "יד (כלי הזזה)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "פעולות קנבאס",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "טיפ: נסה להזיז את הרכיבים הרחוקים ביותר מעט קרוב יותר האחד לשני."
   },
   "errorSplash": {
-    "headingMain_pre": "אירעה שגיאה. נסה ",
-    "headingMain_button": "טוען את העמוד מחדש.",
+    "headingMain": "",
     "clearCanvasMessage": "אם טעינה מחדש לא עובדת, נסה ",
-    "clearCanvasMessage_button": "מנקה את הקנבאס.",
     "clearCanvasCaveat": " זה יגרום לאובדן העבודה ",
-    "trackedToSentry_pre": "השגיאה עם מזהה ",
-    "trackedToSentry_post": " נמצאה במערכת שלנו.",
-    "openIssueMessage_pre": "נזהרנו מאוד שלא לכלול מידע מהקנבאס שלך בשגיאה. אם המידע בקנבאס אינו אישי, שקול לבצע מעקב אחר הטיפול שלנו ",
-    "openIssueMessage_button": "מעקב באגים.",
-    "openIssueMessage_post": " בבקשה כלול את המידע מטה באמצעות העתקתה שלו, והדבקה שלו ב- GitHub Issue.",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": "תוכן הקנבאס:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "נדרש",
       "website": "הזינו כתובת URL תקינה"
     },
-    "noteDescription": {
-      "pre": "הגש את הספריה שלך להכללתה ב ",
-      "link": "מאגר הספריה הציבורית",
-      "post": "לשימושם של אנשים אחרים בציורים שלהם."
-    },
-    "noteGuidelines": {
-      "pre": "הספריה צריכה לקבל אישור ידני קודם לכן. אנא קרא את ",
-      "link": "הנחיות",
-      "post": " לפני השליחה. אתה תצטרך לחשבון GitHub כדי לתקשר ולבצע שינויים אם תתבקש, אבל זה לא דרישה הכרחית."
-    },
-    "noteLicense": {
-      "pre": "על ידי שליחה, אתה מסכים שהסיפריה תפורסם תחת ה- ",
-      "link": "רישיון MIT, ",
-      "post": "שאומר בקצרה, שכל אחד יכול לעשות בהם שימוש ללא מגבלות."
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "לכל פריט בסיפריה חייב להיות שם כדי שאפשר יהיה לסנן. הפריטי סיפריה הבאים יהיו כלולים:",
     "atleastOneLibItem": "אנא בחר לפחות פריט אחד מספריה כדי להתחיל",
     "republishWarning": "הערה: חלק מהפריטים שבחרת מסומנים ככאלו שכבר פורסמו/נשלחו. אתה צריך לשלוח פריטים מחדש כאשר אתה מעדכן ספריה או הגשה קיימים."
   },
   "publishSuccessDialog": {
     "title": "הספריה הוגשה",
-    "content": "תודה {{authorName}}. הספריה שלך נשלחה לבחינה. תוכל לעקוב אחרי סטטוס הפרסום",
-    "link": "כאן"
+    "content": "תודה {{authorName}}. הספריה שלך נשלחה לבחינה. תוכל לעקוב אחרי סטטוס הפרסום"
   },
   "confirmDialog": {
     "resetLibrary": "איפוס ספריה",
     "removeItemsFromLib": "הסר את הפריטים הנבחרים מהספריה"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "הציורים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "השתמש ב- {{shortcut}} כדי להדביק כפריט יחיד,\nאו הדבק לתוך עורך טקסט קיים"
   },
   "colors": {
-    "ffffff": "לבן",
-    "f8f9fa": "אפור 0",
-    "f1f3f5": "אפור 1",
-    "fff5f5": "אדום 0",
-    "fff0f6": "ורוד 0",
-    "f8f0fc": "ענבים 0",
-    "f3f0ff": "סגול 0",
-    "edf2ff": "כחול כהה 0",
-    "e7f5ff": "כחול 0",
-    "e3fafc": "טורקיז 0",
-    "e6fcf5": "ירקרק 0",
-    "ebfbee": "ירוק 0",
-    "f4fce3": "ליים 0",
-    "fff9db": "צהוב",
-    "fff4e6": "כתום 0",
     "transparent": "שקוף",
-    "ced4da": "אפור 4",
-    "868e96": "אפור 6",
-    "fa5252": "אדום 6",
-    "e64980": "ורוד 6",
-    "be4bdb": "ענבים 6",
-    "7950f2": "סגול 6",
-    "4c6ef5": "כחול כהה 6",
-    "228be6": "כחול 6",
-    "15aabf": "טורקיז 6",
-    "12b886": "ירקרק 6",
-    "40c057": "ירוק 6",
-    "82c91e": "ליים 6",
-    "fab005": "צהוב 6",
-    "fd7e14": "כתום 6",
-    "000000": "שחור",
-    "343a40": "אפור 8",
-    "495057": "אפור 7",
-    "c92a2a": "אדום 9",
-    "a61e4d": "ורוד 9",
-    "862e9c": "ענבים 9",
-    "5f3dc4": "סגול 9",
-    "364fc7": "כחול כהה 9",
-    "1864ab": "כחול 9",
-    "0b7285": "טורקיז 9",
-    "087f5b": "ירוק-כחול 9",
-    "2b8a3e": "ירוק 9",
-    "5c940d": "ליים 9",
-    "e67700": "צהוב 9",
-    "d9480f": "כתום 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "בחר כלי & והתחל לצייר!",
       "helpHint": "קיצורים & עזרה"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

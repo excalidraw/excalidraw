@@ -8,6 +8,8 @@ import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
 import { Snaps, snapProject } from "../snapping";
 import { getGridPoint } from "../math";
+import Scene from "../scene/Scene";
+import { isFrameElement } from "./typeChecks";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -15,9 +17,29 @@ export const dragSelectedElements = (
   offset: { x: number; y: number },
   lockDirection: boolean = false,
   appState: AppState,
+  scene: Scene,
   snaps: Snaps | null = null,
 ) => {
-  selectedElements.forEach((element) => {
+  // we do not want a frame and its elements to be selected at the same time
+  // but when it happens (due to some bug), we want to avoid updating element
+  // in the frame twice, hence the use of set
+  const elementsToUpdate = new Set<NonDeletedExcalidrawElement>(
+    selectedElements,
+  );
+  const frames = selectedElements
+    .filter((e) => isFrameElement(e))
+    .map((f) => f.id);
+
+  if (frames.length > 0) {
+    const elementsInFrames = scene
+      .getNonDeletedElements()
+      .filter((e) => e.frameId !== null)
+      .filter((e) => frames.includes(e.frameId!));
+
+    elementsInFrames.forEach((element) => elementsToUpdate.add(element));
+  }
+
+  elementsToUpdate.forEach((element) => {
     updateElementCoords(
       lockDirection,
       pointerDownState,
@@ -36,7 +58,13 @@ export const dragSelectedElements = (
       (appState.editingGroupId && !isSelectedViaGroup(appState, element))
     ) {
       const textElement = getBoundTextElement(element);
-      if (textElement) {
+      if (
+        textElement &&
+        // when container is added to a frame, so will its bound text
+        // so the text is already in `elementsToUpdate` and we should avoid
+        // updating its coords again
+        (!textElement.frameId || !frames.includes(textElement.frameId))
+      ) {
         updateElementCoords(
           lockDirection,
           pointerDownState,
@@ -48,7 +76,7 @@ export const dragSelectedElements = (
       }
     }
     updateBoundElements(element, {
-      simultaneouslyUpdated: selectedElements,
+      simultaneouslyUpdated: Array.from(elementsToUpdate),
     });
   });
 };

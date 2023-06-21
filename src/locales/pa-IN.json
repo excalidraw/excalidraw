@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "ਪੇਸਟ ਕਰੋ",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "ਸਾਦੇ ਪਾਠ ਵਜੋਂ ਪੇਸਟ ਕਰੋ",
     "pasteCharts": "ਚਾਰਟ ਪੇਸਟ ਕਰੋ",
     "selectAll": "ਸਾਰੇ ਚੁਣੋ",
     "multiSelect": "ਐਲੀਮੈਂਟ ਨੂੰ ਚੋਣ ਵਿੱਚ ਜੋੜੋ",
@@ -10,7 +10,7 @@
     "copy": "ਕਾਪੀ ਕਰੋ",
     "copyAsPng": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
     "copyAsSvg": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ SVG ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
-    "copyText": "",
+    "copyText": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਪਾਠ ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
     "bringForward": "ਅੱਗੇ ਲਿਆਓ",
     "sendToBack": "ਸਭ ਤੋਂ ਪਿੱਛੇ ਭੇਜੋ",
     "bringToFront": "ਸਭ ਤੋਂ ਅੱਗੇ ਲਿਆਓ",
@@ -40,10 +40,6 @@
     "arrowhead_triangle": "ਤਿਕੋਣ",
     "fontSize": "ਫੌਂਟ ਅਕਾਰ",
     "fontFamily": "ਫੌਂਟ ਪਰਿਵਾਰ",
-    "onlySelected": "ਸਿਰਫ ਚੁਣੇ ਹੋਏ ਹੀ",
-    "withBackground": "ਬੈਕਗਰਾਉਂਡ",
-    "exportEmbedScene": "ਦ੍ਰਿਸ਼ ਮੜ੍ਹੋ",
-    "exportEmbedScene_details": "ਦ੍ਰਿਸ਼ ਦਾ ਡਾਟਾ ਨਿਰਯਾਤ ਕੀਤੀ PNG/SVG ਫਾਈਲ ਵਿੱਚ ਸਾਂਭ ਦਿੱਤਾ ਜਾਵੇਗਾ ਤਾਂ ਜੋ ਇਸ ਵਿੱਚੋਂ ਦ੍ਰਿਸ਼ ਨੂੰ ਬਹਾਲ ਕੀਤਾ ਜਾ ਸਕੇ। ਇਹ ਨਿਰਯਾਤ ਕੀਤੀ ਜਾਣ ਵਾਲੀ ਫਾਈਲ ਦਾ ਅਕਾਰ ਵਧਾ ਦੇਵੇਗਾ।",
     "addWatermark": "\"Excalidraw ਨਾਲ ਬਣਾਇਆ\" ਜੋੜੋ",
     "handDrawn": "ਹੱਥਲਿਖਤ",
     "normal": "ਆਮ",
@@ -54,7 +50,7 @@
     "veryLarge": "ਬਹੁਤ ਵੱਡਾ",
     "solid": "ਠੋਸ",
     "hachure": "ਤਿਰਛੀਆਂ ਗਰਿੱਲਾਂ",
-    "zigzag": "",
+    "zigzag": "ਵਿੰਗ-ਤੜਿੰਗ",
     "crossHatch": "ਜਾਲੀ",
     "thin": "ਪਤਲੀ",
     "bold": "ਮੋਟੀ",
@@ -73,7 +69,7 @@
     "layers": "ਪਰਤਾਂ",
     "actions": "ਕਾਰਵਾਈਆਂ",
     "language": "ਭਾਸ਼ਾ",
-    "liveCollaboration": "",
+    "liveCollaboration": "ਲਾਇਵ ਸਹਿਯੋਗ...",
     "duplicateSelection": "ਡੁਪਲੀਕੇਟ ਬਣਾਓ",
     "untitled": "ਬੇ-ਸਿਰਨਾਵਾਂ",
     "name": "ਨਾਂ",
@@ -100,7 +96,6 @@
     "flipHorizontal": "ਲੇਟਵੇਂ ਪਾਸੇ ਪਲਟੋ",
     "flipVertical": "ਖੜ੍ਹਵੇਂ ਪਾਸੇ ਪਲਟੋ",
     "viewMode": "ਦੇਖਣ ਵਾਲਾ ਮੋਡ",
-    "toggleExportColorScheme": "ਨਿਰਯਾਤ ਦੇ ਰੰਗਾਂ ਦੀ ਸਕੀਮ ਟਾਗਲ ਕਰੋ",
     "share": "ਸਾਂਝਾ ਕਰੋ",
     "showStroke": "ਰੇਖਾ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
     "showBackground": "ਬੈਕਗਰਾਉਂਡ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
@@ -109,45 +104,44 @@
     "excalidrawLib": "ਐਕਸਕਲੀਡਰਾਅ ਲਾਇਬ੍ਰੇਰੀ",
     "decreaseFontSize": "ਫੌਂਟ ਦਾ ਅਕਾਰ ਘਟਾਓ",
     "increaseFontSize": "ਫੌਂਟ ਦਾ ਅਕਾਰ ਵਧਾਓ",
-    "unbindText": "",
+    "unbindText": "ਪਾਠ ਨੂੰ ਵੱਖ ਕਰੋ",
     "bindText": "ਪਾਠ ਨੂੰ ਕੰਟੇਨਰ ਨਾਲ ਬੰਨ੍ਹੋ",
-    "createContainerFromText": "",
+    "createContainerFromText": "ਪਾਠ ਨੂੰ ਕੰਟੇਨਰ ਵਿੱਚ ਇਕੱਠਾ ਕਰੋ",
     "link": {
       "edit": "ਕੜੀ ਸੋਧੋ",
       "create": "ਕੜੀ ਬਣਾਓ",
       "label": "ਕੜੀ"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "ਪੰਕਤੀ ਸੋਧੋ",
+      "exit": "ਪੰਕਤੀ ਸੋਧਕ 'ਤੋਂ ਬਾਹਰ ਨਿਕਲੋ"
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "ਲਾਕ ਕਰੋ",
+      "unlock": "ਅਨਲਾਕ ਕਰੋ",
+      "lockAll": "ਸਭ ਲਾਕ ਕਰੋ",
+      "unlockAll": "ਸਭ ਅਨਲਾਕ ਕਰੋ"
     },
-    "statusPublished": "",
-    "sidebarLock": ""
+    "statusPublished": "ਪ੍ਰਕਾਸ਼ਤ ਹੈ",
+    "sidebarLock": "ਸਾਈਡਬਾਰ ਨੂੰ ਖੁੱਲ੍ਹਾ ਰੱਖੋ",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
-    "noItems": "",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "noItems": "ਹਾਲੇ ਤੱਕ ਕੋਈ ਚੀਜ ਜੋੜੀ ਨਹੀਂ ਗਈ...",
+    "hint_emptyLibrary": "ਇੱਥੇ ਆਈਟਮ ਜੋੜਨ ਲਈ ਉਸਨੂੰ ਕੈਨਵਸ ‘ਤੇ ਚੁਣੋ, ਜਾਂ ਹੇਠਾਂ ਪਬਲਿਕ ਰਿਪਾਜ਼ੀਟਰੀ ‘ਚੋਂ ਲਾਇਬ੍ਰੇਰੀ ਸਥਾਪਤ ਕਰੋ।",
+    "hint_emptyPrivateLibrary": "ਇੱਥੇ ਆਈਟਮ ਜੋੜਨ ਲਈ ਉਸਨੂੰ ਕੈਨਵਸ ‘ਤੇ ਚੁਣੋ।"
   },
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",
     "exportJSON": "ਫਾਈਲ ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
-    "exportImage": "",
-    "export": "",
-    "exportToPng": "PNG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
-    "exportToSvg": "SVG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
+    "exportImage": "ਤਸਵੀਰ ਨਿਰਯਾਤ ਕਰੋ...",
+    "export": "ਇਸ ਵਿੱਚ ਸਾਂਭੋ...",
     "copyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕਰੋ",
-    "copyPngToClipboard": "PNG ਨੂੰ ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕਰੋ",
-    "scale": "ਪੈਮਾਇਸ਼",
     "save": "ਮੌਜੂਦਾ ਫਾਈਲ ਵਿੱਚ ਸਾਂਭੋ",
     "saveAs": "ਇਸ ਵਜੋਂ ਸਾਂਭੋ",
-    "load": "",
+    "load": "ਖੋਲ੍ਹੋ",
     "getShareableLink": "ਸਾਂਝੀ ਕਰਨ ਵਾਲੀ ਲਿੰਕ ਲਵੋ",
     "close": "ਬੰਦ ਕਰੋ",
     "selectLanguage": "ਭਾਸ਼ਾ ਚੁਣੋ",
@@ -180,8 +174,8 @@
     "couldNotCreateShareableLinkTooBig": "ਸਾਂਝੀ ਕਰਨ ਵਾਲੀ ਲਿੰਕ ਨਹੀਂ ਬਣਾ ਸਕੇ: ਦ੍ਰਿਸ਼ ਬਹੁਤ ਵੱਡਾ ਹੈ",
     "couldNotLoadInvalidFile": "ਨਜਾਇਜ਼ ਫਾਈਲ ਲੋਡ ਨਹੀਂ ਕਰ ਸਕੇ",
     "importBackendFailed": "ਬੈਕਐੱਨਡ ਤੋਂ ਆਯਾਤ ਕਰਨ ਵਿੱਚ ਅਸਫਲ ਰਹੇ।",
-    "cannotExportEmptyCanvas": "ਖਾਲੀ ਕੈਨਵਸ ਨਿਰਯਾਤ ਨਹੀਂ ਕਰ ਸਕਦੇ।",
-    "couldNotCopyToClipboard": "",
+    "cannotExportEmptyCanvas": "ਖਾਲੀ ਕੈਨਵਸ ਨੂੰ ਨਿਰਯਾਤ ਨਹੀਂ ਕਰ ਸਕਦੇ।",
+    "couldNotCopyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ।",
     "decryptFailed": "ਡਾਟਾ ਡੀਕਰਿਪਟ ਨਹੀਂ ਕਰ ਸਕੇ।",
     "uploadedSecurly": "ਅੱਪਲੋਡ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਸ਼ਨ ਨਾਲ ਸੁਰੱਖਿਅਤ ਕੀਤੀ ਹੋਈ ਹੈ, ਜਿਸਦਾ ਮਤਲਬ ਇਹ ਹੈ ਕਿ Excalidraw ਸਰਵਰ ਅਤੇ ਤੀਜੀ ਧਿਰ ਦੇ ਬੰਦੇ ਸਮੱਗਰੀ ਨੂੰ ਪੜ੍ਹ ਨਹੀਂ ਸਕਦੇ।",
     "loadSceneOverridePrompt": "ਬਾਹਰੀ ਡਰਾਇੰਗ ਨੂੰ ਲੋਡ ਕਰਨਾ ਤੁਹਾਡੀ ਮੌਜੂਦਾ ਸਮੱਗਰੀ ਦੀ ਥਾਂ ਲੈ ਲਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਜਾਰੀ ਰੱਖਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
@@ -194,33 +188,24 @@
     "invalidSceneUrl": "ਦਿੱਤੀ ਗਈ URL 'ਚੋਂ ਦ੍ਰਿਸ਼ ਨੂੰ ਆਯਾਤ ਨਹੀਂ ਕਰ ਸਕੇ। ਇਹ ਜਾਂ ਤਾਂ ਖਰਾਬ ਹੈ, ਜਾਂ ਇਸ ਵਿੱਚ ਜਾਇਜ਼ Excalidraw JSON ਡਾਟਾ ਸ਼ਾਮਲ ਨਹੀਂ ਹੈ।",
     "resetLibrary": "ਇਹ ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਸਾਫ ਕਰ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
     "removeItemsFromsLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ {{count}} ਚੀਜ਼(-ਜ਼ਾਂ) ਮਿਟਾਉਣੀਆਂ ਹਨ?",
-    "invalidEncryptionKey": "",
-    "collabOfflineWarning": ""
+    "invalidEncryptionKey": "ਇਨਕਰਿਪਸ਼ਨ ਕੁੰਜੀ ‌‌22 ਅੱਖਰਾਂ ਦੀ ਹੋਣੀ ਚਾਹੀਦੀ ਹੈ। ਲਾਇਵ ਸਹਿਯੋਗ ਬੰਦ ਹੈ।",
+    "collabOfflineWarning": "ਕੋਈ ਇੰਟਰਨੈੱਟ ਕਨੈਕਸ਼ਨ ਨਹੀਂ ਹੈ\nਤੁਹਾਡੀਆਂ ਤਬਦੀਲੀਆਂ ਸਾਂਭੀਆਂ ਨਹੀਂ ਜਾਣਗੀਆਂ।"
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
+    "unsupportedFileType": "ਫਾਈਲ ਦੀ ਕਿਸਮ ਦਾ ਸਮਰਥਨ ਨਹੀਂ ਕੀਤਾ ਜਾਂਦਾ।",
+    "imageInsertError": "ਚਿੱਤਰ ਸ਼ਾਮਲ ਨਹੀਂ ਜਾ ਸਕਿਆ, ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ...",
+    "fileTooBig": "ਫਾਈਲ ਬਹੁਤ ਜ਼ਿਆਦਾ ਵੱਡੀ ਹੈ। ਵੱਧ-ਤੋਂ-ਵੱਧ ਪ੍ਰਵਾਨਤ ਅਕਾਰ {{maxSize}} ਹੈ।",
+    "svgImageInsertError": "SVG ਤਸਵੀਰ ਸ਼ਾਮਲ ਨਹੀਂ ਕਰ ਸਕੇ। SVG ਮਾਰਕ-ਅੱਪ ਨਜਾਇਜ਼ ਲੱਗ ਰਿਹਾ ਹੈ।",
     "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।",
     "cannotResolveCollabServer": "",
-    "importLibraryError": "",
+    "importLibraryError": "ਲਾਇਬ੍ਰੇਰੀ ਲੋਡ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕੀ",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -235,10 +220,12 @@
     "text": "ਪਾਠ",
     "library": "ਲਾਇਬ੍ਰੇਰੀ",
     "lock": "ਡਰਾਇੰਗ ਤੋਂ ਬਾਅਦ ਵੀ ਚੁਣੇ ਹੋਏ ਸੰਦ ਨੂੰ ਸਰਗਰਮ ਰੱਖੋ ",
-    "penMode": "",
+    "penMode": "ਪੈੱਨ ਮੋਡ - ਟੱਚ ਤੋਂ ਬਚਾਉਂਦਾ ਹੈ",
     "link": "",
     "eraser": "ਰਬੜ",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "ਕੈਨਵਸ ਦੀਆਂ ਕਾਰਵਾਈਆਂ",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "ਨੁਸਖਾ: ਸਭ ਤੋਂ ਦੂਰ ਸਥਿੱਤ ਐਲੀਮੈਂਟਾਂ ਨੂੰ ਥੋੜ੍ਹਾ ਜਿਹਾ ਨੇੜੇ ਲਿਆ ਕੇ ਦੇਖੋ।"
   },
   "errorSplash": {
-    "headingMain_pre": "ਗਲਤੀ ਹੋਈ। ਇਹ ਕਰਕੇ ਦੇਖੋ ",
-    "headingMain_button": "ਪੰਨਾ ਮੁੜ-ਲੋਡ ਕਰੋ।",
-    "clearCanvasMessage": "ਜੇ ਮੁੜ-ਲੋਡ ਕਰਨਾ ਕੰਮ ਨਾ ਕਰੇ, ਤਾਂ ਇਹ ਕਰਕੇ ਦੇਖੋ ",
-    "clearCanvasMessage_button": "ਕੈਨਵਸ ਸਾਫ ਕਰੋ।",
+    "headingMain": "ਕੋਈ ਸਮੱਸਿਆ ਖੜ੍ਹੀ ਹੋਈ। <button>ਪੰਨਾ ਮੁੜ-ਲੋਡ</button> ਕਰਕੇ ਦੇਖੋ।",
+    "clearCanvasMessage": "ਜੇ ਮੁੜ-ਲੋਡ ਕਰਨਾ ਕੰਮ ਨਾ ਕਰੇ, ਤਾਂ ਇਹ ਕਰਕੇ ਦੇਖੋ <button>ਕੈਨਵਸ ਸਾਫ ਕਰੋ।</button>",
     "clearCanvasCaveat": " ਇਹ ਸਾਰਾ ਕੰਮ ਗਵਾ ਦੇਵੇਗਾ ",
-    "trackedToSentry_pre": "ਗਲਤੀ ਸੂਚਕ ",
-    "trackedToSentry_post": " ਸਾਡੇ ਸਿਸਟਮ 'ਤੇ ਟਰੈਕ ਕੀਤਾ ਗਿਆ ਸੀ।",
-    "openIssueMessage_pre": "ਅਸੀਂ ਬੜੇ ਸਾਵਧਾਨ ਸੀ ਕਿ ਗਲਤੀ ਵਿੱਚ ਤੁਹਾਡੇ ਦ੍ਰਿਸ਼ ਦੀ ਜਾਣਕਾਰੀ ਸ਼ਾਮਲ ਨਾ ਕਰੀਏ। ਜੇ ਤੁਹਾਡਾ ਦ੍ਰਿਸ਼ ਨਿੱਜੀ ਨਹੀਂ ਹੈ ਤਾਂ ਇਸ 'ਤੇ ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ ਜੀ ",
-    "openIssueMessage_button": "ਬੱਗ ਟਰੈਕਰ।",
-    "openIssueMessage_post": "ਹੇਠਾਂ ਦਿੱਤੀ ਜਾਣਕਾਰੀ ਨੂੰ ਕਾਪੀ ਕਰਕੇ ਗਿੱਟਹੱਬ ਮੁੱਦੇ ਵਿੱਚ ਪੇਸਟ ਕਰਕੇ ਸ਼ਾਮਲ ਕਰੋ ਜੀ।",
+    "trackedToSentry": "ਸੂਚਕ {{eventId}} ਵਾਲੀ ਸਮੱਸਿਆ ਸਾਡੇ ਸਿਸਟਮ 'ਤੇ ਟਰੈਕ ਕੀਤੀ ਗਈ ਸੀ।",
+    "openIssueMessage": "ਅਸੀਂ ਬੜੇ ਸਾਵਧਾਨ ਸੀ ਕਿ ਗਲਤੀ ਵਿੱਚ ਤੁਹਾਡੇ ਦ੍ਰਿਸ਼ ਦੀ ਜਾਣਕਾਰੀ ਸ਼ਾਮਲ ਨਾ ਕਰੀਏ। ਜੇ ਤੁਹਾਡਾ ਦ੍ਰਿਸ਼ ਨਿੱਜੀ ਨਹੀਂ ਹੈ ਤਾਂ ਇਸ 'ਤੇ ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ ਜੀ <button>ਬੱਗ ਟਰੈਕਰ।</button>ਹੇਠਾਂ ਦਿੱਤੀ ਜਾਣਕਾਰੀ ਨੂੰ ਕਾਪੀ ਕਰਕੇ ਗਿੱਟਹੱਬ ਮੁੱਦੇ ਵਿੱਚ ਪੇਸਟ ਕਰਕੇ ਸ਼ਾਮਲ ਕਰੋ ਜੀ।",
     "sceneContent": "ਦ੍ਰਿਸ਼ ਦੀ ਸਮੱਗਰੀ:"
   },
   "roomDialog": {
@@ -290,7 +272,7 @@
     "desc_privacy": "ਫਿਕਰ ਨਾ ਕਰੋ, ਇਜਲਾਸ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਸ਼ਨ ਵਰਤਦਾ ਹੈ, ਸੋ ਜੋ ਕੁਝ ਵੀ ਤੁਸੀਂ ਵਾਹੁੰਦੇ ਹੋ ਉਹ ਨਿੱਜੀ ਹੀ ਰਹਿੰਦਾ ਹੈ। ਇੱਥੋਂ ਤੱਕ ਕਿ ਸਾਡੇ ਸਰਵਰ ਵੀ ਨਹੀਂ ਜਾਣ ਸਕਣਗੇ ਕਿ ਤੁਸੀਂ ਕੀ ਬਣਾਇਆ ਹੈ।",
     "button_startSession": "ਇਜਲਾਸ ਸ਼ੁਰੂ ਕਰੋ",
     "button_stopSession": "ਇਜਲਾਸ ਰੋਕੋ",
-    "desc_inProgressIntro": "ਲਾਇਵ ਸਹਿਯੋਗ ਹੁਣ ਚੱਲ ਰਿਹਾ ਹੈ।",
+    "desc_inProgressIntro": "ਲਾਇਵ ਸਹਿਯੋਗ ਇਜਲਾਸ ਹੁਣ ਚੱਲ ਰਿਹਾ ਹੈ।",
     "desc_shareLink": "ਇਸ ਲਿੰਕ ਨੂੰ ਉਹਨਾਂ ਨਾਲ ਸਾਂਝਾ ਕਰੋ ਜਿਹਨਾਂ ਨਾਲ ਤੁਸੀਂ ਸਹਿਯੋਗ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ:",
     "desc_exitSession": "ਇਜਲਾਸ ਨੂੰ ਰੋਕਣਾ ਤੁਹਾਡਾ ਕਮਰੇ ਨਾਲੋਂ ਨਾਤਾ ਤੋੜ ਦੇਵੇਗਾ, ਪਰ ਤੁਸੀਂ ਸਥਾਨਕ ਪੱਧਰ 'ਤੇ ਦ੍ਰਿਸ਼ ਨਾਲ ਕੰਮ ਕਰਨਾ ਜਾਰੀ ਰੱਖ ਸਕੋਗੇ। ਇਹ ਧਿਆਨ 'ਚ ਰੱਖੋ ਕਿ ਇਹ ਬਾਕੀ ਲੋਕਾਂ ਨੂੰ ਪ੍ਰਭਾਵਿਤ ਨਹੀਂ ਕਰੇਗਾ , ਅਤੇ ਉਹ ਹਾਲੇ ਵੀ ਆਪਣੇ ਸੰਸਕਰਨ 'ਤੇ ਸਹਿਯੋਗ ਕਰਨ ਦੇ ਕਾਬਲ ਹੋਣਗੇ।",
     "shareTitle": "Excalidraw 'ਤੇ ਲਾਈਵ ਇਜਲਾਸ ਦਾ ਹਿੱਸਾ ਬਣੋ"
@@ -303,7 +285,7 @@
     "disk_details": "ਦ੍ਰਿਸ਼ ਦਾ ਡਾਟਾ ਫਾਈਲ ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ ਜਿੱਥੋਂ ਤੁਸੀਂ ਇਸਨੂੰ ਬਾਅਦ ਵਿੱਚ ਆਯਾਤ ਕਰ ਸਕਦੇ ਹੋ।",
     "disk_button": "ਫਾਈਲ ਵਿੱਚ ਸਾਂਭੋ",
     "link_title": "ਸਾਂਝੀ ਕਰਨ ਵਾਲੀ ਲਿੰਕ",
-    "link_details": "ਸਿਰਫ ਪੜ੍ਹੇ-ਜਾਣ ਵਾਲੀ ਲਿੰਕ ਨਿਰਯਾਤ ਕਰੋ।",
+    "link_details": "ਸਿਰਫ ਦੇਖੇ-ਜਾਣ ਵਾਲੀ ਲਿੰਕ ਵਜੋਂ ਨਿਰਯਾਤ ਕਰੋ।",
     "link_button": "ਲਿੰਕ ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
     "excalidrawplus_description": "ਆਪਣੇ ਦ੍ਰਿਸ਼ ਦੇ ਡਾਟੇ ਨੂੰ Excalidraw+ ਵਰਕਸਪੇਸ ਵਿੱਚ ਸਾਂਭੋ।",
     "excalidrawplus_button": "ਨਿਰਯਾਤ ਕਰੋ",
@@ -362,33 +344,44 @@
       "required": "ਲੋੜੀਂਦਾ",
       "website": "ਜਾਇਜ਼ URL ਭਰੋ"
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "ਜਨਤਕ ਲਾਇਬ੍ਰੇਰੀ ਦੀ ਰਿਪਾਜ਼ੀਟਰੀ",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "ਦਿਸ਼ਾ ਨਿਰਦੇਸ਼",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "MIT ਲਾਇਸੈਂਸ, ",
-      "post": ""
-    },
+    "noteDescription": "ਹੋਰ ਲੋਕਾਂ ਵੱਲੋਂ ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਵਰਤਣ ਲਈ ਸਕਣ ਇਸ ਲਈ<link>ਜਨਤਕ ਲਾਇਬ੍ਰੇਰੀ ਦੀ ਰਿਪਾਜ਼ੀਟਰੀ</link> ਵਿੱਚ ਆਪਣੀ ਲਾਇਬ੍ਰੇਰੀ ਸ਼ਾਮਲ ਕਰਵਾਉਣ ਲਈ ਜਮ੍ਹਾ ਕਰਵਾਓ",
+    "noteGuidelines": "<link>ਦਿਸ਼ਾ ਨਿਰਦੇਸ਼</link>",
+    "noteLicense": "<link>MIT ਲਾਇਸੈਂਸ, </link>",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": "ਇੱਥੇ"
+    "title": "ਲਾਇਬ੍ਰੇਰੀ ਜਮ੍ਹਾਂ ਕਰਵਾਈ",
+    "content": "ਧੰਨਵਾਦ {{authorName}} ਜੀਉ। ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਸਮੀਖਿਆ ਲਈ ਭੇਜ ਦਿੱਤਾ ਗਿਆ ਹੈ। ਤੁਸੀਂ ਉਸਦੀ ਸਥਿਤੀ <link>ਇੱਥੇ</link> ਦੇਖ ਸਕਦੇ ਹੋ।"
   },
   "confirmDialog": {
     "resetLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਰੀਸੈੱਟ ਕਰੋ",
     "removeItemsFromLib": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ ਚੁਣੀਆਂ ਹੋਈਆਂ ਆਈਟਮਾਂ ਹਟਾਓ"
+  },
+  "imageExportDialog": {
+    "header": "ਤਸਵੀਰ ਨਿਰਯਾਤ ਕਰੋ",
+    "label": {
+      "withBackground": "ਪਿਛੋਕੜ",
+      "onlySelected": "ਸਿਰਫ ਚੁਣੇ ਹੋਏ",
+      "darkMode": "ਡਾਰਕ ਮੋਡ",
+      "embedScene": "ਦ੍ਰਿਸ਼ ਮੜ੍ਹੋ",
+      "scale": "ਸਕੇਲ",
+      "padding": "ਪੈਡਿੰਗ"
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "PNG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
+      "exportToSvg": "SVG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
+      "copyPngToClipboard": "PNG ਨੂੰ ਕਲਿੱਪੋਬਰਡ ‘ਤੇ ਕਾਪੀ ਕਰੋ"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "ਗੱਤੇ 'ਤੇ ਕਾਪੀ ਕਰੋ"
+    }
   },
   "encrypted": {
     "tooltip": "ਤੁਹਾਡੀ ਡਰਾਇੰਗਾਂ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਟ ਕੀਤੀਆਂ ਹੋਈਆਂ ਹਨ, ਇਸ ਲਈ Excalidraw ਦੇ ਸਰਵਰ ਉਹਨਾਂ ਨੂੰ ਕਦੇ ਵੀ ਨਹੀਂ ਦੇਖਣਗੇ।",
@@ -421,63 +414,40 @@
     "pasteAsSingleElement": ""
   },
   "colors": {
-    "ffffff": "ਚਿੱਟਾ",
-    "f8f9fa": "ਸੁਰਮਈ 0",
-    "f1f3f5": "ਸੁਰਮਈ 1",
-    "fff5f5": "ਲਾਲ 0",
-    "fff0f6": "ਗੁਲਾਬੀ 0",
-    "f8f0fc": "ਅੰਗੂਰੀ 0",
-    "f3f0ff": "ਜਾਮਣੀ 0",
-    "edf2ff": "ਗੂੜ੍ਹਾ ਨੀਲਾ 0",
-    "e7f5ff": "ਨੀਲਾ 0",
-    "e3fafc": "ਫਿਰੋਜੀ 0",
-    "e6fcf5": "ਟੀਲ 0",
-    "ebfbee": "ਹਰਾ 0",
-    "f4fce3": "ਲਾਇਮ 0",
-    "fff9db": "ਪੀਲਾ 0",
-    "fff4e6": "ਸੰਤਰੀ 0",
     "transparent": "ਪਾਰਦਰਸ਼ੀ",
-    "ced4da": "ਸੁਰਮਈ 4",
-    "868e96": "ਸੁਰਮਈ 6",
-    "fa5252": "ਲਾਲ 6",
-    "e64980": "ਗੁਲਾਬੀ 6",
-    "be4bdb": "ਅੰਗੂਰੀ 6",
-    "7950f2": "ਜਾਮਣੀ 6",
-    "4c6ef5": "ਗੂੜ੍ਹਾ ਨੀਲਾ 6",
-    "228be6": "ਨੀਲਾ 6",
-    "15aabf": "ਫਿਰੋਜੀ 6",
-    "12b886": "ਟੀਲ 6",
-    "40c057": "ਹਰਾ 6",
-    "82c91e": "ਲਾਇਮ 6",
-    "fab005": "ਪੀਲਾ 6",
-    "fd7e14": "ਸੰਤਰੀ 6",
-    "000000": "ਕਾਲਾ",
-    "343a40": "ਸੁਰਮਈ 8",
-    "495057": "ਸੁਰਮਈ 7",
-    "c92a2a": "ਲਾਲ 9",
-    "a61e4d": "ਗੁਲਾਬੀ 9",
-    "862e9c": "ਅੰਗੂਰੀ 9",
-    "5f3dc4": "ਜਾਮਣੀ 9",
-    "364fc7": "ਗੂੜ੍ਹਾ ਨੀਲਾ 9",
-    "1864ab": "ਨੀਲਾ 9",
-    "0b7285": "ਫਿਰੋਜੀ 9",
-    "087f5b": "ਟੀਲ 9",
-    "2b8a3e": "ਹਰਾ 9",
-    "5c940d": "ਲਾਇਮ 9",
-    "e67700": "ਪੀਲਾ 9",
-    "d9480f": "ਸੰਤਰੀ 9"
+    "black": "ਕਾਲੀ",
+    "white": "ਸਫ਼ੈਦ",
+    "red": "ਲਾਲ",
+    "pink": "ਗੁਲਾਬੀ",
+    "grape": "ਅੰਗੂਰੀ",
+    "violet": "ਜਾਮਣੀ",
+    "gray": "ਸੁਰਮਈ",
+    "blue": "ਨੀਲਾ",
+    "cyan": "ਫਿਰੋਜੀ",
+    "teal": "ਟੀਲ",
+    "green": "ਹਰਾ",
+    "yellow": "ਪੀਲਾ",
+    "orange": "ਸੰਤਰੀ",
+    "bronze": "ਕਾਂਸੇਰੰਗਾ"
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
+      "center_heading": "ਤੁਹਾਡਾ ਸਾਰਾ ਡਾਟਾ ਤੁਹਾਡੇ ਲੋਕਲ ਬਰਾਉਜ਼ਰ ਵਿੱਚ ਸਾਂਭਿਆ ਹੋਇਆ ਹੈ।",
       "center_heading_plus": "",
-      "menuHint": ""
+      "menuHint": "ਨਿਰਯਾਤ, ਤਰਜੀਹਾਂ, ਭਾਸ਼ਾਵਾਂ, …"
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
+      "menuHint": "ਨਿਰਯਾਤ, ਤਰਜੀਹਾਂ, ਅਤੇ ਹੋਰ ਵੀ ਬਹੁਤ ਕੁਝ…",
+      "center_heading": "ਡਾਇਆਗ੍ਰਾਮਾਂ। ਕੀਤੀਆਂ। ਸੁਖਾਲੀਆਂ।",
       "toolbarHint": "",
-      "helpHint": ""
+      "helpHint": "ਸ਼ਾਰਟਕੱਟ ਤੇ ਮਦਦ"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "ਸਭ ਤੋਂ ਵੱਧ ਵਰਤੇ ਜਾਣ ਵਾਲੇ ਕਸਟਮ ਰੰਗ",
+    "colors": "ਰੰਗ",
+    "shades": "ਸ਼ੇਡਾਂ",
+    "hexCode": "ਹੈਕਸ ਕੋਡ",
+    "noShades": "ਇਸ ਰੰਗ ਦੀ ਕੋਈ ਸ਼ੇਡ ਉਪਲਬਧ ਨਹੀਂ ਹੈ"
   }
 }

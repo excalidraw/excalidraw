@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Háromszög",
     "fontSize": "Betűméret",
     "fontFamily": "Betűkészlet család",
-    "onlySelected": "Csak a kijelölt",
-    "withBackground": "Háttér",
-    "exportEmbedScene": "Jelenet beágyazása",
-    "exportEmbedScene_details": "A jelenetet leíró adatok hozzá lesznek adva a PNG/SVG fájlhoz, így a jelenetet vissza lehet majd tölteni belőle. Ez megnöveli a fájl méretét.",
     "addWatermark": "Add hozzá, hogy \"Excalidraw-val készült\"",
     "handDrawn": "Kézzel rajzolt",
     "normal": "Normál",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Vízszintes tükrözés",
     "flipVertical": "Függőleges tükrözés",
     "viewMode": "Nézet",
-    "toggleExportColorScheme": "Exportált színséma váltása",
     "share": "Megosztás",
     "showStroke": "Körvonal színválasztó megjelenítése",
     "showBackground": "Háttérszín-választó megjelenítése",
@@ -128,7 +123,10 @@
       "unlockAll": ""
     },
     "statusPublished": "",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +138,7 @@
     "exportJSON": "Exportálás fájlba",
     "exportImage": "",
     "export": "",
-    "exportToPng": "Exportálás PNG-be",
-    "exportToSvg": "Exportálás SVG-be",
     "copyToClipboard": "Vágólapra másolás",
-    "copyPngToClipboard": "PNG másolása a vágólapra",
-    "scale": "Nagyítás",
     "save": "Mentés az aktuális fájlba",
     "saveAs": "Mentés másként",
     "load": "",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "",
     "link": "Hivatkozás hozzáadása/frissítése a kiválasztott alakzathoz",
     "eraser": "",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Vászon műveletek",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Tipp: próbáld meg a legtávolabbi elemeket közelebb hozni egy máshoz."
   },
   "errorSplash": {
-    "headingMain_pre": "Hiba történt. Próbáld ",
-    "headingMain_button": "újratölteni az oldalt.",
-    "clearCanvasMessage": "Ha az újratöltés nem működik, próbáld ",
-    "clearCanvasMessage_button": "letörölni a vászont.",
+    "headingMain": "Hiba történt. Próbáld <button>újratölteni az oldalt.</button>",
+    "clearCanvasMessage": "Ha az újratöltés nem működik, próbáld <button>letörölni a vászont.</button>",
     "clearCanvasCaveat": " Ezzel az eddigi munka elveszik ",
-    "trackedToSentry_pre": "A hibakód azonosítóval ",
-    "trackedToSentry_post": " nyomon van követve a rendszerünkben.",
-    "openIssueMessage_pre": "Vigyáztunk arra, hogy a jelenthez tartozó információ ne jelenjen meg a hibaüzenetben. Ha a jeleneted nem bizalmas, kérjük add hozzá a ",
-    "openIssueMessage_button": "hibakövető rendszerünkhöz.",
-    "openIssueMessage_post": " Kérjük, másolja be az alábbi információkat a GitHub problémába.",
+    "trackedToSentry": "A hibakód azonosítóval {{eventId}} nyomon van követve a rendszerünkben.",
+    "openIssueMessage": "Vigyáztunk arra, hogy a jelenthez tartozó információ ne jelenjen meg a hibaüzenetben. Ha a jeleneted nem bizalmas, kérjük add hozzá a <button>hibakövető rendszerünkhöz.</button> Kérjük, másolja be az alábbi információkat a GitHub problémába.",
     "sceneContent": "Jelenet tartalma:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "Kötelező",
       "website": "Adj meg egy érvényes URL-t"
     },
-    "noteDescription": {
-      "pre": "Küld be könyvtáradat, hogy bekerüljön a ",
-      "link": "nyilvános könyvtár tárolóba",
-      "post": "hogy mások is felhasználhassák a rajzaikban."
-    },
-    "noteGuidelines": {
-      "pre": "A könyvtárat először manuálisan kell jóváhagyni. Kérjük, olvassa el a ",
-      "link": "segédletet",
-      "post": " benyújtása előtt. Szüksége lesz egy GitHub-fiókra a kommunikációhoz és a módosításokhoz, ha kérik, de ez nem feltétlenül szükséges."
-    },
-    "noteLicense": {
-      "pre": "A beküldéssel elfogadja, hogy a könyvtár a következő alatt kerül közzétételre ",
-      "link": "MIT Licensz ",
-      "post": "ami röviden azt jelenti, hogy bárki korlátozás nélkül használhatja őket."
-    },
+    "noteDescription": "Küld be könyvtáradat, hogy bekerüljön a <link>nyilvános könyvtár tárolóba</link>hogy mások is felhasználhassák a rajzaikban.",
+    "noteGuidelines": "A könyvtárat először manuálisan kell jóváhagyni. Kérjük, olvassa el a <link>segédletet</link> benyújtása előtt. Szüksége lesz egy GitHub-fiókra a kommunikációhoz és a módosításokhoz, ha kérik, de ez nem feltétlenül szükséges.",
+    "noteLicense": "A beküldéssel elfogadja, hogy a könyvtár a következő alatt kerül közzétételre <link>MIT Licensz </link>ami röviden azt jelenti, hogy bárki korlátozás nélkül használhatja őket.",
     "noteItems": "Minden könyvtárelemnek saját nevével kell rendelkeznie, hogy szűrhető legyen. A következő könyvtári tételek kerülnek bele:",
     "atleastOneLibItem": "A kezdéshez válassz ki legalább egy könyvtári elemet",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "A könyvtár beküldve",
-    "content": "Köszönjük {{authorName}}. Könyvtáradat elküldtük felülvizsgálatra. Nyomon követheted az állapotot",
-    "link": "itt"
+    "content": "Köszönjük {{authorName}}. Könyvtáradat elküldtük felülvizsgálatra. Nyomon követheted az állapotot<link>itt</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Könyvtár alaphelyzetbe állítása",
     "removeItemsFromLib": "A kiválasztott elemek eltávolítása a könyvtárból"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "A rajzaidat végpontok közötti titkosítással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": ""
   },
   "colors": {
-    "ffffff": "Fehér",
-    "f8f9fa": "Szürke 0",
-    "f1f3f5": "Szürke 1",
-    "fff5f5": "Piros 0",
-    "fff0f6": "Pink 0",
-    "f8f0fc": "Szőlő 0",
-    "f3f0ff": "Ibolya 0",
-    "edf2ff": "Indigó 0",
-    "e7f5ff": "Kék 0",
-    "e3fafc": "Cián 0",
-    "e6fcf5": "Kékes-zöld 0",
-    "ebfbee": "Zöld 0",
-    "f4fce3": "Lime 0",
-    "fff9db": "Sárga 0",
-    "fff4e6": "Narancs 0",
     "transparent": "Átlátszó",
-    "ced4da": "Szürke 4",
-    "868e96": "Szürke 6",
-    "fa5252": "Piros 6",
-    "e64980": "Pink 6",
-    "be4bdb": "Szőlő 6",
-    "7950f2": "Ibolya 6",
-    "4c6ef5": "Indigó 6",
-    "228be6": "Kék 6",
-    "15aabf": "Cián 6",
-    "12b886": "Kékes-zöld 6",
-    "40c057": "Zöld 6",
-    "82c91e": "Lime 6",
-    "fab005": "Sárga 6",
-    "fd7e14": "Narancs 6",
-    "000000": "Fekete",
-    "343a40": "Szürke 8",
-    "495057": "Szürke 7",
-    "c92a2a": "Piros 9",
-    "a61e4d": "Pink 9",
-    "862e9c": "Szőlő 9",
-    "5f3dc4": "Ibolya 9",
-    "364fc7": "Indigó 9",
-    "1864ab": "Kék 9",
-    "0b7285": "Cián 9",
-    "087f5b": "Kékes-zöld 9",
-    "2b8a3e": "Zöld 9",
-    "5c940d": "Lime 9",
-    "e67700": "Sárga 9",
-    "d9480f": "Narancs 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "",
       "helpHint": ""
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }
