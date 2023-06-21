@@ -2227,7 +2227,12 @@ class App extends React.Component<AppProps, AppState> {
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
   }) => {
-    const elements = restoreElements(opts.elements, null);
+    const elements = restoreElements(
+      opts.elements,
+      null,
+      undefined,
+      this.props,
+    );
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;

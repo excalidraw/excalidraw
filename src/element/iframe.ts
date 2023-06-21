@@ -80,9 +80,12 @@ export const hideActionForIFrame = (
   !props.iframeURLWhitelist;
 
 export const isURLOnWhiteList = (
-  url: string,
+  url: string | null | undefined,
   validators?: RegExp[],
 ): boolean => {
+  if (!url) {
+    return false;
+  }
   validators = validators ?? [];
   for (const validator of validators) {
     if (url.match(validator)) {
