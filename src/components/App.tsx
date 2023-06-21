@@ -686,16 +686,18 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (select) {
-      this.setState({
-        activeIFrameElement: element,
-        selectedElementIds: { [element.id]: true },
-      });
-    } else {
-      this.setState({
-        activeIFrameElement: element,
-      });
-    }
+    setTimeout(() => {
+      if (select) {
+        this.setState({
+          activeIFrameElement: element,
+          selectedElementIds: { [element.id]: true },
+        });
+      } else {
+        this.setState({
+          activeIFrameElement: element,
+        });
+      }
+    }, 100); // delay to prevent first click propagating to iframe on mobile
 
     const iframe = this.getIFrameElementById(element.id);
 
@@ -799,7 +801,6 @@ class App extends React.Component<AppProps, AppState> {
           );
           const isSelected = this.state.activeIFrameElement === el;
           const radius = getCornerRadius(Math.min(el.width, el.height), el);
-          const borderWidth = el.strokeWidth;
 
           return (
             <div
@@ -817,31 +818,37 @@ class App extends React.Component<AppProps, AppState> {
                 style={{
                   width: isVisible ? `${el.width}px` : 0,
                   height: isVisible ? `${el.height}px` : 0,
-                  borderWidth: `${borderWidth}px`,
-                  borderStyle: "solid",
-                  borderColor: el.strokeColor,
                   transform: isVisible ? `rotate(${el.angle}rad)` : "none",
                   borderRadius: `${radius}px`,
                   pointerEvents: isSelected ? "auto" : "none",
                 }}
               >
-                {this.props.renderCustomIFrame?.(
-                  el,
-                  radius,
-                  this.state as UIAppState,
-                ) ?? (
-                  <iframe
-                    ref={(ref) => this.updateIFrameRef(el.id, ref)}
-                    className="excalidraw__iframe"
-                    style={{
-                      borderRadius: `${radius}px`,
-                    }}
-                    src={src}
-                    title="Excalidraw Embedded Content"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen={true}
-                  />
-                )}
+                <div
+                  style={{
+                    padding: `${el.strokeWidth}px`,
+                    height: isVisible
+                      ? `${el.height - 2 * el.strokeWidth}px`
+                      : 0,
+                  }}
+                >
+                  {this.props.renderCustomIFrame?.(
+                    el,
+                    radius,
+                    this.state as UIAppState,
+                  ) ?? (
+                    <iframe
+                      ref={(ref) => this.updateIFrameRef(el.id, ref)}
+                      className="excalidraw__iframe"
+                      style={{
+                        borderRadius: `${radius}px`,
+                      }}
+                      src={src}
+                      title="Excalidraw Embedded Content"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen={true}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           );
@@ -4420,12 +4427,29 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    this.removePointer(event);
     this.lastPointerUp = event;
 
     const scenePointer = viewportCoordsToSceneCoords(
       { clientX: event.clientX, clientY: event.clientY },
       this.state,
     );
+    const clicklength =
+      event.timeStamp - (this.lastPointerDown?.timeStamp ?? 0);
+    if (this.device.isMobile && clicklength < 300) {
+      const hitElement = this.getElementAtPosition(
+        scenePointer.x,
+        scenePointer.y,
+      );
+      if (
+        isIFrameElement(hitElement) &&
+        this.isIFrameCenter(hitElement, event, scenePointer.x, scenePointer.y)
+      ) {
+        this.handleIFrameCenterClick(hitElement, false);
+        return;
+      }
+    }
+
     if (this.device.isTouchScreen) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
@@ -4436,6 +4460,7 @@ class App extends React.Component<AppProps, AppState> {
         hitElement,
       );
     }
+
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
@@ -4454,8 +4479,6 @@ class App extends React.Component<AppProps, AppState> {
     } else if (this.state.viewModeEnabled) {
       this.setState({ activeIFrameElement: null });
     }
-
-    this.removePointer(event);
   };
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
