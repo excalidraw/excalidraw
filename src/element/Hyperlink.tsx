@@ -224,6 +224,11 @@ export const Hyperlink = ({
   ) {
     return null;
   }
+
+  if (isIFrameElement(element) && !appProps.iframeURLWhitelist) {
+    return null;
+  }
+
   return (
     <div
       className="excalidraw-hyperlinkContainer"
@@ -368,12 +373,19 @@ export const actionLink = register({
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
   contextItemLabel: (elements, appState) =>
     getContextMenuLabel(elements, appState),
-  predicate: (elements, appState) => {
+  predicate: (elements, appState, appProps) => {
     const selectedElements = getSelectedElements(elements, appState);
-    return selectedElements.length === 1;
+    return Boolean(
+      selectedElements.length === 1 &&
+        (!isIFrameElement(selectedElements[0]) || appProps.iframeURLWhitelist),
+    );
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData, appProps }) => {
     const selectedElements = getSelectedElements(elements, appState);
+
+    if (isIFrameElement(selectedElements[0]) && !appProps.iframeURLWhitelist) {
+      return null;
+    }
 
     return (
       <ToolButton
