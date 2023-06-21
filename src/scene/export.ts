@@ -132,7 +132,6 @@ export const exportToSvg = async (
   }
 
   let assetPath = "https://excalidraw.com/";
-  console.log(import.meta.env, "EXPORT");
   // Asset path needs to be determined only when using package
   if (process.env.IS_EXCALIDRAW_NPM_PACKAGE) {
     assetPath =

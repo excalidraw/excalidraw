@@ -1,6 +1,5 @@
 import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
-import { ENV } from "./constants";
 import { jotaiScope, jotaiStore } from "./jotai";
 import { atom, useAtomValue } from "jotai";
 
