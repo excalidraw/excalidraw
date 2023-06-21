@@ -2292,11 +2292,26 @@ class App extends React.Component<AppProps, AppState> {
           zoom: origZoom,
         },
         toValues: { scrollX, scrollY, zoom: zoom.value },
-        onStep: ({ scrollX, scrollY, zoom }) => {
-          this.setState({
-            scrollX,
-            scrollY,
-            zoom: { value: zoom },
+        onStep: ({ scrollX, scrollY, zoom }, progress) => {
+          this.setState((prevState) => {
+            const viewportCenterX = prevState.width / 2;
+            const viewportCenterY = prevState.height / 2;
+
+            const prevZoom = prevState.zoom.value;
+            const zoomChange = 1 + (zoom / prevZoom - 1) * (1 - progress);
+
+            // The new scroll coordinates are calculated by considering the zoom point
+            // as the viewport center and scaling scroll distance based on zoom change
+            const newScrollX =
+              zoomChange * (scrollX - viewportCenterX) + viewportCenterX;
+            const newScrollY =
+              zoomChange * (scrollY - viewportCenterY) + viewportCenterY;
+
+            return {
+              scrollX: newScrollX,
+              scrollY: newScrollY,
+              zoom: { value: zoom },
+            };
           });
         },
         onStart: () => {

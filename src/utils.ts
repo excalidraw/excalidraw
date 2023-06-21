@@ -213,7 +213,7 @@ export const easeToValuesRAF = <T extends Record<keyof T, number>>({
 }: {
   fromValues: T;
   toValues: T;
-  onStep: (values: T) => void;
+  onStep: (values: T, progress: number) => void;
   duration?: number;
   easeFn?: (value: number) => number;
   onStart?: () => void;
@@ -233,26 +233,24 @@ export const easeToValuesRAF = <T extends Record<keyof T, number>>({
       onStart?.();
     }
 
-    const elapsed = timestamp - startTime;
+    const elapsed = Math.min(timestamp - startTime, duration);
+    const progress = Math.min(elapsed / duration, 1);
+    const factor = easeFn(elapsed / duration);
+
+    const newValues = {} as T;
+
+    Object.keys(fromValues).forEach((key) => {
+      const _key = key as keyof T;
+      const result = ((toValues[_key] - fromValues[_key]) * factor +
+        fromValues[_key]) as T[keyof T];
+      newValues[_key] = result;
+    });
+
+    onStep(newValues, progress);
 
     if (elapsed < duration) {
-      const factor = easeFn(elapsed / duration);
-
-      const newValues = {} as T;
-
-      Object.keys(fromValues).forEach((key) => {
-        const _key = key as keyof T;
-        const result = ((toValues[_key] - fromValues[_key]) * factor +
-          fromValues[_key]) as T[keyof T];
-        newValues[_key] = result;
-      });
-
-      onStep(newValues);
-
       frameId = window.requestAnimationFrame(step);
     } else {
-      // ensure final values are reached at the end of the transition
-      onStep(toValues);
       onEnd?.();
     }
   }
