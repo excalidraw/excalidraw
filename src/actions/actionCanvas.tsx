@@ -226,60 +226,20 @@ const zoomValueToFitBoundsOnViewport = (
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
 
-export const zoomToFitElements = (
-  elements: readonly ExcalidrawElement[],
-  appState: Readonly<AppState>,
-  zoomToSelection: boolean,
-) => {
-  const nonDeletedElements = getNonDeletedElements(elements);
-  const selectedElements = getSelectedElements(nonDeletedElements, appState);
-
-  const commonBounds =
-    zoomToSelection && selectedElements.length > 0
-      ? getCommonBounds(excludeElementsInFramesFromSelection(selectedElements))
-      : getCommonBounds(
-          excludeElementsInFramesFromSelection(nonDeletedElements),
-        );
-
-  const newZoom = {
-    value: zoomValueToFitBoundsOnViewport(commonBounds, {
-      width: appState.width,
-      height: appState.height,
-    }),
-  };
-
-  const [x1, y1, x2, y2] = commonBounds;
-  const centerX = (x1 + x2) / 2;
-  const centerY = (y1 + y2) / 2;
-  return {
-    appState: {
-      ...appState,
-      ...centerScrollOn({
-        scenePoint: { x: centerX, y: centerY },
-        viewportDimensions: {
-          width: appState.width,
-          height: appState.height,
-        },
-        zoom: newZoom,
-      }),
-      zoom: newZoom,
-    },
-    commitToHistory: false,
-  };
-};
-
 // TODO
 // maybe make this configurable, as parts of opts?
 // 30% offset from the edges
 const ZOOM_OFFSET = 0.7;
 
-export const zoomToFitViewport = (
+export const zoomToFit = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   zoomToSelection: boolean,
+  useViewportZoom: boolean = false,
 ) => {
   const nonDeletedElements = getNonDeletedElements(elements);
   const selectedElements = getSelectedElements(nonDeletedElements, appState);
+
   const commonBounds =
     zoomToSelection && selectedElements.length > 0
       ? getCommonBounds(selectedElements)
@@ -289,24 +249,46 @@ export const zoomToFitViewport = (
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
 
-  const commonBoundsWidth = x2 - x1;
-  const commonBoundsHeight = y2 - y1;
+  let newZoomValue;
+  let scrollX;
+  let scrollY;
 
-  const desiredZoom =
-    Math.min(
+  if (useViewportZoom) {
+    const commonBoundsWidth = x2 - x1;
+    const commonBoundsHeight = y2 - y1;
+
+    newZoomValue = (Math.min(
       appState.width / commonBoundsWidth,
       appState.height / commonBoundsHeight,
-    ) * ZOOM_OFFSET;
+    ) * ZOOM_OFFSET) as NormalizedZoomValue;
 
-  const scrollX = (appState.width / 2) * (1 / desiredZoom) - centerX;
-  const scrollY = (appState.height / 2) * (1 / desiredZoom) - centerY;
+    scrollX = (appState.width / 2) * (1 / newZoomValue) - centerX;
+    scrollY = (appState.height / 2) * (1 / newZoomValue) - centerY;
+  } else {
+    newZoomValue = zoomValueToFitBoundsOnViewport(commonBounds, {
+      width: appState.width,
+      height: appState.height,
+    });
+
+    const centerScroll = centerScrollOn({
+      scenePoint: { x: centerX, y: centerY },
+      viewportDimensions: {
+        width: appState.width,
+        height: appState.height,
+      },
+      zoom: { value: newZoomValue },
+    });
+
+    scrollX = centerScroll.scrollX;
+    scrollY = centerScroll.scrollY;
+  }
 
   return {
     appState: {
       ...appState,
       scrollX,
       scrollY,
-      zoom: { value: desiredZoom as NormalizedZoomValue },
+      zoom: { value: newZoomValue },
     },
     commitToHistory: false,
   };
@@ -315,7 +297,7 @@ export const zoomToFitViewport = (
 export const actionZoomToSelected = register({
   name: "zoomToSelection",
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) => zoomToFitElements(elements, appState, true),
+  perform: (elements, appState) => zoomToFit(elements, appState, true),
   keyTest: (event) =>
     event.code === CODES.TWO &&
     event.shiftKey &&
@@ -327,7 +309,7 @@ export const actionZoomToFit = register({
   name: "zoomToFit",
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) => zoomToFitElements(elements, appState, false),
+  perform: (elements, appState) => zoomToFit(elements, appState, false),
   keyTest: (event) =>
     event.code === CODES.ONE &&
     event.shiftKey &&

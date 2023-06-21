@@ -321,11 +321,7 @@ import {
   actionRemoveAllElementsFromFrame,
   actionSelectAllElementsInFrame,
 } from "../actions/actionFrame";
-import {
-  actionToggleHandTool,
-  zoomToFitElements,
-  zoomToFitViewport,
-} from "../actions/actionCanvas";
+import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
@@ -2265,9 +2261,12 @@ class App extends React.Component<AppProps, AppState> {
     let scrollY = this.state.scrollY;
 
     if (opts?.fitToContent || opts?.fitToViewport) {
-      const { appState } = opts?.fitToContent
-        ? zoomToFitElements(targets, this.state, false)
-        : zoomToFitViewport(targets, this.state, false);
+      const { appState } = zoomToFit(
+        targets,
+        this.state,
+        false,
+        opts?.fitToViewport,
+      );
       zoom = appState.zoom;
       scrollX = appState.scrollX;
       scrollY = appState.scrollY;
