@@ -453,31 +453,31 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Exportera som bild",
+        "button": "Exportera som bild",
+        "description": "Exportera scendata som en bild från vilken du kan importera senare."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Spara till disk",
+        "button": "Spara till disk",
+        "description": "Exportera scendata till en fil från vilken du kan importera senare."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Exportera till Excalidraw+",
+        "description": "Spara skissen till din Excalidraw+ arbetsyta."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Läs in från fil",
+        "button": "Läs in från fil",
+        "description": "Laddar från en fil kommer <bold>ersätta ditt befintliga innehåll</bold>.<br></br>Du kan säkerhetskopiera din ritning först med hjälp av ett av alternativen nedan."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Läs in från länk",
+        "button": "Ersätt mitt innehåll",
+        "description": "Inläsning av en extern ritning kommer <bold>ersätta ditt befintliga innehåll</bold>.<br></br>Du kan säkerhetskopiera din ritning först genom att använda ett av alternativen nedan."
       }
     }
   }
