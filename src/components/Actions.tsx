@@ -36,7 +36,7 @@ import {
 
 import "./Actions.scss";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import { extraToolsIcon, frameToolIcon } from "./icons";
+import { EmbedIcon, extraToolsIcon, frameToolIcon } from "./icons";
 import { KEYS } from "../keys";
 
 export const SelectedShapeActions = ({
@@ -283,40 +283,76 @@ export const ShapesSwitcher = ({
       <div className="App-toolbar__divider" />
       {/* TEMP HACK because dropdown doesn't work well inside mobile toolbar */}
       {device.isMobile ? (
-        <ToolButton
-          className={clsx("Shape", { fillable: false })}
-          type="radio"
-          icon={frameToolIcon}
-          checked={activeTool.type === "frame"}
-          name="editor-current-shape"
-          title={`${capitalizeString(
-            t("toolBar.frame"),
-          )} — ${KEYS.F.toLocaleUpperCase()}`}
-          keyBindingLabel={KEYS.F.toLocaleUpperCase()}
-          aria-label={capitalizeString(t("toolBar.frame"))}
-          aria-keyshortcuts={KEYS.F.toLocaleUpperCase()}
-          data-testid={`toolbar-frame`}
-          onPointerDown={({ pointerType }) => {
-            if (!appState.penDetected && pointerType === "pen") {
-              setAppState({
-                penDetected: true,
-                penMode: true,
+        <>
+          <ToolButton
+            className={clsx("Shape", { fillable: false })}
+            type="radio"
+            icon={frameToolIcon}
+            checked={activeTool.type === "frame"}
+            name="editor-current-shape"
+            title={`${capitalizeString(
+              t("toolBar.frame"),
+            )} — ${KEYS.F.toLocaleUpperCase()}`}
+            keyBindingLabel={KEYS.F.toLocaleUpperCase()}
+            aria-label={capitalizeString(t("toolBar.frame"))}
+            aria-keyshortcuts={KEYS.F.toLocaleUpperCase()}
+            data-testid={`toolbar-frame`}
+            onPointerDown={({ pointerType }) => {
+              if (!appState.penDetected && pointerType === "pen") {
+                setAppState({
+                  penDetected: true,
+                  penMode: true,
+                });
+              }
+            }}
+            onChange={({ pointerType }) => {
+              trackEvent("toolbar", "frame", "ui");
+              const nextActiveTool = updateActiveTool(appState, {
+                type: "frame",
               });
-            }
-          }}
-          onChange={({ pointerType }) => {
-            trackEvent("toolbar", "frame", "ui");
-            const nextActiveTool = updateActiveTool(appState, {
-              type: "frame",
-            });
-            setAppState({
-              activeTool: nextActiveTool,
-              multiElement: null,
-              selectedElementIds: {},
-              activeIFrameElement: null,
-            });
-          }}
-        />
+              setAppState({
+                activeTool: nextActiveTool,
+                multiElement: null,
+                selectedElementIds: {},
+                activeIFrameElement: null,
+              });
+            }}
+          />
+          <ToolButton
+            className={clsx("Shape", { fillable: false })}
+            type="radio"
+            icon={EmbedIcon}
+            checked={activeTool.type === "iframe"}
+            name="editor-current-shape"
+            title={`${capitalizeString(
+              t("toolBar.iframe"),
+            )} — ${KEYS.B.toLocaleUpperCase()}`}
+            keyBindingLabel={KEYS.B.toLocaleUpperCase()}
+            aria-label={capitalizeString(t("toolBar.iframe"))}
+            aria-keyshortcuts={KEYS.B.toLocaleUpperCase()}
+            data-testid={`toolbar-iframe`}
+            onPointerDown={({ pointerType }) => {
+              if (!appState.penDetected && pointerType === "pen") {
+                setAppState({
+                  penDetected: true,
+                  penMode: true,
+                });
+              }
+            }}
+            onChange={({ pointerType }) => {
+              trackEvent("toolbar", "iframe", "ui");
+              const nextActiveTool = updateActiveTool(appState, {
+                type: "iframe",
+              });
+              setAppState({
+                activeTool: nextActiveTool,
+                multiElement: null,
+                selectedElementIds: {},
+                activeIFrameElement: null,
+              });
+            }}
+          />
+        </>
       ) : (
         <DropdownMenu open={isExtraToolsMenuOpen}>
           <DropdownMenu.Trigger
@@ -347,6 +383,23 @@ export const ShapesSwitcher = ({
               data-testid="toolbar-frame"
             >
               {t("toolBar.frame")}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onSelect={() => {
+                const nextActiveTool = updateActiveTool(appState, {
+                  type: "iframe",
+                });
+                setAppState({
+                  activeTool: nextActiveTool,
+                  multiElement: null,
+                  selectedElementIds: {},
+                });
+              }}
+              icon={EmbedIcon}
+              shortcut={KEYS.B.toLocaleUpperCase()}
+              data-testid="toolbar-iframe"
+            >
+              {t("toolBar.iframe")}
             </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu>

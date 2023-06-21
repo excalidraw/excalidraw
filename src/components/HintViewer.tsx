@@ -51,6 +51,10 @@ const getHints = ({
     return t("hints.text");
   }
 
+  if (activeTool.type === "iframe") {
+    return t("hints.iframe");
+  }
+
   if (appState.activeTool.type === "image" && appState.pendingImageElementId) {
     return t("hints.placeImage");
   }

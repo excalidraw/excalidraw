@@ -438,7 +438,11 @@ export const generateRoughOptions = (
         element.backgroundColor === "transparent"
           ? undefined
           : element.backgroundColor;
-      if (isExporting && isIFrameElement(element) && !options.fill) {
+      if (
+        isIFrameElement(element) &&
+        !options.fill &&
+        (!element.whitelisted || isExporting)
+      ) {
         options.fill = "#d3d3d3";
         options.fillStyle = "solid";
       }
@@ -1297,50 +1301,52 @@ export const renderElementToSvg = (
         exportingFrameId,
       );
 
-      // render iframe
-      const iframeNode = roughSVGDrawWithPrecision(
-        rsvg,
-        getShapeForElement(element)!,
-        MAX_DECIMALS_FOR_SVG_EXPORT,
-      );
-      iframeNode.setAttribute("stroke-linecap", "round");
-      iframeNode.setAttribute(
-        "transform",
-        `translate(${offsetX || 0} ${
-          offsetY || 0
-        }) rotate(${degree} ${cx} ${cy})`,
-      );
-      while (iframeNode.firstChild) {
-        iframeNode.removeChild(iframeNode.firstChild);
+      if (element.whitelisted) {
+        // render iframe
+        const iframeNode = roughSVGDrawWithPrecision(
+          rsvg,
+          getShapeForElement(element)!,
+          MAX_DECIMALS_FOR_SVG_EXPORT,
+        );
+        iframeNode.setAttribute("stroke-linecap", "round");
+        iframeNode.setAttribute(
+          "transform",
+          `translate(${offsetX || 0} ${
+            offsetY || 0
+          }) rotate(${degree} ${cx} ${cy})`,
+        );
+        while (iframeNode.firstChild) {
+          iframeNode.removeChild(iframeNode.firstChild);
+        }
+        const radius = getCornerRadius(
+          Math.min(element.width, element.height),
+          element,
+        );
+        const foreignObject = svgRoot.ownerDocument!.createElementNS(
+          SVG_NS,
+          "foreignObject",
+        );
+        foreignObject.style.width = `${element.width}px`;
+        foreignObject.style.height = `${element.height}px`;
+        foreignObject.style.border = "none";
+        const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
+        div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        div.style.width = "100%";
+        div.style.height = "100%";
+        const iframe = div.ownerDocument!.createElement("iframe");
+        iframe.src = element.link ?? "";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        iframe.style.borderRadius = `${radius}px`;
+        iframe.style.top = "0";
+        iframe.style.left = "0";
+        iframe.allowFullscreen = true;
+        div.appendChild(iframe);
+        foreignObject.appendChild(div);
+        iframeNode.appendChild(foreignObject);
+        root.appendChild(iframeNode);
       }
-      const radius = getCornerRadius(
-        Math.min(element.width, element.height),
-        element,
-      );
-      const foreignObject = svgRoot.ownerDocument!.createElementNS(
-        SVG_NS,
-        "foreignObject",
-      );
-      foreignObject.style.width = `${element.width}px`;
-      foreignObject.style.height = `${element.height}px`;
-      foreignObject.style.border = "none";
-      const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
-      div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-      div.style.width = "100%";
-      div.style.height = "100%";
-      const iframe = div.ownerDocument!.createElement("iframe");
-      iframe.src = element.link ?? "";
-      iframe.style.width = "100%";
-      iframe.style.height = "100%";
-      iframe.style.border = "none";
-      iframe.style.borderRadius = `${radius}px`;
-      iframe.style.top = "0";
-      iframe.style.left = "0";
-      iframe.allowFullscreen = true;
-      div.appendChild(iframe);
-      foreignObject.appendChild(div);
-      iframeNode.appendChild(foreignObject);
-      root.appendChild(iframeNode);
       break;
     }
     case "line":

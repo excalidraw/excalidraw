@@ -63,6 +63,7 @@ export const AllowedExcalidrawActiveTools: Record<
   eraser: false,
   custom: true,
   frame: true,
+  iframe: true,
   hand: true,
 };
 
@@ -271,10 +272,13 @@ const restoreElement = (
     case "ellipse":
       return restoreElementWithProperties(element, {});
     case "rectangle":
-    case "iframe":
       return restoreElementWithProperties(element, {});
     case "diamond":
       return restoreElementWithProperties(element, {});
+    case "iframe":
+      return restoreElementWithProperties(element, {
+        whitelisted: element.whitelisted ?? false,
+      });
     case "frame":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,

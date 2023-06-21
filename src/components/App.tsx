@@ -137,6 +137,7 @@ import {
   duplicateElements,
   newFrameElement,
   newFreeDrawElement,
+  newIFrameElement,
 } from "../element/newElement";
 import {
   hasBoundTextElement,
@@ -778,7 +779,7 @@ class App extends React.Component<AppProps, AppState> {
     const normalizedHeight = this.state.height;
     const iFrameElements = this.scene
       .getNonDeletedElements()
-      .filter((el) => isIFrameElement(el));
+      .filter((el) => isIFrameElement(el) && el.whitelisted);
     Object.keys(this.iFrameRefs).forEach((key) => {
       if (!iFrameElements.some((el) => el.id === key)) {
         delete this.iFrameRefs[key];
@@ -2202,15 +2203,15 @@ class App extends React.Component<AppProps, AppState> {
           (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(data.text) ||
             getEmbedLink(data.text)?.type === "video")
         ) {
-          const rectangle = this.insertEmbeddedRectangleElement({
+          const iframe = this.insertIFrameElement({
             sceneX,
             sceneY,
             link: data.text,
           });
-          if (!rectangle) {
+          if (!iframe) {
             return;
           }
-          this.setState({ selectedElementIds: { [rectangle.id]: true } });
+          this.setState({ selectedElementIds: { [iframe.id]: true } });
           return;
         }
         this.addTextFromPaste(data.text, isPlainPaste);
@@ -3012,7 +3013,14 @@ class App extends React.Component<AppProps, AppState> {
 
   private setActiveTool = (
     tool:
-      | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame" }
+      | {
+          type:
+            | typeof SHAPES[number]["value"]
+            | "eraser"
+            | "hand"
+            | "frame"
+            | "iframe";
+        }
       | { type: "custom"; customType: string },
   ) => {
     const nextActiveTool = updateActiveTool(this.state, tool);
@@ -5163,7 +5171,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   //create rectangle element with youtube top left on nearest grid point width / hight 640/360
-  private insertEmbeddedRectangleElement = ({
+  private insertIFrameElement = ({
     sceneX,
     sceneY,
     link,
@@ -5180,7 +5188,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const element = newElement({
+    const element = newIFrameElement({
       type: "iframe",
       x: gridX,
       y: gridY,
@@ -5196,6 +5204,7 @@ class App extends React.Component<AppProps, AppState> {
       width: embedLink.aspectRatio.w,
       height: embedLink.aspectRatio.h,
       link,
+      whitelisted: isURLOnWhiteList(link, this.props.iframeURLWhitelist),
     });
 
     this.scene.replaceAllElements([
@@ -5397,6 +5406,7 @@ class App extends React.Component<AppProps, AppState> {
       roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      ...(elementType === "iframe" ? { whitelisted: false } : {}),
     });
 
     if (element.type === "selection") {
@@ -6637,6 +6647,10 @@ class App extends React.Component<AppProps, AppState> {
             ...prevState.selectedElementIds,
             [draggingElement.id]: true,
           },
+          showHyperlinkPopup:
+            isIFrameElement(draggingElement) && !draggingElement.link
+              ? "editor"
+              : prevState.showHyperlinkPopup,
         }));
       }
 
@@ -7298,13 +7312,13 @@ class App extends React.Component<AppProps, AppState> {
         (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
           getEmbedLink(text)?.type === "video")
       ) {
-        const rectangle = this.insertEmbeddedRectangleElement({
+        const iframe = this.insertIFrameElement({
           sceneX,
           sceneY,
           link: text,
         });
-        if (rectangle) {
-          this.setState({ selectedElementIds: { [rectangle.id]: true } });
+        if (iframe) {
+          this.setState({ selectedElementIds: { [iframe.id]: true } });
         }
       }
     }

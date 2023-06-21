@@ -5,18 +5,13 @@ import {
   viewportCoordsToSceneCoords,
   wrapEvent,
 } from "../utils";
-import { getEmbedLink, hideActionForIFrame, isURLOnWhiteList } from "./iframe";
+import { getEmbedLink, isURLOnWhiteList } from "./iframe";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
-import {
-  EmbedIcon,
-  FreedrawIcon,
-  LinkIcon,
-  TrashIcon,
-} from "../components/icons";
+import { FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
 import { t } from "../i18n";
 import {
   useCallback,
@@ -94,18 +89,49 @@ export const Hyperlink = ({
       trackEvent("hyperlink", "create");
     }
 
-    if (
-      isIFrameElement(element) &&
-      !isURLOnWhiteList(link, appProps.iframeURLWhitelist)
-    ) {
-      setToast({ message: t("toast.unableToEmbed"), closable: true });
-      element.link && iframeLinkCache.set(element.id, element.link);
-      mutateElement(element, {
-        //@ts-ignore
-        type: "rectangle",
-        link,
-      });
-      invalidateShapeForElement(element);
+    if (isIFrameElement(element)) {
+      if (!isURLOnWhiteList(link, appProps.iframeURLWhitelist)) {
+        if (link && link !== "") {
+          setToast({ message: t("toast.unableToEmbed"), closable: true });
+        }
+        element.link && iframeLinkCache.set(element.id, element.link);
+        mutateElement(element, {
+          whitelisted: false,
+          link,
+        });
+        invalidateShapeForElement(element);
+      } else {
+        const { width, height } = element;
+        const embedLink = getEmbedLink(link);
+        const ar = embedLink
+          ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
+          : 1;
+        const hasLinkChanged = iframeLinkCache.get(element.id) !== element.link;
+        mutateElement(element, {
+          ...(hasLinkChanged
+            ? {
+                width:
+                  embedLink?.type === "video"
+                    ? width > height
+                      ? width
+                      : height * ar
+                    : width,
+                height:
+                  embedLink?.type === "video"
+                    ? width > height
+                      ? width / ar
+                      : height
+                    : height,
+              }
+            : {}),
+          whitelisted: true,
+          link,
+        });
+        invalidateShapeForElement(element);
+        if (iframeLinkCache.has(element.id)) {
+          iframeLinkCache.delete(element.id);
+        }
+      }
     } else {
       mutateElement(element, { link });
     }
@@ -146,62 +172,6 @@ export const Hyperlink = ({
     };
   }, [appState, element, isEditing, setAppState]);
 
-  const handleEmbed = useCallback(() => {
-    trackEvent("hyperlink", "embed");
-    if (!element.link) {
-      if (iframeLinkCache.has(element.id)) {
-        iframeLinkCache.delete(element.id);
-      }
-      return;
-    }
-
-    if (isIFrameElement(element)) {
-      iframeLinkCache.set(element.id, element.link);
-      mutateElement(element, {
-        //@ts-ignore
-        type: "rectangle",
-      });
-      invalidateShapeForElement(element);
-      return;
-    }
-
-    if (!isURLOnWhiteList(element.link, iframeURLWhitelist)) {
-      setToast({ message: t("toast.unableToEmbed"), closable: true });
-      return;
-    }
-
-    const { width, height } = element;
-    const embedLink = getEmbedLink(element.link);
-    const ar = embedLink
-      ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
-      : 1;
-    const hasLinkChanged = iframeLinkCache.get(element.id) !== element.link;
-    mutateElement(element, {
-      //@ts-ignore
-      type: "iframe",
-      ...(hasLinkChanged
-        ? {
-            width:
-              embedLink?.type === "video"
-                ? width > height
-                  ? width
-                  : height * ar
-                : width,
-            height:
-              embedLink?.type === "video"
-                ? width > height
-                  ? width / ar
-                  : height
-                : height,
-          }
-        : {}),
-    });
-    invalidateShapeForElement(element);
-    if (iframeLinkCache.has(element.id)) {
-      iframeLinkCache.delete(element.id);
-    }
-  }, [element, iframeURLWhitelist, setToast]);
-
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
     mutateElement(element, { link: null });
@@ -222,10 +192,6 @@ export const Hyperlink = ({
     appState.isRotating ||
     appState.openMenu
   ) {
-    return null;
-  }
-
-  if (hideActionForIFrame(element, appProps)) {
     return null;
   }
 
@@ -294,20 +260,7 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
-        {((linkVal && element.type === "rectangle") ||
-          isIFrameElement(element)) && (
-          <ToolButton
-            type="radio"
-            title={t("buttons.embed")}
-            aria-label={t("buttons.embed")}
-            label={t("buttons.embed")}
-            checked={isIFrameElement(element)}
-            onPointerDown={handleEmbed}
-            className="excalidraw-hyperlinkContainer--embed"
-            icon={EmbedIcon}
-          />
-        )}
-        {linkVal && (
+        {linkVal && !isIFrameElement(element) && (
           <ToolButton
             type="button"
             title={t("buttons.remove")}
@@ -373,22 +326,12 @@ export const actionLink = register({
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
   contextItemLabel: (elements, appState) =>
     getContextMenuLabel(elements, appState),
-  predicate: (elements, appState, appProps) => {
+  predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
-    if (selectedElements.length === 1) {
-      if (hideActionForIFrame(selectedElements[0], appProps)) {
-        return false;
-      }
-      return true;
-    }
-    return false;
+    return selectedElements.length === 1;
   },
-  PanelComponent: ({ elements, appState, updateData, appProps }) => {
+  PanelComponent: ({ elements, appState, updateData }) => {
     const selectedElements = getSelectedElements(elements, appState);
-
-    if (hideActionForIFrame(selectedElements[0], appProps)) {
-      return null;
-    }
 
     return (
       <ToolButton
@@ -396,7 +339,8 @@ export const actionLink = register({
         icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
         title={`${
-          selectedElements[0].type === "rectangle"
+          selectedElements[0].type === "rectangle" ||
+          isIFrameElement(elements[0])
             ? t("labels.link.labelEmbed")
             : t("labels.link.label")
         } - ${getShortcutKey("CtrlOrCmd+K")}`}
@@ -413,10 +357,10 @@ export const getContextMenuLabel = (
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
   const label = selectedElements[0]!.link
-    ? selectedElements[0]!.type === "rectangle"
+    ? isIFrameElement(selectedElements[0])
       ? "labels.link.editEmbed"
       : "labels.link.edit"
-    : selectedElements[0]!.type === "rectangle"
+    : isIFrameElement(selectedElements[0])
     ? "labels.link.createEmbed"
     : "labels.link.create";
   return label;

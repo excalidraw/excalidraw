@@ -1,5 +1,8 @@
+import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
+import { KEYS } from "../keys";
 import { ExcalidrawProps } from "../types";
+import { setCursorForShape, updateActiveTool } from "../utils";
 import { newTextElement } from "./newElement";
 import { getContainerElement } from "./textElement";
 import { isIFrameElement } from "./typeChecks";
@@ -70,12 +73,16 @@ export const getEmbedLink = (
 export const hideActionForIFrame = (
   element: ExcalidrawElement | undefined,
   props: ExcalidrawProps,
-) => isIFrameElement(element) && !props.iframeURLWhitelist;
+) =>
+  isIFrameElement(element) &&
+  element.link &&
+  element.link !== "" &&
+  !props.iframeURLWhitelist;
 
 export const isURLOnWhiteList = (
   url: string,
   validators?: RegExp[],
-): Boolean => {
+): boolean => {
   validators = validators ?? [];
   for (const validator of validators) {
     if (url.match(validator)) {
@@ -109,7 +116,8 @@ export const isIFrameOrFrameLabel = (
 export const createPlaceholderiFrameLabel = (
   element: NonDeletedExcalidrawElement,
 ): ExcalidrawElement => {
-  const text = element.link ?? "";
+  const text =
+    !element.link || element?.link === "" ? "Empty iFrame" : element.link;
   const fontSize = element.width / text.length;
   return newTextElement({
     x: element.x + element.width / 2,
@@ -125,3 +133,30 @@ export const createPlaceholderiFrameLabel = (
     angle: element.angle ?? 0,
   });
 };
+
+export const actionSetIFrameAsActiveTool = register({
+  name: "setIFrameAsActiveTool",
+  trackEvent: { category: "toolbar" },
+  perform: (elements, appState, _, app) => {
+    const nextActiveTool = updateActiveTool(appState, {
+      type: "iframe",
+    });
+
+    setCursorForShape(app.canvas, {
+      ...appState,
+      activeTool: nextActiveTool,
+    });
+
+    return {
+      elements,
+      appState: {
+        ...appState,
+        activeTool: updateActiveTool(appState, {
+          type: "iframe",
+        }),
+      },
+      commitToHistory: false,
+    };
+  },
+  keyTest: (event) => event.key.toLocaleLowerCase() === KEYS.B,
+});
