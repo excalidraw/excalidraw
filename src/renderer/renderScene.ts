@@ -678,17 +678,6 @@ export const _renderScene = ({
       context.save();
       context.translate(renderConfig.scrollX, renderConfig.scrollY);
 
-      if (appState.draggingElement && locallySelectedElements.length > 0) {
-        renderSnap(
-          {
-            renderConfig,
-            context,
-          },
-          appState.snaps ?? [],
-          locallySelectedElements,
-        );
-      }
-
       if (locallySelectedElements.length === 1) {
         context.fillStyle = oc.white;
         const transformHandles = getTransformHandles(
@@ -740,6 +729,21 @@ export const _renderScene = ({
           renderTransformHandles(context, renderConfig, transformHandles, 0);
         }
       }
+      context.restore();
+    }
+
+    // Paint snaps
+    if (appState.selectedElementsAreBeingDragged) {
+      context.save();
+      context.translate(renderConfig.scrollX, renderConfig.scrollY);
+      renderSnap(
+        {
+          renderConfig,
+          context,
+        },
+        appState.snaps ?? [],
+        locallySelectedElements,
+      );
       context.restore();
     }
 
