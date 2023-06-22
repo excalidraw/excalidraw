@@ -240,15 +240,13 @@ export const handleBindTextResize = (
       baseline: nextBaseLine,
     });
 
-    if (!isArrowElement(container)) {
-      mutateElement(
-        textElement,
-        computeBoundTextPosition(
-          container,
-          textElement as ExcalidrawTextElementWithContainer,
-        ),
-      );
-    }
+    mutateElement(
+      textElement,
+      computeBoundTextPosition(
+        container,
+        textElement as ExcalidrawTextElementWithContainer,
+      ),
+    );
   }
 };
 
