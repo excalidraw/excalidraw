@@ -20,7 +20,6 @@ import {
   isHandToolActive,
 } from "../appState";
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
-import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { Bounds } from "../element/bounds";
 
 export const actionChangeViewBackgroundColor = register({
