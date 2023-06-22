@@ -165,7 +165,7 @@ export const getElementAbsoluteCoords = (
  * Returns the coordinates of the bounding box of the given elements
  * at the 8 transform handle directions
  */
-export const getElementsHandleCoordinates = (
+export const getElementsBoundingBoxHandles = (
   elements: ExcalidrawElement[],
 ): Record<TransformHandleDirection, Point> => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);

@@ -2,7 +2,7 @@ import oc from "open-color";
 import { RenderConfig } from "../scene/types";
 import { Snaps, getSnapLineEndPointsCoords } from "../snapping";
 import { ExcalidrawElement } from "../element/types";
-import { getElementsHandleCoordinates } from "../element/bounds";
+import { getElementsBoundingBoxHandles } from "../element/bounds";
 import * as GA from "../ga";
 
 interface RenderSnapOptions {
@@ -10,7 +10,7 @@ interface RenderSnapOptions {
   context: CanvasRenderingContext2D;
 }
 
-export const renderSnap = (
+export const renderSnaps = (
   { renderConfig, context }: RenderSnapOptions,
   snaps: Snaps,
   selectedElements: ExcalidrawElement[],
@@ -19,14 +19,27 @@ export const renderSnap = (
 
   context.lineWidth = 1 / renderConfig.zoom.value;
 
-  for (const { snapLine, direction } of snaps) {
-    context.strokeStyle = renderConfig.selectionColor ?? oc.black;
+  const snapsByIdMap = new Map<string, Snaps>();
+  snaps.forEach((snap) => {
+    snapsByIdMap.set(snap.id, [...(snapsByIdMap.get(snap.id) ?? []), snap]);
+  });
 
-    const handles = getElementsHandleCoordinates(selectedElements);
+  const handles = getElementsBoundingBoxHandles(selectedElements);
+
+  for (const snapsById of snapsByIdMap.values()) {
+    context.strokeStyle = renderConfig.selectionColor ?? oc.black;
+    const _points = Array.from(
+      new Set(
+        snapsById.flatMap((snap) => [
+          GA.point(...handles[snap.direction]),
+          ...snap.snapLine.points,
+        ]),
+      ),
+    );
 
     const { from, to } = getSnapLineEndPointsCoords({
-      line: snapLine.line,
-      points: [GA.point(...handles[direction]), ...snapLine.points],
+      ...snapsById[0].snapLine,
+      points: _points,
     });
 
     context.beginPath();

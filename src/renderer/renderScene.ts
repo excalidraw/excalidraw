@@ -62,7 +62,7 @@ import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
-import { renderSnap } from "./renderSnap";
+import { renderSnaps } from "./renderSnaps";
 import { isFrameElement, isLinearElement } from "../element/typeChecks";
 import {
   elementOverlapsWithFrame,
@@ -736,7 +736,7 @@ export const _renderScene = ({
     if (appState.selectedElementsAreBeingDragged) {
       context.save();
       context.translate(renderConfig.scrollX, renderConfig.scrollY);
-      renderSnap(
+      renderSnaps(
         {
           renderConfig,
           context,

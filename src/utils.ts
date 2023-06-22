@@ -841,3 +841,9 @@ export const isOnlyExportingSingleFrame = (
     )
   );
 };
+
+export const getIdForElements = (
+  elements: readonly NonDeletedExcalidrawElement[],
+) => {
+  return elements.reduce((acc, ele) => acc + ele.id, "");
+};

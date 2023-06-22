@@ -1,4 +1,4 @@
-import { getElementsHandleCoordinates } from "./element/bounds";
+import { getElementsBoundingBoxHandles } from "./element/bounds";
 import { TransformHandleDirection } from "./element/transformHandles";
 import {
   ExcalidrawElement,
@@ -12,12 +12,14 @@ import { KEYS } from "./keys";
 import { getSelectedElements } from "./scene";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
 import { AppState, Point, Zoom } from "./types";
+import { getIdForElements } from "./utils";
 
 export type Snap = {
   distance: number;
   point: GA.Point;
   direction: TransformHandleDirection;
   snapLine: SnapLine;
+  id: string;
 };
 
 export type Snaps = Snap[];
@@ -25,13 +27,14 @@ export type Snaps = Snap[];
 export type SnapLine = {
   line: GA.Line;
   points: GA.Point[];
+  id: string;
 };
 
 const SNAP_DISTANCE = 15;
 // handle floating point errors
 export const SNAP_PRECISION = 0.001;
 
-const snapLine = (from: Point, to: Point): SnapLine | null => {
+const snapLine = (from: Point, to: Point, id: string): SnapLine | null => {
   const gaFrom = GAPoints.from(from);
   const gaTo = GAPoints.from(to);
 
@@ -42,25 +45,27 @@ const snapLine = (from: Point, to: Point): SnapLine | null => {
   return {
     line: GALines.through(gaFrom, gaTo),
     points: [gaFrom, gaTo],
+    id,
   };
 };
 
 const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
-  const borderPoints = getElementsHandleCoordinates(elements);
+  const borderPoints = getElementsBoundingBoxHandles(elements);
+  const id = getIdForElements(elements);
 
   return [
     // left
-    snapLine(borderPoints.nw, borderPoints.sw),
+    snapLine(borderPoints.nw, borderPoints.sw, id),
     // right
-    snapLine(borderPoints.ne, borderPoints.se),
+    snapLine(borderPoints.ne, borderPoints.se, id),
     // top
-    snapLine(borderPoints.nw, borderPoints.ne),
+    snapLine(borderPoints.nw, borderPoints.ne, id),
     // bottom
-    snapLine(borderPoints.sw, borderPoints.se),
+    snapLine(borderPoints.sw, borderPoints.se, id),
     // center vertical
-    snapLine(borderPoints.n, borderPoints.s),
+    snapLine(borderPoints.n, borderPoints.s, id),
     // center horizontal
-    snapLine(borderPoints.w, borderPoints.e),
+    snapLine(borderPoints.w, borderPoints.e, id),
   ].filter((snapLine): snapLine is SnapLine => snapLine !== null);
 };
 
@@ -91,7 +96,7 @@ export const getSnaps = ({
     return null;
   }
 
-  const selectionCoordinates = getElementsHandleCoordinates(selectedElements);
+  const selectionCoordinates = getElementsBoundingBoxHandles(selectedElements);
 
   // get snaps that are within the "shouldSnap" distance
   const offset = GA.offset(dragOffset.x, dragOffset.y);
@@ -119,6 +124,7 @@ export const getSnaps = ({
             point,
             snapLine,
             direction: handle as TransformHandleDirection,
+            id: snapLine.id,
           };
         })
         .filter(
@@ -135,9 +141,15 @@ export const getSnaps = ({
 
     for (const snap of snaps) {
       if (GALines.areParallel(snap.snapLine.line, snaps[0].snapLine.line)) {
-        groupA.push(snap);
+        groupA.push({
+          ...snap,
+          id: `${snap.id}_a`,
+        });
       } else {
-        groupB.push(snap);
+        groupB.push({
+          ...snap,
+          id: `${snap.id}_b`,
+        });
       }
     }
 
