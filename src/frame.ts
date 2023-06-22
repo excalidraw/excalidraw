@@ -304,7 +304,7 @@ export const groupsAreCompletelyOutOfFrame = (
 /**
  * Returns a map of frameId to frame elements. Includes empty frames.
  */
-export const groupByFrames = (elements: ExcalidrawElementsIncludingDeleted) => {
+export const groupByFrames = (elements: readonly ExcalidrawElement[]) => {
   const frameElementsMap = new Map<
     ExcalidrawElement["id"],
     ExcalidrawElement[]
@@ -591,8 +591,8 @@ export const updateFrameMembershipOfSelectedElements = (
 
   elementsToFilter.forEach((element) => {
     if (
-      !isFrameElement(element) &&
       element.frameId &&
+      !isFrameElement(element) &&
       !isElementInFrame(element, allElements, appState)
     ) {
       elementsToRemove.add(element);
