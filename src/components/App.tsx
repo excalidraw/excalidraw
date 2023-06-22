@@ -1720,7 +1720,7 @@ class App extends React.Component<AppProps, AppState> {
           theme: this.state.theme,
           imageCache: this.imageCache,
           isExporting: false,
-          renderScrollbars: !this.device.isMobile,
+          renderScrollbars: false,
         },
         callback: ({ atLeastOneVisibleElement, scrollBars }) => {
           if (scrollBars) {
