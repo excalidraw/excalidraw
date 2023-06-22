@@ -7,6 +7,7 @@ import type {
   ExcalidrawRectangleElement,
   ExcalidrawEllipseElement,
   ExcalidrawDiamondElement,
+  ExcalidrawTextContainer,
 } from "../../element/types";
 import { KEYS } from "../../keys";
 import { type ToolName } from "../queries/toolQueries";
@@ -365,6 +366,45 @@ export class UI {
         },
       },
     ) as any;
+  }
+
+  static async editText(
+    element: ExcalidrawTextElement | ExcalidrawTextContainer,
+    newText: string,
+  ): Promise<void>;
+  static async editText(
+    element: ExcalidrawTextElement | ExcalidrawTextContainer,
+    updateText: (prevText: string) => string,
+  ): Promise<void>;
+  static async editText(
+    element: ExcalidrawTextElement | ExcalidrawTextContainer,
+    textOrUpdateFn: string | ((prevText: string) => string),
+  ): Promise<void> {
+    const openedEditor = document.querySelector<HTMLTextAreaElement>(
+      ".excalidraw-textEditorContainer > textarea",
+    );
+
+    if (!openedEditor) {
+      mouse.select(element);
+      Keyboard.keyPress(KEYS.ENTER);
+    }
+
+    const editor =
+      openedEditor ??
+      document.querySelector<HTMLTextAreaElement>(
+        ".excalidraw-textEditorContainer > textarea",
+      );
+    if (!editor) {
+      throw new Error("Can't find wysiwyg text editor in the dom");
+    }
+
+    const newText =
+      typeof textOrUpdateFn === "string"
+        ? textOrUpdateFn
+        : textOrUpdateFn(editor.value);
+    fireEvent.input(editor, { target: { value: newText } });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    editor.blur();
   }
 
   static group(elements: ExcalidrawElement[]) {
