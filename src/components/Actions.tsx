@@ -326,10 +326,10 @@ export const ShapesSwitcher = ({
             name="editor-current-shape"
             title={`${capitalizeString(
               t("toolBar.iframe"),
-            )} — ${KEYS.B.toLocaleUpperCase()}`}
-            keyBindingLabel={KEYS.B.toLocaleUpperCase()}
+            )} — ${KEYS.W.toLocaleUpperCase()}`}
+            keyBindingLabel={KEYS.W.toLocaleUpperCase()}
             aria-label={capitalizeString(t("toolBar.iframe"))}
-            aria-keyshortcuts={KEYS.B.toLocaleUpperCase()}
+            aria-keyshortcuts={KEYS.W.toLocaleUpperCase()}
             data-testid={`toolbar-iframe`}
             onPointerDown={({ pointerType }) => {
               if (!appState.penDetected && pointerType === "pen") {
@@ -396,7 +396,7 @@ export const ShapesSwitcher = ({
                 });
               }}
               icon={EmbedIcon}
-              shortcut={KEYS.B.toLocaleUpperCase()}
+              shortcut={KEYS.W.toLocaleUpperCase()}
               data-testid="toolbar-iframe"
             >
               {t("toolBar.iframe")}

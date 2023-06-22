@@ -120,7 +120,7 @@ export const createPlaceholderiFrameLabel = (
   element: NonDeletedExcalidrawElement,
 ): ExcalidrawElement => {
   const text =
-    !element.link || element?.link === "" ? "Empty iFrame" : element.link;
+    !element.link || element?.link === "" ? "Empty Web-Embed" : element.link;
   const fontSize = element.width / text.length;
   return newTextElement({
     x: element.x + element.width / 2,
@@ -161,5 +161,5 @@ export const actionSetIFrameAsActiveTool = register({
       commitToHistory: false,
     };
   },
-  keyTest: (event) => event.key.toLocaleLowerCase() === KEYS.B,
+  keyTest: (event) => event.key.toLocaleLowerCase() === KEYS.W,
 });

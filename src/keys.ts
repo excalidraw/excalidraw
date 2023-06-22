@@ -45,7 +45,6 @@ export const KEYS = {
   SUBTRACT: "-",
 
   A: "a",
-  B: "b",
   C: "c",
   D: "d",
   E: "e",
@@ -65,6 +64,7 @@ export const KEYS = {
   Y: "y",
   Z: "z",
   K: "k",
+  W: "w",
 
   0: "0",
   1: "1",
