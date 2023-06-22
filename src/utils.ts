@@ -201,6 +201,32 @@ function easeOut(k: number): number {
   return 1 - Math.pow(1 - k, 4);
 }
 
+/**
+ * Animates values from `fromValues` to `toValues` using the requestAnimationFrame API.
+ * Executes the `onStep` callback on each step with the interpolated values.
+ * Returns a function that can be called to cancel the animation.
+ *
+ * @example
+ * // Example usage:
+ * const fromValues = { x: 0, y: 0 };
+ * const toValues = { x: 100, y: 200 };
+ * const onStep = ({x, y}) => {
+ *   setState(x, y)
+ * };
+ * const onCancel = () => {
+ *   console.log("Animation canceled");
+ * };
+ *
+ * const cancelAnimation = easeToValuesRAF({
+ *   fromValues,
+ *   toValues,
+ *   onStep,
+ *   onCancel,
+ * });
+ *
+ * // To cancel the animation:
+ * cancelAnimation();
+ */
 export const easeToValuesRAF = <T extends Record<keyof T, number>>({
   fromValues,
   toValues,
@@ -213,7 +239,7 @@ export const easeToValuesRAF = <T extends Record<keyof T, number>>({
 }: {
   fromValues: T;
   toValues: T;
-  onStep: (values: T, progress: number) => void;
+  onStep: (values: T) => void;
   duration?: number;
   easeFn?: (value: number) => number;
   onStart?: () => void;
@@ -234,7 +260,6 @@ export const easeToValuesRAF = <T extends Record<keyof T, number>>({
     }
 
     const elapsed = Math.min(timestamp - startTime, duration);
-    const progress = Math.min(elapsed / duration, 1);
     const factor = easeFn(elapsed / duration);
 
     const newValues = {} as T;
@@ -246,11 +271,12 @@ export const easeToValuesRAF = <T extends Record<keyof T, number>>({
       newValues[_key] = result;
     });
 
-    onStep(newValues, progress);
+    onStep(newValues);
 
     if (elapsed < duration) {
       frameId = window.requestAnimationFrame(step);
     } else {
+      onStep(toValues);
       onEnd?.();
     }
   }
