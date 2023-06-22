@@ -754,7 +754,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private isIFrameCenter(
     el: NonDeletedExcalidrawElement | null,
-    event: React.PointerEvent<HTMLElement>,
+    event: React.PointerEvent<HTMLElement> | PointerEvent,
     sceneX: number,
     sceneY: number,
   ) {
@@ -4899,18 +4899,6 @@ class App extends React.Component<AppProps, AppState> {
           });
           // If we click on something
         } else if (hitElement != null) {
-          if (
-            this.isIFrameCenter(
-              hitElement,
-              event,
-              pointerDownState.origin.x,
-              pointerDownState.origin.y,
-            )
-          ) {
-            this.handleIFrameCenterClick(hitElement);
-            return true;
-          }
-
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
           if (event[KEYS.CTRL_OR_CMD]) {
             if (!this.state.selectedElementIds[hitElement.id]) {
@@ -5980,7 +5968,6 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
       }
-
       const {
         draggingElement,
         resizingElement,
@@ -6686,6 +6673,22 @@ class App extends React.Component<AppProps, AppState> {
           draggingElement: null,
           suggestedBindings: [],
         });
+      }
+
+      if (
+        hitElement &&
+        this.lastPointerUp &&
+        this.lastPointerDown &&
+        this.lastPointerUp.timeStamp - this.lastPointerDown.timeStamp < 300 &&
+        gesture.pointers.size <= 1 &&
+        this.isIFrameCenter(
+          hitElement,
+          this.lastPointerUp,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        )
+      ) {
+        this.handleIFrameCenterClick(hitElement);
       }
     });
   }
