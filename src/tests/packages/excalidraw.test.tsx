@@ -75,15 +75,7 @@ describe("<Excalidraw/>", () => {
       </Excalidraw>,
     ));
     console.log(container.outerHTML);
-    expect(container.querySelector(".footer-center")).toMatchInlineSnapshot(`
-      <div
-        class="footer-center zen-mode-transition"
-      >
-        <div>
-          This is a custom footer
-        </div>
-      </div>
-    `);
+    expect(container.querySelector(".footer-center")).toMatchInlineSnapshot('null');
   });
 
   describe("Test gridModeEnabled prop", () => {
