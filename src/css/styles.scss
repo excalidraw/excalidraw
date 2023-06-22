@@ -9,6 +9,11 @@
   --zIndex-modal: 1000;
   --zIndex-popup: 1001;
   --zIndex-toast: 999999;
+
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+  --sat: env(safe-area-inset-top);
 }
 
 .excalidraw {
