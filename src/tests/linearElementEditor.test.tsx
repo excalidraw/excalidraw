@@ -16,7 +16,6 @@ import { Point } from "../types";
 import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { queryByTestId, queryByText } from "@testing-library/react";
-import { resize, rotate } from "./utils";
 import {
   getBoundTextElementPosition,
   wrapText,
@@ -977,7 +976,7 @@ describe("Test Linear Elements", () => {
           ]
         `);
 
-      rotate(container, -35, 55);
+      UI.rotate(container, -35, 55);
       expect(container.angle).toMatchInlineSnapshot(`1.3988061968364685`);
       expect(textElement.angle).toBe(0);
       expect(getBoundTextElementPosition(container, textElement))
@@ -1042,7 +1041,7 @@ describe("Test Linear Elements", () => {
           ]
         `);
 
-      resize(container, "ne", [300, 200]);
+      UI.resize(container, "ne", [300, 200]);
 
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`

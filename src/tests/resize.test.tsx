@@ -4,7 +4,6 @@ import App from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
 import { UI, Keyboard } from "./helpers/ui";
-import { resize } from "./utils";
 import { ExcalidrawTextElement } from "../element/types";
 import { Excalidraw } from "../packages/excalidraw/index";
 import { API } from "./helpers/api";
@@ -49,7 +48,7 @@ describe("resize rectangle ellipses and diamond elements", () => {
     async ({ handle, move, dimensions, topLeft }) => {
       await render(<App />);
       const rectangle = UI.createElement("rectangle", elemData);
-      resize(rectangle, handle, move);
+      UI.resize(rectangle, handle, move);
       const element = h.elements[0];
       expect([element.width, element.height]).toEqual(dimensions);
       expect([element.x, element.y]).toEqual(topLeft);
@@ -66,7 +65,7 @@ describe("resize rectangle ellipses and diamond elements", () => {
     async ({ handle, move, dimensions, topLeft }) => {
       await render(<App />);
       const rectangle = UI.createElement("rectangle", elemData);
-      resize(rectangle, handle, move, { shift: true });
+      UI.resize(rectangle, handle, move, { shift: true });
       const element = h.elements[0];
       expect([element.width, element.height]).toEqual(dimensions);
       expect([element.x, element.y]).toEqual(topLeft);
@@ -84,7 +83,7 @@ describe("resize rectangle ellipses and diamond elements", () => {
     async ({ handle, move, dimensions, topLeft }) => {
       await render(<App />);
       const rectangle = UI.createElement("rectangle", elemData);
-      resize(rectangle, handle, move, { shift: true });
+      UI.resize(rectangle, handle, move, { shift: true });
       const element = h.elements[0];
       expect([element.width, element.height]).toEqual(dimensions);
       expect([element.x, element.y]).toEqual(topLeft);
@@ -100,7 +99,7 @@ describe("resize rectangle ellipses and diamond elements", () => {
     async ({ handle, move, dimensions, topLeft }) => {
       await render(<App />);
       const rectangle = UI.createElement("rectangle", elemData);
-      resize(rectangle, handle, move, { alt: true });
+      UI.resize(rectangle, handle, move, { alt: true });
       const element = h.elements[0];
       expect([element.width, element.height]).toEqual(dimensions);
       expect([element.x, element.y]).toEqual(topLeft);
@@ -116,7 +115,7 @@ describe("resize rectangle ellipses and diamond elements", () => {
     async ({ handle, move, dimensions, topLeft }) => {
       await render(<App />);
       const rectangle = UI.createElement("rectangle", elemData);
-      resize(rectangle, handle, move, { alt: true, shift: true });
+      UI.resize(rectangle, handle, move, { alt: true, shift: true });
       const element = h.elements[0];
       expect([element.width, element.height]).toEqual(dimensions);
       expect([element.x, element.y]).toEqual(topLeft);
