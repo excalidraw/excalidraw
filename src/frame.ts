@@ -592,13 +592,16 @@ export const updateFrameMembershipOfSelectedElements = (
   elementsToFilter.forEach((element) => {
     if (
       !isFrameElement(element) &&
+      element.frameId &&
       !isElementInFrame(element, allElements, appState)
     ) {
       elementsToRemove.add(element);
     }
   });
 
-  return removeElementsFromFrame(allElements, [...elementsToRemove], appState);
+  return elementsToRemove.size > 0
+    ? removeElementsFromFrame(allElements, [...elementsToRemove], appState)
+    : allElements;
 };
 
 /**
