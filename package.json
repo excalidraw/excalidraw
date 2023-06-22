@@ -80,6 +80,7 @@
     "@types/resize-observer-browser": "0.1.7",
     "@types/socket.io-client": "1.4.36",
     "@vitejs/plugin-react": "3.1.0",
+    "@vitest/ui": "0.32.2",
     "chai": "4.3.6",
     "dotenv": "16.0.1",
     "eslint-config-prettier": "8.5.0",
