@@ -18,6 +18,13 @@ import { type ToolName } from "../queries/toolQueries";
 import { fireEvent, GlobalTestState, screen } from "../test-utils";
 import { mutateElement } from "../../element/mutateElement";
 import { API } from "./api";
+import {
+  isLinearElement,
+  isFreeDrawElement,
+  isTextElement,
+} from "../../element/typeChecks";
+import { getElementPointsCoords } from "../../element/bounds";
+import { rotatePoint } from "../../math";
 
 const { h } = window;
 
@@ -95,6 +102,29 @@ export class Keyboard {
     Keyboard.codeUp(code);
   };
 }
+
+const getElementPointForSelection = (element: ExcalidrawElement): Point => {
+  const { x, y, width, height, angle } = element;
+  const target: Point = [
+    x +
+      (isLinearElement(element) || isFreeDrawElement(element) ? 0 : width / 2),
+    y,
+  ];
+  let center: Point;
+
+  if (isLinearElement(element)) {
+    const bounds = getElementPointsCoords(element, element.points);
+    center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2];
+  } else {
+    center = [x + width / 2, y + height / 2];
+  }
+
+  if (isTextElement(element)) {
+    return center;
+  }
+
+  return rotatePoint(target, center, angle);
+};
 
 export class Pointer {
   public clientX = 0;
@@ -209,25 +239,27 @@ export class Pointer {
     elements: ExcalidrawElement | ExcalidrawElement[],
   ) {
     API.clearSelection();
+
     Keyboard.withModifierKeys({ shift: true }, () => {
       elements = Array.isArray(elements) ? elements : [elements];
       elements.forEach((element) => {
         this.reset();
-        this.click(element.x, element.y);
+        this.click(...getElementPointForSelection(element));
       });
     });
+
     this.reset();
   }
 
   clickOn(element: ExcalidrawElement) {
     this.reset();
-    this.click(element.x, element.y);
+    this.click(...getElementPointForSelection(element));
     this.reset();
   }
 
   doubleClickOn(element: ExcalidrawElement) {
     this.reset();
-    this.doubleClick(element.x, element.y);
+    this.doubleClick(...getElementPointForSelection(element));
     this.reset();
   }
 }
@@ -326,7 +358,8 @@ export class UI {
       mouse.click(x, y);
     } else if ((type === "line" || type === "arrow") && points.length > 2) {
       points.forEach((point) => {
-        mouse.clickAt(x + point[0], y + point[1]);
+        mouse.reset();
+        mouse.click(x + point[0], y + point[1]);
       });
       Keyboard.keyPress(KEYS.ESCAPE);
     } else if (type === "freedraw" && points.length > 2) {
