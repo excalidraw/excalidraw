@@ -50,7 +50,6 @@
     "pwacompat": "2.0.17",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-scripts": "5.0.1",
     "roughjs": "4.5.2",
     "sass": "1.51.0",
     "socket.io-client": "2.3.1",
@@ -87,7 +86,7 @@
     "eslint-plugin-prettier": "3.3.1",
     "http-server": "14.1.1",
     "husky": "7.0.4",
-    "jest-canvas-mock": "2.4.0",
+    "jsdom": "22.1.0",
     "lint-staged": "12.3.7",
     "pepjs": "0.5.3",
     "prettier": "2.6.2",
@@ -96,27 +95,17 @@
     "vite": "4.2.1",
     "vite-plugin-ejs": "1.6.4",
     "vite-plugin-pwa": "0.14.7",
-    "vite-plugin-svgr": "2.4.0"
+    "vite-plugin-svgr": "2.4.0",
+    "vitest": "0.32.2",
+    "vitest-canvas-mock": "0.3.1"
+  },
+  "resolutions": {
+    "jest-canvas-mock": "2.4.0"
   },
   "engines": {
     "node": ">=14.0.0"
   },
   "homepage": ".",
-  "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx,ts,tsx}"
-    ],
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/locales",
-      "<rootDir>/src/packages/excalidraw/dist/",
-      "<rootDir>/src/packages/excalidraw/types",
-      "<rootDir>/src/packages/excalidraw/example"
-    ],
-    "transformIgnorePatterns": [
-      "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-fs-access|canvas-roundrect-polyfill)/)"
-    ],
-    "resetMocks": false
-  },
   "name": "excalidraw",
   "prettier": "@excalidraw/prettier-config",
   "private": true,
@@ -136,14 +125,13 @@
     "start": "vite --port 3000",
     "start:production": "npm run build && npx http-server build -a localhost -p 5001 -o",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watchAll=false",
-    "test:app": "react-scripts test --passWithNoTests",
+    "test:app": "vitest --config vitest.config.ts",
     "test:code": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
-    "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "test:other": "yarn prettier --list-different",
     "test:typecheck": "tsc",
-    "test:update": "yarn test:app --updateSnapshot --watchAll=false",
+    "test:update": "yarn test:app --update --watch=false",
     "test": "yarn test:app",
-    "test:coverage": "react-scripts test --passWithNoTests --coverage --watchAll",
+    "test:coverage": "vitest --coverage --watchAll",
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
     "build:preview": "yarn build && vite preview --port 5000",
