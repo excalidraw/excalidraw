@@ -370,6 +370,24 @@ const repairBoundElement = (
   }
 };
 
+/**
+ * Remove an element's frameId if its containing frame is non-existent
+ *
+ * NOTE mutates elements.
+ */
+const repairFrameMembership = (
+  element: Mutable<ExcalidrawElement>,
+  elementsMap: Map<string, Mutable<ExcalidrawElement>>,
+) => {
+  if (element.frameId) {
+    const containingFrame = elementsMap.get(element.frameId);
+
+    if (!containingFrame) {
+      element.frameId = null;
+    }
+  }
+};
+
 export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
@@ -410,6 +428,10 @@ export const restoreElements = (
   // repair binding. Mutates elements.
   const restoredElementsMap = arrayToMap(restoredElements);
   for (const element of restoredElements) {
+    if (element.frameId) {
+      repairFrameMembership(element, restoredElementsMap);
+    }
+
     if (isTextElement(element) && element.containerId) {
       repairBoundElement(element, restoredElementsMap);
     } else if (element.boundElements) {
