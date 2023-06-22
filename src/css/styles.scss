@@ -275,6 +275,10 @@
     }
   }
 
+  .layer-ui__wrapper.disable-pointerEvents .shapes-section > * {
+    pointer-events: none;
+  }
+
   .App-menu_top {
     grid-template-columns: 1fr 2fr 1fr;
     grid-gap: 2rem;
