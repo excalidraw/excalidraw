@@ -412,10 +412,16 @@ function shift(
         ...(frameElementsMap.get(element.id) ?? []),
         element,
       ];
+      frameElementsMap.delete(element.id);
     } else {
       finalElements = [...finalElements, element];
     }
   });
+
+  // in case root is non-existent, we want to keep its elements
+  for (const leftoverElements of frameElementsMap.values()) {
+    finalElements = [...finalElements, ...leftoverElements];
+  }
 
   return finalElements;
 }
