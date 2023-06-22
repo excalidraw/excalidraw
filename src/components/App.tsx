@@ -679,25 +679,16 @@ class App extends React.Component<AppProps, AppState> {
     return this.iFrameRefs[id];
   }
 
-  private handleIFrameCenterClick(
-    element: NonDeletedExcalidrawElement,
-    select: boolean = true,
-  ) {
+  private handleIFrameCenterClick(element: NonDeletedExcalidrawElement) {
     if (this.state.activeIFrameElement === element) {
       return;
     }
 
     setTimeout(() => {
-      if (select) {
-        this.setState({
-          activeIFrameElement: element,
-          selectedElementIds: { [element.id]: true },
-        });
-      } else {
-        this.setState({
-          activeIFrameElement: element,
-        });
-      }
+      this.setState({
+        activeIFrameElement: element,
+        selectedElementIds: { [element.id]: true },
+      });
     }, 100); // delay to prevent first click propagating to iframe on mobile
 
     const iframe = this.getIFrameElementById(element.id);
@@ -4458,7 +4449,7 @@ class App extends React.Component<AppProps, AppState> {
         isIFrameElement(hitElement) &&
         this.isIFrameCenter(hitElement, event, scenePointer.x, scenePointer.y)
       ) {
-        this.handleIFrameCenterClick(hitElement, false);
+        this.handleIFrameCenterClick(hitElement);
         return;
       }
     }
@@ -4479,18 +4470,22 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
       if (
+        clicklength < 300 &&
         this.hitLinkElement.type === "iframe" &&
         !isPointHittingLinkIcon(this.hitLinkElement, this.state, [
           scenePointer.x,
           scenePointer.y,
         ])
       ) {
-        this.handleIFrameCenterClick(this.hitLinkElement, false);
+        this.handleIFrameCenterClick(this.hitLinkElement);
       } else {
         this.redirectToLink(event, this.device.isTouchScreen);
       }
     } else if (this.state.viewModeEnabled) {
-      this.setState({ activeIFrameElement: null });
+      this.setState({
+        activeIFrameElement: null,
+        selectedElementIds: {},
+      });
     }
   };
 
