@@ -74,6 +74,7 @@ describe("<Excalidraw/>", () => {
         </Footer>
       </Excalidraw>,
     ));
+    console.log(container.outerHTML);
     expect(container.querySelector(".footer-center")).toMatchInlineSnapshot(`
       <div
         class="footer-center zen-mode-transition"

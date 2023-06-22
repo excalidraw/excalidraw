@@ -27,7 +27,7 @@ describe("Test MobileMenu", () => {
 
   it("should set device correctly", () => {
     expect(h.app.device).toMatchInlineSnapshot(`
-      Object {
+      {
         "canDeviceFitSidebar": false,
         "isLandscape": true,
         "isMobile": true,

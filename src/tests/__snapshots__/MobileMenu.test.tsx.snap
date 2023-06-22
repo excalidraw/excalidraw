@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Test MobileMenu should initialize with welcome screen and hide once user interacts 1`] = `
+exports[`Test MobileMenu > should initialize with welcome screen and hide once user interacts 1`] = `
 <div
   class="welcome-screen-center"
 >
@@ -67,11 +67,6 @@ exports[`Test MobileMenu should initialize with welcome screen and hide once use
       >
         Open
       </div>
-      <div
-        class="welcome-screen-menu-item__shortcut"
-      >
-        Ctrl+O
-      </div>
     </button>
     <button
       class="welcome-screen-menu-item "
@@ -121,11 +116,6 @@ exports[`Test MobileMenu should initialize with welcome screen and hide once use
         class="welcome-screen-menu-item__text"
       >
         Help
-      </div>
-      <div
-        class="welcome-screen-menu-item__shortcut"
-      >
-        ?
       </div>
     </button>
     <button

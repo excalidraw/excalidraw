@@ -955,7 +955,7 @@ describe("textWysiwyg", () => {
       // should center align horizontally and vertically by default
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-        Array [
+        [
           85,
           4.5,
         ]
