@@ -5,7 +5,7 @@ import {
 } from "../../element/types";
 import { KEYS } from "../../keys";
 import { ToolName } from "../queries/toolQueries";
-import { fireEvent, GlobalTestState } from "../test-utils";
+import { fireEvent, GlobalTestState, screen } from "../test-utils";
 import { mutateElement } from "../../element/mutateElement";
 import { API } from "./api";
 
@@ -244,6 +244,10 @@ export class UI {
       throw new Error(`No element with testid "${testId}" found`);
     }
     fireEvent.click(element);
+  };
+
+  static clickByTitle = (title: string) => {
+    fireEvent.click(screen.getByTitle(title));
   };
 
   /**
