@@ -1,10 +1,15 @@
-import {
+import type { Point } from "../../types";
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  ExcalidrawArrowElement,
+  ExcalidrawRectangleElement,
+  ExcalidrawEllipseElement,
+  ExcalidrawDiamondElement,
 } from "../../element/types";
 import { KEYS } from "../../keys";
-import { ToolName } from "../queries/toolQueries";
+import { type ToolName } from "../queries/toolQueries";
 import { fireEvent, GlobalTestState, screen } from "../test-utils";
 import { mutateElement } from "../../element/mutateElement";
 import { API } from "./api";
@@ -224,6 +229,23 @@ export class Pointer {
 
 const mouse = new Pointer("mouse");
 
+/** Tools that can be used to draw shapes */
+type DrawingToolName = Exclude<ToolName, "lock" | "selection" | "eraser">;
+
+type Element<T extends DrawingToolName> = T extends "line" | "freedraw"
+  ? ExcalidrawLinearElement
+  : T extends "arrow"
+  ? ExcalidrawArrowElement
+  : T extends "text"
+  ? ExcalidrawTextElement
+  : T extends "rectangle"
+  ? ExcalidrawRectangleElement
+  : T extends "ellipse"
+  ? ExcalidrawEllipseElement
+  : T extends "diamond"
+  ? ExcalidrawDiamondElement
+  : ExcalidrawElement;
+
 export class UI {
   static clickTool = (toolName: ToolName) => {
     fireEvent.click(GlobalTestState.renderResult.getByToolName(toolName));
@@ -259,16 +281,17 @@ export class UI {
    * If you need to get the actual element, not the proxy, call `get()` method
    * on the proxy object.
    */
-  static createElement<T extends ToolName>(
+  static createElement<T extends DrawingToolName>(
     type: T,
     {
       position = 0,
       x = position,
       y = position,
       size = 10,
-      width = size,
-      height = width,
+      width: initialWidth = size,
+      height: initialHeight = initialWidth,
       angle = 0,
+      points: initialPoints,
     }: {
       position?: number;
       x?: number;
@@ -277,25 +300,45 @@ export class UI {
       width?: number;
       height?: number;
       angle?: number;
+      points?: T extends "line" | "arrow" | "freedraw" ? Point[] : never;
     } = {},
-  ): (T extends "arrow" | "line" | "freedraw"
-    ? ExcalidrawLinearElement
-    : T extends "text"
-    ? ExcalidrawTextElement
-    : ExcalidrawElement) & {
+  ): Element<T> & {
     /** Returns the actual, current element from the elements array, instead
         of the proxy */
-    get(): T extends "arrow" | "line" | "freedraw"
-      ? ExcalidrawLinearElement
-      : T extends "text"
-      ? ExcalidrawTextElement
-      : ExcalidrawElement;
+    get(): Element<T>;
   } {
+    const width = initialWidth ?? initialHeight ?? size;
+    const height = initialHeight ?? size;
+    const points: Point[] = initialPoints ?? [
+      [0, 0],
+      [width, height],
+    ];
+
     UI.clickTool(type);
-    mouse.reset();
-    mouse.down(x, y);
-    mouse.reset();
-    mouse.up(x + (width ?? height ?? size), y + (height ?? size));
+
+    if (type === "text") {
+      mouse.reset();
+      mouse.click(x, y);
+    } else if ((type === "line" || type === "arrow") && points.length > 2) {
+      points.forEach((point) => {
+        mouse.clickAt(x + point[0], y + point[1]);
+      });
+      Keyboard.keyPress(KEYS.ESCAPE);
+    } else if (type === "freedraw" && points.length > 2) {
+      const firstPoint = points[0];
+      mouse.reset();
+      mouse.down(x + firstPoint[0], y + firstPoint[1]);
+      points
+        .slice(1)
+        .forEach((point) => mouse.moveTo(x + point[0], y + point[1]));
+      mouse.upAt();
+      Keyboard.keyPress(KEYS.ESCAPE);
+    } else {
+      mouse.reset();
+      mouse.down(x, y);
+      mouse.reset();
+      mouse.up(x + width, y + height);
+    }
 
     const origElement = h.elements[h.elements.length - 1] as any;
 
