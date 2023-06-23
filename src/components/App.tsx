@@ -815,7 +815,9 @@ class App extends React.Component<AppProps, AppState> {
           return (
             <div
               key={el.id}
-              className="excalidraw__iframe-container"
+              className={clsx("excalidraw__iframe-container", {
+                "is-hovered": isHovered,
+              })}
               style={{
                 top: isVisible ? `${y - this.state.offsetTop}px` : 0,
                 left: isVisible ? `${x - this.state.offsetLeft}px` : 0,
@@ -825,6 +827,7 @@ class App extends React.Component<AppProps, AppState> {
               }}
             >
               <div
+                className="excalidraw__iframe-container__inner"
                 style={{
                   width: isVisible ? `${el.width}px` : 0,
                   height: isVisible ? `${el.height}px` : 0,
@@ -856,20 +859,6 @@ class App extends React.Component<AppProps, AppState> {
                       title="Excalidraw Embedded Content"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen={true}
-                    />
-                  )}
-                  {isHovered && (
-                    <div
-                      style={{
-                        opacity: 0.3,
-                        background: "white",
-                        position: "absolute",
-                        borderRadius: `${radius}px`,
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: `${el.height - 2 * el.strokeWidth}px`,
-                      }}
                     />
                   )}
                 </div>

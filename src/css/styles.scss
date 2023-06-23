@@ -668,4 +668,24 @@
       font-size: 0.8em;
     }
   }
+
+  .excalidraw__iframe-container {
+    .excalidraw__iframe-container__inner {
+      overflow: hidden;
+    }
+
+    &.is-hovered .excalidraw__iframe-container__inner::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(0, 0, 0, 0) 20%,
+        rgba(0, 0, 0, 0.6) 80%
+      );
+    }
+  }
 }
