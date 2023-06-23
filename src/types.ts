@@ -112,7 +112,10 @@ export type AppState = {
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: React.ReactNode;
-  activeIFrameElement: NonDeletedExcalidrawElement | null;
+  activeIFrame: {
+    element: NonDeletedExcalidrawElement;
+    state: "hover" | "active";
+  } | null;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;

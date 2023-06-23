@@ -314,7 +314,7 @@ export const ShapesSwitcher = ({
                 activeTool: nextActiveTool,
                 multiElement: null,
                 selectedElementIds: {},
-                activeIFrameElement: null,
+                activeIFrame: null,
               });
             }}
           />
@@ -348,7 +348,7 @@ export const ShapesSwitcher = ({
                 activeTool: nextActiveTool,
                 multiElement: null,
                 selectedElementIds: {},
-                activeIFrameElement: null,
+                activeIFrame: null,
               });
             }}
           />

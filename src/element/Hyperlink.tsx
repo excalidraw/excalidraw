@@ -58,13 +58,11 @@ export const Hyperlink = ({
   element,
   setAppState,
   onLinkOpen,
-  iframeURLWhitelist,
   setToast,
 }: {
   element: NonDeletedExcalidrawElement;
   setAppState: React.Component<any, AppState>["setState"];
   onLinkOpen: ExcalidrawProps["onLinkOpen"];
-  iframeURLWhitelist: ExcalidrawProps["iframeURLWhitelist"];
   setToast: (
     toast: { message: string; closable?: boolean; duration?: number } | null,
   ) => void;

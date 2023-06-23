@@ -197,7 +197,7 @@ export const LibraryMenu = () => {
     setAppState({
       selectedElementIds: {},
       selectedGroupIds: {},
-      activeIFrameElement: null,
+      activeIFrame: null,
     });
   }, [setAppState]);
 
