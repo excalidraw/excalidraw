@@ -256,7 +256,7 @@ import {
   easeToValuesRAF,
   muteFSAbortError,
 } from "../utils";
-import { getEmbedLink, isURLOnWhiteList } from "../element/iframe";
+import { IFrameURLValidator, getEmbedLink } from "../element/iframe";
 import {
   ContextMenu,
   ContextMenuItems,
@@ -492,7 +492,7 @@ class App extends React.Component<AppProps, AppState> {
       showHyperlinkPopup: false,
       defaultSidebarDockedPreference: false,
     };
-
+    IFrameURLValidator.getInstance(props.iframeURLWhitelist);
     this.id = nanoid();
     this.library = new Library(this);
     if (excalidrawRef) {
@@ -2198,7 +2198,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.text) {
         if (
           !isPlainPaste &&
-          isURLOnWhiteList(data.text, this.props.iframeURLWhitelist) &&
+          IFrameURLValidator.getInstance().run(data.text) &&
           (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(data.text) ||
             getEmbedLink(data.text)?.type === "video")
         ) {
@@ -2226,12 +2226,7 @@ class App extends React.Component<AppProps, AppState> {
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
   }) => {
-    const elements = restoreElements(
-      opts.elements,
-      null,
-      undefined,
-      this.props,
-    );
+    const elements = restoreElements(opts.elements, null, undefined);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;
@@ -5200,7 +5195,7 @@ class App extends React.Component<AppProps, AppState> {
       width: embedLink.aspectRatio.w,
       height: embedLink.aspectRatio.h,
       link,
-      whitelisted: isURLOnWhiteList(link, this.props.iframeURLWhitelist),
+      whitelisted: IFrameURLValidator.getInstance().run(link),
     });
 
     this.scene.replaceAllElements([
@@ -7320,7 +7315,7 @@ class App extends React.Component<AppProps, AppState> {
       const text = event.dataTransfer?.getData("text");
       if (
         text &&
-        isURLOnWhiteList(text, this.props.iframeURLWhitelist) &&
+        IFrameURLValidator.getInstance().run(text) &&
         (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
           getEmbedLink(text)?.type === "video")
       ) {

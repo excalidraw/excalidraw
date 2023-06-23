@@ -79,28 +79,6 @@ export const hideActionForIFrame = (
   element.link !== "" &&
   !props.iframeURLWhitelist;
 
-export const isURLOnWhiteList = (
-  url: string | null | undefined,
-  validators?: RegExp[],
-): boolean => {
-  if (!url) {
-    return false;
-  }
-  validators = validators ?? [];
-  for (const validator of validators) {
-    if (url.match(validator)) {
-      return true;
-    }
-  }
-  return Boolean(
-    url.match(YOUTUBE_REG) ||
-      url.match(VIMEO_REG) ||
-      url.match(TWITTER_REG) ||
-      url.match(FIGMA_REG) ||
-      url.match(EXCALIDRAW_REG),
-  );
-};
-
 export const isIFrameOrFrameLabel = (
   element: NonDeletedExcalidrawElement,
 ): Boolean => {
@@ -163,3 +141,37 @@ export const actionSetIFrameAsActiveTool = register({
   },
   keyTest: (event) => event.key.toLocaleLowerCase() === KEYS.W,
 });
+
+export class IFrameURLValidator {
+  private static instance: IFrameURLValidator;
+  private validators: RegExp[];
+
+  private constructor(validators: RegExp[] = []) {
+    this.validators = validators;
+  }
+
+  public static getInstance(validators?: RegExp[]): IFrameURLValidator {
+    if (!IFrameURLValidator.instance) {
+      IFrameURLValidator.instance = new IFrameURLValidator(validators);
+    }
+    return IFrameURLValidator.instance;
+  }
+
+  public run(url: string | null | undefined): boolean {
+    if (!url) {
+      return false;
+    }
+    for (const validator of this.validators) {
+      if (url.match(validator)) {
+        return true;
+      }
+    }
+    return Boolean(
+      url.match(YOUTUBE_REG) ||
+        url.match(VIMEO_REG) ||
+        url.match(TWITTER_REG) ||
+        url.match(FIGMA_REG) ||
+        url.match(EXCALIDRAW_REG),
+    );
+  }
+}
