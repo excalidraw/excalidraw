@@ -811,7 +811,6 @@ class App extends React.Component<AppProps, AppState> {
             this.state.activeIFrame?.element === el &&
             this.state.activeIFrame?.state === "hover";
           const radius = getCornerRadius(Math.min(el.width, el.height), el);
-          const opacity = el.opacity / 100;
 
           return (
             <div
@@ -822,11 +821,7 @@ class App extends React.Component<AppProps, AppState> {
                 left: isVisible ? `${x - this.state.offsetLeft}px` : 0,
                 transform: isVisible ? `scale(${scale})` : "none",
                 display: isVisible ? "block" : "none",
-                opacity: isHovered
-                  ? opacity > 0.7
-                    ? opacity - 0.15
-                    : opacity + 0.15
-                  : opacity,
+                opacity: el.opacity / 100,
               }}
             >
               <div
@@ -861,6 +856,20 @@ class App extends React.Component<AppProps, AppState> {
                       title="Excalidraw Embedded Content"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen={true}
+                    />
+                  )}
+                  {isHovered && (
+                    <div
+                      style={{
+                        opacity: 0.3,
+                        background: "white",
+                        position: "absolute",
+                        borderRadius: `${radius}px`,
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: `${el.height - 2 * el.strokeWidth}px`,
+                      }}
                     />
                   )}
                 </div>
