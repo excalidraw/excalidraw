@@ -709,7 +709,9 @@ export const _renderScene = ({
               dashed: !!renderConfig.remoteSelectedElementIds[element.id],
               cx,
               cy,
-              activeiFrame: appState.activeIFrame?.element === element,
+              activeiFrame:
+                appState.activeIFrame?.element === element &&
+                appState.activeIFrame.state === "active",
             });
           }
           return acc;

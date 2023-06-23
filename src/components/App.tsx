@@ -823,9 +823,9 @@ class App extends React.Component<AppProps, AppState> {
                 transform: isVisible ? `scale(${scale})` : "none",
                 display: isVisible ? "block" : "none",
                 opacity: isHovered
-                  ? opacity > 0.6
-                    ? opacity - 0.3
-                    : opacity + 0.3
+                  ? opacity > 0.7
+                    ? opacity - 0.15
+                    : opacity + 0.15
                   : opacity,
               }}
             >
