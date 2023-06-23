@@ -641,6 +641,55 @@ const ExcalidrawWrapper = () => {
 
   const isOffline = useAtomValue(isOfflineAtom);
 
+  useEffect(() => {
+    if (!excalidrawAPI) {
+      return;
+    }
+    let currElement: ExcalidrawElement | undefined = undefined;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+        return;
+      }
+
+      let targetElement: ExcalidrawElement | undefined = undefined;
+      const elements = excalidrawAPI.getSceneElements();
+      const _currElement = elements.find(
+        (element) => element.id === currElement?.id,
+      );
+      if (_currElement) {
+        targetElement = elements.find((el) =>
+          event.key === "ArrowLeft"
+            ? el.x < _currElement.x
+            : el.x > _currElement.x,
+        );
+      }
+
+      if (!targetElement) {
+        const sortedElements = elements.slice().sort((a, b) => a.x - b.x);
+        if (event.key === "ArrowLeft") {
+          targetElement = sortedElements.at(-1);
+        } else {
+          targetElement = sortedElements.at(0);
+        }
+      }
+
+      if (targetElement) {
+        currElement = targetElement;
+        excalidrawAPI.scrollToContent(targetElement, {
+          fitToViewport: true,
+          animate: true,
+        });
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [excalidrawAPI]);
+
   return (
     <div
       style={{ height: "100%" }}
