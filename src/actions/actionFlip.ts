@@ -19,10 +19,7 @@ export const actionFlipHorizontal = register({
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
-      elements: updateFrameMembershipOfSelectedElements(
-        flipSelectedElements(elements, appState, "horizontal"),
-        appState,
-      ),
+      elements: flipSelectedElements(elements, appState, "horizontal"),
       appState,
       commitToHistory: true,
     };

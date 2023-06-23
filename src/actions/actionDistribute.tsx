@@ -6,7 +6,6 @@ import { ToolButton } from "../components/ToolButton";
 import { distributeElements, Distribution } from "../distribute";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
-import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
@@ -43,9 +42,8 @@ const distributeSelectedElements = (
 
   const updatedElementsMap = arrayToMap(updatedElements);
 
-  return updateFrameMembershipOfSelectedElements(
-    elements.map((element) => updatedElementsMap.get(element.id) || element),
-    appState,
+  return elements.map(
+    (element) => updatedElementsMap.get(element.id) || element,
   );
 };
 
