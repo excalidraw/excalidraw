@@ -684,12 +684,20 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    // The delay serves two purposes
+    // 1. To prevent first click propagating to iframe on mobile,
+    //    else the click will immediately start and stop the video
+    // 2. If the user double clicks the frame center to activate it
+    //    without the delay youtube will immediately open the video
+    //    in fullscreen mode
     setTimeout(() => {
       this.setState({
         activeIFrameElement: element,
         selectedElementIds: { [element.id]: true },
+        draggingElement: null,
+        selectionElement: null,
       });
-    }, 100); // delay to prevent first click propagating to iframe on mobile
+    }, 100);
 
     const iframe = this.getIFrameElementById(element.id);
 
@@ -5669,7 +5677,8 @@ class App extends React.Component<AppProps, AppState> {
         if (
           selectedElements.length > 0 &&
           !pointerDownState.withCmdOrCtrl &&
-          !this.state.editingElement
+          !this.state.editingElement &&
+          !this.state.activeIFrameElement
         ) {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
