@@ -453,31 +453,31 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Esportatu irudi gisa",
+        "button": "Esportatu irudi gisa",
+        "description": "Esportatu eszenaren datuak geroago inportatu ahal izango duzun irudi gisa."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Gorde diskoan",
+        "button": "Gorde diskoan",
+        "description": "Esportatu eszenaren datuak geroago inportatu ahal izango duzun fitxategi batan."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Esportatu Excalidraw+ra",
+        "description": "Gorde eszena zure Excalidraw+ laneko areara."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Fitxategitik kargatu",
+        "button": "Fitxategitik kargatu",
+        "description": "Fitxategi batetik kargatzeak <bold>lehendik duzun edukia ordezkatuko du</bold>.<br></br>Lehenengo marrazkiaren babeskopia egin dezakezu beheko aukeretako bat erabiliz."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Estekatik kargatu",
+        "button": "Ordeztu nire edukia",
+        "description": "Kanpoko irudi bat kargatzeak <bold>lehendik duzun edukia ordezkatuko du</bold>.<br></br>. Zure marrazkiaren babeskopia egin dezakezu lehenik beheko aukeretako bat erabiliz."
       }
     }
   }
