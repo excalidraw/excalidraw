@@ -41,6 +41,7 @@ import {
   measureBaseline,
 } from "../element/textElement";
 import { COLOR_PALETTE } from "../colors";
+import { IFrameURLValidator } from "../element/iframe";
 
 type RestoredAppState = Omit<
   AppState,
@@ -63,6 +64,7 @@ export const AllowedExcalidrawActiveTools: Record<
   eraser: false,
   custom: true,
   frame: true,
+  iframe: true,
   hand: true,
 };
 
@@ -275,6 +277,10 @@ const restoreElement = (
       return restoreElementWithProperties(element, {});
     case "diamond":
       return restoreElementWithProperties(element, {});
+    case "iframe":
+      return restoreElementWithProperties(element, {
+        whitelisted: IFrameURLValidator.getInstance().run(element.link),
+      });
     case "frame":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,

@@ -179,8 +179,9 @@ export class API {
       case "rectangle":
       case "diamond":
       case "ellipse":
+      case "iframe":
         element = newElement({
-          type: type as "rectangle" | "diamond" | "ellipse",
+          type: type as "rectangle" | "diamond" | "ellipse" | "iframe",
           width,
           height,
           ...base,

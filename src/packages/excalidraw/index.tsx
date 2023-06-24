@@ -49,6 +49,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onPointerDown,
     onScrollChange,
     children,
+    iframeURLWhitelist,
+    renderCustomIFrame,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -129,6 +131,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onViewModeChange={onViewModeChange} //zsviczian
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
+          iframeURLWhitelist={iframeURLWhitelist}
+          renderCustomIFrame={renderCustomIFrame}
         >
           {children}
         </App>

@@ -83,6 +83,7 @@ import {
   THEME_FILTER,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
+  YTPLAYER,
   ZOOM_STEP,
 } from "../constants";
 import { exportCanvas, loadFromBlob } from "../data";
@@ -136,6 +137,7 @@ import {
   duplicateElements,
   newFrameElement,
   newFreeDrawElement,
+  newIFrameElement,
 } from "../element/newElement";
 import {
   hasBoundTextElement,
@@ -145,6 +147,7 @@ import {
   isBoundToContainer,
   isFrameElement,
   isImageElement,
+  isIFrameElement,
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
@@ -185,7 +188,14 @@ import {
   isArrowKey,
   KEYS,
 } from "../keys";
-import { distance2d, getGridPoint, isPathALoop, rotate } from "../math";
+
+import {
+  distance2d,
+  getCornerRadius,
+  getGridPoint,
+  isPathALoop,
+  rotate,
+} from "../math";
 import { isVisibleElement, renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
@@ -219,6 +229,7 @@ import {
   FrameNameBoundsCache,
   SidebarName,
   SidebarTabName,
+  UIAppState,
 } from "../types";
 import {
   debounce,
@@ -246,6 +257,7 @@ import {
   easeToValuesRAF,
   muteFSAbortError,
 } from "../utils";
+import { IFrameURLValidator, getEmbedLink } from "../element/iframe";
 import {
   ContextMenu,
   ContextMenuItems,
@@ -296,8 +308,9 @@ import {
   showHyperlinkTooltip,
   hideHyperlinkToolip,
   Hyperlink,
-  isPointHittingLinkIcon,
+  isPointHittingLink,
   isLocalLink,
+  isPointHittingLinkIcon,
 } from "../element/Hyperlink";
 import { ImportedDataState } from "../data/types"; //zsviczian
 import { shouldShowBoundingBox } from "../element/transformHandles";
@@ -401,6 +414,8 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+const youtubeContainers = new Map<string, number>();
+let app: App | null = null;
 
 // remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
@@ -453,10 +468,12 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDown: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
+  private iFrameRefs: { [key: string]: HTMLIFrameElement } = {};
   allowMobileMode: boolean = true; //zsviczian
 
   constructor(props: AppProps) {
     super(props);
+    app = this;
     const defaultAppState = getDefaultAppState();
     const {
       excalidrawRef,
@@ -482,7 +499,7 @@ class App extends React.Component<AppProps, AppState> {
       ...(initState ?? {}), //zsviczian
       defaultSidebarDockedPreference: false,
     };
-
+    IFrameURLValidator.getInstance(props.iframeURLWhitelist);
     this.id = nanoid();
     this.library = new Library(this);
     if (excalidrawRef) {
@@ -612,6 +629,262 @@ class App extends React.Component<AppProps, AppState> {
       >
         {t("labels.drawingCanvas")}
       </canvas>
+    );
+  }
+
+  private onWindowMessage(event: MessageEvent) {
+    if (
+      event.origin !== "https://player.vimeo.com" &&
+      event.origin !== "https://www.youtube.com"
+    ) {
+      return;
+    }
+
+    let data = null;
+    try {
+      data = JSON.parse(event.data);
+    } catch (e) {}
+    if (!data) {
+      return;
+    }
+
+    switch (event.origin) {
+      case "https://player.vimeo.com":
+        //Allowing for multiple instances of Excalidraw running in the window
+        if (data.method === "paused") {
+          let source: Window | null = null;
+          const iframes =
+            app?.excalidrawContainerRef?.current?.querySelectorAll("iframe");
+          if (!iframes) {
+            break;
+          }
+          for (const iframe of iframes) {
+            if (iframe.contentWindow === event.source) {
+              source = iframe.contentWindow;
+            }
+          }
+          source?.postMessage(
+            JSON.stringify({
+              method: data.value ? "play" : "pause",
+              value: true,
+            }),
+            "*",
+          );
+        }
+        break;
+      case "https://www.youtube.com":
+        if (
+          data.event === "infoDelivery" &&
+          data.info &&
+          data.id &&
+          typeof data.info.playerState === "number"
+        ) {
+          const id = data.id;
+          const playerState = data.info.playerState;
+          youtubeContainers.set(id, playerState);
+        }
+        break;
+    }
+  }
+
+  private updateIFrameRef(id: string, ref: HTMLIFrameElement | null) {
+    if (ref) {
+      this.iFrameRefs[id] = ref;
+    }
+  }
+
+  private getIFrameElementById(id: string): HTMLIFrameElement | undefined {
+    return this.iFrameRefs[id];
+  }
+
+  private handleIFrameCenterClick(element: NonDeletedExcalidrawElement) {
+    if (
+      this.state.activeIFrame?.element === element &&
+      this.state.activeIFrame?.state === "active"
+    ) {
+      return;
+    }
+
+    // The delay serves two purposes
+    // 1. To prevent first click propagating to iframe on mobile,
+    //    else the click will immediately start and stop the video
+    // 2. If the user double clicks the frame center to activate it
+    //    without the delay youtube will immediately open the video
+    //    in fullscreen mode
+    setTimeout(() => {
+      this.setState({
+        activeIFrame: { element, state: "active" },
+        selectedElementIds: { [element.id]: true },
+        draggingElement: null,
+        selectionElement: null,
+      });
+    }, 100);
+
+    const iframe = this.getIFrameElementById(element.id);
+
+    if (!iframe?.contentWindow) {
+      return;
+    }
+
+    if (iframe.src.includes("youtube")) {
+      const state = youtubeContainers.get(element.id);
+      if (!state) {
+        youtubeContainers.set(element.id, YTPLAYER.UNSTARTED);
+        iframe.contentWindow.postMessage(
+          JSON.stringify({
+            event: "listening",
+            id: element.id,
+          }),
+          "*",
+        );
+      }
+      switch (state) {
+        case YTPLAYER.PLAYING:
+        case YTPLAYER.BUFFERING:
+          iframe.contentWindow?.postMessage(
+            JSON.stringify({
+              event: "command",
+              func: "pauseVideo",
+              args: "",
+            }),
+            "*",
+          );
+          break;
+        default:
+          iframe.contentWindow?.postMessage(
+            JSON.stringify({
+              event: "command",
+              func: "playVideo",
+              args: "",
+            }),
+            "*",
+          );
+      }
+    }
+
+    if (iframe.src.includes("player.vimeo.com")) {
+      iframe.contentWindow.postMessage(
+        JSON.stringify({
+          method: "paused", //video play/pause in onWindowMessage handler
+        }),
+        "*",
+      );
+    }
+  }
+
+  private isIFrameCenter(
+    el: NonDeletedExcalidrawElement | null,
+    event: React.PointerEvent<HTMLElement> | PointerEvent,
+    sceneX: number,
+    sceneY: number,
+  ) {
+    return (
+      el &&
+      !event.altKey &&
+      !event.shiftKey &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      el.type === "iframe" &&
+      (this.state.activeIFrame?.element !== el ||
+        this.state.activeIFrame?.state === "hover" ||
+        !this.state.activeIFrame) &&
+      sceneX >= el.x + el.width / 3 &&
+      sceneX <= el.x + (2 * el.width) / 3 &&
+      sceneY >= el.y + el.height / 3 &&
+      sceneY <= el.y + (2 * el.height) / 3
+    );
+  }
+
+  private renderIFrames() {
+    const scale = this.state.zoom.value;
+    const normalizedWidth = this.state.width;
+    const normalizedHeight = this.state.height;
+    const iFrameElements = this.scene
+      .getNonDeletedElements()
+      .filter((el) => isIFrameElement(el) && el.whitelisted);
+    Object.keys(this.iFrameRefs).forEach((key) => {
+      if (!iFrameElements.some((el) => el.id === key)) {
+        delete this.iFrameRefs[key];
+      }
+    });
+    return (
+      <>
+        {iFrameElements.map((el) => {
+          const { x, y } = sceneCoordsToViewportCoords(
+            { sceneX: el.x, sceneY: el.y },
+            this.state,
+          );
+          const embedLink = getEmbedLink(el.link);
+          const src = embedLink?.link ?? "";
+          const isVisible = isVisibleElement(
+            el,
+            normalizedWidth,
+            normalizedHeight,
+            this.state,
+          );
+          const isActive =
+            this.state.activeIFrame?.element === el &&
+            this.state.activeIFrame?.state === "active";
+          const isHovered =
+            this.state.activeIFrame?.element === el &&
+            this.state.activeIFrame?.state === "hover";
+          const radius = getCornerRadius(Math.min(el.width, el.height), el);
+
+          return (
+            <div
+              key={el.id}
+              className={clsx("excalidraw__iframe-container", {
+                "is-hovered": isHovered,
+              })}
+              style={{
+                top: isVisible ? `${y - this.state.offsetTop}px` : 0,
+                left: isVisible ? `${x - this.state.offsetLeft}px` : 0,
+                transform: isVisible ? `scale(${scale})` : "none",
+                display: isVisible ? "block" : "none",
+                opacity: el.opacity / 100,
+              }}
+            >
+              <div
+                className="excalidraw__iframe-container__inner"
+                style={{
+                  width: isVisible ? `${el.width}px` : 0,
+                  height: isVisible ? `${el.height}px` : 0,
+                  transform: isVisible ? `rotate(${el.angle}rad)` : "none",
+                  borderRadius: `${radius}px`,
+                  pointerEvents: isActive ? "auto" : "none",
+                }}
+              >
+                <div
+                  style={{
+                    padding: `${el.strokeWidth}px`,
+                    height: isVisible
+                      ? `${el.height - 2 * el.strokeWidth}px`
+                      : 0,
+                  }}
+                >
+                  {this.props.renderCustomIFrame?.(
+                    el,
+                    radius,
+                    this.state as UIAppState,
+                  ) ?? (
+                    <iframe
+                      ref={(ref) => this.updateIFrameRef(el.id, ref)}
+                      className="excalidraw__iframe"
+                      style={{
+                        borderRadius: `${radius}px`,
+                      }}
+                      src={src}
+                      title="Excalidraw Embedded Content"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen={true}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </>
     );
   }
 
@@ -893,6 +1166,7 @@ class App extends React.Component<AppProps, AppState> {
                               element={selectedElement[0]}
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
+                              setToast={this.setToast}
                             />
                           )}
                         {this.state.toast !== null && (
@@ -914,6 +1188,7 @@ class App extends React.Component<AppProps, AppState> {
                         <main>{this.renderCanvas()}</main>
                         {this.renderFrameNames()}
                       </ExcalidrawActionManagerContext.Provider>
+                      {this.renderIFrames()}
                     </ExcalidrawElementsContext.Provider>
                   </ExcalidrawAppStateContext.Provider>
                 </ExcalidrawSetAppStateContext.Provider>
@@ -1438,10 +1713,12 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     this.detachIsMobileMqHandler?.();
+    window.removeEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
   }
 
   private addEventListeners() {
     this.removeEventListeners();
+    window.addEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
     document.addEventListener(EVENT.POINTER_UP, this.removePointer); // #3553
     document.addEventListener(EVENT.COPY, this.onCopy);
     this.excalidrawContainerRef.current?.addEventListener(
@@ -1854,6 +2131,7 @@ class App extends React.Component<AppProps, AppState> {
     if (event.touches.length === 2) {
       this.setState({
         selectedElementIds: {},
+        activeIFrame: null,
       });
     }
   };
@@ -1910,16 +2188,16 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+        {
+          clientX: this.lastViewportPosition.x,
+          clientY: this.lastViewportPosition.y,
+        },
+        this.state,
+      );
+
       // prefer spreadsheet data over image file (MS Office/Libre Office)
       if (isSupportedImageFile(file) && !data.spreadsheet) {
-        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          {
-            clientX: this.lastViewportPosition.x,
-            clientY: this.lastViewportPosition.y,
-          },
-          this.state,
-        );
-
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
@@ -1956,6 +2234,23 @@ class App extends React.Component<AppProps, AppState> {
           retainSeed: isPlainPaste,
         });
       } else if (data.text) {
+        if (
+          !isPlainPaste &&
+          IFrameURLValidator.getInstance().run(data.text) &&
+          (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(data.text) ||
+            getEmbedLink(data.text)?.type === "video")
+        ) {
+          const iframe = this.insertIFrameElement({
+            sceneX,
+            sceneY,
+            link: data.text,
+          });
+          if (!iframe) {
+            return;
+          }
+          this.setState({ selectedElementIds: { [iframe.id]: true } });
+          return;
+        }
         this.addTextFromPaste(data.text, isPlainPaste);
       }
       this.setActiveTool({ type: "selection" });
@@ -1969,7 +2264,7 @@ class App extends React.Component<AppProps, AppState> {
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
   }) => {
-    const elements = restoreElements(opts.elements, null);
+    const elements = restoreElements(opts.elements, null, undefined);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;
@@ -2890,6 +3185,7 @@ class App extends React.Component<AppProps, AppState> {
           selectedElementIds: {},
           selectedGroupIds: {},
           editingGroupId: null,
+          activeIFrame: null,
         });
       }
       isHoldingSpace = false;
@@ -2911,7 +3207,14 @@ class App extends React.Component<AppProps, AppState> {
 
   private setActiveTool = (
     tool:
-      | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame" }
+      | {
+          type:
+            | typeof SHAPES[number]["value"]
+            | "eraser"
+            | "hand"
+            | "frame"
+            | "iframe";
+        }
       | { type: "custom"; customType: string },
   ) => {
     const nextActiveTool = updateActiveTool(this.state, tool);
@@ -2935,6 +3238,7 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
+        activeIFrame: null,
       });
     } else {
       this.setState({ activeTool: nextActiveTool });
@@ -2970,6 +3274,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.isTouchScreenMultiTouchGesture()) {
       this.setState({
         selectedElementIds: {},
+        activeIFrame: null,
       });
     }
     gesture.initialScale = this.state.zoom.value;
@@ -3158,6 +3463,7 @@ class App extends React.Component<AppProps, AppState> {
       selectedElementIds: {},
       selectedGroupIds: {},
       editingGroupId: null,
+      activeIFrame: null,
     });
   }
 
@@ -3498,12 +3804,20 @@ class App extends React.Component<AppProps, AppState> {
           sceneY = midPoint.y;
         }
       }
-      this.startTextEditing({
-        sceneX,
-        sceneY,
-        insertAtParentCenter: !event.altKey,
-        container,
-      });
+      if (isIFrameElement(container as ExcalidrawGenericElement)) {
+        this.setState({
+          activeIFrame: container
+            ? { element: container, state: "active" }
+            : null,
+        });
+      } else {
+        this.startTextEditing({
+          sceneX,
+          sceneY,
+          insertAtParentCenter: !event.altKey,
+          container,
+        });
+      }
     }
   };
 
@@ -3523,7 +3837,7 @@ class App extends React.Component<AppProps, AppState> {
       return (
         element.link &&
         index <= hitElementIndex &&
-        isPointHittingLinkIcon(
+        isPointHittingLink(
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
@@ -3555,7 +3869,7 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerDown!,
       this.state,
     );
-    const lastPointerDownHittingLinkIcon = isPointHittingLinkIcon(
+    const lastPointerDownHittingLinkIcon = isPointHittingLink(
       this.hitLinkElement,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
@@ -3565,7 +3879,7 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerUp!,
       this.state,
     );
-    const lastPointerUpHittingLinkIcon = isPointHittingLinkIcon(
+    const lastPointerUpHittingLinkIcon = isPointHittingLink(
       this.hitLinkElement,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
@@ -3905,7 +4219,7 @@ class App extends React.Component<AppProps, AppState> {
       hideHyperlinkToolip();
       if (
         hitElement &&
-        hitElement.link &&
+        (hitElement.link || isIFrameElement(hitElement)) &&
         this.state.selectedElementIds[hitElement.id] &&
         !this.state.contextMenu &&
         !this.state.showHyperlinkPopup
@@ -3938,7 +4252,20 @@ class App extends React.Component<AppProps, AppState> {
             )) &&
           !hitElement?.locked
         ) {
-          setCursor(this.canvas, CURSOR_TYPE.MOVE);
+          if (
+            hitElement &&
+            this.isIFrameCenter(hitElement, event, scenePointerX, scenePointerY)
+          ) {
+            setCursor(this.canvas, CURSOR_TYPE.POINTER);
+            this.setState({
+              activeIFrame: { element: hitElement, state: "hover" },
+            });
+          } else {
+            setCursor(this.canvas, CURSOR_TYPE.MOVE);
+            if (this.state.activeIFrame?.state === "hover") {
+              this.setState({ activeIFrame: null });
+            }
+          }
         }
       } else {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
@@ -4355,13 +4682,30 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    this.removePointer(event);
     this.lastPointerUp = event;
 
-    if (this.device.isTouchScreen) {
-      const scenePointer = viewportCoordsToSceneCoords(
-        { clientX: event.clientX, clientY: event.clientY },
-        this.state,
+    const scenePointer = viewportCoordsToSceneCoords(
+      { clientX: event.clientX, clientY: event.clientY },
+      this.state,
+    );
+    const clicklength =
+      event.timeStamp - (this.lastPointerDown?.timeStamp ?? 0);
+    if (this.device.isMobile && clicklength < 300) {
+      const hitElement = this.getElementAtPosition(
+        scenePointer.x,
+        scenePointer.y,
       );
+      if (
+        isIFrameElement(hitElement) &&
+        this.isIFrameCenter(hitElement, event, scenePointer.x, scenePointer.y)
+      ) {
+        this.handleIFrameCenterClick(hitElement);
+        return;
+      }
+    }
+
+    if (this.device.isTouchScreen) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
         scenePointer.y,
@@ -4371,14 +4715,29 @@ class App extends React.Component<AppProps, AppState> {
         hitElement,
       );
     }
+
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event, this.device.isTouchScreen);
+      if (
+        clicklength < 300 &&
+        this.hitLinkElement.type === "iframe" &&
+        !isPointHittingLinkIcon(this.hitLinkElement, this.state, [
+          scenePointer.x,
+          scenePointer.y,
+        ])
+      ) {
+        this.handleIFrameCenterClick(this.hitLinkElement);
+      } else {
+        this.redirectToLink(event, this.device.isTouchScreen);
+      }
+    } else if (this.state.viewModeEnabled) {
+      this.setState({
+        activeIFrame: null,
+        selectedElementIds: {},
+      });
     }
-
-    this.removePointer(event);
   };
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
@@ -4650,6 +5009,7 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
+        activeIFrame: null,
       });
     }
   };
@@ -4812,6 +5172,7 @@ class App extends React.Component<AppProps, AppState> {
                 selectedElementIds: {},
                 selectedGroupIds: {},
                 editingGroupId: null,
+                activeIFrame: null,
               });
             }
 
@@ -4900,7 +5261,10 @@ class App extends React.Component<AppProps, AppState> {
                   {
                     ...prevState,
                     selectedElementIds: nextSelectedElementIds,
-                    showHyperlinkPopup: hitElement.link ? "info" : false,
+                    showHyperlinkPopup:
+                      hitElement.link || isIFrameElement(hitElement)
+                        ? "info"
+                        : false,
                   },
                   this.scene.getNonDeletedElements(),
                 );
@@ -5067,6 +5431,51 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  //create rectangle element with youtube top left on nearest grid point width / hight 640/360
+  private insertIFrameElement = ({
+    sceneX,
+    sceneY,
+    link,
+  }: {
+    sceneX: number;
+    sceneY: number;
+    link: string;
+  }) => {
+    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
+
+    const embedLink = getEmbedLink(link);
+
+    if (!embedLink) {
+      return;
+    }
+
+    const element = newIFrameElement({
+      type: "iframe",
+      x: gridX,
+      y: gridY,
+      strokeColor: "transparent",
+      backgroundColor: "transparent",
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      roundness: this.getCurrentItemRoundness("iframe"),
+      opacity: this.state.currentItemOpacity,
+      locked: false,
+      width: embedLink.aspectRatio.w,
+      height: embedLink.aspectRatio.h,
+      link,
+      whitelisted: IFrameURLValidator.getInstance().run(link),
+    });
+
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      element,
+    ]);
+
+    return element;
+  };
+
   private createImageElement = ({
     sceneX,
     sceneY,
@@ -5217,6 +5626,18 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private getCurrentItemRoundness(
+    elementType: "selection" | "rectangle" | "diamond" | "ellipse" | "iframe",
+  ) {
+    return this.state.currentItemRoundness === "round"
+      ? {
+          type: isUsingAdaptiveRadius(elementType)
+            ? ROUNDNESS.ADAPTIVE_RADIUS
+            : ROUNDNESS.PROPORTIONAL_RADIUS,
+        }
+      : null;
+  }
+
   private createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"],
     pointerDownState: PointerDownState,
@@ -5243,16 +5664,10 @@ class App extends React.Component<AppProps, AppState> {
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
-      roundness:
-        this.state.currentItemRoundness === "round"
-          ? {
-              type: isUsingAdaptiveRadius(elementType)
-                ? ROUNDNESS.ADAPTIVE_RADIUS
-                : ROUNDNESS.PROPORTIONAL_RADIUS,
-            }
-          : null,
+      roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      ...(elementType === "iframe" ? { whitelisted: false } : {}),
     });
 
     if (element.type === "selection") {
@@ -5527,7 +5942,8 @@ class App extends React.Component<AppProps, AppState> {
         if (
           selectedElements.length > 0 &&
           !pointerDownState.withCmdOrCtrl &&
-          !this.state.editingElement
+          !this.state.editingElement &&
+          this.state.activeIFrame?.state !== "active"
         ) {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
@@ -5730,6 +6146,7 @@ class App extends React.Component<AppProps, AppState> {
               selectedElementIds: {},
               selectedGroupIds: {},
               editingGroupId: null,
+              activeIFrame: null,
             });
           }
         }
@@ -5770,7 +6187,8 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 showHyperlinkPopup:
                   elementsWithinSelection.length === 1 &&
-                  elementsWithinSelection[0].link
+                  (elementsWithinSelection[0].link ||
+                    isIFrameElement(elementsWithinSelection[0]))
                     ? "info"
                     : false,
                 // select linear element only when we haven't box-selected anything else
@@ -5825,7 +6243,6 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
       }
-
       const {
         draggingElement,
         resizingElement,
@@ -6425,7 +6842,10 @@ class App extends React.Component<AppProps, AppState> {
                 {
                   ...prevState,
                   selectedElementIds: nextSelectedElementIds,
-                  showHyperlinkPopup: hitElement.link ? "info" : false,
+                  showHyperlinkPopup:
+                    hitElement.link || isIFrameElement(hitElement)
+                      ? "info"
+                      : false,
                 },
                 this.scene.getNonDeletedElements(),
               );
@@ -6481,6 +6901,7 @@ class App extends React.Component<AppProps, AppState> {
             selectedElementIds: {},
             selectedGroupIds: {},
             editingGroupId: null,
+            activeIFrame: null,
           });
         }
         return;
@@ -6496,6 +6917,10 @@ class App extends React.Component<AppProps, AppState> {
             ...prevState.selectedElementIds,
             [draggingElement.id]: true,
           },
+          showHyperlinkPopup:
+            isIFrameElement(draggingElement) && !draggingElement.link
+              ? "editor"
+              : prevState.showHyperlinkPopup,
         }));
       }
 
@@ -6526,6 +6951,22 @@ class App extends React.Component<AppProps, AppState> {
           draggingElement: null,
           suggestedBindings: [],
         });
+      }
+
+      if (
+        hitElement &&
+        this.lastPointerUp &&
+        this.lastPointerDown &&
+        this.lastPointerUp.timeStamp - this.lastPointerDown.timeStamp < 300 &&
+        gesture.pointers.size <= 1 &&
+        this.isIFrameCenter(
+          hitElement,
+          this.lastPointerUp,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        )
+      ) {
+        this.handleIFrameCenterClick(hitElement);
       }
     });
   }
@@ -7037,6 +7478,7 @@ class App extends React.Component<AppProps, AppState> {
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: {},
+      activeIFrame: null,
       selectedGroupIds: {},
       // Continue editing the same group if the user selected a different
       // element from it
@@ -7049,6 +7491,7 @@ class App extends React.Component<AppProps, AppState> {
     }));
     this.setState({
       selectedElementIds: {},
+      activeIFrame: null,
       previousSelectedElementIds: this.state.selectedElementIds,
     });
   }
@@ -7084,6 +7527,10 @@ class App extends React.Component<AppProps, AppState> {
 
     // must be retrieved first, in the same frame
     const { file, fileHandle } = await getFileFromEvent(event);
+    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+    );
 
     try {
       if (isSupportedImageFile(file)) {
@@ -7119,11 +7566,6 @@ class App extends React.Component<AppProps, AppState> {
         // to importing as regular image
         // ---------------------------------------------------------------------
 
-        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          event,
-          this.state,
-        );
-
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
@@ -7156,6 +7598,25 @@ class App extends React.Component<AppProps, AppState> {
     if (file) {
       // atetmpt to parse an excalidraw/excalidrawlib file
       await this.loadFileToCanvas(file, fileHandle);
+    }
+
+    if (event.dataTransfer?.types?.includes("text/plain")) {
+      const text = event.dataTransfer?.getData("text");
+      if (
+        text &&
+        IFrameURLValidator.getInstance().run(text) &&
+        (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
+          getEmbedLink(text)?.type === "video")
+      ) {
+        const iframe = this.insertIFrameElement({
+          sceneX,
+          sceneY,
+          link: text,
+        });
+        if (iframe) {
+          this.setState({ selectedElementIds: { [iframe.id]: true } });
+        }
+      }
     }
   };
 
@@ -7359,6 +7820,7 @@ class App extends React.Component<AppProps, AppState> {
       // rotating
       isResizing: transformHandleType && transformHandleType !== "rotation",
       isRotating: transformHandleType === "rotation",
+      activeIFrame: null,
     });
     const pointerCoords = pointerDownState.lastCoords;
     const [resizeX, resizeY] = getGridPoint(

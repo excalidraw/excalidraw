@@ -120,6 +120,7 @@ export type ActionName =
   | "removeAllElementsFromFrame"
   | "toggleFrameRendering"
   | "setFrameAsActiveTool"
+  | "setIFrameAsActiveTool"
   | "createContainerFromText"
   | "wrapTextInContainer";
 

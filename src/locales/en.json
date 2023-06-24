@@ -111,8 +111,11 @@
     "createContainerFromText": "Wrap text in a container",
     "link": {
       "edit": "Edit link",
+      "editEmbed": "Edit link & embed",
       "create": "Create link",
-      "label": "Link"
+      "createEmbed": "Create link & embed",
+      "label": "Link",
+      "labelEmbed": "Link & embed"
     },
     "lineEditor": {
       "edit": "Edit line",
@@ -166,6 +169,7 @@
     "cancel": "Cancel",
     "clear": "Clear",
     "remove": "Remove",
+    "embed": "Toggle embedding",
     "publishLibrary": "Publish",
     "submit": "Submit",
     "confirm": "Confirm"
@@ -226,6 +230,7 @@
     "link": "Add/ Update link for a selected shape",
     "eraser": "Eraser",
     "frame": "Frame tool",
+    "iframe": "Web Embed",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools"
   },
@@ -239,6 +244,7 @@
     "linearElement": "Click to start multiple points, drag for single line",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
+    "iframe": "Currently supported sites are YouTube, Twitter, Excalidraw, Vimeo, Figma",
     "text_selected": "Double-click or press ENTER to edit text",
     "text_editing": "Press Escape or CtrlOrCmd+ENTER to finish editing",
     "linearElementMulti": "Click on last point or press Escape or Enter to finish",
@@ -413,7 +419,8 @@
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
     "selection": "selection",
-    "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor"
+    "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor",
+    "unableToEmbed": "Embedding this url is currently not allowed. Raise an issue on GitHub to request the url whitelisted"
   },
   "colors": {
     "transparent": "Transparent",

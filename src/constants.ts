@@ -71,6 +71,16 @@ export enum EVENT {
   // custom events
   EXCALIDRAW_LINK = "excalidraw-link",
   MENU_ITEM_SELECT = "menu.itemSelect",
+  MESSAGE = "message",
+}
+
+export enum YTPLAYER {
+  UNSTARTED = -1,
+  ENDED = 0,
+  PLAYING = 1,
+  PAUSED = 2,
+  BUFFERING = 3,
+  CUED = 5,
 }
 
 export const ENV = {

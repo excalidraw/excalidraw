@@ -29,6 +29,8 @@ All `props` are *optional*.
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
 | [`autoFocus`](#autofocus) | `boolean` | `false` | indicates whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateidforfile) | `function` | _ | Allows you to override `id` generation for files added on canvas |
+| [`iframeURLWhitelist`](#iframeURLWhitelist) | `RegExp[]` | _ | Set this prop to extend the list of allowed sites to be included in iFrames |
+| [`renderCustomIFrame`](/docs/@excalidraw/excalidraw/api/props/render-props#renderCustomIFrame) |`function` | _ | Render function that can override the built-in iFrame |
 
 ### Storing custom data on Excalidraw elements
 
@@ -228,3 +230,10 @@ Allows you to override `id` generation for files added on canvas (images). By de
 (file: File) => string | Promise<string>
 ```
 
+### iframeURLWhitelist
+
+This is an optional property. Default sites allowed by Excalidraw include YouTube, Vimeo, Figma, Excalidraw and Twitter. You may allow additional sites to be included in iFrames. To allow all sites set the prop to `[/.*/]`.
+
+```tsx
+iframeURLWhitelist?: RegExp[];
+```
