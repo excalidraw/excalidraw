@@ -36,7 +36,7 @@ describe("actionStyles", () => {
     mouse.up(20, 20);
 
     // Change some styles of second rectangle
-    togglePopover("Stroke");
+    togglePopover("Stroke color");
     UI.clickOnTestId("color-red");
     togglePopover("Background");
     UI.clickOnTestId("color-blue");
