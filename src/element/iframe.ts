@@ -109,6 +109,7 @@ export const createPlaceholderiFrameLabel = (
     fontFamily: FONT_FAMILY.Helvetica,
     fontSize,
     text,
+    rawText: text,
     textAlign: "center",
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     angle: element.angle ?? 0,
