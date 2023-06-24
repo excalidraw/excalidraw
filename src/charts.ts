@@ -180,7 +180,7 @@ const commonProps = {
   locked: false,
 } as const;
 
-const getChartDimentions = (spreadsheet: Spreadsheet) => {
+const getChartDimensions = (spreadsheet: Spreadsheet) => {
   const chartWidth =
     (BAR_WIDTH + BAR_GAP) * spreadsheet.values.length + BAR_GAP;
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
@@ -201,6 +201,7 @@ const chartXLabels = (
         backgroundColor,
         ...commonProps,
         text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
+        rawText: label.length > 8 ? `${label.slice(0, 5)}...` : label,
         x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
         y: y + BAR_GAP / 2,
         width: BAR_WIDTH,
@@ -227,6 +228,7 @@ const chartYLabels = (
     x: x - BAR_GAP,
     y: y - BAR_GAP,
     text: "0",
+    rawText: "0",
     textAlign: "right",
   });
 
@@ -237,6 +239,7 @@ const chartYLabels = (
     x: x - BAR_GAP,
     y: y - BAR_HEIGHT - minYLabel.height / 2,
     text: Math.max(...spreadsheet.values).toLocaleString(),
+    rawText: Math.max(...spreadsheet.values).toLocaleString(),
     textAlign: "right",
   });
 
@@ -250,7 +253,7 @@ const chartLines = (
   groupId: string,
   backgroundColor: string,
 ): ChartElements => {
-  const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
+  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet);
   const xLine = newLinearElement({
     backgroundColor,
     groupIds: [groupId],
@@ -313,7 +316,7 @@ const chartBaseElements = (
   backgroundColor: string,
   debug?: boolean,
 ): ChartElements => {
-  const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
+  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet);
 
   const title = spreadsheet.title
     ? newTextElement({
@@ -321,6 +324,7 @@ const chartBaseElements = (
         groupIds: [groupId],
         ...commonProps,
         text: spreadsheet.title,
+        rawText: spreadsheet.title,
         x: x + chartWidth / 2,
         y: y - BAR_HEIGHT - BAR_GAP * 2 - DEFAULT_FONT_SIZE,
         roundness: null,

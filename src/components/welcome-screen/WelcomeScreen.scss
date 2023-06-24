@@ -146,6 +146,7 @@
   .welcome-screen-center__heading {
     font-size: 1.125rem;
     text-align: center;
+    line-height: 1.6; //zsviczian
   }
 
   .welcome-screen-menu {
@@ -174,11 +175,11 @@
     background: none;
     border: none;
 
-    padding: 0.75rem;
+    padding: 0.25rem; //zsviczian
 
     border-radius: var(--border-radius-md);
 
-    grid-template-columns: calc(var(--default-icon-size) + 0.5rem) 1fr 3rem;
+    grid-template-columns: calc(var(--default-icon-size) + 0.5rem) 1fr; //zsviczian
 
     &__text {
       display: flex;

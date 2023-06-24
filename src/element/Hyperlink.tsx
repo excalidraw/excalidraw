@@ -368,13 +368,14 @@ export const getLinkHandleFromCoords = (
   appState: UIAppState,
 ): [x: number, y: number, width: number, height: number] => {
   const size = DEFAULT_LINK_SIZE;
-  const linkWidth = size / appState.zoom.value;
-  const linkHeight = size / appState.zoom.value;
-  const linkMarginY = size / appState.zoom.value;
+  const zoom = appState.zoom.value > 1 ? appState.zoom.value : 1; //zsviczian
+  const linkWidth = size / zoom; //zsviczian
+  const linkHeight = size / zoom; //zsviczian
+  const linkMarginY = size / zoom; //zsviczian
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
-  const centeringOffset = (size - 8) / (2 * appState.zoom.value);
-  const dashedLineMargin = 4 / appState.zoom.value;
+  const centeringOffset = (size - 8) / (2 * zoom); //zsviczian
+  const dashedLineMargin = 4 / zoom; //zsviczian
 
   // Same as `ne` resize handle
   const x = x2 + dashedLineMargin - centeringOffset;

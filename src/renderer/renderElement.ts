@@ -51,6 +51,7 @@ import {
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { createPlaceholderiFrameLabel } from "../element/iframe";
+import easingsFunctions from "./easingFunctions";
 import { getContainingFrame } from "../frame";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
@@ -293,7 +294,17 @@ const drawElementOnCanvas = (
         rc.draw(fillShape);
       }
 
-      context.fillStyle = element.strokeColor;
+      //zsviczian
+      if (element.customData?.strokeOptions?.hasOutline) {
+        context.lineWidth =
+          element.strokeWidth *
+          (element.customData.strokeOptions.outlineWidth ?? 1);
+        context.strokeStyle = element.strokeColor;
+        context.stroke(path);
+        context.fillStyle = element.backgroundColor;
+      } else {
+        context.fillStyle = element.strokeColor;
+      }
       context.fill(path);
 
       context.restore();
@@ -1460,7 +1471,24 @@ export const renderElementToSvg = (
       );
       node.setAttribute("stroke", "none");
       const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
-      path.setAttribute("fill", element.strokeColor);
+      //zsviczian
+      if (element.customData?.strokeOptions?.hasOutline) {
+        node.setAttribute(
+          "stroke-width",
+          `${
+            element.strokeWidth *
+            (element.customData.strokeOptions.outlineWidth ?? 1)
+          }`,
+        );
+        const outline = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
+        outline.setAttribute("fill", "none");
+        outline.setAttribute("stroke", element.strokeColor);
+        outline.setAttribute("d", getFreeDrawSvgPath(element));
+        node.appendChild(outline);
+        path.setAttribute("fill", element.backgroundColor);
+      } else {
+        path.setAttribute("fill", element.strokeColor);
+      }
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
 
@@ -1632,15 +1660,43 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     : [[0, 0, 0.5]];
 
   // Consider changing the options for simulated pressure vs real pressure
-  const options: StrokeOptions = {
-    simulatePressure: element.simulatePressure,
-    size: element.strokeWidth * 4.25,
-    thinning: 0.6,
-    smoothing: 0.5,
-    streamline: 0.5,
-    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
-  };
+  const customOptions = element.customData?.strokeOptions?.options; //zsviczian
+  const options: StrokeOptions = customOptions //zsviczian
+    ? {
+        ...customOptions,
+        simulatePressure:
+          customOptions.simulatePressure ?? element.simulatePressure,
+        size: element.strokeWidth * 4.25, //override size with stroke width
+        last: !!element.lastCommittedPoint,
+        easing: easingsFunctions[customOptions.easing] ?? ((t) => t),
+        ...(customOptions.start?.easing
+          ? {
+              start: {
+                ...customOptions.start,
+                easing:
+                  easingsFunctions[customOptions.start.easing] ?? ((t) => t),
+              },
+            }
+          : { start: customOptions.start }),
+        ...(customOptions.end?.easing
+          ? {
+              end: {
+                ...customOptions.end,
+                easing:
+                  easingsFunctions[customOptions.end.easing] ?? ((t) => t),
+              },
+            }
+          : { end: customOptions.end }),
+      }
+    : {
+        simulatePressure: element.simulatePressure,
+        size: element.strokeWidth * 4.25,
+        thinning: 0.6,
+        smoothing: 0.5,
+        streamline: 0.5,
+        easing: easingsFunctions.easeOutSine, //zsviczian
+        last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
+      };
 
   return getSvgPathFromStroke(getStroke(inputPoints as number[][], options));
 }

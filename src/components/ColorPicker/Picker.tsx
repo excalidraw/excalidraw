@@ -93,6 +93,8 @@ export const Picker = ({
     colorObj?.shade ??
       (type === "elementBackground"
         ? DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX
+        : type === "canvasBackground" //zsviczian
+        ? 0
         : DEFAULT_ELEMENT_STROKE_COLOR_INDEX),
   );
 
