@@ -370,7 +370,7 @@ export const _renderScene = ({
       return { atLeastOneVisibleElement: false };
     }
     const {
-      renderScrollbars = true,
+      renderScrollbars = false,
       renderSelection = true,
       renderGrid = true,
       isExporting,

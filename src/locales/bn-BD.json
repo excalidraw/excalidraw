@@ -124,6 +124,8 @@
     },
     "statusPublished": "প্রকাশিত",
     "sidebarLock": "লক",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "",
     "link": "একটি নির্বাচিত আকৃতির জন্য লিঙ্ক যোগ বা আপডেট করুন",
     "eraser": "ঝাড়ন",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "ক্যানভাস কার্যকলাপ",

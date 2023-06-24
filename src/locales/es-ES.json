@@ -124,6 +124,8 @@
     },
     "statusPublished": "Publicado",
     "sidebarLock": "Mantener barra lateral abierta",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Modo Lápiz - previene toque",
     "link": "Añadir/Actualizar enlace para una forma seleccionada",
     "eraser": "Borrar",
-    "hand": "Mano (herramienta de panoramización)"
+    "frame": "",
+    "hand": "Mano (herramienta de panoramización)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",

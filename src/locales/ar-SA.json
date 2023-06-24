@@ -124,6 +124,8 @@
     },
     "statusPublished": "نُشر",
     "sidebarLock": "إبقاء الشريط الجانبي مفتوح",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "وضع القلم - امنع اللمس",
     "link": "إضافة/تحديث الرابط للشكل المحدد",
     "eraser": "ممحاة",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",

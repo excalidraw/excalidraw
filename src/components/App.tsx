@@ -1745,7 +1745,7 @@ class App extends React.Component<AppProps, AppState> {
           theme: this.state.theme,
           imageCache: this.imageCache,
           isExporting: false,
-          renderScrollbars: !this.device.isMobile,
+          renderScrollbars: false,
         },
         callback: ({ atLeastOneVisibleElement, scrollBars }) => {
           if (scrollBars) {
@@ -3273,7 +3273,10 @@ class App extends React.Component<AppProps, AppState> {
         container,
       );
     if (container && parentCenterPosition) {
-      shouldBindToContainer = true;
+      const boundTextElementToContainer = getBoundTextElement(container);
+      if (!boundTextElementToContainer) {
+        shouldBindToContainer = true;
+      }
     }
     let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
 
