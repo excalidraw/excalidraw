@@ -180,7 +180,7 @@ const commonProps = {
   locked: false,
 } as const;
 
-const getChartDimentions = (spreadsheet: Spreadsheet) => {
+const getChartDimensions = (spreadsheet: Spreadsheet) => {
   const chartWidth =
     (BAR_WIDTH + BAR_GAP) * spreadsheet.values.length + BAR_GAP;
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
@@ -253,7 +253,7 @@ const chartLines = (
   groupId: string,
   backgroundColor: string,
 ): ChartElements => {
-  const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
+  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet);
   const xLine = newLinearElement({
     backgroundColor,
     groupIds: [groupId],
@@ -316,7 +316,7 @@ const chartBaseElements = (
   backgroundColor: string,
   debug?: boolean,
 ): ChartElements => {
-  const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
+  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet);
 
   const title = spreadsheet.title
     ? newTextElement({

@@ -124,6 +124,8 @@
     },
     "statusPublished": "Publicado",
     "sidebarLock": "Manter a barra lateral aberta",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Modo lapis - evitar o contacto",
     "link": "Engadir/ Actualizar ligazón para a forma seleccionada",
     "eraser": "Goma de borrar",
-    "hand": "Man (ferramenta de desprazamento)"
+    "frame": "",
+    "hand": "Man (ferramenta de desprazamento)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Accións do lenzo",
