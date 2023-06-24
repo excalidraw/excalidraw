@@ -1,34 +1,34 @@
-import React, { useState, useCallback, useMemo, useRef } from "react";
+import { atom, useAtom } from "jotai";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { trackEvent } from "../analytics";
+import { useUIAppState } from "../context/ui-appState";
 import Library, {
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,
 } from "../data/library";
 import { t } from "../i18n";
+import { jotaiScope } from "../jotai";
 import { randomId } from "../random";
+import { getSelectedElements } from "../scene";
 import {
-  LibraryItems,
-  LibraryItem,
   ExcalidrawProps,
+  LibraryItem,
+  LibraryItems,
   UIAppState,
 } from "../types";
-import LibraryMenuItems from "./LibraryMenuItems";
-import { trackEvent } from "../analytics";
-import { atom, useAtom } from "jotai";
-import { jotaiScope } from "../jotai";
-import Spinner from "./Spinner";
 import {
   useApp,
   useAppProps,
   useExcalidrawElements,
   useExcalidrawSetAppState,
 } from "./App";
-import { getSelectedElements } from "../scene";
-import { useUIAppState } from "../context/ui-appState";
+import LibraryMenuItems from "./LibraryMenuItems";
+import Spinner from "./Spinner";
 
+import { NonDeletedExcalidrawElement } from "../element/types";
+import { isShallowEqual } from "../utils";
 import "./LibraryMenu.scss";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
-import { isShallowEqual } from "../utils";
-import { NonDeletedExcalidrawElement } from "../element/types";
 
 export const isLibraryMenuOpenAtom = atom(false);
 
@@ -114,9 +114,7 @@ export const LibraryMenuContent = ({
     );
   }
 
-  const showBtn =
-    libraryItemsData.libraryItems.length > 0 || pendingElements.length > 0;
-
+  const showBtn = false; // VBRN diable lib control button
   return (
     <LibraryMenuWrapper>
       <LibraryMenuItems

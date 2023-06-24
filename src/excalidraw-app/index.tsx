@@ -1,5 +1,6 @@
-import polyfill from "../polyfill";
+import clsx from "clsx";
 import LanguageDetector from "i18next-browser-languagedetector";
+import { Provider, atom, useAtom, useAtomValue } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
@@ -13,6 +14,10 @@ import {
   VERSION_TIMEOUT,
 } from "../constants";
 import { loadFromBlob } from "../data/blob";
+import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
+import { RestoredDataState, restore, restoreAppState } from "../data/restore";
+import { newElementWith } from "../element/mutateElement";
+import { isInitializedImageElement } from "../element/typeChecks";
 import {
   ExcalidrawElement,
   FileId,
@@ -21,29 +26,32 @@ import {
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
+import { useAtomWithInitialValue } from "../jotai";
 import {
   Excalidraw,
-  defaultLang,
   LiveCollaborationTrigger,
+  defaultLang,
 } from "../packages/excalidraw/index";
+import polyfill from "../polyfill";
 import {
   AppState,
-  LibraryItems,
-  ExcalidrawImperativeAPI,
   BinaryFiles,
+  ExcalidrawImperativeAPI,
   ExcalidrawInitialDataState,
+  LibraryItems,
   UIAppState,
 } from "../types";
 import {
+  ResolvablePromise,
   debounce,
-  getVersion,
   getFrame,
+  getVersion,
   isTestEnv,
   preventUnload,
-  ResolvablePromise,
   resolvablePromise,
-  isRunningInIframe,
 } from "../utils";
+import CustomStats from "./CustomStats";
+import { appJotaiStore } from "./app-jotai";
 import {
   FIREBASE_STORAGE_PREFIXES,
   STORAGE_KEYS,
@@ -56,38 +64,31 @@ import Collab, {
   isCollaboratingAtom,
   isOfflineAtom,
 } from "./collab/Collab";
+import { reconcileElements } from "./collab/reconciliation";
+import { AppFooter } from "./components/AppFooter";
+import { AppMainMenu } from "./components/AppMainMenu";
+import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
+import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 import {
   exportToBackend,
   getCollaborationLinkData,
   isCollaborationLink,
   loadScene,
 } from "./data";
+import { updateStaleImageStatuses } from "./data/FileManager";
+import { LocalData } from "./data/LocalData";
+import { loadFilesFromFirebase } from "./data/firebase";
 import {
   getLibraryItemsFromStorage,
   importFromLocalStorage,
   importUsernameFromLocalStorage,
 } from "./data/localStorage";
-import CustomStats from "./CustomStats";
-import { restore, restoreAppState, RestoredDataState } from "../data/restore";
-import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
-import { updateStaleImageStatuses } from "./data/FileManager";
-import { newElementWith } from "../element/mutateElement";
-import { isInitializedImageElement } from "../element/typeChecks";
-import { loadFilesFromFirebase } from "./data/firebase";
-import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
-import clsx from "clsx";
-import { reconcileElements } from "./collab/reconciliation";
-import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
-import { AppMainMenu } from "./components/AppMainMenu";
-import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
-import { AppFooter } from "./components/AppFooter";
-import { atom, Provider, useAtom, useAtomValue } from "jotai";
-import { useAtomWithInitialValue } from "../jotai";
-import { appJotaiStore } from "./app-jotai";
 
-import "./index.scss";
 import { ResolutionType } from "../utility-types";
+import { LIB_CAMERAS } from "../vbrn/lib/cameras.library";
+import { LIB_CHARACTERS } from "../vbrn/lib/characters.library";
+import "./index.scss";
 
 polyfill();
 
@@ -238,7 +239,7 @@ export const appLangCodeAtom = atom(
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [langCode, setLangCode] = useAtom(appLangCodeAtom);
-  const isCollabDisabled = isRunningInIframe();
+  const isCollabDisabled = true; // VBRN disable collabaration
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -347,6 +348,13 @@ const ExcalidrawWrapper = () => {
 
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
+      // VBRN Set initial Lib items
+      // FIXME do i not here, but in <Excalidraw initialData={...} >
+      //@ts-ignore
+      data.scene.libraryItems = [
+        ...LIB_CAMERAS.libraryItems,
+        ...LIB_CHARACTERS.libraryItems,
+      ] as LibraryItems;
       initialStatePromiseRef.current.promise.resolve(data.scene);
     });
 
@@ -616,6 +624,12 @@ const ExcalidrawWrapper = () => {
         "is-collaborating": isCollaborating,
       })}
     >
+      {/*
+        NAV Main render point of <Excalidraw >
+        All custom props from docs could be passed here
+        https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/
+
+        */}
       <Excalidraw
         ref={excalidrawRefCallback}
         onChange={onChange}

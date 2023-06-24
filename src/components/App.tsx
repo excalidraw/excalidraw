@@ -1,19 +1,20 @@
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
 
-import { RoughCanvas } from "roughjs/bin/canvas";
-import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 import { nanoid } from "nanoid";
+import { RoughCanvas } from "roughjs/bin/canvas";
+import rough from "roughjs/bin/rough";
 
+import throttle from "lodash.throttle";
 import {
   actionAddToLibrary,
+  actionBindText,
   actionBringForward,
   actionBringToFront,
   actionCopy,
   actionCopyAsPng,
   actionCopyAsSvg,
-  copyText,
   actionCopyStyles,
   actionCut,
   actionDeleteSelected,
@@ -22,21 +23,33 @@ import {
   actionFlipHorizontal,
   actionFlipVertical,
   actionGroup,
+  actionLink,
   actionPasteStyles,
   actionSelectAll,
   actionSendBackward,
   actionSendToBack,
+  actionToggleElementLock,
   actionToggleGridMode,
+  actionToggleLinearEditor,
   actionToggleStats,
   actionToggleZenMode,
   actionUnbindText,
-  actionBindText,
   actionUngroup,
-  actionLink,
-  actionToggleElementLock,
-  actionToggleLinearEditor,
+  copyText,
 } from "../actions";
+import { actionWrapTextInContainer } from "../actions/actionBoundText";
+import {
+  actionToggleHandTool,
+  zoomToFitElements,
+} from "../actions/actionCanvas";
+import { actionPaste } from "../actions/actionClipboard";
+import { actionUnlockAllElements } from "../actions/actionElementLock";
+import {
+  actionRemoveAllElementsFromFrame,
+  actionSelectAllElementsInFrame,
+} from "../actions/actionFrame";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { ActionResult } from "../actions/types";
@@ -59,13 +72,11 @@ import {
   ELEMENT_TRANSLATE_AMOUNT,
   ENV,
   EVENT,
-  FRAME_STYLE,
   EXPORT_IMAGE_TYPES,
+  FRAME_STYLE,
   GRID_SIZE,
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
-  isAndroid,
-  isBrave,
   LINE_CONFIRM_THRESHOLD,
   MAX_ALLOWED_FILE_BYTES,
   MIME_TYPES,
@@ -84,8 +95,24 @@ import {
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
   ZOOM_STEP,
+  isAndroid,
+  isBrave,
 } from "../constants";
 import { exportCanvas, loadFromBlob } from "../data";
+import {
+  SVGStringToFile,
+  dataURLToFile,
+  generateIdFromFile,
+  getDataURL,
+  getFileFromEvent,
+  isImageFileHandle,
+  isSupportedImageFile,
+  loadSceneOrLibraryFromBlob,
+  normalizeFile,
+  parseLibraryJSON,
+  resizeImageFile,
+} from "../data/blob";
+import { FileSystemHandle, fileOpen } from "../data/filesystem";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import {
@@ -96,10 +123,10 @@ import {
   getCursorForResizingElement,
   getDragOffsetXY,
   getElementWithTransformHandleType,
+  getLockedLinearCursorAlignSize,
   getNormalizedDimensions,
   getResizeArrowDirection,
   getResizeOffsetXY,
-  getLockedLinearCursorAlignSize,
   getTransformHandleTypeFromCoords,
   hitTest,
   isHittingElementBoundingBoxWithoutHittingElement,
@@ -107,14 +134,22 @@ import {
   isNonDeletedElement,
   isTextElement,
   newElement,
+  newImageElement,
   newLinearElement,
   newTextElement,
-  newImageElement,
+  redrawTextBoundingBox,
   textWysiwyg,
   transformElements,
   updateTextElement,
-  redrawTextBoundingBox,
 } from "../element";
+import {
+  Hyperlink,
+  hideHyperlinkToolip,
+  isLocalLink,
+  isPointHittingLinkIcon,
+  normalizeLink,
+  showHyperlinkTooltip,
+} from "../element/Hyperlink";
 import {
   bindOrUnbindLinearElement,
   bindOrUnbindSelectedElements,
@@ -129,6 +164,13 @@ import {
   unbindLinearElements,
   updateBoundElements,
 } from "../element/binding";
+import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
+import {
+  updateImageCache as _updateImageCache,
+  getInitializedImageElements,
+  loadHTMLImageElement,
+  normalizeSVG,
+} from "../element/image";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
@@ -137,6 +179,21 @@ import {
   newFrameElement,
   newFreeDrawElement,
 } from "../element/newElement";
+import {
+  bindTextToShapeAfterDuplication,
+  getApproxMinLineHeight,
+  getApproxMinLineWidth,
+  getBoundTextElement,
+  getContainerCenter,
+  getContainerDims,
+  getContainerElement,
+  getDefaultLineHeight,
+  getLineHeightInPx,
+  getTextBindableContainerAtPosition,
+  isMeasureTextSupported,
+  isValidTextContainer,
+} from "../element/textElement";
+import { shouldShowBoundingBox } from "../element/transformHandles";
 import {
   hasBoundTextElement,
   isArrowElement,
@@ -153,18 +210,32 @@ import {
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  ExcalidrawFrameElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  NonDeleted,
-  InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
-  FileId,
-  NonDeletedExcalidrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawTextContainer,
-  ExcalidrawFrameElement,
+  ExcalidrawTextElement,
+  FileId,
+  InitializedExcalidrawImageElement,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "../element/types";
+import {
+  addElementsToFrame,
+  bindElementsToFramesAfterDuplication,
+  elementOverlapsWithFrame,
+  getContainingFrame,
+  getElementsInNewFrame,
+  getElementsInResizingFrame,
+  getFrameElements,
+  isCursorInFrame,
+  isElementInFrame,
+  removeElementsFromFrame,
+  replaceAllElementsInFrame,
+  updateFrameMembershipOfSelectedElements,
+} from "../frame";
 import { getCenter, getDistance } from "../gesture";
 import {
   editGroupForSelectedElement,
@@ -177,17 +248,18 @@ import {
 } from "../groups";
 import History from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
+import { jotaiStore } from "../jotai";
 import {
   CODES,
-  shouldResizeFromCenter,
-  shouldMaintainAspectRatio,
-  shouldRotateWithDiscreteAngle,
-  isArrowKey,
   KEYS,
+  isArrowKey,
+  shouldMaintainAspectRatio,
+  shouldResizeFromCenter,
+  shouldRotateWithDiscreteAngle,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
-import { isVisibleElement, renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
+import { isVisibleElement, renderScene } from "../renderer/renderScene";
 import {
   calculateScrollCenter,
   getElementsAtPosition,
@@ -198,138 +270,66 @@ import {
   isOverScrollBars,
   isSomeElementSelected,
 } from "../scene";
+import { Fonts } from "../scene/Fonts";
 import Scene from "../scene/Scene";
+import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { RenderConfig, ScrollBars } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
-import { findShapeByKey, SHAPES } from "../shapes";
+import { SHAPES, findShapeByKey } from "../shapes";
 import {
   AppClassProperties,
   AppProps,
   AppState,
   BinaryFileData,
-  DataURL,
-  ExcalidrawImperativeAPI,
   BinaryFiles,
+  DataURL,
+  Device,
+  ExcalidrawImperativeAPI,
+  FrameNameBoundsCache,
   Gesture,
   GestureEvent,
   LibraryItems,
   PointerDownState,
   SceneData,
-  Device,
-  FrameNameBoundsCache,
   SidebarName,
   SidebarTabName,
 } from "../types";
 import {
   debounce,
   distance,
+  easeToValuesRAF,
   getFontString,
   getNearestScrollableContainer,
+  getShortcutKey,
   isInputLike,
   isToolIcon,
+  isTransparent,
   isWritableElement,
+  muteFSAbortError,
   resetCursor,
   resolvablePromise,
   sceneCoordsToViewportCoords,
   setCursor,
   setCursorForShape,
+  setEraserCursor,
   tupleToCoors,
+  updateActiveTool,
+  updateObject,
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
-  wrapEvent,
   withBatchedUpdatesThrottled,
-  updateObject,
-  setEraserCursor,
-  updateActiveTool,
-  getShortcutKey,
-  isTransparent,
-  easeToValuesRAF,
-  muteFSAbortError,
+  wrapEvent,
 } from "../utils";
+import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import BraveMeasureTextError from "./BraveMeasureTextError";
 import {
+  CONTEXT_MENU_SEPARATOR,
   ContextMenu,
   ContextMenuItems,
-  CONTEXT_MENU_SEPARATOR,
 } from "./ContextMenu";
+import { activeEyeDropperAtom } from "./EyeDropper";
 import LayerUI from "./LayerUI";
 import { Toast } from "./Toast";
-import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import {
-  dataURLToFile,
-  generateIdFromFile,
-  getDataURL,
-  getFileFromEvent,
-  isImageFileHandle,
-  isSupportedImageFile,
-  loadSceneOrLibraryFromBlob,
-  normalizeFile,
-  parseLibraryJSON,
-  resizeImageFile,
-  SVGStringToFile,
-} from "../data/blob";
-import {
-  getInitializedImageElements,
-  loadHTMLImageElement,
-  normalizeSVG,
-  updateImageCache as _updateImageCache,
-} from "../element/image";
-import throttle from "lodash.throttle";
-import { fileOpen, FileSystemHandle } from "../data/filesystem";
-import {
-  bindTextToShapeAfterDuplication,
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
-  getBoundTextElement,
-  getContainerCenter,
-  getContainerDims,
-  getContainerElement,
-  getDefaultLineHeight,
-  getLineHeightInPx,
-  getTextBindableContainerAtPosition,
-  isMeasureTextSupported,
-  isValidTextContainer,
-} from "../element/textElement";
-import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
-import {
-  normalizeLink,
-  showHyperlinkTooltip,
-  hideHyperlinkToolip,
-  Hyperlink,
-  isPointHittingLinkIcon,
-  isLocalLink,
-} from "../element/Hyperlink";
-import { shouldShowBoundingBox } from "../element/transformHandles";
-import { actionUnlockAllElements } from "../actions/actionElementLock";
-import { Fonts } from "../scene/Fonts";
-import {
-  getFrameElements,
-  isCursorInFrame,
-  bindElementsToFramesAfterDuplication,
-  addElementsToFrame,
-  replaceAllElementsInFrame,
-  removeElementsFromFrame,
-  getElementsInResizingFrame,
-  getElementsInNewFrame,
-  getContainingFrame,
-  elementOverlapsWithFrame,
-  updateFrameMembershipOfSelectedElements,
-  isElementInFrame,
-} from "../frame";
-import { excludeElementsInFramesFromSelection } from "../scene/selection";
-import { actionPaste } from "../actions/actionClipboard";
-import {
-  actionRemoveAllElementsFromFrame,
-  actionSelectAllElementsInFrame,
-} from "../actions/actionFrame";
-import {
-  actionToggleHandTool,
-  zoomToFitElements,
-} from "../actions/actionCanvas";
-import { jotaiStore } from "../jotai";
-import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
-import { actionWrapTextInContainer } from "../actions/actionBoundText";
-import BraveMeasureTextError from "./BraveMeasureTextError";
-import { activeEyeDropperAtom } from "./EyeDropper";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -799,6 +799,13 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public render() {
+    /*
+    NAV App Render
+
+    App attributes:
+    - this.library
+
+    */
     const selectedElement = getSelectedElements(
       this.scene.getNonDeletedElements(),
       this.state,

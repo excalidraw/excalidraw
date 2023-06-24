@@ -1,39 +1,39 @@
 import React from "react";
+import { Point as RoughPoint } from "roughjs/bin/geometry";
+import { Spreadsheet } from "./charts";
+import { ClipboardData } from "./clipboard";
+import type App from "./components/App";
+import { ContextMenuItems } from "./components/ContextMenu";
+import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
+import type { FileSystemHandle } from "./data/filesystem";
+import Library from "./data/library";
+import { ImportedDataState } from "./data/types";
+import { SuggestedBinding } from "./element/binding";
+import { LinearElementEditor } from "./element/linearElementEditor";
+import { MaybeTransformHandleType } from "./element/transformHandles";
 import {
-  PointerType,
-  ExcalidrawLinearElement,
-  NonDeletedExcalidrawElement,
-  NonDeleted,
-  TextAlign,
-  ExcalidrawElement,
-  GroupId,
-  ExcalidrawBindableElement,
   Arrowhead,
   ChartType,
-  FontFamilyValues,
-  FileId,
-  ExcalidrawImageElement,
-  Theme,
-  StrokeRoundness,
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
   ExcalidrawFrameElement,
+  ExcalidrawImageElement,
+  ExcalidrawLinearElement,
+  FileId,
+  FontFamilyValues,
+  GroupId,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
+  PointerType,
+  StrokeRoundness,
+  TextAlign,
+  Theme,
 } from "./element/types";
-import { SHAPES } from "./shapes";
-import { Point as RoughPoint } from "roughjs/bin/geometry";
-import { LinearElementEditor } from "./element/linearElementEditor";
-import { SuggestedBinding } from "./element/binding";
-import { ImportedDataState } from "./data/types";
-import type App from "./components/App";
-import type { ResolvablePromise, throttleRAF } from "./utils";
-import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
-import { ClipboardData } from "./clipboard";
 import { isOverScrollBars } from "./scene";
-import { MaybeTransformHandleType } from "./element/transformHandles";
-import Library from "./data/library";
-import type { FileSystemHandle } from "./data/filesystem";
-import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
-import { ContextMenuItems } from "./components/ContextMenu";
-import { Merge, ForwardRef, ValueOf } from "./utility-types";
+import { SHAPES } from "./shapes";
+import { ForwardRef, Merge, ValueOf } from "./utility-types";
+import type { ResolvablePromise, throttleRAF } from "./utils";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -259,10 +259,16 @@ export type LibraryItem_v1 = readonly NonDeleted<ExcalidrawElement>[];
 /** @deprecated legacy: do not use outside of migration paths */
 type LibraryItems_v1 = readonly LibraryItem_v1[];
 
+export enum ObjecitveKinds {
+  CAMERA = "obj:camera",
+  CHARACTER = "obj:character",
+}
+
 /** v2 library item */
 export type LibraryItem = {
   id: string;
   status: "published" | "unpublished";
+  kind?: ObjecitveKinds;
   elements: readonly NonDeleted<ExcalidrawElement>[];
   /** timestamp in epoch (ms) */
   created: number;

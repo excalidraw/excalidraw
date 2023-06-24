@@ -146,7 +146,7 @@ export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
 // helpers
 // -----------------------------------------------------------------------------
 
-// !!!MUST BE WITHOUT GRAY, TRANSPARENT AND BLACK!!!
+// MUST BE WITHOUT GRAY, TRANSPARENT AND BLACK
 export const getAllColorsSpecificShade = (index: 0 | 1 | 2 | 3 | 4) =>
   [
     // 2nd row

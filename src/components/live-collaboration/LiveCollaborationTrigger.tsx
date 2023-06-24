@@ -1,11 +1,11 @@
 import { t } from "../../i18n";
-import { usersIcon } from "../icons";
 import { Button } from "../Button";
+import { usersIcon } from "../icons";
 
 import clsx from "clsx";
 
-import "./LiveCollaborationTrigger.scss";
 import { useUIAppState } from "../../context/ui-appState";
+import "./LiveCollaborationTrigger.scss";
 
 const LiveCollaborationTrigger = ({
   isCollaborating,

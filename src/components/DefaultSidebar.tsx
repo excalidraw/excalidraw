@@ -6,10 +6,10 @@ import { t } from "../i18n";
 import { MarkOptional, Merge } from "../utility-types";
 import { composeEventHandlers } from "../utils";
 import { useExcalidrawSetAppState } from "./App";
-import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibraryMenu } from "./LibraryMenu";
-import { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
 import { Sidebar } from "./Sidebar/Sidebar";
+import { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
+import { withInternalFallback } from "./hoc/withInternalFallback";
 
 const DefaultSidebarTrigger = withInternalFallback(
   "DefaultSidebarTrigger",
@@ -97,7 +97,8 @@ export const DefaultSidebar = Object.assign(
                     paddingRight: "1em",
                   }}
                 >
-                  {t("toolBar.library")}
+                  {/* VBRN title library as Objects */}
+                  {t("toolBar.objects", null, "Objects")}
                 </div>
               )}
               <DefaultSidebarTabTriggersTunnel.Out />

@@ -1,28 +1,29 @@
-import { loadLibraryFromBlob } from "./blob";
-import {
-  LibraryItems,
-  LibraryItem,
-  ExcalidrawImperativeAPI,
-  LibraryItemsSource,
-} from "../types";
-import { restoreLibraryItems } from "./restore";
-import type App from "../components/App";
 import { atom } from "jotai";
-import { jotaiStore } from "../jotai";
-import { ExcalidrawElement } from "../element/types";
-import { getCommonBoundingBox } from "../element/bounds";
-import { AbortError } from "../errors";
-import { t } from "../i18n";
 import { useEffect, useRef } from "react";
+import type App from "../components/App";
 import {
+  APP_NAME,
+  DEFAULT_SIDEBAR,
+  EVENT,
+  LIBRARY_SIDEBAR_TAB,
   URL_HASH_KEYS,
   URL_QUERY_KEYS,
-  APP_NAME,
-  EVENT,
-  DEFAULT_SIDEBAR,
-  LIBRARY_SIDEBAR_TAB,
 } from "../constants";
+import { getCommonBoundingBox } from "../element/bounds";
+import { ExcalidrawElement } from "../element/types";
+import { AbortError } from "../errors";
 import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
+import { t } from "../i18n";
+import { jotaiStore } from "../jotai";
+import {
+  ExcalidrawImperativeAPI,
+  LibraryItem,
+  LibraryItems,
+  LibraryItemsSource,
+} from "../types";
+import { LIB_CAMERAS } from "../vbrn/lib/cameras.library";
+import { loadLibraryFromBlob } from "./blob";
+import { restoreLibraryItems } from "./restore";
 
 export const libraryItemsAtom = atom<{
   status: "loading" | "loaded";
