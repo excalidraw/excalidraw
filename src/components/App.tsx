@@ -857,9 +857,7 @@ class App extends React.Component<AppProps, AppState> {
                 <div
                   style={{
                     padding: `${el.strokeWidth}px`,
-                    height: isVisible
-                      ? `${el.height - 2 * el.strokeWidth}px`
-                      : 0,
+                    height: "100%",
                   }}
                 >
                   {this.props.renderCustomIFrame?.(
