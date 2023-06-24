@@ -316,7 +316,7 @@ export const ShapesSwitcher = ({
                   multiElement: null,
                   selectedElementIds: {},
                   activeIFrame: null,
-                });
+                }),
               ); //zsviczian added setTimeout wrapper because tools wouldn't select on first click
             }}
           />
@@ -352,7 +352,7 @@ export const ShapesSwitcher = ({
                   multiElement: null,
                   selectedElementIds: {},
                   activeIFrame: null,
-                });
+                }),
               ); //zsviczian added setTimeout wrapper because tools wouldn't select on first click
             }}
           />
