@@ -29,6 +29,7 @@ import {
   FONT_FAMILY,
   ROUNDNESS,
   DEFAULT_SIDEBAR,
+  DEFAULT_TEXT_COLOR,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -217,6 +218,7 @@ const restoreElement = (
 
         lineHeight,
         baseline,
+        textColor: element.textColor || DEFAULT_TEXT_COLOR,
       });
 
       if (refreshDimensions) {
