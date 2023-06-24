@@ -1,10 +1,11 @@
-import { ExcalidrawElement } from "../../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../../element/types";
 import { atom } from "jotai";
 import {
   ColorPickerColor,
   ColorPaletteCustom,
   MAX_CUSTOM_COLORS_USED_IN_CANVAS,
 } from "../../colors";
+import { hasText } from "../../scene";
 
 export const getColorNameAndShadeFromColor = ({
   palette,
@@ -48,12 +49,13 @@ export const isCustomColor = ({
 
 export const getMostUsedCustomColors = (
   elements: readonly ExcalidrawElement[],
-  type: "elementBackground" | "elementStroke",
+  type: Exclude<ColorPickerType, "canvasBackground">,
   palette: ColorPaletteCustom,
 ) => {
   const elementColorTypeMap = {
     elementBackground: "backgroundColor",
-    elementStroke: "strokeColor",
+    elementStrokeColor: "strokeColor",
+    elementTextColor: "textColor",
   };
 
   const colors = elements.filter((element) => {
@@ -61,16 +63,33 @@ export const getMostUsedCustomColors = (
       return false;
     }
 
-    const color =
-      element[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"];
+    if (type === "elementTextColor" && !hasText(element.type)) {
+      return false;
+    }
+
+    const color = hasText(element.type)
+      ? (element as ExcalidrawTextElement)[
+          elementColorTypeMap[type] as
+            | "backgroundColor"
+            | "strokeColor"
+            | "textColor"
+        ]
+      : element[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"];
 
     return isCustomColor({ color, palette });
   });
 
   const colorCountMap = new Map<string, number>();
   colors.forEach((element) => {
-    const color =
-      element[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"];
+    const color = hasText(element.type)
+      ? (element as ExcalidrawTextElement)[
+          elementColorTypeMap[type] as
+            | "backgroundColor"
+            | "strokeColor"
+            | "textColor"
+        ]
+      : element[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"];
+
     if (colorCountMap.has(color)) {
       colorCountMap.set(color, colorCountMap.get(color)! + 1);
     } else {
@@ -133,4 +152,5 @@ export const getContrastYIQ = (bgHex: string, isCustomColor: boolean) => {
 export type ColorPickerType =
   | "canvasBackground"
   | "elementBackground"
-  | "elementStroke";
+  | "elementStrokeColor"
+  | "elementTextColor";

@@ -35,6 +35,7 @@ import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { Merge, ForwardRef, ValueOf } from "./utility-types";
+import { ColorPickerType } from "./components/ColorPicker/colorPickerUtils";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -166,6 +167,7 @@ export type AppState = {
   exportWithDarkMode: boolean;
   exportScale: number;
   currentItemStrokeColor: string;
+  currentItemTextColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidth: number;
@@ -188,7 +190,7 @@ export type AppState = {
   isRotating: boolean;
   zoom: Zoom;
   openMenu: "canvas" | "shape" | null;
-  openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
+  openPopup: ColorPickerType | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog: "imageExport" | "help" | "jsonExport" | null;
   /**
