@@ -453,8 +453,8 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "匯出為圖片",
+        "button": "匯出為圖片",
         "description": ""
       },
       "saveToDisk": {
