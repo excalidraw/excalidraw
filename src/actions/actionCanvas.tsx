@@ -256,17 +256,12 @@ export const zoomToFit = (
     const commonBoundsWidth = x2 - x1;
     const commonBoundsHeight = y2 - y1;
 
-    newZoomValue =
+    newZoomValue = getNormalizedZoom(
       Math.min(
         appState.width / commonBoundsWidth,
         appState.height / commonBoundsHeight,
-      ) * ZOOM_OFFSET;
-
-    // Apply clamping to newZoomValue to be between 10% and 3000%
-    newZoomValue = Math.min(
-      Math.max(newZoomValue, 0.1),
-      30.0,
-    ) as NormalizedZoomValue;
+      ) * ZOOM_OFFSET,
+    );
 
     scrollX = (appState.width / 2) * (1 / newZoomValue) - centerX;
     scrollY = (appState.height / 2) * (1 / newZoomValue) - centerY;
