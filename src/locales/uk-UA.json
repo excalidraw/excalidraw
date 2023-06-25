@@ -362,7 +362,7 @@
   "imageExportDialog": {
     "header": "Експортувати зображення",
     "label": {
-      "withBackground": "",
+      "withBackground": "Тло",
       "onlySelected": "Тільки вибране",
       "darkMode": "Темний режим",
       "embedScene": "Вбудована сцена",
@@ -453,13 +453,13 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "Експортувати як зображення",
+        "button": "Експортувати як зображення",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "Зберегти на диск",
+        "button": "Зберегти на диск",
         "description": ""
       },
       "excalidrawPlus": {
