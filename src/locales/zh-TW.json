@@ -455,29 +455,29 @@
       "exportToImage": {
         "title": "匯出為圖片",
         "button": "匯出為圖片",
-        "description": ""
+        "description": "將場景匯出為可供匯入的圖片檔案"
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "儲存至硬碟",
+        "button": "儲存至硬碟",
+        "description": "將場景匯出為可供匯入的檔案"
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "匯出至 Excalidraw+",
+        "description": "將此場景儲存至您的 Excalidraw+ 工作區"
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "從檔案載入",
+        "button": "從檔案載入",
+        "description": "從檔案載入將<bold>取代您目前的內容</bold>。<br></br>可先使用下方的選項備份您的繪圖。"
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "從連結載入",
+        "button": "取代我的內容",
+        "description": "載入外部繪圖將<bold>取代您目前的內容</bold>。<br></br>可先使用下方的選項備份您的繪圖。"
       }
     }
   }
