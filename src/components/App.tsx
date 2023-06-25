@@ -819,9 +819,11 @@ class App extends React.Component<AppProps, AppState> {
                 "is-hovered": isHovered,
               })}
               style={{
-                top: isVisible ? `${y - this.state.offsetTop}px` : 0,
-                left: isVisible ? `${x - this.state.offsetLeft}px` : 0,
-                transform: isVisible ? `scale(${scale})` : "none",
+                transform: isVisible
+                  ? `translate(${x - this.state.offsetLeft}px, ${
+                      y - this.state.offsetTop
+                    }px) scale(${scale})`
+                  : "none",
                 display: isVisible ? "block" : "none",
                 opacity: el.opacity / 100,
               }}
@@ -839,7 +841,9 @@ class App extends React.Component<AppProps, AppState> {
                 <div
                   style={{
                     padding: `${el.strokeWidth}px`,
-                    height: "100%",
+                    width: isVisible ? `${el.width}px` : 0,
+                    height: isVisible ? `${el.height}px` : 0,
+                    position: "fixed",
                   }}
                 >
                   {this.props.renderCustomIFrame?.(
