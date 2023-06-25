@@ -446,7 +446,7 @@
   "colorPicker": {
     "mostUsedCustomColors": "Найбільш використовувані користувацькі кольори",
     "colors": "Кольори",
-    "shades": "",
+    "shades": "Тіні",
     "hexCode": "Hex-код",
     "noShades": ""
   },
@@ -470,8 +470,8 @@
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "Завантажити з файлу",
+        "button": "Завантажити з файлу",
         "description": ""
       },
       "shareableLink": {
