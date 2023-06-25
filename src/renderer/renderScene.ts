@@ -509,9 +509,9 @@ export const _renderScene = ({
               editingLinearElement =
                 element as NonDeleted<ExcalidrawLinearElement>;
             }
-            if (!isExporting) {
-              renderLinkIcon(element, context, appState);
-            }
+          }
+          if (!isExporting) {
+            renderLinkIcon(element, context, appState);
           }
         } catch (error: any) {
           console.error(error);
