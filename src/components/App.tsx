@@ -2293,9 +2293,16 @@ class App extends React.Component<AppProps, AppState> {
         toValues: { scrollX, scrollY, zoom: zoom.value },
         onStep: ({ scrollX, scrollY, zoom }) => {
           this.setState({
-            scrollX,
-            scrollY,
-            zoom: { value: zoom },
+            ...getStateForZoom(
+              {
+                viewportX: this.state.width / 2,
+                viewportY: this.state.height / 2,
+                nextZoom: getNormalizedZoom(zoom),
+                nextScrollX: scrollX,
+                nextScrollY: scrollY,
+              },
+              this.state,
+            ),
           });
         },
         onStart: () => {
