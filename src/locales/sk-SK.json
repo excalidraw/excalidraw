@@ -124,8 +124,8 @@
     },
     "statusPublished": "Zverejnené",
     "sidebarLock": "Nechať bočný panel otvorený",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "Vybrať všetky prvky v ráme",
+    "removeAllElementsFromFrame": "Odstrániť všetky prvky z rámu",
     "eyeDropper": "Vybrať farbu z plátna"
   },
   "library": {
@@ -223,9 +223,9 @@
     "penMode": "Režim pera – zabrániť dotyku",
     "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
     "eraser": "Guma",
-    "frame": "",
+    "frame": "Nástroj rám",
     "hand": "Ruka (nástroj pre pohyb plátna)",
-    "extraTools": ""
+    "extraTools": "Ďalšie nástroje"
   },
   "headings": {
     "canvasActions": "Akcie plátna",
@@ -453,7 +453,7 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
+        "title": "Exportovať ako obrázok",
         "button": "",
         "description": ""
       },
