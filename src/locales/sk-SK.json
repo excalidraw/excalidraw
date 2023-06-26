@@ -454,30 +454,30 @@
     "action": {
       "exportToImage": {
         "title": "Exportovať ako obrázok",
-        "button": "",
-        "description": ""
+        "button": "Exportovať ako obrázok",
+        "description": "Exportovať údaje scény ako obrázok, z ktorého môžu byť neskôr importované."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Uložiť na disk",
+        "button": "Uložiť na disk",
+        "description": "Exportovať údaje scény do súboru, z ktorého môžu byť neskôr importované."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Exportovať ako Excalidraw+",
+        "description": "Uložiť scénu do vášho Excalidraw+ pracovného priestoru."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Načítať zo súboru",
+        "button": "Načítať zo súboru",
+        "description": "Načítanie zo súboru <bold>nahradí váš existujúci obsah</bold>.<br></br>Vašu kresbu môžete zálohovať jednou z nižšie uvedených možností."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Načítať z odkazu",
+        "button": "Nahradiť môj obsah",
+        "description": "Načítanie externej kresby <bold>nahradí váš existujúci obsah</bold>.<br></br>Vašu kresbu môžete zálohovať jednou z nižšie uvedených možností."
       }
     }
   }
