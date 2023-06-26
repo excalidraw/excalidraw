@@ -777,6 +777,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  previsloading = true;
   private renderIFrames() {
     const scale = this.state.zoom.value;
     const normalizedWidth = this.state.width;
@@ -829,6 +830,17 @@ class App extends React.Component<AppProps, AppState> {
               }}
             >
               <div
+                ref={(ref) => {
+                  if (!this.excalidrawContainerRef.current) return;
+                  const container = this.excalidrawContainerRef.current;
+                  const sh = container.scrollHeight;
+                  const ch = container.clientHeight;
+                  if (sh !== ch) {
+                    console.log ("scrollHeight", sh, "clientHeight", ch);
+                    container.style.height = `${sh}px`;
+                    setTimeout(() => {container.style.height = `100%`});
+                  }
+                }}
                 className="excalidraw__iframe-container__inner"
                 style={{
                   width: isVisible ? `${el.width}px` : 0,
