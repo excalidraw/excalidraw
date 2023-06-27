@@ -11,7 +11,11 @@ import type {
 } from "../../element/types";
 import {
   getTransformHandles,
-  TransformHandleDirection,
+  getTransformHandlesFromCoords,
+  OMIT_SIDES_FOR_FRAME,
+  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  type TransformHandle,
+  type TransformHandleDirection,
 } from "../../element/transformHandles";
 import { KEYS } from "../../keys";
 import { type ToolName } from "../queries/toolQueries";
@@ -19,11 +23,12 @@ import { fireEvent, GlobalTestState, screen } from "../test-utils";
 import { mutateElement } from "../../element/mutateElement";
 import { API } from "./api";
 import {
+  isFrameElement,
   isLinearElement,
   isFreeDrawElement,
   isTextElement,
 } from "../../element/typeChecks";
-import { getElementPointsCoords } from "../../element/bounds";
+import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
 import { rotatePoint } from "../../math";
 
 const { h } = window;
@@ -445,17 +450,41 @@ export class UI {
   }
 
   static resize(
-    element: ExcalidrawElement,
+    element: ExcalidrawElement | ExcalidrawElement[],
     handleDir: TransformHandleDirection,
     mouseMove: [number, number],
     keyboardModifiers: KeyboardModifiers = {},
   ) {
-    mouse.select(element);
-    const handle = getTransformHandles(element, h.state.zoom, "mouse")[
-      handleDir
-    ]!;
+    const elements = Array.isArray(element) ? element : [element];
+    mouse.select(elements);
+    let handle: TransformHandle | undefined;
+
+    if (elements.length === 1) {
+      handle = getTransformHandles(elements[0], h.state.zoom, "mouse")[
+        handleDir
+      ];
+    } else {
+      const [x1, y1, x2, y2] = getCommonBounds(elements);
+      const isFrameSelected = elements.some(isFrameElement);
+      const transformHandles = getTransformHandlesFromCoords(
+        [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
+        0,
+        h.state.zoom,
+        "mouse",
+        isFrameSelected
+          ? OMIT_SIDES_FOR_FRAME
+          : OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+      );
+      handle = transformHandles[handleDir];
+    }
+
+    if (!handle) {
+      throw new Error(`There is no "${handleDir}" handle for this selection`);
+    }
+
     const clientX = handle[0] + handle[2] / 2;
     const clientY = handle[1] + handle[3] / 2;
+
     Keyboard.withModifierKeys(keyboardModifiers, () => {
       mouse.reset();
       mouse.down(clientX, clientY);
