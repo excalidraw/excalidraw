@@ -453,31 +453,31 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "导出为图片",
+        "button": "导出为图片",
+        "description": "将画布数据导出为图片，以便以后导入。"
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "保存到本地",
+        "button": "保存到本地",
+        "description": "将画布数据导出为文件，以便以后导入。"
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "导出到 Excalidraw+",
+        "description": "将画布保存到您的 Excalidraw+ 工作区。"
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "从文件加载",
+        "button": "从文件加载",
+        "description": "从文件加载将<bold>替换您现有的内容</bold>。<br></br>您可以先使用下列方式备份您的绘图。"
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "从链接加载",
+        "button": "替换我的内容",
+        "description": "加载外部绘图将<bold>替换您现有的内容</bold>。<br></br>您可以先使用下列方式备份您的绘图。"
       }
     }
   }
