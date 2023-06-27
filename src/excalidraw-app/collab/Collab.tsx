@@ -324,10 +324,27 @@ class Collab extends PureComponent<Props, CollabState> {
 
   fallbackResumeTimeout: null | ReturnType<typeof setTimeout> = null;
 
+  /**
+   * Handles the pause and resume states of a collaboration session.
+   * This function gets triggered when a change in the collaboration pause state is detected.
+   * Based on the state, the function carries out the following actions:
+   * 1. `PAUSED`: Saves the current scene to Firebase, disconnects the socket, and updates the scene to view mode.
+   * 2. `RESUMED`: Connects the socket, shows a toast message, sets a fallback to fetch data from Firebase, and resets the pause timeout if any.
+   * 3. `SYNCED`: Clears the fallback timeout if any, updates the collaboration pause state, and updates the scene to editing mode.
+   *
+   * @param state - The new state of the collaboration session. It is one of the values of `PauseCollaborationState` enum, which includes `PAUSED`, `RESUMED`, and `SYNCED`.
+   */
   onPauseCollaborationChange = (state: PauseCollaborationState) => {
     switch (state) {
       case PauseCollaborationState.PAUSED: {
         if (this.portal.socket) {
+          // Save current scene to firebase
+          this.saveCollabRoomToFirebase(
+            getSyncableElements(
+              this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+            ),
+          );
+
           this.portal.socket.disconnect();
           this.portal.socketInitialized = false;
           this.setIsCollaborationPaused(true);
