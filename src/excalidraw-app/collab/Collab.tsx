@@ -385,13 +385,11 @@ class Collab extends PureComponent<Props, CollabState> {
           this.portal.socket.on("first-in-room", () => {
             if (this.portal.socket) {
               this.portal.socket.off("first-in-room");
+              // Recall init event to initialize collab with other users (fixes https://github.com/excalidraw/excalidraw/pull/6638#issuecomment-1600799080)
+              this.portal.socket.emit(WS_SCENE_EVENT_TYPES.INIT);
             }
 
             fallbackResumeHandler();
-
-            if (this.fallbackResumeTimeout) {
-              clearTimeout(this.fallbackResumeTimeout);
-            }
           });
         }
 
@@ -403,6 +401,11 @@ class Collab extends PureComponent<Props, CollabState> {
         break;
       }
       case PauseCollaborationState.SYNCED: {
+        if (this.fallbackResumeTimeout) {
+          clearTimeout(this.fallbackResumeTimeout);
+          this.fallbackResumeTimeout = null;
+        }
+
         if (this.isPaused()) {
           this.setIsCollaborationPaused(false);
 
@@ -410,11 +413,7 @@ class Collab extends PureComponent<Props, CollabState> {
             appState: { viewModeEnabled: false },
           });
           this.excalidrawAPI.setToast(null);
-
-          if (this.fallbackResumeTimeout) {
-            clearTimeout(this.fallbackResumeTimeout);
-            this.fallbackResumeTimeout = null;
-          }
+          this.excalidrawAPI.scrollToContent();
         }
       }
     }
