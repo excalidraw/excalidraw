@@ -133,6 +133,7 @@
     "test:update": "yarn test:app --update --watch=false",
     "test": "yarn test:app",
     "test:coverage": "vitest --coverage --watchAll",
+    "test:ui":"yarn test --ui",
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
     "build:preview": "yarn build && vite preview --port 5000",
