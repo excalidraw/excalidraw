@@ -377,7 +377,7 @@ const LayerUI = ({
           {appState.errorMessage}
         </ErrorDialog>
       )}
-      {eyeDropperState && !device.isMobile && (
+      {eyeDropperState && ( //!device.isMobile && //zsviczian
         <EyeDropper
           swapPreviewOnAlt={eyeDropperState.swapPreviewOnAlt}
           previewType={eyeDropperState.previewType}
@@ -414,8 +414,7 @@ const LayerUI = ({
           }
         />
       )}
-      {((isTrayMode && !device.isMobile) || //zsviczian Added isTrayMode condition
-        (device.isMobile && !eyeDropperState)) && (
+      {isTrayMode || device.isMobile && ( //zsviczian Added isTrayMode condition
         <MobileMenu
           appState={appState}
           elements={elements}
