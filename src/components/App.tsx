@@ -3651,7 +3651,6 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerY,
         this.state.zoom,
         event.pointerType,
-        this.state.snaps,
       );
       if (transformHandleType) {
         setCursor(
@@ -4467,7 +4466,6 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.origin.y,
           this.state.zoom,
           event.pointerType,
-          this.state.snaps,
         );
       }
       if (pointerDownState.resize.handleType) {
@@ -5301,12 +5299,12 @@ class App extends React.Component<AppProps, AppState> {
             y: pointerCoords.y - pointerDownState.origin.y,
           };
 
-          const snaps = getSnaps({
-            elements: [...pointerDownState.originalElements.values()],
-            appState: this.state,
+          const snaps = getSnaps(
+            [...pointerDownState.originalElements.values()],
+            this.state,
             event,
             dragOffset,
-          });
+          );
           this.setState({ snaps });
 
           // We only drag in one direction if shift is pressed

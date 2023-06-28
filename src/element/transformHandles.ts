@@ -10,7 +10,6 @@ import { AppState, Zoom } from "../types";
 import { isTextElement } from ".";
 import { isFrameElement, isLinearElement } from "./typeChecks";
 import { DEFAULT_SPACING } from "../renderer/renderScene";
-import { Snaps } from "../snapping";
 
 export type TransformHandleDirection =
   | "n"
@@ -231,7 +230,6 @@ export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: Zoom,
   pointerType: PointerType = "mouse",
-  snaps: Snaps | null = null,
 ): TransformHandles => {
   // so that when locked element is selected (especially when you toggle lock
   // via keyboard) the locked element is visually distinct, indicating

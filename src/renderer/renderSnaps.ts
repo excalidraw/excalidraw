@@ -1,9 +1,11 @@
-import oc from "open-color";
 import { RenderConfig } from "../scene/types";
-import { Snaps, getSnapLineEndPointsCoords } from "../snapping";
-import { ExcalidrawElement } from "../element/types";
-import { getElementsBoundingBoxHandles } from "../element/bounds";
-import * as GA from "../ga";
+import { Snaps, snapProject } from "../snapping";
+import * as GAPoints from "../gapoints";
+import { Point } from "../types";
+
+const SNAP_COLOR = "red";
+const SNAP_WIDTH = 1;
+const SNAP_CROSS_SIZE = 4.5;
 
 interface RenderSnapOptions {
   renderConfig: RenderConfig;
@@ -13,40 +15,64 @@ interface RenderSnapOptions {
 export const renderSnaps = (
   { renderConfig, context }: RenderSnapOptions,
   snaps: Snaps,
-  selectedElements: ExcalidrawElement[],
 ) => {
   context.save();
 
-  context.lineWidth = 1 / renderConfig.zoom.value;
+  context.lineWidth = SNAP_WIDTH / renderConfig.zoom.value;
 
-  const snapsByIdMap = new Map<string, Snaps>();
-  snaps.forEach((snap) => {
-    snapsByIdMap.set(snap.id, [...(snapsByIdMap.get(snap.id) ?? []), snap]);
-  });
+  for (const { snapLine, point } of snaps) {
+    context.strokeStyle = SNAP_COLOR;
 
-  const handles = getElementsBoundingBoxHandles(selectedElements);
+    const from = GAPoints.toTuple(snapLine.point);
 
-  for (const snapsById of snapsByIdMap.values()) {
-    context.strokeStyle = renderConfig.selectionColor ?? oc.black;
-    const _points = Array.from(
-      new Set(
-        snapsById.flatMap((snap) => [
-          GA.point(...handles[snap.direction]),
-          ...snap.snapLine.points,
-        ]),
-      ),
-    );
-
-    const { from, to } = getSnapLineEndPointsCoords({
-      ...snapsById[0].snapLine,
-      points: _points,
+    const to = snapProject({
+      origin: GAPoints.toObject(point),
+      offset: { x: 0, y: 0 },
+      snaps,
+      zoom: renderConfig.zoom,
     });
 
-    context.beginPath();
-    context.lineTo(from.x, from.y);
-    context.lineTo(to.x, to.y);
-    context.stroke();
+    drawSnap(from, to, renderConfig.zoom, context);
   }
 
+  context.restore();
+};
+
+const drawSnap = (
+  from: Point,
+  to: Point,
+  zoom: RenderConfig["zoom"],
+  context: CanvasRenderingContext2D,
+) => {
+  context.save();
+
+  drawCross(from, zoom, context);
+
+  context.beginPath();
+  context.lineTo(...from);
+  context.lineTo(...to);
+  context.stroke();
+
+  drawCross(to, zoom, context);
+
+  context.restore();
+};
+
+const drawCross = (
+  [x, y]: Point,
+  zoom: RenderConfig["zoom"],
+  context: CanvasRenderingContext2D,
+) => {
+  context.save();
+  const size = SNAP_CROSS_SIZE / zoom.value;
+  context.beginPath();
+
+  context.moveTo(x - size, y - size);
+  context.lineTo(x + size, y + size);
+
+  context.moveTo(x + size, y - size);
+  context.lineTo(x - size, y + size);
+
+  context.stroke();
   context.restore();
 };

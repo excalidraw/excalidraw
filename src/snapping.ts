@@ -1,5 +1,5 @@
-import { getElementsBoundingBoxHandles } from "./element/bounds";
-import { TransformHandleDirection } from "./element/transformHandles";
+import { getCommonBounds, getElementAbsoluteCoords } from "./element/bounds";
+import { isBoundToContainer } from "./element/typeChecks";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -9,197 +9,30 @@ import * as GALines from "./galines";
 import * as GAPoints from "./gapoints";
 import { getMaximumGroups } from "./groups";
 import { KEYS } from "./keys";
+import { rotatePoint } from "./math";
 import { getSelectedElements } from "./scene";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
 import { AppState, Point, Zoom } from "./types";
-import { getIdForElements } from "./utils";
+
+const SNAP_DISTANCE = 10;
+// handle floating point errors
+export const SNAP_PRECISION = 0.001;
+
+export type SnapLine = {
+  line: GA.Line;
+  point: GA.Point;
+};
 
 export type Snap = {
   distance: number;
   point: GA.Point;
-  direction: TransformHandleDirection;
   snapLine: SnapLine;
-  id: string;
 };
 
 export type Snaps = Snap[];
 
-export type SnapLine = {
-  line: GA.Line;
-  points: GA.Point[];
-  id: string;
-};
-
-const SNAP_DISTANCE = 15;
-// handle floating point errors
-export const SNAP_PRECISION = 0.001;
-
-const snapLine = (from: Point, to: Point, id: string): SnapLine | null => {
-  const gaFrom = GAPoints.from(from);
-  const gaTo = GAPoints.from(to);
-
-  if (GA.equal(gaFrom, gaTo, SNAP_PRECISION)) {
-    return null;
-  }
-
-  return {
-    line: GALines.through(gaFrom, gaTo),
-    points: [gaFrom, gaTo],
-    id,
-  };
-};
-
-const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
-  const borderPoints = getElementsBoundingBoxHandles(elements);
-  const id = getIdForElements(elements);
-
-  return [
-    // left
-    snapLine(borderPoints.nw, borderPoints.sw, id),
-    // right
-    snapLine(borderPoints.ne, borderPoints.se, id),
-    // top
-    snapLine(borderPoints.nw, borderPoints.ne, id),
-    // bottom
-    snapLine(borderPoints.sw, borderPoints.se, id),
-    // center vertical
-    snapLine(borderPoints.n, borderPoints.s, id),
-    // center horizontal
-    snapLine(borderPoints.w, borderPoints.e, id),
-  ].filter((snapLine): snapLine is SnapLine => snapLine !== null);
-};
-
-/**
- * Given a list of elements and `appState`, `getSnaps` returns
- * only the nearest horizontal and vertical snaps to the selected elements
- */
-export const getSnaps = ({
-  elements,
-  appState,
-  event,
-  dragOffset,
-}: {
-  elements: readonly NonDeletedExcalidrawElement[];
-  appState: AppState;
-  event: PointerEvent;
-  dragOffset: { x: number; y: number };
-}): Snaps | null => {
-  const selectedElements = getSelectedElements(elements, appState, {
-    includeBoundTextElement: true,
-  });
-
-  if (!isSnappingEnabled({ appState, event, selectedElements })) {
-    return null;
-  }
-
-  if (selectedElements.length === 0) {
-    return null;
-  }
-
-  const selectionCoordinates = getElementsBoundingBoxHandles(selectedElements);
-
-  // get snaps that are within the "shouldSnap" distance
-  const offset = GA.offset(dragOffset.x, dragOffset.y);
-  const snaps = getMaximumGroups(
-    getVisibleAndNonSelectedElements(elements, selectedElements, appState),
-  )
-    .filter(
-      (elementsGroup) => !elementsGroup.every((element) => element.locked),
-    )
-    .flatMap(getElementsSnapLines)
-    .flatMap((snapLine) =>
-      Object.entries(selectionCoordinates)
-        .map(([handle, originPoint]) => {
-          const point = GA.add(GAPoints.from(originPoint), offset);
-          const distance = Math.abs(
-            GAPoints.distanceToLine(point, snapLine.line),
-          );
-
-          if (Number.isNaN(distance)) {
-            return null;
-          }
-
-          return {
-            distance,
-            point,
-            snapLine,
-            direction: handle as TransformHandleDirection,
-            id: snapLine.id,
-          };
-        })
-        .filter(
-          (snap): snap is Snap =>
-            snap !== null && shouldSnap(snap, appState.zoom),
-        ),
-    );
-
-  // IMPORTANT: select and return only the nearest horizontal & vertical snaps
-  if (snaps.length > 0) {
-    // one group stores horizontal snaps, the other keeps vertical snaps
-    const groupA: Snaps = [];
-    const groupB: Snaps = [];
-
-    for (const snap of snaps) {
-      if (GALines.areParallel(snap.snapLine.line, snaps[0].snapLine.line)) {
-        groupA.push({
-          ...snap,
-          id: `${snap.id}_a`,
-        });
-      } else {
-        groupB.push({
-          ...snap,
-          id: `${snap.id}_b`,
-        });
-      }
-    }
-
-    const leastDistanceGroupA = Math.min(
-      ...groupA.map((snap) => snap.distance),
-    );
-    const leastDistanceGroupB = Math.min(
-      ...groupB.map((snap) => snap.distance),
-    );
-
-    return [
-      ...groupA.filter((snap) =>
-        areRoughlyEqual(snap.distance, leastDistanceGroupA),
-      ),
-      ...groupB.filter((snap) =>
-        areRoughlyEqual(snap.distance, leastDistanceGroupB),
-      ),
-    ];
-  }
-
-  return null;
-};
-
 const shouldSnap = (snap: Snap, zoom: Zoom) =>
   snap.distance < SNAP_DISTANCE / zoom.value;
-
-//
-/**
- * return the extremity coordinates for the given snapline
- * which in turn decide how long we should render the snapline
- *
- * optional `expansionFactor` can be supplied so that the snapline
- * is rendered with extra width proportional to its length
- */
-export const getSnapLineEndPointsCoords = (
-  snapLine: SnapLine,
-  expansionFactor = 0,
-) => {
-  const { from, to } = getLineExtremities(
-    snapLine.line,
-    snapLine.points as [GA.Point, GA.Point, ...GA.Point[]],
-  );
-
-  const expansion = GA.mul(GA.sub(to, from), expansionFactor);
-
-  return {
-    from: GAPoints.toObject(GA.sub(from, expansion)),
-    to: GAPoints.toObject(GA.add(to, expansion)),
-  };
-};
 
 const isSnappingEnabled = ({
   event,
@@ -218,35 +51,6 @@ const isSnappingEnabled = ({
     (appState.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
     (!appState.objectsSnapModeEnabled && event[KEYS.CTRL_OR_CMD])
   );
-};
-
-/**
- * given a line and some points (not necessarily on the line)
- * return coordinates of the extremity projection points on the line
- * from the given points
- */
-const getLineExtremities = (
-  line: GA.Line,
-  points: [GA.Point, GA.Point, ...GA.Point[]],
-) => {
-  let [pa, pb, ...rest] = points.map((point) =>
-    GALines.orthogonalProjection(point, line),
-  );
-
-  let d = GAPoints.distance(pa, pb);
-  for (const p of rest) {
-    const da = GAPoints.distance(p, pa);
-    const db = GAPoints.distance(p, pb);
-    if (da > d && da > db) {
-      pb = p;
-      d = da;
-    } else if (db > d && db > da) {
-      pa = p;
-      d = db;
-    }
-  }
-
-  return { from: pa, to: pb };
 };
 
 interface ProjectionOptions {
@@ -294,4 +98,181 @@ export const snapProject = ({
 
 const areRoughlyEqual = (a: number, b: number, precision = SNAP_PRECISION) => {
   return Math.abs(a - b) <= precision;
+};
+
+const getElementsCorners = (elements: ExcalidrawElement[]): Point[] => {
+  if (elements.length === 1) {
+    const element = elements[0];
+
+    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
+
+    const halfWidth = (x2 - x1) / 2;
+    const halfHeight = (y2 - y1) / 2;
+
+    switch (element.type) {
+      case "diamond":
+      case "ellipse": {
+        return [
+          // left-mid
+          rotatePoint([x1, y1 + halfHeight], [cx, cy], element.angle),
+          // top-mid
+          rotatePoint([x1 + halfWidth, y1], [cx, cy], element.angle),
+          // right-mid
+          rotatePoint([x2, y1 + halfHeight], [cx, cy], element.angle),
+          // bottom-mid
+          rotatePoint([x1 + halfWidth, y2], [cx, cy], element.angle),
+          // center
+          [cx, cy],
+        ];
+      }
+      case "arrow":
+      case "line":
+        return element.points.map(([x, y]) => [
+          x + element.x,
+          y + element.y,
+        ]) as Point[];
+      default:
+        return [
+          // top left
+          rotatePoint([x1, y1], [cx, cy], element.angle),
+          // top right
+          rotatePoint([x2, y1], [cx, cy], element.angle),
+          // bottom left
+          rotatePoint([x1, y2], [cx, cy], element.angle),
+          // bottom right
+          rotatePoint([x2, y2], [cx, cy], element.angle),
+          // center
+          [cx, cy],
+        ];
+    }
+  }
+
+  if (elements.length > 1) {
+    const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+    const width = maxX - minX;
+    const height = maxY - minY;
+
+    return [
+      [minX, minY],
+      [maxX, minY],
+      [minX, maxY],
+      [maxX, maxY],
+      [minX + width / 2, minY + height / 2],
+    ];
+  }
+
+  return [];
+};
+
+const createSnapLine = (
+  [x, y]: Point,
+  direction: "vertical" | "horizontal",
+): SnapLine => {
+  const gaFrom = GAPoints.from([x, y]);
+  const gaTo = GAPoints.from(
+    direction === "vertical" ? [x, y + SNAP_DISTANCE] : [x + SNAP_DISTANCE, y],
+  );
+
+  return {
+    line: GALines.through(gaFrom, gaTo),
+    point: gaFrom,
+  };
+};
+
+const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
+  const corners = getElementsCorners(elements);
+
+  return Object.values(corners)
+    .map((point) => [
+      createSnapLine(point, "horizontal"),
+      createSnapLine(point, "vertical"),
+    ])
+    .flat();
+};
+
+export const getSnaps = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+  event: PointerEvent,
+  dragOffset: { x: number; y: number },
+) => {
+  const selectedElements = getSelectedElements(elements, appState);
+
+  if (!isSnappingEnabled({ appState, event, selectedElements })) {
+    return null;
+  }
+
+  if (selectedElements.length === 0) {
+    return null;
+  }
+
+  const corners = getElementsCorners(selectedElements);
+
+  const offset = GA.offset(dragOffset.x, dragOffset.y);
+  const snaps = getMaximumGroups(
+    getVisibleAndNonSelectedElements(elements, selectedElements, appState),
+  )
+    .filter(
+      (elementsGroup) => !elementsGroup.every((element) => element.locked),
+    )
+    .filter(
+      (elementsGroup) =>
+        !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
+    )
+    .flatMap(getElementsSnapLines)
+    .flatMap((snapLine) =>
+      corners
+        .map((originPoint) => {
+          const point = GA.add(GAPoints.from(originPoint), offset);
+          const distance = Math.abs(
+            GAPoints.distanceToLine(point, snapLine.line),
+          );
+
+          if (Number.isNaN(distance)) {
+            return null;
+          }
+
+          return {
+            distance,
+            point,
+            snapLine,
+          };
+        })
+        .filter(
+          (snap): snap is Snap =>
+            snap !== null && shouldSnap(snap, appState.zoom),
+        ),
+    );
+
+  if (snaps.length > 0) {
+    // one group stores horizontal snaps, the other keeps vertical snaps
+    const groupA: Snaps = [];
+    const groupB: Snaps = [];
+
+    for (const snap of snaps) {
+      if (GALines.areParallel(snap.snapLine.line, snaps[0].snapLine.line)) {
+        groupA.push(snap);
+      } else {
+        groupB.push(snap);
+      }
+    }
+
+    const leastDistanceGroupA = Math.min(
+      ...groupA.map((snap) => snap.distance),
+    );
+    const leastDistanceGroupB = Math.min(
+      ...groupB.map((snap) => snap.distance),
+    );
+
+    return [
+      ...groupA.filter((snap) =>
+        areRoughlyEqual(snap.distance, leastDistanceGroupA),
+      ),
+      ...groupB.filter((snap) =>
+        areRoughlyEqual(snap.distance, leastDistanceGroupB),
+      ),
+    ];
+  }
+
+  return null;
 };

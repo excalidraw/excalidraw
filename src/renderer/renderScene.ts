@@ -684,7 +684,6 @@ export const _renderScene = ({
           locallySelectedElements[0],
           renderConfig.zoom,
           "mouse", // when we render we don't know which pointer type so use mouse
-          appState.snaps,
         );
         if (!appState.viewModeEnabled && showBoundingBox) {
           renderTransformHandles(
@@ -742,7 +741,6 @@ export const _renderScene = ({
           context,
         },
         appState.snaps ?? [],
-        locallySelectedElements,
       );
       context.restore();
     }
