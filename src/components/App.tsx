@@ -245,6 +245,7 @@ import {
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
+  easeOut,
 } from "../utils";
 import {
   ContextMenu,
@@ -2291,6 +2292,14 @@ class App extends React.Component<AppProps, AppState> {
           zoom: origZoom,
         },
         toValues: { scrollX, scrollY, zoom: zoom.value },
+        interpolateValue: (from, to, progress, key) => {
+          // for zoom, use different easing
+          if (key === "zoom") {
+            return from * Math.pow(to / from, easeOut(progress));
+          }
+          // handle using default
+          return undefined;
+        },
         onStep: ({ scrollX, scrollY, zoom }) => {
           this.setState({
             scrollX,

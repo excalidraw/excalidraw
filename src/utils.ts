@@ -197,9 +197,13 @@ export const throttleRAF = <T extends any[]>(
  * @param {number} k - The value to be tweened.
  * @returns {number} The tweened value.
  */
-function easeOut(k: number): number {
+export const easeOut = (k: number) => {
   return 1 - Math.pow(1 - k, 4);
-}
+};
+
+const easeOutInterpolate = (from: number, to: number, progress: number) => {
+  return (to - from) * easeOut(progress) + from;
+};
 
 /**
  * Animates values from `fromValues` to `toValues` using the requestAnimationFrame API.
@@ -227,21 +231,34 @@ function easeOut(k: number): number {
  * // To cancel the animation:
  * cancelAnimation();
  */
-export const easeToValuesRAF = <T extends Record<keyof T, number>>({
+export const easeToValuesRAF = <
+  T extends Record<keyof T, number>,
+  K extends keyof T,
+>({
   fromValues,
   toValues,
   onStep,
   duration = 250,
-  easeFn = easeOut,
+  interpolateValue,
   onStart,
   onEnd,
   onCancel,
 }: {
   fromValues: T;
   toValues: T;
+  /**
+   * Interpolate a single value.
+   * Return undefined to be handled by the default interpolator.
+   */
+  interpolateValue?: (
+    fromValue: number,
+    toValue: number,
+    /** no easing applied  */
+    progress: number,
+    key: K,
+  ) => number | undefined;
   onStep: (values: T) => void;
   duration?: number;
-  easeFn?: (value: number) => number;
   onStart?: () => void;
   onEnd?: () => void;
   onCancel?: () => void;
@@ -260,7 +277,7 @@ export const easeToValuesRAF = <T extends Record<keyof T, number>>({
     }
 
     const elapsed = Math.min(timestamp - startTime, duration);
-    const factor = easeFn(elapsed / duration);
+    const factor = easeOut(elapsed / duration);
 
     const newValues = {} as T;
 
@@ -274,6 +291,29 @@ export const easeToValuesRAF = <T extends Record<keyof T, number>>({
     onStep(newValues);
 
     if (elapsed < duration) {
+      const progress = elapsed / duration;
+
+      const newValues = {} as T;
+
+      Object.keys(fromValues).forEach((key) => {
+        const _key = key as K;
+        const startValue = fromValues[_key];
+        const endValue = toValues[_key];
+
+        let result;
+
+        result = interpolateValue
+          ? interpolateValue(startValue, endValue, progress, _key)
+          : easeOutInterpolate(startValue, endValue, progress);
+
+        if (result == null) {
+          result = easeOutInterpolate(startValue, endValue, progress);
+        }
+
+        newValues[_key] = result as T[K];
+      });
+      onStep(newValues);
+
       frameId = window.requestAnimationFrame(step);
     } else {
       onStep(toValues);
