@@ -24,9 +24,7 @@ const VIMEO_REG =
 const FIGMA_REG = /^https:\/\/www\.figma\.com/;
 //const EXCALIDRAW_REG = /^https:\/\/excalidraw.com/;
 
-export const getEmbedLink = (
-  link?: string | null,
-): EmbeddedLink => {
+export const getEmbedLink = (link?: string | null): EmbeddedLink => {
   if (!link) {
     return null;
   }
@@ -193,7 +191,7 @@ export class IFrameURLValidator {
         url.match(VIMEO_REG) ||
         //url.match(TWITTER_REG) ||
         url.match(FIGMA_REG),
-        //|| url.match(EXCALIDRAW_REG),
+      //|| url.match(EXCALIDRAW_REG),
     );
   }
 }
