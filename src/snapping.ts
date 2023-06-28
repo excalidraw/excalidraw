@@ -14,7 +14,7 @@ import { getSelectedElements } from "./scene";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
 import { AppState, Point, Zoom } from "./types";
 
-const SNAP_DISTANCE = 10;
+const SNAP_DISTANCE = 8;
 // handle floating point errors
 export const SNAP_PRECISION = 0.001;
 
