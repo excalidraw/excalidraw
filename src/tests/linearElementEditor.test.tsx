@@ -315,12 +315,12 @@ describe("Test Linear Elements", () => {
       expect(midPointsWithRoundEdge[1]).not.toEqual(midPointsWithSharpEdge[1]);
 
       expect(midPointsWithRoundEdge).toMatchInlineSnapshot(`
-        Array [
-          Array [
+        [
+          [
             55.9697848965255,
             47.442326230998205,
           ],
-          Array [
+          [
             76.08587175006699,
             43.294165939653226,
           ],
