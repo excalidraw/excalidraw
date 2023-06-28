@@ -11,7 +11,21 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## 0.15.2-alkemio-1
+
+- First version of Alkemio forked Excalidraw
+- ZoomToFit feature exposed through the external API
+- Added ZoomToFit button to the zoom toolbar
+- Added ZoomToFit flag to initialData to fit items on load
+- [Alkemio Fork of Excalidraw: Expose Zoom to fit feature #1](todo)
+
+
+## 0.15.2-alkemio-1 (2023-06-28)
 
 ### Features
 

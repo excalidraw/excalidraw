@@ -96,7 +96,7 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "homepage": ".",
+  "homepage": "https://github.com/alkem-io/excalidraw",
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}"
@@ -114,7 +114,7 @@
   },
   "name": "excalidraw",
   "prettier": "@excalidraw/prettier-config",
-  "private": true,
+  "private": false,
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "cross-env REACT_APP_DISABLE_SENTRY=true REACT_APP_DISABLE_TRACKING=true react-scripts build",

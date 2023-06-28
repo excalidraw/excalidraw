@@ -1,5 +1,5 @@
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
-import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
+import { ZoomInIcon, ZoomOutIcon, zoomToFit } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
@@ -22,6 +22,7 @@ import {
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { Bounds } from "../element/bounds";
+import clsx from "clsx";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -289,6 +290,19 @@ export const actionZoomToFit = register({
     event.shiftKey &&
     !event.altKey &&
     !event[KEYS.CTRL_OR_CMD],
+    PanelComponent: ({ updateData, data }) => (
+      <ToolButton
+        type="button"
+        icon={zoomToFit}
+        className={clsx("zoomToFit")}
+        title={`${t("toolBar.zoomToFit")} — ${getShortcutKey("Shift+1")}`}
+        aria-label={t("toolBar.zoomToFit")}
+        onClick={() => {
+          updateData(null);
+        }}
+        size={data?.size || "small"}
+      />
+    ),
 });
 
 export const actionToggleTheme = register({
