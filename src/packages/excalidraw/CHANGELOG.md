@@ -15,7 +15,7 @@ Please add the latest change on the top under the correct section.
 
 ### iFrame Site Whitelist
 
-- Set `props.iframeURLWhitelist` to allow additional sites to be added as iFrames. The default list includes: YouTube, Vimeo, Figma, Excalidraw, Twitter. The prop takes a `RegExp[]` array. Set the prop to `[/.*/]` if you want to allow all sites.
+- Set `props.iframeURLWhitelist` to allow additional sites to be added as iFrames. The default list includes: YouTube, Vimeo, Figma, Twitter. The prop takes a `RegExp[]` array. Set the prop to `[/.*/]` if you want to allow all sites.
 
 ### renderCustomIFrame
 

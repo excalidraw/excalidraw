@@ -830,7 +830,9 @@ class App extends React.Component<AppProps, AppState> {
               }}
             >
               <div
-                ref={(ref) => {
+                //this is a hack that addresses isse with embedded excalidraw.com iframe
+                //https://github.com/excalidraw/excalidraw/pull/6691#issuecomment-1607383938
+                /*ref={(ref) => {
                   if (!this.excalidrawContainerRef.current) {
                     return;
                   }
@@ -843,7 +845,7 @@ class App extends React.Component<AppProps, AppState> {
                       container.style.height = `100%`;
                     });
                   }
-                }}
+                }}*/
                 className="excalidraw__iframe-container__inner"
                 style={{
                   width: isVisible ? `${el.width}px` : 0,
