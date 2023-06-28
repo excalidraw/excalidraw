@@ -119,6 +119,7 @@ const LayerUI = ({
   children,
 }: LayerUIProps) => {
   const device = useDevice();
+
   const tunnels = useInitializeTunnels();
 
   const [eyeDropperState, setEyeDropperState] = useAtom(
@@ -200,7 +201,6 @@ const LayerUI = ({
       appState,
       elements,
     );
-
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
@@ -315,7 +315,6 @@ const LayerUI = ({
   };
 
   const isSidebarDocked = useAtomValue(isSidebarDockedAtom, jotaiScope);
-
   const layerUIJSX = (
     <>
       {/* ------------------------- tunneled UI ---------------------------- */}

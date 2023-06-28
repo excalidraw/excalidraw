@@ -156,6 +156,7 @@ describe("regression tests", () => {
   }
   it("change the properties of a shape", () => {
     UI.clickTool("rectangle");
+
     mouse.down(10, 10);
     mouse.up(10, 10);
     togglePopover("Background");
@@ -165,6 +166,10 @@ describe("regression tests", () => {
     togglePopover("Stroke");
     UI.clickOnTestId("color-blue");
     expect(API.getSelectedElement().backgroundColor).toBe("#ffc9c9");
+    console.log(
+      "API.getSelectedElement",
+      API.getSelectedElement().backgroundColor,
+    );
     expect(API.getSelectedElement().strokeColor).toBe("#1971c2");
   });
 
@@ -1090,6 +1095,7 @@ describe("regression tests", () => {
 
   it("should show fill icons when element has non transparent background", async () => {
     UI.clickTool("rectangle");
+    console.log(document.querySelector(".App-menu__left")?.outerHTML, "HELLo");
     expect(screen.queryByText(/fill/i)).not.toBeNull();
     mouse.down();
     mouse.up(10, 10);

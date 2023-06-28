@@ -1283,7 +1283,7 @@ class App extends React.Component<AppProps, AppState> {
       // bounding rects don't work in tests so updating
       // the state on init would result in making the test enviro run
       // in mobile breakpoint (0 width/height), making everything fail
-      isTestEnv()
+      !isTestEnv()
     ) {
       this.refreshDeviceState(this.excalidrawContainerRef.current);
     }
@@ -7395,7 +7395,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   }, 300);
 
-  private updateDOMRect = (cb?: () => void) => {
+  public updateDOMRect = (cb?: () => void) => {
     if (this.excalidrawContainerRef?.current) {
       const excalidrawContainer = this.excalidrawContainerRef.current;
       const {

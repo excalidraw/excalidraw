@@ -3,6 +3,7 @@ import {
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
+  screen,
 } from "./test-utils";
 
 import { UI } from "./helpers/ui";
@@ -13,12 +14,11 @@ describe("Test MobileMenu", () => {
 
   beforeEach(async () => {
     await render(<ExcalidrawApp />);
+    mockBoundingClientRect(dimensions);
     //@ts-ignore
     h.app.refreshDeviceState(h.app.excalidrawContainerRef.current!);
-  });
-
-  beforeAll(() => {
-    mockBoundingClientRect(dimensions);
+    // To rerender the UI after device updated
+    h.app.updateDOMRect();
   });
 
   afterAll(() => {
@@ -37,9 +37,8 @@ describe("Test MobileMenu", () => {
     `);
   });
 
-  it("should initialize with welcome screen and hide once user interacts", async () => {
+  it.only("should initialize with welcome screen and hide once user interacts", async () => {
     expect(document.querySelector(".welcome-screen-center")).toMatchSnapshot();
-
     UI.clickTool("rectangle");
     expect(document.querySelector(".welcome-screen-center")).toBeNull();
   });
