@@ -2242,12 +2242,17 @@ class App extends React.Component<AppProps, AppState> {
       | {
           fitToContent?: boolean;
           fitToViewport?: never;
+          viewportZoomFactor?: never;
           animate?: boolean;
           duration?: number;
         }
       | {
           fitToContent?: never;
           fitToViewport?: boolean;
+          /** when fitToViewport=true, how much screen should the content cover,
+           * between 0.1 (10%) and 1 (100%)
+           */
+          viewportZoomFactor?: number;
           animate?: boolean;
           duration?: number;
         },
@@ -2255,25 +2260,29 @@ class App extends React.Component<AppProps, AppState> {
     this.cancelInProgresAnimation?.();
 
     // convert provided target into ExcalidrawElement[] if necessary
-    const targets = Array.isArray(target) ? target : [target];
+    const targetElements = Array.isArray(target) ? target : [target];
 
     let zoom = this.state.zoom;
     let scrollX = this.state.scrollX;
     let scrollY = this.state.scrollY;
 
     if (opts?.fitToContent || opts?.fitToViewport) {
-      const { appState } = zoomToFit(
-        targets,
-        this.state,
-        false,
-        opts?.fitToViewport,
-      );
+      const { appState } = zoomToFit({
+        targetElements,
+        appState: this.state,
+        fitToViewport: !!opts?.fitToViewport,
+        viewportZoomFactor: opts?.viewportZoomFactor,
+      });
       zoom = appState.zoom;
       scrollX = appState.scrollX;
       scrollY = appState.scrollY;
     } else {
       // compute only the viewport location, without any zoom adjustment
-      const scroll = calculateScrollCenter(targets, this.state, this.canvas);
+      const scroll = calculateScrollCenter(
+        targetElements,
+        this.state,
+        this.canvas,
+      );
       scrollX = scroll.scrollX;
       scrollY = scroll.scrollY;
     }

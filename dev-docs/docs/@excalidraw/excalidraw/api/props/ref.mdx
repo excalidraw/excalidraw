@@ -332,6 +332,7 @@ Scroll the nearest element out of the elements supplied to the center of the vie
 | target | [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115) | All scene elements | The element(s) to scroll to. |
 | opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. Note that the zoom range is between 10%-100%. |
 | opts.fitToViewport | boolean | false | Similar to fitToContent but the zoom range is not limited. If elements are smaller than the viewport, zoom will go above 100%. |
+| opts.viewportZoomFactor | number | 0.7 | when fitToViewport=true, how much screen should the content cover, between 0.1 (10%) and 1 (100%) |
 | opts.animate | boolean | false | Whether to animate between starting and ending position. Note that for larger scenes the animation may not be smooth due to performance issues. |
 | opts.duration | number | 500 | Duration of the animation if `opts.animate` is `true`. |
 
