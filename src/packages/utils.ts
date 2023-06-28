@@ -226,6 +226,11 @@ export const exportToClipboard = async (
   }
 };
 
+export * from "./bbox";
+export {
+  elementsOverlappingBBox,
+  isElementOverlappingBBox,
+} from "./withinBounds";
 export { serializeAsJSON, serializeLibraryAsJSON } from "../data/json";
 export {
   loadFromBlob,

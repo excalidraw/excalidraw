@@ -437,7 +437,7 @@ export const getMinMaxXYFromCurvePathOps = (
   return [minX, minY, maxX, maxY];
 };
 
-const getBoundsFromPoints = (
+export const getBoundsFromPoints = (
   points: ExcalidrawFreeDrawElement["points"],
 ): [number, number, number, number] => {
   let minX = Infinity;
