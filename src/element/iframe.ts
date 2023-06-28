@@ -20,7 +20,7 @@ const YOUTUBE_REG =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
 const VIMEO_REG =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
-const TWITTER_REG = /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
+//const TWITTER_REG = /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
 const FIGMA_REG = /^https:\/\/www\.figma\.com/;
 //const EXCALIDRAW_REG = /^https:\/\/excalidraw.com/;
 
@@ -68,14 +68,14 @@ export const getEmbedLink = (
     return { link, aspectRatio, type };
   }
 
-  const twitterLink = link.match(TWITTER_REG);
+  /*const twitterLink = link.match(TWITTER_REG);
   if (twitterLink) {
     type = "generic";
     link = `https://twitframe.com/show?url=${encodeURIComponent(link)}`;
     aspectRatio = { w: 550, h: 550 };
     embeddedLinkCache.set(link, { link, aspectRatio, type });
     return { link, aspectRatio, type };
-  }
+  }*/
 
   const figmaLink = link.match(FIGMA_REG);
   if (figmaLink) {
@@ -191,7 +191,7 @@ export class IFrameURLValidator {
     return Boolean(
       url.match(YOUTUBE_REG) ||
         url.match(VIMEO_REG) ||
-        url.match(TWITTER_REG) ||
+        //url.match(TWITTER_REG) ||
         url.match(FIGMA_REG),
         //|| url.match(EXCALIDRAW_REG),
     );
