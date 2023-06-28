@@ -6,6 +6,7 @@ import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 export const AppWelcomeScreen: React.FC<{
   setCollabDialogShown: (toggle: boolean) => any;
+  isCollabEnabled: boolean;
 }> = React.memo((props) => {
   const { t } = useI18n();
   let headingContent;
@@ -46,9 +47,11 @@ export const AppWelcomeScreen: React.FC<{
         <WelcomeScreen.Center.Menu>
           <WelcomeScreen.Center.MenuItemLoadScene />
           <WelcomeScreen.Center.MenuItemHelp />
-          <WelcomeScreen.Center.MenuItemLiveCollaborationTrigger
-            onSelect={() => props.setCollabDialogShown(true)}
-          />
+          {props.isCollabEnabled && (
+            <WelcomeScreen.Center.MenuItemLiveCollaborationTrigger
+              onSelect={() => props.setCollabDialogShown(true)}
+            />
+          )}
           {!isExcalidrawPlusSignedUser && (
             <WelcomeScreen.Center.MenuItemLink
               href="https://plus.excalidraw.com/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"

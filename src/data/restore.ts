@@ -62,6 +62,7 @@ export const AllowedExcalidrawActiveTools: Record<
   freedraw: true,
   eraser: false,
   custom: true,
+  frame: true,
   hand: true,
 };
 
@@ -125,6 +126,7 @@ const restoreElementWithProperties = <
     height: element.height || 0,
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
+    frameId: element.frameId ?? null,
     roundness: element.roundness
       ? element.roundness
       : element.strokeSharpness === "round"
@@ -272,6 +274,10 @@ const restoreElement = (
       return restoreElementWithProperties(element, {});
     case "diamond":
       return restoreElementWithProperties(element, {});
+    case "frame":
+      return restoreElementWithProperties(element, {
+        name: element.name ?? null,
+      });
 
     // Don't use default case so as to catch a missing an element type case.
     // We also don't want to throw, but instead return void so we filter
@@ -364,6 +370,24 @@ const repairBoundElement = (
   }
 };
 
+/**
+ * Remove an element's frameId if its containing frame is non-existent
+ *
+ * NOTE mutates elements.
+ */
+const repairFrameMembership = (
+  element: Mutable<ExcalidrawElement>,
+  elementsMap: Map<string, Mutable<ExcalidrawElement>>,
+) => {
+  if (element.frameId) {
+    const containingFrame = elementsMap.get(element.frameId);
+
+    if (!containingFrame) {
+      element.frameId = null;
+    }
+  }
+};
+
 export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
@@ -404,6 +428,10 @@ export const restoreElements = (
   // repair binding. Mutates elements.
   const restoredElementsMap = arrayToMap(restoredElements);
   for (const element of restoredElements) {
+    if (element.frameId) {
+      repairFrameMembership(element, restoredElementsMap);
+    }
+
     if (isTextElement(element) && element.containerId) {
       repairBoundElement(element, restoredElementsMap);
     } else if (element.boundElements) {

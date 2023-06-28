@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Hirukia",
     "fontSize": "Letra-tamaina",
     "fontFamily": "Letra-tipoa",
-    "onlySelected": "Hautapena soilik",
-    "withBackground": "Atzeko planoa",
-    "exportEmbedScene": "Txertatu eszena",
-    "exportEmbedScene_details": "Eszenaren datuak esportatutako PNG/SVG fitxategian gordeko dira, eszena bertatik berrezartzeko.\nEsportatutako fitxategien tamaina handituko da.",
     "addWatermark": "Gehitu \"Excalidraw bidez egina\"",
     "handDrawn": "Eskuz marraztua",
     "normal": "Normala",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Irauli horizontalki",
     "flipVertical": "Irauli bertikalki",
     "viewMode": "Ikuspegia",
-    "toggleExportColorScheme": "Aldatu esportatzeko kolorearen eszena",
     "share": "Partekatu",
     "showStroke": "Erakutsi marraren kolore-hautatzailea",
     "showBackground": "Erakutsi atzeko planoaren kolore-hautatzailea",
@@ -128,7 +123,10 @@
       "unlockAll": "Desblokeatu guztiak"
     },
     "statusPublished": "Argitaratua",
-    "sidebarLock": "Mantendu alboko barra irekita"
+    "sidebarLock": "Mantendu alboko barra irekita",
+    "selectAllElementsInFrame": "Hautatu markoko elementu guztiak",
+    "removeAllElementsFromFrame": "Kendu markoko elementu guztiak",
+    "eyeDropper": "Aukeratu kolorea oihaletik"
   },
   "library": {
     "noItems": "Oraindik ez da elementurik gehitu...",
@@ -140,11 +138,7 @@
     "exportJSON": "Esportatu fitxategira",
     "exportImage": "Esportatu irudia...",
     "export": "Gorde hemen...",
-    "exportToPng": "Esportatu PNG gisa",
-    "exportToSvg": "Esportatu SVG gisa",
     "copyToClipboard": "Kopiatu arbelera",
-    "copyPngToClipboard": "Kopiatu PNG arbelera",
-    "scale": "Eskala",
     "save": "Gorde uneko fitxategian",
     "saveAs": "Gorde honela",
     "load": "Ireki",
@@ -229,7 +223,9 @@
     "penMode": "Luma modua - ukipena saihestu",
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma",
-    "hand": "Eskua (panoratze tresna)"
+    "frame": "Marko tresna",
+    "hand": "Eskua (panoratze tresna)",
+    "extraTools": "Tresna gehiago"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -363,6 +359,30 @@
     "resetLibrary": "Leheneratu liburutegia",
     "removeItemsFromLib": "Kendu hautatutako elementuak liburutegitik"
   },
+  "imageExportDialog": {
+    "header": "Esportatu irudia",
+    "label": {
+      "withBackground": "Atzeko planoa",
+      "onlySelected": "Hautapena soilik",
+      "darkMode": "Modu iluna",
+      "embedScene": "Txertatu eszena",
+      "scale": "Eskala",
+      "padding": "Betegarria"
+    },
+    "tooltip": {
+      "embedScene": "Eszenaren datuak esportatutako PNG/SVG fitxategian gordeko dira, eszena bertatik berrezartzeko.\nEsportatutako fitxategien tamaina handituko da."
+    },
+    "title": {
+      "exportToPng": "Esportatu PNG gisa",
+      "exportToSvg": "Esportatu SVG gisa",
+      "copyPngToClipboard": "Kopiatu PNG arbelera"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopiatu arbelean"
+    }
+  },
   "encrypted": {
     "tooltip": "Zure marrazkiak muturretik muturrera enkriptatu dira, beraz Excalidraw-ren zerbitzariek ezingo dituzte ikusi.",
     "link": "Excalidraw-ren muturretik muturrerako enkriptatzearen gaineko mezua blogean"
@@ -395,20 +415,20 @@
   },
   "colors": {
     "transparent": "Gardena",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Beltza",
+    "white": "Zuria",
+    "red": "Gorria",
+    "pink": "Arrosa",
+    "grape": "Mahats kolorea",
+    "violet": "Bioleta",
+    "gray": "Grisa",
+    "blue": "Urdina",
+    "cyan": "Ziana",
+    "teal": "Berde urdinxka",
+    "green": "Berdea",
+    "yellow": "Horia",
+    "orange": "Laranja",
+    "bronze": "Brontzea"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +444,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Gehien erabilitako kolore pertsonalizatuak",
+    "colors": "Koloreak",
+    "shades": "Ñabardurak",
+    "hexCode": "Hez kodea",
+    "noShades": "Kolore honetarako ez dago ñabardurarik eskuragarri"
   }
 }

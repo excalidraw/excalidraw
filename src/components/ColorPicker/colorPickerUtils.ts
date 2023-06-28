@@ -6,23 +6,23 @@ import {
   MAX_CUSTOM_COLORS_USED_IN_CANVAS,
 } from "../../colors";
 
-export const getColorNameAndShadeFromHex = ({
+export const getColorNameAndShadeFromColor = ({
   palette,
-  hex,
+  color,
 }: {
   palette: ColorPaletteCustom;
-  hex: string;
+  color: string;
 }): {
   colorName: ColorPickerColor;
   shade: number | null;
 } | null => {
   for (const [colorName, colorVal] of Object.entries(palette)) {
     if (Array.isArray(colorVal)) {
-      const shade = colorVal.indexOf(hex);
+      const shade = colorVal.indexOf(color);
       if (shade > -1) {
         return { colorName: colorName as ColorPickerColor, shade };
       }
-    } else if (colorVal === hex) {
+    } else if (colorVal === color) {
       return { colorName: colorName as ColorPickerColor, shade: null };
     }
   }
@@ -39,12 +39,9 @@ export const isCustomColor = ({
   color,
   palette,
 }: {
-  color: string | null;
+  color: string;
   palette: ColorPaletteCustom;
 }) => {
-  if (!color) {
-    return false;
-  }
   const paletteValues = Object.values(palette).flat();
   return !paletteValues.includes(color);
 };

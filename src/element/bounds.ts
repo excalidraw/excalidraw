@@ -6,7 +6,7 @@ import {
   NonDeleted,
   ExcalidrawTextElementWithContainer,
 } from "./types";
-import { distance2d, rotate } from "../math";
+import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
@@ -25,10 +25,101 @@ import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { Mutable } from "../utility-types";
 
-// x and y position of top left corner, x and y position of bottom right corner
-export type Bounds = readonly [number, number, number, number];
+export type RectangleBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  angle: number;
+};
+
 type MaybeQuadraticSolution = [number | null, number | null] | false;
 
+// x and y position of top left corner, x and y position of bottom right corner
+export type Bounds = readonly [x1: number, y1: number, x2: number, y2: number];
+
+export class ElementBounds {
+  private static boundsCache = new WeakMap<
+    ExcalidrawElement,
+    {
+      bounds: Bounds;
+      version: ExcalidrawElement["version"];
+    }
+  >();
+
+  static getBounds(element: ExcalidrawElement) {
+    const cachedBounds = ElementBounds.boundsCache.get(element);
+
+    if (cachedBounds?.version && cachedBounds.version === element.version) {
+      return cachedBounds.bounds;
+    }
+
+    const bounds = ElementBounds.calculateBounds(element);
+
+    ElementBounds.boundsCache.set(element, {
+      version: element.version,
+      bounds,
+    });
+
+    return bounds;
+  }
+
+  private static calculateBounds(element: ExcalidrawElement): Bounds {
+    let bounds: [number, number, number, number];
+
+    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
+
+    if (isFreeDrawElement(element)) {
+      const [minX, minY, maxX, maxY] = getBoundsFromPoints(
+        element.points.map(([x, y]) =>
+          rotate(x, y, cx - element.x, cy - element.y, element.angle),
+        ),
+      );
+
+      return [
+        minX + element.x,
+        minY + element.y,
+        maxX + element.x,
+        maxY + element.y,
+      ];
+    } else if (isLinearElement(element)) {
+      bounds = getLinearElementRotatedBounds(element, cx, cy);
+    } else if (element.type === "diamond") {
+      const [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
+      const [x12, y12] = rotate(cx, y2, cx, cy, element.angle);
+      const [x22, y22] = rotate(x1, cy, cx, cy, element.angle);
+      const [x21, y21] = rotate(x2, cy, cx, cy, element.angle);
+      const minX = Math.min(x11, x12, x22, x21);
+      const minY = Math.min(y11, y12, y22, y21);
+      const maxX = Math.max(x11, x12, x22, x21);
+      const maxY = Math.max(y11, y12, y22, y21);
+      bounds = [minX, minY, maxX, maxY];
+    } else if (element.type === "ellipse") {
+      const w = (x2 - x1) / 2;
+      const h = (y2 - y1) / 2;
+      const cos = Math.cos(element.angle);
+      const sin = Math.sin(element.angle);
+      const ww = Math.hypot(w * cos, h * sin);
+      const hh = Math.hypot(h * cos, w * sin);
+      bounds = [cx - ww, cy - hh, cx + ww, cy + hh];
+    } else {
+      const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
+      const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
+      const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
+      const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
+      const minX = Math.min(x11, x12, x22, x21);
+      const minY = Math.min(y11, y12, y22, y21);
+      const maxX = Math.max(x11, x12, x22, x21);
+      const maxY = Math.max(y11, y12, y22, y21);
+      bounds = [minX, minY, maxX, maxY];
+    }
+
+    return bounds;
+  }
+}
+
+// Scene -> Scene coords, but in x1,x2,y1,y2 format.
+//
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
 export const getElementAbsoluteCoords = (
@@ -66,6 +157,111 @@ export const getElementAbsoluteCoords = (
     element.y + element.height,
     element.x + element.width / 2,
     element.y + element.height / 2,
+  ];
+};
+
+/**
+ * for a given element, `getElementLineSegments` returns line segments
+ * that can be used for visual collision detection (useful for frames)
+ * as opposed to bounding box collision detection
+ */
+export const getElementLineSegments = (
+  element: ExcalidrawElement,
+): [Point, Point][] => {
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
+
+  const center: Point = [cx, cy];
+
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    const segments: [Point, Point][] = [];
+
+    let i = 0;
+
+    while (i < element.points.length - 1) {
+      segments.push([
+        rotatePoint(
+          [
+            element.points[i][0] + element.x,
+            element.points[i][1] + element.y,
+          ] as Point,
+          center,
+          element.angle,
+        ),
+        rotatePoint(
+          [
+            element.points[i + 1][0] + element.x,
+            element.points[i + 1][1] + element.y,
+          ] as Point,
+          center,
+          element.angle,
+        ),
+      ]);
+      i++;
+    }
+
+    return segments;
+  }
+
+  const [nw, ne, sw, se, n, s, w, e] = (
+    [
+      [x1, y1],
+      [x2, y1],
+      [x1, y2],
+      [x2, y2],
+      [cx, y1],
+      [cx, y2],
+      [x1, cy],
+      [x2, cy],
+    ] as Point[]
+  ).map((point) => rotatePoint(point, center, element.angle));
+
+  if (element.type === "diamond") {
+    return [
+      [n, w],
+      [n, e],
+      [s, w],
+      [s, e],
+    ];
+  }
+
+  if (element.type === "ellipse") {
+    return [
+      [n, w],
+      [n, e],
+      [s, w],
+      [s, e],
+      [n, w],
+      [n, e],
+      [s, w],
+      [s, e],
+    ];
+  }
+
+  return [
+    [nw, ne],
+    [sw, se],
+    [nw, sw],
+    [ne, se],
+    [nw, e],
+    [sw, e],
+    [ne, w],
+    [se, w],
+  ];
+};
+
+/**
+ * Scene -> Scene coords, but in x1,x2,y1,y2 format.
+ *
+ * Rectangle here means any rectangular frame, not an excalidraw element.
+ */
+export const getRectangleBoxAbsoluteCoords = (boxSceneCoords: RectangleBox) => {
+  return [
+    boxSceneCoords.x,
+    boxSceneCoords.y,
+    boxSceneCoords.x + boxSceneCoords.width,
+    boxSceneCoords.y + boxSceneCoords.height,
+    boxSceneCoords.x + boxSceneCoords.width / 2,
+    boxSceneCoords.y + boxSceneCoords.height / 2,
   ];
 };
 
@@ -454,64 +650,12 @@ const getLinearElementRotatedBounds = (
   return coords;
 };
 
-// We could cache this stuff
-export const getElementBounds = (
-  element: ExcalidrawElement,
-): [number, number, number, number] => {
-  let bounds: [number, number, number, number];
-
-  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
-  if (isFreeDrawElement(element)) {
-    const [minX, minY, maxX, maxY] = getBoundsFromPoints(
-      element.points.map(([x, y]) =>
-        rotate(x, y, cx - element.x, cy - element.y, element.angle),
-      ),
-    );
-
-    return [
-      minX + element.x,
-      minY + element.y,
-      maxX + element.x,
-      maxY + element.y,
-    ];
-  } else if (isLinearElement(element)) {
-    bounds = getLinearElementRotatedBounds(element, cx, cy);
-  } else if (element.type === "diamond") {
-    const [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
-    const [x12, y12] = rotate(cx, y2, cx, cy, element.angle);
-    const [x22, y22] = rotate(x1, cy, cx, cy, element.angle);
-    const [x21, y21] = rotate(x2, cy, cx, cy, element.angle);
-    const minX = Math.min(x11, x12, x22, x21);
-    const minY = Math.min(y11, y12, y22, y21);
-    const maxX = Math.max(x11, x12, x22, x21);
-    const maxY = Math.max(y11, y12, y22, y21);
-    bounds = [minX, minY, maxX, maxY];
-  } else if (element.type === "ellipse") {
-    const w = (x2 - x1) / 2;
-    const h = (y2 - y1) / 2;
-    const cos = Math.cos(element.angle);
-    const sin = Math.sin(element.angle);
-    const ww = Math.hypot(w * cos, h * sin);
-    const hh = Math.hypot(h * cos, w * sin);
-    bounds = [cx - ww, cy - hh, cx + ww, cy + hh];
-  } else {
-    const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
-    const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
-    const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
-    const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
-    const minX = Math.min(x11, x12, x22, x21);
-    const minY = Math.min(y11, y12, y22, y21);
-    const maxX = Math.max(x11, x12, x22, x21);
-    const maxY = Math.max(y11, y12, y22, y21);
-    bounds = [minX, minY, maxX, maxY];
-  }
-
-  return bounds;
+export const getElementBounds = (element: ExcalidrawElement): Bounds => {
+  return ElementBounds.getBounds(element);
 };
-
 export const getCommonBounds = (
   elements: readonly ExcalidrawElement[],
-): [number, number, number, number] => {
+): Bounds => {
   if (!elements.length) {
     return [0, 0, 0, 0];
   }
@@ -608,7 +752,7 @@ export const getElementPointsCoords = (
 export const getClosestElementBounds = (
   elements: readonly ExcalidrawElement[],
   from: { x: number; y: number },
-): [number, number, number, number] => {
+): Bounds => {
   if (!elements.length) {
     return [0, 0, 0, 0];
   }
@@ -629,7 +773,7 @@ export const getClosestElementBounds = (
   return getElementBounds(closestElement);
 };
 
-export interface Box {
+export interface BoundingBox {
   minX: number;
   minY: number;
   maxX: number;
@@ -642,7 +786,7 @@ export interface Box {
 
 export const getCommonBoundingBox = (
   elements: ExcalidrawElement[] | readonly NonDeleted<ExcalidrawElement>[],
-): Box => {
+): BoundingBox => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   return {
     minX,

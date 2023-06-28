@@ -3,7 +3,7 @@
 .excalidraw {
   &.excalidraw-modal-container {
     position: absolute;
-    z-index: 10;
+    z-index: var(--zIndex-modal);
   }
 
   .Modal {

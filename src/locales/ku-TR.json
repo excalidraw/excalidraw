@@ -40,10 +40,6 @@
     "arrowhead_triangle": "سێگۆشە",
     "fontSize": "قەبارەی فۆنت",
     "fontFamily": "خێزانی فۆنت",
-    "onlySelected": "تەنها دیاریکراوەکان",
-    "withBackground": "باکگراوند",
-    "exportEmbedScene": "ئیمبێدکردنی دیمەنەکە",
-    "exportEmbedScene_details": "هەنداردەکراو بۆ ئەوەی دیمەنەکە بتوانرێت بگەڕێنرێتەوە لێی (PNG/SVG) داتای دیمەنەکە هەڵدەگیرێت وەکو فایلی\nقەبارەی فایلە هەناردەکراوەکان زیاد دەکات.",
     "addWatermark": "زیادبکە \"Made with Excalidraw\"",
     "handDrawn": "دەست کێشراو",
     "normal": "ئاسایی",
@@ -75,7 +71,7 @@
     "language": "زمان",
     "liveCollaboration": "هاوکاریکردنی زیندو...",
     "duplicateSelection": "لەبەرگرتنەوە",
-    "untitled": "بێ-ناو",
+    "untitled": "بێ ناونیشان",
     "name": "ناو",
     "yourName": "ناوەکەت",
     "madeWithExcalidraw": "دروستکراوە بە Excalidraw",
@@ -100,7 +96,6 @@
     "flipHorizontal": "هەڵگەڕانەوەی ئاسۆیی",
     "flipVertical": "هەڵگەڕانەوەی ستونی",
     "viewMode": "دۆخی بینین",
-    "toggleExportColorScheme": "گۆڕینی بارکردنی هێلکاری ڕەنگەکان",
     "share": "هاوبەشی پێکردن",
     "showStroke": "ڕەنگهەڵگری هێڵکار نیشانبدە",
     "showBackground": "ڕەنگهەڵگری باکگراوند نیشانبدە",
@@ -128,7 +123,10 @@
       "unlockAll": "کردنەوەی قفلی هەمووی"
     },
     "statusPublished": "بڵاوکراوەتەوە",
-    "sidebarLock": "هێشتنەوەی شریتی لا بە کراوەیی"
+    "sidebarLock": "هێشتنەوەی شریتی لا بە کراوەیی",
+    "selectAllElementsInFrame": "هەموو توخمەکانی ناو چوارچێوەکە دیاری بکە",
+    "removeAllElementsFromFrame": "هەموو توخمەکانی ناو چوارچێوەکە لابەرە",
+    "eyeDropper": "ڕەنگێک لەسەر تابلۆکە هەڵبژێرە"
   },
   "library": {
     "noItems": "هێشتا هیچ بڕگەیەک زیاد نەکراوە...",
@@ -140,11 +138,7 @@
     "exportJSON": "هەناردەکردن بۆ فایل",
     "exportImage": "وێنە هەناردە بکە...",
     "export": "پاشەکەوت بکە بۆ...",
-    "exportToPng": "هەناردەکردن بۆ PNG",
-    "exportToSvg": "هەناردەکردن بۆ SVG",
     "copyToClipboard": "له‌به‌ری بگره‌وه‌ بۆ ته‌خته‌نووس",
-    "copyPngToClipboard": "لەبەرگرتنەوەی PNG بۆ تەختەنوس",
-    "scale": "پێوەر",
     "save": "پاشەکەوت بکە بۆ فایلی بەردەست",
     "saveAs": "پاشەکەوتکردن وەک",
     "load": "بکەرەوە",
@@ -229,7 +223,9 @@
     "penMode": "شێوازی قەڵەم - دەست لێدان ڕابگرە",
     "link": "زیادکردن/ نوێکردنەوەی لینک بۆ شێوەی دیاریکراو",
     "eraser": "سڕەر",
-    "hand": "دەست (ئامرازی پانکردن)"
+    "frame": "ئامرازی چوارچێوە",
+    "hand": "دەست (ئامرازی پانکردن)",
+    "extraTools": "ئامرازی زیاتر"
   },
   "headings": {
     "canvasActions": "کردارەکانی تابلۆ",
@@ -363,6 +359,30 @@
     "resetLibrary": "ڕێکخستنەوەی کتێبخانە",
     "removeItemsFromLib": "لابردنی ئایتمە دیاریکراوەکان لە کتێبخانە"
   },
+  "imageExportDialog": {
+    "header": "وێنە هەناردە بکە",
+    "label": {
+      "withBackground": "پاشبنەما",
+      "onlySelected": "تەنها دیاریکراوەکان",
+      "darkMode": "دۆخی تاریک",
+      "embedScene": "دیمەنەکە بەکاربهێنەرەوە",
+      "scale": "قەبارە",
+      "padding": "بۆشایی"
+    },
+    "tooltip": {
+      "embedScene": "داتاکانی دیمەنەکە لە فایلە هەناردەکراوەکەی PNG/SVG هەڵدەگیرێن بۆ ئەوەی دیمەنەکە لێیەوە بگەڕێتەوە.\nقەبارەی پەڕگەی هەناردەکراو زیاد دەکات."
+    },
+    "title": {
+      "exportToPng": "هەناردە بکە وەک PNG",
+      "exportToSvg": "هەناردە بکە وەک SVG",
+      "copyPngToClipboard": "لەبەربگرەوە بۆ سەر تەختەنوس"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "له‌به‌ری بگره‌وه‌ بۆ ته‌خته‌نووس"
+    }
+  },
   "encrypted": {
     "tooltip": "وێنەکێشانەکانت لە کۆتاییەوە بۆ کۆتایی کۆد کراون بۆیە سێرڤەرەکانی ئێکسکالیدرا هەرگیز نایانبینن.",
     "link": "بلۆگ پۆست لەسەر کۆدکردنی کۆتای بۆ کۆتای لە ئێکسکالیدرەو"
@@ -395,20 +415,20 @@
   },
   "colors": {
     "transparent": "ڕوون",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "ڕەش",
+    "white": "سپی",
+    "red": "سور",
+    "pink": "پەمەیی",
+    "grape": "مێوژی",
+    "violet": "مۆری کاڵ",
+    "gray": "خۆڵەمێشی",
+    "blue": "شین",
+    "cyan": "شینی ئاسمانی",
+    "teal": "شەدری",
+    "green": "سه‌وز",
+    "yellow": "زەرد",
+    "orange": "پرتەقاڵی",
+    "bronze": "برۆنزی"
   },
   "welcomeScreen": {
     "app": {
@@ -424,10 +444,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "زۆرترین ڕەنگە باوە بەکارهاتووەکان",
+    "colors": "ڕەنگەکان",
+    "shades": "سێبەرەکان",
+    "hexCode": "کۆدی هێکس",
+    "noShades": "هیچ سێبەرێک بۆ ئەم ڕەنگە بەردەست نییە"
   }
 }

@@ -40,10 +40,6 @@
     "arrowhead_triangle": "",
     "fontSize": "Shrift ólshemi",
     "fontFamily": "",
-    "onlySelected": "",
-    "withBackground": "",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
     "addWatermark": "",
     "handDrawn": "",
     "normal": "",
@@ -100,7 +96,6 @@
     "flipHorizontal": "",
     "flipVertical": "",
     "viewMode": "Kóriw rejimi",
-    "toggleExportColorScheme": "",
     "share": "Bólisiw",
     "showStroke": "",
     "showBackground": "",
@@ -128,7 +123,10 @@
       "unlockAll": "Barlıǵın qulıptan shıǵarıw"
     },
     "statusPublished": "",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +138,7 @@
     "exportJSON": "",
     "exportImage": "",
     "export": "",
-    "exportToPng": "",
-    "exportToSvg": "",
     "copyToClipboard": "Almasıw buferine kóshirip alındı",
-    "copyPngToClipboard": "",
-    "scale": "",
     "save": "",
     "saveAs": "",
     "load": "Ashıw",
@@ -229,7 +223,9 @@
     "penMode": "",
     "link": "",
     "eraser": "Óshirgish",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "",
@@ -362,6 +358,30 @@
   "confirmDialog": {
     "resetLibrary": "",
     "removeItemsFromLib": ""
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "",
