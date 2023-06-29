@@ -312,13 +312,12 @@ This is the history API. history.clear() will clear the history.
   opts?:
       | {
           fitToContent?: boolean;
-          fitToViewport?: never;
           animate?: boolean;
           duration?: number;
         }
       | {
-          fitToContent?: never;
           fitToViewport?: boolean;
+          viewportZoomFactor?: number;
           animate?: boolean;
           duration?: number;
         }

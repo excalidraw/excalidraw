@@ -296,6 +296,9 @@ export const zoomToFit = ({
   };
 };
 
+// Note, this action differs from actionZoomToFitSelection in that it doesn't
+// zoom beyond 100%. In other words, if the content is smaller than viewport
+// size, it won't be zoomed in.
 export const actionZoomToFitSelectionInViewport = register({
   name: "zoomToFitSelectionInViewport",
   trackEvent: { category: "canvas" },
@@ -310,7 +313,8 @@ export const actionZoomToFitSelectionInViewport = register({
       fitToViewport: false,
     });
   },
-  // shift-2 should have been zoom-to-selection, but it acts differently
+  // NOTE shift-2 should have been assigned actionZoomToFitSelection.
+  // TBD on how proceed
   keyTest: (event) =>
     event.code === CODES.TWO &&
     event.shiftKey &&
@@ -332,7 +336,7 @@ export const actionZoomToFitSelection = register({
       fitToViewport: true,
     });
   },
-  // this action should use shift-3 per figma, alas
+  // NOTE this action should use shift-2 per figma, alas
   keyTest: (event) =>
     event.code === CODES.THREE &&
     event.shiftKey &&
