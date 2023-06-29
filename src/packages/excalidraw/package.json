@@ -1,6 +1,6 @@
 {
-  "name": "@alkemio/excalidraw-fork",
-  "version": "0.15.2-alkemio-1",
+  "name": "@alkemio/excalidraw",
+  "version": "0.15.2-alkemio-2",
   "main": "main.js",
   "types": "types/packages/excalidraw/index.d.ts",
   "files": [
