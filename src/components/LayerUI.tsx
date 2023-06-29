@@ -399,7 +399,7 @@ const LayerUI = ({
           }
         />
       )}
-      {device.isMobile && !eyeDropperState && (
+      {device.isMobile && (
         <MobileMenu
           appState={appState}
           elements={elements}
