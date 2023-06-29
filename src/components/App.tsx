@@ -296,7 +296,7 @@ import {
   Hyperlink,
   isPointHittingLinkIcon,
 } from "../element/Hyperlink";
-import { normalizeLink } from "../data/normalizeLink";
+import { isLocalLink, normalizeLink } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
@@ -872,6 +872,7 @@ class App extends React.Component<AppProps, AppState> {
                               element={selectedElement[0]}
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
+                              normalizeLink={this.props.normalizeLink}
                             />
                           )}
                         {this.state.toast !== null && (
@@ -3356,15 +3357,23 @@ class App extends React.Component<AppProps, AppState> {
         let customEvent;
         if (this.props.onLinkOpen) {
           customEvent = wrapEvent(EVENT.EXCALIDRAW_LINK, event.nativeEvent);
-          this.props.onLinkOpen(this.hitLinkElement, customEvent);
+          this.props.onLinkOpen(
+            {
+              ...this.hitLinkElement,
+              link: (this.props.normalizeLink || normalizeLink)(url),
+            },
+            customEvent,
+          );
         }
         if (!customEvent?.defaultPrevented) {
-          const target = "_blank";
+          const target = isLocalLink(url) ? "_self" : "_blank";
           const newWindow = window.open(undefined, target);
           // https://mathiasbynens.github.io/rel-noopener/
           if (newWindow) {
             newWindow.opener = null;
-            newWindow.location = normalizeLink(url);
+            newWindow.location = (this.props.normalizeLink || normalizeLink)(
+              url,
+            );
           }
         }
       }

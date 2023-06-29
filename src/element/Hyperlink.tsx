@@ -29,7 +29,7 @@ import { getTooltipDiv, updateTooltipPosition } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
 import { isPointHittingElementBoundingBox } from "./collision";
 import { getElementAbsoluteCoords } from "./";
-import { normalizeLink } from "../data/normalizeLink";
+import { isLocalLink, normalizeLink } from "../data/url";
 
 import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
@@ -52,10 +52,12 @@ export const Hyperlink = ({
   element,
   setAppState,
   onLinkOpen,
+  normalizeLink: customNormalizeLink,
 }: {
   element: NonDeletedExcalidrawElement;
   setAppState: React.Component<any, AppState>["setState"];
   onLinkOpen: ExcalidrawProps["onLinkOpen"];
+  normalizeLink: ExcalidrawProps["normalizeLink"];
 }) => {
   const appState = useExcalidrawAppState();
 
@@ -70,7 +72,7 @@ export const Hyperlink = ({
       return;
     }
 
-    const link = normalizeLink(inputRef.current.value);
+    const link = (customNormalizeLink || normalizeLink)(inputRef.current.value);
 
     if (!element.link && link) {
       trackEvent("hyperlink", "create");
@@ -78,7 +80,7 @@ export const Hyperlink = ({
 
     mutateElement(element, { link });
     setAppState({ showHyperlinkPopup: "info" });
-  }, [element, setAppState]);
+  }, [element, setAppState, customNormalizeLink]);
 
   useLayoutEffect(() => {
     return () => {
@@ -167,18 +169,24 @@ export const Hyperlink = ({
         />
       ) : (
         <a
-          href={element.link || ""}
+          href={(customNormalizeLink || normalizeLink)(element.link || "")}
           className={clsx("excalidraw-hyperlinkContainer-link", {
             "d-none": isEditing,
           })}
-          target="_blank"
+          target={isLocalLink(element.link) ? "_self" : "_blank"}
           onClick={(event) => {
             if (element.link && onLinkOpen) {
               const customEvent = wrapEvent(
                 EVENT.EXCALIDRAW_LINK,
                 event.nativeEvent,
               );
-              onLinkOpen(element, customEvent);
+              onLinkOpen(
+                {
+                  ...element,
+                  link: (customNormalizeLink || normalizeLink)(element.link),
+                },
+                customEvent,
+              );
               if (customEvent.defaultPrevented) {
                 event.preventDefault();
               }

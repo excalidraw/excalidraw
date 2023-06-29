@@ -40,7 +40,6 @@ import {
   getDefaultLineHeight,
   measureBaseline,
 } from "../element/textElement";
-import { normalizeLink } from "./normalizeLink";
 import { COLOR_PALETTE } from "../colors";
 
 type RestoredAppState = Omit<
@@ -143,7 +142,7 @@ const restoreElementWithProperties = <
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
-    link: element.link ? normalizeLink(element.link) : null,
+    link: element.link ?? null,
     locked: element.locked ?? false,
   };
 
