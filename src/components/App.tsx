@@ -506,6 +506,7 @@ class App extends React.Component<AppProps, AppState> {
         resetCursor: this.resetCursor,
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
+        setScrollConstraints: this.setScrollConstraints,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -1728,7 +1729,8 @@ class App extends React.Component<AppProps, AppState> {
           }
           const scrolledOutside =
             // hide when editing text
-            isTextElement(this.state.editingElement)
+            isTextElement(this.state.editingElement) ||
+            this.state.scrollConstraints
               ? false
               : !atLeastOneVisibleElement && renderingElements.length > 0;
           if (this.state.scrolledOutside !== scrolledOutside) {
@@ -2369,7 +2371,25 @@ class App extends React.Component<AppProps, AppState> {
     state,
   ) => {
     this.cancelInProgresAnimation?.();
-    this.setState(state);
+
+    // When there are no scroll constraints, update the state directly
+    if (!this.state.scrollConstraints) {
+      this.setState(state);
+    }
+
+    // If state is a function, we generate the new state and then apply scroll constraints
+    if (typeof state === "function") {
+      this.setState((prevState, props) => {
+        // Generate new state
+        const newState = state(prevState, props);
+
+        // Apply scroll constraints to the new state
+        return this.constrainScroll(newState);
+      });
+    } else {
+      // If state is not a function, apply scroll constraints directly before updating the state
+      this.setState(this.constrainScroll(state));
+    }
   };
 
   setToast = (
@@ -7607,6 +7627,74 @@ class App extends React.Component<AppProps, AppState> {
     await setLanguage(currentLang);
     this.setAppState({});
   }
+
+  /**
+   * Sets the scroll constraints of the application state.
+   *
+   * @param scrollConstraints - The new scroll constraints.
+   */
+  public setScrollConstraints = (
+    scrollConstraints: AppState["scrollConstraints"],
+  ) => {
+    this.setState({
+      scrollConstraints,
+    });
+  };
+
+  /**
+   * Constrains the scroll position of the app state within the defined scroll constraints.
+   * The scroll position is adjusted based on the application's current state including zoom level and viewport dimensions.
+   *
+   * @param nextState - The next state of the application, or a subset of the application state.
+   * @returns The modified next state with scrollX and scrollY constrained to the scroll constraints.
+   */
+  private constrainScroll = <K extends keyof AppState>(
+    nextState: AppState | Pick<AppState, K> | null,
+  ) => {
+    const { scrollX, scrollY, scrollConstraints, width, height, zoom } =
+      this.state;
+
+    // When no scroll constraints are set, return the nextState as is
+    if (!scrollConstraints || !nextState) {
+      return nextState;
+    }
+
+    // Calculate scaled width and height
+    const scaledWidth = width / zoom.value;
+    const scaledHeight = height / zoom.value;
+
+    // Set default constrainedScrollX and constrainedScrollY values
+    let constrainedScrollX = scrollX;
+    let constrainedScrollY = scrollY;
+
+    // If scrollX is part of the nextState, constrain it within the scroll constraints
+    if ("scrollX" in nextState) {
+      constrainedScrollX = Math.min(
+        scrollConstraints.x,
+        Math.max(
+          nextState.scrollX,
+          scrollConstraints.x - scrollConstraints.width + scaledWidth,
+        ),
+      );
+    }
+
+    // If scrollY is part of the nextState, constrain it within the scroll constraints
+    if ("scrollY" in nextState) {
+      constrainedScrollY = Math.min(
+        scrollConstraints.y,
+        Math.max(
+          nextState.scrollY,
+          scrollConstraints.y - scrollConstraints.height + scaledHeight,
+        ),
+      );
+    }
+
+    return {
+      ...nextState,
+      scrollX: constrainedScrollX,
+      scrollY: constrainedScrollY,
+    };
+  };
 }
 
 // -----------------------------------------------------------------------------

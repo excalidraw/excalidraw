@@ -223,6 +223,12 @@ export type AppState = {
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
+  scrollConstraints: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null;
 };
 
 export type UIAppState = Omit<
@@ -549,6 +555,7 @@ export type ExcalidrawImperativeAPI = {
    * used in conjunction with view mode (props.viewModeEnabled).
    */
   updateFrameRendering: InstanceType<typeof App>["updateFrameRendering"];
+  setScrollConstraints: InstanceType<typeof App>["setScrollConstraints"];
 };
 
 export type Device = Readonly<{
