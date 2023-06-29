@@ -27,10 +27,6 @@
   --popup-secondary-bg-color: #{$oc-gray-1};
   --popup-text-color: #{$oc-black};
   --popup-text-inverted-color: #{$oc-white};
-  --sab: env(safe-area-inset-bottom);
-  --sal: env(safe-area-inset-left);
-  --sar: env(safe-area-inset-right);
-  --sat: env(safe-area-inset-top);
   --select-highlight-color: #{$oc-blue-5};
   --shadow-island: 0px 7px 14px rgba(0, 0, 0, 0.05),
     0px 0px 3.12708px rgba(0, 0, 0, 0.0798),

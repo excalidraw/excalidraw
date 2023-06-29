@@ -251,3 +251,5 @@ export { WelcomeScreen };
 export { LiveCollaborationTrigger };
 
 export { DefaultSidebar } from "../../components/DefaultSidebar";
+
+export { normalizeLink } from "../../data/url";

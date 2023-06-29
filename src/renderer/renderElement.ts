@@ -52,6 +52,7 @@ import {
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { createPlaceholderiFrameLabel } from "../element/iframe";
 import { getContainingFrame } from "../frame";
+import { normalizeLink } from "../data/url";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -1220,7 +1221,7 @@ export const renderElementToSvg = (
   // if the element has a link, create an anchor tag and make that the new root
   if (element.link) {
     const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
-    anchorTag.setAttribute("href", element.link);
+    anchorTag.setAttribute("href", normalizeLink(element.link));
     root.appendChild(anchorTag);
     root = anchorTag;
   }

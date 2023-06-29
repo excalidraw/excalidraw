@@ -20,7 +20,6 @@ import {
   isHandToolActive,
 } from "../appState";
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
-import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { Bounds } from "../element/bounds";
 
 export const actionChangeViewBackgroundColor = register({
@@ -226,54 +225,120 @@ const zoomValueToFitBoundsOnViewport = (
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
 
-export const zoomToFitElements = (
-  elements: readonly ExcalidrawElement[],
-  appState: Readonly<AppState>,
-  zoomToSelection: boolean,
-) => {
-  const nonDeletedElements = getNonDeletedElements(elements);
-  const selectedElements = getSelectedElements(nonDeletedElements, appState);
-
-  const commonBounds =
-    zoomToSelection && selectedElements.length > 0
-      ? getCommonBounds(excludeElementsInFramesFromSelection(selectedElements))
-      : getCommonBounds(
-          excludeElementsInFramesFromSelection(nonDeletedElements),
-        );
-
-  const newZoom = {
-    value: zoomValueToFitBoundsOnViewport(commonBounds, {
-      width: appState.width,
-      height: appState.height,
-    }),
-  };
+export const zoomToFit = ({
+  targetElements,
+  appState,
+  fitToViewport = false,
+  viewportZoomFactor = 0.7,
+}: {
+  targetElements: readonly ExcalidrawElement[];
+  appState: Readonly<AppState>;
+  /** whether to fit content to viewport (beyond >100%) */
+  fitToViewport: boolean;
+  /** zoom content to cover X of the viewport, when fitToViewport=true */
+  viewportZoomFactor?: number;
+}) => {
+  const commonBounds = getCommonBounds(getNonDeletedElements(targetElements));
 
   const [x1, y1, x2, y2] = commonBounds;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
+
+  let newZoomValue;
+  let scrollX;
+  let scrollY;
+
+  if (fitToViewport) {
+    const commonBoundsWidth = x2 - x1;
+    const commonBoundsHeight = y2 - y1;
+
+    newZoomValue =
+      Math.min(
+        appState.width / commonBoundsWidth,
+        appState.height / commonBoundsHeight,
+      ) * Math.min(1, Math.max(viewportZoomFactor, 0.1));
+
+    // Apply clamping to newZoomValue to be between 10% and 3000%
+    newZoomValue = Math.min(
+      Math.max(newZoomValue, 0.1),
+      30.0,
+    ) as NormalizedZoomValue;
+
+    scrollX = (appState.width / 2) * (1 / newZoomValue) - centerX;
+    scrollY = (appState.height / 2) * (1 / newZoomValue) - centerY;
+  } else {
+    newZoomValue = zoomValueToFitBoundsOnViewport(commonBounds, {
+      width: appState.width,
+      height: appState.height,
+    });
+
+    const centerScroll = centerScrollOn({
+      scenePoint: { x: centerX, y: centerY },
+      viewportDimensions: {
+        width: appState.width,
+        height: appState.height,
+      },
+      zoom: { value: newZoomValue },
+    });
+
+    scrollX = centerScroll.scrollX;
+    scrollY = centerScroll.scrollY;
+  }
+
   return {
     appState: {
       ...appState,
-      ...centerScrollOn({
-        scenePoint: { x: centerX, y: centerY },
-        viewportDimensions: {
-          width: appState.width,
-          height: appState.height,
-        },
-        zoom: newZoom,
-      }),
-      zoom: newZoom,
+      scrollX,
+      scrollY,
+      zoom: { value: newZoomValue },
     },
     commitToHistory: false,
   };
 };
 
-export const actionZoomToSelected = register({
-  name: "zoomToSelection",
+// Note, this action differs from actionZoomToFitSelection in that it doesn't
+// zoom beyond 100%. In other words, if the content is smaller than viewport
+// size, it won't be zoomed in.
+export const actionZoomToFitSelectionInViewport = register({
+  name: "zoomToFitSelectionInViewport",
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) => zoomToFitElements(elements, appState, true),
+  perform: (elements, appState) => {
+    const selectedElements = getSelectedElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+    return zoomToFit({
+      targetElements: selectedElements.length ? selectedElements : elements,
+      appState,
+      fitToViewport: false,
+    });
+  },
+  // NOTE shift-2 should have been assigned actionZoomToFitSelection.
+  // TBD on how proceed
   keyTest: (event) =>
     event.code === CODES.TWO &&
+    event.shiftKey &&
+    !event.altKey &&
+    !event[KEYS.CTRL_OR_CMD],
+});
+
+export const actionZoomToFitSelection = register({
+  name: "zoomToFitSelection",
+  trackEvent: { category: "canvas" },
+  perform: (elements, appState) => {
+    const selectedElements = getSelectedElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+    return zoomToFit({
+      targetElements: selectedElements.length ? selectedElements : elements,
+      appState,
+      fitToViewport: true,
+    });
+  },
+  // NOTE this action should use shift-2 per figma, alas
+  keyTest: (event) =>
+    event.code === CODES.THREE &&
     event.shiftKey &&
     !event.altKey &&
     !event[KEYS.CTRL_OR_CMD],
@@ -283,7 +348,8 @@ export const actionZoomToFit = register({
   name: "zoomToFit",
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) => zoomToFitElements(elements, appState, false),
+  perform: (elements, appState) =>
+    zoomToFit({ targetElements: elements, appState, fitToViewport: false }),
   keyTest: (event) =>
     event.code === CODES.ONE &&
     event.shiftKey &&
