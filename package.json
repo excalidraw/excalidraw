@@ -112,7 +112,8 @@
     ],
     "resetMocks": false
   },
-  "name": "excalidraw",
+  "name": "@alkemio/excalidraw",
+  "version": "0.15.2-alkemio-1",
   "prettier": "@excalidraw/prettier-config",
   "private": false,
   "scripts": {

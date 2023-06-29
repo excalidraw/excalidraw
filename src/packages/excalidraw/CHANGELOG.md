@@ -16,6 +16,11 @@ Please add the latest change on the top under the correct section.
 **_This section lists the updates made to the excalidraw library and will not affect the integration._**
 
 ---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
 ## 0.15.2-alkemio-1
 
 - First version of Alkemio forked Excalidraw
