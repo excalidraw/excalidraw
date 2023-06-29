@@ -3353,7 +3353,7 @@ class App extends React.Component<AppProps, AppState> {
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       let url = this.hitLinkElement.link;
       if (url) {
-        url = normalizeLink(url)
+        url = normalizeLink(url);
         let customEvent;
         if (this.props.onLinkOpen) {
           customEvent = wrapEvent(EVENT.EXCALIDRAW_LINK, event.nativeEvent);
