@@ -360,7 +360,7 @@
     "removeItemsFromLib": "A kiválasztott elemek eltávolítása a könyvtárból"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Kép exportálása",
     "label": {
       "withBackground": "",
       "onlySelected": "",
