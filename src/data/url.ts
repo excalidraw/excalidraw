@@ -1,20 +1,9 @@
-const re_protocol = /^(?:(?:(?:https?|ftp):\/\/)|www.)/;
+import { sanitizeUrl } from "@braintree/sanitize-url";
 
 export const normalizeLink = (link: string) => {
-  link = link.trim();
-
-  if (link.match(re_protocol)) {
-    return link;
-  }
-
-  // local link
-  if (link.startsWith("/")) {
-    return location.origin + link;
-  }
-
-  return `https://${link}`;
+  return sanitizeUrl(link);
 };
 
 export const isLocalLink = (link: string | null) => {
-  return !!link?.includes(location.origin);
+  return !!(link?.includes(location.origin) || link?.startsWith("/"));
 };
