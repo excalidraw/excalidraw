@@ -22,5 +22,9 @@ describe("normalizeLink", () => {
     expect(normalizeLink("http://test")).toBe("http://test");
     expect(normalizeLink("ftp://test")).toBe("ftp://test");
     expect(normalizeLink("file://")).toBe("file://");
+    expect(normalizeLink("file://")).toBe("file://");
+    expect(normalizeLink("[test](https://test)")).toBe("[test](https://test)");
+    expect(normalizeLink("[[test]]")).toBe("[[test]]");
+    expect(normalizeLink("<test>")).toBe("<test>");
   });
 });

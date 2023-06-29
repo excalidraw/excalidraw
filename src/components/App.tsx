@@ -872,7 +872,6 @@ class App extends React.Component<AppProps, AppState> {
                               element={selectedElement[0]}
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
-                              normalizeLink={this.props.normalizeLink}
                             />
                           )}
                         {this.state.toast !== null && (
@@ -3360,7 +3359,7 @@ class App extends React.Component<AppProps, AppState> {
           this.props.onLinkOpen(
             {
               ...this.hitLinkElement,
-              link: (this.props.normalizeLink || normalizeLink)(url),
+              link: normalizeLink(url),
             },
             customEvent,
           );
@@ -3371,9 +3370,7 @@ class App extends React.Component<AppProps, AppState> {
           // https://mathiasbynens.github.io/rel-noopener/
           if (newWindow) {
             newWindow.opener = null;
-            newWindow.location = (this.props.normalizeLink || normalizeLink)(
-              url,
-            );
+            newWindow.location = normalizeLink(url);
           }
         }
       }

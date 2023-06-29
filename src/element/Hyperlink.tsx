@@ -52,12 +52,10 @@ export const Hyperlink = ({
   element,
   setAppState,
   onLinkOpen,
-  normalizeLink: customNormalizeLink,
 }: {
   element: NonDeletedExcalidrawElement;
   setAppState: React.Component<any, AppState>["setState"];
   onLinkOpen: ExcalidrawProps["onLinkOpen"];
-  normalizeLink: ExcalidrawProps["normalizeLink"];
 }) => {
   const appState = useExcalidrawAppState();
 
@@ -72,7 +70,7 @@ export const Hyperlink = ({
       return;
     }
 
-    const link = (customNormalizeLink || normalizeLink)(inputRef.current.value);
+    const link = normalizeLink(inputRef.current.value);
 
     if (!element.link && link) {
       trackEvent("hyperlink", "create");
@@ -80,7 +78,7 @@ export const Hyperlink = ({
 
     mutateElement(element, { link });
     setAppState({ showHyperlinkPopup: "info" });
-  }, [element, setAppState, customNormalizeLink]);
+  }, [element, setAppState]);
 
   useLayoutEffect(() => {
     return () => {
@@ -169,7 +167,7 @@ export const Hyperlink = ({
         />
       ) : (
         <a
-          href={(customNormalizeLink || normalizeLink)(element.link || "")}
+          href={normalizeLink(element.link || "")}
           className={clsx("excalidraw-hyperlinkContainer-link", {
             "d-none": isEditing,
           })}
@@ -183,7 +181,7 @@ export const Hyperlink = ({
               onLinkOpen(
                 {
                   ...element,
-                  link: (customNormalizeLink || normalizeLink)(element.link),
+                  link: normalizeLink(element.link),
                 },
                 customEvent,
               );
