@@ -40,6 +40,7 @@ import {
   getDefaultLineHeight,
   measureBaseline,
 } from "../element/textElement";
+import { normalizeLink } from "./url";
 
 type RestoredAppState = Omit<
   AppState,
@@ -139,7 +140,7 @@ const restoreElementWithProperties = <
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
-    link: element.link ?? null,
+    link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
   };
 

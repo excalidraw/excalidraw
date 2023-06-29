@@ -245,3 +245,4 @@ export { MainMenu };
 export { useDevice } from "../../components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
+export { normalizeLink } from "../../data/url";

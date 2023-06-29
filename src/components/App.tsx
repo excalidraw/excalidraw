@@ -279,13 +279,12 @@ import {
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
-  normalizeLink,
   showHyperlinkTooltip,
   hideHyperlinkToolip,
   Hyperlink,
   isPointHittingLinkIcon,
-  isLocalLink,
 } from "../element/Hyperlink";
+import { isLocalLink, normalizeLink } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { Fonts } from "../scene/Fonts";
 import { actionPaste } from "../actions/actionClipboard";
@@ -2947,12 +2946,19 @@ class App extends React.Component<AppProps, AppState> {
       this.device.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
-      const url = this.hitLinkElement.link;
+      let url = this.hitLinkElement.link;
       if (url) {
+        url = normalizeLink(url);
         let customEvent;
         if (this.props.onLinkOpen) {
           customEvent = wrapEvent(EVENT.EXCALIDRAW_LINK, event.nativeEvent);
-          this.props.onLinkOpen(this.hitLinkElement, customEvent);
+          this.props.onLinkOpen(
+            {
+              ...this.hitLinkElement,
+              link: url,
+            },
+            customEvent,
+          );
         }
         if (!customEvent?.defaultPrevented) {
           const target = isLocalLink(url) ? "_self" : "_blank";
@@ -2960,7 +2966,7 @@ class App extends React.Component<AppProps, AppState> {
           // https://mathiasbynens.github.io/rel-noopener/
           if (newWindow) {
             newWindow.opener = null;
-            newWindow.location = normalizeLink(url);
+            newWindow.location = url;
           }
         }
       }
