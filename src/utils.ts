@@ -197,38 +197,75 @@ export const throttleRAF = <T extends any[]>(
  * @param {number} k - The value to be tweened.
  * @returns {number} The tweened value.
  */
-function easeOut(k: number): number {
+export const easeOut = (k: number) => {
   return 1 - Math.pow(1 - k, 4);
-}
+};
+
+const easeOutInterpolate = (from: number, to: number, progress: number) => {
+  return (to - from) * easeOut(progress) + from;
+};
 
 /**
- * Compute new values based on the same ease function and trigger the
- * callback through a requestAnimationFrame call
+ * Animates values from `fromValues` to `toValues` using the requestAnimationFrame API.
+ * Executes the `onStep` callback on each step with the interpolated values.
+ * Returns a function that can be called to cancel the animation.
  *
- * use `opts` to define a duration and/or an easeFn
+ * @example
+ * // Example usage:
+ * const fromValues = { x: 0, y: 0 };
+ * const toValues = { x: 100, y: 200 };
+ * const onStep = ({x, y}) => {
+ *   setState(x, y)
+ * };
+ * const onCancel = () => {
+ *   console.log("Animation canceled");
+ * };
  *
- * for example:
- * ```ts
- * easeToValuesRAF([10, 20, 10], [0, 0, 0], (a, b, c) => setState(a,b, c))
- * ```
+ * const cancelAnimation = easeToValuesRAF({
+ *   fromValues,
+ *   toValues,
+ *   onStep,
+ *   onCancel,
+ * });
  *
- * @param fromValues The initial values, must be numeric
- * @param toValues The destination values, must also be numeric
- * @param callback The callback receiving the values
- * @param opts default to 250ms duration and the easeOut function
+ * // To cancel the animation:
+ * cancelAnimation();
  */
-export const easeToValuesRAF = (
-  fromValues: number[],
-  toValues: number[],
-  callback: (...values: number[]) => void,
-  opts?: { duration?: number; easeFn?: (value: number) => number },
-) => {
+export const easeToValuesRAF = <
+  T extends Record<keyof T, number>,
+  K extends keyof T,
+>({
+  fromValues,
+  toValues,
+  onStep,
+  duration = 250,
+  interpolateValue,
+  onStart,
+  onEnd,
+  onCancel,
+}: {
+  fromValues: T;
+  toValues: T;
+  /**
+   * Interpolate a single value.
+   * Return undefined to be handled by the default interpolator.
+   */
+  interpolateValue?: (
+    fromValue: number,
+    toValue: number,
+    /** no easing applied  */
+    progress: number,
+    key: K,
+  ) => number | undefined;
+  onStep: (values: T) => void;
+  duration?: number;
+  onStart?: () => void;
+  onEnd?: () => void;
+  onCancel?: () => void;
+}) => {
   let canceled = false;
   let frameId = 0;
   let startTime: number;
-
-  const duration = opts?.duration || 250; // default animation to 0.25 seconds
-  const easeFn = opts?.easeFn || easeOut; // default the easeFn to easeOut
 
   function step(timestamp: number) {
     if (canceled) {
@@ -236,29 +273,58 @@ export const easeToValuesRAF = (
     }
     if (startTime === undefined) {
       startTime = timestamp;
+      onStart?.();
     }
 
-    const elapsed = timestamp - startTime;
+    const elapsed = Math.min(timestamp - startTime, duration);
+    const factor = easeOut(elapsed / duration);
+
+    const newValues = {} as T;
+
+    Object.keys(fromValues).forEach((key) => {
+      const _key = key as keyof T;
+      const result = ((toValues[_key] - fromValues[_key]) * factor +
+        fromValues[_key]) as T[keyof T];
+      newValues[_key] = result;
+    });
+
+    onStep(newValues);
 
     if (elapsed < duration) {
-      // console.log(elapsed, duration, elapsed / duration);
-      const factor = easeFn(elapsed / duration);
-      const newValues = fromValues.map(
-        (fromValue, index) =>
-          (toValues[index] - fromValue) * factor + fromValue,
-      );
+      const progress = elapsed / duration;
 
-      callback(...newValues);
+      const newValues = {} as T;
+
+      Object.keys(fromValues).forEach((key) => {
+        const _key = key as K;
+        const startValue = fromValues[_key];
+        const endValue = toValues[_key];
+
+        let result;
+
+        result = interpolateValue
+          ? interpolateValue(startValue, endValue, progress, _key)
+          : easeOutInterpolate(startValue, endValue, progress);
+
+        if (result == null) {
+          result = easeOutInterpolate(startValue, endValue, progress);
+        }
+
+        newValues[_key] = result as T[K];
+      });
+      onStep(newValues);
+
       frameId = window.requestAnimationFrame(step);
     } else {
-      // ensure final values are reached at the end of the transition
-      callback(...toValues);
+      onStep(toValues);
+      onEnd?.();
     }
   }
 
   frameId = window.requestAnimationFrame(step);
 
   return () => {
+    onCancel?.();
     canceled = true;
     window.cancelAnimationFrame(frameId);
   };
