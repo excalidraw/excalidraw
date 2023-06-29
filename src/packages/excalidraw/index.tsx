@@ -41,6 +41,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onLinkOpen,
     onPointerDown,
     onScrollChange,
+    normalizeLink,
     children,
   } = props;
 
@@ -115,6 +116,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
+          normalizeLink={normalizeLink}
         >
           {children}
         </App>
@@ -247,3 +249,5 @@ export { WelcomeScreen };
 export { LiveCollaborationTrigger };
 
 export { DefaultSidebar } from "../../components/DefaultSidebar";
+
+export { normalizeLink } from "../../data/url";
