@@ -291,13 +291,12 @@ import {
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
-  normalizeLink,
   showHyperlinkTooltip,
   hideHyperlinkToolip,
   Hyperlink,
   isPointHittingLinkIcon,
-  isLocalLink,
 } from "../element/Hyperlink";
+import { normalizeLink } from "../data/normalizeLink";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
@@ -3360,7 +3359,7 @@ class App extends React.Component<AppProps, AppState> {
           this.props.onLinkOpen(this.hitLinkElement, customEvent);
         }
         if (!customEvent?.defaultPrevented) {
-          const target = isLocalLink(url) ? "_self" : "_blank";
+          const target = "_blank";
           const newWindow = window.open(undefined, target);
           // https://mathiasbynens.github.io/rel-noopener/
           if (newWindow) {

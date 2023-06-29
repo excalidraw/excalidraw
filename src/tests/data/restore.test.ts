@@ -184,6 +184,34 @@ describe("restoreElements", () => {
     expect(restoredLine.points).toMatchObject(expectedLinePoints);
   });
 
+  it("should normalize links", () => {
+    const javas = "javas";
+    let element = {
+      type: "rectangle",
+      link: `${javas}cript://%0aalert(document.domain)`,
+    };
+    let restoredElement = restore.restoreElements(
+      [element as ExcalidrawLinearElement],
+      null,
+    )[0];
+    expect(
+      !restoredElement.link ||
+        !restoredElement.link.startsWith(`${javas}cript:`),
+    ).toBe(true);
+
+    element = {
+      type: "rectangle",
+      link: "https://www.excalidraw.com",
+    };
+    restoredElement = restore.restoreElements(
+      [element as ExcalidrawLinearElement],
+      null,
+    )[0];
+    expect(
+      restoredElement.link && restoredElement.link.startsWith("https://"),
+    ).toBe(true);
+  });
+
   it("when the number of points of a line is greater or equal 2", () => {
     const lineElement_0 = API.createElement({
       type: "line",

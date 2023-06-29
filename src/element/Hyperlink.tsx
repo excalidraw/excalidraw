@@ -29,6 +29,7 @@ import { getTooltipDiv, updateTooltipPosition } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
 import { isPointHittingElementBoundingBox } from "./collision";
 import { getElementAbsoluteCoords } from "./";
+import { normalizeLink } from "../data/normalizeLink";
 
 import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
@@ -170,7 +171,7 @@ export const Hyperlink = ({
           className={clsx("excalidraw-hyperlinkContainer-link", {
             "d-none": isEditing,
           })}
-          target={isLocalLink(element.link) ? "_self" : "_blank"}
+          target="_blank"
           onClick={(event) => {
             if (element.link && onLinkOpen) {
               const customEvent = wrapEvent(
@@ -229,21 +230,6 @@ const getCoordsForPopover = (
   const x = viewportX - appState.offsetLeft - CONTAINER_WIDTH / 2;
   const y = viewportY - appState.offsetTop - SPACE_BOTTOM;
   return { x, y };
-};
-
-export const normalizeLink = (link: string) => {
-  link = link.trim();
-  if (link) {
-    // prefix with protocol if not fully-qualified
-    if (!link.includes("://") && !/^[[\\/]/.test(link)) {
-      link = `https://${link}`;
-    }
-  }
-  return link;
-};
-
-export const isLocalLink = (link: string | null) => {
-  return !!(link?.includes(location.origin) || link?.startsWith("/"));
 };
 
 export const actionLink = register({
