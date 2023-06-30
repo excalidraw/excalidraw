@@ -2249,16 +2249,18 @@ class App extends React.Component<AppProps, AppState> {
     /** decimal fraction between 0.1 (10% zoom) and 30 (3000% zoom) */
     value: number,
   ) => {
-    this.setState({
-      ...getStateForZoom(
-        {
-          viewportX: this.state.width / 2 + this.state.offsetLeft,
-          viewportY: this.state.height / 2 + this.state.offsetTop,
-          nextZoom: getNormalizedZoom(value),
-        },
-        this.state,
-      ),
-    });
+    this.setState(
+      this.constrainScroll({
+        ...getStateForZoom(
+          {
+            viewportX: this.state.width / 2 + this.state.offsetLeft,
+            viewportY: this.state.height / 2 + this.state.offsetTop,
+            nextZoom: getNormalizedZoom(value),
+          },
+          this.state,
+        ),
+      }),
+    );
   };
 
   private cancelInProgresAnimation: (() => void) | null = null;
@@ -7663,9 +7665,13 @@ class App extends React.Component<AppProps, AppState> {
     const scaledWidth = width / zoom.value;
     const scaledHeight = height / zoom.value;
 
+    const maxZoomX = width / scrollConstraints.width;
+    const maxZoomY = height / scrollConstraints.height;
+
     // Set default constrainedScrollX and constrainedScrollY values
     let constrainedScrollX = scrollX;
     let constrainedScrollY = scrollY;
+    let constrainedZoom = zoom;
 
     // If scrollX is part of the nextState, constrain it within the scroll constraints
     if ("scrollX" in nextState) {
@@ -7689,10 +7695,19 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
+    // If zoom is part of the nextState, constrain it within the scroll constraints
+    if ("zoom" in nextState) {
+      const zoomLimit = Math.min(maxZoomX, maxZoomY);
+      constrainedZoom = {
+        value: getNormalizedZoom(Math.max(nextState.zoom.value, zoomLimit)),
+      };
+    }
+
     return {
       ...nextState,
       scrollX: constrainedScrollX,
       scrollY: constrainedScrollY,
+      zoom: constrainedZoom,
     };
   };
 }
