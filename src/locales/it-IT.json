@@ -124,9 +124,9 @@
     },
     "statusPublished": "Pubblicato",
     "sidebarLock": "Mantieni aperta la barra laterale",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Seleziona tutti gli elementi nel riquadro",
+    "removeAllElementsFromFrame": "Rimuovi tutti gli elementi dal riquadro",
+    "eyeDropper": "Scegli il colore della tela"
   },
   "library": {
     "noItems": "Nessun elemento ancora aggiunto...",
@@ -223,7 +223,7 @@
     "penMode": "Modalità penna - previene il tocco",
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
     "eraser": "Gomma",
-    "frame": "",
+    "frame": "Strumento riquadro",
     "hand": "Mano (strumento di panoramica)",
     "extraTools": "Altri strumenti"
   },
