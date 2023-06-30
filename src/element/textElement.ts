@@ -862,7 +862,6 @@ const VALID_CONTAINER_TYPES = new Set([
   "rectangle",
   "ellipse",
   "diamond",
-  "image",
   "arrow",
 ]);
 

@@ -124,6 +124,8 @@
     },
     "statusPublished": "Publicat",
     "sidebarLock": "Gardar la barra laterala dobèrta",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Mòde estilo - empachar lo contact",
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
     "eraser": "Goma",
-    "hand": "Man (aisina de desplaçament de la vista)"
+    "frame": "",
+    "hand": "Man (aisina de desplaçament de la vista)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Accions del canabàs",

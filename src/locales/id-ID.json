@@ -124,6 +124,8 @@
     },
     "statusPublished": "Telah terbit",
     "sidebarLock": "Biarkan sidebar tetap terbuka",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Mode pena - mencegah sentuhan",
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
     "eraser": "Penghapus",
-    "hand": "Tangan (alat panning)"
+    "frame": "",
+    "hand": "Tangan (alat panning)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",

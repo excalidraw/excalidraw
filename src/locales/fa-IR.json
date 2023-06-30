@@ -124,6 +124,8 @@
     },
     "statusPublished": "منتشر شده",
     "sidebarLock": "باز نگه داشتن سایدبار",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "حالت قلم - جلوگیری از تماس",
     "link": "افزودن/به‌روزرسانی پیوند برای شکل انتخابی",
     "eraser": "پاک کن",
-    "hand": "دست (ابزار پانینگ)"
+    "frame": "",
+    "hand": "دست (ابزار پانینگ)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",

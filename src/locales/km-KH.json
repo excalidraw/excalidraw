@@ -124,6 +124,8 @@
     },
     "statusPublished": "ត្រូវបានបោះពុម្ពផ្សាយ",
     "sidebarLock": "ទុករបារចំហៀងបើក",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "របៀបប៊ិច - ជៀសវាងការប៉ះ",
     "link": "បន្ថែម/ធ្វើបច្ចុប្បន្នភាពតំណភ្ជាប់សម្រាប់រូបរាងដែលបានជ្រើសរើស",
     "eraser": "ជ័រលុប",
-    "hand": "ដៃ (panning tool)"
+    "frame": "",
+    "hand": "ដៃ (panning tool)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "សកម្មភាពបាវ",

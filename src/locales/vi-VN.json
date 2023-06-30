@@ -124,6 +124,8 @@
     },
     "statusPublished": "Đã đăng tải",
     "sidebarLock": "Giữ thanh bên luôn mở",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Chế độ bút vẽ - ngăn ngừa chạm nhầm",
     "link": "Thêm/ Chỉnh sửa liên kết cho hình được chọn",
     "eraser": "Xóa",
-    "hand": "Tay kéo"
+    "frame": "",
+    "hand": "Tay kéo",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Hành động canvas",

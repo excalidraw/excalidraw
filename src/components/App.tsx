@@ -245,6 +245,7 @@ import {
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
+  easeOut,
 } from "../utils";
 import {
   ContextMenu,
@@ -291,13 +292,12 @@ import {
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
-  normalizeLink,
   showHyperlinkTooltip,
   hideHyperlinkToolip,
   Hyperlink,
   isPointHittingLinkIcon,
-  isLocalLink,
 } from "../element/Hyperlink";
+import { isLocalLink, normalizeLink } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
@@ -321,10 +321,7 @@ import {
   actionRemoveAllElementsFromFrame,
   actionSelectAllElementsInFrame,
 } from "../actions/actionFrame";
-import {
-  actionToggleHandTool,
-  zoomToFitElements,
-} from "../actions/actionCanvas";
+import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
@@ -1720,7 +1717,7 @@ class App extends React.Component<AppProps, AppState> {
           theme: this.state.theme,
           imageCache: this.imageCache,
           isExporting: false,
-          renderScrollbars: !this.device.isMobile,
+          renderScrollbars: false,
         },
         callback: ({ atLeastOneVisibleElement, scrollBars }) => {
           if (scrollBars) {
@@ -2240,27 +2237,51 @@ class App extends React.Component<AppProps, AppState> {
     target:
       | ExcalidrawElement
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
-    opts?: { fitToContent?: boolean; animate?: boolean; duration?: number },
+    opts?:
+      | {
+          fitToContent?: boolean;
+          fitToViewport?: never;
+          viewportZoomFactor?: never;
+          animate?: boolean;
+          duration?: number;
+        }
+      | {
+          fitToContent?: never;
+          fitToViewport?: boolean;
+          /** when fitToViewport=true, how much screen should the content cover,
+           * between 0.1 (10%) and 1 (100%)
+           */
+          viewportZoomFactor?: number;
+          animate?: boolean;
+          duration?: number;
+        },
   ) => {
     this.cancelInProgresAnimation?.();
 
     // convert provided target into ExcalidrawElement[] if necessary
-    const targets = Array.isArray(target) ? target : [target];
+    const targetElements = Array.isArray(target) ? target : [target];
 
     let zoom = this.state.zoom;
     let scrollX = this.state.scrollX;
     let scrollY = this.state.scrollY;
 
-    if (opts?.fitToContent) {
-      // compute an appropriate viewport location (scroll X, Y) and zoom level
-      // that fit the target elements on the scene
-      const { appState } = zoomToFitElements(targets, this.state, false);
+    if (opts?.fitToContent || opts?.fitToViewport) {
+      const { appState } = zoomToFit({
+        targetElements,
+        appState: this.state,
+        fitToViewport: !!opts?.fitToViewport,
+        viewportZoomFactor: opts?.viewportZoomFactor,
+      });
       zoom = appState.zoom;
       scrollX = appState.scrollX;
       scrollY = appState.scrollY;
     } else {
       // compute only the viewport location, without any zoom adjustment
-      const scroll = calculateScrollCenter(targets, this.state, this.canvas);
+      const scroll = calculateScrollCenter(
+        targetElements,
+        this.state,
+        this.canvas,
+      );
       scrollX = scroll.scrollX;
       scrollY = scroll.scrollY;
     }
@@ -2270,19 +2291,42 @@ class App extends React.Component<AppProps, AppState> {
     if (opts?.animate) {
       const origScrollX = this.state.scrollX;
       const origScrollY = this.state.scrollY;
+      const origZoom = this.state.zoom.value;
 
-      // zoom animation could become problematic on scenes with large number
-      // of elements, setting it to its final value to improve user experience.
-      //
-      // using zoomCanvas() to zoom on current viewport center
-      this.zoomCanvas(zoom.value);
+      const cancel = easeToValuesRAF({
+        fromValues: {
+          scrollX: origScrollX,
+          scrollY: origScrollY,
+          zoom: origZoom,
+        },
+        toValues: { scrollX, scrollY, zoom: zoom.value },
+        interpolateValue: (from, to, progress, key) => {
+          // for zoom, use different easing
+          if (key === "zoom") {
+            return from * Math.pow(to / from, easeOut(progress));
+          }
+          // handle using default
+          return undefined;
+        },
+        onStep: ({ scrollX, scrollY, zoom }) => {
+          this.setState({
+            scrollX,
+            scrollY,
+            zoom: { value: zoom },
+          });
+        },
+        onStart: () => {
+          this.setState({ shouldCacheIgnoreZoom: true });
+        },
+        onEnd: () => {
+          this.setState({ shouldCacheIgnoreZoom: false });
+        },
+        onCancel: () => {
+          this.setState({ shouldCacheIgnoreZoom: false });
+        },
+        duration: opts?.duration ?? 500,
+      });
 
-      const cancel = easeToValuesRAF(
-        [origScrollX, origScrollY],
-        [scrollX, scrollY],
-        (scrollX, scrollY) => this.setState({ scrollX, scrollY }),
-        { duration: opts?.duration ?? 500 },
-      );
       this.cancelInProgresAnimation = () => {
         cancel();
         this.cancelInProgresAnimation = null;
@@ -3054,7 +3098,10 @@ class App extends React.Component<AppProps, AppState> {
         container,
       );
     if (container && parentCenterPosition) {
-      shouldBindToContainer = true;
+      const boundTextElementToContainer = getBoundTextElement(container);
+      if (!boundTextElementToContainer) {
+        shouldBindToContainer = true;
+      }
     }
     let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
 
@@ -3349,12 +3396,19 @@ class App extends React.Component<AppProps, AppState> {
       this.device.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
-      const url = this.hitLinkElement.link;
+      let url = this.hitLinkElement.link;
       if (url) {
+        url = normalizeLink(url);
         let customEvent;
         if (this.props.onLinkOpen) {
           customEvent = wrapEvent(EVENT.EXCALIDRAW_LINK, event.nativeEvent);
-          this.props.onLinkOpen(this.hitLinkElement, customEvent);
+          this.props.onLinkOpen(
+            {
+              ...this.hitLinkElement,
+              link: url,
+            },
+            customEvent,
+          );
         }
         if (!customEvent?.defaultPrevented) {
           const target = isLocalLink(url) ? "_self" : "_blank";
@@ -3362,7 +3416,7 @@ class App extends React.Component<AppProps, AppState> {
           // https://mathiasbynens.github.io/rel-noopener/
           if (newWindow) {
             newWindow.opener = null;
-            newWindow.location = normalizeLink(url);
+            newWindow.location = url;
           }
         }
       }
