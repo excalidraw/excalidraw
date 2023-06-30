@@ -367,7 +367,7 @@
       "darkMode": "Tema scuro",
       "embedScene": "Includi scena",
       "scale": "Scala",
-      "padding": ""
+      "padding": "Rientro"
     },
     "tooltip": {
       "embedScene": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato."
@@ -453,31 +453,31 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Esporta come immagine",
+        "button": "Esporta come immagine",
+        "description": "Esporta i dati della scena come immagine, che potrai importare in seguito."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Salva su disco",
+        "button": "Salva su disco",
+        "description": "Esporta i dati della scena su file, che potrai importare in seguito."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Esporta su Excalidraw+",
+        "description": "Salva la scena sul tuo spazio di lavoro Excalidraw+."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Carica da file",
+        "button": "Carica da file",
+        "description": "Il caricamento da file sostituirà <bold>il contenuto esistente</bold>.<br></br>Puoi salvare il tuo disegno prima usando una delle opzioni qui sotto."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Carica da link",
+        "button": "Sostituisci il mio contenuto",
+        "description": "Il caricamento da file sostituirà <bold>il contenuto esistente</bold>.<br></br>Puoi salvare il tuo disegno prima usando una delle opzioni qui sotto."
       }
     }
   }
