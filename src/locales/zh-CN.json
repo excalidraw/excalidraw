@@ -124,7 +124,7 @@
     },
     "statusPublished": "已发布",
     "sidebarLock": "侧边栏常驻",
-    "selectAllElementsInFrame": "选择画框中的所有元素",
+    "selectAllElementsInFrame": "删除画框中的所有元素",
     "removeAllElementsFromFrame": "删除画框中的所有元素",
     "eyeDropper": "从画布上取色"
   },
