@@ -414,7 +414,7 @@ const LayerUI = ({
           }
         />
       )}
-      {isTrayMode || device.isMobile && ( //zsviczian Added isTrayMode condition
+      {(isTrayMode || device.isMobile) && ( //zsviczian Added isTrayMode condition
         <MobileMenu
           appState={appState}
           elements={elements}
