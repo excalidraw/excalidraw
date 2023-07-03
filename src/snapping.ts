@@ -1,5 +1,5 @@
 import { getCommonBounds, getElementAbsoluteCoords } from "./element/bounds";
-import { isBoundToContainer } from "./element/typeChecks";
+import { isBoundToContainer, isFrameElement } from "./element/typeChecks";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -209,12 +209,39 @@ export const getSnaps = (
     return null;
   }
 
+  const selectedFrames = selectedElements
+    .filter((element) => isFrameElement(element))
+    .map((frame) => frame.id);
+
+  let referenceElements: ExcalidrawElement[] = getVisibleAndNonSelectedElements(
+    elements,
+    selectedElements,
+    appState,
+  ).filter(
+    (element) => !(element.frameId && selectedFrames.includes(element.frameId)),
+  );
+
+  if (appState.frameToHighlight) {
+    referenceElements = referenceElements.filter(
+      (element) => element.frameId === appState.frameToHighlight?.id,
+    );
+  } else if (
+    appState.isResizing &&
+    new Set(selectedElements.map((element) => element.frameId)).size === 1
+  ) {
+    const frameId = selectedElements[0].frameId;
+    referenceElements = referenceElements.filter(
+      (element) => element.frameId === frameId,
+    );
+  } else {
+    referenceElements = referenceElements.filter((element) => !element.frameId);
+  }
+
   const corners = getElementsCorners(selectedElements);
 
   const offset = GA.offset(dragOffset.x, dragOffset.y);
-  const snaps = getMaximumGroups(
-    getVisibleAndNonSelectedElements(elements, selectedElements, appState),
-  )
+
+  const snaps = getMaximumGroups(referenceElements)
     .filter(
       (elementsGroup) => !elementsGroup.every((element) => element.locked),
     )
