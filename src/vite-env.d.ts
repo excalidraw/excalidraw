@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-pwa/react" />
 /// <reference types="vite-plugin-pwa/info" />
+/// <reference types="vite-plugin-svgr/client" />
 
 interface ImportMetaEnv {
   VITE_APP_BACKEND_V2_GET_URL: string;
