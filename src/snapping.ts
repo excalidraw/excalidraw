@@ -40,7 +40,7 @@ const isSnappingEnabled = ({
   selectedElements,
 }: {
   appState: AppState;
-  event: PointerEvent;
+  event: PointerEvent | MouseEvent | KeyboardEvent;
   selectedElements: NonDeletedExcalidrawElement[];
 }) => {
   // do not suggest snaps for an arrow to give way to binding
@@ -56,13 +56,16 @@ const isSnappingEnabled = ({
 interface ProjectionOptions {
   zoom: Zoom;
   origin: { x: number; y: number };
-  offset: { x: number; y: number };
+  offset?: { x: number; y: number };
   snaps: Snaps;
 }
 
 export const snapProject = ({
   origin,
-  offset,
+  offset = {
+    x: 0,
+    y: 0,
+  },
   snaps,
   zoom,
 }: ProjectionOptions) => {
@@ -193,8 +196,8 @@ const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
 export const getSnaps = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  event: PointerEvent,
-  dragOffset: { x: number; y: number },
+  event: PointerEvent | MouseEvent | KeyboardEvent,
+  dragOffset: { x: number; y: number } = { x: 0, y: 0 },
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
 

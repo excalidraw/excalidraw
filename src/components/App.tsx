@@ -7150,6 +7150,14 @@ class App extends React.Component<AppProps, AppState> {
       });
     });
 
+    const snaps = getSnaps(
+      this.scene.getNonDeletedElements(),
+      this.state,
+      event,
+    );
+
+    this.setState({ snaps });
+
     if (
       transformElements(
         pointerDownState,

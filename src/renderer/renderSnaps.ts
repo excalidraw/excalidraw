@@ -27,7 +27,6 @@ export const renderSnaps = (
 
     const to = snapProject({
       origin: GAPoints.toObject(point),
-      offset: { x: 0, y: 0 },
       snaps,
       zoom: renderConfig.zoom,
     });

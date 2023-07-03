@@ -732,7 +732,7 @@ export const _renderScene = ({
     }
 
     // Paint snaps
-    if (appState.selectedElementsAreBeingDragged) {
+    if (appState.selectedElementsAreBeingDragged || appState.isResizing) {
       context.save();
       context.translate(renderConfig.scrollX, renderConfig.scrollY);
       renderSnaps(
