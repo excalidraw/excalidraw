@@ -21,22 +21,19 @@ import { mutateElement } from "../element/mutateElement";
 import { NormalizedZoomValue } from "../types";
 import { ROUNDNESS } from "../constants";
 import { vi } from "vitest";
+import * as blob from "../data/blob";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
 // This needs to fixed in vitest mock, as when importActual used with mock
-// the tests hangs and updating the alias in mock vs importActual is
-// a hack to fix it - https://github.com/vitest-dev/vitest/issues/546#issuecomment-1493440298
-vi.mock("../data/blob?q=hack", async () => {
-  const originalModule: any = await vi.importActual("../data/blob.ts");
-  //Prevent Node.js modules errors (document is not defined etc...)
-  return {
-    __esModule: true,
-    ...originalModule,
-    resizeImageFile: (imageFile: File) => imageFile,
-    generateIdFromFile: () => "fileId" as FileId,
-  };
-});
+// the tests hangs - https://github.com/vitest-dev/vitest/issues/546.
+// But fortunately spying and mocking the return value of spy works :p
+
+const resizeImageFileSpy = vi.spyOn(blob, "resizeImageFile");
+const generateIdFromFileSpy = vi.spyOn(blob, "generateIdFromFile");
+
+resizeImageFileSpy.mockImplementation(async (imageFile: File) => imageFile);
+generateIdFromFileSpy.mockImplementation(async () => "fileId" as FileId);
 
 beforeEach(async () => {
   // Unmount ReactDOM from root
@@ -716,7 +713,6 @@ describe("image", () => {
       expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, 1]);
       expect(API.getSelectedElements().length).toBeGreaterThan(0);
       expect(API.getSelectedElements()[0].type).toEqual("image");
-      console.log("FILE ID", h.app.files);
       expect(h.app.files.fileId).toBeDefined();
     });
     await checkHorizontalFlip();
