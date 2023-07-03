@@ -15,7 +15,7 @@ describe("<Excalidraw/>", () => {
     }
   });
 
-  describe("Test zenModeEnabled prop", async () => {
+  describe("Test zenModeEnabled prop", () => {
     it('should show exit zen mode button when zen mode is set and zen mode option in context menu when zenModeEnabled is "undefined"', async () => {
       const { container } = await render(<Excalidraw />);
       expect(
@@ -49,7 +49,6 @@ describe("<Excalidraw/>", () => {
         clientY: 1,
       });
       const contextMenu = document.querySelector(".context-menu");
-      console.log("context meny", contextMenu?.outerHTML));
       expect(queryByText(contextMenu as HTMLElement, "Zen mode")).toBe(null);
       expect(h.state.zenModeEnabled).toBe(true);
       expect(
@@ -75,9 +74,16 @@ describe("<Excalidraw/>", () => {
         </Footer>
       </Excalidraw>,
     ));
-    console.log(container.outerHTML);
     expect(container.querySelector(".footer-center")).toMatchInlineSnapshot(
-      "null",
+      `
+      <div
+        class="footer-center zen-mode-transition"
+      >
+        <div>
+          This is a custom footer
+        </div>
+      </div>
+    `,
     );
   });
 

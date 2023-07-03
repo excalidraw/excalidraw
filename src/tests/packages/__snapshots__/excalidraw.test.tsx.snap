@@ -2,11 +2,12 @@
 
 exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu items if passed from host 1`] = `
 <div
-  class="dropdown-menu  dropdown-menu--mobile"
+  class="dropdown-menu"
   data-testid="dropdown-menu"
 >
   <div
-    class="Stack Stack_vertical dropdown-menu-container"
+    class="Island dropdown-menu-container"
+    style="--padding: 2; z-index: 2;"
   >
     <button
       class="dropdown-menu-item dropdown-menu-item-base"
@@ -97,6 +98,11 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
       >
         Help
       </div>
+      <div
+        class="dropdown-menu-item__shortcut"
+      >
+        ?
+      </div>
     </button>
   </div>
 </div>
@@ -104,11 +110,12 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
 
 exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should render menu with default items when "UIOPtions" is "undefined" 1`] = `
 <div
-  class="dropdown-menu  dropdown-menu--mobile"
+  class="dropdown-menu"
   data-testid="dropdown-menu"
 >
   <div
-    class="Stack Stack_vertical dropdown-menu-container"
+    class="Island dropdown-menu-container"
+    style="--padding: 2; z-index: 2;"
   >
     <button
       aria-label="Open"
@@ -141,6 +148,11 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         class="dropdown-menu-item__text"
       >
         Open
+      </div>
+      <div
+        class="dropdown-menu-item__shortcut"
+      >
+        Ctrl+O
       </div>
     </button>
     <button
@@ -232,6 +244,11 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       >
         Export image...
       </div>
+      <div
+        class="dropdown-menu-item__shortcut"
+      >
+        Ctrl+Shift+E
+      </div>
     </button>
     <button
       aria-label="Help"
@@ -284,6 +301,11 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         class="dropdown-menu-item__text"
       >
         Help
+      </div>
+      <div
+        class="dropdown-menu-item__shortcut"
+      >
+        ?
       </div>
     </button>
     <button
@@ -483,6 +505,11 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         class="dropdown-menu-item__text"
       >
         Dark mode
+      </div>
+      <div
+        class="dropdown-menu-item__shortcut"
+      >
+        Shift+Alt+D
       </div>
     </button>
     <div
