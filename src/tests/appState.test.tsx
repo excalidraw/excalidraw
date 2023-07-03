@@ -1,11 +1,4 @@
-import {
-  fireEvent,
-  queryByTestId,
-  render,
-  screen,
-  waitFor,
-} from "./test-utils";
-import { act } from "@testing-library/react";
+import { queryByTestId, render, waitFor } from "./test-utils";
 
 import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";

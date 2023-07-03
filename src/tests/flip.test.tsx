@@ -708,7 +708,6 @@ describe("image", () => {
   it("flips an unrotated image horizontally correctly", async () => {
     //paste image
     await createImage();
-
     await waitFor(() => {
       expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, 1]);
       expect(API.getSelectedElements().length).toBeGreaterThan(0);

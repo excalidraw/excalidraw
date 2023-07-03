@@ -1091,7 +1091,6 @@ describe("regression tests", () => {
 
   it("should show fill icons when element has non transparent background", async () => {
     UI.clickTool("rectangle");
-    console.log(document.querySelector(".App-menu__left")?.outerHTML, "HELLo");
     expect(screen.queryByText(/fill/i)).not.toBeNull();
     mouse.down();
     mouse.up(10, 10);

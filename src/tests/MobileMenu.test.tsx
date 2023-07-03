@@ -3,7 +3,6 @@ import {
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
-  screen,
 } from "./test-utils";
 
 import { UI } from "./helpers/ui";

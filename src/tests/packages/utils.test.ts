@@ -73,11 +73,9 @@ describe("exportToSvg", async () => {
   const passedElements = () => mockedExportUtil.mock.calls[0][0];
   const passedOptions = () => mockedExportUtil.mock.calls[0][1];
 
-  let exportSceneMock: any;
-
   beforeEach(() => {
     //@ts-ignore
-    exportSceneMock = vi.fn().mockImplementation(exportSceneSpy);
+    exportSceneSpy.mockImplementation();
   });
 
   afterEach(() => {
