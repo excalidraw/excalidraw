@@ -124,6 +124,8 @@
     },
     "statusPublished": "प्रकाशित",
     "sidebarLock": "साइडबार खुला रखे.",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": "चित्रफलक से रंग चुने"
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "पेन का मोड - स्पर्श टाले",
     "link": "",
     "eraser": "रबड़",
-    "hand": "हाथ ( खिसकाने का औज़ार)"
+    "frame": "",
+    "hand": "हाथ ( खिसकाने का औज़ार)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",

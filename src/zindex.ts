@@ -376,8 +376,21 @@ function shift(
   ) => ExcalidrawElement[] | readonly ExcalidrawElement[],
   elementsToBeMoved?: readonly ExcalidrawElement[],
 ) {
-  let rootElements = elements.filter((element) => isRootElement(element));
+  const elementsMap = arrayToMap(elements);
   const frameElementsMap = groupByFrames(elements);
+
+  // in case root is non-existent, we promote children elements to root
+  let rootElements = elements.filter(
+    (element) =>
+      isRootElement(element) ||
+      (element.frameId && !elementsMap.has(element.frameId)),
+  );
+  // and remove non-existet root
+  for (const frameId of frameElementsMap.keys()) {
+    if (!elementsMap.has(frameId)) {
+      frameElementsMap.delete(frameId);
+    }
+  }
 
   // shift the root elements first
   rootElements = shiftFunction(
