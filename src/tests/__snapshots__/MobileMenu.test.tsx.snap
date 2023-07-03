@@ -67,6 +67,11 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
       >
         Open
       </div>
+      <div
+        class="welcome-screen-menu-item__shortcut"
+      >
+        Ctrl+O
+      </div>
     </button>
     <button
       class="welcome-screen-menu-item "
@@ -116,6 +121,11 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
         class="welcome-screen-menu-item__text"
       >
         Help
+      </div>
+      <div
+        class="welcome-screen-menu-item__shortcut"
+      >
+        ?
       </div>
     </button>
     <button

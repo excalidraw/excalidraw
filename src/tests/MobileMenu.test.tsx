@@ -37,7 +37,7 @@ describe("Test MobileMenu", () => {
     `);
   });
 
-  it.only("should initialize with welcome screen and hide once user interacts", async () => {
+  it("should initialize with welcome screen and hide once user interacts", async () => {
     expect(document.querySelector(".welcome-screen-center")).toMatchSnapshot();
     UI.clickTool("rectangle");
     expect(document.querySelector(".welcome-screen-center")).toBeNull();
