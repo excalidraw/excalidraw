@@ -7640,6 +7640,7 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.setState({
       scrollConstraints,
+      viewModeEnabled: !!scrollConstraints,
     });
   };
 
@@ -7661,17 +7662,34 @@ class App extends React.Component<AppProps, AppState> {
       return nextState;
     }
 
-    // Calculate scaled width and height
-    const scaledWidth = width / zoom.value;
-    const scaledHeight = height / zoom.value;
-
+    // Calculate maximum zoom for both X and Y axis based on width and height of viewport and scrollable area
     const maxZoomX = width / scrollConstraints.width;
     const maxZoomY = height / scrollConstraints.height;
+
+    // The smallest zoom out of maxZoomX and maxZoomY is our zoom limit
+    const zoomLimit = Math.min(maxZoomX, maxZoomY);
 
     // Set default constrainedScrollX and constrainedScrollY values
     let constrainedScrollX = scrollX;
     let constrainedScrollY = scrollY;
     let constrainedZoom = zoom;
+
+    // Function to adjust scroll position for centered view depending on the zoom value
+    const adjustScrollForCenteredView = (zoomValue: number) => {
+      // If zoom value is less than or equal to maxZoomX, adjust scrollX to ensure the view is centered on the X axis
+      if (zoomValue <= maxZoomX) {
+        const centeredScrollX =
+          (scrollConstraints.width - width / zoomValue) / -2;
+        constrainedScrollX = scrollConstraints.x + centeredScrollX;
+      }
+
+      // If zoom value is less than or equal to maxZoomY, adjust scrollY to ensure the view is centered on the Y axis
+      if (zoomValue <= maxZoomY) {
+        const centeredScrollY =
+          (scrollConstraints.height - height / zoomValue) / -2;
+        constrainedScrollY = scrollConstraints.y + centeredScrollY;
+      }
+    };
 
     // If scrollX is part of the nextState, constrain it within the scroll constraints
     if ("scrollX" in nextState) {
@@ -7679,7 +7697,7 @@ class App extends React.Component<AppProps, AppState> {
         scrollConstraints.x,
         Math.max(
           nextState.scrollX,
-          scrollConstraints.x - scrollConstraints.width + scaledWidth,
+          scrollConstraints.x - scrollConstraints.width + width / zoom.value,
         ),
       );
     }
@@ -7690,19 +7708,26 @@ class App extends React.Component<AppProps, AppState> {
         scrollConstraints.y,
         Math.max(
           nextState.scrollY,
-          scrollConstraints.y - scrollConstraints.height + scaledHeight,
+          scrollConstraints.y - scrollConstraints.height + height / zoom.value,
         ),
       );
     }
 
-    // If zoom is part of the nextState, constrain it within the scroll constraints
-    if ("zoom" in nextState) {
-      const zoomLimit = Math.min(maxZoomX, maxZoomY);
+    // If zoom is part of the nextState, constrain it within the scroll constraints and adjust for centered view
+    if (
+      "zoom" in nextState &&
+      typeof nextState.zoom === "object" &&
+      nextState.zoom !== null
+    ) {
       constrainedZoom = {
         value: getNormalizedZoom(Math.max(nextState.zoom.value, zoomLimit)),
       };
     }
 
+    // Call function to adjust scroll position for centered view depending on the current zoom value
+    adjustScrollForCenteredView(constrainedZoom.value);
+
+    // Return the nextState with constrained scrollX, scrollY, and zoom values
     return {
       ...nextState,
       scrollX: constrainedScrollX,
