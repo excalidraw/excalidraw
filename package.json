@@ -32,6 +32,7 @@
     "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",
     "cross-env": "7.0.3",
+    "eslint-plugin-react": "7.32.2",
     "fake-indexeddb": "3.1.7",
     "firebase": "8.3.3",
     "i18next-browser-languagedetector": "6.1.4",
@@ -69,7 +70,7 @@
     "workbox-streams": "^6.5.4"
   },
   "devDependencies": {
-    "@excalidraw/eslint-config": "1.0.0",
+    "@excalidraw/eslint-config": "1.0.3",
     "@excalidraw/prettier-config": "1.0.2",
     "@types/chai": "4.3.0",
     "@types/jest": "27.4.0",
@@ -85,6 +86,7 @@
     "chai": "4.3.6",
     "dotenv": "16.0.1",
     "eslint-config-prettier": "8.5.0",
+    "eslint-config-react-app": "7.0.1",
     "eslint-plugin-prettier": "3.3.1",
     "http-server": "14.1.1",
     "husky": "7.0.4",
@@ -96,6 +98,7 @@
     "typescript": "4.9.4",
     "vite": "4.2.1",
     "vite-plugin-ejs": "1.6.4",
+    "vite-plugin-eslint": "1.8.1",
     "vite-plugin-pwa": "0.14.7",
     "vite-plugin-svgr": "2.4.0",
     "vitest": "0.32.2",

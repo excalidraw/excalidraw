@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import svgrPlugin from "vite-plugin-svgr";
 import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { VitePWA } from "vite-plugin-pwa";
+import eslint from "vite-plugin-eslint";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -11,6 +12,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    eslint(),
     svgrPlugin(),
     ViteEjsPlugin((config) => {
       const esmEnvironment = loadEnv(config.mode, "./");
