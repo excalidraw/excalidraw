@@ -199,7 +199,11 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import Scene from "../scene/Scene";
-import { RenderConfig, ScrollBars } from "../scene/types";
+import {
+  RenderConfig,
+  ScrollBars,
+  ConstrainedScrollValues,
+} from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
 import { findShapeByKey, SHAPES } from "../shapes";
 import {
@@ -1621,7 +1625,10 @@ class App extends React.Component<AppProps, AppState> {
         ),
       );
     }
-    this.renderScene();
+
+    const constraintedScroll = this.constrainScroll(prevState);
+
+    this.renderScene(constraintedScroll);
     this.history.record(this.state, this.scene.getElementsIncludingDeleted());
 
     // Do not notify consumers if we're still loading the scene. Among other
@@ -1637,7 +1644,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private renderScene = () => {
+  private renderScene = (constrainedScroll?: ConstrainedScrollValues) => {
     const cursorButton: {
       [id: string]: string | undefined;
     } = {};
@@ -1708,10 +1715,10 @@ class App extends React.Component<AppProps, AppState> {
         canvas: this.canvas!,
         renderConfig: {
           selectionColor,
-          scrollX: this.state.scrollX,
-          scrollY: this.state.scrollY,
+          scrollX: constrainedScroll?.scrollX ?? this.state.scrollX,
+          scrollY: constrainedScroll?.scrollY ?? this.state.scrollY,
           viewBackgroundColor: this.state.viewBackgroundColor,
-          zoom: this.state.zoom,
+          zoom: constrainedScroll?.zoom ?? this.state.zoom,
           remotePointerViewportCoords: pointerViewportCoords,
           remotePointerButton: cursorButton,
           remoteSelectedElementIds,
@@ -2250,16 +2257,14 @@ class App extends React.Component<AppProps, AppState> {
     value: number,
   ) => {
     this.setState(
-      this.constrainScroll({
-        ...getStateForZoom(
-          {
-            viewportX: this.state.width / 2 + this.state.offsetLeft,
-            viewportY: this.state.height / 2 + this.state.offsetTop,
-            nextZoom: getNormalizedZoom(value),
-          },
-          this.state,
-        ),
-      }),
+      getStateForZoom(
+        {
+          viewportX: this.state.width / 2 + this.state.offsetLeft,
+          viewportY: this.state.height / 2 + this.state.offsetTop,
+          nextZoom: getNormalizedZoom(value),
+        },
+        this.state,
+      ),
     );
   };
 
@@ -2373,25 +2378,7 @@ class App extends React.Component<AppProps, AppState> {
     state,
   ) => {
     this.cancelInProgresAnimation?.();
-
-    // When there are no scroll constraints, update the state directly
-    if (!this.state.scrollConstraints) {
-      this.setState(state);
-    }
-
-    // If state is a function, we generate the new state and then apply scroll constraints
-    if (typeof state === "function") {
-      this.setState((prevState, props) => {
-        // Generate new state
-        const newState = state(prevState, props);
-
-        // Apply scroll constraints to the new state
-        return this.constrainScroll(newState);
-      });
-    } else {
-      // If state is not a function, apply scroll constraints directly before updating the state
-      this.setState(this.constrainScroll(state));
-    }
+    this.setState(state);
   };
 
   setToast = (
@@ -7651,15 +7638,17 @@ class App extends React.Component<AppProps, AppState> {
    * @param nextState - The next state of the application, or a subset of the application state.
    * @returns The modified next state with scrollX and scrollY constrained to the scroll constraints.
    */
-  private constrainScroll = <K extends keyof AppState>(
-    nextState: AppState | Pick<AppState, K> | null,
-  ) => {
+  private constrainScroll = (prevState: AppState): ConstrainedScrollValues => {
     const { scrollX, scrollY, scrollConstraints, width, height, zoom } =
       this.state;
 
-    // When no scroll constraints are set, return the nextState as is
-    if (!scrollConstraints || !nextState) {
-      return nextState;
+    if (
+      !scrollConstraints ||
+      (this.state.zoom.value === prevState.zoom.value &&
+        this.state.scrollX === prevState.scrollX &&
+        this.state.scrollY === prevState.scrollY)
+    ) {
+      return null;
     }
 
     // Calculate maximum zoom for both X and Y axis based on width and height of viewport and scrollable area
@@ -7691,49 +7680,46 @@ class App extends React.Component<AppProps, AppState> {
       }
     };
 
-    // If scrollX is part of the nextState, constrain it within the scroll constraints
-    if ("scrollX" in nextState) {
-      constrainedScrollX = Math.min(
-        scrollConstraints.x,
-        Math.max(
-          nextState.scrollX,
-          scrollConstraints.x - scrollConstraints.width + width / zoom.value,
-        ),
-      );
-    }
+    // Constrain scrollX and scrollY within the scroll constraints
+    constrainedScrollX = Math.min(
+      scrollConstraints.x,
+      Math.max(
+        scrollX,
+        scrollConstraints.x - scrollConstraints.width + width / zoom.value,
+      ),
+    );
 
-    // If scrollY is part of the nextState, constrain it within the scroll constraints
-    if ("scrollY" in nextState) {
-      constrainedScrollY = Math.min(
-        scrollConstraints.y,
-        Math.max(
-          nextState.scrollY,
-          scrollConstraints.y - scrollConstraints.height + height / zoom.value,
-        ),
-      );
-    }
+    constrainedScrollY = Math.min(
+      scrollConstraints.y,
+      Math.max(
+        scrollY,
+        scrollConstraints.y - scrollConstraints.height + height / zoom.value,
+      ),
+    );
 
-    // If zoom is part of the nextState, constrain it within the scroll constraints and adjust for centered view
-    if (
-      "zoom" in nextState &&
-      typeof nextState.zoom === "object" &&
-      nextState.zoom !== null
-    ) {
-      constrainedZoom = {
-        value: getNormalizedZoom(Math.max(nextState.zoom.value, zoomLimit)),
-      };
-    }
-
-    // Call function to adjust scroll position for centered view depending on the current zoom value
-    adjustScrollForCenteredView(constrainedZoom.value);
-
-    // Return the nextState with constrained scrollX, scrollY, and zoom values
-    return {
-      ...nextState,
-      scrollX: constrainedScrollX,
-      scrollY: constrainedScrollY,
-      zoom: constrainedZoom,
+    // Constrain zoom within the scroll constraints and adjust for centered view
+    constrainedZoom = {
+      value: getNormalizedZoom(Math.max(zoom.value, zoomLimit)),
     };
+
+    adjustScrollForCenteredView(zoom.value);
+
+    // If any of the values have changed, set new state
+    if (
+      constrainedScrollX !== this.state.scrollX ||
+      constrainedScrollY !== this.state.scrollY ||
+      constrainedZoom.value !== this.state.zoom.value
+    ) {
+      const constrainedState = {
+        scrollX: constrainedScrollX,
+        scrollY: constrainedScrollY,
+        zoom: constrainedZoom,
+      };
+      this.setState(constrainedState);
+      return constrainedState;
+    }
+
+    return null;
   };
 }
 

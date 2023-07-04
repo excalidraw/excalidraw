@@ -60,3 +60,8 @@ export type ScrollBars = {
     height: number;
   } | null;
 };
+
+export type ConstrainedScrollValues = Pick<
+  AppState,
+  "scrollX" | "scrollY" | "zoom"
+> | null;
