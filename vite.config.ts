@@ -29,6 +29,10 @@ export default defineConfig({
       return templatingEnvs;
     }),
     VitePWA({
+      devOptions: {
+        /* set this flag to true to enable in Development mode */
+        enabled: false,
+      },
       manifest: {
         short_name: "Excalidraw",
         name: "Excalidraw",
