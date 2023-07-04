@@ -170,7 +170,8 @@
     "embed": "Toggle embedding",
     "publishLibrary": "Publish",
     "submit": "Submit",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "iframeInteractionButton": "Click to interact"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",

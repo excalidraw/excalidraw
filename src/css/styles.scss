@@ -678,19 +678,20 @@
 .excalidraw__iframe-container {
   .excalidraw__iframe-container__inner {
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  &.is-hovered .excalidraw__iframe-container__inner::before {
-    content: "";
+  .excalidraw__iframe-hint {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(
-      ellipse at center,
-      rgba(0, 0, 0, 0) 20%,
-      rgba(0, 0, 0, 0.6) 80%
-    );
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1rem 1.6rem;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: bold;
+    letter-spacing: 0.6px;
+    font-family: "Assistant";
   }
 }

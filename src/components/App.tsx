@@ -852,10 +852,16 @@ class App extends React.Component<AppProps, AppState> {
                   pointerEvents: isActive ? "auto" : "none",
                 }}
               >
+                {isHovered && (
+                  <div className="excalidraw__iframe-hint">
+                    {t("buttons.iframeInteractionButton")}
+                  </div>
+                )}
                 <div
                   style={{
                     padding: `${el.strokeWidth}px`,
                     height: "100%",
+                    width: "100%",
                   }}
                 >
                   {this.props.renderCustomIFrame?.(
