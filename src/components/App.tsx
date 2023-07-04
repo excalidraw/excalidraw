@@ -7642,11 +7642,15 @@ class App extends React.Component<AppProps, AppState> {
     const { scrollX, scrollY, scrollConstraints, width, height, zoom } =
       this.state;
 
+    // Skip if scroll constraints are not defined or if the zoom level or viewport dimensions have not changed.
+    // Constrains and scene will update on change of viewport dimensions.
     if (
       !scrollConstraints ||
       (this.state.zoom.value === prevState.zoom.value &&
         this.state.scrollX === prevState.scrollX &&
-        this.state.scrollY === prevState.scrollY)
+        this.state.scrollY === prevState.scrollY &&
+        this.state.width === prevState.width &&
+        this.state.height === prevState.height)
     ) {
       return null;
     }
