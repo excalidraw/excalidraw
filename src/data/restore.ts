@@ -41,7 +41,6 @@ import {
   measureBaseline,
 } from "../element/textElement";
 import { COLOR_PALETTE } from "../colors";
-import { IFrameURLValidator } from "../element/iframe";
 import { normalizeLink } from "./url";
 
 type RestoredAppState = Omit<
@@ -279,7 +278,7 @@ const restoreElement = (
       return restoreElementWithProperties(element, {});
     case "iframe":
       return restoreElementWithProperties(element, {
-        whitelisted: IFrameURLValidator.getInstance().run(element.link),
+        whitelisted: undefined,
       });
     case "frame":
       return restoreElementWithProperties(element, {

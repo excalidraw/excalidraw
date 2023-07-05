@@ -167,6 +167,7 @@ import {
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
+  ExcalidrawIFrameElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -257,7 +258,7 @@ import {
   muteFSAbortError,
   easeOut,
 } from "../utils";
-import { IFrameURLValidator, getEmbedLink } from "../element/iframe";
+import { iframeURLValidator, getEmbedLink } from "../element/iframe";
 import {
   ContextMenu,
   ContextMenuItems,
@@ -489,7 +490,6 @@ class App extends React.Component<AppProps, AppState> {
       showHyperlinkPopup: false,
       defaultSidebarDockedPreference: false,
     };
-    IFrameURLValidator.getInstance(props.iframeURLWhitelist);
     this.id = nanoid();
     this.library = new Library(this);
     if (excalidrawRef) {
@@ -779,13 +779,32 @@ class App extends React.Component<AppProps, AppState> {
     const scale = this.state.zoom.value;
     const normalizedWidth = this.state.width;
     const normalizedHeight = this.state.height;
-    const iFrameElements = this.scene
-      .getNonDeletedElements()
-      .filter((el) => isIFrameElement(el) && el.whitelisted);
+    const whitelistUpdates = new Map<ExcalidrawIFrameElement, boolean>();
+
+    const iFrameElements = this.scene.getNonDeletedElements().filter((el) => {
+      if (!isIFrameElement(el)) {
+        return false;
+      }
+      if (typeof el.whitelisted === "undefined") {
+        const isWhitelisted = iframeURLValidator(
+          el.link,
+          this.props.iframeURLWhitelist,
+        );
+        whitelistUpdates.set(el, isWhitelisted);
+        return isWhitelisted;
+      }
+      return el.whitelisted;
+    });
     Object.keys(this.iFrameRefs).forEach((key) => {
       if (!iFrameElements.some((el) => el.id === key)) {
         delete this.iFrameRefs[key];
       }
+    });
+    setTimeout(() => {
+      whitelistUpdates.forEach((whitelisted, element) => {
+        mutateElement(element, { whitelisted });
+        invalidateShapeForElement(element);
+      });
     });
     return (
       <>
@@ -2230,7 +2249,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.text) {
         if (
           !isPlainPaste &&
-          IFrameURLValidator.getInstance().run(data.text) &&
+          iframeURLValidator(data.text, this.props.iframeURLWhitelist) &&
           (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(data.text) ||
             getEmbedLink(data.text)?.type === "video")
         ) {
@@ -5293,7 +5312,7 @@ class App extends React.Component<AppProps, AppState> {
       width: embedLink.aspectRatio.w,
       height: embedLink.aspectRatio.h,
       link,
-      whitelisted: IFrameURLValidator.getInstance().run(link),
+      whitelisted: undefined,
     });
 
     this.scene.replaceAllElements([
@@ -7417,7 +7436,7 @@ class App extends React.Component<AppProps, AppState> {
       const text = event.dataTransfer?.getData("text");
       if (
         text &&
-        IFrameURLValidator.getInstance().run(text) &&
+        iframeURLValidator(text, this.props.iframeURLWhitelist) &&
         (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
           getEmbedLink(text)?.type === "video")
       ) {

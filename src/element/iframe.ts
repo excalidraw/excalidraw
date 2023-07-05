@@ -165,41 +165,22 @@ export const actionSetIFrameAsActiveTool = register({
   keyTest: (event) => event.key.toLocaleLowerCase() === KEYS.W,
 });
 
-export class IFrameURLValidator {
-  private static instance: IFrameURLValidator;
-  private validators: IFrameURLValidatorRules;
-
-  private constructor(validators: IFrameURLValidatorRules = []) {
-    this.validators = validators;
+export const iframeURLValidator = (
+  url: string | null | undefined,
+  validators: IFrameURLValidatorRules = [],
+): boolean => {
+  if (!url) {
+    return false;
   }
-
-  public static getInstance(
-    validators?: IFrameURLValidatorRules,
-  ): IFrameURLValidator {
-    if (!IFrameURLValidator.instance) {
-      IFrameURLValidator.instance = new IFrameURLValidator(validators);
+  for (const validator of validators) {
+    if (typeof validator === "boolean") {
+      return validator;
     }
-    return IFrameURLValidator.instance;
+    if (url.match(validator)) {
+      return true;
+    }
   }
-
-  public run(url: string | null | undefined): boolean {
-    if (!url) {
-      return false;
-    }
-    for (const validator of this.validators) {
-      if (typeof validator === "boolean") {
-        return validator;
-      }
-      if (url.match(validator)) {
-        return true;
-      }
-    }
-    return Boolean(
-      url.match(YOUTUBE_REG) ||
-        url.match(VIMEO_REG) ||
-        //url.match(TWITTER_REG) ||
-        url.match(FIGMA_REG),
-      //|| url.match(EXCALIDRAW_REG),
-    );
-  }
-}
+  return Boolean(
+    url.match(YOUTUBE_REG) || url.match(VIMEO_REG) || url.match(FIGMA_REG),
+  );
+};

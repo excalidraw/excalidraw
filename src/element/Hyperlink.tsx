@@ -5,7 +5,7 @@ import {
   viewportCoordsToSceneCoords,
   wrapEvent,
 } from "../utils";
-import { getEmbedLink, IFrameURLValidator } from "./iframe";
+import { getEmbedLink, iframeURLValidator } from "./iframe";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
 
@@ -37,7 +37,7 @@ import { isLocalLink, normalizeLink } from "../data/url";
 
 import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
-import { useExcalidrawAppState } from "../components/App";
+import { useAppProps, useExcalidrawAppState } from "../components/App";
 import { isIFrameElement } from "./typeChecks";
 
 const CONTAINER_WIDTH = 320;
@@ -69,6 +69,7 @@ export const Hyperlink = ({
   ) => void;
 }) => {
   const appState = useExcalidrawAppState();
+  const appProps = useAppProps();
 
   const linkVal = element.link || "";
 
@@ -88,7 +89,7 @@ export const Hyperlink = ({
     }
 
     if (isIFrameElement(element)) {
-      if (!IFrameURLValidator.getInstance().run(link)) {
+      if (!iframeURLValidator(link, appProps.iframeURLWhitelist)) {
         if (link && link !== "") {
           setToast({ message: t("toast.unableToEmbed"), closable: true });
         }
@@ -134,7 +135,7 @@ export const Hyperlink = ({
       mutateElement(element, { link });
     }
     setAppState({ showHyperlinkPopup: "info" });
-  }, [element, setAppState, setToast]);
+  }, [element, setAppState, setToast, appProps.iframeURLWhitelist]);
 
   useLayoutEffect(() => {
     return () => {

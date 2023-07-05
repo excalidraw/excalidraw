@@ -134,7 +134,7 @@ export const newElement = (
 export const newIFrameElement = (
   opts: {
     type: "iframe";
-    whitelisted: boolean;
+    whitelisted: boolean | undefined;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawIFrameElement> => {
   return {
