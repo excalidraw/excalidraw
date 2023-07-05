@@ -102,6 +102,7 @@ export const loadFromJSON = async (
     await normalizeFile(file),
     localAppState,
     localElements,
+    //@ts-ignore #5372 https://github.com/excalidraw/excalidraw/commit/bbfd2b3cd3b944d1c8191e54d848401ed0a00e90
     file.handle,
   );
 };
