@@ -149,14 +149,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -192,14 +192,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -221,14 +221,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 0,
           "y": 30,
@@ -264,14 +264,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -293,14 +293,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 0,
           "y": 30,
@@ -322,14 +322,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 0,
           "y": 60,
@@ -368,14 +368,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 0,
           "y": 30,
@@ -399,14 +399,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 915032327,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -430,14 +430,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 238820263,
+          "versionNonce": 81784553,
           "width": 10,
           "x": 0,
           "y": 60,
@@ -450,7 +450,7 @@ Object {
 
 exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] number of elements 1`] = `0`;
 
-exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] number of renders 1`] = `28`;
+exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] number of renders 1`] = `10`;
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] appState 1`] = `
 Object {
@@ -603,14 +603,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 100,
           "x": 0,
           "y": 0,
@@ -646,14 +646,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 100,
           "x": 0,
           "y": 0,
@@ -675,14 +675,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 100,
           "x": 110,
           "y": 110,
@@ -718,14 +718,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 100,
           "x": 0,
           "y": 0,
@@ -747,14 +747,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 100,
           "x": 110,
           "y": 110,
@@ -776,14 +776,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 100,
           "x": 220,
           "y": 220,
@@ -822,14 +822,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 100,
           "x": 110,
           "y": 110,
@@ -853,14 +853,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 493213705,
           "width": 100,
           "x": 0,
           "y": 0,
@@ -884,14 +884,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 915032327,
           "width": 100,
           "x": 220,
           "y": 220,
@@ -904,7 +904,7 @@ Object {
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] number of elements 1`] = `0`;
 
-exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] number of renders 1`] = `24`;
+exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] appState 1`] = `
 Object {
@@ -1048,14 +1048,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -1091,14 +1091,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -1120,14 +1120,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 0,
@@ -1168,14 +1168,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1150084233,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -1199,14 +1199,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 1505387817,
           "width": 10,
           "x": 30,
           "y": 0,
@@ -1244,14 +1244,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1150084233,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -1275,14 +1275,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 1505387817,
           "width": 10,
           "x": 30,
           "y": 0,
@@ -1320,14 +1320,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1150084233,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -1351,14 +1351,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 1505387817,
           "width": 10,
           "x": 30,
           "y": 0,
@@ -1380,14 +1380,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 400692809,
+          "seed": 81784553,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1604849351,
+          "versionNonce": 1723083209,
           "width": 10,
           "x": 60,
           "y": 0,
@@ -1430,14 +1430,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 493213705,
+          "versionNonce": 1315507081,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -1462,14 +1462,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 915032327,
+          "versionNonce": 1898319239,
           "width": 10,
           "x": 30,
           "y": 0,
@@ -1493,14 +1493,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 400692809,
+          "seed": 81784553,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 81784553,
+          "versionNonce": 640725609,
           "width": 10,
           "x": 60,
           "y": 0,
@@ -1539,14 +1539,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 493213705,
+          "versionNonce": 1315507081,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -1571,14 +1571,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 915032327,
+          "versionNonce": 1898319239,
           "width": 10,
           "x": 30,
           "y": 0,
@@ -1602,14 +1602,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 400692809,
+          "seed": 81784553,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 81784553,
+          "versionNonce": 640725609,
           "width": 10,
           "x": 60,
           "y": 0,
@@ -1648,14 +1648,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 493213705,
+          "versionNonce": 1315507081,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -1680,14 +1680,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 915032327,
+          "versionNonce": 1898319239,
           "width": 10,
           "x": 30,
           "y": 0,
@@ -1711,14 +1711,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 400692809,
+          "seed": 81784553,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 81784553,
+          "versionNonce": 640725609,
           "width": 10,
           "x": 60,
           "y": 0,
@@ -1731,7 +1731,7 @@ Object {
 
 exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] number of renders 1`] = `43`;
+exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] appState 1`] = `
 Object {
@@ -1877,14 +1877,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -1920,14 +1920,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 3,
-          "versionNonce": 453191,
+          "versionNonce": 1150084233,
           "width": 10,
           "x": 25,
           "y": 25,
@@ -1940,7 +1940,7 @@ Object {
 
 exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] number of renders 1`] = `12`;
+exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests adjusts z order when grouping: [end of test] appState 1`] = `
 Object {
@@ -2089,14 +2089,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -2132,14 +2132,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -2161,14 +2161,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -2204,14 +2204,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -2233,14 +2233,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -2262,14 +2262,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 50,
           "y": 10,
@@ -2308,14 +2308,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -2339,14 +2339,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 915032327,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -2370,14 +2370,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 238820263,
+          "versionNonce": 81784553,
           "width": 10,
           "x": 50,
           "y": 10,
@@ -2390,7 +2390,7 @@ Object {
 
 exports[`regression tests adjusts z order when grouping: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests adjusts z order when grouping: [end of test] number of renders 1`] = `22`;
+exports[`regression tests adjusts z order when grouping: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests alt-drag duplicates an element: [end of test] appState 1`] = `
 Object {
@@ -2536,14 +2536,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -2579,14 +2579,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 1014066025,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 2019559783,
+          "versionNonce": 238820263,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -2608,14 +2608,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 453191,
+          "versionNonce": 1150084233,
           "width": 10,
           "x": 20,
           "y": 20,
@@ -2628,7 +2628,7 @@ Object {
 
 exports[`regression tests alt-drag duplicates an element: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `12`;
+exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests arrow keys: [end of test] appState 1`] = `
 Object {
@@ -2772,14 +2772,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -2792,7 +2792,7 @@ Object {
 
 exports[`regression tests arrow keys: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests arrow keys: [end of test] number of renders 1`] = `21`;
+exports[`regression tests arrow keys: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] appState 1`] = `
 Object {
@@ -2938,14 +2938,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 200,
           "x": 100,
           "y": 100,
@@ -2981,14 +2981,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 200,
           "x": 100,
           "y": 100,
@@ -3010,14 +3010,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 200,
           "x": 100,
           "y": 100,
@@ -3053,14 +3053,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 200,
           "x": 100,
           "y": 100,
@@ -3082,14 +3082,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 200,
           "x": 100,
           "y": 100,
@@ -3111,14 +3111,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 350,
           "x": 300,
           "y": 300,
@@ -3154,14 +3154,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 200,
           "x": 100,
           "y": 100,
@@ -3183,14 +3183,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 493213705,
           "width": 200,
           "x": 300,
           "y": 300,
@@ -3212,14 +3212,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 350,
           "x": 300,
           "y": 300,
@@ -3232,7 +3232,7 @@ Object {
 
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] number of renders 1`] = `20`;
+exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests change the properties of a shape: [end of test] appState 1`] = `
 Object {
@@ -3376,14 +3376,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -3419,14 +3419,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 449462985,
+          "versionNonce": 2019559783,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -3462,14 +3462,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -3505,14 +3505,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1971c2",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 5,
-          "versionNonce": 401146281,
+          "versionNonce": 238820263,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -3525,7 +3525,7 @@ Object {
 
 exports[`regression tests change the properties of a shape: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `14`;
+exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests click on an element and drag it: [dragged] appState 1`] = `
 Object {
@@ -3644,14 +3644,14 @@ Object {
   "roundness": Object {
     "type": 3,
   },
-  "seed": 337897,
+  "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
   "updated": 1,
   "version": 3,
-  "versionNonce": 453191,
+  "versionNonce": 1150084233,
   "width": 10,
   "x": 20,
   "y": 20,
@@ -3703,14 +3703,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -3746,14 +3746,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 453191,
+          "versionNonce": 1150084233,
           "width": 10,
           "x": 20,
           "y": 20,
@@ -3766,7 +3766,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [dragged] number of elements 1`] = `1`;
 
-exports[`regression tests click on an element and drag it: [dragged] number of renders 1`] = `12`;
+exports[`regression tests click on an element and drag it: [dragged] number of renders 1`] = `7`;
 
 exports[`regression tests click on an element and drag it: [end of test] appState 1`] = `
 Object {
@@ -3912,14 +3912,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -3955,14 +3955,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 453191,
+          "versionNonce": 1150084233,
           "width": 10,
           "x": 20,
           "y": 20,
@@ -3998,14 +3998,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 2019559783,
+          "versionNonce": 400692809,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -4018,7 +4018,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `15`;
+exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests click to select a shape: [end of test] appState 1`] = `
 Object {
@@ -4164,14 +4164,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -4207,14 +4207,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -4236,14 +4236,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -4256,7 +4256,7 @@ Object {
 
 exports[`regression tests click to select a shape: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `15`;
+exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests click-drag to select a group: [end of test] appState 1`] = `
 Object {
@@ -4403,14 +4403,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -4446,14 +4446,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -4475,14 +4475,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -4518,14 +4518,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -4547,14 +4547,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -4576,14 +4576,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 50,
           "y": 10,
@@ -4596,7 +4596,478 @@ Object {
 
 exports[`regression tests click-drag to select a group: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `21`;
+exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `9`;
+
+exports[`regression tests deleting last but one element in editing group should unselect the group: [end of test] appState 1`] = `
+Object {
+  "activeTool": Object {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "frameRendering": Object {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 768,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "pasteDialog": Object {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id1": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": Object {
+    "id4": false,
+  },
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "startBoundElement": null,
+  "suggestedBindings": Array [],
+  "theme": "light",
+  "toast": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": Object {
+    "value": 1,
+  },
+}
+`;
+
+exports[`regression tests deleting last but one element in editing group should unselect the group: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "frameId": null,
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 1278240551,
+          "strokeColor": "#1e1e1e",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 10,
+          "x": 10,
+          "y": 0,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "frameId": null,
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 1278240551,
+          "strokeColor": "#1e1e1e",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 10,
+          "x": 10,
+          "y": 0,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "frameId": null,
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 2019559783,
+          "strokeColor": "#1e1e1e",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 2,
+          "versionNonce": 1116226695,
+          "width": 10,
+          "x": 50,
+          "y": 0,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+        },
+        "selectedGroupIds": Object {
+          "id4": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "frameId": null,
+          "groupIds": Array [
+            "id4",
+          ],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 1278240551,
+          "strokeColor": "#1e1e1e",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 3,
+          "versionNonce": 1604849351,
+          "width": 10,
+          "x": 10,
+          "y": 0,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "frameId": null,
+          "groupIds": Array [
+            "id4",
+          ],
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 2019559783,
+          "strokeColor": "#1e1e1e",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 3,
+          "versionNonce": 1505387817,
+          "width": 10,
+          "x": 50,
+          "y": 0,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": "id4",
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "frameId": null,
+          "groupIds": Array [
+            "id4",
+          ],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": true,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 1278240551,
+          "strokeColor": "#1e1e1e",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 4,
+          "versionNonce": 493213705,
+          "width": 10,
+          "x": 10,
+          "y": 0,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "frameId": null,
+          "groupIds": Array [
+            "id4",
+          ],
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 2019559783,
+          "strokeColor": "#1e1e1e",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 3,
+          "versionNonce": 1505387817,
+          "width": 10,
+          "x": 50,
+          "y": 0,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "selectedGroupIds": Object {
+          "id4": false,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "frameId": null,
+          "groupIds": Array [
+            "id4",
+          ],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": true,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 1278240551,
+          "strokeColor": "#1e1e1e",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 4,
+          "versionNonce": 493213705,
+          "width": 10,
+          "x": 10,
+          "y": 0,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "frameId": null,
+          "groupIds": Array [
+            "id4",
+          ],
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": Object {
+            "type": 3,
+          },
+          "seed": 2019559783,
+          "strokeColor": "#1e1e1e",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 3,
+          "versionNonce": 1505387817,
+          "width": 10,
+          "x": 50,
+          "y": 0,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests deleting last but one element in editing group should unselect the group: [end of test] number of elements 1`] = `0`;
+
+exports[`regression tests deleting last but one element in editing group should unselect the group: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] appState 1`] = `
 Object {
@@ -4641,7 +5112,7 @@ Object {
     "roundness": Object {
       "type": 2,
     },
-    "seed": 2019559783,
+    "seed": 400692809,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 1,
@@ -4722,7 +5193,7 @@ Object {
     "roundness": Object {
       "type": 2,
     },
-    "seed": 2019559783,
+    "seed": 400692809,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 1,
@@ -4797,14 +5268,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -4840,14 +5311,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -4869,14 +5340,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 110,
           "y": 110,
@@ -4889,7 +5360,7 @@ Object {
 
 exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `16`;
+exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] appState 1`] = `
 Object {
@@ -4934,7 +5405,7 @@ Object {
     "roundness": Object {
       "type": 2,
     },
-    "seed": 2019559783,
+    "seed": 400692809,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 1,
@@ -5062,14 +5533,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -5105,14 +5576,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -5134,14 +5605,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 110,
           "y": 110,
@@ -5154,7 +5625,7 @@ Object {
 
 exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] number of renders 1`] = `17`;
+exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] appState 1`] = `
 Object {
@@ -5199,7 +5670,7 @@ Object {
     "roundness": Object {
       "type": 2,
     },
-    "seed": 449462985,
+    "seed": 2019559783,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 1,
@@ -5279,7 +5750,7 @@ Object {
     "roundness": Object {
       "type": 2,
     },
-    "seed": 449462985,
+    "seed": 2019559783,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 1,
@@ -5354,14 +5825,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -5374,7 +5845,7 @@ Object {
 
 exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `10`;
+exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] appState 1`] = `
 Object {
@@ -5518,14 +5989,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 100,
           "x": 0,
           "y": 0,
@@ -5538,7 +6009,7 @@ Object {
 
 exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] number of renders 1`] = `11`;
+exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests double click to edit a group: [end of test] appState 1`] = `
 Object {
@@ -5682,14 +6153,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -5725,14 +6196,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -5754,14 +6225,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -5797,14 +6268,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -5826,14 +6297,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -5855,14 +6326,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 50,
           "y": 10,
@@ -5904,14 +6375,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1150084233,
+          "versionNonce": 23633383,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -5935,14 +6406,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 493213705,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -5966,14 +6437,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 915032327,
           "width": 10,
           "x": 50,
           "y": 10,
@@ -5986,7 +6457,7 @@ Object {
 
 exports[`regression tests double click to edit a group: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests double click to edit a group: [end of test] number of renders 1`] = `20`;
+exports[`regression tests double click to edit a group: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] appState 1`] = `
 Object {
@@ -6134,14 +6605,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -6177,14 +6648,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -6206,14 +6677,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 110,
           "y": 110,
@@ -6250,14 +6721,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1150084233,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 25,
           "y": 25,
@@ -6279,14 +6750,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 23633383,
           "width": 10,
           "x": 135,
           "y": 135,
@@ -6299,7 +6770,7 @@ Object {
 
 exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] number of renders 1`] = `18`;
+exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests draw every type of shape: [end of test] appState 1`] = `
 Object {
@@ -6441,14 +6912,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -6484,14 +6955,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -6513,14 +6984,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 20,
           "x": 40,
           "y": -10,
@@ -6556,14 +7027,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -6585,14 +7056,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 20,
           "x": 40,
           "y": -10,
@@ -6614,14 +7085,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 20,
           "x": 70,
           "y": -10,
@@ -6657,14 +7128,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -6686,14 +7157,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 20,
           "x": 40,
           "y": -10,
@@ -6715,14 +7186,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 20,
           "x": 70,
           "y": -10,
@@ -6757,7 +7228,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 1150084233,
+          "seed": 23633383,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -6766,7 +7237,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 81784553,
           "width": 50,
           "x": 130,
           "y": -10,
@@ -6802,14 +7273,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -6831,14 +7302,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 20,
           "x": 40,
           "y": -10,
@@ -6860,14 +7331,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 20,
           "x": 70,
           "y": -10,
@@ -6902,7 +7373,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 1150084233,
+          "seed": 23633383,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -6911,7 +7382,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 81784553,
           "width": 50,
           "x": 130,
           "y": -10,
@@ -6946,7 +7417,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 238820263,
+          "seed": 1723083209,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -6955,7 +7426,7 @@ Object {
           "type": "line",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1604849351,
+          "versionNonce": 289600103,
           "width": 50,
           "x": 220,
           "y": -10,
@@ -6991,14 +7462,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -7020,14 +7491,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 20,
           "x": 40,
           "y": -10,
@@ -7049,14 +7520,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 20,
           "x": 70,
           "y": -10,
@@ -7091,7 +7562,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 1150084233,
+          "seed": 23633383,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7100,7 +7571,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 81784553,
           "width": 50,
           "x": 130,
           "y": -10,
@@ -7135,7 +7606,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 238820263,
+          "seed": 1723083209,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7144,7 +7615,7 @@ Object {
           "type": "line",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1604849351,
+          "versionNonce": 289600103,
           "width": 50,
           "x": 220,
           "y": -10,
@@ -7182,7 +7653,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 1505387817,
+          "seed": 1898319239,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7191,7 +7662,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 5,
-          "versionNonce": 81784553,
+          "versionNonce": 1349943049,
           "width": 50,
           "x": 310,
           "y": -10,
@@ -7227,14 +7698,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -7256,14 +7727,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 20,
           "x": 40,
           "y": -10,
@@ -7285,14 +7756,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 20,
           "x": 70,
           "y": -10,
@@ -7327,7 +7798,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 1150084233,
+          "seed": 23633383,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7336,7 +7807,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 81784553,
           "width": 50,
           "x": 130,
           "y": -10,
@@ -7371,7 +7842,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 238820263,
+          "seed": 1723083209,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7380,7 +7851,7 @@ Object {
           "type": "line",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1604849351,
+          "versionNonce": 289600103,
           "width": 50,
           "x": 220,
           "y": -10,
@@ -7422,7 +7893,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 1505387817,
+          "seed": 1898319239,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7431,7 +7902,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 7,
-          "versionNonce": 1723083209,
+          "versionNonce": 1292308681,
           "width": 80,
           "x": 310,
           "y": -10,
@@ -7467,14 +7938,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -7496,14 +7967,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 20,
           "x": 40,
           "y": -10,
@@ -7525,14 +7996,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 20,
           "x": 70,
           "y": -10,
@@ -7567,7 +8038,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 1150084233,
+          "seed": 23633383,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7576,7 +8047,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 81784553,
           "width": 50,
           "x": 130,
           "y": -10,
@@ -7611,7 +8082,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 238820263,
+          "seed": 1723083209,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7620,7 +8091,7 @@ Object {
           "type": "line",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1604849351,
+          "versionNonce": 289600103,
           "width": 50,
           "x": 220,
           "y": -10,
@@ -7662,7 +8133,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 1505387817,
+          "seed": 1898319239,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7671,7 +8142,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 7,
-          "versionNonce": 1723083209,
+          "versionNonce": 1292308681,
           "width": 80,
           "x": 310,
           "y": -10,
@@ -7709,7 +8180,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 760410951,
+          "seed": 1508694887,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7718,7 +8189,7 @@ Object {
           "type": "line",
           "updated": 1,
           "version": 5,
-          "versionNonce": 1898319239,
+          "versionNonce": 1177973545,
           "width": 50,
           "x": 430,
           "y": -10,
@@ -7754,14 +8225,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -7783,14 +8254,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 20,
           "x": 40,
           "y": -10,
@@ -7812,14 +8283,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 20,
           "x": 70,
           "y": -10,
@@ -7854,7 +8325,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 1150084233,
+          "seed": 23633383,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7863,7 +8334,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 81784553,
           "width": 50,
           "x": 130,
           "y": -10,
@@ -7898,7 +8369,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 238820263,
+          "seed": 1723083209,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7907,7 +8378,7 @@ Object {
           "type": "line",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1604849351,
+          "versionNonce": 289600103,
           "width": 50,
           "x": 220,
           "y": -10,
@@ -7949,7 +8420,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 1505387817,
+          "seed": 1898319239,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -7958,7 +8429,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 7,
-          "versionNonce": 1723083209,
+          "versionNonce": 1292308681,
           "width": 80,
           "x": 310,
           "y": -10,
@@ -8000,7 +8471,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 760410951,
+          "seed": 1508694887,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -8009,7 +8480,7 @@ Object {
           "type": "line",
           "updated": 1,
           "version": 7,
-          "versionNonce": 406373543,
+          "versionNonce": 271613161,
           "width": 80,
           "x": 430,
           "y": -10,
@@ -8043,14 +8514,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -8072,14 +8543,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 20,
           "x": 40,
           "y": -10,
@@ -8101,14 +8572,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 20,
           "x": 70,
           "y": -10,
@@ -8143,7 +8614,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 1150084233,
+          "seed": 23633383,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -8152,7 +8623,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 81784553,
           "width": 50,
           "x": 130,
           "y": -10,
@@ -8187,7 +8658,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 238820263,
+          "seed": 1723083209,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -8196,7 +8667,7 @@ Object {
           "type": "line",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1604849351,
+          "versionNonce": 289600103,
           "width": 50,
           "x": 220,
           "y": -10,
@@ -8238,7 +8709,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 1505387817,
+          "seed": 1898319239,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -8247,7 +8718,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 7,
-          "versionNonce": 1723083209,
+          "versionNonce": 1292308681,
           "width": 80,
           "x": 310,
           "y": -10,
@@ -8289,7 +8760,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 760410951,
+          "seed": 1508694887,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -8298,7 +8769,7 @@ Object {
           "type": "line",
           "updated": 1,
           "version": 7,
-          "versionNonce": 406373543,
+          "versionNonce": 271613161,
           "width": 80,
           "x": 430,
           "y": -10,
@@ -8341,7 +8812,7 @@ Object {
           ],
           "roughness": 1,
           "roundness": null,
-          "seed": 941653321,
+          "seed": 1189086535,
           "simulatePressure": false,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
@@ -8349,7 +8820,7 @@ Object {
           "type": "freedraw",
           "updated": 1,
           "version": 4,
-          "versionNonce": 1359939303,
+          "versionNonce": 1439318121,
           "width": 50,
           "x": 550,
           "y": -10,
@@ -8362,7 +8833,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `57`;
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `32`;
 
 exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] appState 1`] = `
 Object {
@@ -8509,14 +8980,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -8552,14 +9023,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -8581,14 +9052,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 100,
           "x": 110,
           "y": 110,
@@ -8624,14 +9095,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -8653,14 +9124,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 100,
           "x": 110,
           "y": 110,
@@ -8682,14 +9153,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 100,
           "x": 310,
           "y": 310,
@@ -8702,7 +9173,7 @@ Object {
 
 exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of renders 1`] = `21`;
+exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] appState 1`] = `
 Object {
@@ -8849,14 +9320,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 449462985,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 401146281,
           "width": 1000,
           "x": 0,
           "y": 0,
@@ -8892,14 +9363,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 449462985,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 401146281,
           "width": 1000,
           "x": 0,
           "y": 0,
@@ -8921,14 +9392,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 1150084233,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1014066025,
           "width": 1000,
           "x": 500,
           "y": 500,
@@ -8941,7 +9412,7 @@ Object {
 
 exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `19`;
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] appState 1`] = `
 Object {
@@ -9087,7 +9558,7 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
@@ -9116,7 +9587,7 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 1278240551,
+          "seed": 449462985,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
@@ -9136,7 +9607,7 @@ Object {
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of renders 1`] = `12`;
+exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of renders 1`] = `4`;
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] appState 1`] = `
 Object {
@@ -9282,7 +9753,7 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
@@ -9311,7 +9782,7 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 1278240551,
+          "seed": 449462985,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
@@ -9354,14 +9825,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 401146281,
+          "versionNonce": 1150084233,
           "width": 1000,
           "x": 100,
           "y": 100,
@@ -9383,7 +9854,7 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 1278240551,
+          "seed": 449462985,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
@@ -9403,7 +9874,7 @@ Object {
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of renders 1`] = `13`;
+exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -9547,14 +10018,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -9567,7 +10038,7 @@ Object {
 
 exports[`regression tests key 2 selects rectangle tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests key 2 selects rectangle tool: [end of test] number of renders 1`] = `9`;
+exports[`regression tests key 2 selects rectangle tool: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests key 3 selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -9711,14 +10182,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -9731,7 +10202,7 @@ Object {
 
 exports[`regression tests key 3 selects diamond tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests key 3 selects diamond tool: [end of test] number of renders 1`] = `9`;
+exports[`regression tests key 3 selects diamond tool: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests key 4 selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -9875,14 +10346,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -9895,7 +10366,7 @@ Object {
 
 exports[`regression tests key 4 selects ellipse tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests key 4 selects ellipse tool: [end of test] number of renders 1`] = `9`;
+exports[`regression tests key 4 selects ellipse tool: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests key 5 selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -10075,7 +10546,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -10084,7 +10555,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 3,
-          "versionNonce": 449462985,
+          "versionNonce": 401146281,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -10097,7 +10568,7 @@ Object {
 
 exports[`regression tests key 5 selects arrow tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests key 5 selects arrow tool: [end of test] number of renders 1`] = `10`;
+exports[`regression tests key 5 selects arrow tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key 6 selects line tool: [end of test] appState 1`] = `
 Object {
@@ -10277,7 +10748,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -10286,7 +10757,7 @@ Object {
           "type": "line",
           "updated": 1,
           "version": 3,
-          "versionNonce": 449462985,
+          "versionNonce": 401146281,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -10299,7 +10770,7 @@ Object {
 
 exports[`regression tests key 6 selects line tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests key 6 selects line tool: [end of test] number of renders 1`] = `9`;
+exports[`regression tests key 6 selects line tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key 7 selects freedraw tool: [end of test] appState 1`] = `
 Object {
@@ -10460,7 +10931,7 @@ Object {
           ],
           "roughness": 1,
           "roundness": null,
-          "seed": 337897,
+          "seed": 1278240551,
           "simulatePressure": false,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
@@ -10468,7 +10939,7 @@ Object {
           "type": "freedraw",
           "updated": 1,
           "version": 4,
-          "versionNonce": 453191,
+          "versionNonce": 1150084233,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -10481,7 +10952,7 @@ Object {
 
 exports[`regression tests key 7 selects freedraw tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests key 7 selects freedraw tool: [end of test] number of renders 1`] = `9`;
+exports[`regression tests key 7 selects freedraw tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key a selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -10661,7 +11132,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -10670,7 +11141,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 3,
-          "versionNonce": 449462985,
+          "versionNonce": 401146281,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -10683,7 +11154,7 @@ Object {
 
 exports[`regression tests key a selects arrow tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests key a selects arrow tool: [end of test] number of renders 1`] = `10`;
+exports[`regression tests key a selects arrow tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key d selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -10827,14 +11298,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -10847,7 +11318,7 @@ Object {
 
 exports[`regression tests key d selects diamond tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests key d selects diamond tool: [end of test] number of renders 1`] = `9`;
+exports[`regression tests key d selects diamond tool: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests key l selects line tool: [end of test] appState 1`] = `
 Object {
@@ -11027,7 +11498,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -11036,7 +11507,7 @@ Object {
           "type": "line",
           "updated": 1,
           "version": 3,
-          "versionNonce": 449462985,
+          "versionNonce": 401146281,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -11049,7 +11520,7 @@ Object {
 
 exports[`regression tests key l selects line tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests key l selects line tool: [end of test] number of renders 1`] = `9`;
+exports[`regression tests key l selects line tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key o selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -11193,14 +11664,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -11213,7 +11684,7 @@ Object {
 
 exports[`regression tests key o selects ellipse tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests key o selects ellipse tool: [end of test] number of renders 1`] = `9`;
+exports[`regression tests key o selects ellipse tool: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests key p selects freedraw tool: [end of test] appState 1`] = `
 Object {
@@ -11374,7 +11845,7 @@ Object {
           ],
           "roughness": 1,
           "roundness": null,
-          "seed": 337897,
+          "seed": 1278240551,
           "simulatePressure": false,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
@@ -11382,7 +11853,7 @@ Object {
           "type": "freedraw",
           "updated": 1,
           "version": 4,
-          "versionNonce": 453191,
+          "versionNonce": 1150084233,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -11395,7 +11866,7 @@ Object {
 
 exports[`regression tests key p selects freedraw tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests key p selects freedraw tool: [end of test] number of renders 1`] = `9`;
+exports[`regression tests key p selects freedraw tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key r selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -11539,14 +12010,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -11559,7 +12030,7 @@ Object {
 
 exports[`regression tests key r selects rectangle tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests key r selects rectangle tool: [end of test] number of renders 1`] = `9`;
+exports[`regression tests key r selects rectangle tool: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {
@@ -11711,14 +12182,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -11754,14 +12225,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -11783,14 +12254,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -11826,14 +12297,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -11855,14 +12326,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -11884,14 +12355,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 50,
           "y": 10,
@@ -11933,14 +12404,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 915032327,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -11964,14 +12435,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 238820263,
+          "versionNonce": 81784553,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -11995,14 +12466,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 400692809,
+          "versionNonce": 747212839,
           "width": 10,
           "x": 50,
           "y": 10,
@@ -12044,14 +12515,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 915032327,
+          "seed": 941653321,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 5,
-          "versionNonce": 81784553,
+          "versionNonce": 908564423,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -12075,14 +12546,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 747212839,
+          "seed": 1402203177,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 5,
-          "versionNonce": 1723083209,
+          "versionNonce": 1359939303,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -12106,14 +12577,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 760410951,
+          "seed": 1349943049,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 5,
-          "versionNonce": 1006504105,
+          "versionNonce": 2004587015,
           "width": 10,
           "x": 50,
           "y": 10,
@@ -12137,14 +12608,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 1505387817,
+          "versionNonce": 1006504105,
           "width": 10,
           "x": 20,
           "y": 20,
@@ -12168,14 +12639,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 23633383,
+          "versionNonce": 1315507081,
           "width": 10,
           "x": 40,
           "y": 20,
@@ -12199,14 +12670,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 493213705,
+          "versionNonce": 640725609,
           "width": 10,
           "x": 60,
           "y": 20,
@@ -12219,7 +12690,7 @@ Object {
 
 exports[`regression tests make a group and duplicate it: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests make a group and duplicate it: [end of test] number of renders 1`] = `24`;
+exports[`regression tests make a group and duplicate it: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] appState 1`] = `
 Object {
@@ -12365,14 +12836,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -12408,14 +12879,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -12437,14 +12908,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -12457,7 +12928,7 @@ Object {
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `21`;
+exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
@@ -12576,7 +13047,7 @@ Object {
 
 exports[`regression tests pinch-to-zoom works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `11`;
+exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests rerenders UI on language change: [end of test] appState 1`] = `
 Object {
@@ -12695,7 +13166,7 @@ Object {
 
 exports[`regression tests rerenders UI on language change: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `11`;
+exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `3`;
 
 exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] appState 1`] = `
 Object {
@@ -12839,14 +13310,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -12859,7 +13330,7 @@ Object {
 
 exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] number of renders 1`] = `11`;
+exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] appState 1`] = `
 Object {
@@ -13007,14 +13478,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -13050,14 +13521,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -13079,14 +13550,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -13123,14 +13594,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 1505387817,
           "width": 10,
           "x": 20,
           "y": 20,
@@ -13152,14 +13623,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 493213705,
           "width": 10,
           "x": 40,
           "y": 20,
@@ -13172,7 +13643,7 @@ Object {
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests shift-click to multiselect, then drag: [end of test] number of renders 1`] = `20`;
+exports[`regression tests shift-click to multiselect, then drag: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests should group elements and ungroup them: [end of test] appState 1`] = `
 Object {
@@ -13322,14 +13793,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -13365,14 +13836,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -13394,14 +13865,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -13437,14 +13908,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -13466,14 +13937,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -13495,14 +13966,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 50,
           "y": 10,
@@ -13544,14 +14015,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 915032327,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -13575,14 +14046,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 238820263,
+          "versionNonce": 81784553,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -13606,14 +14077,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 400692809,
+          "versionNonce": 747212839,
           "width": 10,
           "x": 50,
           "y": 10,
@@ -13651,14 +14122,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 23633383,
+          "versionNonce": 289600103,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -13680,14 +14151,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 493213705,
+          "versionNonce": 1315507081,
           "width": 10,
           "x": 30,
           "y": 10,
@@ -13709,14 +14180,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 915032327,
+          "versionNonce": 1898319239,
           "width": 10,
           "x": 50,
           "y": 10,
@@ -13729,7 +14200,7 @@ Object {
 
 exports[`regression tests should group elements and ungroup them: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests should group elements and ungroup them: [end of test] number of renders 1`] = `25`;
+exports[`regression tests should group elements and ungroup them: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests should show fill icons when element has non transparent background: [end of test] appState 1`] = `
 Object {
@@ -13873,14 +14344,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -13916,14 +14387,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 449462985,
+          "versionNonce": 2019559783,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -13936,7 +14407,7 @@ Object {
 
 exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of renders 1`] = `13`;
+exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] appState 1`] = `
 Object {
@@ -14090,14 +14561,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 0,
@@ -14133,14 +14604,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 0,
@@ -14162,14 +14633,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 50,
           "y": 0,
@@ -14210,14 +14681,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1150084233,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 10,
           "y": 0,
@@ -14241,14 +14712,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 1505387817,
           "width": 10,
           "x": 50,
           "y": 0,
@@ -14286,14 +14757,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1150084233,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 10,
           "y": 0,
@@ -14317,14 +14788,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 1505387817,
           "width": 10,
           "x": 50,
           "y": 0,
@@ -14346,14 +14817,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 1014066025,
+          "seed": 493213705,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 238820263,
+          "versionNonce": 81784553,
           "width": 10,
           "x": 10,
           "y": 50,
@@ -14391,14 +14862,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1150084233,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 10,
           "y": 0,
@@ -14422,14 +14893,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 1505387817,
           "width": 10,
           "x": 50,
           "y": 0,
@@ -14451,14 +14922,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 1014066025,
+          "seed": 493213705,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 238820263,
+          "versionNonce": 81784553,
           "width": 10,
           "x": 10,
           "y": 50,
@@ -14480,14 +14951,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 400692809,
+          "seed": 1723083209,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1604849351,
+          "versionNonce": 1006504105,
           "width": 10,
           "x": 50,
           "y": 50,
@@ -14528,14 +14999,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1150084233,
+          "versionNonce": 1604849351,
           "width": 10,
           "x": 10,
           "y": 0,
@@ -14559,14 +15030,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 1505387817,
           "width": 10,
           "x": 50,
           "y": 0,
@@ -14590,14 +15061,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 1014066025,
+          "seed": 493213705,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 493213705,
+          "versionNonce": 640725609,
           "width": 10,
           "x": 10,
           "y": 50,
@@ -14621,14 +15092,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 400692809,
+          "seed": 1723083209,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 915032327,
+          "versionNonce": 406373543,
           "width": 10,
           "x": 50,
           "y": 50,
@@ -14672,14 +15143,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 81784553,
+          "versionNonce": 908564423,
           "width": 10,
           "x": 10,
           "y": 0,
@@ -14704,14 +15175,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 747212839,
+          "versionNonce": 1402203177,
           "width": 10,
           "x": 50,
           "y": 0,
@@ -14736,14 +15207,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 1014066025,
+          "seed": 493213705,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 1723083209,
+          "versionNonce": 1359939303,
           "width": 10,
           "x": 10,
           "y": 50,
@@ -14768,14 +15239,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 400692809,
+          "seed": 1723083209,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 760410951,
+          "versionNonce": 1349943049,
           "width": 10,
           "x": 50,
           "y": 50,
@@ -14788,7 +15259,7 @@ Object {
 
 exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] number of renders 1`] = `39`;
+exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] appState 1`] = `
 Object {
@@ -14907,7 +15378,7 @@ Object {
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of renders 1`] = `8`;
+exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of renders 1`] = `4`;
 
 exports[`regression tests supports nested groups: [end of test] appState 1`] = `
 Object {
@@ -15053,14 +15524,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 50,
           "x": 0,
           "y": 0,
@@ -15096,14 +15567,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 50,
           "x": 0,
           "y": 0,
@@ -15125,14 +15596,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 50,
           "x": 100,
           "y": 100,
@@ -15168,14 +15639,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 50,
           "x": 0,
           "y": 0,
@@ -15197,14 +15668,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 50,
           "x": 100,
           "y": 100,
@@ -15226,14 +15697,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 50,
           "x": 200,
           "y": 200,
@@ -15275,14 +15746,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1150084233,
+          "versionNonce": 23633383,
           "width": 50,
           "x": 0,
           "y": 0,
@@ -15306,14 +15777,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 493213705,
           "width": 50,
           "x": 100,
           "y": 100,
@@ -15337,14 +15808,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 915032327,
           "width": 50,
           "x": 200,
           "y": 200,
@@ -15383,14 +15854,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1150084233,
+          "versionNonce": 23633383,
           "width": 50,
           "x": 0,
           "y": 0,
@@ -15414,14 +15885,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 493213705,
           "width": 50,
           "x": 100,
           "y": 100,
@@ -15445,14 +15916,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 915032327,
           "width": 50,
           "x": 200,
           "y": 200,
@@ -15493,14 +15964,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 493213705,
           "width": 50,
           "x": 100,
           "y": 100,
@@ -15525,14 +15996,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 400692809,
+          "versionNonce": 1723083209,
           "width": 50,
           "x": 0,
           "y": 0,
@@ -15557,14 +16028,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 1604849351,
+          "versionNonce": 760410951,
           "width": 50,
           "x": 200,
           "y": 200,
@@ -15606,14 +16077,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1116226695,
+          "versionNonce": 493213705,
           "width": 50,
           "x": 100,
           "y": 100,
@@ -15638,14 +16109,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 400692809,
+          "versionNonce": 1723083209,
           "width": 50,
           "x": 0,
           "y": 0,
@@ -15670,14 +16141,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 1604849351,
+          "versionNonce": 760410951,
           "width": 50,
           "x": 200,
           "y": 200,
@@ -15690,7 +16161,7 @@ Object {
 
 exports[`regression tests supports nested groups: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests supports nested groups: [end of test] number of renders 1`] = `32`;
+exports[`regression tests supports nested groups: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] appState 1`] = `
 Object {
@@ -15735,7 +16206,7 @@ Object {
     "roundness": Object {
       "type": 2,
     },
-    "seed": 1116226695,
+    "seed": 493213705,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 1,
@@ -15818,7 +16289,7 @@ Object {
     "roundness": Object {
       "type": 2,
     },
-    "seed": 1116226695,
+    "seed": 493213705,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 1,
@@ -15893,14 +16364,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -15936,14 +16407,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -15965,14 +16436,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 100,
           "x": 110,
           "y": 110,
@@ -16008,14 +16479,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -16037,14 +16508,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 100,
           "x": 110,
           "y": 110,
@@ -16066,14 +16537,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "diamond",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 1604849351,
           "width": 100,
           "x": 310,
           "y": 310,
@@ -16086,7 +16557,7 @@ Object {
 
 exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] number of renders 1`] = `20`;
+exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests switches selected element on pointer down: [end of test] appState 1`] = `
 Object {
@@ -16131,7 +16602,7 @@ Object {
     "roundness": Object {
       "type": 2,
     },
-    "seed": 401146281,
+    "seed": 238820263,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 1,
@@ -16213,7 +16684,7 @@ Object {
     "roundness": Object {
       "type": 2,
     },
-    "seed": 401146281,
+    "seed": 238820263,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 1,
@@ -16288,14 +16759,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -16331,14 +16802,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 10,
           "x": 0,
           "y": 0,
@@ -16360,14 +16831,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 10,
           "x": 20,
           "y": 20,
@@ -16380,7 +16851,7 @@ Object {
 
 exports[`regression tests switches selected element on pointer down: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests switches selected element on pointer down: [end of test] number of renders 1`] = `14`;
+exports[`regression tests switches selected element on pointer down: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests two-finger scroll works: [end of test] appState 1`] = `
 Object {
@@ -16499,7 +16970,7 @@ Object {
 
 exports[`regression tests two-finger scroll works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `13`;
+exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests undo/redo drawing an element: [end of test] appState 1`] = `
 Object {
@@ -16631,14 +17102,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -16660,14 +17131,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 30,
           "x": 40,
           "y": 0,
@@ -16709,7 +17180,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -16718,7 +17189,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 7,
-          "versionNonce": 400692809,
+          "versionNonce": 1006504105,
           "width": 100,
           "x": 130,
           "y": 10,
@@ -16754,14 +17225,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -16783,14 +17254,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 30,
           "x": 40,
           "y": 0,
@@ -16828,7 +17299,7 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 401146281,
+          "seed": 238820263,
           "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#1e1e1e",
@@ -16837,7 +17308,7 @@ Object {
           "type": "arrow",
           "updated": 1,
           "version": 5,
-          "versionNonce": 1014066025,
+          "versionNonce": 81784553,
           "width": 60,
           "x": 130,
           "y": 10,
@@ -16886,14 +17357,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -16929,14 +17400,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 337897,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1278240551,
+          "versionNonce": 453191,
           "width": 20,
           "x": 10,
           "y": -10,
@@ -16958,14 +17429,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 2019559783,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 1116226695,
           "width": 30,
           "x": 40,
           "y": 0,
@@ -16978,7 +17449,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `31`;
+exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] appState 1`] = `
 Object {
@@ -17097,7 +17568,7 @@ Object {
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of renders 1`] = `7`;
+exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of renders 1`] = `4`;
 
 exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
@@ -17216,4 +17687,4 @@ Object {
 
 exports[`regression tests zoom hotkeys: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `7`;
+exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `5`;

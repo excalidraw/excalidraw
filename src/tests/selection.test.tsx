@@ -17,10 +17,12 @@ import { SHAPES } from "../shapes";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderInteractiveScene = jest.spyOn(Renderer, "renderInteractiveScene");
+const renderStaticScene = jest.spyOn(Renderer, "renderStaticScene");
 beforeEach(() => {
   localStorage.clear();
-  renderScene.mockClear();
+  renderInteractiveScene.mockClear();
+  renderStaticScene.mockClear();
   reseed(7);
 });
 
@@ -132,7 +134,7 @@ describe("inner box-selection", () => {
     });
     h.elements = [rect1, rect2, rect3];
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      mouse.downAt(rect2.x - 20, rect2.x - 20);
+      mouse.downAt(rect2.x - 20, rect2.y - 20);
       mouse.moveTo(rect2.x + rect2.width + 10, rect2.y + rect2.height + 10);
       assertSelectedElements([rect2.id, rect3.id]);
       expect(h.state.selectedGroupIds).toEqual({ A: true });
@@ -151,10 +153,11 @@ describe("selection element", () => {
     const tool = getByToolName("selection");
     fireEvent.click(tool);
 
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
     fireEvent.pointerDown(canvas, { clientX: 60, clientY: 100 });
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(3);
+    expect(renderStaticScene).toHaveBeenCalledTimes(2);
     const selectionElement = h.state.selectionElement!;
     expect(selectionElement).not.toBeNull();
     expect(selectionElement.type).toEqual("selection");
@@ -171,11 +174,12 @@ describe("selection element", () => {
     const tool = getByToolName("selection");
     fireEvent.click(tool);
 
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
     fireEvent.pointerDown(canvas, { clientX: 60, clientY: 100 });
     fireEvent.pointerMove(canvas, { clientX: 150, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(6);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(4);
+    expect(renderStaticScene).toHaveBeenCalledTimes(2);
     const selectionElement = h.state.selectionElement!;
     expect(selectionElement).not.toBeNull();
     expect(selectionElement.type).toEqual("selection");
@@ -192,12 +196,13 @@ describe("selection element", () => {
     const tool = getByToolName("selection");
     fireEvent.click(tool);
 
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
     fireEvent.pointerDown(canvas, { clientX: 60, clientY: 100 });
     fireEvent.pointerMove(canvas, { clientX: 150, clientY: 30 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+    expect(renderStaticScene).toHaveBeenCalledTimes(2);
     expect(h.state.selectionElement).toBeNull();
   });
 });
@@ -213,7 +218,7 @@ describe("select single element on the scene", () => {
 
   it("rectangle", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
     {
       // create element
       const tool = getByToolName("rectangle");
@@ -232,7 +237,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 45, clientY: 20 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(11);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(5);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -242,7 +248,7 @@ describe("select single element on the scene", () => {
 
   it("diamond", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
     {
       // create element
       const tool = getByToolName("diamond");
@@ -261,7 +267,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 45, clientY: 20 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(11);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(5);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -271,7 +278,7 @@ describe("select single element on the scene", () => {
 
   it("ellipse", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
     {
       // create element
       const tool = getByToolName("ellipse");
@@ -290,7 +297,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 45, clientY: 20 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(11);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(5);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -300,7 +308,7 @@ describe("select single element on the scene", () => {
 
   it("arrow", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
     {
       // create element
       const tool = getByToolName("arrow");
@@ -332,7 +340,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(11);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(6);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -341,7 +350,7 @@ describe("select single element on the scene", () => {
 
   it("arrow escape", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
     {
       // create element
       const tool = getByToolName("line");
@@ -373,7 +382,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(11);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(6);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();

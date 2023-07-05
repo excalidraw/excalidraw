@@ -98,6 +98,51 @@ export type LastActiveTool =
 export type SidebarName = string;
 export type SidebarTabName = string;
 
+export type CommonCanvasAppState = {
+  zoom: AppState["zoom"];
+  scrollX: AppState["scrollX"];
+  scrollY: AppState["scrollY"];
+  width: AppState["width"];
+  height: AppState["height"];
+  viewModeEnabled: AppState["viewModeEnabled"];
+  editingElement: AppState["editingElement"];
+  editingGroupId: AppState["editingGroupId"]; // TODO: move to interactive canvas if possible
+  selectedElementIds: AppState["selectedElementIds"]; // TODO: move to interactive canvas if possible
+  frameToHighlight: AppState["frameToHighlight"]; // TODO: move to interactive canvas if possible
+  offsetLeft: AppState["offsetLeft"];
+  offsetTop: AppState["offsetTop"];
+  theme: AppState["theme"];
+  pendingImageElementId: AppState["pendingImageElementId"];
+};
+
+export type StaticCanvasAppState = CommonCanvasAppState & {
+  shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
+  /** null indicates transparent bg */
+  viewBackgroundColor?: AppState["viewBackgroundColor"];
+  exportScale: AppState["exportScale"];
+  selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
+  gridSize: AppState["gridSize"];
+  frameRendering: AppState["frameRendering"];
+};
+
+export type InteractiveCanvasAppState = CommonCanvasAppState & {
+  // renderInteractiveScene
+  editingLinearElement: AppState["editingLinearElement"];
+  selectionElement: AppState["selectionElement"];
+  selectedGroupIds: AppState["selectedGroupIds"];
+  selectedLinearElement: AppState["selectedLinearElement"];
+  multiElement: AppState["multiElement"];
+  isBindingEnabled: AppState["isBindingEnabled"];
+  suggestedBindings: AppState["suggestedBindings"];
+  isRotating: AppState["isRotating"];
+  elementsToHighlight: AppState["elementsToHighlight"];
+  // App
+  openSidebar: AppState["openSidebar"];
+  showHyperlinkPopup: AppState["showHyperlinkPopup"];
+  // Collaborators
+  collaborators: AppState["collaborators"];
+};
+
 export type AppState = {
   contextMenu: {
     items: ContextMenuItems;
@@ -434,6 +479,7 @@ export type AppProps = Merge<
 export type AppClassProperties = {
   props: AppProps;
   canvas: HTMLCanvasElement | null;
+  interactiveCanvas: HTMLCanvasElement | null;
   focusContainer(): void;
   library: Library;
   imageCache: Map<

@@ -19,7 +19,12 @@ import { AppState } from "../types";
 export const actionFinalize = register({
   name: "finalize",
   trackEvent: false,
-  perform: (elements, appState, _, { canvas, focusContainer, scene }) => {
+  perform: (
+    elements,
+    appState,
+    _,
+    { interactiveCanvas, focusContainer, scene },
+  ) => {
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =
         appState.editingLinearElement;
@@ -132,7 +137,7 @@ export const actionFinalize = register({
         appState.activeTool.type !== "freedraw") ||
       !multiPointElement
     ) {
-      resetCursor(canvas);
+      resetCursor(interactiveCanvas);
     }
 
     let activeTool: AppState["activeTool"];

@@ -17,6 +17,7 @@ interface Window {
   EXCALIDRAW_ASSET_PATH: string | undefined;
   EXCALIDRAW_EXPORT_SOURCE: string;
   EXCALIDRAW_THROTTLE_RENDER: boolean | undefined;
+  EXCALIDRAW_THROTTLE_NEXT_RENDER: boolean;
   gtag: Function;
   sa_event: Function;
   fathom: { trackEvent: Function };

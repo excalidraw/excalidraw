@@ -94,7 +94,7 @@ const populateElements = (
     ),
     ...appState,
     selectedElementIds,
-  });
+  } as AppState);
 
   return selectedElementIds;
 };

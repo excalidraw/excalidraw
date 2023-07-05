@@ -153,7 +153,7 @@ export const actionGroup = register({
         newGroupId,
         { ...appState, selectedGroupIds: {} },
         getNonDeletedElements(nextElements),
-      ),
+      ) as AppState,
       elements: nextElements,
       commitToHistory: true,
     };
@@ -216,7 +216,7 @@ export const actionUngroup = register({
       getNonDeletedElements(nextElements),
       appState,
       null,
-    );
+    ) as AppState;
 
     frames.forEach((frame) => {
       if (frame) {

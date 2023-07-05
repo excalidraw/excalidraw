@@ -293,7 +293,7 @@ export const getContextMenuLabel = (
 export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
-  appState: UIAppState,
+  appState: Pick<UIAppState, "zoom">,
 ): [x: number, y: number, width: number, height: number] => {
   const size = DEFAULT_LINK_SIZE;
   const linkWidth = size / appState.zoom.value;

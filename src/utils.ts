@@ -392,22 +392,25 @@ export const updateActiveTool = (
   };
 };
 
-export const resetCursor = (canvas: HTMLCanvasElement | null) => {
-  if (canvas) {
-    canvas.style.cursor = "";
+export const resetCursor = (interactiveCanvas: HTMLCanvasElement | null) => {
+  if (interactiveCanvas) {
+    interactiveCanvas.style.cursor = "";
   }
 };
 
-export const setCursor = (canvas: HTMLCanvasElement | null, cursor: string) => {
-  if (canvas) {
-    canvas.style.cursor = cursor;
+export const setCursor = (
+  interactiveCanvas: HTMLCanvasElement | null,
+  cursor: string,
+) => {
+  if (interactiveCanvas) {
+    interactiveCanvas.style.cursor = cursor;
   }
 };
 
 let eraserCanvasCache: any;
 let previewDataURL: string;
 export const setEraserCursor = (
-  canvas: HTMLCanvasElement | null,
+  interactiveCanvas: HTMLCanvasElement | null,
   theme: AppState["theme"],
 ) => {
   const cursorImageSizePx = 20;
@@ -439,7 +442,7 @@ export const setEraserCursor = (
   }
 
   setCursor(
-    canvas,
+    interactiveCanvas,
     `url(${previewDataURL}) ${cursorImageSizePx / 2} ${
       cursorImageSizePx / 2
     }, auto`,
@@ -447,23 +450,23 @@ export const setEraserCursor = (
 };
 
 export const setCursorForShape = (
-  canvas: HTMLCanvasElement | null,
+  interactiveCanvas: HTMLCanvasElement | null,
   appState: Pick<AppState, "activeTool" | "theme">,
 ) => {
-  if (!canvas) {
+  if (!interactiveCanvas) {
     return;
   }
   if (appState.activeTool.type === "selection") {
-    resetCursor(canvas);
+    resetCursor(interactiveCanvas);
   } else if (isHandToolActive(appState)) {
-    canvas.style.cursor = CURSOR_TYPE.GRAB;
+    interactiveCanvas.style.cursor = CURSOR_TYPE.GRAB;
   } else if (isEraserActive(appState)) {
-    setEraserCursor(canvas, appState.theme);
+    setEraserCursor(interactiveCanvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
     // Ignore custom type as well and let host decide
   } else if (!["image", "custom"].includes(appState.activeTool.type)) {
-    canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
+    interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
 

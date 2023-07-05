@@ -23,7 +23,7 @@ describe("<Excalidraw/>", () => {
       ).toBe(0);
       expect(h.state.zenModeEnabled).toBe(false);
 
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,
@@ -43,7 +43,7 @@ describe("<Excalidraw/>", () => {
       ).toBe(0);
       expect(h.state.zenModeEnabled).toBe(true);
 
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,
@@ -93,7 +93,7 @@ describe("<Excalidraw/>", () => {
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(0);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,
@@ -112,7 +112,7 @@ describe("<Excalidraw/>", () => {
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(0);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,

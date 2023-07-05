@@ -25,7 +25,12 @@ import {
   getElementPointsCoords,
   getMinMaxXYFromCurvePathOps,
 } from "./bounds";
-import { Point, AppState, PointerCoords } from "../types";
+import {
+  Point,
+  AppState,
+  PointerCoords,
+  InteractiveCanvasAppState,
+} from "../types";
 import { mutateElement } from "./mutateElement";
 import History from "../history";
 
@@ -398,7 +403,7 @@ export class LinearElementEditor {
 
   static getEditorMidPoints = (
     element: NonDeleted<ExcalidrawLinearElement>,
-    appState: AppState,
+    appState: InteractiveCanvasAppState,
   ): typeof editorMidPointsCache["points"] => {
     const boundText = getBoundTextElement(element);
 
@@ -422,7 +427,7 @@ export class LinearElementEditor {
 
   static updateEditorMidPointsCache = (
     element: NonDeleted<ExcalidrawLinearElement>,
-    appState: AppState,
+    appState: InteractiveCanvasAppState,
   ) => {
     const points = LinearElementEditor.getPointsGlobalCoordinates(element);
 

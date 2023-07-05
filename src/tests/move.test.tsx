@@ -16,10 +16,12 @@ import { KEYS } from "../keys";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderInteractiveScene = jest.spyOn(Renderer, "renderInteractiveScene");
+const renderStaticScene = jest.spyOn(Renderer, "renderStaticScene");
 beforeEach(() => {
   localStorage.clear();
-  renderScene.mockClear();
+  renderInteractiveScene.mockClear();
+  renderStaticScene.mockClear();
   reseed(7);
 });
 
@@ -28,7 +30,7 @@ const { h } = window;
 describe("move element", () => {
   it("rectangle", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
 
     {
       // create element
@@ -38,20 +40,23 @@ describe("move element", () => {
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(9);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
+      expect(renderStaticScene).toHaveBeenCalledTimes(4);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
       expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
 
-      renderScene.mockClear();
+      renderInteractiveScene.mockClear();
+      renderStaticScene.mockClear();
     }
 
     fireEvent.pointerDown(canvas, { clientX: 50, clientY: 20 });
     fireEvent.pointerMove(canvas, { clientX: 20, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(3);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(3);
+    expect(renderStaticScene).toHaveBeenCalledTimes(2);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect([h.elements[0].x, h.elements[0].y]).toEqual([0, 40]);
@@ -77,7 +82,8 @@ describe("move element", () => {
     // select the second rectangles
     new Pointer("mouse").clickOn(rectB);
 
-    expect(renderScene).toHaveBeenCalledTimes(23);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
+    expect(renderStaticScene).toHaveBeenCalledTimes(13);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
@@ -86,7 +92,8 @@ describe("move element", () => {
     expect([line.x, line.y]).toEqual([110, 50]);
     expect([line.width, line.height]).toEqual([80, 80]);
 
-    renderScene.mockClear();
+    renderInteractiveScene.mockClear();
+    renderStaticScene.mockClear();
 
     // Move selected rectangle
     Keyboard.keyDown(KEYS.ARROW_RIGHT);
@@ -94,7 +101,8 @@ describe("move element", () => {
     Keyboard.keyDown(KEYS.ARROW_DOWN);
 
     // Check that the arrow size has been changed according to moving the rectangle
-    expect(renderScene).toHaveBeenCalledTimes(3);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(3);
+    expect(renderStaticScene).toHaveBeenCalledTimes(3);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
@@ -110,7 +118,7 @@ describe("move element", () => {
 describe("duplicate element on move when ALT is clicked", () => {
   it("rectangle", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
 
     {
       // create element
@@ -120,13 +128,15 @@ describe("duplicate element on move when ALT is clicked", () => {
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(9);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
+      expect(renderStaticScene).toHaveBeenCalledTimes(4);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
       expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
 
-      renderScene.mockClear();
+      renderInteractiveScene.mockClear();
+      renderStaticScene.mockClear();
     }
 
     fireEvent.pointerDown(canvas, { clientX: 50, clientY: 20 });
@@ -140,7 +150,8 @@ describe("duplicate element on move when ALT is clicked", () => {
 
     // TODO: This used to be 4, but binding made it go up to 5. Do we need
     // that additional render?
-    expect(renderScene).toHaveBeenCalledTimes(5);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+    expect(renderStaticScene).toHaveBeenCalledTimes(3);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(2);
 

@@ -213,13 +213,13 @@ export const SelectedShapeActions = ({
 };
 
 export const ShapesSwitcher = ({
-  canvas,
+  interactiveCanvas,
   activeTool,
   setAppState,
   onImageAction,
   appState,
 }: {
-  canvas: HTMLCanvasElement | null;
+  interactiveCanvas: HTMLCanvasElement | null;
   activeTool: UIAppState["activeTool"];
   setAppState: React.Component<any, UIAppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
@@ -269,7 +269,7 @@ export const ShapesSwitcher = ({
                 multiElement: null,
                 selectedElementIds: {},
               });
-              setCursorForShape(canvas, {
+              setCursorForShape(interactiveCanvas, {
                 ...appState,
                 activeTool: nextActiveTool,
               });

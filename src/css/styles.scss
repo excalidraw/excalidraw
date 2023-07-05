@@ -3,8 +3,9 @@
 
 :root {
   --zIndex-canvas: 1;
-  --zIndex-wysiwyg: 2;
-  --zIndex-layerUI: 3;
+  --zIndex-interactiveCanvas: 2;
+  --zIndex-wysiwyg: 3;
+  --zIndex-layerUI: 4;
 
   --zIndex-modal: 1000;
   --zIndex-popup: 1001;
@@ -68,6 +69,10 @@
     image-rendering: -moz-crisp-edges; // FF
 
     z-index: var(--zIndex-canvas);
+
+    &.interactive {
+      z-index: var(--zIndex-interactiveCanvas);
+    }
 
     // Remove the main canvas from document flow to avoid resizeObserver
     // feedback loop (see https://github.com/excalidraw/excalidraw/pull/3379)

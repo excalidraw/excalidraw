@@ -5,14 +5,14 @@ import { render, queryByTestId } from "../tests/test-utils";
 
 import ExcalidrawApp from "../excalidraw-app";
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderStaticScene = jest.spyOn(Renderer, "renderStaticScene");
 
 describe("Test <App/>", () => {
   beforeEach(async () => {
     // Unmount ReactDOM from root
     ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
     localStorage.clear();
-    renderScene.mockClear();
+    renderStaticScene.mockClear();
     reseed(7);
   });
 

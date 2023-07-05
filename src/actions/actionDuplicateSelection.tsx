@@ -276,6 +276,6 @@ const duplicateElements = (
       getNonDeletedElements(finalElements),
       appState,
       null,
-    ),
+    ) as AppState,
   };
 };

@@ -268,7 +268,7 @@ export class API {
   };
 
   static drop = async (blob: Blob) => {
-    const fileDropEvent = createEvent.drop(GlobalTestState.canvas);
+    const fileDropEvent = createEvent.drop(GlobalTestState.interactiveCanvas);
     const text = await new Promise<string>((resolve, reject) => {
       try {
         const reader = new FileReader();
@@ -295,6 +295,6 @@ export class API {
         },
       },
     });
-    fireEvent(GlobalTestState.canvas, fileDropEvent);
+    fireEvent(GlobalTestState.interactiveCanvas, fileDropEvent);
   };
 }

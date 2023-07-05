@@ -4,21 +4,28 @@ import {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { AppClassProperties, AppState } from "./types";
+import {
+  AppClassProperties,
+  AppState,
+  InteractiveCanvasAppState,
+} from "./types";
 import { getSelectedElements } from "./scene";
 import { getBoundTextElement } from "./element/textElement";
 import { makeNextSelectedElementIds } from "./scene/selection";
 
 export const selectGroup = (
   groupId: GroupId,
-  appState: AppState,
+  appState: InteractiveCanvasAppState,
   elements: readonly NonDeleted<ExcalidrawElement>[],
-): AppState => {
-  const elementsInGroup = elements.filter((element) =>
-    element.groupIds.includes(groupId),
-  );
+): InteractiveCanvasAppState => {
+  const elementsInGroup = elements.reduce((acc, element) => {
+    if (element.groupIds.includes(groupId)) {
+      acc[element.id] = true;
+    }
+    return acc;
+  }, {} as Record<string, boolean>);
 
-  if (elementsInGroup.length < 2) {
+  if (Object.keys(elementsInGroup).length < 2) {
     if (
       appState.selectedGroupIds[groupId] ||
       appState.editingGroupId === groupId
@@ -37,31 +44,120 @@ export const selectGroup = (
     selectedGroupIds: { ...appState.selectedGroupIds, [groupId]: true },
     selectedElementIds: {
       ...appState.selectedElementIds,
-      ...Object.fromEntries(
-        elementsInGroup.map((element) => [element.id, true]),
-      ),
-    },
+      ...elementsInGroup,
+    } as AppState["selectedElementIds"],
   };
 };
+
+export const selectGroups = (function () {
+  let lastSelectedElements: readonly NonDeleted<ExcalidrawElement>[] | null =
+    null;
+  let lastElements: readonly NonDeleted<ExcalidrawElement>[] | null = null;
+  let lastAppState: InteractiveCanvasAppState | null = null;
+
+  const ret = (
+    selectedElements: readonly NonDeleted<ExcalidrawElement>[],
+    elements: readonly NonDeleted<ExcalidrawElement>[],
+    appState: InteractiveCanvasAppState,
+  ): InteractiveCanvasAppState => {
+    if (
+      lastAppState !== undefined &&
+      elements === lastElements &&
+      selectedElements === lastSelectedElements &&
+      appState.editingGroupId === lastAppState?.editingGroupId &&
+      appState.selectedGroupIds === lastAppState?.selectedGroupIds
+    ) {
+      return lastAppState;
+    }
+
+    const selectedGroupIds: Record<GroupId, boolean> = {};
+    // Gather all the groups withing selected elements
+    for (const selectedElement of selectedElements) {
+      let groupIds = selectedElement.groupIds;
+      if (appState.editingGroupId) {
+        // handle the case where a group is nested within a group
+        const indexOfEditingGroup = groupIds.indexOf(appState.editingGroupId);
+        if (indexOfEditingGroup > -1) {
+          groupIds = groupIds.slice(0, indexOfEditingGroup);
+        }
+      }
+      if (groupIds.length > 0) {
+        const lastSelectedGroup = groupIds[groupIds.length - 1];
+        selectedGroupIds[lastSelectedGroup] = true;
+      }
+    }
+
+    // Gather all the elements within selected groups
+    const groupElementsIndex: Record<GroupId, string[]> = {};
+    const selectedElementIdsInGroups = elements.reduce((acc, element) => {
+      const groupId = element.groupIds.find((id) => selectedGroupIds[id]);
+
+      if (groupId) {
+        acc[element.id] = true;
+
+        // Populate the index
+        if (!Array.isArray(groupElementsIndex[groupId])) {
+          groupElementsIndex[groupId] = [element.id];
+        } else {
+          groupElementsIndex[groupId].push(element.id);
+        }
+      }
+      return acc;
+    }, {} as Record<string, boolean>);
+
+    for (const groupId of Object.keys(groupElementsIndex)) {
+      // If there is one element in the group, and the group is selected or it's being edited, it's not a group
+      if (groupElementsIndex[groupId].length < 2) {
+        if (selectedGroupIds[groupId]) {
+          selectedGroupIds[groupId] = false;
+        }
+      }
+    }
+
+    lastElements = elements;
+    lastSelectedElements = selectedElements;
+
+    lastAppState = {
+      ...appState,
+      selectedGroupIds,
+      selectedElementIds: {
+        ...appState.selectedElementIds,
+        ...selectedElementIdsInGroups,
+      } as AppState["selectedElementIds"],
+    };
+
+    return lastAppState;
+  };
+
+  ret.clearCache = () => {
+    lastElements = null;
+    lastSelectedElements = null;
+    lastAppState = null;
+  };
+
+  return ret;
+})();
 
 /**
  * If the element's group is selected, don't render an individual
  * selection border around it.
  */
 export const isSelectedViaGroup = (
-  appState: AppState,
+  appState: InteractiveCanvasAppState,
   element: ExcalidrawElement,
 ) => getSelectedGroupForElement(appState, element) != null;
 
 export const getSelectedGroupForElement = (
-  appState: AppState,
+  appState: InteractiveCanvasAppState,
   element: ExcalidrawElement,
 ) =>
   element.groupIds
     .filter((groupId) => groupId !== appState.editingGroupId)
     .find((groupId) => appState.selectedGroupIds[groupId]);
 
-export const getSelectedGroupIds = (appState: AppState): GroupId[] =>
+export const getSelectedGroupIds = (
+  appState: InteractiveCanvasAppState,
+): GroupId[] =>
   Object.entries(appState.selectedGroupIds)
     .filter(([groupId, isSelected]) => isSelected)
     .map(([groupId, isSelected]) => groupId);
@@ -71,16 +167,19 @@ export const getSelectedGroupIds = (appState: AppState): GroupId[] =>
  * you're currently editing that group.
  */
 export const selectGroupsForSelectedElements = (
-  appState: AppState,
+  appState: InteractiveCanvasAppState,
   elements: readonly NonDeletedExcalidrawElement[],
-  prevAppState: AppState,
+  prevAppState: InteractiveCanvasAppState,
   /**
    * supply null in cases where you don't have access to App instance and
    * you don't care about optimizing selectElements retrieval
    */
   app: AppClassProperties | null,
-): AppState => {
-  let nextAppState: AppState = { ...appState, selectedGroupIds: {} };
+): InteractiveCanvasAppState => {
+  let nextAppState: InteractiveCanvasAppState = {
+    ...appState,
+    selectedGroupIds: {},
+  };
 
   const selectedElements = app
     ? app.scene.getSelectedElements({
@@ -101,25 +200,7 @@ export const selectGroupsForSelectedElements = (
     };
   }
 
-  for (const selectedElement of selectedElements) {
-    let groupIds = selectedElement.groupIds;
-    if (appState.editingGroupId) {
-      // handle the case where a group is nested within a group
-      const indexOfEditingGroup = groupIds.indexOf(appState.editingGroupId);
-      if (indexOfEditingGroup > -1) {
-        groupIds = groupIds.slice(0, indexOfEditingGroup);
-      }
-    }
-    if (groupIds.length > 0) {
-      const groupId = groupIds[groupIds.length - 1];
-      nextAppState = selectGroup(groupId, nextAppState, elements);
-    }
-  }
-
-  nextAppState.selectedElementIds = makeNextSelectedElementIds(
-    nextAppState.selectedElementIds,
-    prevAppState,
-  );
+  nextAppState = selectGroups(selectedElements, elements, appState);
 
   return nextAppState;
 };
@@ -128,9 +209,12 @@ export const selectGroupsForSelectedElements = (
 // or used to update the elements
 export const selectGroupsFromGivenElements = (
   elements: readonly NonDeleted<ExcalidrawElement>[],
-  appState: AppState,
+  appState: InteractiveCanvasAppState,
 ) => {
-  let nextAppState: AppState = { ...appState, selectedGroupIds: {} };
+  let nextAppState: InteractiveCanvasAppState = {
+    ...appState,
+    selectedGroupIds: {},
+  };
 
   for (const element of elements) {
     let groupIds = element.groupIds;
@@ -145,6 +229,8 @@ export const selectGroupsFromGivenElements = (
       nextAppState = selectGroup(groupId, nextAppState, elements);
     }
   }
+
+  // nextAppState = selectGroups(elements, elements, appState);
 
   return nextAppState.selectedGroupIds;
 };
