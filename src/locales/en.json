@@ -113,7 +113,8 @@
       "create": "Create link",
       "createEmbed": "Create link & embed",
       "label": "Link",
-      "labelEmbed": "Link & embed"
+      "labelEmbed": "Link & embed",
+      "empty": "No link is set"
     },
     "lineEditor": {
       "edit": "Edit line",
