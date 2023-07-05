@@ -136,7 +136,7 @@ export const newElement = (
 export const newIFrameElement = (
   opts: {
     type: "iframe";
-    whitelisted: boolean;
+    whitelisted: boolean | undefined;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawIFrameElement> => {
   return {
@@ -193,7 +193,6 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"];
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     strokeWidth?: ExcalidrawTextElement["strokeWidth"];
-    isFrameName?: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -230,7 +229,6 @@ export const newTextElement = (
       containerId: opts.containerId || null,
       originalText: text,
       lineHeight,
-      isFrameName: opts.isFrameName || false,
     },
     {},
   );

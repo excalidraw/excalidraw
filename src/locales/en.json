@@ -115,7 +115,8 @@
       "create": "Create link",
       "createEmbed": "Create link & embed",
       "label": "Link",
-      "labelEmbed": "Link & embed"
+      "labelEmbed": "Link & embed",
+      "empty": "No link is set"
     },
     "lineEditor": {
       "edit": "Edit line",
@@ -172,7 +173,8 @@
     "embed": "Toggle embedding",
     "publishLibrary": "Publish",
     "submit": "Submit",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "iframeInteractionButton": "Click to interact"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -244,7 +246,7 @@
     "linearElement": "Click to start multiple points, drag for single line",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
-    "iframe": "Currently supported sites are YouTube, Twitter, Excalidraw, Vimeo, Figma",
+    "iframe": "Currently supported sites are YouTube, Vimeo, Figma",
     "text_selected": "Double-click or press ENTER to edit text",
     "text_editing": "Press Escape or CtrlOrCmd+ENTER to finish editing",
     "linearElementMulti": "Click on last point or press Escape or Enter to finish",

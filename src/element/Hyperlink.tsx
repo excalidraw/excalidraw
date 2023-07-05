@@ -5,7 +5,7 @@ import {
   viewportCoordsToSceneCoords,
   wrapEvent,
 } from "../utils";
-import { getEmbedLink, IFrameURLValidator } from "./iframe";
+import { getEmbedLink, iframeURLValidator } from "./iframe";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
 
@@ -33,10 +33,11 @@ import { getTooltipDiv, updateTooltipPosition } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
 import { isPointHittingElementBoundingBox } from "./collision";
 import { getElementAbsoluteCoords } from "./";
+import { isLocalLink, normalizeLink } from "../data/url";
 
 import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
-import { useExcalidrawAppState } from "../components/App";
+import { useAppProps, useExcalidrawAppState } from "../components/App";
 import { isIFrameElement } from "./typeChecks";
 
 const CONTAINER_WIDTH = 320;
@@ -68,27 +69,36 @@ export const Hyperlink = ({
   ) => void;
 }) => {
   const appState = useExcalidrawAppState();
+  const appProps = useAppProps();
 
   const linkVal = element.link || "";
 
   const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
-  const isEditing = appState.showHyperlinkPopup === "editor" || !linkVal;
+  const isEditing = appState.showHyperlinkPopup === "editor";
 
   const handleSubmit = useCallback(() => {
     if (!inputRef.current) {
       return;
     }
 
-    const link = normalizeLink(inputRef.current.value);
+    const link = normalizeLink(inputRef.current.value) || null;
 
     if (!element.link && link) {
       trackEvent("hyperlink", "create");
     }
 
     if (isIFrameElement(element)) {
-      if (!IFrameURLValidator.getInstance().run(link)) {
-        if (link && link !== "") {
+      if (!link) {
+        mutateElement(element, {
+          whitelisted: false,
+          link: null,
+        });
+        return;
+      }
+
+      if (!iframeURLValidator(link, appProps.iframeURLWhitelist)) {
+        if (link) {
           setToast({ message: t("toast.unableToEmbed"), closable: true });
         }
         element.link && iframeLinkCache.set(element.id, element.link);
@@ -132,8 +142,7 @@ export const Hyperlink = ({
     } else {
       mutateElement(element, { link });
     }
-    setAppState({ showHyperlinkPopup: "info" });
-  }, [element, setAppState, setToast]);
+  }, [element, setToast, appProps.iframeURLWhitelist]);
 
   useLayoutEffect(() => {
     return () => {
@@ -218,15 +227,14 @@ export const Hyperlink = ({
             }
             if (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) {
               handleSubmit();
+              setAppState({ showHyperlinkPopup: "info" });
             }
           }}
         />
-      ) : (
+      ) : element.link ? (
         <a
-          href={element.link || ""}
-          className={clsx("excalidraw-hyperlinkContainer-link", {
-            "d-none": isEditing,
-          })}
+          href={normalizeLink(element.link || "")}
+          className="excalidraw-hyperlinkContainer-link"
           target={isLocalLink(element.link) ? "_self" : "_blank"}
           onClick={(event) => {
             if (element.link && onLinkOpen) {
@@ -234,7 +242,13 @@ export const Hyperlink = ({
                 EVENT.EXCALIDRAW_LINK,
                 event.nativeEvent,
               );
-              onLinkOpen(element, customEvent);
+              onLinkOpen(
+                {
+                  ...element,
+                  link: normalizeLink(element.link),
+                },
+                customEvent,
+              );
               if (customEvent.defaultPrevented) {
                 event.preventDefault();
               }
@@ -244,6 +258,10 @@ export const Hyperlink = ({
         >
           {element.link}
         </a>
+      ) : (
+        <div className="excalidraw-hyperlinkContainer-link">
+          {t("labels.link.empty")}
+        </div>
       )}
       <div className="excalidraw-hyperlinkContainer__buttons">
         {!isEditing && (
@@ -285,21 +303,6 @@ const getCoordsForPopover = (
   const x = viewportX - appState.offsetLeft - CONTAINER_WIDTH / 2;
   const y = viewportY - appState.offsetTop - SPACE_BOTTOM;
   return { x, y };
-};
-
-export const normalizeLink = (link: string) => {
-  link = link.trim();
-  if (link) {
-    // prefix with protocol if not fully-qualified
-    if (!link.includes("://") && !/^[[\\/]/.test(link)) {
-      link = `https://${link}`;
-    }
-  }
-  return link;
-};
-
-export const isLocalLink = (link: string | null | undefined) => {
-  return !!(link?.includes(location.origin) || link?.startsWith("/"));
 };
 
 export const actionLink = register({

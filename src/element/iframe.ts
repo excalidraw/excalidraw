@@ -1,7 +1,7 @@
 import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import { KEYS } from "../keys";
-import { ExcalidrawProps } from "../types";
+import { ExcalidrawProps, IFrameURLValidatorRules } from "../types";
 import { setCursorForShape, updateActiveTool } from "../utils";
 import { newTextElement } from "./newElement";
 import { getContainerElement } from "./textElement";
@@ -49,6 +49,9 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
       case "playlist?list=":
       case "embed/videoseries?list=":
         link = `https://www.youtube.com/embed/videoseries?list=${ytLink[2]}&enablejsapi=1${time}`;
+        break;
+      default:
+        link = `https://www.youtube.com/embed/${ytLink[2]}?enablejsapi=1${time}`;
         break;
     }
     aspectRatio = isPortrait ? { w: 315, h: 560 } : { w: 560, h: 315 };
@@ -163,36 +166,22 @@ export const actionSetIFrameAsActiveTool = register({
   keyTest: (event) => event.key.toLocaleLowerCase() === KEYS.W,
 });
 
-export class IFrameURLValidator {
-  private static instance: IFrameURLValidator;
-  private validators: RegExp[];
-
-  private constructor(validators: RegExp[] = []) {
-    this.validators = validators;
+export const iframeURLValidator = (
+  url: string | null | undefined,
+  validators: IFrameURLValidatorRules = [],
+): boolean => {
+  if (!url) {
+    return false;
   }
-
-  public static getInstance(validators?: RegExp[]): IFrameURLValidator {
-    if (!IFrameURLValidator.instance) {
-      IFrameURLValidator.instance = new IFrameURLValidator(validators);
+  for (const validator of validators) {
+    if (typeof validator === "boolean") {
+      return validator;
     }
-    return IFrameURLValidator.instance;
+    if (url.match(validator)) {
+      return true;
+    }
   }
-
-  public run(url: string | null | undefined): boolean {
-    if (!url) {
-      return false;
-    }
-    for (const validator of this.validators) {
-      if (url.match(validator)) {
-        return true;
-      }
-    }
-    return Boolean(
-      url.match(YOUTUBE_REG) ||
-        url.match(VIMEO_REG) ||
-        //url.match(TWITTER_REG) ||
-        url.match(FIGMA_REG),
-      //|| url.match(EXCALIDRAW_REG),
-    );
-  }
-}
+  return Boolean(
+    url.match(YOUTUBE_REG) || url.match(VIMEO_REG) || url.match(FIGMA_REG),
+  );
+};
