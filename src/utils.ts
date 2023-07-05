@@ -376,7 +376,8 @@ export const updateActiveTool = (
           | "eraser"
           | "hand"
           | "frame"
-          | "embeddable";
+          | "embeddable"
+          | "laser";
       }
     | { type: "custom"; customType: string }
   ) & { lastActiveToolBeforeEraser?: LastActiveTool },

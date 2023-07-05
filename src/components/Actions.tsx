@@ -36,7 +36,12 @@ import {
 
 import "./Actions.scss";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import { EmbedIcon, extraToolsIcon, frameToolIcon } from "./icons";
+import {
+  EmbedIcon,
+  extraToolsIcon,
+  frameToolIcon,
+  laserPointerToolIcon,
+} from "./icons";
 import { KEYS } from "../keys";
 
 export const SelectedShapeActions = ({
@@ -396,6 +401,23 @@ export const ShapesSwitcher = ({
               data-testid="toolbar-embeddable"
             >
               {t("toolBar.embeddable")}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onSelect={() => {
+                const nextActiveTool = updateActiveTool(appState, {
+                  type: "laser",
+                });
+                setAppState({
+                  activeTool: nextActiveTool,
+                  multiElement: null,
+                  selectedElementIds: {},
+                });
+              }}
+              icon={laserPointerToolIcon}
+              shortcut={KEYS.F.toLocaleUpperCase()}
+              data-testid="toolbar-laser"
+            >
+              {t("toolBar.laser")}
             </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu>
