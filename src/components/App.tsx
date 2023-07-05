@@ -7650,7 +7650,7 @@ class App extends React.Component<AppProps, AppState> {
     } = this.state;
 
     // Set the overscroll allowance percentage
-    const OVERSCROLL_ALLOWANCE_PERCENTAGE = 0.1;
+    const OVERSCROLL_ALLOWANCE_PERCENTAGE = 0.2;
 
     // Check if the state has changed since the last render
     const stateUnchanged =
@@ -7674,14 +7674,10 @@ class App extends React.Component<AppProps, AppState> {
     const scrollableHeight = scrollConstraints.height;
     const maxZoomX = width / scrollableWidth;
     const maxZoomY = height / scrollableHeight;
-    const zoomLimit = Math.min(maxZoomX, maxZoomY);
 
     // Default scroll and zoom values
     let constrainedScrollX = scrollX;
     let constrainedScrollY = scrollY;
-    const constrainedZoom = {
-      value: getNormalizedZoom(Math.max(zoom.value, zoomLimit)),
-    };
 
     // Calculate the overscroll allowance for each axis
     const overscrollAllowanceX =
@@ -7740,16 +7736,14 @@ class App extends React.Component<AppProps, AppState> {
 
     // Check if the new state differs from the old state
     const stateChanged =
-      constrainedScrollX !== scrollX ||
-      constrainedScrollY !== scrollY ||
-      constrainedZoom.value !== zoom.value;
+      constrainedScrollX !== scrollX || constrainedScrollY !== scrollY;
 
     // If the state has changed, update the state and return the new state
     if (stateChanged) {
       const constrainedState = {
         scrollX: constrainedScrollX,
         scrollY: constrainedScrollY,
-        zoom: constrainedZoom,
+        zoom,
       };
 
       this.setState(constrainedState);
