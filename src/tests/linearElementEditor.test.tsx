@@ -24,8 +24,9 @@ import {
 } from "../element/textElement";
 import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
+import { vi } from "vitest";
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderScene = vi.spyOn(Renderer, "renderScene");
 
 const { h } = window;
 const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
@@ -1154,7 +1155,7 @@ describe("Test Linear Elements", () => {
         "Online whiteboard collaboration
         made easy"
       `);
-      const handleBindTextResizeSpy = jest.spyOn(
+      const handleBindTextResizeSpy = vi.spyOn(
         textElementUtils,
         "handleBindTextResize",
       );

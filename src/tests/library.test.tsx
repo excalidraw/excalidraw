@@ -36,7 +36,7 @@ vi.mock("../data/filesystem.ts", async (importOriginal) => {
     __esmodule: true,
     //@ts-ignore
     ...module,
-    fileOpen: jest.fn(() => mockLibraryFilePromise),
+    fileOpen: vi.fn(() => mockLibraryFilePromise),
   };
 });
 
