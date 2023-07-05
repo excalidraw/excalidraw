@@ -1,6 +1,10 @@
 import { sanitizeUrl } from "@braintree/sanitize-url";
 
 export const normalizeLink = (link: string) => {
+  link = link.trim();
+  if (!link) {
+    return link;
+  }
   return sanitizeUrl(link);
 };
 
