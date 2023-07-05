@@ -14,20 +14,7 @@ export default defineConfig({
     react(),
     eslint(),
     svgrPlugin(),
-    ViteEjsPlugin((config) => {
-      const esmEnvironment = loadEnv(config.mode, "./");
-      const templatingEnvs = {
-        process: {
-          // Allow EJS templating to build upon environment variables at build time
-          env: {
-            ...process.env,
-            ...esmEnvironment,
-          },
-        },
-      };
-
-      return templatingEnvs;
-    }),
+    ViteEjsPlugin(),
     VitePWA({
       devOptions: {
         /* set this flag to true to enable in Development mode */

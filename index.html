@@ -78,7 +78,7 @@
       }
     </style>
     <!------------------------------------------------------------------------->
-    <% if (process.env.NODE_ENV === "production") { %>
+    <% if ("%PROD%" === "true") { %>
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -120,14 +120,14 @@
     />
 
     <link rel="stylesheet" href="/fonts.css" type="text/css" />
-    <% if (process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD==="true" ) { %>
+    <% if ("%VITE_APP_DEV_DISABLE_LIVE_RELOAD%"==="true" ) { %>
     <script>
       {
         const _WebSocket = window.WebSocket;
         window.WebSocket = function (url) {
           if (/ws:\/\/localhost:.+?\/sockjs-node/.test(url)) {
             console.info(
-              "[!!!] Live reload is disabled via process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD [!!!]",
+              "[!!!] Live reload is disabled via VITE_APP_DEV_DISABLE_LIVE_RELOAD [!!!]",
             );
           } else {
             return new _WebSocket(url);
@@ -194,7 +194,7 @@
     </header>
     <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
-    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
+    <% if ("%VITE_APP_DEV_DISABLE_LIVE_RELOAD%" !== 'true') { %>
     <!-- 100% privacy friendly analytics -->
     <script>
       // need to load this script dynamically bcs. of iframe embed tracking
