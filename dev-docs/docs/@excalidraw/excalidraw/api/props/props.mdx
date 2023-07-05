@@ -29,7 +29,7 @@ All `props` are *optional*.
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
 | [`autoFocus`](#autofocus) | `boolean` | `false` | indicates whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateidforfile) | `function` | _ | Allows you to override `id` generation for files added on canvas |
-| [`iframeURLWhitelist`](#iframeURLWhitelist) | `RegExp[]` | _ | Set this prop to extend the list of allowed sites to be included in iFrames |
+| [`iframeURLWhitelist`](#iframeURLWhitelist) | `(RegExp | boolean)[]` | _ | Set this prop to extend the list of allowed sites to be included in iFrames |
 | [`renderCustomIFrame`](/docs/@excalidraw/excalidraw/api/props/render-props#renderCustomIFrame) |`function` | _ | Render function that can override the built-in iFrame |
 
 ### Storing custom data on Excalidraw elements
@@ -232,8 +232,8 @@ Allows you to override `id` generation for files added on canvas (images). By de
 
 ### iframeURLWhitelist
 
-This is an optional property. Default sites allowed by Excalidraw include YouTube, Vimeo and Figma. You may allow additional sites to be included in iFrames. To allow all sites set the prop to `[/.*/]`.
+This is an optional property. Default sites allowed by Excalidraw include YouTube, Vimeo and Figma. You may allow additional sites to be included in iFrames. If you pass `[true]` all URLs will be allowed, if you pass `[...,false]`, then the rest of the validators after `false` will not be executed, including the omission of the excalidraw default validators. If you only send `(RegExp | boolean)[]` then after running the validators Excalidraw will also execute the built in validators.
 
 ```tsx
-iframeURLWhitelist?: RegExp[];
+iframeURLWhitelist?: (RegExp | boolean)[];
 ```

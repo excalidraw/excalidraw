@@ -1,7 +1,7 @@
 import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import { KEYS } from "../keys";
-import { ExcalidrawProps } from "../types";
+import { ExcalidrawProps, IFrameURLValidatorRules } from "../types";
 import { setCursorForShape, updateActiveTool } from "../utils";
 import { newTextElement } from "./newElement";
 import { getContainerElement } from "./textElement";
@@ -49,6 +49,9 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
       case "playlist?list=":
       case "embed/videoseries?list=":
         link = `https://www.youtube.com/embed/videoseries?list=${ytLink[2]}&enablejsapi=1${time}`;
+        break;
+      default:
+        link = `https://www.youtube.com/embed/${ytLink[2]}?enablejsapi=1${time}`;
         break;
     }
     aspectRatio = isPortrait ? { w: 315, h: 560 } : { w: 560, h: 315 };
@@ -164,13 +167,15 @@ export const actionSetIFrameAsActiveTool = register({
 
 export class IFrameURLValidator {
   private static instance: IFrameURLValidator;
-  private validators: RegExp[];
+  private validators: IFrameURLValidatorRules;
 
-  private constructor(validators: RegExp[] = []) {
+  private constructor(validators: IFrameURLValidatorRules = []) {
     this.validators = validators;
   }
 
-  public static getInstance(validators?: RegExp[]): IFrameURLValidator {
+  public static getInstance(
+    validators?: IFrameURLValidatorRules,
+  ): IFrameURLValidator {
     if (!IFrameURLValidator.instance) {
       IFrameURLValidator.instance = new IFrameURLValidator(validators);
     }
@@ -182,6 +187,9 @@ export class IFrameURLValidator {
       return false;
     }
     for (const validator of this.validators) {
+      if (typeof validator === "boolean") {
+        return validator;
+      }
       if (url.match(validator)) {
         return true;
       }
