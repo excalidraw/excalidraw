@@ -779,21 +779,21 @@ class App extends React.Component<AppProps, AppState> {
     const scale = this.state.zoom.value;
     const normalizedWidth = this.state.width;
     const normalizedHeight = this.state.height;
-    const whitelistUpdates = new Map<ExcalidrawIFrameElement, boolean>();
+    const validationUpdates = new Map<ExcalidrawIFrameElement, boolean>();
 
     const iFrameElements = this.scene.getNonDeletedElements().filter((el) => {
       if (!isIFrameElement(el)) {
         return false;
       }
-      if (typeof el.whitelisted === "undefined") {
-        const isWhitelisted = iframeURLValidator(
+      if (typeof el.validated === "undefined") {
+        const isValidated = iframeURLValidator(
           el.link,
-          this.props.iframeURLWhitelist,
+          this.props.validateIFrame,
         );
-        whitelistUpdates.set(el, isWhitelisted);
-        return isWhitelisted;
+        validationUpdates.set(el, isValidated);
+        return isValidated;
       }
-      return el.whitelisted;
+      return el.validated;
     });
     Object.keys(this.iFrameRefs).forEach((key) => {
       if (!iFrameElements.some((el) => el.id === key)) {
@@ -801,8 +801,8 @@ class App extends React.Component<AppProps, AppState> {
       }
     });
     setTimeout(() => {
-      whitelistUpdates.forEach((whitelisted, element) => {
-        mutateElement(element, { whitelisted });
+      validationUpdates.forEach((validated, element) => {
+        mutateElement(element, { validated });
         invalidateShapeForElement(element);
       });
     });
@@ -2249,7 +2249,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.text) {
         if (
           !isPlainPaste &&
-          iframeURLValidator(data.text, this.props.iframeURLWhitelist) &&
+          iframeURLValidator(data.text, this.props.validateIFrame) &&
           (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(data.text) ||
             getEmbedLink(data.text)?.type === "video")
         ) {
@@ -5312,7 +5312,7 @@ class App extends React.Component<AppProps, AppState> {
       width: embedLink.aspectRatio.w,
       height: embedLink.aspectRatio.h,
       link,
-      whitelisted: undefined,
+      validated: undefined,
     });
 
     this.scene.replaceAllElements([
@@ -5514,7 +5514,7 @@ class App extends React.Component<AppProps, AppState> {
       roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
-      ...(elementType === "iframe" ? { whitelisted: false } : {}),
+      ...(elementType === "iframe" ? { validated: false } : {}),
     });
 
     if (element.type === "selection") {
@@ -7436,7 +7436,7 @@ class App extends React.Component<AppProps, AppState> {
       const text = event.dataTransfer?.getData("text");
       if (
         text &&
-        iframeURLValidator(text, this.props.iframeURLWhitelist) &&
+        iframeURLValidator(text, this.props.validateIFrame) &&
         (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
           getEmbedLink(text)?.type === "video")
       ) {

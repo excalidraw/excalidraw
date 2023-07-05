@@ -370,7 +370,11 @@ export interface ExcalidrawProps {
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
   children?: React.ReactNode;
-  iframeURLWhitelist?: IFrameURLValidatorRules;
+  validateIFrame?:
+    | boolean
+    | RegExp
+    | RegExp[]
+    | ((link: string) => boolean | undefined);
   renderCustomIFrame?: (
     element: NonDeletedExcalidrawElement,
     radius: number,
@@ -592,5 +596,3 @@ export type FrameNameBoundsCache = {
     }
   >;
 };
-
-export type IFrameURLValidatorRules = (RegExp | boolean)[];

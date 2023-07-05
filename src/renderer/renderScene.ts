@@ -524,7 +524,7 @@ export const _renderScene = ({
           const render = () => {
             if (
               isIFrameElement(element) &&
-              (isExporting || !element.whitelisted)
+              (isExporting || !element.validated)
             ) {
               invalidateShapeForElement(element); //add gray placeholder background
               renderElement(element, rc, context, renderConfig, appState);
@@ -534,7 +534,7 @@ export const _renderScene = ({
             }
             if (
               isIFrameElement(element) &&
-              (isExporting || !element.whitelisted) &&
+              (isExporting || !element.validated) &&
               !getBoundTextElement(element)
             ) {
               const label = createPlaceholderiFrameLabel(element);

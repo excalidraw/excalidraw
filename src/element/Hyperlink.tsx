@@ -91,19 +91,19 @@ export const Hyperlink = ({
     if (isIFrameElement(element)) {
       if (!link) {
         mutateElement(element, {
-          whitelisted: false,
+          validated: false,
           link: null,
         });
         return;
       }
 
-      if (!iframeURLValidator(link, appProps.iframeURLWhitelist)) {
+      if (!iframeURLValidator(link, appProps.validateIFrame)) {
         if (link) {
           setToast({ message: t("toast.unableToEmbed"), closable: true });
         }
         element.link && iframeLinkCache.set(element.id, element.link);
         mutateElement(element, {
-          whitelisted: false,
+          validated: false,
           link,
         });
         invalidateShapeForElement(element);
@@ -131,7 +131,7 @@ export const Hyperlink = ({
                     : height,
               }
             : {}),
-          whitelisted: true,
+          validated: true,
           link,
         });
         invalidateShapeForElement(element);
@@ -142,7 +142,7 @@ export const Hyperlink = ({
     } else {
       mutateElement(element, { link });
     }
-  }, [element, setToast, appProps.iframeURLWhitelist]);
+  }, [element, setToast, appProps.validateIFrame]);
 
   useLayoutEffect(() => {
     return () => {
