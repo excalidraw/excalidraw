@@ -1,5 +1,8 @@
 import { isIFrameElement } from "../element/typeChecks";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawIFrameElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 
 export const hasBackground = (type: string) =>
   type === "rectangle" ||
@@ -66,12 +69,21 @@ export const getElementsAtPosition = (
   elements: readonly NonDeletedExcalidrawElement[],
   isAtPositionFn: (element: NonDeletedExcalidrawElement) => boolean,
 ) => {
+  const iFrames: ExcalidrawIFrameElement[] = [];
   // The parameter elements comes ordered from lower z-index to higher.
   // We want to preserve that order on the returned array.
-  const elsAtPos = elements.filter(
-    (element) => !element.isDeleted && isAtPositionFn(element),
-  );
-  return elsAtPos
-    .filter((element) => !isIFrameElement(element))
-    .concat(elsAtPos.filter((element) => isIFrameElement(element)));
+  // Exception being iFrames which should be on top of everything else in
+  // terms of hit testing.
+  const elsAtPos = elements.filter((element) => {
+    const hit = !element.isDeleted && isAtPositionFn(element);
+    if (hit) {
+      if (isIFrameElement(element)) {
+        iFrames.push(element);
+        return false;
+      }
+      return true;
+    }
+    return false;
+  });
+  return elsAtPos.concat(iFrames);
 };
