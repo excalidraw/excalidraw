@@ -83,7 +83,7 @@ import {
   THEME_FILTER,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
-  YTPLAYER,
+  YOUTUBE_STATES,
   ZOOM_STEP,
 } from "../constants";
 import { exportCanvas, loadFromBlob } from "../data";
@@ -340,6 +340,7 @@ import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
+import { ValueOf } from "../utility-types";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -408,8 +409,15 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
-const youtubeContainers = new Map<string, number>();
 let app: App | null = null;
+
+/**
+ * Map of youtube embed video states
+ */
+const YOUTUBE_VIDEO_STATES = new Map<
+  ExcalidrawElement["id"],
+  ValueOf<typeof YOUTUBE_STATES>
+>();
 
 // remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
@@ -663,8 +671,15 @@ class App extends React.Component<AppProps, AppState> {
           typeof data.info.playerState === "number"
         ) {
           const id = data.id;
-          const playerState = data.info.playerState;
-          youtubeContainers.set(id, playerState);
+          const playerState = data.info.playerState as number;
+          if (
+            (Object.values(YOUTUBE_STATES) as number[]).includes(playerState)
+          ) {
+            YOUTUBE_VIDEO_STATES.set(
+              id,
+              playerState as ValueOf<typeof YOUTUBE_STATES>,
+            );
+          }
         }
         break;
     }
@@ -710,9 +725,9 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (iframe.src.includes("youtube")) {
-      const state = youtubeContainers.get(element.id);
+      const state = YOUTUBE_VIDEO_STATES.get(element.id);
       if (!state) {
-        youtubeContainers.set(element.id, YTPLAYER.UNSTARTED);
+        YOUTUBE_VIDEO_STATES.set(element.id, YOUTUBE_STATES.UNSTARTED);
         iframe.contentWindow.postMessage(
           JSON.stringify({
             event: "listening",
@@ -722,8 +737,8 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
       switch (state) {
-        case YTPLAYER.PLAYING:
-        case YTPLAYER.BUFFERING:
+        case YOUTUBE_STATES.PLAYING:
+        case YOUTUBE_STATES.BUFFERING:
           iframe.contentWindow?.postMessage(
             JSON.stringify({
               event: "command",
