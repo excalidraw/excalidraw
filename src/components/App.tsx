@@ -463,6 +463,10 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
   private iFrameRefs: { [key: string]: HTMLIFrameElement } = {};
+  private validationUpdates: Map<ExcalidrawIFrameElement, boolean> = new Map<
+    ExcalidrawIFrameElement,
+    boolean
+  >();
 
   constructor(props: AppProps) {
     super(props);
@@ -779,7 +783,6 @@ class App extends React.Component<AppProps, AppState> {
     const scale = this.state.zoom.value;
     const normalizedWidth = this.state.width;
     const normalizedHeight = this.state.height;
-    const validationUpdates = new Map<ExcalidrawIFrameElement, boolean>();
 
     const iFrameElements = this.scene.getNonDeletedElements().filter((el) => {
       if (!isIFrameElement(el)) {
@@ -790,7 +793,7 @@ class App extends React.Component<AppProps, AppState> {
           el.link,
           this.props.validateIFrame,
         );
-        validationUpdates.set(el, isValidated);
+        this.validationUpdates.set(el, isValidated);
         return isValidated;
       }
       return el.validated;
@@ -799,12 +802,6 @@ class App extends React.Component<AppProps, AppState> {
       if (!iFrameElements.some((el) => el.id === key)) {
         delete this.iFrameRefs[key];
       }
-    });
-    setTimeout(() => {
-      validationUpdates.forEach((validated, element) => {
-        mutateElement(element, { validated });
-        invalidateShapeForElement(element);
-      });
     });
     return (
       <>
@@ -1805,6 +1802,13 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    if (this.validationUpdates) {
+      this.validationUpdates.forEach((validated, element) => {
+        mutateElement(element, { validated });
+        invalidateShapeForElement(element);
+        this.validationUpdates.delete(element);
+      });
+    }
     if (
       !this.state.showWelcomeScreen &&
       !this.scene.getElementsIncludingDeleted().length
