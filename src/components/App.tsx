@@ -4052,6 +4052,10 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    if (this.handleCanvasZoomUsingCtrlAndSpace(event)) {
+      return;
+    }
+
     // only handle left mouse button or touch
     if (
       event.button !== POINTER_BUTTON.MAIN &&
@@ -4260,7 +4264,8 @@ class App extends React.Component<AppProps, AppState> {
           isHandToolActive(this.state) ||
           this.state.viewModeEnabled)
       ) ||
-      isTextElement(this.state.editingElement)
+      isTextElement(this.state.editingElement) ||
+      event.ctrlKey
     ) {
       return false;
     }
@@ -4343,6 +4348,39 @@ class App extends React.Component<AppProps, AppState> {
       passive: true,
     });
     window.addEventListener(EVENT.POINTER_UP, teardown);
+    return true;
+  };
+
+  private handleCanvasZoomUsingCtrlAndSpace = (
+    event: React.PointerEvent<HTMLElement>,
+  ): boolean => {
+    if(!(isHoldingSpace && event.ctrlKey)) { return false; }
+    if (
+      !(
+        gesture.pointers.size <= 1 &&
+        (event.button === POINTER_BUTTON.WHEEL ||
+          (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
+          isHandToolActive(this.state) ||
+          this.state.viewModeEnabled)
+      ) ||
+      isTextElement(this.state.editingElement)
+    ) {
+      return false;
+    }
+    event.preventDefault();
+
+    setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+    let { clientX: lastX, clientY: lastY } = event;
+    const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
+      const deltaX = lastX - event.clientX;
+      const deltaY = lastY - event.clientY;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      this.translateCanvas(({ zoom, scrollX, scrollY }) => ({
+        scrollX: scrollX - deltaX / zoom.value,
+        scrollY: scrollY - deltaY / zoom.value,
+      }));
+    });
     return true;
   };
 
