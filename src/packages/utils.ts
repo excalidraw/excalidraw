@@ -64,7 +64,14 @@ export const exportToCanvas = ({
   const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
     passElementsSafely(restoredElements),
-    { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
+    {
+      ...restoredAppState,
+      offsetTop: 0,
+      offsetLeft: 0,
+      width: 0,
+      height: 0,
+      scrollConstraints: null,
+    },
     files || {},
     { exportBackground, exportPadding, viewBackgroundColor },
     (width: number, height: number) => {

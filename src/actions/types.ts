@@ -16,7 +16,7 @@ export type ActionResult =
       elements?: readonly ExcalidrawElement[] | null;
       appState?: MarkOptional<
         AppState,
-        "offsetTop" | "offsetLeft" | "width" | "height"
+        "offsetTop" | "offsetLeft" | "width" | "height" | "scrollConstraints"
       > | null;
       files?: BinaryFiles | null;
       commitToHistory: boolean;

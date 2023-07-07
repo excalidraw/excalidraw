@@ -17,7 +17,7 @@ const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
 
 export const getDefaultAppState = (): Omit<
   AppState,
-  "offsetTop" | "offsetLeft" | "width" | "height"
+  "offsetTop" | "offsetLeft" | "width" | "height" | "scrollConstraints"
 > => {
   return {
     showWelcomeScreen: false,
@@ -98,7 +98,6 @@ export const getDefaultAppState = (): Omit<
     pendingImageElementId: null,
     showHyperlinkPopup: false,
     selectedLinearElement: null,
-    scrollConstraints: null,
   };
 };
 
@@ -205,7 +204,7 @@ const APP_STATE_STORAGE_CONF = (<
   pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
-  scrollConstraints: { browser: true, export: false, server: false },
+  scrollConstraints: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <
