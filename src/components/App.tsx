@@ -167,7 +167,6 @@ import {
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
-  ExcalidrawIFrameElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -465,16 +464,12 @@ class App extends React.Component<AppProps, AppState> {
 
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
+  private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDown: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
-  private iFrameRefs: { [key: string]: HTMLIFrameElement } = {};
-  private validationUpdates: Map<ExcalidrawIFrameElement, boolean> = new Map<
-    ExcalidrawIFrameElement,
-    boolean
-  >();
 
   constructor(props: AppProps) {
     super(props);
@@ -687,12 +682,12 @@ class App extends React.Component<AppProps, AppState> {
 
   private updateIFrameRef(id: string, ref: HTMLIFrameElement | null) {
     if (ref) {
-      this.iFrameRefs[id] = ref;
+      this.iFrameRefs.set(id, ref);
     }
   }
 
   private getIFrameElementById(id: string): HTMLIFrameElement | undefined {
-    return this.iFrameRefs[id];
+    return this.iFrameRefs.get(id);
   }
 
   private handleIFrameCenterClick(element: NonDeletedExcalidrawElement) {
@@ -793,31 +788,49 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  previsloading = true;
+  private updateIFrames = () => {
+    const iframeElements = new Map<ExcalidrawElement["id"], true>();
+
+    let updated = false;
+    this.scene.getNonDeletedElements().filter((element) => {
+      if (isIFrameElement(element)) {
+        iframeElements.set(element.id, true);
+        if (element.validated == null) {
+          updated = true;
+
+          const validated = iframeURLValidator(
+            element.link,
+            this.props.validateIFrame,
+          );
+
+          mutateElement(element, { validated }, false);
+          invalidateShapeForElement(element);
+        }
+      }
+      return false;
+    });
+
+    if (updated) {
+      this.scene.informMutation();
+    }
+
+    // GC
+    this.iFrameRefs.forEach((ref, id) => {
+      if (!iframeElements.has(id)) {
+        this.iFrameRefs.delete(id);
+      }
+    });
+  };
+
   private renderIFrames() {
     const scale = this.state.zoom.value;
     const normalizedWidth = this.state.width;
     const normalizedHeight = this.state.height;
 
-    const iFrameElements = this.scene.getNonDeletedElements().filter((el) => {
-      if (!isIFrameElement(el)) {
-        return false;
-      }
-      if (typeof el.validated === "undefined") {
-        const isValidated = iframeURLValidator(
-          el.link,
-          this.props.validateIFrame,
-        );
-        this.validationUpdates.set(el, isValidated);
-        return isValidated;
-      }
-      return el.validated;
-    });
-    Object.keys(this.iFrameRefs).forEach((key) => {
-      if (!iFrameElements.some((el) => el.id === key)) {
-        delete this.iFrameRefs[key];
-      }
-    });
+    const iFrameElements = this.scene
+      .getNonDeletedElements()
+      .filter((el) => isIFrameElement(el) && el.validated);
+
     return (
       <>
         {iFrameElements.map((el) => {
@@ -1817,13 +1830,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
-    if (this.validationUpdates) {
-      this.validationUpdates.forEach((validated, element) => {
-        mutateElement(element, { validated });
-        invalidateShapeForElement(element);
-        this.validationUpdates.delete(element);
-      });
-    }
+    this.updateIFrames();
     if (
       !this.state.showWelcomeScreen &&
       !this.scene.getElementsIncludingDeleted().length
