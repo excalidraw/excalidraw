@@ -65,9 +65,6 @@ Object {
     "id0": true,
     "id1": true,
     "id2": true,
-    "id3": true,
-    "id4": true,
-    "id6": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -76,7 +73,6 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
     "id2": true,
-    "id7": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {
@@ -443,8 +439,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id2": true,
-          "id3": true,
-          "id4": true,
         },
         "selectedGroupIds": Object {
           "id5": true,
@@ -618,8 +612,6 @@ Object {
     "id0": true,
     "id1": true,
     "id2": true,
-    "id3": true,
-    "id5": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -629,18 +621,13 @@ Object {
     "id0": false,
     "id1": true,
     "id2": false,
-    "id3": true,
-    "id5": true,
-    "id6": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {
     "id0": true,
     "id1": true,
     "id2": true,
-    "id3": true,
     "id4": false,
-    "id5": true,
   },
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -1003,7 +990,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id2": true,
-          "id3": true,
         },
         "selectedGroupIds": Object {
           "id4": true,
@@ -1179,7 +1165,6 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id12": true,
     "id7": true,
   },
   "selectedElementsAreBeingDragged": false,
@@ -1448,8 +1433,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id1": true,
-          "id2": true,
-          "id3": true,
         },
         "selectedGroupIds": Object {
           "id4": true,
@@ -1528,7 +1511,6 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
-          "id5": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -1712,8 +1694,6 @@ Object {
           "id0": true,
           "id1": true,
           "id7": true,
-          "id8": true,
-          "id9": true,
         },
         "selectedGroupIds": Object {
           "id10": true,
@@ -1825,7 +1805,6 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
-          "id11": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -1934,7 +1913,6 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
-          "id12": true,
           "id7": true,
         },
         "selectedGroupIds": Object {},
@@ -2116,7 +2094,6 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id0": true,
-    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -2239,7 +2216,6 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
-          "id1": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -2347,7 +2323,6 @@ Object {
   "pendingImageElementId": null,
   "previousSelectedElementIds": Object {
     "id0": true,
-    "id3": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -2356,8 +2331,6 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
     "id2": true,
-    "id3": true,
-    "id4": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {
@@ -2724,8 +2697,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id2": true,
-          "id3": true,
-          "id4": true,
         },
         "selectedGroupIds": Object {
           "id5": true,
@@ -2904,7 +2875,6 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id0": true,
-    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -3059,7 +3029,6 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
-          "id1": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -3394,7 +3363,6 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id1": true,
-    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -3754,7 +3722,6 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id1": true,
-          "id3": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -4247,7 +4214,6 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id0": true,
-    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -4370,7 +4336,6 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
-          "id1": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -4478,7 +4443,6 @@ Object {
   "pendingImageElementId": null,
   "previousSelectedElementIds": Object {
     "id0": true,
-    "id1": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -4486,8 +4450,6 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id0": true,
-    "id1": true,
-    "id2": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -4610,7 +4572,6 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
-          "id1": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -4654,8 +4615,6 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
-          "id1": true,
-          "id2": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -4770,7 +4729,6 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id0": true,
-    "id2": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -5069,7 +5027,6 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -5522,7 +5479,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id2": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -5875,7 +5831,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id2": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -6423,9 +6378,7 @@ Object {
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
-    "id1": true,
-  },
+  "selectedElementIds": Object {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
@@ -7157,7 +7110,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id2": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -7166,8 +7118,6 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id2": true,
-    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -7395,8 +7345,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id1": true,
-          "id2": true,
-          "id3": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -7536,9 +7484,7 @@ Object {
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
-    "id7": false,
-  },
+  "selectedElementIds": Object {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
@@ -9539,9 +9485,7 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id7": false,
-        },
+        "selectedElementIds": Object {},
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
@@ -9948,7 +9892,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
     "id2": true,
-    "id3": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -9956,7 +9899,6 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id1": true,
-    "id4": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -10380,7 +10322,6 @@ Object {
   "pendingImageElementId": null,
   "previousSelectedElementIds": Object {
     "id0": true,
-    "id2": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -10389,8 +10330,6 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id2": true,
-    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -10681,7 +10620,6 @@ Object {
   "pendingImageElementId": null,
   "previousSelectedElementIds": Object {
     "id0": true,
-    "id2": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -10689,7 +10627,6 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id1": true,
-    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -10801,7 +10738,6 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
-          "id2": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -10938,7 +10874,6 @@ Object {
   "pendingImageElementId": null,
   "previousSelectedElementIds": Object {
     "id0": true,
-    "id2": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -10946,8 +10881,6 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id0": true,
-    "id2": true,
-    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -11059,7 +10992,6 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
-          "id2": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -11132,8 +11064,6 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
-          "id2": true,
-          "id3": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -12334,9 +12264,7 @@ Object {
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
-    "id0": false,
-  },
+  "selectedElementIds": Object {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
@@ -12435,9 +12363,7 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": false,
-        },
+        "selectedElementIds": Object {},
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
@@ -13439,9 +13365,7 @@ Object {
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
-    "id0": false,
-  },
+  "selectedElementIds": Object {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
@@ -13540,9 +13464,7 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": false,
-        },
+        "selectedElementIds": Object {},
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
@@ -13864,7 +13786,6 @@ Object {
     "id0": true,
     "id1": true,
     "id2": true,
-    "id3": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -13874,8 +13795,6 @@ Object {
     "id0": true,
     "id1": true,
     "id2": true,
-    "id3": true,
-    "id5": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {
@@ -14347,7 +14266,6 @@ Object {
           "id0": true,
           "id1": true,
           "id2": true,
-          "id3": true,
         },
         "selectedGroupIds": Object {
           "id4": true,
@@ -14459,8 +14377,6 @@ Object {
           "id0": true,
           "id1": true,
           "id2": true,
-          "id3": true,
-          "id5": true,
         },
         "selectedGroupIds": Object {
           "id4": true,
@@ -14727,7 +14643,6 @@ Object {
   "pendingImageElementId": null,
   "previousSelectedElementIds": Object {
     "id0": true,
-    "id3": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -14735,7 +14650,6 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id1": true,
-    "id4": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -15029,9 +14943,7 @@ Object {
   "scrollX": -2.916666666666668,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
-    "id0": true,
-  },
+  "selectedElementIds": Object {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
@@ -15263,7 +15175,6 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id0": false,
-    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -15451,8 +15362,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id2": true,
-    "id3": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -15461,9 +15370,6 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id2": true,
-    "id3": true,
-    "id4": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -15691,9 +15597,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id1": true,
-          "id2": true,
-          "id3": true,
-          "id4": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -15832,7 +15735,6 @@ Object {
     "id0": true,
     "id1": true,
     "id2": true,
-    "id3": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -15842,7 +15744,6 @@ Object {
     "id0": true,
     "id1": true,
     "id2": true,
-    "id5": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -16204,7 +16105,6 @@ Object {
           "id0": true,
           "id1": true,
           "id2": true,
-          "id3": true,
         },
         "selectedGroupIds": Object {
           "id4": true,
@@ -16316,7 +16216,6 @@ Object {
           "id0": true,
           "id1": true,
           "id2": true,
-          "id5": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -16487,7 +16386,6 @@ Object {
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id0": true,
-    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -16728,7 +16626,6 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id11": true,
     "id5": true,
     "id6": true,
   },
@@ -17036,8 +16933,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id1": true,
-          "id2": true,
-          "id3": true,
         },
         "selectedGroupIds": Object {
           "id4": true,
@@ -17356,8 +17251,6 @@ Object {
         "selectedElementIds": Object {
           "id5": true,
           "id6": true,
-          "id7": true,
-          "id8": true,
         },
         "selectedGroupIds": Object {
           "id9": true,
@@ -18309,7 +18202,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id2": true,
-          "id4": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -18418,7 +18310,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id2": true,
-          "id4": true,
         },
         "selectedGroupIds": Object {
           "id5": true,
@@ -18532,7 +18423,6 @@ Object {
           "id0": true,
           "id1": true,
           "id2": true,
-          "id7": true,
         },
         "selectedGroupIds": Object {
           "id3": true,
@@ -18737,7 +18627,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id1": true,
     "id2": true,
-    "id3": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -19552,9 +19441,7 @@ Object {
   "scrollX": 10,
   "scrollY": -10,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
-    "id0": true,
-  },
+  "selectedElementIds": Object {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
