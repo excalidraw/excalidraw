@@ -232,9 +232,18 @@ export const actionUngroup = register({
     });
 
     // remove binded text elements from selection
-    boundTextElementIds.forEach(
-      (id) => (updateAppState.selectedElementIds[id] = false),
+    updateAppState.selectedElementIds = Object.fromEntries(
+      Object.entries(updateAppState.selectedElementIds).reduce(
+        (acc: [ExcalidrawElement["id"], true][], [id, selected]) => {
+          if (selected && !boundTextElementIds.includes(id)) {
+            acc.push([id, true]);
+          }
+          return acc;
+        },
+        [],
+      ),
     );
+
     return {
       appState: updateAppState,
       elements: nextElements,

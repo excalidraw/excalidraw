@@ -181,7 +181,7 @@ export type AppState = {
   defaultSidebarDockedPreference: boolean;
 
   lastPointerDownWith: PointerType;
-  selectedElementIds: { [id: string]: boolean };
+  selectedElementIds: Readonly<{ [id: string]: boolean }>;
   previousSelectedElementIds: { [id: string]: boolean };
   selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
