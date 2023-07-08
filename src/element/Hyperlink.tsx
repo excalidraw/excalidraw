@@ -89,6 +89,9 @@ export const Hyperlink = ({
     }
 
     if (isIFrameElement(element)) {
+      if (appState.activeIFrame?.element === element) {
+        setAppState({ activeIFrame: null });
+      }
       if (!link) {
         mutateElement(element, {
           whitelisted: false,
@@ -142,7 +145,13 @@ export const Hyperlink = ({
     } else {
       mutateElement(element, { link });
     }
-  }, [element, setToast, appProps.iframeURLWhitelist]);
+  }, [
+    element,
+    setToast,
+    appProps.iframeURLWhitelist,
+    appState.activeIFrame,
+    setAppState,
+  ]);
 
   useLayoutEffect(() => {
     return () => {
