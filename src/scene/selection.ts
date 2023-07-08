@@ -192,16 +192,38 @@ export const getTargetElements = (
 /**
  * returns prevState's selectedElementids if no change from previous, so as to
  * retain reference identity for memoization
- *
- * Can be further optimized by skipping undefined:false pairs, and checking
- * length of both keys only when necessary.
  */
 export const makeNextSelectedElementIds = (
   nextSelectedElementIds: AppState["selectedElementIds"],
   prevState: Pick<AppState, "selectedElementIds">,
 ) => {
-  if (isShallowEqual(prevState.selectedElementIds, nextSelectedElementIds)) {
+  const nextIds = Object.keys(nextSelectedElementIds);
+
+  let changed = false;
+
+  for (const id of nextIds) {
+    const nextVal = !!nextSelectedElementIds[id];
+    const prevVal = !!prevState.selectedElementIds[id];
+    if (nextVal !== prevVal) {
+      changed = true;
+      break;
+    }
+  }
+
+  if (!changed) {
+    const prevIds = Object.keys(prevState.selectedElementIds);
+    if (nextIds.length === prevIds.length) {
+      return prevState.selectedElementIds;
+    }
+
+    for (const id of prevIds) {
+      const prevVal = !!prevState.selectedElementIds[id];
+      if (prevVal && prevVal !== nextSelectedElementIds[id]) {
+        return nextSelectedElementIds;
+      }
+    }
     return prevState.selectedElementIds;
   }
+
   return nextSelectedElementIds;
 };
