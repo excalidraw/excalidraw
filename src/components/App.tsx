@@ -1356,6 +1356,7 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.destroy();
     this.library.destroy();
     clearTimeout(touchTimeout);
+    isSomeElementSelected.clearCache();
     touchTimeout = 0;
   }
 

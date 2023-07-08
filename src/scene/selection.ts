@@ -89,11 +89,37 @@ export const getElementsWithinSelection = (
   return elementsInSelection;
 };
 
-export const isSomeElementSelected = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds">,
-): boolean =>
-  elements.some((element) => appState.selectedElementIds[element.id]);
+// FIXME move this into the editor instance to keep utility methods stateless
+export const isSomeElementSelected = (function () {
+  let lastElements: readonly NonDeletedExcalidrawElement[] | null = null;
+  let lastSelectedElementIds: AppState["selectedElementIds"] | null = null;
+  let isSelected: boolean | null = null;
+
+  const ret = (
+    elements: readonly NonDeletedExcalidrawElement[],
+    appState: Pick<AppState, "selectedElementIds">,
+  ): boolean => {
+    if (
+      isSelected != null &&
+      elements === lastElements &&
+      appState.selectedElementIds === lastSelectedElementIds
+    ) {
+      return isSelected;
+    }
+
+    isSelected = elements.some(
+      (element) => appState.selectedElementIds[element.id],
+    );
+    lastElements = elements;
+    lastSelectedElementIds = appState.selectedElementIds;
+
+    return isSelected;
+  };
+
+  ret.clearCache = () => {};
+
+  return ret;
+})();
 
 /**
  * Returns common attribute (picked by `getAttribute` callback) of selected
