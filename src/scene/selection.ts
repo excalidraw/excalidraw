@@ -10,7 +10,6 @@ import {
   getContainingFrame,
   getFrameElements,
 } from "../frame";
-import { isShallowEqual } from "../utils";
 
 /**
  * Frames and their containing elements are not to be selected at the same time.
