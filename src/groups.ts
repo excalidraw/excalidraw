@@ -2,6 +2,7 @@ import { GroupId, ExcalidrawElement, NonDeleted } from "./element/types";
 import { AppState } from "./types";
 import { getSelectedElements } from "./scene";
 import { getBoundTextElement } from "./element/textElement";
+import { makeNextSelectedElementIds } from "./scene/selection";
 
 export const selectGroup = (
   groupId: GroupId,
@@ -67,13 +68,21 @@ export const getSelectedGroupIds = (appState: AppState): GroupId[] =>
 export const selectGroupsForSelectedElements = (
   appState: AppState,
   elements: readonly NonDeleted<ExcalidrawElement>[],
+  prevAppState: AppState,
 ): AppState => {
   let nextAppState: AppState = { ...appState, selectedGroupIds: {} };
 
   const selectedElements = getSelectedElements(elements, appState);
 
   if (!selectedElements.length) {
-    return { ...nextAppState, editingGroupId: null };
+    return {
+      ...nextAppState,
+      editingGroupId: null,
+      selectedElementIds: makeNextSelectedElementIds(
+        nextAppState.selectedElementIds,
+        prevAppState,
+      ),
+    };
   }
 
   for (const selectedElement of selectedElements) {
@@ -90,6 +99,11 @@ export const selectGroupsForSelectedElements = (
       nextAppState = selectGroup(groupId, nextAppState, elements);
     }
   }
+
+  nextAppState.selectedElementIds = makeNextSelectedElementIds(
+    nextAppState.selectedElementIds,
+    prevAppState,
+  );
 
   return nextAppState;
 };

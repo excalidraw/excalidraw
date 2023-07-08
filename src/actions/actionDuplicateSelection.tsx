@@ -274,6 +274,7 @@ const duplicateElements = (
         ),
       },
       getNonDeletedElements(finalElements),
+      appState,
     ),
   };
 };
