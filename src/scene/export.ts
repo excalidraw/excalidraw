@@ -15,6 +15,19 @@ import Scene from "./Scene";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
+const createScene = (
+  //zsviczian
+  elements: readonly NonDeletedExcalidrawElement[],
+): Scene | null => {
+  if (!elements || Scene.getScene(elements[0])) {
+    return null;
+  }
+  const scene = new Scene();
+  scene.replaceAllElements(elements);
+  elements?.forEach((el) => Scene.mapElementToScene(el, scene));
+  return scene;
+};
+
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -38,6 +51,7 @@ export const exportToCanvas = async (
     return { canvas, scale: appState.exportScale };
   },
 ) => {
+  const scene = createScene(elements); //zsviczian
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
   const { canvas, scale = 1 } = createCanvas(width, height);
@@ -79,6 +93,7 @@ export const exportToCanvas = async (
     },
   });
 
+  scene?.destroy(); //zsviczian
   return canvas;
 };
 
@@ -104,6 +119,7 @@ export const exportToSvg = async (
     exportScale = 1,
     exportEmbedScene,
   } = appState;
+  const scene = createScene(elements); //zsviczian
   let metadata = "";
   if (exportEmbedScene) {
     try {
@@ -131,10 +147,10 @@ export const exportToSvg = async (
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
-  let assetPath = "https://excalidraw.com/";
+  const assetPath = "https://excalidraw.com/";
 
   // Asset path needs to be determined only when using package
-  if (process.env.IS_EXCALIDRAW_NPM_PACKAGE) {
+  /*if (process.env.IS_EXCALIDRAW_NPM_PACKAGE) { //zsviczian
     assetPath =
       window.EXCALIDRAW_ASSET_PATH ||
       `https://unpkg.com/${process.env.PKG_NAME}@${process.env.PKG_VERSION}`;
@@ -143,7 +159,7 @@ export const exportToSvg = async (
       assetPath = assetPath.replace("/", `${window.location.origin}/`);
     }
     assetPath = `${assetPath}/dist/excalidraw-assets/`;
-  }
+  }*/ //zsviczian
 
   // do not apply clipping when we're exporting the whole scene
   const isExportingWholeCanvas =
@@ -214,6 +230,7 @@ export const exportToSvg = async (
     exportingFrameId: exportingFrame?.id || null,
   });
 
+  scene?.destroy(); //zsviczian
   return svgRoot;
 };
 

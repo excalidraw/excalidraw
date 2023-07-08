@@ -4,16 +4,17 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
-  EXPORT_SCALES,
+  //EXPORT_SCALES,
   THEME,
 } from "./constants";
 import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
 import { getDateTime } from "./utils";
 
-const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
+const defaultExportScale = 1; //zsviczian - iPad scaling issue on export
+/*EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio
-  : 1;
+  : 1;*/
 
 export const getDefaultAppState = (): Omit<
   AppState,
@@ -58,6 +59,7 @@ export const getDefaultAppState = (): Omit<
     exportWithDarkMode: false,
     fileHandle: null,
     gridSize: null,
+    previousGridSize: null, //zsviczian
     isBindingEnabled: true,
     defaultSidebarDockedPreference: false,
     isLoading: false,
@@ -98,6 +100,18 @@ export const getDefaultAppState = (): Omit<
     viewModeEnabled: false,
     pendingImageElementId: null,
     showHyperlinkPopup: false,
+    linkOpacity: 1, //zsviczian
+    trayModeEnabled: false, //zsviczian
+    colorPalette: undefined, //zsviczian
+    allowPinchZoom: false, //zsviczian
+    allowWheelZoom: false, //zsviczian
+    pinnedScripts: [], //zsviczian
+    customPens: [], //zsviczian
+    currentStrokeOptions: null, //zsviczian
+    resetCustomPen: null, //zsviczian
+    gridColor: "#E6E6E6", //zsviczian
+    dynamicStyle: "", //zsviczian
+    invertBindingBehaviour: false, //zsviczian
     selectedLinearElement: null,
   };
 };
@@ -155,6 +169,7 @@ const APP_STATE_STORAGE_CONF = (<
   exportWithDarkMode: { browser: true, export: false, server: false },
   fileHandle: { browser: false, export: false, server: false },
   gridSize: { browser: true, export: true, server: true },
+  previousGridSize: { browser: false, export: false, server: false }, //zsviczian
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: false, export: false, server: false },
   defaultSidebarDockedPreference: {
@@ -205,6 +220,18 @@ const APP_STATE_STORAGE_CONF = (<
   viewModeEnabled: { browser: false, export: false, server: false },
   pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
+  linkOpacity: { browser: false, export: false, server: false }, //zsviczian
+  trayModeEnabled: { browser: false, export: false, server: false }, //zsviczian
+  colorPalette: { browser: false, export: false, server: false }, //zsviczian
+  allowPinchZoom: { browser: false, export: false, server: false }, //zsviczian
+  allowWheelZoom: { browser: false, export: false, server: false }, //zsviczian
+  pinnedScripts: { browser: false, export: false, server: false }, //zsviczian
+  customPens: { browser: false, export: false, server: false }, //zsviczian
+  currentStrokeOptions: { browser: false, export: false, server: false }, //zsviczian
+  resetCustomPen: { browser: false, export: false, server: false }, //zsviczian
+  gridColor: { browser: false, export: false, server: false }, //zsviczian
+  dynamicStyle: { browser: false, export: false, server: false }, //zsviczian
+  invertBindingBehaviour: { browser: false, export: false, server: false }, //zsviczian
   selectedLinearElement: { browser: true, export: false, server: false },
 });
 

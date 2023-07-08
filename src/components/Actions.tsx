@@ -28,7 +28,7 @@ import { trackEvent } from "../analytics";
 import { hasBoundTextElement } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
-import { Tooltip } from "./Tooltip";
+// import { Tooltip } from "./Tooltip"; //zsviczian
 import {
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
@@ -310,12 +310,14 @@ export const ShapesSwitcher = ({
               const nextActiveTool = updateActiveTool(appState, {
                 type: "frame",
               });
-              setAppState({
-                activeTool: nextActiveTool,
-                multiElement: null,
-                selectedElementIds: {},
-                activeIFrame: null,
-              });
+              setTimeout(() =>
+                setAppState({
+                  activeTool: nextActiveTool,
+                  multiElement: null,
+                  selectedElementIds: {},
+                  activeIFrame: null,
+                }),
+              ); //zsviczian added setTimeout wrapper because tools wouldn't select on first click
             }}
           />
           <ToolButton
@@ -344,12 +346,14 @@ export const ShapesSwitcher = ({
               const nextActiveTool = updateActiveTool(appState, {
                 type: "iframe",
               });
-              setAppState({
-                activeTool: nextActiveTool,
-                multiElement: null,
-                selectedElementIds: {},
-                activeIFrame: null,
-              });
+              setTimeout(() =>
+                setAppState({
+                  activeTool: nextActiveTool,
+                  multiElement: null,
+                  selectedElementIds: {},
+                  activeIFrame: null,
+                }),
+              ); //zsviczian added setTimeout wrapper because tools wouldn't select on first click
             }}
           />
         </>
@@ -411,11 +415,16 @@ export const ShapesSwitcher = ({
 export const ZoomActions = ({
   renderAction,
   zoom,
+  trayMode = false, //zsviczian
 }: {
   renderAction: ActionManager["renderAction"];
   zoom: Zoom;
+  trayMode?: boolean; //zsviczian note also changes to Stack.Col and Stack.Row
 }) => (
-  <Stack.Col gap={1} className="zoom-actions">
+  <Stack.Col
+    gap={1}
+    className={clsx("zoom-actions", { "tray-zoom": trayMode })}
+  >
     <Stack.Row align="center">
       {renderAction("zoomOut")}
       {renderAction("resetZoom")}
@@ -433,10 +442,10 @@ export const UndoRedoActions = ({
 }) => (
   <div className={`undo-redo-buttons ${className}`}>
     <div className="undo-button-container">
-      <Tooltip label={t("buttons.undo")}>{renderAction("undo")}</Tooltip>
+      {renderAction("undo") /* //zsviczian */}
     </div>
     <div className="redo-button-container">
-      <Tooltip label={t("buttons.redo")}> {renderAction("redo")}</Tooltip>
+      {renderAction("redo") /* //zsviczian */}
     </div>
   </div>
 );

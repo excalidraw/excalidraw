@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useUIAppState } from "../../context/ui-appState";
 import { useDevice } from "../App";
 
 const MenuTrigger = ({
@@ -13,12 +14,15 @@ const MenuTrigger = ({
   onToggle: () => void;
   title?: string;
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">) => {
+  const appState = useUIAppState();
   const device = useDevice();
   const classNames = clsx(
     `dropdown-menu-button ${className}`,
     "zen-mode-transition",
     {
-      "dropdown-menu-button--mobile": device.isMobile,
+      "transition-left": appState.zenModeEnabled,
+      "dropdown-menu-button--mobile":
+        device.isMobile || appState.trayModeEnabled, //zsviczian
     },
   ).trim();
   return (
