@@ -10,6 +10,7 @@ import {
   getContainingFrame,
   getFrameElements,
 } from "../frame";
+import { Debug } from "../excalidraw-app/debug";
 
 /**
  * Frames and their containing elements are not to be selected at the same time.
@@ -220,7 +221,7 @@ export const makeNextSelectedElementIds = (
     }
 
     for (const id of prevIds) {
-      const prevVal = !!prevState.selectedElementIds[id];
+      const prevVal = prevState.selectedElementIds[id];
       if (prevVal && prevVal !== nextSelectedElementIds[id]) {
         return nextSelectedElementIds;
       }

@@ -4024,7 +4024,7 @@ class App extends React.Component<AppProps, AppState> {
           selectedElementIds: makeNextSelectedElementIds(
             Object.keys(this.state.selectedElementIds)
               .filter((key) => key !== element.id)
-              .reduce((obj: { [id: string]: boolean }, key) => {
+              .reduce((obj: { [id: string]: true }, key) => {
                 obj[key] = this.state.selectedElementIds[key];
                 return obj;
               }, {}),
@@ -4679,7 +4679,7 @@ class App extends React.Component<AppProps, AppState> {
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
               this.setState((prevState) => {
-                const nextSelectedElementIds = {
+                const nextSelectedElementIds: { [id: string]: true } = {
                   ...prevState.selectedElementIds,
                   [hitElement.id]: true,
                 };
@@ -4697,13 +4697,13 @@ class App extends React.Component<AppProps, AppState> {
                     previouslySelectedElements,
                     hitElement.id,
                   ).forEach((element) => {
-                    nextSelectedElementIds[element.id] = false;
+                    delete nextSelectedElementIds[element.id];
                   });
                 } else if (hitElement.frameId) {
                   // if hitElement is in a frame and its frame has been selected
                   // disable selection for the given element
                   if (nextSelectedElementIds[hitElement.frameId]) {
-                    nextSelectedElementIds[hitElement.id] = false;
+                    delete nextSelectedElementIds[hitElement.id];
                   }
                 } else {
                   // hitElement is neither a frame nor an element in a frame
@@ -4733,7 +4733,7 @@ class App extends React.Component<AppProps, AppState> {
                         framesInGroups.has(element.frameId)
                       ) {
                         // deselect element and groups containing the element
-                        nextSelectedElementIds[element.id] = false;
+                        delete nextSelectedElementIds[element.id];
                         element.groupIds
                           .flatMap((gid) =>
                             getElementsInGroup(
@@ -4741,10 +4741,9 @@ class App extends React.Component<AppProps, AppState> {
                               gid,
                             ),
                           )
-                          .forEach(
-                            (element) =>
-                              (nextSelectedElementIds[element.id] = false),
-                          );
+                          .forEach((element) => {
+                            delete nextSelectedElementIds[element.id];
+                          });
                       }
                     });
                   }
@@ -4874,15 +4873,18 @@ class App extends React.Component<AppProps, AppState> {
       frameId: topLayerFrame ? topLayerFrame.id : null,
     });
 
-    this.setState((prevState) => ({
-      selectedElementIds: makeNextSelectedElementIds(
-        {
-          ...prevState.selectedElementIds,
-          [element.id]: false,
-        },
-        prevState,
-      ),
-    }));
+    this.setState((prevState) => {
+      const nextSelectedElementIds = {
+        ...prevState.selectedElementIds,
+      };
+      delete nextSelectedElementIds[element.id];
+      return {
+        selectedElementIds: makeNextSelectedElementIds(
+          nextSelectedElementIds,
+          prevState,
+        ),
+      };
+    });
 
     const pressures = element.simulatePressure
       ? element.pressures
@@ -5035,15 +5037,18 @@ class App extends React.Component<AppProps, AppState> {
         locked: false,
         frameId: topLayerFrame ? topLayerFrame.id : null,
       });
-      this.setState((prevState) => ({
-        selectedElementIds: makeNextSelectedElementIds(
-          {
-            ...prevState.selectedElementIds,
-            [element.id]: false,
-          },
-          prevState,
-        ),
-      }));
+      this.setState((prevState) => {
+        const nextSelectedElementIds = {
+          ...prevState.selectedElementIds,
+        };
+        delete nextSelectedElementIds[element.id];
+        return {
+          selectedElementIds: makeNextSelectedElementIds(
+            nextSelectedElementIds,
+            prevState,
+          ),
+        };
+      });
       mutateElement(element, {
         points: [...element.points, [0, 0]],
       });
@@ -5582,27 +5587,29 @@ class App extends React.Component<AppProps, AppState> {
             elements,
             draggingElement,
           );
-          this.setState((prevState) =>
-            selectGroupsForSelectedElements(
+          this.setState((prevState) => {
+            const nextSelectedElementIds = elementsWithinSelection.reduce(
+              (acc: Record<ExcalidrawElement["id"], true>, element) => {
+                acc[element.id] = true;
+                return acc;
+              },
+              {},
+            );
+
+            if (pointerDownState.hit.element) {
+              // if using ctrl/cmd, select the hitElement only if we
+              // haven't box-selected anything else
+              if (!elementsWithinSelection.length) {
+                nextSelectedElementIds[pointerDownState.hit.element.id] = true;
+              } else {
+                delete nextSelectedElementIds[pointerDownState.hit.element.id];
+              }
+            }
+
+            return selectGroupsForSelectedElements(
               {
                 ...prevState,
-                selectedElementIds: {
-                  ...elementsWithinSelection.reduce(
-                    (acc: Record<ExcalidrawElement["id"], true>, element) => {
-                      acc[element.id] = true;
-                      return acc;
-                    },
-                    {},
-                  ),
-                  ...(pointerDownState.hit.element
-                    ? {
-                        // if using ctrl/cmd, select the hitElement only if we
-                        // haven't box-selected anything else
-                        [pointerDownState.hit.element.id]:
-                          !elementsWithinSelection.length,
-                      }
-                    : null),
-                },
+                selectedElementIds: nextSelectedElementIds,
                 showHyperlinkPopup:
                   elementsWithinSelection.length === 1 &&
                   elementsWithinSelection[0].link
@@ -5620,8 +5627,8 @@ class App extends React.Component<AppProps, AppState> {
               },
               this.scene.getNonDeletedElements(),
               prevState,
-            ),
-          );
+            );
+          });
         }
       }
     });
@@ -6184,34 +6191,37 @@ class App extends React.Component<AppProps, AppState> {
         if (childEvent.shiftKey && !this.state.editingLinearElement) {
           if (this.state.selectedElementIds[hitElement.id]) {
             if (isSelectedViaGroup(this.state, hitElement)) {
-              // We want to unselect all groups hitElement is part of
-              // as well as all elements that are part of the groups
-              // hitElement is part of
-              const idsOfSelectedElementsThatAreInGroups = hitElement.groupIds
-                .flatMap((groupId) =>
-                  getElementsInGroup(
-                    this.scene.getNonDeletedElements(),
-                    groupId,
-                  ),
-                )
-                .map((element) => ({ [element.id]: false }))
-                .reduce((prevId, acc) => ({ ...prevId, ...acc }), {});
-
-              this.setState((_prevState) => ({
-                selectedGroupIds: {
+              this.setState((_prevState) => {
+                const nextSelectedElementIds = {
                   ..._prevState.selectedElementIds,
-                  ...hitElement.groupIds
-                    .map((gId) => ({ [gId]: false }))
-                    .reduce((prev, acc) => ({ ...prev, ...acc }), {}),
-                },
-                selectedElementIds: makeNextSelectedElementIds(
-                  {
+                };
+
+                // We want to unselect all groups hitElement is part of
+                // as well as all elements that are part of the groups
+                // hitElement is part of
+                for (const groupedElement of hitElement.groupIds.flatMap(
+                  (groupId) =>
+                    getElementsInGroup(
+                      this.scene.getNonDeletedElements(),
+                      groupId,
+                    ),
+                )) {
+                  delete nextSelectedElementIds[groupedElement.id];
+                }
+
+                return {
+                  selectedGroupIds: {
                     ..._prevState.selectedElementIds,
-                    ...idsOfSelectedElementsThatAreInGroups,
+                    ...hitElement.groupIds
+                      .map((gId) => ({ [gId]: false }))
+                      .reduce((prev, acc) => ({ ...prev, ...acc }), {}),
                   },
-                  _prevState,
-                ),
-              }));
+                  selectedElementIds: makeNextSelectedElementIds(
+                    nextSelectedElementIds,
+                    _prevState,
+                  ),
+                };
+              });
               // if not gragging a linear element point (outside editor)
             } else if (!this.state.selectedLinearElement?.isDragging) {
               // remove element from selection while
@@ -6220,8 +6230,8 @@ class App extends React.Component<AppProps, AppState> {
               this.setState((prevState) => {
                 const newSelectedElementIds = {
                   ...prevState.selectedElementIds,
-                  [hitElement!.id]: false,
                 };
+                delete newSelectedElementIds[hitElement!.id];
                 const newSelectedElements = getSelectedElements(
                   this.scene.getNonDeletedElements(),
                   { ...prevState, selectedElementIds: newSelectedElementIds },
@@ -6253,21 +6263,23 @@ class App extends React.Component<AppProps, AppState> {
             // when hitElement is part of a selected frame, deselect the frame
             // to avoid frame and containing elements selected simultaneously
             this.setState((prevState) => {
-              const nextSelectedElementIds = {
+              const nextSelectedElementIds: {
+                [id: string]: true;
+              } = {
                 ...prevState.selectedElementIds,
                 [hitElement.id]: true,
-                // deselect the frame
-                [hitElement.frameId!]: false,
               };
+              // deselect the frame
+              delete nextSelectedElementIds[hitElement.frameId!];
 
               // deselect groups containing the frame
               (this.scene.getElement(hitElement.frameId!)?.groupIds ?? [])
                 .flatMap((gid) =>
                   getElementsInGroup(this.scene.getNonDeletedElements(), gid),
                 )
-                .forEach(
-                  (element) => (nextSelectedElementIds[element.id] = false),
-                );
+                .forEach((element) => {
+                  delete nextSelectedElementIds[element.id];
+                });
 
               return selectGroupsForSelectedElements(
                 {

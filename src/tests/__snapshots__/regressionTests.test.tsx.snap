@@ -618,9 +618,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id0": false,
     "id1": true,
-    "id2": false,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {
@@ -15173,9 +15171,7 @@ Object {
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
-    "id0": false,
-  },
+  "selectedElementIds": Object {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
   "selectedLinearElement": null,
