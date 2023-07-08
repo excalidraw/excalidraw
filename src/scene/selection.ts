@@ -10,7 +10,7 @@ import {
   getContainingFrame,
   getFrameElements,
 } from "../frame";
-import { Debug } from "../excalidraw-app/debug";
+import { isShallowEqual } from "../utils";
 
 /**
  * Frames and their containing elements are not to be selected at the same time.
@@ -201,31 +201,7 @@ export const makeNextSelectedElementIds = (
   nextSelectedElementIds: AppState["selectedElementIds"],
   prevState: Pick<AppState, "selectedElementIds">,
 ) => {
-  const nextIds = Object.keys(nextSelectedElementIds);
-
-  let changed = false;
-
-  for (const id of nextIds) {
-    const nextVal = !!nextSelectedElementIds[id];
-    const prevVal = !!prevState.selectedElementIds[id];
-    if (nextVal !== prevVal) {
-      changed = true;
-      break;
-    }
-  }
-
-  if (!changed) {
-    const prevIds = Object.keys(prevState.selectedElementIds);
-    if (nextIds.length === prevIds.length) {
-      return prevState.selectedElementIds;
-    }
-
-    for (const id of prevIds) {
-      const prevVal = prevState.selectedElementIds[id];
-      if (prevVal && prevVal !== nextSelectedElementIds[id]) {
-        return nextSelectedElementIds;
-      }
-    }
+  if (isShallowEqual(prevState.selectedElementIds, nextSelectedElementIds)) {
     return prevState.selectedElementIds;
   }
 
