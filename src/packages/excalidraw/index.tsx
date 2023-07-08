@@ -42,7 +42,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onPointerDown,
     onScrollChange,
     children,
-    iframeURLWhitelist,
+    validateIFrame,
     renderCustomIFrame,
   } = props;
 
@@ -117,7 +117,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
-          iframeURLWhitelist={iframeURLWhitelist}
+          validateIFrame={validateIFrame}
           renderCustomIFrame={renderCustomIFrame}
         >
           {children}

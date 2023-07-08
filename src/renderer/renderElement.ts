@@ -442,7 +442,7 @@ export const generateRoughOptions = (
       if (
         isIFrameElement(element) &&
         !options.fill &&
-        (!element.whitelisted || isExporting)
+        (!element.validated || isExporting)
       ) {
         options.fill = "#d3d3d3";
         options.fillStyle = "solid";
@@ -1302,7 +1302,7 @@ export const renderElementToSvg = (
         exportingFrameId,
       );
 
-      if (element.whitelisted) {
+      if (element.validated) {
         // render iframe
         const iframeNode = roughSVGDrawWithPrecision(
           rsvg,

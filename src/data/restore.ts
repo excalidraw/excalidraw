@@ -278,7 +278,7 @@ const restoreElement = (
       return restoreElementWithProperties(element, {});
     case "iframe":
       return restoreElementWithProperties(element, {
-        whitelisted: undefined,
+        validated: undefined,
       });
     case "frame":
       return restoreElementWithProperties(element, {
