@@ -74,14 +74,14 @@ export enum EVENT {
   MESSAGE = "message",
 }
 
-export enum YTPLAYER {
-  UNSTARTED = -1,
-  ENDED = 0,
-  PLAYING = 1,
-  PAUSED = 2,
-  BUFFERING = 3,
-  CUED = 5,
-}
+export const YOUTUBE_STATES = {
+  UNSTARTED: -1,
+  ENDED: 0,
+  PLAYING: 1,
+  PAUSED: 2,
+  BUFFERING: 3,
+  CUED: 5,
+} as const;
 
 export const ENV = {
   TEST: "test",

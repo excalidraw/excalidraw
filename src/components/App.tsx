@@ -83,7 +83,7 @@ import {
   THEME_FILTER,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
-  YTPLAYER,
+  YOUTUBE_STATES,
   ZOOM_STEP,
 } from "../constants";
 import { exportCanvas, loadFromBlob } from "../data";
@@ -167,7 +167,6 @@ import {
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
-  ExcalidrawIFrameElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -343,6 +342,7 @@ import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
+import { ValueOf } from "../utility-types";
 export let showFourthFont: boolean = false;
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -412,8 +412,15 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
-const youtubeContainers = new Map<string, number>();
 let app: App | null = null;
+
+/**
+ * Map of youtube embed video states
+ */
+const YOUTUBE_VIDEO_STATES = new Map<
+  ExcalidrawElement["id"],
+  ValueOf<typeof YOUTUBE_STATES>
+>();
 
 // remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
@@ -461,13 +468,12 @@ class App extends React.Component<AppProps, AppState> {
 
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
+  private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDown: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
-  private iFrameRefs: { [key: string]: HTMLIFrameElement } = {};
-  allowMobileMode: boolean = true; //zsviczian
 
   constructor(props: AppProps) {
     super(props);
@@ -677,8 +683,15 @@ class App extends React.Component<AppProps, AppState> {
           typeof data.info.playerState === "number"
         ) {
           const id = data.id;
-          const playerState = data.info.playerState;
-          youtubeContainers.set(id, playerState);
+          const playerState = data.info.playerState as number;
+          if (
+            (Object.values(YOUTUBE_STATES) as number[]).includes(playerState)
+          ) {
+            YOUTUBE_VIDEO_STATES.set(
+              id,
+              playerState as ValueOf<typeof YOUTUBE_STATES>,
+            );
+          }
         }
         break;
     }
@@ -686,12 +699,12 @@ class App extends React.Component<AppProps, AppState> {
 
   private updateIFrameRef(id: string, ref: HTMLIFrameElement | null) {
     if (ref) {
-      this.iFrameRefs[id] = ref;
+      this.iFrameRefs.set(id, ref);
     }
   }
 
   private getIFrameElementById(id: string): HTMLIFrameElement | undefined {
-    return this.iFrameRefs[id];
+    return this.iFrameRefs.get(id);
   }
 
   private handleIFrameCenterClick(element: NonDeletedExcalidrawElement) {
@@ -724,9 +737,9 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (iframe.src.includes("youtube")) {
-      const state = youtubeContainers.get(element.id);
+      const state = YOUTUBE_VIDEO_STATES.get(element.id);
       if (!state) {
-        youtubeContainers.set(element.id, YTPLAYER.UNSTARTED);
+        YOUTUBE_VIDEO_STATES.set(element.id, YOUTUBE_STATES.UNSTARTED);
         iframe.contentWindow.postMessage(
           JSON.stringify({
             event: "listening",
@@ -736,8 +749,8 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
       switch (state) {
-        case YTPLAYER.PLAYING:
-        case YTPLAYER.BUFFERING:
+        case YOUTUBE_STATES.PLAYING:
+        case YOUTUBE_STATES.BUFFERING:
           iframe.contentWindow?.postMessage(
             JSON.stringify({
               event: "command",
@@ -792,38 +805,49 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  previsloading = true;
+  private updateIFrames = () => {
+    const iframeElements = new Map<ExcalidrawElement["id"], true>();
+
+    let updated = false;
+    this.scene.getNonDeletedElements().filter((element) => {
+      if (isIFrameElement(element)) {
+        iframeElements.set(element.id, true);
+        if (element.validated == null) {
+          updated = true;
+
+          const validated = iframeURLValidator(
+            element.link,
+            this.props.validateIFrame,
+          );
+
+          mutateElement(element, { validated }, false);
+          invalidateShapeForElement(element);
+        }
+      }
+      return false;
+    });
+
+    if (updated) {
+      this.scene.informMutation();
+    }
+
+    // GC
+    this.iFrameRefs.forEach((ref, id) => {
+      if (!iframeElements.has(id)) {
+        this.iFrameRefs.delete(id);
+      }
+    });
+  };
+
   private renderIFrames() {
     const scale = this.state.zoom.value;
     const normalizedWidth = this.state.width;
     const normalizedHeight = this.state.height;
-    const whitelistUpdates = new Map<ExcalidrawIFrameElement, boolean>();
 
-    const iFrameElements = this.scene.getNonDeletedElements().filter((el) => {
-      if (!isIFrameElement(el)) {
-        return false;
-      }
-      if (typeof el.whitelisted === "undefined") {
-        const isWhitelisted = iframeURLValidator(
-          el.link,
-          this.props.iframeURLWhitelist,
-        );
-        whitelistUpdates.set(el, isWhitelisted);
-        return isWhitelisted;
-      }
-      return el.whitelisted;
-    });
-    Object.keys(this.iFrameRefs).forEach((key) => {
-      if (!iFrameElements.some((el) => el.id === key)) {
-        delete this.iFrameRefs[key];
-      }
-    });
-    setTimeout(() => {
-      whitelistUpdates.forEach((whitelisted, element) => {
-        mutateElement(element, { whitelisted });
-        invalidateShapeForElement(element);
-      });
-    });
+    const iFrameElements = this.scene
+      .getNonDeletedElements()
+      .filter((el) => isIFrameElement(el) && el.validated);
+
     return (
       <>
         {iFrameElements.map((el) => {
@@ -1827,6 +1851,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    this.updateIFrames();
     if (
       !this.state.showWelcomeScreen &&
       !this.scene.getElementsIncludingDeleted().length
@@ -2275,7 +2300,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.text) {
         if (
           !isPlainPaste &&
-          iframeURLValidator(data.text, this.props.iframeURLWhitelist) &&
+          iframeURLValidator(data.text, this.props.validateIFrame) &&
           (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(data.text) ||
             getEmbedLink(data.text)?.type === "video")
         ) {
@@ -5558,7 +5583,7 @@ class App extends React.Component<AppProps, AppState> {
       width: embedLink.aspectRatio.w,
       height: embedLink.aspectRatio.h,
       link,
-      whitelisted: undefined,
+      validated: undefined,
     });
 
     this.scene.replaceAllElements([
@@ -5760,7 +5785,7 @@ class App extends React.Component<AppProps, AppState> {
       roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
-      ...(elementType === "iframe" ? { whitelisted: false } : {}),
+      ...(elementType === "iframe" ? { validated: false } : {}),
     });
 
     if (element.type === "selection") {
@@ -7697,7 +7722,7 @@ class App extends React.Component<AppProps, AppState> {
       const text = event.dataTransfer?.getData("text");
       if (
         text &&
-        iframeURLValidator(text, this.props.iframeURLWhitelist) &&
+        iframeURLValidator(text, this.props.validateIFrame) &&
         (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
           getEmbedLink(text)?.type === "video")
       ) {

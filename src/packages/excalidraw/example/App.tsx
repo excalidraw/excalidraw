@@ -683,7 +683,8 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
-            iframeURLWhitelist={[/.*/]}
+            // allow all urls
+            validateIFrame={true}
           >
             {excalidrawAPI && (
               <Footer>

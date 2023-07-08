@@ -49,7 +49,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onPointerDown,
     onScrollChange,
     children,
-    iframeURLWhitelist,
+    validateIFrame,
     renderCustomIFrame,
   } = props;
 
@@ -131,7 +131,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onViewModeChange={onViewModeChange} //zsviczian
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
-          iframeURLWhitelist={iframeURLWhitelist}
+          validateIFrame={validateIFrame}
           renderCustomIFrame={renderCustomIFrame}
         >
           {children}

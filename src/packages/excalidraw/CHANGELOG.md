@@ -13,10 +13,6 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
-### iFrame Site Whitelist
-
-- Set `props.iframeURLWhitelist` to allow additional sites to be added as iFrames. The default list includes: YouTube, Vimeo, Figma. The prop takes a `(RegExp | boolean)[]` array. If you pass `[true]` all URLs will be allowed, if you pass `[...,false]`, then the rest of the validators after `false` will not be executed, including the omission of the excalidraw default validators. If you only send `RegExp[]` then after running the validators Excalidraw will also execute the built in validators.
-
 ### renderCustomIFrame
 
 ```tsx
@@ -37,6 +33,7 @@ JSX.Element | null: The JSX component representing the custom rendering, or null
 
 ### Features
 
+- Added [`props.validateIFrame`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateIFrame) to customize iframe url validation. [#6691](https://github.com/excalidraw/excalidraw/pull/6691)
 - Add support for `opts.fitToViewport` and `opts.viewportZoomFactor` in the [`ExcalidrawAPI.scrollToContent`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/ref#scrolltocontent) API. [#6581](https://github.com/excalidraw/excalidraw/pull/6581).
 - Properly sanitize element `link` urls. [#6728](https://github.com/excalidraw/excalidraw/pull/6728).
 - Sidebar component now supports tabs — for more detailed description of new behavior and breaking changes, see the linked PR. [#6213](https://github.com/excalidraw/excalidraw/pull/6213)

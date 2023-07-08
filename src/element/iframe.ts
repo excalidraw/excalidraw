@@ -1,7 +1,7 @@
 import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import { KEYS } from "../keys";
-import { ExcalidrawProps, IFrameURLValidatorRules } from "../types";
+import { ExcalidrawProps } from "../types";
 import { setCursorForShape, updateActiveTool } from "../utils";
 import { newTextElement } from "./newElement";
 import { getContainerElement } from "./textElement";
@@ -100,7 +100,7 @@ export const hideActionForIFrame = (
   isIFrameElement(element) &&
   element.link &&
   element.link !== "" &&
-  !props.iframeURLWhitelist;
+  !props.validateIFrame;
 
 export const isIFrameOrFrameLabel = (
   element: NonDeletedExcalidrawElement,
@@ -168,17 +168,29 @@ export const actionSetIFrameAsActiveTool = register({
 
 export const iframeURLValidator = (
   url: string | null | undefined,
-  validators: IFrameURLValidatorRules = [],
+  validateIFrame: ExcalidrawProps["validateIFrame"],
 ): boolean => {
   if (!url) {
     return false;
   }
-  for (const validator of validators) {
-    if (typeof validator === "boolean") {
-      return validator;
-    }
-    if (url.match(validator)) {
-      return true;
+  if (validateIFrame != null) {
+    if (typeof validateIFrame === "function") {
+      const ret = validateIFrame(url);
+      // if return value is undefined, leave validation to default
+      if (typeof ret === "boolean") {
+        return ret;
+      }
+    } else if (typeof validateIFrame === "boolean") {
+      return validateIFrame;
+    } else if (validateIFrame instanceof RegExp) {
+      return validateIFrame.test(url);
+    } else if (Array.isArray(validateIFrame)) {
+      for (const regex of validateIFrame) {
+        if (url.match(regex)) {
+          return true;
+        }
+      }
+      return false;
     }
   }
   return Boolean(
