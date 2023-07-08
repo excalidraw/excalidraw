@@ -10,6 +10,7 @@ import {
   getContainingFrame,
   getFrameElements,
 } from "../frame";
+import { isShallowEqual } from "../utils";
 
 /**
  * Frames and their containing elements are not to be selected at the same time.
@@ -161,3 +162,20 @@ export const getTargetElements = (
     : getSelectedElements(elements, appState, {
         includeBoundTextElement: true,
       });
+
+/**
+ * returns prevState's selectedElementids if no change from previous, so as to
+ * retain reference identity for memoization
+ *
+ * Can be further optimized by skipping undefined:false pairs, and checking
+ * length of both keys only when necessary.
+ */
+export const makeNextSelectedElementIds = (
+  nextSelectedElementIds: AppState["selectedElementIds"],
+  prevState: Pick<AppState, "selectedElementIds">,
+) => {
+  if (isShallowEqual(prevState.selectedElementIds, nextSelectedElementIds)) {
+    return prevState.selectedElementIds;
+  }
+  return nextSelectedElementIds;
+};

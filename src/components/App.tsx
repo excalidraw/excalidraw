@@ -315,7 +315,10 @@ import {
   updateFrameMembershipOfSelectedElements,
   isElementInFrame,
 } from "../frame";
-import { excludeElementsInFramesFromSelection } from "../scene/selection";
+import {
+  excludeElementsInFramesFromSelection,
+  makeNextSelectedElementIds,
+} from "../scene/selection";
 import { actionPaste } from "../actions/actionClipboard";
 import {
   actionRemoveAllElementsFromFrame,
@@ -1825,7 +1828,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if (event.touches.length === 2) {
       this.setState({
-        selectedElementIds: {},
+        selectedElementIds: makeNextSelectedElementIds({}, this.state),
       });
     }
   };
@@ -1835,7 +1838,10 @@ class App extends React.Component<AppProps, AppState> {
     if (event.touches.length > 0) {
       this.setState({
         previousSelectedElementIds: {},
-        selectedElementIds: this.state.previousSelectedElementIds,
+        selectedElementIds: makeNextSelectedElementIds(
+          this.state.previousSelectedElementIds,
+          this.state,
+        ),
       });
     } else {
       gesture.pointers.clear();
@@ -1895,7 +1901,14 @@ class App extends React.Component<AppProps, AppState> {
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
-        this.setState({ selectedElementIds: { [imageElement.id]: true } });
+        this.setState({
+          selectedElementIds: makeNextSelectedElementIds(
+            {
+              [imageElement.id]: true,
+            },
+            this.state,
+          ),
+        });
 
         return;
       }
@@ -2032,6 +2045,7 @@ class App extends React.Component<AppProps, AppState> {
           selectedGroupIds: {},
         },
         this.scene.getNonDeletedElements(),
+        this.state,
       ),
       () => {
         if (opts.files) {
@@ -2130,8 +2144,9 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.setState({
-      selectedElementIds: Object.fromEntries(
-        textElements.map((el) => [el.id, true]),
+      selectedElementIds: makeNextSelectedElementIds(
+        Object.fromEntries(textElements.map((el) => [el.id, true])),
+        this.state,
       ),
     });
 
@@ -2749,7 +2764,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         setCursorForShape(this.canvas, this.state);
         this.setState({
-          selectedElementIds: {},
+          selectedElementIds: makeNextSelectedElementIds({}, this.state),
           selectedGroupIds: {},
           editingGroupId: null,
         });
@@ -2794,7 +2809,7 @@ class App extends React.Component<AppProps, AppState> {
     if (nextActiveTool.type !== "selection") {
       this.setState({
         activeTool: nextActiveTool,
-        selectedElementIds: {},
+        selectedElementIds: makeNextSelectedElementIds({}, this.state),
         selectedGroupIds: {},
         editingGroupId: null,
       });
@@ -2831,7 +2846,7 @@ class App extends React.Component<AppProps, AppState> {
     // elements by mistake while zooming
     if (this.isTouchScreenMultiTouchGesture()) {
       this.setState({
-        selectedElementIds: {},
+        selectedElementIds: makeNextSelectedElementIds({}, this.state),
       });
     }
     gesture.initialScale = this.state.zoom.value;
@@ -2876,7 +2891,10 @@ class App extends React.Component<AppProps, AppState> {
     if (this.isTouchScreenMultiTouchGesture()) {
       this.setState({
         previousSelectedElementIds: {},
-        selectedElementIds: this.state.previousSelectedElementIds,
+        selectedElementIds: makeNextSelectedElementIds(
+          this.state.previousSelectedElementIds,
+          this.state,
+        ),
       });
     }
     gesture.initialScale = null;
@@ -2941,10 +2959,13 @@ class App extends React.Component<AppProps, AppState> {
             ? element.containerId
             : element.id;
           this.setState((prevState) => ({
-            selectedElementIds: {
-              ...prevState.selectedElementIds,
-              [elementIdToSelect]: true,
-            },
+            selectedElementIds: makeNextSelectedElementIds(
+              {
+                ...prevState.selectedElementIds,
+                [elementIdToSelect]: true,
+              },
+              prevState,
+            ),
           }));
         }
         if (isDeleted) {
@@ -2980,7 +3001,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private deselectElements() {
     this.setState({
-      selectedElementIds: {},
+      selectedElementIds: makeNextSelectedElementIds({}, this.state),
       selectedGroupIds: {},
       editingGroupId: null,
     });
@@ -3291,6 +3312,7 @@ class App extends React.Component<AppProps, AppState> {
               selectedGroupIds: {},
             },
             this.scene.getNonDeletedElements(),
+            prevState,
           ),
         );
         return;
@@ -3998,12 +4020,15 @@ class App extends React.Component<AppProps, AppState> {
           editingElement: null,
           startBoundElement: null,
           suggestedBindings: [],
-          selectedElementIds: Object.keys(this.state.selectedElementIds)
-            .filter((key) => key !== element.id)
-            .reduce((obj: { [id: string]: boolean }, key) => {
-              obj[key] = this.state.selectedElementIds[key];
-              return obj;
-            }, {}),
+          selectedElementIds: makeNextSelectedElementIds(
+            Object.keys(this.state.selectedElementIds)
+              .filter((key) => key !== element.id)
+              .reduce((obj: { [id: string]: boolean }, key) => {
+                obj[key] = this.state.selectedElementIds[key];
+                return obj;
+              }, {}),
+            this.state,
+          ),
         },
       });
       return;
@@ -4472,7 +4497,7 @@ class App extends React.Component<AppProps, AppState> {
   private clearSelectionIfNotUsingSelection = (): void => {
     if (this.state.activeTool.type !== "selection") {
       this.setState({
-        selectedElementIds: {},
+        selectedElementIds: makeNextSelectedElementIds({}, this.state),
         selectedGroupIds: {},
         editingGroupId: null,
       });
@@ -4604,9 +4629,12 @@ class App extends React.Component<AppProps, AppState> {
 
         if (this.state.editingLinearElement) {
           this.setState({
-            selectedElementIds: {
-              [this.state.editingLinearElement.elementId]: true,
-            },
+            selectedElementIds: makeNextSelectedElementIds(
+              {
+                [this.state.editingLinearElement.elementId]: true,
+              },
+              this.state,
+            ),
           });
           // If we click on something
         } else if (hitElement != null) {
@@ -4634,7 +4662,7 @@ class App extends React.Component<AppProps, AppState> {
               !isElementInGroup(hitElement, this.state.editingGroupId)
             ) {
               this.setState({
-                selectedElementIds: {},
+                selectedElementIds: makeNextSelectedElementIds({}, this.state),
                 selectedGroupIds: {},
                 editingGroupId: null,
               });
@@ -4728,6 +4756,7 @@ class App extends React.Component<AppProps, AppState> {
                     showHyperlinkPopup: hitElement.link ? "info" : false,
                   },
                   this.scene.getNonDeletedElements(),
+                  prevState,
                 );
               });
               pointerDownState.hit.wasAddedToSelection = true;
@@ -4845,10 +4874,13 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     this.setState((prevState) => ({
-      selectedElementIds: {
-        ...prevState.selectedElementIds,
-        [element.id]: false,
-      },
+      selectedElementIds: makeNextSelectedElementIds(
+        {
+          ...prevState.selectedElementIds,
+          [element.id]: false,
+        },
+        prevState,
+      ),
     }));
 
     const pressures = element.simulatePressure
@@ -4945,10 +4977,13 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.setState((prevState) => ({
-        selectedElementIds: {
-          ...prevState.selectedElementIds,
-          [multiElement.id]: true,
-        },
+        selectedElementIds: makeNextSelectedElementIds(
+          {
+            ...prevState.selectedElementIds,
+            [multiElement.id]: true,
+          },
+          prevState,
+        ),
       }));
       // clicking outside commit zone → update reference for last committed
       // point
@@ -5000,10 +5035,13 @@ class App extends React.Component<AppProps, AppState> {
         frameId: topLayerFrame ? topLayerFrame.id : null,
       });
       this.setState((prevState) => ({
-        selectedElementIds: {
-          ...prevState.selectedElementIds,
-          [element.id]: false,
-        },
+        selectedElementIds: makeNextSelectedElementIds(
+          {
+            ...prevState.selectedElementIds,
+            [element.id]: false,
+          },
+          prevState,
+        ),
       }));
       mutateElement(element, {
         points: [...element.points, [0, 0]],
@@ -5524,6 +5562,7 @@ class App extends React.Component<AppProps, AppState> {
                   },
                 },
                 this.scene.getNonDeletedElements(),
+                prevState,
               ),
             );
           } else {
@@ -5585,6 +5624,7 @@ class App extends React.Component<AppProps, AppState> {
                     : null,
               },
               this.scene.getNonDeletedElements(),
+              prevState,
             ),
           );
         }
@@ -5780,7 +5820,12 @@ class App extends React.Component<AppProps, AppState> {
         try {
           this.initializeImageDimensions(imageElement);
           this.setState(
-            { selectedElementIds: { [imageElement.id]: true } },
+            {
+              selectedElementIds: makeNextSelectedElementIds(
+                { [imageElement.id]: true },
+                this.state,
+              ),
+            },
             () => {
               this.actionManager.executeAction(actionFinalize);
             },
@@ -5844,10 +5889,13 @@ class App extends React.Component<AppProps, AppState> {
               activeTool: updateActiveTool(this.state, {
                 type: "selection",
               }),
-              selectedElementIds: {
-                ...prevState.selectedElementIds,
-                [draggingElement.id]: true,
-              },
+              selectedElementIds: makeNextSelectedElementIds(
+                {
+                  ...prevState.selectedElementIds,
+                  [draggingElement.id]: true,
+                },
+                prevState,
+              ),
               selectedLinearElement: new LinearElementEditor(
                 draggingElement,
                 this.scene,
@@ -6161,10 +6209,13 @@ class App extends React.Component<AppProps, AppState> {
                     .map((gId) => ({ [gId]: false }))
                     .reduce((prev, acc) => ({ ...prev, ...acc }), {}),
                 },
-                selectedElementIds: {
-                  ..._prevState.selectedElementIds,
-                  ...idsOfSelectedElementsThatAreInGroups,
-                },
+                selectedElementIds: makeNextSelectedElementIds(
+                  {
+                    ..._prevState.selectedElementIds,
+                    ...idsOfSelectedElementsThatAreInGroups,
+                  },
+                  _prevState,
+                ),
               }));
               // if not gragging a linear element point (outside editor)
             } else if (!this.state.selectedLinearElement?.isDragging) {
@@ -6196,6 +6247,7 @@ class App extends React.Component<AppProps, AppState> {
                         : prevState.selectedLinearElement,
                   },
                   this.scene.getNonDeletedElements(),
+                  prevState,
                 );
               });
             }
@@ -6229,15 +6281,19 @@ class App extends React.Component<AppProps, AppState> {
                   showHyperlinkPopup: hitElement.link ? "info" : false,
                 },
                 this.scene.getNonDeletedElements(),
+                prevState,
               );
             });
           } else {
             // add element to selection while keeping prev elements selected
             this.setState((_prevState) => ({
-              selectedElementIds: {
-                ..._prevState.selectedElementIds,
-                [hitElement!.id]: true,
-              },
+              selectedElementIds: makeNextSelectedElementIds(
+                {
+                  ..._prevState.selectedElementIds,
+                  [hitElement!.id]: true,
+                },
+                _prevState,
+              ),
             }));
           }
         } else {
@@ -6255,6 +6311,7 @@ class App extends React.Component<AppProps, AppState> {
                     : prevState.selectedLinearElement,
               },
               this.scene.getNonDeletedElements(),
+              prevState,
             ),
           }));
         }
@@ -6279,7 +6336,7 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           // Deselect selected elements
           this.setState({
-            selectedElementIds: {},
+            selectedElementIds: makeNextSelectedElementIds({}, this.state),
             selectedGroupIds: {},
             editingGroupId: null,
           });
@@ -6293,10 +6350,13 @@ class App extends React.Component<AppProps, AppState> {
         draggingElement
       ) {
         this.setState((prevState) => ({
-          selectedElementIds: {
-            ...prevState.selectedElementIds,
-            [draggingElement.id]: true,
-          },
+          selectedElementIds: makeNextSelectedElementIds(
+            {
+              ...prevState.selectedElementIds,
+              [draggingElement.id]: true,
+            },
+            prevState,
+          ),
         }));
       }
 
@@ -6610,7 +6670,10 @@ class App extends React.Component<AppProps, AppState> {
         this.initializeImageDimensions(imageElement);
         this.setState(
           {
-            selectedElementIds: { [imageElement.id]: true },
+            selectedElementIds: makeNextSelectedElementIds(
+              { [imageElement.id]: true },
+              this.state,
+            ),
           },
           () => {
             this.actionManager.executeAction(actionFinalize);
@@ -6837,7 +6900,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
-      selectedElementIds: {},
+      selectedElementIds: makeNextSelectedElementIds({}, prevState),
       selectedGroupIds: {},
       // Continue editing the same group if the user selected a different
       // element from it
@@ -6849,7 +6912,7 @@ class App extends React.Component<AppProps, AppState> {
           : null,
     }));
     this.setState({
-      selectedElementIds: {},
+      selectedElementIds: makeNextSelectedElementIds({}, this.state),
       previousSelectedElementIds: this.state.selectedElementIds,
     });
   }
@@ -6918,7 +6981,12 @@ class App extends React.Component<AppProps, AppState> {
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
-        this.setState({ selectedElementIds: { [imageElement.id]: true } });
+        this.setState({
+          selectedElementIds: makeNextSelectedElementIds(
+            { [imageElement.id]: true },
+            this.state,
+          ),
+        });
 
         return;
       }
@@ -7043,6 +7111,7 @@ class App extends React.Component<AppProps, AppState> {
                   : null,
               },
               this.scene.getNonDeletedElements(),
+              this.state,
             )
           : this.state),
         showHyperlinkPopup: false,

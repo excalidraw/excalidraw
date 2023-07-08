@@ -218,6 +218,7 @@ export const actionUngroup = register({
     const updateAppState = selectGroupsForSelectedElements(
       { ...appState, selectedGroupIds: {} },
       getNonDeletedElements(nextElements),
+      appState,
     );
 
     frames.forEach((frame) => {
