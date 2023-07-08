@@ -5566,12 +5566,6 @@ class App extends React.Component<AppProps, AppState> {
                 prevState,
               ),
             );
-          } else {
-            this.setState({
-              selectedElementIds: {},
-              selectedGroupIds: {},
-              editingGroupId: null,
-            });
           }
         }
         // box-select line editor points
@@ -5592,7 +5586,6 @@ class App extends React.Component<AppProps, AppState> {
               {
                 ...prevState,
                 selectedElementIds: {
-                  ...prevState.selectedElementIds,
                   ...elementsWithinSelection.reduce(
                     (acc: Record<ExcalidrawElement["id"], true>, element) => {
                       acc[element.id] = true;
