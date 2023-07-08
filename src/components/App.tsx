@@ -408,7 +408,6 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
-let app: App | null = null;
 
 /**
  * Map of youtube embed video states
@@ -473,7 +472,6 @@ class App extends React.Component<AppProps, AppState> {
 
   constructor(props: AppProps) {
     super(props);
-    app = this;
     const defaultAppState = getDefaultAppState();
     const {
       excalidrawRef,
@@ -639,12 +637,13 @@ class App extends React.Component<AppProps, AppState> {
         //Allowing for multiple instances of Excalidraw running in the window
         if (data.method === "paused") {
           let source: Window | null = null;
-          const iframes =
-            app?.excalidrawContainerRef?.current?.querySelectorAll("iframe");
+          const iframes = document.body.querySelectorAll(
+            "iframe.excalidraw__iframe",
+          );
           if (!iframes) {
             break;
           }
-          for (const iframe of iframes) {
+          for (const iframe of iframes as NodeListOf<HTMLIFrameElement>) {
             if (iframe.contentWindow === event.source) {
               source = iframe.contentWindow;
             }
