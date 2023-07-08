@@ -5416,15 +5416,16 @@ class App extends React.Component<AppProps, AppState> {
             const oldIdToDuplicatedId = new Map();
             const hitElement = pointerDownState.hit.element;
             const elements = this.scene.getElementsIncludingDeleted();
-            const selectedElementIds: Array<ExcalidrawElement["id"]> =
+            const selectedElementIds = new Set(
               getSelectedElements(elements, this.state, {
                 includeBoundTextElement: true,
                 includeElementsInFrames: true,
-              }).map((element) => element.id);
+              }).map((element) => element.id),
+            );
 
             for (const element of elements) {
               if (
-                selectedElementIds.includes(element.id) ||
+                selectedElementIds.has(element.id) ||
                 // case: the state.selectedElementIds might not have been
                 // updated yet by the time this mousemove event is fired
                 (element.id === hitElement?.id &&
