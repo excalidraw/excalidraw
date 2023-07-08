@@ -421,6 +421,7 @@ export interface ExcalidrawProps {
     radius: number,
     appState: UIAppState,
   ) => JSX.Element | null;
+  renderWebview?: boolean; //zsviczian
 }
 
 export type SceneData = {
@@ -614,6 +615,7 @@ export type ExcalidrawImperativeAPI = {
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
+  getIFrameElementById: InstanceType<typeof App>["getIFrameElementById"]; //zsviczian
   /**
    * Disables rendering of frames (including element clipping), but currently
    * the frames are still interactive in edit mode. As such, this API should be

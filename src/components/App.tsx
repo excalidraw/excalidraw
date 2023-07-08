@@ -336,7 +336,11 @@ import {
   actionRemoveAllElementsFromFrame,
   actionSelectAllElementsInFrame,
 } from "../actions/actionFrame";
-import { actionToggleHandTool, zoomToFit, zoomToFitElements } from "../actions/actionCanvas";
+import {
+  actionToggleHandTool,
+  zoomToFit,
+  zoomToFitElements,
+} from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
@@ -412,7 +416,6 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
-let app: App | null = null;
 
 /**
  * Map of youtube embed video states
@@ -474,10 +477,10 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDown: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
+  allowMobileMode: boolean = true; //zsviczian
 
   constructor(props: AppProps) {
     super(props);
-    app = this;
     const defaultAppState = getDefaultAppState();
     const {
       excalidrawRef,
@@ -544,6 +547,7 @@ class App extends React.Component<AppProps, AppState> {
         resetCursor: this.resetCursor,
         toggleFrameRendering: this.toggleFrameRendering,
         toggleSidebar: this.toggleSidebar,
+        getIFrameElementById: this.getIFrameElementById, //zsviczian
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -656,12 +660,12 @@ class App extends React.Component<AppProps, AppState> {
         //Allowing for multiple instances of Excalidraw running in the window
         if (data.method === "paused") {
           let source: Window | null = null;
-          const iframes =
-            app?.excalidrawContainerRef?.current?.querySelectorAll("iframe");
+          const iframes = 
+            document.body.querySelectorAll("iframe.excalidraw__iframe");
           if (!iframes) {
             break;
           }
-          for (const iframe of iframes) {
+          for (const iframe of iframes as NodeListOf<HTMLIFrameElement>) {
             if (iframe.contentWindow === event.source) {
               source = iframe.contentWindow;
             }
@@ -705,6 +709,10 @@ class App extends React.Component<AppProps, AppState> {
 
   private getIFrameElementById(id: string): HTMLIFrameElement | undefined {
     return this.iFrameRefs.get(id);
+  }
+
+  private getIFrameElements(): HTMLIFrameElement[] {
+    return Array.from(this.iFrameRefs.values());
   }
 
   private handleIFrameCenterClick(element: NonDeletedExcalidrawElement) {
@@ -870,6 +878,9 @@ class App extends React.Component<AppProps, AppState> {
             this.state.activeIFrame?.element === el &&
             this.state.activeIFrame?.state === "hover";
           const radius = getCornerRadius(Math.min(el.width, el.height), el);
+          const isWebview = //zsviczian
+            this.props.renderWebview &&
+            !src.startsWith("https://player.vimeo.com");
 
           return (
             <div
@@ -929,19 +940,33 @@ class App extends React.Component<AppProps, AppState> {
                     el,
                     radius,
                     this.state as UIAppState,
-                  ) ?? (
-                    <iframe
-                      ref={(ref) => this.updateIFrameRef(el.id, ref)}
-                      className="excalidraw__iframe"
-                      style={{
-                        borderRadius: `${radius}px`,
-                      }}
-                      src={src}
-                      title="Excalidraw Embedded Content"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen={true}
-                    />
-                  )}
+                  ) ??
+                    (isWebview ? (
+                      <webview
+                        ref={(ref) =>
+                          this.updateIFrameRef(el.id, ref as HTMLIFrameElement)
+                        }
+                        className="excalidraw__iframe"
+                        style={{
+                          borderRadius: `${radius}px`,
+                        }}
+                        src={src}
+                        title="Excalidraw Embedded Content"
+                        allowFullScreen={true}
+                      />
+                    ) : (
+                      <iframe
+                        ref={(ref) => this.updateIFrameRef(el.id, ref)}
+                        className="excalidraw__iframe"
+                        style={{
+                          borderRadius: `${radius}px`,
+                        }}
+                        src={src}
+                        title="Excalidraw Embedded Content"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen={true}
+                      />
+                    ))}
                 </div>
               </div>
             </div>
