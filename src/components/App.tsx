@@ -337,7 +337,7 @@ import {
   actionRemoveAllElementsFromFrame,
   actionSelectAllElementsInFrame,
 } from "../actions/actionFrame";
-import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
+import { actionToggleHandTool, zoomToFit, zoomToFitElements } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
