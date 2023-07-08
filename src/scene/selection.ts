@@ -116,7 +116,11 @@ export const isSomeElementSelected = (function () {
     return isSelected;
   };
 
-  ret.clearCache = () => {};
+  ret.clearCache = () => {
+    lastElements = null;
+    lastSelectedElementIds = null;
+    isSelected = null;
+  };
 
   return ret;
 })();
