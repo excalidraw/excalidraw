@@ -6348,7 +6348,8 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !activeTool.locked &&
         activeTool.type !== "freedraw" &&
-        draggingElement
+        draggingElement &&
+        draggingElement.type !== "selection"
       ) {
         this.setState((prevState) => ({
           selectedElementIds: makeNextSelectedElementIds(
