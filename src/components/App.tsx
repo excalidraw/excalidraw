@@ -7667,12 +7667,11 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton === prevState.cursorButton;
 
     // If the state hasn't changed and scrollConstraints didn't just get defined, return null
-    if (
-      !scrollConstraints ||
-      (stateUnchanged && (prevState.scrollConstraints || !scrollConstraints))
-    ) {
+    if (!scrollConstraints || (stateUnchanged && prevState.scrollConstraints)) {
       return null;
     }
+
+    console.log("fired");
 
     // Calculate the maximum possible zoom based on the viewport and scrollable area sizes
     const scrollableWidth = scrollConstraints.width;
@@ -7707,6 +7706,10 @@ class App extends React.Component<AppProps, AppState> {
     const constrainedScrollCenterY =
       scrollConstraints.y + (scrollableHeight - height / zoom.value) / -2;
 
+    // We're using a `switch(true)` construction here to handle a set of conditions
+    // that can't be easily grouped into a regular switch statement.
+    // Each case represents a unique combination of cursorButton state and
+    // whether or not we should adjust for a centered view (constrained area is smaller than viewport).
     switch (true) {
       case cursorButton === "down" && shouldAdjustForCenteredView:
         // case when cursor button is down and we should adjust for centered view
@@ -7761,11 +7764,11 @@ class App extends React.Component<AppProps, AppState> {
     constrainedScrollY = Math.min(maxScrollY, Math.max(scrollY, minScrollY));
 
     // Check if the new state differs from the old state
-    const stateChanged =
+    // and if the state has changed, update the state and return the new state
+    const isStateChanged =
       constrainedScrollX !== scrollX || constrainedScrollY !== scrollY;
 
-    // If the state has changed, update the state and return the new state
-    if (stateChanged) {
+    if (isStateChanged) {
       const constrainedState = {
         scrollX: constrainedScrollX,
         scrollY: constrainedScrollY,
