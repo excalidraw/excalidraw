@@ -7771,13 +7771,15 @@ class App extends React.Component<AppProps, AppState> {
       constrainedScrollX !== scrollX || constrainedScrollY !== scrollY;
 
     if (isStateChanged) {
-      // Animate the scroll position when the cursor button is not down and scroll position is outside of the scroll constraints
+      // Animate the scroll position when the cursor button is not down and scroll position is outside of the scroll constraints.
+      // We don't want to animate the scroll position when the user is dragging the canvas or zooiming in/out.
       if (
         (scrollX < scrollConstraints.x ||
           scrollX + width > scrollConstraints.x + scrollConstraints.width ||
           scrollY < scrollConstraints.y ||
           scrollY + height > scrollConstraints.y + scrollConstraints.height) &&
-        cursorButton !== "down"
+        cursorButton !== "down" &&
+        zoom.value === prevState.zoom.value
       ) {
         this.setState({
           scrollConstraints: { ...scrollConstraints, isAnimating: true },
