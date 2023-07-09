@@ -4372,12 +4372,9 @@ class App extends React.Component<AppProps, AppState> {
 
     setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
 
-    let { clientX: lastX, clientY: lastY } = event;
+    let { clientX: lastX } = event;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const deltaX = lastX - event.clientX;
-      const deltaY = lastY - event.clientY;
-      lastX = event.clientX;
-      lastY = event.clientY;
       let newZoom = this.state.zoom.value - deltaX / 200;
       this.translateCanvas((state) => ({
         ...getStateForZoom(
