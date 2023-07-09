@@ -7777,8 +7777,7 @@ class App extends React.Component<AppProps, AppState> {
           scrollX + width > scrollConstraints.x + scrollConstraints.width ||
           scrollY < scrollConstraints.y ||
           scrollY + height > scrollConstraints.y + scrollConstraints.height) &&
-        cursorButton !== "down" &&
-        !scrollConstraints.isAnimating
+        cursorButton !== "down"
       ) {
         this.setState({
           scrollConstraints: { ...scrollConstraints, isAnimating: true },
@@ -7791,7 +7790,6 @@ class App extends React.Component<AppProps, AppState> {
             scrollY: constrainedScrollY,
           },
           onStep: ({ scrollX, scrollY }) => {
-            console.log("onStep");
             this.setState({
               scrollX,
               scrollY,
@@ -7809,7 +7807,6 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
 
-        console.log("isAnimating");
         return null;
       }
 
