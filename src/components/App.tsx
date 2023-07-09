@@ -7690,54 +7690,75 @@ class App extends React.Component<AppProps, AppState> {
     const overscrollAllowanceY =
       OVERSCROLL_ALLOWANCE_PERCENTAGE * scrollableHeight;
 
-    // Define the maximum and minimum scroll for each axis based on the cursor button state
-    const maxScrollX =
-      cursorButton === "down"
-        ? scrollConstraints.x + overscrollAllowanceX
-        : scrollConstraints.x;
-    const minScrollX =
-      cursorButton === "down"
-        ? scrollConstraints.x -
-          scrollableWidth +
-          width / zoom.value -
-          overscrollAllowanceX
-        : scrollConstraints.x - scrollableWidth + width / zoom.value;
-
-    const maxScrollY =
-      cursorButton === "down"
-        ? scrollConstraints.y + overscrollAllowanceY
-        : scrollConstraints.y;
-    const minScrollY =
-      cursorButton === "down"
-        ? scrollConstraints.y -
-          scrollableHeight +
-          height / zoom.value -
-          overscrollAllowanceY
-        : scrollConstraints.y - scrollableHeight + height / zoom.value;
-
-    // Constrain the scroll within the scroll constraints, with overscroll allowance if the cursor button is down
-    constrainedScrollX = Math.min(maxScrollX, Math.max(scrollX, minScrollX));
-    constrainedScrollY = Math.min(maxScrollY, Math.max(scrollY, minScrollY));
-
-    // Check if the zoom value requires adjustment for a centered view
+    // When we are zoomed out enough to contain constrained area in the viewport we will center the view
     const shouldAdjustForCenteredView =
       zoom.value <= maxZoomX || zoom.value <= maxZoomY;
-    if (shouldAdjustForCenteredView) {
-      // Adjust the scroll position for a centered view based on the zoom value
-      const adjustScrollForCenteredView = (zoomValue: number) => {
-        if (zoomValue <= maxZoomX) {
-          const centeredScrollX = (scrollableWidth - width / zoomValue) / -2;
-          constrainedScrollX = scrollConstraints.x + centeredScrollX;
-        }
 
-        if (zoomValue <= maxZoomY) {
-          const centeredScrollY = (scrollableHeight - height / zoomValue) / -2;
-          constrainedScrollY = scrollConstraints.y + centeredScrollY;
-        }
-      };
+    // When viewport is smaller than the scrollable area, user can pan freely within the constrained area,
+    // otherwilse the viewport is centered to the center of the scrollable area
+    let maxScrollX;
+    let minScrollX;
+    let maxScrollY;
+    let minScrollY;
 
-      adjustScrollForCenteredView(zoom.value);
+    // Get center of scrollable area
+    const constrainedScrollCenterX =
+      scrollConstraints.x + (scrollableWidth - width / zoom.value) / -2;
+    const constrainedScrollCenterY =
+      scrollConstraints.y + (scrollableHeight - height / zoom.value) / -2;
+
+    switch (true) {
+      case cursorButton === "down" && shouldAdjustForCenteredView:
+        // case when cursor button is down and we should adjust for centered view
+
+        maxScrollX = constrainedScrollCenterX + overscrollAllowanceX;
+        minScrollX = constrainedScrollCenterX - overscrollAllowanceX;
+
+        maxScrollY = constrainedScrollCenterY + overscrollAllowanceY;
+        minScrollY = constrainedScrollCenterY - overscrollAllowanceY;
+        break;
+
+      case cursorButton === "down" && !shouldAdjustForCenteredView:
+        // case when cursor button is down and we should not adjust for centered view
+        maxScrollX = scrollConstraints.x + overscrollAllowanceX;
+        minScrollX =
+          scrollConstraints.x -
+          scrollableWidth +
+          width / zoom.value -
+          overscrollAllowanceX;
+
+        maxScrollY = scrollConstraints.y + overscrollAllowanceY;
+        minScrollY =
+          scrollConstraints.y -
+          scrollableHeight +
+          height / zoom.value -
+          overscrollAllowanceY;
+        break;
+
+      case cursorButton !== "down" && shouldAdjustForCenteredView:
+        // case when cursor button is not down and we should adjust for centered view
+
+        maxScrollX = constrainedScrollCenterX;
+        minScrollX = constrainedScrollCenterX;
+
+        maxScrollY = constrainedScrollCenterY;
+        minScrollY = constrainedScrollCenterY;
+        break;
+
+      default:
+        // case when cursor button is not down and we should not adjust for centered view
+        maxScrollX = scrollConstraints.x;
+        minScrollX = scrollConstraints.x - scrollableWidth + width / zoom.value;
+
+        maxScrollY = scrollConstraints.y;
+        minScrollY =
+          scrollConstraints.y - scrollableHeight + height / zoom.value;
+        break;
     }
+
+    // Constrain the scroll within the scroll constraints
+    constrainedScrollX = Math.min(maxScrollX, Math.max(scrollX, minScrollX));
+    constrainedScrollY = Math.min(maxScrollY, Math.max(scrollY, minScrollY));
 
     // Check if the new state differs from the old state
     const stateChanged =
