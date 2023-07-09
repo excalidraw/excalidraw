@@ -32,6 +32,7 @@ import {
 } from "../element/types";
 import { getSelectedElements } from "../scene";
 import { AppState } from "../types";
+import { Mutable } from "../utility-types";
 import { getFontString } from "../utils";
 import { register } from "./register";
 
@@ -215,7 +216,7 @@ export const actionWrapTextInContainer = register({
       appState,
     );
     let updatedElements: readonly ExcalidrawElement[] = elements.slice();
-    const containerIds: AppState["selectedElementIds"] = {};
+    const containerIds: Mutable<AppState["selectedElementIds"]> = {};
 
     for (const textElement of selectedElements) {
       if (isTextElement(textElement)) {
