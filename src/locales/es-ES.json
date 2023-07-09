@@ -378,9 +378,9 @@
       "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copiar al portapapeles"
     }
   },
   "encrypted": {
@@ -415,8 +415,8 @@
   },
   "colors": {
     "transparent": "Transparente",
-    "black": "",
-    "white": "",
+    "black": "Negro",
+    "white": "Blanco",
     "red": "",
     "pink": "",
     "grape": "",
@@ -464,7 +464,7 @@
       },
       "excalidrawPlus": {
         "title": "",
-        "button": "",
+        "button": "Exportar a Excalidraw+",
         "description": ""
       }
     },
@@ -477,7 +477,7 @@
       "shareableLink": {
         "title": "",
         "button": "",
-        "description": ""
+        "description": "Cargar un dibujo externo <bold>reemplazará tu contenido existente</bold>.<br></br>Puedes primero hacer una copia de seguridad de tu dibujo usando una de las opciones de abajo."
       }
     }
   }
