@@ -205,7 +205,8 @@ export const Hyperlink = ({
     appState.draggingElement ||
     appState.resizingElement ||
     appState.isRotating ||
-    appState.openMenu
+    appState.openMenu ||
+    appState.viewModeEnabled
   ) {
     return null;
   }
