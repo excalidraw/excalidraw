@@ -52,6 +52,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     validateIFrame,
     renderCustomIFrame,
     renderWebview, //zsviczian
+    renderIFrameMenu, //zsviczian
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -135,6 +136,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           validateIFrame={validateIFrame}
           renderCustomIFrame={renderCustomIFrame}
           renderWebview={renderWebview} //zsviczian
+          renderIFrameMenu={renderIFrameMenu} //zsviczian
         >
           {children}
         </App>

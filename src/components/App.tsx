@@ -547,7 +547,7 @@ class App extends React.Component<AppProps, AppState> {
         resetCursor: this.resetCursor,
         toggleFrameRendering: this.toggleFrameRendering,
         toggleSidebar: this.toggleSidebar,
-        getIFrameElementById: this.getIFrameElementById, //zsviczian
+        getIFrameElementById: (id:string) =>this.getIFrameElementById(id), //zsviczian
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -660,8 +660,9 @@ class App extends React.Component<AppProps, AppState> {
         //Allowing for multiple instances of Excalidraw running in the window
         if (data.method === "paused") {
           let source: Window | null = null;
-          const iframes = 
-            document.body.querySelectorAll("iframe.excalidraw__iframe");
+          const iframes = document.body.querySelectorAll(
+            "iframe.excalidraw__iframe",
+          );
           if (!iframes) {
             break;
           }
@@ -709,10 +710,6 @@ class App extends React.Component<AppProps, AppState> {
 
   private getIFrameElementById(id: string): HTMLIFrameElement | undefined {
     return this.iFrameRefs.get(id);
-  }
-
-  private getIFrameElements(): HTMLIFrameElement[] {
-    return Array.from(this.iFrameRefs.values());
   }
 
   private handleIFrameCenterClick(element: NonDeletedExcalidrawElement) {
@@ -951,6 +948,8 @@ class App extends React.Component<AppProps, AppState> {
                           borderRadius: `${radius}px`,
                         }}
                         src={src}
+                        //@ts-ignore
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         title="Excalidraw Embedded Content"
                         allowFullScreen={true}
                       />
@@ -1275,6 +1274,8 @@ class App extends React.Component<AppProps, AppState> {
                         )}
                         <main>{this.renderCanvas()}</main>
                         {this.renderFrameNames()}
+                        {this.state.activeIFrame?.state === "active" && //zsviczian
+                          this.props.renderIFrameMenu?.(this.state)}
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderIFrames()}
                     </ExcalidrawElementsContext.Provider>

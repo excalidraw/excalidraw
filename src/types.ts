@@ -422,6 +422,9 @@ export interface ExcalidrawProps {
     appState: UIAppState,
   ) => JSX.Element | null;
   renderWebview?: boolean; //zsviczian
+  renderIFrameMenu?: ( //zsivzian
+    appState: AppState,
+  ) => JSX.Element | null;
 }
 
 export type SceneData = {
