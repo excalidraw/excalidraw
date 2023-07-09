@@ -11,6 +11,8 @@ import {
 } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { isFrameElement } from "../element/typeChecks";
+import { getSelectedElements } from "./selection";
+import { AppState } from "../types";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -36,6 +38,12 @@ class Scene {
 
   private static sceneMapByElement = new WeakMap<ExcalidrawElement, Scene>();
   private static sceneMapById = new Map<string, Scene>();
+
+  // private app: App;
+
+  // constructor(app: App) {
+  //   this.app = app;
+  // }
 
   static mapElementToScene(elementKey: ElementKey, scene: Scene) {
     if (isIdKey(elementKey)) {
@@ -81,6 +89,26 @@ class Scene {
     return this.frames;
   }
 
+  getSelectedElements(opts: {
+    // NOTE can be ommitted by making Scene constructor require App instance
+    selectedElementIds: AppState["selectedElementIds"];
+    /**
+     * for specific cases where you need to use elements not from current
+     * scene state. This in effect will likely result in cache-miss, and
+     * the cache won't be updated in this case.
+     */
+    elements?: readonly ExcalidrawElement[];
+    // selection-related options
+    includeBoundTextElement?: boolean;
+    includeElementsInFrames?: boolean;
+  }): NonDeleted<ExcalidrawElement>[] {
+    return getSelectedElements(
+      opts?.elements || this.nonDeletedElements,
+      { selectedElementIds: opts.selectedElementIds },
+      opts,
+    );
+  }
+
   getNonDeletedFrames(): readonly NonDeleted<ExcalidrawFrameElement>[] {
     return this.nonDeletedFrames;
   }
@@ -98,7 +126,6 @@ class Scene {
     }
     return null;
   }
-
   /**
    * A utility method to help with updating all scene elements, with the added
    * performance optimization of not renewing the array if no change is made.
