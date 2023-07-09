@@ -2187,7 +2187,6 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id2": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {
@@ -2421,7 +2420,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id1": true,
-          "id2": true,
         },
         "selectedGroupIds": Object {
           "id3": true,
@@ -4183,7 +4181,6 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id2": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -4411,7 +4408,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id1": true,
-          "id2": true,
         },
         "selectedGroupIds": Object {
           "id3": true,
@@ -4491,7 +4487,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id1": true,
-          "id2": true,
         },
         "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
@@ -4905,7 +4900,6 @@ Object {
   "pendingImageElementId": null,
   "previousSelectedElementIds": Object {
     "id0": true,
-    "id2": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -4914,8 +4908,6 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id2": true,
-    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {},
@@ -5483,7 +5475,6 @@ Object {
   "pendingImageElementId": null,
   "previousSelectedElementIds": Object {
     "id0": true,
-    "id2": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -5492,8 +5483,6 @@ Object {
   "selectedElementIds": Object {
     "id0": true,
     "id1": true,
-    "id2": true,
-    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": Object {
@@ -5727,8 +5716,6 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
           "id1": true,
-          "id2": true,
-          "id3": true,
         },
         "selectedGroupIds": Object {
           "id4": true,
