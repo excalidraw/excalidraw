@@ -4354,12 +4354,13 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasZoomUsingCtrlAndSpace = (
     event: React.PointerEvent<HTMLElement>,
   ): boolean => {
-    if(!(isHoldingSpace && event.ctrlKey)) { return false; }
     if (
       !(
         gesture.pointers.size <= 1 &&
         (event.button === POINTER_BUTTON.WHEEL ||
-          (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
+          (event.button === POINTER_BUTTON.MAIN && 
+            isHoldingSpace && 
+            event.ctrlKey) ||
           isHandToolActive(this.state) ||
           this.state.viewModeEnabled)
       ) ||
@@ -4369,18 +4370,54 @@ class App extends React.Component<AppProps, AppState> {
     }
     event.preventDefault();
 
-    setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+    setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
+
     let { clientX: lastX, clientY: lastY } = event;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const deltaX = lastX - event.clientX;
       const deltaY = lastY - event.clientY;
       lastX = event.clientX;
       lastY = event.clientY;
-      this.translateCanvas(({ zoom, scrollX, scrollY }) => ({
-        scrollX: scrollX - deltaX / zoom.value,
-        scrollY: scrollY - deltaY / zoom.value,
+      let newZoom = this.state.zoom.value - deltaX / 200;
+      this.translateCanvas((state) => ({
+        ...getStateForZoom(
+          {
+            viewportX: this.lastViewportPosition.x,
+            viewportY: this.lastViewportPosition.y,
+            nextZoom: getNormalizedZoom(newZoom),
+          },
+          state,
+        ),
+        shouldCacheIgnoreZoom: true,
       }));
     });
+    
+    const teardown = withBatchedUpdates(
+      (lastPointerUp = () => {
+        lastPointerUp = null;
+        isPanning = false;
+        if (!isHoldingSpace) {
+          if (this.state.viewModeEnabled) {
+            setCursor(this.canvas, CURSOR_TYPE.GRAB);
+          } else {
+            setCursorForShape(this.canvas, this.state);
+          }
+        }
+        this.setState({
+          cursorButton: "up",
+        });
+        this.savePointer(event.clientX, event.clientY, "up");
+        window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+        window.removeEventListener(EVENT.POINTER_UP, teardown);
+        window.removeEventListener(EVENT.BLUR, teardown);
+        onPointerMove.flush();
+      }),
+    );
+    window.addEventListener(EVENT.BLUR, teardown);
+    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
+      passive: true,
+    });
+    window.addEventListener(EVENT.POINTER_UP, teardown);
     return true;
   };
 
