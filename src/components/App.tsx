@@ -7675,154 +7675,214 @@ class App extends React.Component<AppProps, AppState> {
       return null;
     }
 
-    // Calculate the zoom level on which will constrained area fit the viewport for each axis
-    const scrollableWidth = scrollConstraints.width;
-    const scrollableHeight = scrollConstraints.height;
-    const zoomLevelX = width / scrollableWidth;
-    const zoomLevelY = height / scrollableHeight;
+    /**
+     * Calculate the zoom levels on which will constrained area fits the viewport for each axis
+     * @returns The zoom levels for the X and Y axes.
+     */
+    const calculateZoomLevel = () => {
+      const scrollableWidth = scrollConstraints.width;
+      const scrollableHeight = scrollConstraints.height;
+      const zoomLevelX = width / scrollableWidth;
+      const zoomLevelY = height / scrollableHeight;
+      return { zoomLevelX, zoomLevelY };
+    };
 
-    // Default scroll and zoom values
-    let constrainedScrollX = scrollX;
-    let constrainedScrollY = scrollY;
+    /**
+     * Calculates the center position of the constrained scroll area.
+     * @returns The X and Y coordinates of the center position.
+     */
+    const calculateConstrainedScrollCenter = () => {
+      const constrainedScrollCenterX =
+        scrollConstraints.x +
+        (scrollConstraints.width - width / zoom.value) / -2;
+      const constrainedScrollCenterY =
+        scrollConstraints.y +
+        (scrollConstraints.height - height / zoom.value) / -2;
+      return { constrainedScrollCenterX, constrainedScrollCenterY };
+    };
 
-    // Calculate the overscroll allowance for each axis
-    const overscrollAllowanceX =
-      OVERSCROLL_ALLOWANCE_PERCENTAGE * scrollableWidth;
-    const overscrollAllowanceY =
-      OVERSCROLL_ALLOWANCE_PERCENTAGE * scrollableHeight;
+    /**
+     * Calculates the overscroll allowance values for the constrained area.
+     * @returns The overscroll allowance values for the X and Y axes.
+     */
+    const calculateOverscrollAllowance = () => {
+      const overscrollAllowanceX =
+        OVERSCROLL_ALLOWANCE_PERCENTAGE * scrollConstraints.width;
+      const overscrollAllowanceY =
+        OVERSCROLL_ALLOWANCE_PERCENTAGE * scrollConstraints.height;
+      return { overscrollAllowanceX, overscrollAllowanceY };
+    };
 
-    // When we are zoomed out enough to contain constrained area in the viewport we will center the view
-    const shouldAdjustForCenteredView =
-      zoom.value <= zoomLevelX || zoom.value <= zoomLevelY;
+    /**
+     * Calculates the minimum and maximum scroll values based on the current state.
+     * @param shouldAdjustForCenteredView - Whether the view should be adjusted for centered view - when constrained area fits the viewport.
+     * @param overscrollAllowanceX - The overscroll allowance value for the X axis.
+     * @param overscrollAllowanceY - The overscroll allowance value for the Y axis.
+     * @param constrainedScrollCenterX - The X coordinate of the constrained scroll area center.
+     * @param constrainedScrollCenterY - The Y coordinate of the constrained scroll area center.
+     * @returns The minimum and maximum scroll values for the X and Y axes.
+     */
+    const calculateMinMaxScrollValues = (
+      shouldAdjustForCenteredView: boolean,
+      overscrollAllowanceX: number,
+      overscrollAllowanceY: number,
+      constrainedScrollCenterX: number,
+      constrainedScrollCenterY: number,
+    ) => {
+      let maxScrollX;
+      let minScrollX;
+      let maxScrollY;
+      let minScrollY;
 
-    // When viewport is smaller than the scrollable area, user can pan freely within the constrained area,
-    // otherwilse the viewport is centered to the center of the scrollable area
-    let maxScrollX;
-    let minScrollX;
-    let maxScrollY;
-    let minScrollY;
-
-    // Get center of scrollable area
-    const constrainedScrollCenterX =
-      scrollConstraints.x + (scrollableWidth - width / zoom.value) / -2;
-    const constrainedScrollCenterY =
-      scrollConstraints.y + (scrollableHeight - height / zoom.value) / -2;
-
-    // We're using a `switch(true)` construction here to handle a set of conditions
-    // that can't be easily grouped into a regular switch statement.
-    // Each case represents a unique combination of cursorButton state and
-    // whether or not we should adjust for a centered view (constrained area is smaller than viewport).
-    switch (true) {
-      case cursorButton === "down" && shouldAdjustForCenteredView:
-        // case when cursor button is down and we should adjust for centered view
-
+      if (cursorButton === "down" && shouldAdjustForCenteredView) {
         maxScrollX = constrainedScrollCenterX + overscrollAllowanceX;
         minScrollX = constrainedScrollCenterX - overscrollAllowanceX;
-
         maxScrollY = constrainedScrollCenterY + overscrollAllowanceY;
         minScrollY = constrainedScrollCenterY - overscrollAllowanceY;
-        break;
-
-      case cursorButton === "down" && !shouldAdjustForCenteredView:
-        // case when cursor button is down and we should not adjust for centered view
+      } else if (cursorButton === "down" && !shouldAdjustForCenteredView) {
         maxScrollX = scrollConstraints.x + overscrollAllowanceX;
         minScrollX =
           scrollConstraints.x -
-          scrollableWidth +
+          scrollConstraints.width +
           width / zoom.value -
           overscrollAllowanceX;
-
         maxScrollY = scrollConstraints.y + overscrollAllowanceY;
         minScrollY =
           scrollConstraints.y -
-          scrollableHeight +
+          scrollConstraints.height +
           height / zoom.value -
           overscrollAllowanceY;
-        break;
-
-      case cursorButton !== "down" && shouldAdjustForCenteredView:
-        // case when cursor button is not down and we should adjust for centered view
-
+      } else if (cursorButton !== "down" && shouldAdjustForCenteredView) {
         maxScrollX = constrainedScrollCenterX;
         minScrollX = constrainedScrollCenterX;
-
         maxScrollY = constrainedScrollCenterY;
         minScrollY = constrainedScrollCenterY;
-        break;
-
-      default:
-        // case when cursor button is not down and we should not adjust for centered view
+      } else {
         maxScrollX = scrollConstraints.x;
-        minScrollX = scrollConstraints.x - scrollableWidth + width / zoom.value;
-
+        minScrollX =
+          scrollConstraints.x - scrollConstraints.width + width / zoom.value;
         maxScrollY = scrollConstraints.y;
         minScrollY =
-          scrollConstraints.y - scrollableHeight + height / zoom.value;
-        break;
-    }
-
-    // Constrain the scroll within the scroll constraints
-    constrainedScrollX = Math.min(maxScrollX, Math.max(scrollX, minScrollX));
-    constrainedScrollY = Math.min(maxScrollY, Math.max(scrollY, minScrollY));
-
-    // Check if the new state differs from the old state
-    // and if the state has changed, update the state and return the new state
-    const isStateChanged =
-      constrainedScrollX !== scrollX || constrainedScrollY !== scrollY;
-
-    if (isStateChanged) {
-      // Animate the scroll position when the cursor button is not down and scroll position is outside of the scroll constraints.
-      // We don't want to animate the scroll position when the user is dragging the canvas or zooiming in/out.
-      if (
-        (scrollX < scrollConstraints.x ||
-          scrollX + width > scrollConstraints.x + scrollConstraints.width ||
-          scrollY < scrollConstraints.y ||
-          scrollY + height > scrollConstraints.y + scrollConstraints.height) &&
-        cursorButton !== "down" &&
-        zoom.value === prevState.zoom.value
-      ) {
-        this.setState({
-          scrollConstraints: { ...scrollConstraints, isAnimating: true },
-        });
-
-        easeToValuesRAF({
-          fromValues: { scrollX, scrollY },
-          toValues: {
-            scrollX: constrainedScrollX,
-            scrollY: constrainedScrollY,
-          },
-          onStep: ({ scrollX, scrollY }) => {
-            this.setState({
-              scrollX,
-              scrollY,
-            });
-          },
-          onStart: () => {
-            this.setState({
-              scrollConstraints: { ...scrollConstraints, isAnimating: true },
-            });
-          },
-          onEnd: () => {
-            this.setState({
-              scrollConstraints: { ...scrollConstraints, isAnimating: false },
-            });
-          },
-        });
-
-        return null;
+          scrollConstraints.y - scrollConstraints.height + height / zoom.value;
       }
 
-      const constrainedState = {
-        scrollX: constrainedScrollX,
-        scrollY: constrainedScrollY,
-        zoom,
-      };
+      return { maxScrollX, minScrollX, maxScrollY, minScrollY };
+    };
 
-      this.setState(constrainedState);
-      return constrainedState;
-    }
+    /**
+     * Constrains the scroll values within the constrained area.
+     * @param maxScrollX - The maximum scroll value for the X axis.
+     * @param minScrollX - The minimum scroll value for the X axis.
+     * @param maxScrollY - The maximum scroll value for the Y axis.
+     * @param minScrollY - The minimum scroll value for the Y axis.
+     * @returns The constrained scroll values for the X and Y axes.
+     */
+    const constrainScrollValues = (
+      maxScrollX: number,
+      minScrollX: number,
+      maxScrollY: number,
+      minScrollY: number,
+    ) => {
+      const constrainedScrollX = Math.min(
+        maxScrollX,
+        Math.max(scrollX, minScrollX),
+      );
+      const constrainedScrollY = Math.min(
+        maxScrollY,
+        Math.max(scrollY, minScrollY),
+      );
+      return { constrainedScrollX, constrainedScrollY };
+    };
 
-    return null;
+    /**
+     * Handles the state change based on the constrained scroll values.
+     * Also handles the animation to the constrained area when the viewport is outside of constrained area.
+     * @param constrainedScrollX - The constrained scroll value for the X axis.
+     * @param constrainedScrollY - The constrained scroll value for the Y axis.
+     * @returns The constrained state if the state has changed, when needs to be passed into render function, otherwise null.
+     */
+    const handleStateChange = (
+      constrainedScrollX: number,
+      constrainedScrollY: number,
+    ) => {
+      const isStateChanged =
+        constrainedScrollX !== scrollX || constrainedScrollY !== scrollY;
+
+      if (isStateChanged) {
+        if (
+          (scrollX < scrollConstraints.x ||
+            scrollX + width > scrollConstraints.x + scrollConstraints.width ||
+            scrollY < scrollConstraints.y ||
+            scrollY + height >
+              scrollConstraints.y + scrollConstraints.height) &&
+          cursorButton !== "down" &&
+          zoom.value === prevState.zoom.value
+        ) {
+          this.setState({
+            scrollConstraints: { ...scrollConstraints, isAnimating: true },
+          });
+
+          easeToValuesRAF({
+            fromValues: { scrollX, scrollY },
+            toValues: {
+              scrollX: constrainedScrollX,
+              scrollY: constrainedScrollY,
+            },
+            onStep: ({ scrollX, scrollY }) => {
+              this.setState({ scrollX, scrollY });
+            },
+            onStart: () => {
+              this.setState({
+                scrollConstraints: { ...scrollConstraints, isAnimating: true },
+              });
+            },
+            onEnd: () => {
+              this.setState({
+                scrollConstraints: { ...scrollConstraints, isAnimating: false },
+              });
+            },
+          });
+
+          return null;
+        }
+
+        const constrainedState = {
+          scrollX: constrainedScrollX,
+          scrollY: constrainedScrollY,
+          zoom,
+        };
+
+        this.setState(constrainedState);
+        return constrainedState;
+      }
+
+      return null;
+    };
+
+    // Compute the constrained scroll values.
+    const { zoomLevelX, zoomLevelY } = calculateZoomLevel();
+    const { constrainedScrollCenterX, constrainedScrollCenterY } =
+      calculateConstrainedScrollCenter();
+    const { overscrollAllowanceX, overscrollAllowanceY } =
+      calculateOverscrollAllowance();
+    const shouldAdjustForCenteredView =
+      zoom.value <= zoomLevelX || zoom.value <= zoomLevelY;
+    const { maxScrollX, minScrollX, maxScrollY, minScrollY } =
+      calculateMinMaxScrollValues(
+        shouldAdjustForCenteredView,
+        overscrollAllowanceX,
+        overscrollAllowanceY,
+        constrainedScrollCenterX,
+        constrainedScrollCenterY,
+      );
+    const { constrainedScrollX, constrainedScrollY } = constrainScrollValues(
+      maxScrollX,
+      minScrollX,
+      maxScrollY,
+      minScrollY,
+    );
+
+    return handleStateChange(constrainedScrollX, constrainedScrollY);
   };
 }
 
