@@ -7671,8 +7671,6 @@ class App extends React.Component<AppProps, AppState> {
       return null;
     }
 
-    console.log("fired");
-
     // Calculate the maximum possible zoom based on the viewport and scrollable area sizes
     const scrollableWidth = scrollConstraints.width;
     const scrollableHeight = scrollConstraints.height;
