@@ -7657,6 +7657,10 @@ class App extends React.Component<AppProps, AppState> {
     // Set the overscroll allowance percentage
     const OVERSCROLL_ALLOWANCE_PERCENTAGE = 0.2;
 
+    if (!scrollConstraints || scrollConstraints.isAnimating) {
+      return null;
+    }
+
     // Check if the state has changed since the last render
     const stateUnchanged =
       zoom.value === prevState.zoom.value &&
@@ -7671,11 +7675,11 @@ class App extends React.Component<AppProps, AppState> {
       return null;
     }
 
-    // Calculate the maximum possible zoom based on the viewport and scrollable area sizes
+    // Calculate the zoom level on which will constrained area fit the viewport for each axis
     const scrollableWidth = scrollConstraints.width;
     const scrollableHeight = scrollConstraints.height;
-    const maxZoomX = width / scrollableWidth;
-    const maxZoomY = height / scrollableHeight;
+    const zoomLevelX = width / scrollableWidth;
+    const zoomLevelY = height / scrollableHeight;
 
     // Default scroll and zoom values
     let constrainedScrollX = scrollX;
@@ -7689,7 +7693,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // When we are zoomed out enough to contain constrained area in the viewport we will center the view
     const shouldAdjustForCenteredView =
-      zoom.value <= maxZoomX || zoom.value <= maxZoomY;
+      zoom.value <= zoomLevelX || zoom.value <= zoomLevelY;
 
     // When viewport is smaller than the scrollable area, user can pan freely within the constrained area,
     // otherwilse the viewport is centered to the center of the scrollable area
@@ -7767,6 +7771,48 @@ class App extends React.Component<AppProps, AppState> {
       constrainedScrollX !== scrollX || constrainedScrollY !== scrollY;
 
     if (isStateChanged) {
+      // Animate the scroll position when the cursor button is not down and scroll position is outside of the scroll constraints
+      if (
+        (scrollX < scrollConstraints.x ||
+          scrollX + width > scrollConstraints.x + scrollConstraints.width ||
+          scrollY < scrollConstraints.y ||
+          scrollY + height > scrollConstraints.y + scrollConstraints.height) &&
+        cursorButton !== "down" &&
+        !scrollConstraints.isAnimating
+      ) {
+        this.setState({
+          scrollConstraints: { ...scrollConstraints, isAnimating: true },
+        });
+
+        easeToValuesRAF({
+          fromValues: { scrollX, scrollY },
+          toValues: {
+            scrollX: constrainedScrollX,
+            scrollY: constrainedScrollY,
+          },
+          onStep: ({ scrollX, scrollY }) => {
+            console.log("onStep");
+            this.setState({
+              scrollX,
+              scrollY,
+            });
+          },
+          onStart: () => {
+            this.setState({
+              scrollConstraints: { ...scrollConstraints, isAnimating: true },
+            });
+          },
+          onEnd: () => {
+            this.setState({
+              scrollConstraints: { ...scrollConstraints, isAnimating: false },
+            });
+          },
+        });
+
+        console.log("isAnimating");
+        return null;
+      }
+
       const constrainedState = {
         scrollX: constrainedScrollX,
         scrollY: constrainedScrollY,

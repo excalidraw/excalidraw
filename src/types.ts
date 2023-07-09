@@ -228,6 +228,7 @@ export type AppState = {
     y: number;
     width: number;
     height: number;
+    isAnimating?: boolean;
   } | null;
 };
 
