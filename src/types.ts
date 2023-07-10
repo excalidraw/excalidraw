@@ -229,6 +229,10 @@ export type AppState = {
     width: number;
     height: number;
     isAnimating?: boolean;
+    opts?: {
+      viewportZoomFactor?: number;
+      lockZoom?: boolean;
+    };
   } | null;
 };
 
