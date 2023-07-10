@@ -4370,11 +4370,18 @@ class App extends React.Component<AppProps, AppState> {
     }
     event.preventDefault();
 
-    setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
+    setCursor(this.canvas, CURSOR_TYPE.ZOOM_IN);
 
     let { clientX: lastX } = event;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const deltaX = lastX - event.clientX;
+
+      if (deltaX < 0) {
+        setCursor(this.canvas, CURSOR_TYPE.ZOOM_IN);
+      } else {
+        setCursor(this.canvas, CURSOR_TYPE.ZOOM_OUT);
+      }
+
       let newZoom = this.state.zoom.value - deltaX / 200;
       this.translateCanvas((state) => ({
         ...getStateForZoom(
