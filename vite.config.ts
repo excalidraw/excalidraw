@@ -22,6 +22,19 @@ export default defineConfig({
       },
       workbox: {
         navigateFallbackDenylist: [/^\/locales\/[\w]+\.json$/],
+        runtimeCaching: [
+          {
+            urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "fonts",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 90, // <== 90 days
+              },
+            },
+          },
+        ],
       },
       manifest: {
         short_name: "Excalidraw",
