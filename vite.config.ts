@@ -16,26 +16,12 @@ export default defineConfig({
     svgrPlugin(),
     ViteEjsPlugin(),
     VitePWA({
-      srcDir: "src",
       devOptions: {
         /* set this flag to true to enable in Development mode */
         enabled: false,
       },
       workbox: {
-        navigateFallbackDenylist: [/^\/locales\/[\w]+\.json$/],
-        runtimeCaching: [
-          {
-            urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
-            handler: "CacheFirst",
-            options: {
-              cacheName: "fonts",
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 90, // <== 90 days
-              },
-            },
-          },
-        ],
+        importScripts: ["src/service-worker.ts"],
       },
       manifest: {
         short_name: "Excalidraw",
