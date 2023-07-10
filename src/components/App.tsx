@@ -4377,8 +4377,9 @@ class App extends React.Component<AppProps, AppState> {
     return true;
   };
 
-  private handleCanvasZoomUsingCtrlAndSpace = (
-    event: React.PointerEvent<HTMLElement>,
+  private handleCanvasZoomUsingCtrlAndSpace = 
+  (
+    event: React.PointerEvent<HTMLElement>
   ): boolean => {
     if (
       !(
@@ -4448,6 +4449,8 @@ class App extends React.Component<AppProps, AppState> {
       passive: true,
     });
     window.addEventListener(EVENT.POINTER_UP, teardown);
+
+    this.resetShouldCacheIgnoreZoomDebounced();
     return true;
   };
 
