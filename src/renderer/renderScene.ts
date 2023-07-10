@@ -470,7 +470,9 @@ export const _renderScene = ({
         if (
           frameId &&
           ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
-            (!renderConfig.isExporting && appState.shouldRenderFrames))
+            (!renderConfig.isExporting &&
+              appState.frameRendering.enabled &&
+              appState.frameRendering.clip))
         ) {
           context.save();
 

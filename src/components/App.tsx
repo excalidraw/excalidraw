@@ -505,7 +505,7 @@ class App extends React.Component<AppProps, AppState> {
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
-        toggleFrameRendering: this.toggleFrameRendering,
+        updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
       } as const;
       if (typeof excalidrawRef === "function") {
@@ -651,7 +651,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private renderFrameNames = () => {
-    if (!this.state.shouldRenderFrames) {
+    if (!this.state.frameRendering.enabled || !this.state.frameRendering.name) {
       return null;
     }
 
@@ -2208,10 +2208,23 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  toggleFrameRendering = () => {
+  updateFrameRendering = (
+    opts:
+      | Partial<AppState["frameRendering"]>
+      | ((
+          prevState: AppState["frameRendering"],
+        ) => Partial<AppState["frameRendering"]>),
+  ) => {
     this.setState((prevState) => {
+      const next =
+        typeof opts === "function" ? opts(prevState.frameRendering) : opts;
       return {
-        shouldRenderFrames: !prevState.shouldRenderFrames,
+        frameRendering: {
+          enabled: next?.enabled ?? prevState.frameRendering.enabled,
+          clip: next?.clip ?? prevState.frameRendering.clip,
+          name: next?.name ?? prevState.frameRendering.name,
+          outline: next?.outline ?? prevState.frameRendering.outline,
+        },
       };
     });
   };
@@ -3089,7 +3102,9 @@ class App extends React.Component<AppProps, AppState> {
     ).filter((element) => {
       // hitting a frame's element from outside the frame is not considered a hit
       const containingFrame = getContainingFrame(element);
-      return containingFrame && this.state.shouldRenderFrames
+      return containingFrame &&
+        this.state.frameRendering.enabled &&
+        this.state.frameRendering.clip
         ? isCursorInFrame({ x, y }, containingFrame)
         : true;
     });

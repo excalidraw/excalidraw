@@ -90,8 +90,8 @@ export const actionRemoveAllElementsFromFrame = register({
   predicate: (elements, appState) => isSingleFrameSelected(elements, appState),
 });
 
-export const actionToggleFrameRendering = register({
-  name: "toggleFrameRendering",
+export const actionupdateFrameRendering = register({
+  name: "updateFrameRendering",
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (elements, appState) => {
@@ -99,13 +99,16 @@ export const actionToggleFrameRendering = register({
       elements,
       appState: {
         ...appState,
-        shouldRenderFrames: !appState.shouldRenderFrames,
+        frameRendering: {
+          ...appState.frameRendering,
+          enabled: !appState.frameRendering.enabled,
+        },
       },
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.toggleFrameRendering",
-  checked: (appState: AppState) => appState.shouldRenderFrames,
+  contextItemLabel: "labels.updateFrameRendering",
+  checked: (appState: AppState) => appState.frameRendering.enabled,
 });
 
 export const actionSetFrameAsActiveTool = register({

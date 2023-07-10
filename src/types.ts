@@ -115,7 +115,12 @@ export type AppState = {
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
   frameToHighlight: NonDeleted<ExcalidrawFrameElement> | null;
-  shouldRenderFrames: boolean;
+  frameRendering: {
+    enabled: boolean;
+    name: boolean;
+    outline: boolean;
+    clip: boolean;
+  };
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   // element being edited, but not necessarily added to elements array yet
@@ -543,7 +548,7 @@ export type ExcalidrawImperativeAPI = {
    * the frames are still interactive in edit mode. As such, this API should be
    * used in conjunction with view mode (props.viewModeEnabled).
    */
-  toggleFrameRendering: InstanceType<typeof App>["toggleFrameRendering"];
+  updateFrameRendering: InstanceType<typeof App>["updateFrameRendering"];
 };
 
 export type Device = Readonly<{
