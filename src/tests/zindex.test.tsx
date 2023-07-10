@@ -89,6 +89,7 @@ const populateElements = (
     ...selectGroupsForSelectedElements(
       { ...h.state, ...appState, selectedElementIds },
       h.elements,
+      h.state,
     ),
     ...appState,
     selectedElementIds,

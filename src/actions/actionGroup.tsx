@@ -218,6 +218,7 @@ export const actionUngroup = register({
     const updateAppState = selectGroupsForSelectedElements(
       { ...appState, selectedGroupIds: {} },
       getNonDeletedElements(nextElements),
+      appState,
     );
 
     frames.forEach((frame) => {
@@ -232,9 +233,18 @@ export const actionUngroup = register({
     });
 
     // remove binded text elements from selection
-    boundTextElementIds.forEach(
-      (id) => (updateAppState.selectedElementIds[id] = false),
+    updateAppState.selectedElementIds = Object.entries(
+      updateAppState.selectedElementIds,
+    ).reduce(
+      (acc: { [key: ExcalidrawElement["id"]]: true }, [id, selected]) => {
+        if (selected && !boundTextElementIds.includes(id)) {
+          acc[id] = true;
+        }
+        return acc;
+      },
+      {},
     );
+
     return {
       appState: updateAppState,
       elements: nextElements,
