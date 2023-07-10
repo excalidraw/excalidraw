@@ -99,7 +99,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerUpdate={onPointerUpdate}
           renderTopRightUI={renderTopRightUI}
           langCode={langCode}
-          viewModeEnabled={viewModeEnabled}
+          viewModeEnabled={viewModeEnabled || !!scrollConstraints}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
           libraryReturnUrl={libraryReturnUrl}
