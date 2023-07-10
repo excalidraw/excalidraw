@@ -484,7 +484,8 @@ export const _renderScene = ({
 
           if (
             frameId &&
-            ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
+            ((renderConfig.isExporting &&
+              isOnlyExportingSingleFrame(elements)) ||
               (!renderConfig.isExporting &&
                 appState.frameRendering.enabled &&
                 appState.frameRendering.clip))
@@ -517,7 +518,6 @@ export const _renderScene = ({
           console.error(error);
         }
       });
-
 
     // render iFrames on top
     visibleElements
@@ -554,7 +554,8 @@ export const _renderScene = ({
 
           if (
             frameId &&
-            ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
+            ((renderConfig.isExporting &&
+              isOnlyExportingSingleFrame(elements)) ||
               (!renderConfig.isExporting &&
                 appState.frameRendering.enabled &&
                 appState.frameRendering.clip))
@@ -566,10 +567,10 @@ export const _renderScene = ({
             if (frame && isElementInFrame(element, elements, appState)) {
               frameClip(frame, context, renderConfig);
             }
-            renderElement();
+            render();
             context.restore();
           } else {
-            renderElement();
+            render();
           }
         } catch (error: any) {
           console.error(error);
