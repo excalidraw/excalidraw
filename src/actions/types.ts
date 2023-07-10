@@ -119,7 +119,7 @@ export type ActionName =
   | "toggleHandTool"
   | "selectAllElementsInFrame"
   | "removeAllElementsFromFrame"
-  | "toggleFrameRendering"
+  | "updateFrameRendering"
   | "setFrameAsActiveTool"
   | "setIFrameAsActiveTool"
   | "createContainerFromText"

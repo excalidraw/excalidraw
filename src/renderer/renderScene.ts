@@ -484,8 +484,10 @@ export const _renderScene = ({
 
           if (
             frameId &&
-            ((isExporting && isOnlyExportingSingleFrame(elements)) ||
-              (!isExporting && appState.shouldRenderFrames))
+            ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
+              (!renderConfig.isExporting &&
+                appState.frameRendering.enabled &&
+                appState.frameRendering.clip))
           ) {
             context.save();
 
@@ -516,6 +518,7 @@ export const _renderScene = ({
         }
       });
 
+
     // render iFrames on top
     visibleElements
       .filter((el) => isIFrameOrFrameLabel(el))
@@ -544,7 +547,6 @@ export const _renderScene = ({
               renderLinkIcon(element, context, appState);
             }
           };
-
           // - when exporting the whole canvas, we DO NOT apply clipping
           // - when we are exporting a particular frame, apply clipping
           //   if the containing frame is not selected, apply clipping
@@ -552,8 +554,10 @@ export const _renderScene = ({
 
           if (
             frameId &&
-            ((isExporting && isOnlyExportingSingleFrame(elements)) ||
-              (!isExporting && appState.shouldRenderFrames))
+            ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
+              (!renderConfig.isExporting &&
+                appState.frameRendering.enabled &&
+                appState.frameRendering.clip))
           ) {
             context.save();
 
@@ -562,10 +566,10 @@ export const _renderScene = ({
             if (frame && isElementInFrame(element, elements, appState)) {
               frameClip(frame, context, renderConfig);
             }
-            render();
+            renderElement();
             context.restore();
           } else {
-            render();
+            renderElement();
           }
         } catch (error: any) {
           console.error(error);
