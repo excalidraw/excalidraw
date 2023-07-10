@@ -20,6 +20,9 @@ export default defineConfig({
         /* set this flag to true to enable in Development mode */
         enabled: false,
       },
+      workbox: {
+        navigateFallbackDenylist: [/^\/locales\/[\w-]+json/],
+      },
       manifest: {
         short_name: "Excalidraw",
         name: "Excalidraw",
