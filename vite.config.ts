@@ -16,6 +16,7 @@ export default defineConfig({
     svgrPlugin(),
     ViteEjsPlugin(),
     VitePWA({
+      srcDir: "src",
       devOptions: {
         /* set this flag to true to enable in Development mode */
         enabled: false,
