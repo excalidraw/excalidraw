@@ -21,7 +21,7 @@ export default defineConfig({
         enabled: false,
       },
       workbox: {
-        navigateFallbackDenylist: [/^\/locales\/[\w-]+json/],
+        navigateFallbackDenylist: [/^\/locales\/[\w]+\.json$/],
       },
       manifest: {
         short_name: "Excalidraw",
