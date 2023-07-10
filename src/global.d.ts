@@ -120,3 +120,12 @@ declare module "image-blob-reduce" {
   const reduce: ImageBlobReduce.ImageBlobReduceStatic;
   export = reduce;
 }
+
+declare namespace React {
+  interface CSSProperties {
+    "--swatch-color"?: string;
+    "--max-width"?: string;
+    "--padding"?: number;
+    "--gap"?: number;
+  }
+}
