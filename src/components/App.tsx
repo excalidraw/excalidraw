@@ -4396,8 +4396,6 @@ class App extends React.Component<AppProps, AppState> {
     }
     event.preventDefault();
 
-    setCursor(this.canvas, CURSOR_TYPE.ZOOM_IN);
-
     let previousX = event.clientX;
 
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
@@ -4435,13 +4433,8 @@ class App extends React.Component<AppProps, AppState> {
     const teardown = withBatchedUpdates(
       (lastPointerUp = () => {
         lastPointerUp = null;
-        isPanning = false;
         if (!isHoldingSpace) {
-          if (this.state.viewModeEnabled) {
-            setCursor(this.canvas, CURSOR_TYPE.GRAB);
-          } else {
-            setCursorForShape(this.canvas, this.state);
-          }
+          setCursorForShape(this.canvas, this.state);
         }
         this.setState({
           cursorButton: "up",
