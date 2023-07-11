@@ -21,7 +21,16 @@ export default defineConfig({
         enabled: true,
       },
       workbox: {
-        navigateFallbackDenylist: [/locales\/[^/]+.json$/],
+        manifestTransforms: [
+          (entries) => {
+            const manifest = entries.filter((entry) => {
+              return !/locales\/[\w-]+json/.test(
+                typeof entry === "string" ? entry : entry.url,
+              );
+            });
+            return { manifest };
+          },
+        ],
         runtimeCaching: [
           {
             urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
@@ -45,7 +54,7 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: new RegExp("locales/[^/]+.json$"),
+            urlPattern: new RegExp("locales/[^/]+.json"),
             handler: "CacheFirst",
             options: {
               cacheName: "locales",
