@@ -21,7 +21,7 @@ export default defineConfig({
         enabled: true,
       },
       workbox: {
-        navigateFallbackDenylist: [/\/locales\/[\w]+\.json/],
+        navigateFallbackDenylist: [/locales\/[^/]+.json$/],
         runtimeCaching: [
           {
             urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
@@ -45,7 +45,7 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: new RegExp("/locales\\/[\\w-]+json"),
+            urlPattern: new RegExp("locales/[^/]+.json$"),
             handler: "CacheFirst",
             options: {
               cacheName: "locales",
