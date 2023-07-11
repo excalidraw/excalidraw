@@ -34,7 +34,7 @@ export const CURSOR_TYPE = {
   MOVE: "move",
   AUTO: "",
   ZOOM_IN: "zoom-in",
-  ZOOM_OUT: "zoom-out"
+  ZOOM_OUT: "zoom-out",
 };
 export const POINTER_BUTTON = {
   MAIN: 0,

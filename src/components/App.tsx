@@ -4378,14 +4378,14 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleCanvasZoomUsingCtrlAndSpace = (
-    event: React.PointerEvent<HTMLElement>
+    event: React.PointerEvent<HTMLElement>,
   ): boolean => {
     if (
       !(
         gesture.pointers.size <= 1 &&
         (event.button === POINTER_BUTTON.WHEEL ||
-          (event.button === POINTER_BUTTON.MAIN && 
-            isHoldingSpace && 
+          (event.button === POINTER_BUTTON.MAIN &&
+            isHoldingSpace &&
             event.ctrlKey) ||
           isHandToolActive(this.state) ||
           this.state.viewModeEnabled)
@@ -4398,8 +4398,7 @@ class App extends React.Component<AppProps, AppState> {
 
     setCursor(this.canvas, CURSOR_TYPE.ZOOM_IN);
 
-    let { clientX: lastX } = event;
-    let previousX = lastX;
+    let previousX = event.clientX;
 
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const delta = previousX - event.clientX;
@@ -4414,10 +4413,11 @@ class App extends React.Component<AppProps, AppState> {
 
       let newZoom = this.state.zoom.value - delta / 200;
       newZoom +=
-        Math.log10(Math.max(1, this.state.zoom.value)) * -sign *
+        Math.log10(Math.max(1, this.state.zoom.value)) *
+        -sign *
         Math.min(1, absDelta / 10);
 
-      previousX = event.clientX
+      previousX = event.clientX;
 
       this.translateCanvas((state) => ({
         ...getStateForZoom(
@@ -4431,7 +4431,7 @@ class App extends React.Component<AppProps, AppState> {
         shouldCacheIgnoreZoom: true,
       }));
     });
-    
+
     const teardown = withBatchedUpdates(
       (lastPointerUp = () => {
         lastPointerUp = null;
