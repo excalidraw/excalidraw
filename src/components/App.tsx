@@ -4377,8 +4377,7 @@ class App extends React.Component<AppProps, AppState> {
     return true;
   };
 
-  private handleCanvasZoomUsingCtrlAndSpace = 
-  (
+  private handleCanvasZoomUsingCtrlAndSpace = (
     event: React.PointerEvent<HTMLElement>
   ): boolean => {
     if (
@@ -4400,16 +4399,26 @@ class App extends React.Component<AppProps, AppState> {
     setCursor(this.canvas, CURSOR_TYPE.ZOOM_IN);
 
     let { clientX: lastX } = event;
-    const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
-      const deltaX = lastX - event.clientX;
+    let previousX = lastX;
 
-      if (deltaX < 0) {
+    const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
+      const delta = previousX - event.clientX;
+      const sign = Math.sign(delta);
+      const absDelta = Math.abs(delta);
+
+      if (delta < 0) {
         setCursor(this.canvas, CURSOR_TYPE.ZOOM_IN);
       } else {
         setCursor(this.canvas, CURSOR_TYPE.ZOOM_OUT);
       }
 
-      let newZoom = this.state.zoom.value - deltaX / 200;
+      let newZoom = this.state.zoom.value - delta / 200;
+      newZoom +=
+        Math.log10(Math.max(1, this.state.zoom.value)) * -sign *
+        Math.min(1, absDelta / 10);
+
+      previousX = event.clientX
+
       this.translateCanvas((state) => ({
         ...getStateForZoom(
           {
