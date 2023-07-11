@@ -18,10 +18,10 @@ export default defineConfig({
     VitePWA({
       devOptions: {
         /* set this flag to true to enable in Development mode */
-        enabled: false,
+        enabled: true,
       },
       workbox: {
-        navigateFallbackDenylist: [/^\/locales\/[\w]+\.json$/],
+        navigateFallbackDenylist: [/\/locales\/[\w]+\.json/],
         runtimeCaching: [
           {
             urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
@@ -31,6 +31,27 @@ export default defineConfig({
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 90, // <== 90 days
+              },
+            },
+          },
+          {
+            urlPattern: new RegExp("fonts.css"),
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "fonts",
+              expiration: {
+                maxEntries: 50,
+              },
+            },
+          },
+          {
+            urlPattern: new RegExp("/locales\\/[\\w-]+json"),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "locales",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // <== 30 days
               },
             },
           },
