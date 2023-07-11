@@ -23,11 +23,10 @@ export default defineConfig({
       workbox: {
         manifestTransforms: [
           (entries) => {
-            const manifest = entries.filter((entry) => {
-              return !/locales\/[\w-]+json/.test(
-                typeof entry === "string" ? entry : entry.url,
-              );
-            });
+            const manifest = entries.filter(
+              ({ url }) =>
+                !/assets\/[a-z]{2}-[A-Z]{2}-[a-f0-9]{8}\.js$/.test(url),
+            );
             return { manifest };
           },
         ],
@@ -54,7 +53,7 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: new RegExp("locales/[^/]+.json"),
+            urlPattern: new RegExp("assets/[a-z]{2}-[A-Z]{2}-[a-f0-9]{8}.js$/"),
             handler: "CacheFirst",
             options: {
               cacheName: "locales",
