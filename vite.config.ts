@@ -31,15 +31,7 @@ export default defineConfig({
         enabled: true,
       },
       workbox: {
-        manifestTransforms: [
-          (entries) => {
-            const manifest = entries.filter(
-              ({ url }) => !url.includes("assets/locales"),
-            );
-            return { manifest };
-          },
-        ],
-        globIgnores: ["fonts.css", "locales"],
+        globIgnores: ["fonts.css", "**/locales/**"],
         runtimeCaching: [
           {
             urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
