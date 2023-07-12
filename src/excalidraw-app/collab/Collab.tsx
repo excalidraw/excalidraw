@@ -47,8 +47,8 @@ import {
   saveToFirebase,
 } from "../data/firebase";
 import {
-  importUsernameFromLocalStorage,
-  saveUsernameToLocalStorage,
+  importUsernameAndIdFromLocalStorage,
+  saveUsernameAndIdToLocalStorage,
 } from "../data/localStorage";
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
@@ -124,11 +124,14 @@ class Collab extends PureComponent<Props, CollabState> {
 
   constructor(props: Props) {
     super(props);
+
+    const { username, userId } = importUsernameAndIdFromLocalStorage() || {};
+
     this.state = {
       errorMessage: "",
-      username: importUsernameFromLocalStorage() || "",
+      username: username || "",
+      userId: userId || "",
       activeRoomLink: "",
-      userId: nanoid(),
     };
     this.portal = new Portal(this);
     this.fileManager = new FileManager({
@@ -522,6 +525,11 @@ class Collab extends PureComponent<Props, CollabState> {
         const username = getRandomUsername();
         this.onUsernameChange(username);
       });
+    }
+
+    if (!this.state.userId) {
+      const userId = nanoid();
+      this.onUserIdChange(userId);
     }
 
     if (this.portal.socket) {
@@ -970,7 +978,12 @@ class Collab extends PureComponent<Props, CollabState> {
 
   onUsernameChange = (username: string) => {
     this.setUsername(username);
-    saveUsernameToLocalStorage(username);
+    saveUsernameAndIdToLocalStorage(username, this.state.userId);
+  };
+
+  onUserIdChange = (userId: string) => {
+    this.setState({ userId });
+    saveUsernameAndIdToLocalStorage(this.state.username, userId);
   };
 
   render() {

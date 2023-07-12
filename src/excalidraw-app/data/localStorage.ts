@@ -8,11 +8,14 @@ import { clearElementsForLocalStorage } from "../../element";
 import { STORAGE_KEYS } from "../app_constants";
 import { ImportedDataState } from "../../data/types";
 
-export const saveUsernameToLocalStorage = (username: string) => {
+export const saveUsernameAndIdToLocalStorage = (
+  username: string,
+  userId: string,
+) => {
   try {
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_COLLAB,
-      JSON.stringify({ username }),
+      JSON.stringify({ username, userId }),
     );
   } catch (error: any) {
     // Unable to access window.localStorage
@@ -20,11 +23,14 @@ export const saveUsernameToLocalStorage = (username: string) => {
   }
 };
 
-export const importUsernameFromLocalStorage = (): string | null => {
+export const importUsernameAndIdFromLocalStorage = (): {
+  username: string;
+  userId: string;
+} | null => {
   try {
     const data = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
     if (data) {
-      return JSON.parse(data).username;
+      return JSON.parse(data);
     }
   } catch (error: any) {
     // Unable to access localStorage
