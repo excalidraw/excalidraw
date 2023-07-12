@@ -9,6 +9,16 @@ import eslint from "vite-plugin-eslint";
 export default defineConfig({
   build: {
     outDir: "build",
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("src/locales")) {
+            const index = id.indexOf("locales/");
+            return `locales/${id.substring(index + 8)}`;
+          }
+        },
+      },
+    },
   },
   plugins: [
     react(),
@@ -24,13 +34,12 @@ export default defineConfig({
         manifestTransforms: [
           (entries) => {
             const manifest = entries.filter(
-              ({ url }) =>
-                !/assets\/[a-z]{2}-[A-Z]{2}-[a-f0-9]{8}\.js$/.test(url),
+              ({ url }) => !url.includes("assets/locales"),
             );
             return { manifest };
           },
         ],
-        globIgnores: ["fonts.css"],
+        globIgnores: ["fonts.css", "locales"],
         runtimeCaching: [
           {
             urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
@@ -54,7 +63,7 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: new RegExp("assets/[a-z]{2}-[A-Z]{2}-[a-f0-9]{8}.js$/"),
+            urlPattern: new RegExp("locales/[^/]+.js"),
             handler: "CacheFirst",
             options: {
               cacheName: "locales",
