@@ -30,6 +30,7 @@ export default defineConfig({
             return { manifest };
           },
         ],
+        globIgnores: ["fonts.css"],
         runtimeCaching: [
           {
             urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
