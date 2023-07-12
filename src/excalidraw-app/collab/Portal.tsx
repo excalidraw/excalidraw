@@ -74,9 +74,6 @@ class Portal {
         /* syncAll */ true,
       );
     });
-    this.socket.on("room-user-change", (clients: string[]) => {
-      this.collab.setCollaborators(clients);
-    });
   }
 
   isOpen() {
@@ -189,13 +186,13 @@ class Portal {
   };
 
   broadcastIdleChange = (userState: UserIdleState) => {
-    if (this.socket?.id) {
+    if (this.socket) {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {
         type: "IDLE_STATUS",
         payload: {
-          socketId: this.socket.id,
           userState,
           username: this.collab.state.username,
+          userId: this.collab.state.userId,
         },
       };
       return this._broadcastSocketData(
@@ -209,16 +206,16 @@ class Portal {
     pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
   }) => {
-    if (this.socket?.id) {
+    if (this.socket) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
         type: "MOUSE_LOCATION",
         payload: {
-          socketId: this.socket.id,
           pointer: payload.pointer,
           button: payload.button || "up",
           selectedElementIds:
             this.collab.excalidrawAPI.getAppState().selectedElementIds,
           username: this.collab.state.username,
+          userId: this.collab.state.userId,
         },
       };
       return this._broadcastSocketData(

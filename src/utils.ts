@@ -20,6 +20,7 @@ import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
 import { isEraserActive, isHandToolActive } from "./appState";
 import { ResolutionType } from "./utility-types";
+import { reconcileElements } from "./excalidraw-app/collab/reconciliation";
 
 let mockDateTime: string | null = null;
 
@@ -906,4 +907,15 @@ export const isOnlyExportingSingleFrame = (
       (element) => element.type === "frame" || element.frameId === frames[0].id,
     )
   );
+};
+
+export const upsertMap = <T>(key: T, value: object, map: Map<T, object>) => {
+  if (!map.has(key)) {
+    map.set(key, value);
+  } else {
+    const old = map.get(key);
+    map.set(key, { ...old, ...value });
+  }
+
+  return map;
 };

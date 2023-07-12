@@ -16,6 +16,7 @@ import { Collaborator, Gesture } from "../../types";
 import {
   preventUnload,
   resolvablePromise,
+  upsertMap,
   withBatchedUpdates,
 } from "../../utils";
 import {
@@ -74,6 +75,7 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
+import { nanoid } from "nanoid";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
@@ -85,6 +87,7 @@ interface CollabState {
   errorMessage: string;
   username: string;
   activeRoomLink: string;
+  userId: string;
 }
 
 type CollabInstance = InstanceType<typeof Collab>;
@@ -125,6 +128,7 @@ class Collab extends PureComponent<Props, CollabState> {
       errorMessage: "",
       username: importUsernameFromLocalStorage() || "",
       activeRoomLink: "",
+      userId: nanoid(),
     };
     this.portal = new Portal(this);
     this.fileManager = new FileManager({
@@ -644,33 +648,36 @@ class Collab extends PureComponent<Props, CollabState> {
             );
             break;
           case "MOUSE_LOCATION": {
-            const { pointer, button, username, selectedElementIds } =
+            const { pointer, button, username, selectedElementIds, userId } =
               decryptedData.payload;
-            const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
-              decryptedData.payload.socketId ||
-              // @ts-ignore legacy, see #2094 (#2097)
-              decryptedData.payload.socketID;
-
-            const collaborators = new Map(this.collaborators);
-            const user = collaborators.get(socketId) || {}!;
-            user.pointer = pointer;
-            user.button = button;
-            user.selectedElementIds = selectedElementIds;
-            user.username = username;
-            collaborators.set(socketId, user);
+            const collaborators = upsertMap(
+              userId,
+              {
+                username,
+                pointer,
+                button,
+                selectedElementIds,
+              },
+              this.collaborators,
+            );
             this.excalidrawAPI.updateScene({
-              collaborators,
+              collaborators: new Map(collaborators),
             });
             break;
           }
           case "IDLE_STATUS": {
-            const { userState, socketId, username } = decryptedData.payload;
-            const collaborators = new Map(this.collaborators);
-            const user = collaborators.get(socketId) || {}!;
-            user.userState = userState;
-            user.username = username;
+            const { userState, username, userId } = decryptedData.payload;
+            const collaborators = upsertMap(
+              userId,
+              {
+                username,
+                userState,
+                userId,
+              },
+              this.collaborators,
+            );
             this.excalidrawAPI.updateScene({
-              collaborators,
+              collaborators: new Map(collaborators),
             });
             break;
           }
