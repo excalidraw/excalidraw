@@ -50,7 +50,7 @@ import {
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { createPlaceholderEmbeddableLabel } from "../element/iframe";
+import { createPlaceholderEmbeddableLabel } from "../element/embeddable";
 import { getContainingFrame } from "../frame";
 import { normalizeLink } from "../data/url";
 

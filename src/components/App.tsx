@@ -257,7 +257,7 @@ import {
   muteFSAbortError,
   easeOut,
 } from "../utils";
-import { embeddableURLValidator, getEmbedLink } from "../element/iframe";
+import { embeddableURLValidator, getEmbedLink } from "../element/embeddable";
 import {
   ContextMenu,
   ContextMenuItems,

@@ -5,7 +5,7 @@ import {
   TEXT_ALIGN,
 } from "../constants";
 import { getNonDeletedElements, isTextElement, newElement } from "../element";
-import { hideActionForEmbeddable } from "../element/iframe";
+import { hideActionForEmbeddable } from "../element/embeddable";
 import { mutateElement } from "../element/mutateElement";
 import {
   computeBoundTextPosition,

@@ -75,7 +75,7 @@ import { getBoundTextElement } from "../element/textElement";
 import {
   isEmbeddableOrFrameLabel,
   createPlaceholderEmbeddableLabel,
-} from "../element/iframe";
+} from "../element/embeddable";
 import {
   elementOverlapsWithFrame,
   getTargetFrame,

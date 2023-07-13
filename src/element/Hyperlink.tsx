@@ -5,7 +5,7 @@ import {
   viewportCoordsToSceneCoords,
   wrapEvent,
 } from "../utils";
-import { getEmbedLink, embeddableURLValidator } from "./iframe";
+import { getEmbedLink, embeddableURLValidator } from "./embeddable";
 import { mutateElement } from "./mutateElement";
 import { NonDeletedExcalidrawElement } from "./types";
 
