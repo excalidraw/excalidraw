@@ -13,7 +13,7 @@ import {
   FontFamilyValues,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
-  ExcalidrawIFrameElement,
+  ExcalidrawEmbeddableElement,
 } from "../element/types";
 import {
   arrayToMap,
@@ -131,14 +131,14 @@ export const newElement = (
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
-export const newIFrameElement = (
+export const newEmbeddableElement = (
   opts: {
-    type: "iframe";
+    type: "embeddable";
     validated: boolean | undefined;
   } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawIFrameElement> => {
+): NonDeleted<ExcalidrawEmbeddableElement> => {
   return {
-    ..._newElementBase<ExcalidrawIFrameElement>("iframe", opts),
+    ..._newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts),
     validated: opts.validated,
   };
 };

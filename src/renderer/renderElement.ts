@@ -15,7 +15,7 @@ import {
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
-  isIFrameElement,
+  isEmbeddableElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -50,7 +50,7 @@ import {
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { createPlaceholderiFrameLabel } from "../element/iframe";
+import { createPlaceholderEmbeddableLabel } from "../element/iframe";
 import { getContainingFrame } from "../frame";
 import { normalizeLink } from "../data/url";
 
@@ -264,7 +264,7 @@ const drawElementOnCanvas = (
     ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
   switch (element.type) {
     case "rectangle":
-    case "iframe":
+    case "embeddable":
     case "diamond":
     case "ellipse": {
       context.lineJoin = "round";
@@ -431,7 +431,7 @@ export const generateRoughOptions = (
 
   switch (element.type) {
     case "rectangle":
-    case "iframe":
+    case "embeddable":
     case "diamond":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
@@ -440,7 +440,7 @@ export const generateRoughOptions = (
           ? undefined
           : element.backgroundColor;
       if (
-        isIFrameElement(element) &&
+        isEmbeddableElement(element) &&
         !options.fill &&
         (!element.validated || isExporting)
       ) {
@@ -490,8 +490,8 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
-      case "iframe": {
-        // this is for rendering the stroke/bg of the iframe, especially
+      case "embeddable": {
+        // this is for rendering the stroke/bg of the embeddable, especially
         // when the src url is not set
 
         if (element.roundness) {
@@ -1015,7 +1015,7 @@ export const renderElement = (
     case "arrow":
     case "image":
     case "text":
-    case "iframe": {
+    case "embeddable": {
       generateElementShape(element, generator, renderConfig.isExporting);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -1273,7 +1273,7 @@ export const renderElementToSvg = (
       g ? root.appendChild(g) : root.appendChild(node);
       break;
     }
-    case "iframe": {
+    case "embeddable": {
       // render placeholder rectangle
       generateElementShape(element, generator, true);
       const node = roughSVGDrawWithPrecision(
@@ -1295,9 +1295,10 @@ export const renderElementToSvg = (
       );
       root.appendChild(node);
 
-      // render iframe ALT label
+      // render embeddable ALT label
       const label: ExcalidrawElement =
-        getBoundTextElement(element) ?? createPlaceholderiFrameLabel(element);
+        getBoundTextElement(element) ??
+        createPlaceholderEmbeddableLabel(element);
       renderElementToSvg(
         label,
         rsvg,
@@ -1310,21 +1311,21 @@ export const renderElementToSvg = (
       );
 
       if (element.validated) {
-        // render iframe
-        const iframeNode = roughSVGDrawWithPrecision(
+        // render embeddable element + iframe
+        const node = roughSVGDrawWithPrecision(
           rsvg,
           getShapeForElement(element)!,
           MAX_DECIMALS_FOR_SVG_EXPORT,
         );
-        iframeNode.setAttribute("stroke-linecap", "round");
-        iframeNode.setAttribute(
+        node.setAttribute("stroke-linecap", "round");
+        node.setAttribute(
           "transform",
           `translate(${offsetX || 0} ${
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
-        while (iframeNode.firstChild) {
-          iframeNode.removeChild(iframeNode.firstChild);
+        while (node.firstChild) {
+          node.removeChild(node.firstChild);
         }
         const radius = getCornerRadius(
           Math.min(element.width, element.height),
@@ -1352,8 +1353,8 @@ export const renderElementToSvg = (
         iframe.allowFullscreen = true;
         div.appendChild(iframe);
         foreignObject.appendChild(div);
-        iframeNode.appendChild(foreignObject);
-        root.appendChild(iframeNode);
+        node.appendChild(foreignObject);
+        root.appendChild(node);
       }
       break;
     }

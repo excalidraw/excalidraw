@@ -16,7 +16,7 @@ import {
   Theme,
   StrokeRoundness,
   ExcalidrawFrameElement,
-  ExcalidrawIFrameElement,
+  ExcalidrawEmbeddableElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -92,7 +92,7 @@ export type LastActiveTool =
         | "eraser"
         | "hand"
         | "frame"
-        | "iframe";
+        | "embeddable";
       customType: null;
     }
   | {
@@ -113,7 +113,7 @@ export type AppState = {
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: React.ReactNode;
-  activeIFrame: {
+  activeEmbeddable: {
     element: NonDeletedExcalidrawElement;
     state: "hover" | "active";
   } | null;
@@ -151,7 +151,7 @@ export type AppState = {
           | "eraser"
           | "hand"
           | "frame"
-          | "iframe";
+          | "embeddable";
         customType: null;
       }
     | {
@@ -376,13 +376,13 @@ export interface ExcalidrawProps {
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
   children?: React.ReactNode;
-  validateIFrame?:
+  validateEmbeddable?:
     | boolean
     | RegExp
     | RegExp[]
     | ((link: string) => boolean | undefined);
-  renderIFrame?: (
-    element: NonDeleted<ExcalidrawIFrameElement>,
+  renderEmbeddable?: (
+    element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
   ) => JSX.Element | null;
 }

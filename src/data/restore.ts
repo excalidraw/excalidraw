@@ -64,7 +64,7 @@ export const AllowedExcalidrawActiveTools: Record<
   eraser: false,
   custom: true,
   frame: true,
-  iframe: true,
+  embeddable: true,
   hand: true,
 };
 
@@ -276,7 +276,7 @@ const restoreElement = (
       return restoreElementWithProperties(element, {});
     case "diamond":
       return restoreElementWithProperties(element, {});
-    case "iframe":
+    case "embeddable":
       return restoreElementWithProperties(element, {
         validated: undefined,
       });

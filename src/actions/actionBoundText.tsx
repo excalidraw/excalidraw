@@ -5,7 +5,7 @@ import {
   TEXT_ALIGN,
 } from "../constants";
 import { getNonDeletedElements, isTextElement, newElement } from "../element";
-import { hideActionForIFrame } from "../element/iframe";
+import { hideActionForEmbeddable } from "../element/iframe";
 import { mutateElement } from "../element/mutateElement";
 import {
   computeBoundTextPosition,
@@ -108,7 +108,7 @@ export const actionBindText = register({
       } else if (isTextBindableContainer(selectedElements[1])) {
         bindingContainer = selectedElements[1];
       }
-      if (hideActionForIFrame(bindingContainer, appProps)) {
+      if (hideActionForEmbeddable(bindingContainer, appProps)) {
         return false;
       }
       if (

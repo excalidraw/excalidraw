@@ -13,13 +13,13 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
-### renderIFrame
+### renderEmbeddable
 
 ```tsx
 (element: NonDeletedExcalidrawElement, radius: number, appState: UIAppState) => JSX.Element | null;`
 ```
 
-The renderIFrame function allows you to customize the rendering of a JSX component instead of using the default iFrame. By setting props.renderIFrame, you can provide a custom implementation for rendering the element.
+The renderEmbeddable function allows you to customize the rendering of a JSX component instead of using the default `<iframe>`. By setting props.renderEmbeddable, you can provide a custom implementation for rendering the element.
 
 #### Parameters:
 
@@ -29,11 +29,11 @@ The renderIFrame function allows you to customize the rendering of a JSX compone
 
 #### Return value:
 
-JSX.Element | null: The JSX component representing the custom rendering, or null if the default iFrame should be rendered.
+JSX.Element | null: The JSX component representing the custom rendering, or null if the default `<iframe>` should be rendered.
 
 ### Features
 
-- Added [`props.validateIFrame`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateIFrame) to customize iframe url validation. [#6691](https://github.com/excalidraw/excalidraw/pull/6691)
+- Added [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateEmbeddable) to customize embeddable src url validation. [#6691](https://github.com/excalidraw/excalidraw/pull/6691)
 - Add support for `opts.fitToViewport` and `opts.viewportZoomFactor` in the [`ExcalidrawAPI.scrollToContent`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/ref#scrolltocontent) API. [#6581](https://github.com/excalidraw/excalidraw/pull/6581).
 - Properly sanitize element `link` urls. [#6728](https://github.com/excalidraw/excalidraw/pull/6728).
 - Sidebar component now supports tabs — for more detailed description of new behavior and breaking changes, see the linked PR. [#6213](https://github.com/excalidraw/excalidraw/pull/6213)

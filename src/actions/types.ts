@@ -121,7 +121,7 @@ export type ActionName =
   | "removeAllElementsFromFrame"
   | "updateFrameRendering"
   | "setFrameAsActiveTool"
-  | "setIFrameAsActiveTool"
+  | "setEmbeddableAsActiveTool"
   | "createContainerFromText"
   | "wrapTextInContainer";
 

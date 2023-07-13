@@ -67,14 +67,14 @@ import {
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
 import {
-  isIFrameElement,
+  isEmbeddableElement,
   isFrameElement,
   isLinearElement,
 } from "../element/typeChecks";
 import { getBoundTextElement } from "../element/textElement";
 import {
-  isIFrameOrFrameLabel,
-  createPlaceholderiFrameLabel,
+  isEmbeddableOrFrameLabel,
+  createPlaceholderEmbeddableLabel,
 } from "../element/iframe";
 import {
   elementOverlapsWithFrame,
@@ -474,7 +474,7 @@ export const _renderScene = ({
       undefined;
 
     visibleElements
-      .filter((el) => !isIFrameOrFrameLabel(el))
+      .filter((el) => !isEmbeddableOrFrameLabel(el))
       .forEach((element) => {
         try {
           // - when exporting the whole canvas, we DO NOT apply clipping
@@ -519,14 +519,14 @@ export const _renderScene = ({
         }
       });
 
-    // render iFrames on top
+    // render embeddables on top
     visibleElements
-      .filter((el) => isIFrameOrFrameLabel(el))
+      .filter((el) => isEmbeddableOrFrameLabel(el))
       .forEach((element) => {
         try {
           const render = () => {
             if (
-              isIFrameElement(element) &&
+              isEmbeddableElement(element) &&
               (isExporting || !element.validated)
             ) {
               invalidateShapeForElement(element); //add gray placeholder background
@@ -536,11 +536,11 @@ export const _renderScene = ({
               renderElement(element, rc, context, renderConfig, appState);
             }
             if (
-              isIFrameElement(element) &&
+              isEmbeddableElement(element) &&
               (isExporting || !element.validated) &&
               !getBoundTextElement(element)
             ) {
-              const label = createPlaceholderiFrameLabel(element);
+              const label = createPlaceholderEmbeddableLabel(element);
               renderElement(label, rc, context, renderConfig, appState);
             }
             if (!isExporting) {
@@ -714,13 +714,13 @@ export const _renderScene = ({
               dashed: !!renderConfig.remoteSelectedElementIds[element.id],
               cx,
               cy,
-              activeiFrame:
-                appState.activeIFrame?.element === element &&
-                appState.activeIFrame.state === "active",
+              activeEmbeddable:
+                appState.activeEmbeddable?.element === element &&
+                appState.activeEmbeddable.state === "active",
             });
           }
           return acc;
-        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; dashed?: boolean; cx: number; cy: number; activeiFrame: boolean }[]);
+        }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; dashed?: boolean; cx: number; cy: number; activeEmbeddable: boolean }[]);
 
         const addSelectionForGroupId = (groupId: GroupId) => {
           const groupElements = getElementsInGroup(elements, groupId);
@@ -736,7 +736,7 @@ export const _renderScene = ({
             dashed: true,
             cx: elementX1 + (elementX2 - elementX1) / 2,
             cy: elementY1 + (elementY2 - elementY1) / 2,
-            activeiFrame: false,
+            activeEmbeddable: false,
           });
         };
 
@@ -1078,7 +1078,7 @@ const renderSelectionBorder = (
     dashed?: boolean;
     cx: number;
     cy: number;
-    activeiFrame: boolean;
+    activeEmbeddable: boolean;
   },
   padding = DEFAULT_SPACING * 2,
 ) => {
@@ -1092,7 +1092,7 @@ const renderSelectionBorder = (
     cx,
     cy,
     dashed,
-    activeiFrame,
+    activeEmbeddable,
   } = elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
@@ -1103,7 +1103,7 @@ const renderSelectionBorder = (
 
   context.save();
   context.translate(renderConfig.scrollX, renderConfig.scrollY);
-  context.lineWidth = (activeiFrame ? 4 : 1) / renderConfig.zoom.value;
+  context.lineWidth = (activeEmbeddable ? 4 : 1) / renderConfig.zoom.value;
 
   const count = selectionColors.length;
   for (let index = 0; index < count; ++index) {
@@ -1164,7 +1164,7 @@ const renderBindingHighlightForBindableElement = (
     case "rectangle":
     case "text":
     case "image":
-    case "iframe":
+    case "embeddable":
     case "frame":
       strokeRectWithRotation(
         context,
@@ -1259,7 +1259,7 @@ const renderElementsBoxHighlight = (
       dashed: false,
       cx: elementX1 + (elementX2 - elementX1) / 2,
       cy: elementY1 + (elementY2 - elementY1) / 2,
-      activeiFrame: false,
+      activeEmbeddable: false,
     };
   };
 
@@ -1421,7 +1421,7 @@ export const renderSceneToSvg = (
 
   // render elements
   elements
-    .filter((el) => !isIFrameOrFrameLabel(el))
+    .filter((el) => !isEmbeddableOrFrameLabel(el))
     .forEach((element) => {
       if (!element.isDeleted) {
         try {
@@ -1441,9 +1441,9 @@ export const renderSceneToSvg = (
       }
     });
 
-  // render iFrames on top
+  // render embeddables on top
   elements
-    .filter((el) => isIFrameElement(el))
+    .filter((el) => isEmbeddableElement(el))
     .forEach((element) => {
       if (!element.isDeleted) {
         try {

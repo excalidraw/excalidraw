@@ -5,7 +5,7 @@ import { ExcalidrawProps } from "../types";
 import { setCursorForShape, updateActiveTool } from "../utils";
 import { newTextElement } from "./newElement";
 import { getContainerElement } from "./textElement";
-import { isIFrameElement } from "./typeChecks";
+import { isEmbeddableElement } from "./typeChecks";
 import { ExcalidrawElement, NonDeletedExcalidrawElement } from "./types";
 
 type EmbeddedLink = {
@@ -93,31 +93,31 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
   return { link, aspectRatio, type };
 };
 
-export const hideActionForIFrame = (
+export const hideActionForEmbeddable = (
   element: ExcalidrawElement | undefined,
   props: ExcalidrawProps,
 ) =>
-  isIFrameElement(element) &&
+  isEmbeddableElement(element) &&
   element.link &&
   element.link !== "" &&
-  !props.validateIFrame;
+  !props.validateEmbeddable;
 
-export const isIFrameOrFrameLabel = (
+export const isEmbeddableOrFrameLabel = (
   element: NonDeletedExcalidrawElement,
 ): Boolean => {
-  if (isIFrameElement(element)) {
+  if (isEmbeddableElement(element)) {
     return true;
   }
   if (element.type === "text") {
     const container = getContainerElement(element);
-    if (container && isIFrameElement(container)) {
+    if (container && isEmbeddableElement(container)) {
       return true;
     }
   }
   return false;
 };
 
-export const createPlaceholderiFrameLabel = (
+export const createPlaceholderEmbeddableLabel = (
   element: NonDeletedExcalidrawElement,
 ): ExcalidrawElement => {
   const text =
@@ -138,12 +138,12 @@ export const createPlaceholderiFrameLabel = (
   });
 };
 
-export const actionSetIFrameAsActiveTool = register({
-  name: "setIFrameAsActiveTool",
+export const actionSetEmbeddableAsActiveTool = register({
+  name: "setEmbeddableAsActiveTool",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState, _, app) => {
     const nextActiveTool = updateActiveTool(appState, {
-      type: "iframe",
+      type: "embeddable",
     });
 
     setCursorForShape(app.canvas, {
@@ -156,7 +156,7 @@ export const actionSetIFrameAsActiveTool = register({
       appState: {
         ...appState,
         activeTool: updateActiveTool(appState, {
-          type: "iframe",
+          type: "embeddable",
         }),
       },
       commitToHistory: false,
@@ -165,26 +165,26 @@ export const actionSetIFrameAsActiveTool = register({
   keyTest: (event) => event.key.toLocaleLowerCase() === KEYS.W,
 });
 
-export const iframeURLValidator = (
+export const embeddableURLValidator = (
   url: string | null | undefined,
-  validateIFrame: ExcalidrawProps["validateIFrame"],
+  validateEmbeddable: ExcalidrawProps["validateEmbeddable"],
 ): boolean => {
   if (!url) {
     return false;
   }
-  if (validateIFrame != null) {
-    if (typeof validateIFrame === "function") {
-      const ret = validateIFrame(url);
+  if (validateEmbeddable != null) {
+    if (typeof validateEmbeddable === "function") {
+      const ret = validateEmbeddable(url);
       // if return value is undefined, leave validation to default
       if (typeof ret === "boolean") {
         return ret;
       }
-    } else if (typeof validateIFrame === "boolean") {
-      return validateIFrame;
-    } else if (validateIFrame instanceof RegExp) {
-      return validateIFrame.test(url);
-    } else if (Array.isArray(validateIFrame)) {
-      for (const regex of validateIFrame) {
+    } else if (typeof validateEmbeddable === "boolean") {
+      return validateEmbeddable;
+    } else if (validateEmbeddable instanceof RegExp) {
+      return validateEmbeddable.test(url);
+    } else if (Array.isArray(validateEmbeddable)) {
+      for (const regex of validateEmbeddable) {
         if (url.match(regex)) {
           return true;
         }

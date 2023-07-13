@@ -84,17 +84,17 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
   type: "ellipse";
 };
 
-export type ExcalidrawIFrameElement = _ExcalidrawElementBase &
+export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
   Readonly<{
     /**
-     * indicates whether the iframe src (url) has been validated for rendering.
+     * indicates whether the embeddable src (url) has been validated for rendering.
      * nullish value indicates that the validation is pending. We reset the
      * value on each restore (or url change) so that we can guarantee
      * the validation came from a trusted source (the editor). Also because we
      * may not have access to host-app supplied url validator during restore.
      */
     validated?: boolean;
-    type: "iframe";
+    type: "embeddable";
   }>;
 
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
@@ -123,7 +123,7 @@ export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
 export type ExcalidrawGenericElement =
   | ExcalidrawSelectionElement
   | ExcalidrawRectangleElement
-  | ExcalidrawIFrameElement
+  | ExcalidrawEmbeddableElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement;
 
@@ -170,7 +170,7 @@ export type ExcalidrawBindableElement =
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
   | ExcalidrawImageElement
-  | ExcalidrawIFrameElement
+  | ExcalidrawEmbeddableElement
   | ExcalidrawFrameElement;
 
 export type ExcalidrawTextContainer =
@@ -178,7 +178,7 @@ export type ExcalidrawTextContainer =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawArrowElement
-  | ExcalidrawIFrameElement;
+  | ExcalidrawEmbeddableElement;
 
 export type ExcalidrawTextElementWithContainer = {
   containerId: ExcalidrawTextContainer["id"];

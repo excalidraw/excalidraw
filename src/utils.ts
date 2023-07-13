@@ -375,7 +375,7 @@ export const updateActiveTool = (
           | "eraser"
           | "hand"
           | "frame"
-          | "iframe";
+          | "embeddable";
       }
     | { type: "custom"; customType: string }
   ) & { lastActiveToolBeforeEraser?: LastActiveTool },

@@ -314,7 +314,7 @@ export const ShapesSwitcher = ({
                 activeTool: nextActiveTool,
                 multiElement: null,
                 selectedElementIds: {},
-                activeIFrame: null,
+                activeEmbeddable: null,
               });
             }}
           />
@@ -322,15 +322,15 @@ export const ShapesSwitcher = ({
             className={clsx("Shape", { fillable: false })}
             type="radio"
             icon={EmbedIcon}
-            checked={activeTool.type === "iframe"}
+            checked={activeTool.type === "embeddable"}
             name="editor-current-shape"
             title={`${capitalizeString(
-              t("toolBar.iframe"),
+              t("toolBar.embeddable"),
             )} — ${KEYS.W.toLocaleUpperCase()}`}
             keyBindingLabel={KEYS.W.toLocaleUpperCase()}
-            aria-label={capitalizeString(t("toolBar.iframe"))}
+            aria-label={capitalizeString(t("toolBar.embeddable"))}
             aria-keyshortcuts={KEYS.W.toLocaleUpperCase()}
-            data-testid={`toolbar-iframe`}
+            data-testid={`toolbar-embeddable`}
             onPointerDown={({ pointerType }) => {
               if (!appState.penDetected && pointerType === "pen") {
                 setAppState({
@@ -340,15 +340,15 @@ export const ShapesSwitcher = ({
               }
             }}
             onChange={({ pointerType }) => {
-              trackEvent("toolbar", "iframe", "ui");
+              trackEvent("toolbar", "embeddable", "ui");
               const nextActiveTool = updateActiveTool(appState, {
-                type: "iframe",
+                type: "embeddable",
               });
               setAppState({
                 activeTool: nextActiveTool,
                 multiElement: null,
                 selectedElementIds: {},
-                activeIFrame: null,
+                activeEmbeddable: null,
               });
             }}
           />
@@ -387,7 +387,7 @@ export const ShapesSwitcher = ({
             <DropdownMenu.Item
               onSelect={() => {
                 const nextActiveTool = updateActiveTool(appState, {
-                  type: "iframe",
+                  type: "embeddable",
                 });
                 setAppState({
                   activeTool: nextActiveTool,
@@ -397,9 +397,9 @@ export const ShapesSwitcher = ({
               }}
               icon={EmbedIcon}
               shortcut={KEYS.W.toLocaleUpperCase()}
-              data-testid="toolbar-iframe"
+              data-testid="toolbar-embeddable"
             >
-              {t("toolBar.iframe")}
+              {t("toolBar.embeddable")}
             </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu>
