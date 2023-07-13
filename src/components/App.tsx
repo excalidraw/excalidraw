@@ -4395,16 +4395,11 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasZoomUsingCtrlAndSpace = (
     event: React.PointerEvent<HTMLElement>,
   ): boolean => {
+    const isMainClickOn = event.button === POINTER_BUTTON.MAIN;
+    const areKeysPressed = isHoldingSpace && event.ctrlKey;
     if (
-      !(
-        gesture.pointers.size <= 1 &&
-        (event.button === POINTER_BUTTON.WHEEL ||
-          (event.button === POINTER_BUTTON.MAIN &&
-            isHoldingSpace &&
-            event.ctrlKey) ||
-          isHandToolActive(this.state) ||
-          this.state.viewModeEnabled)
-      ) ||
+      !(gesture.pointers.size <= 1) ||
+      !(areKeysPressed && isMainClickOn) ||
       isTextElement(this.state.editingElement)
     ) {
       return false;
@@ -4443,6 +4438,9 @@ class App extends React.Component<AppProps, AppState> {
         ),
         shouldCacheIgnoreZoom: true,
       }));
+      window.addEventListener(EVENT.POINTER_UP, teardown);
+
+      this.resetShouldCacheIgnoreZoomDebounced();
     });
 
     const teardown = withBatchedUpdates(
@@ -4465,9 +4463,7 @@ class App extends React.Component<AppProps, AppState> {
     window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
       passive: true,
     });
-    window.addEventListener(EVENT.POINTER_UP, teardown);
 
-    this.resetShouldCacheIgnoreZoomDebounced();
     return true;
   };
 
