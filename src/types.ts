@@ -16,6 +16,7 @@ import {
   Theme,
   StrokeRoundness,
   ExcalidrawFrameElement,
+  ExcalidrawIFrameElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -380,10 +381,9 @@ export interface ExcalidrawProps {
     | RegExp
     | RegExp[]
     | ((link: string) => boolean | undefined);
-  renderCustomIFrame?: (
-    element: NonDeletedExcalidrawElement,
-    radius: number,
-    appState: UIAppState,
+  renderIFrame?: (
+    element: NonDeleted<ExcalidrawIFrameElement>,
+    appState: AppState,
   ) => JSX.Element | null;
 }
 

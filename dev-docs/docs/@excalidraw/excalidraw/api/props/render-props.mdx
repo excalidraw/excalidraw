@@ -122,24 +122,18 @@ function App() {
 }
 ```
 
-### renderCustomIFrame
+### renderIFrame
 
 <pre>
   (
-    element: NonDeletedExcalidrawElement, //the rectangle element hosting the embedded content 
-    radius: number, //calculated border radius in px
+    element: NonDeleted<ExcalidrawIFrameElement>,
     appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>
   ) => JSX.Element | null
 </pre>
 
-The renderCustomIFrame function allows you to customize the rendering of a JSX component instead of using the default iFrame. By setting props.renderCustomIFrame, you can provide a custom implementation for rendering the element.
+Allows you to replace the iframes renderer (perhaps not use iframe elements at all).
 
-#### Parameters:
-
-- element (NonDeletedExcalidrawElement): The element to be rendered.
-- radius (number): The calculated border radius in pixels.
-- appState (UIAppState): The current state of the UI.
-
-#### Return value:
-
-JSX.Element | null: The JSX component representing the custom rendering, or null if the default iFrame should be rendered.
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `element` | `NonDeleted<ExcalidrawIFrameElement>` | The iframe element to be rendered. |
+| `appState` | `AppState` | The current state of the UI. |

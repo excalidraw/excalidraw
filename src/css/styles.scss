@@ -681,6 +681,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: var(--iframe-radius);
+  }
+
+  .excalidraw__iframe__outer {
+    width: 100%;
+    height: 100%;
+    & > * {
+      border-radius: var(--iframe-radius);
+    }
   }
 
   .excalidraw__iframe-hint {

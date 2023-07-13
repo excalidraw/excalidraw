@@ -13,13 +13,13 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
-### renderCustomIFrame
+### renderIFrame
 
 ```tsx
 (element: NonDeletedExcalidrawElement, radius: number, appState: UIAppState) => JSX.Element | null;`
 ```
 
-The renderCustomIFrame function allows you to customize the rendering of a JSX component instead of using the default iFrame. By setting props.renderCustomIFrame, you can provide a custom implementation for rendering the element.
+The renderIFrame function allows you to customize the rendering of a JSX component instead of using the default iFrame. By setting props.renderIFrame, you can provide a custom implementation for rendering the element.
 
 #### Parameters:
 

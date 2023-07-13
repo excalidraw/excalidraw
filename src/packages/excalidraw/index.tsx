@@ -43,7 +43,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onScrollChange,
     children,
     validateIFrame,
-    renderCustomIFrame,
+    renderIFrame,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -118,7 +118,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
           validateIFrame={validateIFrame}
-          renderCustomIFrame={renderCustomIFrame}
+          renderIFrame={renderIFrame}
         >
           {children}
         </App>

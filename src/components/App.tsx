@@ -167,6 +167,7 @@ import {
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
+  ExcalidrawIFrameElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -228,7 +229,6 @@ import {
   FrameNameBoundsCache,
   SidebarName,
   SidebarTabName,
-  UIAppState,
 } from "../types";
 import {
   debounce,
@@ -831,7 +831,10 @@ class App extends React.Component<AppProps, AppState> {
 
     const iFrameElements = this.scene
       .getNonDeletedElements()
-      .filter((el) => isIFrameElement(el) && el.validated);
+      .filter(
+        (el): el is NonDeleted<ExcalidrawIFrameElement> =>
+          isIFrameElement(el) && !!el.validated,
+      );
 
     return (
       <>
@@ -854,7 +857,6 @@ class App extends React.Component<AppProps, AppState> {
           const isHovered =
             this.state.activeIFrame?.element === el &&
             this.state.activeIFrame?.state === "hover";
-          const radius = getCornerRadius(Math.min(el.width, el.height), el);
 
           return (
             <div
@@ -870,6 +872,10 @@ class App extends React.Component<AppProps, AppState> {
                   : "none",
                 display: isVisible ? "block" : "none",
                 opacity: el.opacity / 100,
+                ["--iframe-radius" as string]: `${getCornerRadius(
+                  Math.min(el.width, el.height),
+                  el,
+                )}px`,
               }}
             >
               <div
@@ -894,7 +900,6 @@ class App extends React.Component<AppProps, AppState> {
                   width: isVisible ? `${el.width}px` : 0,
                   height: isVisible ? `${el.height}px` : 0,
                   transform: isVisible ? `rotate(${el.angle}rad)` : "none",
-                  borderRadius: `${radius}px`,
                   pointerEvents: isActive ? "auto" : "none",
                 }}
               >
@@ -904,23 +909,15 @@ class App extends React.Component<AppProps, AppState> {
                   </div>
                 )}
                 <div
+                  className="excalidraw__iframe__outer"
                   style={{
                     padding: `${el.strokeWidth}px`,
-                    height: "100%",
-                    width: "100%",
                   }}
                 >
-                  {this.props.renderCustomIFrame?.(
-                    el,
-                    radius,
-                    this.state as UIAppState,
-                  ) ?? (
+                  {this.props.renderIFrame?.(el, this.state) ?? (
                     <iframe
                       ref={(ref) => this.updateIFrameRef(el.id, ref)}
                       className="excalidraw__iframe"
-                      style={{
-                        borderRadius: `${radius}px`,
-                      }}
                       src={src}
                       title="Excalidraw Embedded Content"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

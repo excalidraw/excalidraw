@@ -491,6 +491,9 @@ const generateElementShape = (
     switch (element.type) {
       case "rectangle":
       case "iframe": {
+        // this is for rendering the stroke/bg of the iframe, especially
+        // when the src url is not set
+
         if (element.roundness) {
           const w = element.width;
           const h = element.height;
