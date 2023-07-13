@@ -55,6 +55,7 @@ export type Collaborator = {
   avatarUrl?: string;
   // user id. If supplied, we'll filter out duplicates when rendering user avatars.
   id?: string;
+  socketId?: string;
 };
 
 export type DataURL = string & { _brand: "DataURL" };

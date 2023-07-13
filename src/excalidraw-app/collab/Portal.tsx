@@ -74,6 +74,9 @@ class Portal {
         /* syncAll */ true,
       );
     });
+    this.socket.on("room-user-change", (clients: string[]) => {
+      this.collab.setCollaborators(clients);
+    });
   }
 
   isOpen() {
@@ -193,6 +196,7 @@ class Portal {
           userState,
           username: this.collab.state.username,
           userId: this.collab.state.userId,
+          socketId: this.socket.id,
         },
       };
       return this._broadcastSocketData(
@@ -216,6 +220,7 @@ class Portal {
             this.collab.excalidrawAPI.getAppState().selectedElementIds,
           username: this.collab.state.username,
           userId: this.collab.state.userId,
+          socketId: this.socket.id,
         },
       };
       return this._broadcastSocketData(

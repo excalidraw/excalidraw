@@ -882,17 +882,12 @@ class Collab extends PureComponent<Props, CollabState> {
   };
 
   setCollaborators(sockets: string[]) {
-    const collaborators: InstanceType<typeof Collab>["collaborators"] =
-      new Map();
-    for (const socketId of sockets) {
-      if (this.collaborators.has(socketId)) {
-        collaborators.set(socketId, this.collaborators.get(socketId)!);
-      } else {
-        collaborators.set(socketId, {});
+    this.collaborators.forEach((value, key) => {
+      if (value.socketId && !sockets.includes(value.socketId)) {
+        this.collaborators.delete(key);
       }
-    }
-    this.collaborators = collaborators;
-    this.excalidrawAPI.updateScene({ collaborators });
+    });
+    this.excalidrawAPI.updateScene({ collaborators: this.collaborators });
   }
 
   public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
