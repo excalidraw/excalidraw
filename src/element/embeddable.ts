@@ -6,7 +6,11 @@ import { setCursorForShape, updateActiveTool } from "../utils";
 import { newTextElement } from "./newElement";
 import { getContainerElement } from "./textElement";
 import { isEmbeddableElement } from "./typeChecks";
-import { ExcalidrawElement, NonDeletedExcalidrawElement } from "./types";
+import {
+  ExcalidrawElement,
+  ExcalidrawEmbeddableElement,
+  NonDeletedExcalidrawElement,
+} from "./types";
 
 type EmbeddedLink = {
   link: string;
@@ -118,7 +122,7 @@ export const isEmbeddableOrFrameLabel = (
 };
 
 export const createPlaceholderEmbeddableLabel = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawEmbeddableElement,
 ): ExcalidrawElement => {
   const text =
     !element.link || element?.link === "" ? "Empty Web-Embed" : element.link;

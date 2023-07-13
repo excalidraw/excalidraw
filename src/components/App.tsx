@@ -682,17 +682,22 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private updateEmbeddableRef(id: string, ref: HTMLIFrameElement | null) {
+  private updateEmbeddableRef(
+    id: ExcalidrawEmbeddableElement["id"],
+    ref: HTMLIFrameElement | null,
+  ) {
     if (ref) {
       this.iFrameRefs.set(id, ref);
     }
   }
 
-  private getHTMLIFrameElement(id: string): HTMLIFrameElement | undefined {
+  private getHTMLIFrameElement(
+    id: ExcalidrawEmbeddableElement["id"],
+  ): HTMLIFrameElement | undefined {
     return this.iFrameRefs.get(id);
   }
 
-  private handleEmbeddableCenterClick(element: NonDeletedExcalidrawElement) {
+  private handleEmbeddableCenterClick(element: ExcalidrawEmbeddableElement) {
     if (
       this.state.activeEmbeddable?.element === element &&
       this.state.activeEmbeddable?.state === "active"
@@ -768,7 +773,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private isEmbeddableCenter(
-    el: NonDeletedExcalidrawElement | null,
+    el: ExcalidrawEmbeddableElement | null,
     event: React.PointerEvent<HTMLElement> | PointerEvent,
     sceneX: number,
     sceneY: number,
@@ -779,7 +784,6 @@ class App extends React.Component<AppProps, AppState> {
       !event.shiftKey &&
       !event.metaKey &&
       !event.ctrlKey &&
-      el.type === "embeddable" &&
       (this.state.activeEmbeddable?.element !== el ||
         this.state.activeEmbeddable?.state === "hover" ||
         !this.state.activeEmbeddable) &&
@@ -4180,6 +4184,7 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           if (
             hitElement &&
+            isEmbeddableElement(hitElement) &&
             this.isEmbeddableCenter(
               hitElement,
               event,
@@ -6919,6 +6924,7 @@ class App extends React.Component<AppProps, AppState> {
         this.lastPointerDown &&
         this.lastPointerUp.timeStamp - this.lastPointerDown.timeStamp < 300 &&
         gesture.pointers.size <= 1 &&
+        isEmbeddableElement(hitElement) &&
         this.isEmbeddableCenter(
           hitElement,
           this.lastPointerUp,

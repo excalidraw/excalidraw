@@ -7,7 +7,10 @@ import {
 } from "../utils";
 import { getEmbedLink, embeddableURLValidator } from "./embeddable";
 import { mutateElement } from "./mutateElement";
-import { NonDeletedExcalidrawElement } from "./types";
+import {
+  ExcalidrawEmbeddableElement,
+  NonDeletedExcalidrawElement,
+} from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
@@ -53,7 +56,10 @@ EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
 
 let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
 
-const embeddableLinkCache = new Map<string, string>();
+const embeddableLinkCache = new Map<
+  ExcalidrawEmbeddableElement["id"],
+  string
+>();
 
 export const Hyperlink = ({
   element,
