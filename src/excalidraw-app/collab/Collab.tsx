@@ -656,8 +656,14 @@ class Collab extends PureComponent<Props, CollabState> {
             );
             break;
           case "MOUSE_LOCATION": {
-            const { pointer, button, username, selectedElementIds, userId } =
-              decryptedData.payload;
+            const {
+              pointer,
+              button,
+              username,
+              selectedElementIds,
+              userId,
+              socketId,
+            } = decryptedData.payload;
             const collaborators = upsertMap(
               userId,
               {
@@ -665,6 +671,7 @@ class Collab extends PureComponent<Props, CollabState> {
                 pointer,
                 button,
                 selectedElementIds,
+                socketId,
               },
               this.collaborators,
             );
@@ -674,13 +681,15 @@ class Collab extends PureComponent<Props, CollabState> {
             break;
           }
           case "IDLE_STATUS": {
-            const { userState, username, userId } = decryptedData.payload;
+            const { userState, username, userId, socketId } =
+              decryptedData.payload;
             const collaborators = upsertMap(
               userId,
               {
                 username,
                 userState,
                 userId,
+                socketId,
               },
               this.collaborators,
             );
