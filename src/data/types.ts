@@ -1,11 +1,8 @@
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
-  ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
-  ExcalidrawImageElement,
   ExcalidrawLinearElement,
-  ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
   TextAlign,
@@ -137,30 +134,7 @@ export interface ImportedDataState {
   type?: string;
   version?: number;
   source?: string;
-  elements?:
-    | readonly (
-        | Extract<
-            ExcalidrawElement,
-            | ExcalidrawSelectionElement
-            | ExcalidrawImageElement
-            | ExcalidrawFreeDrawElement
-          >
-        | ({
-            type: Extract<ExcalidrawLinearElement["type"], "line">;
-            x: number;
-            y: number;
-          } & Partial<ExcalidrawLinearElement>)
-        | ValidContainer
-        | ValidLinearElement
-        | ({
-            type: "text";
-            text: string;
-            x: number;
-            y: number;
-            id?: ExcalidrawTextElement["id"];
-          } & Partial<ExcalidrawTextElement>)
-      )[]
-    | null;
+  elements?: readonly ExcalidrawElement[] | null;
   appState?: Readonly<
     Partial<
       AppState & {

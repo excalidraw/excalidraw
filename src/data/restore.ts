@@ -41,7 +41,10 @@ import {
   getDefaultLineHeight,
   measureBaseline,
 } from "../element/textElement";
-import { convertToExcalidrawElements } from "../data/transform";
+import {
+  ExcalidrawProgrammaticAPI,
+  convertToExcalidrawElements,
+} from "../data/transform";
 
 type RestoredAppState = Omit<
   AppState,
@@ -366,7 +369,7 @@ const repairBoundElement = (
 };
 
 export const restoreElements = (
-  elements: ImportedDataState["elements"],
+  elements: ExcalidrawProgrammaticAPI["elements"],
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
   opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,

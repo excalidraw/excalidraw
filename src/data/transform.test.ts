@@ -1,5 +1,7 @@
-import { convertToExcalidrawElements } from "./transform";
-import { ImportedDataState } from "./types";
+import {
+  ExcalidrawProgrammaticAPI,
+  convertToExcalidrawElements,
+} from "./transform";
 
 describe("Test Transform", () => {
   it("should transform regular shapes", () => {
@@ -54,7 +56,9 @@ describe("Test Transform", () => {
     ];
 
     expect(
-      convertToExcalidrawElements(elements as ImportedDataState["elements"]),
+      convertToExcalidrawElements(
+        elements as ExcalidrawProgrammaticAPI["elements"],
+      ),
     ).toMatchSnapshot();
   });
 
@@ -76,7 +80,9 @@ describe("Test Transform", () => {
       },
     ];
     expect(
-      convertToExcalidrawElements(elements as ImportedDataState["elements"]),
+      convertToExcalidrawElements(
+        elements as ExcalidrawProgrammaticAPI["elements"],
+      ),
     ).toMatchSnapshot();
   });
 
@@ -111,7 +117,7 @@ describe("Test Transform", () => {
       },
     ];
     const excaldrawElements = convertToExcalidrawElements(
-      elements as ImportedDataState["elements"],
+      elements as ExcalidrawProgrammaticAPI["elements"],
     );
 
     expect(excaldrawElements.length).toBe(4);
@@ -193,7 +199,7 @@ describe("Test Transform", () => {
       },
     ];
     const excaldrawElements = convertToExcalidrawElements(
-      elements as ImportedDataState["elements"],
+      elements as ExcalidrawProgrammaticAPI["elements"],
     );
 
     expect(excaldrawElements.length).toBe(12);
@@ -250,7 +256,7 @@ describe("Test Transform", () => {
       },
     ];
     const excaldrawElements = convertToExcalidrawElements(
-      elements as ImportedDataState["elements"],
+      elements as ExcalidrawProgrammaticAPI["elements"],
     );
 
     expect(excaldrawElements.length).toBe(8);
@@ -283,7 +289,7 @@ describe("Test Transform", () => {
         },
       ];
       const excaldrawElements = convertToExcalidrawElements(
-        elements as ImportedDataState["elements"],
+        elements as ExcalidrawProgrammaticAPI["elements"],
       );
 
       expect(excaldrawElements.length).toBe(4);
@@ -366,7 +372,7 @@ describe("Test Transform", () => {
       ];
 
       const excaldrawElements = convertToExcalidrawElements(
-        elements as ImportedDataState["elements"],
+        elements as ExcalidrawProgrammaticAPI["elements"],
       );
 
       expect(excaldrawElements.length).toBe(4);
@@ -482,7 +488,7 @@ describe("Test Transform", () => {
       ];
 
       const excaldrawElements = convertToExcalidrawElements(
-        elements as ImportedDataState["elements"],
+        elements as ExcalidrawProgrammaticAPI["elements"],
       );
 
       expect(excaldrawElements.length).toBe(5);
@@ -530,7 +536,7 @@ describe("Test Transform", () => {
       ];
 
       const excaldrawElements = convertToExcalidrawElements(
-        elements as ImportedDataState["elements"],
+        elements as ExcalidrawProgrammaticAPI["elements"],
       );
 
       expect(excaldrawElements.length).toBe(4);
@@ -580,7 +586,7 @@ describe("Test Transform", () => {
       ];
 
       const excaldrawElements = convertToExcalidrawElements(
-        elements as ImportedDataState["elements"],
+        elements as ExcalidrawProgrammaticAPI["elements"],
       );
 
       expect(excaldrawElements.length).toBe(4);
@@ -622,7 +628,9 @@ describe("Test Transform", () => {
       },
     ];
     expect(
-      convertToExcalidrawElements(elements as ImportedDataState["elements"]),
+      convertToExcalidrawElements(
+        elements as ExcalidrawProgrammaticAPI["elements"],
+      ),
     ).toMatchSnapshot();
   });
 });

@@ -24,15 +24,43 @@ import {
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
+  ExcalidrawSelectionElement,
   ExcalidrawTextElement,
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
 import { getFontString } from "../utils";
-import { ImportedDataState, ValidContainer, ValidLinearElement } from "./types";
+import { ValidContainer, ValidLinearElement } from "./types";
 
+export interface ExcalidrawProgrammaticAPI {
+  elements?:
+    | readonly (
+        | Extract<
+            ExcalidrawElement,
+            | ExcalidrawSelectionElement
+            | ExcalidrawImageElement
+            | ExcalidrawFreeDrawElement
+          >
+        | ({
+            type: Extract<ExcalidrawLinearElement["type"], "line">;
+            x: number;
+            y: number;
+          } & Partial<ExcalidrawLinearElement>)
+        | ValidContainer
+        | ValidLinearElement
+        | ({
+            type: "text";
+            text: string;
+            x: number;
+            y: number;
+            id?: ExcalidrawTextElement["id"];
+          } & Partial<ExcalidrawTextElement>)
+      )[]
+    | null;
+}
 export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
   "rectangle",
   "ellipse",
@@ -307,7 +335,7 @@ const excalidrawElements = (() => {
 })();
 
 export const convertToExcalidrawElements = (
-  elements: ImportedDataState["elements"],
+  elements: ExcalidrawProgrammaticAPI["elements"],
 ): ExcalidrawElement[] => {
   excalidrawElements.clear();
   if (!elements) {

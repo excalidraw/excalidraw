@@ -304,7 +304,6 @@ import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
-import { convertToExcalidrawElements } from "../data/transform";
 import { activeEyeDropperAtom } from "./EyeDropper";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -2097,9 +2096,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.elements) {
-        this.scene.replaceAllElements(
-          convertToExcalidrawElements(sceneData.elements),
-        );
+        this.scene.replaceAllElements(sceneData.elements);
       }
 
       if (sceneData.collaborators) {
