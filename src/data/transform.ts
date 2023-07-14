@@ -24,16 +24,109 @@ import {
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  ExcalidrawFrameElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
+  FontFamilyValues,
+  TextAlign,
+  VerticalAlign,
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
 import { getFontString } from "../utils";
-import { ValidContainer, ValidLinearElement } from "./types";
+
+export type ValidLinearElement = {
+  type: "arrow" | "line";
+  x: number;
+  y: number;
+  label?: {
+    text: string;
+    fontSize?: number;
+    fontFamily?: FontFamilyValues;
+    textAlign?: TextAlign;
+    verticalAlign?: VerticalAlign;
+  } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+  end?:
+    | (
+        | (
+            | {
+                type: Exclude<
+                  ExcalidrawBindableElement["type"],
+                  "image" | "selection" | "text" | "frame"
+                >;
+                id?: ExcalidrawGenericElement["id"];
+              }
+            | {
+                id: ExcalidrawGenericElement["id"];
+                type?: Exclude<
+                  ExcalidrawBindableElement["type"],
+                  "image" | "selection" | "text" | "frame"
+                >;
+              }
+          )
+        | ((
+            | {
+                type: "text";
+                text: string;
+              }
+            | {
+                type?: "text";
+                id: ExcalidrawTextElement["id"];
+                text: string;
+              }
+          ) &
+            Partial<ExcalidrawTextElement>)
+      ) &
+        MarkOptional<ElementConstructorOpts, "x" | "y">;
+  start?:
+    | (
+        | (
+            | {
+                type: Exclude<
+                  ExcalidrawBindableElement["type"],
+                  "image" | "selection" | "text" | "frame"
+                >;
+                id?: ExcalidrawGenericElement["id"];
+              }
+            | {
+                id: ExcalidrawGenericElement["id"];
+                type?: Exclude<
+                  ExcalidrawBindableElement["type"],
+                  "image" | "selection" | "text" | "frame"
+                >;
+              }
+          )
+        | ((
+            | {
+                type: "text";
+                text: string;
+              }
+            | {
+                type?: "text";
+                id: ExcalidrawTextElement["id"];
+                text: string;
+              }
+          ) &
+            Partial<ExcalidrawTextElement>)
+      ) &
+        MarkOptional<ElementConstructorOpts, "x" | "y">;
+} & Partial<ExcalidrawLinearElement>;
+
+export type ValidContainer =
+  | {
+      type: Exclude<ExcalidrawGenericElement["type"], "selection">;
+      id?: ExcalidrawGenericElement["id"];
+      label?: {
+        text: string;
+        fontSize?: number;
+        fontFamily?: FontFamilyValues;
+        textAlign?: TextAlign;
+        verticalAlign?: VerticalAlign;
+      } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+    } & ElementConstructorOpts;
 
 export interface ExcalidrawProgrammaticAPI {
   elements?:
@@ -168,7 +261,7 @@ const bindLinearElementToElement = (
         .get()
         .find((ele) => ele?.id === start.id) as Exclude<
         ExcalidrawBindableElement,
-        ExcalidrawImageElement
+        ExcalidrawImageElement | ExcalidrawFrameElement
       >;
       if (!existingElement) {
         console.error(`No element for start binding with id ${start.id} found`);
@@ -235,7 +328,7 @@ const bindLinearElementToElement = (
         .get()
         .find((ele) => ele?.id === end.id) as Exclude<
         ExcalidrawBindableElement,
-        ExcalidrawImageElement
+        ExcalidrawImageElement | ExcalidrawFrameElement
       >;
       if (!existingElement) {
         console.error(`No element for end binding with id ${end.id} found`);

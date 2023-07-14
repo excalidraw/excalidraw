@@ -1,13 +1,4 @@
-import {
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  ExcalidrawGenericElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  FontFamilyValues,
-  TextAlign,
-  VerticalAlign,
-} from "../element/types";
+import { ExcalidrawElement } from "../element/types";
 import {
   AppState,
   BinaryFiles,
@@ -16,8 +7,6 @@ import {
 } from "../types";
 import type { cleanAppStateForExport } from "../appState";
 import { VERSIONS } from "../constants";
-import { MarkOptional } from "../utility-types";
-import { ElementConstructorOpts } from "../element/newElement";
 
 export interface ExportedDataState {
   type: string;
@@ -39,96 +28,6 @@ export type LegacyAppState = {
   /** @deprecated #6213 TODO remove 23-06-01 */
   isSidebarDocked: [boolean, "defaultSidebarDockedPreference"];
 };
-
-export type ValidLinearElement = {
-  type: "arrow" | "line";
-  x: number;
-  y: number;
-  label?: {
-    text: string;
-    fontSize?: number;
-    fontFamily?: FontFamilyValues;
-    textAlign?: TextAlign;
-    verticalAlign?: VerticalAlign;
-  } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-  end?:
-    | (
-        | (
-            | {
-                type: Exclude<
-                  ExcalidrawBindableElement["type"],
-                  "image" | "selection" | "text"
-                >;
-                id?: ExcalidrawGenericElement["id"];
-              }
-            | {
-                id: ExcalidrawGenericElement["id"];
-                type?: Exclude<
-                  ExcalidrawBindableElement["type"],
-                  "image" | "selection" | "text"
-                >;
-              }
-          )
-        | ((
-            | {
-                type: "text";
-                text: string;
-              }
-            | {
-                type?: "text";
-                id: ExcalidrawTextElement["id"];
-                text: string;
-              }
-          ) &
-            Partial<ExcalidrawTextElement>)
-      ) &
-        MarkOptional<ElementConstructorOpts, "x" | "y">;
-  start?:
-    | (
-        | (
-            | {
-                type: Exclude<
-                  ExcalidrawBindableElement["type"],
-                  "image" | "selection" | "text"
-                >;
-                id?: ExcalidrawGenericElement["id"];
-              }
-            | {
-                id: ExcalidrawGenericElement["id"];
-                type?: Exclude<
-                  ExcalidrawBindableElement["type"],
-                  "image" | "selection" | "text"
-                >;
-              }
-          )
-        | ((
-            | {
-                type: "text";
-                text: string;
-              }
-            | {
-                type?: "text";
-                id: ExcalidrawTextElement["id"];
-                text: string;
-              }
-          ) &
-            Partial<ExcalidrawTextElement>)
-      ) &
-        MarkOptional<ElementConstructorOpts, "x" | "y">;
-} & Partial<ExcalidrawLinearElement>;
-
-export type ValidContainer =
-  | {
-      type: Exclude<ExcalidrawGenericElement["type"], "selection">;
-      id?: ExcalidrawGenericElement["id"];
-      label?: {
-        text: string;
-        fontSize?: number;
-        fontFamily?: FontFamilyValues;
-        textAlign?: TextAlign;
-        verticalAlign?: VerticalAlign;
-      } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-    } & ElementConstructorOpts;
 
 export interface ImportedDataState {
   type?: string;

@@ -189,7 +189,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
   const updateScene = () => {
     const sceneData = {
       elements: restoreElements(
-        [
+        convertToExcalidrawElements([
           {
             type: "rectangle",
             id: "rect-1",
@@ -222,7 +222,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             y: 100,
             text: "HELLO WORLD!",
           },
-        ],
+        ]),
         null,
       ),
       appState: {

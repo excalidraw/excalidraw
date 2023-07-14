@@ -32,7 +32,7 @@ describe("embedding scene data", () => {
       const importedData: ImportedDataState = JSON.parse(parsedString);
 
       expect(sourceElements.map((x) => x.id)).toEqual(
-        convertToExcalidrawElements(importedData.elements)?.map((el) => el.id),
+        importedData.elements?.map((el) => el.id),
       );
     });
   });
@@ -61,7 +61,7 @@ describe("embedding scene data", () => {
       const importedData: ImportedDataState = JSON.parse(parsedString);
 
       expect(sourceElements.map((x) => x.id)).toEqual(
-        convertToExcalidrawElements(importedData.elements)?.map((el) => el.id),
+        importedData.elements?.map((el) => el.id),
       );
     });
   });

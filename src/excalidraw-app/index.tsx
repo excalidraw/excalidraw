@@ -91,7 +91,6 @@ import { appJotaiStore } from "./app-jotai";
 
 import "./index.scss";
 import { ResolutionType } from "../utility-types";
-import { convertToExcalidrawElements } from "../data/transform";
 import { ShareableLinkDialog } from "../components/ShareableLinkDialog";
 import { openConfirmModal } from "../components/OverwriteConfirm/OverwriteConfirmState";
 import { OverwriteConfirmDialog } from "../components/OverwriteConfirm/OverwriteConfirm";
@@ -229,7 +228,7 @@ const initializeScene = async (opts: {
           isLoading: false,
         },
         elements: reconcileElements(
-          convertToExcalidrawElements(scene?.elements || []),
+          scene?.elements || [],
           excalidrawAPI.getSceneElementsIncludingDeleted(),
           excalidrawAPI.getAppState(),
         ),
@@ -310,7 +309,7 @@ const ExcalidrawWrapper = () => {
         if (data.scene.elements) {
           collabAPI
             .fetchImageFilesFromFirebase({
-              elements: convertToExcalidrawElements(data.scene.elements),
+              elements: data.scene.elements,
               forceFetchFiles: true,
             })
             .then(({ loadedFiles, erroredFiles }) => {
@@ -323,7 +322,7 @@ const ExcalidrawWrapper = () => {
             });
         }
       } else {
-        const sceneElements = convertToExcalidrawElements(data.scene.elements);
+        const sceneElements = data.scene.elements;
         const fileIds =
           sceneElements?.reduce((acc, element) => {
             if (isInitializedImageElement(element)) {

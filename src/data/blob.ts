@@ -13,7 +13,6 @@ import { FileSystemHandle, nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
 import { restore, restoreLibraryItems } from "./restore";
 import { ImportedLibraryData } from "./types";
-import { convertToExcalidrawElements } from "../data/transform";
 
 const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
@@ -135,9 +134,7 @@ export const loadSceneOrLibraryFromBlob = async (
   try {
     const data = JSON.parse(contents);
     if (isValidExcalidrawData(data)) {
-      const excaldrawElements = convertToExcalidrawElements(
-        data.elements || [],
-      );
+      const excaldrawElements = data.elements || [];
       return {
         type: MIME_TYPES.excalidraw,
         data: restore(

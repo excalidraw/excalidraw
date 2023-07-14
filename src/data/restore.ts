@@ -41,10 +41,7 @@ import {
   getDefaultLineHeight,
   measureBaseline,
 } from "../element/textElement";
-import {
-  ExcalidrawProgrammaticAPI,
-  convertToExcalidrawElements,
-} from "../data/transform";
+
 import { normalizeLink } from "./url";
 
 type RestoredAppState = Omit<
@@ -394,44 +391,37 @@ const repairFrameMembership = (
 };
 
 export const restoreElements = (
-  elements: ExcalidrawProgrammaticAPI["elements"],
+  elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
   opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,
 ): ExcalidrawElement[] => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-  const excalidrawElements = convertToExcalidrawElements(elements);
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
-  const restoredElements = (excalidrawElements || []).reduce(
-    (elements, element) => {
-      // filtering out selection, which is legacy, no longer kept in elements,
-      // and causing issues if retained
-      if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-        let migratedElement: ExcalidrawElement | null = restoreElement(
-          element,
-          opts?.refreshDimensions,
-        );
-        if (migratedElement) {
-          const localElement = localElementsMap?.get(element.id);
-          if (localElement && localElement.version > migratedElement.version) {
-            migratedElement = bumpVersion(
-              migratedElement,
-              localElement.version,
-            );
-          }
-          if (existingIds.has(migratedElement.id)) {
-            migratedElement = { ...migratedElement, id: randomId() };
-          }
-          existingIds.add(migratedElement.id);
-
-          elements.push(migratedElement);
+  const restoredElements = (elements || []).reduce((elements, element) => {
+    // filtering out selection, which is legacy, no longer kept in elements,
+    // and causing issues if retained
+    if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
+      let migratedElement: ExcalidrawElement | null = restoreElement(
+        element,
+        opts?.refreshDimensions,
+      );
+      if (migratedElement) {
+        const localElement = localElementsMap?.get(element.id);
+        if (localElement && localElement.version > migratedElement.version) {
+          migratedElement = bumpVersion(migratedElement, localElement.version);
         }
+        if (existingIds.has(migratedElement.id)) {
+          migratedElement = { ...migratedElement, id: randomId() };
+        }
+        existingIds.add(migratedElement.id);
+
+        elements.push(migratedElement);
       }
-      return elements;
-    },
-    [] as ExcalidrawElement[],
-  );
+    }
+    return elements;
+  }, [] as ExcalidrawElement[]);
 
   if (!opts?.repairBindings) {
     return restoredElements;
