@@ -83,7 +83,7 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
-export const restoreElementWithProperties = <
+const restoreElementWithProperties = <
   T extends Required<Omit<ExcalidrawElement, "customData">> & {
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */

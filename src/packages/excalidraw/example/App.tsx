@@ -31,7 +31,10 @@ import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
 import { KEYS } from "../../../keys";
-import { convertToExcalidrawElements } from "../../../data/transform";
+import {
+  convertToExcalidrawElements,
+  ExcalidrawProgrammaticAPI,
+} from "../../../data/transform";
 
 declare global {
   interface Window {
@@ -143,8 +146,9 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         //@ts-ignore
         initialStatePromiseRef.current.promise.resolve({
           ...initialData,
-          //@ts-ignore
-          elements: convertToExcalidrawElements(initialData.elements),
+          elements: convertToExcalidrawElements(
+            initialData.elements as ExcalidrawProgrammaticAPI["elements"],
+          ),
         });
         excalidrawAPI.addFiles(imagesArray);
       };

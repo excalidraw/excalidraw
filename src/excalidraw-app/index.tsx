@@ -322,9 +322,8 @@ const ExcalidrawWrapper = () => {
             });
         }
       } else {
-        const sceneElements = data.scene.elements;
         const fileIds =
-          sceneElements?.reduce((acc, element) => {
+          data.scene.elements?.reduce((acc, element) => {
             if (isInitializedImageElement(element)) {
               return acc.concat(element.fileId);
             }
