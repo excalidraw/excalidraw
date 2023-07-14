@@ -330,6 +330,7 @@ import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
+import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -473,8 +474,6 @@ class App extends React.Component<AppProps, AppState> {
       name,
       width: window.innerWidth,
       height: window.innerHeight,
-      showHyperlinkPopup: false,
-      defaultSidebarDockedPreference: false,
     };
 
     this.id = nanoid();
@@ -2031,7 +2030,7 @@ class App extends React.Component<AppProps, AppState> {
           openSidebar:
             this.state.openSidebar &&
             this.device.canDeviceFitSidebar &&
-            this.state.defaultSidebarDockedPreference
+            jotaiStore.get(isSidebarDockedAtom)
               ? this.state.openSidebar
               : null,
           selectedElementIds: nextElementsToSelect.reduce(
