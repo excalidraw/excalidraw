@@ -330,6 +330,7 @@ import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
+import { convertToExcalidrawElements } from "../data/transform";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1933,9 +1934,12 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       } else if (data.elements) {
+        const elements = data.programmaticAPI
+          ? convertToExcalidrawElements(data.elements)
+          : data.elements;
         // TODO remove formatting from elements if isPlainPaste
         this.addElementsFromPasteOrLibrary({
-          elements: data.elements,
+          elements,
           files: data.files || null,
           position: "cursor",
           retainSeed: isPlainPaste,

@@ -136,6 +136,7 @@ export interface ExcalidrawProgrammaticAPI {
             | ExcalidrawSelectionElement
             | ExcalidrawImageElement
             | ExcalidrawFreeDrawElement
+            | ExcalidrawFrameElement
           >
         | ({
             type: Extract<ExcalidrawLinearElement["type"], "line">;
