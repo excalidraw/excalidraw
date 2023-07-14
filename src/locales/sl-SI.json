@@ -124,7 +124,9 @@
     },
     "statusPublished": "Objavljeno",
     "sidebarLock": "Obdrži stransko vrstico odprto",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Izberi vse elemente v okvirju",
+    "removeAllElementsFromFrame": "Izbriši vse elemente v okvirju",
+    "eyeDropper": "Izberi barvo s platna"
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
@@ -221,7 +223,9 @@
     "penMode": "Način peresa - prepreči dotik",
     "link": "Dodaj/posodobi povezavo za izbrano obliko",
     "eraser": "Radirka",
-    "hand": "Roka (orodje za premikanje)"
+    "frame": "Okvir",
+    "hand": "Roka (orodje za premikanje)",
+    "extraTools": "Več orodij"
   },
   "headings": {
     "canvasActions": "Dejanja za platno",

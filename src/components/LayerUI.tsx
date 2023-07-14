@@ -41,6 +41,7 @@ import { jotaiScope } from "../jotai";
 import { Provider, useAtom, useAtomValue } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
+import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
@@ -96,6 +97,15 @@ const DefaultMainMenu: React.FC<{
       <MainMenu.DefaultItems.ToggleTheme />
       <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>
+  );
+};
+
+const DefaultOverwriteConfirmDialog = () => {
+  return (
+    <OverwriteConfirmDialog __fallback>
+      <OverwriteConfirmDialog.Actions.SaveToDisk />
+      <OverwriteConfirmDialog.Actions.ExportToImage />
+    </OverwriteConfirmDialog>
   );
 };
 
@@ -204,12 +214,7 @@ const LayerUI = ({
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
-          <Stack.Col
-            gap={6}
-            className={clsx("App-menu_top__left", {
-              "disable-pointerEvents": appState.zenModeEnabled,
-            })}
-          >
+          <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
             {renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
@@ -254,7 +259,7 @@ const LayerUI = ({
                             title={t("toolBar.lock")}
                           />
 
-                          <div className="App-toolbar__divider"></div>
+                          <div className="App-toolbar__divider" />
 
                           <HandButton
                             checked={isHandToolActive(appState)}
@@ -348,6 +353,7 @@ const LayerUI = ({
       >
         {t("toolBar.library")}
       </DefaultSidebar.Trigger>
+      <DefaultOverwriteConfirmDialog />
       {/* ------------------------------------------------------------------ */}
 
       {appState.isLoading && <LoadingMessage delay={250} />}
@@ -379,6 +385,7 @@ const LayerUI = ({
         />
       )}
       <ActiveConfirmDialog />
+      <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
       {renderJSONExportDialog()}
       {appState.pasteDialog.shown && (
@@ -392,7 +399,7 @@ const LayerUI = ({
           }
         />
       )}
-      {device.isMobile && !eyeDropperState && (
+      {device.isMobile && (
         <MobileMenu
           appState={appState}
           elements={elements}

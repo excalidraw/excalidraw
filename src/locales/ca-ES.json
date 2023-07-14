@@ -124,6 +124,8 @@
     },
     "statusPublished": "Publicat",
     "sidebarLock": "Manté la barra lateral oberta",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Mode de llapis - evita tocar",
     "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
     "eraser": "Esborrador",
-    "hand": "Mà (eina de desplaçament)"
+    "frame": "",
+    "hand": "Mà (eina de desplaçament)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Accions del llenç",

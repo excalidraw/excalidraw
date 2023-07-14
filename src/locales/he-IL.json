@@ -124,6 +124,8 @@
     },
     "statusPublished": "פורסם",
     "sidebarLock": "שמור את סרגל הצד פתוח",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "מצב עט - מנע נגיעה",
     "link": "הוספה/עדכון קישור של הצורה שנבחרה",
     "eraser": "מחק",
-    "hand": "יד (כלי הזזה)"
+    "frame": "",
+    "hand": "יד (כלי הזזה)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "פעולות קנבאס",

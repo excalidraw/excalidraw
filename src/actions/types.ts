@@ -82,7 +82,8 @@ export type ActionName =
   | "zoomOut"
   | "resetZoom"
   | "zoomToFit"
-  | "zoomToSelection"
+  | "zoomToFitSelection"
+  | "zoomToFitSelectionInViewport"
   | "changeFontFamily"
   | "changeTextAlign"
   | "changeVerticalAlign"
@@ -116,6 +117,11 @@ export type ActionName =
   | "toggleLinearEditor"
   | "toggleEraserTool"
   | "toggleHandTool"
+  | "selectAllElementsInFrame"
+  | "removeAllElementsFromFrame"
+  | "updateFrameRendering"
+  | "setFrameAsActiveTool"
+  | "createContainerFromText"
   | "wrapTextInContainer";
 
 export type PanelComponentProps = {

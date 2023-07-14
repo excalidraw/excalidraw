@@ -124,6 +124,8 @@
     },
     "statusPublished": "Julkaistu",
     "sidebarLock": "Pidä sivupalkki avoinna",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Kynätila - estä kosketus",
     "link": "Lisää/päivitä linkki valitulle muodolle",
     "eraser": "Poistotyökalu",
-    "hand": "Käsi (panning-työkalu)"
+    "frame": "",
+    "hand": "Käsi (panning-työkalu)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",

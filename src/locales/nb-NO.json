@@ -124,7 +124,9 @@
     },
     "statusPublished": "Publisert",
     "sidebarLock": "Holde sidemenyen åpen",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Velg alle elementene i rammen",
+    "removeAllElementsFromFrame": "Fjern alle elementer fra rammen",
+    "eyeDropper": "Velg farge fra lerretet"
   },
   "library": {
     "noItems": "Ingen elementer lagt til ennå...",
@@ -221,7 +223,9 @@
     "penMode": "Pennemodus - forhindre berøring",
     "link": "Legg til / oppdater link for en valgt figur",
     "eraser": "Viskelær",
-    "hand": "Hånd (panoreringsverktøy)"
+    "frame": "Rammeverktøy",
+    "hand": "Hånd (panoreringsverktøy)",
+    "extraTools": "Flere verktøy"
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",

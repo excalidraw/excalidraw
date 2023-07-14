@@ -6,6 +6,8 @@ import { NonDeletedExcalidrawElement } from "./types";
 import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
+import Scene from "../scene/Scene";
+import { isFrameElement } from "./typeChecks";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -16,10 +18,31 @@ export const dragSelectedElements = (
   distanceX: number = 0,
   distanceY: number = 0,
   appState: AppState,
+  scene: Scene,
 ) => {
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
-  selectedElements.forEach((element) => {
+
+  // we do not want a frame and its elements to be selected at the same time
+  // but when it happens (due to some bug), we want to avoid updating element
+  // in the frame twice, hence the use of set
+  const elementsToUpdate = new Set<NonDeletedExcalidrawElement>(
+    selectedElements,
+  );
+  const frames = selectedElements
+    .filter((e) => isFrameElement(e))
+    .map((f) => f.id);
+
+  if (frames.length > 0) {
+    const elementsInFrames = scene
+      .getNonDeletedElements()
+      .filter((e) => e.frameId !== null)
+      .filter((e) => frames.includes(e.frameId!));
+
+    elementsInFrames.forEach((element) => elementsToUpdate.add(element));
+  }
+
+  elementsToUpdate.forEach((element) => {
     updateElementCoords(
       lockDirection,
       distanceX,
@@ -38,7 +61,13 @@ export const dragSelectedElements = (
       (appState.editingGroupId && !isSelectedViaGroup(appState, element))
     ) {
       const textElement = getBoundTextElement(element);
-      if (textElement) {
+      if (
+        textElement &&
+        // when container is added to a frame, so will its bound text
+        // so the text is already in `elementsToUpdate` and we should avoid
+        // updating its coords again
+        (!textElement.frameId || !frames.includes(textElement.frameId))
+      ) {
         updateElementCoords(
           lockDirection,
           distanceX,
@@ -50,7 +79,7 @@ export const dragSelectedElements = (
       }
     }
     updateBoundElements(element, {
-      simultaneouslyUpdated: selectedElements,
+      simultaneouslyUpdated: Array.from(elementsToUpdate),
     });
   });
 };

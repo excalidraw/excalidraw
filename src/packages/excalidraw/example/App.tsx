@@ -31,6 +31,7 @@ import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
 import { KEYS } from "../../../keys";
+import { convertToExcalidrawElements } from "../../../data/transform";
 
 declare global {
   interface Window {
@@ -140,7 +141,11 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         ];
 
         //@ts-ignore
-        initialStatePromiseRef.current.promise.resolve(initialData);
+        initialStatePromiseRef.current.promise.resolve({
+          ...initialData,
+          //@ts-ignore
+          elements: convertToExcalidrawElements(initialData.elements),
+        });
         excalidrawAPI.addFiles(imagesArray);
       };
     };
@@ -786,7 +791,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
           <div className="export export-blob">
             <img src={blobUrl} alt="" />
           </div>
-
           <button
             onClick={async () => {
               if (!excalidrawAPI) {
@@ -807,6 +811,78 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             }}
           >
             Export to Canvas
+          </button>
+          <button
+            onClick={async () => {
+              if (!excalidrawAPI) {
+                return;
+              }
+              const canvas = await exportToCanvas({
+                elements: excalidrawAPI.getSceneElements(),
+                appState: {
+                  ...initialData.appState,
+                  exportWithDarkMode,
+                },
+                files: excalidrawAPI.getFiles(),
+              });
+              const ctx = canvas.getContext("2d")!;
+              ctx.font = "30px Virgil";
+              ctx.strokeText("My custom text", 50, 60);
+              setCanvasUrl(canvas.toDataURL());
+            }}
+          >
+            Export to Canvas
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!excalidrawAPI) {
+                return;
+              }
+
+              const elements = excalidrawAPI.getSceneElements();
+              excalidrawAPI.scrollToContent(elements[0], {
+                fitToViewport: true,
+              });
+            }}
+          >
+            Fit to viewport, first element
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!excalidrawAPI) {
+                return;
+              }
+
+              const elements = excalidrawAPI.getSceneElements();
+              excalidrawAPI.scrollToContent(elements[0], {
+                fitToContent: true,
+              });
+
+              excalidrawAPI.scrollToContent(elements[0], {
+                fitToContent: true,
+              });
+            }}
+          >
+            Fit to content, first element
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!excalidrawAPI) {
+                return;
+              }
+
+              const elements = excalidrawAPI.getSceneElements();
+              excalidrawAPI.scrollToContent(elements[0], {
+                fitToContent: true,
+              });
+
+              excalidrawAPI.scrollToContent(elements[0]);
+            }}
+          >
+            Scroll to first element, no fitToContent, no fitToViewport
           </button>
           <div className="export export-canvas">
             <img src={canvasUrl} alt="" />

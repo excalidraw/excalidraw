@@ -124,7 +124,9 @@
     },
     "statusPublished": "Опубликовано",
     "sidebarLock": "Держать боковую панель открытой",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": "Взять образец цвета с холста"
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
@@ -221,7 +223,9 @@
     "penMode": "Режим пера - предотвращение касания",
     "link": "Добавить/обновить ссылку для выбранной фигуры",
     "eraser": "Ластик",
-    "hand": "Рука (перемещение холста)"
+    "frame": "",
+    "hand": "Рука (перемещение холста)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Операции холста",

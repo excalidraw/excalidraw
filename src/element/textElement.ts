@@ -845,10 +845,12 @@ export const getTextBindableContainerAtPosition = (
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
     if (
       isArrowElement(elements[index]) &&
-      isHittingElementNotConsideringBoundingBox(elements[index], appState, [
-        x,
-        y,
-      ])
+      isHittingElementNotConsideringBoundingBox(
+        elements[index],
+        appState,
+        null,
+        [x, y],
+      )
     ) {
       hitElement = elements[index];
       break;
@@ -865,7 +867,6 @@ export const VALID_CONTAINER_TYPES = new Set([
   "rectangle",
   "ellipse",
   "diamond",
-  "image",
   "arrow",
 ]);
 

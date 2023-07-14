@@ -29,6 +29,7 @@ import { getTooltipDiv, updateTooltipPosition } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
 import { isPointHittingElementBoundingBox } from "./collision";
 import { getElementAbsoluteCoords } from "./";
+import { isLocalLink, normalizeLink } from "../data/url";
 
 import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
@@ -166,7 +167,7 @@ export const Hyperlink = ({
         />
       ) : (
         <a
-          href={element.link || ""}
+          href={normalizeLink(element.link || "")}
           className={clsx("excalidraw-hyperlinkContainer-link", {
             "d-none": isEditing,
           })}
@@ -177,7 +178,13 @@ export const Hyperlink = ({
                 EVENT.EXCALIDRAW_LINK,
                 event.nativeEvent,
               );
-              onLinkOpen(element, customEvent);
+              onLinkOpen(
+                {
+                  ...element,
+                  link: normalizeLink(element.link),
+                },
+                customEvent,
+              );
               if (customEvent.defaultPrevented) {
                 event.preventDefault();
               }
@@ -229,21 +236,6 @@ const getCoordsForPopover = (
   const x = viewportX - appState.offsetLeft - CONTAINER_WIDTH / 2;
   const y = viewportY - appState.offsetTop - SPACE_BOTTOM;
   return { x, y };
-};
-
-export const normalizeLink = (link: string) => {
-  link = link.trim();
-  if (link) {
-    // prefix with protocol if not fully-qualified
-    if (!link.includes("://") && !/^[[\\/]/.test(link)) {
-      link = `https://${link}`;
-    }
-  }
-  return link;
-};
-
-export const isLocalLink = (link: string | null) => {
-  return !!(link?.includes(location.origin) || link?.startsWith("/"));
 };
 
 export const actionLink = register({
@@ -344,7 +336,7 @@ export const isPointHittingLinkIcon = (
   if (
     !isMobile &&
     appState.viewModeEnabled &&
-    isPointHittingElementBoundingBox(element, [x, y], threshold)
+    isPointHittingElementBoundingBox(element, [x, y], threshold, null)
   ) {
     return true;
   }
@@ -440,7 +432,9 @@ export const shouldHideLinkPopup = (
 
   const threshold = 15 / appState.zoom.value;
   // hitbox to prevent hiding when hovered in element bounding box
-  if (isPointHittingElementBoundingBox(element, [sceneX, sceneY], threshold)) {
+  if (
+    isPointHittingElementBoundingBox(element, [sceneX, sceneY], threshold, null)
+  ) {
     return false;
   }
   const [x1, y1, x2] = getElementAbsoluteCoords(element);

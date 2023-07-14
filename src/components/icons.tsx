@@ -1608,11 +1608,42 @@ export const tablerCheckIcon = createIcon(
   tablerIconProps,
 );
 
+export const alertTriangleIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M10.24 3.957l-8.422 14.06a1.989 1.989 0 0 0 1.7 2.983h16.845a1.989 1.989 0 0 0 1.7 -2.983l-8.423 -14.06a1.989 1.989 0 0 0 -3.4 0z" />
+    <path d="M12 9v4" />
+    <path d="M12 17h.01" />
+  </>,
+  tablerIconProps,
+);
+
 export const eyeDropperIcon = createIcon(
   <g strokeWidth={1.25}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <path d="M11 7l6 6"></path>
     <path d="M4 16l11.7 -11.7a1 1 0 0 1 1.4 0l2.6 2.6a1 1 0 0 1 0 1.4l-11.7 11.7h-4v-4z"></path>
+  </g>,
+  tablerIconProps,
+);
+
+export const extraToolsIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M12 3l-4 7h8z"></path>
+    <path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+    <path d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path>
+  </g>,
+  tablerIconProps,
+);
+
+export const frameToolIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M4 7l16 0"></path>
+    <path d="M4 17l16 0"></path>
+    <path d="M7 4l0 16"></path>
+    <path d="M17 4l0 16"></path>
   </g>,
   tablerIconProps,
 );

@@ -124,7 +124,9 @@
     },
     "statusPublished": "Zverejnené",
     "sidebarLock": "Nechať bočný panel otvorený",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": "Vybrať farbu z plátna"
   },
   "library": {
     "noItems": "Zatiaľ neboli pridané žiadne položky...",
@@ -221,7 +223,9 @@
     "penMode": "Režim pera – zabrániť dotyku",
     "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
     "eraser": "Guma",
-    "hand": "Ruka (nástroj pre pohyb plátna)"
+    "frame": "",
+    "hand": "Ruka (nástroj pre pohyb plátna)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Akcie plátna",
