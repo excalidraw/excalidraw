@@ -701,7 +701,8 @@ const ExcalidrawWrapper = () => {
           y: 0,
           width: 2560,
           height: 1300,
-          opts: { lockZoom: true, viewportZoomFactor: 0.1 },
+          lockZoom: true,
+          viewportZoomFactor: 0.1,
         }}
       >
         <AppMainMenu

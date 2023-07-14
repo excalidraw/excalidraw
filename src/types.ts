@@ -223,17 +223,7 @@ export type AppState = {
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
-  scrollConstraints: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    isAnimating?: boolean;
-    opts?: {
-      viewportZoomFactor?: number;
-      lockZoom?: boolean;
-    };
-  } | null;
+  scrollConstraints: ScrollConstraints | null;
 };
 
 export type UIAppState = Omit<
@@ -589,4 +579,14 @@ export type FrameNameBoundsCache = {
       versionNonce: ExcalidrawFrameElement["versionNonce"];
     }
   >;
+};
+
+export type ScrollConstraints = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  isAnimating?: boolean;
+  viewportZoomFactor?: number;
+  lockZoom?: boolean;
 };

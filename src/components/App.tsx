@@ -223,6 +223,7 @@ import {
   FrameNameBoundsCache,
   SidebarName,
   SidebarTabName,
+  ScrollConstraints,
   NormalizedZoomValue,
 } from "../types";
 import {
@@ -251,6 +252,7 @@ import {
   easeToValuesRAF,
   muteFSAbortError,
   easeOut,
+  isShallowEqual,
 } from "../utils";
 import {
   ContextMenu,
@@ -457,6 +459,13 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDown: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
+  private memoizedScrollConstraints: {
+    input: {
+      scrollConstraints: AppState["scrollConstraints"];
+      values: Omit<Partial<AppState>, "zoom"> & { zoom: NormalizedZoomValue };
+    };
+    result: ReturnType<App["calculateConstraints"]>;
+  } | null = null;
 
   constructor(props: AppProps) {
     super(props);
@@ -1632,9 +1641,74 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    const constraintedScroll = this.constrainScroll(prevState);
+    let constraintedScrollState;
+    if (
+      this.state.scrollConstraints &&
+      !this.state.scrollConstraints.isAnimating
+    ) {
+      const {
+        scrollX,
+        scrollY,
+        width,
+        height,
+        scrollConstraints,
+        zoom,
+        cursorButton,
+      } = this.state;
 
-    this.renderScene(constraintedScroll);
+      // TODO: this could be replaced with memoization function like _.memoize()
+      const calculatedConstraints =
+        isShallowEqual(
+          scrollConstraints,
+          this.memoizedScrollConstraints?.input.scrollConstraints ?? {},
+        ) &&
+        isShallowEqual(
+          { width, height, zoom: zoom.value, cursorButton },
+          this.memoizedScrollConstraints?.input.values ?? {},
+        ) &&
+        this.memoizedScrollConstraints
+          ? this.memoizedScrollConstraints.result
+          : this.calculateConstraints({
+              scrollConstraints,
+              width,
+              height,
+              zoom,
+              cursorButton,
+            });
+
+      this.memoizedScrollConstraints = {
+        input: {
+          scrollConstraints,
+          values: { width, height, zoom: zoom.value, cursorButton },
+        },
+        result: calculatedConstraints,
+      };
+
+      const constrainedScrollValues = this.constrainScrollValues({
+        ...calculatedConstraints,
+        scrollX,
+        scrollY,
+      });
+
+      const isViewportOutsideOfConstrainedArea =
+        this.isViewportOutsideOfConstrainedArea({
+          scrollX,
+          scrollY,
+          width,
+          height,
+          scrollConstraints,
+        });
+
+      constraintedScrollState = this.handleConstrainedScrollStateChange({
+        ...constrainedScrollValues,
+        shouldAnimate:
+          isViewportOutsideOfConstrainedArea &&
+          this.state.cursorButton !== "down" &&
+          prevState.zoom.value === this.state.zoom.value,
+      });
+    }
+
+    this.renderScene(constraintedScrollState);
     this.history.record(this.state, this.scene.getElementsIncludingDeleted());
 
     // Do not notify consumers if we're still loading the scene. Among other
@@ -7629,55 +7703,59 @@ class App extends React.Component<AppProps, AppState> {
    * @param scrollConstraints - The new scroll constraints.
    */
   public setScrollConstraints = (
-    scrollConstraints: AppState["scrollConstraints"],
+    scrollConstraints: ScrollConstraints | null,
   ) => {
-    this.setState({
-      scrollConstraints,
-      viewModeEnabled: !!scrollConstraints,
-    });
+    if (scrollConstraints) {
+      const { scrollX, scrollY, width, height, zoom, cursorButton } =
+        this.state;
+      const constrainedScrollValues = this.constrainScrollValues({
+        ...this.calculateConstraints({
+          scrollConstraints,
+          zoom,
+          cursorButton,
+          width,
+          height,
+        }),
+        scrollX,
+        scrollY,
+      });
+      this.animateConstainedScroll({
+        ...constrainedScrollValues,
+        opts: {
+          onEndCallback: () => {
+            this.setState({
+              scrollConstraints,
+              viewModeEnabled: true,
+            });
+          },
+        },
+      });
+    } else {
+      this.setState({
+        scrollConstraints: null,
+        viewModeEnabled: false,
+      });
+    }
   };
 
-  /**
-   * Constrains the scroll position of the app state within the defined scroll constraints.
-   * The scroll position is adjusted based on the application's current state including zoom level and viewport dimensions.
-   *
-   * @param nextState - The next state of the application, or a subset of the application state.
-   * @returns The modified next state with scrollX and scrollY constrained to the scroll constraints.
-   */
-  private constrainScroll = (prevState: AppState): ConstrainedScrollValues => {
-    const {
-      scrollX,
-      scrollY,
-      scrollConstraints,
-      width,
-      height,
-      zoom: currentZoom,
-      cursorButton,
-    } = this.state;
-
-    if (!scrollConstraints || scrollConstraints.isAnimating) {
-      return null;
-    }
-
-    // Check if the state has changed since the last render
-    const stateUnchanged =
-      currentZoom.value === prevState.zoom.value &&
-      scrollX === prevState.scrollX &&
-      scrollY === prevState.scrollY &&
-      width === prevState.width &&
-      height === prevState.height &&
-      cursorButton === prevState.cursorButton;
-
-    // If the state hasn't changed and scrollConstraints didn't just get defined, return null
-    if (stateUnchanged && prevState.scrollConstraints) {
-      return null;
-    }
-
+  private calculateConstraints = ({
+    scrollConstraints,
+    width,
+    height,
+    zoom,
+    cursorButton,
+  }: {
+    scrollConstraints: ScrollConstraints;
+    width: AppState["width"];
+    height: AppState["height"];
+    zoom: AppState["zoom"];
+    cursorButton: AppState["cursorButton"];
+  }) => {
     // Set the overscroll allowance percentage
     const OVERSCROLL_ALLOWANCE_PERCENTAGE = 0.2;
-    const lockZoom = scrollConstraints.opts?.lockZoom ?? false;
-    const viewportZoomFactor = scrollConstraints.opts?.viewportZoomFactor
-      ? Math.min(1, Math.max(scrollConstraints.opts.viewportZoomFactor, 0.1))
+    const lockZoom = scrollConstraints.lockZoom ?? false;
+    const viewportZoomFactor = scrollConstraints.viewportZoomFactor
+      ? Math.min(1, Math.max(scrollConstraints.viewportZoomFactor, 0.1))
       : 0.9;
 
     /**
@@ -7776,110 +7854,16 @@ class App extends React.Component<AppProps, AppState> {
       return { maxScrollX, minScrollX, maxScrollY, minScrollY };
     };
 
-    /**
-     * Constrains the scroll values within the constrained area.
-     * @param maxScrollX - The maximum scroll value for the X axis.
-     * @param minScrollX - The minimum scroll value for the X axis.
-     * @param maxScrollY - The maximum scroll value for the Y axis.
-     * @param minScrollY - The minimum scroll value for the Y axis.
-     * @returns The constrained scroll values for the X and Y axes.
-     */
-    const constrainScrollValues = (
-      maxScrollX: number,
-      minScrollX: number,
-      maxScrollY: number,
-      minScrollY: number,
-    ) => {
-      const constrainedScrollX = Math.min(
-        maxScrollX,
-        Math.max(scrollX, minScrollX),
-      );
-      const constrainedScrollY = Math.min(
-        maxScrollY,
-        Math.max(scrollY, minScrollY),
-      );
-      return { constrainedScrollX, constrainedScrollY };
-    };
-
-    /**
-     * Handles the state change based on the constrained scroll values.
-     * Also handles the animation to the constrained area when the viewport is outside of constrained area.
-     * @param constrainedScrollX - The constrained scroll value for the X axis.
-     * @param constrainedScrollY - The constrained scroll value for the Y axis.
-     * @returns The constrained state if the state has changed, when needs to be passed into render function, otherwise null.
-     */
-    const handleStateChange = (
-      constrainedScrollX: number,
-      constrainedScrollY: number,
-    ) => {
-      const isStateChanged =
-        constrainedScrollX !== scrollX || constrainedScrollY !== scrollY;
-
-      if (isStateChanged) {
-        if (
-          (scrollX < scrollConstraints.x ||
-            scrollX + width > scrollConstraints.x + scrollConstraints.width ||
-            scrollY < scrollConstraints.y ||
-            scrollY + height >
-              scrollConstraints.y + scrollConstraints.height) &&
-          cursorButton !== "down" &&
-          currentZoom.value === prevState.zoom.value
-        ) {
-          easeToValuesRAF({
-            fromValues: { scrollX, scrollY },
-            toValues: {
-              scrollX: constrainedScrollX,
-              scrollY: constrainedScrollY,
-            },
-            onStep: ({ scrollX, scrollY }) => {
-              this.setState({ scrollX, scrollY });
-            },
-            onStart: () => {
-              this.setState({
-                scrollConstraints: { ...scrollConstraints, isAnimating: true },
-              });
-            },
-            onEnd: () => {
-              this.setState({
-                scrollConstraints: { ...scrollConstraints, isAnimating: false },
-              });
-            },
-          });
-
-          return null;
-        }
-
-        const constrainedState = {
-          scrollX: constrainedScrollX,
-          scrollY: constrainedScrollY,
-          zoom: {
-            value: maxZoomLevel
-              ? (Math.max(
-                  currentZoom.value,
-                  maxZoomLevel,
-                ) as NormalizedZoomValue)
-              : currentZoom.value,
-          },
-        };
-
-        this.setState(constrainedState);
-        return constrainedState;
-      }
-
-      return null;
-    };
-
-    // Compute the constrained scroll values.
     const { zoomLevelX, zoomLevelY, maxZoomLevel } = calculateZoomLevel();
-    const zoom = maxZoomLevel
-      ? Math.max(maxZoomLevel, currentZoom.value)
-      : currentZoom.value;
+    const constrainedZoom = getNormalizedZoom(
+      maxZoomLevel ? Math.max(maxZoomLevel, zoom.value) : zoom.value,
+    );
     const { constrainedScrollCenterX, constrainedScrollCenterY } =
-      calculateConstrainedScrollCenter(zoom);
+      calculateConstrainedScrollCenter(constrainedZoom);
     const { overscrollAllowanceX, overscrollAllowanceY } =
       calculateOverscrollAllowance();
     const shouldAdjustForCenteredView =
-      zoom <= zoomLevelX || zoom <= zoomLevelY;
+      constrainedZoom <= zoomLevelX || constrainedZoom <= zoomLevelY;
     const { maxScrollX, minScrollX, maxScrollY, minScrollY } =
       calculateMinMaxScrollValues(
         shouldAdjustForCenteredView,
@@ -7887,16 +7871,170 @@ class App extends React.Component<AppProps, AppState> {
         overscrollAllowanceY,
         constrainedScrollCenterX,
         constrainedScrollCenterY,
-        zoom,
+        constrainedZoom,
       );
-    const { constrainedScrollX, constrainedScrollY } = constrainScrollValues(
+
+    return {
       maxScrollX,
       minScrollX,
       maxScrollY,
       minScrollY,
-    );
+      constrainedZoom: {
+        value: constrainedZoom,
+      },
+    };
+  };
 
-    return handleStateChange(constrainedScrollX, constrainedScrollY);
+  /**
+   * Constrains the scroll values within the constrained area.
+   * @param maxScrollX - The maximum scroll value for the X axis.
+   * @param minScrollX - The minimum scroll value for the X axis.
+   * @param maxScrollY - The maximum scroll value for the Y axis.
+   * @param minScrollY - The minimum scroll value for the Y axis.
+   * @returns The constrained scroll values for the X and Y axes.
+   */
+  private constrainScrollValues = ({
+    scrollX,
+    scrollY,
+    maxScrollX,
+    minScrollX,
+    maxScrollY,
+    minScrollY,
+    constrainedZoom,
+  }: {
+    scrollX: number;
+    scrollY: number;
+    maxScrollX: number;
+    minScrollX: number;
+    maxScrollY: number;
+    minScrollY: number;
+    constrainedZoom: AppState["zoom"];
+  }) => {
+    const constrainedScrollX = Math.min(
+      maxScrollX,
+      Math.max(scrollX, minScrollX),
+    );
+    const constrainedScrollY = Math.min(
+      maxScrollY,
+      Math.max(scrollY, minScrollY),
+    );
+    return { constrainedScrollX, constrainedScrollY, constrainedZoom };
+  };
+
+  /**
+   * Animate the scroll values to the constrained area
+   */
+  private animateConstainedScroll = ({
+    constrainedScrollX,
+    constrainedScrollY,
+    opts,
+  }: {
+    constrainedScrollX: number;
+    constrainedScrollY: number;
+    opts?: {
+      onStartCallback?: () => void;
+      onEndCallback?: () => void;
+    };
+  }) => {
+    const { scrollX, scrollY, scrollConstraints } = this.state;
+
+    const { onStartCallback, onEndCallback } = opts || {};
+
+    if (!scrollConstraints) {
+      return null;
+    }
+
+    easeToValuesRAF({
+      fromValues: { scrollX, scrollY },
+      toValues: {
+        scrollX: constrainedScrollX,
+        scrollY: constrainedScrollY,
+      },
+      onStep: ({ scrollX, scrollY }) => {
+        this.setState({ scrollX, scrollY });
+      },
+      onStart: () => {
+        this.setState({
+          scrollConstraints: { ...scrollConstraints, isAnimating: true },
+        });
+        onStartCallback && onStartCallback();
+      },
+      onEnd: () => {
+        this.setState({
+          scrollConstraints: { ...scrollConstraints, isAnimating: false },
+        });
+        onEndCallback && onEndCallback();
+      },
+    });
+  };
+
+  private isViewportOutsideOfConstrainedArea = ({
+    scrollX,
+    scrollY,
+    width,
+    height,
+    scrollConstraints,
+  }: {
+    scrollX: AppState["scrollX"];
+    scrollY: AppState["scrollY"];
+    width: AppState["width"];
+    height: AppState["height"];
+    scrollConstraints: AppState["scrollConstraints"];
+  }) => {
+    if (!scrollConstraints) {
+      return false;
+    }
+
+    return (
+      scrollX < scrollConstraints.x ||
+      scrollX + width > scrollConstraints.x + scrollConstraints.width ||
+      scrollY < scrollConstraints.y ||
+      scrollY + height > scrollConstraints.y + scrollConstraints.height
+    );
+  };
+
+  /**
+   * Handles the state change based on the constrained scroll values.
+   * Also handles the animation to the constrained area when the viewport is outside of constrained area.
+   * @param constrainedScrollX - The constrained scroll value for the X axis.
+   * @param constrainedScrollY - The constrained scroll value for the Y axis.
+   * @returns The constrained state if the state has changed, when needs to be passed into render function, otherwise null.
+   */
+  private handleConstrainedScrollStateChange = ({
+    constrainedScrollX,
+    constrainedScrollY,
+    constrainedZoom,
+    shouldAnimate,
+  }: {
+    constrainedScrollX: number;
+    constrainedScrollY: number;
+    constrainedZoom: AppState["zoom"];
+    shouldAnimate?: boolean;
+  }) => {
+    const { scrollX, scrollY } = this.state;
+    const isStateChanged =
+      constrainedScrollX !== scrollX || constrainedScrollY !== scrollY;
+
+    if (isStateChanged) {
+      if (shouldAnimate) {
+        this.animateConstainedScroll({
+          constrainedScrollX,
+          constrainedScrollY,
+        });
+
+        return null;
+      }
+      const constrainedState = {
+        scrollX: constrainedScrollX,
+        scrollY: constrainedScrollY,
+        zoom: constrainedZoom,
+      };
+
+      this.setState(constrainedState);
+      return constrainedState;
+    }
+
+    return null;
   };
 }
 
