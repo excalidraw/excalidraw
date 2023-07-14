@@ -20,7 +20,6 @@ import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
 import { isEraserActive, isHandToolActive } from "./appState";
 import { ResolutionType } from "./utility-types";
-import { reconcileElements } from "./excalidraw-app/collab/reconciliation";
 
 let mockDateTime: string | null = null;
 
