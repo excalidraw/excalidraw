@@ -224,7 +224,6 @@ import {
   SidebarName,
   SidebarTabName,
   ScrollConstraints,
-  NormalizedZoomValue,
 } from "../types";
 import {
   debounce,
@@ -459,13 +458,9 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDown: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
-  private memoizedScrollConstraints: {
-    input: {
-      scrollConstraints: AppState["scrollConstraints"];
-      values: Omit<Partial<AppState>, "zoom"> & { zoom: NormalizedZoomValue };
-    };
-    result: ReturnType<App["calculateConstraints"]>;
-  } | null = null;
+  private memoizedScrollConstraints: ReturnType<
+    App["calculateConstraints"]
+  > | null = null;
 
   constructor(props: AppProps) {
     super(props);
@@ -1657,17 +1652,21 @@ class App extends React.Component<AppProps, AppState> {
       } = this.state;
 
       // TODO: this could be replaced with memoization function like _.memoize()
-      const calculatedConstraints =
-        isShallowEqual(
-          scrollConstraints,
-          this.memoizedScrollConstraints?.input.scrollConstraints ?? {},
-        ) &&
+      const canUseMemoizedConstraints =
+        isShallowEqual(scrollConstraints, prevState.scrollConstraints ?? {}) &&
         isShallowEqual(
           { width, height, zoom: zoom.value, cursorButton },
-          this.memoizedScrollConstraints?.input.values ?? {},
-        ) &&
-        this.memoizedScrollConstraints
-          ? this.memoizedScrollConstraints.result
+          {
+            width: prevState.width,
+            height: prevState.height,
+            zoom: prevState.zoom.value,
+            cursorButton: prevState.cursorButton,
+          } ?? {},
+        );
+
+      const calculatedConstraints =
+        canUseMemoizedConstraints && !!this.memoizedScrollConstraints
+          ? this.memoizedScrollConstraints
           : this.calculateConstraints({
               scrollConstraints,
               width,
@@ -1676,13 +1675,7 @@ class App extends React.Component<AppProps, AppState> {
               cursorButton,
             });
 
-      this.memoizedScrollConstraints = {
-        input: {
-          scrollConstraints,
-          values: { width, height, zoom: zoom.value, cursorButton },
-        },
-        result: calculatedConstraints,
-      };
+      this.memoizedScrollConstraints = calculatedConstraints;
 
       const constrainedScrollValues = this.constrainScrollValues({
         ...calculatedConstraints,
