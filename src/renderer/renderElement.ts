@@ -50,7 +50,10 @@ import {
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { createPlaceholderEmbeddableLabel } from "../element/embeddable";
+import {
+  createPlaceholderEmbeddableLabel,
+  getEmbedLink,
+} from "../element/embeddable";
 import { getContainingFrame } from "../frame";
 import { normalizeLink } from "../data/url";
 
@@ -1341,7 +1344,8 @@ export const renderElementToSvg = (
         div.style.width = "100%";
         div.style.height = "100%";
         const iframe = div.ownerDocument!.createElement("iframe");
-        iframe.src = element.link ?? "";
+        const embedLink = getEmbedLink(element.link);
+        iframe.src = embedLink?.link ?? "";
         iframe.style.width = "100%";
         iframe.style.height = "100%";
         iframe.style.border = "none";
