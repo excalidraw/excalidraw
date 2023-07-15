@@ -5,9 +5,12 @@ import {
   viewportCoordsToSceneCoords,
   wrapEvent,
 } from "../utils";
-import { getEmbedLink, iframeURLValidator } from "./iframe";
+import { getEmbedLink, embeddableURLValidator } from "./embeddable";
 import { mutateElement } from "./mutateElement";
-import { NonDeletedExcalidrawElement } from "./types";
+import {
+  ExcalidrawEmbeddableElement,
+  NonDeletedExcalidrawElement,
+} from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
@@ -38,7 +41,7 @@ import { isLocalLink, normalizeLink } from "../data/url";
 import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
 import { useAppProps, useExcalidrawAppState } from "../components/App";
-import { isIFrameElement } from "./typeChecks";
+import { isEmbeddableElement } from "./typeChecks";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -53,7 +56,10 @@ EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
 
 let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
 
-const iframeLinkCache = new Map<string, string>();
+const embeddableLinkCache = new Map<
+  ExcalidrawEmbeddableElement["id"],
+  string
+>();
 
 export const Hyperlink = ({
   element,
@@ -88,9 +94,9 @@ export const Hyperlink = ({
       trackEvent("hyperlink", "create");
     }
 
-    if (isIFrameElement(element)) {
-      if (appState.activeIFrame?.element === element) {
-        setAppState({ activeIFrame: null });
+    if (isEmbeddableElement(element)) {
+      if (appState.activeEmbeddable?.element === element) {
+        setAppState({ activeEmbeddable: null });
       }
       if (!link) {
         mutateElement(element, {
@@ -100,11 +106,11 @@ export const Hyperlink = ({
         return;
       }
 
-      if (!iframeURLValidator(link, appProps.validateIFrame)) {
+      if (!embeddableURLValidator(link, appProps.validateEmbeddable)) {
         if (link) {
           setToast({ message: t("toast.unableToEmbed"), closable: true });
         }
-        element.link && iframeLinkCache.set(element.id, element.link);
+        element.link && embeddableLinkCache.set(element.id, element.link);
         mutateElement(element, {
           validated: false,
           link,
@@ -116,7 +122,8 @@ export const Hyperlink = ({
         const ar = embedLink
           ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
           : 1;
-        const hasLinkChanged = iframeLinkCache.get(element.id) !== element.link;
+        const hasLinkChanged =
+          embeddableLinkCache.get(element.id) !== element.link;
         mutateElement(element, {
           ...(hasLinkChanged
             ? {
@@ -138,8 +145,8 @@ export const Hyperlink = ({
           link,
         });
         invalidateShapeForElement(element);
-        if (iframeLinkCache.has(element.id)) {
-          iframeLinkCache.delete(element.id);
+        if (embeddableLinkCache.has(element.id)) {
+          embeddableLinkCache.delete(element.id);
         }
       }
     } else {
@@ -148,8 +155,8 @@ export const Hyperlink = ({
   }, [
     element,
     setToast,
-    appProps.validateIFrame,
-    appState.activeIFrame,
+    appProps.validateEmbeddable,
+    appState.activeEmbeddable,
     setAppState,
   ]);
 
@@ -285,7 +292,7 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
-        {linkVal && !isIFrameElement(element) && (
+        {linkVal && !isEmbeddableElement(element) && (
           <ToolButton
             type="button"
             title={t("buttons.remove")}
@@ -349,7 +356,7 @@ export const actionLink = register({
         icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
         title={`${
-          isIFrameElement(elements[0])
+          isEmbeddableElement(elements[0])
             ? t("labels.link.labelEmbed")
             : t("labels.link.label")
         } - ${getShortcutKey("CtrlOrCmd+K")}`}
@@ -366,10 +373,10 @@ export const getContextMenuLabel = (
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
   const label = selectedElements[0]!.link
-    ? isIFrameElement(selectedElements[0])
+    ? isEmbeddableElement(selectedElements[0])
       ? "labels.link.editEmbed"
       : "labels.link.edit"
-    : isIFrameElement(selectedElements[0])
+    : isEmbeddableElement(selectedElements[0])
     ? "labels.link.createEmbed"
     : "labels.link.create";
   return label;

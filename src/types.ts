@@ -17,6 +17,7 @@ import {
   Theme,
   StrokeRoundness,
   ExcalidrawFrameElement,
+  ExcalidrawEmbeddableElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -93,7 +94,7 @@ export type LastActiveTool =
         | "eraser"
         | "hand"
         | "frame"
-        | "iframe";
+        | "embeddable";
       customType: null;
     }
   | {
@@ -114,7 +115,7 @@ export type AppState = {
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: React.ReactNode;
-  activeIFrame: {
+  activeEmbeddable: {
     element: NonDeletedExcalidrawElement;
     state: "hover" | "active";
   } | null;
@@ -126,7 +127,12 @@ export type AppState = {
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
   frameToHighlight: NonDeleted<ExcalidrawFrameElement> | null;
-  shouldRenderFrames: boolean;
+  frameRendering: {
+    enabled: boolean;
+    name: boolean;
+    outline: boolean;
+    clip: boolean;
+  };
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   // element being edited, but not necessarily added to elements array yet
@@ -147,7 +153,7 @@ export type AppState = {
           | "eraser"
           | "hand"
           | "frame"
-          | "iframe";
+          | "embeddable";
         customType: null;
       }
     | {
@@ -411,15 +417,14 @@ export interface ExcalidrawProps {
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
   children?: React.ReactNode;
-  validateIFrame?:
+  validateEmbeddable?:
     | boolean
     | RegExp
     | RegExp[]
     | ((link: string) => boolean | undefined);
-  renderCustomIFrame?: (
-    element: NonDeletedExcalidrawElement,
-    radius: number,
-    appState: UIAppState,
+  renderEmbeddable?: (
+    element: NonDeleted<ExcalidrawEmbeddableElement>,
+    appState: AppState,
   ) => JSX.Element | null;
   renderWebview?: boolean; //zsviczian
   renderIFrameMenu?: ( //zsivzian
@@ -624,7 +629,7 @@ export type ExcalidrawImperativeAPI = {
    * the frames are still interactive in edit mode. As such, this API should be
    * used in conjunction with view mode (props.viewModeEnabled).
    */
-  toggleFrameRendering: InstanceType<typeof App>["toggleFrameRendering"];
+  updateFrameRendering: InstanceType<typeof App>["updateFrameRendering"];
 };
 
 export type Device = Readonly<{
