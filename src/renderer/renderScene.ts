@@ -71,7 +71,6 @@ import {
   isFrameElement,
   isLinearElement,
 } from "../element/typeChecks";
-import { getBoundTextElement } from "../element/textElement";
 import {
   isEmbeddableOrFrameLabel,
   createPlaceholderEmbeddableLabel,
