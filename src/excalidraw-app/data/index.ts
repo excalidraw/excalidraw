@@ -123,6 +123,14 @@ export type SocketUpdateDataSource = {
       socketId: string;
     };
   };
+  USER_JOINED: {
+    type: "USER_JOINED";
+    payload: {
+      username: string;
+      userId: string;
+      socketId: string;
+    };
+  };
 };
 
 export type SocketUpdateDataIncoming =

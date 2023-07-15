@@ -229,6 +229,23 @@ class Portal {
       );
     }
   };
+
+  brodcastUserJoinedRoom = (payload: {
+    username: string;
+    userId: string;
+    socketId: string;
+  }) => {
+    if (this.socket) {
+      const data: SocketUpdateDataSource["USER_JOINED"] = {
+        type: "USER_JOINED",
+        payload,
+      };
+      return this._broadcastSocketData(
+        data as SocketUpdateData,
+        false, // volatile
+      );
+    }
+  };
 }
 
 export default Portal;

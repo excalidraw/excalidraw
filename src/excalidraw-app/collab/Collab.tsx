@@ -698,6 +698,21 @@ class Collab extends PureComponent<Props, CollabState> {
             });
             break;
           }
+          case "USER_JOINED": {
+            const { username, userId, socketId } = decryptedData.payload;
+            const collaborators = upsertMap(
+              userId,
+              {
+                username,
+                userId,
+                socketId,
+              },
+              this.collaborators,
+            );
+            this.excalidrawAPI.updateScene({
+              collaborators: new Map(collaborators),
+            });
+          }
         }
       },
     );
@@ -766,6 +781,15 @@ class Collab extends PureComponent<Props, CollabState> {
     } else {
       this.portal.socketInitialized = true;
     }
+
+    if (this.portal.socket) {
+      this.portal.brodcastUserJoinedRoom({
+        username: this.state.username,
+        userId: this.state.userId,
+        socketId: this.portal.socket.id,
+      });
+    }
+
     return null;
   };
 
