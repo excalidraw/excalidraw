@@ -2,11 +2,15 @@ import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import { KEYS } from "../keys";
 import { ExcalidrawProps } from "../types";
-import { setCursorForShape, updateActiveTool } from "../utils";
+import { getFontString, setCursorForShape, updateActiveTool } from "../utils";
 import { newTextElement } from "./newElement";
-import { getContainerElement } from "./textElement";
-import { isIFrameElement } from "./typeChecks";
-import { ExcalidrawElement, NonDeletedExcalidrawElement } from "./types";
+import { getContainerElement, wrapText } from "./textElement";
+import { isEmbeddableElement } from "./typeChecks";
+import {
+  ExcalidrawElement,
+  ExcalidrawEmbeddableElement,
+  NonDeletedExcalidrawElement,
+} from "./types";
 
 type EmbeddedLink = {
   link: string;
@@ -93,45 +97,46 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
   return { link, aspectRatio, type };
 };
 
-export const hideActionForIFrame = (
-  element: ExcalidrawElement | undefined,
-  props: ExcalidrawProps,
-) =>
-  isIFrameElement(element) &&
-  element.link &&
-  element.link !== "" &&
-  !props.validateIFrame;
-
-export const isIFrameOrFrameLabel = (
+export const isEmbeddableOrFrameLabel = (
   element: NonDeletedExcalidrawElement,
 ): Boolean => {
-  if (isIFrameElement(element)) {
+  if (isEmbeddableElement(element)) {
     return true;
   }
   if (element.type === "text") {
     const container = getContainerElement(element);
-    if (container && isIFrameElement(container)) {
+    if (container && isEmbeddableElement(container)) {
       return true;
     }
   }
   return false;
 };
 
-export const createPlaceholderiFrameLabel = (
-  element: NonDeletedExcalidrawElement,
+export const createPlaceholderEmbeddableLabel = (
+  element: ExcalidrawEmbeddableElement,
 ): ExcalidrawElement => {
   const text =
     !element.link || element?.link === "" ? "Empty Web-Embed" : element.link;
-  const fontSize = element.width / text.length;
+  const fontSize = Math.max(
+    Math.min(element.width / 2, element.width / text.length),
+    element.width / 30,
+  );
+  const fontFamily = FONT_FAMILY.Helvetica;
+
+  const fontString = getFontString({
+    fontSize,
+    fontFamily,
+  });
+
   return newTextElement({
     x: element.x + element.width / 2,
     y: element.y + element.height / 2,
     strokeColor:
       element.strokeColor !== "transparent" ? element.strokeColor : "black",
     backgroundColor: "transparent",
-    fontFamily: FONT_FAMILY.Helvetica,
+    fontFamily,
     fontSize,
-    text,
+    text: wrapText(text, fontString, element.width - 20),
     rawText: text,
     textAlign: "center",
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
@@ -139,12 +144,12 @@ export const createPlaceholderiFrameLabel = (
   });
 };
 
-export const actionSetIFrameAsActiveTool = register({
-  name: "setIFrameAsActiveTool",
+export const actionSetEmbeddableAsActiveTool = register({
+  name: "setEmbeddableAsActiveTool",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState, _, app) => {
     const nextActiveTool = updateActiveTool(appState, {
-      type: "iframe",
+      type: "embeddable",
     });
 
     setCursorForShape(app.canvas, {
@@ -157,7 +162,7 @@ export const actionSetIFrameAsActiveTool = register({
       appState: {
         ...appState,
         activeTool: updateActiveTool(appState, {
-          type: "iframe",
+          type: "embeddable",
         }),
       },
       commitToHistory: false,
@@ -166,26 +171,26 @@ export const actionSetIFrameAsActiveTool = register({
   keyTest: (event) => event.key.toLocaleLowerCase() === KEYS.W,
 });
 
-export const iframeURLValidator = (
+export const embeddableURLValidator = (
   url: string | null | undefined,
-  validateIFrame: ExcalidrawProps["validateIFrame"],
+  validateEmbeddable: ExcalidrawProps["validateEmbeddable"],
 ): boolean => {
   if (!url) {
     return false;
   }
-  if (validateIFrame != null) {
-    if (typeof validateIFrame === "function") {
-      const ret = validateIFrame(url);
+  if (validateEmbeddable != null) {
+    if (typeof validateEmbeddable === "function") {
+      const ret = validateEmbeddable(url);
       // if return value is undefined, leave validation to default
       if (typeof ret === "boolean") {
         return ret;
       }
-    } else if (typeof validateIFrame === "boolean") {
-      return validateIFrame;
-    } else if (validateIFrame instanceof RegExp) {
-      return validateIFrame.test(url);
-    } else if (Array.isArray(validateIFrame)) {
-      for (const regex of validateIFrame) {
+    } else if (typeof validateEmbeddable === "boolean") {
+      return validateEmbeddable;
+    } else if (validateEmbeddable instanceof RegExp) {
+      return validateEmbeddable.test(url);
+    } else if (Array.isArray(validateEmbeddable)) {
+      for (const regex of validateEmbeddable) {
         if (url.match(regex)) {
           return true;
         }

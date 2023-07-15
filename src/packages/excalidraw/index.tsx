@@ -49,8 +49,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onPointerDown,
     onScrollChange,
     children,
-    validateIFrame,
-    renderCustomIFrame,
+    validateEmbeddable,
+    renderEmbeddable,
     renderWebview, //zsviczian
     renderIFrameMenu, //zsviczian
   } = props;
@@ -133,8 +133,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onViewModeChange={onViewModeChange} //zsviczian
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
-          validateIFrame={validateIFrame}
-          renderCustomIFrame={renderCustomIFrame}
+          validateEmbeddable={validateEmbeddable}
+          renderEmbeddable={renderEmbeddable}
           renderWebview={renderWebview} //zsviczian
           renderIFrameMenu={renderIFrameMenu} //zsviczian
         >

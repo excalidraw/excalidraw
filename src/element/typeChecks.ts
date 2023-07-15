@@ -4,7 +4,7 @@ import { MarkNonNullable } from "../utility-types";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
-  ExcalidrawIFrameElement,
+  ExcalidrawEmbeddableElement,
   ExcalidrawLinearElement,
   ExcalidrawBindableElement,
   ExcalidrawGenericElement,
@@ -26,7 +26,7 @@ export const isGenericElement = (
       element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
-      element.type === "iframe")
+      element.type === "embeddable")
   );
 };
 
@@ -42,10 +42,10 @@ export const isImageElement = (
   return !!element && element.type === "image";
 };
 
-export const isIFrameElement = (
+export const isEmbeddableElement = (
   element: ExcalidrawElement | null | undefined,
-): element is ExcalidrawIFrameElement => {
-  return !!element && element.type === "iframe";
+): element is ExcalidrawEmbeddableElement => {
+  return !!element && element.type === "embeddable";
 };
 
 export const isTextElement = (
@@ -85,7 +85,7 @@ export const isArrowElement = (
 };
 
 export const isLinearElementType = (
-  elementType: AppState["activeTool"]["type"] | "iframe",
+  elementType: AppState["activeTool"]["type"],
 ): boolean => {
   return (
     elementType === "arrow" || elementType === "line" // || elementType === "freedraw"
@@ -104,7 +104,7 @@ export const isBindingElement = (
 };
 
 export const isBindingElementType = (
-  elementType: AppState["activeTool"]["type"] | "iframe",
+  elementType: AppState["activeTool"]["type"],
 ): boolean => {
   return elementType === "arrow";
 };
@@ -120,7 +120,7 @@ export const isBindableElement = (
       element.type === "diamond" ||
       element.type === "ellipse" ||
       element.type === "image" ||
-      element.type === "iframe" ||
+      element.type === "embeddable" ||
       (element.type === "text" && !element.containerId))
   );
 };
@@ -135,7 +135,6 @@ export const isTextBindableContainer = (
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
-      element.type === "iframe" ||
       isArrowElement(element))
   );
 };
@@ -145,7 +144,7 @@ export const isExcalidrawElement = (element: any): boolean => {
     element?.type === "text" ||
     element?.type === "diamond" ||
     element?.type === "rectangle" ||
-    element?.type === "iframe" ||
+    element?.type === "embeddable" ||
     element?.type === "ellipse" ||
     element?.type === "arrow" ||
     element?.type === "freedraw" ||
@@ -174,7 +173,7 @@ export const isBoundToContainer = (
 };
 
 export const isUsingAdaptiveRadius = (type: string) =>
-  type === "rectangle" || type === "iframe";
+  type === "rectangle" || type === "embeddable";
 
 export const isUsingProportionalRadius = (type: string) =>
   type === "line" || type === "arrow" || type === "diamond";
@@ -205,17 +204,13 @@ export const canApplyRoundnessTypeToElement = (
 export const getDefaultRoundnessTypeForElement = (
   element: ExcalidrawElement,
 ) => {
-  if (
-    element.type === "arrow" ||
-    element.type === "line" ||
-    element.type === "diamond"
-  ) {
+  if (isUsingProportionalRadius(element.type)) {
     return {
       type: ROUNDNESS.PROPORTIONAL_RADIUS,
     };
   }
 
-  if (element.type === "rectangle" || element.type === "iframe") {
+  if (isUsingAdaptiveRadius(element.type)) {
     return {
       type: ROUNDNESS.ADAPTIVE_RADIUS,
     };

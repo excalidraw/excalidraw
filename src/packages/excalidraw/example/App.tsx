@@ -684,7 +684,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
             // allow all urls
-            validateIFrame={true}
+            validateEmbeddable={true}
           >
             {excalidrawAPI && (
               <Footer>
