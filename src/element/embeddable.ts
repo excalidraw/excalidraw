@@ -2,9 +2,9 @@ import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import { KEYS } from "../keys";
 import { ExcalidrawProps } from "../types";
-import { setCursorForShape, updateActiveTool } from "../utils";
+import { getFontString, setCursorForShape, updateActiveTool } from "../utils";
 import { newTextElement } from "./newElement";
-import { getContainerElement } from "./textElement";
+import { getContainerElement, wrapText } from "./textElement";
 import { isEmbeddableElement } from "./typeChecks";
 import {
   ExcalidrawElement,
@@ -117,16 +117,26 @@ export const createPlaceholderEmbeddableLabel = (
 ): ExcalidrawElement => {
   const text =
     !element.link || element?.link === "" ? "Empty Web-Embed" : element.link;
-  const fontSize = element.width / text.length;
+  const fontSize = Math.max(
+    Math.min(element.width / 2, element.width / text.length),
+    element.width / 30,
+  );
+  const fontFamily = FONT_FAMILY.Helvetica;
+
+  const fontString = getFontString({
+    fontSize,
+    fontFamily,
+  });
+
   return newTextElement({
     x: element.x + element.width / 2,
     y: element.y + element.height / 2,
     strokeColor:
       element.strokeColor !== "transparent" ? element.strokeColor : "black",
     backgroundColor: "transparent",
-    fontFamily: FONT_FAMILY.Helvetica,
+    fontFamily,
     fontSize,
-    text,
+    text: wrapText(text, fontString, element.width - 20),
     textAlign: "center",
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     angle: element.angle ?? 0,
