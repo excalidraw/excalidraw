@@ -3709,12 +3709,22 @@ class App extends React.Component<AppProps, AppState> {
 
     resetCursor(this.canvas);
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
+      const hitElement = this.getElementAtPosition(sceneX, sceneY);
+
+      if (isEmbeddableElement(hitElement)) {
+        this.setState({
+          activeEmbeddable: { element: hitElement, state: "active" },
+        });
+        return;
+      }
+
       const container = getTextBindableContainerAtPosition(
         this.scene.getNonDeletedElements(),
         this.state,
         sceneX,
         sceneY,
       );
+
       if (container) {
         if (
           hasBoundTextElement(container) ||
@@ -3732,20 +3742,13 @@ class App extends React.Component<AppProps, AppState> {
           sceneY = midPoint.y;
         }
       }
-      if (isEmbeddableElement(container as ExcalidrawGenericElement)) {
-        this.setState({
-          activeEmbeddable: container
-            ? { element: container, state: "active" }
-            : null,
-        });
-      } else {
-        this.startTextEditing({
-          sceneX,
-          sceneY,
-          insertAtParentCenter: !event.altKey,
-          container,
-        });
-      }
+
+      this.startTextEditing({
+        sceneX,
+        sceneY,
+        insertAtParentCenter: !event.altKey,
+        container,
+      });
     }
   };
 

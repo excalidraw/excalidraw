@@ -1295,9 +1295,7 @@ export const renderElementToSvg = (
       );
       root.appendChild(node);
 
-      // render embeddable ALT label
       const label: ExcalidrawElement =
-        getBoundTextElement(element) ??
         createPlaceholderEmbeddableLabel(element);
       renderElementToSvg(
         label,

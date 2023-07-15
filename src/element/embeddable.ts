@@ -97,15 +97,6 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
   return { link, aspectRatio, type };
 };
 
-export const hideActionForEmbeddable = (
-  element: ExcalidrawElement | undefined,
-  props: ExcalidrawProps,
-) =>
-  isEmbeddableElement(element) &&
-  element.link &&
-  element.link !== "" &&
-  !props.validateEmbeddable;
-
 export const isEmbeddableOrFrameLabel = (
   element: NonDeletedExcalidrawElement,
 ): Boolean => {
