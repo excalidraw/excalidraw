@@ -204,17 +204,13 @@ export const canApplyRoundnessTypeToElement = (
 export const getDefaultRoundnessTypeForElement = (
   element: ExcalidrawElement,
 ) => {
-  if (
-    element.type === "arrow" ||
-    element.type === "line" ||
-    element.type === "diamond"
-  ) {
+  if (isUsingProportionalRadius(element.type)) {
     return {
       type: ROUNDNESS.PROPORTIONAL_RADIUS,
     };
   }
 
-  if (element.type === "rectangle" || element.type === "embeddable") {
+  if (isUsingAdaptiveRadius(element.type)) {
     return {
       type: ROUNDNESS.ADAPTIVE_RADIUS,
     };
