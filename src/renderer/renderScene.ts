@@ -536,7 +536,9 @@ export const _renderScene = ({
             }
             if (
               isEmbeddableElement(element) &&
-              (isExporting || !element.validated)
+              (isExporting || !element.validated) &&
+              element.width &&
+              element.height
             ) {
               const label = createPlaceholderEmbeddableLabel(element);
               renderElement(label, rc, context, renderConfig, appState);
