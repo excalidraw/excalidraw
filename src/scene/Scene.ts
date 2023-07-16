@@ -23,21 +23,9 @@ type SceneStateCallbackRemover = () => void;
 
 type SelectionHash = string & { __brand: "selectionHash" };
 
-type getSelectedElementsOpts = {
-  // NOTE can be ommitted by making Scene constructor require App instance
-  selectedElementIds: AppState["selectedElementIds"];
-  /**
-   * for specific cases where you need to use elements not from current
-   * scene state. This in effect will likely result in cache-miss, and
-   * the cache won't be updated in this case.
-   */
-  elements?: readonly ExcalidrawElement[];
-  // selection-related options
-  includeBoundTextElement?: boolean;
-  includeElementsInFrames?: boolean;
-};
-
-const hashSelectionOpts = (opts: getSelectedElementsOpts) => {
+const hashSelectionOpts = (
+  opts: Parameters<InstanceType<typeof Scene>["getSelectedElements"]>[0],
+) => {
   const keys = ["includeBoundTextElement", "includeElementsInFrames"] as const;
 
   type HashableKeys = Omit<typeof opts, "selectedElementIds" | "elements">;
@@ -136,9 +124,19 @@ class Scene {
     return this.frames;
   }
 
-  getSelectedElements(
-    opts: getSelectedElementsOpts,
-  ): NonDeleted<ExcalidrawElement>[] {
+  getSelectedElements(opts: {
+    // NOTE can be ommitted by making Scene constructor require App instance
+    selectedElementIds: AppState["selectedElementIds"];
+    /**
+     * for specific cases where you need to use elements not from current
+     * scene state. This in effect will likely result in cache-miss, and
+     * the cache won't be updated in this case.
+     */
+    elements?: readonly ExcalidrawElement[];
+    // selection-related options
+    includeBoundTextElement?: boolean;
+    includeElementsInFrames?: boolean;
+  }): NonDeleted<ExcalidrawElement>[] {
     const hash = hashSelectionOpts(opts);
 
     const elements = opts?.elements || this.nonDeletedElements;
