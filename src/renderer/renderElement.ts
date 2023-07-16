@@ -405,6 +405,11 @@ export const generateRoughOptions = (
   continuousPath = false,
   isExporting: boolean = false,
 ): Options => {
+  const shouldOverrideForEmbeddableExport =
+    isExporting &&
+    element.type === "embeddable" &&
+    element.backgroundColor === "transparent" &&
+    element.strokeColor === "transparent";
   const options: Options = {
     seed: element.seed,
     strokeLineDash:
@@ -427,7 +432,7 @@ export const generateRoughOptions = (
     // calculate them (and we don't want the fills to be modified)
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
-    roughness: element.roughness,
+    roughness: shouldOverrideForEmbeddableExport ? 0 : element.roughness,
     stroke: element.strokeColor,
     preserveVertices: continuousPath,
   };
