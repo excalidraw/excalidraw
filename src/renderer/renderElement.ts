@@ -416,6 +416,11 @@ export const generateRoughOptions = (
   continuousPath = false,
   isExporting: boolean = false,
 ): Options => {
+  const shouldOverrideForEmbeddableExport =
+    isExporting &&
+    element.type === "embeddable" &&
+    element.backgroundColor === "transparent" &&
+    element.strokeColor === "transparent";
   const options: Options = {
     seed: element.seed,
     strokeLineDash:
@@ -438,7 +443,7 @@ export const generateRoughOptions = (
     // calculate them (and we don't want the fills to be modified)
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
-    roughness: element.roughness,
+    roughness: shouldOverrideForEmbeddableExport ? 0 : element.roughness,
     stroke: element.strokeColor,
     preserveVertices: continuousPath,
   };
@@ -1322,53 +1327,51 @@ export const renderElementToSvg = (
         exportingFrameId,
       );
 
-      if (element.validated) {
-        // render embeddable element + iframe
-        const node = roughSVGDrawWithPrecision(
-          rsvg,
-          getShapeForElement(element)!,
-          MAX_DECIMALS_FOR_SVG_EXPORT,
-        );
-        node.setAttribute("stroke-linecap", "round");
-        node.setAttribute(
-          "transform",
-          `translate(${offsetX || 0} ${
-            offsetY || 0
-          }) rotate(${degree} ${cx} ${cy})`,
-        );
-        while (node.firstChild) {
-          node.removeChild(node.firstChild);
-        }
-        const radius = getCornerRadius(
-          Math.min(element.width, element.height),
-          element,
-        );
-        const foreignObject = svgRoot.ownerDocument!.createElementNS(
-          SVG_NS,
-          "foreignObject",
-        );
-        foreignObject.style.width = `${element.width}px`;
-        foreignObject.style.height = `${element.height}px`;
-        foreignObject.style.border = "none";
-        const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
-        div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-        div.style.width = "100%";
-        div.style.height = "100%";
-        const iframe = div.ownerDocument!.createElement("iframe");
-        const embedLink = getEmbedLink(element.link);
-        iframe.src = embedLink?.link ?? "";
-        iframe.style.width = "100%";
-        iframe.style.height = "100%";
-        iframe.style.border = "none";
-        iframe.style.borderRadius = `${radius}px`;
-        iframe.style.top = "0";
-        iframe.style.left = "0";
-        iframe.allowFullscreen = true;
-        div.appendChild(iframe);
-        foreignObject.appendChild(div);
-        node.appendChild(foreignObject);
-        root.appendChild(node);
+      // render embeddable element + iframe
+      const embeddableNode = roughSVGDrawWithPrecision(
+        rsvg,
+        getShapeForElement(element)!,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
+      embeddableNode.setAttribute("stroke-linecap", "round");
+      embeddableNode.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      while (embeddableNode.firstChild) {
+        embeddableNode.removeChild(embeddableNode.firstChild);
       }
+      const radius = getCornerRadius(
+        Math.min(element.width, element.height),
+        element,
+      );
+      const foreignObject = svgRoot.ownerDocument!.createElementNS(
+        SVG_NS,
+        "foreignObject",
+      );
+      foreignObject.style.width = `${element.width}px`;
+      foreignObject.style.height = `${element.height}px`;
+      foreignObject.style.border = "none";
+      const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
+      div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+      div.style.width = "100%";
+      div.style.height = "100%";
+      const iframe = div.ownerDocument!.createElement("iframe");
+      const embedLink = getEmbedLink(element.link);
+      iframe.src = embedLink?.link ?? "";
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.border = "none";
+      iframe.style.borderRadius = `${radius}px`;
+      iframe.style.top = "0";
+      iframe.style.left = "0";
+      iframe.allowFullscreen = true;
+      div.appendChild(iframe);
+      foreignObject.appendChild(div);
+      embeddableNode.appendChild(foreignObject);
+      root.appendChild(embeddableNode);
       break;
     }
     case "line":

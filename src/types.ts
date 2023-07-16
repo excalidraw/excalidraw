@@ -427,7 +427,7 @@ export interface ExcalidrawProps {
     appState: AppState,
   ) => JSX.Element | null;
   renderWebview?: boolean; //zsviczian
-  renderIFrameMenu?: ( //zsivzian
+  renderEmbeddableMenu?: ( //zsivzian
     appState: AppState,
   ) => JSX.Element | null;
 }
@@ -623,7 +623,7 @@ export type ExcalidrawImperativeAPI = {
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
-  getIFrameElementById: InstanceType<typeof App>["getIFrameElementById"]; //zsviczian
+  getHTMLIFrameElement: InstanceType<typeof App>["getHTMLIFrameElement"]; //zsviczian
   /**
    * Disables rendering of frames (including element clipping), but currently
    * the frames are still interactive in edit mode. As such, this API should be

@@ -549,7 +549,7 @@ class App extends React.Component<AppProps, AppState> {
         resetCursor: this.resetCursor,
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
-        getIFrameElementById: (id:string) =>this.getHTMLIFrameElement(id), //zsviczian
+        getHTMLIFrameElement: (id:string) =>this.getHTMLIFrameElement(id), //zsviczian
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -1273,7 +1273,7 @@ class App extends React.Component<AppProps, AppState> {
                         <main>{this.renderCanvas()}</main>
                         {this.renderFrameNames()}
                         {this.state.activeEmbeddable?.state === "active" && //zsviczian
-                          this.props.renderIFrameMenu?.(this.state)}
+                          this.props.renderEmbeddableMenu?.(this.state)}
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
                     </ExcalidrawElementsContext.Provider>
