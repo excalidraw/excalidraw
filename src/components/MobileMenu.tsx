@@ -1,5 +1,11 @@
 import React from "react";
-import { AppState, Device, ExcalidrawProps, UIAppState } from "../types";
+import {
+  AppClassProperties,
+  AppState,
+  Device,
+  ExcalidrawProps,
+  UIAppState,
+} from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -41,6 +47,7 @@ type MobileMenuProps = {
   renderSidebars: () => JSX.Element | null;
   device: Device;
   renderWelcomeScreen: boolean;
+  app: AppClassProperties;
 };
 
 export const MobileMenu = ({
@@ -58,6 +65,7 @@ export const MobileMenu = ({
   renderSidebars,
   device,
   renderWelcomeScreen,
+  app,
 }: MobileMenuProps) => {
   const {
     WelcomeScreenCenterTunnel,
@@ -119,9 +127,9 @@ export const MobileMenu = ({
         </Section>
         <HintViewer
           appState={appState}
-          elements={elements}
           isMobile={true}
           device={device}
+          app={app}
         />
       </FixedSideContainer>
     );

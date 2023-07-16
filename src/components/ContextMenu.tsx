@@ -82,7 +82,9 @@ export const ContextMenu = React.memo(
             let label = "";
             if (item.contextItemLabel) {
               if (typeof item.contextItemLabel === "function") {
-                label = t(item.contextItemLabel(elements, appState));
+                label = t(
+                  item.contextItemLabel(elements, appState, actionManager.app),
+                );
               } else {
                 label = t(item.contextItemLabel);
               }

@@ -798,10 +798,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public render() {
-    const selectedElement = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
+    const selectedElement = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderCustomStats } = this.props;
 
     return (
@@ -858,6 +855,7 @@ class App extends React.Component<AppProps, AppState> {
                             !this.state.zenModeEnabled &&
                             !this.scene.getElementsIncludingDeleted().length
                           }
+                          app={this}
                         >
                           {this.props.children}
                         </LayerUI>
@@ -963,10 +961,7 @@ class App extends React.Component<AppProps, AppState> {
         const shouldUpdateStrokeColor =
           (type === "background" && event.altKey) ||
           (type === "stroke" && !event.altKey);
-        const selectedElements = getSelectedElements(
-          this.scene.getElementsIncludingDeleted(),
-          this.state,
-        );
+        const selectedElements = this.scene.getSelectedElements(this.state);
         if (
           !selectedElements.length ||
           this.state.activeTool.type !== "selection"
@@ -2046,6 +2041,7 @@ class App extends React.Component<AppProps, AppState> {
         },
         this.scene.getNonDeletedElements(),
         this.state,
+        this,
       ),
       () => {
         if (opts.files) {
@@ -2610,14 +2606,11 @@ class App extends React.Component<AppProps, AppState> {
           offsetY = step;
         }
 
-        const selectedElements = getSelectedElements(
-          this.scene.getNonDeletedElements(),
-          this.state,
-          {
-            includeBoundTextElement: true,
-            includeElementsInFrames: true,
-          },
-        );
+        const selectedElements = this.scene.getSelectedElements({
+          selectedElementIds: this.state.selectedElementIds,
+          includeBoundTextElement: true,
+          includeElementsInFrames: true,
+        });
 
         selectedElements.forEach((element) => {
           mutateElement(element, {
@@ -2634,10 +2627,7 @@ class App extends React.Component<AppProps, AppState> {
 
         event.preventDefault();
       } else if (event.key === KEYS.ENTER) {
-        const selectedElements = getSelectedElements(
-          this.scene.getNonDeletedElements(),
-          this.state,
-        );
+        const selectedElements = this.scene.getSelectedElements(this.state);
         if (selectedElements.length === 1) {
           const selectedElement = selectedElements[0];
           if (event[KEYS.CTRL_OR_CMD]) {
@@ -2713,10 +2703,7 @@ class App extends React.Component<AppProps, AppState> {
         !event.altKey &&
         !event[KEYS.CTRL_OR_CMD]
       ) {
-        const selectedElements = getSelectedElements(
-          this.scene.getNonDeletedElements(),
-          this.state,
-        );
+        const selectedElements = this.scene.getSelectedElements(this.state);
         if (
           this.state.activeTool.type === "selection" &&
           !selectedElements.length
@@ -2788,10 +2775,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ isBindingEnabled: true });
     }
     if (isArrowKey(event.key)) {
-      const selectedElements = getSelectedElements(
-        this.scene.getNonDeletedElements(),
-        this.state,
-      );
+      const selectedElements = this.scene.getSelectedElements(this.state);
       isBindingEnabled(this.state)
         ? bindOrUnbindSelectedElements(selectedElements)
         : unbindLinearElements(selectedElements);
@@ -3141,10 +3125,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
 
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
+    const selectedElements = this.scene.getSelectedElements(this.state);
 
     if (selectedElements.length === 1) {
       if (isTextElement(selectedElements[0])) {
@@ -3274,10 +3255,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
+    const selectedElements = this.scene.getSelectedElements(this.state);
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
@@ -3328,6 +3306,7 @@ class App extends React.Component<AppProps, AppState> {
             },
             this.scene.getNonDeletedElements(),
             prevState,
+            this,
           ),
         );
         return;
@@ -3704,7 +3683,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const elements = this.scene.getNonDeletedElements();
 
-    const selectedElements = getSelectedElements(elements, this.state);
+    const selectedElements = this.scene.getSelectedElements(this.state);
     if (
       selectedElements.length === 1 &&
       !isOverScrollBar &&
@@ -4407,10 +4386,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
   ): PointerDownState {
     const origin = viewportCoordsToSceneCoords(event, this.state);
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
+    const selectedElements = this.scene.getSelectedElements(this.state);
     const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
 
     return {
@@ -4528,7 +4504,7 @@ class App extends React.Component<AppProps, AppState> {
   ): boolean => {
     if (this.state.activeTool.type === "selection") {
       const elements = this.scene.getNonDeletedElements();
-      const selectedElements = getSelectedElements(elements, this.state);
+      const selectedElements = this.scene.getSelectedElements(this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
@@ -4771,6 +4747,7 @@ class App extends React.Component<AppProps, AppState> {
                   },
                   this.scene.getNonDeletedElements(),
                   prevState,
+                  this,
                 );
               });
               pointerDownState.hit.wasAddedToSelection = true;
@@ -5198,7 +5175,7 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.drag.offset === null) {
         pointerDownState.drag.offset = tupleToCoors(
           getDragOffsetXY(
-            getSelectedElements(this.scene.getNonDeletedElements(), this.state),
+            this.scene.getSelectedElements(this.state),
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           ),
@@ -5361,10 +5338,7 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
         !isSelectingPointsInLineEditor
       ) {
-        const selectedElements = getSelectedElements(
-          this.scene.getNonDeletedElements(),
-          this.state,
-        );
+        const selectedElements = this.scene.getSelectedElements(this.state);
 
         if (selectedElements.every((element) => element.locked)) {
           return;
@@ -5435,13 +5409,17 @@ class App extends React.Component<AppProps, AppState> {
             const groupIdMap = new Map();
             const oldIdToDuplicatedId = new Map();
             const hitElement = pointerDownState.hit.element;
-            const elements = this.scene.getElementsIncludingDeleted();
             const selectedElementIds = new Set(
-              getSelectedElements(elements, this.state, {
-                includeBoundTextElement: true,
-                includeElementsInFrames: true,
-              }).map((element) => element.id),
+              this.scene
+                .getSelectedElements({
+                  selectedElementIds: this.state.selectedElementIds,
+                  includeBoundTextElement: true,
+                  includeElementsInFrames: true,
+                })
+                .map((element) => element.id),
             );
+
+            const elements = this.scene.getNonDeletedElements();
 
             for (const element of elements) {
               if (
@@ -5584,6 +5562,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 this.scene.getNonDeletedElements(),
                 prevState,
+                this,
               ),
             );
           }
@@ -5641,6 +5620,7 @@ class App extends React.Component<AppProps, AppState> {
               },
               this.scene.getNonDeletedElements(),
               prevState,
+              this,
             );
           });
         }
@@ -5740,10 +5720,7 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.hit?.element?.id !==
           this.state.selectedLinearElement.elementId
         ) {
-          const selectedELements = getSelectedElements(
-            this.scene.getNonDeletedElements(),
-            this.state,
-          );
+          const selectedELements = this.scene.getSelectedElements(this.state);
           // set selectedLinearElement to null if there is more than one element selected since we don't want to show linear element handles
           if (selectedELements.length > 1) {
             this.setState({ selectedLinearElement: null });
@@ -5985,10 +5962,7 @@ class App extends React.Component<AppProps, AppState> {
             const topLayerFrame =
               this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
-            const selectedElements = getSelectedElements(
-              this.scene.getNonDeletedElements(),
-              this.state,
-            );
+            const selectedElements = this.scene.getSelectedElements(this.state);
             let nextElements = this.scene.getElementsIncludingDeleted();
 
             const updateGroupIdsAfterEditingGroup = (
@@ -6067,6 +6041,7 @@ class App extends React.Component<AppProps, AppState> {
             nextElements = updateFrameMembershipOfSelectedElements(
               this.scene.getElementsIncludingDeleted(),
               this.state,
+              this,
             );
 
             this.scene.replaceAllElements(nextElements);
@@ -6111,14 +6086,14 @@ class App extends React.Component<AppProps, AppState> {
         let nextElements = updateFrameMembershipOfSelectedElements(
           this.scene.getElementsIncludingDeleted(),
           this.state,
+          this,
         );
 
-        const selectedFrames = getSelectedElements(
-          this.scene.getElementsIncludingDeleted(),
-          this.state,
-        ).filter(
-          (element) => element.type === "frame",
-        ) as ExcalidrawFrameElement[];
+        const selectedFrames = this.scene
+          .getSelectedElements(this.state)
+          .filter(
+            (element) => element.type === "frame",
+          ) as ExcalidrawFrameElement[];
 
         for (const frame of selectedFrames) {
           nextElements = replaceAllElementsInFrame(
@@ -6143,10 +6118,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement?.elementId !== hitElement?.id &&
         isLinearElement(hitElement)
       ) {
-        const selectedELements = getSelectedElements(
-          this.scene.getNonDeletedElements(),
-          this.state,
-        );
+        const selectedELements = this.scene.getSelectedElements(this.state);
         // set selectedLinearElement when no other element selected except
         // the one we've hit
         if (selectedELements.length === 1) {
@@ -6248,7 +6220,7 @@ class App extends React.Component<AppProps, AppState> {
                 delete newSelectedElementIds[hitElement!.id];
                 const newSelectedElements = getSelectedElements(
                   this.scene.getNonDeletedElements(),
-                  { ...prevState, selectedElementIds: newSelectedElementIds },
+                  { selectedElementIds: newSelectedElementIds },
                 );
 
                 return selectGroupsForSelectedElements(
@@ -6267,6 +6239,7 @@ class App extends React.Component<AppProps, AppState> {
                   },
                   this.scene.getNonDeletedElements(),
                   prevState,
+                  this,
                 );
               });
             }
@@ -6303,6 +6276,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 this.scene.getNonDeletedElements(),
                 prevState,
+                this,
               );
             });
           } else {
@@ -6333,6 +6307,7 @@ class App extends React.Component<AppProps, AppState> {
               },
               this.scene.getNonDeletedElements(),
               prevState,
+              this,
             ),
           }));
         }
@@ -6392,9 +6367,7 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
         (isBindingEnabled(this.state)
           ? bindOrUnbindSelectedElements
-          : unbindLinearElements)(
-          getSelectedElements(this.scene.getNonDeletedElements(), this.state),
-        );
+          : unbindLinearElements)(this.scene.getSelectedElements(this.state));
       }
 
       if (!activeTool.locked && activeTool.type !== "freedraw") {
@@ -7101,10 +7074,7 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements: true,
     });
 
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
+    const selectedElements = this.scene.getSelectedElements(this.state);
     const isHittignCommonBoundBox =
       this.isHittingCommonBoundingBoxOfSelectedElements(
         { x, y },
@@ -7134,6 +7104,7 @@ class App extends React.Component<AppProps, AppState> {
               },
               this.scene.getNonDeletedElements(),
               this.state,
+              this,
             )
           : this.state),
         showHyperlinkPopup: false,
@@ -7221,10 +7192,7 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
+    const selectedElements = this.scene.getSelectedElements(this.state);
     const selectedFrames = selectedElements.filter(
       (element) => element.type === "frame",
     ) as ExcalidrawFrameElement[];

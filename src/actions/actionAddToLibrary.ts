@@ -1,6 +1,4 @@
 import { register } from "./register";
-import { getSelectedElements } from "../scene";
-import { getNonDeletedElements } from "../element";
 import { deepCopyElement } from "../element/newElement";
 import { randomId } from "../random";
 import { t } from "../i18n";
@@ -9,14 +7,11 @@ export const actionAddToLibrary = register({
   name: "addToLibrary",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-      {
-        includeBoundTextElement: true,
-        includeElementsInFrames: true,
-      },
-    );
+    const selectedElements = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: true,
+      includeElementsInFrames: true,
+    });
     if (selectedElements.some((element) => element.type === "image")) {
       return {
         commitToHistory: false,

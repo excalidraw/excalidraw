@@ -42,6 +42,7 @@ export const actionSelectAll = register({
         },
         getNonDeletedElements(elements),
         appState,
+        app,
       ),
       commitToHistory: true,
     };

@@ -16,7 +16,7 @@ import {
 } from "./element/textElement";
 import { arrayToMap, findIndex } from "./utils";
 import { mutateElement } from "./element/mutateElement";
-import { AppState } from "./types";
+import { AppClassProperties, AppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
 import { moveOneRight } from "./zindex";
@@ -571,8 +571,13 @@ export const replaceAllElementsInFrame = (
 export const updateFrameMembershipOfSelectedElements = (
   allElements: ExcalidrawElementsIncludingDeleted,
   appState: AppState,
+  app: AppClassProperties,
 ) => {
-  const selectedElements = getSelectedElements(allElements, appState);
+  const selectedElements = app.scene.getSelectedElements({
+    selectedElementIds: appState.selectedElementIds,
+    // supplying elements explicitly in case we're passed non-state elements
+    elements: allElements,
+  });
   const elementsToFilter = new Set<ExcalidrawElement>(selectedElements);
 
   if (appState.editingGroupId) {

@@ -1,7 +1,6 @@
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
 import { KEYS } from "../keys";
-import { getSelectedElements } from "../scene";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 
@@ -11,14 +10,15 @@ const shouldLock = (elements: readonly ExcalidrawElement[]) =>
 export const actionToggleElementLock = register({
   name: "toggleElementLock",
   trackEvent: { category: "element" },
-  predicate: (elements, appState) => {
-    const selectedElements = getSelectedElements(elements, appState);
+  predicate: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
     return !selectedElements.some(
       (element) => element.locked && element.frameId,
     );
   },
-  perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(elements, appState, {
+  perform: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: true,
       includeElementsInFrames: true,
     });
@@ -46,8 +46,9 @@ export const actionToggleElementLock = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: (elements, appState) => {
-    const selected = getSelectedElements(elements, appState, {
+  contextItemLabel: (elements, appState, app) => {
+    const selected = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: false,
     });
     if (selected.length === 1 && selected[0].type !== "frame") {
@@ -60,12 +61,13 @@ export const actionToggleElementLock = register({
       ? "labels.elementLock.lockAll"
       : "labels.elementLock.unlockAll";
   },
-  keyTest: (event, appState, elements) => {
+  keyTest: (event, appState, elements, app) => {
     return (
       event.key.toLocaleLowerCase() === KEYS.L &&
       event[KEYS.CTRL_OR_CMD] &&
       event.shiftKey &&
-      getSelectedElements(elements, appState, {
+      app.scene.getSelectedElements({
+        selectedElementIds: appState.selectedElementIds,
         includeBoundTextElement: false,
       }).length > 0
     );
