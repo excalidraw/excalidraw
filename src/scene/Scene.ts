@@ -156,8 +156,6 @@ class Scene {
       this.selectedElementsCache.cache.clear();
     }
 
-    this.selectedElementsCache.selectedElementIds = opts.selectedElementIds;
-
     const selectedElements = getSelectedElements(
       elements,
       { selectedElementIds: opts.selectedElementIds },
@@ -166,6 +164,7 @@ class Scene {
 
     // cache only if we're not using custom elements
     if (opts?.elements == null) {
+      this.selectedElementsCache.selectedElementIds = opts.selectedElementIds;
       this.selectedElementsCache.elements = this.nonDeletedElements;
       this.selectedElementsCache.cache.set(hash, selectedElements);
     }
