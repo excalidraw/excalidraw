@@ -206,7 +206,7 @@ export const actionAlignHorizontallyCentered = register({
   name: "alignHorizontallyCentered",
   trackEvent: { category: "element" },
   predicate: alignActionsPredicate,
-  perform: (elements, appState, app) => {
+  perform: (elements, appState, _, app) => {
     return {
       appState,
       elements: alignSelectedElements(elements, appState, app, {

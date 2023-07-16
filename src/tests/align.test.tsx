@@ -442,33 +442,41 @@ describe("aligning", () => {
     mouse.down();
     mouse.up(100, 100);
 
+    // console.log(h.state.selectedElementIds);
+
     UI.clickTool("rectangle");
     mouse.down(0, 0);
     mouse.up(100, 100);
 
+    // console.log(h.state.selectedElementIds);
     // Select the first element.
     // The second rectangle is already reselected because it was the last element created
     mouse.reset();
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.click();
     });
+    // console.log(h.state.selectedElementIds);
 
     // Create first group of rectangles
     h.app.actionManager.executeAction(actionGroup);
+    // console.log(h.state.selectedElementIds);
 
     mouse.reset();
     UI.clickTool("rectangle");
     mouse.down(200, 200);
     mouse.up(100, 100);
+    // console.log(h.state.selectedElementIds);
 
     // Add group to current selection
     mouse.restorePosition(0, 0);
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.click();
     });
+    // console.log(h.state.selectedElementIds);
 
     // Create the nested group
     h.app.actionManager.executeAction(actionGroup);
+    // console.log(h.state.selectedElementIds);
 
     mouse.reset();
     UI.clickTool("rectangle");
@@ -564,6 +572,9 @@ describe("aligning", () => {
 
   it("centers nested group and other element correctly horizontally", () => {
     createAndSelectNestedGroupAndRectangle();
+
+    // console.log(h.state.selectedElementIds);
+    // console.log(API.getSelectedElements());
 
     expect(API.getSelectedElements()[0].x).toEqual(0);
     expect(API.getSelectedElements()[1].x).toEqual(100);

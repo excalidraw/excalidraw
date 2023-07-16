@@ -99,106 +99,6 @@ Object {
 }
 `;
 
-exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 0,
-  "y": 30,
-}
-`;
-
-exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id5",
-  ],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1014066025,
-  "width": 10,
-  "x": 0,
-  "y": 0,
-}
-`;
-
-exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id5",
-  ],
-  "height": 10,
-  "id": "id2",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 238820263,
-  "width": 10,
-  "x": 0,
-  "y": 60,
-}
-`;
-
 exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -543,7 +443,7 @@ Object {
 }
 `;
 
-exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] number of elements 1`] = `3`;
+exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] number of elements 1`] = `0`;
 
 exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] number of renders 1`] = `28`;
 
@@ -645,106 +545,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 100,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 100,
-  "x": 110,
-  "y": 110,
-}
-`;
-
-exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id4",
-  ],
-  "height": 100,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1116226695,
-  "width": 100,
-  "x": 0,
-  "y": 0,
-}
-`;
-
-exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id4",
-  ],
-  "height": 100,
-  "id": "id2",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1014066025,
-  "width": 100,
-  "x": 220,
-  "y": 220,
 }
 `;
 
@@ -1092,7 +892,7 @@ Object {
 }
 `;
 
-exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] number of elements 1`] = `3`;
+exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] number of elements 1`] = `0`;
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] number of renders 1`] = `24`;
 
@@ -1185,110 +985,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id4",
-    "id10",
-  ],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 493213705,
-  "width": 10,
-  "x": 0,
-  "y": 0,
-}
-`;
-
-exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id4",
-    "id10",
-  ],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 915032327,
-  "width": 10,
-  "x": 30,
-  "y": 0,
-}
-`;
-
-exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id10",
-  ],
-  "height": 10,
-  "id": "id7",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 400692809,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 81784553,
-  "width": 10,
-  "x": 60,
-  "y": 0,
 }
 `;
 
@@ -2018,7 +1714,7 @@ Object {
 }
 `;
 
-exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] number of elements 1`] = `3`;
+exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] number of renders 1`] = `43`;
 
@@ -2113,38 +1809,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 25,
-  "y": 25,
 }
 `;
 
@@ -2254,7 +1918,7 @@ Object {
 }
 `;
 
-exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] number of elements 1`] = `1`;
+exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] number of renders 1`] = `12`;
 
@@ -2352,106 +2016,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests adjusts z order when grouping: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 30,
-  "y": 10,
-}
-`;
-
-exports[`regression tests adjusts z order when grouping: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id5",
-  ],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1014066025,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
-exports[`regression tests adjusts z order when grouping: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id5",
-  ],
-  "height": 10,
-  "id": "id2",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 238820263,
-  "width": 10,
-  "x": 50,
-  "y": 10,
 }
 `;
 
@@ -2799,7 +2363,7 @@ Object {
 }
 `;
 
-exports[`regression tests adjusts z order when grouping: [end of test] number of elements 1`] = `3`;
+exports[`regression tests adjusts z order when grouping: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests adjusts z order when grouping: [end of test] number of renders 1`] = `22`;
 
@@ -2894,70 +2458,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests alt-drag duplicates an element: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0_copy",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 2019559783,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
-exports[`regression tests alt-drag duplicates an element: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 20,
-  "y": 20,
 }
 `;
 
@@ -3096,7 +2596,7 @@ Object {
 }
 `;
 
-exports[`regression tests alt-drag duplicates an element: [end of test] number of elements 1`] = `2`;
+exports[`regression tests alt-drag duplicates an element: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `12`;
 
@@ -3192,38 +2692,6 @@ Object {
 }
 `;
 
-exports[`regression tests arrow keys: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 8,
-  "versionNonce": 1116226695,
-  "width": 10,
-  "x": 9,
-  "y": 9,
-}
-`;
-
 exports[`regression tests arrow keys: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -3287,7 +2755,7 @@ Object {
 }
 `;
 
-exports[`regression tests arrow keys: [end of test] number of elements 1`] = `1`;
+exports[`regression tests arrow keys: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests arrow keys: [end of test] number of renders 1`] = `21`;
 
@@ -3385,102 +2853,6 @@ Object {
 }
 `;
 
-exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 200,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 1278240551,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 449462985,
-  "width": 200,
-  "x": 100,
-  "y": 100,
-}
-`;
-
-exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 200,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 453191,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1014066025,
-  "width": 200,
-  "x": 300,
-  "y": 300,
-}
-`;
-
-exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 350,
-  "id": "id2",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 2019559783,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1150084233,
-  "width": 350,
-  "x": 300,
-  "y": 300,
-}
-`;
-
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -3526,14 +2898,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 1278240551,
+          "seed": 337897,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 449462985,
+          "versionNonce": 1278240551,
           "width": 200,
           "x": 100,
           "y": 100,
@@ -3569,14 +2941,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 1278240551,
+          "seed": 337897,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 449462985,
+          "versionNonce": 1278240551,
           "width": 200,
           "x": 100,
           "y": 100,
@@ -3598,14 +2970,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 453191,
+          "seed": 449462985,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 401146281,
+          "versionNonce": 453191,
           "width": 200,
           "x": 100,
           "y": 100,
@@ -3641,14 +3013,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 1278240551,
+          "seed": 337897,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 449462985,
+          "versionNonce": 1278240551,
           "width": 200,
           "x": 100,
           "y": 100,
@@ -3670,14 +3042,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 453191,
+          "seed": 449462985,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 401146281,
+          "versionNonce": 453191,
           "width": 200,
           "x": 100,
           "y": 100,
@@ -3699,14 +3071,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 2019559783,
+          "seed": 401146281,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1150084233,
+          "versionNonce": 2019559783,
           "width": 350,
           "x": 300,
           "y": 300,
@@ -3742,14 +3114,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 1278240551,
+          "seed": 337897,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 449462985,
+          "versionNonce": 1278240551,
           "width": 200,
           "x": 100,
           "y": 100,
@@ -3771,14 +3143,14 @@ Object {
           "roundness": Object {
             "type": 3,
           },
-          "seed": 453191,
+          "seed": 449462985,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 3,
-          "versionNonce": 1014066025,
+          "versionNonce": 1116226695,
           "width": 200,
           "x": 300,
           "y": 300,
@@ -3800,14 +3172,14 @@ Object {
           "roundness": Object {
             "type": 2,
           },
-          "seed": 2019559783,
+          "seed": 401146281,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "updated": 1,
           "version": 2,
-          "versionNonce": 1150084233,
+          "versionNonce": 2019559783,
           "width": 350,
           "x": 300,
           "y": 300,
@@ -3818,7 +3190,7 @@ Object {
 }
 `;
 
-exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] number of elements 1`] = `3`;
+exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] number of renders 1`] = `20`;
 
@@ -3911,38 +3283,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests change the properties of a shape: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "#ffc9c9",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1971c2",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 5,
-  "versionNonce": 401146281,
-  "width": 10,
-  "x": 10,
-  "y": 10,
 }
 `;
 
@@ -4138,7 +3478,7 @@ Object {
 }
 `;
 
-exports[`regression tests change the properties of a shape: [end of test] number of elements 1`] = `1`;
+exports[`regression tests change the properties of a shape: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `14`;
 
@@ -4472,38 +3812,6 @@ Object {
 }
 `;
 
-exports[`regression tests click on an element and drag it: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 2019559783,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests click on an element and drag it: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -4653,7 +3961,7 @@ Object {
 }
 `;
 
-exports[`regression tests click on an element and drag it: [end of test] number of elements 1`] = `1`;
+exports[`regression tests click on an element and drag it: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `15`;
 
@@ -4748,70 +4056,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests click to select a shape: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
-exports[`regression tests click to select a shape: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 30,
-  "y": 10,
 }
 `;
 
@@ -4950,7 +4194,7 @@ Object {
 }
 `;
 
-exports[`regression tests click to select a shape: [end of test] number of elements 1`] = `2`;
+exports[`regression tests click to select a shape: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `15`;
 
@@ -5046,102 +4290,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests click-drag to select a group: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
-exports[`regression tests click-drag to select a group: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 30,
-  "y": 10,
-}
-`;
-
-exports[`regression tests click-drag to select a group: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id2",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 2019559783,
-  "width": 10,
-  "x": 50,
-  "y": 10,
 }
 `;
 
@@ -5381,7 +4529,7 @@ Object {
 }
 `;
 
-exports[`regression tests click-drag to select a group: [end of test] number of elements 1`] = `3`;
+exports[`regression tests click-drag to select a group: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `21`;
 
@@ -5534,70 +4682,6 @@ Object {
 }
 `;
 
-exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 0,
-  "y": 0,
-}
-`;
-
-exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 110,
-  "y": 110,
-}
-`;
-
 exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -5733,7 +4817,7 @@ Object {
 }
 `;
 
-exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] number of elements 1`] = `2`;
+exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `16`;
 
@@ -5855,70 +4939,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 0,
-  "y": 0,
-}
-`;
-
-exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 110,
-  "y": 110,
 }
 `;
 
@@ -6057,7 +5077,7 @@ Object {
 }
 `;
 
-exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] number of elements 1`] = `2`;
+exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] number of renders 1`] = `17`;
 
@@ -6209,38 +5229,6 @@ Object {
 }
 `;
 
-exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 0,
-  "y": 0,
-}
-`;
-
 exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -6304,7 +5292,7 @@ Object {
 }
 `;
 
-exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] number of elements 1`] = `1`;
+exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `10`;
 
@@ -6400,38 +5388,6 @@ Object {
 }
 `;
 
-exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 100,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 100,
-  "x": 0,
-  "y": 0,
-}
-`;
-
 exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -6495,7 +5451,7 @@ Object {
 }
 `;
 
-exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] number of elements 1`] = `1`;
+exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] number of renders 1`] = `11`;
 
@@ -6588,108 +5544,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests double click to edit a group: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id3",
-  ],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1150084233,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
-exports[`regression tests double click to edit a group: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id3",
-  ],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1116226695,
-  "width": 10,
-  "x": 30,
-  "y": 10,
-}
-`;
-
-exports[`regression tests double click to edit a group: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id3",
-  ],
-  "height": 10,
-  "id": "id2",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1014066025,
-  "width": 10,
-  "x": 50,
-  "y": 10,
 }
 `;
 
@@ -7040,7 +5894,7 @@ Object {
 }
 `;
 
-exports[`regression tests double click to edit a group: [end of test] number of elements 1`] = `3`;
+exports[`regression tests double click to edit a group: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests double click to edit a group: [end of test] number of renders 1`] = `20`;
 
@@ -7137,70 +5991,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1150084233,
-  "width": 10,
-  "x": 25,
-  "y": 25,
-}
-`;
-
-exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1116226695,
-  "width": 10,
-  "x": 135,
-  "y": 135,
 }
 `;
 
@@ -7412,7 +6202,7 @@ Object {
 }
 `;
 
-exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] number of elements 1`] = `2`;
+exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] number of renders 1`] = `18`;
 
@@ -7503,358 +6293,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests draw every type of shape: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 20,
-  "x": 10,
-  "y": -10,
-}
-`;
-
-exports[`regression tests draw every type of shape: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "diamond",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 20,
-  "x": 40,
-  "y": -10,
-}
-`;
-
-exports[`regression tests draw every type of shape: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id2",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 2019559783,
-  "width": 20,
-  "x": 70,
-  "y": -10,
-}
-`;
-
-exports[`regression tests draw every type of shape: [end of test] element 3 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "endArrowhead": "arrow",
-  "endBinding": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id3",
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      50,
-      10,
-    ],
-  ],
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 1150084233,
-  "startArrowhead": null,
-  "startBinding": null,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "arrow",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1014066025,
-  "width": 50,
-  "x": 130,
-  "y": -10,
-}
-`;
-
-exports[`regression tests draw every type of shape: [end of test] element 4 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "endArrowhead": null,
-  "endBinding": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id4",
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      50,
-      10,
-    ],
-  ],
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 238820263,
-  "startArrowhead": null,
-  "startBinding": null,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "line",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1604849351,
-  "width": 50,
-  "x": 220,
-  "y": -10,
-}
-`;
-
-exports[`regression tests draw every type of shape: [end of test] element 5 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "endArrowhead": "arrow",
-  "endBinding": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 20,
-  "id": "id5",
-  "isDeleted": false,
-  "lastCommittedPoint": Array [
-    80,
-    20,
-  ],
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      50,
-      10,
-    ],
-    Array [
-      80,
-      20,
-    ],
-  ],
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 1505387817,
-  "startArrowhead": null,
-  "startBinding": null,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "arrow",
-  "updated": 1,
-  "version": 7,
-  "versionNonce": 1723083209,
-  "width": 80,
-  "x": 310,
-  "y": -10,
-}
-`;
-
-exports[`regression tests draw every type of shape: [end of test] element 6 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "endArrowhead": null,
-  "endBinding": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 20,
-  "id": "id6",
-  "isDeleted": false,
-  "lastCommittedPoint": Array [
-    80,
-    20,
-  ],
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      50,
-      10,
-    ],
-    Array [
-      80,
-      20,
-    ],
-  ],
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 760410951,
-  "startArrowhead": null,
-  "startBinding": null,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "line",
-  "updated": 1,
-  "version": 7,
-  "versionNonce": 406373543,
-  "width": 80,
-  "x": 430,
-  "y": -10,
-}
-`;
-
-exports[`regression tests draw every type of shape: [end of test] element 7 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id7",
-  "isDeleted": false,
-  "lastCommittedPoint": Array [
-    50,
-    10,
-  ],
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      50,
-      10,
-    ],
-    Array [
-      50,
-      10,
-    ],
-  ],
-  "pressures": Array [
-    0,
-    0,
-    0,
-  ],
-  "roughness": 1,
-  "roundness": null,
-  "seed": 941653321,
-  "simulatePressure": false,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "freedraw",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 1359939303,
-  "width": 50,
-  "x": 550,
-  "y": -10,
 }
 `;
 
@@ -9822,7 +8260,7 @@ Object {
 }
 `;
 
-exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `8`;
+exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `57`;
 
@@ -9918,102 +8356,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 0,
-  "y": 0,
-}
-`;
-
-exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 100,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 100,
-  "x": 110,
-  "y": 110,
-}
-`;
-
-exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 100,
-  "id": "id2",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "diamond",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 2019559783,
-  "width": 100,
-  "x": 310,
-  "y": 310,
 }
 `;
 
@@ -10253,7 +8595,7 @@ Object {
 }
 `;
 
-exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of elements 1`] = `3`;
+exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of renders 1`] = `21`;
 
@@ -10349,70 +8691,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "#ffc9c9",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 1000,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 1000,
-  "x": 0,
-  "y": 0,
-}
-`;
-
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "#ffc9c9",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 1000,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 1000,
-  "x": 500,
-  "y": 500,
 }
 `;
 
@@ -10551,7 +8829,7 @@ Object {
 }
 `;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of elements 1`] = `2`;
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `19`;
 
@@ -10649,70 +8927,6 @@ Object {
 }
 `;
 
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "red",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 1000,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 1,
-  "versionNonce": 0,
-  "width": 1000,
-  "x": 0,
-  "y": 0,
-}
-`;
-
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "red",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 500,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 1278240551,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 1,
-  "versionNonce": 0,
-  "width": 500,
-  "x": 500,
-  "y": 500,
-}
-`;
-
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -10805,7 +9019,7 @@ Object {
 }
 `;
 
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of elements 1`] = `2`;
+exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of renders 1`] = `12`;
 
@@ -10900,70 +9114,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "red",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 1000,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 401146281,
-  "width": 1000,
-  "x": 100,
-  "y": 100,
-}
-`;
-
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "red",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 500,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 1278240551,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 1,
-  "versionNonce": 0,
-  "width": 500,
-  "x": 500,
-  "y": 500,
 }
 `;
 
@@ -11131,7 +9281,7 @@ Object {
 }
 `;
 
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of elements 1`] = `2`;
+exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of renders 1`] = `13`;
 
@@ -11227,38 +9377,6 @@ Object {
 }
 `;
 
-exports[`regression tests key 2 selects rectangle tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests key 2 selects rectangle tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -11322,7 +9440,7 @@ Object {
 }
 `;
 
-exports[`regression tests key 2 selects rectangle tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 2 selects rectangle tool: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests key 2 selects rectangle tool: [end of test] number of renders 1`] = `9`;
 
@@ -11418,38 +9536,6 @@ Object {
 }
 `;
 
-exports[`regression tests key 3 selects diamond tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "diamond",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests key 3 selects diamond tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -11513,7 +9599,7 @@ Object {
 }
 `;
 
-exports[`regression tests key 3 selects diamond tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 3 selects diamond tool: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests key 3 selects diamond tool: [end of test] number of renders 1`] = `9`;
 
@@ -11609,38 +9695,6 @@ Object {
 }
 `;
 
-exports[`regression tests key 4 selects ellipse tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests key 4 selects ellipse tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -11704,7 +9758,7 @@ Object {
 }
 `;
 
-exports[`regression tests key 4 selects ellipse tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 4 selects ellipse tool: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests key 4 selects ellipse tool: [end of test] number of renders 1`] = `9`;
 
@@ -11823,53 +9877,6 @@ Object {
 }
 `;
 
-exports[`regression tests key 5 selects arrow tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "endArrowhead": "arrow",
-  "endBinding": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      10,
-      10,
-    ],
-  ],
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 337897,
-  "startArrowhead": null,
-  "startBinding": null,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "arrow",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 449462985,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests key 5 selects arrow tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -11948,7 +9955,7 @@ Object {
 }
 `;
 
-exports[`regression tests key 5 selects arrow tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 5 selects arrow tool: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests key 5 selects arrow tool: [end of test] number of renders 1`] = `10`;
 
@@ -12067,53 +10074,6 @@ Object {
 }
 `;
 
-exports[`regression tests key 6 selects line tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "endArrowhead": null,
-  "endBinding": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      10,
-      10,
-    ],
-  ],
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 337897,
-  "startArrowhead": null,
-  "startBinding": null,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "line",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 449462985,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests key 6 selects line tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -12192,7 +10152,7 @@ Object {
 }
 `;
 
-exports[`regression tests key 6 selects line tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 6 selects line tool: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests key 6 selects line tool: [end of test] number of renders 1`] = `9`;
 
@@ -12286,60 +10246,6 @@ Object {
 }
 `;
 
-exports[`regression tests key 7 selects freedraw tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "lastCommittedPoint": Array [
-    10,
-    10,
-  ],
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      10,
-      10,
-    ],
-    Array [
-      10,
-      10,
-    ],
-  ],
-  "pressures": Array [
-    0,
-    0,
-    0,
-  ],
-  "roughness": 1,
-  "roundness": null,
-  "seed": 337897,
-  "simulatePressure": false,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "freedraw",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests key 7 selects freedraw tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -12423,7 +10329,7 @@ Object {
 }
 `;
 
-exports[`regression tests key 7 selects freedraw tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 7 selects freedraw tool: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests key 7 selects freedraw tool: [end of test] number of renders 1`] = `9`;
 
@@ -12542,53 +10448,6 @@ Object {
 }
 `;
 
-exports[`regression tests key a selects arrow tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "endArrowhead": "arrow",
-  "endBinding": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      10,
-      10,
-    ],
-  ],
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 337897,
-  "startArrowhead": null,
-  "startBinding": null,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "arrow",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 449462985,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests key a selects arrow tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -12667,7 +10526,7 @@ Object {
 }
 `;
 
-exports[`regression tests key a selects arrow tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key a selects arrow tool: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests key a selects arrow tool: [end of test] number of renders 1`] = `10`;
 
@@ -12763,38 +10622,6 @@ Object {
 }
 `;
 
-exports[`regression tests key d selects diamond tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "diamond",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests key d selects diamond tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -12858,7 +10685,7 @@ Object {
 }
 `;
 
-exports[`regression tests key d selects diamond tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key d selects diamond tool: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests key d selects diamond tool: [end of test] number of renders 1`] = `9`;
 
@@ -12977,53 +10804,6 @@ Object {
 }
 `;
 
-exports[`regression tests key l selects line tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "endArrowhead": null,
-  "endBinding": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      10,
-      10,
-    ],
-  ],
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 337897,
-  "startArrowhead": null,
-  "startBinding": null,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "line",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 449462985,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests key l selects line tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -13102,7 +10882,7 @@ Object {
 }
 `;
 
-exports[`regression tests key l selects line tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key l selects line tool: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests key l selects line tool: [end of test] number of renders 1`] = `9`;
 
@@ -13198,38 +10978,6 @@ Object {
 }
 `;
 
-exports[`regression tests key o selects ellipse tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests key o selects ellipse tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -13293,7 +11041,7 @@ Object {
 }
 `;
 
-exports[`regression tests key o selects ellipse tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key o selects ellipse tool: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests key o selects ellipse tool: [end of test] number of renders 1`] = `9`;
 
@@ -13387,60 +11135,6 @@ Object {
 }
 `;
 
-exports[`regression tests key p selects freedraw tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "lastCommittedPoint": Array [
-    10,
-    10,
-  ],
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      10,
-      10,
-    ],
-    Array [
-      10,
-      10,
-    ],
-  ],
-  "pressures": Array [
-    0,
-    0,
-    0,
-  ],
-  "roughness": 1,
-  "roundness": null,
-  "seed": 337897,
-  "simulatePressure": false,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "freedraw",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests key p selects freedraw tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -13524,7 +11218,7 @@ Object {
 }
 `;
 
-exports[`regression tests key p selects freedraw tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key p selects freedraw tool: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests key p selects freedraw tool: [end of test] number of renders 1`] = `9`;
 
@@ -13620,38 +11314,6 @@ Object {
 }
 `;
 
-exports[`regression tests key r selects rectangle tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests key r selects rectangle tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -13715,7 +11377,7 @@ Object {
 }
 `;
 
-exports[`regression tests key r selects rectangle tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key r selects rectangle tool: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests key r selects rectangle tool: [end of test] number of renders 1`] = `9`;
 
@@ -13816,210 +11478,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests make a group and duplicate it: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id4_copy",
-  ],
-  "height": 10,
-  "id": "id0_copy",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 915032327,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 5,
-  "versionNonce": 81784553,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
-exports[`regression tests make a group and duplicate it: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id4_copy",
-  ],
-  "height": 10,
-  "id": "id1_copy",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 747212839,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 5,
-  "versionNonce": 1723083209,
-  "width": 10,
-  "x": 30,
-  "y": 10,
-}
-`;
-
-exports[`regression tests make a group and duplicate it: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id4_copy",
-  ],
-  "height": 10,
-  "id": "id2_copy",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 760410951,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 5,
-  "versionNonce": 1006504105,
-  "width": 10,
-  "x": 50,
-  "y": 10,
-}
-`;
-
-exports[`regression tests make a group and duplicate it: [end of test] element 3 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id4",
-  ],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 1505387817,
-  "width": 10,
-  "x": 20,
-  "y": 20,
-}
-`;
-
-exports[`regression tests make a group and duplicate it: [end of test] element 4 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id4",
-  ],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 23633383,
-  "width": 10,
-  "x": 40,
-  "y": 20,
-}
-`;
-
-exports[`regression tests make a group and duplicate it: [end of test] element 5 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id4",
-  ],
-  "height": 10,
-  "id": "id2",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 493213705,
-  "width": 10,
-  "x": 60,
-  "y": 20,
 }
 `;
 
@@ -14574,7 +12032,7 @@ Object {
 }
 `;
 
-exports[`regression tests make a group and duplicate it: [end of test] number of elements 1`] = `6`;
+exports[`regression tests make a group and duplicate it: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests make a group and duplicate it: [end of test] number of renders 1`] = `24`;
 
@@ -14669,70 +12127,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 1116226695,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
-exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 1014066025,
-  "width": 10,
-  "x": 30,
-  "y": 10,
 }
 `;
 
@@ -14871,7 +12265,7 @@ Object {
 }
 `;
 
-exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of elements 1`] = `2`;
+exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `21`;
 
@@ -15195,38 +12589,6 @@ Object {
 }
 `;
 
-exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 0,
-  "y": 0,
-}
-`;
-
 exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -15290,7 +12652,7 @@ Object {
 }
 `;
 
-exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] number of elements 1`] = `1`;
+exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] number of renders 1`] = `11`;
 
@@ -15387,70 +12749,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests shift-click to multiselect, then drag: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1116226695,
-  "width": 10,
-  "x": 20,
-  "y": 20,
-}
-`;
-
-exports[`regression tests shift-click to multiselect, then drag: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1014066025,
-  "width": 10,
-  "x": 40,
-  "y": 20,
 }
 `;
 
@@ -15662,7 +12960,7 @@ Object {
 }
 `;
 
-exports[`regression tests shift-click to multiselect, then drag: [end of test] number of elements 1`] = `2`;
+exports[`regression tests shift-click to multiselect, then drag: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] number of renders 1`] = `20`;
 
@@ -15761,102 +13059,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests should group elements and ungroup them: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 23633383,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
-exports[`regression tests should group elements and ungroup them: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 493213705,
-  "width": 10,
-  "x": 30,
-  "y": 10,
-}
-`;
-
-exports[`regression tests should group elements and ungroup them: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id2",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 915032327,
-  "width": 10,
-  "x": 50,
-  "y": 10,
 }
 `;
 
@@ -16310,7 +13512,7 @@ Object {
 }
 `;
 
-exports[`regression tests should group elements and ungroup them: [end of test] number of elements 1`] = `3`;
+exports[`regression tests should group elements and ungroup them: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests should group elements and ungroup them: [end of test] number of renders 1`] = `25`;
 
@@ -16403,38 +13605,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests should show fill icons when element has non transparent background: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "#ffc9c9",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 449462985,
-  "width": 10,
-  "x": 0,
-  "y": 0,
 }
 `;
 
@@ -16544,7 +13714,7 @@ Object {
 }
 `;
 
-exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of elements 1`] = `1`;
+exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of renders 1`] = `13`;
 
@@ -16647,146 +13817,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id4",
-    "id10",
-  ],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 81784553,
-  "width": 10,
-  "x": 10,
-  "y": 0,
-}
-`;
-
-exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id4",
-    "id10",
-  ],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 747212839,
-  "width": 10,
-  "x": 50,
-  "y": 0,
-}
-`;
-
-exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id9",
-    "id10",
-  ],
-  "height": 10,
-  "id": "id5",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 1014066025,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 1723083209,
-  "width": 10,
-  "x": 10,
-  "y": 50,
-}
-`;
-
-exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] element 3 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id9",
-    "id10",
-  ],
-  "height": 10,
-  "id": "id6",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 400692809,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 760410951,
-  "width": 10,
-  "x": 50,
-  "y": 50,
 }
 `;
 
@@ -17531,7 +14561,7 @@ Object {
 }
 `;
 
-exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] number of elements 1`] = `4`;
+exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] number of renders 1`] = `39`;
 
@@ -17740,110 +14770,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests supports nested groups: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id3",
-  ],
-  "height": 50,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1116226695,
-  "width": 50,
-  "x": 100,
-  "y": 100,
-}
-`;
-
-exports[`regression tests supports nested groups: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id5",
-    "id3",
-  ],
-  "height": 50,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 400692809,
-  "width": 50,
-  "x": 0,
-  "y": 0,
-}
-`;
-
-exports[`regression tests supports nested groups: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [
-    "id5",
-    "id3",
-  ],
-  "height": 50,
-  "id": "id2",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 1604849351,
-  "width": 50,
-  "x": 200,
-  "y": 200,
 }
 `;
 
@@ -18527,7 +15453,7 @@ Object {
 }
 `;
 
-exports[`regression tests supports nested groups: [end of test] number of elements 1`] = `3`;
+exports[`regression tests supports nested groups: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests supports nested groups: [end of test] number of renders 1`] = `32`;
 
@@ -18679,102 +15605,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 0,
-  "y": 0,
-}
-`;
-
-exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 100,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 100,
-  "x": 110,
-  "y": 110,
-}
-`;
-
-exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 100,
-  "id": "id2",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "diamond",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 2019559783,
-  "width": 100,
-  "x": 310,
-  "y": 310,
 }
 `;
 
@@ -19014,7 +15844,7 @@ Object {
 }
 `;
 
-exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] number of elements 1`] = `3`;
+exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] number of renders 1`] = `20`;
 
@@ -19168,70 +15998,6 @@ Object {
 }
 `;
 
-exports[`regression tests switches selected element on pointer down: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 0,
-  "y": 0,
-}
-`;
-
-exports[`regression tests switches selected element on pointer down: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 10,
-  "x": 20,
-  "y": 20,
-}
-`;
-
 exports[`regression tests switches selected element on pointer down: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -19367,7 +16133,7 @@ Object {
 }
 `;
 
-exports[`regression tests switches selected element on pointer down: [end of test] number of elements 1`] = `2`;
+exports[`regression tests switches selected element on pointer down: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests switches selected element on pointer down: [end of test] number of renders 1`] = `14`;
 
@@ -19574,120 +16340,6 @@ Object {
   "zoom": Object {
     "value": 1,
   },
-}
-`;
-
-exports[`regression tests undo/redo drawing an element: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 337897,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 6,
-  "versionNonce": 760410951,
-  "width": 20,
-  "x": 10,
-  "y": -10,
-}
-`;
-
-exports[`regression tests undo/redo drawing an element: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 20,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 449462985,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 6,
-  "versionNonce": 1006504105,
-  "width": 30,
-  "x": 40,
-  "y": 0,
-}
-`;
-
-exports[`regression tests undo/redo drawing an element: [end of test] element 2 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "endArrowhead": "arrow",
-  "endBinding": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id2",
-  "isDeleted": true,
-  "lastCommittedPoint": Array [
-    60,
-    10,
-  ],
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      60,
-      10,
-    ],
-  ],
-  "roughness": 1,
-  "roundness": Object {
-    "type": 2,
-  },
-  "seed": 401146281,
-  "startArrowhead": null,
-  "startBinding": null,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "arrow",
-  "updated": 1,
-  "version": 9,
-  "versionNonce": 81784553,
-  "width": 60,
-  "x": 130,
-  "y": 10,
 }
 `;
 
@@ -20069,7 +16721,7 @@ Object {
 }
 `;
 
-exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `3`;
+exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `0`;
 
 exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `31`;
 
