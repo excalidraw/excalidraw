@@ -65,12 +65,6 @@ class Scene {
   private static sceneMapByElement = new WeakMap<ExcalidrawElement, Scene>();
   private static sceneMapById = new Map<string, Scene>();
 
-  // private app: App;
-
-  // constructor(app: App) {
-  //   this.app = app;
-  // }
-
   static mapElementToScene(elementKey: ElementKey, scene: Scene) {
     if (isIdKey(elementKey)) {
       // for cases where we don't have access to the element object
@@ -187,6 +181,7 @@ class Scene {
     }
     return null;
   }
+
   /**
    * A utility method to help with updating all scene elements, with the added
    * performance optimization of not renewing the array if no change is made.
