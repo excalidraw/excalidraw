@@ -20,13 +20,21 @@ type EmbeddedLink = {
 const embeddedLinkCache = new Map<string, EmbeddedLink>();
 
 const RE_YOUTUBE =
-  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be|.be)?(?:\.com)?\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
 const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
-const RE_FIGMA = /^https:\/\/(?:www\.)??:figma\.com/;
-const RE_EXCALIDRAW = /^https:\/\/(?:www\.)?link\.excalidraw\.com/;
+const RE_FIGMA = /^https:\/\/(?:www\.)?figma\.com/;
 
 //const RE_TWITTER = /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
+
+const ALLOWED_DOMAINS = new Set([
+  "youtube.com",
+  "youtu.be",
+  "vimeo.com",
+  "player.vimeo.com",
+  "figma.com",
+  "link.excalidraw.com",
+]);
 
 export const getEmbedLink = (link?: string | null): EmbeddedLink => {
   if (!link) {
@@ -169,6 +177,29 @@ export const actionSetEmbeddableAsActiveTool = register({
   },
 });
 
+const validateHostname = (
+  url: string,
+  /** using a Set assumes it already contains normalized bare domains */
+  allowedHostnames: Set<string> | string,
+): boolean => {
+  try {
+    const { hostname } = new URL(url);
+
+    const bareDomain = hostname.replace(/^www\./, "");
+
+    if (allowedHostnames instanceof Set) {
+      return ALLOWED_DOMAINS.has(bareDomain);
+    }
+
+    if (bareDomain === allowedHostnames.replace(/^www\./, "")) {
+      return true;
+    }
+  } catch (error) {
+    // ignore
+  }
+  return false;
+};
+
 export const embeddableURLValidator = (
   url: string | null | undefined,
   validateEmbeddable: ExcalidrawProps["validateEmbeddable"],
@@ -188,18 +219,18 @@ export const embeddableURLValidator = (
     } else if (validateEmbeddable instanceof RegExp) {
       return validateEmbeddable.test(url);
     } else if (Array.isArray(validateEmbeddable)) {
-      for (const regex of validateEmbeddable) {
-        if (url.match(regex)) {
+      for (const domain of validateEmbeddable) {
+        if (domain instanceof RegExp) {
+          if (url.match(domain)) {
+            return true;
+          }
+        } else if (validateHostname(url, domain)) {
           return true;
         }
       }
       return false;
     }
   }
-  return Boolean(
-    url.match(RE_YOUTUBE) ||
-      url.match(RE_VIMEO) ||
-      url.match(RE_FIGMA) ||
-      url.match(RE_EXCALIDRAW),
-  );
+
+  return validateHostname(url, ALLOWED_DOMAINS);
 };

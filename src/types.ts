@@ -378,6 +378,7 @@ export interface ExcalidrawProps {
   children?: React.ReactNode;
   validateEmbeddable?:
     | boolean
+    | string[]
     | RegExp
     | RegExp[]
     | ((link: string) => boolean | undefined);
