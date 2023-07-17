@@ -11,9 +11,13 @@ export default defineConfig({
     outDir: "build",
     rollupOptions: {
       output: {
+        // Creating separate chunk for locales so they
+        // can be cached at runtime and not merged with
+        // app precache
         manualChunks(id) {
           if (id.includes("src/locales")) {
             const index = id.indexOf("locales/");
+            // Taking the substring after "locales/"
             return `locales/${id.substring(index + 8)}`;
           }
         },
@@ -32,6 +36,7 @@ export default defineConfig({
         enabled: true,
       },
       workbox: {
+        // Don't push fonts and locales to app precache
         globIgnores: ["fonts.css", "**/locales/**"],
         runtimeCaching: [
           {
