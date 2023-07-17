@@ -325,12 +325,8 @@ export const ShapesSwitcher = ({
             icon={EmbedIcon}
             checked={activeTool.type === "embeddable"}
             name="editor-current-shape"
-            title={`${capitalizeString(
-              t("toolBar.embeddable"),
-            )} — ${KEYS.W.toLocaleUpperCase()}`}
-            keyBindingLabel={KEYS.W.toLocaleUpperCase()}
+            title={capitalizeString(t("toolBar.embeddable"))}
             aria-label={capitalizeString(t("toolBar.embeddable"))}
-            aria-keyshortcuts={KEYS.W.toLocaleUpperCase()}
             data-testid={`toolbar-embeddable`}
             onPointerDown={({ pointerType }) => {
               if (!appState.penDetected && pointerType === "pen") {
@@ -397,7 +393,6 @@ export const ShapesSwitcher = ({
                 });
               }}
               icon={EmbedIcon}
-              shortcut={KEYS.W.toLocaleUpperCase()}
               data-testid="toolbar-embeddable"
             >
               {t("toolBar.embeddable")}

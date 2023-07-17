@@ -167,7 +167,6 @@ export const actionSetEmbeddableAsActiveTool = register({
       commitToHistory: false,
     };
   },
-  keyTest: (event) => event.key.toLocaleLowerCase() === KEYS.W,
 });
 
 export const embeddableURLValidator = (
