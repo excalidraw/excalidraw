@@ -448,31 +448,31 @@ export const convertToExcalidrawElements = (
 
       return;
     }
-    const elementWithid = { ...element, id: elementId };
+    const elementWithId = { ...element, id: elementId };
 
     if (
-      (elementWithid.type === "rectangle" ||
-        elementWithid.type === "ellipse" ||
-        elementWithid.type === "diamond" ||
-        elementWithid.type === "arrow") &&
-      elementWithid?.label?.text
+      (elementWithId.type === "rectangle" ||
+        elementWithId.type === "ellipse" ||
+        elementWithId.type === "diamond" ||
+        elementWithId.type === "arrow") &&
+      elementWithId?.label?.text
     ) {
       let [container, text] = bindTextToContainer(
-        elementWithid as
+        elementWithId as
           | ValidContainer
           | ({
               type: "arrow";
             } & ValidLinearElement),
-        elementWithid?.label,
+        elementWithId?.label,
       );
       excalidrawElements.add(container);
       excalidrawElements.add(text);
 
       if (container.type === "arrow") {
         const originalStart =
-          elementWithid.type === "arrow" ? elementWithid?.start : undefined;
+          elementWithId.type === "arrow" ? elementWithId?.start : undefined;
         const originalEnd =
-          elementWithid.type === "arrow" ? elementWithid?.end : undefined;
+          elementWithId.type === "arrow" ? elementWithId?.end : undefined;
         const { linearElement, startBoundElement, endBoundElement } =
           bindLinearElementToElement({
             ...container,
@@ -486,12 +486,12 @@ export const convertToExcalidrawElements = (
       }
     } else {
       let excalidrawElement;
-      if (elementWithid.type === "text") {
-        const fontFamily = elementWithid?.fontFamily || DEFAULT_FONT_FAMILY;
-        const fontSize = elementWithid?.fontSize || DEFAULT_FONT_SIZE;
+      if (elementWithId.type === "text") {
+        const fontFamily = elementWithId?.fontFamily || DEFAULT_FONT_FAMILY;
+        const fontSize = elementWithId?.fontSize || DEFAULT_FONT_SIZE;
         const lineHeight =
-          elementWithid?.lineHeight || getDefaultLineHeight(fontFamily);
-        const text = elementWithid.text ?? "";
+          elementWithId?.lineHeight || getDefaultLineHeight(fontFamily);
+        const text = elementWithId.text ?? "";
         const normalizedText = normalizeText(text);
         const metrics = measureText(
           normalizedText,
@@ -503,20 +503,20 @@ export const convertToExcalidrawElements = (
           height: metrics.height,
           fontFamily,
           fontSize,
-          ...elementWithid,
+          ...elementWithId,
         };
 
         excalidrawElements.add(excalidrawElement as ExcalidrawTextElement);
-      } else if (elementWithid.type === "arrow") {
+      } else if (elementWithId.type === "arrow") {
         const { linearElement, startBoundElement, endBoundElement } =
-          bindLinearElementToElement(elementWithid);
+          bindLinearElementToElement(elementWithId);
         excalidrawElements.add(linearElement);
         excalidrawElements.add(startBoundElement);
         excalidrawElements.add(endBoundElement);
-      } else if (elementWithid.type === "line") {
-        const width = elementWithid.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
+      } else if (elementWithId.type === "line") {
+        const width = elementWithId.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
         const height =
-          elementWithid.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
+          elementWithId.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
         const lineElement = newLinearElement({
           width,
           height,
@@ -524,14 +524,14 @@ export const convertToExcalidrawElements = (
             [0, 0],
             [width, height],
           ],
-          ...elementWithid,
+          ...elementWithId,
         });
         excalidrawElements.add(lineElement);
       } else {
         excalidrawElement = {
-          ...elementWithid,
-          width: elementWithid?.width || DEFAULT_DIMENSION,
-          height: elementWithid?.height || DEFAULT_DIMENSION,
+          ...elementWithId,
+          width: elementWithId?.width || DEFAULT_DIMENSION,
+          height: elementWithId?.height || DEFAULT_DIMENSION,
         } as ExcalidrawGenericElement;
         excalidrawElements.add(excalidrawElement);
       }
