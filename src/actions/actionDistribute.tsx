@@ -9,19 +9,13 @@ import { ExcalidrawElement } from "../element/types";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
-import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { AppState } from "../types";
+import { isSomeElementSelected } from "../scene";
+import { AppClassProperties, AppState } from "../types";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 
-const enableActionGroup = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  const selectedElements = getSelectedElements(
-    getNonDeletedElements(elements),
-    appState,
-  );
+const enableActionGroup = (appState: AppState, app: AppClassProperties) => {
+  const selectedElements = app.scene.getSelectedElements(appState);
   return (
     selectedElements.length > 1 &&
     // TODO enable distributing frames when implemented properly
@@ -32,12 +26,10 @@ const enableActionGroup = (
 const distributeSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
+  app: AppClassProperties,
   distribution: Distribution,
 ) => {
-  const selectedElements = getSelectedElements(
-    getNonDeletedElements(elements),
-    appState,
-  );
+  const selectedElements = app.scene.getSelectedElements(appState);
 
   const updatedElements = distributeElements(selectedElements, distribution);
 
@@ -46,16 +38,17 @@ const distributeSelectedElements = (
   return updateFrameMembershipOfSelectedElements(
     elements.map((element) => updatedElementsMap.get(element.id) || element),
     appState,
+    app,
   );
 };
 
 export const distributeHorizontally = register({
   name: "distributeHorizontally",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     return {
       appState,
-      elements: distributeSelectedElements(elements, appState, {
+      elements: distributeSelectedElements(elements, appState, app, {
         space: "between",
         axis: "x",
       }),
@@ -64,9 +57,9 @@ export const distributeHorizontally = register({
   },
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.H,
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, app }) => (
     <ToolButton
-      hidden={!enableActionGroup(elements, appState)}
+      hidden={!enableActionGroup(appState, app)}
       type="button"
       icon={DistributeHorizontallyIcon}
       onClick={() => updateData(null)}
@@ -82,10 +75,10 @@ export const distributeHorizontally = register({
 export const distributeVertically = register({
   name: "distributeVertically",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     return {
       appState,
-      elements: distributeSelectedElements(elements, appState, {
+      elements: distributeSelectedElements(elements, appState, app, {
         space: "between",
         axis: "y",
       }),
@@ -94,9 +87,9 @@ export const distributeVertically = register({
   },
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.V,
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, app }) => (
     <ToolButton
-      hidden={!enableActionGroup(elements, appState)}
+      hidden={!enableActionGroup(appState, app)}
       type="button"
       icon={DistributeVerticallyIcon}
       onClick={() => updateData(null)}
