@@ -3181,7 +3181,7 @@ class App extends React.Component<AppProps, AppState> {
         activeEmbeddable: null,
       });
     } else {
-      this.setState({ activeTool: nextActiveTool });
+      this.setState({ activeTool: nextActiveTool, activeEmbeddable: null });
     }
   };
 

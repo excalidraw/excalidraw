@@ -266,6 +266,7 @@ export const ShapesSwitcher = ({
               });
               setAppState({
                 activeTool: nextActiveTool,
+                activeEmbeddable: null,
                 multiElement: null,
                 selectedElementIds: {},
               });
