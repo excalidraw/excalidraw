@@ -227,6 +227,11 @@ export const Hyperlink = ({
         width: CONTAINER_WIDTH,
         padding: CONTAINER_PADDING,
       }}
+      onClick={() => {
+        if (!element.link && !isEditing) {
+          setAppState({ showHyperlinkPopup: "editor" });
+        }
+      }}
     >
       {isEditing ? (
         <input

@@ -1,6 +1,5 @@
 import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
-import { KEYS } from "../keys";
 import { ExcalidrawProps } from "../types";
 import { getFontString, setCursorForShape, updateActiveTool } from "../utils";
 import { newTextElement } from "./newElement";
@@ -20,13 +19,22 @@ type EmbeddedLink = {
 
 const embeddedLinkCache = new Map<string, EmbeddedLink>();
 
-const YOUTUBE_REG =
-  /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
-const VIMEO_REG =
+const RE_YOUTUBE =
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
+const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
-//const TWITTER_REG = /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
-const FIGMA_REG = /^https:\/\/www\.figma\.com/;
-//const EXCALIDRAW_REG = /^https:\/\/excalidraw.com/;
+const RE_FIGMA = /^https:\/\/(?:www\.)?figma\.com/;
+
+//const RE_TWITTER = /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
+
+const ALLOWED_DOMAINS = new Set([
+  "youtube.com",
+  "youtu.be",
+  "vimeo.com",
+  "player.vimeo.com",
+  "figma.com",
+  "link.excalidraw.com",
+]);
 
 export const getEmbedLink = (link?: string | null): EmbeddedLink => {
   if (!link) {
@@ -39,7 +47,7 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
 
   let type: "video" | "generic" = "generic";
   let aspectRatio = { w: 560, h: 840 };
-  const ytLink = link.match(YOUTUBE_REG);
+  const ytLink = link.match(RE_YOUTUBE);
   if (ytLink?.[2]) {
     const time = ytLink[3] ? `&t=${ytLink[3]}` : ``;
     const isPortrait = link.includes("shorts");
@@ -63,7 +71,7 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
     return { link, aspectRatio, type };
   }
 
-  const vimeoLink = link.match(VIMEO_REG);
+  const vimeoLink = link.match(RE_VIMEO);
   if (vimeoLink?.[1]) {
     const target = vimeoLink?.[1];
     type = "video";
@@ -73,7 +81,7 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
     return { link, aspectRatio, type };
   }
 
-  /*const twitterLink = link.match(TWITTER_REG);
+  /*const twitterLink = link.match(RE_TWITTER);
   if (twitterLink) {
     type = "generic";
     link = `https://twitframe.com/show?url=${encodeURIComponent(link)}`;
@@ -82,7 +90,7 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
     return { link, aspectRatio, type };
   }*/
 
-  const figmaLink = link.match(FIGMA_REG);
+  const figmaLink = link.match(RE_FIGMA);
   if (figmaLink) {
     type = "generic";
     link = `https://www.figma.com/embed?embed_host=share&url=${encodeURIComponent(
@@ -168,8 +176,30 @@ export const actionSetEmbeddableAsActiveTool = register({
       commitToHistory: false,
     };
   },
-  keyTest: (event) => event.key.toLocaleLowerCase() === KEYS.W,
 });
+
+const validateHostname = (
+  url: string,
+  /** using a Set assumes it already contains normalized bare domains */
+  allowedHostnames: Set<string> | string,
+): boolean => {
+  try {
+    const { hostname } = new URL(url);
+
+    const bareDomain = hostname.replace(/^www\./, "");
+
+    if (allowedHostnames instanceof Set) {
+      return ALLOWED_DOMAINS.has(bareDomain);
+    }
+
+    if (bareDomain === allowedHostnames.replace(/^www\./, "")) {
+      return true;
+    }
+  } catch (error) {
+    // ignore
+  }
+  return false;
+};
 
 export const embeddableURLValidator = (
   url: string | null | undefined,
@@ -190,15 +220,18 @@ export const embeddableURLValidator = (
     } else if (validateEmbeddable instanceof RegExp) {
       return validateEmbeddable.test(url);
     } else if (Array.isArray(validateEmbeddable)) {
-      for (const regex of validateEmbeddable) {
-        if (url.match(regex)) {
+      for (const domain of validateEmbeddable) {
+        if (domain instanceof RegExp) {
+          if (url.match(domain)) {
+            return true;
+          }
+        } else if (validateHostname(url, domain)) {
           return true;
         }
       }
       return false;
     }
   }
-  return Boolean(
-    url.match(YOUTUBE_REG) || url.match(VIMEO_REG) || url.match(FIGMA_REG),
-  );
+
+  return validateHostname(url, ALLOWED_DOMAINS);
 };

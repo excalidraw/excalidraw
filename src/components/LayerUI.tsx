@@ -72,6 +72,7 @@ interface LayerUIProps {
   onExportImage: AppClassProperties["onExportImage"];
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
+  app: AppClassProperties;
 }
 
 const DefaultMainMenu: React.FC<{
@@ -127,6 +128,7 @@ const LayerUI = ({
   onExportImage,
   renderWelcomeScreen,
   children,
+  app,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
@@ -243,7 +245,6 @@ const LayerUI = ({
                       >
                         <HintViewer
                           appState={appState}
-                          elements={elements}
                           isMobile={
                             device.isMobile ||
                             (!(
@@ -253,6 +254,7 @@ const LayerUI = ({
                               appState.trayModeEnabled)
                           } //zsviczian
                           device={device}
+                          app={app}
                         />
                         {heading}
                         <Stack.Row gap={1}>
@@ -416,6 +418,7 @@ const LayerUI = ({
       )}
       {(isTrayMode || device.isMobile) && ( //zsviczian Added isTrayMode condition
         <MobileMenu
+          app={app}
           appState={appState}
           elements={elements}
           actionManager={actionManager}
