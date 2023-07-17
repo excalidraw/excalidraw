@@ -9,7 +9,7 @@ import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import { AppState, NormalizedZoomValue } from "../types";
+import { AppClassProperties, AppState, NormalizedZoomValue } from "../types";
 import { getShortcutKey, setCursor, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
@@ -470,11 +470,12 @@ export const zoomToFitElements = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   zoomToSelection: boolean,
+  app: AppClassProperties, //zsviczian
   maxZoom: number = 1, //zsviczian
   margin: number = 0, //zsviczian
 ) => {
   const nonDeletedElements = getNonDeletedElements(elements);
-  const selectedElements = getSelectedElements(nonDeletedElements, appState);
+  const selectedElements = app.scene.getSelectedElements(appState);
 
   const commonBounds =
     zoomToSelection && selectedElements.length > 0

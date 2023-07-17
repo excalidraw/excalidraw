@@ -2791,7 +2791,7 @@ class App extends React.Component<AppProps, AppState> {
       maxZoom = 1;
     }
     this.setState(
-      zoomToFitElements(target, this.state, false, maxZoom, margin).appState,
+      zoomToFitElements(target, this.state, false, this, maxZoom, margin).appState,
     );
   };
 
