@@ -129,36 +129,35 @@ export type ValidContainer =
       } & MarkOptional<ElementConstructorOpts, "x" | "y">;
     } & ElementConstructorOpts;
 
+export type ExcalidrawProgrammaticElement =
+  | Extract<
+      ExcalidrawElement,
+      | ExcalidrawSelectionElement
+      | ExcalidrawFreeDrawElement
+      | ExcalidrawFrameElement
+    >
+  | ({
+      type: Extract<ExcalidrawLinearElement["type"], "line">;
+      x: number;
+      y: number;
+    } & Partial<ExcalidrawLinearElement>)
+  | ValidContainer
+  | ValidLinearElement
+  | ({
+      type: "text";
+      text: string;
+      x: number;
+      y: number;
+      id?: ExcalidrawTextElement["id"];
+    } & Partial<ExcalidrawTextElement>)
+  | ({
+      type: Extract<ExcalidrawImageElement["type"], "image">;
+      x: number;
+      y: number;
+    } & Partial<ExcalidrawImageElement>);
+
 export interface ExcalidrawProgrammaticAPI {
-  elements?:
-    | readonly (
-        | Extract<
-            ExcalidrawElement,
-            | ExcalidrawSelectionElement
-            | ExcalidrawFreeDrawElement
-            | ExcalidrawFrameElement
-          >
-        | ({
-            type: Extract<ExcalidrawLinearElement["type"], "line">;
-            x: number;
-            y: number;
-          } & Partial<ExcalidrawLinearElement>)
-        | ValidContainer
-        | ValidLinearElement
-        | ({
-            type: "text";
-            text: string;
-            x: number;
-            y: number;
-            id?: ExcalidrawTextElement["id"];
-          } & Partial<ExcalidrawTextElement>)
-        | ({
-            type: Extract<ExcalidrawImageElement["type"], "image">;
-            x: number;
-            y: number;
-          } & Partial<ExcalidrawImageElement>)
-      )[]
-    | null;
+  elements?: readonly ExcalidrawProgrammaticElement[] | null;
 }
 export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
   "rectangle",
