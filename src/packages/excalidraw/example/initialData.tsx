@@ -29,12 +29,12 @@ const elements: ExcalidrawProgrammaticAPI["elements"] = [
     end: { type: "ellipse" },
   },
   {
-    fileId: "rocket" as FileId,
     type: "image",
     x: 606.1042326312408,
     y: 153.57729779411773,
     width: 231.30325348751828,
     height: 231.64340533088227,
+    fileId: "rocket" as FileId,
   },
 ];
 export default {

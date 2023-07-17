@@ -13,6 +13,7 @@ import { bindLinearElement } from "../element/binding";
 import { mutateElement } from "../element/mutateElement";
 import {
   ElementConstructorOpts,
+  newImageElement,
   newTextElement,
   regenerateId,
 } from "../element/newElement";
@@ -166,6 +167,7 @@ export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
   "text",
   "arrow",
   "line",
+  "image",
 ];
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
@@ -531,6 +533,13 @@ export const convertToExcalidrawElements = (
           ...elementWithId,
         });
         excalidrawElements.add(lineElement);
+      } else if (elementWithId.type === "image") {
+        const imageElement = newImageElement({
+          width: elementWithId?.width || DEFAULT_DIMENSION,
+          height: elementWithId?.height || DEFAULT_DIMENSION,
+          ...elementWithId,
+        });
+        excalidrawElements.add(imageElement);
       } else {
         excalidrawElement = {
           ...elementWithId,
