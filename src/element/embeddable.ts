@@ -1,6 +1,5 @@
 import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
-import { KEYS } from "../keys";
 import { ExcalidrawProps } from "../types";
 import { getFontString, setCursorForShape, updateActiveTool } from "../utils";
 import { newTextElement } from "./newElement";
