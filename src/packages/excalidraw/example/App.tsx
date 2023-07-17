@@ -146,9 +146,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         //@ts-ignore
         initialStatePromiseRef.current.promise.resolve({
           ...initialData,
-          elements: convertToExcalidrawElements(
-            initialData.elements as ExcalidrawProgrammaticAPI["elements"],
-          ),
+          elements: convertToExcalidrawElements(initialData.elements),
         });
         excalidrawAPI.addFiles(imagesArray);
       };

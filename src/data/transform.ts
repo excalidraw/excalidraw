@@ -134,7 +134,6 @@ export interface ExcalidrawProgrammaticAPI {
         | Extract<
             ExcalidrawElement,
             | ExcalidrawSelectionElement
-            | ExcalidrawImageElement
             | ExcalidrawFreeDrawElement
             | ExcalidrawFrameElement
           >
@@ -152,6 +151,11 @@ export interface ExcalidrawProgrammaticAPI {
             y: number;
             id?: ExcalidrawTextElement["id"];
           } & Partial<ExcalidrawTextElement>)
+        | ({
+            type: Extract<ExcalidrawImageElement["type"], "image">;
+            x: number;
+            y: number;
+          } & Partial<ExcalidrawImageElement>)
       )[]
     | null;
 }

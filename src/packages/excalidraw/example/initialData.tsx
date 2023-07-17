@@ -1,41 +1,44 @@
-export default {
-  elements: [
-    {
-      type: "rectangle",
-      x: 10,
-      y: 10,
-      strokeWidth: "2",
-    },
-    {
-      type: "diamond",
-      x: 120,
-      y: 20,
-      backgroundColor: "#fff3bf",
-      strokeWidth: "2",
-      label: {
-        text: "HELLO EXCALIDRAW",
-        strokeColor: "#099268",
-        fontSize: 30,
-      },
-    },
-    {
-      type: "arrow",
-      x: 100,
-      y: 200,
-      label: { text: "HELLO WORLD!!" },
-      start: { type: "rectangle" },
-      end: { type: "ellipse" },
-    },
+import { ExcalidrawProgrammaticAPI } from "../../../data/transform";
+import { FileId } from "../../../element/types";
 
-    {
-      fileId: "rocket",
-      type: "image",
-      x: 606.1042326312408,
-      y: 153.57729779411773,
-      width: 231.30325348751828,
-      height: 231.64340533088227,
+const elements: ExcalidrawProgrammaticAPI["elements"] = [
+  {
+    type: "rectangle",
+    x: 10,
+    y: 10,
+    strokeWidth: 2,
+  },
+  {
+    type: "diamond",
+    x: 120,
+    y: 20,
+    backgroundColor: "#fff3bf",
+    strokeWidth: 2,
+    label: {
+      text: "HELLO EXCALIDRAW",
+      strokeColor: "#099268",
+      fontSize: 30,
     },
-  ],
+  },
+  {
+    type: "arrow",
+    x: 100,
+    y: 200,
+    label: { text: "HELLO WORLD!!" },
+    start: { type: "rectangle" },
+    end: { type: "ellipse" },
+  },
+  {
+    fileId: "rocket" as FileId,
+    type: "image",
+    x: 606.1042326312408,
+    y: 153.57729779411773,
+    width: 231.30325348751828,
+    height: 231.64340533088227,
+  },
+];
+export default {
+  elements,
   appState: { viewBackgroundColor: "#AFEEEE", currentItemFontFamily: 1 },
   scrollToContent: true,
   libraryItems: [
