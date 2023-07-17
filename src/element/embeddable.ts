@@ -19,13 +19,14 @@ type EmbeddedLink = {
 
 const embeddedLinkCache = new Map<string, EmbeddedLink>();
 
-const YOUTUBE_REG =
-  /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?youtu(?:be|.be)?(?:\.com)?\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
-const VIMEO_REG =
+const RE_YOUTUBE =
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be|.be)?(?:\.com)?\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
+const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
-//const TWITTER_REG = /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
-const FIGMA_REG = /^https:\/\/www\.figma\.com/;
-//const EXCALIDRAW_REG = /^https:\/\/excalidraw.com/;
+const RE_FIGMA = /^https:\/\/(?:www\.)??:figma\.com/;
+const RE_EXCALIDRAW = /^https:\/\/(?:www\.)?link\.excalidraw\.com/;
+
+//const RE_TWITTER = /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
 
 export const getEmbedLink = (link?: string | null): EmbeddedLink => {
   if (!link) {
@@ -38,7 +39,7 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
 
   let type: "video" | "generic" = "generic";
   let aspectRatio = { w: 560, h: 840 };
-  const ytLink = link.match(YOUTUBE_REG);
+  const ytLink = link.match(RE_YOUTUBE);
   if (ytLink?.[2]) {
     const time = ytLink[3] ? `&t=${ytLink[3]}` : ``;
     const isPortrait = link.includes("shorts");
@@ -62,7 +63,7 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
     return { link, aspectRatio, type };
   }
 
-  const vimeoLink = link.match(VIMEO_REG);
+  const vimeoLink = link.match(RE_VIMEO);
   if (vimeoLink?.[1]) {
     const target = vimeoLink?.[1];
     type = "video";
@@ -72,7 +73,7 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
     return { link, aspectRatio, type };
   }
 
-  /*const twitterLink = link.match(TWITTER_REG);
+  /*const twitterLink = link.match(RE_TWITTER);
   if (twitterLink) {
     type = "generic";
     link = `https://twitframe.com/show?url=${encodeURIComponent(link)}`;
@@ -81,7 +82,7 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
     return { link, aspectRatio, type };
   }*/
 
-  const figmaLink = link.match(FIGMA_REG);
+  const figmaLink = link.match(RE_FIGMA);
   if (figmaLink) {
     type = "generic";
     link = `https://www.figma.com/embed?embed_host=share&url=${encodeURIComponent(
@@ -196,6 +197,9 @@ export const embeddableURLValidator = (
     }
   }
   return Boolean(
-    url.match(YOUTUBE_REG) || url.match(VIMEO_REG) || url.match(FIGMA_REG),
+    url.match(RE_YOUTUBE) ||
+      url.match(RE_VIMEO) ||
+      url.match(RE_FIGMA) ||
+      url.match(RE_EXCALIDRAW),
   );
 };
