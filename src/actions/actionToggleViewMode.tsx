@@ -8,7 +8,12 @@ export const actionToggleViewMode = register({
     category: "canvas",
     predicate: (appState) => !appState.viewModeEnabled,
   },
-  perform(elements, appState) {
+  perform(elements, appState, _, app) {
+    //zsviczian
+    if (app.props.onViewModeChange) {
+      //zsviczian
+      app.props.onViewModeChange(!this.checked!(appState));
+    }
     return {
       appState: {
         ...appState,

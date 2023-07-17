@@ -4,7 +4,7 @@ import Trans from "./Trans";
 import { jotaiScope } from "../jotai";
 import { LibraryItem, LibraryItems, UIAppState } from "../types";
 import { useApp, useExcalidrawSetAppState } from "./App";
-import { saveLibraryAsJSON } from "../data/json";
+//import { saveLibraryAsJSON } from "../data/json"; //zsviczian
 import Library, { libraryItemsAtom } from "../data/library";
 import {
   DotsIcon,
@@ -15,7 +15,7 @@ import {
 } from "./icons";
 import { ToolButton } from "./ToolButton";
 import { fileOpen } from "../data/filesystem";
-import { muteFSAbortError } from "../utils";
+//import { muteFSAbortError } from "../utils"; //zsiczian
 import { useAtom } from "jotai";
 import ConfirmDialog from "./ConfirmDialog";
 import PublishLibrary from "./PublishLibrary";
@@ -175,15 +175,42 @@ export const LibraryDropdownMenuButton: React.FC<{
     }
   };
 
+  //zsviczian
+  const download = (encoding: string, data: any, filename: string) => {
+    const element = document.createElement("a");
+    element.setAttribute("href", (encoding ? `${encoding},` : "") + data);
+    element.setAttribute("download", filename);
+    element.style.display = "none";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
   const onLibraryExport = async () => {
     const libraryItems = itemsSelected
       ? items
       : await library.getLatestLibrary();
+    download(
+      "data:text/plain;charset=utf-8",
+      encodeURIComponent(
+        JSON.stringify(
+          {
+            type: "excalidrawlib",
+            version: 2,
+            source: "https://excalidraw.com",
+            libraryItems,
+          },
+          null,
+          "\t",
+        ),
+      ),
+      "my-obsidian-library.excalidrawlib", //zsviczian
+    ); /*
     saveLibraryAsJSON(libraryItems)
       .catch(muteFSAbortError)
       .catch((error) => {
         setAppState({ errorMessage: error.message });
-      });
+      });*/
   };
 
   const renderLibraryMenu = () => {
