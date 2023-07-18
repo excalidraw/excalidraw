@@ -107,16 +107,16 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
     let ret: EmbeddedLink;
     // assume embed code
     if (/<blockquote/.test(link)) {
+      const srcDoc = createSrcDoc(link);
       ret = {
         type: "document",
-        srcdoc: () => createSrcDoc(link!),
+        srcdoc: () => srcDoc,
         aspectRatio: { w: 480, h: 480 },
       };
       // assume regular tweet url
     } else {
       ret = {
         type: "document",
-        // TODO support dark mode
         srcdoc: (theme: string) =>
           createSrcDoc(
             `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${link}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
@@ -132,9 +132,10 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
     let ret: EmbeddedLink;
     // assume embed code
     if (/<script>/.test(link)) {
+      const srcDoc = createSrcDoc(link);
       ret = {
         type: "document",
-        srcdoc: () => createSrcDoc(link!),
+        srcdoc: () => srcDoc,
         aspectRatio: { w: 550, h: 720 },
       };
       // assume regular url
