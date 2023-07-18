@@ -199,6 +199,7 @@ describe("<Excalidraw/>", () => {
         );
         //open menu
         toggleMenu(container);
+        expect(queryByTestId(container, "canvas-background-LABEL")).toBeNull();
         expect(queryByTestId(container, "canvas-background-picker")).toBeNull();
       });
 
