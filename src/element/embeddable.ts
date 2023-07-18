@@ -16,7 +16,7 @@ type EmbeddedLink =
       aspectRatio: { w: number; h: number };
     } & (
       | { type: "video" | "generic"; link: string }
-      | { type: "document"; srcdoc: string }
+      | { type: "document"; srcdoc: (theme: string) => string }
     ))
   | null;
 
@@ -108,7 +108,7 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
     if (/<blockquote/.test(link)) {
       ret = {
         type: "document",
-        srcdoc: createSrcDoc(link),
+        srcdoc: () => createSrcDoc(link!),
         aspectRatio: { w: 480, h: 480 },
       };
       // assume regular tweet url
@@ -116,9 +116,10 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
       ret = {
         type: "document",
         // TODO support dark mode
-        srcdoc: createSrcDoc(
-          `<blockquote class="twitter-tweet" data-dnt="true" data-theme="light"><a href="${link}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
-        ),
+        srcdoc: (theme: string) =>
+          createSrcDoc(
+            `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${link}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
+          ),
         aspectRatio: { w: 480, h: 480 },
       };
     }
@@ -132,14 +133,14 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
     if (/<script>/.test(link)) {
       ret = {
         type: "document",
-        srcdoc: createSrcDoc(link),
+        srcdoc: () => createSrcDoc(link!),
         aspectRatio: { w: 550, h: 720 },
       };
       // assume regular url
     } else {
       ret = {
         type: "document",
-        srcdoc: createSrcDoc(`<script src="${link}.js"></script>`),
+        srcdoc: () => createSrcDoc(`<script src="${link}.js"></script>`),
         aspectRatio: { w: 550, h: 720 },
       };
     }

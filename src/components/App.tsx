@@ -922,7 +922,7 @@ class App extends React.Component<AppProps, AppState> {
                       className="excalidraw__embeddable"
                       srcDoc={
                         embedLink?.type === "document"
-                          ? embedLink.srcdoc
+                          ? embedLink.srcdoc(this.state.theme)
                           : undefined
                       }
                       src={
