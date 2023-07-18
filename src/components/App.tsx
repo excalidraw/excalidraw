@@ -309,7 +309,7 @@ import {
   isPointHittingLink,
   isPointHittingLinkIcon,
 } from "../element/Hyperlink";
-import { isLocalLink, normalizeLink } from "../data/url";
+import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
@@ -846,7 +846,7 @@ class App extends React.Component<AppProps, AppState> {
             { sceneX: el.x, sceneY: el.y },
             this.state,
           );
-          const embedLink = getEmbedLink(normalizeLink(el.link || ""));
+          const embedLink = getEmbedLink(toValidURL(el.link || ""));
           const isVisible = isVisibleElement(
             el,
             normalizedWidth,
