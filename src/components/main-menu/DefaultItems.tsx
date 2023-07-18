@@ -4,6 +4,7 @@ import {
   useExcalidrawSetAppState,
   useExcalidrawActionManager,
   useExcalidrawElements,
+  useAppProps,
 } from "../App";
 import {
   ExportIcon,
@@ -198,8 +199,12 @@ export const ChangeCanvasBackground = () => {
   const { t } = useI18n();
   const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
+  const appProps = useAppProps();
 
-  if (appState.viewModeEnabled) {
+  if (
+    appState.viewModeEnabled ||
+    !appProps.UIOptions.canvasActions.changeViewBackgroundColor
+  ) {
     return null;
   }
   return (
