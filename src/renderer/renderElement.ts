@@ -1348,7 +1348,7 @@ export const renderElementToSvg = (
       div.style.width = "100%";
       div.style.height = "100%";
       const iframe = div.ownerDocument!.createElement("iframe");
-      const embedLink = getEmbedLink(element.link);
+      const embedLink = getEmbedLink(normalizeLink(element.link || ""));
       if (embedLink?.type !== "document") {
         iframe.src = embedLink?.link ?? "";
       }
@@ -1366,7 +1366,7 @@ export const renderElementToSvg = (
       // we replace with a link instead
       if (embedLink?.type === "document") {
         const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
-        anchorTag.setAttribute("href", normalizeLink(element.link ?? ""));
+        anchorTag.setAttribute("href", normalizeLink(element.link || ""));
         anchorTag.setAttribute("target", "_blank");
         anchorTag.setAttribute("rel", "noopener noreferrer");
 

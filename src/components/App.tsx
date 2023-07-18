@@ -846,7 +846,7 @@ class App extends React.Component<AppProps, AppState> {
             { sceneX: el.x, sceneY: el.y },
             this.state,
           );
-          const embedLink = getEmbedLink(el.link);
+          const embedLink = getEmbedLink(normalizeLink(el.link || ""));
           const isVisible = isVisibleElement(
             el,
             normalizedWidth,
@@ -2299,7 +2299,7 @@ class App extends React.Component<AppProps, AppState> {
           const embeddable = this.insertEmbeddableElement({
             sceneX,
             sceneY,
-            link: data.text,
+            link: normalizeLink(data.text),
           });
           if (embeddable) {
             this.setState({ selectedElementIds: { [embeddable.id]: true } });
@@ -7560,7 +7560,7 @@ class App extends React.Component<AppProps, AppState> {
         const embeddable = this.insertEmbeddableElement({
           sceneX,
           sceneY,
-          link: text,
+          link: normalizeLink(text),
         });
         if (embeddable) {
           this.setState({ selectedElementIds: { [embeddable.id]: true } });
