@@ -32,6 +32,7 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
+  FileId,
   FontFamilyValues,
   TextAlign,
   VerticalAlign,
@@ -154,6 +155,7 @@ export type ExcalidrawProgrammaticElement =
       type: Extract<ExcalidrawImageElement["type"], "image">;
       x: number;
       y: number;
+      fileId: FileId;
     } & Partial<ExcalidrawImageElement>);
 
 export interface ExcalidrawProgrammaticAPI {

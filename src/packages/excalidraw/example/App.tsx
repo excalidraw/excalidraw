@@ -31,7 +31,6 @@ import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
 import { KEYS } from "../../../keys";
-import { convertToExcalidrawElements } from "../../../data/transform";
 
 declare global {
   interface Window {
@@ -76,6 +75,7 @@ const {
   WelcomeScreen,
   MainMenu,
   LiveCollaborationTrigger,
+  convertToExcalidrawElements,
 } = window.ExcalidrawLib;
 
 const COMMENT_ICON_DIMENSION = 32;

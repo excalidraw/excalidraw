@@ -32,8 +32,8 @@ const elements: ExcalidrawProgrammaticAPI["elements"] = [
     type: "image",
     x: 606.1042326312408,
     y: 153.57729779411773,
-    width: 231.30325348751828,
-    height: 231.64340533088227,
+    width: 230,
+    height: 230,
     fileId: "rocket" as FileId,
   },
 ];
