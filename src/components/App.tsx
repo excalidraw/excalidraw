@@ -1928,9 +1928,12 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       } else if (data.elements) {
-        const elements = data.programmaticAPI
-          ? convertToExcalidrawElements(data.elements)
-          : data.elements;
+        const elements = (
+          data.programmaticAPI
+            ? //@ts-ignore
+              convertToExcalidrawElements(data.elements)
+            : data.elements
+        ) as readonly ExcalidrawElement[];
         // TODO remove formatting from elements if isPlainPaste
         this.addElementsFromPasteOrLibrary({
           elements,
