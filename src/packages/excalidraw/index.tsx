@@ -28,22 +28,31 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     viewModeEnabled,
     zenModeEnabled,
     gridModeEnabled,
+    initState, //zsviczian
     libraryReturnUrl,
     theme,
     name,
     renderCustomStats,
     onPaste,
+    onDrop, //zsviczian
     detectScroll = true,
     handleKeyboardGlobally = false,
     onLibraryChange,
     autoFocus = false,
+    onBeforeTextEdit, //zsviczian
+    onBeforeTextSubmit, //zsviczian
     generateIdForFile,
+    onThemeChange, //zsviczian
     onLinkOpen,
+    onLinkHover, //zsviczian
+    onViewModeChange, //zsviczian
     onPointerDown,
     onScrollChange,
     children,
     validateEmbeddable,
     renderEmbeddable,
+    renderWebview, //zsviczian
+    renderEmbeddableMenu, //zsviczian
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -103,22 +112,31 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           viewModeEnabled={viewModeEnabled}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
+          initState={initState} //zsviczian
           libraryReturnUrl={libraryReturnUrl}
           theme={theme}
           name={name}
           renderCustomStats={renderCustomStats}
           UIOptions={UIOptions}
           onPaste={onPaste}
+          onDrop={onDrop} //zsviczian
           detectScroll={detectScroll}
           handleKeyboardGlobally={handleKeyboardGlobally}
           onLibraryChange={onLibraryChange}
           autoFocus={autoFocus}
+          onBeforeTextEdit={onBeforeTextEdit} //zsviczian
+          onBeforeTextSubmit={onBeforeTextSubmit} //zsviczian
           generateIdForFile={generateIdForFile}
+          onThemeChange={onThemeChange} //zsviczian
           onLinkOpen={onLinkOpen}
+          onLinkHover={onLinkHover} //zsviczian
+          onViewModeChange={onViewModeChange} //zsviczian
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}
+          renderWebview={renderWebview} //zsviczian
+          renderEmbeddableMenu={renderEmbeddableMenu} //zsviczian
         >
           {children}
         </App>
@@ -219,6 +237,15 @@ export {
   loadFromBlob,
   loadSceneOrLibraryFromBlob,
   getFreeDrawSvgPath,
+  getCommonBoundingBox, //zsviczian
+  getMaximumGroups, //zsviczian
+  intersectElementWithLine, //zsviczian
+  determineFocusDistance, //zsviczian
+  measureText, //zsviczian
+  getDefaultLineHeight, //zsviczian
+  wrapText, //zsviczian
+  getFontString, //zsviczian
+  getBoundTextMaxWidth, //zsviczian
   exportToClipboard,
   mergeLibraryItems,
 } from "../../packages/utils";

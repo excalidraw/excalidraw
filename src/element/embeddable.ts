@@ -192,6 +192,7 @@ export const createPlaceholderEmbeddableLabel = (
     fontFamily,
     fontSize,
     text: wrapText(text, fontString, element.width - 20),
+    rawText: text,
     textAlign: "center",
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     angle: element.angle ?? 0,
