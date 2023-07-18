@@ -102,7 +102,7 @@ export const FONT_FAMILY = {
 export const THEME = {
   LIGHT: "light",
   DARK: "dark",
-};
+} as const;
 
 export const FRAME_STYLE = {
   strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],

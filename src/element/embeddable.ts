@@ -9,6 +9,7 @@ import {
   ExcalidrawElement,
   ExcalidrawEmbeddableElement,
   NonDeletedExcalidrawElement,
+  Theme,
 } from "./types";
 
 type EmbeddedLink =
@@ -16,7 +17,7 @@ type EmbeddedLink =
       aspectRatio: { w: number; h: number };
     } & (
       | { type: "video" | "generic"; link: string }
-      | { type: "document"; srcdoc: (theme: string) => string }
+      | { type: "document"; srcdoc: (theme: Theme) => string }
     ))
   | null;
 

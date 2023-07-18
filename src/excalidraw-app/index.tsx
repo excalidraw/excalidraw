@@ -518,7 +518,9 @@ const ExcalidrawWrapper = () => {
 
   const [theme, setTheme] = useState<Theme>(
     () =>
-      localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_THEME) ||
+      (localStorage.getItem(
+        STORAGE_KEYS.LOCAL_STORAGE_THEME,
+      ) as Theme | null) ||
       // FIXME migration from old LS scheme. Can be removed later. #5660
       importFromLocalStorage().appState?.theme ||
       THEME.LIGHT,
