@@ -104,9 +104,10 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
     type = "video";
     link = `https://player.vimeo.com/video/${target}?api=1`;
     aspectRatio = { w: 560, h: 315 };
-    const ret = { link, aspectRatio, type, warning };
-    embeddedLinkCache.set(originalLink, ret);
-    return ret;
+    //warning deliberately ommited so it is displayed only once per link
+    //same link next time will be served from cache
+    embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
+    return { link, aspectRatio, type, warning };
   }
 
   const figmaLink = link.match(RE_FIGMA);
