@@ -99,30 +99,30 @@
     "share": "Сподели",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": "",
-    "personalLib": "",
-    "excalidrawLib": "",
-    "decreaseFontSize": "",
-    "increaseFontSize": "",
+    "toggleTheme": "Включи тема",
+    "personalLib": "Лична Библиотека",
+    "excalidrawLib": "Excalidraw Библиотека",
+    "decreaseFontSize": "Намали размера на шрифта",
+    "increaseFontSize": "Увеличи размера на шрифта",
     "unbindText": "",
     "bindText": "",
     "createContainerFromText": "",
     "link": {
       "edit": "Редактирай линк",
       "create": "",
-      "label": ""
+      "label": "Линк"
     },
     "lineEditor": {
       "edit": "",
       "exit": ""
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Заключи",
+      "unlock": "Отключи",
+      "lockAll": "Заключи всички",
+      "unlockAll": "Отключи всички"
     },
-    "statusPublished": "",
+    "statusPublished": "Публикувани",
     "sidebarLock": "",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
@@ -175,36 +175,36 @@
     "couldNotLoadInvalidFile": "Невалиден файл не може да се зареди",
     "importBackendFailed": "Импортирането от бекенд не беше успешно.",
     "cannotExportEmptyCanvas": "Не може да се експортира празно платно.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "Не можем да копираме в клипбоарда.",
     "decryptFailed": "Данните не можаха да се дешифрират.",
     "uploadedSecurly": "Качването е защитено с криптиране от край до край, което означава, че сървърът Excalidraw и трети страни не могат да четат съдържанието.",
     "loadSceneOverridePrompt": "Зареждането на външна рисунка ще презапише настоящото ви съдържание. Желаете ли да продължите?",
     "collabStopOverridePrompt": "Прекратяването на сесията ще презапише предишната, локално запазена, рисунка. Сигурни ли сте?\n\n(Ако искате да продължите с локалната рисунка, просто затворете таба на браузъра.)",
-    "errorAddingToLibrary": "",
-    "errorRemovingFromLibrary": "",
+    "errorAddingToLibrary": "Не можем да заредим от библиотеката",
+    "errorRemovingFromLibrary": "Не можем да премахнем елемент от библиотеката",
     "confirmAddLibrary": "Ще се добавят {{numShapes}} фигура(и) във вашата библиотека. Сигурни ли сте?",
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "Не може да бъде възстановена сцена от този файл",
     "invalidSceneUrl": "",
     "resetLibrary": "",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "Изтрий {{count}} елемент(а) от библиотеката?",
     "invalidEncryptionKey": "",
     "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "Този файлов формат не се поддържа.",
     "imageInsertError": "",
-    "fileTooBig": "",
+    "fileTooBig": "Файлът е твърде голям. Максималния допустим размер е {{maxSize}}.",
     "svgImageInsertError": "",
     "invalidSVGString": "Невалиден SVG.",
     "cannotResolveCollabServer": "",
-    "importLibraryError": "",
+    "importLibraryError": "Не можем да заредим библиотеката",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
-      "line3": "",
+      "line3": "Силно препоръчваме да изключите тази настройка. Можете да следвате <link>тези стъпки</link> за това как да го направите.",
       "line4": ""
     }
   },
@@ -326,7 +326,7 @@
   "publishDialog": {
     "title": "",
     "itemName": "",
-    "authorName": "",
+    "authorName": "Авторско име",
     "githubUsername": "GitHub потребителско име",
     "twitterUsername": "Twitter потребителско име",
     "libraryName": "",
@@ -403,36 +403,36 @@
     "width": "Широчина"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "Добавена към библиотеката",
     "copyStyles": "Копирани стилове.",
     "copyToClipboard": "Копирано в клипборда.",
     "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": "",
+    "fileSaved": "Файлът е запазен.",
+    "fileSavedToFilename": "Запазен към {filename}",
+    "canvas": "платно",
+    "selection": "селекция",
     "pasteAsSingleElement": ""
   },
   "colors": {
-    "transparent": "",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "transparent": "Прозрачен",
+    "black": "Черен",
+    "white": "Бял",
+    "red": "Червен",
+    "pink": "Розов",
+    "grape": "Грозде",
+    "violet": "Виолетово",
+    "gray": "Сив",
+    "blue": "Син",
+    "cyan": "Синьозелено",
+    "teal": "Тъмно синьо-зелено",
+    "green": "Зелено",
+    "yellow": "Жълто",
+    "orange": "Оранжево",
+    "bronze": "Бронзово"
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
+      "center_heading": "Всичките Ви данни са запазени локално в браузъра Ви.",
       "center_heading_plus": "",
       "menuHint": ""
     },
@@ -445,9 +445,9 @@
   },
   "colorPicker": {
     "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
+    "colors": "Цветове",
+    "shades": "Нюанси",
+    "hexCode": "Шестнадесетичен код",
     "noShades": ""
   },
   "overwriteConfirm": {
@@ -470,12 +470,12 @@
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "Зареди от файл",
+        "button": "Зареди от файл",
         "description": ""
       },
       "shareableLink": {
-        "title": "",
+        "title": "Зареди от линк",
         "button": "",
         "description": ""
       }
