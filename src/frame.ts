@@ -1,6 +1,7 @@
 import {
   getCommonBounds,
   getElementAbsoluteCoords,
+  getElementBounds,
   isTextElement,
 } from "./element";
 import {
@@ -297,6 +298,15 @@ export const groupsAreCompletelyOutOfFrame = (
         FrameGeometry.isElementIntersectingFrame(element, frame),
     ) === undefined
   );
+};
+
+export const isPointInFrame = (
+  { x, y }: { x: number; y: number },
+  frame: ExcalidrawFrameElement,
+) => {
+  const [x1, y1, x2, y2] = getElementBounds(frame);
+
+  return x >= x1 && x <= x2 && y >= y1 && y <= y2;
 };
 
 // --------------------------- Frame Utils ------------------------------------
