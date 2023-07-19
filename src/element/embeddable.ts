@@ -259,7 +259,7 @@ const validateHostname = (
 
 export const extractSrc = (htmlString: string): string => {
   const regex =
-    /^(?:<iframe|<blockquote>)[\s\S]*?\ssrc=["']([^"']*)["'][\s\S]*?>$/i;
+    /^<(?:iframe|blockquote)[\s\S]*?\s(?:src|href)=["']([^"']*)["'][\s\S]*?>$/i;
   const match = htmlString.match(regex);
   if (match && match.length >= 2) {
     return match[1];
