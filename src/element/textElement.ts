@@ -85,13 +85,12 @@ export const redrawTextBoundingBox = (
   boundTextUpdates.baseline = metrics.baseline;
 
   if (container) {
-    const containerDims = getContainerDims(container);
     const maxContainerHeight = getBoundTextMaxHeight(
       container,
       textElement as ExcalidrawTextElementWithContainer,
     );
 
-    let nextHeight = containerDims.height;
+    let nextHeight = container.height;
     if (metrics.height > maxContainerHeight) {
       nextHeight = computeContainerDimensionForBoundText(
         metrics.height,
@@ -177,13 +176,12 @@ export const handleBindTextResize = (
     let text = textElement.text;
     let nextHeight = textElement.height;
     let nextWidth = textElement.width;
-    const containerDims = getContainerDims(container);
     const maxWidth = getBoundTextMaxWidth(container);
     const maxHeight = getBoundTextMaxHeight(
       container,
       textElement as ExcalidrawTextElementWithContainer,
     );
-    let containerHeight = containerDims.height;
+    let containerHeight = container.height;
     let nextBaseLine = textElement.baseline;
     if (transformHandleType !== "n" && transformHandleType !== "s") {
       if (text) {
@@ -209,7 +207,7 @@ export const handleBindTextResize = (
         container.type,
       );
 
-      const diff = containerHeight - containerDims.height;
+      const diff = containerHeight - container.height;
       // fix the y coord when resizing from ne/nw/n
       const updatedY =
         !isArrowElement(container) &&
@@ -689,10 +687,6 @@ export const getContainerElement = (
   return null;
 };
 
-export const getContainerDims = (element: ExcalidrawElement) => {
-  return { width: element.width, height: element.height };
-};
-
 export const getContainerCenter = (
   container: ExcalidrawElement,
   appState: AppState,
@@ -889,7 +883,7 @@ export const getBoundTextMaxWidth = (
     container,
   ),
 ) => {
-  const { width } = getContainerDims(container);
+  const { width } = container;
   if (isArrowElement(container)) {
     const minWidth =
       (boundTextElement?.fontSize ?? DEFAULT_FONT_SIZE) *
@@ -914,9 +908,9 @@ export const getBoundTextMaxHeight = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
-  const height = getContainerDims(container).height;
+  const { height } = container;
   if (isArrowElement(container)) {
-    const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2; // TODO
+    const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
     if (containerHeight <= 0) {
       return boundTextElement.height;
     }
