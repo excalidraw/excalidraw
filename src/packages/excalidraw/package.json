@@ -85,10 +85,10 @@
   },
   "size-limit": [
     {
-      "path": [
-        "dist/excalidraw.development.js",
-        "dist/excalidraw.production.min.js"
-      ]
+      "path": "dist/excalidraw.development.js"
+    },
+    {
+      "path": "dist/excalidraw.production.min.js"
     }
   ]
 }
