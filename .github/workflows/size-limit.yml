@@ -1,6 +1,10 @@
 name: "size"
 on:
-  pull_request:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
     branches:
       - master
 jobs:
