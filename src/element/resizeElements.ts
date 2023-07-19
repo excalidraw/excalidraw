@@ -1,4 +1,4 @@
-import { SHIFT_LOCKING_ANGLE } from "../constants";
+import { MIN_FONT_SIZE, SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
 import {
@@ -203,8 +203,6 @@ const rescalePointsInElement = (
         ),
       }
     : {};
-
-const MIN_FONT_SIZE = 1;
 
 const measureFontSizeFromWidth = (
   element: NonDeleted<ExcalidrawTextElement>,
@@ -722,12 +720,8 @@ export const resizeMultipleElements = (
       fontSize?: ExcalidrawTextElement["fontSize"];
       baseline?: ExcalidrawTextElement["baseline"];
       scale?: ExcalidrawImageElement["scale"];
+      boundTextFontSize?: ExcalidrawTextElement["fontSize"];
     };
-    boundText: {
-      element: ExcalidrawTextElementWithContainer;
-      fontSize: ExcalidrawTextElement["fontSize"];
-      baseline: ExcalidrawTextElement["baseline"];
-    } | null;
   }[] = [];
 
   for (const { orig, latest } of targetElements) {
@@ -798,50 +792,39 @@ export const resizeMultipleElements = (
       }
     }
 
-    let boundText: typeof elementsAndUpdates[0]["boundText"] = null;
-
-    const boundTextElement = getBoundTextElement(latest);
-
-    if (boundTextElement || isTextElement(orig)) {
-      const updatedElement = {
-        ...latest,
-        width,
-        height,
-      };
-      const metrics = measureFontSizeFromWidth(
-        boundTextElement ?? (orig as ExcalidrawTextElement),
-        boundTextElement
-          ? getBoundTextMaxWidth(updatedElement)
-          : updatedElement.width,
-        boundTextElement
-          ? getBoundTextMaxHeight(updatedElement, boundTextElement)
-          : updatedElement.height,
-      );
-
+    if (isTextElement(orig)) {
+      const metrics = measureFontSizeFromWidth(orig, width, height);
       if (!metrics) {
         return;
       }
-
-      if (isTextElement(orig)) {
-        update.fontSize = metrics.size;
-        update.baseline = metrics.baseline;
-      }
-
-      if (boundTextElement) {
-        boundText = {
-          element: boundTextElement,
-          fontSize: metrics.size,
-          baseline: metrics.baseline,
-        };
-      }
+      update.fontSize = metrics.size;
+      update.baseline = metrics.baseline;
     }
 
-    elementsAndUpdates.push({ element: latest, update, boundText });
+    const boundTextElement = pointerDownState.originalElements.get(
+      getBoundTextElementId(orig) ?? "",
+    ) as ExcalidrawTextElementWithContainer | undefined;
+
+    if (boundTextElement) {
+      const newFontSize = boundTextElement.fontSize * scale;
+      if (newFontSize < MIN_FONT_SIZE) {
+        return;
+      }
+      update.boundTextFontSize = newFontSize;
+    }
+
+    elementsAndUpdates.push({
+      element: latest,
+      update,
+    });
   }
 
   const elementsToUpdate = elementsAndUpdates.map(({ element }) => element);
 
-  for (const { element, update, boundText } of elementsAndUpdates) {
+  for (const {
+    element,
+    update: { boundTextFontSize, ...update },
+  } of elementsAndUpdates) {
     const { width, height, angle } = update;
 
     mutateElement(element, update, false);
@@ -851,12 +834,12 @@ export const resizeMultipleElements = (
       newSize: { width, height },
     });
 
-    if (boundText) {
-      const { element: boundTextElement, ...boundTextUpdates } = boundText;
+    const boundTextElement = getBoundTextElement(element);
+    if (boundTextElement && boundTextFontSize) {
       mutateElement(
         boundTextElement,
         {
-          ...boundTextUpdates,
+          fontSize: boundTextFontSize,
           angle: isLinearElement(element) ? undefined : angle,
         },
         false,

@@ -10,6 +10,8 @@ import {
 } from "./types";
 import { mutateElement } from "./mutateElement";
 import {
+  ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO,
+  ARROW_LABEL_WIDTH_FRACTION,
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -688,12 +690,6 @@ export const getContainerElement = (
 };
 
 export const getContainerDims = (element: ExcalidrawElement) => {
-  const MIN_WIDTH = 300;
-  if (isArrowElement(element)) {
-    const width = Math.max(element.width, MIN_WIDTH);
-    const height = element.height;
-    return { width, height };
-  }
   return { width: element.width, height: element.height };
 };
 
@@ -887,12 +883,19 @@ export const computeContainerDimensionForBoundText = (
   return dimension + padding;
 };
 
-export const getBoundTextMaxWidth = (container: ExcalidrawElement) => {
-  const width = getContainerDims(container).width;
+export const getBoundTextMaxWidth = (
+  container: ExcalidrawElement,
+  boundTextElement: ExcalidrawTextElement | null = getBoundTextElement(
+    container,
+  ),
+) => {
+  const { width } = getContainerDims(container);
   if (isArrowElement(container)) {
-    return width - BOUND_TEXT_PADDING * 8 * 2;
+    const minWidth =
+      (boundTextElement?.fontSize ?? DEFAULT_FONT_SIZE) *
+      ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO;
+    return Math.max(ARROW_LABEL_WIDTH_FRACTION * width, minWidth);
   }
-
   if (container.type === "ellipse") {
     // The width of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
@@ -913,7 +916,7 @@ export const getBoundTextMaxHeight = (
 ) => {
   const height = getContainerDims(container).height;
   if (isArrowElement(container)) {
-    const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
+    const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2; // TODO
     if (containerHeight <= 0) {
       return boundTextElement.height;
     }
