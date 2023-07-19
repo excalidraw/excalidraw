@@ -1,5 +1,7 @@
 import { register } from "../actions/register";
+import App from "../components/App";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
+import { t } from "../i18n";
 import { ExcalidrawProps } from "../types";
 import { getFontString, setCursorForShape, updateActiveTool } from "../utils";
 import { newTextElement } from "./newElement";
@@ -47,7 +49,10 @@ const createSrcDoc = (body: string) => {
   return `<html><body>${body}</body></html>`;
 };
 
-export const getEmbedLink = (link?: string | null): EmbeddedLink => {
+export const getEmbedLink = (
+  link: string | null | undefined,
+  setToast?: InstanceType<typeof App>["setToast"],
+): EmbeddedLink => {
   if (!link) {
     return null;
   }
@@ -85,6 +90,9 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
   const vimeoLink = link.match(RE_VIMEO);
   if (vimeoLink?.[1]) {
     const target = vimeoLink?.[1];
+    if (setToast && !/^\d+$/.test(target)) {
+      setToast({ message: t("toast.unrecognizedLinkFormat"), closable: true });
+    }
     type = "video";
     link = `https://player.vimeo.com/video/${target}?api=1`;
     aspectRatio = { w: 560, h: 315 };
@@ -247,6 +255,16 @@ const validateHostname = (
     // ignore
   }
   return false;
+};
+
+export const extractSrc = (htmlString: string): string => {
+  const regex =
+    /^(?:<iframe|<blockquote>)[\s\S]*?\ssrc=["']([^"']*)["'][\s\S]*?>$/i;
+  const match = htmlString.match(regex);
+  if (match && match.length >= 2) {
+    return match[1];
+  }
+  return htmlString;
 };
 
 export const embeddableURLValidator = (

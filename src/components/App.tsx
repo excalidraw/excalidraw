@@ -257,7 +257,11 @@ import {
   muteFSAbortError,
   easeOut,
 } from "../utils";
-import { embeddableURLValidator, getEmbedLink } from "../element/embeddable";
+import {
+  embeddableURLValidator,
+  extractSrc,
+  getEmbedLink,
+} from "../element/embeddable";
 import {
   ContextMenu,
   ContextMenuItems,
@@ -2291,16 +2295,17 @@ class App extends React.Component<AppProps, AppState> {
           retainSeed: isPlainPaste,
         });
       } else if (data.text) {
+        const maybeUrl = extractSrc(data.text);
         if (
           !isPlainPaste &&
-          embeddableURLValidator(data.text, this.props.validateEmbeddable) &&
-          (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(data.text) ||
-            getEmbedLink(data.text)?.type === "video")
+          embeddableURLValidator(maybeUrl, this.props.validateEmbeddable) &&
+          (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(maybeUrl) ||
+            getEmbedLink(maybeUrl, this.setToast)?.type === "video")
         ) {
           const embeddable = this.insertEmbeddableElement({
             sceneX,
             sceneY,
-            link: normalizeLink(data.text),
+            link: normalizeLink(maybeUrl),
           });
           if (embeddable) {
             this.setState({ selectedElementIds: { [embeddable.id]: true } });
@@ -5366,7 +5371,7 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
 
-    const embedLink = getEmbedLink(link);
+    const embedLink = getEmbedLink(link, this.setToast);
 
     if (!embedLink) {
       return;
@@ -7556,7 +7561,7 @@ class App extends React.Component<AppProps, AppState> {
         text &&
         embeddableURLValidator(text, this.props.validateEmbeddable) &&
         (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
-          getEmbedLink(text)?.type === "video")
+          getEmbedLink(text, this.setToast)?.type === "video")
       ) {
         const embeddable = this.insertEmbeddableElement({
           sceneX,

@@ -118,7 +118,7 @@ export const Hyperlink = ({
         invalidateShapeForElement(element);
       } else {
         const { width, height } = element;
-        const embedLink = getEmbedLink(link);
+        const embedLink = getEmbedLink(link, setToast);
         const ar = embedLink
           ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
           : 1;
