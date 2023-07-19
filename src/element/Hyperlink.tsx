@@ -118,7 +118,10 @@ export const Hyperlink = ({
         invalidateShapeForElement(element);
       } else {
         const { width, height } = element;
-        const embedLink = getEmbedLink(link, setToast);
+        const embedLink = getEmbedLink(link);
+        if (embedLink?.warning) {
+          setToast({ message: embedLink.warning, closable: true });
+        }
         const ar = embedLink
           ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
           : 1;

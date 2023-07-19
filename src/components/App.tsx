@@ -2300,7 +2300,7 @@ class App extends React.Component<AppProps, AppState> {
           !isPlainPaste &&
           embeddableURLValidator(maybeUrl, this.props.validateEmbeddable) &&
           (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(maybeUrl) ||
-            getEmbedLink(maybeUrl, this.setToast)?.type === "video")
+            getEmbedLink(maybeUrl)?.type === "video")
         ) {
           const embeddable = this.insertEmbeddableElement({
             sceneX,
@@ -5371,10 +5371,14 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
 
-    const embedLink = getEmbedLink(link, this.setToast);
+    const embedLink = getEmbedLink(link);
 
     if (!embedLink) {
       return;
+    }
+
+    if (embedLink.warning) {
+      this.setToast({ message: embedLink.warning, closable: true });
     }
 
     const element = newEmbeddableElement({
@@ -7561,7 +7565,7 @@ class App extends React.Component<AppProps, AppState> {
         text &&
         embeddableURLValidator(text, this.props.validateEmbeddable) &&
         (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
-          getEmbedLink(text, this.setToast)?.type === "video")
+          getEmbedLink(text)?.type === "video")
       ) {
         const embeddable = this.insertEmbeddableElement({
           sceneX,

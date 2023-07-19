@@ -1,5 +1,4 @@
 import { register } from "../actions/register";
-import App from "../components/App";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import { t } from "../i18n";
 import { ExcalidrawProps } from "../types";
@@ -17,6 +16,7 @@ import {
 type EmbeddedLink =
   | ({
       aspectRatio: { w: number; h: number };
+      warning?: string;
     } & (
       | { type: "video" | "generic"; link: string }
       | { type: "document"; srcdoc: (theme: Theme) => string }
@@ -26,13 +26,22 @@ type EmbeddedLink =
 const embeddedLinkCache = new Map<string, EmbeddedLink>();
 
 const RE_YOUTUBE =
-  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=|\?start=|&start=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
 const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
 const RE_FIGMA = /^https:\/\/(?:www\.)?figma\.com/;
+
 const RE_GH_GIST = /^https:\/\/gist\.github\.com/;
+const RE_GH_GIST_EMBED =
+  /^<script[\s\S]*?\ssrc=["'](https:\/\/gist.github.com\/.*?)\.js["']/i;
+
 // not anchored to start to allow <blockquote> twitter embeds
 const RE_TWITTER = /(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
+const RE_TWITTER_EMBED =
+  /^<blockquote[\s\S]*?\shref=["'](https:\/\/twitter.com\/[^"']*)/i;
+
+const RE_GENERIC_EMBED =
+  /^<(?:iframe|blockquote)[\s\S]*?\s(?:src|href)=["']([^"']*)["'][\s\S]*?>$/i;
 
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
@@ -49,10 +58,7 @@ const createSrcDoc = (body: string) => {
   return `<html><body>${body}</body></html>`;
 };
 
-export const getEmbedLink = (
-  link: string | null | undefined,
-  setToast?: InstanceType<typeof App>["setToast"],
-): EmbeddedLink => {
+export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
   if (!link) {
     return null;
   }
@@ -61,11 +67,13 @@ export const getEmbedLink = (
     return embeddedLinkCache.get(link)!;
   }
 
+  const originalLink = link;
+
   let type: "video" | "generic" = "generic";
   let aspectRatio = { w: 560, h: 840 };
   const ytLink = link.match(RE_YOUTUBE);
   if (ytLink?.[2]) {
-    const time = ytLink[3] ? `&t=${ytLink[3]}` : ``;
+    const time = ytLink[3] ? `&start=${ytLink[3]}` : ``;
     const isPortrait = link.includes("shorts");
     type = "video";
     switch (ytLink[1]) {
@@ -83,21 +91,22 @@ export const getEmbedLink = (
         break;
     }
     aspectRatio = isPortrait ? { w: 315, h: 560 } : { w: 560, h: 315 };
-    embeddedLinkCache.set(link, { link, aspectRatio, type });
+    embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
     return { link, aspectRatio, type };
   }
 
   const vimeoLink = link.match(RE_VIMEO);
   if (vimeoLink?.[1]) {
     const target = vimeoLink?.[1];
-    if (setToast && !/^\d+$/.test(target)) {
-      setToast({ message: t("toast.unrecognizedLinkFormat"), closable: true });
-    }
+    const warning = !/^\d+$/.test(target)
+      ? t("toast.unrecognizedLinkFormat")
+      : undefined;
     type = "video";
     link = `https://player.vimeo.com/video/${target}?api=1`;
     aspectRatio = { w: 560, h: 315 };
-    embeddedLinkCache.set(link, { link, aspectRatio, type });
-    return { link, aspectRatio, type };
+    const ret = { link, aspectRatio, type, warning };
+    embeddedLinkCache.set(originalLink, ret);
+    return ret;
   }
 
   const figmaLink = link.match(RE_FIGMA);
@@ -107,7 +116,7 @@ export const getEmbedLink = (
       link,
     )}`;
     aspectRatio = { w: 550, h: 550 };
-    embeddedLinkCache.set(link, { link, aspectRatio, type });
+    embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
     return { link, aspectRatio, type };
   }
 
@@ -132,7 +141,7 @@ export const getEmbedLink = (
         aspectRatio: { w: 480, h: 480 },
       };
     }
-    embeddedLinkCache.set(link, ret);
+    embeddedLinkCache.set(originalLink, ret);
     return ret;
   }
 
@@ -258,10 +267,18 @@ const validateHostname = (
 };
 
 export const extractSrc = (htmlString: string): string => {
-  const regex =
-    /^<(?:iframe|blockquote)[\s\S]*?\s(?:src|href)=["']([^"']*)["'][\s\S]*?>$/i;
-  const match = htmlString.match(regex);
-  if (match && match.length >= 2) {
+  const twitterMatch = htmlString.match(RE_TWITTER_EMBED);
+  if (twitterMatch && twitterMatch.length === 2) {
+    return twitterMatch[1];
+  }
+
+  const gistMatch = htmlString.match(RE_GH_GIST_EMBED);
+  if (gistMatch && gistMatch.length === 2) {
+    return gistMatch[1];
+  }
+
+  const match = htmlString.match(RE_GENERIC_EMBED);
+  if (match && match.length === 2) {
     return match[1];
   }
   return htmlString;
