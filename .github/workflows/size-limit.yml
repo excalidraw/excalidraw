@@ -1,4 +1,4 @@
-name: "size"
+name: "size-limit"
 on:
   pull_request:
     branches:
