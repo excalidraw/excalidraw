@@ -145,7 +145,6 @@
     "test:coverage": "react-scripts test --passWithNoTests --coverage --watchAll",
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
-    "release": "node scripts/release.js",
-    "size": "node scripts/buildPackageExcalidraw.js && size-limit"
+    "release": "node scripts/release.js"
   }
 }
