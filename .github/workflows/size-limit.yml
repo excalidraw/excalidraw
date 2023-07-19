@@ -6,8 +6,6 @@ on:
 jobs:
   size:
     runs-on: ubuntu-latest
-    env:
-      CI_JOB_NUMBER: 1
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
