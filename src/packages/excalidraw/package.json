@@ -81,5 +81,13 @@
     "start": "webpack serve --config webpack.dev-server.config.js",
     "install:deps": "yarn install --frozen-lockfile && yarn --cwd ../../../",
     "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js && yarn gen:types"
-  }
+  },
+  "size-limit": [
+    {
+      "path": [
+        "src/packages/excalidraw/dist/excalidraw.development.js",
+        "src/packages/excalidraw/dist/excalidraw.production.min.js"
+      ]
+    }
+  ]
 }
