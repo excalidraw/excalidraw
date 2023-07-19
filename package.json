@@ -145,15 +145,6 @@
     "test:coverage": "react-scripts test --passWithNoTests --coverage --watchAll",
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
-    "release": "node scripts/release.js",
-    "size": "node scripts/buildPackageExcalidraw.js && size-limit"
-  },
-  "size-limit": [
-    {
-      "path": [
-        "src/packages/excalidraw/dist/excalidraw.development.js",
-        "src/packages/excalidraw/dist/excalidraw.production.min.js"
-      ]
-    }
-  ]
+    "release": "node scripts/release.js"
+  }
 }
