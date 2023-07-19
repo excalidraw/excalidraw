@@ -1550,3 +1550,100 @@ export const handIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+export const downloadIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+    <path d="M7 11l5 5l5 -5"></path>
+    <path d="M12 4l0 12"></path>
+  </>,
+  tablerIconProps,
+);
+
+export const copyIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"></path>
+    <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"></path>
+  </>,
+  tablerIconProps,
+);
+
+export const helpIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+    <path d="M12 17l0 .01"></path>
+    <path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"></path>
+  </>,
+  tablerIconProps,
+);
+
+export const playerPlayIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M7 4v16l13 -8z"></path>
+  </>,
+  tablerIconProps,
+);
+
+export const playerStopFilledIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path
+      d="M17 4h-10a3 3 0 0 0 -3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3 -3v-10a3 3 0 0 0 -3 -3z"
+      strokeWidth="0"
+      fill="currentColor"
+    ></path>
+  </>,
+  tablerIconProps,
+);
+
+export const tablerCheckIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M5 12l5 5l10 -10"></path>
+  </>,
+  tablerIconProps,
+);
+
+export const alertTriangleIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M10.24 3.957l-8.422 14.06a1.989 1.989 0 0 0 1.7 2.983h16.845a1.989 1.989 0 0 0 1.7 -2.983l-8.423 -14.06a1.989 1.989 0 0 0 -3.4 0z" />
+    <path d="M12 9v4" />
+    <path d="M12 17h.01" />
+  </>,
+  tablerIconProps,
+);
+
+export const eyeDropperIcon = createIcon(
+  <g strokeWidth={1.25}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M11 7l6 6"></path>
+    <path d="M4 16l11.7 -11.7a1 1 0 0 1 1.4 0l2.6 2.6a1 1 0 0 1 0 1.4l-11.7 11.7h-4v-4z"></path>
+  </g>,
+  tablerIconProps,
+);
+
+export const extraToolsIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M12 3l-4 7h8z"></path>
+    <path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+    <path d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path>
+  </g>,
+  tablerIconProps,
+);
+
+export const frameToolIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M4 7l16 0"></path>
+    <path d="M4 17l16 0"></path>
+    <path d="M7 4l0 16"></path>
+    <path d="M17 4l0 16"></path>
+  </g>,
+  tablerIconProps,
+);

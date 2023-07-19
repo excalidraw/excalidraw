@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Akerdis",
     "fontSize": "Tiddi n tsefsit",
     "fontFamily": "Tawacult n tsefsiyin",
-    "onlySelected": "Tafrayt kan",
-    "withBackground": "Agilal",
-    "exportEmbedScene": "Sleɣ asayes",
-    "exportEmbedScene_details": "Asayes ad yettwasekles deg ufaylu n usifeḍ PNG/SVG akken akken ad yili wamek ara d-yettwarr seg-s usayes. Ayagi ad isimɣur tiddi n ufaylu n usifeḍ.",
     "addWatermark": "Seddu \"Yettwaxdem s Excalidraw\"",
     "handDrawn": "Asuneɣ s ufus",
     "normal": "Amagnu",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Tuttya taglawant",
     "flipVertical": "Tuttya tubdidt",
     "viewMode": "Askar n tmuɣli",
-    "toggleExportColorScheme": "Sermed/sens asifeḍ usentel n yini",
     "share": "Bḍu",
     "showStroke": "Beqqeḍ amelqaḍ n yini n yizirig",
     "showBackground": "Beqqeḍ amelqaḍ n yini n ugilal",
@@ -128,7 +123,10 @@
       "unlockAll": "Serreḥ akk"
     },
     "statusPublished": "Yeffeɣ-d",
-    "sidebarLock": "Eǧǧ afeggag n yidis yeldi"
+    "sidebarLock": "Eǧǧ afeggag n yidis yeldi",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Ulac iferdisen yettwarnan yakan...",
@@ -140,11 +138,7 @@
     "exportJSON": "Sifeḍ afaylu",
     "exportImage": "Sifeḍ tugna...",
     "export": "Sekles di...",
-    "exportToPng": "Sifeḍ ɣer PNG",
-    "exportToSvg": "Sifeḍ ɣer SVG",
     "copyToClipboard": "Nɣel ɣer tecfawit",
-    "copyPngToClipboard": "Nɣel PNG ɣer tecfawit",
-    "scale": "Taskala",
     "save": "Sekles deg ufaylu amiran",
     "saveAs": "Sekles am",
     "load": "Ldi",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "Ulamek asekles deg uzadur n yisefka deg ugilal. Ma ikemmel wugur, isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
     "collabSaveFailed_sizeExceeded": "Ulamek asekles deg uzadur n yisefka deg ugilal, taɣzut n usuneɣ tettban-d temqer aṭas. Isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
     "brave_measure_text_error": {
-      "start": "Ittban-d am wakken tsseqdaceḍ iminig Brave akked",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "yermed",
-      "break": "Ayagi yezmer ad d-iseglu s truẓi n",
-      "text_elements": "Iferdisen iḍrisen",
-      "in_your_drawings": "deg wunuɣen-inek",
-      "strongly_recommend": "",
-      "steps": "isurifen-agi",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "di GitHub inek neɣ aru-yaɣ-d di",
-      "discord": ""
+      "line1": "",
+      "line2": "Ayagi yezmer ad d-iglu s truẓi n<bold>Iferdisen n uḍris</bold>deg wunuɣen-inek.",
+      "line3": "Ad k-nsemter ad tsexsiḍ aɣewwar-agi. Tzemreḍ ad tḍefreḍ<link>isurifen-agi</link> ɣef wamek ara txedmeḍ.",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Askar n yimru - gdel tanalit",
     "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen",
     "eraser": "Sfeḍ",
-    "hand": "Afus (afecku n usmutti n tmuɣli)"
+    "frame": "",
+    "hand": "Afus (afecku n usmutti n tmuɣli)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Tigawin n teɣzut n usuneɣ",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Tixidest: eɛreḍ ad tesqerbeḍ ciṭ iferdisen yembaɛaden."
   },
   "errorSplash": {
-    "headingMain_pre": "Teḍra-d tuccḍa. Eɛreḍ ",
-    "headingMain_button": "asali n usebter tikkelt-nniḍen.",
-    "clearCanvasMessage": "Ma yella tulsa n usali ur tefri ara ugur, eɛreḍ ",
-    "clearCanvasMessage_button": "asfaḍ n teɣzut n usuneɣ.",
+    "headingMain": "Teḍra-d tuccḍa. Eɛreḍ <button>asali n usebter tikkelt-nniḍen.</button>",
+    "clearCanvasMessage": "Ma yella tulsa n usali ur tefri ara ugur, eɛreḍ <button>asfaḍ n teɣzut n usuneɣ.</button>",
     "clearCanvasCaveat": " Ayagi ad d-iglu s usṛuḥu n umahil ",
-    "trackedToSentry_pre": "Tuccḍa akked umesmagi ",
-    "trackedToSentry_post": " tettwasekles deg unagraw-nneɣ.",
-    "openIssueMessage_pre": "Nḥuder aṭas akken ur nseddu ara talɣut n usayes-inek (m) di tuccḍa. Ma yella asayes-inek (m) mačči d amaẓlay, ttxil-k (m) xemmem ad ḍefreḍ ",
-    "openIssueMessage_button": "afecku n weḍfar n yibugen.",
-    "openIssueMessage_post": " Ma ulac uɣilif seddu talɣut ukessar-agi s wenɣal akked usenṭeḍ di GitHub issue.",
+    "trackedToSentry": "Tuccḍa akked umesmagi {{eventId}} tettwasekles deg unagraw-nneɣ.",
+    "openIssueMessage": "Nḥuder aṭas akken ur nseddu ara talɣut n usayes-inek (m) di tuccḍa. Ma yella asayes-inek (m) mačči d amaẓlay, ttxil-k (m) xemmem ad ḍefreḍ <button>afecku n weḍfar n yibugen.</button> Ma ulac uɣilif seddu talɣut ukessar-agi s wenɣal akked usenṭeḍ di GitHub issue.",
     "sceneContent": "Agbur n usayes:"
   },
   "roomDialog": {
@@ -320,8 +302,8 @@
     "doubleClick": "ssit snat n tikkal",
     "drag": "zuɣer",
     "editor": "Amaẓrag",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Ẓreg tinqiḍin n yizirig/taneccabt",
+    "editText": "Ẓreg aḍris/rnu tabzimt",
     "github": "Tufiḍ-d ugur? Azen-aɣ-d",
     "howto": "Ḍfer imniren-nneɣ",
     "or": "neɣ",
@@ -362,33 +344,44 @@
       "required": "Yettwasra",
       "website": "Sekcem URL ameɣtu"
     },
-    "noteDescription": {
-      "pre": "Azen tamkarḍit-inek•inem akken ad teddu di ",
-      "link": "akaram azayez n temkarḍit",
-      "post": "i yimdanen-nniḍen ara isqedcen deg wunuɣen-nnsen."
-    },
-    "noteGuidelines": {
-      "pre": "Tamkarḍit teḥwaǧ ad tettwaqbel s ufus qbel. Ma ulac uɣilif ɣer ",
-      "link": "iwellihen",
-      "post": " send ad tazneḍ. Tesriḍ amiḍan n GitHub akken ad tmmeslayeḍ yerna ad tgeḍ ibeddilen ma yelaq, maca mačči d ayen yettwaḥetmen."
-    },
-    "noteLicense": {
-      "pre": "Mi tuzneḍ ad tqebleḍ akken tamkarḍit ad d-teffeɣ s ",
-      "link": "Turagt MIT, ",
-      "post": "ayen yebɣan ad d-yini belli yal yiwen izmer ad ten-iseqdec war tilist."
-    },
+    "noteDescription": "Azen tamkarḍit-inek•inem akken ad teddu di <link>akaram azayez n temkarḍit</link>i yimdanen-nniḍen ara isqedcen deg wunuɣen-nnsen.",
+    "noteGuidelines": "Tamkarḍit teḥwaǧ ad tettwaqbel s ufus qbel. Ma ulac uɣilif ɣer <link>iwellihen</link> send ad tazneḍ. Tesriḍ amiḍan n GitHub akken ad tmmeslayeḍ yerna ad tgeḍ ibeddilen ma yelaq, maca mačči d ayen yettwaḥetmen.",
+    "noteLicense": "Mi tuzneḍ ad tqebleḍ akken tamkarḍit ad d-teffeɣ s <link>Turagt MIT, </link>ayen yebɣan ad d-yini belli yal yiwen izmer ad ten-iseqdec war tilist.",
     "noteItems": "Yal aferdis n temkarḍit isefk ad isɛu isem-is i yiman-is akken ad yili wamek ara yettusizdeg. Iferdisen-agi n temkarḍit ad ddun:",
     "atleastOneLibItem": "Ma ulac uɣilif fern ma drus yiwen n uferdis n temkarḍit akken ad tebduḍ",
     "republishWarning": "Tamawt: kra n yiferdisen yettwafernen ttwacerḍen ffeɣen-d/ttwaznen. Isefk ad talseḍ tuzzna n yiferdisen anagar mi ara tleqqemeḍ tamkarḍit neɣ tuzzna yellan."
   },
   "publishSuccessDialog": {
     "title": "Tamkarḍit tettwazen",
-    "content": "Tanemmirt-ik•im {{authorName}}. Tamkarḍit-inek•inem tettwazen i weselken. Tzemreḍ ad tḍefreḍ aẓayer",
-    "link": "dagi"
+    "content": "Tanemmirt-ik•im {{authorName}}. Tamkarḍit-inek•inem tettwazen i weselken. Tzemreḍ ad tḍefreḍ aẓayer<link>dagi</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Ales awennez n temkarḍit",
     "removeItemsFromLib": "Kkes iferdisen yettafernen si temkarḍit"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Unuɣen-inek (m) ttuwgelhnen seg yixef s ixef dɣa iqeddacen n Excalidraw werǧin ad ten-walin. ",
@@ -421,63 +414,40 @@
     "pasteAsSingleElement": ""
   },
   "colors": {
-    "ffffff": "Amellal",
-    "f8f9fa": "Aɣiɣdi 0",
-    "f1f3f5": "Aɣiɣdi 1",
-    "fff5f5": "Azeggaɣ",
-    "fff0f6": "Axuxi 0",
-    "f8f0fc": "Tiẓurin 0",
-    "f3f0ff": "Amidadi 0",
-    "edf2ff": "",
-    "e7f5ff": "Anili 0",
-    "e3fafc": "",
-    "e6fcf5": "",
-    "ebfbee": "Azegzaw 0",
-    "f4fce3": "Llim 0",
-    "fff9db": "Awraɣ 0",
-    "fff4e6": "Aččinawi 0",
     "transparent": "Afrawan",
-    "ced4da": "Aɣiɣdi 4",
-    "868e96": "Aɣiɣdi 6",
-    "fa5252": "Azeggaɣ 6",
-    "e64980": "Axuxi 6",
-    "be4bdb": "",
-    "7950f2": "Amidadi 6",
-    "4c6ef5": "",
-    "228be6": "Anili 6",
-    "15aabf": "",
-    "12b886": "",
-    "40c057": "Azegzaw 0",
-    "82c91e": "Llim 6",
-    "fab005": "Awraɣ 6",
-    "fd7e14": "Aččinawi 6",
-    "000000": "Aberkan",
-    "343a40": "Aɣiɣdi 8",
-    "495057": "Aɣiɣdi 7",
-    "c92a2a": "Azeggaɣ 9",
-    "a61e4d": "Axuxi 9",
-    "862e9c": "Tiẓurin 9",
-    "5f3dc4": "Amidadi 9",
-    "364fc7": "",
-    "1864ab": "Anili 9",
-    "0b7285": "",
-    "087f5b": "",
-    "2b8a3e": "Azegzaw 9",
-    "5c940d": "Llim 9",
-    "e67700": "Awraɣ 9",
-    "d9480f": "Aččinawi 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
+      "center_heading": "Akk isefka-inek•inem ttwakelsen s wudem adigan deg yiminig-inek•inem.",
       "center_heading_plus": "Tebɣiḍ ad tedduḍ ɣer Excalidraw+ deg umḍiq?",
       "menuHint": "Asifeḍ, ismenyifen, tutlayin, ..."
     },
     "defaults": {
       "menuHint": "Asifeḍ, ismenyifen, d wayen-nniḍen...",
       "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "toolbarHint": "Fren afecku tebduḍ asuneɣ!",
+      "helpHint": "Inegzumen akked tallelt"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

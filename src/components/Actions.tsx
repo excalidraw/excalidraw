@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, PointerType } from "../element/types";
@@ -14,7 +14,7 @@ import {
   hasText,
 } from "../scene";
 import { SHAPES } from "../shapes";
-import { AppState, Zoom } from "../types";
+import { UIAppState, Zoom } from "../types";
 import {
   capitalizeString,
   isTransparent,
@@ -28,19 +28,23 @@ import { trackEvent } from "../analytics";
 import { hasBoundTextElement } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
-import "./Actions.scss";
 import { Tooltip } from "./Tooltip";
 import {
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
 } from "../element/textElement";
 
+import "./Actions.scss";
+import DropdownMenu from "./dropdownMenu/DropdownMenu";
+import { extraToolsIcon, frameToolIcon } from "./icons";
+import { KEYS } from "../keys";
+
 export const SelectedShapeActions = ({
   appState,
   elements,
   renderAction,
 }: {
-  appState: AppState;
+  appState: UIAppState;
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
 }) => {
@@ -88,7 +92,8 @@ export const SelectedShapeActions = ({
       <div>
         {((hasStrokeColor(appState.activeTool.type) &&
           appState.activeTool.type !== "image" &&
-          commonSelectedType !== "image") ||
+          commonSelectedType !== "image" &&
+          commonSelectedType !== "frame") ||
           targetElements.some((element) => hasStrokeColor(element.type))) &&
           renderAction("changeStrokeColor")}
       </div>
@@ -215,32 +220,82 @@ export const ShapesSwitcher = ({
   appState,
 }: {
   canvas: HTMLCanvasElement | null;
-  activeTool: AppState["activeTool"];
-  setAppState: React.Component<any, AppState>["setState"];
+  activeTool: UIAppState["activeTool"];
+  setAppState: React.Component<any, UIAppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
-  appState: AppState;
-}) => (
-  <>
-    {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
-      const label = t(`toolBar.${value}`);
-      const letter =
-        key && capitalizeString(typeof key === "string" ? key : key[0]);
-      const shortcut = letter
-        ? `${letter} ${t("helpDialog.or")} ${numericKey}`
-        : `${numericKey}`;
-      return (
+  appState: UIAppState;
+}) => {
+  const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
+  const device = useDevice();
+  return (
+    <>
+      {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
+        const label = t(`toolBar.${value}`);
+        const letter =
+          key && capitalizeString(typeof key === "string" ? key : key[0]);
+        const shortcut = letter
+          ? `${letter} ${t("helpDialog.or")} ${numericKey}`
+          : `${numericKey}`;
+        return (
+          <ToolButton
+            className={clsx("Shape", { fillable })}
+            key={value}
+            type="radio"
+            icon={icon}
+            checked={activeTool.type === value}
+            name="editor-current-shape"
+            title={`${capitalizeString(label)} — ${shortcut}`}
+            keyBindingLabel={numericKey || letter}
+            aria-label={capitalizeString(label)}
+            aria-keyshortcuts={shortcut}
+            data-testid={`toolbar-${value}`}
+            onPointerDown={({ pointerType }) => {
+              if (!appState.penDetected && pointerType === "pen") {
+                setAppState({
+                  penDetected: true,
+                  penMode: true,
+                });
+              }
+            }}
+            onChange={({ pointerType }) => {
+              if (appState.activeTool.type !== value) {
+                trackEvent("toolbar", value, "ui");
+              }
+              const nextActiveTool = updateActiveTool(appState, {
+                type: value,
+              });
+              setAppState({
+                activeTool: nextActiveTool,
+                multiElement: null,
+                selectedElementIds: {},
+              });
+              setCursorForShape(canvas, {
+                ...appState,
+                activeTool: nextActiveTool,
+              });
+              if (value === "image") {
+                onImageAction({ pointerType });
+              }
+            }}
+          />
+        );
+      })}
+      <div className="App-toolbar__divider" />
+      {/* TEMP HACK because dropdown doesn't work well inside mobile toolbar */}
+      {device.isMobile ? (
         <ToolButton
-          className={clsx("Shape", { fillable })}
-          key={value}
+          className={clsx("Shape", { fillable: false })}
           type="radio"
-          icon={icon}
-          checked={activeTool.type === value}
+          icon={frameToolIcon}
+          checked={activeTool.type === "frame"}
           name="editor-current-shape"
-          title={`${capitalizeString(label)} — ${shortcut}`}
-          keyBindingLabel={numericKey || letter}
-          aria-label={capitalizeString(label)}
-          aria-keyshortcuts={shortcut}
-          data-testid={`toolbar-${value}`}
+          title={`${capitalizeString(
+            t("toolBar.frame"),
+          )} — ${KEYS.F.toLocaleUpperCase()}`}
+          keyBindingLabel={KEYS.F.toLocaleUpperCase()}
+          aria-label={capitalizeString(t("toolBar.frame"))}
+          aria-keyshortcuts={KEYS.F.toLocaleUpperCase()}
+          data-testid={`toolbar-frame`}
           onPointerDown={({ pointerType }) => {
             if (!appState.penDetected && pointerType === "pen") {
               setAppState({
@@ -250,30 +305,54 @@ export const ShapesSwitcher = ({
             }
           }}
           onChange={({ pointerType }) => {
-            if (appState.activeTool.type !== value) {
-              trackEvent("toolbar", value, "ui");
-            }
+            trackEvent("toolbar", "frame", "ui");
             const nextActiveTool = updateActiveTool(appState, {
-              type: value,
+              type: "frame",
             });
             setAppState({
               activeTool: nextActiveTool,
               multiElement: null,
               selectedElementIds: {},
             });
-            setCursorForShape(canvas, {
-              ...appState,
-              activeTool: nextActiveTool,
-            });
-            if (value === "image") {
-              onImageAction({ pointerType });
-            }
           }}
         />
-      );
-    })}
-  </>
-);
+      ) : (
+        <DropdownMenu open={isExtraToolsMenuOpen}>
+          <DropdownMenu.Trigger
+            className="App-toolbar__extra-tools-trigger"
+            onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
+            title={t("toolBar.extraTools")}
+          >
+            {extraToolsIcon}
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content
+            onClickOutside={() => setIsExtraToolsMenuOpen(false)}
+            onSelect={() => setIsExtraToolsMenuOpen(false)}
+            className="App-toolbar__extra-tools-dropdown"
+          >
+            <DropdownMenu.Item
+              onSelect={() => {
+                const nextActiveTool = updateActiveTool(appState, {
+                  type: "frame",
+                });
+                setAppState({
+                  activeTool: nextActiveTool,
+                  multiElement: null,
+                  selectedElementIds: {},
+                });
+              }}
+              icon={frameToolIcon}
+              shortcut={KEYS.F.toLocaleUpperCase()}
+              data-testid="toolbar-frame"
+            >
+              {t("toolBar.frame")}
+            </DropdownMenu.Item>
+          </DropdownMenu.Content>
+        </DropdownMenu>
+      )}
+    </>
+  );
+};
 
 export const ZoomActions = ({
   renderAction,

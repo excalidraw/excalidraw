@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trójkąt",
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
-    "onlySelected": "Tylko wybrane",
-    "withBackground": "Kolor wypełnienia",
-    "exportEmbedScene": "Osadź scenę",
-    "exportEmbedScene_details": "Dane sceny zostaną zapisane w eksportowanym pliku PNG/SVG tak, aby scena mogła zostać z niego przywrócona.\nZwiększy to rozmiar eksportowanego pliku.",
     "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
     "handDrawn": "Odręczny",
     "normal": "Normalny",
@@ -54,7 +50,7 @@
     "veryLarge": "Bardzo duży",
     "solid": "Pełne",
     "hachure": "Linie",
-    "zigzag": "",
+    "zigzag": "Zygzak",
     "crossHatch": "Zakreślone",
     "thin": "Cienkie",
     "bold": "Pogrubione",
@@ -67,7 +63,7 @@
     "cartoonist": "Rysunkowy",
     "fileTitle": "Nazwa pliku",
     "colorPicker": "Paleta kolorów",
-    "canvasColors": "",
+    "canvasColors": "Używane na płótnie",
     "canvasBackground": "Kolor dokumentu",
     "drawingCanvas": "Obszar roboczy",
     "layers": "Warstwy",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Odwróć w poziomie",
     "flipVertical": "Odwróć w pionie",
     "viewMode": "Tryb widoku",
-    "toggleExportColorScheme": "Przełącz schemat kolorów przy eksporcie",
     "share": "Udostępnij",
     "showStroke": "Pokaż próbnik kolorów obrysu",
     "showBackground": "Pokaż próbnik koloru tła",
@@ -109,17 +104,17 @@
     "excalidrawLib": "Biblioteka Excalidraw",
     "decreaseFontSize": "Zmniejsz rozmiar czcionki",
     "increaseFontSize": "Zwiększ rozmiar czcionki",
-    "unbindText": "",
-    "bindText": "",
-    "createContainerFromText": "",
+    "unbindText": "Rozłącz tekst",
+    "bindText": "Połącz tekst z kontenerem",
+    "createContainerFromText": "Zawijaj tekst w kontenerze",
     "link": {
       "edit": "Edytuj łącze",
       "create": "Utwórz łącze",
       "label": "Łącze"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "Edytuj linię",
+      "exit": "Wyjdź z edytora linii"
     },
     "elementLock": {
       "lock": "Zablokuj",
@@ -128,11 +123,14 @@
       "unlockAll": "Odblokuj wszystko"
     },
     "statusPublished": "Opublikowano",
-    "sidebarLock": "Panel boczny zawsze otwarty"
+    "sidebarLock": "Panel boczny zawsze otwarty",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": "Wybierz kolor z płótna"
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
-    "hint_emptyLibrary": "",
+    "hint_emptyLibrary": "Wybierz element na płótnie, aby go tutaj dodać, lub zainstaluj bibliotekę z poniższego publicznego repozytorium.",
     "hint_emptyPrivateLibrary": "Wybierz element, aby dodać go tutaj."
   },
   "buttons": {
@@ -140,11 +138,7 @@
     "exportJSON": "Eksportuj do pliku",
     "exportImage": "Eksportuj obraz...",
     "export": "Zapisz jako...",
-    "exportToPng": "Zapisz jako PNG",
-    "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
-    "copyPngToClipboard": "Skopiuj do schowka jako plik PNG",
-    "scale": "Skala",
     "save": "Zapisz do bieżącego pliku",
     "saveAs": "Zapisz jako",
     "load": "Otwórz",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "Nie udało się zapisać w bazie danych. Jeśli problemy nie ustąpią, zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "collabSaveFailed_sizeExceeded": "Nie udało się zapisać w bazie danych — dokument jest za duży. Zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "problem",
-      "write": "na naszym GitHubie lub napisz do nas na",
-      "discord": "Discord"
+      "line1": "Wygląda na to, że używasz przeglądarki Brave z włączonym ustawieniem <bold>Agressively Block Fingerprinting</bold>.",
+      "line2": "Może to doprowadzić do złamania <bold>elementów tekstu</bold> na rysunkach.",
+      "line3": "Zdecydowanie zalecamy wyłączenie tego ustawienia. Możesz wykonać <link>te kroki</link>, aby to zrobić.",
+      "line4": "Jeśli wyłączenie tego ustawienia nie naprawia wyświetlania elementów tekstowych, zgłoś <issueLink>problem</issueLink> na naszym GitHubie lub napisz do nas na <discordLink>Discordzie</discordLink>"
     }
   },
   "toolBar": {
@@ -235,10 +220,12 @@
     "text": "Tekst",
     "library": "Biblioteka",
     "lock": "Zablokuj wybrane narzędzie",
-    "penMode": "",
-    "link": "",
+    "penMode": "Tryb pióra — zapobiegaj dotknięciom",
+    "link": "Dodaj/aktualizuj link dla wybranego kształtu",
     "eraser": "Gumka",
-    "hand": ""
+    "frame": "",
+    "hand": "Ręka (narzędzie do przesuwania)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -246,7 +233,7 @@
     "shapes": "Kształty"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Aby przesunąć płótno, przytrzymaj kółko myszy lub spację podczas przeciągania, albo użyj narzędzia ręki",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
@@ -257,15 +244,15 @@
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "resizeImage": "Możesz zmienić rozmiar swobodnie trzymając SHIFT,\nprzytrzymaj ALT, aby przeskalować względem środka obiektu",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_info": "Przytrzymaj CtrlOrCmd i kliknij dwukrotnie lub naciśnij CtrlOrCmd + Enter, aby edytować punkty",
+    "lineEditor_pointSelected": "Naciśnij przycisk Delete, aby usunąć punkt. Ctrl/Cmd+D, aby go zduplikować. Przeciągnij, aby go przenieść",
+    "lineEditor_nothingSelected": "Wybierz punkt do edycji (przytrzymaj SHIFT, aby wybrać wiele),\nlub przytrzymaj Alt i kliknij, aby dodać nowe punkty",
     "placeImage": "Kliknij, aby umieścić obraz, lub kliknij i przeciągnij, aby ustawić jego rozmiar ręcznie",
     "publishLibrary": "Opublikuj własną bibliotekę",
-    "bindTextToElement": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
-    "firefox_clipboard_write": ""
+    "bindTextToElement": "Wciśnij enter, aby dodać tekst",
+    "deepBoxSelect": "Przytrzymaj CtrlOrCmd, aby wybrać w obrębie grupy i uniknąć przeciągania",
+    "eraserRevert": "Przytrzymaj Alt, aby przywrócić elementy oznaczone do usunięcia",
+    "firefox_clipboard_write": "Ta funkcja może być włączona poprzez ustawienie flagi \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Aby zmienić flagi przeglądarki w Firefox, odwiedź stronę \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Wskazówka: spróbuj nieco zbliżyć najdalej wysunięte elementy."
   },
   "errorSplash": {
-    "headingMain_pre": "Wystąpił błąd. Spróbuj ",
-    "headingMain_button": "odświeżyć stronę.",
-    "clearCanvasMessage": "Jeśli odświeżenie strony nie zadziałało, spróbuj ",
-    "clearCanvasMessage_button": "usunąć wszystko z dokumentu.",
+    "headingMain": "Wystąpił błąd. Spróbuj <button>odświeżyć stronę.</button>",
+    "clearCanvasMessage": "Jeśli odświeżenie strony nie zadziałało, spróbuj <button>usunąć wszystko z dokumentu.</button>",
     "clearCanvasCaveat": " Pamiętaj tylko, że spowoduje to utratę całej twojej pracy ",
-    "trackedToSentry_pre": "Błąd o identyfikatorze ",
-    "trackedToSentry_post": " został zaraportowany w naszym systemie.",
-    "openIssueMessage_pre": "Szanujemy twoją prywatność i raport nie zawierał żadnych danych dotyczących tego nad czym pracowałeś, natomiast jeżeli jesteś w stanie podzielić się tym nad czym pracowałeś, prosimy o dodatkowy raport poprzez ",
-    "openIssueMessage_button": "nasze narzędzie do raportowania błędów.",
-    "openIssueMessage_post": " Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i umieszczenie jej w zgłoszeniu na portalu GitHub.",
+    "trackedToSentry": "Błąd o identyfikatorze {{eventId}} został zaraportowany w naszym systemie.",
+    "openIssueMessage": "Szanujemy twoją prywatność i raport nie zawierał żadnych danych dotyczących tego nad czym pracowałeś, natomiast jeżeli jesteś w stanie podzielić się tym nad czym pracowałeś, prosimy o dodatkowy raport poprzez <button>nasze narzędzie do raportowania błędów.</button> Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i umieszczenie jej w zgłoszeniu na portalu GitHub.",
     "sceneContent": "Zawartość dokumentu:"
   },
   "roomDialog": {
@@ -307,21 +289,21 @@
     "link_button": "Wygeneruj link",
     "excalidrawplus_description": "Zapisz scenę do swojego obszaru roboczego Excalidraw+.",
     "excalidrawplus_button": "Eksportuj",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_exportError": "W tej chwili nie można wyeksportować do Excalidraw+..."
   },
   "helpDialog": {
     "blog": "Przeczytaj na naszym blogu",
     "click": "kliknięcie",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Wybór w obrębie grupy",
+    "deepBoxSelect": "Wybór w obrębie grupy i unikanie przeciągania",
     "curvedArrow": "Zakrzywiona strzałka",
     "curvedLine": "Zakrzywiona linia",
     "documentation": "Dokumentacja",
     "doubleClick": "podwójne kliknięcie",
     "drag": "przeciągnij",
     "editor": "Edytor",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Edytuj punkty linii/strzałki",
+    "editText": "Edytuj tekst/dodaj etykietę",
     "github": "Znalazłeś problem? Prześlij",
     "howto": "Skorzystaj z instrukcji",
     "or": "lub",
@@ -334,9 +316,9 @@
     "view": "Widok",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
     "zoomToSelection": "Przybliż do zaznaczenia",
-    "toggleElementLock": "",
+    "toggleElementLock": "Zablokuj/odblokuj zaznaczenie",
     "movePageUpDown": "Przesuń stronę w górę/w dół",
-    "movePageLeftRight": ""
+    "movePageLeftRight": "Przenieś stronę w lewo/prawo"
   },
   "clearCanvasDialog": {
     "title": "Wyczyść płótno"
@@ -354,7 +336,7 @@
       "authorName": "Twoje imię lub nazwa użytkownika",
       "libraryName": "Nazwa twojej biblioteki",
       "libraryDesc": "Opis twojej biblioteki, aby pomóc innym zrozumieć jej działanie",
-      "githubHandle": "",
+      "githubHandle": "Uchwyt GitHub (opcjonalny), dzięki czemu możesz edytować bibliotekę po przesłaniu do sprawdzenia",
       "twitterHandle": "Nazwa użytkownika w serwisie Twitter (opcjonalna), aby wiedzieć kogo oznaczyć przy promowaniu na Twitterze",
       "website": "Link do Twojej osobistej strony internetowej lub gdzie indziej (opcjonalnie)"
     },
@@ -362,37 +344,48 @@
       "required": "Wymagane",
       "website": "Wprowadź prawidłowy adres URL"
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": "dla innych osób do wykorzystania w swoich rysunkach."
-    },
-    "noteGuidelines": {
-      "pre": "Biblioteka musi być najpierw zatwierdzona ręcznie. Przeczytaj ",
-      "link": "wytyczne",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "Wysyłając zgadzasz się, że biblioteka zostanie opublikowana pod ",
-      "link": "Licencja MIT, ",
-      "post": "w skrócie, każdy może z nich korzystać bez ograniczeń."
-    },
-    "noteItems": "",
+    "noteDescription": "<link></link>dla innych osób do wykorzystania w swoich rysunkach.",
+    "noteGuidelines": "Biblioteka musi być najpierw zatwierdzona ręcznie. Przeczytaj <link>wytyczne</link>",
+    "noteLicense": "Wysyłając zgadzasz się, że biblioteka zostanie opublikowana pod <link>Licencja MIT, </link>w skrócie, każdy może z nich korzystać bez ograniczeń.",
+    "noteItems": "Każdy element biblioteki musi mieć własną nazwę, aby był filtrowalny. Uwzględnione zostaną następujące elementy biblioteki:",
     "atleastOneLibItem": "Proszę wybrać co najmniej jeden element biblioteki, by rozpocząć",
-    "republishWarning": ""
+    "republishWarning": "Uwaga: niektóre z wybranych elementów są oznaczone jako już opublikowane/wysłane. Powinieneś ponownie przesłać elementy tylko wtedy, gdy aktualizujesz istniejącą bibliotekę lub zgłoszenie."
   },
   "publishSuccessDialog": {
     "title": "Biblioteka została przesłana",
-    "content": "Dziękujemy {{authorName}}. Twoja biblioteka została przesłana do sprawdzenia. Możesz śledzić jej stan",
-    "link": "tutaj"
+    "content": "Dziękujemy {{authorName}}. Twoja biblioteka została przesłana do sprawdzenia. Możesz śledzić jej stan<link>tutaj</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Zresetuj Bibliotekę",
     "removeItemsFromLib": "Usuń wybrane elementy z biblioteki"
   },
+  "imageExportDialog": {
+    "header": "Eksportuj obraz",
+    "label": {
+      "withBackground": "Tło",
+      "onlySelected": "Tylko wybrane",
+      "darkMode": "Tryb ciemny",
+      "embedScene": "Osadź scenę",
+      "scale": "Skala",
+      "padding": "Dopełnienie"
+    },
+    "tooltip": {
+      "embedScene": "Dane sceny zostaną zapisane w eksportowanym pliku PNG/SVG tak, aby scena mogła zostać z niego przywrócona.\nZwiększy to rozmiar eksportowanego pliku."
+    },
+    "title": {
+      "exportToPng": "Zapisz jako PNG",
+      "exportToSvg": "Zapisz jako SVG",
+      "copyPngToClipboard": "Skopiuj do schowka jako PNG"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Skopiuj do schowka"
+    }
+  },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz.",
-    "link": ""
+    "link": "Wpis na blogu dotyczący szyfrowania end-to-end w Excalidraw"
   },
   "stats": {
     "angle": "Kąt",
@@ -418,66 +411,43 @@
     "fileSavedToFilename": "Zapisano jako {filename}",
     "canvas": "płótno",
     "selection": "zaznaczenie",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Użyj {{shortcut}}, aby wkleić jako pojedynczy element,\nlub wklej do istniejącego edytora tekstu"
   },
   "colors": {
-    "ffffff": "Biały",
-    "f8f9fa": "Szary 0",
-    "f1f3f5": "Szary 1",
-    "fff5f5": "Czerwony 0",
-    "fff0f6": "Różowy 0",
-    "f8f0fc": "Bordowy 0",
-    "f3f0ff": "Fioletowy 0",
-    "edf2ff": "Granatowy 0",
-    "e7f5ff": "Niebieski 0",
-    "e3fafc": "Błękitny 0",
-    "e6fcf5": "Turkusowy 0",
-    "ebfbee": "Zielony 0",
-    "f4fce3": "Limonkowy 0",
-    "fff9db": "Żółty 0",
-    "fff4e6": "Pomarańczowy 0",
     "transparent": "Przezroczysty",
-    "ced4da": "Szary 4",
-    "868e96": "Szary 6",
-    "fa5252": "Czerwony 6",
-    "e64980": "Różowy 6",
-    "be4bdb": "Bordowy 6",
-    "7950f2": "Fioletowy 6",
-    "4c6ef5": "Granatowy 6",
-    "228be6": "Niebieski 6",
-    "15aabf": "Błękitny 6",
-    "12b886": "Turkusowy 6",
-    "40c057": "Zielony 6",
-    "82c91e": "Limonkowy 6",
-    "fab005": "Żółty 6",
-    "fd7e14": "Pomarańczowy 6",
-    "000000": "Czarny",
-    "343a40": "Szary 8",
-    "495057": "Szary 7",
-    "c92a2a": "Czerwony 9",
-    "a61e4d": "Różowy 9",
-    "862e9c": "Bordowy 9",
-    "5f3dc4": "Fioletowy 9",
-    "364fc7": "Granatowy 9",
-    "1864ab": "Niebieski 9",
-    "0b7285": "Błękitny 9",
-    "087f5b": "Turkusowy 9",
-    "2b8a3e": "Zielony 9",
-    "5c940d": "Limonkowy 9",
-    "e67700": "Żółty 9",
-    "d9480f": "Pomarańczowy 9"
+    "black": "Czarny",
+    "white": "Biały",
+    "red": "Czerwony",
+    "pink": "Różowy",
+    "grape": "Winogronowy",
+    "violet": "Fioletowy",
+    "gray": "Szary",
+    "blue": "Niebieski",
+    "cyan": "Cyjanowy",
+    "teal": "Turkusowy",
+    "green": "Zielony",
+    "yellow": "Żółty",
+    "orange": "Pomarańczowy",
+    "bronze": "Brązowy"
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Wszystkie dane są zapisywane lokalnie w przeglądarce.",
+      "center_heading_plus": "Czy zamiast tego chcesz przejść do Excalidraw+?",
+      "menuHint": "Eksportuj, preferencje, języki..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Eksportuj, preferencje i więcej...",
+      "center_heading": "Schematy uproszczone.",
+      "toolbarHint": "Wybierz narzędzie i zacznij rysować!",
+      "helpHint": "Skróty klawiaturowe i pomoc"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "Najczęściej używane kolory",
+    "colors": "Kolory",
+    "shades": "Odcienie",
+    "hexCode": "Kod HEX",
+    "noShades": "Brak dostępnych odcieni dla tego koloru"
   }
 }

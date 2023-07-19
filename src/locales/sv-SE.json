@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triangel",
     "fontSize": "Teckenstorlek",
     "fontFamily": "Teckensnitt",
-    "onlySelected": "Endast markering",
-    "withBackground": "Bakgrund",
-    "exportEmbedScene": "Bädda in skiss",
-    "exportEmbedScene_details": "Skissdata kommer att sparas i den exporterade PNG/SVG-filen så att skissen kan återställas från den.\nKommer att öka exporterad filstorlek.",
     "addWatermark": "Lägg till \"Skapad med Excalidraw\"",
     "handDrawn": "Handritad",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Vänd horisontellt",
     "flipVertical": "Vänd vertikalt",
     "viewMode": "Visningsläge",
-    "toggleExportColorScheme": "Växla färgschema för export",
     "share": "Dela",
     "showStroke": "Visa färgväljare för linjefärg",
     "showBackground": "Visa färgväljare för bakgrundsfärg",
@@ -128,7 +123,10 @@
       "unlockAll": "Lås upp alla"
     },
     "statusPublished": "Publicerad",
-    "sidebarLock": "Håll sidofältet öppet"
+    "sidebarLock": "Håll sidofältet öppet",
+    "selectAllElementsInFrame": "Markera alla element i rutan",
+    "removeAllElementsFromFrame": "Ta bort alla element från rutan",
+    "eyeDropper": "Välj färg från canvas"
   },
   "library": {
     "noItems": "Inga objekt tillagda ännu...",
@@ -140,11 +138,7 @@
     "exportJSON": "Exportera till fil",
     "exportImage": "Exportera bild...",
     "export": "Spara till...",
-    "exportToPng": "Exportera till PNG",
-    "exportToSvg": "Exportera till SVG",
     "copyToClipboard": "Kopiera till urklipp",
-    "copyPngToClipboard": "Kopiera PNG till urklipp",
-    "scale": "Skala",
     "save": "Spara till aktuell fil",
     "saveAs": "Spara som",
     "load": "Öppna",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "Det gick inte att spara i backend-databasen. Om problemen kvarstår bör du spara filen lokalt för att se till att du inte förlorar ditt arbete.",
     "collabSaveFailed_sizeExceeded": "Det gick inte att spara till backend-databasen, whiteboarden verkar vara för stor. Du bör spara filen lokalt för att du inte ska förlora ditt arbete.",
     "brave_measure_text_error": {
-      "start": "Det ser ut som att du använder webbläsaren Brave med",
-      "aggressive_block_fingerprint": "Blockera \"Fingerprinting\" aggressivt",
-      "setting_enabled": "inställningen aktiverad",
-      "break": "Detta kan resultera i att ha sönder",
-      "text_elements": "Textelement",
-      "in_your_drawings": "i dina skisser",
-      "strongly_recommend": "Vi rekommenderar starkt att inaktivera denna inställning. Du kan följa",
-      "steps": "dessa steg",
-      "how": "om hur man gör det",
-      "disable_setting": " Om inaktivering av den här inställningen inte åtgärdar visningen av textelement, vänligen skapa ett",
-      "issue": "ärende",
-      "write": "på vår GitHub, eller skriv till oss på",
-      "discord": "Discord"
+      "line1": "Det ser ut som om du använder Brave-webbläsaren med <bold>Aggressivt Blockera fingeravtryck</bold> inställningen aktiverad.",
+      "line2": "Detta kan resultera i trasiga <bold>Textelement</bold> i dina ritningar.",
+      "line3": "Vi rekommenderar starkt att du inaktiverar den här inställningen. Du kan följa <link>dessa steg</link> för att inaktivera den.",
+      "line4": "Om inaktivering av denna inställning inte åtgärdar visningen av textelement, öppna ett <issueLink>ärende</issueLink> på vår GitHub, eller skriv till oss på <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Pennläge - förhindra touch",
     "link": "Lägg till / Uppdatera länk för en vald form",
     "eraser": "Radergummi",
-    "hand": "Hand (panoreringsverktyg)"
+    "frame": "Rutverktyg",
+    "hand": "Hand (panoreringsverktyg)",
+    "extraTools": "Fler verktyg"
   },
   "headings": {
     "canvasActions": "Canvas-åtgärder",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Tips: prova att flytta de mest avlägsna elementen lite närmare varandra."
   },
   "errorSplash": {
-    "headingMain_pre": "Ett fel uppstod. Försök ",
-    "headingMain_button": "med att läsa in sidan på nytt.",
-    "clearCanvasMessage": "Om omladdning inte fungerar, försök ",
-    "clearCanvasMessage_button": "rensa canvasen.",
+    "headingMain": "Ett fel uppstod. Försök <button>med att läsa in sidan på nytt.</button>",
+    "clearCanvasMessage": "Om omladdning inte fungerar, försök <button>rensa canvasen.</button>",
     "clearCanvasCaveat": " Detta kommer att leda till förlust av arbete ",
-    "trackedToSentry_pre": "Felet med identifieraren ",
-    "trackedToSentry_post": " spårades på vårt system.",
-    "openIssueMessage_pre": "Vi var mycket försiktiga med att inte inkludera din skissinformation om felet. Om din skiss inte är privat, vänligen överväga att följa upp på vår ",
-    "openIssueMessage_button": "buggspårare.",
-    "openIssueMessage_post": " Vänligen inkludera information nedan genom att kopiera och klistra in i GitHub-problemet.",
+    "trackedToSentry": "Felet med identifieraren {{eventId}} spårades på vårt system.",
+    "openIssueMessage": "Vi var mycket försiktiga med att inte inkludera din skissinformation om felet. Om din skiss inte är privat, vänligen överväga att följa upp på vår <button>buggspårare.</button> Vänligen inkludera information nedan genom att kopiera och klistra in i GitHub-problemet.",
     "sceneContent": "Skissinnehåll:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "Obligatoriskt",
       "website": "Ange en giltig URL"
     },
-    "noteDescription": {
-      "pre": "Skicka ditt bibliotek för att inkluderas i ",
-      "link": "det offentliga bibliotekets arkiv",
-      "post": "för andra människor att använda i sina skisser."
-    },
-    "noteGuidelines": {
-      "pre": "Biblioteket måste godkännas manuellt först. Vänligen läs ",
-      "link": "riktlinjerna",
-      "post": " innan du skickar in. Du behöver ett GitHub-konto för att kommunicera och göra ändringar om så önskas, men det krävs inte."
-    },
-    "noteLicense": {
-      "pre": "Genom att skicka in godkänner du att biblioteket kommer att publiceras under ",
-      "link": "MIT-licens, ",
-      "post": "vilket kort sagt betyder att vem som helst kan använda det utan restriktioner."
-    },
+    "noteDescription": "Skicka ditt bibliotek för att inkluderas i <link>det offentliga bibliotekets arkiv</link>för andra människor att använda i sina skisser.",
+    "noteGuidelines": "Biblioteket måste godkännas manuellt först. Vänligen läs <link>riktlinjerna</link> innan du skickar in. Du behöver ett GitHub-konto för att kommunicera och göra ändringar om så önskas, men det krävs inte.",
+    "noteLicense": "Genom att skicka in godkänner du att biblioteket kommer att publiceras under <link>MIT-licens, </link>vilket kort sagt betyder att vem som helst kan använda det utan restriktioner.",
     "noteItems": "Varje objekt måste ha sitt eget namn så att det är filtrerbart. Följande objekt kommer att inkluderas:",
     "atleastOneLibItem": "Välj minst ett biblioteksobjekt för att komma igång",
     "republishWarning": "Obs: några av de markerade objekten är redan markerade som publicerade/skickade. Du bör endast skicka objekt igen när du uppdaterar ett befintligt bibliotek eller inlämning."
   },
   "publishSuccessDialog": {
     "title": "Bibliotek inskickat",
-    "content": "Tack {{authorName}}. Ditt bibliotek har skickats för granskning. Du kan följa status",
-    "link": "här"
+    "content": "Tack {{authorName}}. Ditt bibliotek har skickats för granskning. Du kan följa status<link>här</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Återställ bibliotek",
     "removeItemsFromLib": "Ta bort markerade objekt från biblioteket"
+  },
+  "imageExportDialog": {
+    "header": "Exportera bild",
+    "label": {
+      "withBackground": "Bakgrund",
+      "onlySelected": "Endast markerade",
+      "darkMode": "Mörkt läge",
+      "embedScene": "Bädda in skiss",
+      "scale": "Skala",
+      "padding": "Utfyllnad"
+    },
+    "tooltip": {
+      "embedScene": "Skissdata kommer att sparas i den exporterade PNG/SVG-filen så att skissen kan återställas från den.\nKommer att öka exporterad filstorlek."
+    },
+    "title": {
+      "exportToPng": "Exportera till PNG",
+      "exportToSvg": "Exportera till SVG",
+      "copyPngToClipboard": "Kopiera PNG till urklipp"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopiera till urklipp"
+    }
   },
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "Använd {{shortcut}} för att klistra in som ett enda element,\neller klistra in i en befintlig textredigerare"
   },
   "colors": {
-    "ffffff": "Vit",
-    "f8f9fa": "Grå 0",
-    "f1f3f5": "Grå 1",
-    "fff5f5": "Röd 0",
-    "fff0f6": "Rosa 0",
-    "f8f0fc": "Lila 0",
-    "f3f0ff": "Violett 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Blå 0",
-    "e3fafc": "Turkos 0",
-    "e6fcf5": "Blågrön 0",
-    "ebfbee": "Grön 0",
-    "f4fce3": "Limegrön 0",
-    "fff9db": "Gul 0",
-    "fff4e6": "Orange 0",
     "transparent": "Genomskinlig",
-    "ced4da": "Grå 4",
-    "868e96": "Grå 6",
-    "fa5252": "Röd 6",
-    "e64980": "Rosa 6",
-    "be4bdb": "Lila 6",
-    "7950f2": "Violett 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Blå 6",
-    "15aabf": "Turkos 6",
-    "12b886": "Blågrön 6",
-    "40c057": "Grön 6",
-    "82c91e": "Limegrön 6",
-    "fab005": "Gul 6",
-    "fd7e14": "Orange 6",
-    "000000": "Svart",
-    "343a40": "Grå 8",
-    "495057": "Grå 7",
-    "c92a2a": "Röd 9",
-    "a61e4d": "Rosa 9",
-    "862e9c": "Lila 9",
-    "5f3dc4": "Violett 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Blå 9",
-    "0b7285": "Turkos 9",
-    "087f5b": "Blågrön 9",
-    "2b8a3e": "Grön 9",
-    "5c940d": "Limegrön 9",
-    "e67700": "Gul 9",
-    "d9480f": "Orange 9"
+    "black": "Svart",
+    "white": "Vit",
+    "red": "Röd",
+    "pink": "Rosa",
+    "grape": "Lila",
+    "violet": "Violett",
+    "gray": "Grå",
+    "blue": "Blå",
+    "cyan": "Turkos",
+    "teal": "Blågrön",
+    "green": "Grön",
+    "yellow": "Gul",
+    "orange": "Orange",
+    "bronze": "Brons"
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "Välj ett verktyg & börja rita!",
       "helpHint": "Genvägar & hjälp"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "Mest frekvent använda anpassade färger",
+    "colors": "Färger",
+    "shades": "Nyanser",
+    "hexCode": "Hex-kod",
+    "noShades": "Inga nyanser tillgängliga för denna färg"
   }
 }

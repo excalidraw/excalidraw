@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "جای گذاری",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "جای‌گذاری به عنوان متن ساده",
     "pasteCharts": "قراردادن نمودارها",
     "selectAll": "انتخاب همه",
     "multiSelect": "یک ایتم به انتخاب شده ها اضافه کنید.",
@@ -40,10 +40,6 @@
     "arrowhead_triangle": "مثلث",
     "fontSize": "اندازه قلم",
     "fontFamily": "نوع قلم",
-    "onlySelected": "فقط انتخاب شده ها",
-    "withBackground": "پس زمینه",
-    "exportEmbedScene": "تعبیه صحنه",
-    "exportEmbedScene_details": "متحوای صحنه به فایل خروجی SVG/PNG اضافه خواهد شد برای بازیابی صحنه به آن اضافه خواهد شد.\nباعث افزایش حجم فایل خروجی میشود.",
     "addWatermark": "\"ساخته شده با Excalidraw\" را اضافه کن",
     "handDrawn": "دست نویس",
     "normal": "عادی",
@@ -54,7 +50,7 @@
     "veryLarge": "بسیار بزرگ",
     "solid": "توپر",
     "hachure": "هاشور",
-    "zigzag": "",
+    "zigzag": "زیگزاگ",
     "crossHatch": "هاشور متقاطع",
     "thin": "نازک",
     "bold": "ضخیم",
@@ -100,7 +96,6 @@
     "flipHorizontal": "چرخش افقی",
     "flipVertical": "چرخش عمودی",
     "viewMode": "حالت نمایش",
-    "toggleExportColorScheme": "تغییر طرح خروجی رنگ",
     "share": "اشتراک‌گذاری",
     "showStroke": "نمایش انتخاب کننده رنگ حاشیه",
     "showBackground": "نمایش انتخاب کننده رنگ پس زمینه",
@@ -111,7 +106,7 @@
     "increaseFontSize": "افزایش دادن اندازه فونت",
     "unbindText": "بازکردن نوشته",
     "bindText": "بستن نوشته",
-    "createContainerFromText": "",
+    "createContainerFromText": "متن را در یک جایگاه بپیچید",
     "link": {
       "edit": "ویرایش لینک",
       "create": "ایجاد پیوند",
@@ -128,7 +123,10 @@
       "unlockAll": "باز کردن قفل همه"
     },
     "statusPublished": "منتشر شده",
-    "sidebarLock": "باز نگه داشتن سایدبار"
+    "sidebarLock": "باز نگه داشتن سایدبار",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "آیتمی به اینجا اضافه نشده...",
@@ -140,11 +138,7 @@
     "exportJSON": "خروجی در فایل",
     "exportImage": "خروجی گرفتن از تصویر...",
     "export": "ذخیره در...",
-    "exportToPng": "تبدیل به PNG",
-    "exportToSvg": "تبدیل به SVG",
     "copyToClipboard": "کپی در حافظه موقت",
-    "copyPngToClipboard": "کپی PNG در حافظه موقت",
-    "scale": "مقیاس",
     "save": "ذخیره در همین فایل",
     "saveAs": "ذخیره با نام",
     "load": "باز کردن",
@@ -195,7 +189,7 @@
     "resetLibrary": "ین کار کل صفحه را پاک میکند. آیا مطمئنید?",
     "removeItemsFromsLibrary": "حذف {{count}} آیتم(ها) از کتابخانه?",
     "invalidEncryptionKey": "کلید رمزگذاری باید 22 کاراکتر باشد. همکاری زنده غیرفعال است.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "اتصال به اینترنت در دسترس نیست.\nتغییرات شما ذخیره نمی شود!"
   },
   "errors": {
     "unsupportedFileType": "نوع فایل پشتیبانی نشده.",
@@ -205,22 +199,13 @@
     "invalidSVGString": "SVG نادرست.",
     "cannotResolveCollabServer": "به سرور collab متصل نشد. لطفا صفحه را مجددا بارگذاری کنید و دوباره تلاش کنید.",
     "importLibraryError": "داده‌ها بارگذاری نشدند",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": "",
+    "collabSaveFailed": "در پایگاه داده باطن ذخیره نشد. اگر مشکلات همچنان ادامه داشت، باید فایل خود را به صورت محلی ذخیره کنید تا مطمئن شوید کار خود را از دست نمی دهید.",
+    "collabSaveFailed_sizeExceeded": "در پایگاه داده بکند ذخیره نشد. اگر مشکلات همچنان ادامه داشت، باید فایل خود را به صورت محلی ذخیره کنید تا مطمئن شوید کار خود را از دست نمی دهید.",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "به نظر می‌رسد از مرورگر Brave با تنظیم <bold> مسدود کردن شدید اثرانگشت</bold> استفاده می‌کنید.",
+      "line2": "این می تواند منجر به شکستن <bold>عناصر متن</bold> در نقاشی های شما شود.",
+      "line3": "اکیداً توصیه می کنیم این تنظیم را غیرفعال کنید. برای نحوه انجام این کار می‌توانید <link>این مراحل</link> را دنبال کنید.",
+      "line4": "اگر غیرفعال کردن این تنظیم نمایش عناصر متنی را برطرف نکرد، لطفاً یک <issueLink>مشکل</issueLink> را در GitHub ما باز کنید یا برای ما در <discordLink>Discord</discordLink> بنویسید."
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "حالت قلم - جلوگیری از تماس",
     "link": "افزودن/به‌روزرسانی پیوند برای شکل انتخابی",
     "eraser": "پاک کن",
-    "hand": ""
+    "frame": "",
+    "hand": "دست (ابزار پانینگ)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",
@@ -246,7 +233,7 @@
     "shapes": "شکل‌ها"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "برای حرکت دادن بوم، چرخ ماوس یا فاصله را در حین کشیدن نگه دارید یا از ابزار دستی استفاده کنید",
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
@@ -257,7 +244,7 @@
     "resize": "می توانید با نگه داشتن SHIFT در هنگام تغییر اندازه، نسبت ها را محدود کنید،ALT را برای تغییر اندازه از مرکز نگه دارید",
     "resizeImage": "با نگه داشتن SHIFT می توانید آزادانه اندازه را تغییر دهید،\nبرای تغییر اندازه از مرکز، ALT را نگه دارید",
     "rotate": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
-    "lineEditor_info": "",
+    "lineEditor_info": "CtrlOrCmd را نگه دارید و دوبار کلیک کنید یا CtrlOrCmd + Enter را فشار دهید تا نقاط را ویرایش کنید.",
     "lineEditor_pointSelected": "برای حذف نقطه Delete برای کپی زدن Ctrl یا Cmd+D را بزنید و یا برای جابجایی بکشید",
     "lineEditor_nothingSelected": "یک نقطه را برای ویرایش انتخاب کنید (SHIFT را برای انتخاب چندگانه نگه دارید)،\nیا Alt را نگه دارید و برای افزودن نقاط جدید کلیک کنید",
     "placeImage": "برای قرار دادن تصویر کلیک کنید، یا کلیک کنید و بکشید تا اندازه آن به صورت دستی تنظیم شود",
@@ -265,7 +252,7 @@
     "bindTextToElement": "برای افزودن اینتر را بزنید",
     "deepBoxSelect": "CtrlOrCmd را برای انتخاب عمیق و جلوگیری از کشیدن نگه دارید",
     "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "احتمالاً می‌توان این ویژگی را با تنظیم پرچم «dom.events.asyncClipboard.clipboardItem» روی «true» فعال کرد. برای تغییر پرچم های مرورگر در فایرفاکس، از صفحه \"about:config\" دیدن کنید."
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "نکته: سعی کنید دورترین عناصر را کمی به همدیگر نزدیک کنید."
   },
   "errorSplash": {
-    "headingMain_pre": "با مشکلی مواجه شدیم. این را امتحان کنید ",
-    "headingMain_button": "در حال بازنشانی صفحه.",
+    "headingMain": "",
     "clearCanvasMessage": "اگر بازنشانی صفحه مشکل را حل نکرد این را امتحان کنید ",
-    "clearCanvasMessage_button": "در حال تمیز کردن بوم",
     "clearCanvasCaveat": " این باعث میشود کارهای شما ذخیره نشود ",
-    "trackedToSentry_pre": "خطا در شناسه ",
-    "trackedToSentry_post": " در سیستم ما رهگیری شد.",
-    "openIssueMessage_pre": "ما خیلی محتاط هستیم که اطلاعات شما را در خطا قرار ندهیم. با این حال اگر اطلاعات شما خصوصی نیست لطفا پیگیری کنید ",
-    "openIssueMessage_button": "پیگیری اشکالات.",
-    "openIssueMessage_post": " لطفا اطلاعات زیر را با کپی کردن در صفحه مشکلات GitHub بگذارید.",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": "محتوای صحنه:"
   },
   "roomDialog": {
@@ -320,8 +302,8 @@
     "doubleClick": "دابل کلیک",
     "drag": "کشیدن",
     "editor": "ویرایشگر",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "نقاط خط/پیکان را ویرایش کنید",
+    "editText": "ویرایش متن / افزودن برچسب",
     "github": "اشکالی می بینید؟ گزارش دهید",
     "howto": "راهنمای ما را دنبال کنید",
     "or": "یا",
@@ -335,8 +317,8 @@
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
     "zoomToSelection": "بزرگنمایی قسمت انتخاب شده",
     "toggleElementLock": "قفل/بازکردن انتخاب شده ها",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "حرکت صفحه به بالا/پایین",
+    "movePageLeftRight": "حرکت صفحه به چپ/راست"
   },
   "clearCanvasDialog": {
     "title": "پاک کردن بوم"
@@ -362,33 +344,44 @@
       "required": "لازم",
       "website": "وارد کردن آدرس درست"
     },
-    "noteDescription": {
-      "pre": "کتابخانه خود را ارسال کنید تا در آن گنجانده شود ",
-      "link": "مخزن کتابخانه عمومی",
-      "post": "تا افراد دیگر در نقاشی های خود از آن استفاده کنند."
-    },
-    "noteGuidelines": {
-      "pre": "کتابخانه باید ابتدا به صورت دستی تایید شود. لطفاً بخوانید ",
-      "link": "دستورالعمل‌ها",
-      "post": " قبل از ارسال برای برقراری ارتباط و ایجاد تغییرات در صورت درخواست، به یک حساب GitHub نیاز دارید، اما به شدت الزامی نیست."
-    },
-    "noteLicense": {
-      "pre": "با ارسال، موافقت می کنید که کتابخانه تحت عنوان منتشر شود ",
-      "link": "پروانهٔ MIT ",
-      "post": "که به طور خلاصه به این معنی است که هر کسی می تواند بدون محدودیت از آنها استفاده کند."
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "هر مورد کتابخانه باید نام خاص خود را داشته باشد تا قابل فیلتر باشد. اقلام کتابخانه زیر شامل خواهد شد:",
     "atleastOneLibItem": "لطفاً حداقل یک مورد از کتابخانه را برای شروع انتخاب کنید",
     "republishWarning": "توجه: برخی از موارد انتخاب شده به عنوان قبلاً منتشر شده/ارسال شده علامت گذاری شده اند. شما فقط باید هنگام به‌روزرسانی یک کتابخانه موجود یا ارسال، موارد را دوباره ارسال کنید."
   },
   "publishSuccessDialog": {
     "title": "کتابخانه ارسال شد",
-    "content": "تشکر از شما {{authorName}}. کتابخانه شما برای بررسی ارسال شده است. می توانید وضعیت را پیگیری کنید",
-    "link": "اینجا"
+    "content": "تشکر از شما {{authorName}}. کتابخانه شما برای بررسی ارسال شده است. می توانید وضعیت را پیگیری کنید"
   },
   "confirmDialog": {
     "resetLibrary": "تنظیم مجدد کتابخانه",
     "removeItemsFromLib": "موارد انتخاب شده از موارد پسندیده حذف شوند"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "شما در یک محیط رمزگزاری شده دو طرفه در حال طراحی هستید پس Excalidraw هرگز طرح های شما را نمیبند.",
@@ -418,66 +411,43 @@
     "fileSavedToFilename": "ذخیره در {filename}",
     "canvas": "بوم",
     "selection": "انتخاب",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "از {{shortcut}} برای چسباندن به عنوان یک عنصر استفاده کنید،\nیا در یک ویرایشگر متن موجود جایگذاری کنید"
   },
   "colors": {
-    "ffffff": "سفید",
-    "f8f9fa": "خاکستری 0",
-    "f1f3f5": "خاکستری 1",
-    "fff5f5": "قرمز 0",
-    "fff0f6": "صورتی 0",
-    "f8f0fc": "انگوری 0",
-    "f3f0ff": "بنفش 0",
-    "edf2ff": "نیلی 0",
-    "e7f5ff": "آبی 0",
-    "e3fafc": "آبی نفتی 0",
-    "e6fcf5": "آبی فیروزه ای 0",
-    "ebfbee": "سبز 0",
-    "f4fce3": "لیمویی 0",
-    "fff9db": "زرد 0",
-    "fff4e6": "نارنجی 0",
     "transparent": "شفاف",
-    "ced4da": "خاکستری 4",
-    "868e96": "خاکستری 6",
-    "fa5252": "قرمز 6",
-    "e64980": "صورتی 6",
-    "be4bdb": "انگوری 6",
-    "7950f2": "بنفش 6",
-    "4c6ef5": "نیلی 6",
-    "228be6": "آبی 6",
-    "15aabf": "آبی نفتی 6",
-    "12b886": "آبی فیروزه ای 6",
-    "40c057": "سبز 6",
-    "82c91e": "لیمویی 6",
-    "fab005": "زرد 6",
-    "fd7e14": "نارنجی 6",
-    "000000": "سیاه",
-    "343a40": "خاکستری 8",
-    "495057": "خاکستری 7",
-    "c92a2a": "قرمز 9",
-    "a61e4d": "صورتی 9",
-    "862e9c": "انگوری 9",
-    "5f3dc4": "بنفش 9",
-    "364fc7": "نیلی 9",
-    "1864ab": "آبی 9",
-    "0b7285": "آبی نفتی 9",
-    "087f5b": "آبی فیروزه ای 9",
-    "2b8a3e": "سبز 9",
-    "5c940d": "لیمویی 9",
-    "e67700": "زرد 9",
-    "d9480f": "نارنجی 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "تمام داده های شما به صورت محلی در مرورگر شما ذخیره می شود.",
+      "center_heading_plus": "آیا می‌خواهید به جای آن به Excalidraw+ بروید؟",
+      "menuHint": "خروجی، ترجیحات، زبان ها، ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "خروجی، ترجیحات، وبیشتر ...",
+      "center_heading": "نمودارها .ساخته شده. ساده.",
+      "toolbarHint": "ابزاری را انتخاب کنید و نقاشی را شروع کنید!",
+      "helpHint": "میانبرها و راهنما"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

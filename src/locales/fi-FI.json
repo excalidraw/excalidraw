@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Kolmio",
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
-    "onlySelected": "Vain valitut",
-    "withBackground": "Taustalla",
-    "exportEmbedScene": "Upota työ",
-    "exportEmbedScene_details": "Teoksen tiedot tallennetaan PNG/SVG-tiedostoon, jolloin teoksen voi palauttaa siitä. Kasvattaa tallennetun tiedoston kokoa.",
     "addWatermark": "Lisää \"Tehty Excalidrawilla\"",
     "handDrawn": "Käsinpiirretty",
     "normal": "Tavallinen",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Käännä vaakasuunnassa",
     "flipVertical": "Käännä pystysuunnassa",
     "viewMode": "Katselutila",
-    "toggleExportColorScheme": "Vaihda viennin väriteema",
     "share": "Jaa",
     "showStroke": "Näytä viivan värin valitsin",
     "showBackground": "Näytä taustavärin valitsin",
@@ -128,7 +123,10 @@
       "unlockAll": "Poista lukitus kaikista"
     },
     "statusPublished": "Julkaistu",
-    "sidebarLock": "Pidä sivupalkki avoinna"
+    "sidebarLock": "Pidä sivupalkki avoinna",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Kirjastossa ei ole vielä yhtään kohdetta...",
@@ -140,11 +138,7 @@
     "exportJSON": "Vie tiedostoon",
     "exportImage": "Vie kuva...",
     "export": "Tallenna nimellä...",
-    "exportToPng": "Vie PNG-tiedostona",
-    "exportToSvg": "Vie SVG-tiedostona",
     "copyToClipboard": "Kopioi leikepöydälle",
-    "copyPngToClipboard": "Kopioi PNG-tiedosto leikepöydälle",
-    "scale": "Koko",
     "save": "Tallenna nykyiseen tiedostoon",
     "saveAs": "Tallenna nimellä",
     "load": "Avaa",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi.",
     "collabSaveFailed_sizeExceeded": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi.",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Kynätila - estä kosketus",
     "link": "Lisää/päivitä linkki valitulle muodolle",
     "eraser": "Poistotyökalu",
-    "hand": "Käsi (panning-työkalu)"
+    "frame": "",
+    "hand": "Käsi (panning-työkalu)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Vinkki: yritä siirtää kaukaisimpia elementtejä hieman lähemmäs toisiaan."
   },
   "errorSplash": {
-    "headingMain_pre": "Tapahtui virhe. Yritä ",
-    "headingMain_button": "sivun lataamista uudelleen.",
-    "clearCanvasMessage": "Mikäli sivun lataaminen uudelleen ei auta, yritä ",
-    "clearCanvasMessage_button": "tyhjentää piirtoalue.",
+    "headingMain": "Tapahtui virhe. Yritä <button>sivun lataamista uudelleen.</button>",
+    "clearCanvasMessage": "Mikäli sivun lataaminen uudelleen ei auta, yritä <button>tyhjentää piirtoalue.</button>",
     "clearCanvasCaveat": " Tämä johtaa työn menetykseen ",
-    "trackedToSentry_pre": "Virhe tunnisteella ",
-    "trackedToSentry_post": " tallennettiin järjestelmäämme.",
-    "openIssueMessage_pre": "Olimme varovaisia emmekä sisällyttäneet tietoa piirroksestasi virheeseen. Mikäli piirroksesi ei ole yksityinen, harkitsethan kertovasi meille ",
-    "openIssueMessage_button": "virheenseurantajärjestelmässämme.",
-    "openIssueMessage_post": " Sisällytä alla olevat tiedot kopioimalla ne GitHub-ongelmaan.",
+    "trackedToSentry": "Virhe tunnisteella {{eventId}} tallennettiin järjestelmäämme.",
+    "openIssueMessage": "Olimme varovaisia emmekä sisällyttäneet tietoa piirroksestasi virheeseen. Mikäli piirroksesi ei ole yksityinen, harkitsethan kertovasi meille <button>virheenseurantajärjestelmässämme.</button> Sisällytä alla olevat tiedot kopioimalla ne GitHub-ongelmaan.",
     "sceneContent": "Piirroksen tiedot:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "Pakollinen",
       "website": "Syötä oikeamuotoinen URL-osoite"
     },
-    "noteDescription": {
-      "pre": "Lähetä kirjastosi, jotta se voidaan sisällyttää ",
-      "link": "julkisessa kirjastolistauksessa",
-      "post": "muiden käyttöön omissa piirrustuksissaan."
-    },
-    "noteGuidelines": {
-      "pre": "Kirjasto on ensin hyväksyttävä manuaalisesti. Ole hyvä ja lue ",
-      "link": "ohjeet",
-      "post": " ennen lähettämistä. Tarvitset GitHub-tilin, jotta voit viestiä ja tehdä muutoksia pyydettäessä, mutta se ei ole ehdottoman välttämätöntä."
-    },
-    "noteLicense": {
-      "pre": "Lähettämällä hyväksyt että kirjasto julkaistaan ",
-      "link": "MIT-lisenssin ",
-      "post": "alla, mikä lyhyesti antaa muiden käyttää sitä ilman rajoituksia."
-    },
+    "noteDescription": "Lähetä kirjastosi, jotta se voidaan sisällyttää <link>julkisessa kirjastolistauksessa</link>muiden käyttöön omissa piirrustuksissaan.",
+    "noteGuidelines": "Kirjasto on ensin hyväksyttävä manuaalisesti. Ole hyvä ja lue <link>ohjeet</link> ennen lähettämistä. Tarvitset GitHub-tilin, jotta voit viestiä ja tehdä muutoksia pyydettäessä, mutta se ei ole ehdottoman välttämätöntä.",
+    "noteLicense": "Lähettämällä hyväksyt että kirjasto julkaistaan <link>MIT-lisenssin </link>alla, mikä lyhyesti antaa muiden käyttää sitä ilman rajoituksia.",
     "noteItems": "Jokaisella kirjaston kohteella on oltava oma nimensä suodatusta varten. Seuraavat kirjaston kohteet sisältyvät:",
     "atleastOneLibItem": "Valitse vähintään yksi kirjaston kohde aloittaaksesi",
     "republishWarning": "Huom! Osa valituista kohteista on merkitty jo julkaistu/lähetetyiksi. Lähetä kohteita uudelleen vain päivitettäessä olemassa olevaa kirjastoa tai ehdotusta."
   },
   "publishSuccessDialog": {
     "title": "Kirjasto lähetetty",
-    "content": "Kiitos {{authorName}}. Kirjastosi on lähetetty tarkistettavaksi. Voit seurata sen tilaa",
-    "link": "täällä"
+    "content": "Kiitos {{authorName}}. Kirjastosi on lähetetty tarkistettavaksi. Voit seurata sen tilaa<link>täällä</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Tyhjennä kirjasto",
     "removeItemsFromLib": "Poista valitut kohteet kirjastosta"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä-päähän-salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "Käytä {{shortcut}} liittääksesi yhtenä elementtinä,\ntai liittääksesi olemassa olevaan tekstieditoriin"
   },
   "colors": {
-    "ffffff": "Valkoinen",
-    "f8f9fa": "Harmaa 0",
-    "f1f3f5": "Harmaa 1",
-    "fff5f5": "Punainen 0",
-    "fff0f6": "Pinkki 0",
-    "f8f0fc": "Rypäle 0",
-    "f3f0ff": "Violetti 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Sininen 0",
-    "e3fafc": "Syaani 0",
-    "e6fcf5": "Sinivihreä 0",
-    "ebfbee": "Vihreä 0",
-    "f4fce3": "Limenvihreä 0",
-    "fff9db": "Keltainen 0",
-    "fff4e6": "Oranssi 0",
     "transparent": "Läpinäkyvä",
-    "ced4da": "Harmaa 4",
-    "868e96": "Harmaa 6",
-    "fa5252": "Punainen 6",
-    "e64980": "Pinkki 6",
-    "be4bdb": "Rypäle 6",
-    "7950f2": "Violetti 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Sininen 6",
-    "15aabf": "Syaani 6",
-    "12b886": "Sinivihreä 6",
-    "40c057": "Vihreä 6",
-    "82c91e": "Limenvihreä 6",
-    "fab005": "Keltainen 6",
-    "fd7e14": "Oranssi 6",
-    "000000": "Musta",
-    "343a40": "Harmaa 8",
-    "495057": "Harmaa 7",
-    "c92a2a": "Punainen 9",
-    "a61e4d": "Pinkki 9",
-    "862e9c": "Rypäle 9",
-    "5f3dc4": "Violetti 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Sininen 9",
-    "0b7285": "Syaani 9",
-    "087f5b": "Sinivihreä 9",
-    "2b8a3e": "Vihreä 9",
-    "5c940d": "Limenvihreä 9",
-    "e67700": "Keltainen 9",
-    "d9480f": "Oranssi 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "Valitse työkalu ja aloita piirtäminen!",
       "helpHint": "Pikanäppäimet & ohje"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

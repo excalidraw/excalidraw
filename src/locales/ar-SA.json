@@ -40,10 +40,6 @@
     "arrowhead_triangle": "مثلث",
     "fontSize": "حجم الخط",
     "fontFamily": "نوع الخط",
-    "onlySelected": "المحدد فقط",
-    "withBackground": "الخلفية",
-    "exportEmbedScene": "تضمين المشهد",
-    "exportEmbedScene_details": "سيتم حفظ بيانات المشهد في ملف PNG/SVG المصدّر بحيث يمكن استعادة المشهد منه.\nسيزيد حجم الملف المصدر.",
     "addWatermark": "إضافة \"مصنوعة بواسطة Excalidraw\"",
     "handDrawn": "رسم باليد",
     "normal": "عادي",
@@ -100,7 +96,6 @@
     "flipHorizontal": "قلب عامودي",
     "flipVertical": "قلب أفقي",
     "viewMode": "نمط العرض",
-    "toggleExportColorScheme": "تبديل نظام ألوان الصادرات",
     "share": "مشاركة",
     "showStroke": "إظهار منتقي لون الخط",
     "showBackground": "إظهار منتقي لون الخلفية",
@@ -128,7 +123,10 @@
       "unlockAll": "فتح الكل"
     },
     "statusPublished": "نُشر",
-    "sidebarLock": "إبقاء الشريط الجانبي مفتوح"
+    "sidebarLock": "إبقاء الشريط الجانبي مفتوح",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "لا توجد عناصر أضيفت بعد...",
@@ -140,11 +138,7 @@
     "exportJSON": "صدر الملف",
     "exportImage": "تصدير الصورة...",
     "export": "حفظ إلى...",
-    "exportToPng": "تصدير بصيغة PNG",
-    "exportToSvg": "تصدير بصيغة SVG",
     "copyToClipboard": "نسخ إلى الحافظة",
-    "copyPngToClipboard": "نسخ الـ PNG إلى الحافظة",
-    "scale": "مقاس",
     "save": "احفظ للملف الحالي",
     "saveAs": "حفظ كـ",
     "load": "فتح",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "تعذر الحفظ في قاعدة البيانات. إذا استمرت المشاكل، يفضل أن تحفظ ملفك محليا كي لا تفقد عملك.",
     "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك.",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "وضع القلم - امنع اللمس",
     "link": "إضافة/تحديث الرابط للشكل المحدد",
     "eraser": "ممحاة",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "نصيحة: حاول تحريك العناصر البعيدة بشكل أقرب قليلاً."
   },
   "errorSplash": {
-    "headingMain_pre": "حدث خطأ، حاول مرة أخرى ",
-    "headingMain_button": "إعادة تحميل الصفحة.",
+    "headingMain": "",
     "clearCanvasMessage": "إذا لم تعمل إعادة التحميل، حاول مرة أخرى ",
-    "clearCanvasMessage_button": "مسح اللوحة.",
     "clearCanvasCaveat": " هذا سيؤدي إلى فقدان العمل ",
-    "trackedToSentry_pre": "الخطأ ",
-    "trackedToSentry_post": " تم تعقبه على نظامنا.",
-    "openIssueMessage_pre": "كنا حذرين جدا لعدم تضمين معلومات المشهد الخاصة بك في الخطأ. إذا لم يكن المشهد خاصًا ، يرجى النظر في متابعة هذا الأمر ",
-    "openIssueMessage_button": "متعقّب الخلل.",
-    "openIssueMessage_post": " يرجى تضمين المعلومات أدناة عن طريق نسخ ولصق المشكلة في GitHub.",
+    "trackedToSentry": "",
+    "openIssueMessage": "",
     "sceneContent": "محتوى المشهد:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "مطلوب",
       "website": "أدخل عنوان URL صالح"
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "مستودع المكتبة العامة",
-      "post": "ليستخدمها الآخرون في رسوماتهم."
-    },
-    "noteGuidelines": {
-      "pre": "يجب الموافقة على المكتبة يدويًا أولاً. يرجى قراءة ",
-      "link": "الإرشادات",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "رخصة إم أي تي ",
-      "post": "وهو ما يعني باختصار أنه يمكن لأي شخص استخدامها دون قيود."
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "يجب أن يكون لكل عنصر مكتبة اسمه الخاص حتى يكون قابلاً للتصفية. سيتم تضمين عناصر المكتبة التالية:",
     "atleastOneLibItem": "يرجى تحديد عنصر مكتبة واحد على الأقل للبدء",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "تم إرسال المكتبة",
-    "content": "شكرا لك {{authorName}}. لقد تم إرسال مكتبتك للمراجعة. يمكنك تتبع الحالة",
-    "link": "هنا"
+    "content": "شكرا لك {{authorName}}. لقد تم إرسال مكتبتك للمراجعة. يمكنك تتبع الحالة"
   },
   "confirmDialog": {
     "resetLibrary": "إعادة ضبط المكتبة",
     "removeItemsFromLib": "إزالة العناصر المحددة من المكتبة"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "رسوماتك مشفرة من النهاية إلى النهاية حتى أن خوادم Excalidraw لن تراها أبدا.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": ""
   },
   "colors": {
-    "ffffff": "أبيض",
-    "f8f9fa": "رمادي 0",
-    "f1f3f5": "رمادي 1",
-    "fff5f5": "أحمر 0",
-    "fff0f6": "وردي 0",
-    "f8f0fc": "عنبي 0",
-    "f3f0ff": "بنفسجي 0",
-    "edf2ff": "نيلي 0",
-    "e7f5ff": "أزرق 0",
-    "e3fafc": "سماوي 0",
-    "e6fcf5": "تركواز 0",
-    "ebfbee": "أخضر 0",
-    "f4fce3": "ليموني 0",
-    "fff9db": "أصفر 0",
-    "fff4e6": "برتقالي 0",
     "transparent": "شفاف",
-    "ced4da": "رمادي 4",
-    "868e96": "رمادي 6",
-    "fa5252": "أحمر 6",
-    "e64980": "وردي 6",
-    "be4bdb": "عنبي 6",
-    "7950f2": "بنفسجي 6",
-    "4c6ef5": "نيلي 6",
-    "228be6": "أزرق 6",
-    "15aabf": "سماوي 6",
-    "12b886": "تركواز 6",
-    "40c057": "أخضر 6",
-    "82c91e": "ليموني 6",
-    "fab005": "أصفر 6",
-    "fd7e14": "برتقالي 6",
-    "000000": "أسود",
-    "343a40": "رمادي 8",
-    "495057": "رمادي 7",
-    "c92a2a": "أحمر 9",
-    "a61e4d": "وردي 9",
-    "862e9c": "عنبي 9",
-    "5f3dc4": "بنفسجي 9",
-    "364fc7": "نيلي 9",
-    "1864ab": "أزرق 9",
-    "0b7285": "سماوي 9",
-    "087f5b": "تركواز 9",
-    "2b8a3e": "أخضر 9",
-    "5c940d": "ليموني 9",
-    "e67700": "أصفر 9",
-    "d9480f": "برتقالي 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "",
       "helpHint": ""
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

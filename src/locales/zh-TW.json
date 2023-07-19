@@ -40,10 +40,6 @@
     "arrowhead_triangle": "三角形",
     "fontSize": "字型大小",
     "fontFamily": "字體集",
-    "onlySelected": "僅選取物件",
-    "withBackground": "含有背景",
-    "exportEmbedScene": "嵌入場景",
-    "exportEmbedScene_details": "用於回復場景的場景資料會被包含在輸出的 PNG/SVG 檔案中。\n會增加輸出的檔案大小。",
     "addWatermark": "加上 \"Made with Excalidraw\" 浮水印",
     "handDrawn": "手寫",
     "normal": "一般",
@@ -100,7 +96,6 @@
     "flipHorizontal": "水平翻轉",
     "flipVertical": "垂直翻轉",
     "viewMode": "檢視模式",
-    "toggleExportColorScheme": "切換輸出配色",
     "share": "共享",
     "showStroke": "顯示線條檢色器",
     "showBackground": "顯示背景檢色器",
@@ -128,7 +123,10 @@
       "unlockAll": "全部解鎖"
     },
     "statusPublished": "已發布",
-    "sidebarLock": "側欄維持開啟"
+    "sidebarLock": "側欄維持開啟",
+    "selectAllElementsInFrame": "選取框架內的所有元素",
+    "removeAllElementsFromFrame": "從框架內移除所有元素",
+    "eyeDropper": "從畫布中選取顏色"
   },
   "library": {
     "noItems": "尚未加入任何物件...",
@@ -140,11 +138,7 @@
     "exportJSON": "匯出至檔案",
     "exportImage": "匯出圖片",
     "export": "儲存至...",
-    "exportToPng": "輸出成 PNG",
-    "exportToSvg": "輸出成 SVG",
     "copyToClipboard": "複製至剪貼簿",
-    "copyPngToClipboard": "複製 PNG 至剪貼簿",
-    "scale": "縮放比例",
     "save": "儲存目前檔案",
     "saveAs": "儲存為",
     "load": "開啟",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "無法儲存至後端資料庫。若此問題持續發生，請將檔案儲存於本機以確保資料不會遺失。",
     "collabSaveFailed_sizeExceeded": "無法儲存至後端資料庫，可能的原因為畫布尺寸過大。請將檔案儲存於本機以確保資料不會遺失。",
     "brave_measure_text_error": {
-      "start": "您似乎正在使用 Brave 瀏覽器並且將",
-      "aggressive_block_fingerprint": "\"Aggressively Block Fingerprinting\" 設定",
-      "setting_enabled": "設為開啟",
-      "break": "這可能導致破壞",
-      "text_elements": "文字元素",
-      "in_your_drawings": "在您的繪圖中",
-      "strongly_recommend": "我們強烈建議您關掉此設定。您可以參考",
-      "steps": "這些步驟",
-      "how": "來變更",
-      "disable_setting": " 若關閉此設定無法修正文字元素的顯示問題，請回報",
-      "issue": "問題",
-      "write": "至我們的 GitHub，或反應在我們的",
-      "discord": "Discord"
+      "line1": "看起來您開啟了 Brave 瀏覽器的 <bold>Aggressively Block Fingerprinting</bold> 設定。",
+      "line2": "這可能造成您畫布中 <bold>文字元素</bold> 的異常。",
+      "line3": "我們強烈建議您關閉此設定。您可以依照 <link>這些步驟</link> 來進行。",
+      "line4": "若關閉此設定並未修復文字元素的顯示問題，請回報於我們 GitHub 上的 <issueLink>issue</issueLink>，或在 <discordLink>Discord</discordLink> 上告訴我們。"
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "筆模式 - 避免觸摸",
     "link": "為所選的形狀增加\b/更新連結",
     "eraser": "橡皮擦",
-    "hand": "手形（平移工具）"
+    "frame": "框架工具",
+    "hand": "手形（平移工具）",
+    "extraTools": "更多工具"
   },
   "headings": {
     "canvasActions": "canvas 動作",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "提示：可嘗試將最遠的元素移動至較集中的位置"
   },
   "errorSplash": {
-    "headingMain_pre": "發生錯誤，嘗試",
-    "headingMain_button": "重新載入頁面。",
-    "clearCanvasMessage": "若重新載入仍無法解決問題，嘗試",
-    "clearCanvasMessage_button": "清除 canvas。",
+    "headingMain": "發生錯誤，嘗試<button>重新載入頁面。</button>",
+    "clearCanvasMessage": "若重新載入仍無法解決問題，嘗試<button>清除 canvas。</button>",
     "clearCanvasCaveat": "此動作將造成目前的作品被移除。",
-    "trackedToSentry_pre": "此錯誤與其識別碼",
-    "trackedToSentry_post": "將由系統記錄。",
-    "openIssueMessage_pre": "我們將謹慎處理，你的作品內容不會被包含在錯誤報告中。若你的作品不需保持私密，請考慮使用我們的",
-    "openIssueMessage_button": "bug tracker。",
-    "openIssueMessage_post": "請將下列資訊複製貼上至 GitHub issue 中。",
+    "trackedToSentry": "此錯誤與其識別碼{{eventId}}將由系統記錄。",
+    "openIssueMessage": "我們將謹慎處理，你的作品內容不會被包含在錯誤報告中。若你的作品不需保持私密，請考慮使用我們的<button>bug tracker。</button>請將下列資訊複製貼上至 GitHub issue 中。",
     "sceneContent": "作品內容："
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "必填",
       "website": "請輸入有效的 URL"
     },
-    "noteDescription": {
-      "pre": "送出您的資料庫後將被包含於",
-      "link": "公開資料庫 repository",
-      "post": "以利他人在其繪圖中使用。"
-    },
-    "noteGuidelines": {
-      "pre": "資料庫需先經人工審查。請閱讀",
-      "link": "說明文件",
-      "post": "再送出。若需溝通與修改時要透過 GitHub 帳號來進行，但並非強制需求。"
-    },
-    "noteLicense": {
-      "pre": "送出即代表您同意此資料庫將發布時使用 ",
-      "link": "MIT 授權，",
-      "post": "簡單來說是指任何人都能不受限制的使用。"
-    },
+    "noteDescription": "送出您的資料庫後將被包含於<link>公開資料庫 repository</link>以利他人在其繪圖中使用。",
+    "noteGuidelines": "資料庫需先經人工審查。請閱讀<link>說明文件</link>再送出。若需溝通與修改時要透過 GitHub 帳號來進行，但並非強制需求。",
+    "noteLicense": "送出即代表您同意此資料庫將發布時使用 <link>MIT 授權，</link>簡單來說是指任何人都能不受限制的使用。",
     "noteItems": "每個資料庫項目都有獨立的名稱故可篩選。會包含下列資料庫項目：",
     "atleastOneLibItem": "請選擇至少一項資料庫項目",
     "republishWarning": "注意：部分選取中的物件先前已發布/送出過。建議僅在要更新現存資料庫或已送出的物件時才重新送出這些物件。"
   },
   "publishSuccessDialog": {
     "title": "資料庫已送出",
-    "content": "感謝 {{authorName}} 。您的資料庫已送出待審查。您可查看目前狀態",
-    "link": "在此"
+    "content": "感謝 {{authorName}} 。您的資料庫已送出待審查。您可查看目前狀態<link>在此</link>"
   },
   "confirmDialog": {
     "resetLibrary": "重設資料庫",
     "removeItemsFromLib": "從資料庫移除所選的項目"
+  },
+  "imageExportDialog": {
+    "header": "匯出圖片",
+    "label": {
+      "withBackground": "背景",
+      "onlySelected": "僅選取物件",
+      "darkMode": "深色模式",
+      "embedScene": "嵌入場景",
+      "scale": "縮放比例",
+      "padding": "內間距"
+    },
+    "tooltip": {
+      "embedScene": "用於回復場景的場景資料會被包含在輸出的 PNG/SVG 檔案中。\n會增加輸出的檔案大小。"
+    },
+    "title": {
+      "exportToPng": "輸出成 PNG",
+      "exportToSvg": "輸出成 SVG",
+      "copyPngToClipboard": "複製 PNG 至剪貼簿"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "複製至剪貼簿"
+    }
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "使用 {{shortcut}} 以做為單一物件貼上，\n或貼上至現有的文字編輯器"
   },
   "colors": {
-    "ffffff": "白",
-    "f8f9fa": "灰 0",
-    "f1f3f5": "灰 1",
-    "fff5f5": "紅 0",
-    "fff0f6": "粉紅 0",
-    "f8f0fc": "深紫 0",
-    "f3f0ff": "藍紫 0",
-    "edf2ff": "靛藍 0",
-    "e7f5ff": "藍 0",
-    "e3fafc": "青 0",
-    "e6fcf5": "藍綠 0",
-    "ebfbee": "綠 0",
-    "f4fce3": "黃綠 0",
-    "fff9db": "黃 0",
-    "fff4e6": "橘 0",
     "transparent": "透明",
-    "ced4da": "灰 4",
-    "868e96": "灰 6",
-    "fa5252": "紅 6",
-    "e64980": "粉紅 6",
-    "be4bdb": "深紫 6",
-    "7950f2": "藍紫 6",
-    "4c6ef5": "靛藍 6",
-    "228be6": "藍 6",
-    "15aabf": "青 6",
-    "12b886": "藍綠 6",
-    "40c057": "綠 6",
-    "82c91e": "黃綠 6",
-    "fab005": "黃 6",
-    "fd7e14": "橘 6",
-    "000000": "黑",
-    "343a40": "灰 8",
-    "495057": "灰 7",
-    "c92a2a": "紅 9",
-    "a61e4d": "粉紅 9",
-    "862e9c": "深紫 9",
-    "5f3dc4": "藍紫 9",
-    "364fc7": "靛藍 9",
-    "1864ab": "藍 9",
-    "0b7285": "青 9",
-    "087f5b": "藍綠 9",
-    "2b8a3e": "綠 9",
-    "5c940d": "黃綠 9",
-    "e67700": "黃 9",
-    "d9480f": "橘 9"
+    "black": "黑",
+    "white": "白",
+    "red": "紅",
+    "pink": "粉紅",
+    "grape": "深紫",
+    "violet": "藍紫",
+    "gray": "灰",
+    "blue": "藍",
+    "cyan": "青",
+    "teal": "藍綠",
+    "green": "綠",
+    "yellow": "黃",
+    "orange": "橘",
+    "bronze": "銅"
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "選個工具開始畫圖吧！",
       "helpHint": "快速鍵與說明"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "最常使用的自訂顏色",
+    "colors": "顏色",
+    "shades": "漸變色",
+    "hexCode": "Hex 碼",
+    "noShades": "沒有此顏色的漸變色"
   }
 }

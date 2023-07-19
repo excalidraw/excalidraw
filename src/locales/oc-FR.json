@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triangle",
     "fontSize": "Talha polissa",
     "fontFamily": "Familha de polissa",
-    "onlySelected": "Seleccion sonque",
-    "withBackground": "Rèireplan",
-    "exportEmbedScene": "Scèna embarcada",
-    "exportEmbedScene_details": "Las donadas de scèna seràn enregistradas dins lo fichièr PNG/SVG exportat, per que la scèna pòsca èsser restaurada a partir d’aqueste fichièr.\nAumentarà la talha del fichièr exportat.",
     "addWatermark": "Apondre « Fabricat amb Excalidraw »",
     "handDrawn": "A la man levada",
     "normal": "Normala",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Virar orizontalament",
     "flipVertical": "Virar verticalament",
     "viewMode": "Mòde de vista",
-    "toggleExportColorScheme": "Alternar l’esquèma de color d’expòrt",
     "share": "Partejar",
     "showStroke": "Mostrar lo selector de color de contorn",
     "showBackground": "Mostrar lo selector de color de fons",
@@ -128,7 +123,10 @@
       "unlockAll": "Tot desverrolhar"
     },
     "statusPublished": "Publicat",
-    "sidebarLock": "Gardar la barra laterala dobèrta"
+    "sidebarLock": "Gardar la barra laterala dobèrta",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
@@ -140,11 +138,7 @@
     "exportJSON": "Exportar en fichièr",
     "exportImage": "Exportar imatges...",
     "export": "Enregistrar dins...",
-    "exportToPng": "Exportar en PNG",
-    "exportToSvg": "Exportar en SVG",
     "copyToClipboard": "Copiar al quichapapièrs",
-    "copyPngToClipboard": "Copiar PNG al quichapapièrs",
-    "scale": "Escala",
     "save": "Salvar al fichièr actual",
     "saveAs": "Enregistrar jos",
     "load": "Dobrir",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Mòde estilo - empachar lo contact",
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
     "eraser": "Goma",
-    "hand": "Man (aisina de desplaçament de la vista)"
+    "frame": "",
+    "hand": "Man (aisina de desplaçament de la vista)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Astúcia : ensajatz de sarrar los elements mai alonhats."
   },
   "errorSplash": {
-    "headingMain_pre": "Una error s’es producha. Ensajatz ",
-    "headingMain_button": "recargament de la pagina.",
-    "clearCanvasMessage": "Se recargar fonciona pas, ensajatz ",
-    "clearCanvasMessage_button": "d’escafar los canabasses.",
+    "headingMain": "Una error s’es producha. Ensajatz <button>recargament de la pagina.</button>",
+    "clearCanvasMessage": "Se recargar fonciona pas, ensajatz <button>d’escafar los canabasses.</button>",
     "clearCanvasCaveat": " Menarà a una pèrda del trabalh ",
-    "trackedToSentry_pre": "Error amb l’identificant ",
-    "trackedToSentry_post": " es estada enregistrada sus nòstre sistèma.",
-    "openIssueMessage_pre": "Èrem plan prudents per inclure pas d’informacions de la scèna vòstra sus l’error. Se vòstra scèna es pas privada, volgatz considerar de perseguir sus nòstre ",
-    "openIssueMessage_button": "traçadors d’avarias.",
-    "openIssueMessage_post": " Volgatz inclure las informacions çai-jos en las copiant e pegant a l’issue GitHub.",
+    "trackedToSentry": "Error amb l’identificant {{eventId}} es estada enregistrada sus nòstre sistèma.",
+    "openIssueMessage": "Èrem plan prudents per inclure pas d’informacions de la scèna vòstra sus l’error. Se vòstra scèna es pas privada, volgatz considerar de perseguir sus nòstre <button>traçadors d’avarias.</button> Volgatz inclure las informacions çai-jos en las copiant e pegant a l’issue GitHub.",
     "sceneContent": "Contengut de la scèna :"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "Requerit",
       "website": "Picatz una URL valida"
     },
-    "noteDescription": {
-      "pre": "Enviatz vòstra bibliotèca per èsser compresa al ",
-      "link": "repertòri public de bibliotèca",
-      "post": "per que los autres l’utilizen dins lor dessenhs."
-    },
-    "noteGuidelines": {
-      "pre": "Qualqu’un deu aprovar la bibliotèca manualament per començar. Volgatz legir las ",
-      "link": "linhas directrises",
-      "post": " abans de sometre. Vos farà mestièr un compte GitHub per comunicar e realizar de modificacions se demandadas, mas es pas complètament obligatòri."
-    },
-    "noteLicense": {
-      "pre": "En sometent, acceptatz que la bibliotèca siá publicada sota la ",
-      "link": "Licéncia MIT, ",
-      "post": "que significa en brèu que qual que siá pòt l’utilizar sens cap de restriccion."
-    },
+    "noteDescription": "Enviatz vòstra bibliotèca per èsser compresa al <link>repertòri public de bibliotèca</link>per que los autres l’utilizen dins lor dessenhs.",
+    "noteGuidelines": "Qualqu’un deu aprovar la bibliotèca manualament per començar. Volgatz legir las <link>linhas directrises</link> abans de sometre. Vos farà mestièr un compte GitHub per comunicar e realizar de modificacions se demandadas, mas es pas complètament obligatòri.",
+    "noteLicense": "En sometent, acceptatz que la bibliotèca siá publicada sota la <link>Licéncia MIT, </link>que significa en brèu que qual que siá pòt l’utilizar sens cap de restriccion.",
     "noteItems": "Cada element de bibliotèca deu aver un nom pròpri per èsser filtrable. Los elements de bibliotèca seguentas seràn incluses :",
     "atleastOneLibItem": "Volgatz seleccionar almens un element de bibliotèca per començar",
     "republishWarning": "Nòta : d’unes elements seleccionats son marcats ja coma publicats/enviats. Deuriatz sonque tornar enviar los elements pendent l’actualizacion d’una bibliotèca existenta o un mandadís."
   },
   "publishSuccessDialog": {
     "title": "Bibliotèca somesa",
-    "content": "Mercés {{authorName}}. Vòstre bibliotèca es estada somesa per repassa. Podètz seguir l’avançament",
-    "link": "aquí"
+    "content": "Mercés {{authorName}}. Vòstre bibliotèca es estada somesa per repassa. Podètz seguir l’avançament<link>aquí</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Reïnicializar la bibliotèca",
     "removeItemsFromLib": "Tirar los elements seleccionats de la bibliotèca"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": ""
   },
   "colors": {
-    "ffffff": "Blanc",
-    "f8f9fa": "Gris 0",
-    "f1f3f5": "Gris 0",
-    "fff5f5": "Roge 0",
-    "fff0f6": "Ròse 0",
-    "f8f0fc": "Bordèu 0",
-    "f3f0ff": "Violet 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Blau 0",
-    "e3fafc": "Cian 0",
-    "e6fcf5": "Esmerauda 0",
-    "ebfbee": "Verd 0",
-    "f4fce3": "Verd citron 0",
-    "fff9db": "Jaune 0",
-    "fff4e6": "Irange 0",
     "transparent": "Transparéncia",
-    "ced4da": "Gris 4",
-    "868e96": "Gris 6",
-    "fa5252": "Roge 6",
-    "e64980": "Ròse 6",
-    "be4bdb": "Bordèu 6",
-    "7950f2": "Violet 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Blau 6",
-    "15aabf": "Cian 6",
-    "12b886": "Esmerauda 6",
-    "40c057": "Verd 6",
-    "82c91e": "Verd citron 6",
-    "fab005": "Jaune 6",
-    "fd7e14": "Irange 6",
-    "000000": "Negre",
-    "343a40": "Gris 8",
-    "495057": "Gris 7",
-    "c92a2a": "Roge 9",
-    "a61e4d": "Ròse 9",
-    "862e9c": "Bordèu 9",
-    "5f3dc4": "Violet 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Blau 9",
-    "0b7285": "Cian 9",
-    "087f5b": "Esmerauda 9",
-    "2b8a3e": "Verd 9",
-    "5c940d": "Verd citron 9",
-    "e67700": "Jaune 9",
-    "d9480f": "Irange 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "Prenètz un esplech e començatz de dessenhar !",
       "helpHint": "Acorchis e ajuda"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

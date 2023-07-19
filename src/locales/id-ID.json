@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Segitiga",
     "fontSize": "Ukuran font",
     "fontFamily": "Jenis font",
-    "onlySelected": "Hanya yang Dipilih",
-    "withBackground": "Latar",
-    "exportEmbedScene": "Sematkan pemandangan",
-    "exportEmbedScene_details": "Data pemandangan akan disimpan dalam file PNG/SVG yang diekspor, sehingga pemandangan itu dapat dipulihkan darinya.\nAkan membesarkan ukuran file yang diekspor.",
     "addWatermark": "Tambahkan \"Dibuat dengan Excalidraw\"",
     "handDrawn": "Tulisan tangan",
     "normal": "Normal",
@@ -54,7 +50,7 @@
     "veryLarge": "Sangat besar",
     "solid": "Padat",
     "hachure": "Garis-garis",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Asiran silang",
     "thin": "Lembut",
     "bold": "Tebal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Balikkan horizontal",
     "flipVertical": "Balikkan vertikal",
     "viewMode": "Mode tampilan",
-    "toggleExportColorScheme": "Ubah skema warna ekspor",
     "share": "Bagikan",
     "showStroke": "Tampilkan garis pengambil warna",
     "showBackground": "Tampilkan latar pengambil warna",
@@ -111,7 +106,7 @@
     "increaseFontSize": "Besarkan ukuran font",
     "unbindText": "Lepas teks",
     "bindText": "Kunci teks ke kontainer",
-    "createContainerFromText": "",
+    "createContainerFromText": "Bungkus teks dalam kontainer",
     "link": {
       "edit": "Edit tautan",
       "create": "Buat tautan",
@@ -128,7 +123,10 @@
       "unlockAll": "Lepas semua"
     },
     "statusPublished": "Telah terbit",
-    "sidebarLock": "Biarkan sidebar tetap terbuka"
+    "sidebarLock": "Biarkan sidebar tetap terbuka",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
@@ -140,11 +138,7 @@
     "exportJSON": "Ekspor ke file",
     "exportImage": "Ekspor gambar...",
     "export": "Simpan ke...",
-    "exportToPng": "Ekspor ke PNG",
-    "exportToSvg": "Ekspor ke SVG",
     "copyToClipboard": "Salin ke Papan Klip",
-    "copyPngToClipboard": "Salin PNG ke papan klip",
-    "scale": "Skala",
     "save": "Simpan ke file sekarang",
     "saveAs": "Simpan sebagai",
     "load": "Buka",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "Tidak dapat menyimpan ke dalam basis data server. Jika masih berlanjut, Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "brave_measure_text_error": {
-      "start": "Sepertinya kamu menggunakan browser Brave dengan",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "pengaturan diaktifkan",
-      "break": "",
-      "text_elements": "Elemen Teks",
-      "in_your_drawings": "dalam gambar anda",
-      "strongly_recommend": "Kami sangat menyarankan untuk mematikan pengaturan ini. Kamu dapat mengikuti",
-      "steps": "langkah-langkah ini",
-      "how": "dalam bagaimana melakukan itu",
-      "disable_setting": " Jika pengaturan ini dimatikan tidak mengatasi masalah tampilan dari elemen teks, silahkan buka",
-      "issue": "isu",
-      "write": "di GitHub kami, atau tulis kami di",
-      "discord": "Discord"
+      "line1": "Sepertinya Anda menggunkan peramban Brave dengan pengaturan <bold>Blokir Fingerprinting yang Agresif</bold> diaktifkan.",
+      "line2": "Ini dapat membuat <bold>Elemen Teks</bold> dalam gambar mu.",
+      "line3": "Kami sangat menyarankan mematikan pengaturan ini. Anda dapat mengikuti <link>langkah-langkah ini</link> untuk melakukannya.",
+      "line4": "Jika mematikan pengaturan ini tidak membenarkan tampilan elemen teks, mohon buka\n<issueLink>isu</issueLink> di GitHub kami, atau chat kami di <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Mode pena - mencegah sentuhan",
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
     "eraser": "Penghapus",
-    "hand": ""
+    "frame": "",
+    "hand": "Tangan (alat panning)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -246,7 +233,7 @@
     "shapes": "Bentuk"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Untuk memindahkan kanvas, tekan roda mouse atau spacebar sambil menyeret, atau menggunakan alat tangan",
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Tip: coba pindahkan elemen-terjauh lebih dekat bersama."
   },
   "errorSplash": {
-    "headingMain_pre": "Mengalami sebuah kesalahan. Cobalah ",
-    "headingMain_button": "muat ulang halaman.",
-    "clearCanvasMessage": "Jika memuat ulang tidak bekerja, cobalah ",
-    "clearCanvasMessage_button": "bersihkan canvas.",
+    "headingMain": "Mengalami sebuah kesalahan. Cobalah <button>muat ulang halaman.</button>",
+    "clearCanvasMessage": "Jika memuat ulang tidak bekerja, cobalah <button>bersihkan canvas.</button>",
     "clearCanvasCaveat": " Ini akan menghasilkan hilangnya pekerjaan ",
-    "trackedToSentry_pre": "Kesalahan dengan pengidentifikasi ",
-    "trackedToSentry_post": " dilacak di sistem kami.",
-    "openIssueMessage_pre": "Kami sangat berhati-hati untuk tidak menyertakan informasi pemandangan Anda pada kesalahan. Jika pemandangan Anda tidak bersifat pribadi, mohon pertimbangkan menindak lanjut pada ",
-    "openIssueMessage_button": "pelacak bug.",
-    "openIssueMessage_post": " Mohon sertakan informasi dibawah ini dengan menyalin dan menempelkan di Github issue.",
+    "trackedToSentry": "Kesalahan dengan pengidentifikasi {{eventId}} dilacak di sistem kami.",
+    "openIssueMessage": "Kami sangat berhati-hati untuk tidak menyertakan informasi pemandangan Anda pada kesalahan. Jika pemandangan Anda tidak bersifat pribadi, mohon pertimbangkan menindak lanjut pada <button>pelacak bug.</button> Mohon sertakan informasi dibawah ini dengan menyalin dan menempelkan di Github issue.",
     "sceneContent": "Pemandangan konten:"
   },
   "roomDialog": {
@@ -320,8 +302,8 @@
     "doubleClick": "klik-ganda",
     "drag": "seret",
     "editor": "Editor",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Edit titik garis/panah",
+    "editText": "Edit teks / tambah label",
     "github": "Menemukan masalah? Kirimkan",
     "howto": "Ikuti panduan kami",
     "or": "atau",
@@ -362,33 +344,44 @@
       "required": "Dibutuhkan",
       "website": "Masukkan URL valid"
     },
-    "noteDescription": {
-      "pre": "Kirimkan pustaka Anda untuk disertakan di ",
-      "link": "repositori pustaka publik",
-      "post": "untuk orang lain menggunakannya dalam gambar mereka."
-    },
-    "noteGuidelines": {
-      "pre": "Pustaka butuh disetujui secara manual terlebih dahulu. Baca ",
-      "link": "pedoman",
-      "post": " sebelum mengirim. Anda butuh akun GitHub untuk berkomunikasi dan membuat perubahan jika dibutuhkan, tetapi tidak wajib dibutukan."
-    },
-    "noteLicense": {
-      "pre": "Dengan mengkirimkannya, Anda setuju pustaka akan diterbitkan dibawah ",
-      "link": "Lisensi MIT, ",
-      "post": "yang artinya siapa pun dapat menggunakannya tanpa batasan."
-    },
+    "noteDescription": "Kirimkan pustaka Anda untuk disertakan di <link>repositori pustaka publik</link>untuk orang lain menggunakannya dalam gambar mereka.",
+    "noteGuidelines": "Pustaka butuh disetujui secara manual terlebih dahulu. Baca <link>pedoman</link> sebelum mengirim. Anda butuh akun GitHub untuk berkomunikasi dan membuat perubahan jika dibutuhkan, tetapi tidak wajib dibutukan.",
+    "noteLicense": "Dengan mengkirimkannya, Anda setuju pustaka akan diterbitkan dibawah <link>Lisensi MIT, </link>yang artinya siapa pun dapat menggunakannya tanpa batasan.",
     "noteItems": "Setiap item pustaka harus memiliki nama, sehingga bisa disortir. Item pustaka di bawah ini akan dimasukan:",
     "atleastOneLibItem": "Pilih setidaknya satu item pustaka untuk mulai",
     "republishWarning": "Catatan: beberapa item yang dipilih telah ditandai sebagai sudah dipublikasikan/diserahkan. Anda hanya dapat menyerahkan kembali item-item ketika memperbarui pustaka atau pengumpulan."
   },
   "publishSuccessDialog": {
     "title": "Pustaka telah dikirm",
-    "content": "Terima kasih {{authorName}}. pustaka Anda telah diserahkan untuk ditinjau ulang. Anda dapat cek statusnya",
-    "link": "di sini"
+    "content": "Terima kasih {{authorName}}. pustaka Anda telah diserahkan untuk ditinjau ulang. Anda dapat cek statusnya<link>di sini</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Reset pustaka",
     "removeItemsFromLib": "Hapus item yang dipilih dari pustaka"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "Gunakan {{shortcut}} untuk menempelkan sebagai satu elemen,\natau tempelkan ke teks editor yang ada"
   },
   "colors": {
-    "ffffff": "Putih",
-    "f8f9fa": "Abu-abu 0",
-    "f1f3f5": "Abu-abu 1",
-    "fff5f5": "Merah 0",
-    "fff0f6": "Merah muda 0",
-    "f8f0fc": "Ungu 0",
-    "f3f0ff": "Violet 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Biru 0",
-    "e3fafc": "Cyan 0",
-    "e6fcf5": "Teal 0",
-    "ebfbee": "Hijau 0",
-    "f4fce3": "Lime 0",
-    "fff9db": "Kuning 0",
-    "fff4e6": "Jingga 0",
     "transparent": "Transparan",
-    "ced4da": "Abu-abu 4",
-    "868e96": "Abu-abu 6",
-    "fa5252": "Merah 6",
-    "e64980": "Merah muda 6",
-    "be4bdb": "Ungu 6",
-    "7950f2": "Violet 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Biru 6",
-    "15aabf": "Cyan 6",
-    "12b886": "Teal 6",
-    "40c057": "Hijau 6",
-    "82c91e": "Lime 6",
-    "fab005": "Kuning 6",
-    "fd7e14": "Jingga 6",
-    "000000": "Hitam",
-    "343a40": "Abu-abu 8",
-    "495057": "Abu-abu 7",
-    "c92a2a": "Merah 9",
-    "a61e4d": "Merah muda 9",
-    "862e9c": "Ungu 9",
-    "5f3dc4": "Violet 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Biru 9",
-    "0b7285": "Cyan 9",
-    "087f5b": "Teal 9",
-    "2b8a3e": "Hijau 9",
-    "5c940d": "Lime 9",
-    "e67700": "Kuning 9",
-    "d9480f": "Jingga 9"
+    "black": "Hitam",
+    "white": "Putih",
+    "red": "Merah",
+    "pink": "Pink",
+    "grape": "Ungu",
+    "violet": "Violet",
+    "gray": "Abu-abu",
+    "blue": "Biru",
+    "cyan": "Cyan",
+    "teal": "Teal",
+    "green": "Hijau",
+    "yellow": "Kuning",
+    "orange": "Jingga",
+    "bronze": "Tembaga"
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "Pilih alat & mulai menggambar!",
       "helpHint": "Pintasan & bantuan"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "Warna yang sering dipakai",
+    "colors": "Warna",
+    "shades": "Nuansa",
+    "hexCode": "Kode hexa",
+    "noShades": "Tidak ada nuansa untuk warna ini"
   }
 }

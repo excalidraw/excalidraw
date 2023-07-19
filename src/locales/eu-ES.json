@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Hirukia",
     "fontSize": "Letra-tamaina",
     "fontFamily": "Letra-tipoa",
-    "onlySelected": "Hautapena soilik",
-    "withBackground": "Atzeko planoa",
-    "exportEmbedScene": "Txertatu eszena",
-    "exportEmbedScene_details": "Eszenaren datuak esportatutako PNG/SVG fitxategian gordeko dira, eszena bertatik berrezartzeko.\nEsportatutako fitxategien tamaina handituko da.",
     "addWatermark": "Gehitu \"Excalidraw bidez egina\"",
     "handDrawn": "Eskuz marraztua",
     "normal": "Normala",
@@ -54,7 +50,7 @@
     "veryLarge": "Oso handia",
     "solid": "Solidoa",
     "hachure": "Itzalduna",
-    "zigzag": "",
+    "zigzag": "Sigi-saga",
     "crossHatch": "Marraduna",
     "thin": "Mehea",
     "bold": "Lodia",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Irauli horizontalki",
     "flipVertical": "Irauli bertikalki",
     "viewMode": "Ikuspegia",
-    "toggleExportColorScheme": "Aldatu esportatzeko kolorearen eszena",
     "share": "Partekatu",
     "showStroke": "Erakutsi marraren kolore-hautatzailea",
     "showBackground": "Erakutsi atzeko planoaren kolore-hautatzailea",
@@ -128,7 +123,10 @@
       "unlockAll": "Desblokeatu guztiak"
     },
     "statusPublished": "Argitaratua",
-    "sidebarLock": "Mantendu alboko barra irekita"
+    "sidebarLock": "Mantendu alboko barra irekita",
+    "selectAllElementsInFrame": "Hautatu markoko elementu guztiak",
+    "removeAllElementsFromFrame": "Kendu markoko elementu guztiak",
+    "eyeDropper": "Aukeratu kolorea oihaletik"
   },
   "library": {
     "noItems": "Oraindik ez da elementurik gehitu...",
@@ -140,11 +138,7 @@
     "exportJSON": "Esportatu fitxategira",
     "exportImage": "Esportatu irudia...",
     "export": "Gorde hemen...",
-    "exportToPng": "Esportatu PNG gisa",
-    "exportToSvg": "Esportatu SVG gisa",
     "copyToClipboard": "Kopiatu arbelera",
-    "copyPngToClipboard": "Kopiatu PNG arbelera",
-    "scale": "Eskala",
     "save": "Gorde uneko fitxategian",
     "saveAs": "Gorde honela",
     "load": "Ireki",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "Ezin izan da backend datu-basean gorde. Arazoak jarraitzen badu, zure fitxategia lokalean gorde beharko zenuke zure lana ez duzula galtzen ziurtatzeko.",
     "collabSaveFailed_sizeExceeded": "Ezin izan da backend datu-basean gorde, ohiala handiegia dela dirudi. Fitxategia lokalean gorde beharko zenuke zure lana galtzen ez duzula ziurtatzeko.",
     "brave_measure_text_error": {
-      "start": "Brave nabigatzailea erabiltzen ari zarela dirudi",
-      "aggressive_block_fingerprint": "Aggressively Block Fingerprinting",
-      "setting_enabled": "ezarpena gaituta",
-      "break": "Honek honen haustea eragin dezake",
-      "text_elements": "Testu-elementuak",
-      "in_your_drawings": "zure marrazkietan",
-      "strongly_recommend": "Ezarpen hau desgaitzea gomendatzen dugu. Jarrai dezakezu",
-      "steps": "urrats hauek",
-      "how": "jakiteko nola egin",
-      "disable_setting": " Ezarpen hau desgaitzeak testu-elementuen bistaratzea konpontzen ez badu, ireki",
-      "issue": "eskaera (issue) bat",
-      "write": "gure Github-en edo idatz iezaguzu",
-      "discord": "Discord-en"
+      "line1": "Brave arakatzailea erabiltzen ari zarela dirudi <bold>Blokeatu hatz-markak erasokorki</bold> ezarpena gaituta.",
+      "line2": "Honek zure marrazkietako <bold>Testu-elementuak</bold> hautsi ditzake.",
+      "line3": "Ezarpen hau desgaitzea gomendatzen dugu. <link>urrats hauek</link> jarrai ditzakezu hori nola egin jakiteko.",
+      "line4": "Ezarpen hau desgaituz gero, testu-elementuen bistaratzea konpontzen ez bada, ireki <issueLink>arazo</issueLink> gure GitHub-en edo idatzi iezaguzu <discordLink>Discord</discordLink> helbidera"
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Luma modua - ukipena saihestu",
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma",
-    "hand": "Eskua (panoratze tresna)"
+    "frame": "Marko tresna",
+    "hand": "Eskua (panoratze tresna)",
+    "extraTools": "Tresna gehiago"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Aholkua: saiatu urrunen dauden elementuak pixka bat hurbiltzen."
   },
   "errorSplash": {
-    "headingMain_pre": "Errore bat aurkitu da. Saiatu ",
-    "headingMain_button": "orria birkargatzen.",
-    "clearCanvasMessage": "Birkargatzea ez bada burutzen, saiatu ",
-    "clearCanvasMessage_button": "oihala garbitzen.",
+    "headingMain": "Errore bat aurkitu da. Saiatu <button>orria birkargatzen.</button>",
+    "clearCanvasMessage": "Birkargatzea ez bada burutzen, saiatu <button>oihala garbitzen.</button>",
     "clearCanvasCaveat": " Honen ondorioz lana galduko da ",
-    "trackedToSentry_pre": "Identifikatzailearen errorea ",
-    "trackedToSentry_post": " gure sistemak behatu du.",
-    "openIssueMessage_pre": "Oso kontuz ibili gara zure eszenaren informazioa errorean ez sartzeko. Zure eszena pribatua ez bada, kontuan hartu gure ",
-    "openIssueMessage_button": "erroreen jarraipena egitea.",
-    "openIssueMessage_post": " Sartu beheko informazioa kopiatu eta itsatsi bidez GitHub issue-n.",
+    "trackedToSentry": "Identifikatzailearen errorea {{eventId}} gure sistemak behatu du.",
+    "openIssueMessage": "Oso kontuz ibili gara zure eszenaren informazioa errorean ez sartzeko. Zure eszena pribatua ez bada, kontuan hartu gure <button>erroreen jarraipena egitea.</button> Sartu beheko informazioa kopiatu eta itsatsi bidez GitHub issue-n.",
     "sceneContent": "Eszenaren edukia:"
   },
   "roomDialog": {
@@ -320,8 +302,8 @@
     "doubleClick": "klik bikoitza",
     "drag": "arrastatu",
     "editor": "Editorea",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Editatu lerroak/gezi-puntuak",
+    "editText": "Editatu testua / gehitu etiketa",
     "github": "Arazorik izan al duzu? Eman horren berri",
     "howto": "Jarraitu gure gidak",
     "or": "edo",
@@ -362,33 +344,44 @@
       "required": "Beharrezkoa",
       "website": "Sartu baliozko URL bat"
     },
-    "noteDescription": {
-      "pre": "Bidali zure liburutegira sartu ahal izateko ",
-      "link": "zure liburutegiko biltegian",
-      "post": "beste jendeak bere marrazkietan erabili ahal izateko."
-    },
-    "noteGuidelines": {
-      "pre": "Liburutegia eskuz onartu behar da. Irakurri ",
-      "link": "gidalerroak",
-      "post": " bidali aurretik. GitHub kontu bat edukitzea komeni da komunikatzeko eta aldaketak egin ahal izateko, baina ez da guztiz beharrezkoa."
-    },
-    "noteLicense": {
-      "pre": "Bidaltzen baduzu, onartzen duzu liburutegia ",
-      "link": "MIT lizentziarekin argitaratuko dela, ",
-      "post": "zeinak, laburbilduz, esan nahi du edozeinek erabiltzen ahal duela murrizketarik gabe."
-    },
+    "noteDescription": "Bidali zure liburutegira sartu ahal izateko <link>zure liburutegiko biltegian</link>beste jendeak bere marrazkietan erabili ahal izateko.",
+    "noteGuidelines": "Liburutegia eskuz onartu behar da. Irakurri <link>gidalerroak</link> bidali aurretik. GitHub kontu bat edukitzea komeni da komunikatzeko eta aldaketak egin ahal izateko, baina ez da guztiz beharrezkoa.",
+    "noteLicense": "Bidaltzen baduzu, onartzen duzu liburutegia <link>MIT lizentziarekin argitaratuko dela, </link>zeinak, laburbilduz, esan nahi du edozeinek erabiltzen ahal duela murrizketarik gabe.",
     "noteItems": "Liburutegiko elementu bakoitzak bere izena eduki behar du iragazi ahal izateko. Liburutegiko hurrengo elementuak barne daude:",
     "atleastOneLibItem": "Hautatu gutxienez liburutegiko elementu bat gutxienez hasi ahal izateko",
     "republishWarning": "Oharra: hautatutako elementu batzuk dagoeneko argitaratuta/bidalita bezala markatuta daude. Elementuak berriro bidali behar dituzu lehendik dagoen liburutegi edo bidalketa eguneratzen duzunean."
   },
   "publishSuccessDialog": {
     "title": "Liburutegia bidali da",
-    "content": "Eskerrik asko {{authorName}}. Zure liburutegia bidali da berrikustera. Jarraitu dezakezu haren egoera",
-    "link": "hemen"
+    "content": "Eskerrik asko {{authorName}}. Zure liburutegia bidali da berrikustera. Jarraitu dezakezu haren egoera<link>hemen</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Leheneratu liburutegia",
     "removeItemsFromLib": "Kendu hautatutako elementuak liburutegitik"
+  },
+  "imageExportDialog": {
+    "header": "Esportatu irudia",
+    "label": {
+      "withBackground": "Atzeko planoa",
+      "onlySelected": "Hautapena soilik",
+      "darkMode": "Modu iluna",
+      "embedScene": "Txertatu eszena",
+      "scale": "Eskala",
+      "padding": "Betegarria"
+    },
+    "tooltip": {
+      "embedScene": "Eszenaren datuak esportatutako PNG/SVG fitxategian gordeko dira, eszena bertatik berrezartzeko.\nEsportatutako fitxategien tamaina handituko da."
+    },
+    "title": {
+      "exportToPng": "Esportatu PNG gisa",
+      "exportToSvg": "Esportatu SVG gisa",
+      "copyPngToClipboard": "Kopiatu PNG arbelera"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopiatu arbelean"
+    }
   },
   "encrypted": {
     "tooltip": "Zure marrazkiak muturretik muturrera enkriptatu dira, beraz Excalidraw-ren zerbitzariek ezingo dituzte ikusi.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "Erabili {{shortcut}} elementu bakar gisa itsasteko,\nedo itsatsi lehendik dagoen testu-editore batean"
   },
   "colors": {
-    "ffffff": "Zuria",
-    "f8f9fa": "Grisa 0",
-    "f1f3f5": "Grisa 1",
-    "fff5f5": "Gorria 0",
-    "fff0f6": "Arrosa 0",
-    "f8f0fc": "Mahats kolorea 0",
-    "f3f0ff": "Bioleta 0",
-    "edf2ff": "Indigoa 0",
-    "e7f5ff": "Urdina 0",
-    "e3fafc": "Ziana 0",
-    "e6fcf5": "Berde urdinxka 0",
-    "ebfbee": "Berdea 0",
-    "f4fce3": "Lima 0",
-    "fff9db": "Horia 0",
-    "fff4e6": "Laranja 0",
     "transparent": "Gardena",
-    "ced4da": "Grisa 4",
-    "868e96": "Grisa 6",
-    "fa5252": "Gorria 6",
-    "e64980": "Arrosa 6",
-    "be4bdb": "Mahats kolorea 6",
-    "7950f2": "Bioleta 6",
-    "4c6ef5": "Indigoa 6",
-    "228be6": "Urdina 6",
-    "15aabf": "Ziana 6",
-    "12b886": "Berde urdinxka 6",
-    "40c057": "Berdea 6",
-    "82c91e": "Lima 6",
-    "fab005": "Horia 6",
-    "fd7e14": "Laranja 6",
-    "000000": "Beltza",
-    "343a40": "Grisa 8",
-    "495057": "Grisa 7",
-    "c92a2a": "Gorria 9",
-    "a61e4d": "Arrosa 9",
-    "862e9c": "Mahats kolorea 9",
-    "5f3dc4": "Bioleta 9",
-    "364fc7": "Indigoa 9",
-    "1864ab": "Urdina 9",
-    "0b7285": "Ziana 9",
-    "087f5b": "Berde urdinxka 9",
-    "2b8a3e": "Berdea 9",
-    "5c940d": "Lima 9",
-    "e67700": "Horia 9",
-    "d9480f": "Laranja 9"
+    "black": "Beltza",
+    "white": "Zuria",
+    "red": "Gorria",
+    "pink": "Arrosa",
+    "grape": "Mahats kolorea",
+    "violet": "Bioleta",
+    "gray": "Grisa",
+    "blue": "Urdina",
+    "cyan": "Ziana",
+    "teal": "Berde urdinxka",
+    "green": "Berdea",
+    "yellow": "Horia",
+    "orange": "Laranja",
+    "bronze": "Brontzea"
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "Aukeratu tresna bat eta hasi marrazten!",
       "helpHint": "Lasterbideak eta laguntza"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "Gehien erabilitako kolore pertsonalizatuak",
+    "colors": "Koloreak",
+    "shades": "Ñabardurak",
+    "hexCode": "Hez kodea",
+    "noShades": "Kolore honetarako ez dago ñabardurarik eskuragarri"
   }
 }

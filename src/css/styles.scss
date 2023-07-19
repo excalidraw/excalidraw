@@ -5,6 +5,15 @@
   --zIndex-canvas: 1;
   --zIndex-wysiwyg: 2;
   --zIndex-layerUI: 3;
+
+  --zIndex-modal: 1000;
+  --zIndex-popup: 1001;
+  --zIndex-toast: 999999;
+
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+  --sat: env(safe-area-inset-top);
 }
 
 .excalidraw {
@@ -538,6 +547,10 @@
     height: 3px;
   }
 
+  select::-webkit-scrollbar {
+    width: 10px;
+  }
+
   ::-webkit-scrollbar-thumb {
     background: var(--scrollbar-thumb);
     border-radius: 10px;
@@ -567,7 +580,7 @@
       border-radius: 0;
     }
 
-    .library-button {
+    .default-sidebar-trigger {
       border: 0;
     }
   }

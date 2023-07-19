@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triangle",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
-    "onlySelected": "Només seleccionats",
-    "withBackground": "Fons",
-    "exportEmbedScene": "Insereix l'escena",
-    "exportEmbedScene_details": "Les dades de l’escena es desaran al fitxer PNG/SVG de manera que es pugui restaurar l’escena.\nAugmentarà la mida del fitxer exportat.",
     "addWatermark": "Afegeix-hi «Fet amb Excalidraw»",
     "handDrawn": "Dibuixat a mà",
     "normal": "Normal",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Capgira horitzontalment",
     "flipVertical": "Capgira verticalment",
     "viewMode": "Mode de visualització",
-    "toggleExportColorScheme": "Canvia l'esquema de colors de l'exportació",
     "share": "Comparteix",
     "showStroke": "Mostra el selector de color del traç",
     "showBackground": "Mostra el selector de color de fons",
@@ -128,7 +123,10 @@
       "unlockAll": "Desbloca-ho tot"
     },
     "statusPublished": "Publicat",
-    "sidebarLock": "Manté la barra lateral oberta"
+    "sidebarLock": "Manté la barra lateral oberta",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Encara no s'hi han afegit elements...",
@@ -140,11 +138,7 @@
     "exportJSON": "Exporta a un fitxer",
     "exportImage": "Exporta la imatge...",
     "export": "Guardar a...",
-    "exportToPng": "Exporta a PNG",
-    "exportToSvg": "Exporta a SNG",
     "copyToClipboard": "Copia al porta-retalls",
-    "copyPngToClipboard": "Copia el PNG al porta-retalls",
-    "scale": "Escala",
     "save": "Desa al fitxer actual",
     "saveAs": "Anomena i desa",
     "load": "Obrir",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "No s'ha pogut desar a la base de dades de fons. Si els problemes persisteixen, hauríeu de desar el fitxer localment per assegurar-vos que no perdeu el vostre treball.",
     "collabSaveFailed_sizeExceeded": "No s'ha pogut desar a la base de dades de fons, sembla que el llenç és massa gran. Hauríeu de desar el fitxer localment per assegurar-vos que no perdeu el vostre treball.",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "Mode de llapis - evita tocar",
     "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
     "eraser": "Esborrador",
-    "hand": "Mà (eina de desplaçament)"
+    "frame": "",
+    "hand": "Mà (eina de desplaçament)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "Consell: proveu d’acostar una mica els elements més allunyats."
   },
   "errorSplash": {
-    "headingMain_pre": "S'ha produït un error. Proveu ",
-    "headingMain_button": "recarregar la pàgina.",
-    "clearCanvasMessage": "Si la recàrrega no funciona, proveu ",
-    "clearCanvasMessage_button": "esborrar el llenç.",
+    "headingMain": "S'ha produït un error. Proveu <button>recarregar la pàgina.</button>",
+    "clearCanvasMessage": "Si la recàrrega no funciona, proveu <button>esborrar el llenç.</button>",
     "clearCanvasCaveat": " Això resultarà en la pèrdua de feina ",
-    "trackedToSentry_pre": "L'error amb l'identificador ",
-    "trackedToSentry_post": " s'ha rastrejat en el nostre sistema.",
-    "openIssueMessage_pre": "Anàvem amb molta cura de no incloure la informació de la vostra escena en l'error. Si l'escena no és privada, podeu fer-ne el seguiment al nostre ",
-    "openIssueMessage_button": "rastrejador d'errors.",
-    "openIssueMessage_post": " Incloeu la informació a continuació copiant i enganxant a GitHub Issues.",
+    "trackedToSentry": "L'error amb l'identificador {{eventId}} s'ha rastrejat en el nostre sistema.",
+    "openIssueMessage": "Anàvem amb molta cura de no incloure la informació de la vostra escena en l'error. Si l'escena no és privada, podeu fer-ne el seguiment al nostre <button>rastrejador d'errors.</button> Incloeu la informació a continuació copiant i enganxant a GitHub Issues.",
     "sceneContent": "Contingut de l'escena:"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "Requerit",
       "website": "Introduïu una URL vàlida"
     },
-    "noteDescription": {
-      "pre": "Envieu la vostra biblioteca perquè sigui inclosa al ",
-      "link": "repositori públic",
-      "post": "per tal que altres persones puguin fer-ne ús en els seus dibuixos."
-    },
-    "noteGuidelines": {
-      "pre": "La biblioteca ha de ser aprovada manualment. Si us plau, llegiu les ",
-      "link": "directrius",
-      "post": " abans d'enviar-hi res. Necessitareu un compte de GitHub per a comunicar i fer-hi canvis si cal, però no és requisit imprescindible."
-    },
-    "noteLicense": {
-      "pre": "Quan l'envieu, accepteu que la biblioteca sigui publicada sota la ",
-      "link": "llicència MIT, ",
-      "post": "que, en resum, vol dir que qualsevol persona pot fer-ne ús sense restriccions."
-    },
+    "noteDescription": "Envieu la vostra biblioteca perquè sigui inclosa al <link>repositori públic</link>per tal que altres persones puguin fer-ne ús en els seus dibuixos.",
+    "noteGuidelines": "La biblioteca ha de ser aprovada manualment. Si us plau, llegiu les <link>directrius</link> abans d'enviar-hi res. Necessitareu un compte de GitHub per a comunicar i fer-hi canvis si cal, però no és requisit imprescindible.",
+    "noteLicense": "Quan l'envieu, accepteu que la biblioteca sigui publicada sota la <link>llicència MIT, </link>que, en resum, vol dir que qualsevol persona pot fer-ne ús sense restriccions.",
     "noteItems": "Cada element de la biblioteca ha de tenir el seu propi nom per tal que sigui filtrable. S'hi inclouran els elements següents:",
     "atleastOneLibItem": "Si us plau, seleccioneu si més no un element de la biblioteca per a començar",
     "republishWarning": "Nota: alguns dels elements seleccionats s'han marcat com a publicats/enviats. Només hauríeu de reenviar elements quan actualitzeu una biblioteca existent."
   },
   "publishSuccessDialog": {
     "title": "Biblioteca enviada",
-    "content": "Gràcies, {{authorName}}. La vostra biblioteca ha estat enviada per a ser revisada. Podeu comprovar-ne l'estat",
-    "link": "aquí"
+    "content": "Gràcies, {{authorName}}. La vostra biblioteca ha estat enviada per a ser revisada. Podeu comprovar-ne l'estat<link>aquí</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Restableix la biblioteca",
     "removeItemsFromLib": "Suprimeix els elements seleccionats de la llibreria"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai.",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": "Fer servir {{shortcut}} per enganxar com un sol element,\no enganxeu-lo en un editor de text existent"
   },
   "colors": {
-    "ffffff": "Blanc",
-    "f8f9fa": "Gris 0",
-    "f1f3f5": "Gris 1",
-    "fff5f5": "Vermell 0",
-    "fff0f6": "Rosa 0",
-    "f8f0fc": "Malva 0",
-    "f3f0ff": "Violat 0",
-    "edf2ff": "Indi 0",
-    "e7f5ff": "Blau 0",
-    "e3fafc": "Cian 0",
-    "e6fcf5": "Xarxet 0",
-    "ebfbee": "Verd 0",
-    "f4fce3": "Llima 0",
-    "fff9db": "Groc 0",
-    "fff4e6": "Taronja 0",
     "transparent": "Transparent",
-    "ced4da": "Gris 4",
-    "868e96": "Gris 6",
-    "fa5252": "Vermell 6",
-    "e64980": "Rosa 6",
-    "be4bdb": "Malva 6",
-    "7950f2": "Violat 6",
-    "4c6ef5": "Indi 6",
-    "228be6": "Blau 6",
-    "15aabf": "Cian 6",
-    "12b886": "Xarxet 6",
-    "40c057": "Verd 6",
-    "82c91e": "Llima 6",
-    "fab005": "Groc 6",
-    "fd7e14": "Taronja 6",
-    "000000": "Negre",
-    "343a40": "Gris 8",
-    "495057": "Gris 7",
-    "c92a2a": "Vermell 9",
-    "a61e4d": "Rosa 9",
-    "862e9c": "Malva 9",
-    "5f3dc4": "Violat 9",
-    "364fc7": "Indi 9",
-    "1864ab": "Blau 9",
-    "0b7285": "Cian 9",
-    "087f5b": "Xarxet 9",
-    "2b8a3e": "Verd 9",
-    "5c940d": "Llima 9",
-    "e67700": "Groc 9",
-    "d9480f": "Taronja 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "Selecciona una eina i comença a dibuixar!",
       "helpHint": "Dreceres i ajuda"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

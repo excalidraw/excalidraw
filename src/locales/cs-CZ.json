@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Vložit",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Vložit jako prostý text",
     "pasteCharts": "Vložit grafy",
     "selectAll": "Vybrat vše",
     "multiSelect": "Přidat prvek do výběru",
@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Trojúhelník",
     "fontSize": "Velikost písma",
     "fontFamily": "Písmo",
-    "onlySelected": "Pouze vybrané",
-    "withBackground": "Pozadí",
-    "exportEmbedScene": "Vložit scénu",
-    "exportEmbedScene_details": "Data scény budou uložena do exportovaného souboru PNG/SVG tak, aby z něj mohla být scéna obnovena.\nZvýší se velikost exportovaného souboru.",
     "addWatermark": "Přidat \"Vyrobeno s Excalidraw\"",
     "handDrawn": "Od ruky",
     "normal": "Normální",
@@ -53,9 +49,9 @@
     "large": "Velké",
     "veryLarge": "Velmi velké",
     "solid": "Plný",
-    "hachure": "",
-    "zigzag": "",
-    "crossHatch": "",
+    "hachure": "Hachure",
+    "zigzag": "Klikatě",
+    "crossHatch": "Křížový šrafování",
     "thin": "Tenký",
     "bold": "Tlustý",
     "left": "Vlevo",
@@ -64,7 +60,7 @@
     "extraBold": "Extra tlustý",
     "architect": "Architekt",
     "artist": "Umělec",
-    "cartoonist": "",
+    "cartoonist": "Kartoonista",
     "fileTitle": "Název souboru",
     "colorPicker": "Výběr barvy",
     "canvasColors": "Použito na plátně",
@@ -100,7 +96,6 @@
     "flipHorizontal": "Převrátit vodorovně",
     "flipVertical": "Převrátit svisle",
     "viewMode": "Náhled",
-    "toggleExportColorScheme": "Přepnout exportování barevného schématu",
     "share": "Sdílet",
     "showStroke": "Zobrazit výběr barvy",
     "showBackground": "Zobrazit výběr barev pozadí",
@@ -111,7 +106,7 @@
     "increaseFontSize": "Zvětšit písmo",
     "unbindText": "Zrušit vazbu textu",
     "bindText": "Vázat text s kontejnerem",
-    "createContainerFromText": "",
+    "createContainerFromText": "Zabalit text do kontejneru",
     "link": {
       "edit": "Upravit odkaz",
       "create": "Vytvořit odkaz",
@@ -128,7 +123,10 @@
       "unlockAll": "Odemknout vše"
     },
     "statusPublished": "Zveřejněno",
-    "sidebarLock": "Ponechat postranní panel otevřený"
+    "sidebarLock": "Ponechat postranní panel otevřený",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": "Vyberte barvu z plátna"
   },
   "library": {
     "noItems": "Dosud neexistují žádné položky...",
@@ -140,11 +138,7 @@
     "exportJSON": "Exportovat do souboru",
     "exportImage": "Exportovat obrázek...",
     "export": "Uložit jako...",
-    "exportToPng": "Exportovat do PNG",
-    "exportToSvg": "Exportovat do SVG",
     "copyToClipboard": "Kopírovat do schránky",
-    "copyPngToClipboard": "Kopírovat PNG do schránky",
-    "scale": "Měřítko",
     "save": "Uložit do aktuálního souboru",
     "saveAs": "Uložit jako",
     "load": "Otevřít",
@@ -185,47 +179,38 @@
     "decryptFailed": "Nelze dešifrovat data.",
     "uploadedSecurly": "Nahrávání je zabezpečeno koncovým šifrováním, což znamená, že server Excalidraw ani třetí strany nemohou obsah přečíst.",
     "loadSceneOverridePrompt": "Načítání externího výkresu nahradí váš existující obsah. Přejete si pokračovat?",
-    "collabStopOverridePrompt": "",
+    "collabStopOverridePrompt": "Zastavení relace přepíše vaše předchozí, lokálně uložené kresby. Jste si jisti?\n\n(Pokud chcete zachovat místní kresbu, jednoduše zavřete kartu prohlížeče)",
     "errorAddingToLibrary": "Položku nelze přidat do knihovny",
     "errorRemovingFromLibrary": "Položku nelze odstranit z knihovny",
     "confirmAddLibrary": "Tímto přidáte {{numShapes}} tvarů do tvé knihovny. Jste si jisti?",
     "imageDoesNotContainScene": "Zdá se, že tento obrázek neobsahuje žádná data o scéně. Zapnuli jste při exportu vkládání scény?",
-    "cannotRestoreFromImage": "",
-    "invalidSceneUrl": "",
-    "resetLibrary": "",
-    "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": "",
-    "collabOfflineWarning": ""
+    "cannotRestoreFromImage": "Scénu nelze obnovit z tohoto souboru obrázku",
+    "invalidSceneUrl": "Nelze importovat scénu z zadané URL. Je buď poškozená, nebo neobsahuje platná JSON data Excalidraw.",
+    "resetLibrary": "Tímto vymažete vaši knihovnu. Jste si jisti?",
+    "removeItemsFromsLibrary": "Smazat {{count}} položek z knihovny?",
+    "invalidEncryptionKey": "Šifrovací klíč musí mít 22 znaků. Live spolupráce je zakázána.",
+    "collabOfflineWarning": "Není k dispozici žádné internetové připojení.\nVaše změny nebudou uloženy!"
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
-    "invalidSVGString": "",
-    "cannotResolveCollabServer": "",
-    "importLibraryError": "",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": "",
+    "unsupportedFileType": "Nepodporovaný typ souboru.",
+    "imageInsertError": "Nelze vložit obrázek. Zkuste to později...",
+    "fileTooBig": "Soubor je příliš velký. Maximální povolená velikost je {{maxSize}}.",
+    "svgImageInsertError": "Nelze vložit SVG obrázek. Značení SVG je neplatné.",
+    "invalidSVGString": "Neplatný SVG.",
+    "cannotResolveCollabServer": "Nelze se připojit ke sdílenému serveru. Prosím obnovte stránku a zkuste to znovu.",
+    "importLibraryError": "Nelze načíst knihovnu",
+    "collabSaveFailed": "Nelze uložit do databáze na serveru. Pokud problémy přetrvávají, měli byste uložit soubor lokálně, abyste se ujistili, že neztratíte svou práci.",
+    "collabSaveFailed_sizeExceeded": "Nelze uložit do databáze na serveru, plátno se zdá být příliš velké. Měli byste uložit soubor lokálně, abyste se ujistili, že neztratíte svou práci.",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "Vypadá to, že používáte Brave prohlížeč s povoleným nastavením <bold>Aggressively Block Fingerprinting</bold>.",
+      "line2": "To by mohlo vést k narušení <bold>Textových elementů</bold> ve vašich výkresech.",
+      "line3": "Důrazně doporučujeme zakázat toto nastavení. Můžete sledovat <link>tyto kroky</link> jak to udělat.",
+      "line4": "Pokud vypnutí tohoto nastavení neopravuje zobrazení textových prvků, prosím, otevřete <issueLink>problém</issueLink> na našem GitHubu, nebo nám napište na <discordLink>Discord</discordLink>"
     }
   },
   "toolBar": {
     "selection": "Výběr",
-    "image": "",
+    "image": "Vložit obrázek",
     "rectangle": "Obdélník",
     "diamond": "Diamant",
     "ellipse": "Elipsa",
@@ -233,74 +218,71 @@
     "line": "Čára",
     "freedraw": "Kreslení",
     "text": "Text",
-    "library": "",
-    "lock": "",
-    "penMode": "",
-    "link": "",
+    "library": "Knihovna",
+    "lock": "Po kreslení ponechat vybraný nástroj aktivní",
+    "penMode": "Režim Pera - zabránit dotyku",
+    "link": "Přidat/aktualizovat odkaz pro vybraný tvar",
     "eraser": "Guma",
-    "hand": ""
+    "frame": "",
+    "hand": "Ruka (nástroj pro posouvání)",
+    "extraTools": ""
   },
   "headings": {
-    "canvasActions": "",
-    "selectedShapeActions": "",
+    "canvasActions": "Akce plátna",
+    "selectedShapeActions": "Akce vybraného tvaru",
     "shapes": "Tvary"
   },
   "hints": {
-    "canvasPanning": "",
-    "linearElement": "",
-    "freeDraw": "",
-    "text": "",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
-    "placeImage": "",
-    "publishLibrary": "",
-    "bindTextToElement": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
-    "firefox_clipboard_write": ""
+    "canvasPanning": "Chcete-li přesunout plátno, podržte kolečko nebo mezerník při tažení nebo použijte nástroj Ruka",
+    "linearElement": "Kliknutím pro více bodů, táhnutím pro jednu čáru",
+    "freeDraw": "Klikněte a táhněte, pro ukončení pusťte",
+    "text": "Tip: Text můžete také přidat dvojitým kliknutím kdekoli pomocí nástroje pro výběr",
+    "text_selected": "Dvojklikem nebo stisknutím klávesy ENTER upravíte text",
+    "text_editing": "Stiskněte Escape nebo Ctrl/Cmd+ENTER pro dokončení úprav",
+    "linearElementMulti": "Klikněte na poslední bod nebo stiskněte Escape anebo Enter pro dokončení",
+    "lockAngle": "Úhel můžete omezit podržením SHIFT",
+    "resize": "Můžete omezit proporce podržením SHIFT při změně velikosti,\npodržte ALT pro změnu velikosti od středu",
+    "resizeImage": "Můžete volně změnit velikost podržením SHIFT,\npodržením klávesy ALT změníte velikosti od středu",
+    "rotate": "Úhly můžete omezit podržením SHIFT při otáčení",
+    "lineEditor_info": "Podržte Ctrl/Cmd a dvakrát klikněte nebo stiskněte Ctrl/Cmd + Enter pro úpravu bodů",
+    "lineEditor_pointSelected": "Stisknutím tlačítka Delete odstraňte bod(y),\nCtrl/Cmd+D pro duplicitu nebo táhnutím pro přesun",
+    "lineEditor_nothingSelected": "Vyberte bod, který chcete upravit (podržením klávesy SHIFT vyberete více položek),\nnebo podržením klávesy Alt a kliknutím přidáte nové body",
+    "placeImage": "Kliknutím umístěte obrázek, nebo klepnutím a přetažením ručně nastavíte jeho velikost",
+    "publishLibrary": "Publikovat vlastní knihovnu",
+    "bindTextToElement": "Stiskněte Enter pro přidání textu",
+    "deepBoxSelect": "Podržte Ctrl/Cmd pro hluboký výběr a pro zabránění táhnutí",
+    "eraserRevert": "Podržením klávesy Alt vrátíte prvky označené pro smazání",
+    "firefox_clipboard_write": "Tato funkce může být povolena nastavením vlajky \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Chcete-li změnit vlajky prohlížeče ve Firefoxu, navštivte stránku \"about:config\"."
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "Náhled nelze zobrazit",
+    "canvasTooBig": "Plátno je možná příliš velké.",
+    "canvasTooBigTip": "Tip: zkus posunout nejvzdálenější prvky trochu blíže k sobě."
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
-    "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "",
-    "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "Chyba identifikátoru ",
-    "trackedToSentry_post": " byl zaznamenán v našem systému.",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
-    "sceneContent": ""
+    "headingMain": "Chyba. Zkuste <button>znovu načíst stránku</button>.",
+    "clearCanvasMessage": "Pokud opětovné načtení nefunguje, zkuste <button>vymazat plátno</button>.",
+    "clearCanvasCaveat": " To povede ke ztrátě dat ",
+    "trackedToSentry": "Chyba identifikátoru {{eventId}} byl zaznamenán v našem systému.",
+    "openIssueMessage": "Byli jsme velmi opatrní, abychom neuváděli informace o Vaší scéně. Pokud vaše scéna není soukromá, zvažte prosím sledování na našem <button>bug trackeru</button>. Uveďte prosím níže uvedené informace kopírováním a vložením do problému na GitHubu.",
+    "sceneContent": "Obsah scény:"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
-    "desc_inProgressIntro": "",
-    "desc_shareLink": "",
-    "desc_exitSession": "",
-    "shareTitle": ""
+    "desc_intro": "Můžete pozvat lidi na vaši aktuální scénu ke spolupráci s vámi.",
+    "desc_privacy": "Nebojte se, relace používá end-to-end šifrování, takže cokoliv nakreslíte zůstane soukromé. Ani náš server nebude schopen vidět, s čím budete pracovat.",
+    "button_startSession": "Zahájit relaci",
+    "button_stopSession": "Ukončit relaci",
+    "desc_inProgressIntro": "Živá spolupráce právě probíhá.",
+    "desc_shareLink": "Sdílejte tento odkaz s každým, s kým chcete spolupracovat:",
+    "desc_exitSession": "Zastavením relace se odpojíte od místnosti, ale budete moci pokračovat v práci s touto scénou lokálně. Všimněte si, že to nebude mít vliv na ostatní lidi a budou stále moci spolupracovat na jejich verzi.",
+    "shareTitle": "Připojte se k aktivní spolupráci na Excalidraw"
   },
   "errorDialog": {
-    "title": ""
+    "title": "Chyba"
   },
   "exportDialog": {
-    "disk_title": "",
-    "disk_details": "",
+    "disk_title": "Uložit na disk",
+    "disk_details": "Exportovat data scény do souboru, ze kterého můžete importovat později.",
     "disk_button": "Uložit do souboru",
     "link_title": "Odkaz pro sdílení",
     "link_details": "Exportovat jako odkaz pouze pro čtení.",
@@ -312,18 +294,18 @@
   "helpDialog": {
     "blog": "Přečtěte si náš blog",
     "click": "kliknutí",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "Hluboký výběr",
+    "deepBoxSelect": "Hluboký výběr uvnitř boxu a zabránění táhnnutí",
     "curvedArrow": "Zakřivená šipka",
     "curvedLine": "Zakřivená čára",
     "documentation": "Dokumentace",
     "doubleClick": "dvojklik",
     "drag": "tažení",
     "editor": "Editor",
-    "editLineArrowPoints": "",
-    "editText": "",
-    "github": "",
-    "howto": "",
+    "editLineArrowPoints": "Upravit body linií/šipek",
+    "editText": "Upravit text / přidat popis",
+    "github": "Našel jsi problém? Nahlaš ho",
+    "howto": "Sledujte naše návody",
     "or": "nebo",
     "preventBinding": "Zabránit vázání šipky",
     "tools": "Nástroje",
@@ -335,8 +317,8 @@
     "zoomToFit": "Přiblížit na zobrazení všech prvků",
     "zoomToSelection": "Přiblížit na výběr",
     "toggleElementLock": "Zamknout/odemknout výběr",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "Posunout stránku nahoru/dolů",
+    "movePageLeftRight": "Přesunout stránku doleva/doprava"
   },
   "clearCanvasDialog": {
     "title": "Vymazat plátno"
@@ -362,37 +344,48 @@
       "required": "Povinné",
       "website": "Zadejte platnou URL adresu"
     },
-    "noteDescription": {
-      "pre": "Odešlete svou knihovnu, pro zařazení do ",
-      "link": "veřejného úložiště knihoven",
-      "post": ", odkud ji budou moci při kreslení využít i ostatní uživatelé."
-    },
-    "noteGuidelines": {
-      "pre": "Knihovna musí být nejdříve ručně schválena. Přečtěte si prosím ",
-      "link": "pokyny",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteItems": "",
-    "atleastOneLibItem": "",
-    "republishWarning": ""
+    "noteDescription": "Odešlete svou knihovnu, pro zařazení do <link>veřejného úložiště knihoven</link>, odkud ji budou moci při kreslení využít i ostatní uživatelé.",
+    "noteGuidelines": "Knihovna musí být nejdříve ručně schválena. Přečtěte si prosím <link>pokyny</link>",
+    "noteLicense": "Odesláním souhlasíte s tím, že knihovna bude zveřejněna pod <link>MIT licencí</link>, stručně řečeno, kdokoli ji může používat bez omezení.",
+    "noteItems": "Každá položka knihovny musí mít svůj vlastní název, aby byla filtrovatelná. Následující položky knihovny budou zahrnuty:",
+    "atleastOneLibItem": "Vyberte alespoň jednu položku knihovny, kterou chcete začít",
+    "republishWarning": "Poznámka: některé z vybraných položek jsou označeny jako již zveřejněné/odeslané. Položky byste měli znovu odeslat pouze při aktualizaci existující knihovny nebo podání."
   },
   "publishSuccessDialog": {
     "title": "Knihovna byla odeslána",
-    "content": "",
-    "link": ""
+    "content": "Děkujeme vám {{authorName}}. Vaše knihovna byla odeslána k posouzení. Stav můžete sledovat <link>zde</link>"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "Resetovat knihovnu",
+    "removeItemsFromLib": "Odstranit vybrané položky z knihovny"
+  },
+  "imageExportDialog": {
+    "header": "Exportovat obrázek",
+    "label": {
+      "withBackground": "Pozadí",
+      "onlySelected": "Pouze vybrané",
+      "darkMode": "Tmavý režim",
+      "embedScene": "Vložit scénu",
+      "scale": "Měřítko",
+      "padding": "Odsazení"
+    },
+    "tooltip": {
+      "embedScene": "Data scény budou uložena do exportovaného souboru PNG/SVG tak, aby z něj mohla být scéna obnovena.\nZvýší se velikost exportovaného souboru."
+    },
+    "title": {
+      "exportToPng": "Exportovat do PNG",
+      "exportToSvg": "Exportovat do SVG",
+      "copyPngToClipboard": "Kopírovat PNG do schránky"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopírovat do schránky"
+    }
   },
   "encrypted": {
-    "tooltip": "",
-    "link": ""
+    "tooltip": "Vaše kresby jsou end-to-end šifrované, takže servery Excalidraw je nikdy neuvidí.",
+    "link": "Blog příspěvek na end-to-end šifrování v Excalidraw"
   },
   "stats": {
     "angle": "Úhel",
@@ -413,71 +406,48 @@
     "addedToLibrary": "Přidáno do knihovny",
     "copyStyles": "Styly byly zkopírovány.",
     "copyToClipboard": "Zkopírováno do schránky.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "{{exportSelection}} zkopírován do schránky jako PNG\n({{exportColorScheme}})",
     "fileSaved": "Soubor byl uložen.",
     "fileSavedToFilename": "Uloženo do {filename}",
     "canvas": "plátno",
     "selection": "výběr",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "Pomocí {{shortcut}} vložte jako jeden prvek,\nnebo vložte do existujícího textového editoru"
   },
   "colors": {
-    "ffffff": "Bílá",
-    "f8f9fa": "Šedá 0",
-    "f1f3f5": "Šedá 1",
-    "fff5f5": "Červená 0",
-    "fff0f6": "Růžová 0",
-    "f8f0fc": "Vínová 0",
-    "f3f0ff": "Fialová 0",
-    "edf2ff": "Indigová 0",
-    "e7f5ff": "Modrá 0",
-    "e3fafc": "Azurová 0",
-    "e6fcf5": "Modrozelená 0",
-    "ebfbee": "Zelená 0",
-    "f4fce3": "Limetková 0",
-    "fff9db": "Žlutá 0",
-    "fff4e6": "Oranžová 0",
     "transparent": "Průhledná",
-    "ced4da": "Šedá 4",
-    "868e96": "Šedá 6",
-    "fa5252": "Červená 6",
-    "e64980": "Růžová 6",
-    "be4bdb": "Vínová 6",
-    "7950f2": "Fialová 6",
-    "4c6ef5": "Indigová 6",
-    "228be6": "Modrá 6",
-    "15aabf": "Azurová 6",
-    "12b886": "Modrozelená 6",
-    "40c057": "Zelená 6",
-    "82c91e": "Limetková 6",
-    "fab005": "Žlutá 6",
-    "fd7e14": "Oranžová 6",
-    "000000": "Černá",
-    "343a40": "Šedá 8",
-    "495057": "Šedá 7",
-    "c92a2a": "Červená 9",
-    "a61e4d": "Růžová 9",
-    "862e9c": "Vínová 9",
-    "5f3dc4": "Fialová 9",
-    "364fc7": "Indigová 9",
-    "1864ab": "Modrá 9",
-    "0b7285": "Azurová 9",
-    "087f5b": "Modrozelená 9",
-    "2b8a3e": "Zelená 9",
-    "5c940d": "Limetková 9",
-    "e67700": "Žlutá 9",
-    "d9480f": "Oranzova"
+    "black": "Černá",
+    "white": "Bílá",
+    "red": "Červená",
+    "pink": "Růžová",
+    "grape": "Vínová",
+    "violet": "Fialová",
+    "gray": "Šedá",
+    "blue": "Modrá",
+    "cyan": "Azurová",
+    "teal": "Modrozelená",
+    "green": "Zelená",
+    "yellow": "Žlutá",
+    "orange": "Oranžová",
+    "bronze": "Bronzová"
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Všechna vaše data jsou uložena lokálně ve vašem prohlížeči.",
+      "center_heading_plus": "Chcete místo toho přejít na Excalidraw+?",
+      "menuHint": "Export, nastavení, jazyky, ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Export, nastavení a další...",
+      "center_heading": "Diagramy. Vytvořeny. Jednoduše.",
+      "toolbarHint": "Vyberte nástroj a začněte kreslit!",
+      "helpHint": "Zkratky a pomoc"
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "Nejpoužívanější vlastní barvy",
+    "colors": "Barvy",
+    "shades": "Stíny",
+    "hexCode": "Hex kód",
+    "noShades": "Pro tuto barvu nejsou k dispozici žádné odstíny"
   }
 }

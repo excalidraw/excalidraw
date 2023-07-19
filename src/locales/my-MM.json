@@ -40,10 +40,6 @@
     "arrowhead_triangle": "",
     "fontSize": "စာလုံးအရွယ်",
     "fontFamily": "စာလုံးပုံစံ",
-    "onlySelected": "ရွေးထားသလောက်",
-    "withBackground": "",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "ထုတ်ယူလိုက်သော PNG/SVG ထဲမြင်ကွင်းအချက်အလက်များပါဝင်သဖြင့် ပြန်လည်ရယူနိုင်သော်လည်း ဖိုင်အရွယ်အစားကြီးပါမည်။",
     "addWatermark": "\"Excalidraw ဖြင့်ဖန်တီးသည်။\" စာသားထည့်",
     "handDrawn": "လက်ရေး",
     "normal": "ပုံမှန်",
@@ -100,7 +96,6 @@
     "flipHorizontal": "",
     "flipVertical": "",
     "viewMode": "",
-    "toggleExportColorScheme": "",
     "share": "",
     "showStroke": "",
     "showBackground": "",
@@ -128,7 +123,10 @@
       "unlockAll": ""
     },
     "statusPublished": "",
-    "sidebarLock": ""
+    "sidebarLock": "",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "",
@@ -140,11 +138,7 @@
     "exportJSON": "",
     "exportImage": "",
     "export": "",
-    "exportToPng": "PNG ထုတ်",
-    "exportToSvg": "SVG ထုတ်",
     "copyToClipboard": "ကူးယူ",
-    "copyPngToClipboard": "PNG ကူးယူ",
-    "scale": "စကေး",
     "save": "",
     "saveAs": "ပြောင်းသိမ်း",
     "load": "",
@@ -208,19 +202,10 @@
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "brave_measure_text_error": {
-      "start": "",
-      "aggressive_block_fingerprint": "",
-      "setting_enabled": "",
-      "break": "",
-      "text_elements": "",
-      "in_your_drawings": "",
-      "strongly_recommend": "",
-      "steps": "",
-      "how": "",
-      "disable_setting": "",
-      "issue": "",
-      "write": "",
-      "discord": ""
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
     }
   },
   "toolBar": {
@@ -238,7 +223,9 @@
     "penMode": "",
     "link": "",
     "eraser": "",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "ကားချပ်လုပ်ဆောင်ချက်",
@@ -273,16 +260,11 @@
     "canvasTooBigTip": "မှတ်ချက်။ ။ဝေးကွာနေသော ပုံများ၊ စာများအား ပိုမိုနီးကပ်အောင်ရွှေ့ကြည့်ပါ။"
   },
   "errorSplash": {
-    "headingMain_pre": "ချို့ယွင်းမှုဖြစ်ပေါ်ခဲ့သဖြင့် ထပ်မံကြိုးစားကြည့်ရန် ",
-    "headingMain_button": "စာမျက်နှာအား အသစ်ပြန်လည်ရယူပါ။",
-    "clearCanvasMessage": "အသစ်ပြန်လည်မရယူနိုင်ပါက ထပ်မံကြိုးစားကြည့်ရန်",
-    "clearCanvasMessage_button": "ကားချပ်အား ရှင်းလင်းပါ။",
+    "headingMain": "ချို့ယွင်းမှုဖြစ်ပေါ်ခဲ့သဖြင့် ထပ်မံကြိုးစားကြည့်ရန် <button>စာမျက်နှာအား အသစ်ပြန်လည်ရယူပါ။</button>",
+    "clearCanvasMessage": "အသစ်ပြန်လည်မရယူနိုင်ပါက ထပ်မံကြိုးစားကြည့်ရန်<button>ကားချပ်အား ရှင်းလင်းပါ။</button>",
     "clearCanvasCaveat": " ရေးဆွဲထားသည်များ ဆုံးရှုံးနိုင်သည် ",
-    "trackedToSentry_pre": "ချို့ယွင်းမှုသတ်မှတ်ချက် ",
-    "trackedToSentry_post": " အားစနစ်အတွင်းခြေရာကောက်ပြီးပါပြီ။",
-    "openIssueMessage_pre": "ချို့ယွင်းမှုမှတ်တမ်းတွင် အရေးကြီးအချက်အလက်များပါဝင်မှုမရှိစေရန်အထူးသတိပြုပါသည်။ မပါဝင်ပါက ဆက်လက်ဆောင်ရွက်ရန် ",
-    "openIssueMessage_button": "ချို့ယွင်းမှုအားခြေရာကောက်ပါ။",
-    "openIssueMessage_post": " အောက်ပါအချက်အလက်များအား Github တွင် Issue အနေဖြင့်ဖြည့်သွင်းဖော်ပြပေးပါ။",
+    "trackedToSentry": "ချို့ယွင်းမှုသတ်မှတ်ချက် {{eventId}} အားစနစ်အတွင်းခြေရာကောက်ပြီးပါပြီ။",
+    "openIssueMessage": "ချို့ယွင်းမှုမှတ်တမ်းတွင် အရေးကြီးအချက်အလက်များပါဝင်မှုမရှိစေရန်အထူးသတိပြုပါသည်။ မပါဝင်ပါက ဆက်လက်ဆောင်ရွက်ရန် <button>ချို့ယွင်းမှုအားခြေရာကောက်ပါ။</button> အောက်ပါအချက်အလက်များအား Github တွင် Issue အနေဖြင့်ဖြည့်သွင်းဖော်ပြပေးပါ။",
     "sceneContent": "မြင်ကွင်းပါအချက်အလက်။ ။"
   },
   "roomDialog": {
@@ -362,33 +344,44 @@
       "required": "",
       "website": ""
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": ""
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",
     "removeItemsFromLib": ""
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။",
@@ -421,51 +414,21 @@
     "pasteAsSingleElement": ""
   },
   "colors": {
-    "ffffff": "",
-    "f8f9fa": "",
-    "f1f3f5": "",
-    "fff5f5": "",
-    "fff0f6": "",
-    "f8f0fc": "",
-    "f3f0ff": "",
-    "edf2ff": "",
-    "e7f5ff": "",
-    "e3fafc": "",
-    "e6fcf5": "",
-    "ebfbee": "",
-    "f4fce3": "",
-    "fff9db": "",
-    "fff4e6": "",
     "transparent": "",
-    "ced4da": "",
-    "868e96": "",
-    "fa5252": "",
-    "e64980": "",
-    "be4bdb": "",
-    "7950f2": "",
-    "4c6ef5": "",
-    "228be6": "",
-    "15aabf": "",
-    "12b886": "",
-    "40c057": "",
-    "82c91e": "",
-    "fab005": "",
-    "fd7e14": "",
-    "000000": "",
-    "343a40": "",
-    "495057": "",
-    "c92a2a": "",
-    "a61e4d": "",
-    "862e9c": "",
-    "5f3dc4": "",
-    "364fc7": "",
-    "1864ab": "",
-    "0b7285": "",
-    "087f5b": "",
-    "2b8a3e": "",
-    "5c940d": "",
-    "e67700": "",
-    "d9480f": ""
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -479,5 +442,12 @@
       "toolbarHint": "",
       "helpHint": ""
     }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

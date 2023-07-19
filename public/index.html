@@ -148,33 +148,6 @@
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
     </script>
-    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
-
-    <!-- Fathom - privacy-friendly analytics -->
-    <script
-      src="https://cdn.usefathom.com/script.js"
-      data-site="VMSBUEYA"
-      defer
-    ></script>
-    <!-- / Fathom -->
-
-    <!-- LEGACY GOOGLE ANALYTICS -->
-    <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=%REACT_APP_GOOGLE_ANALYTICS_ID%"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "%REACT_APP_GOOGLE_ANALYTICS_ID%");
-    </script>
-    <% } %>
-    <!-- end LEGACY GOOGLE ANALYTICS -->
-    <% } %>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
     <style>
@@ -227,17 +200,39 @@
       <h1 class="visually-hidden">Excalidraw</h1>
     </header>
     <div id="root"></div>
+    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
     <!-- 100% privacy friendly analytics -->
-    <script
-      async
-      defer
-      src="https://scripts.simpleanalyticscdn.com/latest.js"
-    ></script>
-    <noscript
-      ><img
-        src="https://queue.simpleanalyticscdn.com/noscript.gif"
-        alt=""
-        referrerpolicy="no-referrer-when-downgrade"
-    /></noscript>
+    <script>
+      // need to load this script dynamically bcs. of iframe embed tracking
+      var scriptEle = document.createElement("script");
+      scriptEle.setAttribute(
+        "src",
+        "https://scripts.simpleanalyticscdn.com/latest.js",
+      );
+      scriptEle.setAttribute("type", "text/javascript");
+      scriptEle.setAttribute("defer", true);
+      scriptEle.setAttribute("async", true);
+      // if iframe
+      if (window.self !== window.top) {
+        scriptEle.setAttribute("data-auto-collect", true);
+      }
+
+      document.body.appendChild(scriptEle);
+
+      // if iframe
+      if (window.self !== window.top) {
+        scriptEle.addEventListener("load", () => {
+          if (window.sa_pageview) {
+            window.window.sa_event(action, {
+              category: "iframe",
+              label: "embed",
+              value: window.location.pathname,
+            });
+          }
+        });
+      }
+    </script>
+    <!-- end LEGACY GOOGLE ANALYTICS -->
+    <% } %>
   </body>
 </html>
