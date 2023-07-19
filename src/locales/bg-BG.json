@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Постави",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Постави като обикновен текст",
     "pasteCharts": "Постави графики",
     "selectAll": "Маркирай всичко",
     "multiSelect": "Добави елемент към селекция",
@@ -50,7 +50,7 @@
     "veryLarge": "Много голям",
     "solid": "Солиден",
     "hachure": "Хералдика",
-    "zigzag": "",
+    "zigzag": "Зигзаг",
     "crossHatch": "Двойно-пресечено",
     "thin": "Тънък",
     "bold": "Ясно очертан",
@@ -63,7 +63,7 @@
     "cartoonist": "Карикатурист",
     "fileTitle": "Име на файл",
     "colorPicker": "Избор на цвят",
-    "canvasColors": "",
+    "canvasColors": "Използван на платно",
     "canvasBackground": "Фон на платно",
     "drawingCanvas": "Платно за рисуване",
     "layers": "Слоеве",
@@ -108,7 +108,7 @@
     "bindText": "",
     "createContainerFromText": "",
     "link": {
-      "edit": "",
+      "edit": "Редактирай линк",
       "create": "",
       "label": ""
     },
@@ -137,11 +137,11 @@
     "clearReset": "Нулиране на платно",
     "exportJSON": "",
     "exportImage": "",
-    "export": "",
+    "export": "Запази на...",
     "copyToClipboard": "Копиране в клипборда",
-    "save": "",
+    "save": "Запази към текущ файл",
     "saveAs": "Запиши като",
-    "load": "",
+    "load": "Отвори",
     "getShareableLink": "Получаване на връзка за споделяне",
     "close": "Затвори",
     "selectLanguage": "Избор на език",
@@ -196,7 +196,7 @@
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": "",
+    "invalidSVGString": "Невалиден SVG.",
     "cannotResolveCollabServer": "",
     "importLibraryError": "",
     "collabSaveFailed": "",
@@ -222,10 +222,10 @@
     "lock": "Поддържайте избрания инструмент активен след рисуване",
     "penMode": "",
     "link": "",
-    "eraser": "",
+    "eraser": "Гума",
     "frame": "",
     "hand": "",
-    "extraTools": ""
+    "extraTools": "Още инструменти"
   },
   "headings": {
     "canvasActions": "Действия по платното",
@@ -288,7 +288,7 @@
     "link_details": "",
     "link_button": "",
     "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
+    "excalidrawplus_button": "Експорт",
     "excalidrawplus_exportError": ""
   },
   "helpDialog": {
@@ -299,7 +299,7 @@
     "curvedArrow": "Извита стрелка",
     "curvedLine": "Извита линия",
     "documentation": "Документация",
-    "doubleClick": "",
+    "doubleClick": "двойно-щракване",
     "drag": "плъзнете",
     "editor": "Редактор",
     "editLineArrowPoints": "",
@@ -308,7 +308,7 @@
     "howto": "Следвайте нашите ръководства",
     "or": "или",
     "preventBinding": "Спри прилепяне на стрелките",
-    "tools": "",
+    "tools": "Инструменти",
     "shortcuts": "Клавиши за бърз достъп",
     "textFinish": "",
     "textNewLine": "",
@@ -316,25 +316,25 @@
     "view": "Преглед",
     "zoomToFit": "Приближи докато се виждат всички елементи",
     "zoomToSelection": "Приближи селекцията",
-    "toggleElementLock": "",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "toggleElementLock": "Заключи/Отключи селекция",
+    "movePageUpDown": "Премести страница нагоре/надолу",
+    "movePageLeftRight": "Премести страница наляво/надясно"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Изчисти платното"
   },
   "publishDialog": {
     "title": "",
     "itemName": "",
     "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
+    "githubUsername": "GitHub потребителско име",
+    "twitterUsername": "Twitter потребителско име",
     "libraryName": "",
     "libraryDesc": "",
-    "website": "",
+    "website": "Уебсайт",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
+      "authorName": "Името или потребителското Ви име",
+      "libraryName": "Име на библиотеката Ви",
       "libraryDesc": "",
       "githubHandle": "",
       "twitterHandle": "",
