@@ -72,6 +72,7 @@
   "devDependencies": {
     "@excalidraw/eslint-config": "1.0.0",
     "@excalidraw/prettier-config": "1.0.2",
+    "@size-limit/preset-big-lib": "8.2.4",
     "@types/chai": "4.3.0",
     "@types/jest": "27.4.0",
     "@types/lodash.throttle": "4.1.7",
@@ -92,6 +93,7 @@
     "pepjs": "0.5.3",
     "prettier": "2.6.2",
     "rewire": "6.0.0",
+    "size-limit": "8.2.4",
     "typescript": "4.9.4"
   },
   "engines": {
@@ -143,6 +145,15 @@
     "test:coverage": "react-scripts test --passWithNoTests --coverage --watchAll",
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
-    "release": "node scripts/release.js"
-  }
+    "release": "node scripts/release.js",
+    "size": "yarn build:app && size-limit"
+  },
+  "size-limit": [
+    {
+      "limit": "500kb",
+      "path": [
+        "build/static/js/*.js"
+      ]
+    }
+  ]
 }
