@@ -80,8 +80,7 @@
     "pack": "yarn build:umd && yarn pack",
     "start": "webpack serve --config webpack.dev-server.config.js",
     "install:deps": "yarn install --frozen-lockfile && yarn --cwd ../../../",
-    "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js && yarn gen:types",
-    "size": "yarn build:umd && size-limit"
+    "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js && yarn gen:types"
   },
   "size-limit": [
     {
