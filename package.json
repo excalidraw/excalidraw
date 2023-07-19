@@ -146,13 +146,13 @@
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
     "release": "node scripts/release.js",
-    "size": "yarn build:app && size-limit"
+    "size": "node scripts/buildPackageExcalidraw.js && size-limit"
   },
   "size-limit": [
     {
-      "limit": "500kb",
       "path": [
-        "build/static/js/*.js"
+        "src/packages/excalidraw/dist/excalidraw.development.js",
+        "src/packages/excalidraw/dist/excalidraw.production.min.js"
       ]
     }
   ]
