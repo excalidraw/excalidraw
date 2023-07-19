@@ -19,7 +19,7 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Install in src/packages/excalidraw
         run: yarn --frozen-lockfile
-        working-directory: src/packages/excalidraw  
+        working-directory: src/packages/excalidraw
         env:
           CI: true
       - uses: andresz1/size-limit-action@v1
