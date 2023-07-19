@@ -1,4 +1,4 @@
-name: "size-limit"
+name: "Bundle Size check @excalidraw/excalidraw"
 on:
   pull_request:
     branches:
@@ -17,6 +17,7 @@ jobs:
           node-version: 18.x
       - name: Install and build
         run: yarn --frozen-lockfile
+        working-directory: src/packages/excalidraw
         env:
           CI: true
       - uses: andresz1/size-limit-action@v1

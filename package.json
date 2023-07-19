@@ -145,15 +145,6 @@
     "test:coverage": "react-scripts test --passWithNoTests --coverage --watchAll",
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
-    "release": "node scripts/release.js",
-    "size": "yarn build:app && size-limit"
-  },
-  "size-limit": [
-    {
-      "limit": "520kb",
-      "path": [
-        "build/static/js/*.js"
-      ]
-    }
-  ]
+    "release": "node scripts/release.js"
+  }
 }
