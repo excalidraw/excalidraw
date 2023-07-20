@@ -154,23 +154,44 @@ const fillCircle = (
 const strokeGrid = (
   context: CanvasRenderingContext2D,
   gridSize: number,
-  offsetX: number,
-  offsetY: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
   width: number,
   height: number,
 ) => {
+  const BOLD_LINE_FREQUENCY = 5;
+  enum GridLineColor {
+    Bold = "rgba(0,0,0,0.3)",
+    Regular = "rgba(0,0,0,0.1)",
+  }
+
+  const offsetX =
+    -Math.round(zoom.value / gridSize) * gridSize + (scrollX % gridSize);
+  const offsetY =
+    -Math.round(zoom.value / gridSize) * gridSize + (scrollY % gridSize);
+
   context.save();
-  context.strokeStyle = "rgba(0,0,0,0.1)";
-  context.beginPath();
   for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+    context.beginPath();
+    context.strokeStyle =
+      Math.round(x - scrollX) % (BOLD_LINE_FREQUENCY * gridSize) === 0
+        ? GridLineColor.Bold
+        : GridLineColor.Regular;
     context.moveTo(x, offsetY - gridSize);
     context.lineTo(x, offsetY + height + gridSize * 2);
+    context.stroke();
   }
   for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
+    context.beginPath();
+    context.strokeStyle =
+      Math.round(y - scrollY) % (BOLD_LINE_FREQUENCY * gridSize) === 0
+        ? GridLineColor.Bold
+        : GridLineColor.Regular;
     context.moveTo(offsetX - gridSize, y);
     context.lineTo(offsetX + width + gridSize * 2, y);
+    context.stroke();
   }
-  context.stroke();
   context.restore();
 };
 
@@ -417,12 +438,9 @@ export const _renderScene = ({
       strokeGrid(
         context,
         appState.gridSize,
-        -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
-          appState.gridSize +
-          (renderConfig.scrollX % appState.gridSize),
-        -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
-          appState.gridSize +
-          (renderConfig.scrollY % appState.gridSize),
+        renderConfig.scrollX,
+        renderConfig.scrollY,
+        renderConfig.zoom,
         normalizedCanvasWidth / renderConfig.zoom.value,
         normalizedCanvasHeight / renderConfig.zoom.value,
       );
