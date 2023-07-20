@@ -556,7 +556,7 @@ export const textWysiwyg = ({
       }
       redrawTextBoundingBox(updateElement, container);
     }
-
+    app.setState({ openPopup: null }); //zsviczian (container text color issue)
     onSubmit({
       text,
       viaKeyboard: submittedViaKeyboard,
@@ -647,11 +647,16 @@ export const textWysiwyg = ({
     const isTargetPickerTrigger =
       event.target instanceof HTMLElement &&
       event.target.classList.contains("active-color");
-
+    const isShapeActionsPanel = //zsviczian
+      (event.target instanceof HTMLElement ||
+        event.target instanceof SVGElement) &&
+      (event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
+        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MOBILE_MENU}`) ||
+        event.target.closest(`.${CLASSES.MOBILE_TOOLBAR}`));
     if (
       ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
+        isShapeActionsPanel && //zsviczian
         !isWritableElement(event.target)) ||
       isTargetPickerTrigger
     ) {
