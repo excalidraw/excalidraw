@@ -1408,11 +1408,13 @@ export const renderSceneToSvg = (
     offsetY = 0,
     exportWithDarkMode = false,
     exportingFrameId = null,
+    renderEmbeddables,
   }: {
     offsetX?: number;
     offsetY?: number;
     exportWithDarkMode?: boolean;
     exportingFrameId?: string | null;
+    renderEmbeddables?: boolean;
   } = {},
 ) => {
   if (!svgRoot) {
@@ -1434,6 +1436,7 @@ export const renderSceneToSvg = (
             element.y + offsetY,
             exportWithDarkMode,
             exportingFrameId,
+            renderEmbeddables,
           );
         } catch (error: any) {
           console.error(error);
@@ -1459,6 +1462,7 @@ export const renderSceneToSvg = (
             element.y + offsetY,
             exportWithDarkMode,
             exportingFrameId,
+            renderEmbeddables,
           );
           if (element.backgroundColor === "transparent") {
             invalidateShapeForElement(element); //revert to transparent

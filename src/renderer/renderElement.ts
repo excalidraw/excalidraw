@@ -1207,6 +1207,7 @@ export const renderElementToSvg = (
   offsetY: number,
   exportWithDarkMode?: boolean,
   exportingFrameId?: string | null,
+  renderEmbeddables?: boolean,
 ) => {
   const offset = { x: offsetX, y: offsetY };
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -1314,6 +1315,7 @@ export const renderElementToSvg = (
         label.y + offset.y - element.y,
         exportWithDarkMode,
         exportingFrameId,
+        renderEmbeddables,
       );
 
       // render embeddable element + iframe
@@ -1336,42 +1338,44 @@ export const renderElementToSvg = (
         Math.min(element.width, element.height),
         element,
       );
-      const foreignObject = svgRoot.ownerDocument!.createElementNS(
-        SVG_NS,
-        "foreignObject",
-      );
-      foreignObject.style.width = `${element.width}px`;
-      foreignObject.style.height = `${element.height}px`;
-      foreignObject.style.border = "none";
-      const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
-      div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-      div.style.width = "100%";
-      div.style.height = "100%";
-      const iframe = div.ownerDocument!.createElement("iframe");
-      const embedLink = getEmbedLink(toValidURL(element.link || ""));
-      if (embedLink?.type !== "document") {
-        iframe.src = embedLink?.link ?? "";
-      }
-      iframe.style.width = "100%";
-      iframe.style.height = "100%";
-      iframe.style.border = "none";
-      iframe.style.borderRadius = `${radius}px`;
-      iframe.style.top = "0";
-      iframe.style.left = "0";
-      iframe.allowFullscreen = true;
-      div.appendChild(iframe);
-      foreignObject.appendChild(div);
 
-      // embedding documents via srcdoc doesn't seem to work for SVGs, so
-      // we replace with a link instead
-      if (embedLink?.type === "document") {
+      const embedLink = getEmbedLink(toValidURL(element.link || ""));
+
+      // if rendering embeddables explicitly disabled or
+      // embedding documents via srcdoc (which doesn't seem to work for SVGs)
+      // replace with a link instead
+      if (renderEmbeddables === false || embedLink?.type === "document") {
         const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
         anchorTag.setAttribute("href", normalizeLink(element.link || ""));
         anchorTag.setAttribute("target", "_blank");
         anchorTag.setAttribute("rel", "noopener noreferrer");
+        anchorTag.style.borderRadius = `${radius}px`;
 
         embeddableNode.appendChild(anchorTag);
       } else {
+        const foreignObject = svgRoot.ownerDocument!.createElementNS(
+          SVG_NS,
+          "foreignObject",
+        );
+        foreignObject.style.width = `${element.width}px`;
+        foreignObject.style.height = `${element.height}px`;
+        foreignObject.style.border = "none";
+        const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
+        div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        div.style.width = "100%";
+        div.style.height = "100%";
+        const iframe = div.ownerDocument!.createElement("iframe");
+        iframe.src = embedLink?.link ?? "";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        iframe.style.borderRadius = `${radius}px`;
+        iframe.style.top = "0";
+        iframe.style.left = "0";
+        iframe.allowFullscreen = true;
+        div.appendChild(iframe);
+        foreignObject.appendChild(div);
+
         embeddableNode.appendChild(foreignObject);
       }
 
