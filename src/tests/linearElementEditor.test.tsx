@@ -1151,8 +1151,8 @@ describe("Test Linear Elements", () => {
       expect(
         wrapText(textElement.originalText, font, getBoundTextMaxWidth(arrow)),
       ).toMatchInlineSnapshot(`
-        "Online whiteboard collaboration
-        made easy"
+        "Online whiteboard 
+        collaboration made easy"
       `);
       const handleBindTextResizeSpy = jest.spyOn(
         textElementUtils,
