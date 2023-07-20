@@ -8,7 +8,7 @@ import {
 } from "./colorPickerUtils";
 import HotkeyLabel from "./HotkeyLabel";
 import { ColorPaletteCustom } from "../../colors";
-import { t } from "../../i18n";
+import { TranslationKeys, t } from "../../i18n";
 
 interface PickerColorListProps {
   palette: ColorPaletteCustom;
@@ -48,7 +48,11 @@ const PickerColorList = ({
           (Array.isArray(value) ? value[activeShade] : value) || "transparent";
 
         const keybinding = colorPickerHotkeyBindings[index];
-        const label = t(`colors.${key.replace(/\d+/, "")}`, null, "");
+        const label = t(
+          `colors.${key.replace(/\d+/, "")}` as unknown as TranslationKeys,
+          null,
+          "",
+        );
 
         return (
           <button
