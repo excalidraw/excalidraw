@@ -1359,8 +1359,10 @@ export const renderElementToSvg = (
       div.style.width = "100%";
       div.style.height = "100%";
       const iframe = div.ownerDocument!.createElement("iframe");
-      const embedLink = getEmbedLink(element.link);
-      iframe.src = embedLink?.link ?? "";
+      const embedLink = getEmbedLink(normalizeLink(element.link || ""));
+      if (embedLink?.type !== "document") {
+        iframe.src = embedLink?.link ?? "";
+      }
       iframe.style.width = "100%";
       iframe.style.height = "100%";
       iframe.style.border = "none";
@@ -1370,7 +1372,20 @@ export const renderElementToSvg = (
       iframe.allowFullscreen = true;
       div.appendChild(iframe);
       foreignObject.appendChild(div);
-      embeddableNode.appendChild(foreignObject);
+
+      // embedding documents via srcdoc doesn't seem to work for SVGs, so
+      // we replace with a link instead
+      if (embedLink?.type === "document") {
+        const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
+        anchorTag.setAttribute("href", normalizeLink(element.link || ""));
+        anchorTag.setAttribute("target", "_blank");
+        anchorTag.setAttribute("rel", "noopener noreferrer");
+
+        embeddableNode.appendChild(anchorTag);
+      } else {
+        embeddableNode.appendChild(foreignObject);
+      }
+
       root.appendChild(embeddableNode);
       break;
     }

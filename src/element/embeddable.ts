@@ -11,11 +11,14 @@ import {
   NonDeletedExcalidrawElement,
 } from "./types";
 
-type EmbeddedLink = {
-  link: string;
-  aspectRatio: { w: number; h: number };
-  type: "video" | "generic";
-} | null;
+type EmbeddedLink =
+  | ({
+      aspectRatio: { w: number; h: number };
+    } & (
+      | { type: "video" | "generic"; link: string }
+      | { type: "document"; srcdoc: (theme: string) => string }
+    ))
+  | null;
 
 const embeddedLinkCache = new Map<string, EmbeddedLink>();
 
@@ -24,8 +27,9 @@ const RE_YOUTUBE =
 const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
 const RE_FIGMA = /^https:\/\/(?:www\.)?figma\.com/;
-
-//const RE_TWITTER = /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
+const RE_GH_GIST = /^https:\/\/gist\.github\.com/;
+// not anchored to start to allow <blockquote> twitter embeds
+const RE_TWITTER = /(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
 
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
@@ -34,7 +38,13 @@ const ALLOWED_DOMAINS = new Set([
   "player.vimeo.com",
   "figma.com",
   "link.excalidraw.com",
+  "gist.github.com",
+  "twitter.com",
 ]);
+
+const createSrcDoc = (body: string) => {
+  return `<html><body>${body}</body></html>`;
+};
 
 export const getEmbedLink = (link?: string | null): EmbeddedLink => {
   if (!link) {
@@ -81,15 +91,6 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
     return { link, aspectRatio, type };
   }
 
-  /*const twitterLink = link.match(RE_TWITTER);
-  if (twitterLink) {
-    type = "generic";
-    link = `https://twitframe.com/show?url=${encodeURIComponent(link)}`;
-    aspectRatio = { w: 550, h: 550 };
-    embeddedLinkCache.set(link, { link, aspectRatio, type });
-    return { link, aspectRatio, type };
-  }*/
-
   const figmaLink = link.match(RE_FIGMA);
   if (figmaLink) {
     type = "generic";
@@ -99,6 +100,52 @@ export const getEmbedLink = (link?: string | null): EmbeddedLink => {
     aspectRatio = { w: 550, h: 550 };
     embeddedLinkCache.set(link, { link, aspectRatio, type });
     return { link, aspectRatio, type };
+  }
+
+  if (RE_TWITTER.test(link)) {
+    let ret: EmbeddedLink;
+    // assume embed code
+    if (/<blockquote/.test(link)) {
+      ret = {
+        type: "document",
+        srcdoc: () => createSrcDoc(link!),
+        aspectRatio: { w: 480, h: 480 },
+      };
+      // assume regular tweet url
+    } else {
+      ret = {
+        type: "document",
+        // TODO support dark mode
+        srcdoc: (theme: string) =>
+          createSrcDoc(
+            `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${link}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
+          ),
+        aspectRatio: { w: 480, h: 480 },
+      };
+    }
+    embeddedLinkCache.set(link, ret);
+    return ret;
+  }
+
+  if (RE_GH_GIST.test(link)) {
+    let ret: EmbeddedLink;
+    // assume embed code
+    if (/<script>/.test(link)) {
+      ret = {
+        type: "document",
+        srcdoc: () => createSrcDoc(link!),
+        aspectRatio: { w: 550, h: 720 },
+      };
+      // assume regular url
+    } else {
+      ret = {
+        type: "document",
+        srcdoc: () => createSrcDoc(`<script src="${link}.js"></script>`),
+        aspectRatio: { w: 550, h: 720 },
+      };
+    }
+    embeddedLinkCache.set(link, ret);
+    return ret;
   }
 
   embeddedLinkCache.set(link, { link, aspectRatio, type });

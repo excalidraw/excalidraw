@@ -869,8 +869,7 @@ class App extends React.Component<AppProps, AppState> {
             { sceneX: el.x, sceneY: el.y },
             this.state,
           );
-          const embedLink = getEmbedLink(el.link);
-          const src = embedLink?.link ?? "";
+          const embedLink = getEmbedLink(normalizeLink(el.link || ""));
           const isVisible = isVisibleElement(
             el,
             normalizedWidth,
@@ -943,6 +942,26 @@ class App extends React.Component<AppProps, AppState> {
                     padding: `${el.strokeWidth}px`,
                   }}
                 >
+                  {this.props.renderEmbeddable?.(el, this.state) ?? (
+                    <iframe
+                      ref={(ref) => this.updateEmbeddableRef(el.id, ref)}
+                      className="excalidraw__embeddable"
+                      srcDoc={
+                        embedLink?.type === "document"
+                          ? embedLink.srcdoc(this.state.theme)
+                          : undefined
+                      }
+                      src={
+                        embedLink?.type !== "document"
+                          ? embedLink?.link ?? ""
+                          : undefined
+                      }
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="Excalidraw Embedded Content"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen={true}
+                    />
+                  )}
                   {this.props.renderEmbeddable?.(el, this.state) ??
                     (isWebview ? (
                       <webview
@@ -958,7 +977,17 @@ class App extends React.Component<AppProps, AppState> {
                       <iframe
                         ref={(ref) => this.updateEmbeddableRef(el.id, ref)}
                         className="excalidraw__embeddable"
-                        src={src}
+                        srcDoc={
+                          embedLink?.type === "document"
+                            ? embedLink.srcdoc(this.state.theme)
+                            : undefined
+                        }
+                        src={
+                          embedLink?.type !== "document"
+                            ? embedLink?.link ?? ""
+                            : undefined
+                        }
+                        referrerPolicy="no-referrer-when-downgrade"
                         title="Excalidraw Embedded Content"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen={true}
@@ -2337,7 +2366,7 @@ class App extends React.Component<AppProps, AppState> {
           const embeddable = this.insertEmbeddableElement({
             sceneX,
             sceneY,
-            link: data.text,
+            link: normalizeLink(data.text),
           });
           if (embeddable) {
             this.setState({ selectedElementIds: { [embeddable.id]: true } });
@@ -5495,6 +5524,7 @@ class App extends React.Component<AppProps, AppState> {
       includeBoundTextElement: true,
     });
 
+    // FIXME
     let container = getTextBindableContainerAtPosition(
       this.scene.getNonDeletedElements(),
       this.state,
@@ -7832,7 +7862,7 @@ class App extends React.Component<AppProps, AppState> {
         const embeddable = this.insertEmbeddableElement({
           sceneX,
           sceneY,
-          link: text,
+          link: normalizeLink(text),
         });
         if (embeddable) {
           this.setState({ selectedElementIds: { [embeddable.id]: true } });
