@@ -56,7 +56,7 @@ import {
 } from "../element/embeddable";
 import easingsFunctions from "./easingFunctions";
 import { getContainingFrame } from "../frame";
-import { normalizeLink } from "../data/url";
+import { normalizeLink, toValidURL } from "../data/url";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -1359,7 +1359,7 @@ export const renderElementToSvg = (
       div.style.width = "100%";
       div.style.height = "100%";
       const iframe = div.ownerDocument!.createElement("iframe");
-      const embedLink = getEmbedLink(normalizeLink(element.link || ""));
+      const embedLink = getEmbedLink(toValidURL(element.link || ""));
       if (embedLink?.type !== "document") {
         iframe.src = embedLink?.link ?? "";
       }

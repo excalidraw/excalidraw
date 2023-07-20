@@ -258,7 +258,11 @@ import {
   muteFSAbortError,
   easeOut,
 } from "../utils";
-import { embeddableURLValidator, getEmbedLink } from "../element/embeddable";
+import {
+  embeddableURLValidator,
+  extractSrc,
+  getEmbedLink,
+} from "../element/embeddable";
 import {
   ContextMenu,
   ContextMenuItems,
@@ -311,7 +315,7 @@ import {
   isPointHittingLink,
   isPointHittingLinkIcon,
 } from "../element/Hyperlink";
-import { isLocalLink, normalizeLink } from "../data/url";
+import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
 import { ImportedDataState } from "../data/types"; //zsviczian
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
@@ -869,7 +873,7 @@ class App extends React.Component<AppProps, AppState> {
             { sceneX: el.x, sceneY: el.y },
             this.state,
           );
-          const embedLink = getEmbedLink(normalizeLink(el.link || ""));
+          const embedLink = getEmbedLink(toValidURL(el.link || ""));
           const isVisible = isVisibleElement(
             el,
             normalizedWidth,
@@ -956,10 +960,13 @@ class App extends React.Component<AppProps, AppState> {
                           ? embedLink?.link ?? ""
                           : undefined
                       }
+                      // https://stackoverflow.com/q/18470015
+                      scrolling="no"
                       referrerPolicy="no-referrer-when-downgrade"
                       title="Excalidraw Embedded Content"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen={true}
+                      sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
                     />
                   )}
                   {this.props.renderEmbeddable?.(el, this.state) ??
@@ -2357,16 +2364,17 @@ class App extends React.Component<AppProps, AppState> {
           retainSeed: isPlainPaste,
         });
       } else if (data.text) {
+        const maybeUrl = extractSrc(data.text);
         if (
           !isPlainPaste &&
-          embeddableURLValidator(data.text, this.props.validateEmbeddable) &&
-          (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(data.text) ||
-            getEmbedLink(data.text)?.type === "video")
+          embeddableURLValidator(maybeUrl, this.props.validateEmbeddable) &&
+          (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(maybeUrl) ||
+            getEmbedLink(maybeUrl)?.type === "video")
         ) {
           const embeddable = this.insertEmbeddableElement({
             sceneX,
             sceneY,
-            link: normalizeLink(data.text),
+            link: normalizeLink(maybeUrl),
           });
           if (embeddable) {
             this.setState({ selectedElementIds: { [embeddable.id]: true } });
@@ -5656,6 +5664,10 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!embedLink) {
       return;
+    }
+
+    if (embedLink.warning) {
+      this.setToast({ message: embedLink.warning, closable: true });
     }
 
     const element = newEmbeddableElement({
