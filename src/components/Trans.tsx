@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useI18n } from "../i18n";
+import { TranslationKeys, useI18n } from "../i18n";
 
 // Used for splitting i18nKey into tokens in Trans component
 // Example:
@@ -153,7 +153,7 @@ const Trans = ({
   children,
   ...props
 }: {
-  i18nKey: string;
+  i18nKey: TranslationKeys;
   [key: string]: React.ReactNode | ((el: React.ReactNode) => React.ReactNode);
 }) => {
   const { t } = useI18n();

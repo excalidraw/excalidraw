@@ -3,6 +3,7 @@ import percentages from "./locales/percentages.json";
 import { ENV } from "./constants";
 import { jotaiScope, jotaiStore } from "./jotai";
 import { atom, useAtomValue } from "jotai";
+import { NestedKeyOf } from "./utility-types";
 
 const COMPLETION_THRESHOLD = 85;
 
@@ -11,6 +12,8 @@ export interface Language {
   label: string;
   rtl?: boolean;
 }
+
+export type TranslationKeys = NestedKeyOf<typeof fallbackLangData>;
 
 export const defaultLang = { code: "en", label: "English" };
 
@@ -123,7 +126,7 @@ const findPartsForData = (data: any, parts: string[]) => {
 };
 
 export const t = (
-  path: string,
+  path: NestedKeyOf<typeof fallbackLangData>,
   replacement?: { [key: string]: string | number } | null,
   fallback?: string,
 ) => {

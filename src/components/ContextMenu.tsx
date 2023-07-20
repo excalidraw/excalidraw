@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { Popover } from "./Popover";
-import { t } from "../i18n";
+import { t, TranslationKeys } from "../i18n";
 
 import "./ContextMenu.scss";
 import {
@@ -83,10 +83,14 @@ export const ContextMenu = React.memo(
             if (item.contextItemLabel) {
               if (typeof item.contextItemLabel === "function") {
                 label = t(
-                  item.contextItemLabel(elements, appState, actionManager.app),
+                  item.contextItemLabel(
+                    elements,
+                    appState,
+                    actionManager.app,
+                  ) as unknown as TranslationKeys,
                 );
               } else {
-                label = t(item.contextItemLabel);
+                label = t(item.contextItemLabel as unknown as TranslationKeys);
               }
             }
 

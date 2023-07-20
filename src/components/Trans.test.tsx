@@ -3,6 +3,7 @@ import { render } from "@testing-library/react";
 import fallbackLangData from "../locales/en.json";
 
 import Trans from "./Trans";
+import { TranslationKeys } from "../i18n";
 
 describe("Test <Trans/>", () => {
   it("should translate the the strings correctly", () => {
@@ -18,24 +19,27 @@ describe("Test <Trans/>", () => {
     const { getByTestId } = render(
       <>
         <div data-testid="test1">
-          <Trans i18nKey="transTest.key1" audience="world" />
+          <Trans
+            i18nKey={"transTest.key1" as unknown as TranslationKeys}
+            audience="world"
+          />
         </div>
         <div data-testid="test2">
           <Trans
-            i18nKey="transTest.key2"
+            i18nKey={"transTest.key2" as unknown as TranslationKeys}
             link={(el) => <a href="https://example.com">{el}</a>}
           />
         </div>
         <div data-testid="test3">
           <Trans
-            i18nKey="transTest.key3"
+            i18nKey={"transTest.key3" as unknown as TranslationKeys}
             link={(el) => <a href="https://example.com">{el}</a>}
             location="the button"
           />
         </div>
         <div data-testid="test4">
           <Trans
-            i18nKey="transTest.key4"
+            i18nKey={"transTest.key4" as unknown as TranslationKeys}
             link={(el) => <a href="https://example.com">{el}</a>}
             location="the button"
             bold={(el) => <strong>{el}</strong>}
@@ -43,7 +47,7 @@ describe("Test <Trans/>", () => {
         </div>
         <div data-testid="test5">
           <Trans
-            i18nKey="transTest.key5"
+            i18nKey={"transTest.key5" as unknown as TranslationKeys}
             connect-link={(el) => <a href="https://example.com">{el}</a>}
           />
         </div>
