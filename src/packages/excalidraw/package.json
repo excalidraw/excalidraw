@@ -61,6 +61,7 @@
     "mini-css-extract-plugin": "2.6.1",
     "postcss-loader": "7.0.1",
     "sass-loader": "13.0.2",
+    "size-limit": "8.2.4",
     "terser-webpack-plugin": "5.3.3",
     "ts-loader": "9.3.1",
     "typescript": "4.9.4",
@@ -79,6 +80,7 @@
     "pack": "yarn build:umd && yarn pack",
     "start": "webpack serve --config webpack.dev-server.config.js",
     "install:deps": "yarn install --frozen-lockfile && yarn --cwd ../../../",
-    "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js && yarn gen:types"
+    "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js && yarn gen:types",
+    "size": "yarn build:umd && size-limit"
   }
 }
