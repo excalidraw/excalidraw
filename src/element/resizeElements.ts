@@ -593,11 +593,12 @@ export const resizeSingleElement = (
     Number.isFinite(resizedElement.x) &&
     Number.isFinite(resizedElement.y)
   ) {
+    mutateElement(element, resizedElement);
+
     updateBoundElements(element, {
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
 
-    mutateElement(element, resizedElement);
     if (boundTextElement && boundTextFont != null) {
       mutateElement(boundTextElement, {
         fontSize: boundTextFont.fontSize,

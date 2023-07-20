@@ -1127,7 +1127,7 @@ describe("Test Linear Elements", () => {
         height: 500,
       });
       const arrow = UI.createElement("arrow", {
-        x: 210,
+        x: -10,
         y: 250,
         width: 400,
         height: 1,
@@ -1164,7 +1164,7 @@ describe("Test Linear Elements", () => {
       mouse.moveTo(200, 0);
       mouse.upAt(200, 0);
 
-      expect(arrow.width).toBe(170);
+      expect(arrow.width).toBe(200);
       expect(rect.x).toBe(200);
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(
