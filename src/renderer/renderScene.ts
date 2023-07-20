@@ -151,73 +151,26 @@ const fillCircle = (
   }
 };
 
-const strokeGrid = ({
-  context,
-  gridSize,
-  scrollX,
-  scrollY,
-  width,
-  height,
-  zoom,
-  boldLineInterval = 50,
-}: {
-  context: CanvasRenderingContext2D;
-  gridSize: number;
-  scrollX: number;
-  scrollY: number;
-  width: number;
-  height: number;
-  zoom: number;
-  boldLineInterval?: number;
-}) => {
-  enum GridLineColor {
-    Bold = "rgba(0,0,0,0.4)",
-    Regular = "rgba(0,0,0,0.1)",
-  }
+const strokeGrid = (
+  context: CanvasRenderingContext2D,
+  gridSize: number,
+  offsetX: number,
+  offsetY: number,
+  width: number,
+  height: number,
+) => {
   context.save();
+  context.strokeStyle = "rgba(0,0,0,0.1)";
   context.beginPath();
-
-  const scaledGridSize = gridSize * zoom;
-  const offsetX = -Math.ceil(zoom / gridSize) * gridSize + (scrollX % gridSize);
-  const offsetY = -Math.ceil(zoom / gridSize) * gridSize + (scrollY % gridSize);
-
-  const originLineX = Math.floor(scrollX / scaledGridSize);
-  const originLineY = Math.floor(scrollY / scaledGridSize);
-
-  // Render horizontal grid lines
-  for (
-    let x = offsetX;
-    x < offsetX + width + scaledGridSize * 2;
-    x += scaledGridSize
-  ) {
-    const lineIndexX = Math.floor(x / scaledGridSize) - originLineX;
-    context.beginPath();
-    context.strokeStyle =
-      lineIndexX % boldLineInterval === 0
-        ? GridLineColor.Bold
-        : GridLineColor.Regular;
-    context.moveTo(x, offsetY - scaledGridSize);
-    context.lineTo(x, offsetY + height + scaledGridSize * 2);
-    context.stroke();
+  for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+    context.moveTo(x, offsetY - gridSize);
+    context.lineTo(x, offsetY + height + gridSize * 2);
   }
-
-  // Render vertical grid lines
-  for (
-    let y = offsetY;
-    y < offsetY + height + scaledGridSize * 2;
-    y += scaledGridSize
-  ) {
-    const lineIndexY = Math.floor(y / scaledGridSize) - originLineY;
-    context.beginPath();
-    context.strokeStyle =
-      lineIndexY % boldLineInterval === 0
-        ? GridLineColor.Bold
-        : GridLineColor.Regular;
-    context.moveTo(offsetX - scaledGridSize, y);
-    context.lineTo(offsetX + width + scaledGridSize * 2, y);
-    context.stroke();
+  for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
+    context.moveTo(offsetX - gridSize, y);
+    context.lineTo(offsetX + width + gridSize * 2, y);
   }
-
+  context.stroke();
   context.restore();
 };
 
@@ -461,15 +414,18 @@ export const _renderScene = ({
 
     // Grid
     if (renderGrid && appState.gridSize) {
-      strokeGrid({
+      strokeGrid(
         context,
-        gridSize: appState.gridSize,
-        scrollX: renderConfig.scrollX,
-        scrollY: renderConfig.scrollY,
-        width: normalizedCanvasWidth / renderConfig.zoom.value,
-        height: normalizedCanvasHeight / renderConfig.zoom.value,
-        zoom: renderConfig.zoom.value,
-      });
+        appState.gridSize,
+        -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
+          appState.gridSize +
+          (renderConfig.scrollX % appState.gridSize),
+        -Math.ceil(renderConfig.zoom.value / appState.gridSize) *
+          appState.gridSize +
+          (renderConfig.scrollY % appState.gridSize),
+        normalizedCanvasWidth / renderConfig.zoom.value,
+        normalizedCanvasHeight / renderConfig.zoom.value,
+      );
     }
 
     // Paint visible elements
