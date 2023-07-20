@@ -1502,6 +1502,11 @@ class App extends React.Component<AppProps, AppState> {
 
     // TODO follow-participant
     // add zoom change
+
+    if (prevState.zoom.value !== this.state.zoom.value) {
+      this.props?.onZoomChange?.(this.state.zoom);
+    }
+
     if (
       prevState.scrollX !== this.state.scrollX ||
       prevState.scrollY !== this.state.scrollY

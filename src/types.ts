@@ -361,6 +361,7 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
+  onZoomChange?: (zoom: Zoom) => void;
   children?: React.ReactNode;
 }
 

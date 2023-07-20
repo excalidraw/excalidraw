@@ -121,6 +121,14 @@ export type SocketUpdateDataSource = {
       username: string;
     };
   };
+  ZOOM_VALUE: {
+    type: "ZOOM_VALUE";
+    payload: {
+      socketId: string;
+      zoom: AppState["zoom"];
+      username: string;
+    };
+  };
   IDLE_STATUS: {
     type: "IDLE_STATUS";
     payload: {

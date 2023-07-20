@@ -249,6 +249,28 @@ class Portal {
       );
     }
   };
+
+  broadcastZoomValue = (payload: {
+    zoom: SocketUpdateDataSource["ZOOM_VALUE"]["payload"]["zoom"];
+  }) => {
+    if (this.socket?.id) {
+      const data: SocketUpdateDataSource["ZOOM_VALUE"] = {
+        type: "ZOOM_VALUE",
+        payload: {
+          socketId: this.socket.id,
+          zoom: payload.zoom,
+          username: this.collab.state.username,
+        },
+      };
+
+      console.log("broadcastZoomValue data", data);
+
+      return this._broadcastSocketData(
+        data as SocketUpdateData,
+        true, // volatile
+      );
+    }
+  };
 }
 
 export default Portal;

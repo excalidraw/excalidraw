@@ -90,6 +90,7 @@ export interface CollabAPI {
   isCollaborating: () => boolean;
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   onScrollChange: CollabInstance["onScrollChange"];
+  onZoomChange: CollabInstance["onZoomChange"];
   startCollaboration: CollabInstance["startCollaboration"];
   stopCollaboration: CollabInstance["stopCollaboration"];
   syncElements: CollabInstance["syncElements"];
@@ -164,6 +165,7 @@ class Collab extends PureComponent<Props, CollabState> {
       isCollaborating: this.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
       onScrollChange: this.onScrollChange,
+      onZoomChange: this.onZoomChange,
       startCollaboration: this.startCollaboration,
       syncElements: this.syncElements,
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
@@ -542,7 +544,7 @@ class Collab extends PureComponent<Props, CollabState> {
           // case "ZOOM_VALUE"
           // if following someone, update scroll and zoom
 
-          case "SCROLL_LOCATION":
+          case "SCROLL_LOCATION": {
             const {
               scroll: { x, y },
             } = decryptedData.payload;
@@ -565,6 +567,26 @@ class Collab extends PureComponent<Props, CollabState> {
             }
 
             break;
+          }
+
+          case "ZOOM_VALUE": {
+            const { zoom } = decryptedData.payload;
+
+            console.log({ decryptedData });
+
+            const socketId: SocketUpdateDataSource["ZOOM_VALUE"]["payload"]["socketId"] =
+              decryptedData.payload.socketId;
+
+            const appState = this.excalidrawAPI.getAppState();
+
+            if (appState.userToFollow === socketId) {
+              this.excalidrawAPI.updateScene({
+                appState: { zoom },
+              });
+            }
+
+            break;
+          }
 
           case "IDLE_STATUS": {
             const { userState, socketId, username } = decryptedData.payload;
@@ -805,6 +827,14 @@ class Collab extends PureComponent<Props, CollabState> {
   // -- broadCastScrollLocation
   // - onZoomChange
   // -- broadCastZoomValue
+
+  onZoomChange = throttle(
+    (payload: {
+      zoom: SocketUpdateDataSource["ZOOM_VALUE"]["payload"]["zoom"];
+    }) => {
+      this.portal.socket && this.portal.broadcastZoomValue(payload);
+    },
+  );
 
   onScrollChange = throttle(
     (payload: {
