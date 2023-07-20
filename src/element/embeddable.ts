@@ -160,7 +160,15 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
     } else {
       ret = {
         type: "document",
-        srcdoc: () => createSrcDoc(`<script src="${link}.js"></script>`),
+        srcdoc: () =>
+          createSrcDoc(`
+          <script src="${link}.js"></script>
+          <style type="text/css">
+            * { margin: 0px; }
+            table, .gist { height: 100%; }
+            .gist .gist-file { height: calc(100vh - 2px); padding: 0px; display: grid; grid-template-rows: 1fr auto; }
+          </style>
+        `),
         aspectRatio: { w: 550, h: 720 },
       };
     }

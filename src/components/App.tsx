@@ -934,6 +934,8 @@ class App extends React.Component<AppProps, AppState> {
                           ? embedLink?.link ?? ""
                           : undefined
                       }
+                      // https://stackoverflow.com/q/18470015
+                      scrolling="no"
                       referrerPolicy="no-referrer-when-downgrade"
                       title="Excalidraw Embedded Content"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
