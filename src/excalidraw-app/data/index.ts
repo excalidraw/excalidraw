@@ -113,6 +113,14 @@ export type SocketUpdateDataSource = {
       username: string;
     };
   };
+  SCROLL_LOCATION: {
+    type: "SCROLL_LOCATION";
+    payload: {
+      socketId: string;
+      scroll: { x: number; y: number };
+      username: string;
+    };
+  };
   IDLE_STATUS: {
     type: "IDLE_STATUS";
     payload: {

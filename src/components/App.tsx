@@ -1500,6 +1500,8 @@ class App extends React.Component<AppProps, AppState> {
       this.refreshDeviceState(this.excalidrawContainerRef.current);
     }
 
+    // TODO follow-participant
+    // add zoom change
     if (
       prevState.scrollX !== this.state.scrollX ||
       prevState.scrollY !== this.state.scrollY

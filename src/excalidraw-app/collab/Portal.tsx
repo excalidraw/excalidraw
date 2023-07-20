@@ -213,6 +213,36 @@ class Portal {
           username: this.collab.state.username,
         },
       };
+
+      // console.log("broadcastMouseLocation data", data);
+
+      return this._broadcastSocketData(
+        data as SocketUpdateData,
+        true, // volatile
+      );
+    }
+  };
+
+  // TODO follow-participant
+  // - broadCastScrollLocation
+  // - broadCastZoomValue
+
+  broadcastScrollLocation = (payload: {
+    scrollX: SocketUpdateDataSource["SCROLL_LOCATION"]["payload"]["scroll"]["x"];
+    scrollY: SocketUpdateDataSource["SCROLL_LOCATION"]["payload"]["scroll"]["y"];
+  }) => {
+    if (this.socket?.id) {
+      const data: SocketUpdateDataSource["SCROLL_LOCATION"] = {
+        type: "SCROLL_LOCATION",
+        payload: {
+          socketId: this.socket.id,
+          scroll: { x: payload.scrollX, y: payload.scrollY },
+          username: this.collab.state.username,
+        },
+      };
+
+      console.log("broadcastScrollLocation data", data);
+
       return this._broadcastSocketData(
         data as SocketUpdateData,
         true, // volatile

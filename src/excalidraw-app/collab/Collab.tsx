@@ -89,6 +89,7 @@ export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */
   isCollaborating: () => boolean;
   onPointerUpdate: CollabInstance["onPointerUpdate"];
+  onScrollChange: CollabInstance["onScrollChange"];
   startCollaboration: CollabInstance["startCollaboration"];
   stopCollaboration: CollabInstance["stopCollaboration"];
   syncElements: CollabInstance["syncElements"];
@@ -162,6 +163,7 @@ class Collab extends PureComponent<Props, CollabState> {
     const collabAPI: CollabAPI = {
       isCollaborating: this.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
+      onScrollChange: this.onScrollChange,
       startCollaboration: this.startCollaboration,
       syncElements: this.syncElements,
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
@@ -506,6 +508,8 @@ class Collab extends PureComponent<Props, CollabState> {
             break;
           }
           case WS_SCENE_EVENT_TYPES.UPDATE:
+            console.log("received update", decryptedData);
+            console.log(this.excalidrawAPI.getAppState());
             this.handleRemoteSceneUpdate(
               this.reconcileElements(decryptedData.payload.elements),
             );
@@ -513,6 +517,9 @@ class Collab extends PureComponent<Props, CollabState> {
           case "MOUSE_LOCATION": {
             const { pointer, button, username, selectedElementIds } =
               decryptedData.payload;
+
+            // console.log({ decryptedData });
+
             const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
               decryptedData.payload.socketId ||
               // @ts-ignore legacy, see #2094 (#2097)
@@ -530,6 +537,35 @@ class Collab extends PureComponent<Props, CollabState> {
             });
             break;
           }
+          // TODO follow-participant
+          // case "SCROLL_LOCATION"
+          // case "ZOOM_VALUE"
+          // if following someone, update scroll and zoom
+
+          case "SCROLL_LOCATION":
+            const {
+              scroll: { x, y },
+            } = decryptedData.payload;
+
+            const socketId: SocketUpdateDataSource["SCROLL_LOCATION"]["payload"]["socketId"] =
+              decryptedData.payload.socketId;
+
+            console.log({ decryptedData });
+
+            const appState = this.excalidrawAPI.getAppState();
+            console.log({ appState });
+
+            if (appState.userToFollow === socketId) {
+              this.excalidrawAPI.updateScene({
+                appState: {
+                  scrollX: x,
+                  scrollY: y,
+                },
+              });
+            }
+
+            break;
+
           case "IDLE_STATUS": {
             const { userState, socketId, username } = decryptedData.payload;
             const collaborators = new Map(this.collaborators);
@@ -756,11 +792,27 @@ class Collab extends PureComponent<Props, CollabState> {
       button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
       pointersMap: Gesture["pointers"];
     }) => {
+      // console.log({ payload });
       payload.pointersMap.size < 2 &&
         this.portal.socket &&
         this.portal.broadcastMouseLocation(payload);
     },
     CURSOR_SYNC_TIMEOUT,
+  );
+
+  // TODO follow-participant
+  // - onScrollChange
+  // -- broadCastScrollLocation
+  // - onZoomChange
+  // -- broadCastZoomValue
+
+  onScrollChange = throttle(
+    (payload: {
+      scrollX: SocketUpdateDataSource["SCROLL_LOCATION"]["payload"]["scroll"]["x"];
+      scrollY: SocketUpdateDataSource["SCROLL_LOCATION"]["payload"]["scroll"]["y"];
+    }) => {
+      this.portal.socket && this.portal.broadcastScrollLocation(payload);
+    },
   );
 
   onIdleStateChange = (userState: UserIdleState) => {

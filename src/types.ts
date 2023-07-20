@@ -223,6 +223,7 @@ export type AppState = {
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
+  userToFollow: string | null;
 };
 
 export type UIAppState = Omit<

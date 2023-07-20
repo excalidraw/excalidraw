@@ -9,7 +9,9 @@ export const actionGoToCollaborator = register({
   viewMode: true,
   trackEvent: { category: "collab" },
   perform: (_elements, appState, value) => {
-    const point = value as Collaborator["pointer"];
+    const _value = value as Collaborator & { clientId: string };
+    const point = _value.pointer;
+
     if (!point) {
       return { appState, commitToHistory: false };
     }
@@ -17,6 +19,8 @@ export const actionGoToCollaborator = register({
     return {
       appState: {
         ...appState,
+        // ˇˇ or maybe an atom? 🤔
+        userToFollow: _value.clientId,
         ...centerScrollOn({
           scenePoint: point,
           viewportDimensions: {
@@ -39,7 +43,7 @@ export const actionGoToCollaborator = register({
     return (
       <Avatar
         color={background}
-        onClick={() => updateData(collaborator.pointer)}
+        onClick={() => updateData({ ...collaborator, clientId })}
         name={collaborator.username || ""}
         src={collaborator.avatarUrl}
       />

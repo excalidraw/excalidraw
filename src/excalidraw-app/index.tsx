@@ -649,6 +649,13 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
+        // TODO follow-participant
+        // add onZoomChange
+        onScrollChange={(x, y) => {
+          // console.log({ x, y });
+
+          collabAPI?.onScrollChange({ scrollX: x, scrollY: y });
+        }}
         ref={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
