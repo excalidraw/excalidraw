@@ -1,10 +1,8 @@
 name: "Bundle Size check @excalidraw/excalidraw"
 on:
-  pull_request_target:
-    types:
-      - opened
-      - edited
-      - synchronize
+  pull_request:
+    branches:
+      - master
 jobs:
   size:
     runs-on: ubuntu-latest
