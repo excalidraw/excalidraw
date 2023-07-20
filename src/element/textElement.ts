@@ -67,7 +67,7 @@ export const redrawTextBoundingBox = (
   boundTextUpdates.text = textElement.text;
 
   if (container) {
-    maxWidth = getBoundTextMaxWidth(container);
+    maxWidth = getBoundTextMaxWidth(container, textElement);
     boundTextUpdates.text = wrapText(
       textElement.originalText,
       getFontString(textElement),
