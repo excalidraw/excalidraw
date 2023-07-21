@@ -28,5 +28,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: denovocto/excalidraw-arm-test:latest
+          tags: excalidraw/excalidraw:latest
           platforms: linux/amd64, linux/arm64, linux/arm/v7
