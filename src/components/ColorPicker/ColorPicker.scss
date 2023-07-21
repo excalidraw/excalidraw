@@ -18,15 +18,12 @@
     grid-template-columns: 1fr 20px 1.625rem;
     padding: 0.25rem 0px;
     align-items: center;
-
-    @include isMobile {
-      max-width: 175px;
-    }
   }
 
   .color-picker__top-picks {
     display: flex;
     justify-content: space-between;
+    gap: 0.5rem;
   }
 
   .color-picker__button {

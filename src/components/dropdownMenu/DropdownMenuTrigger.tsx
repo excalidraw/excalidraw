@@ -24,6 +24,7 @@ const MenuTrigger = ({
   ).trim();
   return (
     <DropdownMenuPrimitive.Trigger
+      data-dropdown-menu-trigger
       data-prevent-outside-click
       className={classNames}
       onClick={onToggle}

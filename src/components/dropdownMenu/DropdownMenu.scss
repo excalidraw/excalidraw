@@ -1,8 +1,8 @@
 @import "../../css/variables.module";
 
 .excalidraw {
-  [data-radix-popper-content-wrapper] {
-    z-index: 1 !important;
+  [data-dropdown-menu-trigger] + [data-radix-popper-content-wrapper] {
+    z-index: 2 !important;
   }
 
   .dropdown-menu {
@@ -29,6 +29,7 @@
 
     &--mobile {
       .dropdown-menu-container {
+        grid-template-columns: minmax(0, 1fr);
         padding: 8px 8px;
         box-sizing: border-box;
         background-color: var(--island-bg-color);
