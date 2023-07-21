@@ -1,9 +1,7 @@
 import { ColorPaletteCustom } from "../../colors";
-import { ExcalidrawElement } from "../../element/types";
 import {
   getColorNameAndShadeFromColor,
   isCustomColor,
-  getMostUsedCustomColors,
 } from "./colorPickerUtils";
 
 describe("getColorNameAndShadeFromColor", () => {
