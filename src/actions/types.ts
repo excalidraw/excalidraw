@@ -82,7 +82,8 @@ export type ActionName =
   | "zoomOut"
   | "resetZoom"
   | "zoomToFit"
-  | "zoomToSelection"
+  | "zoomToFitSelection"
+  | "zoomToFitSelectionInViewport"
   | "changeFontFamily"
   | "changeTextAlign"
   | "changeVerticalAlign"
@@ -111,11 +112,17 @@ export type ActionName =
   | "unbindText"
   | "hyperlink"
   | "bindText"
-  | "toggleLock"
+  | "unlockAllElements"
+  | "toggleElementLock"
   | "toggleLinearEditor"
   | "toggleEraserTool"
   | "toggleHandTool"
-  | "createContainerFromText";
+  | "selectAllElementsInFrame"
+  | "removeAllElementsFromFrame"
+  | "updateFrameRendering"
+  | "setFrameAsActiveTool"
+  | "createContainerFromText"
+  | "wrapTextInContainer";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -123,6 +130,7 @@ export type PanelComponentProps = {
   updateData: (formData?: any) => void;
   appProps: ExcalidrawProps;
   data?: Record<string, any>;
+  app: AppClassProperties;
 };
 
 export interface Action {
@@ -134,12 +142,14 @@ export interface Action {
     event: React.KeyboardEvent | KeyboardEvent,
     appState: AppState,
     elements: readonly ExcalidrawElement[],
+    app: AppClassProperties,
   ) => boolean;
   contextItemLabel?:
     | string
     | ((
         elements: readonly ExcalidrawElement[],
         appState: Readonly<AppState>,
+        app: AppClassProperties,
       ) => string);
   predicate?: (
     elements: readonly ExcalidrawElement[],

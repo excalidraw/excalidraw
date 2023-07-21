@@ -3,14 +3,15 @@ import { API } from "../tests/helpers/api";
 import {
   computeContainerDimensionForBoundText,
   getContainerCoords,
-  getMaxContainerWidth,
-  getMaxContainerHeight,
+  getBoundTextMaxWidth,
+  getBoundTextMaxHeight,
   wrapText,
   detectLineHeight,
   getLineHeightInPx,
   getDefaultLineHeight,
+  parseTokens,
 } from "./textElement";
-import { FontString } from "./types";
+import { ExcalidrawTextElementWithContainer, FontString } from "./types";
 
 describe("Test wrapText", () => {
   const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
@@ -183,6 +184,56 @@ now`,
     expect(wrapText(text, font, -1)).toEqual(text);
     expect(wrapText(text, font, Infinity)).toEqual(text);
   });
+
+  it("should wrap the text correctly when text contains hyphen", () => {
+    let text =
+      "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range-of other projects";
+    const res = wrapText(text, font, 110);
+    expect(res).toBe(
+      `Wikipedia \nis hosted \nby \nWikimedia-\nFoundation,\na non-\nprofit \norganizati\non that \nalso hosts\na range-of\nother \nprojects`,
+    );
+
+    text = "Hello thereusing-now";
+    expect(wrapText(text, font, 100)).toEqual("Hello \nthereusin\ng-now");
+  });
+});
+
+describe("Test parseTokens", () => {
+  it("should split into tokens correctly", () => {
+    let text = "Excalidraw is a virtual collaborative whiteboard";
+    expect(parseTokens(text)).toEqual([
+      "Excalidraw",
+      "is",
+      "a",
+      "virtual",
+      "collaborative",
+      "whiteboard",
+    ]);
+
+    text =
+      "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range-of other projects";
+    expect(parseTokens(text)).toEqual([
+      "Wikipedia",
+      "is",
+      "hosted",
+      "by",
+      "Wikimedia-",
+      "",
+      "Foundation,",
+      "a",
+      "non-",
+      "profit",
+      "organization",
+      "that",
+      "also",
+      "hosts",
+      "a",
+      "range-",
+      "of",
+      "other",
+      "projects",
+    ]);
+  });
 });
 
 describe("Test measureText", () => {
@@ -260,7 +311,7 @@ describe("Test measureText", () => {
     });
   });
 
-  describe("Test getMaxContainerWidth", () => {
+  describe("Test getBoundTextMaxWidth", () => {
     const params = {
       width: 178,
       height: 194,
@@ -268,39 +319,76 @@ describe("Test measureText", () => {
 
     it("should return max width when container is rectangle", () => {
       const container = API.createElement({ type: "rectangle", ...params });
-      expect(getMaxContainerWidth(container)).toBe(168);
+      expect(getBoundTextMaxWidth(container)).toBe(168);
     });
 
     it("should return max width when container is ellipse", () => {
       const container = API.createElement({ type: "ellipse", ...params });
-      expect(getMaxContainerWidth(container)).toBe(116);
+      expect(getBoundTextMaxWidth(container)).toBe(116);
     });
 
     it("should return max width when container is diamond", () => {
       const container = API.createElement({ type: "diamond", ...params });
-      expect(getMaxContainerWidth(container)).toBe(79);
+      expect(getBoundTextMaxWidth(container)).toBe(79);
     });
   });
 
-  describe("Test getMaxContainerHeight", () => {
+  describe("Test getBoundTextMaxHeight", () => {
     const params = {
       width: 178,
       height: 194,
+      id: '"container-id',
     };
+
+    const boundTextElement = API.createElement({
+      type: "text",
+      id: "text-id",
+      x: 560.51171875,
+      y: 202.033203125,
+      width: 154,
+      height: 175,
+      fontSize: 20,
+      fontFamily: 1,
+      text: "Excalidraw is a\nvirtual \nopensource \nwhiteboard for \nsketching \nhand-drawn like\ndiagrams",
+      textAlign: "center",
+      verticalAlign: "middle",
+      containerId: params.id,
+    }) as ExcalidrawTextElementWithContainer;
 
     it("should return max height when container is rectangle", () => {
       const container = API.createElement({ type: "rectangle", ...params });
-      expect(getMaxContainerHeight(container)).toBe(184);
+      expect(getBoundTextMaxHeight(container, boundTextElement)).toBe(184);
     });
 
     it("should return max height when container is ellipse", () => {
       const container = API.createElement({ type: "ellipse", ...params });
-      expect(getMaxContainerHeight(container)).toBe(127);
+      expect(getBoundTextMaxHeight(container, boundTextElement)).toBe(127);
     });
 
     it("should return max height when container is diamond", () => {
       const container = API.createElement({ type: "diamond", ...params });
-      expect(getMaxContainerHeight(container)).toBe(87);
+      expect(getBoundTextMaxHeight(container, boundTextElement)).toBe(87);
+    });
+
+    it("should return max height when container is arrow", () => {
+      const container = API.createElement({
+        type: "arrow",
+        ...params,
+      });
+      expect(getBoundTextMaxHeight(container, boundTextElement)).toBe(194);
+    });
+
+    it("should return max height when container is arrow and height is less than threshold", () => {
+      const container = API.createElement({
+        type: "arrow",
+        ...params,
+        height: 70,
+        boundElements: [{ type: "text", id: "text-id" }],
+      });
+
+      expect(getBoundTextMaxHeight(container, boundTextElement)).toBe(
+        boundTextElement.height,
+      );
     });
   });
 });

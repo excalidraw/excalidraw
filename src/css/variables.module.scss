@@ -72,7 +72,14 @@
 
   &:hover {
     background-color: var(--button-hover-bg, var(--island-bg-color));
-    border-color: var(--button-hover-border, var(--default-border-color));
+    border-color: var(
+      --button-hover-border,
+      var(--button-border, var(--default-border-color))
+    );
+    color: var(
+      --button-hover-color,
+      var(--button-color, var(--text-primary-color, inherit))
+    );
   }
 
   &:active {
@@ -81,11 +88,14 @@
   }
 
   &.active {
-    background-color: var(--color-primary-light);
-    border-color: var(--color-primary-light);
+    background-color: var(--button-selected-bg, var(--color-primary-light));
+    border-color: var(--button-selected-border, var(--color-primary-light));
 
     &:hover {
-      background-color: var(--color-primary-light);
+      background-color: var(
+        --button-selected-hover-bg,
+        var(--color-primary-light)
+      );
     }
 
     svg {

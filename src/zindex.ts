@@ -1,36 +1,52 @@
 import { bumpVersion } from "./element/mutateElement";
+import { isFrameElement } from "./element/typeChecks";
 import { ExcalidrawElement } from "./element/types";
+import { groupByFrames } from "./frame";
 import { getElementsInGroup } from "./groups";
 import { getSelectedElements } from "./scene";
 import Scene from "./scene/Scene";
 import { AppState } from "./types";
 import { arrayToMap, findIndex, findLastIndex } from "./utils";
 
+// elements that do not belong to a frame are considered a root element
+const isRootElement = (element: ExcalidrawElement) => {
+  return !element.frameId;
+};
+
 /**
  * Returns indices of elements to move based on selected elements.
  * Includes contiguous deleted elements that are between two selected elements,
  *  e.g.: [0 (selected), 1 (deleted), 2 (deleted), 3 (selected)]
+ *
+ * Specified elements (elementsToBeMoved) take precedence over
+ * appState.selectedElementsIds
  */
 const getIndicesToMove = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
   let selectedIndices: number[] = [];
   let deletedIndices: number[] = [];
   let includeDeletedIndex = null;
   let index = -1;
   const selectedElementIds = arrayToMap(
-    getSelectedElements(elements, appState, true),
+    elementsToBeMoved
+      ? elementsToBeMoved
+      : getSelectedElements(elements, appState, {
+          includeBoundTextElement: true,
+        }),
   );
   while (++index < elements.length) {
-    if (selectedElementIds.get(elements[index].id)) {
+    const element = elements[index];
+    if (selectedElementIds.get(element.id)) {
       if (deletedIndices.length) {
         selectedIndices = selectedIndices.concat(deletedIndices);
         deletedIndices = [];
       }
       selectedIndices.push(index);
       includeDeletedIndex = index + 1;
-    } else if (elements[index].isDeleted && includeDeletedIndex === index) {
+    } else if (element.isDeleted && includeDeletedIndex === index) {
       includeDeletedIndex = index + 1;
       deletedIndices.push(index);
     } else {
@@ -168,8 +184,8 @@ const getTargetIndex = (
   return candidateIndex;
 };
 
-const getTargetElementsMap = (
-  elements: readonly ExcalidrawElement[],
+const getTargetElementsMap = <T extends ExcalidrawElement>(
+  elements: readonly T[],
   indices: number[],
 ) => {
   return indices.reduce((acc, index) => {
@@ -179,12 +195,13 @@ const getTargetElementsMap = (
   }, {} as Record<string, ExcalidrawElement>);
 };
 
-const shiftElements = (
-  appState: AppState,
+const _shiftElements = (
   elements: readonly ExcalidrawElement[],
+  appState: AppState,
   direction: "left" | "right",
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  const indicesToMove = getIndicesToMove(elements, appState);
+  const indicesToMove = getIndicesToMove(elements, appState, elementsToBeMoved);
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
   let groupedIndices = toContiguousGroups(indicesToMove);
 
@@ -246,7 +263,22 @@ const shiftElements = (
   });
 };
 
-const shiftElementsToEnd = (
+const shiftElements = (
+  appState: AppState,
+  elements: readonly ExcalidrawElement[],
+  direction: "left" | "right",
+  elementsToBeMoved?: readonly ExcalidrawElement[],
+) => {
+  return shift(
+    elements,
+    appState,
+    direction,
+    _shiftElements,
+    elementsToBeMoved,
+  );
+};
+
+const _shiftElementsToEnd = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
@@ -317,33 +349,121 @@ const shiftElementsToEnd = (
       ];
 };
 
+const shiftElementsToEnd = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  direction: "left" | "right",
+  elementsToBeMoved?: readonly ExcalidrawElement[],
+) => {
+  return shift(
+    elements,
+    appState,
+    direction,
+    _shiftElementsToEnd,
+    elementsToBeMoved,
+  );
+};
+
+function shift(
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  direction: "left" | "right",
+  shiftFunction: (
+    elements: ExcalidrawElement[],
+    appState: AppState,
+    direction: "left" | "right",
+    elementsToBeMoved?: readonly ExcalidrawElement[],
+  ) => ExcalidrawElement[] | readonly ExcalidrawElement[],
+  elementsToBeMoved?: readonly ExcalidrawElement[],
+) {
+  const elementsMap = arrayToMap(elements);
+  const frameElementsMap = groupByFrames(elements);
+
+  // in case root is non-existent, we promote children elements to root
+  let rootElements = elements.filter(
+    (element) =>
+      isRootElement(element) ||
+      (element.frameId && !elementsMap.has(element.frameId)),
+  );
+  // and remove non-existet root
+  for (const frameId of frameElementsMap.keys()) {
+    if (!elementsMap.has(frameId)) {
+      frameElementsMap.delete(frameId);
+    }
+  }
+
+  // shift the root elements first
+  rootElements = shiftFunction(
+    rootElements,
+    appState,
+    direction,
+    elementsToBeMoved,
+  ) as ExcalidrawElement[];
+
+  // shift the elements in frames if needed
+  frameElementsMap.forEach((frameElements, frameId) => {
+    if (!appState.selectedElementIds[frameId]) {
+      frameElementsMap.set(
+        frameId,
+        shiftFunction(
+          frameElements,
+          appState,
+          direction,
+          elementsToBeMoved,
+        ) as ExcalidrawElement[],
+      );
+    }
+  });
+
+  // return the final elements
+  let finalElements: ExcalidrawElement[] = [];
+
+  rootElements.forEach((element) => {
+    if (isFrameElement(element)) {
+      finalElements = [
+        ...finalElements,
+        ...(frameElementsMap.get(element.id) ?? []),
+        element,
+      ];
+    } else {
+      finalElements = [...finalElements, element];
+    }
+  });
+
+  return finalElements;
+}
+
 // public API
 // -----------------------------------------------------------------------------
 
 export const moveOneLeft = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shiftElements(appState, elements, "left");
+  return shiftElements(appState, elements, "left", elementsToBeMoved);
 };
 
 export const moveOneRight = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shiftElements(appState, elements, "right");
+  return shiftElements(appState, elements, "right", elementsToBeMoved);
 };
 
 export const moveAllLeft = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shiftElementsToEnd(elements, appState, "left");
+  return shiftElementsToEnd(elements, appState, "left", elementsToBeMoved);
 };
 
 export const moveAllRight = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shiftElementsToEnd(elements, appState, "right");
+  return shiftElementsToEnd(elements, appState, "right", elementsToBeMoved);
 };

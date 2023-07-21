@@ -30,6 +30,7 @@ import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
+import { KEYS } from "../../../keys";
 
 declare global {
   interface Window {
@@ -55,9 +56,9 @@ type PointerDownState = {
     y: number;
   };
 };
+
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
-
 const {
   exportToCanvas,
   exportToSvg,
@@ -161,8 +162,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
           onClick={() => alert("This is an empty top right UI")}
           style={{ height: "2.5rem" }}
         >
-          {" "}
-          Click me{" "}
+          Click me
         </button>
       </>
     );
@@ -205,6 +205,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             height: 141.9765625,
             seed: 1968410350,
             groupIds: [],
+            frameId: null,
             boundElements: null,
             locked: false,
             link: null,
@@ -485,21 +486,12 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         }}
         onBlur={saveComment}
         onKeyDown={(event) => {
-          if (!event.shiftKey && event.key === "Enter") {
+          if (!event.shiftKey && event.key === KEYS.ENTER) {
             event.preventDefault();
             saveComment();
           }
         }}
       />
-    );
-  };
-
-  const renderSidebar = () => {
-    return (
-      <Sidebar>
-        <Sidebar.Header>Custom header!</Sidebar.Header>
-        Custom sidebar!
-      </Sidebar>
     );
   };
 
@@ -617,9 +609,11 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
       </MainMenu>
     );
   };
+
   return (
     <div className="App" ref={appRef}>
       <h1>{appTitle}</h1>
+      {/* TODO fix type */}
       <ExampleSidebar>
         <div className="button-wrapper">
           <button onClick={loadSceneOrLibrary}>Load Scene or Library</button>
@@ -754,23 +748,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
           </div>
         </div>
         <div className="excalidraw-wrapper">
-          <div
-            style={{
-              position: "absolute",
-              left: "50%",
-              bottom: "20px",
-              display: "flex",
-              zIndex: 9999999999999999,
-              padding: "5px 10px",
-              transform: "translateX(-50%)",
-              background: "rgba(255, 255, 255, 0.8)",
-              gap: "1rem",
-            }}
-          >
-            <button onClick={() => excalidrawAPI?.toggleMenu("customSidebar")}>
-              Toggle Custom Sidebar
-            </button>
-          </div>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
             initialData={initialStatePromiseRef.current.promise}
@@ -792,7 +769,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
-            renderSidebar={renderSidebar}
           >
             {excalidrawAPI && (
               <Footer>
@@ -800,6 +776,30 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               </Footer>
             )}
             <WelcomeScreen />
+            <Sidebar name="custom">
+              <Sidebar.Tabs>
+                <Sidebar.Header />
+                <Sidebar.Tab tab="one">Tab one!</Sidebar.Tab>
+                <Sidebar.Tab tab="two">Tab two!</Sidebar.Tab>
+                <Sidebar.TabTriggers>
+                  <Sidebar.TabTrigger tab="one">One</Sidebar.TabTrigger>
+                  <Sidebar.TabTrigger tab="two">Two</Sidebar.TabTrigger>
+                </Sidebar.TabTriggers>
+              </Sidebar.Tabs>
+            </Sidebar>
+            <Sidebar.Trigger
+              name="custom"
+              tab="one"
+              style={{
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
+                bottom: "20px",
+                zIndex: 9999999999999999,
+              }}
+            >
+              Toggle Custom Sidebar
+            </Sidebar.Trigger>
             {renderMenu()}
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
@@ -870,7 +870,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
           <div className="export export-blob">
             <img src={blobUrl} alt="" />
           </div>
-
           <button
             onClick={async () => {
               if (!excalidrawAPI) {
@@ -891,6 +890,78 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             }}
           >
             Export to Canvas
+          </button>
+          <button
+            onClick={async () => {
+              if (!excalidrawAPI) {
+                return;
+              }
+              const canvas = await exportToCanvas({
+                elements: excalidrawAPI.getSceneElements(),
+                appState: {
+                  ...initialData.appState,
+                  exportWithDarkMode,
+                },
+                files: excalidrawAPI.getFiles(),
+              });
+              const ctx = canvas.getContext("2d")!;
+              ctx.font = "30px Virgil";
+              ctx.strokeText("My custom text", 50, 60);
+              setCanvasUrl(canvas.toDataURL());
+            }}
+          >
+            Export to Canvas
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!excalidrawAPI) {
+                return;
+              }
+
+              const elements = excalidrawAPI.getSceneElements();
+              excalidrawAPI.scrollToContent(elements[0], {
+                fitToViewport: true,
+              });
+            }}
+          >
+            Fit to viewport, first element
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!excalidrawAPI) {
+                return;
+              }
+
+              const elements = excalidrawAPI.getSceneElements();
+              excalidrawAPI.scrollToContent(elements[0], {
+                fitToContent: true,
+              });
+
+              excalidrawAPI.scrollToContent(elements[0], {
+                fitToContent: true,
+              });
+            }}
+          >
+            Fit to content, first element
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!excalidrawAPI) {
+                return;
+              }
+
+              const elements = excalidrawAPI.getSceneElements();
+              excalidrawAPI.scrollToContent(elements[0], {
+                fitToContent: true,
+              });
+
+              excalidrawAPI.scrollToContent(elements[0]);
+            }}
+          >
+            Scroll to first element, no fitToContent, no fitToViewport
           </button>
           <div className="export export-canvas">
             <img src={canvasUrl} alt="" />

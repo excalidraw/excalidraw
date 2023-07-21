@@ -16,9 +16,9 @@ import { MIME_TYPES } from "../../constants";
 import { trackEvent } from "../../analytics";
 import { getFrame } from "../../utils";
 
-const exportToExcalidrawPlus = async (
+export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
+  appState: Partial<AppState>,
   files: BinaryFiles,
 ) => {
   const firebase = await loadFirebaseStorage();
@@ -75,7 +75,7 @@ const exportToExcalidrawPlus = async (
 
 export const ExportToExcalidrawPlus: React.FC<{
   elements: readonly NonDeletedExcalidrawElement[];
-  appState: AppState;
+  appState: Partial<AppState>;
   files: BinaryFiles;
   onError: (error: Error) => void;
 }> = ({ elements, appState, files, onError }) => {

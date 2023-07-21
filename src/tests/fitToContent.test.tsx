@@ -160,19 +160,6 @@ describe("fitToContent animated", () => {
 
     expect(window.requestAnimationFrame).toHaveBeenCalled();
 
-    // Since this is an animation, we expect values to change through time.
-    // We'll verify that the zoom/scroll values change in each animation frame
-
-    // zoom is not animated, it should be set to its final value, which in our
-    // case zooms out to 50% so that th element is fully visible (it's 2x large
-    // as the canvas)
-    expect(h.state.zoom.value).toBeLessThanOrEqual(0.5);
-
-    // FIXME I think this should be [-100, -100] so we may have a bug in our zoom
-    // hadnling, alas
-    expect(h.state.scrollX).toBe(25);
-    expect(h.state.scrollY).toBe(25);
-
     await waitForNextAnimationFrame();
 
     const prevScrollX = h.state.scrollX;

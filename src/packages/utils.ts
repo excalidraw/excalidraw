@@ -79,7 +79,11 @@ export const exportToCanvas = ({
 
         const max = Math.max(width, height);
 
-        const scale = maxWidthOrHeight / max;
+        // if content is less then maxWidthOrHeight, fallback on supplied scale
+        const scale =
+          maxWidthOrHeight < max
+            ? maxWidthOrHeight / max
+            : appState?.exportScale ?? 1;
 
         canvas.width = width * scale;
         canvas.height = height * scale;
@@ -216,15 +220,7 @@ export const exportToClipboard = async (
   } else if (opts.type === "png") {
     await copyBlobToClipboardAsPng(exportToBlob(opts));
   } else if (opts.type === "json") {
-    const appState = {
-      offsetTop: 0,
-      offsetLeft: 0,
-      width: 0,
-      height: 0,
-      ...getDefaultAppState(),
-      ...opts.appState,
-    };
-    await copyToClipboard(opts.elements, appState, opts.files);
+    await copyToClipboard(opts.elements, opts.files);
   } else {
     throw new Error("Invalid export type");
   }

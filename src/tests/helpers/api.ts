@@ -37,8 +37,12 @@ export class API {
 
   static getSelectedElements = (
     includeBoundTextElement: boolean = false,
+    includeElementsInFrames: boolean = false,
   ): ExcalidrawElement[] => {
-    return getSelectedElements(h.elements, h.state, includeBoundTextElement);
+    return getSelectedElements(h.elements, h.state, {
+      includeBoundTextElement,
+      includeElementsInFrames,
+    });
   };
 
   static getSelectedElement = (): ExcalidrawElement => {
@@ -141,6 +145,7 @@ export class API {
       | "versionNonce"
       | "isDeleted"
       | "groupIds"
+      | "frameId"
       | "link"
       | "updated"
     > = {

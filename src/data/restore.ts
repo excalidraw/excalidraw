@@ -27,19 +27,21 @@ import {
   PRECEDING_ELEMENT_KEY,
   FONT_FAMILY,
   ROUNDNESS,
+  DEFAULT_SIDEBAR,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getFontString, getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
-import oc from "open-color";
 import { MarkOptional, Mutable } from "../utility-types";
 import {
   detectLineHeight,
   getDefaultLineHeight,
   measureBaseline,
 } from "../element/textElement";
+import { COLOR_PALETTE } from "../colors";
+import { normalizeLink } from "./url";
 
 type RestoredAppState = Omit<
   AppState,
@@ -61,6 +63,7 @@ export const AllowedExcalidrawActiveTools: Record<
   freedraw: true,
   eraser: false,
   custom: true,
+  frame: true,
   hand: true,
 };
 
@@ -118,12 +121,13 @@ const restoreElementWithProperties = <
     angle: element.angle || 0,
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
-    strokeColor: element.strokeColor || oc.black,
-    backgroundColor: element.backgroundColor || "transparent",
+    strokeColor: element.strokeColor || COLOR_PALETTE.black,
+    backgroundColor: element.backgroundColor || COLOR_PALETTE.transparent,
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
+    frameId: element.frameId ?? null,
     roundness: element.roundness
       ? element.roundness
       : element.strokeSharpness === "round"
@@ -139,7 +143,7 @@ const restoreElementWithProperties = <
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
-    link: element.link ?? null,
+    link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
   };
 
@@ -271,6 +275,10 @@ const restoreElement = (
       return restoreElementWithProperties(element, {});
     case "diamond":
       return restoreElementWithProperties(element, {});
+    case "frame":
+      return restoreElementWithProperties(element, {
+        name: element.name ?? null,
+      });
 
     // Don't use default case so as to catch a missing an element type case.
     // We also don't want to throw, but instead return void so we filter
@@ -363,6 +371,24 @@ const repairBoundElement = (
   }
 };
 
+/**
+ * Remove an element's frameId if its containing frame is non-existent
+ *
+ * NOTE mutates elements.
+ */
+const repairFrameMembership = (
+  element: Mutable<ExcalidrawElement>,
+  elementsMap: Map<string, Mutable<ExcalidrawElement>>,
+) => {
+  if (element.frameId) {
+    const containingFrame = elementsMap.get(element.frameId);
+
+    if (!containingFrame) {
+      element.frameId = null;
+    }
+  }
+};
+
 export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
@@ -403,6 +429,10 @@ export const restoreElements = (
   // repair binding. Mutates elements.
   const restoredElementsMap = arrayToMap(restoredElements);
   for (const element of restoredElements) {
+    if (element.frameId) {
+      repairFrameMembership(element, restoredElementsMap);
+    }
+
     if (isTextElement(element) && element.containerId) {
       repairBoundElement(element, restoredElementsMap);
     } else if (element.boundElements) {
@@ -431,21 +461,15 @@ const LegacyAppStateMigrations: {
     defaultAppState: ReturnType<typeof getDefaultAppState>,
   ) => [LegacyAppState[K][1], AppState[LegacyAppState[K][1]]];
 } = {
-  isLibraryOpen: (appState, defaultAppState) => {
+  isSidebarDocked: (appState, defaultAppState) => {
     return [
-      "openSidebar",
-      "isLibraryOpen" in appState
-        ? appState.isLibraryOpen
-          ? "library"
-          : null
-        : coalesceAppStateValue("openSidebar", appState, defaultAppState),
-    ];
-  },
-  isLibraryMenuDocked: (appState, defaultAppState) => {
-    return [
-      "isSidebarDocked",
-      appState.isLibraryMenuDocked ??
-        coalesceAppStateValue("isSidebarDocked", appState, defaultAppState),
+      "defaultSidebarDockedPreference",
+      appState.isSidebarDocked ??
+        coalesceAppStateValue(
+          "defaultSidebarDockedPreference",
+          appState,
+          defaultAppState,
+        ),
     ];
   },
 };
@@ -517,13 +541,10 @@ export const restoreAppState = (
         : appState.zoom?.value
         ? appState.zoom
         : defaultAppState.zoom,
-    // when sidebar docked and user left it open in last session,
-    // keep it open. If not docked, keep it closed irrespective of last state.
     openSidebar:
-      nextAppState.openSidebar === "library"
-        ? nextAppState.isSidebarDocked
-          ? "library"
-          : null
+      // string (legacy)
+      typeof (appState.openSidebar as any as string) === "string"
+        ? { name: DEFAULT_SIDEBAR.name }
         : nextAppState.openSidebar,
   };
 };

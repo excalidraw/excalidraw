@@ -1,9 +1,9 @@
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { useI18n } from "../../i18n";
 import {
-  useExcalidrawAppState,
   useExcalidrawSetAppState,
   useExcalidrawActionManager,
+  useExcalidrawElements,
 } from "../App";
 import {
   ExportIcon,
@@ -32,19 +32,43 @@ import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { jotaiScope } from "../../jotai";
+import { useUIAppState } from "../../context/ui-appState";
+import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
+import Trans from "../Trans";
 
 export const LoadScene = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
+  const elements = useExcalidrawElements();
 
   if (!actionManager.isActionEnabled(actionLoadScene)) {
     return null;
   }
 
+  const handleSelect = async () => {
+    if (
+      !elements.length ||
+      (await openConfirmModal({
+        title: t("overwriteConfirm.modal.loadFromFile.title"),
+        actionLabel: t("overwriteConfirm.modal.loadFromFile.button"),
+        color: "warning",
+        description: (
+          <Trans
+            i18nKey="overwriteConfirm.modal.loadFromFile.description"
+            bold={(text) => <strong>{text}</strong>}
+            br={() => <br />}
+          />
+        ),
+      }))
+    ) {
+      actionManager.executeAction(actionLoadScene);
+    }
+  };
+
   return (
     <DropdownMenuItem
       icon={LoadIcon}
-      onSelect={() => actionManager.executeAction(actionLoadScene)}
+      onSelect={handleSelect}
       data-testid="load-button"
       shortcut={getShortcutFromShortcutName("loadScene")}
       aria-label={t("buttons.load")}
@@ -139,7 +163,7 @@ ClearCanvas.displayName = "ClearCanvas";
 
 export const ToggleTheme = () => {
   const { t } = useI18n();
-  const appState = useExcalidrawAppState();
+  const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
 
   if (!actionManager.isActionEnabled(actionToggleTheme)) {
@@ -172,7 +196,7 @@ ToggleTheme.displayName = "ToggleTheme";
 
 export const ChangeCanvasBackground = () => {
   const { t } = useI18n();
-  const appState = useExcalidrawAppState();
+  const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
 
   if (appState.viewModeEnabled) {

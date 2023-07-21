@@ -148,50 +148,6 @@
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
     </script>
-    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
-
-    <!-- LEGACY GOOGLE ANALYTICS -->
-    <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=%REACT_APP_GOOGLE_ANALYTICS_ID%"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "%REACT_APP_GOOGLE_ANALYTICS_ID%");
-    </script>
-    <% } %>
-    <!-- end LEGACY GOOGLE ANALYTICS -->
-
-    <!-- Matomo -->
-    <% if (process.env.REACT_APP_MATOMO_URL &&
-    process.env.REACT_APP_MATOMO_SITE_ID &&
-    process.env.REACT_APP_CDN_MATOMO_TRACKER_URL) { %>
-    <script>
-      var _paq = (window._paq = window._paq || []);
-      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-      _paq.push(["trackPageView"]);
-      _paq.push(["enableLinkTracking"]);
-      (function () {
-        var u = "%REACT_APP_MATOMO_URL%";
-        _paq.push(["setTrackerUrl", u + "matomo.php"]);
-        _paq.push(["setSiteId", "%REACT_APP_MATOMO_SITE_ID%"]);
-        var d = document,
-          g = d.createElement("script"),
-          s = d.getElementsByTagName("script")[0];
-        g.async = true;
-        g.src = "%REACT_APP_CDN_MATOMO_TRACKER_URL%";
-        s.parentNode.insertBefore(g, s);
-      })();
-    </script>
-    <% } %>
-    <!-- end Matomo analytics -->
-
-    <% } %>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
     <style>
@@ -244,5 +200,39 @@
       <h1 class="visually-hidden">Excalidraw</h1>
     </header>
     <div id="root"></div>
+    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
+    <!-- 100% privacy friendly analytics -->
+    <script>
+      // need to load this script dynamically bcs. of iframe embed tracking
+      var scriptEle = document.createElement("script");
+      scriptEle.setAttribute(
+        "src",
+        "https://scripts.simpleanalyticscdn.com/latest.js",
+      );
+      scriptEle.setAttribute("type", "text/javascript");
+      scriptEle.setAttribute("defer", true);
+      scriptEle.setAttribute("async", true);
+      // if iframe
+      if (window.self !== window.top) {
+        scriptEle.setAttribute("data-auto-collect", true);
+      }
+
+      document.body.appendChild(scriptEle);
+
+      // if iframe
+      if (window.self !== window.top) {
+        scriptEle.addEventListener("load", () => {
+          if (window.sa_pageview) {
+            window.window.sa_event(action, {
+              category: "iframe",
+              label: "embed",
+              value: window.location.pathname,
+            });
+          }
+        });
+      }
+    </script>
+    <!-- end LEGACY GOOGLE ANALYTICS -->
+    <% } %>
   </body>
 </html>

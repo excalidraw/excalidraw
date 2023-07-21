@@ -4,7 +4,7 @@ import {
   VERTICAL_ALIGN,
   TEXT_ALIGN,
 } from "../constants";
-import { getNonDeletedElements, isTextElement, newElement } from "../element";
+import { isTextElement, newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import {
   computeBoundTextPosition,
@@ -16,6 +16,7 @@ import {
 import {
   getOriginalContainerHeightFromCache,
   resetOriginalContainerCache,
+  updateOriginalContainerCache,
 } from "../element/textWysiwyg";
 import {
   hasBoundTextElement,
@@ -28,8 +29,8 @@ import {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
 } from "../element/types";
-import { getSelectedElements } from "../scene";
 import { AppState } from "../types";
+import { Mutable } from "../utility-types";
 import { getFontString } from "../utils";
 import { register } from "./register";
 
@@ -37,16 +38,13 @@ export const actionUnbindText = register({
   name: "unbindText",
   contextItemLabel: "labels.unbindText",
   trackEvent: { category: "element" },
-  predicate: (elements, appState) => {
-    const selectedElements = getSelectedElements(elements, appState);
+  predicate: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
 
     return selectedElements.some((element) => hasBoundTextElement(element));
   },
-  perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
+  perform: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
     selectedElements.forEach((element) => {
       const boundTextElement = getBoundTextElement(element);
       if (boundTextElement) {
@@ -91,8 +89,8 @@ export const actionBindText = register({
   name: "bindText",
   contextItemLabel: "labels.bindText",
   trackEvent: { category: "element" },
-  predicate: (elements, appState) => {
-    const selectedElements = getSelectedElements(elements, appState);
+  predicate: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
 
     if (selectedElements.length === 2) {
       const textElement =
@@ -115,11 +113,8 @@ export const actionBindText = register({
     }
     return false;
   },
-  perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
+  perform: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
 
     let textElement: ExcalidrawTextElement;
     let container: ExcalidrawTextContainer;
@@ -145,7 +140,11 @@ export const actionBindText = register({
         id: textElement.id,
       }),
     });
+    const originalContainerHeight = container.height;
     redrawTextBoundingBox(textElement, container);
+    // overwritting the cache with original container height so
+    // it can be restored when unbind
+    updateOriginalContainerCache(container.id, originalContainerHeight);
 
     return {
       elements: pushTextAboveContainer(elements, container, textElement),
@@ -191,22 +190,19 @@ const pushContainerBelowText = (
   return updatedElements;
 };
 
-export const actionCreateContainerFromText = register({
-  name: "createContainerFromText",
+export const actionWrapTextInContainer = register({
+  name: "wrapTextInContainer",
   contextItemLabel: "labels.createContainerFromText",
   trackEvent: { category: "element" },
-  predicate: (elements, appState) => {
-    const selectedElements = getSelectedElements(elements, appState);
+  predicate: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
     const areTextElements = selectedElements.every((el) => isTextElement(el));
     return selectedElements.length > 0 && areTextElements;
   },
-  perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
+  perform: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
     let updatedElements: readonly ExcalidrawElement[] = elements.slice();
-    const containerIds: AppState["selectedElementIds"] = {};
+    const containerIds: Mutable<AppState["selectedElementIds"]> = {};
 
     for (const textElement of selectedElements) {
       if (isTextElement(textElement)) {
@@ -244,6 +240,7 @@ export const actionCreateContainerFromText = register({
             "rectangle",
           ),
           groupIds: textElement.groupIds,
+          frameId: textElement.frameId,
         });
 
         // update bindings
@@ -281,6 +278,7 @@ export const actionCreateContainerFromText = register({
             containerId: container.id,
             verticalAlign: VERTICAL_ALIGN.MIDDLE,
             boundElements: null,
+            textAlign: TEXT_ALIGN.CENTER,
           },
           false,
         );
