@@ -23,7 +23,7 @@ const DropdownMenuSubItem = ({
   const handleClick = useHandleDropdownMenuItemClick(rest.onClick, onSelect);
 
   return (
-    <DropdownMenuPrimitive.Item className="radix-menuitem">
+    <DropdownMenuPrimitive.Item className="radix-menu-item">
       <button
         {...rest}
         onClick={handleClick}

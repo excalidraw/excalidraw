@@ -65,7 +65,7 @@ const MainMenu = Object.assign(
             <DropdownMenu.Content
               // style={{ zIndex: 11 }}
               sideOffset={device.isMobile ? 20 : undefined}
-              className="mainmenu-content"
+              className="main-menu-content"
               onClickOutside={onClickOutside}
               onSelect={composeEventHandlers(onSelect, () => {
                 setAppState({ openMenu: null });

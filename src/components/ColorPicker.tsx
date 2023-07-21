@@ -369,16 +369,16 @@ export const ColorPicker = ({
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
   const coords = pickerButton.current?.getBoundingClientRect();
-  const mainmenuContentCoords = document
-    .querySelector(".mainmenu-content")
+  const mainMenuContentCoords = document
+    .querySelector(".main-menu-content")
     ?.getBoundingClientRect();
 
   const top =
-    coords && mainmenuContentCoords && coords.top - mainmenuContentCoords.top;
+    coords && mainMenuContentCoords && coords.top - mainMenuContentCoords.top;
   const left =
     coords &&
-    mainmenuContentCoords &&
-    coords.right - mainmenuContentCoords.left;
+    mainMenuContentCoords &&
+    coords.right - mainMenuContentCoords.left;
 
   return (
     <div>

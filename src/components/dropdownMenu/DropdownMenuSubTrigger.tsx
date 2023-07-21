@@ -15,7 +15,7 @@ const DropdownMenuSubTrigger = ({
   className?: string;
 } & React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <DropdownMenuPrimitive.SubTrigger className="radix-menuitem dropdown-menu__submenu-trigger">
+    <DropdownMenuPrimitive.SubTrigger className="radix-menu-item dropdown-menu__submenu-trigger">
       <div
         {...rest}
         className={getDropdownMenuItemClassName(className)}

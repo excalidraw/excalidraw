@@ -6,8 +6,7 @@
   }
 
   .dropdown-menu {
-    // position: absolute;
-    max-width: 250px;
+    max-width: 16rem;
 
     &__submenu-trigger {
       &[aria-expanded="true"] {
@@ -22,24 +21,13 @@
       opacity: 0.5;
     }
 
-    .radix-menuitem {
+    .radix-menu-item {
       &:focus-visible {
         outline: none;
       }
     }
 
     &--mobile {
-      max-width: none;
-      // bottom: 55px;
-      // top: auto;
-      // left: 0;
-      // // TODO barnabasmolnar/mainmenu-radix
-      // // double check rendering/styling on mobile
-      // // width: 100%;
-      // display: flex;
-      // flex-direction: column;
-      // row-gap: 0.75rem;
-
       .dropdown-menu-container {
         padding: 8px 8px;
         box-sizing: border-box;
