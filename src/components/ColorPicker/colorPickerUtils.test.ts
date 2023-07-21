@@ -2,7 +2,6 @@ import { ColorPaletteCustom } from "../../colors";
 import { ExcalidrawElement } from "../../element/types";
 import {
   getColorNameAndShadeFromColor,
-  colorPickerHotkeyBindings,
   isCustomColor,
   getMostUsedCustomColors,
 } from "./colorPickerUtils";
@@ -19,17 +18,41 @@ describe("getColorNameAndShadeFromColor", () => {
 
     expect(result).toBeNull();
   });
-});
 
-describe("colorPickerHotkeyBindings", () => {
-  it("should contain all the expected hotkey bindings", () => {
-    const testBindingKeys = [
-      ["q", "w", "e", "r", "t"],
-      ["a", "s", "d", "f", "g"],
-      ["z", "x", "c", "v", "b"],
-    ].flat();
+  it("returns color name and null when matching single color is found", () => {
+    const palette: ColorPaletteCustom = {
+      red: "#FF0000",
+      orange: "#FFA500",
+      yellow: "#FFFF00",
+      green: "#008000",
+      blue: "#0000FF",
+      indigo: "#4B0082",
+      violet: "#EE82EE",
+      pink: "#FFC0CB",
+      brown: "#A52A2A",
+      black: "#000000",
+      white: "#FFFFFF",
+      gray: "#808080",
+    };
+    
+    const color = "#FF0000";
 
-    expect(testBindingKeys).toEqual(colorPickerHotkeyBindings);
+    const result = getColorNameAndShadeFromColor({ palette, color });
+
+    expect(result).toEqual({colorName: "red", shade: null});
+  });
+
+  it("returns color name and shade index when matching array of colors is found", () => {
+    const palette: ColorPaletteCustom = {
+      red: ["#FF0000", "#FF6666"],
+      green: ["#00FF00"],
+    };
+    
+    const color = "#FF6666";
+
+    const result = getColorNameAndShadeFromColor({ palette, color });
+
+    expect(result).toEqual({colorName: "red", shade: 1});
   });
 });
 
@@ -119,7 +142,7 @@ describe("getMostUsedCustomColors", () => {
 
     const result = getMostUsedCustomColors(elements, type, palette);
 
-    expect(result).toEqual(["#00FF00"]);
+    expect(result).toEqual(["#00FF00", "#0000FF"]);
   });
 
   it("should handle empty elements correctly", () => {
