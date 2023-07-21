@@ -91,6 +91,8 @@ describe("isCustomColor", () => {
   });
 });
 
+// FIXME: temporary commented below test because they're failing
+
 // describe("getMostUsedCustomColors", () => {
 // const elements: readonly any[] = [
 //   {
