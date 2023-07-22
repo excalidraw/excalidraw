@@ -4,6 +4,7 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   FontString,
+  NonDeleted,
 } from "../element/types";
 import ExcalidrawApp from "../excalidraw-app";
 import { centerPoint } from "../math";
@@ -14,7 +15,10 @@ import { screen, render, fireEvent, GlobalTestState } from "./test-utils";
 import { API } from "../tests/helpers/api";
 import { Point } from "../types";
 import { KEYS } from "../keys";
-import { LinearElementEditor } from "../element/linearElementEditor";
+import {
+  LinearElementEditor,
+  editorMidPointsCache,
+} from "../element/linearElementEditor";
 import { queryByTestId, queryByText } from "@testing-library/react";
 import { resize, rotate } from "./utils";
 import {
@@ -24,6 +28,7 @@ import {
 } from "../element/textElement";
 import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
+import { AppState, NormalizedZoomValue } from "../types";
 
 const renderScene = jest.spyOn(Renderer, "renderScene");
 
@@ -240,6 +245,133 @@ describe("Test Linear Elements", () => {
       mouse.doubleClick();
     });
     expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should correctly update editor midpoints cache", () => {
+    const element: NonDeleted<ExcalidrawLinearElement> = {
+      id: "yJtQhjgD1xjc5_mTmTNQR",
+      type: "line",
+      x: 489.25390625,
+      y: 691.328125,
+      width: 0,
+      height: 0,
+      angle: 0,
+      strokeColor: "#000000",
+      backgroundColor: "transparent",
+      fillStyle: "hachure",
+      strokeWidth: 1,
+      strokeStyle: "solid",
+      roughness: 1,
+      opacity: 100,
+      groupIds: [],
+      roundness: {
+        type: 2,
+      },
+      seed: 1175292260,
+      version: 1,
+      versionNonce: 0,
+      isDeleted: false,
+      boundElements: null,
+      updated: 1684620964612,
+      link: null,
+      locked: false,
+      points: [],
+      lastCommittedPoint: null,
+      startBinding: null,
+      endBinding: null,
+      startArrowhead: null,
+      endArrowhead: null,
+    };
+    const appState: AppState = {
+      contextMenu: null,
+      showWelcomeScreen: true,
+      isLoading: false,
+      errorMessage: null,
+      draggingElement: null,
+      resizingElement: null,
+      multiElement: null,
+      selectionElement: null,
+      isBindingEnabled: false,
+      startBoundElement: null,
+      suggestedBindings: [],
+      editingElement: null,
+      editingLinearElement: null,
+      activeTool: {
+        lastActiveTool: null,
+        locked: false,
+        type: "selection",
+        customType: null,
+      },
+      penMode: false,
+      penDetected: false,
+      exportBackground: false,
+      exportEmbedScene: false,
+      exportWithDarkMode: false,
+      exportScale: 1,
+      currentItemStrokeColor: "#000000",
+      currentItemBackgroundColor: "#ffffff",
+      currentItemFillStyle: "hachure",
+      currentItemStrokeWidth: 1,
+      currentItemStrokeStyle: "solid",
+      currentItemRoughness: 1,
+      currentItemOpacity: 100,
+      currentItemFontFamily: 1,
+      currentItemFontSize: 16,
+      currentItemTextAlign: "left",
+      currentItemStartArrowhead: null,
+      currentItemEndArrowhead: null,
+      currentItemRoundness: "round",
+      viewBackgroundColor: "#fff",
+      scrollX: 0,
+      scrollY: 0,
+      cursorButton: "up",
+      scrolledOutside: false,
+      name: "",
+      isResizing: false,
+      isRotating: false,
+      zoom: {
+        value: 1 as NormalizedZoomValue,
+      },
+      openMenu: null,
+      openPopup: null,
+      openSidebar: null,
+      openDialog: null,
+      defaultSidebarDockedPreference: false,
+      lastPointerDownWith: "mouse",
+      selectedElementIds: {},
+      previousSelectedElementIds: {},
+      shouldCacheIgnoreZoom: false,
+      toast: null,
+      zenModeEnabled: false,
+      theme: "light",
+      gridSize: null,
+      viewModeEnabled: false,
+      selectedGroupIds: {},
+      editingGroupId: null,
+      width: 800,
+      height: 600,
+      offsetTop: 0,
+      offsetLeft: 0,
+      fileHandle: null,
+      collaborators: new Map(),
+      showStats: false,
+      currentChartType: "line",
+      pasteDialog: { shown: false, data: null },
+      pendingImageElementId: null,
+      showHyperlinkPopup: false,
+      selectedLinearElement: null,
+    };
+
+    // Clear midpoints cache before updating
+    LinearElementEditor.clearEditorMidPointsCache();
+
+    // Update midpoints cache
+    LinearElementEditor.updateEditorMidPointsCache(element, appState);
+
+    // Check if midpoints cache updated correctly
+    expect(editorMidPointsCache.version).toBe(1);
+    expect(editorMidPointsCache.zoom).toBe(1);
+    expect(editorMidPointsCache.points?.length).toBe(0);
   });
 
   describe("Inside editor", () => {
@@ -869,8 +1001,8 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
+        "Online whiteboard
+        collaboration made
         easy"
       `);
     });
@@ -903,8 +1035,8 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
+        "Online whiteboard
+        collaboration made
         easy"
       `);
     });
@@ -945,8 +1077,8 @@ describe("Test Linear Elements", () => {
         }
       `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
+        "Online whiteboard
+        collaboration made
         easy"
       `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
@@ -972,8 +1104,8 @@ describe("Test Linear Elements", () => {
         }
       `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
+        "Online whiteboard
+        collaboration made
         easy"
       `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
@@ -1010,8 +1142,8 @@ describe("Test Linear Elements", () => {
         }
       `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
+        "Online whiteboard
+        collaboration made
         easy"
       `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
@@ -1045,7 +1177,7 @@ describe("Test Linear Elements", () => {
       `);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-        "Online whiteboard 
+        "Online whiteboard
         collaboration made easy"
       `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
@@ -1078,8 +1210,8 @@ describe("Test Linear Elements", () => {
         }
       `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
+        "Online whiteboard
+        collaboration made
         easy"
       `);
       const points = LinearElementEditor.getPointsGlobalCoordinates(container);
@@ -1103,7 +1235,7 @@ describe("Test Linear Elements", () => {
         }
       `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
+        "Online whiteboard
         collaboration made easy"
       `);
     });
@@ -1174,8 +1306,8 @@ describe("Test Linear Elements", () => {
       expect(
         wrapText(textElement.originalText, font, getBoundTextMaxWidth(arrow)),
       ).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
+        "Online whiteboard
+        collaboration made
         easy"
       `);
     });

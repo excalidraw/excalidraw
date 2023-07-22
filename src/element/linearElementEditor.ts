@@ -43,7 +43,7 @@ import { getShapeForElement } from "../renderer/renderElement";
 import { DRAGGING_THRESHOLD } from "../constants";
 import { Mutable } from "../utility-types";
 
-const editorMidPointsCache: {
+export const editorMidPointsCache: {
   version: number | null;
   points: (Point | null)[];
   zoom: number | null;
@@ -414,10 +414,18 @@ export class LinearElementEditor {
       editorMidPointsCache.version === element.version &&
       editorMidPointsCache.zoom === appState.zoom.value
     ) {
+      LinearElementEditor.clearEditorMidPointsCache();
+      LinearElementEditor.updateEditorMidPointsCache(element, appState);
       return editorMidPointsCache.points;
     }
     LinearElementEditor.updateEditorMidPointsCache(element, appState);
     return editorMidPointsCache.points!;
+  };
+
+  static clearEditorMidPointsCache = () => {
+    editorMidPointsCache.version = null;
+    editorMidPointsCache.points = [];
+    editorMidPointsCache.zoom = null;
   };
 
   static updateEditorMidPointsCache = (
