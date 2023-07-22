@@ -888,7 +888,8 @@ class App extends React.Component<AppProps, AppState> {
             this.state.activeEmbeddable?.state === "hover";
           const isWebview = //zsviczian
             this.props.renderWebview &&
-            !src.startsWith("https://player.vimeo.com");
+            embedLink?.type !== "document" &&
+            !embedLink?.link?.startsWith?.("https://player.vimeo.com");
 
           return (
             <div
@@ -946,29 +947,6 @@ class App extends React.Component<AppProps, AppState> {
                     padding: `${el.strokeWidth}px`,
                   }}
                 >
-                  {this.props.renderEmbeddable?.(el, this.state) ?? (
-                    <iframe
-                      ref={(ref) => this.updateEmbeddableRef(el.id, ref)}
-                      className="excalidraw__embeddable"
-                      srcDoc={
-                        embedLink?.type === "document"
-                          ? embedLink.srcdoc(this.state.theme)
-                          : undefined
-                      }
-                      src={
-                        embedLink?.type !== "document"
-                          ? embedLink?.link ?? ""
-                          : undefined
-                      }
-                      // https://stackoverflow.com/q/18470015
-                      scrolling="no"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Excalidraw Embedded Content"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen={true}
-                      sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
-                    />
-                  )}
                   {this.props.renderEmbeddable?.(el, this.state) ??
                     (isWebview ? (
                       <webview
@@ -976,7 +954,7 @@ class App extends React.Component<AppProps, AppState> {
                           this.updateEmbeddableRef(el.id, ref as HTMLIFrameElement)
                         }
                         className="excalidraw__embeddable"
-                        src={src}
+                        src={embedLink?.link ?? ""}
                         title="Excalidraw Embedded Content"
                         allowFullScreen={true}
                       />
@@ -994,10 +972,13 @@ class App extends React.Component<AppProps, AppState> {
                             ? embedLink?.link ?? ""
                             : undefined
                         }
+                        // https://stackoverflow.com/q/18470015
+                        scrolling="no"
                         referrerPolicy="no-referrer-when-downgrade"
                         title="Excalidraw Embedded Content"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen={true}
+                        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
                       />
                   ))}
                 </div>
