@@ -318,7 +318,7 @@
     "zoomToSelection": "தெரிவுக்கு விரிவாக்கு",
     "toggleElementLock": "தேர்ந்தெடுப்பைப் பூட்டு/பூட்டவிழ்",
     "movePageUpDown": "மேலே/கீழே நகர்த்தவும்",
-    "movePageLeftRight": ""
+    "movePageLeftRight": "இடது/வலது பக்கம் நகர்த்தவும்"
   },
   "clearCanvasDialog": {
     "title": "கித்தானைத் துடை"
@@ -373,13 +373,13 @@
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNGக்கு ஏற்றுமதிசெய்",
+      "exportToSvg": "SVGக்கு ஏற்றுமதிசெய்",
       "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": ""
     }
   },
@@ -415,20 +415,20 @@
   },
   "colors": {
     "transparent": "ஒளிபுகுத்தன்மை",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "கருப்பு",
+    "white": "வெள்ளை",
+    "red": "சிவப்பு",
+    "pink": "இளஞ்சிவப்பு",
+    "grape": "திராட்சை",
+    "violet": "ஊதா",
+    "gray": "சாம்பல்",
+    "blue": "நீலம்",
+    "cyan": "மயில்நிறம்",
+    "teal": "டீல்",
+    "green": "பச்சை",
+    "yellow": "மஞ்சள்",
+    "orange": "ஆரஞ்சு",
+    "bronze": "வெண்கலம்"
   },
   "welcomeScreen": {
     "app": {
