@@ -220,12 +220,12 @@
     "text": "உரை",
     "library": "நூலகம்",
     "lock": "தேர்ந்த கருவியை வரைந்த பின்பும் வைத்திரு",
-    "penMode": "",
+    "penMode": "பேனா - தடுப்பு தொடுதல்",
     "link": "தேர்தெடுத்த வடிவத்திற்குத் தொடுப்பைச் சேர்/ புதுப்பி",
     "eraser": "அழிப்பி",
-    "frame": "",
-    "hand": "",
-    "extraTools": ""
+    "frame": "சட்டகம் கருவி",
+    "hand": "கை (பார்வை நகர்கும் கருவி)",
+    "extraTools": "மற்ற கருவிகள்"
   },
   "headings": {
     "canvasActions": "கித்தான் செயல்கள்",
@@ -317,7 +317,7 @@
     "zoomToFit": "அனைத்துறுப்புகளும் பொருந்தும்படி விரிவாக்கு",
     "zoomToSelection": "தெரிவுக்கு விரிவாக்கு",
     "toggleElementLock": "தேர்ந்தெடுப்பைப் பூட்டு/பூட்டவிழ்",
-    "movePageUpDown": "",
+    "movePageUpDown": "மேலே/கீழே நகர்த்தவும்",
     "movePageLeftRight": ""
   },
   "clearCanvasDialog": {
@@ -360,13 +360,13 @@
     "removeItemsFromLib": "நூலகத்திலிருந்து தேர்ந்தெடுத்த உருப்படிகளை நீக்கு"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "படத்தை ஏற்றுமதிதல",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
+      "withBackground": "பின்னணி",
+      "onlySelected": "தேர்ந்ததை மட்டும்",
+      "darkMode": "இருள் பயன்முறை",
+      "embedScene": "காட்சியை உட்பொதி",
+      "scale": "அளவுகோல்",
       "padding": ""
     },
     "tooltip": {
