@@ -126,10 +126,10 @@
     "sidebarLock": "",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "Избери цвят от платното"
   },
   "library": {
-    "noItems": "",
+    "noItems": "Няма добавени неща все още...",
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },
@@ -310,8 +310,8 @@
     "preventBinding": "Спри прилепяне на стрелките",
     "tools": "Инструменти",
     "shortcuts": "Клавиши за бърз достъп",
-    "textFinish": "",
-    "textNewLine": "",
+    "textFinish": "Завърши редактиране (текстов редактор)",
+    "textNewLine": "Добави нова линия (текстов редактор)",
     "title": "Помощ",
     "view": "Преглед",
     "zoomToFit": "Приближи докато се виждат всички елементи",
@@ -324,25 +324,25 @@
     "title": "Изчисти платното"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
+    "title": "Публикувай библиотека",
+    "itemName": "Име",
     "authorName": "Авторско име",
     "githubUsername": "GitHub потребителско име",
     "twitterUsername": "Twitter потребителско име",
-    "libraryName": "",
-    "libraryDesc": "",
+    "libraryName": "Име на библиотеката",
+    "libraryDesc": "Описание на библиотеката",
     "website": "Уебсайт",
     "placeholder": {
       "authorName": "Името или потребителското Ви име",
       "libraryName": "Име на библиотеката Ви",
-      "libraryDesc": "",
+      "libraryDesc": "Описание на библиотеката ви, за да помогнете на хората да разберат приложенията ѝ",
       "githubHandle": "",
       "twitterHandle": "",
       "website": ""
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Задължително",
+      "website": "Въведете валиден URL адрес"
     },
     "noteDescription": "",
     "noteGuidelines": "",
@@ -356,15 +356,15 @@
     "content": ""
   },
   "confirmDialog": {
-    "resetLibrary": "",
+    "resetLibrary": "Нулирай библиотека",
     "removeItemsFromLib": ""
   },
   "imageExportDialog": {
     "header": "",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
+      "withBackground": "Фон",
+      "onlySelected": "Само избраното",
+      "darkMode": "Тъмен режим",
       "embedScene": "",
       "scale": "",
       "padding": ""
@@ -373,14 +373,14 @@
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Изнасяне в PNG",
+      "exportToSvg": "Изнасяне в SVG",
+      "copyPngToClipboard": "Копирай PNG в клипборда"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Копиране в клипборда"
     }
   },
   "encrypted": {
@@ -406,7 +406,7 @@
     "addedToLibrary": "Добавена към библиотеката",
     "copyStyles": "Копирани стилове.",
     "copyToClipboard": "Копирано в клипборда.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "Копира {{exportSelection}} в клипборда като PNG\n({{exportColorScheme}})",
     "fileSaved": "Файлът е запазен.",
     "fileSavedToFilename": "Запазен към {filename}",
     "canvas": "платно",
@@ -434,17 +434,17 @@
     "app": {
       "center_heading": "Всичките Ви данни са запазени локално в браузъра Ви.",
       "center_heading_plus": "",
-      "menuHint": ""
+      "menuHint": "Експорт, предпочитания, езици, ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "Експорт, предпочитания, и още...",
+      "center_heading": "Диаграми. Направени. Просто.",
+      "toolbarHint": "Изберете инструмент & Започнете да рисувате!",
+      "helpHint": "Преки пътища & помощ"
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
+    "mostUsedCustomColors": "Най-често използвани цветове",
     "colors": "Цветове",
     "shades": "Нюанси",
     "hexCode": "Шестнадесетичен код",
@@ -453,19 +453,19 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "Изнеси като изображение",
+        "button": "Изнеси като изображение",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "Запази към диск",
+        "button": "Запази към диск",
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Експортирай към Excalidraw+",
+        "description": "Запази сцената към Excalidraw+ работното място."
       }
     },
     "modal": {
@@ -476,7 +476,7 @@
       },
       "shareableLink": {
         "title": "Зареди от линк",
-        "button": "",
+        "button": "Замени моето съдържание",
         "description": ""
       }
     }
