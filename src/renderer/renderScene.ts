@@ -6,7 +6,6 @@ import {
   StaticCanvasAppState,
   BinaryFiles,
   Point,
-  Zoom,
   CommonCanvasAppState,
 } from "../types";
 import {
@@ -23,7 +22,6 @@ import {
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   getTransformHandlesFromCoords,
   getTransformHandles,
-  getElementBounds,
   getCommonBounds,
 } from "../element";
 
@@ -62,11 +60,7 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import {
-  viewportCoordsToSceneCoords,
-  throttleRAF,
-  isOnlyExportingSingleFrame,
-} from "../utils";
+import { throttleRAF, isOnlyExportingSingleFrame } from "../utils";
 import { UserIdleState } from "../types";
 import { FRAME_STYLE, THEME_FILTER } from "../constants";
 import {
@@ -418,10 +412,11 @@ const bootstrapCanvas = ({
 };
 
 const _renderInteractiveScene = ({
-  elements,
-  appState,
-  scale,
   canvas,
+  elements,
+  visibleElements,
+  scale,
+  appState,
   renderConfig,
 }: InteractiveSceneRenderConfig) => {
   if (canvas === null) {
@@ -443,17 +438,6 @@ const _renderInteractiveScene = ({
 
   let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
     undefined;
-
-  // FIXME I: memo?
-  const visibleElements = elements.filter((element) =>
-    isVisibleElement(element, normalizedWidth, normalizedHeight, {
-      zoom: appState.zoom,
-      offsetLeft: appState.offsetLeft,
-      offsetTop: appState.offsetTop,
-      scrollX: appState.scrollX,
-      scrollY: appState.scrollY,
-    }),
-  );
 
   visibleElements.forEach((element) => {
     // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
@@ -867,11 +851,12 @@ const _renderInteractiveScene = ({
 };
 
 const _renderStaticScene = ({
-  elements,
-  appState,
-  scale,
-  rc,
   canvas,
+  rc,
+  elements,
+  visibleElements,
+  scale,
+  appState,
   renderConfig,
 }: StaticSceneRenderConfig) => {
   if (canvas === null) {
@@ -910,17 +895,6 @@ const _renderStaticScene = ({
     );
   }
 
-  // Paint visible elements
-  const visibleElements = elements.filter((element) =>
-    isVisibleElement(element, normalizedWidth, normalizedHeight, {
-      zoom: appState.zoom,
-      offsetLeft: appState.offsetLeft,
-      offsetTop: appState.offsetTop,
-      scrollX: appState.scrollX,
-      scrollY: appState.scrollY,
-    }),
-  );
-
   const groupsToBeAddedToFrame = new Set<string>();
 
   visibleElements.forEach((element) => {
@@ -937,6 +911,7 @@ const _renderStaticScene = ({
     }
   });
 
+  // Paint visible elements
   visibleElements.forEach((element) => {
     try {
       // - when exporting the whole canvas, we DO NOT apply clipping
@@ -1351,42 +1326,6 @@ const renderLinkIcon = (
     }
     context.restore();
   }
-};
-
-export const isVisibleElement = (
-  element: ExcalidrawElement,
-  canvasWidth: number,
-  canvasHeight: number,
-  viewTransformations: {
-    zoom: Zoom;
-    offsetLeft: number;
-    offsetTop: number;
-    scrollX: number;
-    scrollY: number;
-  },
-) => {
-  const [x1, y1, x2, y2] = getElementBounds(element); // scene coordinates
-  const topLeftSceneCoords = viewportCoordsToSceneCoords(
-    {
-      clientX: viewTransformations.offsetLeft,
-      clientY: viewTransformations.offsetTop,
-    },
-    viewTransformations,
-  );
-  const bottomRightSceneCoords = viewportCoordsToSceneCoords(
-    {
-      clientX: viewTransformations.offsetLeft + canvasWidth,
-      clientY: viewTransformations.offsetTop + canvasHeight,
-    },
-    viewTransformations,
-  );
-
-  return (
-    topLeftSceneCoords.x <= x2 &&
-    topLeftSceneCoords.y <= y2 &&
-    bottomRightSceneCoords.x >= x1 &&
-    bottomRightSceneCoords.y >= y1
-  );
 };
 
 // This should be only called for exporting purposes

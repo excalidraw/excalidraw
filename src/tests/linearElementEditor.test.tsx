@@ -25,7 +25,6 @@ import {
 import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 
-// FIXME I: add specific tests for render of both components (when they should both, when just one, when just second, what is the order of renders - first static, then interactive, etc., all tests)
 const renderInteractiveScene = jest.spyOn(Renderer, "renderInteractiveScene");
 const renderStaticScene = jest.spyOn(Renderer, "renderStaticScene");
 
@@ -34,7 +33,6 @@ const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
 
 describe("Test Linear Elements", () => {
   let container: HTMLElement;
-  let canvas: HTMLCanvasElement;
   let interactiveCanvas: HTMLCanvasElement;
 
   beforeEach(async () => {
@@ -45,13 +43,10 @@ describe("Test Linear Elements", () => {
     renderStaticScene.mockClear();
     reseed(7);
     const comp = await render(<ExcalidrawApp />);
+    h.state.width = 1000;
+    h.state.height = 1000;
     container = comp.container;
-    canvas = container.querySelector("canvas.static")!;
-    canvas.width = 1000;
-    canvas.height = 1000;
     interactiveCanvas = container.querySelector("canvas.interactive")!;
-    interactiveCanvas.width = 1000;
-    interactiveCanvas.height = 1000;
   });
 
   const p1: Point = [20, 20];

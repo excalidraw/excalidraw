@@ -187,7 +187,7 @@ import {
   KEYS,
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
-import { isVisibleElement } from "../renderer/renderScene";
+import { isVisibleElement } from "../element/sizeHelpers";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
@@ -839,16 +839,18 @@ class App extends React.Component<AppProps, AppState> {
                           appState={this.state}
                           scene={this.scene}
                         >
-                          {(elements, versionNonce) => (
+                          {(versionNonce, elements, visibleElements) => (
                             <>
                               <StaticCanvas
                                 canvas={this.canvas}
                                 rc={this.rc}
                                 elements={elements}
+                                visibleElements={visibleElements}
                                 versionNonce={versionNonce}
                                 selectionNonce={
                                   this.state.selectionElement?.versionNonce
                                 }
+                                scale={window.devicePixelRatio}
                                 appState={this.state}
                                 renderConfig={{
                                   imageCache: this.imageCache,
@@ -860,10 +862,12 @@ class App extends React.Component<AppProps, AppState> {
                               <InteractiveCanvas
                                 canvas={this.interactiveCanvas}
                                 elements={elements}
+                                visibleElements={visibleElements}
                                 versionNonce={versionNonce}
                                 selectionNonce={
                                   this.state.selectionElement?.versionNonce
                                 }
+                                scale={window.devicePixelRatio}
                                 appState={this.state}
                                 renderInteractiveSceneCallback={
                                   this.renderInteractiveSceneCallback

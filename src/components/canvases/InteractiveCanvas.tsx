@@ -14,8 +14,10 @@ import type { NonDeletedExcalidrawElement } from "../../element/types";
 type InteractiveCanvasProps = {
   canvas: HTMLCanvasElement | null;
   elements: readonly NonDeletedExcalidrawElement[];
+  visibleElements: readonly NonDeletedExcalidrawElement[];
   versionNonce: number | undefined;
   selectionNonce: number | undefined;
+  scale: number;
   appState: InteractiveCanvasAppState;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
@@ -83,9 +85,10 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
 
     renderInteractiveScene(
       {
-        scale: window.devicePixelRatio,
-        elements: props.elements,
         canvas: props.canvas,
+        elements: props.elements,
+        visibleElements: props.visibleElements,
+        scale: window.devicePixelRatio,
         appState: props.appState,
         renderConfig: {
           remotePointerViewportCoords: pointerViewportCoords,
@@ -117,8 +120,8 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           ? CURSOR_TYPE.GRAB
           : CURSOR_TYPE.AUTO,
       }}
-      width={props.appState.width * window.devicePixelRatio}
-      height={props.appState.height * window.devicePixelRatio}
+      width={props.appState.width * props.scale}
+      height={props.appState.height * props.scale}
       ref={props.handleCanvasRef}
       onContextMenu={props.onContextMenu}
       onPointerMove={props.onPointerMove}
@@ -133,7 +136,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   );
 };
 
-const stripIrrelevantAppStateProps = (
+const getRelevantAppStateProps = (
   appState: AppState,
 ): Omit<InteractiveCanvasAppState, "editingElement"> => ({
   zoom: appState.zoom,
@@ -167,10 +170,11 @@ const areEqual = (
   prevProps: InteractiveCanvasProps,
   nextProps: InteractiveCanvasProps,
 ) => {
-  // This could be further optimised if needed, as we don't have to render interactive canvas on each mutation
+  // This could be further optimised if needed, as we don't have to render interactive canvas on each scene mutation
   if (
     prevProps.selectionNonce !== nextProps.selectionNonce ||
-    prevProps.versionNonce !== nextProps.versionNonce
+    prevProps.versionNonce !== nextProps.versionNonce ||
+    prevProps.scale !== nextProps.scale
   ) {
     return false;
   }
@@ -179,8 +183,8 @@ const areEqual = (
   return isShallowEqual(
     // asserting AppState because we're being passed the whole AppState
     // but resolve to only the InteractiveCanvas-relevant props
-    stripIrrelevantAppStateProps(prevProps.appState as AppState),
-    stripIrrelevantAppStateProps(nextProps.appState as AppState),
+    getRelevantAppStateProps(prevProps.appState as AppState),
+    getRelevantAppStateProps(nextProps.appState as AppState),
   );
 };
 

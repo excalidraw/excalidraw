@@ -12,6 +12,7 @@ import {
   updateImageCache,
 } from "../element/image";
 import Scene from "./Scene";
+import { isVisibleElement } from "../element/sizeHelpers";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -54,8 +55,29 @@ export const exportToCanvas = async (
 
   const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
+  const viewTransformations = {
+    zoom: appState.zoom,
+    offsetLeft: appState.offsetLeft,
+    offsetTop: appState.offsetTop,
+    scrollX: appState.scrollX,
+    scrollY: appState.scrollY,
+  };
+
+  const visibleElements = elements.filter((element) =>
+    isVisibleElement(
+      element,
+      appState.width,
+      appState.height,
+      viewTransformations,
+    ),
+  );
+
   renderStaticScene({
+    canvas,
+    rc: rough.canvas(canvas),
     elements,
+    visibleElements,
+    scale,
     appState: {
       ...appState,
       scrollX: -minX + (onlyExportingSingleFrame ? 0 : exportPadding),
@@ -64,9 +86,6 @@ export const exportToCanvas = async (
       shouldCacheIgnoreZoom: false,
       theme: appState.exportWithDarkMode ? "dark" : "light",
     },
-    scale,
-    rc: rough.canvas(canvas),
-    canvas,
     renderConfig: {
       imageCache,
       renderGrid: false,

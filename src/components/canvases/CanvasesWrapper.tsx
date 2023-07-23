@@ -1,25 +1,30 @@
 import { ReactNode } from "react";
-import { useMutatedElements } from "../../hooks/useMutatedElements";
-import { AppState } from "../../types";
+import { useCanvasElements } from "../../hooks/useMutatedElements";
+import { CommonCanvasAppState } from "../../types";
 import { NonDeletedExcalidrawElement } from "../../element/types";
 import Scene from "../../scene/Scene";
+import { useVisibleCanvasElements } from "../../hooks/useVisibleElements";
 
 type CanvasesWrapperProps = {
-  appState: AppState;
+  appState: CommonCanvasAppState;
   scene: Scene;
   children: (
-    elements: readonly NonDeletedExcalidrawElement[],
     versionNonce: number | undefined,
+    elements: readonly NonDeletedExcalidrawElement[],
+    visibleElements: readonly NonDeletedExcalidrawElement[],
   ) => ReactNode;
 };
 
-const CanvasesWrapper = (props: CanvasesWrapperProps) => {
-  const [elements, versionNonce] = useMutatedElements({
-    appState: props.appState,
-    scene: props.scene,
-  });
+const CanvasesWrapper = ({
+  appState,
+  scene,
+  children,
+}: CanvasesWrapperProps) => {
+  const versionNonce = scene.getVersionNonce();
+  const elements = useCanvasElements(appState, scene);
+  const visibleElements = useVisibleCanvasElements(appState, elements);
 
-  return <main>{props.children(elements, versionNonce)}</main>;
+  return <main>{children(versionNonce, elements, visibleElements)}</main>;
 };
 
 export default CanvasesWrapper;

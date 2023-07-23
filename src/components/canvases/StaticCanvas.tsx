@@ -10,8 +10,10 @@ type StaticCanvasProps = {
   canvas: HTMLCanvasElement | null;
   rc: RoughCanvas | null;
   elements: readonly NonDeletedExcalidrawElement[];
+  visibleElements: readonly NonDeletedExcalidrawElement[];
   versionNonce: number | undefined;
   selectionNonce: number | undefined;
+  scale: number;
   appState: StaticCanvasAppState;
   renderConfig: StaticCanvasRenderConfig;
   handleCanvasRef: (canvas: HTMLCanvasElement) => void;
@@ -27,10 +29,11 @@ const StaticCanvas = (props: StaticCanvasProps) => {
     }
     renderStaticScene(
       {
-        scale: window.devicePixelRatio,
-        elements: props.elements,
         canvas: props.canvas,
         rc: props.rc!,
+        scale: props.scale,
+        elements: props.elements,
+        visibleElements: props.visibleElements,
         appState: props.appState,
         renderConfig: props.renderConfig,
       },
@@ -51,14 +54,14 @@ const StaticCanvas = (props: StaticCanvasProps) => {
         height: props.appState.height,
         pointerEvents: "none",
       }}
-      width={props.appState.width * window.devicePixelRatio}
-      height={props.appState.height * window.devicePixelRatio}
+      width={props.appState.width * props.scale}
+      height={props.appState.height * props.scale}
       ref={props.handleCanvasRef}
     />
   );
 };
 
-const stripIrrelevantAppStateProps = (
+const getRelevantAppStateProps = (
   appState: AppState,
 ): Omit<
   StaticCanvasAppState,
@@ -89,15 +92,18 @@ const areEqual = (
   prevProps: StaticCanvasProps,
   nextProps: StaticCanvasProps,
 ) => {
-  if (prevProps.versionNonce !== nextProps.versionNonce) {
+  if (
+    prevProps.versionNonce !== nextProps.versionNonce ||
+    prevProps.scale !== nextProps.scale
+  ) {
     return false;
   }
 
   return isShallowEqual(
     // asserting AppState because we're being passed the whole AppState
-    // but resolve to only the InteractiveCanvas-relevant props
-    stripIrrelevantAppStateProps(prevProps.appState as AppState),
-    stripIrrelevantAppStateProps(nextProps.appState as AppState),
+    // but resolve to only the StaticCanvas-relevant props
+    getRelevantAppStateProps(prevProps.appState as AppState),
+    getRelevantAppStateProps(nextProps.appState as AppState),
   );
 };
 

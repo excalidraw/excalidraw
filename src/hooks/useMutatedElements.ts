@@ -1,17 +1,13 @@
 import Scene from "../scene/Scene";
 import { useMemo } from "react";
-import { InteractiveCanvasAppState, StaticCanvasAppState } from "../types";
 import { isImageElement } from "../element/typeChecks";
 import { NonDeletedExcalidrawElement } from "../element/types";
+import { CommonCanvasAppState } from "../types";
 
-export const useMutatedElements = ({
-  appState,
-  scene,
-}: {
-  appState: InteractiveCanvasAppState | StaticCanvasAppState;
-  scene: Scene;
-}): [readonly NonDeletedExcalidrawElement[], number | undefined] => {
-  const versionNonce = scene.getVersionNonce();
+export const useCanvasElements = (
+  appState: CommonCanvasAppState,
+  scene: Scene,
+): readonly NonDeletedExcalidrawElement[] => {
   const nonDeletedElements = scene.getNonDeletedElements();
 
   const elements = useMemo(() => {
@@ -38,5 +34,5 @@ export const useMutatedElements = ({
     appState.pendingImageElementId,
   ]);
 
-  return [elements, versionNonce];
+  return elements;
 };
