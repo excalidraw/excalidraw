@@ -28,12 +28,12 @@ jobs:
               pull_number: number,
             });
             return pr.data.head.sha
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ steps.sha.outputs.result }}
           fetch-depth: 2
       - name: Setup Node.js 14.x
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 14.x
       - name: Set up publish access

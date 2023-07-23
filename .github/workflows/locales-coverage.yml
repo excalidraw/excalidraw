@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
 
       - name: Setup Node.js 14.x
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 14.x
 
@@ -40,7 +40,7 @@ jobs:
           echo ::set-output name=body::$body
 
       - name: Update description with coverage
-        uses: kt3k/update-pr-description@v1.0.1
+        uses: kt3k/update-pr-description@v2.1.1
         with:
           pr_body: ${{ steps.getCommentBody.outputs.body }}
           pr_title: "chore: Update translations from Crowdin"
