@@ -1,0 +1,18 @@
+https://storybook.js.org/docs/react/get-started/install
+
+Unfortunately I ran into this error when running a the `WelcomeCenter` component through storybook.
+
+```
+Cannot destructure property 'welcomeScreenCenterTunnel' of '(0 , _context_tunnels__WEBPACK_IMPORTED_MODULE_4__.useTunnels)(...)' as it is null.
+TypeError: Cannot destructure property 'welcomeScreenCenterTunnel' of '(0 , _context_tunnels__WEBPACK_IMPORTED_MODULE_4__.useTunnels)(...)' as it is null.
+    at Center (http://localhost:49156/main.iframe.bundle.js:26041:5)
+    at renderWithHooks (http://localhost:49156/vendors-node_modules_dwelle_tunnel-rat_dist_index_js-node_modules_storybook_addon-actions_pre-2da91c.iframe.bundle.js:116218:18)
+    at mountIndeterminateComponent (http://localhost:49156/vendors-node_modules_dwelle_tunnel-rat_dist_index_js-node_modules_storybook_addon-actions_pre-2da91c.iframe.bundle.js:119982:13)
+    at beginWork (http://localhost:49156/vendors-node_modules_dwelle_tunnel-rat_dist_index_js-node_modules_storybook_addon-actions_pre-2da91c.iframe.bundle.js:121495:16)
+    at beginWork$1 (http://localhost:49156/vendors-node_modules_dwelle_tunnel-rat_dist_index_js-node_modules_storybook_addon-actions_pre-2da91c.iframe.bundle.js:127334:14)
+    at performUnitOfWork (http://localhost:49156/vendors-node_modules_dwelle_tunnel-rat_dist_index_js-node_modules_storybook_addon-actions_pre-2da91c.iframe.bundle.js:126468:12)
+    at workLoopSync (http://localhost:49156/vendors-node_modules_dwelle_tunnel-rat_dist_index_js-node_modules_storybook_addon-actions_pre-2da91c.iframe.bundle.js:126374:5)
+    at renderRootSync (http://localhost:49156/vendors-node_modules_dwelle_tunnel-rat_dist_index_js-node_modules_storybook_addon-actions_pre-2da91c.iframe.bundle.js:126342:7)
+    at recoverFromConcurrentError (http://localhost:49156/vendors-node_modules_dwelle_tunnel-rat_dist_index_js-node_modules_storybook_addon-actions_pre-2da91c.iframe.bundle.js:125758:20)
+    at performConcurrentWorkOnRoot (http://localhost:49156/vendors-node_modules_dwelle_tunnel-rat_dist_index_js-node_modules_storybook_addon-actions_pre-2da91c.iframe.bundle.js:125658:22)
+```

@@ -67,12 +67,12 @@ export const getCollabServer = async (): Promise<{
   url: string;
   polling: boolean;
 }> => {
-  if (process.env.REACT_APP_WS_SERVER_URL) {
+  // if (process.env.REACT_APP_WS_SERVER_URL) {
     return {
-      url: process.env.REACT_APP_WS_SERVER_URL,
+      url: `url:"http://localhost:3002"`, //process.env.REACT_APP_WS_SERVER_URL,
       polling: true,
     };
-  }
+  // }
 
   try {
     const resp = await fetch(

@@ -15,11 +15,83 @@ services:
       disable: true
     environment:
       - NODE_ENV=development
+      - REACT_APP_WS_SERVER_URL=http://localhost:3002
     volumes:
       - ./:/opt/node_app/app:delegated
       - ./package.json:/opt/node_app/package.json
       - ./yarn.lock:/opt/node_app/yarn.lock
       - notused:/opt/node_app/app/node_modules
 
+  ngrok:
+    image: ngrok/ngrok
+    command: http 3000
+    ports:
+      - 4040
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+
+  excalidraw_room:
+    image: excalidraw/excalidraw-room
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3002:80"
+
+  radicale:
+    image: tomsquest/docker-radicale
+    container_name: radicale
+    ports:
+      - 127.0.0.1:5232:5232
+    init: true
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETUID
+      - SETGID
+      - CHOWN
+      - KILL
+    healthcheck:
+      test: curl -f http://127.0.0.1:5232 || exit 1
+      interval: 30s
+      retries: 3
+    restart: unless-stopped
+    volumes:
+      - ./data:/data
+
+  db:
+    image: postgres:15.1-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=onlyplans
+      - PGDATA=/var/lib/postgresql/data/pgdata \
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+    depends_on:
+      - restic
+
+  restic:
+    image: restic/rest-server
+    ports:
+      - 8080:8080
+    command: rest-server --listen ':8080' --no-auth --private-repos
+    volumes:
+      - root:/tmp/restic
+
 volumes:
-  notused:
+  notused: {}
+  postgresql: {}
+  root: {}
+  work: {}
+
+networks:
+  default:
+    name: development
+    external: true

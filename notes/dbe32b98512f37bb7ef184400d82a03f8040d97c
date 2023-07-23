@@ -1,0 +1,11 @@
+extend collab feature to update window.locations/#room={data},{key}
+
+- when user makes changes to scene
+- when collaborator makes changes and those changes are available in child snapshot
+
+Encode decode logic is fairly generic                                                                                                                   
+// TODO map with decodedIconUri                                                                                                                         
+const snapshots = await $`restic snapshots`                                                                                                             
+const bytes = crypto.AES.decrypt(snapshot.tags[0], snapshot.tags[1]);                                                                                   
+const decryptedData = JSON.parse(bytes.toString(crypto.enc.Utf8));                                                                                      
+const decodedIconUri = excalidraw.decode(decryptedData 

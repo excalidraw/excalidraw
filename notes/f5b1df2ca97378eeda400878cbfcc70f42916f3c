@@ -1,0 +1,1 @@
+can use restic "parent" snapshot as anchor for business logic around collab syncing
