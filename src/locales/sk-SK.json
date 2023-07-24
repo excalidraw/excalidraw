@@ -109,8 +109,12 @@
     "createContainerFromText": "Zabaliť text do kontajneru",
     "link": {
       "edit": "Upraviť odkaz",
+      "editEmbed": "",
       "create": "Vytvoriť odkaz",
-      "label": "Odkaz"
+      "createEmbed": "",
+      "label": "Odkaz",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Upraviť čiaru",
@@ -164,9 +168,11 @@
     "cancel": "Zrušiť",
     "clear": "Vymazať",
     "remove": "Odstrániť",
+    "embed": "",
     "publishLibrary": "Uverejniť",
     "submit": "Potvrdiť",
-    "confirm": "Potvrdiť"
+    "confirm": "Potvrdiť",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Týmto sa vyčistí celé plátno. Ste si istí?",
@@ -206,6 +212,10 @@
       "line2": "To môže spôsobiť nesprávne zobrazenie <bold>textových prvkov</bold> vo vašej kresbe.",
       "line3": "Dôrazne odporúčame vypnutie toho nastavenia. Môžete tak spraviť vykonaním <link>týchto krokov</link>.",
       "line4": "Ak vypnutie toho nastavenia nevyrieši problém so zobrazením textových prvkov, prosím ohláste <issueLink>problém</issueLink> na našom GitHub-e alebo nám napíšte na náš <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
     "eraser": "Guma",
     "frame": "Nástroj rám",
+    "embeddable": "",
     "hand": "Ruka (nástroj pre pohyb plátna)",
     "extraTools": "Ďalšie nástroje"
   },
@@ -237,6 +248,7 @@
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
+    "embeddable": "",
     "text_selected": "Použite dvojklik alebo stlačte Enter na editáciu textu",
     "text_editing": "Stlačte Escape alebo CtrlOrCmd+ENTER na ukončenie editovania",
     "linearElementMulti": "Kliknite na počiatočný bod alebo stlačte Escape alebo Enter na ukončenie",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Uložený ako {filename}",
     "canvas": "plátna",
     "selection": "výberu",
-    "pasteAsSingleElement": "Použitím {{shortcut}} vložte ako samostatný prvok alebo vložte do existujúceho editovaného textu"
+    "pasteAsSingleElement": "Použitím {{shortcut}} vložte ako samostatný prvok alebo vložte do existujúceho editovaného textu",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Priehľadná",
