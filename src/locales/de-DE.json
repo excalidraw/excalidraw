@@ -109,12 +109,12 @@
     "createContainerFromText": "Text in Container einbetten",
     "link": {
       "edit": "Link bearbeiten",
-      "editEmbed": "",
+      "editEmbed": "Link bearbeiten & einbetten",
       "create": "Link erstellen",
-      "createEmbed": "",
+      "createEmbed": "Link erstellen & einbetten",
       "label": "Link",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Verlinken & einbetten",
+      "empty": "Kein Link festgelegt"
     },
     "lineEditor": {
       "edit": "Linie bearbeiten",
@@ -168,11 +168,11 @@
     "cancel": "Abbrechen",
     "clear": "Löschen",
     "remove": "Entfernen",
-    "embed": "",
+    "embed": "Einbettung umschalten",
     "publishLibrary": "Veröffentlichen",
     "submit": "Absenden",
     "confirm": "Bestätigen",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Klicken, um zu interagieren"
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
@@ -214,8 +214,8 @@
       "line4": "Wenn die Deaktivierung dieser Einstellung die fehlerhafte Anzeige von Textelementen nicht behebt, öffne bitte ein <issueLink>Ticket</issueLink> auf unserem GitHub oder schreibe uns auf <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "image": ""
+      "embeddable": "Einbettbare Elemente können der Bibliothek nicht hinzugefügt werden.",
+      "image": "Unterstützung für das Hinzufügen von Bildern in die Bibliothek kommt bald!"
     }
   },
   "toolBar": {
@@ -234,7 +234,7 @@
     "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
     "eraser": "Radierer",
     "frame": "Rahmenwerkzeug",
-    "embeddable": "",
+    "embeddable": "Web-Einbettung",
     "hand": "Hand (Schwenkwerkzeug)",
     "extraTools": "Weitere Werkzeuge"
   },
@@ -248,7 +248,7 @@
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
-    "embeddable": "",
+    "embeddable": "Klicken und ziehen, um eine Webseiten-Einbettung zu erstellen",
     "text_selected": "Doppelklicken oder Eingabetaste drücken, um Text zu bearbeiten",
     "text_editing": "Drücke Escape oder CtrlOrCmd+Eingabetaste, um die Bearbeitung abzuschließen",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
@@ -424,8 +424,8 @@
     "canvas": "Zeichenfläche",
     "selection": "Auswahl",
     "pasteAsSingleElement": "Verwende {{shortcut}} , um als einzelnes Element\neinzufügen oder in einen existierenden Texteditor einzufügen",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "Einbetten dieser URL ist derzeit nicht zulässig. Erstelle einen Issue auf GitHub, um die URL freigeben zu lassen",
+    "unrecognizedLinkFormat": "Der Link, den Du eingebettet hast, stimmt nicht mit dem erwarteten Format überein. Bitte versuche den 'embed' String einzufügen, der von der Quellseite zur Verfügung gestellt wird"
   },
   "colors": {
     "transparent": "Transparent",
