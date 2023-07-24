@@ -109,8 +109,12 @@
     "createContainerFromText": "Encadrer le texte dans un conteneur",
     "link": {
       "edit": "Modifier le lien",
+      "editEmbed": "",
       "create": "Ajouter un lien",
-      "label": "Lien"
+      "createEmbed": "",
+      "label": "Lien",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Modifier la ligne",
@@ -164,9 +168,11 @@
     "cancel": "Annuler",
     "clear": "Effacer",
     "remove": "Supprimer",
+    "embed": "",
     "publishLibrary": "Publier",
     "submit": "Envoyer",
-    "confirm": "Confirmer"
+    "confirm": "Confirmer",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "L'intégralité du canevas va être effacée. Êtes-vous sûr ?",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
     "eraser": "Gomme",
     "frame": "",
+    "embeddable": "",
     "hand": "Mains (outil de déplacement de la vue)",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
+    "embeddable": "",
     "text_selected": "Double-cliquez ou appuyez sur ENTRÉE pour modifier le texte",
     "text_editing": "Appuyez sur ÉCHAP ou Ctrl/Cmd+ENTRÉE pour terminer l'édition",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Enregistré sous {filename}",
     "canvas": "canevas",
     "selection": "sélection",
-    "pasteAsSingleElement": "Utiliser {{shortcut}} pour coller comme un seul élément,\nou coller dans un éditeur de texte existant"
+    "pasteAsSingleElement": "Utiliser {{shortcut}} pour coller comme un seul élément,\nou coller dans un éditeur de texte existant",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Transparent",
