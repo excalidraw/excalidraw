@@ -109,8 +109,12 @@
     "createContainerFromText": "Radbryt text i en avgränsad yta",
     "link": {
       "edit": "Redigera länk",
+      "editEmbed": "",
       "create": "Skapa länk",
-      "label": "Länk"
+      "createEmbed": "",
+      "label": "Länk",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Redigera linje",
@@ -164,9 +168,11 @@
     "cancel": "Avbryt",
     "clear": "Rensa",
     "remove": "Ta bort",
+    "embed": "",
     "publishLibrary": "Publicera",
     "submit": "Skicka",
-    "confirm": "Bekräfta"
+    "confirm": "Bekräfta",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Detta rensar hela canvasen. Är du säker?",
@@ -206,6 +212,10 @@
       "line2": "Detta kan resultera i trasiga <bold>Textelement</bold> i dina ritningar.",
       "line3": "Vi rekommenderar starkt att du inaktiverar den här inställningen. Du kan följa <link>dessa steg</link> för att inaktivera den.",
       "line4": "Om inaktivering av denna inställning inte åtgärdar visningen av textelement, öppna ett <issueLink>ärende</issueLink> på vår GitHub, eller skriv till oss på <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Lägg till / Uppdatera länk för en vald form",
     "eraser": "Radergummi",
     "frame": "Rutverktyg",
+    "embeddable": "",
     "hand": "Hand (panoreringsverktyg)",
     "extraTools": "Fler verktyg"
   },
@@ -237,6 +248,7 @@
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
+    "embeddable": "",
     "text_selected": "Dubbelklicka eller tryck ENTER för att redigera text",
     "text_editing": "Tryck Escape eller CtrlOrCmd + ENTER för att slutföra redigeringen",
     "linearElementMulti": "Klicka på sista punkten eller tryck Escape eller Enter för att avsluta",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Sparad till {filename}",
     "canvas": "canvas",
     "selection": "markering",
-    "pasteAsSingleElement": "Använd {{shortcut}} för att klistra in som ett enda element,\neller klistra in i en befintlig textredigerare"
+    "pasteAsSingleElement": "Använd {{shortcut}} för att klistra in som ett enda element,\neller klistra in i en befintlig textredigerare",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Genomskinlig",
