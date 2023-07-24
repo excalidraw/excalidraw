@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Modificar lo ligam",
+      "editEmbed": "",
       "create": "Crear un ligam",
-      "label": "Ligam"
+      "createEmbed": "",
+      "label": "Ligam",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Modificar la linha",
@@ -164,9 +168,11 @@
     "cancel": "Anullar",
     "clear": "Escafar",
     "remove": "Tirar",
+    "embed": "",
     "publishLibrary": "Publicar",
     "submit": "Enviar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Aquò suprimirà lo canabàs complèt. O volètz vertadièrament ?",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
     "eraser": "Goma",
     "frame": "",
+    "embeddable": "",
     "hand": "Man (aisina de desplaçament de la vista)",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "Clicatz per començar mantun punt, lisatz per una sola linha",
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
+    "embeddable": "",
     "text_selected": "Clicatz dos còps o quichatz ENTRADA per modificar lo tèxt",
     "text_editing": "Quichatz ESCAPAR o CtrlOrCmd+ENTRADA per acabar la modificacion",
     "linearElementMulti": "Clicatz sul darrièr punt o quichatz Ecap o Entrada per acabar",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Enregistrat jos {filename}",
     "canvas": "canabàs",
     "selection": "seleccion",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Transparéncia",
