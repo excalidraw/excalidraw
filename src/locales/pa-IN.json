@@ -109,8 +109,12 @@
     "createContainerFromText": "ਪਾਠ ਨੂੰ ਕੰਟੇਨਰ ਵਿੱਚ ਇਕੱਠਾ ਕਰੋ",
     "link": {
       "edit": "ਕੜੀ ਸੋਧੋ",
+      "editEmbed": "",
       "create": "ਕੜੀ ਬਣਾਓ",
-      "label": "ਕੜੀ"
+      "createEmbed": "",
+      "label": "ਕੜੀ",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "ਪੰਕਤੀ ਸੋਧੋ",
@@ -164,9 +168,11 @@
     "cancel": "ਰੱਦ ਕਰੋ",
     "clear": "ਸਾਫ਼ ਕਰੋ",
     "remove": "ਹਟਾਓ",
+    "embed": "",
     "publishLibrary": "ਪ੍ਰਕਾਸ਼ਤ ਕਰੋ",
     "submit": "ਜਮ੍ਹਾ ਕਰਵਾਓ",
-    "confirm": "ਪੁਸ਼ਟੀ ਕਰੋ"
+    "confirm": "ਪੁਸ਼ਟੀ ਕਰੋ",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "ਇਹ ਸਾਰਾ ਕੈਨਵਸ ਸਾਫ ਕਰ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "",
     "eraser": "ਰਬੜ",
     "frame": "",
+    "embeddable": "",
     "hand": "",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "ਇੱਕ ਤੋਂ ਜ਼ਿਆਦਾ ਬਿੰਦੂਆਂ ਲਈ ਕਲਿੱਕ ਕਰਕੇ ਸ਼ੁਰੂਆਤ ਕਰੋ, ਇਕਹਿਰੀ ਲਕੀਰ ਲਈ ਘਸੀਟੋ",
     "freeDraw": "ਕਲਿੱਕ ਕਰਕੇ ਘਸੀਟੋ, ਪੂਰਾ ਹੋਣ 'ਤੇ ਛੱਡ ਦਿਉ",
     "text": "ਨੁਸਖਾ: ਤੁਸੀਂ ਚੋਣਕਾਰ ਸੰਦ ਰਾਹੀਂ ਕਿਤੇ ਵੀ ਡਬਲ-ਕਲਿੱਕ ਕਰਕੇ ਵੀ ਪਾਠ ਜੋੜ ਸਕਦੇ ਹੋ",
+    "embeddable": "",
     "text_selected": "ਪਾਠ ਨੂੰ ਸੋਧਣ ਲਈ ਡਬਲ-ਕਲਿੱਕ ਕਰੋ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
     "text_editing": "ਸੋਧ ਮੁਕੰਮਲ ਕਰਨ ਲਈ ਐਸਕੇਪ (Esc) ਜਾਂ Ctrl-ਜਾਂ-Cmd+ਐਂਟਰ (enter) ਦਬਾਓ",
     "linearElementMulti": "ਮੁਕੰਮਲ ਕਰਨ ਲਈ ਆਖਰੀ ਬਿੰਦੂ 'ਤੇ ਕਲਿੱਕ ਕਰੋ ਜਾਂ ਇਸਕੇਪ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "{filename} ਵਿੱਚ ਸਾਂਭੀ",
     "canvas": "ਕੈਨਵਸ",
     "selection": "ਚੋਣ",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "ਪਾਰਦਰਸ਼ੀ",
