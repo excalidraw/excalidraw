@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Ẓreg aseɣwen",
+      "editEmbed": "",
       "create": "Snulfu-d aseɣwen",
-      "label": "Aseɣwen"
+      "createEmbed": "",
+      "label": "Aseɣwen",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Ẓreg izirig",
@@ -164,9 +168,11 @@
     "cancel": "Sefsex",
     "clear": "Sfeḍ",
     "remove": "Kkes",
+    "embed": "",
     "publishLibrary": "Ẓreg",
     "submit": "Azen",
-    "confirm": "Sentem"
+    "confirm": "Sentem",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Ayagi ad isfeḍ akk taɣzut n usuneɣ. Tetḥeqqeḍ?",
@@ -206,6 +212,10 @@
       "line2": "Ayagi yezmer ad d-iglu s truẓi n<bold>Iferdisen n uḍris</bold>deg wunuɣen-inek.",
       "line3": "Ad k-nsemter ad tsexsiḍ aɣewwar-agi. Tzemreḍ ad tḍefreḍ<link>isurifen-agi</link> ɣef wamek ara txedmeḍ.",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen",
     "eraser": "Sfeḍ",
     "frame": "",
+    "embeddable": "",
     "hand": "Afus (afecku n usmutti n tmuɣli)",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "Ssit akken ad tebduḍ aṭas n tenqiḍin, zuɣer i yiwen n yizirig",
     "freeDraw": "Ssit yerna zuɣer, serreḥ ticki tfukeḍ",
     "text": "Tixidest: tzemreḍ daɣen ad ternuḍ aḍris s usiti snat n tikkal anida tebɣiḍ s ufecku n tefrayt",
+    "embeddable": "",
     "text_selected": "Ssit snat n tikkal neɣ ssed taqeffalt Kcem akken ad tẓergeḍ aḍris",
     "text_editing": "Ssit Escape neɣ CtrlOrCmd+ENTER akken ad tfakkeḍ asiẓreg",
     "linearElementMulti": "Ssit ɣef tenqiḍt taneggarut neɣ ssed taqeffalt Escape neɣ taqeffalt Kcem akken ad tfakkeḍ",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Yettwasekles di {filename}",
     "canvas": "taɣzut n usuneɣ",
     "selection": "tafrayt",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Afrawan",
