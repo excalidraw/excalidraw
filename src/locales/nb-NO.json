@@ -424,8 +424,8 @@
     "canvas": "lerret",
     "selection": "utvalg",
     "pasteAsSingleElement": "Bruk {{shortcut}} for å lime inn som ett enkelt element,\neller lim inn i en eksisterende tekstbehandler",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "Innbygging av denne nettadressen er ikke tillatt. Oppret en sak på GitHub for å be om url-hvitelisting",
+    "unrecognizedLinkFormat": "Linken du bygget inn samsvarer ikke med det forventede formatet. Prøv å lime inn \"bygg inn\"-strengen fra kildesiden"
   },
   "colors": {
     "transparent": "Gjennomsiktig",
