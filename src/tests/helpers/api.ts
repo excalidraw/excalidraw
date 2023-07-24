@@ -178,8 +178,9 @@ export class API {
       case "rectangle":
       case "diamond":
       case "ellipse":
+      case "embeddable":
         element = newElement({
-          type: type as "rectangle" | "diamond" | "ellipse",
+          type: type as "rectangle" | "diamond" | "ellipse" | "embeddable",
           width,
           height,
           ...base,

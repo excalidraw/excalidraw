@@ -100,6 +100,20 @@ polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
 
+let isSelfEmbedding = false;
+
+if (window.self !== window.top) {
+  try {
+    const parentUrl = new URL(document.referrer);
+    const currentUrl = new URL(window.location.href);
+    if (parentUrl.origin === currentUrl.origin) {
+      isSelfEmbedding = true;
+    }
+  } catch (error) {
+    // ignore
+  }
+}
+
 const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {},
@@ -518,7 +532,9 @@ const ExcalidrawWrapper = () => {
 
   const [theme, setTheme] = useState<Theme>(
     () =>
-      localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_THEME) ||
+      (localStorage.getItem(
+        STORAGE_KEYS.LOCAL_STORAGE_THEME,
+      ) as Theme | null) ||
       // FIXME migration from old LS scheme. Can be removed later. #5660
       importFromLocalStorage().appState?.theme ||
       THEME.LIGHT,
@@ -640,6 +656,25 @@ const ExcalidrawWrapper = () => {
   };
 
   const isOffline = useAtomValue(isOfflineAtom);
+
+  // browsers generally prevent infinite self-embedding, there are
+  // cases where it still happens, and while we disallow self-embedding
+  // by not whitelisting our own origin, this serves as an additional guard
+  if (isSelfEmbedding) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          height: "100%",
+        }}
+      >
+        <h1>I'm not a pretzel!</h1>
+      </div>
+    );
+  }
 
   return (
     <div

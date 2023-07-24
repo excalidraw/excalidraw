@@ -178,8 +178,10 @@ export const exportToSvg = async ({
   appState = getDefaultAppState(),
   files = {},
   exportPadding,
+  renderEmbeddables,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
+  renderEmbeddables?: boolean;
 }): Promise<SVGSVGElement> => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
@@ -197,6 +199,7 @@ export const exportToSvg = async ({
     exportAppState,
     files,
     {
+      renderEmbeddables,
       // NOTE as long as we're using the Scene hack, we need to ensure
       // we pass the original, uncloned elements when serializing
       // so that we keep ids stable. Hence adding the serializeAsJSON helper

@@ -13,6 +13,7 @@ import {
   FontFamilyValues,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
+  ExcalidrawEmbeddableElement,
 } from "../element/types";
 import {
   arrayToMap,
@@ -130,6 +131,18 @@ export const newElement = (
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
+export const newEmbeddableElement = (
+  opts: {
+    type: "embeddable";
+    validated: boolean | undefined;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawEmbeddableElement> => {
+  return {
+    ..._newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts),
+    validated: opts.validated,
+  };
+};
+
 export const newFrameElement = (
   opts: ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFrameElement> => {
@@ -177,7 +190,6 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"];
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     strokeWidth?: ExcalidrawTextElement["strokeWidth"];
-    isFrameName?: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -212,7 +224,6 @@ export const newTextElement = (
       containerId: opts.containerId || null,
       originalText: text,
       lineHeight,
-      isFrameName: opts.isFrameName || false,
     },
     {},
   );

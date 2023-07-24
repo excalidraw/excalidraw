@@ -77,6 +77,19 @@
     position: absolute;
   }
 
+  &__embeddable {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  &__embeddable-container {
+    position: absolute;
+    z-index: 2;
+    transform-origin: top left;
+    pointer-events: none;
+  }
+
   &.theme--dark {
     // The percentage is inspired by
     // https://material.io/design/color/dark-theme.html#properties, which
@@ -659,5 +672,35 @@
       font-family: "Cascadia";
       font-size: 0.8em;
     }
+  }
+}
+
+.excalidraw__embeddable-container {
+  .excalidraw__embeddable-container__inner {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--embeddable-radius);
+  }
+
+  .excalidraw__embeddable__outer {
+    width: 100%;
+    height: 100%;
+    & > * {
+      border-radius: var(--embeddable-radius);
+    }
+  }
+
+  .excalidraw__embeddable-hint {
+    position: absolute;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1rem 1.6rem;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: bold;
+    letter-spacing: 0.6px;
+    font-family: "Assistant";
   }
 }

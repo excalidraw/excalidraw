@@ -71,7 +71,17 @@ export enum EVENT {
   // custom events
   EXCALIDRAW_LINK = "excalidraw-link",
   MENU_ITEM_SELECT = "menu.itemSelect",
+  MESSAGE = "message",
 }
+
+export const YOUTUBE_STATES = {
+  UNSTARTED: -1,
+  ENDED: 0,
+  PLAYING: 1,
+  PAUSED: 2,
+  BUFFERING: 3,
+  CUED: 5,
+} as const;
 
 export const ENV = {
   TEST: "test",
@@ -92,7 +102,7 @@ export const FONT_FAMILY = {
 export const THEME = {
   LIGHT: "light",
   DARK: "dark",
-};
+} as const;
 
 export const FRAME_STYLE = {
   strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
@@ -300,3 +310,5 @@ export const DEFAULT_SIDEBAR = {
   name: "default",
   defaultTab: LIBRARY_SIDEBAR_TAB,
 } as const;
+
+export const LIBRARY_DISABLED_TYPES = new Set(["embeddable", "image"] as const);

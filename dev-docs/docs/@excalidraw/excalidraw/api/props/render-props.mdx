@@ -121,3 +121,16 @@ function App() {
   );
 }
 ```
+
+## renderEmbeddable
+
+<pre>
+  (element: NonDeleted&lt;ExcalidrawEmbeddableElement&gt;, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>) => JSX.Element | null
+</pre>
+
+Allows you to replace the renderer for embeddable elements (which renders `<iframe>` elements).
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `element` | `NonDeleted<ExcalidrawEmbeddableElement>` | The embeddable element to be rendered. |
+| `appState` | `AppState` | The current state of the UI. |

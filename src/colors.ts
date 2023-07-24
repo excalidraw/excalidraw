@@ -21,7 +21,7 @@ export type ColorPickerColor =
 export type ColorTuple = readonly [string, string, string, string, string];
 export type ColorPalette = Merge<
   Record<ColorPickerColor, ColorTuple>,
-  { black: string; white: string; transparent: string }
+  { black: "#1e1e1e"; white: "#ffffff"; transparent: "transparent" }
 >;
 
 // used general type instead of specific type (ColorPalette) to support custom colors
