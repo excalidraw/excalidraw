@@ -109,8 +109,12 @@
     "createContainerFromText": "मूलपाठ कंटेनर में मोड के दिखाए",
     "link": {
       "edit": "",
+      "editEmbed": "",
       "create": "",
-      "label": ""
+      "createEmbed": "",
+      "label": "",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "रेखा संपादित करे",
@@ -164,9 +168,11 @@
     "cancel": "",
     "clear": "साफ़ करे",
     "remove": "हटाएं",
+    "embed": "",
     "publishLibrary": "प्रकाशित करें",
     "submit": "प्रस्तुत करे",
-    "confirm": "पुष्टि करें"
+    "confirm": "पुष्टि करें",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "इससे पूरा कैनवास साफ हो जाएगा। क्या आपको यकीन है?",
@@ -206,6 +212,10 @@
       "line2": "यह आपके चित्रों के <bold>पाठ तत्वों</bold>को खंडित कर सकता हैं",
       "line3": "हमें आपसे ठोस आग्रह है की आप सेट्टिंग में इस विकल्प का चयन ना करे.<link> इस अनुक्रम </link> का पालन करके इसका पता लगा सकते हैं",
       "line4": "यदि इस सेटिंग्स को अक्षम करने पर भी पृष्ठ ठीक नहीं दिखता हो तो, हमारे GitHub पर एक <issueLink>मुद्दा प्रस्तुत</issueLink> करे, या हमें <discordLink>डिस्कोर्ड</discordLink> पर लिखित सम्पर्क करें"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "",
     "eraser": "रबड़",
     "frame": "",
+    "embeddable": "",
     "hand": "हाथ ( खिसकाने का औज़ार)",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, सिंगल लाइन के लिए खींचें",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोड़ो",
     "text": "आप चयन टूल से कहीं भी डबल-क्लिक करके टेक्स्ट जोड़ सकते हैं",
+    "embeddable": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "अंतिम बिंदु पर क्लिक करें या समाप्त होने के लिए एस्केप या एंटर दबाएं",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "",
     "canvas": "",
     "selection": "",
-    "pasteAsSingleElement": "एक अवयव के रूप में चिपकाने के लिए {{shortcut}} का उपयोग करें,\nया किसी मौजूदा पाठ संपादक में चिपकायें"
+    "pasteAsSingleElement": "एक अवयव के रूप में चिपकाने के लिए {{shortcut}} का उपयोग करें,\nया किसी मौजूदा पाठ संपादक में चिपकायें",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "",
