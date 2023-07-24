@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Επεξεργασία συνδέσμου",
+      "editEmbed": "",
       "create": "Δημιουργία συνδέσμου",
-      "label": "Σύνδεσμος"
+      "createEmbed": "",
+      "label": "Σύνδεσμος",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Επεξεργασία γραμμής",
@@ -164,9 +168,11 @@
     "cancel": "Ακύρωση",
     "clear": "Καθαρισμός",
     "remove": "Κατάργηση",
+    "embed": "",
     "publishLibrary": "Δημοσίευση",
     "submit": "Υποβολή",
-    "confirm": "Επιβεβαίωση"
+    "confirm": "Επιβεβαίωση",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Αυτό θα σβήσει ολόκληρο τον καμβά. Είσαι σίγουρος;",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Προσθήκη/ Ενημέρωση συνδέσμου για ένα επιλεγμένο σχήμα",
     "eraser": "Γόμα",
     "frame": "",
+    "embeddable": "",
     "hand": "",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "Κάνε κλικ για να ξεκινήσεις πολλαπλά σημεία, σύρε για μια γραμμή",
     "freeDraw": "Κάντε κλικ και σύρτε, απελευθερώσατε όταν έχετε τελειώσει",
     "text": "Tip: μπορείτε επίσης να προσθέστε κείμενο με διπλό-κλικ οπουδήποτε με το εργαλείο επιλογών",
+    "embeddable": "",
     "text_selected": "Κάντε διπλό κλικ ή πατήστε ENTER για να επεξεργαστείτε το κείμενο",
     "text_editing": "Πατήστε Escape ή CtrlOrCmd+ENTER για να ολοκληρώσετε την επεξεργασία",
     "linearElementMulti": "Κάνε κλικ στο τελευταίο σημείο ή πάτησε Escape ή Enter για να τελειώσεις",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Αποθηκεύτηκε στο {filename}",
     "canvas": "καμβάς",
     "selection": "επιλογή",
-    "pasteAsSingleElement": "Χρησιμοποίησε το {{shortcut}} για να επικολλήσεις ως ένα μόνο στοιχείο,\nή να επικολλήσεις σε έναν υπάρχοντα επεξεργαστή κειμένου"
+    "pasteAsSingleElement": "Χρησιμοποίησε το {{shortcut}} για να επικολλήσεις ως ένα μόνο στοιχείο,\nή να επικολλήσεις σε έναν υπάρχοντα επεξεργαστή κειμένου",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Διαφανές",
