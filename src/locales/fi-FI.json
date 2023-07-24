@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Muokkaa linkkiä",
+      "editEmbed": "",
       "create": "Luo linkki",
-      "label": "Linkki"
+      "createEmbed": "",
+      "label": "Linkki",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Muokkaa riviä",
@@ -164,9 +168,11 @@
     "cancel": "Peruuta",
     "clear": "Pyyhi",
     "remove": "Poista",
+    "embed": "",
     "publishLibrary": "Julkaise",
     "submit": "Lähetä",
-    "confirm": "Vahvista"
+    "confirm": "Vahvista",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Lisää/päivitä linkki valitulle muodolle",
     "eraser": "Poistotyökalu",
     "frame": "",
+    "embeddable": "",
     "hand": "Käsi (panning-työkalu)",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
+    "embeddable": "",
     "text_selected": "Kaksoisnapsauta tai paina ENTER muokataksesi tekstiä",
     "text_editing": "Paina Escape tai CtrlOrCmd+ENTER lopettaaksesi muokkaamisen",
     "linearElementMulti": "Lopeta klikkaamalla viimeistä pistettä, painamalla Escape- tai Enter-näppäintä",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Tallennettiin kohteeseen {filename}",
     "canvas": "piirtoalue",
     "selection": "valinta",
-    "pasteAsSingleElement": "Käytä {{shortcut}} liittääksesi yhtenä elementtinä,\ntai liittääksesi olemassa olevaan tekstieditoriin"
+    "pasteAsSingleElement": "Käytä {{shortcut}} liittääksesi yhtenä elementtinä,\ntai liittääksesi olemassa olevaan tekstieditoriin",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Läpinäkyvä",
