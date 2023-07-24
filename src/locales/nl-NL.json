@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Wijzig link",
+      "editEmbed": "",
       "create": "Maak link",
-      "label": "Link"
+      "createEmbed": "",
+      "label": "Link",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Bewerk regel",
@@ -164,9 +168,11 @@
     "cancel": "Annuleren",
     "clear": "Wissen",
     "remove": "Verwijderen",
+    "embed": "",
     "publishLibrary": "Publiceren",
     "submit": "Versturen",
-    "confirm": "Bevestigen"
+    "confirm": "Bevestigen",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Weet je het zeker?",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Link toevoegen / bijwerken voor een geselecteerde vorm",
     "eraser": "Gum",
     "frame": "",
+    "embeddable": "",
     "hand": "",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
+    "embeddable": "",
     "text_selected": "Dubbelklik of druk op ENTER om tekst te bewerken",
     "text_editing": "Druk op Escape of CtrlOrCmd+ENTER om het bewerken te voltooien",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Opgeslagen als {filename}",
     "canvas": "canvas",
     "selection": "selectie",
-    "pasteAsSingleElement": "Gebruik {{shortcut}} om te plakken als een enkel element,\nof plak in een bestaande teksteditor"
+    "pasteAsSingleElement": "Gebruik {{shortcut}} om te plakken als een enkel element,\nof plak in een bestaande teksteditor",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Transparant",
