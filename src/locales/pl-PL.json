@@ -109,8 +109,12 @@
     "createContainerFromText": "Zawijaj tekst w kontenerze",
     "link": {
       "edit": "Edytuj łącze",
+      "editEmbed": "",
       "create": "Utwórz łącze",
-      "label": "Łącze"
+      "createEmbed": "",
+      "label": "Łącze",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Edytuj linię",
@@ -164,9 +168,11 @@
     "cancel": "Anuluj",
     "clear": "Wyczyść",
     "remove": "Usuń",
+    "embed": "",
     "publishLibrary": "Opublikuj",
     "submit": "Prześlij",
-    "confirm": "Zatwierdź"
+    "confirm": "Zatwierdź",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
@@ -206,6 +212,10 @@
       "line2": "Może to doprowadzić do złamania <bold>elementów tekstu</bold> na rysunkach.",
       "line3": "Zdecydowanie zalecamy wyłączenie tego ustawienia. Możesz wykonać <link>te kroki</link>, aby to zrobić.",
       "line4": "Jeśli wyłączenie tego ustawienia nie naprawia wyświetlania elementów tekstowych, zgłoś <issueLink>problem</issueLink> na naszym GitHubie lub napisz do nas na <discordLink>Discordzie</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Dodaj/aktualizuj link dla wybranego kształtu",
     "eraser": "Gumka",
     "frame": "",
+    "embeddable": "",
     "hand": "Ręka (narzędzie do przesuwania)",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
+    "embeddable": "",
     "text_selected": "Kliknij dwukrotnie lub naciśnij ENTER, aby edytować tekst",
     "text_editing": "Naciśnij Escape lub Ctrl (Cmd w macOS) + ENTER, aby zakończyć edycję",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Zapisano jako {filename}",
     "canvas": "płótno",
     "selection": "zaznaczenie",
-    "pasteAsSingleElement": "Użyj {{shortcut}}, aby wkleić jako pojedynczy element,\nlub wklej do istniejącego edytora tekstu"
+    "pasteAsSingleElement": "Użyj {{shortcut}}, aby wkleić jako pojedynczy element,\nlub wklej do istniejącego edytora tekstu",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Przezroczysty",
