@@ -124,9 +124,9 @@
     },
     "statusPublished": "Publicado",
     "sidebarLock": "Manter barra lateral aberta",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Selecionar todos os elementos no quadro",
+    "removeAllElementsFromFrame": "Remover todos os elementos do quadro",
+    "eyeDropper": "Escolher cor da tela"
   },
   "library": {
     "noItems": "Nenhum item adicionado ainda...",
@@ -223,9 +223,9 @@
     "penMode": "Modo caneta — impede o toque",
     "link": "Adicionar/Atualizar link para uma forma selecionada",
     "eraser": "Borracha",
-    "frame": "",
+    "frame": "Ferramenta de quadro",
     "hand": "Mão (ferramenta de rolagem)",
-    "extraTools": ""
+    "extraTools": "Mais ferramentas"
   },
   "headings": {
     "canvasActions": "Ações da tela",
@@ -453,31 +453,31 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Exportar como imagem",
+        "button": "Exportar como imagem",
+        "description": "Exportar os dados da cena para um arquivo que você poderá importar mais tarde."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Salvar no computador",
+        "button": "Salvar no computador",
+        "description": "Exportar os dados da cena para um arquivo que você poderá importar mais tarde."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Exportar para Excalidraw+",
+        "description": "Salvar a cena na sua área de trabalho Excalidraw+."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Carregar de arquivo",
+        "button": "Carregar de arquivo",
+        "description": "Carregar de um arquivo irá <bold> substituir o conteúdo existente</bold>.<br></br>Você pode salvar seu desenho primeiro usando uma das opções abaixo."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Carregar de um link",
+        "button": "Substituir meu conteúdo",
+        "description": "Carregar um desenho externo irá <bold> substituir seu conteúdo existente</bold>.<br></br>Você pode salvar seu desenho antes utilizando uma das opções abaixo."
       }
     }
   }
