@@ -33,7 +33,7 @@ export default defineConfig({
     VitePWA({
       devOptions: {
         /* set this flag to true to enable in Development mode */
-        enabled: true,
+        enabled: false,
       },
       workbox: {
         // Don't push fonts and locales to app precache
