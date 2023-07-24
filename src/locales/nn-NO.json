@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Rediger lenke",
+      "editEmbed": "",
       "create": "Lag lenke",
-      "label": "Lenke"
+      "createEmbed": "",
+      "label": "Lenke",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "",
@@ -164,9 +168,11 @@
     "cancel": "Avbryt",
     "clear": "Tøm",
     "remove": "Fjern",
+    "embed": "",
     "publishLibrary": "Publiser",
     "submit": "Send inn",
-    "confirm": "Stadfest"
+    "confirm": "Stadfest",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Legg til/ oppdater lenke til valt figur",
     "eraser": "Viskelêr",
     "frame": "",
+    "embeddable": "",
     "hand": "",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "Klikk for å starte linje med fleire punkt, eller drag for ei enkel linje",
     "freeDraw": "Klikk og drag, slepp når du er ferdig",
     "text": "Tips: du kan òg leggje til tekst ved å dobbeltklikke kor som helst med utvalgsverktyet",
+    "embeddable": "",
     "text_selected": "Dobbelklikk eller trykk ENTER for å redigere teksta",
     "text_editing": "Trykk Escape eller CtrlOrCmd+ENTER for å fullføre redigeringa",
     "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Lagra som {filename}",
     "canvas": "lerret",
     "selection": "val",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Gjennomsiktig",
