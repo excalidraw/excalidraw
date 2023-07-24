@@ -8074,7 +8074,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   }, 300);
 
-  public updateDOMRect = (cb?: () => void) => {
+  private updateDOMRect = (cb?: () => void) => {
     if (this.excalidrawContainerRef?.current) {
       const excalidrawContainer = this.excalidrawContainerRef.current;
       const {
