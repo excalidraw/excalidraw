@@ -109,8 +109,12 @@
     "createContainerFromText": "Bungkus teks dalam kontainer",
     "link": {
       "edit": "Edit tautan",
+      "editEmbed": "",
       "create": "Buat tautan",
-      "label": "Tautan"
+      "createEmbed": "",
+      "label": "Tautan",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Edit tautan",
@@ -164,9 +168,11 @@
     "cancel": "Batal",
     "clear": "Hapus",
     "remove": "Hapus",
+    "embed": "",
     "publishLibrary": "Terbitkan",
     "submit": "Kirimkan",
-    "confirm": "Konfirmasi"
+    "confirm": "Konfirmasi",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
@@ -206,6 +212,10 @@
       "line2": "Ini dapat membuat <bold>Elemen Teks</bold> dalam gambar mu.",
       "line3": "Kami sangat menyarankan mematikan pengaturan ini. Anda dapat mengikuti <link>langkah-langkah ini</link> untuk melakukannya.",
       "line4": "Jika mematikan pengaturan ini tidak membenarkan tampilan elemen teks, mohon buka\n<issueLink>isu</issueLink> di GitHub kami, atau chat kami di <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
     "eraser": "Penghapus",
     "frame": "Alat bingkai",
+    "embeddable": "",
     "hand": "Tangan (alat panning)",
     "extraTools": "Alat-alat lain"
   },
@@ -237,6 +248,7 @@
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
+    "embeddable": "",
     "text_selected": "Klik ganda atau tekan ENTER untuk edit teks",
     "text_editing": "Tekan Escape atau CtrlAtauCmd+ENTER untuk selesai mengedit",
     "linearElementMulti": "Klik pada titik akhir atau tekan Escape atau Enter untuk menyelesaikan",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Disimpan ke {filename}",
     "canvas": "kanvas",
     "selection": "pilihan",
-    "pasteAsSingleElement": "Gunakan {{shortcut}} untuk menempelkan sebagai satu elemen,\natau tempelkan ke teks editor yang ada"
+    "pasteAsSingleElement": "Gunakan {{shortcut}} untuk menempelkan sebagai satu elemen,\natau tempelkan ke teks editor yang ada",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Transparan",
