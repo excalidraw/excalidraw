@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "リンクを編集",
+      "editEmbed": "",
       "create": "リンクを作成",
-      "label": "リンク"
+      "createEmbed": "",
+      "label": "リンク",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "行を編集",
@@ -164,9 +168,11 @@
     "cancel": "キャンセル",
     "clear": "消去",
     "remove": "削除",
+    "embed": "",
     "publishLibrary": "公開",
     "submit": "送信",
-    "confirm": "確認"
+    "confirm": "確認",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "この操作によってキャンバス全体が消えます。よろしいですか？",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "選択した図形のリンクを追加/更新",
     "eraser": "消しゴム",
     "frame": "",
+    "embeddable": "",
     "hand": "手 (パンニングツール)",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "クリックすると複数の頂点からなる曲線を開始、ドラッグすると直線",
     "freeDraw": "クリックしてドラッグします。離すと終了します",
     "text": "ヒント: 選択ツールを使用して任意の場所をダブルクリックしてテキストを追加することもできます",
+    "embeddable": "",
     "text_selected": "テキストを編集するには、ダブルクリックまたはEnterキーを押します",
     "text_editing": "Esc キーまたは CtrlOrCmd+ENTER キーを押して編集を終了します",
     "linearElementMulti": "最後のポイントをクリックするか、エスケープまたはEnterを押して終了します",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "{filename} に保存しました",
     "canvas": "キャンバス",
     "selection": "選択",
-    "pasteAsSingleElement": "{{shortcut}} を使用して単一の要素として貼り付けるか、\n既存のテキストエディタに貼り付け"
+    "pasteAsSingleElement": "{{shortcut}} を使用して単一の要素として貼り付けるか、\n既存のテキストエディタに貼り付け",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "透明",
