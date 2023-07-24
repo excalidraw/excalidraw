@@ -203,6 +203,22 @@ describe("<Excalidraw/>", () => {
         expect(queryByTestId(container, "canvas-background-picker")).toBeNull();
       });
 
+      it("should hide the canvas background picker even if passed if the `canvasActions.changeViewBackgroundColor` is set to false", async () => {
+        const { container } = await render(
+          <Excalidraw
+            UIOptions={{ canvasActions: { changeViewBackgroundColor: false } }}
+          >
+            <MainMenu>
+              <MainMenu.DefaultItems.ChangeCanvasBackground />
+            </MainMenu>
+          </Excalidraw>,
+        );
+        //open menu
+        toggleMenu(container);
+        expect(queryByTestId(container, "canvas-background-label")).toBeNull();
+        expect(queryByTestId(container, "canvas-background-picker")).toBeNull();
+      });
+
       it("should hide the theme toggle when theme is false", async () => {
         const { container } = await render(
           <Excalidraw UIOptions={{ canvasActions: { toggleTheme: false } }} />,

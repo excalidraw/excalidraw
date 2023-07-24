@@ -678,7 +678,11 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             gridModeEnabled={gridModeEnabled}
             theme={theme}
             name="Custom name of drawing"
-            UIOptions={{ canvasActions: { loadScene: false } }}
+            UIOptions={{
+              canvasActions: {
+                loadScene: false,
+              },
+            }}
             renderTopRightUI={renderTopRightUI}
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
