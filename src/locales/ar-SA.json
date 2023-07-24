@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "تعديل الرابط",
+      "editEmbed": "",
       "create": "إنشاء رابط",
-      "label": "رابط"
+      "createEmbed": "",
+      "label": "رابط",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "تحرير السطر",
@@ -164,9 +168,11 @@
     "cancel": "إلغاء",
     "clear": "مسح",
     "remove": "إزالة",
+    "embed": "",
     "publishLibrary": "انشر",
     "submit": "أرسل",
-    "confirm": "تأكيد"
+    "confirm": "تأكيد",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "هذا سيُزيل كامل اللوحة. هل أنت متأكد؟",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "إضافة/تحديث الرابط للشكل المحدد",
     "eraser": "ممحاة",
     "frame": "",
+    "embeddable": "",
     "hand": "",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
     "freeDraw": "انقر واسحب، افرج عند الانتهاء",
     "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",
+    "embeddable": "",
     "text_selected": "انقر نقراً مزدوجاً أو اضغط ادخال لتعديل النص",
     "text_editing": "اضغط على Esc أو (Ctrl أو Cmd) + Enter لإنهاء التعديل",
     "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "حفظ باسم {filename}",
     "canvas": "لوحة الرسم",
     "selection": "العنصر المحدد",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "شفاف",
