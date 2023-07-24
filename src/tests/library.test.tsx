@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "./test-utils";
+import { fireEvent, render, togglePopover, waitFor } from "./test-utils";
 import { queryByTestId } from "@testing-library/react";
 
 import ExcalidrawApp from "../excalidraw-app";
@@ -192,12 +192,7 @@ describe("library menu", () => {
     const libraryButton = container.querySelector(".sidebar-trigger");
 
     fireEvent.click(libraryButton!);
-    fireEvent.click(
-      queryByTestId(
-        container.querySelector(".layer-ui__library")!,
-        "dropdown-menu-button",
-      )!,
-    );
+    togglePopover("Library menu");
     queryByTestId(container, "lib-dropdown--load")!.click();
 
     const libraryItems = parseLibraryJSON(await libraryJSONPromise);

@@ -191,6 +191,7 @@ export const LibraryDropdownMenuButton: React.FC<{
       <DropdownMenu open={isLibraryMenuOpen}>
         <DropdownMenu.Trigger
           onToggle={() => setIsLibraryMenuOpen(!isLibraryMenuOpen)}
+          aria-label="Library menu"
         >
           {DotsIcon}
         </DropdownMenu.Trigger>

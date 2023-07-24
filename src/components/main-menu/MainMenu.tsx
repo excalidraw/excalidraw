@@ -57,6 +57,7 @@ const MainMenu = Object.assign(
                 });
               }}
               data-testid="main-menu-trigger"
+              aria-label="Main menu"
             >
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>
