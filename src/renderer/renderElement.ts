@@ -15,7 +15,6 @@ import {
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
-  isEmbeddableElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -28,7 +27,13 @@ import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
-import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
+import {
+  distance,
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+  isTransparent,
+} from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
@@ -403,13 +408,7 @@ export const invalidateShapeForElement = (element: ExcalidrawElement) =>
 export const generateRoughOptions = (
   element: ExcalidrawElement,
   continuousPath = false,
-  isExporting: boolean = false,
 ): Options => {
-  const shouldOverrideForEmbeddableExport =
-    isExporting &&
-    element.type === "embeddable" &&
-    element.backgroundColor === "transparent" &&
-    element.strokeColor === "transparent";
   const options: Options = {
     seed: element.seed,
     strokeLineDash:
@@ -432,7 +431,7 @@ export const generateRoughOptions = (
     // calculate them (and we don't want the fills to be modified)
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
-    roughness: shouldOverrideForEmbeddableExport ? 0 : element.roughness,
+    roughness: element.roughness,
     stroke: element.strokeColor,
     preserveVertices: continuousPath,
   };
@@ -443,18 +442,9 @@ export const generateRoughOptions = (
     case "diamond":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
-      options.fill =
-        element.backgroundColor === "transparent"
-          ? undefined
-          : element.backgroundColor;
-      if (
-        isEmbeddableElement(element) &&
-        !options.fill &&
-        (!element.validated || isExporting)
-      ) {
-        options.fill = "#d3d3d3";
-        options.fillStyle = "solid";
-      }
+      options.fill = isTransparent(element.backgroundColor)
+        ? undefined
+        : element.backgroundColor;
       if (element.type === "ellipse") {
         options.curveFitting = 1;
       }
@@ -479,6 +469,26 @@ export const generateRoughOptions = (
   }
 };
 
+const modifyEmbeddableForRoughOptions = (
+  element: NonDeletedExcalidrawElement,
+  isExporting: boolean,
+) => {
+  if (
+    element.type === "embeddable" &&
+    (isExporting || !element.validated) &&
+    isTransparent(element.backgroundColor) &&
+    isTransparent(element.strokeColor)
+  ) {
+    return {
+      ...element,
+      roughness: 0,
+      backgroundColor: "#d3d3d3",
+      fillStyle: "solid",
+    } as const;
+  }
+  return element;
+};
+
 /**
  * Generates the element's shape and puts it into the cache.
  * @param element
@@ -489,7 +499,7 @@ const generateElementShape = (
   generator: RoughGenerator,
   isExporting: boolean = false,
 ) => {
-  let shape = shapeCache.get(element);
+  let shape = isExporting ? undefined : shapeCache.get(element);
 
   // `null` indicates no rc shape applicable for this element type
   // (= do not generate anything)
@@ -512,7 +522,10 @@ const generateElementShape = (
             } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
               h - r
             } L 0 ${r} Q 0 0, ${r} 0`,
-            generateRoughOptions(element, true, isExporting),
+            generateRoughOptions(
+              modifyEmbeddableForRoughOptions(element, isExporting),
+              true,
+            ),
           );
         } else {
           shape = generator.rectangle(
@@ -520,7 +533,10 @@ const generateElementShape = (
             0,
             element.width,
             element.height,
-            generateRoughOptions(element, false, isExporting),
+            generateRoughOptions(
+              modifyEmbeddableForRoughOptions(element, isExporting),
+              false,
+            ),
           );
         }
         setShapeForElement(element, shape);
