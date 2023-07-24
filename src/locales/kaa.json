@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Siltemeni ózgertiw",
+      "editEmbed": "",
       "create": "Siltemeni jaratıw",
-      "label": "Silteme"
+      "createEmbed": "",
+      "label": "Silteme",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "",
@@ -164,9 +168,11 @@
     "cancel": "Biykarlaw",
     "clear": "Tazalaw",
     "remove": "Óshiriw",
+    "embed": "",
     "publishLibrary": "",
     "submit": "Jiberiw",
-    "confirm": "Tastıyıqlaw"
+    "confirm": "Tastıyıqlaw",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "",
     "eraser": "Óshirgish",
     "frame": "",
+    "embeddable": "",
     "hand": "",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "",
     "freeDraw": "",
     "text": "",
+    "embeddable": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "{filename} saqlandı",
     "canvas": "",
     "selection": "",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "",
