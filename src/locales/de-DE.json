@@ -109,8 +109,12 @@
     "createContainerFromText": "Text in Container einbetten",
     "link": {
       "edit": "Link bearbeiten",
+      "editEmbed": "",
       "create": "Link erstellen",
-      "label": "Link"
+      "createEmbed": "",
+      "label": "Link",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Linie bearbeiten",
@@ -164,9 +168,11 @@
     "cancel": "Abbrechen",
     "clear": "Löschen",
     "remove": "Entfernen",
+    "embed": "",
     "publishLibrary": "Veröffentlichen",
     "submit": "Absenden",
-    "confirm": "Bestätigen"
+    "confirm": "Bestätigen",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
@@ -206,6 +212,10 @@
       "line2": "Dies könnte dazu führen, dass die <bold>Textelemente</bold> in Ihren Zeichnungen zerstört werden.",
       "line3": "Wir empfehlen dringend, diese Einstellung zu deaktivieren. Dazu kannst Du <link>diesen Schritten</link> folgen.",
       "line4": "Wenn die Deaktivierung dieser Einstellung die fehlerhafte Anzeige von Textelementen nicht behebt, öffne bitte ein <issueLink>Ticket</issueLink> auf unserem GitHub oder schreibe uns auf <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
     "eraser": "Radierer",
     "frame": "Rahmenwerkzeug",
+    "embeddable": "",
     "hand": "Hand (Schwenkwerkzeug)",
     "extraTools": "Weitere Werkzeuge"
   },
@@ -237,6 +248,7 @@
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
+    "embeddable": "",
     "text_selected": "Doppelklicken oder Eingabetaste drücken, um Text zu bearbeiten",
     "text_editing": "Drücke Escape oder CtrlOrCmd+Eingabetaste, um die Bearbeitung abzuschließen",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Als {filename} gespeichert",
     "canvas": "Zeichenfläche",
     "selection": "Auswahl",
-    "pasteAsSingleElement": "Verwende {{shortcut}} , um als einzelnes Element\neinzufügen oder in einen existierenden Texteditor einzufügen"
+    "pasteAsSingleElement": "Verwende {{shortcut}} , um als einzelnes Element\neinzufügen oder in einen existierenden Texteditor einzufügen",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Transparent",
