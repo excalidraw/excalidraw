@@ -109,8 +109,12 @@
     "createContainerFromText": "Поместить текст в контейнер",
     "link": {
       "edit": "Редактировать ссылку",
+      "editEmbed": "",
       "create": "Создать ссылку",
-      "label": "Ссылка"
+      "createEmbed": "",
+      "label": "Ссылка",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Редактирование строки",
@@ -164,9 +168,11 @@
     "cancel": "Отменить",
     "clear": "Очистить",
     "remove": "Удалить",
+    "embed": "",
     "publishLibrary": "Опубликовать",
     "submit": "Отправить",
-    "confirm": "Подтвердить"
+    "confirm": "Подтвердить",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -206,6 +212,10 @@
       "line2": "Это может привести к поломке <bold>Текстовых объектов</bold> на рисунке.",
       "line3": "Мы настоятельно рекомендуем отключить эту настройку. Для этого нужно выполнить <link>эти шаги</link>.",
       "line4": "Если отключение этой настройки не исправит отображение текстовых объектов, создайте <issueLink>issue</issueLink> на нашем GitHub или напишите нам в <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Добавить/обновить ссылку для выбранной фигуры",
     "eraser": "Ластик",
     "frame": "",
+    "embeddable": "",
     "hand": "Рука (перемещение холста)",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
     "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
     "text": "Совет: при выбранном инструменте выделения дважды щёлкните в любом месте, чтобы добавить текст",
+    "embeddable": "",
     "text_selected": "Дважды щелкните мышью или нажмите ENTER, чтобы редактировать текст",
     "text_editing": "Нажмите Escape либо Ctrl или Cmd + ENTER для завершения редактирования",
     "linearElementMulti": "Кликните на последней точке или нажмите Escape или Enter чтобы закончить",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Сохранено в {filename}",
     "canvas": "холст",
     "selection": "выделение",
-    "pasteAsSingleElement": "Используйте {{shortcut}}, чтобы вставить один объект,\nили вставьте в существующий текстовый редактор"
+    "pasteAsSingleElement": "Используйте {{shortcut}}, чтобы вставить один объект,\nили вставьте в существующий текстовый редактор",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Прозрачный",
