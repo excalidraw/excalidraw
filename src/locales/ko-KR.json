@@ -109,12 +109,12 @@
     "createContainerFromText": "텍스트를 컨테이너에 담기",
     "link": {
       "edit": "링크 수정하기",
-      "editEmbed": "",
+      "editEmbed": "링크 & 임베드 수정하기",
       "create": "링크 만들기",
-      "createEmbed": "",
+      "createEmbed": "링크 & 임베드 만들기",
       "label": "링크",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "링크 & 임베드",
+      "empty": "링크를 지정하지 않았습니다"
     },
     "lineEditor": {
       "edit": "선 수정하기",
@@ -172,7 +172,7 @@
     "publishLibrary": "게시하기",
     "submit": "제출",
     "confirm": "확인",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "클릭하여 상호작용"
   },
   "alerts": {
     "clearReset": "모든 작업 내용이 초기화됩니다. 계속하시겠습니까?",
@@ -214,7 +214,7 @@
       "line4": "만약 이 설정을 껐음에도 텍스트 요소들이 올바르게 표시되지 않는다면, 저희 Github에 <issueLink>이슈</issueLink>를 올려주시거나 <discordLink>Discord</discordLink>로 알려주세요."
     },
     "libraryElementTypeError": {
-      "embeddable": "",
+      "embeddable": "임베드 요소들은 라이브러리에 추가할 수 없습니다.",
       "image": ""
     }
   },
@@ -234,7 +234,7 @@
     "link": "선택한 도형에 대해서 링크를 추가/업데이트",
     "eraser": "지우개",
     "frame": "프레임 도구",
-    "embeddable": "",
+    "embeddable": "웹 임베드",
     "hand": "손 (패닝 도구)",
     "extraTools": "다른 도구"
   },
@@ -248,7 +248,7 @@
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
     "freeDraw": "클릭 후 드래그하세요. 완료되면 놓으세요.",
     "text": "팁: 선택 툴로 아무 곳이나 더블 클릭해 텍스트를 추가할 수도 있습니다.",
-    "embeddable": "",
+    "embeddable": "클릭 및 드래그하여 웹사이트 임베드 만들기",
     "text_selected": "더블 클릭 또는 ENTER를 눌러서 텍스트 수정",
     "text_editing": "ESC나 CtrlOrCmd+ENTER를 눌러서 수정을 종료하기",
     "linearElementMulti": "마지막 지점을 클릭하거나 Esc 또는 Enter 키를 눌러 완료하세요.",
@@ -424,8 +424,8 @@
     "canvas": "캔버스",
     "selection": "선택한 요소",
     "pasteAsSingleElement": "단일 요소로 붙여넣거나, 기존 텍스트 에디터에 붙여넣으려면 {{shortcut}} 을 사용하세요.",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "이 URL의 임베딩이 허용되지 않았습니다. GitHub에 이슈를 남겨서 이 URL이 화이트리스트에 등재될 수 있도록 요청하세요",
+    "unrecognizedLinkFormat": "임베딩하려는 링크의 형식이 잘못된 것 같습니다. 원본 사이트에서 제공하는 \"임베딩\" 링크를 그대로 붙여 넣어 주세요"
   },
   "colors": {
     "transparent": "투명",
