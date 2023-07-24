@@ -215,7 +215,10 @@ export const ChangeCanvasBackground = () => {
       >
         {t("labels.canvasBackground")}
       </div>
-      <div style={{ padding: "0 0.625rem" }}>
+      <div
+        style={{ padding: "0 0.625rem" }}
+        id="canvas-bg-color-picker-container"
+      >
         {actionManager.renderAction("changeViewBackgroundColor")}
       </div>
     </div>

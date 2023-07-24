@@ -62,7 +62,6 @@ const MainMenu = Object.assign(
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
-              // style={{ zIndex: 11 }}
               sideOffset={device.isMobile ? 20 : undefined}
               className="main-menu-content"
               onClickOutside={onClickOutside}
