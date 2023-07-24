@@ -109,8 +109,12 @@
     "createContainerFromText": "Envolver o texto nun contedor",
     "link": {
       "edit": "Editar ligazón",
+      "editEmbed": "",
       "create": "Crear ligazón",
-      "label": "Ligazón"
+      "createEmbed": "",
+      "label": "Ligazón",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Editar liña",
@@ -164,9 +168,11 @@
     "cancel": "Cancelar",
     "clear": "Limpar",
     "remove": "Eliminar",
+    "embed": "",
     "publishLibrary": "Publicar",
     "submit": "Enviar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Isto limpará todo o lenzo. Estás seguro?",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Engadir/ Actualizar ligazón para a forma seleccionada",
     "eraser": "Goma de borrar",
     "frame": "",
+    "embeddable": "",
     "hand": "Man (ferramenta de desprazamento)",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "Faga clic para iniciar varios puntos, arrastre para unha sola liña",
     "freeDraw": "Fai clic e arrastra, solta cando acabes",
     "text": "Consello: tamén podes engadir texto facendo dobre-clic en calquera lugar coa ferramenta de selección",
+    "embeddable": "",
     "text_selected": "Dobre-clic ou prema ENTER para editar o texto",
     "text_editing": "Prema Escape ou CtrlOrCmd+ENTER para finalizar a edición",
     "linearElementMulti": "Faga clic no último punto ou prema Escape ou Enter para rematar",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Gardado en {filename}",
     "canvas": "lenzo",
     "selection": "selección",
-    "pasteAsSingleElement": "Usa {{shortcut}} para pegar como un único elemento\nou pega nun editor de texto existente"
+    "pasteAsSingleElement": "Usa {{shortcut}} para pegar como un único elemento\nou pega nun editor de texto existente",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Transparente",
