@@ -33,11 +33,11 @@
     "sharp": "",
     "round": "",
     "arrowheads": "",
-    "arrowhead_none": "",
-    "arrowhead_arrow": "",
-    "arrowhead_bar": "",
-    "arrowhead_dot": "",
-    "arrowhead_triangle": "",
+    "arrowhead_none": "ไม่มี",
+    "arrowhead_arrow": "ลูกศร",
+    "arrowhead_bar": "แถบ",
+    "arrowhead_dot": "จุด",
+    "arrowhead_triangle": "สามเหลี่ยม",
     "fontSize": "ขนาดตัวอักษร",
     "fontFamily": "แบบตัวอักษร",
     "addWatermark": "เพิ่มลายน้ำ \"สร้างด้วย Excalidraw\"",
@@ -104,17 +104,17 @@
     "excalidrawLib": "คลังของ Excalidraw",
     "decreaseFontSize": "ลดขนาดตัวอักษร",
     "increaseFontSize": "เพิ่มขนาดตัวอักษร",
-    "unbindText": "",
+    "unbindText": "ยกเลิกการผูกติด",
     "bindText": "",
     "createContainerFromText": "",
     "link": {
       "edit": "แก้ไขลิงก์",
-      "editEmbed": "",
+      "editEmbed": "แก้ไขลิงค์และการฝัง",
       "create": "สร้างลิงค์",
-      "createEmbed": "",
+      "createEmbed": "สร้างลิงค์และการฝัง",
       "label": "ลิงค์",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "ลิงค์และการฝัง",
+      "empty": "ไม่ได้ใส่ลิงค์"
     },
     "lineEditor": {
       "edit": "แก้ไขเส้น",
@@ -133,18 +133,18 @@
     "eyeDropper": ""
   },
   "library": {
-    "noItems": "",
+    "noItems": "ยังไม่มีรายการที่เพิ่มเข้าไปได้",
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },
   "buttons": {
-    "clearReset": "",
+    "clearReset": "รีเซ็ทผืนผ้าใบ",
     "exportJSON": "ส่งออกไปยังไฟล์",
     "exportImage": "ส่งออกเป็นรูปภาพ",
     "export": "บันทึกไปยัง",
     "copyToClipboard": "คัดลอกไปยังคลิปบอร์ด",
-    "save": "",
-    "saveAs": "",
+    "save": "บันทึกเป็นไฟล์ปัจจุบัน",
+    "saveAs": "บันทึกเป็น",
     "load": "เปิด",
     "getShareableLink": "สร้างลิงค์ที่แชร์ได้",
     "close": "ปิด",
@@ -168,18 +168,18 @@
     "cancel": "ยกเลิก",
     "clear": "เคลียร์",
     "remove": "ลบ",
-    "embed": "",
+    "embed": "สลับการฝัง",
     "publishLibrary": "เผยแพร่",
     "submit": "ตกลง",
     "confirm": "ยืนยัน",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "คลิกเพื่อปฏิสัมพันธ์"
   },
   "alerts": {
     "clearReset": "",
-    "couldNotCreateShareableLink": "",
+    "couldNotCreateShareableLink": "ไม่สามารถสร้างลิงค์ได้",
     "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "ไม่สามารถโหลดไฟล์ที่ผิดพลาดได้",
-    "importBackendFailed": "",
+    "importBackendFailed": "เกิดข้อผิดพลาดจากการนำเข้าจากระบบหลังบ้าน",
     "cannotExportEmptyCanvas": "",
     "couldNotCopyToClipboard": "ไม่สามารถคัดลอกไปยังคลิปบอร์ดได้",
     "decryptFailed": "ไม่สามารถถอดรหัสข้อมูลได้",
@@ -214,8 +214,8 @@
       "line4": ""
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "image": ""
+      "embeddable": "การเพิ่มองค์ประกอบที่ฝังยังไม่สามารถเพิ่มเข้าไปในไลบลารีได้",
+      "image": "การสนับสนุนสำหรับเพิ่มรูปภาพลงในไลบลารีจะมาในเร็ว ๆ นี้"
     }
   },
   "toolBar": {
@@ -234,7 +234,7 @@
     "link": "",
     "eraser": "ยางลบ",
     "frame": "",
-    "embeddable": "",
+    "embeddable": "ฝังเว็บ",
     "hand": "",
     "extraTools": ""
   },
@@ -248,7 +248,7 @@
     "linearElement": "",
     "freeDraw": "",
     "text": "",
-    "embeddable": "",
+    "embeddable": "คลิกและลากเพื่อสร้างการฝังสำหรับเว็บไซต์",
     "text_selected": "คลิกสองครั้งหรือกด ENTER เพื่อแก้ไขข้อความ",
     "text_editing": "กดปุ่ม Esc หรือกด Ctrl, Cmd + Enter เพื่อเสร็จการแก้ไข",
     "linearElementMulti": "คลิกที่จุดสุดท้ายหรือกด Escape หรือ Enter เพื่อเสร็จสิ้น",
