@@ -4,6 +4,7 @@ import {
   useExcalidrawSetAppState,
   useExcalidrawActionManager,
   useExcalidrawElements,
+  useAppProps,
 } from "../App";
 import {
   ExportIcon,
@@ -198,13 +199,20 @@ export const ChangeCanvasBackground = () => {
   const { t } = useI18n();
   const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
+  const appProps = useAppProps();
 
-  if (appState.viewModeEnabled) {
+  if (
+    appState.viewModeEnabled ||
+    !appProps.UIOptions.canvasActions.changeViewBackgroundColor
+  ) {
     return null;
   }
   return (
     <div style={{ marginTop: "0.5rem" }}>
-      <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
+      <div
+        data-testid="canvas-background-label"
+        style={{ fontSize: ".75rem", marginBottom: ".5rem" }}
+      >
         {t("labels.canvasBackground")}
       </div>
       <div style={{ padding: "0 0.625rem" }}>

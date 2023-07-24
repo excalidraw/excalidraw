@@ -516,6 +516,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
       style="margin-top: 0.5rem;"
     >
       <div
+        data-testid="canvas-background-label"
         style="font-size: .75rem; margin-bottom: .5rem;"
       >
         Canvas background
