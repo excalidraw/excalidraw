@@ -2,6 +2,7 @@
 
 exports[`exportToSvg with default arguments 1`] = `
 Object {
+  "activeEmbeddable": null,
   "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
