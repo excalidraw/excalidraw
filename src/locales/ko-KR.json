@@ -168,7 +168,7 @@
     "cancel": "취소",
     "clear": "지우기",
     "remove": "삭제",
-    "embed": "",
+    "embed": "임베딩 토글",
     "publishLibrary": "게시하기",
     "submit": "제출",
     "confirm": "확인",
@@ -215,7 +215,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "임베드 요소들은 라이브러리에 추가할 수 없습니다.",
-      "image": ""
+      "image": "라이브러리에 이미지 삽입 기능은 곧 지원될 예정입니다!"
     }
   },
   "toolBar": {
@@ -425,7 +425,7 @@
     "selection": "선택한 요소",
     "pasteAsSingleElement": "단일 요소로 붙여넣거나, 기존 텍스트 에디터에 붙여넣으려면 {{shortcut}} 을 사용하세요.",
     "unableToEmbed": "이 URL의 임베딩이 허용되지 않았습니다. GitHub에 이슈를 남겨서 이 URL이 화이트리스트에 등재될 수 있도록 요청하세요",
-    "unrecognizedLinkFormat": "임베딩하려는 링크의 형식이 잘못된 것 같습니다. 원본 사이트에서 제공하는 \"임베딩\" 링크를 그대로 붙여 넣어 주세요"
+    "unrecognizedLinkFormat": "임베딩하려는 링크의 형식이 잘못된 것 같습니다. 원본 사이트에서 제공하는 \"임베딩\" 텍스트를 그대로 붙여 넣어 주세요"
   },
   "colors": {
     "transparent": "투명",
@@ -458,7 +458,7 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "많이 쓰이는 사용자 색상들",
+    "mostUsedCustomColors": "가장 많이 사용된 색상들",
     "colors": "색상",
     "shades": "색조",
     "hexCode": "Hex 코드",
