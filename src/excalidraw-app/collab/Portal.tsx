@@ -37,6 +37,29 @@ class Portal {
     this.roomId = id;
     this.roomKey = key;
 
+    this.initializeSocketListeners();
+
+    return socket;
+  }
+
+  close() {
+    if (!this.socket) {
+      return;
+    }
+    this.queueFileUpload.flush();
+    this.socket.close();
+    this.socket = null;
+    this.roomId = null;
+    this.roomKey = null;
+    this.socketInitialized = false;
+    this.broadcastedElementVersions = new Map();
+  }
+
+  initializeSocketListeners() {
+    if (!this.socket) {
+      return;
+    }
+
     // Initialize socket listeners
     this.socket.on("init-room", () => {
       if (this.socket) {
@@ -54,21 +77,6 @@ class Portal {
     this.socket.on("room-user-change", (clients: string[]) => {
       this.collab.setCollaborators(clients);
     });
-
-    return socket;
-  }
-
-  close() {
-    if (!this.socket) {
-      return;
-    }
-    this.queueFileUpload.flush();
-    this.socket.close();
-    this.socket = null;
-    this.roomId = null;
-    this.roomKey = null;
-    this.socketInitialized = false;
-    this.broadcastedElementVersions = new Map();
   }
 
   isOpen() {
@@ -181,13 +189,14 @@ class Portal {
   };
 
   broadcastIdleChange = (userState: UserIdleState) => {
-    if (this.socket?.id) {
+    if (this.socket) {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {
         type: "IDLE_STATUS",
         payload: {
-          socketId: this.socket.id,
           userState,
           username: this.collab.state.username,
+          userId: this.collab.state.userId,
+          socketId: this.socket.id,
         },
       };
       return this._broadcastSocketData(
@@ -201,21 +210,39 @@ class Portal {
     pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
   }) => {
-    if (this.socket?.id) {
+    if (this.socket) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
         type: "MOUSE_LOCATION",
         payload: {
-          socketId: this.socket.id,
           pointer: payload.pointer,
           button: payload.button || "up",
           selectedElementIds:
             this.collab.excalidrawAPI.getAppState().selectedElementIds,
           username: this.collab.state.username,
+          userId: this.collab.state.userId,
+          socketId: this.socket.id,
         },
       };
       return this._broadcastSocketData(
         data as SocketUpdateData,
         true, // volatile
+      );
+    }
+  };
+
+  brodcastUserJoinedRoom = (payload: {
+    username: string;
+    userId: string;
+    socketId: string;
+  }) => {
+    if (this.socket) {
+      const data: SocketUpdateDataSource["USER_JOINED"] = {
+        type: "USER_JOINED",
+        payload,
+      };
+      return this._broadcastSocketData(
+        data as SocketUpdateData,
+        false, // volatile
       );
     }
   };

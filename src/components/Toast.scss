@@ -25,6 +25,17 @@
       white-space: pre-wrap;
     }
 
+    .Toast__message--spinner {
+      padding: 0 3rem;
+    }
+
+    .Toast__spinner {
+      position: absolute;
+      left: 1.5rem;
+      top: 50%;
+      margin-top: -8px;
+    }
+
     .close {
       position: absolute;
       top: 0;

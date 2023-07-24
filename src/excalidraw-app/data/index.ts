@@ -106,19 +106,29 @@ export type SocketUpdateDataSource = {
   MOUSE_LOCATION: {
     type: "MOUSE_LOCATION";
     payload: {
-      socketId: string;
       pointer: { x: number; y: number };
       button: "down" | "up";
       selectedElementIds: AppState["selectedElementIds"];
       username: string;
+      userId: string;
+      socketId: string;
     };
   };
   IDLE_STATUS: {
     type: "IDLE_STATUS";
     payload: {
-      socketId: string;
       userState: UserIdleState;
       username: string;
+      userId: string;
+      socketId: string;
+    };
+  };
+  USER_JOINED: {
+    type: "USER_JOINED";
+    payload: {
+      username: string;
+      userId: string;
+      socketId: string;
     };
   };
 };

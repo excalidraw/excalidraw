@@ -1,5 +1,7 @@
+import clsx from "clsx";
 import { useCallback, useEffect, useRef } from "react";
 import { CloseIcon } from "./icons";
+import Spinner from "./Spinner";
 import "./Toast.scss";
 import { ToolButton } from "./ToolButton";
 
@@ -9,12 +11,14 @@ export const Toast = ({
   message,
   onClose,
   closable = false,
+  spinner = true,
   // To prevent autoclose, pass duration as Infinity
   duration = DEFAULT_TOAST_TIMEOUT,
 }: {
   message: string;
   onClose: () => void;
   closable?: boolean;
+  spinner?: boolean;
   duration?: number;
 }) => {
   const timerRef = useRef<number>(0);
@@ -44,7 +48,18 @@ export const Toast = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <p className="Toast__message">{message}</p>
+      {spinner && (
+        <div className="Toast__spinner">
+          <Spinner />
+        </div>
+      )}
+      <p
+        className={clsx("Toast__message", {
+          "Toast__message--spinner": spinner,
+        })}
+      >
+        {message}
+      </p>
       {closable && (
         <ToolButton
           icon={CloseIcon}
