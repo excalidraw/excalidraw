@@ -109,12 +109,12 @@
     "createContainerFromText": "La tekst flyte i en beholder",
     "link": {
       "edit": "Rediger lenke",
-      "editEmbed": "",
+      "editEmbed": "Rediger lenke og bygg inn",
       "create": "Opprett lenke",
-      "createEmbed": "",
+      "createEmbed": "Opprett lenke og bygg inn",
       "label": "Lenke",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Lenk & bygg inn",
+      "empty": "Ingen lenke er valgt"
     },
     "lineEditor": {
       "edit": "Rediger linje",
@@ -168,11 +168,11 @@
     "cancel": "Avbryt",
     "clear": "Tøm",
     "remove": "Fjern",
-    "embed": "",
+    "embed": "Slå av/på innebygging",
     "publishLibrary": "Publiser",
     "submit": "Send inn",
     "confirm": "Bekreft",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Klikk for å samhandle"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
@@ -214,8 +214,8 @@
       "line4": "Hvis deaktivering av denne innstillingen ikke fikser visningen av tekstelementer, vennligst åpne en <issueLink>sak</issueLink> på vår GitHub, eller skriv oss på <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "image": ""
+      "embeddable": "Innebygde elementer kan ikke legges til i biblioteket.",
+      "image": "Støtte for å legge til bilder i biblioteket kommer snart!"
     }
   },
   "toolBar": {
@@ -234,7 +234,7 @@
     "link": "Legg til / oppdater link for en valgt figur",
     "eraser": "Viskelær",
     "frame": "Rammeverktøy",
-    "embeddable": "",
+    "embeddable": "Nettinnbygging",
     "hand": "Hånd (panoreringsverktøy)",
     "extraTools": "Flere verktøy"
   },
@@ -248,7 +248,7 @@
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
     "freeDraw": "Klikk og dra, slipp når du er ferdig",
     "text": "Tips: du kan også legge til tekst ved å dobbeltklikke hvor som helst med utvalgsverktøyet",
-    "embeddable": "",
+    "embeddable": "Klikk og dra for å opprette en nettside innebygd",
     "text_selected": "Dobbeltklikk eller trykk ENTER for å redigere tekst",
     "text_editing": "Trykk Escape eller Ctrl/Cmd+Enter for å fullføre redigering",
     "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
