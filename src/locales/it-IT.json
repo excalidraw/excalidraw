@@ -109,8 +109,12 @@
     "createContainerFromText": "Avvolgi il testo in un container",
     "link": {
       "edit": "Modifica link",
+      "editEmbed": "",
       "create": "Crea link",
-      "label": "Link"
+      "createEmbed": "",
+      "label": "Link",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Modifica linea",
@@ -164,9 +168,11 @@
     "cancel": "Annulla",
     "clear": "Cancella",
     "remove": "Rimuovi",
+    "embed": "",
     "publishLibrary": "Pubblica",
     "submit": "Invia",
-    "confirm": "Conferma"
+    "confirm": "Conferma",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Questa azione cancellerà l'intera tela. Sei sicuro?",
@@ -206,6 +212,10 @@
       "line2": "Ciò potrebbe causare la rottura degli <bold>Elementi di testo</bold> nei tuoi disegni.",
       "line3": "Consigliamo vivamente di disabilitare questa impostazione. Puoi seguire <link>questi passaggi</link> su come farlo.",
       "line4": "Se la disattivazione di questa impostazione non risolve la visualizzazione degli elementi di testo, apri un <issueLink>problema</issueLink> sul nostro GitHub o scrivici su <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
     "eraser": "Gomma",
     "frame": "Strumento riquadro",
+    "embeddable": "",
     "hand": "Mano (strumento di panoramica)",
     "extraTools": "Altri strumenti"
   },
@@ -237,6 +248,7 @@
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
+    "embeddable": "",
     "text_selected": "Fai doppio click o premi INVIO per modificare il testo",
     "text_editing": "Premi ESC o CtrlOCmd+INVIO per completare le modifiche",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Salvato in {filename}",
     "canvas": "tela",
     "selection": "selezione",
-    "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente"
+    "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Trasparente",
