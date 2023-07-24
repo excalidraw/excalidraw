@@ -109,8 +109,12 @@
     "createContainerFromText": "உரையைக் கொள்கலனுள் சுருட்டு",
     "link": {
       "edit": "தொடுப்பைத் திருத்து",
+      "editEmbed": "",
       "create": "தொடுப்பைப் படை",
-      "label": "தொடுப்பு"
+      "createEmbed": "",
+      "label": "தொடுப்பு",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "தொடுப்பைத் திருத்து",
@@ -164,9 +168,11 @@
     "cancel": "ரத்துசெய்",
     "clear": "துடை",
     "remove": "நீக்கு",
+    "embed": "",
     "publishLibrary": "பிரசுரி",
     "submit": "சமர்ப்பி",
-    "confirm": "உறுதிசெய்"
+    "confirm": "உறுதிசெய்",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "இது முழு கித்தானையும் துடைக்கும். நீங்கள் உறுதியா?",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "தேர்தெடுத்த வடிவத்திற்குத் தொடுப்பைச் சேர்/ புதுப்பி",
     "eraser": "அழிப்பி",
     "frame": "சட்டகம் கருவி",
+    "embeddable": "",
     "hand": "கை (பார்வை நகர்கும் கருவி)",
     "extraTools": "மற்ற கருவிகள்"
   },
@@ -237,6 +248,7 @@
     "linearElement": "பல புள்ளிகளைத் துவக்க சொடுக்கு, ஒற்றை வரிக்கு பிடித்திழு",
     "freeDraw": "சொடுக்கி பிடித்திழு, முடித்ததும் விடுவி",
     "text": "துணுக்குதவி: தெரிவு கருவி கொண்டு எங்காவது இரு-சொடுக்கி உரையைச் சேர்க்கலாம்",
+    "embeddable": "",
     "text_selected": "உரையைத் திருத்த இரு-சொடுக்கு அ ENTERஐ அழுத்து",
     "text_editing": "திருத்துவதை முடிக்க Escape அ CtrlOrCmd+ENTERஐ அழுத்து",
     "linearElementMulti": "கடைசி புள்ளியில் சொடுக்கு அ முடிக்க Escape அ Enter அழுத்து",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "{filename}-க்கு சேமிக்கப்பட்டது",
     "canvas": "கித்தான்",
     "selection": "தெரிவு",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "ஒளிபுகுத்தன்மை",
