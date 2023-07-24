@@ -109,8 +109,12 @@
     "createContainerFromText": "Envolver texto num recipiente",
     "link": {
       "edit": "Editar ligação",
+      "editEmbed": "",
       "create": "Criar ligação",
-      "label": "Ligação"
+      "createEmbed": "",
+      "label": "Ligação",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Editar linha",
@@ -164,9 +168,11 @@
     "cancel": "Cancelar",
     "clear": "Limpar",
     "remove": "Remover",
+    "embed": "",
     "publishLibrary": "Publicar",
     "submit": "Enviar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Isto irá limpar toda a área de desenho. Tem a certeza?",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Acrescentar/ Adicionar ligação para uma forma seleccionada",
     "eraser": "Borracha",
     "frame": "",
+    "embeddable": "",
     "hand": "Mão (ferramenta de movimento da tela)",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "freeDraw": "Clique e arraste, large quando terminar",
     "text": "Dica: também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
+    "embeddable": "",
     "text_selected": "Clique duas vezes ou pressione a tecla Enter para editar o texto",
     "text_editing": "Pressione a tecla Escape ou CtrlOrCmd+ENTER para terminar a edição",
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Guardado como {filename}",
     "canvas": "área de desenho",
     "selection": "seleção",
-    "pasteAsSingleElement": "Usar {{shortcut}} para colar como um único elemento,\nou colar num editor de texto existente"
+    "pasteAsSingleElement": "Usar {{shortcut}} para colar como um único elemento,\nou colar num editor de texto existente",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Transparente",
