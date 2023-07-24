@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Редактирай линк",
+      "editEmbed": "",
       "create": "",
-      "label": "Линк"
+      "createEmbed": "",
+      "label": "Линк",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "",
@@ -164,9 +168,11 @@
     "cancel": "Отмени",
     "clear": "Изчисти",
     "remove": "Премахване",
+    "embed": "",
     "publishLibrary": "Публикувай",
     "submit": "Изпрати",
-    "confirm": "Потвърждаване"
+    "confirm": "Потвърждаване",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Това ще изчисти цялото платно. Сигурни ли сте?",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "Силно препоръчваме да изключите тази настройка. Можете да следвате <link>тези стъпки</link> за това как да го направите.",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "",
     "eraser": "Гума",
     "frame": "",
+    "embeddable": "",
     "hand": "",
     "extraTools": "Още инструменти"
   },
@@ -237,6 +248,7 @@
     "linearElement": "Кликнете, за да стартирате няколко точки, плъзнете за една линия",
     "freeDraw": "Натиснете и влачете, пуснете като сте готови",
     "text": "Подсказка: Можете също да добавите текст като натиснете някъде два път с инструмента за селекция",
+    "embeddable": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "Кликнете върху последната точка или натиснете Escape или Enter, за да завършите",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Запазен към {filename}",
     "canvas": "платно",
     "selection": "селекция",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Прозрачен",
