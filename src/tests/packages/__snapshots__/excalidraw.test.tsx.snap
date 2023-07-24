@@ -610,6 +610,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
         Canvas background
       </div>
       <div
+        id="canvas-bg-color-picker-container"
         style="padding: 0px 0.625rem;"
       >
         <div>
