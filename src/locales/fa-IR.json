@@ -109,8 +109,12 @@
     "createContainerFromText": "متن را در یک جایگاه بپیچید",
     "link": {
       "edit": "ویرایش لینک",
+      "editEmbed": "",
       "create": "ایجاد پیوند",
-      "label": "لینک"
+      "createEmbed": "",
+      "label": "لینک",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "ویرایش لینک",
@@ -164,9 +168,11 @@
     "cancel": "لغو",
     "clear": "پاک کردن",
     "remove": "پاک کردن",
+    "embed": "",
     "publishLibrary": "انتشار",
     "submit": "ارسال",
-    "confirm": "تایید"
+    "confirm": "تایید",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",
@@ -206,6 +212,10 @@
       "line2": "این می تواند منجر به شکستن <bold>عناصر متن</bold> در نقاشی های شما شود.",
       "line3": "اکیداً توصیه می کنیم این تنظیم را غیرفعال کنید. برای نحوه انجام این کار می‌توانید <link>این مراحل</link> را دنبال کنید.",
       "line4": "اگر غیرفعال کردن این تنظیم نمایش عناصر متنی را برطرف نکرد، لطفاً یک <issueLink>مشکل</issueLink> را در GitHub ما باز کنید یا برای ما در <discordLink>Discord</discordLink> بنویسید."
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "افزودن/به‌روزرسانی پیوند برای شکل انتخابی",
     "eraser": "پاک کن",
     "frame": "",
+    "embeddable": "",
     "hand": "دست (ابزار پانینگ)",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
+    "embeddable": "",
     "text_selected": "دوبار کلیک کنید یا Enter را فشار دهید تا نقاط را ویرایش کنید",
     "text_editing": "Escape یا CtrlOrCmd+ENTER را فشار دهید تا ویرایش تمام شود",
     "linearElementMulti": "روی آخرین نقطه کلیک کنید یا کلید ESC را بزنید یا کلید Enter را بزنید برای اتمام کار",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "ذخیره در {filename}",
     "canvas": "بوم",
     "selection": "انتخاب",
-    "pasteAsSingleElement": "از {{shortcut}} برای چسباندن به عنوان یک عنصر استفاده کنید،\nیا در یک ویرایشگر متن موجود جایگذاری کنید"
+    "pasteAsSingleElement": "از {{shortcut}} برای چسباندن به عنوان یک عنصر استفاده کنید،\nیا در یک ویرایشگر متن موجود جایگذاری کنید",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "شفاف",
