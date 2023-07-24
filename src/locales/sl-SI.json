@@ -109,8 +109,12 @@
     "createContainerFromText": "Zavij besedilo v vsebnik",
     "link": {
       "edit": "Uredi povezavo",
+      "editEmbed": "",
       "create": "Ustvari povezavo",
-      "label": "Povezava"
+      "createEmbed": "",
+      "label": "Povezava",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Uredi črto",
@@ -164,9 +168,11 @@
     "cancel": "Prekliči",
     "clear": "Počisti",
     "remove": "Odstrani",
+    "embed": "",
     "publishLibrary": "Objavi",
     "submit": "Pošlji",
-    "confirm": "Potrdi"
+    "confirm": "Potrdi",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "To bo počistilo celotno platno. Ali ste prepričani?",
@@ -206,6 +212,10 @@
       "line2": "To bi lahko povzročilo motnje v obnašanju <bold>besedilnih elementov</bold> v vaših risbah.",
       "line3": "Močno priporočamo, da onemogočite to nastavitev. Sledite <link>tem korakom</link>, kako to storiti.",
       "line4": "Če onemogočanje te nastavitve ne popravi prikaza besedilnih elementov, odprite <issueLink>vprašanje</issueLink> na našem GitHubu ali nam pišite na <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Dodaj/posodobi povezavo za izbrano obliko",
     "eraser": "Radirka",
     "frame": "Okvir",
+    "embeddable": "",
     "hand": "Roka (orodje za premikanje)",
     "extraTools": "Več orodij"
   },
@@ -237,6 +248,7 @@
     "linearElement": "Kliknite za začetek več točk, povlecite za posamezno črto",
     "freeDraw": "Kliknite in povlecite, spustite, ko končate",
     "text": "Namig: besedilo lahko dodate tudi z dvoklikom kjer koli z orodjem za izbiro",
+    "embeddable": "",
     "text_selected": "Dvokliknite ali pritisnite tipko Enter, da uredite besedilo",
     "text_editing": "Pritisnite tipko Escape ali CtrlOrCmd+Enter za zaključek urejanja",
     "linearElementMulti": "Kliknite zadnjo točko ali pritisnite Escape ali Enter, da končate",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Shranjeno v {filename}",
     "canvas": "platno",
     "selection": "izbor",
-    "pasteAsSingleElement": "Uporabite {{shortcut}}, da prilepite kot en element,\n ali prilepite v obstoječ urejevalnik besedil"
+    "pasteAsSingleElement": "Uporabite {{shortcut}}, da prilepite kot en element,\n ali prilepite v obstoječ urejevalnik besedil",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Prosojno",
