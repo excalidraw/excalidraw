@@ -61,18 +61,7 @@ describe("appState", () => {
       },
     });
 
-    //@ts-ignore
     UI.clickTool("text");
-    // h.setState({
-    //   activeTool: {
-    //     type: "text",
-    //     customType: null,
-    //     locked: false,
-    //     lastActiveTool: null,
-    //   },
-    // });
-
-    //console.log(container.outerHTML, "outerHTML");
 
     expect(h.state.currentItemFontSize).toBe(30);
     queryByTestId(container, "fontSize-small")!.click();

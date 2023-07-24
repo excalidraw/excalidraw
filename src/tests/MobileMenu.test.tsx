@@ -11,13 +11,14 @@ describe("Test MobileMenu", () => {
   const { h } = window;
   const dimensions = { height: 400, width: 800 };
 
+  beforeAll(() => {
+    mockBoundingClientRect(dimensions);
+  });
+
   beforeEach(async () => {
     await render(<ExcalidrawApp />);
-    mockBoundingClientRect(dimensions);
     //@ts-ignore
     h.app.refreshDeviceState(h.app.excalidrawContainerRef.current!);
-    // To rerender the UI after device updated
-    h.app.updateDOMRect();
   });
 
   afterAll(() => {
