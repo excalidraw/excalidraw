@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Bağlantıyı düzenle",
+      "editEmbed": "",
       "create": "Bağlantı oluştur",
-      "label": "Bağlantı"
+      "createEmbed": "",
+      "label": "Bağlantı",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Çizgiyi düzenle",
@@ -164,9 +168,11 @@
     "cancel": "İptal",
     "clear": "Temizle",
     "remove": "Kaldır",
+    "embed": "",
     "publishLibrary": "Yayınla",
     "submit": "Gönder",
-    "confirm": "Onayla"
+    "confirm": "Onayla",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",
@@ -206,6 +212,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Seçilen şekil için bağlantı Ekle/Güncelle",
     "eraser": "Silgi",
     "frame": "",
+    "embeddable": "",
     "hand": "",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
+    "embeddable": "",
     "text_selected": "Metni düzenlemek için çift tıklayın veya ENTER'a basın",
     "text_editing": "Düzenlemeyi bitirmek için ESC veya Ctrl/Cmd+ENTER tuşlarına basın",
     "linearElementMulti": "Bitirmek için son noktaya tıklayın ya da Escape veya Enter tuşuna basın",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "{filename} kaydedildi",
     "canvas": "tuval",
     "selection": "seçim",
-    "pasteAsSingleElement": "Tekil obje olarak yapıştırmak için veya var olan bir metin editörüne yapıştırmak için {{shortcut}} kullanın"
+    "pasteAsSingleElement": "Tekil obje olarak yapıştırmak için veya var olan bir metin editörüne yapıştırmak için {{shortcut}} kullanın",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Şeffaf",
