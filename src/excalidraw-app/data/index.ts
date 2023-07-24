@@ -113,20 +113,12 @@ export type SocketUpdateDataSource = {
       username: string;
     };
   };
-  SCROLL_LOCATION: {
-    type: "SCROLL_LOCATION";
+  SCROLL_AND_ZOOM: {
+    type: "SCROLL_AND_ZOOM";
     payload: {
       socketId: string;
-      scroll: { x: number; y: number };
       username: string;
-    };
-  };
-  ZOOM_VALUE: {
-    type: "ZOOM_VALUE";
-    payload: {
-      socketId: string;
-      zoom: AppState["zoom"];
-      username: string;
+      bounds: [number, number, number, number];
     };
   };
   IDLE_STATUS: {

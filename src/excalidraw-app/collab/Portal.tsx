@@ -214,8 +214,6 @@ class Portal {
         },
       };
 
-      // console.log("broadcastMouseLocation data", data);
-
       return this._broadcastSocketData(
         data as SocketUpdateData,
         true, // volatile
@@ -223,47 +221,18 @@ class Portal {
     }
   };
 
-  // TODO follow-participant
-  // - broadCastScrollLocation
-  // - broadCastZoomValue
-
-  broadcastScrollLocation = (payload: {
-    scrollX: SocketUpdateDataSource["SCROLL_LOCATION"]["payload"]["scroll"]["x"];
-    scrollY: SocketUpdateDataSource["SCROLL_LOCATION"]["payload"]["scroll"]["y"];
+  broadcastScrollAndZoom = (payload: {
+    bounds: [number, number, number, number];
   }) => {
     if (this.socket?.id) {
-      const data: SocketUpdateDataSource["SCROLL_LOCATION"] = {
-        type: "SCROLL_LOCATION",
+      const data: SocketUpdateDataSource["SCROLL_AND_ZOOM"] = {
+        type: "SCROLL_AND_ZOOM",
         payload: {
           socketId: this.socket.id,
-          scroll: { x: payload.scrollX, y: payload.scrollY },
           username: this.collab.state.username,
+          bounds: payload.bounds,
         },
       };
-
-      console.log("broadcastScrollLocation data", data);
-
-      return this._broadcastSocketData(
-        data as SocketUpdateData,
-        true, // volatile
-      );
-    }
-  };
-
-  broadcastZoomValue = (payload: {
-    zoom: SocketUpdateDataSource["ZOOM_VALUE"]["payload"]["zoom"];
-  }) => {
-    if (this.socket?.id) {
-      const data: SocketUpdateDataSource["ZOOM_VALUE"] = {
-        type: "ZOOM_VALUE",
-        payload: {
-          socketId: this.socket.id,
-          zoom: payload.zoom,
-          username: this.collab.state.username,
-        },
-      };
-
-      console.log("broadcastZoomValue data", data);
 
       return this._broadcastSocketData(
         data as SocketUpdateData,

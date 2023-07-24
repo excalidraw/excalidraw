@@ -225,22 +225,20 @@ const zoomValueToFitBoundsOnViewport = (
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
 
-export const zoomToFit = ({
-  targetElements,
+export const zoomToFitBounds = ({
+  bounds,
   appState,
   fitToViewport = false,
   viewportZoomFactor = 0.7,
 }: {
-  targetElements: readonly ExcalidrawElement[];
+  bounds: readonly [number, number, number, number];
   appState: Readonly<AppState>;
   /** whether to fit content to viewport (beyond >100%) */
   fitToViewport: boolean;
   /** zoom content to cover X of the viewport, when fitToViewport=true */
   viewportZoomFactor?: number;
 }) => {
-  const commonBounds = getCommonBounds(getNonDeletedElements(targetElements));
-
-  const [x1, y1, x2, y2] = commonBounds;
+  const [x1, y1, x2, y2] = bounds;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
 
@@ -267,7 +265,7 @@ export const zoomToFit = ({
     scrollX = (appState.width / 2) * (1 / newZoomValue) - centerX;
     scrollY = (appState.height / 2) * (1 / newZoomValue) - centerY;
   } else {
-    newZoomValue = zoomValueToFitBoundsOnViewport(commonBounds, {
+    newZoomValue = zoomValueToFitBoundsOnViewport(bounds, {
       width: appState.width,
       height: appState.height,
     });
@@ -294,6 +292,29 @@ export const zoomToFit = ({
     },
     commitToHistory: false,
   };
+};
+
+export const zoomToFit = ({
+  targetElements,
+  appState,
+  fitToViewport,
+  viewportZoomFactor,
+}: {
+  targetElements: readonly ExcalidrawElement[];
+  appState: Readonly<AppState>;
+  /** whether to fit content to viewport (beyond >100%) */
+  fitToViewport: boolean;
+  /** zoom content to cover X of the viewport, when fitToViewport=true */
+  viewportZoomFactor?: number;
+}) => {
+  const commonBounds = getCommonBounds(getNonDeletedElements(targetElements));
+
+  return zoomToFitBounds({
+    bounds: commonBounds,
+    appState,
+    fitToViewport,
+    viewportZoomFactor,
+  });
 };
 
 // Note, this action differs from actionZoomToFitSelection in that it doesn't

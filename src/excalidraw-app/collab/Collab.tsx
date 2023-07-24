@@ -1,6 +1,6 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import { ExcalidrawImperativeAPI } from "../../types";
+import { AppState, ExcalidrawImperativeAPI } from "../../types";
 import { ErrorDialog } from "../../components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../constants";
 import { ImportedDataState } from "../../data/types";
@@ -16,6 +16,7 @@ import { Collaborator, Gesture } from "../../types";
 import {
   preventUnload,
   resolvablePromise,
+  viewportCoordsToSceneCoords,
   withBatchedUpdates,
 } from "../../utils";
 import {
@@ -71,6 +72,7 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
+import { zoomToFitBounds } from "../../actions/actionCanvas";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
@@ -89,8 +91,7 @@ export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */
   isCollaborating: () => boolean;
   onPointerUpdate: CollabInstance["onPointerUpdate"];
-  onScrollChange: CollabInstance["onScrollChange"];
-  onZoomChange: CollabInstance["onZoomChange"];
+  onScrollAndZoomChange: CollabInstance["onScrollAndZoomChange"];
   startCollaboration: CollabInstance["startCollaboration"];
   stopCollaboration: CollabInstance["stopCollaboration"];
   syncElements: CollabInstance["syncElements"];
@@ -164,8 +165,7 @@ class Collab extends PureComponent<Props, CollabState> {
     const collabAPI: CollabAPI = {
       isCollaborating: this.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
-      onScrollChange: this.onScrollChange,
-      onZoomChange: this.onZoomChange,
+      onScrollAndZoomChange: this.onScrollAndZoomChange,
       startCollaboration: this.startCollaboration,
       syncElements: this.syncElements,
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
@@ -510,8 +510,6 @@ class Collab extends PureComponent<Props, CollabState> {
             break;
           }
           case WS_SCENE_EVENT_TYPES.UPDATE:
-            console.log("received update", decryptedData);
-            console.log(this.excalidrawAPI.getAppState());
             this.handleRemoteSceneUpdate(
               this.reconcileElements(decryptedData.payload.elements),
             );
@@ -519,8 +517,6 @@ class Collab extends PureComponent<Props, CollabState> {
           case "MOUSE_LOCATION": {
             const { pointer, button, username, selectedElementIds } =
               decryptedData.payload;
-
-            // console.log({ decryptedData });
 
             const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
               decryptedData.payload.socketId ||
@@ -539,50 +535,22 @@ class Collab extends PureComponent<Props, CollabState> {
             });
             break;
           }
-          // TODO follow-participant
-          // case "SCROLL_LOCATION"
-          // case "ZOOM_VALUE"
-          // if following someone, update scroll and zoom
 
-          case "SCROLL_LOCATION": {
-            const {
-              scroll: { x, y },
-            } = decryptedData.payload;
+          case "SCROLL_AND_ZOOM": {
+            const { bounds } = decryptedData.payload;
 
-            const socketId: SocketUpdateDataSource["SCROLL_LOCATION"]["payload"]["socketId"] =
+            const socketId: SocketUpdateDataSource["SCROLL_AND_ZOOM"]["payload"]["socketId"] =
               decryptedData.payload.socketId;
 
-            console.log({ decryptedData });
-
-            const appState = this.excalidrawAPI.getAppState();
-            console.log({ appState });
-
-            if (appState.userToFollow === socketId) {
-              this.excalidrawAPI.updateScene({
-                appState: {
-                  scrollX: x,
-                  scrollY: y,
-                },
+            const _appState = this.excalidrawAPI.getAppState();
+            if (_appState.userToFollow === socketId) {
+              const { appState } = zoomToFitBounds({
+                appState: _appState,
+                bounds,
+                fitToViewport: true,
+                viewportZoomFactor: 1,
               });
-            }
-
-            break;
-          }
-
-          case "ZOOM_VALUE": {
-            const { zoom } = decryptedData.payload;
-
-            console.log({ decryptedData });
-
-            const socketId: SocketUpdateDataSource["ZOOM_VALUE"]["payload"]["socketId"] =
-              decryptedData.payload.socketId;
-
-            const appState = this.excalidrawAPI.getAppState();
-
-            if (appState.userToFollow === socketId) {
-              this.excalidrawAPI.updateScene({
-                appState: { zoom },
-              });
+              this.excalidrawAPI.updateScene({ appState });
             }
 
             break;
@@ -814,7 +782,6 @@ class Collab extends PureComponent<Props, CollabState> {
       button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
       pointersMap: Gesture["pointers"];
     }) => {
-      // console.log({ payload });
       payload.pointersMap.size < 2 &&
         this.portal.socket &&
         this.portal.broadcastMouseLocation(payload);
@@ -822,26 +789,34 @@ class Collab extends PureComponent<Props, CollabState> {
     CURSOR_SYNC_TIMEOUT,
   );
 
-  // TODO follow-participant
-  // - onScrollChange
-  // -- broadCastScrollLocation
-  // - onZoomChange
-  // -- broadCastZoomValue
+  onScrollAndZoomChange = throttle(
+    (payload: { zoom: AppState["zoom"]; scroll: { x: number; y: number } }) => {
+      const appState = this.excalidrawAPI.getAppState();
 
-  onZoomChange = throttle(
-    (payload: {
-      zoom: SocketUpdateDataSource["ZOOM_VALUE"]["payload"]["zoom"];
-    }) => {
-      this.portal.socket && this.portal.broadcastZoomValue(payload);
-    },
-  );
+      const { x: x1, y: y1 } = viewportCoordsToSceneCoords(
+        { clientX: 0, clientY: 0 },
+        {
+          offsetLeft: appState.offsetLeft,
+          offsetTop: appState.offsetTop,
+          scrollX: payload.scroll.x,
+          scrollY: payload.scroll.y,
+          zoom: payload.zoom,
+        },
+      );
 
-  onScrollChange = throttle(
-    (payload: {
-      scrollX: SocketUpdateDataSource["SCROLL_LOCATION"]["payload"]["scroll"]["x"];
-      scrollY: SocketUpdateDataSource["SCROLL_LOCATION"]["payload"]["scroll"]["y"];
-    }) => {
-      this.portal.socket && this.portal.broadcastScrollLocation(payload);
+      const { x: x2, y: y2 } = viewportCoordsToSceneCoords(
+        { clientX: appState.width, clientY: appState.height },
+        {
+          offsetLeft: appState.offsetLeft,
+          offsetTop: appState.offsetTop,
+          scrollX: payload.scroll.x,
+          scrollY: payload.scroll.y,
+          zoom: payload.zoom,
+        },
+      );
+
+      this.portal.socket &&
+        this.portal.broadcastScrollAndZoom({ bounds: [x1, y1, x2, y2] });
     },
   );
 

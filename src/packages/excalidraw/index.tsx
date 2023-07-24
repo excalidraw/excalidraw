@@ -41,7 +41,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onLinkOpen,
     onPointerDown,
     onScrollChange,
-    onZoomChange,
+    onScrollAndZoomChange,
     children,
   } = props;
 
@@ -116,7 +116,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
-          onZoomChange={onZoomChange}
+          onScrollAndZoomChange={onScrollAndZoomChange}
         >
           {children}
         </App>
