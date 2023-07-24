@@ -109,8 +109,12 @@
     "createContainerFromText": "मजकूर कंटेनर मधे मोडून दाखवा",
     "link": {
       "edit": "दुवा संपादन",
+      "editEmbed": "",
       "create": "दुवा तयार करा",
-      "label": "दुवा"
+      "createEmbed": "",
+      "label": "दुवा",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "रेघ संपादन",
@@ -164,9 +168,11 @@
     "cancel": "रद्द",
     "clear": "स्वछ",
     "remove": "हटवा",
+    "embed": "",
     "publishLibrary": "प्रकाशित करा",
     "submit": "जमा करा",
-    "confirm": "पुष्टि करा"
+    "confirm": "पुष्टि करा",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "पटल स्वच्छ होणार, तुम्हाला खात्री आहे का?",
@@ -206,6 +212,10 @@
       "line2": "हे तुमच्या चित्रांच्या <bold>पाठ तत्वांनां </bold> खंडित करू शकतात.",
       "line3": "तुम्हाला आमच्या कड़ून खूप आग्रह आहे की हे सेटिंग्स मधले चयन नका करु. <link>हे अनुक्रम </link> हे कसे करावे हे दाखवु शकते.",
       "line4": "ही सेटिंग अक्षम करूनही पृष्ठ योग्यरित्या प्रदर्शित होत नसल्यास, आमच्या GitHub वर <issueLink>समस्या</issueLink> सबमिट करा, किव्हा <discordLink>डिस्कॉर्ड</discordLink> वर आम्हाला लिहा"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "निवडलेल्या आकारासाठी दुवा जोडा/बदल करा",
     "eraser": "खोड रबर",
     "frame": "",
+    "embeddable": "",
     "hand": "हात ( सरकवण्या चे उपकरण)",
     "extraTools": ""
   },
@@ -237,6 +248,7 @@
     "linearElement": "अनेक बिंदु साठी क्लिक करा, रेघे साठी ड्रैग करा",
     "freeDraw": "क्लिक आणि ड्रैग करा, झालं तेव्हा सोडा",
     "text": "टीप: तुम्हीं निवड यंत्रानी कोठेही दुहेरी क्लिक करून टेक्स्ट जोडू शकता",
+    "embeddable": "",
     "text_selected": "लेखन संपादन साठी दुहेरी क्लिक करा किव्हा एंटर दाबा",
     "text_editing": "संपादन संपवायचं असल्यास एस्केप दाबा किव्हा कंट्रोल या कम्मांड बरोबार एंटर दाबा",
     "linearElementMulti": "शेवटच्या बिंदु वर क्लिक करा किव्हा एस्केप या एंटर दाबा",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "{filename} मधे जतन झाली",
     "canvas": "पटल",
     "selection": "निवड",
-    "pasteAsSingleElement": "एक घटक म्हणून चिपकावण्या साठी {{shortcut}} वापरा,\nकिंवा विद्यमान मजकूर संपादकात चिपकवा"
+    "pasteAsSingleElement": "एक घटक म्हणून चिपकावण्या साठी {{shortcut}} वापरा,\nकिंवा विद्यमान मजकूर संपादकात चिपकवा",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "पारदर्शक",
