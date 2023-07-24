@@ -2,7 +2,7 @@
 
 exports[`<Excalidraw/> <MainMenu/> should render main menu with host menu items if passed from host 1`] = `
 <div
-  aria-labelledby="radix-:r5v:"
+  aria-labelledby="radix-:r65:"
   aria-orientation="vertical"
   class="dropdown-menu main-menu-content"
   data-align="start"
@@ -12,7 +12,7 @@ exports[`<Excalidraw/> <MainMenu/> should render main menu with host menu items 
   data-state="open"
   data-testid="dropdown-menu"
   dir="ltr"
-  id="radix-:r60:"
+  id="radix-:r66:"
   role="menu"
   style="outline: none; --radix-dropdown-menu-content-transform-origin: var(--radix-popper-transform-origin); --radix-dropdown-menu-content-available-width: var(--radix-popper-available-width); --radix-dropdown-menu-content-available-height: var(--radix-popper-available-height); --radix-dropdown-menu-trigger-width: var(--radix-popper-anchor-width); --radix-dropdown-menu-trigger-height: var(--radix-popper-anchor-height); animation: none;"
   tabindex="-1"
@@ -604,6 +604,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
       style="margin-top: 0.5rem;"
     >
       <div
+        data-testid="canvas-background-label"
         style="font-size: .75rem; margin-bottom: .5rem;"
       >
         Canvas background
