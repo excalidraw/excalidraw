@@ -29,7 +29,7 @@ exports[`<Excalidraw/> <MainMenu/> should render main menu with host menu items 
       tabindex="-1"
     >
       <button
-        class="dropdown-menu-item dropdown-menu-item-base"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
         type="button"
       >
         <div
@@ -75,7 +75,7 @@ exports[`<Excalidraw/> <MainMenu/> should render main menu with host menu items 
     >
       <button
         aria-label="Help"
-        class="dropdown-menu-item dropdown-menu-item-base"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
         data-testid="help-menu-item"
         title="Help"
         type="button"
@@ -166,7 +166,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
     >
       <button
         aria-label="Open"
-        class="dropdown-menu-item dropdown-menu-item-base"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
         data-testid="load-button"
         title="Open"
         type="button"
@@ -212,7 +212,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
     >
       <button
         aria-label="Save to..."
-        class="dropdown-menu-item dropdown-menu-item-base"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
         data-testid="json-export-button"
         title="Save to..."
         type="button"
@@ -253,7 +253,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
     >
       <button
         aria-label="Export image..."
-        class="dropdown-menu-item dropdown-menu-item-base"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
         data-testid="image-export-button"
         title="Export image..."
         type="button"
@@ -323,7 +323,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
     >
       <button
         aria-label="Help"
-        class="dropdown-menu-item dropdown-menu-item-base"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
         data-testid="help-menu-item"
         title="Help"
         type="button"
@@ -389,7 +389,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
     >
       <button
         aria-label="Reset the canvas"
-        class="dropdown-menu-item dropdown-menu-item-base"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
         data-testid="clear-canvas-button"
         title="Reset the canvas"
         type="button"
@@ -562,7 +562,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
     >
       <button
         aria-label="Dark mode"
-        class="dropdown-menu-item dropdown-menu-item-base"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
         data-testid="toggle-dark-mode"
         title="Dark mode"
         type="button"
