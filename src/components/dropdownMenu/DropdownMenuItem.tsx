@@ -1,3 +1,4 @@
+import { Button } from "../Button";
 import {
   getDropdownMenuItemClassName,
   useHandleDropdownMenuItemClick,
@@ -24,17 +25,17 @@ const DropdownMenuItem = ({
 
   return (
     <DropdownMenuPrimitive.Item className="radix-menu-item">
-      <button
+      <Button
         {...rest}
         onClick={handleClick}
-        type="button"
+        onSelect={() => {}}
         className={getDropdownMenuItemClassName(className)}
         title={rest.title ?? rest["aria-label"]}
       >
         <MenuItemContent icon={icon} shortcut={shortcut}>
           {children}
         </MenuItemContent>
-      </button>
+      </Button>
     </DropdownMenuPrimitive.Item>
   );
 };
