@@ -10,24 +10,6 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
-// jest.d.ts
-
-expect.extend({
-  toBeNonNaNNumber(received) {
-    const pass = typeof received === "number" && !isNaN(received);
-    if (pass) {
-      return {
-        message: () => `expected ${received} not to be a non-NaN number`,
-        pass: true,
-      };
-    }
-    return {
-      message: () => `expected ${received} to be a non-NaN number`,
-      pass: false,
-    };
-  },
-});
-
 describe("element binding", () => {
   beforeEach(async () => {
     await render(<ExcalidrawApp />);
