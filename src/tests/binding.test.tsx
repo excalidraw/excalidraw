@@ -10,9 +10,82 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
+// jest.d.ts
+
+expect.extend({
+  toBeNonNaNNumber(received) {
+    const pass = typeof received === "number" && !isNaN(received);
+    if (pass) {
+      return {
+        message: () => `expected ${received} not to be a non-NaN number`,
+        pass: true,
+      };
+    }
+    return {
+      message: () => `expected ${received} to be a non-NaN number`,
+      pass: false,
+    };
+  },
+});
+
 describe("element binding", () => {
   beforeEach(async () => {
     await render(<ExcalidrawApp />);
+  });
+
+  it("should create valid binding if duplicate start/end points", async () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      width: 50,
+      height: 50,
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 100,
+      y: 0,
+      width: 100,
+      height: 1,
+      points: [
+        [0, 0],
+        [0, 0],
+        [100, 0],
+        [100, 0],
+      ],
+    });
+    h.elements = [rect, arrow];
+    expect(arrow.startBinding).toBe(null);
+
+    API.setSelectedElements([arrow]);
+
+    expect(API.getSelectedElements()).toEqual([arrow]);
+    mouse.downAt(100, 0);
+    mouse.moveTo(55, 0);
+    mouse.up(0, 0);
+    expect(arrow.startBinding).toEqual({
+      elementId: rect.id,
+      focus: expect.toBeNonNaNNumber(),
+      gap: expect.toBeNonNaNNumber(),
+    });
+
+    mouse.downAt(100, 0);
+    mouse.move(-45, 0);
+    mouse.up();
+    expect(arrow.startBinding).toEqual({
+      elementId: rect.id,
+      focus: expect.toBeNonNaNNumber(),
+      gap: expect.toBeNonNaNNumber(),
+    });
+
+    mouse.down();
+    mouse.move(-50, 0);
+    mouse.up();
+    expect(arrow.startBinding).toBe(null);
+    expect(arrow.endBinding).toEqual({
+      elementId: rect.id,
+      focus: expect.toBeNonNaNNumber(),
+      gap: expect.toBeNonNaNNumber(),
+    });
   });
 
   //@TODO fix the test with rotation
