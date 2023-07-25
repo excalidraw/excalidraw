@@ -109,12 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Wijzig link",
-      "editEmbed": "",
+      "editEmbed": "Link bewerken & insluiten",
       "create": "Maak link",
-      "createEmbed": "",
+      "createEmbed": "Link maken en insluiten",
       "label": "Link",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Link toevoegen & insluiten",
+      "empty": "Er is geen link ingesteld"
     },
     "lineEditor": {
       "edit": "Bewerk regel",
@@ -168,11 +168,11 @@
     "cancel": "Annuleren",
     "clear": "Wissen",
     "remove": "Verwijderen",
-    "embed": "",
+    "embed": "Insluiten in-/uitschakelen",
     "publishLibrary": "Publiceren",
     "submit": "Versturen",
     "confirm": "Bevestigen",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Klik voor interactie"
   },
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Weet je het zeker?",
@@ -214,8 +214,8 @@
       "line4": ""
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "image": ""
+      "embeddable": "Ingesloten elementen kunnen niet worden toegevoegd aan de bibliotheek.",
+      "image": "Ondersteuning voor het toevoegen van afbeeldingen aan de bibliotheek komt binnenkort!"
     }
   },
   "toolBar": {
@@ -234,7 +234,7 @@
     "link": "Link toevoegen / bijwerken voor een geselecteerde vorm",
     "eraser": "Gum",
     "frame": "",
-    "embeddable": "",
+    "embeddable": "Web insluiten",
     "hand": "",
     "extraTools": ""
   },
@@ -248,7 +248,7 @@
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
-    "embeddable": "",
+    "embeddable": "Klink-sleep om een website-insluiting te maken",
     "text_selected": "Dubbelklik of druk op ENTER om tekst te bewerken",
     "text_editing": "Druk op Escape of CtrlOrCmd+ENTER om het bewerken te voltooien",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
@@ -424,8 +424,8 @@
     "canvas": "canvas",
     "selection": "selectie",
     "pasteAsSingleElement": "Gebruik {{shortcut}} om te plakken als een enkel element,\nof plak in een bestaande teksteditor",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "Het insluiten van deze url is momenteel niet toegestaan. Zet een probleem op GitHub om de URL op de whitelist te zetten",
+    "unrecognizedLinkFormat": "De link die u hebt ingesloten komt niet overeen met het verwachte formaat. Probeer de 'embed' string van de bronsite te plakken"
   },
   "colors": {
     "transparent": "Transparant",
