@@ -3,6 +3,9 @@ import { getPerfectElementSize } from "./sizeHelpers";
 import * as constants from "../constants";
 
 const EPSILON_DIGITS = 3;
+// Needed so that we can mock the value of constants which is done in
+// below tests. In Jest this wasn't needed as global override was possible
+// but vite doesn't allow that hence we need to mock
 vi.mock(
   "../constants.ts",
   //@ts-ignore
