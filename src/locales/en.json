@@ -214,6 +214,10 @@
       "line2": "This could result in breaking the <bold>Text Elements</bold> in your drawings.",
       "line3": "We strongly recommend disabling this setting. You can follow <link>these steps</link> on how to do so.",
       "line4": "If disabling this setting doesn't fix the display of text elements, please open an <issueLink>issue</issueLink> on our GitHub, or write us on <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "Embeddable elements cannot be added to the library.",
+      "image": "Support for adding images to the library coming soon!"
     }
   },
   "toolBar": {
