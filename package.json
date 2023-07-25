@@ -55,19 +55,7 @@
     "roughjs": "4.5.2",
     "sass": "1.51.0",
     "socket.io-client": "2.3.1",
-    "tunnel-rat": "0.1.2",
-    "workbox-background-sync": "^6.5.4",
-    "workbox-broadcast-update": "^6.5.4",
-    "workbox-cacheable-response": "^6.5.4",
-    "workbox-core": "^6.5.4",
-    "workbox-expiration": "^6.5.4",
-    "workbox-google-analytics": "^6.5.4",
-    "workbox-navigation-preload": "^6.5.4",
-    "workbox-precaching": "^6.5.4",
-    "workbox-range-requests": "^6.5.4",
-    "workbox-routing": "^6.5.4",
-    "workbox-strategies": "^6.5.4",
-    "workbox-streams": "^6.5.4"
+    "tunnel-rat": "0.1.2"
   },
   "devDependencies": {
     "@excalidraw/eslint-config": "1.0.3",
@@ -100,7 +88,7 @@
     "vite": "4.4.2",
     "vite-plugin-ejs": "1.6.4",
     "vite-plugin-eslint": "1.8.1",
-    "vite-plugin-pwa": "0.14.7",
+    "vite-plugin-pwa": "0.16.4",
     "vite-plugin-svgr": "2.4.0",
     "vitest": "0.32.2",
     "vitest-canvas-mock": "0.3.1"
