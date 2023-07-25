@@ -2,7 +2,7 @@ name: Auto release excalidraw next
 on:
   push:
     branches:
-      - master
+      - release
 
 jobs:
   Auto-release-excalidraw-next:

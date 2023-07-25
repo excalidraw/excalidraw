@@ -1,15 +1,12 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require("prism-react-renderer/themes/github");
-const darkCodeTheme = require("prism-react-renderer/themes/dracula");
-
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Excalidraw developer docs",
   tagline:
     "For Excalidraw contributors or those integrating the Excalidraw editor",
-  url: "https://docs.excalidraw.com.com",
+  url: "https://docs.excalidraw.com",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -33,10 +30,16 @@ const config = {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
-          editUrl: "https://github.com/excalidraw/docs/tree/master/",
+          editUrl:
+            "https://github.com/excalidraw/excalidraw/tree/master/dev-docs/",
+          showLastUpdateAuthor: true,
+          showLastUpdateTime: true,
         },
         theme: {
-          customCss: require.resolve("./src/css/custom.css"),
+          customCss: [
+            require.resolve("./src/css/custom.scss"),
+            require.resolve("../src/packages/excalidraw/example/App.scss"),
+          ],
         },
       }),
     ],
@@ -45,18 +48,20 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      colorMode: {
+        respectPrefersColorScheme: true,
+      },
       navbar: {
-        title: "Excalidraw Docs",
+        title: "Excalidraw",
         logo: {
           alt: "Excalidraw Logo",
           src: "img/logo.svg",
         },
         items: [
           {
-            type: "doc",
-            docId: "get-started",
+            to: "/docs",
             position: "left",
-            label: "Get started",
+            label: "Docs",
           },
           {
             to: "https://blog.excalidraw.com",
@@ -78,7 +83,7 @@ const config = {
             items: [
               {
                 label: "Get Started",
-                to: "/docs/get-started",
+                to: "/docs",
               },
             ],
           },
@@ -92,6 +97,10 @@ const config = {
               {
                 label: "Twitter",
                 href: "https://twitter.com/excalidraw",
+              },
+              {
+                label: "Linkedin",
+                href: "https://www.linkedin.com/company/excalidraw",
               },
             ],
           },
@@ -109,13 +118,28 @@ const config = {
             ],
           },
         ],
-        copyright: `Made with ❤️ Built with Docusaurus`,
+        copyright: `Copyright © 2023 Excalidraw community. Built with Docusaurus ❤️`,
       },
       prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
+        theme: require("prism-react-renderer/themes/dracula"),
+      },
+      image: "img/og-image.png",
+      docs: {
+        sidebar: {
+          hideable: true,
+        },
+      },
+      tableOfContents: {
+        maxHeadingLevel: 4,
+      },
+      algolia: {
+        appId: "8FEAOD28DI",
+        apiKey: "4b07cca33ff2d2919bc95ff98f148e9e",
+        indexName: "excalidraw",
       },
     }),
+  themes: ["@docusaurus/theme-live-codeblock"],
+  plugins: ["docusaurus-plugin-sass"],
 };
 
 module.exports = config;

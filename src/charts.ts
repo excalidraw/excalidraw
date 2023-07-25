@@ -1,4 +1,8 @@
-import colors from "./colors";
+import {
+  COLOR_PALETTE,
+  DEFAULT_CHART_COLOR_INDEX,
+  getAllColorsSpecificShade,
+} from "./colors";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -158,10 +162,7 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   return result;
 };
 
-const bgColors = colors.elementBackground.slice(
-  2,
-  colors.elementBackground.length,
-);
+const bgColors = getAllColorsSpecificShade(DEFAULT_CHART_COLOR_INDEX);
 
 // Put all the common properties here so when the whole chart is selected
 // the properties dialog shows the correct selected values
@@ -171,15 +172,15 @@ const commonProps = {
   fontSize: DEFAULT_FONT_SIZE,
   opacity: 100,
   roughness: 1,
-  strokeColor: colors.elementStroke[0],
-  strokeSharpness: "sharp",
+  strokeColor: COLOR_PALETTE.black,
+  roundness: null,
   strokeStyle: "solid",
   strokeWidth: 1,
   verticalAlign: VERTICAL_ALIGN.MIDDLE,
   locked: false,
 } as const;
 
-const getChartDimentions = (spreadsheet: Spreadsheet) => {
+const getChartDimensions = (spreadsheet: Spreadsheet) => {
   const chartWidth =
     (BAR_WIDTH + BAR_GAP) * spreadsheet.values.length + BAR_GAP;
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
@@ -200,6 +201,7 @@ const chartXLabels = (
         backgroundColor,
         ...commonProps,
         text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
+        rawText: label.length > 8 ? `${label.slice(0, 5)}...` : label,
         x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
         y: y + BAR_GAP / 2,
         width: BAR_WIDTH,
@@ -226,6 +228,7 @@ const chartYLabels = (
     x: x - BAR_GAP,
     y: y - BAR_GAP,
     text: "0",
+    rawText: "0",
     textAlign: "right",
   });
 
@@ -236,6 +239,7 @@ const chartYLabels = (
     x: x - BAR_GAP,
     y: y - BAR_HEIGHT - minYLabel.height / 2,
     text: Math.max(...spreadsheet.values).toLocaleString(),
+    rawText: Math.max(...spreadsheet.values).toLocaleString(),
     textAlign: "right",
   });
 
@@ -249,7 +253,7 @@ const chartLines = (
   groupId: string,
   backgroundColor: string,
 ): ChartElements => {
-  const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
+  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet);
   const xLine = newLinearElement({
     backgroundColor,
     groupIds: [groupId],
@@ -312,7 +316,7 @@ const chartBaseElements = (
   backgroundColor: string,
   debug?: boolean,
 ): ChartElements => {
-  const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
+  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet);
 
   const title = spreadsheet.title
     ? newTextElement({
@@ -320,10 +324,10 @@ const chartBaseElements = (
         groupIds: [groupId],
         ...commonProps,
         text: spreadsheet.title,
+        rawText: spreadsheet.title,
         x: x + chartWidth / 2,
         y: y - BAR_HEIGHT - BAR_GAP * 2 - DEFAULT_FONT_SIZE,
-        strokeSharpness: "sharp",
-        strokeStyle: "solid",
+        roundness: null,
         textAlign: "center",
       })
     : null;
@@ -338,7 +342,7 @@ const chartBaseElements = (
         y: y - chartHeight,
         width: chartWidth,
         height: chartHeight,
-        strokeColor: colors.elementStroke[0],
+        strokeColor: COLOR_PALETTE.black,
         fillStyle: "solid",
         opacity: 6,
       })

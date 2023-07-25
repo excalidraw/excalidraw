@@ -3,6 +3,7 @@ import { register } from "./register";
 
 export const actionToggleZenMode = register({
   name: "zenMode",
+  viewMode: true,
   trackEvent: {
     category: "canvas",
     predicate: (appState) => !appState.zenModeEnabled,
@@ -17,6 +18,9 @@ export const actionToggleZenMode = register({
     };
   },
   checked: (appState) => appState.zenModeEnabled,
+  predicate: (elements, appState, appProps) => {
+    return typeof appProps.zenModeEnabled === "undefined";
+  },
   contextItemLabel: "buttons.zenMode",
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z,

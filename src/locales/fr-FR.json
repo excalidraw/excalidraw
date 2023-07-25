@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Coller",
+    "pasteAsPlaintext": "Coller comme texte brut",
     "pasteCharts": "Coller les graphiques",
     "selectAll": "Tout sélectionner",
     "multiSelect": "Ajouter l'élément à la sélection",
@@ -10,23 +11,23 @@
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
     "copyText": "Copier dans le presse-papier en tant que texte",
-    "bringForward": "Avancer d'un plan",
+    "bringForward": "Envoyer vers l'avant",
     "sendToBack": "Déplacer à l'arrière-plan",
-    "bringToFront": "Placer au premier plan",
+    "bringToFront": "Mettre au premier plan",
     "sendBackward": "Reculer d'un plan",
     "delete": "Supprimer",
     "copyStyles": "Copier les styles",
     "pasteStyles": "Coller les styles",
     "stroke": "Trait",
-    "background": "Fond",
-    "fill": "Motif du fond",
-    "strokeWidth": "Épaisseur du trait",
+    "background": "Arrière-plan",
+    "fill": "Remplissage",
+    "strokeWidth": "Largeur du contour",
     "strokeStyle": "Style du trait",
     "strokeStyle_solid": "Continu",
     "strokeStyle_dashed": "Tirets",
     "strokeStyle_dotted": "Pointillés",
     "sloppiness": "Style de tracé",
-    "opacity": "Opacité",
+    "opacity": "Transparence",
     "textAlign": "Alignement du texte",
     "edges": "Angles",
     "sharp": "Pointus",
@@ -39,12 +40,8 @@
     "arrowhead_triangle": "Triangle",
     "fontSize": "Taille de la police",
     "fontFamily": "Police",
-    "onlySelected": "Uniquement la sélection",
-    "withBackground": "Arrière-plan",
-    "exportEmbedScene": "Intégrer la scène",
-    "exportEmbedScene_details": "Les données de scène seront enregistrées dans le fichier PNG/SVG exporté, afin que la scène puisse être restaurée à partir de celui-ci.\nCela augmentera la taille du fichier exporté.",
     "addWatermark": "Ajouter \"Réalisé avec Excalidraw\"",
-    "handDrawn": "À la main",
+    "handDrawn": "À main levée",
     "normal": "Normale",
     "code": "Code",
     "small": "Petite",
@@ -53,6 +50,7 @@
     "veryLarge": "Très grande",
     "solid": "Solide",
     "hachure": "Hachures",
+    "zigzag": "",
     "crossHatch": "Hachures croisées",
     "thin": "Fine",
     "bold": "Épaisse",
@@ -71,7 +69,7 @@
     "layers": "Disposition",
     "actions": "Actions",
     "language": "Langue",
-    "liveCollaboration": "Collaboration en direct",
+    "liveCollaboration": "Collaboration en direct...",
     "duplicateSelection": "Dupliquer",
     "untitled": "Sans-titre",
     "name": "Nom",
@@ -98,7 +96,6 @@
     "flipHorizontal": "Retourner horizontalement",
     "flipVertical": "Retourner verticalement",
     "viewMode": "Mode présentation",
-    "toggleExportColorScheme": "Activer/Désactiver l'export du thème de couleur",
     "share": "Partager",
     "showStroke": "Afficher le sélecteur de couleur de trait",
     "showBackground": "Afficher le sélecteur de couleur de fond",
@@ -106,13 +103,18 @@
     "personalLib": "Bibliothèque personnelle",
     "excalidrawLib": "Bibliothèque Excalidraw",
     "decreaseFontSize": "Diminuer la taille de police",
-    "increaseFontSize": "Augmenter la taille de police",
+    "increaseFontSize": "Augmenter la taille de la police",
     "unbindText": "Dissocier le texte",
     "bindText": "Associer le texte au conteneur",
+    "createContainerFromText": "Encadrer le texte dans un conteneur",
     "link": {
       "edit": "Modifier le lien",
       "create": "Ajouter un lien",
       "label": "Lien"
+    },
+    "lineEditor": {
+      "edit": "Modifier la ligne",
+      "exit": "Quitter l'éditeur de ligne"
     },
     "elementLock": {
       "lock": "Verrouiller",
@@ -121,7 +123,10 @@
       "unlockAll": "Tout déverrouiller"
     },
     "statusPublished": "Publié",
-    "sidebarLock": "Maintenir la barre latérale ouverte"
+    "sidebarLock": "Maintenir la barre latérale ouverte",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
@@ -131,13 +136,9 @@
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
     "exportJSON": "Exporter comme fichier",
-    "exportImage": "Enregistrer comme image",
-    "export": "Exporter",
-    "exportToPng": "Enregistrer en PNG",
-    "exportToSvg": "Enregistrer en SVG",
+    "exportImage": "Exporter l'image...",
+    "export": "Enregistrer sous...",
     "copyToClipboard": "Copier dans le presse-papier",
-    "copyPngToClipboard": "Copier le PNG dans le presse-papier",
-    "scale": "Échelle",
     "save": "Enregistrer dans le fichier actuel",
     "saveAs": "Enregistrer sous",
     "load": "Ouvrir",
@@ -187,7 +188,8 @@
     "invalidSceneUrl": "Impossible d'importer la scène depuis l'URL fournie. Elle est soit incorrecte, soit ne contient pas de données JSON Excalidraw valides.",
     "resetLibrary": "Cela va effacer votre bibliothèque. Êtes-vous sûr·e ?",
     "removeItemsFromsLibrary": "Supprimer {{count}} élément(s) de la bibliothèque ?",
-    "invalidEncryptionKey": "La clé de chiffrement doit comporter 22 caractères. La collaboration en direct est désactivée."
+    "invalidEncryptionKey": "La clé de chiffrement doit comporter 22 caractères. La collaboration en direct est désactivée.",
+    "collabOfflineWarning": "Aucune connexion internet disponible.\nVos modifications ne seront pas enregistrées !"
   },
   "errors": {
     "unsupportedFileType": "Type de fichier non supporté.",
@@ -196,7 +198,15 @@
     "svgImageInsertError": "Impossible d'insérer l'image SVG. Le balisage SVG semble invalide.",
     "invalidSVGString": "SVG invalide.",
     "cannotResolveCollabServer": "Impossible de se connecter au serveur collaboratif. Veuillez recharger la page et réessayer.",
-    "importLibraryError": "Impossible de charger la bibliothèque"
+    "importLibraryError": "Impossible de charger la bibliothèque",
+    "collabSaveFailed": "Impossible d'enregistrer dans la base de données en arrière-plan. Si des problèmes persistent, vous devriez enregistrer votre fichier localement pour vous assurer de ne pas perdre votre travail.",
+    "collabSaveFailed_sizeExceeded": "Impossible d'enregistrer dans la base de données en arrière-plan, le tableau semble trop grand. Vous devriez enregistrer le fichier localement pour vous assurer de ne pas perdre votre travail.",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    }
   },
   "toolBar": {
     "selection": "Sélection",
@@ -210,9 +220,12 @@
     "text": "Texte",
     "library": "Bibliothèque",
     "lock": "Garder l'outil sélectionné actif après le dessin",
-    "penMode": "Empêcher le zoom tactile et accepter la saisie libre uniquement à partir du stylet",
+    "penMode": "Mode stylo - évite le toucher",
     "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
-    "eraser": "Gomme"
+    "eraser": "Gomme",
+    "frame": "",
+    "hand": "Mains (outil de déplacement de la vue)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Actions du canevas",
@@ -220,7 +233,7 @@
     "shapes": "Formes"
   },
   "hints": {
-    "canvasPanning": "Pour déplacer la zone de dessin, maintenez la molette de la souris enfoncée ou la barre d'espace tout en faisant glisser",
+    "canvasPanning": "Pour déplacer la zone de dessin, maintenez la molette de la souris enfoncée ou la barre d'espace tout en faisant glisser, ou utiliser l'outil main.",
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
@@ -231,14 +244,15 @@
     "resize": "Vous pouvez conserver les proportions en maintenant la touche MAJ pendant le redimensionnement, maintenez la touche ALT pour redimensionner par rapport au centre",
     "resizeImage": "Vous pouvez redimensionner librement en maintenant SHIFT,\nmaintenez ALT pour redimensionner depuis le centre",
     "rotate": "Vous pouvez restreindre les angles en maintenant MAJ pendant la rotation",
-    "lineEditor_info": "Double-cliquez ou appuyez sur Entrée pour éditer les points",
+    "lineEditor_info": "Maintenez CtrlOrCmd et Double-cliquez ou appuyez sur CtrlOrCmd + Entrée pour modifier les points",
     "lineEditor_pointSelected": "Appuyer sur Suppr. pour supprimer des points, Ctrl ou Cmd+D pour dupliquer, ou faire glisser pour déplacer",
     "lineEditor_nothingSelected": "Sélectionner un point pour éditer (maintenir la touche MAJ pour en sélectionner plusieurs),\nou maintenir la touche Alt enfoncée et cliquer pour ajouter de nouveaux points",
     "placeImage": "Cliquez pour placer l'image, ou cliquez et faites glisser pour définir sa taille manuellement",
     "publishLibrary": "Publier votre propre bibliothèque",
     "bindTextToElement": "Appuyer sur Entrée pour ajouter du texte",
     "deepBoxSelect": "Maintenir Ctrl ou Cmd pour sélectionner dans les groupes et empêcher le déplacement",
-    "eraserRevert": "Maintenez Alt enfoncé pour annuler les éléments marqués pour suppression"
+    "eraserRevert": "Maintenez Alt enfoncé pour annuler les éléments marqués pour suppression",
+    "firefox_clipboard_write": "Cette fonctionnalité devrait pouvoir être activée en définissant l'option \"dom.events.asyncClipboard.clipboard.clipboardItem\" à \"true\". Pour modifier les paramètres du navigateur dans Firefox, visitez la page \"about:config\"."
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
@@ -246,16 +260,11 @@
     "canvasTooBigTip": "Astuce : essayez de rapprocher un peu les éléments les plus éloignés."
   },
   "errorSplash": {
-    "headingMain_pre": "Une erreur est survenue. Essayez ",
-    "headingMain_button": "de recharger la page.",
-    "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
-    "clearCanvasMessage_button": "effacement du canevas.",
+    "headingMain": "Une erreur est survenue. Essayez <button>de recharger la page.</button>",
+    "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez <button>effacement du canevas.</button>",
     "clearCanvasCaveat": " Cela entraînera une perte du travail ",
-    "trackedToSentry_pre": "L'erreur avec l'identifiant ",
-    "trackedToSentry_post": " a été enregistrée dans notre système.",
-    "openIssueMessage_pre": "Nous avons fait très attention à ne pas inclure les informations de votre scène dans l'erreur. Si votre scène n'est pas privée, veuillez envisager de poursuivre sur notre ",
-    "openIssueMessage_button": "outil de suivi des bugs.",
-    "openIssueMessage_post": " Veuillez inclure les informations ci-dessous en les copiant-collant dans le ticket GitHub.",
+    "trackedToSentry": "L'erreur avec l'identifiant {{eventId}} a été enregistrée dans notre système.",
+    "openIssueMessage": "Nous avons fait très attention à ne pas inclure les informations de votre scène dans l'erreur. Si votre scène n'est pas privée, veuillez envisager de poursuivre sur notre <button>outil de suivi des bugs.</button> Veuillez inclure les informations ci-dessous en les copiant-collant dans le ticket GitHub.",
     "sceneContent": "Contenu de la scène :"
   },
   "roomDialog": {
@@ -293,7 +302,8 @@
     "doubleClick": "double-clic",
     "drag": "glisser",
     "editor": "Éditeur",
-    "editSelectedShape": "Modifier la forme sélectionnée (texte/flèche/ligne)",
+    "editLineArrowPoints": "Modifier les points de ligne/flèche",
+    "editText": "Modifier le texte / ajouter un libellé",
     "github": "Problème trouvé ? Soumettre",
     "howto": "Suivez nos guides",
     "or": "ou",
@@ -306,7 +316,9 @@
     "view": "Affichage",
     "zoomToFit": "Zoomer pour voir tous les éléments",
     "zoomToSelection": "Zoomer sur la sélection",
-    "toggleElementLock": "Verrouiller/déverrouiller la sélection"
+    "toggleElementLock": "Verrouiller/déverrouiller la sélection",
+    "movePageUpDown": "Déplacer la page vers le haut/bas",
+    "movePageLeftRight": "Déplacer la page vers la gauche/droite"
   },
   "clearCanvasDialog": {
     "title": "Effacer la zone de dessin"
@@ -332,33 +344,44 @@
       "required": "Requis",
       "website": "Entrer une URL valide"
     },
-    "noteDescription": {
-      "pre": "Soumets ta bibliothèque pour l'inclure au ",
-      "link": "dépôt de bibliothèque publique",
-      "post": "pour permettre son utilisation par autrui dans leurs dessins."
-    },
-    "noteGuidelines": {
-      "pre": "La bibliothèque doit d'abord être approuvée manuellement. Veuillez lire les ",
-      "link": "lignes directrices",
-      "post": " avant de la soumettre. Vous aurez besoin d'un compte GitHub pour communiquer et apporter des modifications si demandé, mais ce n'est pas obligatoire."
-    },
-    "noteLicense": {
-      "pre": "En soumettant, vous acceptez que la bibliothèque soit publiée sous la ",
-      "link": "Licence MIT, ",
-      "post": "ce qui en gros signifie que tout le monde peut l'utiliser sans restrictions."
-    },
+    "noteDescription": "Soumets ta bibliothèque pour l'inclure au <link>dépôt de bibliothèque publique</link>pour permettre son utilisation par autrui dans leurs dessins.",
+    "noteGuidelines": "La bibliothèque doit d'abord être approuvée manuellement. Veuillez lire les <link>lignes directrices</link> avant de la soumettre. Vous aurez besoin d'un compte GitHub pour communiquer et apporter des modifications si demandé, mais ce n'est pas obligatoire.",
+    "noteLicense": "En soumettant, vous acceptez que la bibliothèque soit publiée sous la <link>Licence MIT, </link>ce qui en gros signifie que tout le monde peut l'utiliser sans restrictions.",
     "noteItems": "Chaque élément de la bibliothèque doit avoir son propre nom afin qu'il soit filtrable. Les éléments de bibliothèque suivants seront inclus :",
     "atleastOneLibItem": "Veuillez sélectionner au moins un élément de bibliothèque pour commencer",
     "republishWarning": "Remarque : certains des éléments sélectionnés sont marqués comme étant déjà publiés/soumis. Vous devez uniquement resoumettre des éléments lors de la mise à jour d'une bibliothèque ou d'une soumission existante."
   },
   "publishSuccessDialog": {
     "title": "Bibliothèque soumise",
-    "content": "Merci {{authorName}}. Votre bibliothèque a été soumise pour examen. Vous pouvez suivre le statut",
-    "link": "ici"
+    "content": "Merci {{authorName}}. Votre bibliothèque a été soumise pour examen. Vous pouvez suivre le statut<link>ici</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Réinitialiser la bibliothèque",
     "removeItemsFromLib": "Enlever les éléments sélectionnés de la bibliothèque"
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais.",
@@ -387,53 +410,44 @@
     "fileSaved": "Fichier enregistré.",
     "fileSavedToFilename": "Enregistré sous {filename}",
     "canvas": "canevas",
-    "selection": "sélection"
+    "selection": "sélection",
+    "pasteAsSingleElement": "Utiliser {{shortcut}} pour coller comme un seul élément,\nou coller dans un éditeur de texte existant"
   },
   "colors": {
-    "ffffff": "Blanc",
-    "f8f9fa": "Gris 0",
-    "f1f3f5": "Gris 1",
-    "fff5f5": "Rouge 0",
-    "fff0f6": "Rose 0",
-    "f8f0fc": "Mauve 0",
-    "f3f0ff": "Violet 0",
-    "edf2ff": "Indigo 0",
-    "e7f5ff": "Bleu 0",
-    "e3fafc": "Cyan 0",
-    "e6fcf5": "Turquoise 0",
-    "ebfbee": "Vert 0",
-    "f4fce3": "Citron vert 0",
-    "fff9db": "Jaune 0",
-    "fff4e6": "Orange 0",
     "transparent": "Transparent",
-    "ced4da": "Gris 4",
-    "868e96": "Gris 6",
-    "fa5252": "Rouge 6",
-    "e64980": "Rose 6",
-    "be4bdb": "Mauve 6",
-    "7950f2": "Violet 6",
-    "4c6ef5": "Indigo 6",
-    "228be6": "Bleu 6",
-    "15aabf": "Cyan 6",
-    "12b886": "Turquoise 6",
-    "40c057": "Vert 6",
-    "82c91e": "Citron vert 6",
-    "fab005": "Jaune 6",
-    "fd7e14": "Orange 6",
-    "000000": "Noir",
-    "343a40": "Gris 8",
-    "495057": "Gris 7",
-    "c92a2a": "Rouge 9",
-    "a61e4d": "Rose 9",
-    "862e9c": "Mauve 9",
-    "5f3dc4": "Violet 9",
-    "364fc7": "Indigo 9",
-    "1864ab": "Bleu 9",
-    "0b7285": "Cyan 9",
-    "087f5b": "Turquoise 9",
-    "2b8a3e": "Vert 9",
-    "5c940d": "Citron vert 9",
-    "e67700": "Jaune 9",
-    "d9480f": "Orange 9"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "Toutes vos données sont sauvegardées en local dans votre navigateur.",
+      "center_heading_plus": "Vouliez-vous plutôt aller à Excalidraw+ à la place ?",
+      "menuHint": "Exportation, préférences, langues, ..."
+    },
+    "defaults": {
+      "menuHint": "Exportation, préférences et plus...",
+      "center_heading": "Diagrammes. Rendus. Simples.",
+      "toolbarHint": "Choisissez un outil et commencez à dessiner !",
+      "helpHint": "Raccourcis et aide"
+    }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   }
 }

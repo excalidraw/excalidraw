@@ -42,7 +42,7 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(8);
+      expect(renderScene).toHaveBeenCalledTimes(9);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -73,7 +73,7 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(8);
+      expect(renderScene).toHaveBeenCalledTimes(9);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -104,7 +104,7 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(8);
+      expect(renderScene).toHaveBeenCalledTimes(9);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -135,7 +135,7 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(8);
+      expect(renderScene).toHaveBeenCalledTimes(9);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -170,7 +170,7 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(8);
+      expect(renderScene).toHaveBeenCalledTimes(9);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -210,7 +210,7 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(6);
+      expect(renderScene).toHaveBeenCalledTimes(7);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -229,7 +229,7 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(6);
+      expect(renderScene).toHaveBeenCalledTimes(7);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -248,7 +248,7 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(6);
+      expect(renderScene).toHaveBeenCalledTimes(7);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -272,7 +272,7 @@ describe("Test dragCreate", () => {
         key: KEYS.ENTER,
       });
 
-      expect(renderScene).toHaveBeenCalledTimes(7);
+      expect(renderScene).toHaveBeenCalledTimes(8);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -296,7 +296,7 @@ describe("Test dragCreate", () => {
         key: KEYS.ENTER,
       });
 
-      expect(renderScene).toHaveBeenCalledTimes(7);
+      expect(renderScene).toHaveBeenCalledTimes(8);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });

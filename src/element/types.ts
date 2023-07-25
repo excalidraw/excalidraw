@@ -1,17 +1,25 @@
 import { Point } from "../types";
-import { FONT_FAMILY, THEME, VERTICAL_ALIGN } from "../constants";
+import {
+  FONT_FAMILY,
+  ROUNDNESS,
+  TEXT_ALIGN,
+  THEME,
+  VERTICAL_ALIGN,
+} from "../constants";
+import { MarkNonNullable, ValueOf } from "../utility-types";
 
 export type ChartType = "bar" | "line";
-export type FillStyle = "hachure" | "cross-hatch" | "solid";
+export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
 export type FontFamilyKeys = keyof typeof FONT_FAMILY;
 export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
 export type Theme = typeof THEME[keyof typeof THEME];
 export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
 export type PointerType = "mouse" | "pen" | "touch";
-export type StrokeSharpness = "round" | "sharp";
+export type StrokeRoundness = "round" | "sharp";
+export type RoundnessType = ValueOf<typeof ROUNDNESS>;
 export type StrokeStyle = "solid" | "dashed" | "dotted";
-export type TextAlign = "left" | "center" | "right";
+export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
 
 type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
 export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];
@@ -25,7 +33,7 @@ type _ExcalidrawElementBase = Readonly<{
   fillStyle: FillStyle;
   strokeWidth: number;
   strokeStyle: StrokeStyle;
-  strokeSharpness: StrokeSharpness;
+  roundness: null | { type: RoundnessType; value?: number };
   roughness: number;
   opacity: number;
   width: number;
@@ -45,6 +53,7 @@ type _ExcalidrawElementBase = Readonly<{
   /** List of groups the element belongs to.
       Ordered from deepest to shallowest. */
   groupIds: readonly GroupId[];
+  frameId: string | null;
   /** other elements that are bound to this element */
   boundElements:
     | readonly Readonly<{
@@ -56,6 +65,7 @@ type _ExcalidrawElementBase = Readonly<{
   updated: number;
   link: string | null;
   locked: boolean;
+  customData?: Record<string, any>;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
@@ -74,6 +84,19 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
   type: "ellipse";
 };
 
+export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
+  Readonly<{
+    /**
+     * indicates whether the embeddable src (url) has been validated for rendering.
+     * nullish value indicates that the validation is pending. We reset the
+     * value on each restore (or url change) so that we can guarantee
+     * the validation came from a trusted source (the editor). Also because we
+     * may not have access to host-app supplied url validator during restore.
+     */
+    validated?: boolean;
+    type: "embeddable";
+  }>;
+
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
   Readonly<{
     type: "image";
@@ -89,12 +112,18 @@ export type InitializedExcalidrawImageElement = MarkNonNullable<
   "fileId"
 >;
 
+export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
+  type: "frame";
+  name: string | null;
+};
+
 /**
  * These are elements that don't have any additional properties.
  */
 export type ExcalidrawGenericElement =
   | ExcalidrawSelectionElement
   | ExcalidrawRectangleElement
+  | ExcalidrawEmbeddableElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement;
 
@@ -108,7 +137,8 @@ export type ExcalidrawElement =
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
   | ExcalidrawFreeDrawElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawFrameElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: boolean;
@@ -122,11 +152,17 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     fontSize: number;
     fontFamily: FontFamilyValues;
     text: string;
+    rawText: string;
     baseline: number;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
+    /**
+     * Unitless line height (aligned to W3C). To get line height in px, multiply
+     *  with font size (using `getLineHeightInPx` helper).
+     */
+    lineHeight: number & { _brand: "unitlessLineHeight" };
   }>;
 
 export type ExcalidrawBindableElement =
@@ -134,13 +170,15 @@ export type ExcalidrawBindableElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawEmbeddableElement
+  | ExcalidrawFrameElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
-  | ExcalidrawImageElement;
+  | ExcalidrawArrowElement;
 
 export type ExcalidrawTextElementWithContainer = {
   containerId: ExcalidrawTextContainer["id"];
@@ -163,6 +201,11 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     endBinding: PointBinding | null;
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
+  }>;
+
+export type ExcalidrawArrowElement = ExcalidrawLinearElement &
+  Readonly<{
+    type: "arrow";
   }>;
 
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &

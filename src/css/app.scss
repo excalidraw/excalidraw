@@ -1,3 +1,5 @@
+@import "open-color/open-color.scss";
+
 .visually-hidden {
   position: absolute !important;
   height: 1px;
@@ -29,4 +31,9 @@
     margin-top: 1em;
     font-size: 0.8em;
   }
+}
+
+.LoadingMessage--dark {
+  background-color: #121212;
+  color: #ced4da;
 }

@@ -6,6 +6,7 @@ import {
   ExcalidrawProps,
   BinaryFiles,
 } from "../types";
+import { MarkOptional } from "../utility-types";
 
 export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
 
@@ -81,7 +82,8 @@ export type ActionName =
   | "zoomOut"
   | "resetZoom"
   | "zoomToFit"
-  | "zoomToSelection"
+  | "zoomToFitSelection"
+  | "zoomToFitSelectionInViewport"
   | "changeFontFamily"
   | "changeTextAlign"
   | "changeVerticalAlign"
@@ -91,7 +93,7 @@ export type ActionName =
   | "ungroup"
   | "goToCollaborator"
   | "addToLibrary"
-  | "changeSharpness"
+  | "changeRoundness"
   | "alignTop"
   | "alignBottom"
   | "alignLeft"
@@ -109,9 +111,19 @@ export type ActionName =
   | "decreaseFontSize"
   | "unbindText"
   | "hyperlink"
-  | "eraser"
   | "bindText"
-  | "toggleLock";
+  | "unlockAllElements"
+  | "toggleElementLock"
+  | "toggleLinearEditor"
+  | "toggleEraserTool"
+  | "toggleHandTool"
+  | "selectAllElementsInFrame"
+  | "removeAllElementsFromFrame"
+  | "updateFrameRendering"
+  | "setFrameAsActiveTool"
+  | "setEmbeddableAsActiveTool"
+  | "createContainerFromText"
+  | "wrapTextInContainer";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -119,6 +131,7 @@ export type PanelComponentProps = {
   updateData: (formData?: any) => void;
   appProps: ExcalidrawProps;
   data?: Record<string, any>;
+  app: AppClassProperties;
 };
 
 export interface Action {
@@ -130,16 +143,20 @@ export interface Action {
     event: React.KeyboardEvent | KeyboardEvent,
     appState: AppState,
     elements: readonly ExcalidrawElement[],
+    app: AppClassProperties,
   ) => boolean;
   contextItemLabel?:
     | string
     | ((
         elements: readonly ExcalidrawElement[],
         appState: Readonly<AppState>,
+        app: AppClassProperties,
       ) => string);
-  contextItemPredicate?: (
+  predicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
+    appProps: ExcalidrawProps,
+    app: AppClassProperties,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
   trackEvent:
@@ -161,4 +178,7 @@ export interface Action {
           value: any,
         ) => boolean;
       };
+  /** if set to `true`, allow action to be performed in viewMode.
+   *  Defaults to `false` */
+  viewMode?: boolean;
 }

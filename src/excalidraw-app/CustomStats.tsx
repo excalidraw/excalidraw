@@ -7,6 +7,9 @@ import {
 import { DEFAULT_VERSION } from "../constants";
 import { t } from "../i18n";
 import { copyTextToSystemClipboard } from "../clipboard";
+import { NonDeletedExcalidrawElement } from "../element/types";
+import { UIAppState } from "../types";
+
 type StorageSizes = { scene: number; total: number };
 
 const STORAGE_SIZE_TIMEOUT = 500;
@@ -20,6 +23,8 @@ const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
 
 type Props = {
   setToast: (message: string) => void;
+  elements: readonly NonDeletedExcalidrawElement[];
+  appState: UIAppState;
 };
 const CustomStats = (props: Props) => {
   const [storageSizes, setStorageSizes] = useState<StorageSizes>({
@@ -31,7 +36,7 @@ const CustomStats = (props: Props) => {
     getStorageSizes((sizes) => {
       setStorageSizes(sizes);
     });
-  });
+  }, [props.elements, props.appState]);
   useEffect(() => () => getStorageSizes.cancel(), []);
 
   const version = getVersion();

@@ -263,9 +263,12 @@ export const loadScene = async (
       await importFromBackend(id, privateKey),
       localDataState?.appState,
       localDataState?.elements,
+      { repairBindings: true, refreshDimensions: false },
     );
   } else {
-    data = restore(localDataState || null, null, null);
+    data = restore(localDataState || null, null, null, {
+      repairBindings: true,
+    });
   }
 
   return {
@@ -279,11 +282,15 @@ export const loadScene = async (
   };
 };
 
+type ExportToBackendResult =
+  | { url: null; errorMessage: string }
+  | { url: string; errorMessage: null };
+
 export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
-  appState: AppState,
+  appState: Partial<AppState>,
   files: BinaryFiles,
-) => {
+): Promise<ExportToBackendResult> => {
   const encryptionKey = await generateEncryptionKey("string");
 
   const payload = await compressData(
@@ -324,14 +331,18 @@ export const exportToBackend = async (
         files: filesToUpload,
       });
 
-      window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
+      return { url: urlString, errorMessage: null };
     } else if (json.error_class === "RequestTooLargeError") {
-      window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));
-    } else {
-      window.alert(t("alerts.couldNotCreateShareableLink"));
+      return {
+        url: null,
+        errorMessage: t("alerts.couldNotCreateShareableLinkTooBig"),
+      };
     }
+
+    return { url: null, errorMessage: t("alerts.couldNotCreateShareableLink") };
   } catch (error: any) {
     console.error(error);
-    window.alert(t("alerts.couldNotCreateShareableLink"));
+
+    return { url: null, errorMessage: t("alerts.couldNotCreateShareableLink") };
   }
 };

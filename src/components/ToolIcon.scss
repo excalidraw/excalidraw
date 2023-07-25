@@ -3,12 +3,19 @@
 
 .excalidraw {
   .ToolIcon {
+    border-radius: var(--border-radius-lg);
     display: inline-flex;
     align-items: center;
     position: relative;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+
+    &__hidden {
+      display: none !important;
+    }
+
+    @include toolbarButtonColorStates;
   }
 
   .ToolIcon--plain {
@@ -21,21 +28,15 @@
 
   .ToolIcon_type_radio,
   .ToolIcon_type_checkbox {
-    & + .ToolIcon__icon {
-      background-color: var(--button-gray-1);
-
-      &:hover {
-        background-color: var(--button-gray-2);
-      }
-      &:active {
-        background-color: var(--button-gray-3);
-      }
-    }
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .ToolIcon__icon {
-    width: 2.5rem;
-    height: 2.5rem;
+    box-sizing: border-box;
+    width: var(--default-button-size);
+    height: var(--default-button-size);
     color: var(--icon-fill-color);
 
     display: flex;
@@ -50,8 +51,8 @@
 
     svg {
       position: relative;
-      height: 1em;
-      fill: var(--icon-fill-color);
+      width: var(--default-icon-size);
+      height: var(--default-icon-size);
       color: var(--icon-fill-color);
     }
   }
@@ -75,13 +76,14 @@
     font-size: 0.8em;
   }
 
-  .excalidraw .ToolIcon_type_button,
+  .ToolIcon_type_button,
   .Modal .ToolIcon_type_button,
   .ToolIcon_type_button {
     padding: 0;
     border: none;
     margin: 0;
     font-size: inherit;
+    background-color: initial;
 
     &:focus-visible {
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
@@ -95,9 +97,9 @@
       }
     }
 
-    &:hover {
-      background-color: var(--button-gray-2);
-    }
+    // &:hover {
+    //   background-color: var(--button-gray-2);
+    // }
 
     &:active {
       background-color: var(--button-gray-3);
@@ -108,29 +110,8 @@
     }
 
     &--hide {
-      visibility: hidden;
-    }
-  }
-
-  .ToolIcon_type_radio,
-  .ToolIcon_type_checkbox {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-
-    &:not(.ToolIcon_toggle_opaque):checked + .ToolIcon__icon {
-      background-color: var(--button-gray-2);
-      &:active {
-        background-color: var(--button-gray-3);
-      }
-    }
-
-    &:focus-visible + .ToolIcon__icon {
-      box-shadow: 0 0 0 2px var(--focus-highlight-color);
-    }
-
-    &:active + .ToolIcon__icon {
-      background-color: var(--button-gray-3);
+      // visibility: hidden;
+      display: none !important;
     }
   }
 
@@ -163,64 +144,10 @@
     position: absolute;
     bottom: 2px;
     right: 3px;
-    font-size: 0.5em;
+    font-size: 0.625rem;
     color: var(--keybinding-color);
     font-family: var(--ui-font);
     user-select: none;
-  }
-
-  // shrink shape icons on small viewports to make them fit
-  @media (max-width: 425px) {
-    .Shape .ToolIcon__icon {
-      width: 2rem;
-      height: 2rem;
-
-      svg {
-        height: 0.8em;
-      }
-    }
-  }
-
-  // move the lock button out of the way on small viewports
-  // it begins to collide with the GitHub icon before we switch to mobile mode
-  @media (max-width: 760px) {
-    .ToolIcon.ToolIcon_type_floating {
-      display: inline-block;
-      position: absolute;
-      right: -8px;
-
-      margin-left: 0;
-      border-radius: 20px 0 0 20px;
-      z-index: 1;
-
-      background-color: var(--button-gray-1);
-
-      &:hover {
-        background-color: var(--button-gray-1);
-      }
-
-      &:active {
-        background-color: var(--button-gray-2);
-      }
-
-      .ToolIcon__icon {
-        border-radius: inherit;
-      }
-
-      svg {
-        position: static;
-      }
-    }
-    .ToolIcon.ToolIcon__library {
-      top: calc(var(--sat) + 100px);
-    }
-
-    .ToolIcon.ToolIcon__lock {
-      top: calc(var(--sat) + 60px);
-    }
-    .ToolIcon.ToolIcon__penMode {
-      top: calc(var(--sat) + 140px);
-    }
   }
 
   .unlocked-icon {
@@ -230,6 +157,18 @@
 
     :root[dir="rtl"] & {
       right: 2px;
+    }
+  }
+
+  .App-toolbar-container {
+    .ToolIcon__icon {
+      width: var(--lg-button-size);
+      height: var(--lg-button-size);
+
+      svg {
+        width: var(--lg-icon-size);
+        height: var(--lg-icon-size);
+      }
     }
   }
 }

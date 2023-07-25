@@ -26,6 +26,7 @@ import Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
 import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
+import { getBoundTextElement, handleBindTextResize } from "./textElement";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -38,13 +39,15 @@ export type SuggestedPointBinding = [
 ];
 
 export const shouldEnableBindingForPointerEvent = (
-  event: React.PointerEvent<HTMLCanvasElement>,
+  event: React.PointerEvent<HTMLElement>,
 ) => {
   return !event[KEYS.CTRL_OR_CMD];
 };
 
 export const isBindingEnabled = (appState: AppState): boolean => {
-  return appState.isBindingEnabled;
+  return appState.invertBindingBehaviour //zsviczian
+    ? !appState.isBindingEnabled
+    : appState.isBindingEnabled;
 };
 
 const getNonDeletedElements = (
@@ -361,6 +364,10 @@ export const updateBoundElements = (
       endBinding,
       changedElement as ExcalidrawBindableElement,
     );
+    const boundText = getBoundTextElement(element);
+    if (boundText) {
+      handleBindTextResize(element, false);
+    }
   });
 };
 

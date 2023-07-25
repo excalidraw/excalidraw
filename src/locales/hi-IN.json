@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "चिपकाएँ",
+    "pasteAsPlaintext": "सादे पाठ के रूप में चिपकाएं",
     "pasteCharts": "चार्ट चिपकाएँ",
     "selectAll": "सभी चुनें",
     "multiSelect": "आकार को चयन में जोड़ें",
@@ -39,10 +40,6 @@
     "arrowhead_triangle": "त्रिकोण",
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
-    "onlySelected": "केवल चयनित",
-    "withBackground": "पृष्ठभूमि",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "निर्यात एम्बेड दृश्य विवरण",
     "addWatermark": "ऐड \"मेड विथ एक्सकैलिडराव\"",
     "handDrawn": "हाथ से बनाया हुआ",
     "normal": "साधारण",
@@ -52,7 +49,8 @@
     "large": "बड़ा",
     "veryLarge": "बहुत बड़ा",
     "solid": "दृढ़",
-    "hachure": "हाचुरे",
+    "hachure": "हैशूर",
+    "zigzag": "तेढ़ी मेढ़ी",
     "crossHatch": "क्रॉस हैच",
     "thin": "पतला",
     "bold": "मोटा",
@@ -71,7 +69,7 @@
     "layers": "परतें",
     "actions": "कार्रवाई",
     "language": "भाषा",
-    "liveCollaboration": "",
+    "liveCollaboration": "जीवंत सहयोग...",
     "duplicateSelection": "डुप्लिकेट",
     "untitled": "अशीर्षित",
     "name": "नाम",
@@ -98,10 +96,9 @@
     "flipHorizontal": "दायें बायें पलटे",
     "flipVertical": "ऊपर नीचे पलटे",
     "viewMode": "अलग अलग देखें",
-    "toggleExportColorScheme": "",
     "share": "शेयर करें",
     "showStroke": "",
-    "showBackground": "",
+    "showBackground": "पृष्ठभूमि रंग वरक़ दिखाये",
     "toggleTheme": "",
     "personalLib": "",
     "excalidrawLib": "",
@@ -109,10 +106,15 @@
     "increaseFontSize": "फ़ॉन्ट आकार बढ़ाएँ",
     "unbindText": "",
     "bindText": "लेखन को कोश से जोड़े",
+    "createContainerFromText": "मूलपाठ कंटेनर में मोड के दिखाए",
     "link": {
       "edit": "",
       "create": "",
       "label": ""
+    },
+    "lineEditor": {
+      "edit": "रेखा संपादित करे",
+      "exit": "रेखा संपादक के बाहर"
     },
     "elementLock": {
       "lock": "ताले में रखें",
@@ -121,7 +123,10 @@
       "unlockAll": "सब ताले के बाहर निकाले"
     },
     "statusPublished": "प्रकाशित",
-    "sidebarLock": "साइडबार खुला रखे."
+    "sidebarLock": "साइडबार खुला रखे.",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": "चित्रफलक से रंग चुने"
   },
   "library": {
     "noItems": "अभी तक कोई आइटम जोडा नहीं गया.",
@@ -131,16 +136,12 @@
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
     "exportJSON": "",
-    "exportImage": "",
-    "export": "निर्यात",
-    "exportToPng": "पीएनजी के रूप में निर्यात करे",
-    "exportToSvg": "Svg के रूप में निर्यात करे",
+    "exportImage": "प्रतिमा निर्यात करे...",
+    "export": "यंहा सुरक्षित करे...",
     "copyToClipboard": "क्लिपबोर्ड पर प्रतिलिपि बनाएँ",
-    "copyPngToClipboard": "क्लिपबोर्ड पर कॉपी करें,पीएनजी के रूप में",
-    "scale": "पैमाना",
     "save": "",
     "saveAs": "सेव करे इस तरह",
-    "load": "लोड करें",
+    "load": "खोलें",
     "getShareableLink": "साझा करने योग्य लिंक प्राप्त करें",
     "close": "बंद करें",
     "selectLanguage": "भाषा चुनें",
@@ -161,11 +162,11 @@
     "zenMode": "ज़ेन मोड",
     "exitZenMode": "जेन मोड से बाहर निकलें",
     "cancel": "",
-    "clear": "",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "clear": "साफ़ करे",
+    "remove": "हटाएं",
+    "publishLibrary": "प्रकाशित करें",
+    "submit": "प्रस्तुत करे",
+    "confirm": "पुष्टि करें"
   },
   "alerts": {
     "clearReset": "इससे पूरा कैनवास साफ हो जाएगा। क्या आपको यकीन है?",
@@ -174,45 +175,57 @@
     "couldNotLoadInvalidFile": "अमान्य फ़ाइल लोड नहीं की जा सकी",
     "importBackendFailed": "बैकएंड से आयात करना विफल रहा।",
     "cannotExportEmptyCanvas": "खाली कैनवास निर्यात नहीं कर सकता।",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "क्लिपबोर्ड पर कॉपी नहीं किया जा सका",
     "decryptFailed": "डेटा को डिक्रिप्ट नहीं किया जा सका।",
     "uploadedSecurly": "अपलोड को एंड-टू-एंड एन्क्रिप्शन के साथ सुरक्षित किया गया है, जिसका मतलब है कि एक्सक्लूसिव सर्वर और थर्ड पार्टी कंटेंट नहीं पढ़ सकते हैं।",
     "loadSceneOverridePrompt": "लोड हो रहा है बाहरी ड्राइंग आपके मौजूदा सामग्री को बदल देगा। क्या आप जारी रखना चाहते हैं?",
-    "collabStopOverridePrompt": "",
-    "errorAddingToLibrary": "",
-    "errorRemovingFromLibrary": "",
+    "collabStopOverridePrompt": "चालू सत्र समाप्ति से आपका संग्रहित पूर्व स्थानीय अधिलेखन नष्ट होकर पुनः अधिलेखित होगा, क्या आपको यक़ीन हैं? ( यदी आपको पूर्व स्थापित अधिलेखन सुरक्षित चाहिये तो बस ब्राउज़र टैब बंद करे)",
+    "errorAddingToLibrary": "संग्रह में जोडा न जा सका",
+    "errorRemovingFromLibrary": "संग्रह से हटाया नहीं जा सका",
     "confirmAddLibrary": "लाइब्रेरी जोड़ें पुष्‍टि करें आकार संख्या",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "ऐसा लगता है कि इस छवि में कोई दृश्य डेटा नहीं है। क्या आपने निर्यात के दौरान दृश्य एम्बेडिंग अनुमतित की है?",
     "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है",
-    "invalidSceneUrl": "",
-    "resetLibrary": "",
-    "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": ""
+    "invalidSceneUrl": "दिये गये युआरेल से दृश्य आयात नहीं किया जा सका. यह या तो अनुचित है, या इसमें उचित Excalidraw JSON डेटा नहीं है।",
+    "resetLibrary": "यह पूरा संग्रह रिक्त करेगा. क्या आपको यक़ीन हैं?",
+    "removeItemsFromsLibrary": "{{count}} वस्तु(यें) संग्रह से हटायें?",
+    "invalidEncryptionKey": "कूटलेखन कुंजी 22 अक्षरों की होनी चाहिये, इसलिये जीवंत सहयोग अक्षम हैं",
+    "collabOfflineWarning": "कोई इंटरनेट कनेक्शन उपलब्ध नहीं है।\nआपके बदलाव सहेजे नहीं जाएंगे!"
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
-    "invalidSVGString": "",
+    "unsupportedFileType": "असमर्थित फाइल प्रकार",
+    "imageInsertError": "छवि सम्मिलित नहीं की जा सकी. पुनः प्रयत्न करे...",
+    "fileTooBig": "फ़ाइल ज़रूरत से ज़्यादा बड़ी हैं. अधिकतम अनुमित परिमाण {{maxSize}} हैं",
+    "svgImageInsertError": "एसवीजी छवि सम्मिलित नहीं कर सके, एसवीजी रचना अनुचित हैं",
+    "invalidSVGString": "अनुचित SVG",
     "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे.",
-    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका"
+    "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका",
+    "collabSaveFailed": "किसी कारण वश अंदरूनी डेटाबेस में सहेजा नहीं जा सका। यदि समस्या बनी रहती है, तो किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।",
+    "collabSaveFailed_sizeExceeded": "लगता है कि पृष्ठ तल काफ़ी बड़ा है, इस्कारण अंदरूनी डेटाबेस में सहेजा नहीं जा सका। किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।",
+    "brave_measure_text_error": {
+      "line1": "लगता है कि आप Brave ब्राउज़र का उपयोग कर रहे और साथ में <bold>आक्रामक उँगलियो के छाप </bold> का चयन किया हुवा है",
+      "line2": "यह आपके चित्रों के <bold>पाठ तत्वों</bold>को खंडित कर सकता हैं",
+      "line3": "हमें आपसे ठोस आग्रह है की आप सेट्टिंग में इस विकल्प का चयन ना करे.<link> इस अनुक्रम </link> का पालन करके इसका पता लगा सकते हैं",
+      "line4": "यदि इस सेटिंग्स को अक्षम करने पर भी पृष्ठ ठीक नहीं दिखता हो तो, हमारे GitHub पर एक <issueLink>मुद्दा प्रस्तुत</issueLink> करे, या हमें <discordLink>डिस्कोर्ड</discordLink> पर लिखित सम्पर्क करें"
+    }
   },
   "toolBar": {
     "selection": "चयन",
-    "image": "",
+    "image": "छवि सम्मिलित करें",
     "rectangle": "आयात",
     "diamond": "तिर्यग्वर्ग",
     "ellipse": "दीर्घवृत्त",
     "arrow": "तीर",
     "line": "रेखा",
-    "freedraw": "",
+    "freedraw": "चित्रांतित करे",
     "text": "पाठ",
     "library": "लाइब्रेरी",
     "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें",
-    "penMode": "",
+    "penMode": "पेन का मोड - स्पर्श टाले",
     "link": "",
-    "eraser": "रबड़"
+    "eraser": "रबड़",
+    "frame": "",
+    "hand": "हाथ ( खिसकाने का औज़ार)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",
@@ -220,7 +233,7 @@
     "shapes": "आकृतियाँ"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "कैनवास को सरकाने के लिए, ड्रैग करते समय माउस व्हील को पकड़े रखे या स्पेसबार को दबाए रखे, अथवा हाथ वाले औज़ार का उपयोग करें",
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, सिंगल लाइन के लिए खींचें",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोड़ो",
     "text": "आप चयन टूल से कहीं भी डबल-क्लिक करके टेक्स्ट जोड़ सकते हैं",
@@ -231,14 +244,15 @@
     "resize": "आकार बदलते समय आप SHIFT को पकड़ कर अनुपात में कमी कर सकते हैं,\nकेंद्र से आकार बदलने के लिए ALT दबाए रखें",
     "resizeImage": "",
     "rotate": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को विवश कर सकते हैं",
-    "lineEditor_info": "बिंदुओं को संपादित करने के लिए Enter पर डबल-क्लिक करें या दबाएँ",
+    "lineEditor_info": "बिंदुओं को सम्पादित करने के लिए CtrlOrCmd को दबायें रखते हुये डबल क्लिक करे, अथवा CtrlOrCmd + Enter साथ दबाये",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
     "deepBoxSelect": "",
-    "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए"
+    "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए",
+    "firefox_clipboard_write": "\"dom.events.asyncClipboard.clipboardItem\" फ़्लैग को \"true\" पर सेट करके इस सुविधा को संभवतः सक्षम किया जा सकता है। Firefox में ब्राउज़र फ़्लैग बदलने के लिए, \"about:config\" पृष्ठ पर जाएँ।"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -246,16 +260,11 @@
     "canvasTooBigTip": "कैनवास बहुत बड़ा टिप"
   },
   "errorSplash": {
-    "headingMain_pre": "एक त्रुटि का सामना करना पड़ा। प्रयत्न ",
-    "headingMain_button": "इस पृष्ठ को पुनः लोड करें",
-    "clearCanvasMessage": "यदि पुनः लोड करना काम नहीं करता है, तो प्रयास करें ",
-    "clearCanvasMessage_button": "कैनवास साफ करना।",
+    "headingMain": "एक त्रुटि का सामना करना पड़ा। प्रयत्न <button>इस पृष्ठ को पुनः लोड करें</button>",
+    "clearCanvasMessage": "यदि पुनः लोड करना काम नहीं करता है, तो प्रयास करें <button>कैनवास साफ करना।</button>",
     "clearCanvasCaveat": " इससे काम का नुकसान होगा ",
-    "trackedToSentry_pre": "पहचानकर्ता के साथ त्रुटि ",
-    "trackedToSentry_post": " हमारे सिस्टम पर नज़र रखी गई थी।",
-    "openIssueMessage_pre": "हम बहुत सतर्क थे कि त्रुटि पर आपकी दृश्य जानकारी शामिल न करें। यदि आपका दृश्य निजी नहीं है, तो कृपया हमारे बारे में विचार करें ",
-    "openIssueMessage_button": "बग ट्रैकर",
-    "openIssueMessage_post": " कृपया GitHub मुद्दे को कॉपी और पेस्ट करके नीचे दी गई जानकारी शामिल करें।",
+    "trackedToSentry": "पहचानकर्ता के साथ त्रुटि {{eventId}} हमारे सिस्टम पर नज़र रखी गई थी।",
+    "openIssueMessage": "हम बहुत सतर्क थे कि त्रुटि पर आपकी दृश्य जानकारी शामिल न करें। यदि आपका दृश्य निजी नहीं है, तो कृपया हमारे बारे में विचार करें <button>बग ट्रैकर</button> कृपया GitHub मुद्दे को कॉपी और पेस्ट करके नीचे दी गई जानकारी शामिल करें।",
     "sceneContent": "दृश्य सामग्री:"
   },
   "roomDialog": {
@@ -293,7 +302,8 @@
     "doubleClick": "",
     "drag": "खींचें",
     "editor": "संपादक",
-    "editSelectedShape": "",
+    "editLineArrowPoints": "रेखा/तीर बिंदु सम्पादित करे",
+    "editText": "पाठ्य सम्पादित करे/ लेबल जोड़े",
     "github": "मुद्दा मिला? प्रस्तुत करें",
     "howto": "हमारे गाइड का पालन करें",
     "or": "या",
@@ -306,7 +316,9 @@
     "view": "दृश्य",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
     "zoomToSelection": "चयन तक ज़ूम करे",
-    "toggleElementLock": "ताले के अंदर/बाहर चुनाव"
+    "toggleElementLock": "ताले के अंदर/बाहर चुनाव",
+    "movePageUpDown": "पृष्ठ ऊपर/नीचे करे",
+    "movePageLeftRight": "पृष्ठ बायी/दायी तरफ करे"
   },
   "clearCanvasDialog": {
     "title": ""
@@ -330,35 +342,46 @@
     },
     "errors": {
       "required": "",
-      "website": ""
+      "website": "मान्य URL प्रविष्ट करें"
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "संग्रह सम्मिलित करने हेतु प्रस्तुत करें <link>सार्वजनिक संग्रहालय</link>अन्य वक्तियों को उनके चित्रकारी में उपयोग के लिये",
+    "noteGuidelines": "संग्रह को पहले स्वीकृति आवश्यक कृपया यह पढ़ें <link>दिशा-निर्देश</link>",
+    "noteLicense": "जमा करके, आप सहमत हैं कि संग्रहण को <link>MIT लाइसेंस</link> के तहत प्रकाशित किया जाएगा, जिसका संक्षिप्त अर्थ है कि कोई भी बिना किसी प्रतिबंध के उनका उपयोग कर सकता है।",
     "noteItems": "",
     "atleastOneLibItem": "",
-    "republishWarning": "टिप्पणी: कुछ चुने हुवे आइटम पहले ही प्रकाशित/प्रस्तुत किए जा चुके हैं। किसी प्रकाशित संग्रह को अद्यतन करते समय या प्रस्तुतित आइटम को पुन्हा प्रस्तुत करते समय, आप बस उसे केवल अद्यतन करें ।"
+    "republishWarning": "टिप्पणी: कुछ चुने हुवे आइटम पहले ही प्रकाशित/प्रस्तुत किए जा चुके हैं। किसी प्रकाशित संग्रह को अद्यतन करते समय या पहले से प्रस्तुत आइटम को पुन्हा प्रस्तुत करते समय, आप बस उसे केवल अद्यतन करें ।"
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": ""
+    "content": "{{authorName}} धन्यवाद. आपका संग्रहण समीक्षा के लिए दर्ज हो चुका है. समीक्षा स्थिति <link>यहाँ</link>जान सकते हैं."
   },
   "confirmDialog": {
     "resetLibrary": "",
     "removeItemsFromLib": ""
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।",
@@ -387,53 +410,44 @@
     "fileSaved": "",
     "fileSavedToFilename": "",
     "canvas": "",
-    "selection": ""
+    "selection": "",
+    "pasteAsSingleElement": "एक अवयव के रूप में चिपकाने के लिए {{shortcut}} का उपयोग करें,\nया किसी मौजूदा पाठ संपादक में चिपकायें"
   },
   "colors": {
-    "ffffff": "सफेद",
-    "f8f9fa": "",
-    "f1f3f5": "",
-    "fff5f5": "",
-    "fff0f6": "",
-    "f8f0fc": "अंगूरी 0",
-    "f3f0ff": "",
-    "edf2ff": "नील 0",
-    "e7f5ff": "नीला 0",
-    "e3fafc": "",
-    "e6fcf5": "",
-    "ebfbee": "",
-    "f4fce3": "",
-    "fff9db": "",
-    "fff4e6": "",
     "transparent": "",
-    "ced4da": "",
-    "868e96": "",
-    "fa5252": "",
-    "e64980": "",
-    "be4bdb": "",
-    "7950f2": "",
-    "4c6ef5": "",
-    "228be6": "",
-    "15aabf": "",
-    "12b886": "",
-    "40c057": "",
-    "82c91e": "",
-    "fab005": "",
-    "fd7e14": "",
-    "000000": "",
-    "343a40": "",
-    "495057": "",
-    "c92a2a": "",
-    "a61e4d": "",
-    "862e9c": "",
-    "5f3dc4": "",
-    "364fc7": "",
-    "1864ab": "",
-    "0b7285": "आसमानी",
-    "087f5b": "",
-    "2b8a3e": "हरा",
-    "5c940d": "",
-    "e67700": "पीला",
-    "d9480f": "नारंगी"
+    "black": "काला",
+    "white": "सफ़ेद",
+    "red": "लाल",
+    "pink": "गुलाबी",
+    "grape": "अंगूरी",
+    "violet": "जामुनी",
+    "gray": "गहरा",
+    "blue": "नीला",
+    "cyan": "आसमानी",
+    "teal": "हरा-नीला",
+    "green": "हरा",
+    "yellow": "पीला",
+    "orange": "नारंगी",
+    "bronze": "कांस्य"
+  },
+  "welcomeScreen": {
+    "app": {
+      "center_heading": "आपका सर्व डेटा ब्राउज़र के भीतर स्थानिक जगह पे सुरक्षित किया गया.",
+      "center_heading_plus": "बजाय आपको Excalidraw+ पर जाना है?",
+      "menuHint": "निर्यात, पसंद, भाषायें, ..."
+    },
+    "defaults": {
+      "menuHint": "निर्यात, पसंद, और भी...",
+      "center_heading": "चित्रांकन। बनाया गया। सरल।",
+      "toolbarHint": "एक औजार चुने और चित्रकारी प्रारंभ करे!",
+      "helpHint": "शॉर्ट्कट और सहाय्य"
+    }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "अधिकांश उपयोगित रंग",
+    "colors": "रंग",
+    "shades": "छाया",
+    "hexCode": "हेक्स कोड",
+    "noShades": "इस रंग की कोई छाया उपलब्ध नहीं हैं"
   }
 }

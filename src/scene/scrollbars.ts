@@ -7,7 +7,7 @@ import { getLanguage } from "../i18n";
 
 export const SCROLLBAR_MARGIN = 4;
 export const SCROLLBAR_WIDTH = 6;
-export const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
+export const SCROLLBAR_COLOR = "rgba(128,128,128,0.3)"; //zsviczian
 
 export const getScrollBars = (
   elements: readonly ExcalidrawElement[],
@@ -41,10 +41,10 @@ export const getScrollBars = (
   const viewportHeightDiff = viewportHeight - viewportHeightWithZoom;
 
   const safeArea = {
-    top: parseInt(getGlobalCSSVariable("sat")),
-    bottom: parseInt(getGlobalCSSVariable("sab")),
-    left: parseInt(getGlobalCSSVariable("sal")),
-    right: parseInt(getGlobalCSSVariable("sar")),
+    top: parseInt(getGlobalCSSVariable("sat")) || 0,
+    bottom: parseInt(getGlobalCSSVariable("sab")) || 0,
+    left: parseInt(getGlobalCSSVariable("sal")) || 0,
+    right: parseInt(getGlobalCSSVariable("sar")) || 0,
   };
 
   const isRTL = getLanguage().rtl;

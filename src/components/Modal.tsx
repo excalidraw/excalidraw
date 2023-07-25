@@ -1,12 +1,11 @@
 import "./Modal.scss";
 
-import React, { useState, useLayoutEffect, useRef } from "react";
+import React from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { KEYS } from "../keys";
-import { useExcalidrawContainer, useDevice } from "./App";
 import { AppState } from "../types";
-import { THEME } from "../constants";
+import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 
 export const Modal: React.FC<{
   className?: string;
@@ -16,9 +15,13 @@ export const Modal: React.FC<{
   labelledBy: string;
   theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
+  style: string; //zsviczian
 }> = (props) => {
-  const { theme = THEME.LIGHT, closeOnClickOutside = true } = props;
-  const modalRoot = useBodyRoot(theme);
+  const { closeOnClickOutside = true, style } = props; //zsviczian added style for Dynamic Styles
+  const modalRoot = useCreatePortalContainer({
+    className: "excalidraw-modal-container",
+    style, //zsviczian
+  });
 
   if (!modalRoot) {
     return null;
@@ -39,11 +42,12 @@ export const Modal: React.FC<{
       aria-modal="true"
       onKeyDown={handleKeydown}
       aria-labelledby={props.labelledBy}
+      data-prevent-outside-click
     >
       <div
         className="Modal__background"
         onClick={closeOnClickOutside ? props.onCloseRequest : undefined}
-      ></div>
+      />
       <div
         className="Modal__content"
         style={{ "--max-width": `${props.maxWidth}px` }}
@@ -54,44 +58,4 @@ export const Modal: React.FC<{
     </div>,
     modalRoot,
   );
-};
-
-const useBodyRoot = (theme: AppState["theme"]) => {
-  const [div, setDiv] = useState<HTMLDivElement | null>(null);
-
-  const device = useDevice();
-  const isMobileRef = useRef(device.isMobile);
-  isMobileRef.current = device.isMobile;
-
-  const { container: excalidrawContainer } = useExcalidrawContainer();
-
-  useLayoutEffect(() => {
-    if (div) {
-      div.classList.toggle("excalidraw--mobile", device.isMobile);
-    }
-  }, [div, device.isMobile]);
-
-  useLayoutEffect(() => {
-    const isDarkTheme =
-      !!excalidrawContainer?.classList.contains("theme--dark") ||
-      theme === "dark";
-    const div = document.createElement("div");
-
-    div.classList.add("excalidraw", "excalidraw-modal-container");
-    div.classList.toggle("excalidraw--mobile", isMobileRef.current);
-
-    if (isDarkTheme) {
-      div.classList.add("theme--dark");
-      div.classList.add("theme--dark-background-none");
-    }
-    document.body.appendChild(div);
-
-    setDiv(div);
-
-    return () => {
-      document.body.removeChild(div);
-    };
-  }, [excalidrawContainer, theme]);
-
-  return div;
 };

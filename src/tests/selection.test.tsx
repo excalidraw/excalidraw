@@ -11,7 +11,8 @@ import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { reseed } from "../random";
 import { API } from "./helpers/api";
-import { Keyboard, Pointer } from "./helpers/ui";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { SHAPES } from "../shapes";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -153,7 +154,7 @@ describe("selection element", () => {
     const canvas = container.querySelector("canvas")!;
     fireEvent.pointerDown(canvas, { clientX: 60, clientY: 100 });
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene).toHaveBeenCalledTimes(5);
     const selectionElement = h.state.selectionElement!;
     expect(selectionElement).not.toBeNull();
     expect(selectionElement.type).toEqual("selection");
@@ -174,7 +175,7 @@ describe("selection element", () => {
     fireEvent.pointerDown(canvas, { clientX: 60, clientY: 100 });
     fireEvent.pointerMove(canvas, { clientX: 150, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
+    expect(renderScene).toHaveBeenCalledTimes(6);
     const selectionElement = h.state.selectionElement!;
     expect(selectionElement).not.toBeNull();
     expect(selectionElement.type).toEqual("selection");
@@ -196,7 +197,7 @@ describe("selection element", () => {
     fireEvent.pointerMove(canvas, { clientX: 150, clientY: 30 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(6);
+    expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
   });
 });
@@ -231,7 +232,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 45, clientY: 20 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(10);
+    expect(renderScene).toHaveBeenCalledTimes(11);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -260,7 +261,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 45, clientY: 20 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(10);
+    expect(renderScene).toHaveBeenCalledTimes(11);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -289,7 +290,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 45, clientY: 20 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(10);
+    expect(renderScene).toHaveBeenCalledTimes(11);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -331,7 +332,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(10);
+    expect(renderScene).toHaveBeenCalledTimes(11);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -372,11 +373,27 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(10);
+    expect(renderScene).toHaveBeenCalledTimes(11);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
+  });
+});
+
+describe("tool locking & selection", () => {
+  it("should not select newly created element while tool is locked", async () => {
+    await render(<ExcalidrawApp />);
+
+    UI.clickTool("lock");
+    expect(h.state.activeTool.locked).toBe(true);
+
+    for (const { value } of Object.values(SHAPES)) {
+      if (value !== "image" && value !== "selection") {
+        const element = UI.createElement(value);
+        expect(h.state.selectedElementIds[element.id]).not.toBe(true);
+      }
+    }
   });
 });

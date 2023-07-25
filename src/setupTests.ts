@@ -3,6 +3,8 @@ import "jest-canvas-mock";
 import dotenv from "dotenv";
 import polyfill from "./polyfill";
 
+require("fake-indexeddb/auto");
+
 polyfill();
 // jest doesn't know of .env.development so we need to init it ourselves
 dotenv.config({

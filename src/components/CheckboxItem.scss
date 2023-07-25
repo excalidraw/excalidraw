@@ -64,6 +64,8 @@
 
       color: #{$oc-blue-7};
 
+      border: 0;
+
       &:focus {
         box-shadow: 0 0 0 3px #{$oc-blue-7};
       }

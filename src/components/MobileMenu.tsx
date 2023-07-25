@@ -1,77 +1,91 @@
 import React from "react";
-import { AppState } from "../types";
+import {
+  AppClassProperties,
+  AppState,
+  Device,
+  ExcalidrawProps,
+  UIAppState,
+} from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
-import { showSelectedShapeActions } from "../element";
+import { getNonDeletedElements, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
-import { calculateScrollCenter, getSelectedElements } from "../scene";
-import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
+import { calculateScrollCenter, isSomeElementSelected } from "../scene";
+import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { Section } from "./Section";
-import CollabButton from "./CollabButton";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockButton } from "./LockButton";
-import { UserList } from "./UserList";
-import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
-import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
+import { Stats } from "./Stats";
+import { actionToggleStats } from "../actions";
+import { HandButton } from "./HandButton";
+import { isHandToolActive } from "../appState";
+import { useTunnels } from "../context/tunnels";
 
 type MobileMenuProps = {
-  appState: AppState;
+  appState: UIAppState;
   actionManager: ActionManager;
   renderJSONExportDialog: () => React.ReactNode;
   renderImageExportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  libraryMenu: JSX.Element | null;
-  onCollabButtonClick?: () => void;
   onLockToggle: () => void;
+  onHandToolToggle: () => void;
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
-  isCollaborating: boolean;
-  renderCustomFooter?: (
-    isMobile: boolean,
-    appState: AppState,
-  ) => JSX.Element | null;
-  showThemeBtn: boolean;
+
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
-    appState: AppState,
+    appState: UIAppState,
   ) => JSX.Element | null;
-  renderStats: () => JSX.Element | null;
+  renderCustomStats?: ExcalidrawProps["renderCustomStats"];
+  renderSidebars: () => JSX.Element | null;
+  device: Device;
+  renderWelcomeScreen: boolean;
+  app: AppClassProperties;
 };
 
 export const MobileMenu = ({
   appState,
   elements,
-  libraryMenu,
   actionManager,
-  renderJSONExportDialog,
-  renderImageExportDialog,
   setAppState,
-  onCollabButtonClick,
   onLockToggle,
+  onHandToolToggle,
   onPenModeToggle,
   canvas,
-  isCollaborating,
-  renderCustomFooter,
-  showThemeBtn,
   onImageAction,
   renderTopRightUI,
-  renderStats,
+  renderCustomStats,
+  renderSidebars,
+  device,
+  renderWelcomeScreen,
+  app,
 }: MobileMenuProps) => {
+  const {
+    WelcomeScreenCenterTunnel,
+    MainMenuTunnel,
+    DefaultSidebarTriggerTunnel,
+  } = useTunnels();
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
+        {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
         <Section heading="shapes">
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
               <Stack.Row gap={1} className="App-toolbar-container">
-                <Island padding={1} className="App-toolbar">
+                <Island
+                  padding={1}
+                  className={`App-toolbar${
+                    device.isMobile ? " App-toolbar--mobile" : "" //zsviczian
+                  }`}
+                >
                   {heading}
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
@@ -87,141 +101,124 @@ export const MobileMenu = ({
                     />
                   </Stack.Row>
                 </Island>
-                {renderTopRightUI && renderTopRightUI(true, appState)}
-                <LockButton
-                  checked={appState.activeTool.locked}
-                  onChange={onLockToggle}
-                  title={t("toolBar.lock")}
-                  isMobile
-                />
-                <LibraryButton
-                  appState={appState}
-                  setAppState={setAppState}
-                  isMobile
-                />
-                <PenModeButton
-                  checked={appState.penMode}
-                  onChange={onPenModeToggle}
-                  title={t("toolBar.penMode")}
-                  isMobile
-                  penDetected={appState.penDetected}
-                />
+                <div className="mobile-misc-tools-container">
+                  {!appState.viewModeEnabled && //zsviczian
+                    renderTopRightUI?.(true, appState)}
+                  {!appState.viewModeEnabled && (
+                    <DefaultSidebarTriggerTunnel.Out />
+                  )}
+                  <PenModeButton
+                    checked={appState.penMode}
+                    onChange={onPenModeToggle}
+                    title={t("toolBar.penMode")}
+                    isMobile
+                    penDetected={appState.penDetected}
+                  />
+                  <LockButton
+                    checked={appState.activeTool.locked}
+                    onChange={onLockToggle}
+                    title={t("toolBar.lock")}
+                    isMobile
+                  />
+                  <HandButton
+                    checked={isHandToolActive(appState)}
+                    onChange={() => onHandToolToggle()}
+                    title={t("toolBar.hand")}
+                    isMobile
+                  />
+                </div>
               </Stack.Row>
-              {libraryMenu}
             </Stack.Col>
           )}
         </Section>
-        <HintViewer appState={appState} elements={elements} isMobile={true} />
+        <HintViewer
+          appState={appState}
+          isMobile={true}
+          device={device}
+          app={app}
+        />
       </FixedSideContainer>
     );
   };
 
   const renderAppToolbar = () => {
-    // Render eraser conditionally in mobile
-    const showEraser =
-      !appState.viewModeEnabled &&
-      !appState.editingElement &&
-      getSelectedElements(elements, appState).length === 0;
-
     if (appState.viewModeEnabled) {
-      return (
+      return; //zsviczian
+      /*return (
         <div className="App-toolbar-content">
-          {actionManager.renderAction("toggleCanvasMenu")}
+          <MainMenuTunnel.Out />
         </div>
-      );
+      );*/
     }
+
+    //zsviczian fix mobile menu button positions
+    const showEditMenu = showSelectedShapeActions(
+      appState,
+      getNonDeletedElements(elements),
+    );
+    const showElAction = isSomeElementSelected(
+      getNonDeletedElements(elements),
+      appState,
+    );
 
     return (
       <div className="App-toolbar-content">
-        {actionManager.renderAction("toggleCanvasMenu")}
-        {actionManager.renderAction("toggleEditMenu")}
-
+        <MainMenuTunnel.Out />
+        {showEditMenu ? ( //zsviczian
+          actionManager.renderAction("toggleEditMenu")
+        ) : (
+          <div className="ToolIcon__icon" aria-hidden="true" />
+        )}
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
-        {showEraser && actionManager.renderAction("eraser")}
-
-        {actionManager.renderAction(
-          appState.multiElement ? "finalize" : "duplicateSelection",
+        {showElAction || appState.multiElement ? ( //zsviczian
+          actionManager.renderAction(
+            appState.multiElement ? "finalize" : "duplicateSelection",
+          )
+        ) : (
+          <div className="ToolIcon__icon" aria-hidden="true" />
         )}
-        {actionManager.renderAction("deleteSelectedElements")}
+        {showElAction ? ( //zsviczian
+          actionManager.renderAction("deleteSelectedElements")
+        ) : (
+          <div className="ToolIcon__icon" aria-hidden="true" />
+        )}
       </div>
     );
   };
 
-  const renderCanvasActions = () => {
-    if (appState.viewModeEnabled) {
-      return (
-        <>
-          {renderJSONExportDialog()}
-          {renderImageExportDialog()}
-        </>
-      );
-    }
-    return (
-      <>
-        {actionManager.renderAction("clearCanvas")}
-        {actionManager.renderAction("loadScene")}
-        {renderJSONExportDialog()}
-        {renderImageExportDialog()}
-        {onCollabButtonClick && (
-          <CollabButton
-            isCollaborating={isCollaborating}
-            collaboratorCount={appState.collaborators.size}
-            onClick={onCollabButtonClick}
-          />
-        )}
-        {
-          <BackgroundPickerAndDarkModeToggle
-            actionManager={actionManager}
-            appState={appState}
-            setAppState={setAppState}
-            showThemeBtn={showThemeBtn}
-          />
-        }
-      </>
-    );
-  };
   return (
     <>
+      {renderSidebars()}
       {!appState.viewModeEnabled && renderToolbar()}
-      {renderStats()}
+      {!appState.openMenu && appState.showStats && (
+        <Stats
+          appState={appState}
+          setAppState={setAppState}
+          elements={elements}
+          onClose={() => {
+            actionManager.executeAction(actionToggleStats);
+          }}
+          renderCustomStats={renderCustomStats}
+        />
+      )}
       <div
         className="App-bottom-bar"
         style={{
-          marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
+          marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN, //* 2, zsviczian
           marginLeft: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
           marginRight: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
         }}
       >
         <Island padding={0}>
-          {appState.openMenu === "canvas" ? (
-            <Section className="App-mobile-menu" heading="canvasActions">
-              <div className="panelColumn">
-                <Stack.Col gap={4}>
-                  {renderCanvasActions()}
-                  {renderCustomFooter?.(true, appState)}
-                  {appState.collaborators.size > 0 && (
-                    <fieldset>
-                      <legend>{t("labels.collaborators")}</legend>
-                      <UserList
-                        mobile
-                        collaborators={appState.collaborators}
-                        actionManager={actionManager}
-                      />
-                    </fieldset>
-                  )}
-                </Stack.Col>
-              </div>
-            </Section>
-          ) : appState.openMenu === "shape" &&
-            !appState.viewModeEnabled &&
-            showSelectedShapeActions(appState, elements) ? (
+          {appState.openMenu === "shape" &&
+          !appState.viewModeEnabled &&
+          showSelectedShapeActions(appState, elements) ? (
             <Section className="App-mobile-menu" heading="selectedShapeActions">
               <SelectedShapeActions
                 appState={appState}
                 elements={elements}
                 renderAction={actionManager.renderAction}
-                activeTool={appState.activeTool.type}
               />
             </Section>
           ) : null}
@@ -229,13 +226,13 @@ export const MobileMenu = ({
             {renderAppToolbar()}
             {appState.scrolledOutside &&
               !appState.openMenu &&
-              !appState.isLibraryOpen && (
+              !appState.openSidebar && (
                 <button
                   className="scroll-back-to-content"
                   onClick={() => {
-                    setAppState({
+                    setAppState((appState) => ({
                       ...calculateScrollCenter(elements, appState, canvas),
-                    });
+                    }));
                   }}
                 >
                   {t("buttons.scrollBackToContent")}
@@ -243,6 +240,17 @@ export const MobileMenu = ({
               )}
           </footer>
         </Island>
+        {appState.trayModeEnabled ? ( //zsviczian display zoom menu in tray mode
+          <Island padding={1} style={{ marginLeft: `4px` }}>
+            <ZoomActions
+              renderAction={actionManager.renderAction}
+              zoom={appState.zoom}
+              trayMode={true}
+            />
+          </Island>
+        ) : (
+          ""
+        )}
       </div>
     </>
   );

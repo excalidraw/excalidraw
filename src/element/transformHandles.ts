@@ -4,11 +4,11 @@ import {
   PointerType,
 } from "./types";
 
-import { getElementAbsoluteCoords, Bounds } from "./bounds";
+import { getElementAbsoluteCoords } from "./bounds";
 import { rotate } from "../math";
-import { Zoom } from "../types";
+import { AppState, Zoom } from "../types";
 import { isTextElement } from ".";
-import { isLinearElement } from "./typeChecks";
+import { isFrameElement, isLinearElement } from "./typeChecks";
 import { DEFAULT_SPACING } from "../renderer/renderScene";
 
 export type TransformHandleDirection =
@@ -42,6 +42,14 @@ export const OMIT_SIDES_FOR_MULTIPLE_ELEMENTS = {
   s: true,
   n: true,
   w: true,
+};
+
+export const OMIT_SIDES_FOR_FRAME = {
+  e: true,
+  s: true,
+  n: true,
+  w: true,
+  rotation: true,
 };
 
 const OMIT_SIDES_FOR_TEXT_ELEMENT = {
@@ -81,7 +89,7 @@ const generateTransformHandle = (
 };
 
 export const getTransformHandlesFromCoords = (
-  [x1, y1, x2, y2]: Bounds,
+  [x1, y1, x2, y2, cx, cy]: [number, number, number, number, number, number],
   angle: number,
   zoom: Zoom,
   pointerType: PointerType,
@@ -97,10 +105,8 @@ export const getTransformHandlesFromCoords = (
 
   const width = x2 - x1;
   const height = y2 - y1;
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
   const dashedLineMargin = margin / zoom.value;
-  const centeringOffset = (size - 8) / (2 * zoom.value);
+  const centeringOffset = (size - DEFAULT_SPACING * 2) / (2 * zoom.value);
 
   const transformHandles: TransformHandles = {
     nw: omitSides.nw
@@ -251,12 +257,16 @@ export const getTransformHandles = (
     }
   } else if (isTextElement(element)) {
     omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
+  } else if (isFrameElement(element)) {
+    omitSides = {
+      rotation: true,
+    };
   }
   const dashedLineMargin = isLinearElement(element)
-    ? DEFAULT_SPACING * 3
+    ? DEFAULT_SPACING + 8
     : DEFAULT_SPACING;
   return getTransformHandlesFromCoords(
-    getElementAbsoluteCoords(element),
+    getElementAbsoluteCoords(element, true),
     element.angle,
     zoom,
     pointerType,
@@ -267,7 +277,11 @@ export const getTransformHandles = (
 
 export const shouldShowBoundingBox = (
   elements: NonDeletedExcalidrawElement[],
+  appState: AppState,
 ) => {
+  if (appState.editingLinearElement) {
+    return false;
+  }
   if (elements.length > 1) {
     return true;
   }

@@ -3,17 +3,12 @@ import { render } from "./test-utils";
 import App from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
-import { UI, Pointer, Keyboard, KeyboardModifiers } from "./helpers/ui";
-import {
-  getTransformHandles,
-  TransformHandleDirection,
-} from "../element/transformHandles";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import { UI, Keyboard } from "./helpers/ui";
+import { resize } from "./utils";
+import { ExcalidrawTextElement } from "../element/types";
 import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
-
-const mouse = new Pointer("mouse");
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -126,26 +121,6 @@ describe("resize rectangle ellipses and diamond elements", () => {
     },
   );
 });
-
-const resize = (
-  element: ExcalidrawElement,
-  handleDir: TransformHandleDirection,
-  mouseMove: [number, number],
-  keyboardModifiers: KeyboardModifiers = {},
-) => {
-  mouse.select(element);
-  const handle = getTransformHandles(element, h.state.zoom, "mouse")[
-    handleDir
-  ]!;
-  const clientX = handle[0] + handle[2] / 2;
-  const clientY = handle[1] + handle[3] / 2;
-  Keyboard.withModifierKeys(keyboardModifiers, () => {
-    mouse.reset();
-    mouse.down(clientX, clientY);
-    mouse.move(mouseMove[0], mouseMove[1]);
-    mouse.up();
-  });
-};
 
 describe("Test text element", () => {
   it("should update font size via keyboard", async () => {
