@@ -63,7 +63,6 @@
     "mini-css-extract-plugin": "2.6.1",
     "postcss-loader": "7.0.1",
     "sass-loader": "13.0.2",
-    "style-loader": "3.3.3",
     "size-limit": "8.2.4",
     "style-loader": "3.3.3",
     "terser-webpack-plugin": "5.3.3",
