@@ -109,12 +109,12 @@
     "createContainerFromText": "將文字包於容器中",
     "link": {
       "edit": "編輯連結",
-      "editEmbed": "",
+      "editEmbed": "編輯連結&嵌入",
       "create": "建立連結",
-      "createEmbed": "",
+      "createEmbed": "建立連結&嵌入",
       "label": "連結",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "連結&嵌入",
+      "empty": "未設定連結"
     },
     "lineEditor": {
       "edit": "編輯線條",
@@ -168,11 +168,11 @@
     "cancel": "取消",
     "clear": "清除",
     "remove": "刪除",
-    "embed": "",
+    "embed": "切換嵌入",
     "publishLibrary": "發布",
     "submit": "送出",
     "confirm": "確認",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "點擊以互動"
   },
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",
@@ -214,8 +214,8 @@
       "line4": "若關閉此設定並未修復文字元素的顯示問題，請回報於我們 GitHub 上的 <issueLink>issue</issueLink>，或在 <discordLink>Discord</discordLink> 上告訴我們。"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "image": ""
+      "embeddable": "可嵌入元素無法加入資料庫",
+      "image": "即將支援加入圖片至資料庫！"
     }
   },
   "toolBar": {
@@ -234,7 +234,7 @@
     "link": "為所選的形狀增加\b/更新連結",
     "eraser": "橡皮擦",
     "frame": "框架工具",
-    "embeddable": "",
+    "embeddable": "嵌入網站",
     "hand": "手形（平移工具）",
     "extraTools": "更多工具"
   },
@@ -248,7 +248,7 @@
     "linearElement": "點擊以繪製多點曲線；或拖曳以繪製直線",
     "freeDraw": "點擊並拖曳來繪圖，放開即結束",
     "text": "提示：亦可使用選取工具在任何地方雙擊來加入文字",
-    "embeddable": "",
+    "embeddable": "點擊並拖移以建立嵌入網站",
     "text_selected": "雙擊滑鼠或按 Enter 以編輯文字",
     "text_editing": "按跳脫鍵或 Ctrl 或 Cmd + Enter 以結束編輯",
     "linearElementMulti": "按下 Escape 或 Enter 以結束繪製",
@@ -424,8 +424,8 @@
     "canvas": "畫布",
     "selection": "已選項目",
     "pasteAsSingleElement": "使用 {{shortcut}} 以做為單一物件貼上，\n或貼上至現有的文字編輯器",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "目前不允許嵌入此網址。您可至 GitHub 提出 issue 以要求將此網址加入合格名單。",
+    "unrecognizedLinkFormat": "您嵌入的連結格式不符。請嘗試貼入原網站所提供的「嵌入」字串。"
   },
   "colors": {
     "transparent": "透明",
