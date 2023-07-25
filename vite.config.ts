@@ -18,7 +18,7 @@ export default defineConfig({
         manualChunks(id) {
           if (
             id.includes("src/locales") &&
-            id.match(/en.json$|percentages.json$/) === null
+            id.match(/en.json|percentages.json/) === null
           ) {
             const index = id.indexOf("locales/");
             // Taking the substring after "locales/"
