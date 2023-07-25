@@ -124,6 +124,8 @@
     },
     "statusPublished": "Publicēts",
     "sidebarLock": "Paturēt atvērtu sānjoslu",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Pildspalvas režīms – novērst pieskaršanos",
     "link": "Pievienot/rediģēt atlasītās figūras saiti",
     "eraser": "Dzēšgumija",
-    "hand": "Roka (panoramēšanas rīks)"
+    "frame": "",
+    "hand": "Roka (panoramēšanas rīks)",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",

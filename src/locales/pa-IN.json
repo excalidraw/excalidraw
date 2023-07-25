@@ -124,6 +124,8 @@
     },
     "statusPublished": "ਪ੍ਰਕਾਸ਼ਤ ਹੈ",
     "sidebarLock": "ਸਾਈਡਬਾਰ ਨੂੰ ਖੁੱਲ੍ਹਾ ਰੱਖੋ",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": ""
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "ਪੈੱਨ ਮੋਡ - ਟੱਚ ਤੋਂ ਬਚਾਉਂਦਾ ਹੈ",
     "link": "",
     "eraser": "ਰਬੜ",
-    "hand": ""
+    "frame": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "ਕੈਨਵਸ ਦੀਆਂ ਕਾਰਵਾਈਆਂ",

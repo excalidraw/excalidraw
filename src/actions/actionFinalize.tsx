@@ -125,13 +125,6 @@ export const actionFinalize = register({
           { x, y },
         );
       }
-
-      if (
-        !appState.activeTool.locked &&
-        appState.activeTool.type !== "freedraw"
-      ) {
-        appState.selectedElementIds[multiPointElement.id] = true;
-      }
     }
 
     if (
@@ -167,6 +160,7 @@ export const actionFinalize = register({
           multiPointElement
             ? appState.activeTool
             : activeTool,
+        activeEmbeddable: null,
         draggingElement: null,
         multiElement: null,
         editingElement: null,

@@ -27,13 +27,20 @@ import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
-import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
+import {
+  distance,
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+  isTransparent,
+} from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
+  FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
@@ -48,6 +55,12 @@ import {
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import {
+  createPlaceholderEmbeddableLabel,
+  getEmbedLink,
+} from "../element/embeddable";
+import { getContainingFrame } from "../frame";
+import { normalizeLink, toValidURL } from "../data/url";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -92,6 +105,7 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetX: number;
   canvasOffsetY: number;
   boundTextElementVersion: number | null;
+  containingFrameOpacity: number;
 }
 
 const cappedElementCanvasSize = (
@@ -207,6 +221,7 @@ const generateElementCanvas = (
     canvasOffsetX,
     canvasOffsetY,
     boundTextElementVersion: getBoundTextElement(element)?.version || null,
+    containingFrameOpacity: getContainingFrame(element)?.opacity || 100,
   };
 };
 
@@ -253,9 +268,11 @@ const drawElementOnCanvas = (
   context: CanvasRenderingContext2D,
   renderConfig: RenderConfig,
 ) => {
-  context.globalAlpha = element.opacity / 100;
+  context.globalAlpha =
+    ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
   switch (element.type) {
     case "rectangle":
+    case "embeddable":
     case "diamond":
     case "ellipse": {
       context.lineJoin = "round";
@@ -421,13 +438,13 @@ export const generateRoughOptions = (
 
   switch (element.type) {
     case "rectangle":
+    case "embeddable":
     case "diamond":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
-      options.fill =
-        element.backgroundColor === "transparent"
-          ? undefined
-          : element.backgroundColor;
+      options.fill = isTransparent(element.backgroundColor)
+        ? undefined
+        : element.backgroundColor;
       if (element.type === "ellipse") {
         options.curveFitting = 1;
       }
@@ -452,6 +469,26 @@ export const generateRoughOptions = (
   }
 };
 
+const modifyEmbeddableForRoughOptions = (
+  element: NonDeletedExcalidrawElement,
+  isExporting: boolean,
+) => {
+  if (
+    element.type === "embeddable" &&
+    (isExporting || !element.validated) &&
+    isTransparent(element.backgroundColor) &&
+    isTransparent(element.strokeColor)
+  ) {
+    return {
+      ...element,
+      roughness: 0,
+      backgroundColor: "#d3d3d3",
+      fillStyle: "solid",
+    } as const;
+  }
+  return element;
+};
+
 /**
  * Generates the element's shape and puts it into the cache.
  * @param element
@@ -460,8 +497,9 @@ export const generateRoughOptions = (
 const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
+  isExporting: boolean = false,
 ) => {
-  let shape = shapeCache.get(element);
+  let shape = isExporting ? undefined : shapeCache.get(element);
 
   // `null` indicates no rc shape applicable for this element type
   // (= do not generate anything)
@@ -470,6 +508,10 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
+      case "embeddable": {
+        // this is for rendering the stroke/bg of the embeddable, especially
+        // when the src url is not set
+
         if (element.roundness) {
           const w = element.width;
           const h = element.height;
@@ -480,7 +522,10 @@ const generateElementShape = (
             } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
               h - r
             } L 0 ${r} Q 0 0, ${r} 0`,
-            generateRoughOptions(element, true),
+            generateRoughOptions(
+              modifyEmbeddableForRoughOptions(element, isExporting),
+              true,
+            ),
           );
         } else {
           shape = generator.rectangle(
@@ -488,12 +533,16 @@ const generateElementShape = (
             0,
             element.width,
             element.height,
-            generateRoughOptions(element),
+            generateRoughOptions(
+              modifyEmbeddableForRoughOptions(element, isExporting),
+              false,
+            ),
           );
         }
         setShapeForElement(element, shape);
 
         break;
+      }
       case "diamond": {
         const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
           getDiamondPoints(element);
@@ -717,12 +766,14 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.zoomValue !== zoom.value &&
     !renderConfig?.shouldCacheIgnoreZoom;
   const boundTextElementVersion = getBoundTextElement(element)?.version || null;
+  const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
 
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== renderConfig.theme ||
-    prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion
+    prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
+    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
@@ -897,25 +948,63 @@ export const renderElement = (
   const generator = rc.generator;
   switch (element.type) {
     case "selection": {
-      context.save();
-      context.translate(
-        element.x + renderConfig.scrollX,
-        element.y + renderConfig.scrollY,
-      );
-      context.fillStyle = "rgba(0, 0, 200, 0.04)";
+      // do not render selection when exporting
+      if (!renderConfig.isExporting) {
+        context.save();
+        context.translate(
+          element.x + renderConfig.scrollX,
+          element.y + renderConfig.scrollY,
+        );
+        context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
-      // render from 0.5px offset  to get 1px wide line
-      // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
-      // TODO can be be improved by offseting to the negative when user selects
-      // from right to left
-      const offset = 0.5 / renderConfig.zoom.value;
+        // render from 0.5px offset  to get 1px wide line
+        // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
+        // TODO can be be improved by offseting to the negative when user selects
+        // from right to left
+        const offset = 0.5 / renderConfig.zoom.value;
 
-      context.fillRect(offset, offset, element.width, element.height);
-      context.lineWidth = 1 / renderConfig.zoom.value;
-      context.strokeStyle = "rgb(105, 101, 219)";
-      context.strokeRect(offset, offset, element.width, element.height);
+        context.fillRect(offset, offset, element.width, element.height);
+        context.lineWidth = 1 / renderConfig.zoom.value;
+        context.strokeStyle = " rgb(105, 101, 219)";
+        context.strokeRect(offset, offset, element.width, element.height);
 
-      context.restore();
+        context.restore();
+      }
+      break;
+    }
+    case "frame": {
+      if (
+        !renderConfig.isExporting &&
+        appState.frameRendering.enabled &&
+        appState.frameRendering.outline
+      ) {
+        context.save();
+        context.translate(
+          element.x + renderConfig.scrollX,
+          element.y + renderConfig.scrollY,
+        );
+        context.fillStyle = "rgba(0, 0, 200, 0.04)";
+
+        context.lineWidth = 2 / renderConfig.zoom.value;
+        context.strokeStyle = FRAME_STYLE.strokeColor;
+
+        if (FRAME_STYLE.radius && context.roundRect) {
+          context.beginPath();
+          context.roundRect(
+            0,
+            0,
+            element.width,
+            element.height,
+            FRAME_STYLE.radius / renderConfig.zoom.value,
+          );
+          context.stroke();
+          context.closePath();
+        } else {
+          context.strokeRect(0, 0, element.width, element.height);
+        }
+
+        context.restore();
+      }
       break;
     }
     case "freedraw": {
@@ -949,8 +1038,9 @@ export const renderElement = (
     case "line":
     case "arrow":
     case "image":
-    case "text": {
-      generateElementShape(element, generator);
+    case "text":
+    case "embeddable": {
+      generateElementShape(element, generator, renderConfig.isExporting);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
         const cx = (x1 + x2) / 2 + renderConfig.scrollX;
@@ -1107,6 +1197,23 @@ const roughSVGDrawWithPrecision = (
   return rsvg.draw(pshape);
 };
 
+const maybeWrapNodesInFrameClipPath = (
+  element: NonDeletedExcalidrawElement,
+  root: SVGElement,
+  nodes: SVGElement[],
+  exportedFrameId?: string | null,
+) => {
+  const frame = getContainingFrame(element);
+  if (frame && frame.id === exportedFrameId) {
+    const g = root.ownerDocument!.createElementNS(SVG_NS, "g");
+    g.setAttributeNS(SVG_NS, "clip-path", `url(#${frame.id})`);
+    nodes.forEach((node) => g.appendChild(node));
+    return g;
+  }
+
+  return null;
+};
+
 export const renderElementToSvg = (
   element: NonDeletedExcalidrawElement,
   rsvg: RoughSVG,
@@ -1115,7 +1222,10 @@ export const renderElementToSvg = (
   offsetX: number,
   offsetY: number,
   exportWithDarkMode?: boolean,
+  exportingFrameId?: string | null,
+  renderEmbeddables?: boolean,
 ) => {
+  const offset = { x: offsetX, y: offsetY };
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   let cx = (x2 - x1) / 2 - (element.x - x1);
   let cy = (y2 - y1) / 2 - (element.y - y1);
@@ -1143,10 +1253,13 @@ export const renderElementToSvg = (
   // if the element has a link, create an anchor tag and make that the new root
   if (element.link) {
     const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
-    anchorTag.setAttribute("href", element.link);
+    anchorTag.setAttribute("href", normalizeLink(element.link));
     root.appendChild(anchorTag);
     root = anchorTag;
   }
+
+  const opacity =
+    ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
 
   switch (element.type) {
     case "selection": {
@@ -1158,6 +1271,36 @@ export const renderElementToSvg = (
     case "diamond":
     case "ellipse": {
       generateElementShape(element, generator);
+      const node = roughSVGDrawWithPrecision(
+        rsvg,
+        getShapeForElement(element)!,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
+      if (opacity !== 1) {
+        node.setAttribute("stroke-opacity", `${opacity}`);
+        node.setAttribute("fill-opacity", `${opacity}`);
+      }
+      node.setAttribute("stroke-linecap", "round");
+      node.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [node],
+        exportingFrameId,
+      );
+
+      g ? root.appendChild(g) : root.appendChild(node);
+      break;
+    }
+    case "embeddable": {
+      // render placeholder rectangle
+      generateElementShape(element, generator, true);
       const node = roughSVGDrawWithPrecision(
         rsvg,
         getShapeForElement(element)!,
@@ -1176,6 +1319,83 @@ export const renderElementToSvg = (
         }) rotate(${degree} ${cx} ${cy})`,
       );
       root.appendChild(node);
+
+      const label: ExcalidrawElement =
+        createPlaceholderEmbeddableLabel(element);
+      renderElementToSvg(
+        label,
+        rsvg,
+        root,
+        files,
+        label.x + offset.x - element.x,
+        label.y + offset.y - element.y,
+        exportWithDarkMode,
+        exportingFrameId,
+        renderEmbeddables,
+      );
+
+      // render embeddable element + iframe
+      const embeddableNode = roughSVGDrawWithPrecision(
+        rsvg,
+        getShapeForElement(element)!,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
+      embeddableNode.setAttribute("stroke-linecap", "round");
+      embeddableNode.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      while (embeddableNode.firstChild) {
+        embeddableNode.removeChild(embeddableNode.firstChild);
+      }
+      const radius = getCornerRadius(
+        Math.min(element.width, element.height),
+        element,
+      );
+
+      const embedLink = getEmbedLink(toValidURL(element.link || ""));
+
+      // if rendering embeddables explicitly disabled or
+      // embedding documents via srcdoc (which doesn't seem to work for SVGs)
+      // replace with a link instead
+      if (renderEmbeddables === false || embedLink?.type === "document") {
+        const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
+        anchorTag.setAttribute("href", normalizeLink(element.link || ""));
+        anchorTag.setAttribute("target", "_blank");
+        anchorTag.setAttribute("rel", "noopener noreferrer");
+        anchorTag.style.borderRadius = `${radius}px`;
+
+        embeddableNode.appendChild(anchorTag);
+      } else {
+        const foreignObject = svgRoot.ownerDocument!.createElementNS(
+          SVG_NS,
+          "foreignObject",
+        );
+        foreignObject.style.width = `${element.width}px`;
+        foreignObject.style.height = `${element.height}px`;
+        foreignObject.style.border = "none";
+        const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
+        div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        div.style.width = "100%";
+        div.style.height = "100%";
+        const iframe = div.ownerDocument!.createElement("iframe");
+        iframe.src = embedLink?.link ?? "";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        iframe.style.borderRadius = `${radius}px`;
+        iframe.style.top = "0";
+        iframe.style.left = "0";
+        iframe.allowFullscreen = true;
+        div.appendChild(iframe);
+        foreignObject.appendChild(div);
+
+        embeddableNode.appendChild(foreignObject);
+      }
+
+      root.appendChild(embeddableNode);
       break;
     }
     case "line":
@@ -1228,7 +1448,6 @@ export const renderElementToSvg = (
       if (boundText) {
         group.setAttribute("mask", `url(#mask-${element.id})`);
       }
-      const opacity = element.opacity / 100;
       group.setAttribute("stroke-linecap", "round");
 
       getShapeForElement(element)!.forEach((shape) => {
@@ -1256,14 +1475,24 @@ export const renderElementToSvg = (
         }
         group.appendChild(node);
       });
-      root.appendChild(group);
-      root.append(maskPath);
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [group, maskPath],
+        exportingFrameId,
+      );
+      if (g) {
+        root.appendChild(g);
+      } else {
+        root.appendChild(group);
+        root.append(maskPath);
+      }
       break;
     }
     case "freedraw": {
       generateElementShape(element, generator);
       generateFreeDrawShape(element);
-      const opacity = element.opacity / 100;
       const shape = getShapeForElement(element);
       const node = shape
         ? roughSVGDrawWithPrecision(rsvg, shape, MAX_DECIMALS_FOR_SVG_EXPORT)
@@ -1283,7 +1512,15 @@ export const renderElementToSvg = (
       path.setAttribute("fill", element.strokeColor);
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
-      root.appendChild(node);
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [node],
+        exportingFrameId,
+      );
+
+      g ? root.appendChild(g) : root.appendChild(node);
       break;
     }
     case "image": {
@@ -1319,6 +1556,7 @@ export const renderElementToSvg = (
 
         use.setAttribute("width", `${width}`);
         use.setAttribute("height", `${height}`);
+        use.setAttribute("opacity", `${opacity}`);
 
         // We first apply `scale` transforms (horizontal/vertical mirroring)
         // on the <use> element, then apply translation and rotation
@@ -1344,13 +1582,22 @@ export const renderElementToSvg = (
           }) rotate(${degree} ${cx} ${cy})`,
         );
 
-        root.appendChild(g);
+        const clipG = maybeWrapNodesInFrameClipPath(
+          element,
+          root,
+          [g],
+          exportingFrameId,
+        );
+        clipG ? root.appendChild(clipG) : root.appendChild(g);
       }
+      break;
+    }
+    // frames are not rendered and only acts as a container
+    case "frame": {
       break;
     }
     default: {
       if (isTextElement(element)) {
-        const opacity = element.opacity / 100;
         const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
         if (opacity !== 1) {
           node.setAttribute("stroke-opacity", `${opacity}`);
@@ -1395,7 +1642,15 @@ export const renderElementToSvg = (
           text.setAttribute("dominant-baseline", "text-before-edge");
           node.appendChild(text);
         }
-        root.appendChild(node);
+
+        const g = maybeWrapNodesInFrameClipPath(
+          element,
+          root,
+          [node],
+          exportingFrameId,
+        );
+
+        g ? root.appendChild(g) : root.appendChild(node);
       } else {
         // @ts-ignore
         throw new Error(`Unimplemented type ${element.type}`);

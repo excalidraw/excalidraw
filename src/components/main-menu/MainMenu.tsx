@@ -42,6 +42,7 @@ const MainMenu = Object.assign(
                   openMenu: appState.openMenu === "canvas" ? null : "canvas",
                 });
               }}
+              data-testid="main-menu-trigger"
             >
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>

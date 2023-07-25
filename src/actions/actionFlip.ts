@@ -12,13 +12,18 @@ import {
   isBindingEnabled,
   unbindLinearElements,
 } from "../element/binding";
+import { updateFrameMembershipOfSelectedElements } from "../frame";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     return {
-      elements: flipSelectedElements(elements, appState, "horizontal"),
+      elements: updateFrameMembershipOfSelectedElements(
+        flipSelectedElements(elements, appState, "horizontal"),
+        appState,
+        app,
+      ),
       appState,
       commitToHistory: true,
     };
@@ -30,9 +35,13 @@ export const actionFlipHorizontal = register({
 export const actionFlipVertical = register({
   name: "flipVertical",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     return {
-      elements: flipSelectedElements(elements, appState, "vertical"),
+      elements: updateFrameMembershipOfSelectedElements(
+        flipSelectedElements(elements, appState, "vertical"),
+        appState,
+        app,
+      ),
       appState,
       commitToHistory: true,
     };
@@ -50,6 +59,9 @@ const flipSelectedElements = (
   const selectedElements = getSelectedElements(
     getNonDeletedElements(elements),
     appState,
+    {
+      includeElementsInFrames: true,
+    },
   );
 
   const updatedElements = flipElements(

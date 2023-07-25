@@ -124,6 +124,8 @@
     },
     "statusPublished": "已发布",
     "sidebarLock": "侧边栏常驻",
+    "selectAllElementsInFrame": "选择画框中的所有元素",
+    "removeAllElementsFromFrame": "删除画框中的所有元素",
     "eyeDropper": "从画布上取色"
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "笔模式 – 避免误触",
     "link": "为选中的形状添加/更新链接",
     "eraser": "橡皮",
-    "hand": "抓手（平移工具）"
+    "frame": "画框工具",
+    "hand": "抓手（平移工具）",
+    "extraTools": "更多工具"
   },
   "headings": {
     "canvasActions": "画布动作",

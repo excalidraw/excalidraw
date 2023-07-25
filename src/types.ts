@@ -15,6 +15,8 @@ import {
   ExcalidrawImageElement,
   Theme,
   StrokeRoundness,
+  ExcalidrawFrameElement,
+  ExcalidrawEmbeddableElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -85,7 +87,12 @@ export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
 export type LastActiveTool =
   | {
-      type: typeof SHAPES[number]["value"] | "eraser" | "hand";
+      type:
+        | typeof SHAPES[number]["value"]
+        | "eraser"
+        | "hand"
+        | "frame"
+        | "embeddable";
       customType: null;
     }
   | {
@@ -106,6 +113,10 @@ export type AppState = {
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: React.ReactNode;
+  activeEmbeddable: {
+    element: NonDeletedExcalidrawElement;
+    state: "hover" | "active";
+  } | null;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
@@ -113,6 +124,15 @@ export type AppState = {
   isBindingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
+  frameToHighlight: NonDeleted<ExcalidrawFrameElement> | null;
+  frameRendering: {
+    enabled: boolean;
+    name: boolean;
+    outline: boolean;
+    clip: boolean;
+  };
+  editingFrame: string | null;
+  elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   // element being edited, but not necessarily added to elements array yet
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
@@ -126,7 +146,12 @@ export type AppState = {
     locked: boolean;
   } & (
     | {
-        type: typeof SHAPES[number]["value"] | "eraser" | "hand";
+        type:
+          | typeof SHAPES[number]["value"]
+          | "eraser"
+          | "hand"
+          | "frame"
+          | "embeddable";
         customType: null;
       }
     | {
@@ -176,8 +201,9 @@ export type AppState = {
   defaultSidebarDockedPreference: boolean;
 
   lastPointerDownWith: PointerType;
-  selectedElementIds: { [id: string]: boolean };
-  previousSelectedElementIds: { [id: string]: boolean };
+  selectedElementIds: Readonly<{ [id: string]: true }>;
+  previousSelectedElementIds: { [id: string]: true };
+  selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
   toast: { message: string; closable?: boolean; duration?: number } | null;
   zenModeEnabled: boolean;
@@ -350,6 +376,16 @@ export interface ExcalidrawProps {
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
   children?: React.ReactNode;
+  validateEmbeddable?:
+    | boolean
+    | string[]
+    | RegExp
+    | RegExp[]
+    | ((link: string) => boolean | undefined);
+  renderEmbeddable?: (
+    element: NonDeleted<ExcalidrawEmbeddableElement>,
+    appState: AppState,
+  ) => JSX.Element | null;
 }
 
 export type SceneData = {
@@ -532,6 +568,12 @@ export type ExcalidrawImperativeAPI = {
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
+  /**
+   * Disables rendering of frames (including element clipping), but currently
+   * the frames are still interactive in edit mode. As such, this API should be
+   * used in conjunction with view mode (props.viewModeEnabled).
+   */
+  updateFrameRendering: InstanceType<typeof App>["updateFrameRendering"];
 };
 
 export type Device = Readonly<{
@@ -541,3 +583,22 @@ export type Device = Readonly<{
   canDeviceFitSidebar: boolean;
   isLandscape: boolean;
 }>;
+
+type FrameNameBounds = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  angle: number;
+};
+
+export type FrameNameBoundsCache = {
+  get: (frameElement: ExcalidrawFrameElement) => FrameNameBounds | null;
+  _cache: Map<
+    string,
+    FrameNameBounds & {
+      zoom: AppState["zoom"]["value"];
+      versionNonce: ExcalidrawFrameElement["versionNonce"];
+    }
+  >;
+};

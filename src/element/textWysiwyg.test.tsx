@@ -1459,5 +1459,54 @@ describe("textWysiwyg", () => {
         }),
       );
     });
+
+    it("shouldn't bind to container if container has bound text not centered and text tool is used", async () => {
+      expect(h.elements.length).toBe(1);
+
+      Keyboard.keyPress(KEYS.ENTER);
+
+      expect(h.elements.length).toBe(2);
+
+      // Bind first text
+      let text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.containerId).toBe(rectangle.id);
+      let editor = getTextEditor();
+      await new Promise((r) => setTimeout(r, 0));
+      updateTextEditor(editor, "Hello!");
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).verticalAlign,
+      ).toBe(VERTICAL_ALIGN.MIDDLE);
+
+      fireEvent.click(screen.getByTitle("Align bottom"));
+      await new Promise((r) => setTimeout(r, 0));
+
+      editor.blur();
+
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: text.id, type: "text" },
+      ]);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).verticalAlign,
+      ).toBe(VERTICAL_ALIGN.BOTTOM);
+
+      // Attempt to Bind 2nd text using text tool
+      UI.clickTool("text");
+      mouse.clickAt(
+        rectangle.x + rectangle.width / 2,
+        rectangle.y + rectangle.height / 2,
+      );
+      editor = getTextEditor();
+      await new Promise((r) => setTimeout(r, 0));
+      updateTextEditor(editor, "Excalidraw");
+      editor.blur();
+
+      expect(h.elements.length).toBe(3);
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: h.elements[1].id, type: "text" },
+      ]);
+      text = h.elements[2] as ExcalidrawTextElementWithContainer;
+      expect(text.containerId).toBe(null);
+      expect(text.text).toBe("Excalidraw");
+    });
   });
 });

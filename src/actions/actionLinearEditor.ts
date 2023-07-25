@@ -1,8 +1,6 @@
-import { getNonDeletedElements } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { isLinearElement } from "../element/typeChecks";
 import { ExcalidrawLinearElement } from "../element/types";
-import { getSelectedElements } from "../scene";
 import { register } from "./register";
 
 export const actionToggleLinearEditor = register({
@@ -10,19 +8,18 @@ export const actionToggleLinearEditor = register({
   trackEvent: {
     category: "element",
   },
-  predicate: (elements, appState) => {
-    const selectedElements = getSelectedElements(elements, appState);
+  predicate: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       return true;
     }
     return false;
   },
   perform(elements, appState, _, app) {
-    const selectedElement = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-      true,
-    )[0] as ExcalidrawLinearElement;
+    const selectedElement = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: true,
+    })[0] as ExcalidrawLinearElement;
 
     const editingLinearElement =
       appState.editingLinearElement?.elementId === selectedElement.id
@@ -36,12 +33,11 @@ export const actionToggleLinearEditor = register({
       commitToHistory: false,
     };
   },
-  contextItemLabel: (elements, appState) => {
-    const selectedElement = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-      true,
-    )[0] as ExcalidrawLinearElement;
+  contextItemLabel: (elements, appState, app) => {
+    const selectedElement = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: true,
+    })[0] as ExcalidrawLinearElement;
     return appState.editingLinearElement?.elementId === selectedElement.id
       ? "labels.lineEditor.exit"
       : "labels.lineEditor.edit";

@@ -1,4 +1,4 @@
-import { isSomeElementSelected } from "../scene";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { KEYS } from "../keys";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
@@ -18,11 +18,23 @@ const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
+  const framesToBeDeleted = new Set(
+    getSelectedElements(
+      elements.filter((el) => el.type === "frame"),
+      appState,
+    ).map((el) => el.id),
+  );
+
   return {
     elements: elements.map((el) => {
       if (appState.selectedElementIds[el.id]) {
         return newElementWith(el, { isDeleted: true });
       }
+
+      if (el.frameId && framesToBeDeleted.has(el.frameId)) {
+        return newElementWith(el, { isDeleted: true });
+      }
+
       if (
         isBoundToContainer(el) &&
         appState.selectedElementIds[el.containerId]
@@ -146,6 +158,7 @@ export const actionDeleteSelected = register({
         ...nextAppState,
         activeTool: updateActiveTool(appState, { type: "selection" }),
         multiElement: null,
+        activeEmbeddable: null,
       },
       commitToHistory: isSomeElementSelected(
         getNonDeletedElements(elements),

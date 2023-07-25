@@ -124,6 +124,8 @@
     },
     "statusPublished": "Veröffentlicht",
     "sidebarLock": "Seitenleiste offen lassen",
+    "selectAllElementsInFrame": "Alle Elemente im Rahmen auswählen",
+    "removeAllElementsFromFrame": "Alle Elemente aus dem Rahmen entfernen",
     "eyeDropper": "Farbe von der Zeichenfläche auswählen"
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Stift-Modus - Berührung verhindern",
     "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
     "eraser": "Radierer",
-    "hand": "Hand (Schwenkwerkzeug)"
+    "frame": "Rahmenwerkzeug",
+    "hand": "Hand (Schwenkwerkzeug)",
+    "extraTools": "Weitere Werkzeuge"
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",

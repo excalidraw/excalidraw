@@ -12,6 +12,8 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
   ExcalidrawTextContainer,
+  ExcalidrawFrameElement,
+  ExcalidrawEmbeddableElement,
 } from "../element/types";
 import {
   arrayToMap,
@@ -50,6 +52,7 @@ type ElementConstructorOpts = MarkOptional<
   | "height"
   | "angle"
   | "groupIds"
+  | "frameId"
   | "boundElements"
   | "seed"
   | "version"
@@ -82,6 +85,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     height = 0,
     angle = 0,
     groupIds = [],
+    frameId = null,
     roundness = null,
     boundElements = null,
     link = null,
@@ -106,6 +110,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     roughness,
     opacity,
     groupIds,
+    frameId,
     roundness,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
@@ -125,6 +130,33 @@ export const newElement = (
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
+
+export const newEmbeddableElement = (
+  opts: {
+    type: "embeddable";
+    validated: boolean | undefined;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawEmbeddableElement> => {
+  return {
+    ..._newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts),
+    validated: opts.validated,
+  };
+};
+
+export const newFrameElement = (
+  opts: ElementConstructorOpts,
+): NonDeleted<ExcalidrawFrameElement> => {
+  const frameElement = newElementWith(
+    {
+      ..._newElementBase<ExcalidrawFrameElement>("frame", opts),
+      type: "frame",
+      name: null,
+    },
+    {},
+  );
+
+  return frameElement;
+};
 
 /** computes element x/y offset based on textAlign/verticalAlign */
 const getTextElementPositionOffsets = (
@@ -610,6 +642,10 @@ export const duplicateElements = (
             elementId: newEndBindingId,
           }
         : null;
+    }
+
+    if (clonedElement.frameId) {
+      clonedElement.frameId = maybeGetNewId(clonedElement.frameId);
     }
 
     clonedElements.push(clonedElement);
