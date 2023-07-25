@@ -109,12 +109,12 @@
     "createContainerFromText": "Radbryt text i en avgränsad yta",
     "link": {
       "edit": "Redigera länk",
-      "editEmbed": "",
+      "editEmbed": "Redigera länk & bädda in",
       "create": "Skapa länk",
-      "createEmbed": "",
+      "createEmbed": "Skapa länk & bädda in",
       "label": "Länk",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Länka & bädda in",
+      "empty": "Ingen länk är angiven"
     },
     "lineEditor": {
       "edit": "Redigera linje",
@@ -168,11 +168,11 @@
     "cancel": "Avbryt",
     "clear": "Rensa",
     "remove": "Ta bort",
-    "embed": "",
+    "embed": "Växla inbäddning",
     "publishLibrary": "Publicera",
     "submit": "Skicka",
     "confirm": "Bekräfta",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Klicka för att interagera"
   },
   "alerts": {
     "clearReset": "Detta rensar hela canvasen. Är du säker?",
@@ -214,8 +214,8 @@
       "line4": "Om inaktivering av denna inställning inte åtgärdar visningen av textelement, öppna ett <issueLink>ärende</issueLink> på vår GitHub, eller skriv till oss på <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "image": ""
+      "embeddable": "Inbäddbara element kan inte läggas till i biblioteket.",
+      "image": "Stöd för att lägga till bilder till biblioteket kommer snart!"
     }
   },
   "toolBar": {
@@ -234,7 +234,7 @@
     "link": "Lägg till / Uppdatera länk för en vald form",
     "eraser": "Radergummi",
     "frame": "Rutverktyg",
-    "embeddable": "",
+    "embeddable": "Bädda in (web)",
     "hand": "Hand (panoreringsverktyg)",
     "extraTools": "Fler verktyg"
   },
@@ -248,7 +248,7 @@
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
-    "embeddable": "",
+    "embeddable": "Klicka-dra för att skapa en webbplats-inbäddning",
     "text_selected": "Dubbelklicka eller tryck ENTER för att redigera text",
     "text_editing": "Tryck Escape eller CtrlOrCmd + ENTER för att slutföra redigeringen",
     "linearElementMulti": "Klicka på sista punkten eller tryck Escape eller Enter för att avsluta",
@@ -424,8 +424,8 @@
     "canvas": "canvas",
     "selection": "markering",
     "pasteAsSingleElement": "Använd {{shortcut}} för att klistra in som ett enda element,\neller klistra in i en befintlig textredigerare",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "Att bädda in denna webbadress är för närvarande inte tillåtet. Skapa en problemrapport på GitHub för att begära att webbadressen vitlistas.",
+    "unrecognizedLinkFormat": "Länken du bäddade in matchar inte det förväntade formatet. Försök klistra in 'embed'-strängen som tillhandahålls av källwebbplatsen"
   },
   "colors": {
     "transparent": "Genomskinlig",
