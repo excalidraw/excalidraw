@@ -618,7 +618,6 @@ export type ExcalidrawImperativeAPI = {
   bringForward: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   sendToBack: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   bringToFront: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
-  restore: InstanceType<typeof App>["restore"]; //zsviczian
   setMobileModeAllowed: (allow: boolean) => void; //zsviczian
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
   setCursor: InstanceType<typeof App>["setCursor"];

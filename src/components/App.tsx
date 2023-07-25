@@ -88,7 +88,7 @@ import {
 } from "../constants";
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
-import { restore, RestoredDataState, restoreElements } from "../data/restore";
+import { restore, restoreElements } from "../data/restore";
 import {
   dragNewElement,
   dragSelectedElements,
@@ -546,7 +546,6 @@ class App extends React.Component<AppProps, AppState> {
         bringForward: this.bringForward, //zsviczian
         sendToBack: this.sendToBack, //zsviczian
         bringToFront: this.bringToFront, //zsviczian
-        restore: this.restore, //zsviczian
         setMobileModeAllowed: this.setMobileModeAllowed, //zsviczian
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
@@ -2854,11 +2853,6 @@ class App extends React.Component<AppProps, AppState> {
       });
     },
   );
-
-  //zsviczian
-  restore = (data: ImportedDataState): RestoredDataState => {
-    return restore(data, null, null);
-  };
 
   setToast = (
     toast: {
