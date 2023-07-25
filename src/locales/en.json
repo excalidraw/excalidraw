@@ -109,8 +109,12 @@
     "createContainerFromText": "Wrap text in a container",
     "link": {
       "edit": "Edit link",
+      "editEmbed": "Edit link & embed",
       "create": "Create link",
-      "label": "Link"
+      "createEmbed": "Create link & embed",
+      "label": "Link",
+      "labelEmbed": "Link & embed",
+      "empty": "No link is set"
     },
     "lineEditor": {
       "edit": "Edit line",
@@ -164,9 +168,11 @@
     "cancel": "Cancel",
     "clear": "Clear",
     "remove": "Remove",
+    "embed": "Toggle embedding",
     "publishLibrary": "Publish",
     "submit": "Submit",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "embeddableInteractionButton": "Click to interact"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -206,6 +212,10 @@
       "line2": "This could result in breaking the <bold>Text Elements</bold> in your drawings.",
       "line3": "We strongly recommend disabling this setting. You can follow <link>these steps</link> on how to do so.",
       "line4": "If disabling this setting doesn't fix the display of text elements, please open an <issueLink>issue</issueLink> on our GitHub, or write us on <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "Embeddable elements cannot be added to the library.",
+      "image": "Support for adding images to the library coming soon!"
     }
   },
   "toolBar": {
@@ -224,6 +234,7 @@
     "link": "Add/ Update link for a selected shape",
     "eraser": "Eraser",
     "frame": "Frame tool",
+    "embeddable": "Web Embed",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools"
   },
@@ -237,6 +248,7 @@
     "linearElement": "Click to start multiple points, drag for single line",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
+    "embeddable": "Click-drag to create a website embed",
     "text_selected": "Double-click or press ENTER to edit text",
     "text_editing": "Press Escape or CtrlOrCmd+ENTER to finish editing",
     "linearElementMulti": "Click on last point or press Escape or Enter to finish",
@@ -411,7 +423,9 @@
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
     "selection": "selection",
-    "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor"
+    "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor",
+    "unableToEmbed": "Embedding this url is currently not allowed. Raise an issue on GitHub to request the url whitelisted",
+    "unrecognizedLinkFormat": "The link you embedded does not match the expected format. Please try to paste the 'embed' string provided by the source site"
   },
   "colors": {
     "transparent": "Transparent",

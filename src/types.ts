@@ -16,6 +16,7 @@ import {
   Theme,
   StrokeRoundness,
   ExcalidrawFrameElement,
+  ExcalidrawEmbeddableElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -86,7 +87,12 @@ export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
 export type LastActiveTool =
   | {
-      type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame";
+      type:
+        | typeof SHAPES[number]["value"]
+        | "eraser"
+        | "hand"
+        | "frame"
+        | "embeddable";
       customType: null;
     }
   | {
@@ -127,6 +133,7 @@ export type StaticCanvasAppState = CommonCanvasAppState & {
 
 export type InteractiveCanvasAppState = CommonCanvasAppState & {
   // renderInteractiveScene
+  activeEmbeddable: AppState["activeEmbeddable"];
   editingLinearElement: AppState["editingLinearElement"];
   selectionElement: AppState["selectionElement"];
   selectedGroupIds: AppState["selectedGroupIds"];
@@ -152,6 +159,10 @@ export type AppState = {
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: React.ReactNode;
+  activeEmbeddable: {
+    element: NonDeletedExcalidrawElement;
+    state: "hover" | "active";
+  } | null;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
@@ -181,7 +192,12 @@ export type AppState = {
     locked: boolean;
   } & (
     | {
-        type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame";
+        type:
+          | typeof SHAPES[number]["value"]
+          | "eraser"
+          | "hand"
+          | "frame"
+          | "embeddable";
         customType: null;
       }
     | {
@@ -406,6 +422,16 @@ export interface ExcalidrawProps {
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
   children?: React.ReactNode;
+  validateEmbeddable?:
+    | boolean
+    | string[]
+    | RegExp
+    | RegExp[]
+    | ((link: string) => boolean | undefined);
+  renderEmbeddable?: (
+    element: NonDeleted<ExcalidrawEmbeddableElement>,
+    appState: AppState,
+  ) => JSX.Element | null;
 }
 
 export type SceneData = {

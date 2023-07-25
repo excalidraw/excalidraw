@@ -5,8 +5,12 @@ import {
   viewportCoordsToSceneCoords,
   wrapEvent,
 } from "../utils";
+import { getEmbedLink, embeddableURLValidator } from "./embeddable";
 import { mutateElement } from "./mutateElement";
-import { NonDeletedExcalidrawElement } from "./types";
+import {
+  ExcalidrawEmbeddableElement,
+  NonDeletedExcalidrawElement,
+} from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
@@ -21,7 +25,10 @@ import {
 } from "react";
 import clsx from "clsx";
 import { KEYS } from "../keys";
-import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
+import {
+  DEFAULT_LINK_SIZE,
+  invalidateShapeForElement,
+} from "../renderer/renderElement";
 import { rotate } from "../math";
 import { EVENT, HYPERLINK_TOOLTIP_DELAY, MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
@@ -33,7 +40,8 @@ import { isLocalLink, normalizeLink } from "../data/url";
 
 import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
-import { useExcalidrawAppState } from "../components/App";
+import { useAppProps, useExcalidrawAppState } from "../components/App";
+import { isEmbeddableElement } from "./typeChecks";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -48,37 +56,112 @@ EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
 
 let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
 
+const embeddableLinkCache = new Map<
+  ExcalidrawEmbeddableElement["id"],
+  string
+>();
+
 export const Hyperlink = ({
   element,
   setAppState,
   onLinkOpen,
+  setToast,
 }: {
   element: NonDeletedExcalidrawElement;
   setAppState: React.Component<any, AppState>["setState"];
   onLinkOpen: ExcalidrawProps["onLinkOpen"];
+  setToast: (
+    toast: { message: string; closable?: boolean; duration?: number } | null,
+  ) => void;
 }) => {
   const appState = useExcalidrawAppState();
+  const appProps = useAppProps();
 
   const linkVal = element.link || "";
 
   const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
-  const isEditing = appState.showHyperlinkPopup === "editor" || !linkVal;
+  const isEditing = appState.showHyperlinkPopup === "editor";
 
   const handleSubmit = useCallback(() => {
     if (!inputRef.current) {
       return;
     }
 
-    const link = normalizeLink(inputRef.current.value);
+    const link = normalizeLink(inputRef.current.value) || null;
 
     if (!element.link && link) {
       trackEvent("hyperlink", "create");
     }
 
-    mutateElement(element, { link });
-    setAppState({ showHyperlinkPopup: "info" });
-  }, [element, setAppState]);
+    if (isEmbeddableElement(element)) {
+      if (appState.activeEmbeddable?.element === element) {
+        setAppState({ activeEmbeddable: null });
+      }
+      if (!link) {
+        mutateElement(element, {
+          validated: false,
+          link: null,
+        });
+        return;
+      }
+
+      if (!embeddableURLValidator(link, appProps.validateEmbeddable)) {
+        if (link) {
+          setToast({ message: t("toast.unableToEmbed"), closable: true });
+        }
+        element.link && embeddableLinkCache.set(element.id, element.link);
+        mutateElement(element, {
+          validated: false,
+          link,
+        });
+        invalidateShapeForElement(element);
+      } else {
+        const { width, height } = element;
+        const embedLink = getEmbedLink(link);
+        if (embedLink?.warning) {
+          setToast({ message: embedLink.warning, closable: true });
+        }
+        const ar = embedLink
+          ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
+          : 1;
+        const hasLinkChanged =
+          embeddableLinkCache.get(element.id) !== element.link;
+        mutateElement(element, {
+          ...(hasLinkChanged
+            ? {
+                width:
+                  embedLink?.type === "video"
+                    ? width > height
+                      ? width
+                      : height * ar
+                    : width,
+                height:
+                  embedLink?.type === "video"
+                    ? width > height
+                      ? width / ar
+                      : height
+                    : height,
+              }
+            : {}),
+          validated: true,
+          link,
+        });
+        invalidateShapeForElement(element);
+        if (embeddableLinkCache.has(element.id)) {
+          embeddableLinkCache.delete(element.id);
+        }
+      }
+    } else {
+      mutateElement(element, { link });
+    }
+  }, [
+    element,
+    setToast,
+    appProps.validateEmbeddable,
+    appState.activeEmbeddable,
+    setAppState,
+  ]);
 
   useLayoutEffect(() => {
     return () => {
@@ -132,10 +215,12 @@ export const Hyperlink = ({
     appState.draggingElement ||
     appState.resizingElement ||
     appState.isRotating ||
-    appState.openMenu
+    appState.openMenu ||
+    appState.viewModeEnabled
   ) {
     return null;
   }
+
   return (
     <div
       className="excalidraw-hyperlinkContainer"
@@ -144,6 +229,11 @@ export const Hyperlink = ({
         left: `${x}px`,
         width: CONTAINER_WIDTH,
         padding: CONTAINER_PADDING,
+      }}
+      onClick={() => {
+        if (!element.link && !isEditing) {
+          setAppState({ showHyperlinkPopup: "editor" });
+        }
       }}
     >
       {isEditing ? (
@@ -162,15 +252,14 @@ export const Hyperlink = ({
             }
             if (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) {
               handleSubmit();
+              setAppState({ showHyperlinkPopup: "info" });
             }
           }}
         />
-      ) : (
+      ) : element.link ? (
         <a
           href={normalizeLink(element.link || "")}
-          className={clsx("excalidraw-hyperlinkContainer-link", {
-            "d-none": isEditing,
-          })}
+          className="excalidraw-hyperlinkContainer-link"
           target={isLocalLink(element.link) ? "_self" : "_blank"}
           onClick={(event) => {
             if (element.link && onLinkOpen) {
@@ -194,6 +283,10 @@ export const Hyperlink = ({
         >
           {element.link}
         </a>
+      ) : (
+        <div className="excalidraw-hyperlinkContainer-link">
+          {t("labels.link.empty")}
+        </div>
       )}
       <div className="excalidraw-hyperlinkContainer__buttons">
         {!isEditing && (
@@ -207,8 +300,7 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
-
-        {linkVal && (
+        {linkVal && !isEmbeddableElement(element) && (
           <ToolButton
             type="button"
             title={t("buttons.remove")}
@@ -271,7 +363,11 @@ export const actionLink = register({
         type="button"
         icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
-        title={`${t("labels.link.label")} - ${getShortcutKey("CtrlOrCmd+K")}`}
+        title={`${
+          isEmbeddableElement(elements[0])
+            ? t("labels.link.labelEmbed")
+            : t("labels.link.label")
+        } - ${getShortcutKey("CtrlOrCmd+K")}`}
         onClick={() => updateData(null)}
         selected={selectedElements.length === 1 && !!selectedElements[0].link}
       />
@@ -285,7 +381,11 @@ export const getContextMenuLabel = (
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
   const label = selectedElements[0]!.link
-    ? "labels.link.edit"
+    ? isEmbeddableElement(selectedElements[0])
+      ? "labels.link.editEmbed"
+      : "labels.link.edit"
+    : isEmbeddableElement(selectedElements[0])
+    ? "labels.link.createEmbed"
     : "labels.link.create";
   return label;
 };
@@ -327,6 +427,26 @@ export const isPointHittingLinkIcon = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   [x, y]: Point,
+) => {
+  const threshold = 4 / appState.zoom.value;
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
+    [x1, y1, x2, y2],
+    element.angle,
+    appState,
+  );
+  const hitLink =
+    x > linkX - threshold &&
+    x < linkX + threshold + linkWidth &&
+    y > linkY - threshold &&
+    y < linkY + linkHeight + threshold;
+  return hitLink;
+};
+
+export const isPointHittingLink = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+  [x, y]: Point,
   isMobile: boolean,
 ) => {
   if (!element.link || appState.selectedElementIds[element.id]) {
@@ -340,19 +460,7 @@ export const isPointHittingLinkIcon = (
   ) {
     return true;
   }
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-
-  const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
-    [x1, y1, x2, y2],
-    element.angle,
-    appState,
-  );
-  const hitLink =
-    x > linkX - threshold &&
-    x < linkX + threshold + linkWidth &&
-    y > linkY - threshold &&
-    y < linkY + linkHeight + threshold;
-  return hitLink;
+  return isPointHittingLinkIcon(element, appState, [x, y]);
 };
 
 let HYPERLINK_TOOLTIP_TIMEOUT_ID: number | null = null;

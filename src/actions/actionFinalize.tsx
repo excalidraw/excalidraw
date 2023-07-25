@@ -165,6 +165,7 @@ export const actionFinalize = register({
           multiPointElement
             ? appState.activeTool
             : activeTool,
+        activeEmbeddable: null,
         draggingElement: null,
         multiElement: null,
         editingElement: null,

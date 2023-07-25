@@ -110,6 +110,7 @@ export const exportToSvg = async (
   files: BinaryFiles | null,
   opts?: {
     serializeAsJSON?: () => string;
+    renderEmbeddables?: boolean;
   },
 ): Promise<SVGSVGElement> => {
   const {
@@ -226,6 +227,7 @@ export const exportToSvg = async (
     offsetY,
     exportWithDarkMode: appState.exportWithDarkMode,
     exportingFrameId: exportingFrame?.id || null,
+    renderEmbeddables: opts?.renderEmbeddables,
   });
 
   return svgRoot;

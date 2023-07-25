@@ -67,7 +67,15 @@ import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
-import { isFrameElement, isLinearElement } from "../element/typeChecks";
+import {
+  isEmbeddableElement,
+  isFrameElement,
+  isLinearElement,
+} from "../element/typeChecks";
+import {
+  isEmbeddableOrFrameLabel,
+  createPlaceholderEmbeddableLabel,
+} from "../element/embeddable";
 import {
   elementOverlapsWithFrame,
   getTargetFrame,
@@ -532,51 +540,71 @@ const _renderInteractiveScene = ({
     if (showBoundingBox) {
       // Optimisation for finding quickly relevant element ids
       const locallySelectedIds = locallySelectedElements.reduce(
-        (acc, element) => {
+        (acc: Record<string, boolean>, element) => {
           acc[element.id] = true;
           return acc;
         },
-        {} as Record<string, boolean>,
+        {},
       );
 
-      const selections = elements.reduce((acc, element) => {
-        const selectionColors = [];
-        // local user
-        if (
-          locallySelectedIds[element.id] &&
-          !isSelectedViaGroup(appState, element)
-        ) {
-          selectionColors.push(selectionColor);
-        }
-        // remote users
-        if (renderConfig.remoteSelectedElementIds[element.id]) {
-          selectionColors.push(
-            ...renderConfig.remoteSelectedElementIds[element.id].map(
-              (socketId: string) => {
-                const background = getClientColor(socketId);
-                return background;
-              },
-            ),
-          );
-        }
+      const selections = elements.reduce(
+        (
+          acc: {
+            angle: number;
+            elementX1: number;
+            elementY1: number;
+            elementX2: number;
+            elementY2: number;
+            selectionColors: string[];
+            dashed?: boolean;
+            cx: number;
+            cy: number;
+            activeEmbeddable: boolean;
+          }[],
+          element,
+        ) => {
+          const selectionColors = [];
+          // local user
+          if (
+            locallySelectedIds[element.id] &&
+            !isSelectedViaGroup(appState, element)
+          ) {
+            selectionColors.push(selectionColor);
+          }
+          // remote users
+          if (renderConfig.remoteSelectedElementIds[element.id]) {
+            selectionColors.push(
+              ...renderConfig.remoteSelectedElementIds[element.id].map(
+                (socketId: string) => {
+                  const background = getClientColor(socketId);
+                  return background;
+                },
+              ),
+            );
+          }
 
-        if (selectionColors.length) {
-          const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
-            getElementAbsoluteCoords(element, true);
-          acc.push({
-            angle: element.angle,
-            elementX1,
-            elementY1,
-            elementX2,
-            elementY2,
-            selectionColors,
-            dashed: !!renderConfig.remoteSelectedElementIds[element.id],
-            cx,
-            cy,
-          });
-        }
-        return acc;
-      }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[]; dashed?: boolean; cx: number; cy: number }[]);
+          if (selectionColors.length) {
+            const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
+              getElementAbsoluteCoords(element, true);
+            acc.push({
+              angle: element.angle,
+              elementX1,
+              elementY1,
+              elementX2,
+              elementY2,
+              selectionColors,
+              dashed: !!renderConfig.remoteSelectedElementIds[element.id],
+              cx,
+              cy,
+              activeEmbeddable:
+                appState.activeEmbeddable?.element === element &&
+                appState.activeEmbeddable.state === "active",
+            });
+          }
+          return acc;
+        },
+        [],
+      );
 
       const addSelectionForGroupId = (groupId: GroupId) => {
         const groupElements = getElementsInGroup(elements, groupId);
@@ -592,6 +620,7 @@ const _renderInteractiveScene = ({
           dashed: true,
           cx: elementX1 + (elementX2 - elementX1) / 2,
           cy: elementY1 + (elementY2 - elementY1) / 2,
+          activeEmbeddable: false,
         });
       };
 
@@ -912,39 +941,91 @@ const _renderStaticScene = ({
   });
 
   // Paint visible elements
-  visibleElements.forEach((element) => {
-    try {
-      // - when exporting the whole canvas, we DO NOT apply clipping
-      // - when we are exporting a particular frame, apply clipping
-      //   if the containing frame is not selected, apply clipping
-      const frameId = element.frameId || appState.frameToHighlight?.id;
+  visibleElements
+    .filter((el) => !isEmbeddableOrFrameLabel(el))
+    .forEach((element) => {
+      try {
+        // - when exporting the whole canvas, we DO NOT apply clipping
+        // - when we are exporting a particular frame, apply clipping
+        //   if the containing frame is not selected, apply clipping
+        const frameId = element.frameId || appState.frameToHighlight?.id;
 
-      if (
-        frameId &&
-        ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
-          (!renderConfig.isExporting &&
-            appState.frameRendering.enabled &&
-            appState.frameRendering.clip))
-      ) {
-        context.save();
+        if (
+          frameId &&
+          ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
+            (!renderConfig.isExporting &&
+              appState.frameRendering.enabled &&
+              appState.frameRendering.clip))
+        ) {
+          context.save();
 
-        const frame = getTargetFrame(element, appState);
+          const frame = getTargetFrame(element, appState);
 
-        if (frame && isElementInFrame(element, elements, appState)) {
-          frameClip(frame, context, renderConfig, appState);
+          if (frame && isElementInFrame(element, elements, appState)) {
+            frameClip(frame, context, renderConfig, appState);
+          }
+          renderElement(element, rc, context, renderConfig, appState);
+          context.restore();
+        } else {
+          renderElement(element, rc, context, renderConfig, appState);
         }
-        renderElement(element, rc, context, renderConfig, appState);
-        context.restore();
-      } else {
-        renderElement(element, rc, context, renderConfig, appState);
+        if (!isExporting) {
+          renderLinkIcon(element, context, appState);
+        }
+      } catch (error: any) {
+        console.error(error);
       }
-      if (!isExporting) {
-        renderLinkIcon(element, context, appState);
+    });
+
+  // render embeddables on top
+  visibleElements
+    .filter((el) => isEmbeddableOrFrameLabel(el))
+    .forEach((element) => {
+      try {
+        const render = () => {
+          renderElement(element, rc, context, renderConfig, appState);
+
+          if (
+            isEmbeddableElement(element) &&
+            (isExporting || !element.validated) &&
+            element.width &&
+            element.height
+          ) {
+            const label = createPlaceholderEmbeddableLabel(element);
+            renderElement(label, rc, context, renderConfig, appState);
+          }
+          if (!isExporting) {
+            renderLinkIcon(element, context, appState);
+          }
+        };
+        // - when exporting the whole canvas, we DO NOT apply clipping
+        // - when we are exporting a particular frame, apply clipping
+        //   if the containing frame is not selected, apply clipping
+        const frameId = element.frameId || appState.frameToHighlight?.id;
+
+        if (
+          frameId &&
+          ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
+            (!renderConfig.isExporting &&
+              appState.frameRendering.enabled &&
+              appState.frameRendering.clip))
+        ) {
+          context.save();
+
+          const frame = getTargetFrame(element, appState);
+
+          if (frame && isElementInFrame(element, elements, appState)) {
+            frameClip(frame, context, renderConfig, appState);
+          }
+          render();
+          context.restore();
+        } else {
+          render();
+        }
+      } catch (error: any) {
+        console.error(error);
       }
-    } catch (error: any) {
-      console.error(error);
-    }
-  });
+    });
 
   context.restore();
 };
@@ -1050,6 +1131,7 @@ const renderSelectionBorder = (
     dashed?: boolean;
     cx: number;
     cy: number;
+    activeEmbeddable: boolean;
   },
   padding = DEFAULT_SPACING * 2,
 ) => {
@@ -1063,6 +1145,7 @@ const renderSelectionBorder = (
     cx,
     cy,
     dashed,
+    activeEmbeddable,
   } = elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
@@ -1073,7 +1156,7 @@ const renderSelectionBorder = (
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  context.lineWidth = 1 / appState.zoom.value;
+  context.lineWidth = (activeEmbeddable ? 4 : 1) / appState.zoom.value;
 
   const count = selectionColors.length;
   for (let index = 0; index < count; ++index) {
@@ -1134,6 +1217,7 @@ const renderBindingHighlightForBindableElement = (
     case "rectangle":
     case "text":
     case "image":
+    case "embeddable":
     case "frame":
       strokeRectWithRotation(
         context,
@@ -1227,6 +1311,7 @@ const renderElementsBoxHighlight = (
       dashed: false,
       cx: elementX1 + (elementX2 - elementX1) / 2,
       cy: elementY1 + (elementY2 - elementY1) / 2,
+      activeEmbeddable: false,
     };
   };
 
@@ -1339,11 +1424,13 @@ export const renderSceneToSvg = (
     offsetY = 0,
     exportWithDarkMode = false,
     exportingFrameId = null,
+    renderEmbeddables,
   }: {
     offsetX?: number;
     offsetY?: number;
     exportWithDarkMode?: boolean;
     exportingFrameId?: string | null;
+    renderEmbeddables?: boolean;
   } = {},
 ) => {
   if (!svgRoot) {
@@ -1351,22 +1438,48 @@ export const renderSceneToSvg = (
   }
 
   // render elements
-  elements.forEach((element) => {
-    if (!element.isDeleted) {
-      try {
-        renderElementToSvg(
-          element,
-          rsvg,
-          svgRoot,
-          files,
-          element.x + offsetX,
-          element.y + offsetY,
-          exportWithDarkMode,
-          exportingFrameId,
-        );
-      } catch (error: any) {
-        console.error(error);
+  elements
+    .filter((el) => !isEmbeddableOrFrameLabel(el))
+    .forEach((element) => {
+      if (!element.isDeleted) {
+        try {
+          renderElementToSvg(
+            element,
+            rsvg,
+            svgRoot,
+            files,
+            element.x + offsetX,
+            element.y + offsetY,
+            exportWithDarkMode,
+            exportingFrameId,
+            renderEmbeddables,
+          );
+        } catch (error: any) {
+          console.error(error);
+        }
       }
-    }
-  });
+    });
+
+  // render embeddables on top
+  elements
+    .filter((el) => isEmbeddableElement(el))
+    .forEach((element) => {
+      if (!element.isDeleted) {
+        try {
+          renderElementToSvg(
+            element,
+            rsvg,
+            svgRoot,
+            files,
+            element.x + offsetX,
+            element.y + offsetY,
+            exportWithDarkMode,
+            exportingFrameId,
+            renderEmbeddables,
+          );
+        } catch (error: any) {
+          console.error(error);
+        }
+      }
+    });
 };

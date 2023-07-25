@@ -164,6 +164,7 @@ const getRelevantAppStateProps = (
   openSidebar: appState.openSidebar,
   showHyperlinkPopup: appState.showHyperlinkPopup,
   collaborators: appState.collaborators, // Necessary for collab. sessions
+  activeEmbeddable: appState.activeEmbeddable,
 });
 
 const areEqual = (
