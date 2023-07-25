@@ -58,7 +58,7 @@ export const EyeDropper: React.FC<{
       return;
     }
 
-    let currentColor = COLOR_PALETTE.black;
+    let currentColor: string = COLOR_PALETTE.black;
     let isHoldingPointerDown = false;
 
     const ctx = app.canvas.getContext("2d")!;

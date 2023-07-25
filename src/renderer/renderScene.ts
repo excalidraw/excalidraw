@@ -526,16 +526,8 @@ export const _renderScene = ({
       .forEach((element) => {
         try {
           const render = () => {
-            if (
-              isEmbeddableElement(element) &&
-              (isExporting || !element.validated)
-            ) {
-              invalidateShapeForElement(element); //add gray placeholder background
-              renderElement(element, rc, context, renderConfig, appState);
-              invalidateShapeForElement(element); //revert to transparent
-            } else {
-              renderElement(element, rc, context, renderConfig, appState);
-            }
+            renderElement(element, rc, context, renderConfig, appState);
+
             if (
               isEmbeddableElement(element) &&
               (isExporting || !element.validated) &&
@@ -1413,11 +1405,13 @@ export const renderSceneToSvg = (
     offsetY = 0,
     exportWithDarkMode = false,
     exportingFrameId = null,
+    renderEmbeddables,
   }: {
     offsetX?: number;
     offsetY?: number;
     exportWithDarkMode?: boolean;
     exportingFrameId?: string | null;
+    renderEmbeddables?: boolean;
   } = {},
 ) => {
   if (!svgRoot) {
@@ -1439,6 +1433,7 @@ export const renderSceneToSvg = (
             element.y + offsetY,
             exportWithDarkMode,
             exportingFrameId,
+            renderEmbeddables,
           );
         } catch (error: any) {
           console.error(error);
@@ -1452,9 +1447,6 @@ export const renderSceneToSvg = (
     .forEach((element) => {
       if (!element.isDeleted) {
         try {
-          if (element.backgroundColor === "transparent") {
-            invalidateShapeForElement(element); //add gray placeholder background
-          }
           renderElementToSvg(
             element,
             rsvg,
@@ -1464,10 +1456,8 @@ export const renderSceneToSvg = (
             element.y + offsetY,
             exportWithDarkMode,
             exportingFrameId,
+            renderEmbeddables,
           );
-          if (element.backgroundColor === "transparent") {
-            invalidateShapeForElement(element); //revert to transparent
-          }
         } catch (error: any) {
           console.error(error);
         }

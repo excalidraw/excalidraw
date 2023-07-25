@@ -12,6 +12,11 @@
     box-sizing: border-box;
     border-radius: var(--border-radius-lg);
 
+    svg {
+      // to prevent clicks on links and such
+      pointer-events: none;
+    }
+
     &--hover {
       border-color: var(--color-primary);
     }
