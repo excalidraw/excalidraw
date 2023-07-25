@@ -199,6 +199,7 @@ export const LibraryDropdownMenuButton: React.FC<{
           onClickOutside={() => setIsLibraryMenuOpen(false)}
           onSelect={() => setIsLibraryMenuOpen(false)}
           className="library-menu"
+          align="end"
         >
           {!itemsSelected && (
             <DropdownMenu.Item

@@ -14,7 +14,8 @@ const MenuContent = ({
   className = "",
   onSelect,
   style,
-  sideOffset,
+  sideOffset = 4,
+  align = "start",
 }: {
   children?: React.ReactNode;
   onClickOutside?: () => void;
@@ -25,6 +26,7 @@ const MenuContent = ({
   onSelect?: (event: Event) => void;
   style?: React.CSSProperties;
   sideOffset?: number;
+  align?: "start" | "center" | "end";
 }) => {
   const device = useDevice();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -45,8 +47,8 @@ const MenuContent = ({
         style={style}
         data-testid="dropdown-menu"
         side="bottom"
-        sideOffset={sideOffset ?? 4}
-        align="start"
+        sideOffset={sideOffset}
+        align={align}
       >
         {/* the zIndex ensures this menu has higher stacking order,
     see https://github.com/excalidraw/excalidraw/pull/1445 */}

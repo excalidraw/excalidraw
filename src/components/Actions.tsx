@@ -363,6 +363,7 @@ export const ShapesSwitcher = ({
             onClickOutside={() => setIsExtraToolsMenuOpen(false)}
             onSelect={() => setIsExtraToolsMenuOpen(false)}
             className="App-toolbar__extra-tools-dropdown"
+            align="end"
           >
             <DropdownMenu.Item
               onSelect={() => {
