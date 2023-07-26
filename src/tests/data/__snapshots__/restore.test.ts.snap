@@ -1,15 +1,15 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+// Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`restoreElements > should restore arrow element correctly 1`] = `
-{
+exports[`restoreElements should restore arrow element correctly 1`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [],
+  "boundElements": Array [],
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 100,
   "id": "id-arrow01",
   "isDeleted": false,
@@ -17,18 +17,18 @@ exports[`restoreElements > should restore arrow element correctly 1`] = `
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": [
-    [
+  "points": Array [
+    Array [
       0,
       0,
     ],
-    [
+    Array [
       100,
       100,
     ],
   ],
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 2,
   },
   "seed": Any<Number>,
@@ -47,14 +47,14 @@ exports[`restoreElements > should restore arrow element correctly 1`] = `
 }
 `;
 
-exports[`restoreElements > should restore correctly with rectangle, ellipse and diamond elements 1`] = `
-{
+exports[`restoreElements should restore correctly with rectangle, ellipse and diamond elements 1`] = `
+Object {
   "angle": 0,
   "backgroundColor": "blue",
-  "boundElements": [],
+  "boundElements": Array [],
   "fillStyle": "cross-hatch",
   "frameId": null,
-  "groupIds": [
+  "groupIds": Array [
     "1",
     "2",
     "3",
@@ -66,7 +66,7 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
   "locked": false,
   "opacity": 10,
   "roughness": 2,
-  "roundness": {
+  "roundness": Object {
     "type": 3,
   },
   "seed": Any<Number>,
@@ -83,14 +83,14 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
 }
 `;
 
-exports[`restoreElements > should restore correctly with rectangle, ellipse and diamond elements 2`] = `
-{
+exports[`restoreElements should restore correctly with rectangle, ellipse and diamond elements 2`] = `
+Object {
   "angle": 0,
   "backgroundColor": "blue",
-  "boundElements": [],
+  "boundElements": Array [],
   "fillStyle": "cross-hatch",
   "frameId": null,
-  "groupIds": [
+  "groupIds": Array [
     "1",
     "2",
     "3",
@@ -102,7 +102,7 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
   "locked": false,
   "opacity": 10,
   "roughness": 2,
-  "roundness": {
+  "roundness": Object {
     "type": 3,
   },
   "seed": Any<Number>,
@@ -119,14 +119,14 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
 }
 `;
 
-exports[`restoreElements > should restore correctly with rectangle, ellipse and diamond elements 3`] = `
-{
+exports[`restoreElements should restore correctly with rectangle, ellipse and diamond elements 3`] = `
+Object {
   "angle": 0,
   "backgroundColor": "blue",
-  "boundElements": [],
+  "boundElements": Array [],
   "fillStyle": "cross-hatch",
   "frameId": null,
-  "groupIds": [
+  "groupIds": Array [
     "1",
     "2",
     "3",
@@ -138,7 +138,7 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
   "locked": false,
   "opacity": 10,
   "roughness": 2,
-  "roundness": {
+  "roundness": Object {
     "type": 3,
   },
   "seed": Any<Number>,
@@ -155,14 +155,14 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
 }
 `;
 
-exports[`restoreElements > should restore freedraw element correctly 1`] = `
-{
+exports[`restoreElements should restore freedraw element correctly 1`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [],
+  "boundElements": Array [],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 0,
   "id": "id-freedraw01",
   "isDeleted": false,
@@ -170,10 +170,10 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": [],
-  "pressures": [],
+  "points": Array [],
+  "pressures": Array [],
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 3,
   },
   "seed": Any<Number>,
@@ -191,16 +191,16 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
 }
 `;
 
-exports[`restoreElements > should restore line and draw elements correctly 1`] = `
-{
+exports[`restoreElements should restore line and draw elements correctly 1`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [],
+  "boundElements": Array [],
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 100,
   "id": "id-line01",
   "isDeleted": false,
@@ -208,18 +208,18 @@ exports[`restoreElements > should restore line and draw elements correctly 1`] =
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": [
-    [
+  "points": Array [
+    Array [
       0,
       0,
     ],
-    [
+    Array [
       100,
       100,
     ],
   ],
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 2,
   },
   "seed": Any<Number>,
@@ -238,16 +238,16 @@ exports[`restoreElements > should restore line and draw elements correctly 1`] =
 }
 `;
 
-exports[`restoreElements > should restore line and draw elements correctly 2`] = `
-{
+exports[`restoreElements should restore line and draw elements correctly 2`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [],
+  "boundElements": Array [],
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 100,
   "id": "id-draw01",
   "isDeleted": false,
@@ -255,18 +255,18 @@ exports[`restoreElements > should restore line and draw elements correctly 2`] =
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": [
-    [
+  "points": Array [
+    Array [
       0,
       0,
     ],
-    [
+    Array [
       100,
       100,
     ],
   ],
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 2,
   },
   "seed": Any<Number>,
@@ -285,18 +285,18 @@ exports[`restoreElements > should restore line and draw elements correctly 2`] =
 }
 `;
 
-exports[`restoreElements > should restore text element correctly passing value for each attribute 1`] = `
-{
+exports[`restoreElements should restore text element correctly passing value for each attribute 1`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
-  "boundElements": [],
+  "boundElements": Array [],
   "containerId": null,
   "fillStyle": "hachure",
   "fontFamily": 1,
   "fontSize": 14,
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 100,
   "id": "id-text01",
   "isDeleted": false,
@@ -306,7 +306,7 @@ exports[`restoreElements > should restore text element correctly passing value f
   "opacity": 100,
   "originalText": "text",
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 3,
   },
   "seed": Any<Number>,
@@ -326,18 +326,18 @@ exports[`restoreElements > should restore text element correctly passing value f
 }
 `;
 
-exports[`restoreElements > should restore text element correctly with unknown font family, null text and undefined alignment 1`] = `
-{
+exports[`restoreElements should restore text element correctly with unknown font family, null text and undefined alignment 1`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
-  "boundElements": [],
+  "boundElements": Array [],
   "containerId": null,
   "fillStyle": "hachure",
   "fontFamily": 1,
   "fontSize": 10,
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 100,
   "id": "id-text01",
   "isDeleted": false,
@@ -347,7 +347,7 @@ exports[`restoreElements > should restore text element correctly with unknown fo
   "opacity": 100,
   "originalText": "test",
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 3,
   },
   "seed": Any<Number>,
