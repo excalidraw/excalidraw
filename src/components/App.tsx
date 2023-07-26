@@ -6068,6 +6068,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.boxSelection.hasOccurred = true;
 
         const elements = this.scene.getNonDeletedElements();
+
+        let shouldReuseSelection = true;
         if (
           !event.shiftKey &&
           // allows for box-selecting points (without shift)
@@ -6088,6 +6090,8 @@ class App extends React.Component<AppProps, AppState> {
                 this,
               ),
             );
+          } else {
+            shouldReuseSelection = false;
           }
         }
         // box-select line editor points
@@ -6104,13 +6108,16 @@ class App extends React.Component<AppProps, AppState> {
             draggingElement,
           );
           this.setState((prevState) => {
-            const nextSelectedElementIds = elementsWithinSelection.reduce(
-              (acc: Record<ExcalidrawElement["id"], true>, element) => {
-                acc[element.id] = true;
-                return acc;
-              },
-              {},
-            );
+            const nextSelectedElementIds = {
+              ...(shouldReuseSelection && prevState.selectedElementIds),
+              ...elementsWithinSelection.reduce(
+                (acc: Record<ExcalidrawElement["id"], true>, element) => {
+                  acc[element.id] = true;
+                  return acc;
+                },
+                {},
+              ),
+            };
 
             if (pointerDownState.hit.element) {
               // if using ctrl/cmd, select the hitElement only if we
@@ -6125,6 +6132,10 @@ class App extends React.Component<AppProps, AppState> {
             return selectGroupsForSelectedElements(
               {
                 ...prevState,
+                ...(!shouldReuseSelection && {
+                  selectedGroupIds: {},
+                  editingGroupId: null,
+                }),
                 selectedElementIds: nextSelectedElementIds,
                 showHyperlinkPopup:
                   elementsWithinSelection.length === 1 &&
