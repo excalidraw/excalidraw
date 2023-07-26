@@ -1,7 +1,7 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+// Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`multi point mode in linear elements > arrow 1`] = `
-{
+exports[`multi point mode in linear elements arrow 1`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
@@ -9,33 +9,33 @@ exports[`multi point mode in linear elements > arrow 1`] = `
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 110,
   "id": "id0",
   "isDeleted": false,
-  "lastCommittedPoint": [
+  "lastCommittedPoint": Array [
     70,
     110,
   ],
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": [
-    [
+  "points": Array [
+    Array [
       0,
       0,
     ],
-    [
+    Array [
       20,
       30,
     ],
-    [
+    Array [
       70,
       110,
     ],
   ],
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 2,
   },
   "seed": 337897,
@@ -54,8 +54,8 @@ exports[`multi point mode in linear elements > arrow 1`] = `
 }
 `;
 
-exports[`multi point mode in linear elements > line 1`] = `
-{
+exports[`multi point mode in linear elements line 1`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
@@ -63,33 +63,33 @@ exports[`multi point mode in linear elements > line 1`] = `
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 110,
   "id": "id0",
   "isDeleted": false,
-  "lastCommittedPoint": [
+  "lastCommittedPoint": Array [
     70,
     110,
   ],
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": [
-    [
+  "points": Array [
+    Array [
       0,
       0,
     ],
-    [
+    Array [
       20,
       30,
     ],
-    [
+    Array [
       70,
       110,
     ],
   ],
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 2,
   },
   "seed": 337897,

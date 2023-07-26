@@ -20,21 +20,21 @@ import ExcalidrawApp from "../excalidraw-app";
 import { mutateElement } from "../element/mutateElement";
 import { NormalizedZoomValue } from "../types";
 import { ROUNDNESS } from "../constants";
-import { vi } from "vitest";
-import * as blob from "../data/blob";
 
 const { h } = window;
+
 const mouse = new Pointer("mouse");
-// This needs to fixed in vitest mock, as when importActual used with mock
-// the tests hangs - https://github.com/vitest-dev/vitest/issues/546.
-// But fortunately spying and mocking the return value of spy works :p
+jest.mock("../data/blob", () => {
+  const originalModule = jest.requireActual("../data/blob");
 
-const resizeImageFileSpy = vi.spyOn(blob, "resizeImageFile");
-const generateIdFromFileSpy = vi.spyOn(blob, "generateIdFromFile");
-
-resizeImageFileSpy.mockImplementation(async (imageFile: File) => imageFile);
-generateIdFromFileSpy.mockImplementation(async () => "fileId" as FileId);
-
+  //Prevent Node.js modules errors (document is not defined etc...)
+  return {
+    __esModule: true,
+    ...originalModule,
+    resizeImageFile: (imageFile: File) => imageFile,
+    generateIdFromFile: () => "fileId" as FileId,
+  };
+});
 beforeEach(async () => {
   // Unmount ReactDOM from root
   ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -42,7 +42,7 @@ beforeEach(async () => {
   mouse.reset();
   localStorage.clear();
   sessionStorage.clear();
-  vi.clearAllMocks();
+  jest.clearAllMocks();
 
   Object.assign(document, {
     elementFromPoint: () => GlobalTestState.canvas,
@@ -732,6 +732,7 @@ describe("image", () => {
   it("flips an unrotated image horizontally correctly", async () => {
     //paste image
     await createImage();
+
     await waitFor(() => {
       expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, 1]);
       expect(API.getSelectedElements().length).toBeGreaterThan(0);

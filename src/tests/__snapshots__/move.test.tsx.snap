@@ -1,13 +1,13 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+// Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`duplicate element on move when ALT is clicked > rectangle 1`] = `
-{
+exports[`duplicate element on move when ALT is clicked rectangle 1`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 50,
   "id": "id0_copy",
   "isDeleted": false,
@@ -15,7 +15,7 @@ exports[`duplicate element on move when ALT is clicked > rectangle 1`] = `
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 3,
   },
   "seed": 401146281,
@@ -32,14 +32,14 @@ exports[`duplicate element on move when ALT is clicked > rectangle 1`] = `
 }
 `;
 
-exports[`duplicate element on move when ALT is clicked > rectangle 2`] = `
-{
+exports[`duplicate element on move when ALT is clicked rectangle 2`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 50,
   "id": "id0",
   "isDeleted": false,
@@ -47,7 +47,7 @@ exports[`duplicate element on move when ALT is clicked > rectangle 2`] = `
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 3,
   },
   "seed": 337897,
@@ -64,14 +64,14 @@ exports[`duplicate element on move when ALT is clicked > rectangle 2`] = `
 }
 `;
 
-exports[`move element > rectangle 1`] = `
-{
+exports[`move element rectangle 1`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 50,
   "id": "id0",
   "isDeleted": false,
@@ -79,7 +79,7 @@ exports[`move element > rectangle 1`] = `
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 3,
   },
   "seed": 337897,
@@ -96,19 +96,19 @@ exports[`move element > rectangle 1`] = `
 }
 `;
 
-exports[`move element > rectangles with binding arrow 1`] = `
-{
+exports[`move element rectangles with binding arrow 1`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
+  "boundElements": Array [
+    Object {
       "id": "id2",
       "type": "arrow",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 100,
   "id": "id0",
   "isDeleted": false,
@@ -116,7 +116,7 @@ exports[`move element > rectangles with binding arrow 1`] = `
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 3,
   },
   "seed": 337897,
@@ -133,19 +133,19 @@ exports[`move element > rectangles with binding arrow 1`] = `
 }
 `;
 
-exports[`move element > rectangles with binding arrow 2`] = `
-{
+exports[`move element rectangles with binding arrow 2`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
+  "boundElements": Array [
+    Object {
       "id": "id2",
       "type": "arrow",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 300,
   "id": "id1",
   "isDeleted": false,
@@ -153,7 +153,7 @@ exports[`move element > rectangles with binding arrow 2`] = `
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 3,
   },
   "seed": 449462985,
@@ -170,20 +170,20 @@ exports[`move element > rectangles with binding arrow 2`] = `
 }
 `;
 
-exports[`move element > rectangles with binding arrow 3`] = `
-{
+exports[`move element rectangles with binding arrow 3`] = `
+Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "endArrowhead": null,
-  "endBinding": {
+  "endBinding": Object {
     "elementId": "id1",
     "focus": -0.46666666666666673,
     "gap": 10,
   },
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": [],
+  "groupIds": Array [],
   "height": 81.48231043525051,
   "id": "id2",
   "isDeleted": false,
@@ -191,23 +191,23 @@ exports[`move element > rectangles with binding arrow 3`] = `
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": [
-    [
+  "points": Array [
+    Array [
       0,
       0,
     ],
-    [
+    Array [
       81,
       81.48231043525051,
     ],
   ],
   "roughness": 1,
-  "roundness": {
+  "roundness": Object {
     "type": 2,
   },
   "seed": 401146281,
   "startArrowhead": null,
-  "startBinding": {
+  "startBinding": Object {
     "elementId": "id0",
     "focus": -0.6000000000000001,
     "gap": 10,

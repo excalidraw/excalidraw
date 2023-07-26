@@ -1,6 +1,6 @@
 import { fireEvent, GlobalTestState, toggleMenu, render } from "../test-utils";
 import { Excalidraw, Footer, MainMenu } from "../../packages/excalidraw/index";
-import { queryByText, queryByTestId, screen } from "@testing-library/react";
+import { queryByText, queryByTestId } from "@testing-library/react";
 import { GRID_SIZE, THEME } from "../../constants";
 import { t } from "../../i18n";
 import { useMemo } from "react";
@@ -42,7 +42,7 @@ describe("<Excalidraw/>", () => {
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(0);
       expect(h.state.zenModeEnabled).toBe(true);
-      screen.debug();
+
       fireEvent.contextMenu(GlobalTestState.canvas, {
         button: 2,
         clientX: 1,
@@ -74,8 +74,7 @@ describe("<Excalidraw/>", () => {
         </Footer>
       </Excalidraw>,
     ));
-    expect(container.querySelector(".footer-center")).toMatchInlineSnapshot(
-      `
+    expect(container.querySelector(".footer-center")).toMatchInlineSnapshot(`
       <div
         class="footer-center zen-mode-transition"
       >
@@ -83,8 +82,7 @@ describe("<Excalidraw/>", () => {
           This is a custom footer
         </div>
       </div>
-    `,
-    );
+    `);
   });
 
   describe("Test gridModeEnabled prop", () => {

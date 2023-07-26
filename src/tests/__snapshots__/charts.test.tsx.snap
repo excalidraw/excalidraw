@@ -1,15 +1,15 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+// Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`tryParseSpreadsheet > works for numbers with comma in them 1`] = `
-{
-  "spreadsheet": {
-    "labels": [
+exports[`tryParseSpreadsheet works for numbers with comma in them 1`] = `
+Object {
+  "spreadsheet": Object {
+    "labels": Array [
       "Week 1",
       "Week 2",
       "Week 3",
     ],
     "title": "Users",
-    "values": [
+    "values": Array [
       814,
       10301,
       4264,

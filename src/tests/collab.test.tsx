@@ -1,4 +1,3 @@
-import { vi } from "vitest";
 import { render, updateSceneData, waitFor } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
@@ -16,18 +15,15 @@ Object.defineProperty(window, "crypto", {
   },
 });
 
-vi.mock("../excalidraw-app/data/index.ts", async (importActual) => {
-  const module = (await importActual()) as any;
-  return {
-    __esmodule: true,
-    ...module,
-    getCollabServer: vi.fn(() => ({
-      url: /* doesn't really matter */ "http://localhost:3002",
-    })),
-  };
-});
+jest.mock("../excalidraw-app/data/index.ts", () => ({
+  __esmodule: true,
+  ...jest.requireActual("../excalidraw-app/data/index.ts"),
+  getCollabServer: jest.fn(() => ({
+    url: /* doesn't really matter */ "http://localhost:3002",
+  })),
+}));
 
-vi.mock("../excalidraw-app/data/firebase.ts", () => {
+jest.mock("../excalidraw-app/data/firebase.ts", () => {
   const loadFromFirebase = async () => null;
   const saveToFirebase = () => {};
   const isSavedToFirebase = () => true;
@@ -49,17 +45,15 @@ vi.mock("../excalidraw-app/data/firebase.ts", () => {
   };
 });
 
-vi.mock("socket.io-client", () => {
-  return {
-    default: () => {
-      return {
-        close: () => {},
-        on: () => {},
-        once: () => {},
-        off: () => {},
-        emit: () => {},
-      };
-    },
+jest.mock("socket.io-client", () => {
+  return () => {
+    return {
+      close: () => {},
+      on: () => {},
+      once: () => {},
+      off: () => {},
+      emit: () => {},
+    };
   };
 });
 
