@@ -131,7 +131,6 @@ const LayerUI = ({
   app,
 }: LayerUIProps) => {
   const device = useDevice();
-
   const tunnels = useInitializeTunnels();
 
   const [eyeDropperState, setEyeDropperState] = useAtom(

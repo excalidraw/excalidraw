@@ -5,7 +5,7 @@ import * as mockedSceneExportUtils from "../../scene/export";
 
 import { MIME_TYPES } from "../../constants";
 
-const exportSceneSpy = vi.spyOn(mockedSceneExportUtils, "exportToSvg");
+const exportToSvgSpy = vi.spyOn(mockedSceneExportUtils, "exportToSvg");
 
 describe("exportToCanvas", async () => {
   const EXPORT_PADDING = 10;
@@ -68,15 +68,9 @@ describe("exportToBlob", async () => {
   });
 });
 
-describe("exportToSvg", async () => {
-  const mockedExportUtil = mockedSceneExportUtils.exportToSvg as any;
-  const passedElements = () => mockedExportUtil.mock.calls[0][0];
-  const passedOptions = () => mockedExportUtil.mock.calls[0][1];
-
-  beforeEach(() => {
-    //@ts-ignore
-    exportSceneSpy.mockImplementation();
-  });
+describe("exportToSvg", () => {
+  const passedElements = () => exportToSvgSpy.mock.calls[0][0];
+  const passedOptions = () => exportToSvgSpy.mock.calls[0][1];
 
   afterEach(() => {
     vi.clearAllMocks();
