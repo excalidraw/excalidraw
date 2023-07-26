@@ -12,10 +12,9 @@ import { ImportedDataState } from "../../data/types";
 import { NormalizedZoomValue } from "../../types";
 import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "../../constants";
 import { newElementWith } from "../../element/mutateElement";
-import { vi } from "vitest";
 
 describe("restoreElements", () => {
-  const mockSizeHelper = vi.spyOn(sizeHelpers, "isInvisiblySmallElement");
+  const mockSizeHelper = jest.spyOn(sizeHelpers, "isInvisiblySmallElement");
 
   beforeEach(() => {
     mockSizeHelper.mockReset();
@@ -153,7 +152,7 @@ describe("restoreElements", () => {
   it("when arrow element has undefined endArrowHead", () => {
     const arrowElement = API.createElement({ type: "arrow" });
     Object.defineProperty(arrowElement, "endArrowhead", {
-      get: vi.fn(() => undefined),
+      get: jest.fn(() => undefined),
     });
 
     const restoredElements = restore.restoreElements([arrowElement], null);
@@ -206,7 +205,7 @@ describe("restoreElements", () => {
       [1, 1],
     ];
     Object.defineProperty(lineElement_0, "points", {
-      get: vi.fn(() => pointsEl_0),
+      get: jest.fn(() => pointsEl_0),
     });
 
     const pointsEl_1 = [
@@ -214,7 +213,7 @@ describe("restoreElements", () => {
       [5, 6],
     ];
     Object.defineProperty(lineElement_1, "points", {
-      get: vi.fn(() => pointsEl_1),
+      get: jest.fn(() => pointsEl_1),
     });
 
     const restoredElements = restore.restoreElements(
@@ -441,7 +440,7 @@ describe("restoreAppState", () => {
       const stubImportedAppState = getDefaultAppState();
 
       Object.defineProperty(stubImportedAppState, "zoom", {
-        get: vi.fn(() => null),
+        get: jest.fn(() => null),
       });
 
       const stubLocalAppState = getDefaultAppState();

@@ -1,13 +1,15 @@
 import * as utils from "../../packages/utils";
 import { diagramFactory } from "../fixtures/diagramFixture";
-import { vi } from "vitest";
 import * as mockedSceneExportUtils from "../../scene/export";
-
 import { MIME_TYPES } from "../../constants";
 
-const exportToSvgSpy = vi.spyOn(mockedSceneExportUtils, "exportToSvg");
+jest.mock("../../scene/export", () => ({
+  __esmodule: true,
+  ...jest.requireActual("../../scene/export"),
+  exportToSvg: jest.fn(),
+}));
 
-describe("exportToCanvas", async () => {
+describe("exportToCanvas", () => {
   const EXPORT_PADDING = 10;
 
   it("with default arguments", async () => {
@@ -30,9 +32,10 @@ describe("exportToCanvas", async () => {
   });
 });
 
-describe("exportToBlob", async () => {
+describe("exportToBlob", () => {
   describe("mime type", () => {
-    // afterEach(vi.restoreAllMocks);
+    afterEach(jest.restoreAllMocks);
+
     it("should change image/jpg to image/jpeg", async () => {
       const blob = await utils.exportToBlob({
         ...diagramFactory(),
@@ -45,6 +48,7 @@ describe("exportToBlob", async () => {
       });
       expect(blob?.type).toBe(MIME_TYPES.jpg);
     });
+
     it("should default to image/png", async () => {
       const blob = await utils.exportToBlob({
         ...diagramFactory(),
@@ -53,14 +57,16 @@ describe("exportToBlob", async () => {
     });
 
     it("should warn when using quality with image/png", async () => {
-      const consoleSpy = vi
+      const consoleSpy = jest
         .spyOn(console, "warn")
         .mockImplementationOnce(() => void 0);
+
       await utils.exportToBlob({
         ...diagramFactory(),
         mimeType: MIME_TYPES.png,
         quality: 1,
       });
+
       expect(consoleSpy).toHaveBeenCalledWith(
         `"quality" will be ignored for "${MIME_TYPES.png}" mimeType`,
       );
@@ -69,12 +75,10 @@ describe("exportToBlob", async () => {
 });
 
 describe("exportToSvg", () => {
-  const passedElements = () => exportToSvgSpy.mock.calls[0][0];
-  const passedOptions = () => exportToSvgSpy.mock.calls[0][1];
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
+  const mockedExportUtil = mockedSceneExportUtils.exportToSvg as jest.Mock;
+  const passedElements = () => mockedExportUtil.mock.calls[0][0];
+  const passedOptions = () => mockedExportUtil.mock.calls[0][1];
+  afterEach(jest.resetAllMocks);
 
   it("with default arguments", async () => {
     await utils.exportToSvg({
