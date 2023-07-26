@@ -39,6 +39,7 @@ export default defineConfig({
         /* set this flag to true to enable in Development mode */
         enabled: false,
       },
+
       workbox: {
         // Don't push fonts and locales to app precache
         globIgnores: ["fonts.css", "**/locales/**"],
@@ -96,7 +97,7 @@ export default defineConfig({
         ],
         start_url: "/",
         display: "standalone",
-        theme_color: "#000000",
+        theme_color: "#121212",
         background_color: "#ffffff",
         file_handlers: [
           {
