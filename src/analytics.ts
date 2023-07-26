@@ -11,7 +11,7 @@ export const trackEvent = (
     // Uncomment the next line to track locally
     // console.log("Track Event", { category, action, label, value });
 
-    if (typeof window === "undefined" || process.env.JEST_WORKER_ID) {
+    if (typeof window === "undefined" || import.meta.env.VITE_WORKER_ID) {
       return;
     }
 

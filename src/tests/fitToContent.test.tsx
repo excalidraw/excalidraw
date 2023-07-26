@@ -2,6 +2,7 @@ import { render } from "./test-utils";
 import { API } from "./helpers/api";
 
 import ExcalidrawApp from "../excalidraw-app";
+import { vi } from "vitest";
 
 const { h } = window;
 
@@ -97,11 +98,11 @@ const waitForNextAnimationFrame = () => {
 
 describe("fitToContent animated", () => {
   beforeEach(() => {
-    jest.spyOn(window, "requestAnimationFrame");
+    vi.spyOn(window, "requestAnimationFrame");
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("should ease scroll the viewport to the selected element", async () => {

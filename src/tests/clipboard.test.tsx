@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import ReactDOM from "react-dom";
 import {
   render,
@@ -21,14 +22,14 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
-jest.mock("../keys.ts", () => {
-  const actual = jest.requireActual("../keys.ts");
+vi.mock("../keys.ts", async (importOriginal) => {
+  const module: any = await importOriginal();
   return {
     __esmodule: true,
-    ...actual,
+    ...module,
     isDarwin: false,
     KEYS: {
-      ...actual.KEYS,
+      ...module.KEYS,
       CTRL_OR_CMD: "ctrlKey",
     },
   };

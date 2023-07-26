@@ -53,7 +53,7 @@ export const SidebarInner = forwardRef(
     }: SidebarProps & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">,
     ref: React.ForwardedRef<HTMLDivElement>,
   ) => {
-    if (process.env.NODE_ENV === "development" && onDock && docked == null) {
+    if (import.meta.env.DEV && onDock && docked == null) {
       console.warn(
         "Sidebar: `docked` must be set when `onDock` is supplied for the sidebar to be user-dockable. To hide this message, either pass `docked` or remove `onDock`",
       );

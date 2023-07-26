@@ -1,7 +1,7 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`select single element on the scene arrow 1`] = `
-Object {
+exports[`select single element on the scene > arrow 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
@@ -9,7 +9,7 @@ Object {
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 50,
   "id": "id0",
   "isDeleted": false,
@@ -17,18 +17,18 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       30,
       50,
     ],
   ],
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 2,
   },
   "seed": 337897,
@@ -47,8 +47,8 @@ Object {
 }
 `;
 
-exports[`select single element on the scene arrow escape 1`] = `
-Object {
+exports[`select single element on the scene > arrow escape 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
@@ -56,7 +56,7 @@ Object {
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 50,
   "id": "id0",
   "isDeleted": false,
@@ -64,18 +64,18 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       30,
       50,
     ],
   ],
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 2,
   },
   "seed": 337897,
@@ -94,14 +94,14 @@ Object {
 }
 `;
 
-exports[`select single element on the scene diamond 1`] = `
-Object {
+exports[`select single element on the scene > diamond 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 50,
   "id": "id0",
   "isDeleted": false,
@@ -109,7 +109,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 2,
   },
   "seed": 337897,
@@ -126,14 +126,14 @@ Object {
 }
 `;
 
-exports[`select single element on the scene ellipse 1`] = `
-Object {
+exports[`select single element on the scene > ellipse 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 50,
   "id": "id0",
   "isDeleted": false,
@@ -141,7 +141,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 2,
   },
   "seed": 337897,
@@ -158,14 +158,14 @@ Object {
 }
 `;
 
-exports[`select single element on the scene rectangle 1`] = `
-Object {
+exports[`select single element on the scene > rectangle 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 50,
   "id": "id0",
   "isDeleted": false,
@@ -173,7 +173,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 337897,
