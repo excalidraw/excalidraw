@@ -5094,7 +5094,7 @@ jake@^10.8.5:
     filelist "^1.0.1"
     minimatch "^3.0.4"
 
-jest-canvas-mock@2.4.0, jest-canvas-mock@^2.4.0:
+jest-canvas-mock@~2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/jest-canvas-mock/-/jest-canvas-mock-2.4.0.tgz#947b71442d7719f8e055decaecdb334809465341"
   integrity sha512-mmMpZzpmLzn5vepIaHk5HoH3Ka4WykbSoLuG/EKoJd0x0ID/t+INo1l8ByfcUJuDM+RIsL4QDg/gDnBbrj2/IQ==
@@ -7189,12 +7189,12 @@ vite@4.4.2:
   optionalDependencies:
     fsevents "~2.3.2"
 
-vitest-canvas-mock@0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/vitest-canvas-mock/-/vitest-canvas-mock-0.3.1.tgz#f999f565570947ce36531e6ecf254edb59495be5"
-  integrity sha512-UWkRsgGddcmbo+AWALUua75MvfX98y4/ABrwHdXSCfg+OxGGfzxln3axtvtBYzUdhaGTAfaKZh5gqoPzIJfZng==
+vitest-canvas-mock@0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/vitest-canvas-mock/-/vitest-canvas-mock-0.3.2.tgz#d52031c423519e0c7bf2687ca6d7ad2e926ea182"
+  integrity sha512-lds7MKxvFFPDCGLXsQI2ym1fxvC93DaS0Bb6sdjvylFyL6NYrAAcPb6xZGF2sMOt5fSLHddqAQaujqpbc3p0Zg==
   dependencies:
-    jest-canvas-mock "^2.4.0"
+    jest-canvas-mock "~2.4.0"
 
 vitest@0.32.2:
   version "0.32.2"

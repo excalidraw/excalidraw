@@ -90,10 +90,7 @@
     "vite-plugin-pwa": "0.16.4",
     "vite-plugin-svgr": "2.4.0",
     "vitest": "0.32.2",
-    "vitest-canvas-mock": "0.3.1"
-  },
-  "resolutions": {
-    "jest-canvas-mock": "2.4.0"
+    "vitest-canvas-mock": "0.3.2"
   },
   "engines": {
     "node": ">=18.0.0"
