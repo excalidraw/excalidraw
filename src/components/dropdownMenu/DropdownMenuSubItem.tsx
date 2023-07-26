@@ -1,3 +1,4 @@
+import { Button } from "../Button";
 import MenuItemContent from "./DropdownMenuItemContent";
 import {
   getDropdownMenuItemClassName,
@@ -24,9 +25,10 @@ const DropdownMenuSubItem = ({
 
   return (
     <DropdownMenuPrimitive.Item className="radix-menu-item">
-      <button
+      <Button
         {...rest}
         onClick={handleClick}
+        onSelect={() => {}}
         type="button"
         className={getDropdownMenuItemClassName(className)}
         title={rest.title ?? rest["aria-label"]}
@@ -34,7 +36,7 @@ const DropdownMenuSubItem = ({
         <MenuItemContent icon={icon} shortcut={shortcut}>
           {children}
         </MenuItemContent>
-      </button>
+      </Button>
     </DropdownMenuPrimitive.Item>
   );
 };
