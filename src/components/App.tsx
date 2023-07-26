@@ -316,7 +316,6 @@ import {
   isPointHittingLinkIcon,
 } from "../element/Hyperlink";
 import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
-import { ImportedDataState } from "../data/types"; //zsviczian
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
@@ -354,8 +353,8 @@ import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
 import { ValueOf } from "../utility-types";
-export let showFourthFont: boolean = false;
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
+export let showFourthFont: boolean = false;
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -552,7 +551,7 @@ class App extends React.Component<AppProps, AppState> {
         resetCursor: this.resetCursor,
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
-        getHTMLIFrameElement: (id:string) =>this.getHTMLIFrameElement(id), //zsviczian
+        getHTMLIFrameElement: (id: string) => this.getHTMLIFrameElement(id), //zsviczian
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -950,7 +949,10 @@ class App extends React.Component<AppProps, AppState> {
                     (isWebview ? (
                       <webview
                         ref={(ref) =>
-                          this.updateEmbeddableRef(el.id, ref as HTMLIFrameElement)
+                          this.updateEmbeddableRef(
+                            el.id,
+                            ref as HTMLIFrameElement,
+                          )
                         }
                         className="excalidraw__embeddable"
                         src={embedLink?.link ?? ""}
@@ -979,7 +981,7 @@ class App extends React.Component<AppProps, AppState> {
                         allowFullScreen={true}
                         sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
                       />
-                  ))}
+                    ))}
                 </div>
               </div>
             </div>
@@ -1092,7 +1094,10 @@ class App extends React.Component<AppProps, AppState> {
       let frameNameJSX;
 
       if (f.id === this.state.editingFrame) {
-        const frameNameInEdit = f.name == null ? `Frame ${index + 1}` : f.name;
+        const frameNameInEdit =
+          f.name == null
+            ? `Frame ${(index + 1).toString().padStart(2, "0")}` //zsviczian
+            : f.name;
 
         frameNameJSX = (
           <input
@@ -1141,7 +1146,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         frameNameJSX =
           f.name == null || f.name.trim() === ""
-            ? `Frame ${index + 1}`
+            ? `Frame ${(index + 1).toString().padStart(2, "0")}` //zsviczian
             : f.name.trim();
       }
 
@@ -2808,7 +2813,8 @@ class App extends React.Component<AppProps, AppState> {
       maxZoom = 1;
     }
     this.setState(
-      zoomToFitElements(target, this.state, false, this, maxZoom, margin).appState,
+      zoomToFitElements(target, this.state, false, this, maxZoom, margin)
+        .appState,
     );
   };
 

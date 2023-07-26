@@ -31,7 +31,6 @@ import {
 import { getSelectedElements } from "../scene/selection";
 
 import {
-  invalidateShapeForElement,
   renderElement,
   renderElementToSvg,
 } from "./renderElement";

@@ -15,7 +15,6 @@ import {
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
-  isEmbeddableElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,

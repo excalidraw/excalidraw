@@ -428,7 +428,8 @@ export interface ExcalidrawProps {
     appState: AppState,
   ) => JSX.Element | null;
   renderWebview?: boolean; //zsviczian
-  renderEmbeddableMenu?: ( //zsivzian
+  renderEmbeddableMenu?: (
+    //zsivzian
     appState: AppState,
   ) => JSX.Element | null;
 }
