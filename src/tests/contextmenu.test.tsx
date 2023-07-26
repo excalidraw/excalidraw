@@ -21,7 +21,6 @@ import { copiedStyles } from "../actions/actionStyles";
 import { API } from "./helpers/api";
 import { setDateTimeForTests } from "../utils";
 import { LibraryItem } from "../types";
-import { vi } from "vitest";
 
 const checkpoint = (name: string) => {
   expect(renderScene.mock.calls.length).toMatchSnapshot(
@@ -40,7 +39,7 @@ const mouse = new Pointer("mouse");
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderScene = vi.spyOn(Renderer, "renderScene");
+const renderScene = jest.spyOn(Renderer, "renderScene");
 beforeEach(() => {
   localStorage.clear();
   renderScene.mockClear();

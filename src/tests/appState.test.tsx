@@ -1,5 +1,4 @@
 import { queryByTestId, render, waitFor } from "./test-utils";
-
 import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";

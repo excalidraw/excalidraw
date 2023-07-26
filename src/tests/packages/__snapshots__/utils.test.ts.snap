@@ -1,9 +1,9 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+// Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`exportToSvg > with default arguments 1`] = `
-{
+exports[`exportToSvg with default arguments 1`] = `
+Object {
   "activeEmbeddable": null,
-  "activeTool": {
+  "activeTool": Object {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
@@ -40,7 +40,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "frameRendering": {
+  "frameRendering": Object {
     "clip": true,
     "enabled": true,
     "name": true,
@@ -59,21 +59,21 @@ exports[`exportToSvg > with default arguments 1`] = `
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": {
+  "pasteDialog": Object {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": {},
+  "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": {},
+  "selectedElementIds": Object {},
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": {},
+  "selectedGroupIds": Object {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
@@ -81,13 +81,13 @@ exports[`exportToSvg > with default arguments 1`] = `
   "showStats": false,
   "showWelcomeScreen": false,
   "startBoundElement": null,
-  "suggestedBindings": [],
+  "suggestedBindings": Array [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "zenModeEnabled": false,
-  "zoom": {
+  "zoom": Object {
     "value": 1,
   },
 }

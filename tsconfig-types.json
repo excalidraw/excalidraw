@@ -1,7 +1,6 @@
 {
   "include": ["src/packages/excalidraw", "src/global.d.ts", "src/css.d.ts"],
   "compilerOptions": {
-    "types": ["vite/client", "vite-plugin-svgr/client"],
     "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
@@ -9,7 +8,7 @@
     "jsx": "react-jsx",
     "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "ESNext",
+    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "skipLibCheck": true,
