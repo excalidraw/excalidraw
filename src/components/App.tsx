@@ -6069,31 +6069,6 @@ class App extends React.Component<AppProps, AppState> {
 
         const elements = this.scene.getNonDeletedElements();
 
-        let shouldReuseSelection = true;
-        if (
-          !event.shiftKey &&
-          // allows for box-selecting points (without shift)
-          !this.state.editingLinearElement &&
-          isSomeElementSelected(elements, this.state)
-        ) {
-          if (pointerDownState.withCmdOrCtrl && pointerDownState.hit.element) {
-            this.setState((prevState) =>
-              selectGroupsForSelectedElements(
-                {
-                  ...prevState,
-                  selectedElementIds: {
-                    [pointerDownState.hit.element!.id]: true,
-                  },
-                },
-                this.scene.getNonDeletedElements(),
-                prevState,
-                this,
-              ),
-            );
-          } else {
-            shouldReuseSelection = false;
-          }
-        }
         // box-select line editor points
         if (this.state.editingLinearElement) {
           LinearElementEditor.handleBoxSelection(
@@ -6103,10 +6078,35 @@ class App extends React.Component<AppProps, AppState> {
           );
           // regular box-select
         } else {
+          let shouldReuseSelection = true;
+
+          if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
+            if (
+              pointerDownState.withCmdOrCtrl &&
+              pointerDownState.hit.element
+            ) {
+              this.setState((prevState) =>
+                selectGroupsForSelectedElements(
+                  {
+                    ...prevState,
+                    selectedElementIds: {
+                      [pointerDownState.hit.element!.id]: true,
+                    },
+                  },
+                  this.scene.getNonDeletedElements(),
+                  prevState,
+                  this,
+                ),
+              );
+            } else {
+              shouldReuseSelection = false;
+            }
+          }
           const elementsWithinSelection = getElementsWithinSelection(
             elements,
             draggingElement,
           );
+
           this.setState((prevState) => {
             const nextSelectedElementIds = {
               ...(shouldReuseSelection && prevState.selectedElementIds),
