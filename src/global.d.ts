@@ -111,7 +111,7 @@ declare module "image-blob-reduce" {
   export = reduce;
 }
 
-declare namespace vitest {
+declare namespace jest {
   interface Expect {
     toBeNonNaNNumber(): void;
   }
