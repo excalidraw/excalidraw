@@ -255,6 +255,7 @@ import {
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
+  isTestEnv,
   easeOut,
 } from "../utils";
 import {
@@ -1595,10 +1596,7 @@ class App extends React.Component<AppProps, AppState> {
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
-    if (
-      process.env.NODE_ENV === ENV.TEST ||
-      process.env.NODE_ENV === ENV.DEVELOPMENT
-    ) {
+    if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
         state: {
@@ -1636,7 +1634,7 @@ class App extends React.Component<AppProps, AppState> {
       // bounding rects don't work in tests so updating
       // the state on init would result in making the test enviro run
       // in mobile breakpoint (0 width/height), making everything fail
-      process.env.NODE_ENV !== "test"
+      !isTestEnv()
     ) {
       this.refreshDeviceState(this.excalidrawContainerRef.current);
     }
@@ -8162,10 +8160,7 @@ declare global {
   }
 }
 
-if (
-  process.env.NODE_ENV === ENV.TEST ||
-  process.env.NODE_ENV === ENV.DEVELOPMENT
-) {
+if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
   window.h = window.h || ({} as Window["h"]);
 
   Object.defineProperties(window.h, {
