@@ -17,10 +17,11 @@ import {
 } from "./test-utils";
 import { defaultLang } from "../i18n";
 import { FONT_FAMILY } from "../constants";
+import { vi } from "vitest";
 
 const { h } = window;
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderScene = vi.spyOn(Renderer, "renderScene");
 
 const mouse = new Pointer("mouse");
 const finger1 = new Pointer("touch", 1);
@@ -156,6 +157,7 @@ describe("regression tests", () => {
   }
   it("change the properties of a shape", () => {
     UI.clickTool("rectangle");
+
     mouse.down(10, 10);
     mouse.up(10, 10);
     togglePopover("Background");
