@@ -120,3 +120,9 @@ declare module "image-blob-reduce" {
   const reduce: ImageBlobReduce.ImageBlobReduceStatic;
   export = reduce;
 }
+
+declare namespace jest {
+  interface Expect {
+    toBeNonNaNNumber(): void;
+  }
+}
