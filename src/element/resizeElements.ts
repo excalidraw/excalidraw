@@ -6,6 +6,7 @@ import {
   adjustXYWithRotation,
   centerPoint,
   rotatePoint,
+  distance2d,
 } from "../math";
 import {
   ExcalidrawLinearElement,
@@ -41,7 +42,7 @@ import {
   MaybeTransformHandleType,
   TransformHandleDirection,
 } from "./transformHandles";
-import { Point, PointerDownState } from "../types";
+import { AppState, Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
   getApproxMinLineWidth,
@@ -55,6 +56,8 @@ import {
   getBoundTextMaxHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
+import { SNAP_DISTANCE, Snap, Snaps } from "../snapping";
+import * as GAPoints from "../gapoints";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -79,6 +82,8 @@ export const transformElements = (
   pointerY: number,
   centerX: number,
   centerY: number,
+  appState: AppState,
+  snaps: Snaps | null,
 ) => {
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
@@ -115,6 +120,8 @@ export const transformElements = (
         shouldResizeFromCenter,
         pointerX,
         pointerY,
+        appState,
+        snaps,
       );
     }
 
@@ -347,6 +354,8 @@ export const resizeSingleElement = (
   shouldResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
+  appState: AppState,
+  snaps: Snaps | null,
 ) => {
   const stateAtResizeStart = originalElements.get(element.id)!;
   // Gets bounds corners
@@ -569,11 +578,144 @@ export const resizeSingleElement = (
   const newOrigin = [...newTopLeft];
   newOrigin[0] += stateAtResizeStart.x - newBoundsX1;
   newOrigin[1] += stateAtResizeStart.y - newBoundsY1;
+
+  let nextX = newOrigin[0];
+  let nextY = newOrigin[1];
+
+  if (snaps) {
+    let corner: Point;
+
+    switch (transformHandleDirection) {
+      case "w":
+      case "nw":
+      case "n": {
+        corner = [newOrigin[0], newOrigin[1]];
+        break;
+      }
+      case "ne":
+      case "e": {
+        corner = [newOrigin[0] + eleNewWidth, newOrigin[1]];
+        break;
+      }
+      case "s":
+      case "sw": {
+        corner = [newOrigin[0], newOrigin[1] + eleNewHeight];
+        break;
+      }
+      case "se": {
+        corner = [newOrigin[0] + eleNewWidth, newOrigin[1] + eleNewHeight];
+        break;
+      }
+    }
+
+    // find out which snapline the dragged corners are closet to
+
+    let leastDistanceX = SNAP_DISTANCE / appState.zoom.value;
+    let leastDistanceY = SNAP_DISTANCE / appState.zoom.value;
+
+    const xDir =
+      transformHandleDirection.includes("w") ||
+      transformHandleDirection.includes("e");
+    const yDir =
+      transformHandleDirection.includes("n") ||
+      transformHandleDirection.includes("s");
+
+    let verticalSnap: Snap | null = null;
+    let horizontalSnap: Snap | null = null;
+
+    for (const snap of snaps) {
+      const distance = distance2d(...GAPoints.toTuple(snap.point), ...corner);
+
+      if (xDir) {
+        if (snap.snapLine.direction === "vertical") {
+          if (distance <= leastDistanceX) {
+            leastDistanceX = distance;
+            verticalSnap = snap;
+          }
+        }
+      }
+
+      if (yDir) {
+        if (snap.snapLine.direction === "horizontal") {
+          if (distance <= leastDistanceY) {
+            leastDistanceY = distance;
+            horizontalSnap = snap;
+          }
+        }
+      }
+    }
+
+    if (verticalSnap) {
+      if (transformHandleDirection.includes("e")) {
+        eleNewWidth =
+          GAPoints.toTuple(verticalSnap.snapLine.point)[0] - newOrigin[0];
+      }
+
+      if (transformHandleDirection.includes("w")) {
+        nextX = GAPoints.toTuple(verticalSnap.snapLine.point)[0];
+        eleNewWidth = eleNewWidth + (newOrigin[0] - nextX);
+      }
+    }
+
+    if (horizontalSnap) {
+      if (transformHandleDirection.includes("n")) {
+        nextY = GAPoints.toTuple(horizontalSnap.snapLine.point)[1];
+        eleNewHeight = eleNewHeight + (newOrigin[1] - nextY);
+      }
+
+      if (transformHandleDirection.includes("s")) {
+        eleNewHeight =
+          GAPoints.toTuple(horizontalSnap.snapLine.point)[1] - newOrigin[1];
+      }
+    }
+
+    // aspect ratio compensation
+    if (shouldMaintainAspectRatio) {
+      if (
+        transformHandleDirection === "n" ||
+        transformHandleDirection === "s"
+      ) {
+        const heightRatio = Math.abs(eleNewHeight) / eleInitialHeight;
+        eleNewWidth = eleInitialWidth * heightRatio;
+
+        const [newBoundsX1, , newBoundsX2] = getResizedElementAbsoluteCoords(
+          stateAtResizeStart,
+          eleNewWidth,
+          eleNewHeight,
+          true,
+        );
+        const newBoundsWidth = newBoundsX2 - newBoundsX1;
+        nextX =
+          startCenter[0] -
+          newBoundsWidth / 2 +
+          (stateAtResizeStart.x - newBoundsX1);
+      } else if (
+        transformHandleDirection === "w" ||
+        transformHandleDirection === "e"
+      ) {
+        const widthRatio = Math.abs(eleNewWidth) / eleInitialWidth;
+        eleNewHeight = eleInitialHeight * widthRatio;
+
+        const [, newBoundsY1, , newBoundsY2] = getResizedElementAbsoluteCoords(
+          stateAtResizeStart,
+          eleNewWidth,
+          eleNewHeight,
+          true,
+        );
+        const newBoundsHeight = newBoundsY2 - newBoundsY1;
+        nextY =
+          startCenter[1] -
+          newBoundsHeight / 2 +
+          (stateAtResizeStart.y - newBoundsY1);
+      }
+    }
+  }
+
   const resizedElement = {
     width: Math.abs(eleNewWidth),
     height: Math.abs(eleNewHeight),
-    x: newOrigin[0],
-    y: newOrigin[1],
+    x: nextX,
+    y: nextY,
     points: rescaledPoints,
   };
 

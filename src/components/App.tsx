@@ -145,6 +145,7 @@ import {
   isBindingElementType,
   isBoundToContainer,
   isFrameElement,
+  isFreeDrawElement,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -328,7 +329,7 @@ import {
 } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
-import { getSnaps } from "../snapping";
+import { getElementsCorners, getSnaps } from "../snapping";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
@@ -5299,12 +5300,19 @@ class App extends React.Component<AppProps, AppState> {
             y: pointerCoords.y - pointerDownState.origin.y,
           };
 
-          const snaps = getSnaps(
-            [...pointerDownState.originalElements.values()],
-            this.state,
+          const originalElements = [
+            ...pointerDownState.originalElements.values(),
+          ];
+
+          const snaps = getSnaps({
+            elements: originalElements,
+            appState: this.state,
             event,
             dragOffset,
-          );
+            corners: getElementsCorners(
+              getSelectedElements(originalElements, this.state),
+            ),
+          });
           this.setState({ snaps });
 
           // We only drag in one direction if shift is pressed
@@ -7150,11 +7158,28 @@ class App extends React.Component<AppProps, AppState> {
       });
     });
 
-    const snaps = getSnaps(
-      this.scene.getNonDeletedElements(),
-      this.state,
-      event,
-    );
+    // TODO: update condition as linear, freedraw and multiple elements snapping on resizing is supported
+    const shouldGetResizedSnaps =
+      selectedElements.length === 1 &&
+      selectedElements[0].angle === 0 &&
+      !isLinearElement(
+        selectedElements[0] || isFreeDrawElement(selectedElements[0]),
+      );
+
+    const snaps = shouldGetResizedSnaps
+      ? getSnaps({
+          elements: this.scene.getNonDeletedElements(),
+          corners: getElementsCorners(
+            getSelectedElements(this.scene.getNonDeletedElements(), this.state),
+            {
+              omitCenter: true,
+              boundingBoxCorners: true,
+            },
+          ),
+          appState: this.state,
+          event,
+        })
+      : null;
 
     this.setState({ snaps });
 
@@ -7173,6 +7198,8 @@ class App extends React.Component<AppProps, AppState> {
         resizeY,
         pointerDownState.resize.center.x,
         pointerDownState.resize.center.y,
+        this.state,
+        snaps,
       )
     ) {
       this.maybeSuggestBindingForAll(selectedElements);

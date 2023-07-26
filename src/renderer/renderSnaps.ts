@@ -1,11 +1,17 @@
 import { RenderConfig } from "../scene/types";
-import { Snaps, snapProject } from "../snapping";
+import {
+  SNAP_DISTANCE,
+  areRoughlyEqual,
+  snapProject,
+  snapToPoint,
+} from "../snapping";
 import * as GAPoints from "../gapoints";
-import { Point } from "../types";
+import { AppState, Point } from "../types";
+import { distance2d } from "../math";
 
 const SNAP_COLOR = "#fa5252";
 const SNAP_WIDTH = 1;
-const SNAP_CROSS_SIZE = 4.5;
+const SNAP_CROSS_SIZE = 3;
 
 interface RenderSnapOptions {
   renderConfig: RenderConfig;
@@ -14,24 +20,37 @@ interface RenderSnapOptions {
 
 export const renderSnaps = (
   { renderConfig, context }: RenderSnapOptions,
-  snaps: Snaps,
+  appState: AppState,
 ) => {
   context.save();
 
+  const snaps = appState.snaps ?? [];
+
   context.lineWidth = SNAP_WIDTH / renderConfig.zoom.value;
 
-  for (const { snapLine, point } of snaps) {
+  for (const snap of snaps) {
     context.strokeStyle = SNAP_COLOR;
 
-    const from = GAPoints.toTuple(snapLine.point);
-
-    const to = snapProject({
-      origin: GAPoints.toObject(point),
-      snaps,
-      zoom: renderConfig.zoom,
-    });
-
-    drawSnap(from, to, renderConfig.zoom, context);
+    if (appState.isResizing) {
+      areRoughlyEqual(snap.distance, 0) &&
+        drawSnap(
+          GAPoints.toTuple(snap.snapLine.point),
+          snapToPoint(snap),
+          renderConfig.zoom,
+          context,
+        );
+    } else {
+      drawSnap(
+        GAPoints.toTuple(snap.snapLine.point),
+        snapProject({
+          origin: GAPoints.toObject(snap.point),
+          snaps,
+          zoom: renderConfig.zoom,
+        }),
+        renderConfig.zoom,
+        context,
+      );
+    }
   }
 
   context.restore();
@@ -43,18 +62,23 @@ const drawSnap = (
   zoom: RenderConfig["zoom"],
   context: CanvasRenderingContext2D,
 ) => {
-  context.save();
+  if (distance2d(...from, ...to) >= SNAP_DISTANCE) {
+    context.save();
+    context.save();
 
-  drawCross(from, zoom, context);
+    context.save();
 
-  context.beginPath();
-  context.lineTo(...from);
-  context.lineTo(...to);
-  context.stroke();
+    drawCross(from, zoom, context);
 
-  drawCross(to, zoom, context);
+    context.beginPath();
+    context.lineTo(...from);
+    context.lineTo(...to);
+    context.stroke();
 
-  context.restore();
+    drawCross(to, zoom, context);
+
+    context.restore();
+  }
 };
 
 const drawCross = (

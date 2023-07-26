@@ -740,7 +740,7 @@ export const _renderScene = ({
           renderConfig,
           context,
         },
-        appState.snaps ?? [],
+        appState,
       );
       context.restore();
     }
