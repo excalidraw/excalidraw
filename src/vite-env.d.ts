@@ -36,6 +36,8 @@ interface ImportMetaEnv {
   // To enable bounding box for text containers
   VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX: string;
   VITE_APP_DISABLE_SENTRY: string;
+  // Set this flag to false if you want to open the overlay by default
+  VITE_APP_COLLAPSE_OVERLAY: string;
 
   VITE_PKG_NAME: string;
   VITE_PKG_VERSION: string;
