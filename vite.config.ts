@@ -35,7 +35,10 @@ export default defineConfig({
     react(),
     checker({
       typescript: true,
-      eslint: { lintCommand: 'eslint "./src/**/*.{js,ts,tsx}"' },
+      eslint:
+        envVars.VITE_APP_ENABLE_ESLINT === "true"
+          ? { lintCommand: 'eslint "./src/**/*.{js,ts,tsx}"' }
+          : undefined,
       overlay: {
         initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false",
         badgeStyle: "margin-bottom: 4rem; margin-left: 1rem",
