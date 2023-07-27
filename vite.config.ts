@@ -12,6 +12,8 @@ const envVars = loadEnv("", process.cwd());
 export default defineConfig({
   server: {
     port: Number(envVars.VITE_APP_PORT || 3000),
+    // open the browser
+    open: true,
   },
   build: {
     outDir: "build",
