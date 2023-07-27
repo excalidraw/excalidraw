@@ -6068,28 +6068,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.boxSelection.hasOccurred = true;
 
         const elements = this.scene.getNonDeletedElements();
-        if (
-          !event.shiftKey &&
-          // allows for box-selecting points (without shift)
-          !this.state.editingLinearElement &&
-          isSomeElementSelected(elements, this.state)
-        ) {
-          if (pointerDownState.withCmdOrCtrl && pointerDownState.hit.element) {
-            this.setState((prevState) =>
-              selectGroupsForSelectedElements(
-                {
-                  ...prevState,
-                  selectedElementIds: {
-                    [pointerDownState.hit.element!.id]: true,
-                  },
-                },
-                this.scene.getNonDeletedElements(),
-                prevState,
-                this,
-              ),
-            );
-          }
-        }
+
         // box-select line editor points
         if (this.state.editingLinearElement) {
           LinearElementEditor.handleBoxSelection(
@@ -6099,18 +6078,46 @@ class App extends React.Component<AppProps, AppState> {
           );
           // regular box-select
         } else {
+          let shouldReuseSelection = true;
+
+          if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
+            if (
+              pointerDownState.withCmdOrCtrl &&
+              pointerDownState.hit.element
+            ) {
+              this.setState((prevState) =>
+                selectGroupsForSelectedElements(
+                  {
+                    ...prevState,
+                    selectedElementIds: {
+                      [pointerDownState.hit.element!.id]: true,
+                    },
+                  },
+                  this.scene.getNonDeletedElements(),
+                  prevState,
+                  this,
+                ),
+              );
+            } else {
+              shouldReuseSelection = false;
+            }
+          }
           const elementsWithinSelection = getElementsWithinSelection(
             elements,
             draggingElement,
           );
+
           this.setState((prevState) => {
-            const nextSelectedElementIds = elementsWithinSelection.reduce(
-              (acc: Record<ExcalidrawElement["id"], true>, element) => {
-                acc[element.id] = true;
-                return acc;
-              },
-              {},
-            );
+            const nextSelectedElementIds = {
+              ...(shouldReuseSelection && prevState.selectedElementIds),
+              ...elementsWithinSelection.reduce(
+                (acc: Record<ExcalidrawElement["id"], true>, element) => {
+                  acc[element.id] = true;
+                  return acc;
+                },
+                {},
+              ),
+            };
 
             if (pointerDownState.hit.element) {
               // if using ctrl/cmd, select the hitElement only if we
@@ -6125,6 +6132,10 @@ class App extends React.Component<AppProps, AppState> {
             return selectGroupsForSelectedElements(
               {
                 ...prevState,
+                ...(!shouldReuseSelection && {
+                  selectedGroupIds: {},
+                  editingGroupId: null,
+                }),
                 selectedElementIds: nextSelectedElementIds,
                 showHyperlinkPopup:
                   elementsWithinSelection.length === 1 &&
