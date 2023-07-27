@@ -86,7 +86,6 @@
     "typescript": "4.9.4",
     "vite": "4.4.2",
     "vite-plugin-ejs": "1.6.4",
-    "vite-plugin-eslint": "1.8.1",
     "vite-plugin-pwa": "0.16.4",
     "vite-plugin-svgr": "2.4.0",
     "vitest": "0.32.2",
