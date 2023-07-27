@@ -108,6 +108,9 @@ export const actionZoomIn = register({
           },
           appState,
         ),
+        userToFollow: appState.shouldDisconnectFollowModeOnCanvasInteraction
+          ? null
+          : appState.userToFollow,
       },
       commitToHistory: false,
     };
@@ -145,6 +148,9 @@ export const actionZoomOut = register({
           },
           appState,
         ),
+        userToFollow: appState.shouldDisconnectFollowModeOnCanvasInteraction
+          ? null
+          : appState.userToFollow,
       },
       commitToHistory: false,
     };
@@ -182,6 +188,9 @@ export const actionResetZoom = register({
           },
           appState,
         ),
+        userToFollow: appState.shouldDisconnectFollowModeOnCanvasInteraction
+          ? null
+          : appState.userToFollow,
       },
       commitToHistory: false,
     };
@@ -327,7 +336,12 @@ export const actionZoomToFitSelectionInViewport = register({
     const selectedElements = app.scene.getSelectedElements(appState);
     return zoomToFit({
       targetElements: selectedElements.length ? selectedElements : elements,
-      appState,
+      appState: {
+        ...appState,
+        userToFollow: appState.shouldDisconnectFollowModeOnCanvasInteraction
+          ? null
+          : appState.userToFollow,
+      },
       fitToViewport: false,
     });
   },
@@ -347,7 +361,12 @@ export const actionZoomToFitSelection = register({
     const selectedElements = app.scene.getSelectedElements(appState);
     return zoomToFit({
       targetElements: selectedElements.length ? selectedElements : elements,
-      appState,
+      appState: {
+        ...appState,
+        userToFollow: appState.shouldDisconnectFollowModeOnCanvasInteraction
+          ? null
+          : appState.userToFollow,
+      },
       fitToViewport: true,
     });
   },
@@ -364,7 +383,16 @@ export const actionZoomToFit = register({
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (elements, appState) =>
-    zoomToFit({ targetElements: elements, appState, fitToViewport: false }),
+    zoomToFit({
+      targetElements: elements,
+      appState: {
+        ...appState,
+        userToFollow: appState.shouldDisconnectFollowModeOnCanvasInteraction
+          ? null
+          : appState.userToFollow,
+      },
+      fitToViewport: false,
+    }),
   keyTest: (event) =>
     event.code === CODES.ONE &&
     event.shiftKey &&

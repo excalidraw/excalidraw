@@ -99,6 +99,7 @@ export const getDefaultAppState = (): Omit<
     showHyperlinkPopup: false,
     selectedLinearElement: null,
     userToFollow: null,
+    shouldDisconnectFollowModeOnCanvasInteraction: true,
   };
 };
 
@@ -206,6 +207,11 @@ const APP_STATE_STORAGE_CONF = (<
   showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
   userToFollow: { browser: false, export: false, server: false },
+  shouldDisconnectFollowModeOnCanvasInteraction: {
+    browser: false,
+    export: false,
+    server: false,
+  },
 });
 
 const _clearAppStateForStorage = <

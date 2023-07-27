@@ -223,7 +223,10 @@ export type AppState = {
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
+  /** the user's clientId who is being followed on the canvas */
   userToFollow: string | null;
+  /** whether follow mode should be disconnected when the non-remote user interacts with the canvas */
+  shouldDisconnectFollowModeOnCanvasInteraction: boolean;
 };
 
 export type UIAppState = Omit<
@@ -361,7 +364,6 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
-  onZoomChange?: (zoom: Zoom) => void;
   onScrollAndZoomChange?: ({
     zoom,
     scroll,

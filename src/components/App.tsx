@@ -2375,7 +2375,27 @@ class App extends React.Component<AppProps, AppState> {
     state,
   ) => {
     this.cancelInProgresAnimation?.();
-    this.setState(state);
+
+    // TODO follow-participant
+    // seems to work fine but ideally figure out a way to satisfy TS
+    // @ts-ignore
+    this.setState((prevState, props) => {
+      if (typeof state === "function") {
+        return {
+          ...state(prevState, props),
+          userToFollow: prevState.shouldDisconnectFollowModeOnCanvasInteraction
+            ? null
+            : prevState.userToFollow,
+        };
+      }
+
+      return {
+        ...state,
+        userToFollow: prevState.shouldDisconnectFollowModeOnCanvasInteraction
+          ? null
+          : prevState.userToFollow,
+      };
+    });
   };
 
   setToast = (
@@ -3990,6 +4010,12 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    this.setState((prevState) => ({
+      userToFollow: prevState.shouldDisconnectFollowModeOnCanvasInteraction
+        ? null
+        : prevState.userToFollow,
+    }));
+
     // since contextMenu options are potentially evaluated on each render,
     // and an contextMenu action may depend on selection state, we must
     // close the contextMenu before we update the selection on pointerDown

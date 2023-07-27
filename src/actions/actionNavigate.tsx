@@ -16,10 +16,21 @@ export const actionGoToCollaborator = register({
       return { appState, commitToHistory: false };
     }
 
+    if (appState.userToFollow === _value.clientId) {
+      return {
+        appState: {
+          ...appState,
+          userToFollow: null,
+        },
+        commitToHistory: false,
+      };
+    }
+
     return {
       appState: {
         ...appState,
-        // ˇˇ or maybe an atom? 🤔
+        // TODO follow-participant
+        // maybe store more data other than just the clientId
         userToFollow: _value.clientId,
         ...centerScrollOn({
           scenePoint: point,
@@ -35,7 +46,7 @@ export const actionGoToCollaborator = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData, data }) => {
+  PanelComponent: ({ updateData, data, appState }) => {
     const [clientId, collaborator] = data as [string, Collaborator];
 
     const background = getClientColor(clientId);
@@ -46,6 +57,7 @@ export const actionGoToCollaborator = register({
         onClick={() => updateData({ ...collaborator, clientId })}
         name={collaborator.username || ""}
         src={collaborator.avatarUrl}
+        isBeingFollowed={appState.userToFollow === clientId}
       />
     );
   },

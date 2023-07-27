@@ -31,5 +31,11 @@
       border: 1px solid var(--avatar-border-color);
       border-radius: 100%;
     }
+
+    &--is-followed {
+      &::before {
+        border-color: red;
+      }
+    }
   }
 }
