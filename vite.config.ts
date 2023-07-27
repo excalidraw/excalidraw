@@ -36,7 +36,10 @@ export default defineConfig({
     checker({
       typescript: true,
       eslint: { lintCommand: 'eslint "./src/**/*.{js,ts,tsx}"' },
-      overlay: { initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false" },
+      overlay: {
+        initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false",
+        badgeStyle: "margin-bottom: 4rem; margin-left: 1rem",
+      },
     }),
     svgrPlugin(),
     ViteEjsPlugin(),
