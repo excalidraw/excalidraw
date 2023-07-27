@@ -112,7 +112,7 @@
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prepare": "husky install",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
-    "start": "vite --port 3000",
+    "start": "vite",
     "start:production": "npm run build && npx http-server build -a localhost -p 5001 -o",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watchAll=false",
     "test:app": "vitest --config vitest.config.ts",

@@ -5,10 +5,14 @@ import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 
+// To load .env.local variables
 const envVars = loadEnv("", process.cwd());
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    port: Number(envVars.VITE_APP_PORT || 3000),
+  },
   build: {
     outDir: "build",
     rollupOptions: {
