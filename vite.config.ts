@@ -4,7 +4,6 @@ import svgrPlugin from "vite-plugin-svgr";
 import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
-import eslintPlugin from "@nabla/vite-plugin-eslint";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -32,8 +31,10 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    checker({ typescript: true }),
-    eslintPlugin(),
+    checker({
+      typescript: true,
+      eslint: { lintCommand: 'eslint "./src/**/*.{js,ts,tsx}"' },
+    }),
     svgrPlugin(),
     ViteEjsPlugin(),
     VitePWA({
