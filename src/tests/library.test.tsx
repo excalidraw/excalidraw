@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import { fireEvent, render, waitFor } from "./test-utils";
 import { queryByTestId } from "@testing-library/react";
 
@@ -29,11 +30,15 @@ const mockLibraryFilePromise = new Promise<Blob>(async (resolve, reject) => {
   }
 });
 
-jest.mock("../data/filesystem.ts", () => ({
-  __esmodule: true,
-  ...jest.requireActual("../data/filesystem.ts"),
-  fileOpen: jest.fn(() => mockLibraryFilePromise),
-}));
+vi.mock("../data/filesystem.ts", async (importOriginal) => {
+  const module = await importOriginal();
+  return {
+    __esmodule: true,
+    //@ts-ignore
+    ...module,
+    fileOpen: vi.fn(() => mockLibraryFilePromise),
+  };
+});
 
 describe("library", () => {
   beforeEach(async () => {

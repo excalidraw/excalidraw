@@ -24,8 +24,9 @@ import {
 } from "../element/textElement";
 import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
+import { vi } from "vitest";
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderScene = vi.spyOn(Renderer, "renderScene");
 
 const { h } = window;
 const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
@@ -179,16 +180,16 @@ describe("Test Linear Elements", () => {
     expect(renderScene).toHaveBeenCalledTimes(11);
     expect(line.points.length).toEqual(3);
     expect(line.points).toMatchInlineSnapshot(`
-      Array [
-        Array [
+      [
+        [
           0,
           0,
         ],
-        Array [
+        [
           70,
           50,
         ],
-        Array [
+        [
           40,
           0,
         ],
@@ -273,16 +274,16 @@ describe("Test Linear Elements", () => {
 
       expect(line.points.length).toEqual(3);
       expect(line.points).toMatchInlineSnapshot(`
-        Array [
-          Array [
+        [
+          [
             0,
             0,
           ],
-          Array [
+          [
             70,
             50,
           ],
-          Array [
+          [
             40,
             0,
           ],
@@ -315,12 +316,12 @@ describe("Test Linear Elements", () => {
       expect(midPointsWithRoundEdge[1]).not.toEqual(midPointsWithSharpEdge[1]);
 
       expect(midPointsWithRoundEdge).toMatchInlineSnapshot(`
-        Array [
-          Array [
+        [
+          [
             55.9697848965255,
             47.442326230998205,
           ],
-          Array [
+          [
             76.08587175006699,
             43.294165939653226,
           ],
@@ -363,12 +364,12 @@ describe("Test Linear Elements", () => {
       expect(midPoints[0]).not.toEqual(newMidPoints[0]);
       expect(midPoints[1]).not.toEqual(newMidPoints[1]);
       expect(newMidPoints).toMatchInlineSnapshot(`
-        Array [
-          Array [
+        [
+          [
             105.96978489652551,
             67.4423262309982,
           ],
-          Array [
+          [
             126.08587175006699,
             63.294165939653226,
           ],
@@ -412,29 +413,29 @@ describe("Test Linear Elements", () => {
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)
           .toMatchInlineSnapshot(`
-          Array [
-            Array [
-              0,
-              0,
-            ],
-            Array [
-              85,
-              75,
-            ],
-            Array [
-              70,
-              50,
-            ],
-            Array [
-              105,
-              70,
-            ],
-            Array [
-              40,
-              0,
-            ],
-          ]
-        `);
+            [
+              [
+                0,
+                0,
+              ],
+              [
+                85,
+                75,
+              ],
+              [
+                70,
+                50,
+              ],
+              [
+                105,
+                70,
+              ],
+              [
+                40,
+                0,
+              ],
+            ]
+          `);
       });
 
       it("should update only the first segment midpoint when its point is dragged", async () => {
@@ -558,29 +559,29 @@ describe("Test Linear Elements", () => {
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)
           .toMatchInlineSnapshot(`
-          Array [
-            Array [
-              0,
-              0,
-            ],
-            Array [
-              85.96978489652551,
-              77.4423262309982,
-            ],
-            Array [
-              70,
-              50,
-            ],
-            Array [
-              106.08587175006699,
-              73.29416593965323,
-            ],
-            Array [
-              40,
-              0,
-            ],
-          ]
-        `);
+            [
+              [
+                0,
+                0,
+              ],
+              [
+                85.96978489652551,
+                77.4423262309982,
+              ],
+              [
+                70,
+                50,
+              ],
+              [
+                106.08587175006699,
+                73.29416593965323,
+              ],
+              [
+                40,
+                0,
+              ],
+            ]
+          `);
       });
 
       it("should update all the midpoints when its point is dragged", async () => {
@@ -606,12 +607,12 @@ describe("Test Linear Elements", () => {
         expect(midPoints[0]).not.toEqual(newMidPoints[0]);
         expect(midPoints[1]).not.toEqual(newMidPoints[1]);
         expect(newMidPoints).toMatchInlineSnapshot(`
-          Array [
-            Array [
+          [
+            [
               31.884084517616053,
               23.13275505472383,
             ],
-            Array [
+            [
               77.74792546875662,
               44.57840982272327,
             ],
@@ -667,12 +668,12 @@ describe("Test Linear Elements", () => {
         expect(midPoints[0]).not.toEqual(newMidPoints[0]);
         expect(midPoints[1]).not.toEqual(newMidPoints[1]);
         expect(newMidPoints).toMatchInlineSnapshot(`
-          Array [
-            Array [
+          [
+            [
               55.9697848965255,
               47.442326230998205,
             ],
-            Array [
+            [
               76.08587175006699,
               43.294165939653226,
             ],
@@ -704,12 +705,12 @@ describe("Test Linear Elements", () => {
         [dragEndPositionOffset[0] + line.x, dragEndPositionOffset[1] + line.y],
       );
       expect(line.points).toMatchInlineSnapshot(`
-        Array [
-          Array [
+        [
+          [
             0,
             0,
           ],
-          Array [
+          [
             -60,
             -100,
           ],
@@ -768,7 +769,7 @@ describe("Test Linear Elements", () => {
           textElement,
         );
         expect(position).toMatchInlineSnapshot(`
-          Object {
+          {
             "x": 25,
             "y": 10,
           }
@@ -790,7 +791,7 @@ describe("Test Linear Elements", () => {
           textElement,
         );
         expect(position).toMatchInlineSnapshot(`
-          Object {
+          {
             "x": 75,
             "y": 60,
           }
@@ -824,7 +825,7 @@ describe("Test Linear Elements", () => {
           textElement,
         );
         expect(position).toMatchInlineSnapshot(`
-          Object {
+          {
             "x": 85.82201843191861,
             "y": 75.63461309860818,
           }
@@ -939,11 +940,11 @@ describe("Test Linear Elements", () => {
       expect(textElement.angle).toBe(0);
       expect(getBoundTextElementPosition(arrow, textElement))
         .toMatchInlineSnapshot(`
-        Object {
-          "x": 75,
-          "y": 60,
-        }
-      `);
+          {
+            "x": 75,
+            "y": 60,
+          }
+        `);
       expect(textElement.text).toMatchInlineSnapshot(`
         "Online whiteboard 
         collaboration made 
@@ -951,26 +952,26 @@ describe("Test Linear Elements", () => {
       `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
         .toMatchInlineSnapshot(`
-        Array [
-          20,
-          20,
-          105,
-          80,
-          55.45893770831013,
-          45,
-        ]
-      `);
+          [
+            20,
+            20,
+            105,
+            80,
+            55.45893770831013,
+            45,
+          ]
+        `);
 
       rotate(container, -35, 55);
       expect(container.angle).toMatchInlineSnapshot(`1.3988061968364685`);
       expect(textElement.angle).toBe(0);
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
-        Object {
-          "x": 21.73926141863671,
-          "y": 73.31003398390868,
-        }
-      `);
+          {
+            "x": 21.73926141863671,
+            "y": 73.31003398390868,
+          }
+        `);
       expect(textElement.text).toMatchInlineSnapshot(`
         "Online whiteboard 
         collaboration made 
@@ -978,15 +979,15 @@ describe("Test Linear Elements", () => {
       `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
         .toMatchInlineSnapshot(`
-        Array [
-          20,
-          20,
-          102.41961302274555,
-          86.49012635273976,
-          55.45893770831013,
-          45,
-        ]
-      `);
+          [
+            20,
+            20,
+            102.41961302274555,
+            86.49012635273976,
+            55.45893770831013,
+            45,
+          ]
+        `);
     });
 
     it("should resize and position the bound text and bounding box correctly when 3 pointer arrow element resized", () => {
@@ -1004,11 +1005,11 @@ describe("Test Linear Elements", () => {
       expect(container.height).toBe(50);
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
-        Object {
-          "x": 75,
-          "y": 60,
-        }
-      `);
+          {
+            "x": 75,
+            "y": 60,
+          }
+        `);
       expect(textElement.text).toMatchInlineSnapshot(`
         "Online whiteboard 
         collaboration made 
@@ -1016,33 +1017,33 @@ describe("Test Linear Elements", () => {
       `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
         .toMatchInlineSnapshot(`
-        Array [
-          20,
-          20,
-          105,
-          80,
-          55.45893770831013,
-          45,
-        ]
-      `);
+          [
+            20,
+            20,
+            105,
+            80,
+            55.45893770831013,
+            45,
+          ]
+        `);
 
       resize(container, "ne", [300, 200]);
 
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
-        Object {
-          "height": 130,
-          "width": 367,
-        }
-      `);
+          {
+            "height": 130,
+            "width": 367,
+          }
+        `);
 
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
-        Object {
-          "x": 272,
-          "y": 45,
-        }
-      `);
+          {
+            "x": 272,
+            "y": 45,
+          }
+        `);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
         "Online whiteboard 
@@ -1050,15 +1051,15 @@ describe("Test Linear Elements", () => {
       `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
         .toMatchInlineSnapshot(`
-        Array [
-          20,
-          35,
-          502,
-          95,
-          205.9061448421403,
-          52.5,
-        ]
-      `);
+          [
+            20,
+            35,
+            502,
+            95,
+            205.9061448421403,
+            52.5,
+          ]
+        `);
     });
 
     it("should resize and position the bound text correctly when 2 pointer linear element resized", () => {
@@ -1072,11 +1073,11 @@ describe("Test Linear Elements", () => {
       expect(container.width).toBe(40);
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
-        Object {
-          "x": 25,
-          "y": 10,
-        }
-      `);
+          {
+            "x": 25,
+            "y": 10,
+          }
+        `);
       expect(textElement.text).toMatchInlineSnapshot(`
         "Online whiteboard 
         collaboration made 
@@ -1089,19 +1090,19 @@ describe("Test Linear Elements", () => {
 
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
-        Object {
-          "height": 130,
-          "width": 340,
-        }
-      `);
+          {
+            "height": 130,
+            "width": 340,
+          }
+        `);
 
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
-        Object {
-          "x": 75,
-          "y": -5,
-        }
-      `);
+          {
+            "x": 75,
+            "y": -5,
+          }
+        `);
       expect(textElement.text).toMatchInlineSnapshot(`
         "Online whiteboard 
         collaboration made easy"
@@ -1154,7 +1155,7 @@ describe("Test Linear Elements", () => {
         "Online whiteboard collaboration
         made easy"
       `);
-      const handleBindTextResizeSpy = jest.spyOn(
+      const handleBindTextResizeSpy = vi.spyOn(
         textElementUtils,
         "handleBindTextResize",
       );

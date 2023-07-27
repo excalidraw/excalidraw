@@ -10,6 +10,7 @@ import {
   waitFor,
   withExcalidrawDimensions,
 } from "../../tests/test-utils";
+import { vi } from "vitest";
 
 export const assertSidebarDockButton = async <T extends boolean>(
   hasDockButton: T,
@@ -205,7 +206,7 @@ describe("Sidebar", () => {
     });
 
     it("<Sidebar.Header> should render close button", async () => {
-      const onStateChange = jest.fn();
+      const onStateChange = vi.fn();
       const CustomExcalidraw = () => {
         return (
           <Excalidraw

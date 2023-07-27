@@ -319,7 +319,7 @@ const PublishLibrary = ({
     formData.append("twitterHandle", libraryData.twitterHandle);
     formData.append("website", libraryData.website);
 
-    fetch(`${process.env.REACT_APP_LIBRARY_BACKEND}/submit`, {
+    fetch(`${import.meta.env.VITE_APP_LIBRARY_BACKEND}/submit`, {
       method: "post",
       body: formData,
     })
