@@ -52,6 +52,7 @@ const ALLOWED_DOMAINS = new Set([
   "link.excalidraw.com",
   "gist.github.com",
   "twitter.com",
+  "stackblitz.com",
 ]);
 
 const createSrcDoc = (body: string) => {
