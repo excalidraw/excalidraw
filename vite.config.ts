@@ -53,6 +53,7 @@ export default defineConfig({
     svgrPlugin(),
     ViteEjsPlugin(),
     VitePWA({
+      registerType: "autoUpdate",
       devOptions: {
         /* set this flag to true to enable in Development mode */
         enabled: false,
