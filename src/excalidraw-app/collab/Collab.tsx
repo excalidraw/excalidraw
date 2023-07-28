@@ -207,10 +207,13 @@ class Collab extends PureComponent<Props, CollabState> {
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload);
     window.removeEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
-    window.removeEventListener(
-      EVENT.VISIBILITY_CHANGE,
-      this.onVisibilityChange,
-    );
+    // window.removeEventListener(
+    //   EVENT.VISIBILITY_CHANGE,
+    //   this.onVisibilityChange,
+    // );
+    window.removeEventListener(EVENT.BLUR, this.onVisibilityChange);
+    window.removeEventListener(EVENT.FOCUS, this.onVisibilityChange);
+
     if (this.activeIntervalId) {
       window.clearInterval(this.activeIntervalId);
       this.activeIntervalId = null;
@@ -364,6 +367,7 @@ class Collab extends PureComponent<Props, CollabState> {
           this.portal.socket.connect();
           this.portal.socket.emit(WS_SCENE_EVENT_TYPES.INIT);
 
+          console.log("setting toast");
           this.excalidrawAPI.setToast({
             message: t("toast.reconnectRoomServer"),
             duration: Infinity,
@@ -433,6 +437,7 @@ class Collab extends PureComponent<Props, CollabState> {
           this.excalidrawAPI.updateScene({
             appState: { viewModeEnabled: false },
           });
+          console.log("resetting toast");
           this.excalidrawAPI.setToast(null);
           this.excalidrawAPI.scrollToContent();
         }
@@ -700,6 +705,7 @@ class Collab extends PureComponent<Props, CollabState> {
     );
 
     this.portal.socket.on("first-in-room", async () => {
+      console.log("first in room");
       if (this.portal.socket) {
         this.portal.socket.off("first-in-room");
       }
@@ -841,7 +847,9 @@ class Collab extends PureComponent<Props, CollabState> {
   };
 
   private onVisibilityChange = () => {
-    if (document.hidden) {
+    // if (document.hidden) {
+    console.log("VIS CHANGE");
+    if (!document.hasFocus()) {
       if (this.idleTimeoutId) {
         window.clearTimeout(this.idleTimeoutId);
         this.idleTimeoutId = null;
@@ -883,8 +891,10 @@ class Collab extends PureComponent<Props, CollabState> {
   };
 
   private initializeIdleDetector = () => {
-    document.addEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
-    document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
+    // document.addEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
+    // document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
+    window.addEventListener(EVENT.BLUR, this.onVisibilityChange);
+    window.addEventListener(EVENT.FOCUS, this.onVisibilityChange);
   };
 
   setCollaborators(sockets: string[]) {

@@ -34,6 +34,8 @@ class Portal {
 
   open(socket: SocketIOClient.Socket, id: string, key: string) {
     this.socket = socket;
+    // @ts-ignore
+    window.socket = socket;
     this.roomId = id;
     this.roomKey = key;
 
@@ -62,6 +64,7 @@ class Portal {
 
     // Initialize socket listeners
     this.socket.on("init-room", () => {
+      console.log("join room");
       if (this.socket) {
         this.socket.emit("join-room", this.roomId);
         trackEvent("share", "room joined");
