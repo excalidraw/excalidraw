@@ -286,8 +286,6 @@ const ExcalidrawWrapper = () => {
   }
 
   useEffect(() => {
-    console.log("againnn dummy");
-    console.log("should auto reload once sw is updated");
     trackEvent("load", "frame", getFrame());
     // Delayed so that the app has a time to load the latest SW
     setTimeout(() => {
