@@ -9,6 +9,7 @@ import {
   actionChangeExportEmbedScene,
   actionChangeExportScale,
   actionChangeProjectName,
+  actionChangeExportBackgroundImage,
 } from "../actions/actionExport";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import {
@@ -16,6 +17,8 @@ import {
   EXPORT_IMAGE_TYPES,
   isFirefox,
   EXPORT_SCALES,
+  EXPORT_BACKGROUND_IMAGES,
+  DEFAULT_EXPORT_BACKGROUND_IMAGE,
 } from "../constants";
 
 import { canvasToBlob } from "../data/blob";
@@ -34,6 +37,7 @@ import { Tooltip } from "./Tooltip";
 import "./ImageExportDialog.scss";
 import { useAppProps } from "./App";
 import { FilledButton } from "./FilledButton";
+import Select from "./Select";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -74,6 +78,10 @@ const ImageExportModal = ({
   const [exportWithBackground, setExportWithBackground] = useState(
     appState.exportBackground,
   );
+  const [exportBackgroundImage, setExportBackgroundImage] = useState<string>(
+    DEFAULT_EXPORT_BACKGROUND_IMAGE,
+  );
+
   const [exportDarkMode, setExportDarkMode] = useState(
     appState.exportWithDarkMode,
   );
@@ -169,6 +177,20 @@ const ImageExportModal = ({
           label={t("imageExportDialog.label.withBackground")}
           name="exportBackgroundSwitch"
         >
+          <Select
+            items={EXPORT_BACKGROUND_IMAGES}
+            ariaLabel={t("imageExportDialog.label.backgroundImage")}
+            placeholder={t("imageExportDialog.label.backgroundImage")}
+            value={exportBackgroundImage}
+            onChange={(value) => {
+              setExportBackgroundImage(value);
+              actionManager.executeAction(
+                actionChangeExportBackgroundImage,
+                "ui",
+                value,
+              );
+            }}
+          />
           <Switch
             name="exportBackgroundSwitch"
             checked={exportWithBackground}

@@ -11,7 +11,13 @@ import { KEYS } from "../keys";
 import { register } from "./register";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
-import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
+import {
+  DEFAULT_EXPORT_BACKGROUND_IMAGE,
+  DEFAULT_EXPORT_PADDING,
+  EXPORT_BACKGROUND_IMAGES,
+  EXPORT_SCALES,
+  THEME,
+} from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { isImageFileHandle } from "../data/blob";
@@ -19,6 +25,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
 
 import "../components/ToolIcon.scss";
+import Select from "../components/Select";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -104,6 +111,28 @@ export const actionChangeExportBackground = register({
     >
       {t("imageExportDialog.label.withBackground")}
     </CheckboxItem>
+  ),
+});
+
+export const actionChangeExportBackgroundImage = register({
+  name: "changeExportBackgroundImage",
+  trackEvent: { category: "export", action: "toggleBackgroundImage" },
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportBackgroundImage: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ updateData }) => (
+    <Select
+      items={EXPORT_BACKGROUND_IMAGES}
+      ariaLabel={t("imageExportDialog.label.backgroundImage")}
+      placeholder={t("imageExportDialog.label.backgroundImage")}
+      value={DEFAULT_EXPORT_BACKGROUND_IMAGE}
+      onChange={(value) => {
+        updateData(value);
+      }}
+    />
   ),
 });
 

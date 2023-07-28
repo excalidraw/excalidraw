@@ -1655,3 +1655,19 @@ export const frameToolIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+export const tablerChevronDownIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M6 9l6 6l6 -6"></path>
+  </>,
+  tablerIconProps,
+);
+
+export const tablerChevronUpIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M6 15l6 -6l6 6"></path>
+  </>,
+  tablerIconProps,
+);

@@ -1,6 +1,7 @@
 import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_ELEMENT_PROPS,
+  DEFAULT_EXPORT_BACKGROUND_IMAGE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
@@ -99,6 +100,7 @@ export const getDefaultAppState = (): Omit<
     pendingImageElementId: null,
     showHyperlinkPopup: false,
     selectedLinearElement: null,
+    exportBackgroundImage: DEFAULT_EXPORT_BACKGROUND_IMAGE,
   };
 };
 
@@ -206,6 +208,7 @@ const APP_STATE_STORAGE_CONF = (<
   pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
+  exportBackgroundImage: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

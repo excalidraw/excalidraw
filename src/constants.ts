@@ -316,3 +316,15 @@ export const DEFAULT_SIDEBAR = {
 } as const;
 
 export const LIBRARY_DISABLED_TYPES = new Set(["embeddable", "image"] as const);
+
+export const EXPORT_BACKGROUND_IMAGES = {
+  "/backgrounds/bubbles.svg": "bubbles",
+  "/backgrounds/bubbles2.svg": "bubbles 2",
+  "/backgrounds/bricks.svg": "bricks",
+  "/backgrounds/lines.svg": "lines",
+  "/backgrounds/lines2.svg": "lines 2",
+} as const;
+
+export const DEFAULT_EXPORT_BACKGROUND_IMAGE = Object.keys(
+  EXPORT_BACKGROUND_IMAGES,
+)[0];

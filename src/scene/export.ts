@@ -73,6 +73,7 @@ export const exportToCanvas = async (
       imageCache,
       renderGrid: false,
       isExporting: true,
+      exportBackgroundImage: appState.exportBackgroundImage,
     },
   });
 

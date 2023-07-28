@@ -1,0 +1,69 @@
+.Select {
+  &__trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    line-height: 1;
+    gap: 5px;
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--text-primary-color);
+  }
+
+  &__trigger-icon {
+    width: 15px;
+    height: 15px;
+  }
+
+  &__content {
+    overflow: hidden;
+    box-shadow: var(--shadow-island);
+    border-radius: var(--border-radius-md);
+    padding: calc(var(--padding) * var(--space-factor));
+    background-color: var(--input-bg-color);
+    z-index: 1;
+  }
+
+  &__viewport {
+    padding: 0.5rem;
+  }
+
+  &__item {
+    font-size: 0.8rem;
+    line-height: 1;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    position: relative;
+    user-select: none;
+    font-weight: 600;
+    color: var(--text-primary-color);
+
+    &[data-highlighted] {
+      outline: none;
+      background-color: var(--button-hover-bg);
+    }
+
+    &[data-state="checked"] {
+      background-color: var(--color-primary);
+      color: var(--input-bg-color);
+    }
+
+    &[data-highlighted][data-state="checked"] {
+      background-color: var(--color-primary-darker);
+    }
+  }
+
+  &__scroll-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 25px;
+    background-color: white;
+    cursor: default;
+  }
+}

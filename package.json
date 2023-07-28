@@ -22,6 +22,7 @@
     "@braintree/sanitize-url": "6.0.2",
     "@excalidraw/random-username": "1.0.0",
     "@radix-ui/react-popover": "1.0.3",
+    "@radix-ui/react-select": "1.2.2",
     "@radix-ui/react-tabs": "1.0.2",
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
