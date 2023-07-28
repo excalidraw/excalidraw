@@ -128,13 +128,15 @@ const ImageExportModal = ({
         <div className="ImageExportModal__preview__canvas" ref={previewRef}>
           {renderError && <ErrorCanvasPreview />}
         </div>
-        <div className="ImageExportModal__preview__filename">
+      </div>
+      <div className="ImageExportModal__settings">
+        <h3>{t("imageExportDialog.header")}</h3>
+        <div className="ImageExportModal__settings__filename">
           {!nativeFileSystemSupported && (
             <input
               type="text"
               className="TextInput"
               value={projectName}
-              style={{ width: "30ch" }}
               disabled={
                 typeof appProps.name !== "undefined" || appState.viewModeEnabled
               }
@@ -149,9 +151,6 @@ const ImageExportModal = ({
             />
           )}
         </div>
-      </div>
-      <div className="ImageExportModal__settings">
-        <h3>{t("imageExportDialog.header")}</h3>
         {someElementIsSelected && (
           <ExportSetting
             label={t("imageExportDialog.label.onlySelected")}

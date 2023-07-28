@@ -58,12 +58,6 @@
         flex-grow: 1;
       }
 
-      &__filename {
-        & > input {
-          margin-top: 1rem;
-        }
-      }
-
       &__canvas {
         box-sizing: border-box;
         width: 100%;
@@ -113,6 +107,13 @@
         gap: 6px 34px;
 
         align-content: flex-start;
+      }
+
+      &__filename {
+        & > input {
+          width: 100%;
+          box-sizing: border-box;
+        }
       }
 
       &__setting {
