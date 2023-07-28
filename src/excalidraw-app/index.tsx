@@ -95,6 +95,7 @@ import { ShareableLinkDialog } from "../components/ShareableLinkDialog";
 import { openConfirmModal } from "../components/OverwriteConfirm/OverwriteConfirmState";
 import { OverwriteConfirmDialog } from "../components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../components/Trans";
+import { registerSW } from "virtual:pwa-register";
 
 polyfill();
 
@@ -286,6 +287,7 @@ const ExcalidrawWrapper = () => {
   }
 
   useEffect(() => {
+    registerSW();
     trackEvent("load", "frame", getFrame());
     // Delayed so that the app has a time to load the latest SW
     setTimeout(() => {

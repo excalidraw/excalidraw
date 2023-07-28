@@ -2,7 +2,7 @@
 /// <reference types="vite-plugin-pwa/react" />
 /// <reference types="vite-plugin-pwa/info" />
 /// <reference types="vite-plugin-svgr/client" />
-
+/// <reference types="vite-plugin-pwa/client" />
 interface ImportMetaEnv {
   // The port to run the dev server
   VITE_APP_PORT: string;
