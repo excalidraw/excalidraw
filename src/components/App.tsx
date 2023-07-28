@@ -331,6 +331,7 @@ import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
+import FollowMode from "./FollowMode/FollowMode";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -549,12 +550,38 @@ class App extends React.Component<AppProps, AppState> {
     const canvasHeight = canvasDOMHeight * canvasScale;
     if (viewModeEnabled) {
       return (
+        <FollowMode width={canvasDOMWidth} height={canvasDOMHeight}>
+          <canvas
+            className="excalidraw__canvas"
+            style={{
+              width: canvasDOMWidth,
+              height: canvasDOMHeight,
+              cursor: CURSOR_TYPE.GRAB,
+            }}
+            width={canvasWidth}
+            height={canvasHeight}
+            ref={this.handleCanvasRef}
+            onContextMenu={(event: React.PointerEvent<HTMLCanvasElement>) =>
+              this.handleCanvasContextMenu(event)
+            }
+            onPointerMove={this.handleCanvasPointerMove}
+            onPointerUp={this.handleCanvasPointerUp}
+            onPointerCancel={this.removePointer}
+            onTouchMove={this.handleTouchMove}
+            onPointerDown={this.handleCanvasPointerDown}
+          >
+            {t("labels.drawingCanvas")}
+          </canvas>
+        </FollowMode>
+      );
+    }
+    return (
+      <FollowMode width={canvasDOMWidth} height={canvasDOMHeight}>
         <canvas
           className="excalidraw__canvas"
           style={{
             width: canvasDOMWidth,
             height: canvasDOMHeight,
-            cursor: CURSOR_TYPE.GRAB,
           }}
           width={canvasWidth}
           height={canvasHeight}
@@ -562,38 +589,16 @@ class App extends React.Component<AppProps, AppState> {
           onContextMenu={(event: React.PointerEvent<HTMLCanvasElement>) =>
             this.handleCanvasContextMenu(event)
           }
+          onPointerDown={this.handleCanvasPointerDown}
+          onDoubleClick={this.handleCanvasDoubleClick}
           onPointerMove={this.handleCanvasPointerMove}
           onPointerUp={this.handleCanvasPointerUp}
           onPointerCancel={this.removePointer}
           onTouchMove={this.handleTouchMove}
-          onPointerDown={this.handleCanvasPointerDown}
         >
           {t("labels.drawingCanvas")}
         </canvas>
-      );
-    }
-    return (
-      <canvas
-        className="excalidraw__canvas"
-        style={{
-          width: canvasDOMWidth,
-          height: canvasDOMHeight,
-        }}
-        width={canvasWidth}
-        height={canvasHeight}
-        ref={this.handleCanvasRef}
-        onContextMenu={(event: React.PointerEvent<HTMLCanvasElement>) =>
-          this.handleCanvasContextMenu(event)
-        }
-        onPointerDown={this.handleCanvasPointerDown}
-        onDoubleClick={this.handleCanvasDoubleClick}
-        onPointerMove={this.handleCanvasPointerMove}
-        onPointerUp={this.handleCanvasPointerUp}
-        onPointerCancel={this.removePointer}
-        onTouchMove={this.handleTouchMove}
-      >
-        {t("labels.drawingCanvas")}
-      </canvas>
+      </FollowMode>
     );
   }
 

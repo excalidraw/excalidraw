@@ -32,10 +32,8 @@
       border-radius: 100%;
     }
 
-    &--is-followed {
-      &::before {
-        border-color: red;
-      }
+    &--is-followed::before {
+      border-color: var(--color-primary-hover);
     }
   }
 }
