@@ -593,6 +593,13 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
                 </MainMenu.Sub.Item>
               </MainMenu.Sub.Content>
             </MainMenu.Sub>
+            <MainMenu.Sub.Item
+              onSelect={() => {
+                alert("wow, nested submenus! very cool");
+              }}
+            >
+              Another one
+            </MainMenu.Sub.Item>
           </MainMenu.Sub.Content>
         </MainMenu.Sub>
         <MainMenu.ItemCustom>

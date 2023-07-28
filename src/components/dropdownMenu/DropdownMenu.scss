@@ -53,8 +53,8 @@
 
     .dropdown-menu-item-base {
       display: flex;
-      padding: 0 0.625rem;
-      column-gap: 0.625rem;
+      padding: 0 0.75rem;
+      column-gap: 0.5rem;
       font-size: 0.875rem;
       color: var(--color-gray-100);
       width: 100%;
@@ -70,7 +70,7 @@
       align-items: center;
       height: 2rem;
       cursor: pointer;
-      border-radius: var(--border-radius-md);
+      border-radius: var(--border-radius-sm);
 
       @media screen and (min-width: 1921px) {
         height: 2.25rem;

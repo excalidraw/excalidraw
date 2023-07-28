@@ -19,7 +19,7 @@ exports[`<Excalidraw/> <MainMenu/> should render main menu with host menu items 
 >
   <div
     class="Island dropdown-menu-container"
-    style="--padding: 2; z-index: 2;"
+    style="--padding: 1; z-index: 2;"
   >
     <div
       class="radix-menu-item"
@@ -155,7 +155,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
 >
   <div
     class="Island dropdown-menu-container"
-    style="--padding: 2; z-index: 2;"
+    style="--padding: 1; z-index: 2;"
   >
     <div
       class="radix-menu-item"

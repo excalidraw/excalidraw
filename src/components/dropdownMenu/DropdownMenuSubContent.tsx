@@ -18,13 +18,17 @@ const DropdownMenuSubContent = ({
   }).trim();
 
   return (
-    <DropdownMenuPrimitive.SubContent className={classNames}>
+    <DropdownMenuPrimitive.SubContent
+      className={classNames}
+      sideOffset={8}
+      alignOffset={-4}
+    >
       {device.isMobile ? (
         <Stack.Col className="dropdown-menu-container">{children}</Stack.Col>
       ) : (
         <Island
           className="dropdown-menu-container"
-          padding={2}
+          padding={1}
           style={{ zIndex: 1 }}
         >
           {children}
