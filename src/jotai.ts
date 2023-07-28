@@ -1,4 +1,4 @@
-import { unstable_createStore, useAtom, WritableAtom } from "jotai";
+import { PrimitiveAtom, unstable_createStore, useAtom } from "jotai";
 import { useLayoutEffect } from "react";
 
 export const jotaiScope = Symbol();
@@ -6,7 +6,7 @@ export const jotaiStore = unstable_createStore();
 
 export const useAtomWithInitialValue = <
   T extends unknown,
-  A extends WritableAtom<T, T>,
+  A extends PrimitiveAtom<T>,
 >(
   atom: A,
   initialValue: T | (() => T),

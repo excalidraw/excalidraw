@@ -1,8 +1,11 @@
-import colors from "./colors";
+import {
+  COLOR_PALETTE,
+  DEFAULT_CHART_COLOR_INDEX,
+  getAllColorsSpecificShade,
+} from "./colors";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
-  ENV,
   VERTICAL_ALIGN,
 } from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
@@ -158,10 +161,7 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   return result;
 };
 
-const bgColors = colors.elementBackground.slice(
-  2,
-  colors.elementBackground.length,
-);
+const bgColors = getAllColorsSpecificShade(DEFAULT_CHART_COLOR_INDEX);
 
 // Put all the common properties here so when the whole chart is selected
 // the properties dialog shows the correct selected values
@@ -171,7 +171,7 @@ const commonProps = {
   fontSize: DEFAULT_FONT_SIZE,
   opacity: 100,
   roughness: 1,
-  strokeColor: colors.elementStroke[0],
+  strokeColor: COLOR_PALETTE.black,
   roundness: null,
   strokeStyle: "solid",
   strokeWidth: 1,
@@ -179,7 +179,7 @@ const commonProps = {
   locked: false,
 } as const;
 
-const getChartDimentions = (spreadsheet: Spreadsheet) => {
+const getChartDimensions = (spreadsheet: Spreadsheet) => {
   const chartWidth =
     (BAR_WIDTH + BAR_GAP) * spreadsheet.values.length + BAR_GAP;
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
@@ -249,7 +249,7 @@ const chartLines = (
   groupId: string,
   backgroundColor: string,
 ): ChartElements => {
-  const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
+  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet);
   const xLine = newLinearElement({
     backgroundColor,
     groupIds: [groupId],
@@ -312,7 +312,7 @@ const chartBaseElements = (
   backgroundColor: string,
   debug?: boolean,
 ): ChartElements => {
-  const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
+  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet);
 
   const title = spreadsheet.title
     ? newTextElement({
@@ -323,7 +323,6 @@ const chartBaseElements = (
         x: x + chartWidth / 2,
         y: y - BAR_HEIGHT - BAR_GAP * 2 - DEFAULT_FONT_SIZE,
         roundness: null,
-        strokeStyle: "solid",
         textAlign: "center",
       })
     : null;
@@ -338,7 +337,7 @@ const chartBaseElements = (
         y: y - chartHeight,
         width: chartWidth,
         height: chartHeight,
-        strokeColor: colors.elementStroke[0],
+        strokeColor: COLOR_PALETTE.black,
         fillStyle: "solid",
         opacity: 6,
       })
@@ -384,7 +383,7 @@ const chartTypeBar = (
       y,
       groupId,
       backgroundColor,
-      process.env.NODE_ENV === ENV.DEVELOPMENT,
+      import.meta.env.DEV,
     ),
   ];
 };
@@ -473,7 +472,7 @@ const chartTypeLine = (
       y,
       groupId,
       backgroundColor,
-      process.env.NODE_ENV === ENV.DEVELOPMENT,
+      import.meta.env.DEV,
     ),
     line,
     ...lines,

@@ -90,6 +90,7 @@ export class ActionManager {
             event,
             this.getAppState(),
             this.getElementsIncludingDeleted(),
+            this.app,
           ),
       );
 
@@ -118,10 +119,13 @@ export class ActionManager {
     return true;
   }
 
-  executeAction(action: Action, source: ActionSource = "api") {
+  executeAction(
+    action: Action,
+    source: ActionSource = "api",
+    value: any = null,
+  ) {
     const elements = this.getElementsIncludingDeleted();
     const appState = this.getAppState();
-    const value = null;
 
     trackAction(action, source, appState, elements, this.app, value);
 
@@ -131,11 +135,7 @@ export class ActionManager {
   /**
    * @param data additional data sent to the PanelComponent
    */
-  renderAction = (
-    name: ActionName,
-    data?: PanelComponentProps["data"],
-    isInHamburgerMenu = false,
-  ) => {
+  renderAction = (name: ActionName, data?: PanelComponentProps["data"]) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
     if (
@@ -169,12 +169,22 @@ export class ActionManager {
           appState={this.getAppState()}
           updateData={updateData}
           appProps={this.app.props}
+          app={this.app}
           data={data}
-          isInHamburgerMenu={isInHamburgerMenu}
         />
       );
     }
 
     return null;
+  };
+
+  isActionEnabled = (action: Action) => {
+    const elements = this.getElementsIncludingDeleted();
+    const appState = this.getAppState();
+
+    return (
+      !action.predicate ||
+      action.predicate(elements, appState, this.app.props, this.app)
+    );
   };
 }

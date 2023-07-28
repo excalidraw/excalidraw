@@ -1,14 +1,15 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`select single element on the scene arrow 1`] = `
-Object {
+exports[`select single element on the scene > arrow 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
-  "groupIds": Array [],
+  "frameId": null,
+  "groupIds": [],
   "height": 50,
   "id": "id0",
   "isDeleted": false,
@@ -16,24 +17,24 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       30,
       50,
     ],
   ],
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 2,
   },
   "seed": 337897,
   "startArrowhead": null,
   "startBinding": null,
-  "strokeColor": "#000000",
+  "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "arrow",
@@ -46,15 +47,16 @@ Object {
 }
 `;
 
-exports[`select single element on the scene arrow escape 1`] = `
-Object {
+exports[`select single element on the scene > arrow escape 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
-  "groupIds": Array [],
+  "frameId": null,
+  "groupIds": [],
   "height": 50,
   "id": "id0",
   "isDeleted": false,
@@ -62,24 +64,24 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       30,
       50,
     ],
   ],
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 2,
   },
   "seed": 337897,
   "startArrowhead": null,
   "startBinding": null,
-  "strokeColor": "#000000",
+  "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "line",
@@ -92,13 +94,14 @@ Object {
 }
 `;
 
-exports[`select single element on the scene diamond 1`] = `
-Object {
+exports[`select single element on the scene > diamond 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
-  "groupIds": Array [],
+  "frameId": null,
+  "groupIds": [],
   "height": 50,
   "id": "id0",
   "isDeleted": false,
@@ -106,11 +109,11 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 2,
   },
   "seed": 337897,
-  "strokeColor": "#000000",
+  "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "diamond",
@@ -123,13 +126,14 @@ Object {
 }
 `;
 
-exports[`select single element on the scene ellipse 1`] = `
-Object {
+exports[`select single element on the scene > ellipse 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
-  "groupIds": Array [],
+  "frameId": null,
+  "groupIds": [],
   "height": 50,
   "id": "id0",
   "isDeleted": false,
@@ -137,11 +141,11 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 2,
   },
   "seed": 337897,
-  "strokeColor": "#000000",
+  "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "ellipse",
@@ -154,13 +158,14 @@ Object {
 }
 `;
 
-exports[`select single element on the scene rectangle 1`] = `
-Object {
+exports[`select single element on the scene > rectangle 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
-  "groupIds": Array [],
+  "frameId": null,
+  "groupIds": [],
   "height": 50,
   "id": "id0",
   "isDeleted": false,
@@ -168,11 +173,11 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 337897,
-  "strokeColor": "#000000",
+  "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",

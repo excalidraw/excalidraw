@@ -1,20 +1,25 @@
 import oc from "open-color";
-
-import colors from "./colors";
+import { COLOR_PALETTE } from "./colors";
 import {
   CURSOR_TYPE,
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
+  isDarwin,
   MIME_TYPES,
   THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import { FontFamilyValues, FontString } from "./element/types";
-import { AppState, DataURL, LastActiveToolBeforeEraser, Zoom } from "./types";
+import {
+  FontFamilyValues,
+  FontString,
+  NonDeletedExcalidrawElement,
+} from "./element/types";
+import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
-import { isDarwin } from "./keys";
 import { SHAPES } from "./shapes";
+import { isEraserActive, isHandToolActive } from "./appState";
+import { ResolutionType } from "./utility-types";
 
 let mockDateTime: string | null = null;
 
@@ -58,6 +63,13 @@ export const isInputLike = (
   target instanceof HTMLInputElement ||
   target instanceof HTMLTextAreaElement ||
   target instanceof HTMLSelectElement;
+
+export const isInteractive = (target: Element | EventTarget | null) => {
+  return (
+    isInputLike(target) ||
+    (target instanceof Element && !!target.closest("label, button"))
+  );
+};
 
 export const isWritableElement = (
   target: Element | EventTarget | null,
@@ -148,7 +160,7 @@ export const throttleRAF = <T extends any[]>(
   };
 
   const ret = (...args: T) => {
-    if (process.env.NODE_ENV === "test") {
+    if (import.meta.env.MODE === "test") {
       fn(...args);
       return;
     }
@@ -177,6 +189,145 @@ export const throttleRAF = <T extends any[]>(
     }
   };
   return ret;
+};
+
+/**
+ * Exponential ease-out method
+ *
+ * @param {number} k - The value to be tweened.
+ * @returns {number} The tweened value.
+ */
+export const easeOut = (k: number) => {
+  return 1 - Math.pow(1 - k, 4);
+};
+
+const easeOutInterpolate = (from: number, to: number, progress: number) => {
+  return (to - from) * easeOut(progress) + from;
+};
+
+/**
+ * Animates values from `fromValues` to `toValues` using the requestAnimationFrame API.
+ * Executes the `onStep` callback on each step with the interpolated values.
+ * Returns a function that can be called to cancel the animation.
+ *
+ * @example
+ * // Example usage:
+ * const fromValues = { x: 0, y: 0 };
+ * const toValues = { x: 100, y: 200 };
+ * const onStep = ({x, y}) => {
+ *   setState(x, y)
+ * };
+ * const onCancel = () => {
+ *   console.log("Animation canceled");
+ * };
+ *
+ * const cancelAnimation = easeToValuesRAF({
+ *   fromValues,
+ *   toValues,
+ *   onStep,
+ *   onCancel,
+ * });
+ *
+ * // To cancel the animation:
+ * cancelAnimation();
+ */
+export const easeToValuesRAF = <
+  T extends Record<keyof T, number>,
+  K extends keyof T,
+>({
+  fromValues,
+  toValues,
+  onStep,
+  duration = 250,
+  interpolateValue,
+  onStart,
+  onEnd,
+  onCancel,
+}: {
+  fromValues: T;
+  toValues: T;
+  /**
+   * Interpolate a single value.
+   * Return undefined to be handled by the default interpolator.
+   */
+  interpolateValue?: (
+    fromValue: number,
+    toValue: number,
+    /** no easing applied  */
+    progress: number,
+    key: K,
+  ) => number | undefined;
+  onStep: (values: T) => void;
+  duration?: number;
+  onStart?: () => void;
+  onEnd?: () => void;
+  onCancel?: () => void;
+}) => {
+  let canceled = false;
+  let frameId = 0;
+  let startTime: number;
+
+  function step(timestamp: number) {
+    if (canceled) {
+      return;
+    }
+    if (startTime === undefined) {
+      startTime = timestamp;
+      onStart?.();
+    }
+
+    const elapsed = Math.min(timestamp - startTime, duration);
+    const factor = easeOut(elapsed / duration);
+
+    const newValues = {} as T;
+
+    Object.keys(fromValues).forEach((key) => {
+      const _key = key as keyof T;
+      const result = ((toValues[_key] - fromValues[_key]) * factor +
+        fromValues[_key]) as T[keyof T];
+      newValues[_key] = result;
+    });
+
+    onStep(newValues);
+
+    if (elapsed < duration) {
+      const progress = elapsed / duration;
+
+      const newValues = {} as T;
+
+      Object.keys(fromValues).forEach((key) => {
+        const _key = key as K;
+        const startValue = fromValues[_key];
+        const endValue = toValues[_key];
+
+        let result;
+
+        result = interpolateValue
+          ? interpolateValue(startValue, endValue, progress, _key)
+          : easeOutInterpolate(startValue, endValue, progress);
+
+        if (result == null) {
+          result = easeOutInterpolate(startValue, endValue, progress);
+        }
+
+        newValues[_key] = result as T[K];
+      });
+      onStep(newValues);
+
+      frameId = window.requestAnimationFrame(step);
+    } else {
+      onStep(toValues);
+      onEnd?.();
+    }
+  }
+
+  frameId = window.requestAnimationFrame(step);
+
+  return () => {
+    onCancel?.();
+    canceled = true;
+    window.cancelAnimationFrame(frameId);
+  };
 };
 
 // https://github.com/lodash/lodash/blob/es/chunk.js
@@ -218,9 +369,16 @@ export const distance = (x: number, y: number) => Math.abs(x - y);
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: (
-    | { type: typeof SHAPES[number]["value"] | "eraser" }
+    | {
+        type:
+          | typeof SHAPES[number]["value"]
+          | "eraser"
+          | "hand"
+          | "frame"
+          | "embeddable";
+      }
     | { type: "custom"; customType: string }
-  ) & { lastActiveToolBeforeEraser?: LastActiveToolBeforeEraser },
+  ) & { lastActiveToolBeforeEraser?: LastActiveTool },
 ): AppState["activeTool"] => {
   if (data.type === "custom") {
     return {
@@ -232,9 +390,9 @@ export const updateActiveTool = (
 
   return {
     ...appState.activeTool,
-    lastActiveToolBeforeEraser:
+    lastActiveTool:
       data.lastActiveToolBeforeEraser === undefined
-        ? appState.activeTool.lastActiveToolBeforeEraser
+        ? appState.activeTool.lastActiveTool
         : data.lastActiveToolBeforeEraser,
     type: data.type,
     customType: null,
@@ -297,14 +455,16 @@ export const setEraserCursor = (
 
 export const setCursorForShape = (
   canvas: HTMLCanvasElement | null,
-  appState: AppState,
+  appState: Pick<AppState, "activeTool" | "theme">,
 ) => {
   if (!canvas) {
     return;
   }
   if (appState.activeTool.type === "selection") {
     resetCursor(canvas);
-  } else if (appState.activeTool.type === "eraser") {
+  } else if (isHandToolActive(appState)) {
+    canvas.style.cursor = CURSOR_TYPE.GRAB;
+  } else if (isEraserActive(appState)) {
     setEraserCursor(canvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
@@ -351,9 +511,8 @@ export const viewportCoordsToSceneCoords = (
     scrollY: number;
   },
 ) => {
-  const invScale = 1 / zoom.value;
-  const x = (clientX - offsetLeft) * invScale - scrollX;
-  const y = (clientY - offsetTop) * invScale - scrollY;
+  const x = (clientX - offsetLeft) / zoom.value - scrollX;
+  const y = (clientY - offsetTop) / zoom.value - scrollY;
 
   return { x, y };
 };
@@ -453,7 +612,7 @@ export const isTransparent = (color: string) => {
   return (
     isRGBTransparent ||
     isRRGGBBTransparent ||
-    color === colors.elementBackground[0]
+    color === COLOR_PALETTE.transparent
   );
 };
 
@@ -605,11 +764,15 @@ export const arrayToMap = <T extends { id: string } | string>(
   }, new Map());
 };
 
-export const isTestEnv = () =>
-  typeof process !== "undefined" && process.env?.NODE_ENV === "test";
+export const arrayToMapWithIndex = <T extends { id: string }>(
+  elements: readonly T[],
+) =>
+  elements.reduce((acc, element: T, idx) => {
+    acc.set(element.id, [element, idx]);
+    return acc;
+  }, new Map<string, [element: T, index: number]>());
 
-export const isProdEnv = () =>
-  typeof process !== "undefined" && process.env?.NODE_ENV === "production";
+export const isTestEnv = () => import.meta.env.MODE === "test";
 
 export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
   return new CustomEvent(name, {
@@ -662,6 +825,8 @@ export const getFrame = () => {
   }
 };
 
+export const isRunningInIframe = () => getFrame() === "iframe";
+
 export const isPromiseLike = (
   value: any,
 ): value is Promise<ResolutionType<typeof value>> => {
@@ -685,4 +850,67 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
           element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
       )
     : [];
+};
+
+export const isShallowEqual = <
+  T extends Record<string, any>,
+  I extends keyof T,
+>(
+  objA: T,
+  objB: T,
+  comparators?: Record<I, (a: T[I], b: T[I]) => boolean>,
+  debug = false,
+) => {
+  const aKeys = Object.keys(objA);
+  const bKeys = Object.keys(objB);
+  if (aKeys.length !== bKeys.length) {
+    return false;
+  }
+  return aKeys.every((key) => {
+    const comparator = comparators?.[key as I];
+    const ret = comparator
+      ? comparator(objA[key], objB[key])
+      : objA[key] === objB[key];
+    if (!ret && debug) {
+      console.info(
+        `%cisShallowEqual: ${key} not equal ->`,
+        "color: #8B4000",
+        objA[key],
+        objB[key],
+      );
+    }
+    return ret;
+  });
+};
+
+// taken from Radix UI
+// https://github.com/radix-ui/primitives/blob/main/packages/core/primitive/src/primitive.tsx
+export const composeEventHandlers = <E>(
+  originalEventHandler?: (event: E) => void,
+  ourEventHandler?: (event: E) => void,
+  { checkForDefaultPrevented = true } = {},
+) => {
+  return function handleEvent(event: E) {
+    originalEventHandler?.(event);
+
+    if (
+      !checkForDefaultPrevented ||
+      !(event as unknown as Event).defaultPrevented
+    ) {
+      return ourEventHandler?.(event);
+    }
+  };
+};
+
+export const isOnlyExportingSingleFrame = (
+  elements: readonly NonDeletedExcalidrawElement[],
+) => {
+  const frames = elements.filter((element) => element.type === "frame");
+
+  return (
+    frames.length === 1 &&
+    elements.every(
+      (element) => element.type === "frame" || element.frameId === frames[0].id,
+    )
+  );
 };

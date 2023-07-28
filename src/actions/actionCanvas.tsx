@@ -1,57 +1,57 @@
-import { ColorPicker } from "../components/ColorPicker";
-import {
-  eraser,
-  MoonIcon,
-  SunIcon,
-  ZoomInIcon,
-  ZoomOutIcon,
-} from "../components/icons";
+import { ColorPicker } from "../components/ColorPicker/ColorPicker";
+import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
+import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
-import { getNormalizedZoom, getSelectedElements } from "../scene";
+import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
-import { getShortcutKey, updateActiveTool } from "../utils";
+import { getShortcutKey, setCursor, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
-import { getDefaultAppState, isEraserActive } from "../appState";
-import ClearCanvas from "../components/ClearCanvas";
-import clsx from "clsx";
-import MenuItem from "../components/MenuItem";
-import { getShortcutFromShortcutName } from "./shortcuts";
+import {
+  getDefaultAppState,
+  isEraserActive,
+  isHandToolActive,
+} from "../appState";
+import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
+import { Bounds } from "../element/bounds";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   trackEvent: false,
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.changeViewBackgroundColor &&
+      !appState.viewModeEnabled
+    );
+  },
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
       commitToHistory: !!value.viewBackgroundColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData, appProps }) => {
+    // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
-      <div style={{ position: "relative" }}>
-        <ColorPicker
-          label={t("labels.canvasBackground")}
-          type="canvasBackground"
-          color={appState.viewBackgroundColor}
-          onChange={(color) => updateData({ viewBackgroundColor: color })}
-          isActive={appState.openPopup === "canvasColorPicker"}
-          setActive={(active) =>
-            updateData({ openPopup: active ? "canvasColorPicker" : null })
-          }
-          data-testid="canvas-background-picker"
-          elements={elements}
-          appState={appState}
-        />
-      </div>
+      <ColorPicker
+        palette={null}
+        topPicks={DEFAULT_CANVAS_BACKGROUND_PICKS}
+        label={t("labels.canvasBackground")}
+        type="canvasBackground"
+        color={appState.viewBackgroundColor}
+        onChange={(color) => updateData({ viewBackgroundColor: color })}
+        data-testid="canvas-background-picker"
+        elements={elements}
+        appState={appState}
+        updateData={updateData}
+      />
     );
   },
 });
@@ -59,6 +59,12 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   trackEvent: { category: "canvas" },
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.clearCanvas &&
+      !appState.viewModeEnabled
+    );
+  },
   perform: (elements, appState, _, app) => {
     app.imageCache.clear();
     return {
@@ -84,8 +90,6 @@ export const actionClearCanvas = register({
       commitToHistory: true,
     };
   },
-
-  PanelComponent: ({ updateData }) => <ClearCanvas onConfirm={updateData} />,
 });
 
 export const actionZoomIn = register({
@@ -203,7 +207,7 @@ export const actionResetZoom = register({
 });
 
 const zoomValueToFitBoundsOnViewport = (
-  bounds: [number, number, number, number],
+  bounds: Bounds,
   viewportDimensions: { width: number; height: number },
 ) => {
   const [x1, y1, x2, y2] = bounds;
@@ -221,52 +225,114 @@ const zoomValueToFitBoundsOnViewport = (
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
 
-const zoomToFitElements = (
-  elements: readonly ExcalidrawElement[],
-  appState: Readonly<AppState>,
-  zoomToSelection: boolean,
-) => {
-  const nonDeletedElements = getNonDeletedElements(elements);
-  const selectedElements = getSelectedElements(nonDeletedElements, appState);
-
-  const commonBounds =
-    zoomToSelection && selectedElements.length > 0
-      ? getCommonBounds(selectedElements)
-      : getCommonBounds(nonDeletedElements);
-
-  const newZoom = {
-    value: zoomValueToFitBoundsOnViewport(commonBounds, {
-      width: appState.width,
-      height: appState.height,
-    }),
-  };
+export const zoomToFit = ({
+  targetElements,
+  appState,
+  fitToViewport = false,
+  viewportZoomFactor = 0.7,
+}: {
+  targetElements: readonly ExcalidrawElement[];
+  appState: Readonly<AppState>;
+  /** whether to fit content to viewport (beyond >100%) */
+  fitToViewport: boolean;
+  /** zoom content to cover X of the viewport, when fitToViewport=true */
+  viewportZoomFactor?: number;
+}) => {
+  const commonBounds = getCommonBounds(getNonDeletedElements(targetElements));
 
   const [x1, y1, x2, y2] = commonBounds;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
+
+  let newZoomValue;
+  let scrollX;
+  let scrollY;
+
+  if (fitToViewport) {
+    const commonBoundsWidth = x2 - x1;
+    const commonBoundsHeight = y2 - y1;
+
+    newZoomValue =
+      Math.min(
+        appState.width / commonBoundsWidth,
+        appState.height / commonBoundsHeight,
+      ) * Math.min(1, Math.max(viewportZoomFactor, 0.1));
+
+    // Apply clamping to newZoomValue to be between 10% and 3000%
+    newZoomValue = Math.min(
+      Math.max(newZoomValue, 0.1),
+      30.0,
+    ) as NormalizedZoomValue;
+
+    scrollX = (appState.width / 2) * (1 / newZoomValue) - centerX;
+    scrollY = (appState.height / 2) * (1 / newZoomValue) - centerY;
+  } else {
+    newZoomValue = zoomValueToFitBoundsOnViewport(commonBounds, {
+      width: appState.width,
+      height: appState.height,
+    });
+
+    const centerScroll = centerScrollOn({
+      scenePoint: { x: centerX, y: centerY },
+      viewportDimensions: {
+        width: appState.width,
+        height: appState.height,
+      },
+      zoom: { value: newZoomValue },
+    });
+
+    scrollX = centerScroll.scrollX;
+    scrollY = centerScroll.scrollY;
+  }
+
   return {
     appState: {
       ...appState,
-      ...centerScrollOn({
-        scenePoint: { x: centerX, y: centerY },
-        viewportDimensions: {
-          width: appState.width,
-          height: appState.height,
-        },
-        zoom: newZoom,
-      }),
-      zoom: newZoom,
+      scrollX,
+      scrollY,
+      zoom: { value: newZoomValue },
     },
     commitToHistory: false,
   };
 };
 
-export const actionZoomToSelected = register({
-  name: "zoomToSelection",
+// Note, this action differs from actionZoomToFitSelection in that it doesn't
+// zoom beyond 100%. In other words, if the content is smaller than viewport
+// size, it won't be zoomed in.
+export const actionZoomToFitSelectionInViewport = register({
+  name: "zoomToFitSelectionInViewport",
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) => zoomToFitElements(elements, appState, true),
+  perform: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
+    return zoomToFit({
+      targetElements: selectedElements.length ? selectedElements : elements,
+      appState,
+      fitToViewport: false,
+    });
+  },
+  // NOTE shift-2 should have been assigned actionZoomToFitSelection.
+  // TBD on how proceed
   keyTest: (event) =>
     event.code === CODES.TWO &&
+    event.shiftKey &&
+    !event.altKey &&
+    !event[KEYS.CTRL_OR_CMD],
+});
+
+export const actionZoomToFitSelection = register({
+  name: "zoomToFitSelection",
+  trackEvent: { category: "canvas" },
+  perform: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
+    return zoomToFit({
+      targetElements: selectedElements.length ? selectedElements : elements,
+      appState,
+      fitToViewport: true,
+    });
+  },
+  // NOTE this action should use shift-2 per figma, alas
+  keyTest: (event) =>
+    event.code === CODES.THREE &&
     event.shiftKey &&
     !event.altKey &&
     !event[KEYS.CTRL_OR_CMD],
@@ -276,7 +342,8 @@ export const actionZoomToFit = register({
   name: "zoomToFit",
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) => zoomToFitElements(elements, appState, false),
+  perform: (elements, appState) =>
+    zoomToFit({ targetElements: elements, appState, fitToViewport: false }),
   keyTest: (event) =>
     event.code === CODES.ONE &&
     event.shiftKey &&
@@ -298,33 +365,21 @@ export const actionToggleTheme = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ appState, updateData }) => (
-    <MenuItem
-      label={
-        appState.theme === "dark"
-          ? t("buttons.lightMode")
-          : t("buttons.darkMode")
-      }
-      onClick={() => {
-        updateData(appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT);
-      }}
-      icon={appState.theme === "dark" ? SunIcon : MoonIcon}
-      dataTestId="toggle-dark-mode"
-      shortcut={getShortcutFromShortcutName("toggleTheme")}
-    />
-  ),
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
+  predicate: (elements, appState, props, app) => {
+    return !!app.props.UIOptions.canvasActions.toggleTheme;
+  },
 });
 
-export const actionErase = register({
-  name: "eraser",
+export const actionToggleEraserTool = register({
+  name: "toggleEraserTool",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
     let activeTool: AppState["activeTool"];
 
     if (isEraserActive(appState)) {
       activeTool = updateActiveTool(appState, {
-        ...(appState.activeTool.lastActiveToolBeforeEraser || {
+        ...(appState.activeTool.lastActiveTool || {
           type: "selection",
         }),
         lastActiveToolBeforeEraser: null,
@@ -341,23 +396,46 @@ export const actionErase = register({
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
+        activeEmbeddable: null,
         activeTool,
       },
       commitToHistory: true,
     };
   },
   keyTest: (event) => event.key === KEYS.E,
-  PanelComponent: ({ elements, appState, updateData, data }) => (
-    <ToolButton
-      type="button"
-      icon={eraser}
-      className={clsx("eraser", { active: isEraserActive(appState) })}
-      title={`${t("toolBar.eraser")}-${getShortcutKey("E")}`}
-      aria-label={t("toolBar.eraser")}
-      onClick={() => {
-        updateData(null);
-      }}
-      size={data?.size || "medium"}
-    ></ToolButton>
-  ),
+});
+
+export const actionToggleHandTool = register({
+  name: "toggleHandTool",
+  trackEvent: { category: "toolbar" },
+  perform: (elements, appState, _, app) => {
+    let activeTool: AppState["activeTool"];
+
+    if (isHandToolActive(appState)) {
+      activeTool = updateActiveTool(appState, {
+        ...(appState.activeTool.lastActiveTool || {
+          type: "selection",
+        }),
+        lastActiveToolBeforeEraser: null,
+      });
+    } else {
+      activeTool = updateActiveTool(appState, {
+        type: "hand",
+        lastActiveToolBeforeEraser: appState.activeTool,
+      });
+      setCursor(app.canvas, CURSOR_TYPE.GRAB);
+    }
+
+    return {
+      appState: {
+        ...appState,
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        activeEmbeddable: null,
+        activeTool,
+      },
+      commitToHistory: true,
+    };
+  },
+  keyTest: (event) => event.key === KEYS.H,
 });

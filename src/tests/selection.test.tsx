@@ -13,11 +13,12 @@ import { reseed } from "../random";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { SHAPES } from "../shapes";
+import { vi } from "vitest";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderScene = vi.spyOn(Renderer, "renderScene");
 beforeEach(() => {
   localStorage.clear();
   renderScene.mockClear();
@@ -27,6 +28,74 @@ beforeEach(() => {
 const { h } = window;
 
 const mouse = new Pointer("mouse");
+
+describe("box-selection", () => {
+  beforeEach(async () => {
+    await render(<ExcalidrawApp />);
+  });
+
+  it("should allow adding to selection via box-select when holding shift", async () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 0,
+      width: 50,
+      height: 50,
+    });
+
+    h.elements = [rect1, rect2];
+
+    mouse.downAt(175, -20);
+    mouse.moveTo(85, 70);
+    mouse.up();
+
+    assertSelectedElements([rect2.id]);
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.downAt(75, -20);
+      mouse.moveTo(-15, 70);
+      mouse.up();
+    });
+
+    assertSelectedElements([rect2.id, rect1.id]);
+  });
+
+  it("should (de)select element when box-selecting over and out while not holding shift", async () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+
+    h.elements = [rect1];
+
+    mouse.downAt(75, -20);
+    mouse.moveTo(-15, 70);
+
+    assertSelectedElements([rect1.id]);
+
+    mouse.moveTo(100, -100);
+
+    assertSelectedElements([]);
+
+    mouse.up();
+
+    assertSelectedElements([]);
+  });
+});
 
 describe("inner box-selection", () => {
   beforeEach(async () => {

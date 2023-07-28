@@ -1,7 +1,6 @@
-import { LoadIcon, questionCircle, saveAs } from "../components/icons";
+import { questionCircle, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
-import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
@@ -15,12 +14,11 @@ import { getExportSize } from "../scene/export";
 import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
-import { ActiveFile } from "../components/ActiveFile";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
-import MenuItem from "../components/MenuItem";
-import { getShortcutFromShortcutName } from "./shortcuts";
+
+import "../components/ToolIcon.scss";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -28,7 +26,7 @@ export const actionChangeProjectName = register({
   perform: (_elements, appState, value) => {
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
-  PanelComponent: ({ appState, updateData, appProps }) => (
+  PanelComponent: ({ appState, updateData, appProps, data }) => (
     <ProjectName
       label={t("labels.fileTitle")}
       value={appState.name || "Unnamed"}
@@ -36,6 +34,7 @@ export const actionChangeProjectName = register({
       isNameEditable={
         typeof appProps.name === "undefined" && !appState.viewModeEnabled
       }
+      ignoreFocus={data?.ignoreFocus ?? false}
     />
   ),
 });
@@ -66,7 +65,7 @@ export const actionChangeExportScale = register({
           );
 
           const scaleButtonTitle = `${t(
-            "buttons.scale",
+            "imageExportDialog.label.scale",
           )} ${s}x (${width}x${height})`;
 
           return (
@@ -103,7 +102,7 @@ export const actionChangeExportBackground = register({
       checked={appState.exportBackground}
       onChange={(checked) => updateData(checked)}
     >
-      {t("labels.withBackground")}
+      {t("imageExportDialog.label.withBackground")}
     </CheckboxItem>
   ),
 });
@@ -122,8 +121,8 @@ export const actionChangeExportEmbedScene = register({
       checked={appState.exportEmbedScene}
       onChange={(checked) => updateData(checked)}
     >
-      {t("labels.exportEmbedScene")}
-      <Tooltip label={t("labels.exportEmbedScene_details")} long={true}>
+      {t("imageExportDialog.label.embedScene")}
+      <Tooltip label={t("imageExportDialog.tooltip.embedScene")} long={true}>
         <div className="excalidraw-tooltip-icon">{questionCircle}</div>
       </Tooltip>
     </CheckboxItem>
@@ -133,6 +132,13 @@ export const actionChangeExportEmbedScene = register({
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
   trackEvent: { category: "export" },
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.saveToActiveFile &&
+      !!appState.fileHandle &&
+      !appState.viewModeEnabled
+    );
+  },
   perform: async (elements, appState, value, app) => {
     const fileHandleExists = !!appState.fileHandle;
 
@@ -169,12 +175,6 @@ export const actionSaveToActiveFile = register({
   },
   keyTest: (event) =>
     event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
-  PanelComponent: ({ updateData, appState }) => (
-    <ActiveFile
-      onSave={() => updateData(null)}
-      fileName={appState.fileHandle?.name}
-    />
-  ),
 });
 
 export const actionSaveFileToDisk = register({
@@ -220,6 +220,11 @@ export const actionSaveFileToDisk = register({
 export const actionLoadScene = register({
   name: "loadScene",
   trackEvent: { category: "export" },
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.loadScene && !appState.viewModeEnabled
+    );
+  },
   perform: async (elements, appState, _, app) => {
     try {
       const {
@@ -247,15 +252,6 @@ export const actionLoadScene = register({
     }
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
-  PanelComponent: ({ updateData }) => (
-    <MenuItem
-      label={t("buttons.load")}
-      icon={LoadIcon}
-      onClick={updateData}
-      dataTestId="load-button"
-      shortcut={getShortcutFromShortcutName("loadScene")}
-    />
-  ),
 });
 
 export const actionExportWithDarkMode = register({
@@ -281,7 +277,7 @@ export const actionExportWithDarkMode = register({
         onChange={(theme: Theme) => {
           updateData(theme === THEME.DARK);
         }}
-        title={t("labels.toggleExportColorScheme")}
+        title={t("imageExportDialog.label.darkMode")}
       />
     </div>
   ),

@@ -1,7 +1,13 @@
-import { GroupId, ExcalidrawElement, NonDeleted } from "./element/types";
-import { AppState } from "./types";
+import {
+  GroupId,
+  ExcalidrawElement,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
+} from "./element/types";
+import { AppClassProperties, AppState } from "./types";
 import { getSelectedElements } from "./scene";
 import { getBoundTextElement } from "./element/textElement";
+import { makeNextSelectedElementIds } from "./scene/selection";
 
 export const selectGroup = (
   groupId: GroupId,
@@ -66,14 +72,33 @@ export const getSelectedGroupIds = (appState: AppState): GroupId[] =>
  */
 export const selectGroupsForSelectedElements = (
   appState: AppState,
-  elements: readonly NonDeleted<ExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
+  prevAppState: AppState,
+  /**
+   * supply null in cases where you don't have access to App instance and
+   * you don't care about optimizing selectElements retrieval
+   */
+  app: AppClassProperties | null,
 ): AppState => {
   let nextAppState: AppState = { ...appState, selectedGroupIds: {} };
 
-  const selectedElements = getSelectedElements(elements, appState);
+  const selectedElements = app
+    ? app.scene.getSelectedElements({
+        selectedElementIds: appState.selectedElementIds,
+        // supplying elements explicitly in case we're passed non-state elements
+        elements,
+      })
+    : getSelectedElements(elements, appState);
 
   if (!selectedElements.length) {
-    return { ...nextAppState, editingGroupId: null };
+    return {
+      ...nextAppState,
+      editingGroupId: null,
+      selectedElementIds: makeNextSelectedElementIds(
+        nextAppState.selectedElementIds,
+        prevAppState,
+      ),
+    };
   }
 
   for (const selectedElement of selectedElements) {
@@ -91,7 +116,37 @@ export const selectGroupsForSelectedElements = (
     }
   }
 
+  nextAppState.selectedElementIds = makeNextSelectedElementIds(
+    nextAppState.selectedElementIds,
+    prevAppState,
+  );
+
   return nextAppState;
+};
+
+// given a list of elements, return the the actual group ids that should be selected
+// or used to update the elements
+export const selectGroupsFromGivenElements = (
+  elements: readonly NonDeleted<ExcalidrawElement>[],
+  appState: AppState,
+) => {
+  let nextAppState: AppState = { ...appState, selectedGroupIds: {} };
+
+  for (const element of elements) {
+    let groupIds = element.groupIds;
+    if (appState.editingGroupId) {
+      const indexOfEditingGroup = groupIds.indexOf(appState.editingGroupId);
+      if (indexOfEditingGroup > -1) {
+        groupIds = groupIds.slice(0, indexOfEditingGroup);
+      }
+    }
+    if (groupIds.length > 0) {
+      const groupId = groupIds[groupIds.length - 1];
+      nextAppState = selectGroup(groupId, nextAppState, elements);
+    }
+  }
+
+  return nextAppState.selectedGroupIds;
 };
 
 export const editGroupForSelectedElement = (
@@ -185,4 +240,19 @@ export const getMaximumGroups = (
   });
 
   return Array.from(groups.values());
+};
+
+export const elementsAreInSameGroup = (elements: ExcalidrawElement[]) => {
+  const allGroups = elements.flatMap((element) => element.groupIds);
+  const groupCount = new Map<string, number>();
+  let maxGroup = 0;
+
+  for (const group of allGroups) {
+    groupCount.set(group, (groupCount.get(group) ?? 0) + 1);
+    if (groupCount.get(group)! > maxGroup) {
+      maxGroup = groupCount.get(group)!;
+    }
+  }
+
+  return maxGroup === elements.length;
 };

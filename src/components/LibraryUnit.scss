@@ -12,6 +12,11 @@
     box-sizing: border-box;
     border-radius: var(--border-radius-lg);
 
+    svg {
+      // to prevent clicks on links and such
+      pointer-events: none;
+    }
+
     &--hover {
       border-color: var(--color-primary);
     }
@@ -20,6 +25,27 @@
       border-color: var(--color-primary);
       border-width: 1px;
     }
+
+    &--skeleton {
+      opacity: 0.5;
+      background: linear-gradient(
+        -45deg,
+        var(--color-gray-10),
+        var(--color-gray-20),
+        var(--color-gray-10)
+      );
+      background-size: 200% 200%;
+      animation: library-unit__skeleton-opacity-animation 0.2s linear;
+    }
+  }
+
+  &.theme--dark .library-unit--skeleton {
+    background-image: linear-gradient(
+      -45deg,
+      var(--color-gray-100),
+      var(--color-gray-80),
+      var(--color-gray-100)
+    );
   }
 
   .library-unit__dragger {
@@ -140,6 +166,20 @@
 
     100% {
       transform: scale(0.85);
+    }
+  }
+
+  @keyframes library-unit__skeleton-opacity-animation {
+    0% {
+      opacity: 0;
+    }
+
+    75% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 0.5;
     }
   }
 }

@@ -6,6 +6,7 @@ import {
   ExcalidrawProps,
   BinaryFiles,
 } from "../types";
+import { MarkOptional } from "../utility-types";
 
 export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
 
@@ -81,7 +82,8 @@ export type ActionName =
   | "zoomOut"
   | "resetZoom"
   | "zoomToFit"
-  | "zoomToSelection"
+  | "zoomToFitSelection"
+  | "zoomToFitSelectionInViewport"
   | "changeFontFamily"
   | "changeTextAlign"
   | "changeVerticalAlign"
@@ -109,10 +111,19 @@ export type ActionName =
   | "decreaseFontSize"
   | "unbindText"
   | "hyperlink"
-  | "eraser"
   | "bindText"
-  | "toggleLock"
-  | "toggleLinearEditor";
+  | "unlockAllElements"
+  | "toggleElementLock"
+  | "toggleLinearEditor"
+  | "toggleEraserTool"
+  | "toggleHandTool"
+  | "selectAllElementsInFrame"
+  | "removeAllElementsFromFrame"
+  | "updateFrameRendering"
+  | "setFrameAsActiveTool"
+  | "setEmbeddableAsActiveTool"
+  | "createContainerFromText"
+  | "wrapTextInContainer";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -120,29 +131,32 @@ export type PanelComponentProps = {
   updateData: (formData?: any) => void;
   appProps: ExcalidrawProps;
   data?: Record<string, any>;
+  app: AppClassProperties;
 };
 
 export interface Action {
   name: ActionName;
-  PanelComponent?: React.FC<
-    PanelComponentProps & { isInHamburgerMenu: boolean }
-  >;
+  PanelComponent?: React.FC<PanelComponentProps>;
   perform: ActionFn;
   keyPriority?: number;
   keyTest?: (
     event: React.KeyboardEvent | KeyboardEvent,
     appState: AppState,
     elements: readonly ExcalidrawElement[],
+    app: AppClassProperties,
   ) => boolean;
   contextItemLabel?:
     | string
     | ((
         elements: readonly ExcalidrawElement[],
         appState: Readonly<AppState>,
+        app: AppClassProperties,
       ) => string);
-  contextItemPredicate?: (
+  predicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
+    appProps: ExcalidrawProps,
+    app: AppClassProperties,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
   trackEvent:

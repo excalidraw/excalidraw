@@ -26,8 +26,11 @@ import {
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
 } from "../../../types";
-import { NonDeletedExcalidrawElement } from "../../../element/types";
+import { NonDeletedExcalidrawElement, Theme } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
+import CustomFooter from "./CustomFooter";
+import MobileFooter from "./MobileFooter";
+import { KEYS } from "../../../keys";
 
 declare global {
   interface Window {
@@ -53,9 +56,9 @@ type PointerDownState = {
     y: number;
   };
 };
+
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
-
 const {
   exportToCanvas,
   exportToSvg,
@@ -68,41 +71,23 @@ const {
   viewportCoordsToSceneCoords,
   restoreElements,
   Sidebar,
+  Footer,
+  WelcomeScreen,
+  MainMenu,
+  LiveCollaborationTrigger,
 } = window.ExcalidrawLib;
 
-const COMMENT_SVG = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="feather feather-message-circle"
-  >
-    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-  </svg>
-);
 const COMMENT_ICON_DIMENSION = 32;
 const COMMENT_INPUT_HEIGHT = 50;
 const COMMENT_INPUT_WIDTH = 150;
 
-const renderTopRightUI = () => {
-  return (
-    <button
-      onClick={() => alert("This is dummy top right UI")}
-      style={{ height: "2.5rem" }}
-    >
-      {" "}
-      Click me{" "}
-    </button>
-  );
-};
+export interface AppProps {
+  appTitle: string;
+  useCustom: (api: ExcalidrawImperativeAPI | null, customArgs?: any[]) => void;
+  customArgs?: any[];
+}
 
-export default function App() {
+export default function App({ appTitle, useCustom, customArgs }: AppProps) {
   const appRef = useRef<any>(null);
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
@@ -111,7 +96,7 @@ export default function App() {
   const [canvasUrl, setCanvasUrl] = useState<string>("");
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
   const [exportEmbedScene, setExportEmbedScene] = useState(false);
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState<Theme>("light");
   const [isCollaborating, setIsCollaborating] = useState(false);
   const [commentIcons, setCommentIcons] = useState<{ [id: string]: Comment }>(
     {},
@@ -129,6 +114,8 @@ export default function App() {
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
 
+  useCustom(excalidrawAPI, customArgs);
+
   useHandleLibrary({ excalidrawAPI });
 
   useEffect(() => {
@@ -136,7 +123,7 @@ export default function App() {
       return;
     }
     const fetchData = async () => {
-      const res = await fetch("/rocket.jpeg");
+      const res = await fetch("/images/rocket.jpeg");
       const imageData = await res.blob();
       const reader = new FileReader();
       reader.readAsDataURL(imageData);
@@ -160,44 +147,22 @@ export default function App() {
     fetchData();
   }, [excalidrawAPI]);
 
-  const renderFooter = () => {
+  const renderTopRightUI = (isMobile: boolean) => {
     return (
       <>
-        {" "}
+        {!isMobile && (
+          <LiveCollaborationTrigger
+            isCollaborating={isCollaborating}
+            onSelect={() => {
+              window.alert("Collab dialog clicked");
+            }}
+          />
+        )}
         <button
-          className="custom-element"
-          onClick={() => {
-            excalidrawAPI?.setActiveTool({
-              type: "custom",
-              customType: "comment",
-            });
-            const url = `data:${MIME_TYPES.svg},${encodeURIComponent(
-              `<svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="feather feather-message-circle"
-            >
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-            </svg>`,
-            )}`;
-            excalidrawAPI?.setCursor(`url(${url}), auto`);
-          }}
+          onClick={() => alert("This is an empty top right UI")}
+          style={{ height: "2.5rem" }}
         >
-          {COMMENT_SVG}
-        </button>
-        <button
-          className="custom-footer"
-          onClick={() => alert("This is dummy footer")}
-        >
-          {" "}
-          custom footer{" "}
+          Click me
         </button>
       </>
     );
@@ -240,6 +205,7 @@ export default function App() {
             height: 141.9765625,
             seed: 1968410350,
             groupIds: [],
+            frameId: null,
             boundElements: null,
             locked: false,
             link: null,
@@ -385,6 +351,7 @@ export default function App() {
       }
     });
   };
+
   const renderCommentIcons = () => {
     return Object.values(commentIcons).map((commentIcon) => {
       if (!excalidrawAPI) {
@@ -439,7 +406,7 @@ export default function App() {
           }}
         >
           <div className="comment-avatar">
-            <img src="doremon.png" alt="doremon" />
+            <img src="images/doremon.png" alt="doremon" />
           </div>
         </div>
       );
@@ -519,7 +486,7 @@ export default function App() {
         }}
         onBlur={saveComment}
         onKeyDown={(event) => {
-          if (!event.shiftKey && event.key === "Enter") {
+          if (!event.shiftKey && event.key === KEYS.ENTER) {
             event.preventDefault();
             saveComment();
           }
@@ -528,18 +495,39 @@ export default function App() {
     );
   };
 
-  const renderSidebar = () => {
+  const renderMenu = () => {
     return (
-      <Sidebar>
-        <Sidebar.Header>Custom header!</Sidebar.Header>
-        Custom sidebar!
-      </Sidebar>
+      <MainMenu>
+        <MainMenu.DefaultItems.SaveAsImage />
+        <MainMenu.DefaultItems.Export />
+        <MainMenu.Separator />
+        <MainMenu.DefaultItems.LiveCollaborationTrigger
+          isCollaborating={isCollaborating}
+          onSelect={() => window.alert("You clicked on collab button")}
+        />
+        <MainMenu.Group title="Excalidraw links">
+          <MainMenu.DefaultItems.Socials />
+        </MainMenu.Group>
+        <MainMenu.Separator />
+        <MainMenu.ItemCustom>
+          <button
+            style={{ height: "2rem" }}
+            onClick={() => window.alert("custom menu item")}
+          >
+            custom item
+          </button>
+        </MainMenu.ItemCustom>
+        <MainMenu.DefaultItems.Help />
+
+        {excalidrawAPI && <MobileFooter excalidrawAPI={excalidrawAPI} />}
+      </MainMenu>
     );
   };
 
   return (
     <div className="App" ref={appRef}>
-      <h1> Excalidraw Example</h1>
+      <h1>{appTitle}</h1>
+      {/* TODO fix type */}
       <ExampleSidebar>
         <div className="button-wrapper">
           <button onClick={loadSceneOrLibrary}>Load Scene or Library</button>
@@ -607,11 +595,7 @@ export default function App() {
               type="checkbox"
               checked={theme === "dark"}
               onChange={() => {
-                let newTheme = "light";
-                if (theme === "light") {
-                  newTheme = "dark";
-                }
-                setTheme(newTheme);
+                setTheme(theme === "light" ? "dark" : "light");
               }}
             />
             Switch to Dark Theme
@@ -625,15 +609,15 @@ export default function App() {
                   const collaborators = new Map();
                   collaborators.set("id1", {
                     username: "Doremon",
-                    avatarUrl: "doremon.png",
+                    avatarUrl: "images/doremon.png",
                   });
                   collaborators.set("id2", {
                     username: "Excalibot",
-                    avatarUrl: "excalibot.png",
+                    avatarUrl: "images/excalibot.png",
                   });
                   collaborators.set("id3", {
                     username: "Pika",
-                    avatarUrl: "pika.jpeg",
+                    avatarUrl: "images/pika.jpeg",
                   });
                   collaborators.set("id4", {
                     username: "fallback",
@@ -674,23 +658,6 @@ export default function App() {
           </div>
         </div>
         <div className="excalidraw-wrapper">
-          <div
-            style={{
-              position: "absolute",
-              left: "50%",
-              bottom: "20px",
-              display: "flex",
-              zIndex: 9999999999999999,
-              padding: "5px 10px",
-              transform: "translateX(-50%)",
-              background: "rgba(255, 255, 255, 0.8)",
-              gap: "1rem",
-            }}
-          >
-            <button onClick={() => excalidrawAPI?.toggleMenu("customSidebar")}>
-              Toggle Custom Sidebar
-            </button>
-          </div>
           <Excalidraw
             ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
             initialData={initialStatePromiseRef.current.promise}
@@ -702,22 +669,55 @@ export default function App() {
               button: "down" | "up";
               pointersMap: Gesture["pointers"];
             }) => setPointerData(payload)}
-            onCollabButtonClick={() =>
-              window.alert("You clicked on collab button")
-            }
             viewModeEnabled={viewModeEnabled}
             zenModeEnabled={zenModeEnabled}
             gridModeEnabled={gridModeEnabled}
             theme={theme}
             name="Custom name of drawing"
-            UIOptions={{ canvasActions: { loadScene: false } }}
+            UIOptions={{
+              canvasActions: {
+                loadScene: false,
+              },
+            }}
             renderTopRightUI={renderTopRightUI}
-            renderFooter={renderFooter}
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
-            renderSidebar={renderSidebar}
-          />
+            // allow all urls
+            validateEmbeddable={true}
+          >
+            {excalidrawAPI && (
+              <Footer>
+                <CustomFooter excalidrawAPI={excalidrawAPI} />
+              </Footer>
+            )}
+            <WelcomeScreen />
+            <Sidebar name="custom">
+              <Sidebar.Tabs>
+                <Sidebar.Header />
+                <Sidebar.Tab tab="one">Tab one!</Sidebar.Tab>
+                <Sidebar.Tab tab="two">Tab two!</Sidebar.Tab>
+                <Sidebar.TabTriggers>
+                  <Sidebar.TabTrigger tab="one">One</Sidebar.TabTrigger>
+                  <Sidebar.TabTrigger tab="two">Two</Sidebar.TabTrigger>
+                </Sidebar.TabTriggers>
+              </Sidebar.Tabs>
+            </Sidebar>
+            <Sidebar.Trigger
+              name="custom"
+              tab="one"
+              style={{
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
+                bottom: "20px",
+                zIndex: 9999999999999999,
+              }}
+            >
+              Toggle Custom Sidebar
+            </Sidebar.Trigger>
+            {renderMenu()}
+          </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}
         </div>
@@ -786,7 +786,6 @@ export default function App() {
           <div className="export export-blob">
             <img src={blobUrl} alt="" />
           </div>
-
           <button
             onClick={async () => {
               if (!excalidrawAPI) {
@@ -807,6 +806,78 @@ export default function App() {
             }}
           >
             Export to Canvas
+          </button>
+          <button
+            onClick={async () => {
+              if (!excalidrawAPI) {
+                return;
+              }
+              const canvas = await exportToCanvas({
+                elements: excalidrawAPI.getSceneElements(),
+                appState: {
+                  ...initialData.appState,
+                  exportWithDarkMode,
+                },
+                files: excalidrawAPI.getFiles(),
+              });
+              const ctx = canvas.getContext("2d")!;
+              ctx.font = "30px Virgil";
+              ctx.strokeText("My custom text", 50, 60);
+              setCanvasUrl(canvas.toDataURL());
+            }}
+          >
+            Export to Canvas
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!excalidrawAPI) {
+                return;
+              }
+
+              const elements = excalidrawAPI.getSceneElements();
+              excalidrawAPI.scrollToContent(elements[0], {
+                fitToViewport: true,
+              });
+            }}
+          >
+            Fit to viewport, first element
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!excalidrawAPI) {
+                return;
+              }
+
+              const elements = excalidrawAPI.getSceneElements();
+              excalidrawAPI.scrollToContent(elements[0], {
+                fitToContent: true,
+              });
+
+              excalidrawAPI.scrollToContent(elements[0], {
+                fitToContent: true,
+              });
+            }}
+          >
+            Fit to content, first element
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!excalidrawAPI) {
+                return;
+              }
+
+              const elements = excalidrawAPI.getSceneElements();
+              excalidrawAPI.scrollToContent(elements[0], {
+                fitToContent: true,
+              });
+
+              excalidrawAPI.scrollToContent(elements[0]);
+            }}
+          >
+            Scroll to first element, no fitToContent, no fitToViewport
           </button>
           <div className="export export-canvas">
             <img src={canvasUrl} alt="" />

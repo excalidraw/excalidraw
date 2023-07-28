@@ -8,16 +8,7 @@ import { EVENT, MIME_TYPES } from "../constants";
 import { AbortError } from "../errors";
 import { debounce } from "../utils";
 
-type FILE_EXTENSION =
-  | "gif"
-  | "jpg"
-  | "png"
-  | "excalidraw.png"
-  | "svg"
-  | "excalidraw.svg"
-  | "json"
-  | "excalidraw"
-  | "excalidrawlib";
+type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 
 const INPUT_CHANGE_INTERVAL_MS = 500;
 

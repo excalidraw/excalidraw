@@ -1,6 +1,4 @@
-export const isDarwin = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
-export const isWindows = /^Win/.test(window.navigator.platform);
-export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
+import { isDarwin } from "./constants";
 
 export const CODES = {
   EQUAL: "Equal",
@@ -12,6 +10,7 @@ export const CODES = {
   BRACKET_LEFT: "BracketLeft",
   ONE: "Digit1",
   TWO: "Digit2",
+  THREE: "Digit3",
   NINE: "Digit9",
   QUOTE: "Quote",
   ZERO: "Digit0",
@@ -29,6 +28,8 @@ export const KEYS = {
   ARROW_LEFT: "ArrowLeft",
   ARROW_RIGHT: "ArrowRight",
   ARROW_UP: "ArrowUp",
+  PAGE_UP: "PageUp",
+  PAGE_DOWN: "PageDown",
   BACKSPACE: "Backspace",
   ALT: "Alt",
   CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
@@ -42,6 +43,7 @@ export const KEYS = {
   CHEVRON_RIGHT: ">",
   PERIOD: ".",
   COMMA: ",",
+  SUBTRACT: "-",
 
   A: "a",
   C: "c",
@@ -63,6 +65,7 @@ export const KEYS = {
   Y: "y",
   Z: "z",
   K: "k",
+  W: "w",
 
   0: "0",
   1: "1",

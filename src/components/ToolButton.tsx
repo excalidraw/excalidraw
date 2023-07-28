@@ -1,6 +1,6 @@
 import "./ToolIcon.scss";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { useExcalidrawContainer } from "./App";
 import { AbortError } from "../errors";
@@ -19,12 +19,13 @@ type ToolButtonBaseProps = {
   name?: string;
   id?: string;
   size?: ToolButtonSize;
-  keyBindingLabel?: string;
+  keyBindingLabel?: string | null;
   showAriaLabel?: boolean;
   hidden?: boolean;
   visible?: boolean;
   selected?: boolean;
   className?: string;
+  style?: CSSProperties;
   isLoading?: boolean;
 };
 
@@ -114,6 +115,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
             "ToolIcon--plain": props.type === "icon",
           },
         )}
+        style={props.style}
         data-testid={props["data-testid"]}
         hidden={props.hidden}
         title={props.title}

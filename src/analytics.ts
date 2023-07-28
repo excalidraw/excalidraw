@@ -1,22 +1,32 @@
-export const trackEvent =
-  typeof process !== "undefined" &&
-  process.env?.REACT_APP_GOOGLE_ANALYTICS_ID &&
-  typeof window !== "undefined" &&
-  window.gtag
-    ? (category: string, action: string, label?: string, value?: number) => {
-        try {
-          window.gtag("event", action, {
-            event_category: category,
-            event_label: label,
-            value,
-          });
-        } catch (error) {
-          console.error("error logging to ga", error);
-        }
-      }
-    : typeof process !== "undefined" && process.env?.JEST_WORKER_ID
-    ? (category: string, action: string, label?: string, value?: number) => {}
-    : (category: string, action: string, label?: string, value?: number) => {
-        // Uncomment the next line to track locally
-        // console.log("Track Event", { category, action, label, value });
-      };
+export const trackEvent = (
+  category: string,
+  action: string,
+  label?: string,
+  value?: number,
+) => {
+  try {
+    // place here categories that you want to track as events
+    // KEEP IN MIND THE PRICING
+    const ALLOWED_CATEGORIES_TO_TRACK = [] as string[];
+    // Uncomment the next line to track locally
+    // console.log("Track Event", { category, action, label, value });
+
+    if (typeof window === "undefined" || import.meta.env.VITE_WORKER_ID) {
+      return;
+    }
+
+    if (!ALLOWED_CATEGORIES_TO_TRACK.includes(category)) {
+      return;
+    }
+
+    if (window.sa_event) {
+      window.sa_event(action, {
+        category,
+        label,
+        value,
+      });
+    }
+  } catch (error) {
+    console.error("error during analytics", error);
+  }
+};

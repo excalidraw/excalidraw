@@ -1,6 +1,6 @@
 import { VERSIONS } from "../constants";
 import { t } from "../i18n";
-import { AppState, ExcalidrawProps } from "../types";
+import { ExcalidrawProps, UIAppState } from "../types";
 
 const LibraryMenuBrowseButton = ({
   theme,
@@ -8,7 +8,7 @@ const LibraryMenuBrowseButton = ({
   libraryReturnUrl,
 }: {
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
-  theme: AppState["theme"];
+  theme: UIAppState["theme"];
   id: string;
 }) => {
   const referrer =
@@ -16,7 +16,7 @@ const LibraryMenuBrowseButton = ({
   return (
     <a
       className="library-menu-browse-button"
-      href={`${process.env.REACT_APP_LIBRARY_URL}?target=${
+      href={`${import.meta.env.VITE_APP_LIBRARY_URL}?target=${
         window.name || "_blank"
       }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}&version=${
         VERSIONS.excalidrawLibrary
