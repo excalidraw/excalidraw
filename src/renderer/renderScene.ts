@@ -394,6 +394,100 @@ const getNormalizedCanvasDimensions = (
   return [canvas.width / scale, canvas.height / scale];
 };
 
+const addExportBackground = (
+  canvas: HTMLCanvasElement,
+  normalizedCanvasWidth: number,
+  normalizedCanvasHeight: number,
+  svgUrl: string,
+  rectangleColor: string,
+): void => {
+  const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+
+  // Create a new image object
+  const img = new Image();
+
+  // When the image has loaded
+  img.onload = (): void => {
+    // Draw the image onto the canvas
+    ctx.drawImage(img, 0, 0, normalizedCanvasWidth, canvas.height);
+
+    // Create shadow similar to the CSS box-shadow
+    const shadows = [
+      {
+        offsetX: 0,
+        offsetY: 0.7698959708213806,
+        blur: 1.4945039749145508,
+        alpha: 0.02,
+      },
+      {
+        offsetX: 0,
+        offsetY: 1.1299999952316284,
+        blur: 4.1321120262146,
+        alpha: 0.04,
+      },
+      {
+        offsetX: 0,
+        offsetY: 4.130000114440918,
+        blur: 9.94853401184082,
+        alpha: 0.05,
+      },
+      { offsetX: 0, offsetY: 13, blur: 33, alpha: 0.07 },
+    ];
+
+    shadows.forEach((shadow, index): void => {
+      const MARGIN = 24;
+      const BORDER_RADIUS = 12;
+
+      ctx.shadowColor = `rgba(0, 0, 0, ${shadow.alpha})`;
+      ctx.shadowBlur = shadow.blur;
+      ctx.shadowOffsetX = shadow.offsetX;
+      ctx.shadowOffsetY = shadow.offsetY;
+
+      // Define path for rectangle
+      ctx.beginPath();
+      ctx.moveTo(MARGIN, MARGIN);
+      ctx.lineTo(normalizedCanvasWidth - MARGIN, MARGIN);
+      ctx.quadraticCurveTo(
+        normalizedCanvasWidth,
+        MARGIN,
+        normalizedCanvasWidth,
+        MARGIN + BORDER_RADIUS,
+      );
+      ctx.lineTo(normalizedCanvasWidth, normalizedCanvasHeight - MARGIN);
+      ctx.quadraticCurveTo(
+        normalizedCanvasWidth,
+        normalizedCanvasHeight,
+        normalizedCanvasWidth - MARGIN,
+        normalizedCanvasHeight,
+      );
+      ctx.lineTo(MARGIN, normalizedCanvasHeight);
+      ctx.quadraticCurveTo(
+        0,
+        normalizedCanvasHeight,
+        0,
+        normalizedCanvasHeight - MARGIN,
+      );
+      ctx.lineTo(0, MARGIN + BORDER_RADIUS);
+      ctx.quadraticCurveTo(0, MARGIN, MARGIN, MARGIN);
+      ctx.closePath();
+
+      if (index === shadows.length - 1) {
+        ctx.fillStyle = rectangleColor;
+        ctx.fill();
+      }
+    });
+
+    // Reset shadow properties for future drawings
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+  };
+
+  // Start loading the image
+  img.src = svgUrl;
+};
+
 const bootstrapCanvas = ({
   canvas,
   scale,
@@ -441,6 +535,7 @@ const bootstrapCanvas = ({
   return context;
 };
 
+<<<<<<< HEAD
 const _renderInteractiveScene = ({
   canvas,
   elements,
