@@ -210,8 +210,8 @@
     "brave_measure_text_error": {
       "line1": "<bold>Aggressly Block Fingerprinting</bold> の設定が有効なBraveブラウザを使用しているようです。",
       "line2": "これにより、図面の <bold>テキスト要素</bold> が壊れる可能性があります。",
-      "line3": "",
-      "line4": ""
+      "line3": "この設定を無効にすることを強く推奨します。 <link>設定手順</link> をこちらから確認できます。",
+      "line4": "この設定を無効にすると、テキスト要素の表示が修正されません。 GitHub で <issueLink>Issue</issueLink> を開くか、 <discordLink>Discord</discordLink> にご記入ください"
     },
     "libraryElementTypeError": {
       "embeddable": "",
@@ -378,21 +378,21 @@
       "onlySelected": "",
       "darkMode": "ダークモード",
       "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "scale": "スケール",
+      "padding": "余白"
     },
     "tooltip": {
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG にエクスポート",
+      "exportToSvg": "SVG にエクスポート",
+      "copyPngToClipboard": "クリップボードにPNGをコピー"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "クリップボードにコピー"
     }
   },
   "encrypted": {
@@ -461,35 +461,35 @@
     "mostUsedCustomColors": "最も使用されているカスタム色",
     "colors": "色",
     "shades": "影",
-    "hexCode": "",
+    "hexCode": "Hexコード",
     "noShades": ""
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "画像としてエクスポート",
+        "button": "画像としてエクスポート",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "ディスクに保存",
+        "button": "ディスクに保存",
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Excalidraw+にエクスポート",
+        "description": "Excalidraw+ ワークスペースにシーンを保存します。"
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "ファイルからロード",
+        "button": "ファイルからロード",
         "description": ""
       },
       "shareableLink": {
-        "title": "",
+        "title": "リンクからロード",
         "button": "",
         "description": ""
       }
