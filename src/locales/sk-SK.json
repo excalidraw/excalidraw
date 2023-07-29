@@ -109,12 +109,12 @@
     "createContainerFromText": "Zabaliť text do kontajneru",
     "link": {
       "edit": "Upraviť odkaz",
-      "editEmbed": "",
+      "editEmbed": "Editovať a zapustiť odkaz",
       "create": "Vytvoriť odkaz",
-      "createEmbed": "",
+      "createEmbed": "Vytvoriť a zapustiť odkaz",
       "label": "Odkaz",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Zapustiť odkaz",
+      "empty": "Nie je nastavený žiaden odkaz"
     },
     "lineEditor": {
       "edit": "Upraviť čiaru",
@@ -168,11 +168,11 @@
     "cancel": "Zrušiť",
     "clear": "Vymazať",
     "remove": "Odstrániť",
-    "embed": "",
+    "embed": "Prepnúť zapustenie",
     "publishLibrary": "Uverejniť",
     "submit": "Potvrdiť",
     "confirm": "Potvrdiť",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Kliknite pre interakciu"
   },
   "alerts": {
     "clearReset": "Týmto sa vyčistí celé plátno. Ste si istí?",
@@ -214,8 +214,8 @@
       "line4": "Ak vypnutie toho nastavenia nevyrieši problém so zobrazením textových prvkov, prosím ohláste <issueLink>problém</issueLink> na našom GitHub-e alebo nám napíšte na náš <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "image": ""
+      "embeddable": "Zapustené prvky nie je možné pridať do knižnice.",
+      "image": "Podpora pre pridávanie obrázkov do knižnice bude dostupná už čoskoro!"
     }
   },
   "toolBar": {
@@ -234,7 +234,7 @@
     "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
     "eraser": "Guma",
     "frame": "Nástroj rám",
-    "embeddable": "",
+    "embeddable": "Web Embed",
     "hand": "Ruka (nástroj pre pohyb plátna)",
     "extraTools": "Ďalšie nástroje"
   },
@@ -248,7 +248,7 @@
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
-    "embeddable": "",
+    "embeddable": "Kliknite a ťahajte pre zapustenie webovej stránky",
     "text_selected": "Použite dvojklik alebo stlačte Enter na editáciu textu",
     "text_editing": "Stlačte Escape alebo CtrlOrCmd+ENTER na ukončenie editovania",
     "linearElementMulti": "Kliknite na počiatočný bod alebo stlačte Escape alebo Enter na ukončenie",
@@ -424,8 +424,8 @@
     "canvas": "plátna",
     "selection": "výberu",
     "pasteAsSingleElement": "Použitím {{shortcut}} vložte ako samostatný prvok alebo vložte do existujúceho editovaného textu",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "Zapustenie tejto URL nie je povolené. Vytvorte issue na GitHub-e a požiadajte povolenie tejto URL",
+    "unrecognizedLinkFormat": "Odkaz, ktorý sa snažíte zapustiť nie je v očakávanom formáte. Prosím skúste vložiť 'odkaz na zdieľanie' poskytnutý zdrojovou webovou stránkou"
   },
   "colors": {
     "transparent": "Priehľadná",
