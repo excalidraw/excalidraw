@@ -55,6 +55,7 @@ const ALLOWED_DOMAINS = new Set([
   "link.excalidraw.com",
   "gist.github.com",
   "twitter.com",
+  "*.simplepdf.eu",
   "stackblitz.com",
   "val.town",
 ]);
@@ -274,9 +275,16 @@ const validateHostname = (
     const { hostname } = new URL(url);
 
     const bareDomain = hostname.replace(/^www\./, "");
+    const bareDomainWithFirstSubdomainWildcarded = bareDomain.replace(
+      /^([^.]+)/,
+      "*",
+    );
 
     if (allowedHostnames instanceof Set) {
-      return ALLOWED_DOMAINS.has(bareDomain);
+      return (
+        ALLOWED_DOMAINS.has(bareDomain) ||
+        ALLOWED_DOMAINS.has(bareDomainWithFirstSubdomainWildcarded)
+      );
     }
 
     if (bareDomain === allowedHostnames.replace(/^www\./, "")) {
