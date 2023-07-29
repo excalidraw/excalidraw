@@ -50,7 +50,7 @@
     "veryLarge": "特大",
     "solid": "ベタ塗り",
     "hachure": "斜線",
-    "zigzag": "",
+    "zigzag": "ジグザグ",
     "crossHatch": "網掛け",
     "thin": "細",
     "bold": "太字",
@@ -106,15 +106,15 @@
     "increaseFontSize": "フォントサイズを拡大",
     "unbindText": "テキストのバインド解除",
     "bindText": "テキストをコンテナにバインド",
-    "createContainerFromText": "",
+    "createContainerFromText": "コンテナ内でテキストを折り返す",
     "link": {
       "edit": "リンクを編集",
-      "editEmbed": "",
+      "editEmbed": "リンクの編集と埋め込み",
       "create": "リンクを作成",
-      "createEmbed": "",
+      "createEmbed": "リンクの作成と埋め込み",
       "label": "リンク",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "リンクと埋め込み",
+      "empty": "リンクが設定されていません"
     },
     "lineEditor": {
       "edit": "行を編集",
@@ -128,9 +128,9 @@
     },
     "statusPublished": "公開済み",
     "sidebarLock": "サイドバーを開いたままにする",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "フレーム内のすべての要素を選択",
+    "removeAllElementsFromFrame": "フレーム内のすべての要素を削除",
+    "eyeDropper": "キャンバスから色を選択"
   },
   "library": {
     "noItems": "まだアイテムが追加されていません…",
@@ -168,7 +168,7 @@
     "cancel": "キャンセル",
     "clear": "消去",
     "remove": "削除",
-    "embed": "",
+    "embed": "埋め込みの切り替え",
     "publishLibrary": "公開",
     "submit": "送信",
     "confirm": "確認",
@@ -208,8 +208,8 @@
     "collabSaveFailed": "バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
     "collabSaveFailed_sizeExceeded": "キャンバスが大きすぎるため、バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
+      "line1": "<bold>Aggressly Block Fingerprinting</bold> の設定が有効なBraveブラウザを使用しているようです。",
+      "line2": "これにより、図面の <bold>テキスト要素</bold> が壊れる可能性があります。",
       "line3": "",
       "line4": ""
     },
@@ -233,10 +233,10 @@
     "penMode": "ペンモード - タッチ防止",
     "link": "選択した図形のリンクを追加/更新",
     "eraser": "消しゴム",
-    "frame": "",
-    "embeddable": "",
+    "frame": "フレームツール",
+    "embeddable": "Web埋め込み",
     "hand": "手 (パンニングツール)",
-    "extraTools": ""
+    "extraTools": "その他のツール"
   },
   "headings": {
     "canvasActions": "キャンバス操作",
@@ -372,11 +372,11 @@
     "removeItemsFromLib": "選択したアイテムをライブラリから削除"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "画像をエクスポート",
     "label": {
-      "withBackground": "",
+      "withBackground": "背景",
       "onlySelected": "",
-      "darkMode": "",
+      "darkMode": "ダークモード",
       "embedScene": "",
       "scale": "",
       "padding": ""
@@ -429,20 +429,20 @@
   },
   "colors": {
     "transparent": "透明",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "黒",
+    "white": "白",
+    "red": "赤",
+    "pink": "ピンク",
+    "grape": "グレープ",
+    "violet": "バイオレット",
+    "gray": "灰色",
+    "blue": "青",
+    "cyan": "シアン",
+    "teal": "ティール",
+    "green": "緑",
+    "yellow": "黄",
+    "orange": "オレンジ",
+    "bronze": "ブロンズ"
   },
   "welcomeScreen": {
     "app": {
@@ -458,9 +458,9 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
+    "mostUsedCustomColors": "最も使用されているカスタム色",
+    "colors": "色",
+    "shades": "影",
     "hexCode": "",
     "noShades": ""
   },
