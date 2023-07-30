@@ -4,8 +4,9 @@ import { reseed } from "../random";
 import { render, queryByTestId } from "../tests/test-utils";
 
 import ExcalidrawApp from "../excalidraw-app";
+import { vi } from "vitest";
 
-const renderStaticScene = jest.spyOn(Renderer, "renderStaticScene");
+const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
 
 describe("Test <App/>", () => {
   beforeEach(async () => {

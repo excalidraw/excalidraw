@@ -10,12 +10,13 @@ import {
 } from "./test-utils";
 import { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
+import { vi } from "vitest";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderInteractiveScene = jest.spyOn(Renderer, "renderInteractiveScene");
-const renderStaticScene = jest.spyOn(Renderer, "renderStaticScene");
+const renderInteractiveScene = vi.spyOn(Renderer, "renderInteractiveScene");
+const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
 
 beforeEach(() => {
   localStorage.clear();

@@ -12,12 +12,14 @@ import {
 } from "../element/types";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
+import { vi } from "vitest";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderInteractiveScene = jest.spyOn(Renderer, "renderInteractiveScene");
-const renderStaticScene = jest.spyOn(Renderer, "renderStaticScene");
+const renderInteractiveScene = vi.spyOn(Renderer, "renderInteractiveScene");
+const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+
 beforeEach(() => {
   localStorage.clear();
   renderInteractiveScene.mockClear();

@@ -255,6 +255,7 @@ import {
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
+  isTestEnv,
   easeOut,
 } from "../utils";
 import {
@@ -883,7 +884,7 @@ class App extends React.Component<AppProps, AppState> {
                       title="Excalidraw Embedded Content"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen={true}
-                      sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
+                      sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads"
                     />
                   )}
                 </div>
@@ -1595,10 +1596,7 @@ class App extends React.Component<AppProps, AppState> {
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
-    if (
-      process.env.NODE_ENV === ENV.TEST ||
-      process.env.NODE_ENV === ENV.DEVELOPMENT
-    ) {
+    if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
         state: {
@@ -1636,7 +1634,7 @@ class App extends React.Component<AppProps, AppState> {
       // bounding rects don't work in tests so updating
       // the state on init would result in making the test enviro run
       // in mobile breakpoint (0 width/height), making everything fail
-      process.env.NODE_ENV !== "test"
+      !isTestEnv()
     ) {
       this.refreshDeviceState(this.excalidrawContainerRef.current);
     }
@@ -5969,28 +5967,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.boxSelection.hasOccurred = true;
 
         const elements = this.scene.getNonDeletedElements();
-        if (
-          !event.shiftKey &&
-          // allows for box-selecting points (without shift)
-          !this.state.editingLinearElement &&
-          isSomeElementSelected(elements, this.state)
-        ) {
-          if (pointerDownState.withCmdOrCtrl && pointerDownState.hit.element) {
-            this.setState((prevState) =>
-              selectGroupsForSelectedElements(
-                {
-                  ...prevState,
-                  selectedElementIds: {
-                    [pointerDownState.hit.element!.id]: true,
-                  },
-                },
-                this.scene.getNonDeletedElements(),
-                prevState,
-                this,
-              ),
-            );
-          }
-        }
+
         // box-select line editor points
         if (this.state.editingLinearElement) {
           LinearElementEditor.handleBoxSelection(
@@ -6000,18 +5977,46 @@ class App extends React.Component<AppProps, AppState> {
           );
           // regular box-select
         } else {
+          let shouldReuseSelection = true;
+
+          if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
+            if (
+              pointerDownState.withCmdOrCtrl &&
+              pointerDownState.hit.element
+            ) {
+              this.setState((prevState) =>
+                selectGroupsForSelectedElements(
+                  {
+                    ...prevState,
+                    selectedElementIds: {
+                      [pointerDownState.hit.element!.id]: true,
+                    },
+                  },
+                  this.scene.getNonDeletedElements(),
+                  prevState,
+                  this,
+                ),
+              );
+            } else {
+              shouldReuseSelection = false;
+            }
+          }
           const elementsWithinSelection = getElementsWithinSelection(
             elements,
             draggingElement,
           );
+
           this.setState((prevState) => {
-            const nextSelectedElementIds = elementsWithinSelection.reduce(
-              (acc: Record<ExcalidrawElement["id"], true>, element) => {
-                acc[element.id] = true;
-                return acc;
-              },
-              {},
-            );
+            const nextSelectedElementIds = {
+              ...(shouldReuseSelection && prevState.selectedElementIds),
+              ...elementsWithinSelection.reduce(
+                (acc: Record<ExcalidrawElement["id"], true>, element) => {
+                  acc[element.id] = true;
+                  return acc;
+                },
+                {},
+              ),
+            };
 
             if (pointerDownState.hit.element) {
               // if using ctrl/cmd, select the hitElement only if we
@@ -6026,6 +6031,10 @@ class App extends React.Component<AppProps, AppState> {
             return selectGroupsForSelectedElements(
               {
                 ...prevState,
+                ...(!shouldReuseSelection && {
+                  selectedGroupIds: {},
+                  editingGroupId: null,
+                }),
                 selectedElementIds: nextSelectedElementIds,
                 showHyperlinkPopup:
                   elementsWithinSelection.length === 1 &&
@@ -8082,10 +8091,7 @@ declare global {
   }
 }
 
-if (
-  process.env.NODE_ENV === ENV.TEST ||
-  process.env.NODE_ENV === ENV.DEVELOPMENT
-) {
+if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
   window.h = window.h || ({} as Window["h"]);
 
   Object.defineProperties(window.h, {

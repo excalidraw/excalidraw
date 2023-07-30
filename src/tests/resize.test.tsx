@@ -9,11 +9,13 @@ import { ExcalidrawTextElement } from "../element/types";
 import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
+import { vi } from "vitest";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderStaticScene = jest.spyOn(Renderer, "renderStaticScene");
+const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+
 beforeEach(() => {
   localStorage.clear();
   renderStaticScene.mockClear();

@@ -7,6 +7,7 @@ import {
   BinaryFiles,
   Point,
   CommonCanvasAppState,
+  Zoom,
 } from "../types";
 import {
   ExcalidrawElement,
@@ -167,23 +168,52 @@ const fillCircle = (
 const strokeGrid = (
   context: CanvasRenderingContext2D,
   gridSize: number,
-  offsetX: number,
-  offsetY: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
   width: number,
   height: number,
 ) => {
+  const BOLD_LINE_FREQUENCY = 5;
+
+  enum GridLineColor {
+    Bold = "#cccccc",
+    Regular = "#e5e5e5",
+  }
+
+  const offsetX =
+    -Math.round(zoom.value / gridSize) * gridSize + (scrollX % gridSize);
+  const offsetY =
+    -Math.round(zoom.value / gridSize) * gridSize + (scrollY % gridSize);
+
+  const lineWidth = Math.min(1 / zoom.value, 1);
+
+  const spaceWidth = 1 / zoom.value;
+  const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
+
   context.save();
-  context.strokeStyle = "rgba(0,0,0,0.1)";
-  context.beginPath();
+  context.lineWidth = lineWidth;
+
   for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+    const isBold =
+      Math.round(x - scrollX) % (BOLD_LINE_FREQUENCY * gridSize) === 0;
+    context.beginPath();
+    context.setLineDash(isBold ? [] : lineDash);
+    context.strokeStyle = isBold ? GridLineColor.Bold : GridLineColor.Regular;
     context.moveTo(x, offsetY - gridSize);
     context.lineTo(x, offsetY + height + gridSize * 2);
+    context.stroke();
   }
   for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
+    const isBold =
+      Math.round(y - scrollY) % (BOLD_LINE_FREQUENCY * gridSize) === 0;
+    context.beginPath();
+    context.setLineDash(isBold ? [] : lineDash);
+    context.strokeStyle = isBold ? GridLineColor.Bold : GridLineColor.Regular;
     context.moveTo(offsetX - gridSize, y);
     context.lineTo(offsetX + width + gridSize * 2, y);
+    context.stroke();
   }
-  context.stroke();
   context.restore();
 };
 
@@ -919,6 +949,7 @@ const _renderStaticScene = ({
         (appState.scrollX % appState.gridSize),
       -Math.ceil(appState.zoom.value / appState.gridSize) * appState.gridSize +
         (appState.scrollY % appState.gridSize),
+      appState.zoom,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
     );
