@@ -109,9 +109,9 @@
     "createContainerFromText": "Огорнути текст у контейнер",
     "link": {
       "edit": "Редагування посилання",
-      "editEmbed": "",
+      "editEmbed": "Редагування посилання і додавання",
       "create": "Створити посилання",
-      "createEmbed": "",
+      "createEmbed": "Створити посилання і додавання",
       "label": "Посилання",
       "labelEmbed": "",
       "empty": ""
