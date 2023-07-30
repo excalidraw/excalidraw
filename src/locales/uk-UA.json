@@ -172,7 +172,7 @@
     "publishLibrary": "Опублікувати",
     "submit": "Надіслати",
     "confirm": "Підтвердити",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Натисніть для взаємодії"
   },
   "alerts": {
     "clearReset": "Це очистить все полотно. Впевнені?",
@@ -236,7 +236,7 @@
     "frame": "",
     "embeddable": "",
     "hand": "Рука (інструмент для панорамування)",
-    "extraTools": ""
+    "extraTools": "Інші інструменти"
   },
   "headings": {
     "canvasActions": "Дії з полотном",
@@ -378,8 +378,8 @@
       "onlySelected": "Тільки вибране",
       "darkMode": "Темний режим",
       "embedScene": "Вбудована сцена",
-      "scale": "",
-      "padding": ""
+      "scale": "Масштабування",
+      "padding": "Відступ"
     },
     "tooltip": {
       "embedScene": ""
@@ -387,12 +387,12 @@
     "title": {
       "exportToPng": "Експортувати в PNG",
       "exportToSvg": "Експортувати у SVG",
-      "copyPngToClipboard": ""
+      "copyPngToClipboard": "Скопіювати PNG в буфер обміну"
     },
     "button": {
       "exportToPng": "PNG",
       "exportToSvg": "SVG",
-      "copyPngToClipboard": ""
+      "copyPngToClipboard": "Копіювати в буфер обміну"
     }
   },
   "encrypted": {
@@ -477,9 +477,9 @@
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Експортувати до Excalidraw+",
+        "description": "Зберегти сцену до робочого простору Excalidraw+."
       }
     },
     "modal": {
@@ -489,8 +489,8 @@
         "description": ""
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
+        "title": "Завантажити з посилання",
+        "button": "Замінити мій контент",
         "description": ""
       }
     }
