@@ -26,7 +26,7 @@ import {
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
 } from "../../../types";
-import { NonDeletedExcalidrawElement } from "../../../element/types";
+import { NonDeletedExcalidrawElement, Theme } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
@@ -97,7 +97,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
   const [canvasUrl, setCanvasUrl] = useState<string>("");
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
   const [exportEmbedScene, setExportEmbedScene] = useState(false);
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState<Theme>("light");
   const [isCollaborating, setIsCollaborating] = useState(false);
   const [commentIcons, setCommentIcons] = useState<{ [id: string]: Comment }>(
     {},
@@ -601,11 +601,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               type="checkbox"
               checked={theme === "dark"}
               onChange={() => {
-                let newTheme = "light";
-                if (theme === "light") {
-                  newTheme = "dark";
-                }
-                setTheme(newTheme);
+                setTheme(theme === "light" ? "dark" : "light");
               }}
             />
             Switch to Dark Theme
@@ -684,11 +680,17 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             gridModeEnabled={gridModeEnabled}
             theme={theme}
             name="Custom name of drawing"
-            UIOptions={{ canvasActions: { loadScene: false } }}
+            UIOptions={{
+              canvasActions: {
+                loadScene: false,
+              },
+            }}
             renderTopRightUI={renderTopRightUI}
             onLinkOpen={onLinkOpen}
             onPointerDown={onPointerDown}
             onScrollChange={rerenderCommentIcons}
+            // allow all urls
+            validateEmbeddable={true}
           >
             {excalidrawAPI && (
               <Footer>

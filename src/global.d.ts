@@ -38,16 +38,6 @@ interface CanvasRenderingContext2D {
   ) => void;
 }
 
-// https://github.com/facebook/create-react-app/blob/ddcb7d5/packages/react-scripts/lib/react-app.d.ts
-declare namespace NodeJS {
-  interface ProcessEnv {
-    readonly REACT_APP_BACKEND_V2_GET_URL: string;
-    readonly REACT_APP_BACKEND_V2_POST_URL: string;
-    readonly REACT_APP_PORTAL_URL: string;
-    readonly REACT_APP_FIREBASE_CONFIG: string;
-  }
-}
-
 interface Clipboard extends EventTarget {
   write(data: any[]): Promise<void>;
 }
@@ -119,4 +109,10 @@ declare module "image-blob-reduce" {
   }
   const reduce: ImageBlobReduce.ImageBlobReduceStatic;
   export = reduce;
+}
+
+declare namespace jest {
+  interface Expect {
+    toBeNonNaNNumber(): void;
+  }
 }

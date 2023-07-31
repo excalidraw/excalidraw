@@ -78,8 +78,7 @@
       }
     </style>
     <!------------------------------------------------------------------------->
-
-    <% if (process.env.NODE_ENV === "production") { %>
+    <% if ("%PROD%" === "true") { %>
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -100,41 +99,35 @@
     </script>
     <% } %>
 
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
 
     <!-- Excalidraw version -->
     <meta name="version" content="{version}" />
 
     <link
       rel="preload"
-      href="Virgil.woff2"
+      href="/Virgil.woff2"
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
     />
     <link
       rel="preload"
-      href="Cascadia.woff2"
+      href="/Cascadia.woff2"
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
     />
 
-    <link
-      rel="manifest"
-      href="manifest.json"
-      style="--pwacompat-splash-font: 24px Virgil"
-    />
-
-    <link rel="stylesheet" href="fonts.css" type="text/css" />
-    <% if (process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD==="true" ) { %>
+    <link rel="stylesheet" href="/fonts.css" type="text/css" />
+    <% if ("%VITE_APP_DEV_DISABLE_LIVE_RELOAD%"==="true" ) { %>
     <script>
       {
         const _WebSocket = window.WebSocket;
         window.WebSocket = function (url) {
           if (/ws:\/\/localhost:.+?\/sockjs-node/.test(url)) {
             console.info(
-              "[!!!] Live reload is disabled via process.env.REACT_APP_DEV_DISABLE_LIVE_RELOAD [!!!]",
+              "[!!!] Live reload is disabled via VITE_APP_DEV_DISABLE_LIVE_RELOAD [!!!]",
             );
           } else {
             return new _WebSocket(url);
@@ -200,7 +193,8 @@
       <h1 class="visually-hidden">Excalidraw</h1>
     </header>
     <div id="root"></div>
-    <% if (process.env.REACT_APP_DISABLE_TRACKING !== 'true') { %>
+    <script type="module" src="/src/index.tsx"></script>
+    <% if ("%VITE_APP_DEV_DISABLE_LIVE_RELOAD%" !== 'true') { %>
     <!-- 100% privacy friendly analytics -->
     <script>
       // need to load this script dynamically bcs. of iframe embed tracking

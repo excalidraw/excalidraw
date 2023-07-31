@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`<Excalidraw/> <MainMenu/> should render main menu with host menu items if passed from host 1`] = `
+exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu items if passed from host 1`] = `
 <div
   class="dropdown-menu"
   data-testid="dropdown-menu"
@@ -108,7 +108,7 @@ exports[`<Excalidraw/> <MainMenu/> should render main menu with host menu items 
 </div>
 `;
 
-exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu with default items when "UIOPtions" is "undefined" 1`] = `
+exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should render menu with default items when "UIOPtions" is "undefined" 1`] = `
 <div
   class="dropdown-menu"
   data-testid="dropdown-menu"
@@ -516,6 +516,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
       style="margin-top: 0.5rem;"
     >
       <div
+        data-testid="canvas-background-label"
         style="font-size: .75rem; margin-bottom: .5rem;"
       >
         Canvas background
