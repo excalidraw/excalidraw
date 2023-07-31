@@ -16,7 +16,7 @@ export const actionGoToCollaborator = register({
       return { appState, commitToHistory: false };
     }
 
-    if (appState.userToFollow === _value.clientId) {
+    if (appState.userToFollow?.clientId === _value.clientId) {
       return {
         appState: {
           ...appState,
@@ -29,9 +29,10 @@ export const actionGoToCollaborator = register({
     return {
       appState: {
         ...appState,
-        // TODO follow-participant
-        // maybe store more data other than just the clientId
-        userToFollow: _value.clientId,
+        userToFollow: {
+          clientId: _value.clientId,
+          username: _value.username || "",
+        },
         ...centerScrollOn({
           scenePoint: point,
           viewportDimensions: {
@@ -57,7 +58,7 @@ export const actionGoToCollaborator = register({
         onClick={() => updateData({ ...collaborator, clientId })}
         name={collaborator.username || ""}
         src={collaborator.avatarUrl}
-        isBeingFollowed={appState.userToFollow === clientId}
+        isBeingFollowed={appState.userToFollow?.clientId === clientId}
       />
     );
   },

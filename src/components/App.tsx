@@ -548,9 +548,19 @@ class App extends React.Component<AppProps, AppState> {
     } = this.state;
     const canvasWidth = canvasDOMWidth * canvasScale;
     const canvasHeight = canvasDOMHeight * canvasScale;
+
+    const userToFollow = this.state.userToFollow;
+
     if (viewModeEnabled) {
       return (
-        <FollowMode width={canvasDOMWidth} height={canvasDOMHeight}>
+        <FollowMode
+          width={canvasDOMWidth}
+          height={canvasDOMHeight}
+          userToFollow={userToFollow}
+          onDisconnect={() => {
+            this.setState({ userToFollow: null });
+          }}
+        >
           <canvas
             className="excalidraw__canvas"
             style={{
@@ -576,7 +586,14 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
     return (
-      <FollowMode width={canvasDOMWidth} height={canvasDOMHeight}>
+      <FollowMode
+        width={canvasDOMWidth}
+        height={canvasDOMHeight}
+        userToFollow={userToFollow}
+        onDisconnect={() => {
+          this.setState({ userToFollow: null });
+        }}
+      >
         <canvas
           className="excalidraw__canvas"
           style={{

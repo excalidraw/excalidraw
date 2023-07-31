@@ -20,6 +20,19 @@
       display: flex;
       gap: 0.5rem;
       align-items: center;
+
+      &__label {
+        display: flex;
+        white-space: pre-wrap;
+      }
+
+      &__username {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+      }
     }
 
     &__disconnect-btn {

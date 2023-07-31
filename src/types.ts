@@ -98,6 +98,8 @@ export type LastActiveTool =
 export type SidebarName = string;
 export type SidebarTabName = string;
 
+export type UserToFollow = { clientId: string; username: string };
+
 export type AppState = {
   contextMenu: {
     items: ContextMenuItems;
@@ -224,7 +226,7 @@ export type AppState = {
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
   /** the user's clientId who is being followed on the canvas */
-  userToFollow: string | null;
+  userToFollow: UserToFollow | null;
   /** whether follow mode should be disconnected when the non-remote user interacts with the canvas */
   shouldDisconnectFollowModeOnCanvasInteraction: boolean;
 };

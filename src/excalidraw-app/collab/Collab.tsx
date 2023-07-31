@@ -543,7 +543,7 @@ class Collab extends PureComponent<Props, CollabState> {
               decryptedData.payload.socketId;
 
             const _appState = this.excalidrawAPI.getAppState();
-            if (_appState.userToFollow === socketId) {
+            if (_appState.userToFollow?.clientId === socketId) {
               const { appState } = zoomToFitBounds({
                 appState: _appState,
                 bounds,
