@@ -6,12 +6,11 @@ const SentryEnvHostnameMap: { [key: string]: string } = {
   "vercel.app": "staging",
 };
 
-const REACT_APP_DISABLE_SENTRY =
-  import.meta.env.VITE_APP_DISABLE_SENTRY === "true";
+const SENTRY_DISABLED = import.meta.env.VITE_APP_DISABLE_SENTRY === "true";
 
 // Disable Sentry locally or inside the Docker to avoid noise/respect privacy
 const onlineEnv =
-  !REACT_APP_DISABLE_SENTRY &&
+  !SENTRY_DISABLED &&
   Object.keys(SentryEnvHostnameMap).find(
     (item) => window.location.hostname.indexOf(item) >= 0,
   );
