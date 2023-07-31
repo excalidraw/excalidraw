@@ -269,6 +269,7 @@ export {
   viewportCoordsToSceneCoords,
 } from "../../utils";
 
+export { getEmbedLink } from "../../element/embeddable";
 export { Sidebar } from "../../components/Sidebar/Sidebar";
 export { Button } from "../../components/Button";
 export { Footer };

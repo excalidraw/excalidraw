@@ -397,7 +397,7 @@ export interface ExcalidrawProps {
     textToSubmit: string,
     originalText: string,
     isDeleted: boolean,
-  ) => [string, string, string]; //zsviczian
+  ) => [updatedText: string, updatedOriginalText: string, link: string]; //zsviczian
   generateIdForFile?: (file: File) => string | Promise<string>;
   onThemeChange?: (newTheme: string) => void; //zsviczian
   onViewModeChange?: (isViewModeEnabled: boolean) => void; //zsviczian
