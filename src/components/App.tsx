@@ -1560,7 +1560,15 @@ class App extends React.Component<AppProps, AppState> {
       isLoading: false,
       toast: this.state.toast,
     };
-    if (initialData?.scrollToContent) {
+    if (this.props.scrollConstraints) {
+      scene.appState = {
+        ...scene.appState,
+        ...this.calculateConstrainedScrollCenter(
+          this.props.scrollConstraints,
+          scene.appState,
+        ),
+      };
+    } else if (initialData?.scrollToContent) {
       scene.appState = {
         ...scene.appState,
         ...calculateScrollCenter(
@@ -8277,6 +8285,98 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  /**
+   * Calculates the scroll center coordinates and the optimal zoom level to fit the constrained scrollable area within the viewport.
+   *
+   * This method first calculates the necessary zoom level to fit the entire constrained scrollable area within the viewport.
+   * Then it calculates the constraints for the viewport given the new zoom level and the current scrollable area dimensions.
+   * The function returns an object containing the optimal scroll positions and zoom level.
+   *
+   * @param scrollConstraints - The constraints of the scrollable area including width, height, and position.
+   * @param appState - An object containing the current horizontal and vertical scroll positions.
+   * @returns An object containing the calculated optimal horizontal and vertical scroll positions and zoom level.
+   *
+   * @example
+   *
+   * const { scrollX, scrollY, zoom } = this.calculateConstrainedScrollCenter(scrollConstraints, { scrollX, scrollY });
+   */
+  public calculateConstrainedScrollCenter = (
+    scrollConstraints: AppState["scrollConstraints"],
+    { scrollX, scrollY }: Pick<AppState, "scrollX" | "scrollY">,
+  ): {
+    scrollX: AppState["scrollX"];
+    scrollY: AppState["scrollY"];
+    zoom: AppState["zoom"];
+  } => {
+    const { width, height, zoom } = this.state;
+
+    if (!scrollConstraints) {
+      return { scrollX, scrollY, zoom };
+    }
+
+    const { zoomLevelX, zoomLevelY, maxZoomLevel } = this.calculateZoomLevel(
+      scrollConstraints,
+      width,
+      height,
+    );
+
+    // The zoom level to contain the whole constrained area in view
+    const _zoom = {
+      value: getNormalizedZoom(
+        maxZoomLevel ?? Math.min(zoomLevelX, zoomLevelY),
+      ),
+    };
+
+    const constraints = this.calculateConstraints({
+      scrollConstraints,
+      width,
+      height,
+      zoom: _zoom,
+      cursorButton: "up",
+    });
+
+    return {
+      scrollX: constraints.minScrollX,
+      scrollY: constraints.minScrollY,
+      zoom: constraints.constrainedZoom,
+    };
+  };
+
+  /**
+   * Calculates the zoom levels necessary to fit the constrained scrollable area within the viewport on the X and Y axes.
+   *
+   * The function considers the dimensions of the scrollable area, the dimensions of the viewport, the viewport zoom factor,
+   * and whether the zoom should be locked. It then calculates the necessary zoom levels for the X and Y axes separately.
+   * If the zoom should be locked, it calculates the maximum zoom level that fits the scrollable area within the viewport,
+   * factoring in the viewport zoom factor. If the zoom should not be locked, the maximum zoom level is set to null.
+   *
+   * @param scrollConstraints - The constraints of the scrollable area including width, height, and position.
+   * @param width - The width of the viewport.
+   * @param height - The height of the viewport.
+   * @returns An object containing the calculated zoom levels for the X and Y axes, and the maximum zoom level if applicable.
+   */
+  private calculateZoomLevel = (
+    scrollConstraints: ScrollConstraints,
+    width: AppState["width"],
+    height: AppState["height"],
+  ) => {
+    const DEFAULT_VIEWPORT_ZOOM_FACTOR = 0.2;
+
+    const lockZoom = scrollConstraints.lockZoom ?? false;
+    const viewportZoomFactor = scrollConstraints.viewportZoomFactor
+      ? Math.min(1, Math.max(scrollConstraints.viewportZoomFactor, 0.1))
+      : DEFAULT_VIEWPORT_ZOOM_FACTOR;
+
+    const scrollableWidth = scrollConstraints.width;
+    const scrollableHeight = scrollConstraints.height;
+    const zoomLevelX = width / scrollableWidth;
+    const zoomLevelY = height / scrollableHeight;
+    const maxZoomLevel = lockZoom
+      ? getNormalizedZoom(Math.min(zoomLevelX, zoomLevelY) * viewportZoomFactor)
+      : null;
+    return { zoomLevelX, zoomLevelY, maxZoomLevel };
+  };
+
   private calculateConstraints = ({
     scrollConstraints,
     width,
@@ -8292,25 +8392,6 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     // Set the overscroll allowance percentage
     const OVERSCROLL_ALLOWANCE_PERCENTAGE = 0.2;
-    const lockZoom = scrollConstraints.lockZoom ?? false;
-    const viewportZoomFactor = scrollConstraints.viewportZoomFactor
-      ? Math.min(1, Math.max(scrollConstraints.viewportZoomFactor, 0.1))
-      : 0.9;
-
-    /**
-     * Calculate the zoom levels on which will constrained area fits the viewport for each axis
-     * @returns The zoom levels for the X and Y axes.
-     */
-    const calculateZoomLevel = () => {
-      const scrollableWidth = scrollConstraints.width;
-      const scrollableHeight = scrollConstraints.height;
-      const zoomLevelX = width / scrollableWidth;
-      const zoomLevelY = height / scrollableHeight;
-      const maxZoomLevel = lockZoom
-        ? Math.min(zoomLevelX, zoomLevelY) * viewportZoomFactor
-        : null;
-      return { zoomLevelX, zoomLevelY, maxZoomLevel };
-    };
 
     /**
      * Calculates the center position of the constrained scroll area.
@@ -8393,7 +8474,12 @@ class App extends React.Component<AppProps, AppState> {
       return { maxScrollX, minScrollX, maxScrollY, minScrollY };
     };
 
-    const { zoomLevelX, zoomLevelY, maxZoomLevel } = calculateZoomLevel();
+    const { zoomLevelX, zoomLevelY, maxZoomLevel } = this.calculateZoomLevel(
+      scrollConstraints,
+      width,
+      height,
+    );
+
     const constrainedZoom = getNormalizedZoom(
       maxZoomLevel ? Math.max(maxZoomLevel, zoom.value) : zoom.value,
     );
