@@ -618,7 +618,11 @@ export const resizeSingleElement = (
         baseline: boundTextFont.baseline,
       });
     }
-    handleBindTextResize(element, transformHandleDirection);
+    handleBindTextResize(
+      element,
+      transformHandleDirection,
+      shouldMaintainAspectRatio,
+    );
   }
 };
 
@@ -858,7 +862,7 @@ export const resizeMultipleElements = (
         },
         false,
       );
-      handleBindTextResize(element, transformHandleType);
+      handleBindTextResize(element, transformHandleType, true);
     }
   }
 
