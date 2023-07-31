@@ -83,6 +83,7 @@ import {
   THEME_FILTER,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
+  YOUTUBE_STATES,
   ZOOM_STEP,
 } from "../constants";
 import { exportCanvas, loadFromBlob } from "../data";
@@ -136,6 +137,7 @@ import {
   duplicateElements,
   newFrameElement,
   newFreeDrawElement,
+  newEmbeddableElement,
 } from "../element/newElement";
 import {
   hasBoundTextElement,
@@ -145,6 +147,7 @@ import {
   isBoundToContainer,
   isFrameElement,
   isImageElement,
+  isEmbeddableElement,
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
@@ -164,6 +167,7 @@ import {
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
+  ExcalidrawEmbeddableElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -185,7 +189,13 @@ import {
   isArrowKey,
   KEYS,
 } from "../keys";
-import { distance2d, getGridPoint, isPathALoop } from "../math";
+
+import {
+  distance2d,
+  getCornerRadius,
+  getGridPoint,
+  isPathALoop,
+} from "../math";
 import { isVisibleElement, renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
@@ -250,9 +260,15 @@ import {
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
+  isTestEnv,
   easeOut,
   isShallowEqual,
 } from "../utils";
+import {
+  embeddableURLValidator,
+  extractSrc,
+  getEmbedLink,
+} from "../element/embeddable";
 import {
   ContextMenu,
   ContextMenuItems,
@@ -301,9 +317,10 @@ import {
   showHyperlinkTooltip,
   hideHyperlinkToolip,
   Hyperlink,
+  isPointHittingLink,
   isPointHittingLinkIcon,
 } from "../element/Hyperlink";
-import { isLocalLink, normalizeLink } from "../data/url";
+import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
@@ -336,6 +353,7 @@ import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
+import { ValueOf } from "../utility-types";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -407,6 +425,14 @@ let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
 
+/**
+ * Map of youtube embed video states
+ */
+const YOUTUBE_VIDEO_STATES = new Map<
+  ExcalidrawElement["id"],
+  ValueOf<typeof YOUTUBE_STATES>
+>();
+
 // remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
 let THROTTLE_NEXT_RENDER = true;
@@ -453,6 +479,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
+  private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDown: React.PointerEvent<HTMLElement> | null = null;
@@ -488,7 +515,6 @@ class App extends React.Component<AppProps, AppState> {
       height: window.innerHeight,
       scrollConstraints: scrollConstraints ?? null,
     };
-
     this.id = nanoid();
     this.library = new Library(this);
     if (excalidrawRef) {
@@ -608,6 +634,336 @@ class App extends React.Component<AppProps, AppState> {
       >
         {t("labels.drawingCanvas")}
       </canvas>
+    );
+  }
+
+  private onWindowMessage(event: MessageEvent) {
+    if (
+      event.origin !== "https://player.vimeo.com" &&
+      event.origin !== "https://www.youtube.com"
+    ) {
+      return;
+    }
+
+    let data = null;
+    try {
+      data = JSON.parse(event.data);
+    } catch (e) {}
+    if (!data) {
+      return;
+    }
+
+    switch (event.origin) {
+      case "https://player.vimeo.com":
+        //Allowing for multiple instances of Excalidraw running in the window
+        if (data.method === "paused") {
+          let source: Window | null = null;
+          const iframes = document.body.querySelectorAll(
+            "iframe.excalidraw__embeddable",
+          );
+          if (!iframes) {
+            break;
+          }
+          for (const iframe of iframes as NodeListOf<HTMLIFrameElement>) {
+            if (iframe.contentWindow === event.source) {
+              source = iframe.contentWindow;
+            }
+          }
+          source?.postMessage(
+            JSON.stringify({
+              method: data.value ? "play" : "pause",
+              value: true,
+            }),
+            "*",
+          );
+        }
+        break;
+      case "https://www.youtube.com":
+        if (
+          data.event === "infoDelivery" &&
+          data.info &&
+          data.id &&
+          typeof data.info.playerState === "number"
+        ) {
+          const id = data.id;
+          const playerState = data.info.playerState as number;
+          if (
+            (Object.values(YOUTUBE_STATES) as number[]).includes(playerState)
+          ) {
+            YOUTUBE_VIDEO_STATES.set(
+              id,
+              playerState as ValueOf<typeof YOUTUBE_STATES>,
+            );
+          }
+        }
+        break;
+    }
+  }
+
+  private updateEmbeddableRef(
+    id: ExcalidrawEmbeddableElement["id"],
+    ref: HTMLIFrameElement | null,
+  ) {
+    if (ref) {
+      this.iFrameRefs.set(id, ref);
+    }
+  }
+
+  private getHTMLIFrameElement(
+    id: ExcalidrawEmbeddableElement["id"],
+  ): HTMLIFrameElement | undefined {
+    return this.iFrameRefs.get(id);
+  }
+
+  private handleEmbeddableCenterClick(element: ExcalidrawEmbeddableElement) {
+    if (
+      this.state.activeEmbeddable?.element === element &&
+      this.state.activeEmbeddable?.state === "active"
+    ) {
+      return;
+    }
+
+    // The delay serves two purposes
+    // 1. To prevent first click propagating to iframe on mobile,
+    //    else the click will immediately start and stop the video
+    // 2. If the user double clicks the frame center to activate it
+    //    without the delay youtube will immediately open the video
+    //    in fullscreen mode
+    setTimeout(() => {
+      this.setState({
+        activeEmbeddable: { element, state: "active" },
+        selectedElementIds: { [element.id]: true },
+        draggingElement: null,
+        selectionElement: null,
+      });
+    }, 100);
+
+    const iframe = this.getHTMLIFrameElement(element.id);
+
+    if (!iframe?.contentWindow) {
+      return;
+    }
+
+    if (iframe.src.includes("youtube")) {
+      const state = YOUTUBE_VIDEO_STATES.get(element.id);
+      if (!state) {
+        YOUTUBE_VIDEO_STATES.set(element.id, YOUTUBE_STATES.UNSTARTED);
+        iframe.contentWindow.postMessage(
+          JSON.stringify({
+            event: "listening",
+            id: element.id,
+          }),
+          "*",
+        );
+      }
+      switch (state) {
+        case YOUTUBE_STATES.PLAYING:
+        case YOUTUBE_STATES.BUFFERING:
+          iframe.contentWindow?.postMessage(
+            JSON.stringify({
+              event: "command",
+              func: "pauseVideo",
+              args: "",
+            }),
+            "*",
+          );
+          break;
+        default:
+          iframe.contentWindow?.postMessage(
+            JSON.stringify({
+              event: "command",
+              func: "playVideo",
+              args: "",
+            }),
+            "*",
+          );
+      }
+    }
+
+    if (iframe.src.includes("player.vimeo.com")) {
+      iframe.contentWindow.postMessage(
+        JSON.stringify({
+          method: "paused", //video play/pause in onWindowMessage handler
+        }),
+        "*",
+      );
+    }
+  }
+
+  private isEmbeddableCenter(
+    el: ExcalidrawEmbeddableElement | null,
+    event: React.PointerEvent<HTMLElement> | PointerEvent,
+    sceneX: number,
+    sceneY: number,
+  ) {
+    return (
+      el &&
+      !event.altKey &&
+      !event.shiftKey &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      (this.state.activeEmbeddable?.element !== el ||
+        this.state.activeEmbeddable?.state === "hover" ||
+        !this.state.activeEmbeddable) &&
+      sceneX >= el.x + el.width / 3 &&
+      sceneX <= el.x + (2 * el.width) / 3 &&
+      sceneY >= el.y + el.height / 3 &&
+      sceneY <= el.y + (2 * el.height) / 3
+    );
+  }
+
+  private updateEmbeddables = () => {
+    const embeddableElements = new Map<ExcalidrawElement["id"], true>();
+
+    let updated = false;
+    this.scene.getNonDeletedElements().filter((element) => {
+      if (isEmbeddableElement(element)) {
+        embeddableElements.set(element.id, true);
+        if (element.validated == null) {
+          updated = true;
+
+          const validated = embeddableURLValidator(
+            element.link,
+            this.props.validateEmbeddable,
+          );
+
+          mutateElement(element, { validated }, false);
+          invalidateShapeForElement(element);
+        }
+      }
+      return false;
+    });
+
+    if (updated) {
+      this.scene.informMutation();
+    }
+
+    // GC
+    this.iFrameRefs.forEach((ref, id) => {
+      if (!embeddableElements.has(id)) {
+        this.iFrameRefs.delete(id);
+      }
+    });
+  };
+
+  private renderEmbeddables() {
+    const scale = this.state.zoom.value;
+    const normalizedWidth = this.state.width;
+    const normalizedHeight = this.state.height;
+
+    const embeddableElements = this.scene
+      .getNonDeletedElements()
+      .filter(
+        (el): el is NonDeleted<ExcalidrawEmbeddableElement> =>
+          isEmbeddableElement(el) && !!el.validated,
+      );
+
+    return (
+      <>
+        {embeddableElements.map((el) => {
+          const { x, y } = sceneCoordsToViewportCoords(
+            { sceneX: el.x, sceneY: el.y },
+            this.state,
+          );
+          const embedLink = getEmbedLink(toValidURL(el.link || ""));
+          const isVisible = isVisibleElement(
+            el,
+            normalizedWidth,
+            normalizedHeight,
+            this.state,
+          );
+          const isActive =
+            this.state.activeEmbeddable?.element === el &&
+            this.state.activeEmbeddable?.state === "active";
+          const isHovered =
+            this.state.activeEmbeddable?.element === el &&
+            this.state.activeEmbeddable?.state === "hover";
+
+          return (
+            <div
+              key={el.id}
+              className={clsx("excalidraw__embeddable-container", {
+                "is-hovered": isHovered,
+              })}
+              style={{
+                transform: isVisible
+                  ? `translate(${x - this.state.offsetLeft}px, ${
+                      y - this.state.offsetTop
+                    }px) scale(${scale})`
+                  : "none",
+                display: isVisible ? "block" : "none",
+                opacity: el.opacity / 100,
+                ["--embeddable-radius" as string]: `${getCornerRadius(
+                  Math.min(el.width, el.height),
+                  el,
+                )}px`,
+              }}
+            >
+              <div
+                //this is a hack that addresses isse with embedded excalidraw.com embeddable
+                //https://github.com/excalidraw/excalidraw/pull/6691#issuecomment-1607383938
+                /*ref={(ref) => {
+                  if (!this.excalidrawContainerRef.current) {
+                    return;
+                  }
+                  const container = this.excalidrawContainerRef.current;
+                  const sh = container.scrollHeight;
+                  const ch = container.clientHeight;
+                  if (sh !== ch) {
+                    container.style.height = `${sh}px`;
+                    setTimeout(() => {
+                      container.style.height = `100%`;
+                    });
+                  }
+                }}*/
+                className="excalidraw__embeddable-container__inner"
+                style={{
+                  width: isVisible ? `${el.width}px` : 0,
+                  height: isVisible ? `${el.height}px` : 0,
+                  transform: isVisible ? `rotate(${el.angle}rad)` : "none",
+                  pointerEvents: isActive ? "auto" : "none",
+                }}
+              >
+                {isHovered && (
+                  <div className="excalidraw__embeddable-hint">
+                    {t("buttons.embeddableInteractionButton")}
+                  </div>
+                )}
+                <div
+                  className="excalidraw__embeddable__outer"
+                  style={{
+                    padding: `${el.strokeWidth}px`,
+                  }}
+                >
+                  {this.props.renderEmbeddable?.(el, this.state) ?? (
+                    <iframe
+                      ref={(ref) => this.updateEmbeddableRef(el.id, ref)}
+                      className="excalidraw__embeddable"
+                      srcDoc={
+                        embedLink?.type === "document"
+                          ? embedLink.srcdoc(this.state.theme)
+                          : undefined
+                      }
+                      src={
+                        embedLink?.type !== "document"
+                          ? embedLink?.link ?? ""
+                          : undefined
+                      }
+                      // https://stackoverflow.com/q/18470015
+                      scrolling="no"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="Excalidraw Embedded Content"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen={true}
+                      sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads"
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </>
     );
   }
 
@@ -812,10 +1168,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public render() {
-    const selectedElement = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
+    const selectedElement = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderCustomStats } = this.props;
 
     return (
@@ -872,6 +1225,7 @@ class App extends React.Component<AppProps, AppState> {
                             !this.state.zenModeEnabled &&
                             !this.scene.getElementsIncludingDeleted().length
                           }
+                          app={this}
                         >
                           {this.props.children}
                         </LayerUI>
@@ -886,6 +1240,7 @@ class App extends React.Component<AppProps, AppState> {
                               element={selectedElement[0]}
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
+                              setToast={this.setToast}
                             />
                           )}
                         {this.state.toast !== null && (
@@ -907,6 +1262,7 @@ class App extends React.Component<AppProps, AppState> {
                         <main>{this.renderCanvas()}</main>
                         {this.renderFrameNames()}
                       </ExcalidrawActionManagerContext.Provider>
+                      {this.renderEmbeddables()}
                     </ExcalidrawElementsContext.Provider>
                   </ExcalidrawAppStateContext.Provider>
                 </ExcalidrawSetAppStateContext.Provider>
@@ -977,10 +1333,7 @@ class App extends React.Component<AppProps, AppState> {
         const shouldUpdateStrokeColor =
           (type === "background" && event.altKey) ||
           (type === "stroke" && !event.altKey);
-        const selectedElements = getSelectedElements(
-          this.scene.getElementsIncludingDeleted(),
-          this.state,
-        );
+        const selectedElements = this.scene.getSelectedElements(this.state);
         if (
           !selectedElements.length ||
           this.state.activeTool.type !== "selection"
@@ -1258,10 +1611,7 @@ class App extends React.Component<AppProps, AppState> {
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
-    if (
-      process.env.NODE_ENV === ENV.TEST ||
-      process.env.NODE_ENV === ENV.DEVELOPMENT
-    ) {
+    if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
         state: {
@@ -1299,7 +1649,7 @@ class App extends React.Component<AppProps, AppState> {
       // bounding rects don't work in tests so updating
       // the state on init would result in making the test enviro run
       // in mobile breakpoint (0 width/height), making everything fail
-      process.env.NODE_ENV !== "test"
+      !isTestEnv()
     ) {
       this.refreshDeviceState(this.excalidrawContainerRef.current);
     }
@@ -1432,10 +1782,12 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     this.detachIsMobileMqHandler?.();
+    window.removeEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
   }
 
   private addEventListeners() {
     this.removeEventListeners();
+    window.addEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
     document.addEventListener(EVENT.POINTER_UP, this.removePointer); // #3553
     document.addEventListener(EVENT.COPY, this.onCopy);
     this.excalidrawContainerRef.current?.addEventListener(
@@ -1505,6 +1857,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    this.updateEmbeddables();
     if (
       !this.state.showWelcomeScreen &&
       !this.scene.getElementsIncludingDeleted().length
@@ -1911,6 +2264,7 @@ class App extends React.Component<AppProps, AppState> {
     if (event.touches.length === 2) {
       this.setState({
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
+        activeEmbeddable: null,
       });
     }
   };
@@ -1970,16 +2324,16 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+        {
+          clientX: this.lastViewportPosition.x,
+          clientY: this.lastViewportPosition.y,
+        },
+        this.state,
+      );
+
       // prefer spreadsheet data over image file (MS Office/Libre Office)
       if (isSupportedImageFile(file) && !data.spreadsheet) {
-        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          {
-            clientX: this.lastViewportPosition.x,
-            clientY: this.lastViewportPosition.y,
-          },
-          this.state,
-        );
-
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
@@ -2023,6 +2377,23 @@ class App extends React.Component<AppProps, AppState> {
           retainSeed: isPlainPaste,
         });
       } else if (data.text) {
+        const maybeUrl = extractSrc(data.text);
+        if (
+          !isPlainPaste &&
+          embeddableURLValidator(maybeUrl, this.props.validateEmbeddable) &&
+          (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(maybeUrl) ||
+            getEmbedLink(maybeUrl)?.type === "video")
+        ) {
+          const embeddable = this.insertEmbeddableElement({
+            sceneX,
+            sceneY,
+            link: normalizeLink(maybeUrl),
+          });
+          if (embeddable) {
+            this.setState({ selectedElementIds: { [embeddable.id]: true } });
+          }
+          return;
+        }
         this.addTextFromPaste(data.text, isPlainPaste);
       }
       this.setActiveTool({ type: "selection" });
@@ -2036,7 +2407,7 @@ class App extends React.Component<AppProps, AppState> {
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
   }) => {
-    const elements = restoreElements(opts.elements, null);
+    const elements = restoreElements(opts.elements, null, undefined);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;
@@ -2128,6 +2499,7 @@ class App extends React.Component<AppProps, AppState> {
         },
         this.scene.getNonDeletedElements(),
         this.state,
+        this,
       ),
       () => {
         if (opts.files) {
@@ -2692,14 +3064,11 @@ class App extends React.Component<AppProps, AppState> {
           offsetY = step;
         }
 
-        const selectedElements = getSelectedElements(
-          this.scene.getNonDeletedElements(),
-          this.state,
-          {
-            includeBoundTextElement: true,
-            includeElementsInFrames: true,
-          },
-        );
+        const selectedElements = this.scene.getSelectedElements({
+          selectedElementIds: this.state.selectedElementIds,
+          includeBoundTextElement: true,
+          includeElementsInFrames: true,
+        });
 
         selectedElements.forEach((element) => {
           mutateElement(element, {
@@ -2716,10 +3085,7 @@ class App extends React.Component<AppProps, AppState> {
 
         event.preventDefault();
       } else if (event.key === KEYS.ENTER) {
-        const selectedElements = getSelectedElements(
-          this.scene.getNonDeletedElements(),
-          this.state,
-        );
+        const selectedElements = this.scene.getSelectedElements(this.state);
         if (selectedElements.length === 1) {
           const selectedElement = selectedElements[0];
           if (event[KEYS.CTRL_OR_CMD]) {
@@ -2795,10 +3161,7 @@ class App extends React.Component<AppProps, AppState> {
         !event.altKey &&
         !event[KEYS.CTRL_OR_CMD]
       ) {
-        const selectedElements = getSelectedElements(
-          this.scene.getNonDeletedElements(),
-          this.state,
-        );
+        const selectedElements = this.scene.getSelectedElements(this.state);
         if (
           this.state.activeTool.type === "selection" &&
           !selectedElements.length
@@ -2862,6 +3225,7 @@ class App extends React.Component<AppProps, AppState> {
           selectedElementIds: makeNextSelectedElementIds({}, this.state),
           selectedGroupIds: {},
           editingGroupId: null,
+          activeEmbeddable: null,
         });
       }
       isHoldingSpace = false;
@@ -2870,10 +3234,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ isBindingEnabled: true });
     }
     if (isArrowKey(event.key)) {
-      const selectedElements = getSelectedElements(
-        this.scene.getNonDeletedElements(),
-        this.state,
-      );
+      const selectedElements = this.scene.getSelectedElements(this.state);
       isBindingEnabled(this.state)
         ? bindOrUnbindSelectedElements(selectedElements)
         : unbindLinearElements(selectedElements);
@@ -2883,7 +3244,14 @@ class App extends React.Component<AppProps, AppState> {
 
   private setActiveTool = (
     tool:
-      | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame" }
+      | {
+          type:
+            | typeof SHAPES[number]["value"]
+            | "eraser"
+            | "hand"
+            | "frame"
+            | "embeddable";
+        }
       | { type: "custom"; customType: string },
   ) => {
     const nextActiveTool = updateActiveTool(this.state, tool);
@@ -2907,9 +3275,10 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
         selectedGroupIds: {},
         editingGroupId: null,
+        activeEmbeddable: null,
       });
     } else {
-      this.setState({ activeTool: nextActiveTool });
+      this.setState({ activeTool: nextActiveTool, activeEmbeddable: null });
     }
   };
 
@@ -2942,6 +3311,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.isTouchScreenMultiTouchGesture()) {
       this.setState({
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
+        activeEmbeddable: null,
       });
     }
     gesture.initialScale = this.state.zoom.value;
@@ -3099,6 +3469,7 @@ class App extends React.Component<AppProps, AppState> {
       selectedElementIds: makeNextSelectedElementIds({}, this.state),
       selectedGroupIds: {},
       editingGroupId: null,
+      activeEmbeddable: null,
     });
   }
 
@@ -3223,10 +3594,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
 
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
+    const selectedElements = this.scene.getSelectedElements(this.state);
 
     if (selectedElements.length === 1) {
       if (isTextElement(selectedElements[0])) {
@@ -3356,10 +3724,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
+    const selectedElements = this.scene.getSelectedElements(this.state);
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
@@ -3410,6 +3775,7 @@ class App extends React.Component<AppProps, AppState> {
             },
             this.scene.getNonDeletedElements(),
             prevState,
+            this,
           ),
         );
         return;
@@ -3418,12 +3784,22 @@ class App extends React.Component<AppProps, AppState> {
 
     resetCursor(this.canvas);
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
+      const hitElement = this.getElementAtPosition(sceneX, sceneY);
+
+      if (isEmbeddableElement(hitElement)) {
+        this.setState({
+          activeEmbeddable: { element: hitElement, state: "active" },
+        });
+        return;
+      }
+
       const container = getTextBindableContainerAtPosition(
         this.scene.getNonDeletedElements(),
         this.state,
         sceneX,
         sceneY,
       );
+
       if (container) {
         if (
           hasBoundTextElement(container) ||
@@ -3441,6 +3817,7 @@ class App extends React.Component<AppProps, AppState> {
           sceneY = midPoint.y;
         }
       }
+
       this.startTextEditing({
         sceneX,
         sceneY,
@@ -3466,7 +3843,7 @@ class App extends React.Component<AppProps, AppState> {
       return (
         element.link &&
         index <= hitElementIndex &&
-        isPointHittingLinkIcon(
+        isPointHittingLink(
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
@@ -3498,7 +3875,7 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerDown!,
       this.state,
     );
-    const lastPointerDownHittingLinkIcon = isPointHittingLinkIcon(
+    const lastPointerDownHittingLinkIcon = isPointHittingLink(
       this.hitLinkElement,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
@@ -3508,7 +3885,7 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerUp!,
       this.state,
     );
-    const lastPointerUpHittingLinkIcon = isPointHittingLinkIcon(
+    const lastPointerUpHittingLinkIcon = isPointHittingLink(
       this.hitLinkElement,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
@@ -3786,7 +4163,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const elements = this.scene.getNonDeletedElements();
 
-    const selectedElements = getSelectedElements(elements, this.state);
+    const selectedElements = this.scene.getSelectedElements(this.state);
     if (
       selectedElements.length === 1 &&
       !isOverScrollBar &&
@@ -3850,7 +4227,7 @@ class App extends React.Component<AppProps, AppState> {
       hideHyperlinkToolip();
       if (
         hitElement &&
-        hitElement.link &&
+        (hitElement.link || isEmbeddableElement(hitElement)) &&
         this.state.selectedElementIds[hitElement.id] &&
         !this.state.contextMenu &&
         !this.state.showHyperlinkPopup
@@ -3883,7 +4260,26 @@ class App extends React.Component<AppProps, AppState> {
             )) &&
           !hitElement?.locked
         ) {
-          setCursor(this.canvas, CURSOR_TYPE.MOVE);
+          if (
+            hitElement &&
+            isEmbeddableElement(hitElement) &&
+            this.isEmbeddableCenter(
+              hitElement,
+              event,
+              scenePointerX,
+              scenePointerY,
+            )
+          ) {
+            setCursor(this.canvas, CURSOR_TYPE.POINTER);
+            this.setState({
+              activeEmbeddable: { element: hitElement, state: "hover" },
+            });
+          } else {
+            setCursor(this.canvas, CURSOR_TYPE.MOVE);
+            if (this.state.activeEmbeddable?.state === "hover") {
+              this.setState({ activeEmbeddable: null });
+            }
+          }
         }
       } else {
         setCursor(this.canvas, CURSOR_TYPE.AUTO);
@@ -4302,13 +4698,35 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    this.removePointer(event);
     this.lastPointerUp = event;
 
-    if (this.device.isTouchScreen) {
-      const scenePointer = viewportCoordsToSceneCoords(
-        { clientX: event.clientX, clientY: event.clientY },
-        this.state,
+    const scenePointer = viewportCoordsToSceneCoords(
+      { clientX: event.clientX, clientY: event.clientY },
+      this.state,
+    );
+    const clicklength =
+      event.timeStamp - (this.lastPointerDown?.timeStamp ?? 0);
+    if (this.device.isMobile && clicklength < 300) {
+      const hitElement = this.getElementAtPosition(
+        scenePointer.x,
+        scenePointer.y,
       );
+      if (
+        isEmbeddableElement(hitElement) &&
+        this.isEmbeddableCenter(
+          hitElement,
+          event,
+          scenePointer.x,
+          scenePointer.y,
+        )
+      ) {
+        this.handleEmbeddableCenterClick(hitElement);
+        return;
+      }
+    }
+
+    if (this.device.isTouchScreen) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
         scenePointer.y,
@@ -4318,14 +4736,29 @@ class App extends React.Component<AppProps, AppState> {
         hitElement,
       );
     }
+
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event, this.device.isTouchScreen);
+      if (
+        clicklength < 300 &&
+        this.hitLinkElement.type === "embeddable" &&
+        !isPointHittingLinkIcon(this.hitLinkElement, this.state, [
+          scenePointer.x,
+          scenePointer.y,
+        ])
+      ) {
+        this.handleEmbeddableCenterClick(this.hitLinkElement);
+      } else {
+        this.redirectToLink(event, this.device.isTouchScreen);
+      }
+    } else if (this.state.viewModeEnabled) {
+      this.setState({
+        activeEmbeddable: null,
+        selectedElementIds: {},
+      });
     }
-
-    this.removePointer(event);
   };
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
@@ -4489,10 +4922,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
   ): PointerDownState {
     const origin = viewportCoordsToSceneCoords(event, this.state);
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
+    const selectedElements = this.scene.getSelectedElements(this.state);
     const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
 
     return {
@@ -4597,6 +5027,7 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
         selectedGroupIds: {},
         editingGroupId: null,
+        activeEmbeddable: null,
       });
     }
   };
@@ -4610,7 +5041,7 @@ class App extends React.Component<AppProps, AppState> {
   ): boolean => {
     if (this.state.activeTool.type === "selection") {
       const elements = this.scene.getNonDeletedElements();
-      const selectedElements = getSelectedElements(elements, this.state);
+      const selectedElements = this.scene.getSelectedElements(this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
@@ -4762,6 +5193,7 @@ class App extends React.Component<AppProps, AppState> {
                 selectedElementIds: makeNextSelectedElementIds({}, this.state),
                 selectedGroupIds: {},
                 editingGroupId: null,
+                activeEmbeddable: null,
               });
             }
 
@@ -4849,10 +5281,14 @@ class App extends React.Component<AppProps, AppState> {
                   {
                     ...prevState,
                     selectedElementIds: nextSelectedElementIds,
-                    showHyperlinkPopup: hitElement.link ? "info" : false,
+                    showHyperlinkPopup:
+                      hitElement.link || isEmbeddableElement(hitElement)
+                        ? "info"
+                        : false,
                   },
                   this.scene.getNonDeletedElements(),
                   prevState,
+                  this,
                 );
               });
               pointerDownState.hit.wasAddedToSelection = true;
@@ -4908,6 +5344,7 @@ class App extends React.Component<AppProps, AppState> {
       includeBoundTextElement: true,
     });
 
+    // FIXME
     let container = getTextBindableContainerAtPosition(
       this.scene.getNonDeletedElements(),
       this.state,
@@ -5002,6 +5439,55 @@ class App extends React.Component<AppProps, AppState> {
       startBoundElement: boundElement,
       suggestedBindings: [],
     });
+  };
+
+  //create rectangle element with youtube top left on nearest grid point width / hight 640/360
+  private insertEmbeddableElement = ({
+    sceneX,
+    sceneY,
+    link,
+  }: {
+    sceneX: number;
+    sceneY: number;
+    link: string;
+  }) => {
+    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
+
+    const embedLink = getEmbedLink(link);
+
+    if (!embedLink) {
+      return;
+    }
+
+    if (embedLink.warning) {
+      this.setToast({ message: embedLink.warning, closable: true });
+    }
+
+    const element = newEmbeddableElement({
+      type: "embeddable",
+      x: gridX,
+      y: gridY,
+      strokeColor: "transparent",
+      backgroundColor: "transparent",
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      roundness: this.getCurrentItemRoundness("embeddable"),
+      opacity: this.state.currentItemOpacity,
+      locked: false,
+      width: embedLink.aspectRatio.w,
+      height: embedLink.aspectRatio.h,
+      link,
+      validated: undefined,
+    });
+
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      element,
+    ]);
+
+    return element;
   };
 
   private createImageElement = ({
@@ -5163,6 +5649,23 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private getCurrentItemRoundness(
+    elementType:
+      | "selection"
+      | "rectangle"
+      | "diamond"
+      | "ellipse"
+      | "embeddable",
+  ) {
+    return this.state.currentItemRoundness === "round"
+      ? {
+          type: isUsingAdaptiveRadius(elementType)
+            ? ROUNDNESS.ADAPTIVE_RADIUS
+            : ROUNDNESS.PROPORTIONAL_RADIUS,
+        }
+      : null;
+  }
+
   private createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"],
     pointerDownState: PointerDownState,
@@ -5189,16 +5692,10 @@ class App extends React.Component<AppProps, AppState> {
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
-      roundness:
-        this.state.currentItemRoundness === "round"
-          ? {
-              type: isUsingAdaptiveRadius(elementType)
-                ? ROUNDNESS.ADAPTIVE_RADIUS
-                : ROUNDNESS.PROPORTIONAL_RADIUS,
-            }
-          : null,
+      roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      ...(elementType === "embeddable" ? { validated: false } : {}),
     });
 
     if (element.type === "selection") {
@@ -5280,7 +5777,7 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.drag.offset === null) {
         pointerDownState.drag.offset = tupleToCoors(
           getDragOffsetXY(
-            getSelectedElements(this.scene.getNonDeletedElements(), this.state),
+            this.scene.getSelectedElements(this.state),
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           ),
@@ -5443,10 +5940,7 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
         !isSelectingPointsInLineEditor
       ) {
-        const selectedElements = getSelectedElements(
-          this.scene.getNonDeletedElements(),
-          this.state,
-        );
+        const selectedElements = this.scene.getSelectedElements(this.state);
 
         if (selectedElements.every((element) => element.locked)) {
           return;
@@ -5473,7 +5967,8 @@ class App extends React.Component<AppProps, AppState> {
         if (
           selectedElements.length > 0 &&
           !pointerDownState.withCmdOrCtrl &&
-          !this.state.editingElement
+          !this.state.editingElement &&
+          this.state.activeEmbeddable?.state !== "active"
         ) {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
@@ -5517,13 +6012,17 @@ class App extends React.Component<AppProps, AppState> {
             const groupIdMap = new Map();
             const oldIdToDuplicatedId = new Map();
             const hitElement = pointerDownState.hit.element;
-            const elements = this.scene.getElementsIncludingDeleted();
             const selectedElementIds = new Set(
-              getSelectedElements(elements, this.state, {
-                includeBoundTextElement: true,
-                includeElementsInFrames: true,
-              }).map((element) => element.id),
+              this.scene
+                .getSelectedElements({
+                  selectedElementIds: this.state.selectedElementIds,
+                  includeBoundTextElement: true,
+                  includeElementsInFrames: true,
+                })
+                .map((element) => element.id),
             );
+
+            const elements = this.scene.getNonDeletedElements();
 
             for (const element of elements) {
               if (
@@ -5649,27 +6148,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.boxSelection.hasOccurred = true;
 
         const elements = this.scene.getNonDeletedElements();
-        if (
-          !event.shiftKey &&
-          // allows for box-selecting points (without shift)
-          !this.state.editingLinearElement &&
-          isSomeElementSelected(elements, this.state)
-        ) {
-          if (pointerDownState.withCmdOrCtrl && pointerDownState.hit.element) {
-            this.setState((prevState) =>
-              selectGroupsForSelectedElements(
-                {
-                  ...prevState,
-                  selectedElementIds: {
-                    [pointerDownState.hit.element!.id]: true,
-                  },
-                },
-                this.scene.getNonDeletedElements(),
-                prevState,
-              ),
-            );
-          }
-        }
+
         // box-select line editor points
         if (this.state.editingLinearElement) {
           LinearElementEditor.handleBoxSelection(
@@ -5679,18 +6158,46 @@ class App extends React.Component<AppProps, AppState> {
           );
           // regular box-select
         } else {
+          let shouldReuseSelection = true;
+
+          if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
+            if (
+              pointerDownState.withCmdOrCtrl &&
+              pointerDownState.hit.element
+            ) {
+              this.setState((prevState) =>
+                selectGroupsForSelectedElements(
+                  {
+                    ...prevState,
+                    selectedElementIds: {
+                      [pointerDownState.hit.element!.id]: true,
+                    },
+                  },
+                  this.scene.getNonDeletedElements(),
+                  prevState,
+                  this,
+                ),
+              );
+            } else {
+              shouldReuseSelection = false;
+            }
+          }
           const elementsWithinSelection = getElementsWithinSelection(
             elements,
             draggingElement,
           );
+
           this.setState((prevState) => {
-            const nextSelectedElementIds = elementsWithinSelection.reduce(
-              (acc: Record<ExcalidrawElement["id"], true>, element) => {
-                acc[element.id] = true;
-                return acc;
-              },
-              {},
-            );
+            const nextSelectedElementIds = {
+              ...(shouldReuseSelection && prevState.selectedElementIds),
+              ...elementsWithinSelection.reduce(
+                (acc: Record<ExcalidrawElement["id"], true>, element) => {
+                  acc[element.id] = true;
+                  return acc;
+                },
+                {},
+              ),
+            };
 
             if (pointerDownState.hit.element) {
               // if using ctrl/cmd, select the hitElement only if we
@@ -5705,10 +6212,15 @@ class App extends React.Component<AppProps, AppState> {
             return selectGroupsForSelectedElements(
               {
                 ...prevState,
+                ...(!shouldReuseSelection && {
+                  selectedGroupIds: {},
+                  editingGroupId: null,
+                }),
                 selectedElementIds: nextSelectedElementIds,
                 showHyperlinkPopup:
                   elementsWithinSelection.length === 1 &&
-                  elementsWithinSelection[0].link
+                  (elementsWithinSelection[0].link ||
+                    isEmbeddableElement(elementsWithinSelection[0]))
                     ? "info"
                     : false,
                 // select linear element only when we haven't box-selected anything else
@@ -5723,6 +6235,7 @@ class App extends React.Component<AppProps, AppState> {
               },
               this.scene.getNonDeletedElements(),
               prevState,
+              this,
             );
           });
         }
@@ -5764,7 +6277,6 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
       }
-
       const {
         draggingElement,
         resizingElement,
@@ -5822,10 +6334,7 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.hit?.element?.id !==
           this.state.selectedLinearElement.elementId
         ) {
-          const selectedELements = getSelectedElements(
-            this.scene.getNonDeletedElements(),
-            this.state,
-          );
+          const selectedELements = this.scene.getSelectedElements(this.state);
           // set selectedLinearElement to null if there is more than one element selected since we don't want to show linear element handles
           if (selectedELements.length > 1) {
             this.setState({ selectedLinearElement: null });
@@ -6067,10 +6576,7 @@ class App extends React.Component<AppProps, AppState> {
             const topLayerFrame =
               this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
-            const selectedElements = getSelectedElements(
-              this.scene.getNonDeletedElements(),
-              this.state,
-            );
+            const selectedElements = this.scene.getSelectedElements(this.state);
             let nextElements = this.scene.getElementsIncludingDeleted();
 
             const updateGroupIdsAfterEditingGroup = (
@@ -6149,6 +6655,7 @@ class App extends React.Component<AppProps, AppState> {
             nextElements = updateFrameMembershipOfSelectedElements(
               this.scene.getElementsIncludingDeleted(),
               this.state,
+              this,
             );
 
             this.scene.replaceAllElements(nextElements);
@@ -6193,14 +6700,14 @@ class App extends React.Component<AppProps, AppState> {
         let nextElements = updateFrameMembershipOfSelectedElements(
           this.scene.getElementsIncludingDeleted(),
           this.state,
+          this,
         );
 
-        const selectedFrames = getSelectedElements(
-          this.scene.getElementsIncludingDeleted(),
-          this.state,
-        ).filter(
-          (element) => element.type === "frame",
-        ) as ExcalidrawFrameElement[];
+        const selectedFrames = this.scene
+          .getSelectedElements(this.state)
+          .filter(
+            (element) => element.type === "frame",
+          ) as ExcalidrawFrameElement[];
 
         for (const frame of selectedFrames) {
           nextElements = replaceAllElementsInFrame(
@@ -6225,10 +6732,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement?.elementId !== hitElement?.id &&
         isLinearElement(hitElement)
       ) {
-        const selectedELements = getSelectedElements(
-          this.scene.getNonDeletedElements(),
-          this.state,
-        );
+        const selectedELements = this.scene.getSelectedElements(this.state);
         // set selectedLinearElement when no other element selected except
         // the one we've hit
         if (selectedELements.length === 1) {
@@ -6330,7 +6834,7 @@ class App extends React.Component<AppProps, AppState> {
                 delete newSelectedElementIds[hitElement!.id];
                 const newSelectedElements = getSelectedElements(
                   this.scene.getNonDeletedElements(),
-                  { ...prevState, selectedElementIds: newSelectedElementIds },
+                  { selectedElementIds: newSelectedElementIds },
                 );
 
                 return selectGroupsForSelectedElements(
@@ -6349,6 +6853,7 @@ class App extends React.Component<AppProps, AppState> {
                   },
                   this.scene.getNonDeletedElements(),
                   prevState,
+                  this,
                 );
               });
             }
@@ -6381,10 +6886,14 @@ class App extends React.Component<AppProps, AppState> {
                 {
                   ...prevState,
                   selectedElementIds: nextSelectedElementIds,
-                  showHyperlinkPopup: hitElement.link ? "info" : false,
+                  showHyperlinkPopup:
+                    hitElement.link || isEmbeddableElement(hitElement)
+                      ? "info"
+                      : false,
                 },
                 this.scene.getNonDeletedElements(),
                 prevState,
+                this,
               );
             });
           } else {
@@ -6415,6 +6924,7 @@ class App extends React.Component<AppProps, AppState> {
               },
               this.scene.getNonDeletedElements(),
               prevState,
+              this,
             ),
           }));
         }
@@ -6442,6 +6952,7 @@ class App extends React.Component<AppProps, AppState> {
             selectedElementIds: makeNextSelectedElementIds({}, this.state),
             selectedGroupIds: {},
             editingGroupId: null,
+            activeEmbeddable: null,
           });
         }
         return;
@@ -6461,6 +6972,10 @@ class App extends React.Component<AppProps, AppState> {
             },
             prevState,
           ),
+          showHyperlinkPopup:
+            isEmbeddableElement(draggingElement) && !draggingElement.link
+              ? "editor"
+              : prevState.showHyperlinkPopup,
         }));
       }
 
@@ -6474,9 +6989,7 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
         (isBindingEnabled(this.state)
           ? bindOrUnbindSelectedElements
-          : unbindLinearElements)(
-          getSelectedElements(this.scene.getNonDeletedElements(), this.state),
-        );
+          : unbindLinearElements)(this.scene.getSelectedElements(this.state));
       }
 
       if (!activeTool.locked && activeTool.type !== "freedraw") {
@@ -6491,6 +7004,23 @@ class App extends React.Component<AppProps, AppState> {
           draggingElement: null,
           suggestedBindings: [],
         });
+      }
+
+      if (
+        hitElement &&
+        this.lastPointerUp &&
+        this.lastPointerDown &&
+        this.lastPointerUp.timeStamp - this.lastPointerDown.timeStamp < 300 &&
+        gesture.pointers.size <= 1 &&
+        isEmbeddableElement(hitElement) &&
+        this.isEmbeddableCenter(
+          hitElement,
+          this.lastPointerUp,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        )
+      ) {
+        this.handleEmbeddableCenterClick(hitElement);
       }
     });
   }
@@ -7005,6 +7535,7 @@ class App extends React.Component<AppProps, AppState> {
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: makeNextSelectedElementIds({}, prevState),
+      activeEmbeddable: null,
       selectedGroupIds: {},
       // Continue editing the same group if the user selected a different
       // element from it
@@ -7017,6 +7548,7 @@ class App extends React.Component<AppProps, AppState> {
     }));
     this.setState({
       selectedElementIds: makeNextSelectedElementIds({}, this.state),
+      activeEmbeddable: null,
       previousSelectedElementIds: this.state.selectedElementIds,
     });
   }
@@ -7042,6 +7574,10 @@ class App extends React.Component<AppProps, AppState> {
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     // must be retrieved first, in the same frame
     const { file, fileHandle } = await getFileFromEvent(event);
+    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+    );
 
     try {
       if (isSupportedImageFile(file)) {
@@ -7076,11 +7612,6 @@ class App extends React.Component<AppProps, AppState> {
         // if no scene is embedded or we fail for whatever reason, fall back
         // to importing as regular image
         // ---------------------------------------------------------------------
-
-        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          event,
-          this.state,
-        );
 
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
@@ -7119,6 +7650,25 @@ class App extends React.Component<AppProps, AppState> {
     if (file) {
       // atetmpt to parse an excalidraw/excalidrawlib file
       await this.loadFileToCanvas(file, fileHandle);
+    }
+
+    if (event.dataTransfer?.types?.includes("text/plain")) {
+      const text = event.dataTransfer?.getData("text");
+      if (
+        text &&
+        embeddableURLValidator(text, this.props.validateEmbeddable) &&
+        (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
+          getEmbedLink(text)?.type === "video")
+      ) {
+        const embeddable = this.insertEmbeddableElement({
+          sceneX,
+          sceneY,
+          link: normalizeLink(text),
+        });
+        if (embeddable) {
+          this.setState({ selectedElementIds: { [embeddable.id]: true } });
+        }
+      }
     }
   };
 
@@ -7183,10 +7733,7 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements: true,
     });
 
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
+    const selectedElements = this.scene.getSelectedElements(this.state);
     const isHittignCommonBoundBox =
       this.isHittingCommonBoundingBoxOfSelectedElements(
         { x, y },
@@ -7216,6 +7763,7 @@ class App extends React.Component<AppProps, AppState> {
               },
               this.scene.getNonDeletedElements(),
               this.state,
+              this,
             )
           : this.state),
         showHyperlinkPopup: false,
@@ -7303,10 +7851,7 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
+    const selectedElements = this.scene.getSelectedElements(this.state);
     const selectedFrames = selectedElements.filter(
       (element) => element.type === "frame",
     ) as ExcalidrawFrameElement[];
@@ -7323,6 +7868,7 @@ class App extends React.Component<AppProps, AppState> {
       // rotating
       isResizing: transformHandleType && transformHandleType !== "rotation",
       isRotating: transformHandleType === "rotation",
+      activeEmbeddable: null,
     });
     const pointerCoords = pointerDownState.lastCoords;
     const [resizeX, resizeY] = getGridPoint(
@@ -8047,10 +8593,7 @@ declare global {
   }
 }
 
-if (
-  process.env.NODE_ENV === ENV.TEST ||
-  process.env.NODE_ENV === ENV.DEVELOPMENT
-) {
+if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
   window.h = window.h || ({} as Window["h"]);
 
   Object.defineProperties(window.h, {

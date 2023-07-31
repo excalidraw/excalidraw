@@ -29,6 +29,7 @@ import "./LibraryMenu.scss";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { isShallowEqual } from "../utils";
 import { NonDeletedExcalidrawElement } from "../element/types";
+import { LIBRARY_DISABLED_TYPES } from "../constants";
 
 export const isLibraryMenuOpenAtom = atom(false);
 
@@ -68,11 +69,12 @@ export const LibraryMenuContent = ({
         libraryItems: LibraryItems,
       ) => {
         trackEvent("element", "addToLibrary", "ui");
-        if (processedElements.some((element) => element.type === "image")) {
-          return setAppState({
-            errorMessage:
-              "Support for adding images to the library coming soon!",
-          });
+        for (const type of LIBRARY_DISABLED_TYPES) {
+          if (processedElements.some((element) => element.type === type)) {
+            return setAppState({
+              errorMessage: t(`errors.libraryElementTypeError.${type}`),
+            });
+          }
         }
         const nextItems: LibraryItems = [
           {
@@ -197,6 +199,7 @@ export const LibraryMenu = () => {
     setAppState({
       selectedElementIds: {},
       selectedGroupIds: {},
+      activeEmbeddable: null,
     });
   }, [setAppState]);
 

@@ -43,6 +43,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onScrollChange,
     children,
     scrollConstraints,
+    validateEmbeddable,
+    renderEmbeddable,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -117,6 +119,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
           scrollConstraints={scrollConstraints}
+          validateEmbeddable={validateEmbeddable}
+          renderEmbeddable={renderEmbeddable}
         >
           {children}
         </App>

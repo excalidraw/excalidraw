@@ -6,7 +6,7 @@ import { getCommonBounds, getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
-import { getNormalizedZoom, getSelectedElements } from "../scene";
+import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
@@ -302,11 +302,8 @@ export const zoomToFit = ({
 export const actionZoomToFitSelectionInViewport = register({
   name: "zoomToFitSelectionInViewport",
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
+  perform: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
     return zoomToFit({
       targetElements: selectedElements.length ? selectedElements : elements,
       appState,
@@ -325,11 +322,8 @@ export const actionZoomToFitSelectionInViewport = register({
 export const actionZoomToFitSelection = register({
   name: "zoomToFitSelection",
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
+  perform: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
     return zoomToFit({
       targetElements: selectedElements.length ? selectedElements : elements,
       appState,
@@ -402,6 +396,7 @@ export const actionToggleEraserTool = register({
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
+        activeEmbeddable: null,
         activeTool,
       },
       commitToHistory: true,
@@ -436,6 +431,7 @@ export const actionToggleHandTool = register({
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
+        activeEmbeddable: null,
         activeTool,
       },
       commitToHistory: true,

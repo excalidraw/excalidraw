@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Test <App/> should show error modal when using brave and measureText API is not working 1`] = `
+exports[`Test <App/> > should show error modal when using brave and measureText API is not working 1`] = `
 <div
   data-testid="brave-measure-text-error"
 >

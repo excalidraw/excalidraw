@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Test MobileMenu should initialize with welcome screen and hide once user interacts 1`] = `
+exports[`Test MobileMenu > should initialize with welcome screen and hide once user interacts 1`] = `
 <div
   class="welcome-screen-center"
 >
