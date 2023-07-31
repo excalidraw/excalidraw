@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup Node.js 14.x
+      - name: Setup Node.js 18.x
         uses: actions/setup-node@v2
         with:
-          node-version: 14.x
+          node-version: 18.x
       - name: Install and build
         run: |
           yarn --frozen-lockfile
