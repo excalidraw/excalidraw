@@ -8258,7 +8258,7 @@ class App extends React.Component<AppProps, AppState> {
         scrollX,
         scrollY,
       });
-      this.animateConstainedScroll({
+      this.animateConstrainedScroll({
         ...constrainedScrollValues,
         opts: {
           onEndCallback: () => {
@@ -8463,7 +8463,7 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * Animate the scroll values to the constrained area
    */
-  private animateConstainedScroll = ({
+  private animateConstrainedScroll = ({
     constrainedScrollX,
     constrainedScrollY,
     opts,
@@ -8556,7 +8556,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if (isStateChanged) {
       if (shouldAnimate) {
-        this.animateConstainedScroll({
+        this.animateConstrainedScroll({
           constrainedScrollX,
           constrainedScrollY,
         });
