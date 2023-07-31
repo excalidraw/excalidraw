@@ -14,7 +14,12 @@ import { getSelectedElements } from "./scene";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
 import { AppState, Point, Zoom } from "./types";
 
-export const SNAP_DISTANCE = 8;
+const SNAP_DISTANCE = 8;
+
+export const getSnapThreshold = (zoomValue: number) => {
+  return SNAP_DISTANCE / zoomValue;
+};
+
 // handle floating point errors
 export const SNAP_PRECISION = 0.001;
 
@@ -59,9 +64,9 @@ const isSnappingEnabled = ({
   return appState.objectsSnapModeEnabled;
 };
 
-const round = (x: number) => {
+export const round = (x: number) => {
   // round numbers to avoid glitches for floating point rounding errors
-  const decimalPlacesTolerance = 8;
+  const decimalPlacesTolerance = 2;
   return (
     Math.round(x * 10 ** decimalPlacesTolerance) / 10 ** decimalPlacesTolerance
   );
@@ -177,18 +182,24 @@ export const getElementsCorners = (
       return omitCenter
         ? [leftMid, topMid, rightMid, bottomMid]
         : [leftMid, topMid, rightMid, bottomMid, center];
-    } else if (element.type === "arrow" || element.type === "line") {
-      return element.points.map(([x, y]) => [
-        x + element.x,
-        y + element.y,
-      ]) as Point[];
     }
 
-    const topLeft = rotatePoint([x1, y1], [cx, cy], element.angle);
-    const topRight = rotatePoint([x2, y1], [cx, cy], element.angle);
-    const bottomLeft = rotatePoint([x1, y2], [cx, cy], element.angle);
-    const bottomRight = rotatePoint([x2, y2], [cx, cy], element.angle);
-    const center: Point = [cx, cy];
+    const topLeft = rotatePoint([x1, y1], [cx, cy], element.angle).map(
+      (point) => round(point),
+    ) as [number, number];
+    const topRight = rotatePoint([x2, y1], [cx, cy], element.angle).map(
+      (point) => round(point),
+    ) as [number, number];
+    const bottomLeft = rotatePoint([x1, y2], [cx, cy], element.angle).map(
+      (point) => round(point),
+    ) as [number, number];
+    const bottomRight = rotatePoint([x2, y2], [cx, cy], element.angle).map(
+      (point) => round(point),
+    ) as [number, number];
+    const center: Point = [cx, cy].map((point) => round(point)) as [
+      number,
+      number,
+    ];
 
     return omitCenter
       ? [topLeft, topRight, bottomLeft, bottomRight]

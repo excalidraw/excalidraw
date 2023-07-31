@@ -5311,6 +5311,9 @@ class App extends React.Component<AppProps, AppState> {
             dragOffset,
             corners: getElementsCorners(
               getSelectedElements(originalElements, this.state),
+              {
+                boundingBoxCorners: true,
+              },
             ),
           });
           this.setState({ snaps });
@@ -7162,10 +7165,9 @@ class App extends React.Component<AppProps, AppState> {
     const shouldGetResizedSnaps =
       selectedElements.length === 1 &&
       selectedElements[0].angle === 0 &&
-      !isLinearElement(
-        selectedElements[0] || isFreeDrawElement(selectedElements[0]),
-      );
+      !isFreeDrawElement(selectedElements[0]);
 
+    // console.time("getting snaps");
     const snaps = shouldGetResizedSnaps
       ? getSnaps({
           elements: this.scene.getNonDeletedElements(),
@@ -7182,6 +7184,7 @@ class App extends React.Component<AppProps, AppState> {
       : null;
 
     this.setState({ snaps });
+    // console.timeEnd("getting snaps");
 
     if (
       transformElements(

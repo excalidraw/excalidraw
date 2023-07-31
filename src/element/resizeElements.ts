@@ -56,7 +56,7 @@ import {
   getBoundTextMaxHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
-import { SNAP_DISTANCE, Snap, Snaps } from "../snapping";
+import { Snap, Snaps, getSnapThreshold, round, snapToPoint } from "../snapping";
 import * as GAPoints from "../gapoints";
 
 export const normalizeAngle = (angle: number): number => {
@@ -519,6 +519,9 @@ export const resizeSingleElement = (
     }
   }
 
+  const flipX = eleNewWidth < 0;
+  const flipY = eleNewHeight < 0;
+
   // Flip horizontally
   if (eleNewWidth < 0) {
     if (transformHandleDirection.includes("e")) {
@@ -528,8 +531,9 @@ export const resizeSingleElement = (
       newTopLeft[0] += Math.abs(newBoundsWidth);
     }
   }
+
   // Flip vertically
-  if (eleNewHeight < 0) {
+  if (flipY) {
     if (transformHandleDirection.includes("s")) {
       newTopLeft[1] -= Math.abs(newBoundsHeight);
     }
@@ -576,47 +580,67 @@ export const resizeSingleElement = (
   // For linear elements (x,y) are the coordinates of the first drawn point not the top-left corner
   // So we need to readjust (x,y) to be where the first point should be
   const newOrigin = [...newTopLeft];
-  newOrigin[0] += stateAtResizeStart.x - newBoundsX1;
-  newOrigin[1] += stateAtResizeStart.y - newBoundsY1;
+  const linearElementXOffset = stateAtResizeStart.x - newBoundsX1;
+  const linearElementYOffset = stateAtResizeStart.y - newBoundsY1;
+  newOrigin[0] += linearElementXOffset;
+  newOrigin[1] += linearElementYOffset;
 
   let nextX = newOrigin[0];
   let nextY = newOrigin[1];
 
   if (snaps) {
-    let corner: Point;
+    let cornerX: number;
+    let cornerY: number;
 
     switch (transformHandleDirection) {
       case "w":
       case "nw":
       case "n": {
-        corner = [newOrigin[0], newOrigin[1]];
+        cornerX = newOrigin[0] - linearElementXOffset;
+        cornerY = newOrigin[1] - linearElementYOffset;
+
         break;
       }
       case "ne":
       case "e": {
-        corner = [newOrigin[0] + eleNewWidth, newOrigin[1]];
+        cornerX = newOrigin[0] + eleNewWidth - linearElementXOffset;
+        cornerY = newOrigin[1] - linearElementYOffset;
+
         break;
       }
       case "s":
       case "sw": {
-        corner = [newOrigin[0], newOrigin[1] + eleNewHeight];
+        cornerX = newOrigin[0] - linearElementXOffset;
+        cornerY = newOrigin[1] - linearElementYOffset + eleNewHeight;
+
         break;
       }
       case "se": {
-        corner = [newOrigin[0] + eleNewWidth, newOrigin[1] + eleNewHeight];
+        cornerX = newOrigin[0] - linearElementXOffset + eleNewWidth;
+        cornerY = newOrigin[1] - linearElementYOffset + eleNewHeight;
         break;
       }
     }
 
-    // find out which snapline the dragged corners are closet to
+    if (flipX) {
+      cornerX = cornerX + Math.abs(newBoundsWidth);
+    }
 
-    let leastDistanceX = SNAP_DISTANCE / appState.zoom.value;
-    let leastDistanceY = SNAP_DISTANCE / appState.zoom.value;
+    if (flipY) {
+      cornerY = cornerY + Math.abs(newBoundsHeight);
+    }
 
-    const xDir =
+    const corner: Point = [cornerX, cornerY];
+
+    const snapThreshold = getSnapThreshold(appState.zoom.value);
+
+    let leastDistanceX = snapThreshold;
+    let leastDistanceY = snapThreshold;
+
+    const resizingAlongXAxis =
       transformHandleDirection.includes("w") ||
       transformHandleDirection.includes("e");
-    const yDir =
+    const resizingAlongYAxis =
       transformHandleDirection.includes("n") ||
       transformHandleDirection.includes("s");
 
@@ -624,9 +648,9 @@ export const resizeSingleElement = (
     let horizontalSnap: Snap | null = null;
 
     for (const snap of snaps) {
-      const distance = distance2d(...GAPoints.toTuple(snap.point), ...corner);
+      const distance = round(distance2d(...snapToPoint(snap), ...corner));
 
-      if (xDir) {
+      if (resizingAlongXAxis) {
         if (snap.snapLine.direction === "vertical") {
           if (distance <= leastDistanceX) {
             leastDistanceX = distance;
@@ -635,7 +659,7 @@ export const resizeSingleElement = (
         }
       }
 
-      if (yDir) {
+      if (resizingAlongYAxis) {
         if (snap.snapLine.direction === "horizontal") {
           if (distance <= leastDistanceY) {
             leastDistanceY = distance;
@@ -646,26 +670,51 @@ export const resizeSingleElement = (
     }
 
     if (verticalSnap) {
-      if (transformHandleDirection.includes("e")) {
+      if (
+        (transformHandleDirection.includes("e") && !flipX) ||
+        (transformHandleDirection.includes("w") && flipX)
+      ) {
         eleNewWidth =
-          GAPoints.toTuple(verticalSnap.snapLine.point)[0] - newOrigin[0];
+          Math.sign(eleNewWidth) *
+          (GAPoints.toTuple(verticalSnap.snapLine.point)[0] -
+            newOrigin[0] +
+            linearElementXOffset);
       }
 
-      if (transformHandleDirection.includes("w")) {
+      if (
+        (transformHandleDirection.includes("w") && !flipX) ||
+        (transformHandleDirection.includes("e") && flipX)
+      ) {
         nextX = GAPoints.toTuple(verticalSnap.snapLine.point)[0];
-        eleNewWidth = eleNewWidth + (newOrigin[0] - nextX);
+        nextX += linearElementXOffset;
+
+        eleNewWidth = flipX
+          ? nextX - startTopLeft[0] - linearElementXOffset
+          : eleNewWidth + (newOrigin[0] - nextX);
       }
     }
 
     if (horizontalSnap) {
-      if (transformHandleDirection.includes("n")) {
+      if (
+        (transformHandleDirection.includes("n") && !flipY) ||
+        (transformHandleDirection.includes("s") && flipY)
+      ) {
         nextY = GAPoints.toTuple(horizontalSnap.snapLine.point)[1];
-        eleNewHeight = eleNewHeight + (newOrigin[1] - nextY);
+        nextY += linearElementYOffset;
+        eleNewHeight = flipY
+          ? nextY - startTopLeft[1] - linearElementYOffset
+          : eleNewHeight + (newOrigin[1] - nextY);
       }
 
-      if (transformHandleDirection.includes("s")) {
+      if (
+        (transformHandleDirection.includes("s") && !flipY) ||
+        (transformHandleDirection.includes("n") && flipY)
+      ) {
         eleNewHeight =
-          GAPoints.toTuple(horizontalSnap.snapLine.point)[1] - newOrigin[1];
+          Math.sign(eleNewHeight) *
+          (GAPoints.toTuple(horizontalSnap.snapLine.point)[1] -
+            newOrigin[1] +
+            linearElementYOffset);
       }
     }
 
@@ -708,6 +757,22 @@ export const resizeSingleElement = (
           newBoundsHeight / 2 +
           (stateAtResizeStart.y - newBoundsY1);
       }
+    }
+
+    if (isLinearElement(element) || isFreeDrawElement(element)) {
+      rescaledElementPointsY = rescalePoints(
+        1,
+        eleNewHeight,
+        (stateAtResizeStart as ExcalidrawLinearElement).points,
+        true,
+      );
+
+      rescaledPoints = rescalePoints(
+        0,
+        eleNewWidth,
+        rescaledElementPointsY,
+        true,
+      );
     }
   }
 

@@ -1,7 +1,7 @@
 import { RenderConfig } from "../scene/types";
 import {
-  SNAP_DISTANCE,
   areRoughlyEqual,
+  getSnapThreshold,
   snapProject,
   snapToPoint,
 } from "../snapping";
@@ -62,7 +62,9 @@ const drawSnap = (
   zoom: RenderConfig["zoom"],
   context: CanvasRenderingContext2D,
 ) => {
-  if (distance2d(...from, ...to) >= SNAP_DISTANCE) {
+  const snapThreshold = getSnapThreshold(zoom.value);
+
+  if (distance2d(...from, ...to) >= snapThreshold) {
     context.save();
     context.save();
 
