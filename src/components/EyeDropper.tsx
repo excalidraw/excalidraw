@@ -77,8 +77,8 @@ export const EyeDropper: React.FC<{
       colorPreviewDiv.style.left = `${clientX + 20}px`;
 
       const pixel = ctx.getImageData(
-        clientX * window.devicePixelRatio - appState.offsetLeft,
-        clientY * window.devicePixelRatio - appState.offsetTop,
+        (clientX - appState.offsetLeft) * window.devicePixelRatio,
+        (clientY - appState.offsetTop) * window.devicePixelRatio,
         1,
         1,
       ).data;
