@@ -588,6 +588,19 @@ export const resizeSingleElement = (
   }
 
   if (
+    isArrowElement(element) &&
+    boundTextElement &&
+    shouldMaintainAspectRatio
+  ) {
+    const fontSize =
+      (resizedElement.width / element.width) * boundTextElement.fontSize;
+    if (fontSize < MIN_FONT_SIZE) {
+      return;
+    }
+    boundTextFont.fontSize = fontSize;
+  }
+
+  if (
     resizedElement.width !== 0 &&
     resizedElement.height !== 0 &&
     Number.isFinite(resizedElement.x) &&
