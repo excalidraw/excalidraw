@@ -1,4 +1,4 @@
-name: "Test Coverage PR"
+name: Vitest Coverage PR
 on:
   pull_request:
 
