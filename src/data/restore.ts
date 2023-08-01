@@ -165,6 +165,7 @@ const restoreElementWithProperties = <
   if (PRECEDING_ELEMENT_KEY in element) {
     base[PRECEDING_ELEMENT_KEY] = element[PRECEDING_ELEMENT_KEY];
   }
+
   return {
     ...base,
     ...getNormalizedDimensions(base),

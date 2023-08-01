@@ -863,7 +863,7 @@ export const getTextBindableContainerAtPosition = (
   return isTextBindableContainer(hitElement, false) ? hitElement : null;
 };
 
-export const VALID_CONTAINER_TYPES = new Set([
+const VALID_CONTAINER_TYPES = new Set([
   "rectangle",
   "ellipse",
   "diamond",

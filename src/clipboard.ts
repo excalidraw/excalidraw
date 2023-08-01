@@ -11,7 +11,6 @@ import { deepCopyElement } from "./element/newElement";
 import { mutateElement } from "./element/mutateElement";
 import { getContainingFrame } from "./frame";
 import { isPromiseLike, isTestEnv } from "./utils";
-import { ExcalidrawProgrammaticElement } from "./data/transform";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
@@ -21,7 +20,7 @@ type ElementsClipboard = {
 
 export interface ClipboardData {
   spreadsheet?: Spreadsheet;
-  elements?: readonly (ExcalidrawElement | ExcalidrawProgrammaticElement)[];
+  elements?: readonly ExcalidrawElement[];
   files?: BinaryFiles;
   text?: string;
   errorMessage?: string;
