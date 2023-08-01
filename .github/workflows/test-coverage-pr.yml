@@ -1,10 +1,9 @@
-name: Vitest Coverage PR
+name: Test Coverage PR
 on:
   pull_request:
 
 jobs:
-  name: Test Coverage
-  test:
+  coverage:
     runs-on: ubuntu-latest
     permissions:
       contents: read
