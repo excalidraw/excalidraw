@@ -182,7 +182,7 @@ const bindTextToContainer = (
   containerProps: ValidContainer | ({ type: "arrow" } & ValidLinearElement),
   textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
 ) => {
-  let container;
+  let container: ExcalidrawGenericElement | ExcalidrawLinearElement;
   if (containerProps.type === "arrow") {
     const width = containerProps.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
     const height = containerProps.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
@@ -220,7 +220,7 @@ const bindTextToContainer = (
 
   redrawTextBoundingBox(textElement, container);
 
-  return [container, textElement];
+  return [container, textElement] as const;
 };
 
 const bindLinearElementToElement = (

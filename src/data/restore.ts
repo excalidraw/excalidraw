@@ -42,7 +42,6 @@ import {
   getDefaultLineHeight,
   measureBaseline,
 } from "../element/textElement";
-
 import { normalizeLink } from "./url";
 
 type RestoredAppState = Omit<
