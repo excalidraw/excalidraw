@@ -1842,6 +1842,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    console.log("HEYYYY THERE");
     this.updateEmbeddables();
     if (
       !this.state.showWelcomeScreen &&
