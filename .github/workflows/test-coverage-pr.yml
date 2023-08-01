@@ -3,6 +3,7 @@ on:
   pull_request:
 
 jobs:
+  name: Test Coverage
   test:
     runs-on: ubuntu-latest
     permissions:
