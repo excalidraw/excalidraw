@@ -22,6 +22,11 @@
       width: var(--lg-icon-size);
       height: var(--lg-icon-size);
     }
+
+    // TODO follow-participant
+    &__label-element {
+      align-self: flex-start;
+    }
   }
 
   .default-sidebar-trigger .sidebar-trigger__label {

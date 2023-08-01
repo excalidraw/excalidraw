@@ -1,5 +1,6 @@
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
+import DropdownMenu from "../components/dropdownMenu/DropdownMenu";
 import { centerScrollOn } from "../scene/scroll";
 import { Collaborator } from "../types";
 import { register } from "./register";
@@ -48,9 +49,32 @@ export const actionGoToCollaborator = register({
     };
   },
   PanelComponent: ({ updateData, data, appState }) => {
-    const [clientId, collaborator] = data as [string, Collaborator];
+    const [clientId, collaborator, withName] = data as [
+      string,
+      Collaborator,
+      boolean,
+    ];
 
     const background = getClientColor(clientId);
+
+    if (withName) {
+      return (
+        <DropdownMenu.Item
+          onSelect={() => updateData({ ...collaborator, clientId })}
+          icon={
+            <Avatar
+              color={background}
+              onClick={() => {}}
+              name={collaborator.username || ""}
+              src={collaborator.avatarUrl}
+              isBeingFollowed={appState.userToFollow?.clientId === clientId}
+            />
+          }
+        >
+          {collaborator.username}
+        </DropdownMenu.Item>
+      );
+    }
 
     return (
       <Avatar

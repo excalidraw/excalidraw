@@ -19,7 +19,8 @@ export const SidebarTrigger = ({
   const appState = useUIAppState();
 
   return (
-    <label title={title}>
+    // TODO follow-participant
+    <label title={title} className="sidebar-trigger__label-element">
       <input
         className="ToolIcon_type_checkbox"
         type="checkbox"
