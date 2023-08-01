@@ -17,8 +17,8 @@ jobs:
           node-version: "18.x"
       - name: "Install Deps"
         run: yarn --frozen-lockfile
-      - name: "Test"
-        run: vitest --coverage
+      - name: "Test Coverage"
+        run: yarn test:coverage
       - name: "Report Coverage"
         if: always() # Also generate the report if tests are failing
         uses: davelosert/vitest-coverage-report-action@v2
