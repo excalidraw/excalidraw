@@ -1,22 +1,22 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Test Transform Test arrow bindings should bind arrows to existing shapes when start / end provided with ids 1`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 1`] = `
+{
   "angle": 0,
   "backgroundColor": "#d8f5a2",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id40",
       "type": "arrow",
     },
-    Object {
+    {
       "id": "id42",
       "type": "arrow",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 300,
   "id": Any<String>,
   "isDeleted": false,
@@ -39,19 +39,19 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to existing shapes when start / end provided with ids 2`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 2`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id42",
       "type": "arrow",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 100,
   "id": Any<String>,
   "isDeleted": false,
@@ -74,20 +74,20 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to existing shapes when start / end provided with ids 3`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 3`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "endArrowhead": "arrow",
-  "endBinding": Object {
+  "endBinding": {
     "elementId": "ellipse-1",
     "focus": -0.008153707962747813,
     "gap": 1,
   },
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 35,
   "id": Any<String>,
   "isDeleted": false,
@@ -95,12 +95,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       395,
       35,
     ],
@@ -109,7 +109,7 @@ Object {
   "roundness": null,
   "seed": Any<Number>,
   "startArrowhead": null,
-  "startBinding": Object {
+  "startBinding": {
     "elementId": "id41",
     "focus": -0.08139534883720931,
     "gap": 1,
@@ -127,19 +127,19 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to existing shapes when start / end provided with ids 4`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 4`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id40",
       "type": "arrow",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 300,
   "id": Any<String>,
   "isDeleted": false,
@@ -162,20 +162,20 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to existing shapes when start / end provided with ids 5`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 5`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "endArrowhead": "arrow",
-  "endBinding": Object {
+  "endBinding": {
     "elementId": "ellipse-1",
     "focus": 0.10666666666666667,
     "gap": 3.834326468444573,
   },
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 0,
   "id": Any<String>,
   "isDeleted": false,
@@ -183,12 +183,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       400,
       0,
     ],
@@ -197,7 +197,7 @@ Object {
   "roundness": null,
   "seed": Any<Number>,
   "startArrowhead": null,
-  "startBinding": Object {
+  "startBinding": {
     "elementId": "diamond-1",
     "focus": 0,
     "gap": 1,
@@ -215,13 +215,13 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to existing text elements when start / end provided with ids 1`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing text elements when start / end provided with ids 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id43",
       "type": "arrow",
     },
@@ -231,11 +231,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 25,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -260,13 +259,13 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to existing text elements when start / end provided with ids 2`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing text elements when start / end provided with ids 2`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id43",
       "type": "arrow",
     },
@@ -276,11 +275,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 25,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -305,25 +303,25 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to existing text elements when start / end provided with ids 3`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing text elements when start / end provided with ids 3`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id44",
       "type": "text",
     },
   ],
   "endArrowhead": "arrow",
-  "endBinding": Object {
+  "endBinding": {
     "elementId": "text-2",
     "focus": 0,
     "gap": 5,
   },
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 0,
   "id": Any<String>,
   "isDeleted": false,
@@ -331,12 +329,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       300,
       0,
     ],
@@ -345,7 +343,7 @@ Object {
   "roundness": null,
   "seed": Any<Number>,
   "startArrowhead": null,
-  "startBinding": Object {
+  "startBinding": {
     "elementId": "text-1",
     "focus": 0,
     "gap": 1,
@@ -363,8 +361,8 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to existing text elements when start / end provided with ids 4`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing text elements when start / end provided with ids 4`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -374,11 +372,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 25,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -403,25 +400,25 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to shapes when start / end provided without ids 1`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id33",
       "type": "text",
     },
   ],
   "endArrowhead": "arrow",
-  "endBinding": Object {
+  "endBinding": {
     "elementId": "id35",
     "focus": 0,
     "gap": 1,
   },
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 0,
   "id": Any<String>,
   "isDeleted": false,
@@ -429,12 +426,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       300,
       0,
     ],
@@ -443,7 +440,7 @@ Object {
   "roundness": null,
   "seed": Any<Number>,
   "startArrowhead": null,
-  "startBinding": Object {
+  "startBinding": {
     "elementId": "id34",
     "focus": 0,
     "gap": 1,
@@ -461,8 +458,8 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to shapes when start / end provided without ids 2`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 2`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -472,11 +469,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 25,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -501,19 +497,19 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to shapes when start / end provided without ids 3`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 3`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id32",
       "type": "arrow",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 100,
   "id": Any<String>,
   "isDeleted": false,
@@ -536,19 +532,19 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to shapes when start / end provided without ids 4`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 4`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id32",
       "type": "arrow",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 100,
   "id": Any<String>,
   "isDeleted": false,
@@ -571,25 +567,25 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to text when start / end provided without ids 1`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id37",
       "type": "text",
     },
   ],
   "endArrowhead": "arrow",
-  "endBinding": Object {
+  "endBinding": {
     "elementId": "id39",
     "focus": 0,
     "gap": 1,
   },
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 0,
   "id": Any<String>,
   "isDeleted": false,
@@ -597,12 +593,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       300,
       0,
     ],
@@ -611,7 +607,7 @@ Object {
   "roundness": null,
   "seed": Any<Number>,
   "startArrowhead": null,
-  "startBinding": Object {
+  "startBinding": {
     "elementId": "id38",
     "focus": 0,
     "gap": 1,
@@ -629,8 +625,8 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to text when start / end provided without ids 2`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 2`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -640,11 +636,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 25,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -669,13 +664,13 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to text when start / end provided without ids 3`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 3`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id36",
       "type": "arrow",
     },
@@ -685,11 +680,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 25,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -714,13 +708,13 @@ Object {
 }
 `;
 
-exports[`Test Transform Test arrow bindings should bind arrows to text when start / end provided without ids 4`] = `
-Object {
+exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 4`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id36",
       "type": "arrow",
     },
@@ -730,11 +724,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 25,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -759,9 +752,9 @@ Object {
 }
 `;
 
-exports[`Test Transform should generate new ids if multiple elements contain same ids 1`] = `
-Array [
-  Object {
+exports[`Test Transform > should generate new ids if multiple elements contain same ids 1`] = `
+[
+  {
     "height": 200,
     "id": "rect-1",
     "type": "rectangle",
@@ -769,7 +762,7 @@ Array [
     "x": 300,
     "y": 100,
   },
-  Object {
+  {
     "height": 200,
     "id": "rect-1_copy",
     "type": "rectangle",
@@ -780,8 +773,8 @@ Array [
 ]
 `;
 
-exports[`Test Transform should transform linear elements 1`] = `
-Object {
+exports[`Test Transform > should transform linear elements 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
@@ -789,7 +782,7 @@ Object {
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 0,
   "id": Any<String>,
   "isDeleted": false,
@@ -797,12 +790,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       300,
       0,
     ],
@@ -825,8 +818,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform linear elements 2`] = `
-Object {
+exports[`Test Transform > should transform linear elements 2`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
@@ -834,7 +827,7 @@ Object {
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 0,
   "id": Any<String>,
   "isDeleted": false,
@@ -842,12 +835,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       300,
       0,
     ],
@@ -870,8 +863,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform linear elements 3`] = `
-Object {
+exports[`Test Transform > should transform linear elements 3`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
@@ -879,7 +872,7 @@ Object {
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 0,
   "id": Any<String>,
   "isDeleted": false,
@@ -887,12 +880,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       300,
       0,
     ],
@@ -915,8 +908,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform linear elements 4`] = `
-Object {
+exports[`Test Transform > should transform linear elements 4`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
@@ -924,7 +917,7 @@ Object {
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 0,
   "id": Any<String>,
   "isDeleted": false,
@@ -932,12 +925,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       300,
       0,
     ],
@@ -960,9 +953,9 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform regular shapes 1`] = `
-Array [
-  Object {
+exports[`Test Transform > should transform regular shapes 1`] = `
+[
+  {
     "height": 100,
     "id": "id0",
     "type": "rectangle",
@@ -970,7 +963,7 @@ Array [
     "x": 100,
     "y": 100,
   },
-  Object {
+  {
     "height": 100,
     "id": "id1",
     "type": "ellipse",
@@ -978,7 +971,7 @@ Array [
     "x": 100,
     "y": 250,
   },
-  Object {
+  {
     "height": 100,
     "id": "id2",
     "type": "diamond",
@@ -986,7 +979,7 @@ Array [
     "x": 100,
     "y": 400,
   },
-  Object {
+  {
     "backgroundColor": "#c0eb75",
     "height": 100,
     "id": "id3",
@@ -996,7 +989,7 @@ Array [
     "x": 300,
     "y": 100,
   },
-  Object {
+  {
     "backgroundColor": "#ffc9c9",
     "fillStyle": "solid",
     "height": 100,
@@ -1008,7 +1001,7 @@ Array [
     "x": 300,
     "y": 250,
   },
-  Object {
+  {
     "backgroundColor": "#a5d8ff",
     "fillStyle": "cross-hatch",
     "height": 100,
@@ -1024,9 +1017,9 @@ Array [
 ]
 `;
 
-exports[`Test Transform should transform text element 1`] = `
-Array [
-  Object {
+exports[`Test Transform > should transform text element 1`] = `
+[
+  {
     "fontFamily": 1,
     "fontSize": 20,
     "height": 25,
@@ -1037,7 +1030,7 @@ Array [
     "x": 100,
     "y": 100,
   },
-  Object {
+  {
     "fontFamily": 1,
     "fontSize": 20,
     "height": 25,
@@ -1052,12 +1045,12 @@ Array [
 ]
 `;
 
-exports[`Test Transform should transform to labelled arrows when label provided for arrows 1`] = `
-Object {
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id25",
       "type": "text",
     },
@@ -1066,7 +1059,7 @@ Object {
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 0,
   "id": Any<String>,
   "isDeleted": false,
@@ -1074,12 +1067,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       300,
       0,
     ],
@@ -1102,8 +1095,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to labelled arrows when label provided for arrows 2`] = `
-Object {
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 2`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -1113,11 +1106,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 25,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -1142,12 +1134,12 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to labelled arrows when label provided for arrows 3`] = `
-Object {
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 3`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id27",
       "type": "text",
     },
@@ -1156,7 +1148,7 @@ Object {
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 0,
   "id": Any<String>,
   "isDeleted": false,
@@ -1164,12 +1156,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       300,
       0,
     ],
@@ -1192,8 +1184,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to labelled arrows when label provided for arrows 4`] = `
-Object {
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 4`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -1203,11 +1195,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 25,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -1232,12 +1223,12 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to labelled arrows when label provided for arrows 5`] = `
-Object {
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 5`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id29",
       "type": "text",
     },
@@ -1246,7 +1237,7 @@ Object {
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 130,
   "id": Any<String>,
   "isDeleted": false,
@@ -1254,12 +1245,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       300,
       0,
     ],
@@ -1282,8 +1273,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to labelled arrows when label provided for arrows 6`] = `
-Object {
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 6`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -1293,11 +1284,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 50,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -1323,12 +1313,12 @@ LABELLED ARROW",
 }
 `;
 
-exports[`Test Transform should transform to labelled arrows when label provided for arrows 7`] = `
-Object {
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 7`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id31",
       "type": "text",
     },
@@ -1337,7 +1327,7 @@ Object {
   "endBinding": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 130,
   "id": Any<String>,
   "isDeleted": false,
@@ -1345,12 +1335,12 @@ Object {
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": Array [
-    Array [
+  "points": [
+    [
       0,
       0,
     ],
-    Array [
+    [
       300,
       0,
     ],
@@ -1373,8 +1363,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to labelled arrows when label provided for arrows 8`] = `
-Object {
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 8`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -1384,11 +1374,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 50,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -1414,19 +1403,19 @@ LABELLED ARROW",
 }
 `;
 
-exports[`Test Transform should transform to text containers when label provided 1`] = `
-Object {
+exports[`Test Transform > should transform to text containers when label provided 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id13",
       "type": "text",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 35,
   "id": Any<String>,
   "isDeleted": false,
@@ -1449,8 +1438,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to text containers when label provided 2`] = `
-Object {
+exports[`Test Transform > should transform to text containers when label provided 2`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -1460,11 +1449,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 25,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -1489,19 +1477,19 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to text containers when label provided 3`] = `
-Object {
+exports[`Test Transform > should transform to text containers when label provided 3`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id15",
       "type": "text",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 85,
   "id": Any<String>,
   "isDeleted": false,
@@ -1524,8 +1512,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to text containers when label provided 4`] = `
-Object {
+exports[`Test Transform > should transform to text containers when label provided 4`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -1535,11 +1523,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 50,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -1565,19 +1552,19 @@ CONTAINER",
 }
 `;
 
-exports[`Test Transform should transform to text containers when label provided 5`] = `
-Object {
+exports[`Test Transform > should transform to text containers when label provided 5`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id17",
       "type": "text",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 170,
   "id": Any<String>,
   "isDeleted": false,
@@ -1600,8 +1587,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to text containers when label provided 6`] = `
-Object {
+exports[`Test Transform > should transform to text containers when label provided 6`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -1611,11 +1598,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 75,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -1643,19 +1629,19 @@ CONTAINER",
 }
 `;
 
-exports[`Test Transform should transform to text containers when label provided 7`] = `
-Object {
+exports[`Test Transform > should transform to text containers when label provided 7`] = `
+{
   "angle": 0,
   "backgroundColor": "#fff3bf",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id19",
       "type": "text",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 120,
   "id": Any<String>,
   "isDeleted": false,
@@ -1678,8 +1664,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to text containers when label provided 8`] = `
-Object {
+exports[`Test Transform > should transform to text containers when label provided 8`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -1689,11 +1675,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 50,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -1719,19 +1704,19 @@ TEXT CONTAINER",
 }
 `;
 
-exports[`Test Transform should transform to text containers when label provided 9`] = `
-Object {
+exports[`Test Transform > should transform to text containers when label provided 9`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id21",
       "type": "text",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 85,
   "id": Any<String>,
   "isDeleted": false,
@@ -1754,8 +1739,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to text containers when label provided 10`] = `
-Object {
+exports[`Test Transform > should transform to text containers when label provided 10`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -1765,11 +1750,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 75,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -1796,19 +1780,19 @@ CONTAINER",
 }
 `;
 
-exports[`Test Transform should transform to text containers when label provided 11`] = `
-Object {
+exports[`Test Transform > should transform to text containers when label provided 11`] = `
+{
   "angle": 0,
   "backgroundColor": "#ffec99",
-  "boundElements": Array [
-    Object {
+  "boundElements": [
+    {
       "id": "id23",
       "type": "text",
     },
   ],
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 120,
   "id": Any<String>,
   "isDeleted": false,
@@ -1831,8 +1815,8 @@ Object {
 }
 `;
 
-exports[`Test Transform should transform to text containers when label provided 12`] = `
-Object {
+exports[`Test Transform > should transform to text containers when label provided 12`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
@@ -1842,11 +1826,10 @@ Object {
   "fontFamily": 1,
   "fontSize": 20,
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 75,
   "id": Any<String>,
   "isDeleted": false,
-  "isFrameName": false,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
