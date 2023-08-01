@@ -1866,10 +1866,8 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     this.updateEmbeddables();
-    if (
-      !this.state.showWelcomeScreen &&
-      !this.scene.getElementsIncludingDeleted().length
-    ) {
+    const elementsIncludingDeleted = this.scene.getElementsIncludingDeleted();
+    if (!this.state.showWelcomeScreen && !elementsIncludingDeleted.length) {
       this.setState({ showWelcomeScreen: true });
     }
 
@@ -2058,7 +2056,7 @@ class App extends React.Component<AppProps, AppState> {
           isViewportOutsideOfConstrainedArea &&
           this.state.cursorButton !== "down" &&
           prevState.zoom.value === this.state.zoom.value &&
-          this.scene.getElementsIncludingDeleted().length > 0, // Do not animate when app is initialized but scene is empty - this would cause flickering
+          elementsIncludingDeleted.length > 0, // Do not animate when app is initialized but scene is empty - this would cause flickering
       });
     }
 
