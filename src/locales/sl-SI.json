@@ -109,12 +109,12 @@
     "createContainerFromText": "Zavij besedilo v vsebnik",
     "link": {
       "edit": "Uredi povezavo",
-      "editEmbed": "",
+      "editEmbed": "Uredi povezavo in vdelaj",
       "create": "Ustvari povezavo",
-      "createEmbed": "",
+      "createEmbed": "Ustvari povezavo in vdelaj",
       "label": "Povezava",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Povezava in vdelovanje",
+      "empty": "Povezava ni nastavljena"
     },
     "lineEditor": {
       "edit": "Uredi črto",
@@ -168,11 +168,11 @@
     "cancel": "Prekliči",
     "clear": "Počisti",
     "remove": "Odstrani",
-    "embed": "",
+    "embed": "Preklopi vdelavo",
     "publishLibrary": "Objavi",
     "submit": "Pošlji",
     "confirm": "Potrdi",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Kliknite za interakcijo"
   },
   "alerts": {
     "clearReset": "To bo počistilo celotno platno. Ali ste prepričani?",
@@ -214,8 +214,8 @@
       "line4": "Če onemogočanje te nastavitve ne popravi prikaza besedilnih elementov, odprite <issueLink>vprašanje</issueLink> na našem GitHubu ali nam pišite na <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "image": ""
+      "embeddable": "Vdelani elementi ne morejo biti dodani v knjižnico.",
+      "image": "Podpora za dodajanje slik v knjižnico prihaja kmalu!"
     }
   },
   "toolBar": {
@@ -234,7 +234,7 @@
     "link": "Dodaj/posodobi povezavo za izbrano obliko",
     "eraser": "Radirka",
     "frame": "Okvir",
-    "embeddable": "",
+    "embeddable": "Spletna vdelava",
     "hand": "Roka (orodje za premikanje)",
     "extraTools": "Več orodij"
   },
@@ -248,7 +248,7 @@
     "linearElement": "Kliknite za začetek več točk, povlecite za posamezno črto",
     "freeDraw": "Kliknite in povlecite, spustite, ko končate",
     "text": "Namig: besedilo lahko dodate tudi z dvoklikom kjer koli z orodjem za izbiro",
-    "embeddable": "",
+    "embeddable": "Kliknite in povlecite, da ustvarite spletno vdelavo",
     "text_selected": "Dvokliknite ali pritisnite tipko Enter, da uredite besedilo",
     "text_editing": "Pritisnite tipko Escape ali CtrlOrCmd+Enter za zaključek urejanja",
     "linearElementMulti": "Kliknite zadnjo točko ali pritisnite Escape ali Enter, da končate",
@@ -424,8 +424,8 @@
     "canvas": "platno",
     "selection": "izbor",
     "pasteAsSingleElement": "Uporabite {{shortcut}}, da prilepite kot en element,\n ali prilepite v obstoječ urejevalnik besedil",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "Vdelava tega URL-ja trenutno ni dovoljena. Ustvarite vprašanje na GitHub-u in prosite za vmestitev URL-ja na seznam dovoljenih",
+    "unrecognizedLinkFormat": "Povezava, ki ste jo vdelali, se ne ujema s pričakovano obliko. Poskusite prilepiti niz za vdelavo, ki ste ga prejeli na izvorni strani"
   },
   "colors": {
     "transparent": "Prosojno",
