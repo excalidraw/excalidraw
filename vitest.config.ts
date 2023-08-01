@@ -7,6 +7,10 @@ export default defineConfig({
     environment: "jsdom",
     coverage: {
       reporter: ["text", "json-summary", "json"],
+      lines: 70,
+      branches: 70,
+      functions: 70,
+      statements: 70,
     },
   },
 });
