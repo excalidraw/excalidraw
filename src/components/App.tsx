@@ -2012,7 +2012,6 @@ class App extends React.Component<AppProps, AppState> {
         cursorButton,
       } = this.state;
 
-      // TODO: this could be replaced with memoization function like _.memoize()
       const canUseMemoizedConstraints =
         isShallowEqual(scrollConstraints, prevState.scrollConstraints ?? {}) &&
         isShallowEqual(
@@ -2058,7 +2057,8 @@ class App extends React.Component<AppProps, AppState> {
         shouldAnimate:
           isViewportOutsideOfConstrainedArea &&
           this.state.cursorButton !== "down" &&
-          prevState.zoom.value === this.state.zoom.value,
+          prevState.zoom.value === this.state.zoom.value &&
+          this.scene.getElementsIncludingDeleted().length > 0, // Do not animate when app is initialized but scene is empty - this would cause flickering
       });
     }
 
