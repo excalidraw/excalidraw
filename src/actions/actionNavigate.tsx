@@ -57,26 +57,22 @@ export const actionGoToCollaborator = register({
 
     const background = getClientColor(clientId);
 
-    if (withName) {
-      return (
-        <DropdownMenu.Item
-          onSelect={() => updateData({ ...collaborator, clientId })}
-          icon={
-            <Avatar
-              color={background}
-              onClick={() => {}}
-              name={collaborator.username || ""}
-              src={collaborator.avatarUrl}
-              isBeingFollowed={appState.userToFollow?.clientId === clientId}
-            />
-          }
-        >
-          {collaborator.username}
-        </DropdownMenu.Item>
-      );
-    }
-
-    return (
+    return withName ? (
+      <DropdownMenu.Item
+        onSelect={() => updateData({ ...collaborator, clientId })}
+        icon={
+          <Avatar
+            color={background}
+            onClick={() => {}}
+            name={collaborator.username || ""}
+            src={collaborator.avatarUrl}
+            isBeingFollowed={appState.userToFollow?.clientId === clientId}
+          />
+        }
+      >
+        {collaborator.username}
+      </DropdownMenu.Item>
+    ) : (
       <Avatar
         color={background}
         onClick={() => updateData({ ...collaborator, clientId })}

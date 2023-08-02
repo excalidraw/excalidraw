@@ -53,51 +53,6 @@ const sampleCollaborators = new Map([
   ],
 ]) as any as Map<string, Collaborator>;
 
-export const __UserList: React.FC<{
-  className?: string;
-  mobile?: boolean;
-  collaborators: AppState["collaborators"];
-}> = ({ className, mobile, collaborators }) => {
-  const actionManager = useExcalidrawActionManager();
-
-  const uniqueCollaborators = new Map<string, Collaborator>();
-  collaborators.forEach((collaborator, socketId) => {
-    uniqueCollaborators.set(
-      // filter on user id, else fall back on unique socketId
-      collaborator.id || socketId,
-      collaborator,
-    );
-  });
-
-  const avatars =
-    uniqueCollaborators.size > 0 &&
-    Array.from(uniqueCollaborators)
-      .filter(([_, client]) => Object.keys(client).length !== 0)
-      .map(([clientId, collaborator]) => {
-        const avatarJSX = actionManager.renderAction("goToCollaborator", [
-          clientId,
-          collaborator,
-        ]);
-
-        return mobile ? (
-          <Tooltip
-            label={collaborator.username || "Unknown user"}
-            key={clientId}
-          >
-            {avatarJSX}
-          </Tooltip>
-        ) : (
-          <React.Fragment key={clientId}>{avatarJSX}</React.Fragment>
-        );
-      });
-
-  return (
-    <div className={clsx("UserList", className, { UserList_mobile: mobile })}>
-      {avatars}
-    </div>
-  );
-};
-
 const FIRST_N_AVATARS = 3;
 
 const ConditionalTooltipWrapper = ({
@@ -140,6 +95,7 @@ const renderCollaborator = ({
 
   return (
     <ConditionalTooltipWrapper
+      key={clientId}
       clientId={clientId}
       username={collaborator.username}
       shouldWrap={shouldWrapWithTooltip}
@@ -195,56 +151,50 @@ export const UserList = ({
       }),
   );
 
-  if (mobile) {
-    return (
-      <div className={clsx("UserList UserList_mobile", className)}>
-        {uniqueCollaboratorsArray.map(([clientId, collaborator]) =>
-          renderCollaborator({
-            actionManager,
-            collaborator,
-            clientId,
-            shouldWrapWithTooltip: true,
-          }),
-        )}
-      </div>
-    );
-  }
+  return mobile ? (
+    <div className={clsx("UserList UserList_mobile", className)}>
+      {uniqueCollaboratorsArray.map(([clientId, collaborator]) =>
+        renderCollaborator({
+          actionManager,
+          collaborator,
+          clientId,
+          shouldWrapWithTooltip: true,
+        }),
+      )}
+    </div>
+  ) : (
+    <div className={clsx("UserList", className)}>
+      {first3avatarsJSX}
 
-  return (
-    <>
-      <div className={clsx("UserList", className)}>
-        {first3avatarsJSX}
-
-        {uniqueCollaboratorsArray.length > FIRST_N_AVATARS && (
-          <div style={{ position: "relative" }}>
-            <DropdownMenu open={open}>
-              <DropdownMenu.Trigger
-                className="UserList__more"
-                onToggle={() => {
-                  setOpen(!open);
-                }}
-              >
-                +{uniqueCollaboratorsArray.length - FIRST_N_AVATARS}
-              </DropdownMenu.Trigger>
-              <DropdownMenu.Content
-                style={{ width: "10rem" }}
-                onClickOutside={() => {
-                  setOpen(false);
-                }}
-              >
-                {uniqueCollaboratorsArray.map(([clientId, collaborator]) =>
-                  renderCollaborator({
-                    actionManager,
-                    collaborator,
-                    clientId,
-                    withName: true,
-                  }),
-                )}
-              </DropdownMenu.Content>
-            </DropdownMenu>
-          </div>
-        )}
-      </div>
-    </>
+      {uniqueCollaboratorsArray.length > FIRST_N_AVATARS && (
+        <div style={{ position: "relative" }}>
+          <DropdownMenu open={open}>
+            <DropdownMenu.Trigger
+              className="UserList__more"
+              onToggle={() => {
+                setOpen(!open);
+              }}
+            >
+              +{uniqueCollaboratorsArray.length - FIRST_N_AVATARS}
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content
+              style={{ width: "10rem" }}
+              onClickOutside={() => {
+                setOpen(false);
+              }}
+            >
+              {uniqueCollaboratorsArray.map(([clientId, collaborator]) =>
+                renderCollaborator({
+                  actionManager,
+                  collaborator,
+                  clientId,
+                  withName: true,
+                }),
+              )}
+            </DropdownMenu.Content>
+          </DropdownMenu>
+        </div>
+      )}
+    </div>
   );
 };
