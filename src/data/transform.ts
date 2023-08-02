@@ -441,20 +441,26 @@ export const convertToExcalidrawElements = (
   if (!elements) {
     return [];
   }
+
+  // Push all elements to array as there could be cases where element id
+  // is referenced before element is created
   elements.forEach((element) => {
     let elementId = element.id || regenerateId(null);
 
-    // To make sure every element has a unique id
+    // To make sure every element has a unique id since regenerateId appends
+    // _copy to the original id and if it exists we need to generate again
+    // hence a loop
     while (excalidrawElements.hasElementWithId(elementId)) {
       elementId = regenerateId(elementId);
     }
-
-    if (!ELEMENTS_SUPPORTING_PROGRAMMATIC_API.includes(element.type)) {
-      excalidrawElements.add(element as ExcalidrawElement);
-
-      return;
-    }
     const elementWithId = { ...element, id: elementId };
+    excalidrawElements.add(elementWithId as ExcalidrawElement);
+  });
+
+  const pushedElements =
+    excalidrawElements.get() as readonly ExcalidrawProgrammaticElement[];
+  pushedElements.forEach((element) => {
+    const elementWithId = { ...element };
 
     if (
       (elementWithId.type === "rectangle" ||
