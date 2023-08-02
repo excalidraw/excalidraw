@@ -10,7 +10,6 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { bindLinearElement } from "../element/binding";
-import { mutateElement } from "../element/mutateElement";
 import {
   ElementConstructorOpts,
   newImageElement,
@@ -211,7 +210,7 @@ const bindTextToContainer = (
     strokeColor: textProps.strokeColor || container.strokeColor,
   });
 
-  mutateElement(container, {
+  Object.assign(container, {
     boundElements: (container.boundElements || []).concat({
       type: "text",
       id: textElement.id,
@@ -254,7 +253,7 @@ const bindLinearElementToElement = (
   let startBoundElement;
   let endBoundElement;
 
-  mutateElement(excliadrawLinearElement, {
+  Object.assign(excliadrawLinearElement, {
     startBinding: linearElement?.startBinding || null,
     endBinding: linearElement.endBinding || null,
   });
@@ -302,7 +301,7 @@ const bindLinearElementToElement = (
           text,
         });
         // to position the text correctly when coordinates not provided
-        mutateElement(startBoundElement, {
+        Object.assign(startBoundElement, {
           x: start.x || excliadrawLinearElement.x - startBoundElement.width,
           y:
             start.y || excliadrawLinearElement.y - startBoundElement.height / 2,
@@ -370,7 +369,7 @@ const bindLinearElementToElement = (
           text,
         });
         // to position the text correctly when coordinates not provided
-        mutateElement(endBoundElement, {
+        Object.assign(endBoundElement, {
           y: end.y || excliadrawLinearElement.y - endBoundElement.height / 2,
         });
       } else {
@@ -551,5 +550,6 @@ export const convertToExcalidrawElements = (
       }
     }
   });
+  console.log(excalidrawElements.get());
   return excalidrawElements.get();
 };
