@@ -117,6 +117,7 @@ export const FRAME_STYLE = {
 
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
+export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
 export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil;
 export const DEFAULT_TEXT_ALIGN = "left";
@@ -239,6 +240,8 @@ export const VERSIONS = {
 } as const;
 
 export const BOUND_TEXT_PADDING = 5;
+export const ARROW_LABEL_WIDTH_FRACTION = 0.7;
+export const ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO = 11;
 
 export const VERTICAL_ALIGN = {
   TOP: "top",

@@ -264,11 +264,11 @@ export class LinearElementEditor {
             };
           }),
         );
+      }
 
-        const boundTextElement = getBoundTextElement(element);
-        if (boundTextElement) {
-          handleBindTextResize(element, false);
-        }
+      const boundTextElement = getBoundTextElement(element);
+      if (boundTextElement) {
+        handleBindTextResize(element, false);
       }
 
       // suggest bindings for first and last point if selected
