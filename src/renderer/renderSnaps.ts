@@ -5,7 +5,7 @@ import { AppState, Point } from "../types";
 
 const SNAP_COLOR = "#fa5252";
 const SNAP_WIDTH = 1;
-const SNAP_CROSS_SIZE = 3;
+const SNAP_CROSS_SIZE = 2;
 
 interface RenderSnapOptions {
   renderConfig: RenderConfig;

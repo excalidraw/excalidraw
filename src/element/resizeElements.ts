@@ -709,15 +709,65 @@ export const resizeSingleElement = (
       }
     }
 
+    if (shouldMaintainAspectRatio) {
+      const fixWidthFromHeight = () => {
+        const heightRatio = Math.abs(eleNewHeight) / eleInitialHeight;
+        eleNewWidth = eleInitialWidth * heightRatio;
+      };
+
+      const fixHeightFromWidth = () => {
+        const widthRatio = Math.abs(eleNewWidth) / eleInitialWidth;
+        eleNewHeight = eleInitialHeight * widthRatio;
+      };
+
+      if (verticalSnap) {
+        fixHeightFromWidth();
+        if (
+          transformHandleDirection === "w" ||
+          transformHandleDirection === "e"
+        ) {
+          nextY = stateAtResizeStart.y - (eleNewHeight - eleInitialHeight) / 2;
+        } else if (transformHandleDirection === "ne") {
+          nextY = stateAtResizeStart.y - (eleNewHeight - eleInitialHeight);
+        } else if (transformHandleDirection === "se" && flipX) {
+          nextY = stateAtResizeStart.y - eleNewHeight;
+        }
+      }
+
+      if (horizontalSnap) {
+        fixWidthFromHeight();
+        if (
+          transformHandleDirection === "n" ||
+          transformHandleDirection === "s"
+        ) {
+          nextX = stateAtResizeStart.x - (eleNewWidth - eleInitialWidth) / 2;
+        } else if (
+          transformHandleDirection === "sw" ||
+          transformHandleDirection === "nw"
+        ) {
+          nextX = flipY
+            ? stateAtResizeStart.x + eleInitialWidth
+            : stateAtResizeStart.x - (eleNewWidth - eleInitialWidth);
+        } else if (
+          (transformHandleDirection === "se" ||
+            transformHandleDirection === "ne") &&
+          flipY
+        ) {
+          nextX = stateAtResizeStart.x - eleNewWidth;
+        }
+      }
+    }
+
     const nextSnaps = snaps
       .map((snap) => {
+        let nextSnap: Snap = snap;
+
         if (snap === verticalSnap || snap === horizontalSnap) {
-          return {
+          nextSnap = {
             ...snap,
             isSnapped: true,
           };
-        }
-        if (verticalSnap) {
+        } else if (verticalSnap) {
           if (
             GALines.areParallel(
               snap.snapLine.line,
@@ -726,13 +776,12 @@ export const resizeSingleElement = (
             GALines.distance(snap.snapLine.line, verticalSnap.snapLine.line) <=
               SNAP_PRECISION
           ) {
-            return {
+            nextSnap = {
               ...snap,
               isSnapped: true,
             };
           }
-        }
-        if (horizontalSnap) {
+        } else if (horizontalSnap) {
           if (
             GALines.areParallel(
               snap.snapLine.line,
@@ -743,58 +792,18 @@ export const resizeSingleElement = (
               horizontalSnap.snapLine.line,
             ) <= SNAP_PRECISION
           ) {
-            return {
+            nextSnap = {
               ...snap,
               isSnapped: true,
             };
           }
         }
-        return snap;
+
+        return nextSnap;
       })
       .filter((snap) => snap?.isSnapped);
 
     snapsCallback(nextSnaps);
-
-    // aspect ratio compensation
-    if (shouldMaintainAspectRatio) {
-      if (
-        transformHandleDirection === "n" ||
-        transformHandleDirection === "s"
-      ) {
-        const heightRatio = Math.abs(eleNewHeight) / eleInitialHeight;
-        eleNewWidth = eleInitialWidth * heightRatio;
-
-        const [newBoundsX1, , newBoundsX2] = getResizedElementAbsoluteCoords(
-          stateAtResizeStart,
-          eleNewWidth,
-          eleNewHeight,
-          true,
-        );
-        const newBoundsWidth = newBoundsX2 - newBoundsX1;
-        nextX =
-          startCenter[0] -
-          newBoundsWidth / 2 +
-          (stateAtResizeStart.x - newBoundsX1);
-      } else if (
-        transformHandleDirection === "w" ||
-        transformHandleDirection === "e"
-      ) {
-        const widthRatio = Math.abs(eleNewWidth) / eleInitialWidth;
-        eleNewHeight = eleInitialHeight * widthRatio;
-
-        const [, newBoundsY1, , newBoundsY2] = getResizedElementAbsoluteCoords(
-          stateAtResizeStart,
-          eleNewWidth,
-          eleNewHeight,
-          true,
-        );
-        const newBoundsHeight = newBoundsY2 - newBoundsY1;
-        nextY =
-          startCenter[1] -
-          newBoundsHeight / 2 +
-          (stateAtResizeStart.y - newBoundsY1);
-      }
-    }
   }
 
   // Readjust points for linear elements
