@@ -51,7 +51,7 @@ const sampleCollaborators = new Map([
       color: "#FCCB5F",
     },
   ],
-]);
+]) as any as Map<string, Collaborator>;
 
 export const __UserList: React.FC<{
   className?: string;
@@ -98,18 +98,39 @@ export const __UserList: React.FC<{
   );
 };
 
+const FIRST_N_AVATARS = 3;
+
+const ConditionalTooltipWrapper = ({
+  shouldWrap,
+  children,
+  clientId,
+  username,
+}: {
+  shouldWrap: boolean;
+  children: React.ReactNode;
+  username?: string | null;
+  clientId: string;
+}) =>
+  shouldWrap ? (
+    <Tooltip label={username || "Unknown user"} key={clientId}>
+      {children}
+    </Tooltip>
+  ) : (
+    <React.Fragment key={clientId}>{children}</React.Fragment>
+  );
+
 const renderCollaborator = ({
   actionManager,
   collaborator,
   clientId,
-  mobile,
   withName = false,
+  shouldWrapWithTooltip = false,
 }: {
   actionManager: ActionManager;
   collaborator: Collaborator;
   clientId: string;
-  mobile?: boolean;
   withName?: boolean;
+  shouldWrapWithTooltip?: boolean;
 }) => {
   const avatarJSX = actionManager.renderAction("goToCollaborator", [
     clientId,
@@ -117,12 +138,14 @@ const renderCollaborator = ({
     withName,
   ]);
 
-  return mobile ? (
-    <Tooltip label={collaborator.username || "Unknown user"} key={clientId}>
+  return (
+    <ConditionalTooltipWrapper
+      clientId={clientId}
+      username={collaborator.username}
+      shouldWrap={shouldWrapWithTooltip}
+    >
       {avatarJSX}
-    </Tooltip>
-  ) : (
-    <React.Fragment key={clientId}>{avatarJSX}</React.Fragment>
+    </ConditionalTooltipWrapper>
   );
 };
 
@@ -157,33 +180,42 @@ export const UserList = ({
     return null;
   }
 
-  // TODO follow-participant
-  // possibly make it configurable
-  const firstThreeCollaborators = uniqueCollaboratorsArray.slice(0, 3);
-
-  // TODO follow-participant
-  // should we show all or just the rest in the dropdown?
-  // const restCollaborators = uniqueCollaboratorsArray.slice(3);
+  const firstThreeCollaborators = uniqueCollaboratorsArray.slice(
+    0,
+    FIRST_N_AVATARS,
+  );
 
   const first3avatarsJSX = firstThreeCollaborators.map(
     ([clientId, collaborator]) =>
       renderCollaborator({
         actionManager,
-        // TODO follow-participant
-        collaborator: collaborator as any,
+        collaborator,
         clientId,
-        mobile,
+        shouldWrapWithTooltip: true,
       }),
   );
 
-  // TODO follow-participant
-  // on mobile, we can probably show all collaborators without the need for a dropdown
+  if (mobile) {
+    return (
+      <div className={clsx("UserList UserList_mobile", className)}>
+        {uniqueCollaboratorsArray.map(([clientId, collaborator]) =>
+          renderCollaborator({
+            actionManager,
+            collaborator,
+            clientId,
+            shouldWrapWithTooltip: true,
+          }),
+        )}
+      </div>
+    );
+  }
+
   return (
     <>
-      <div className={clsx("UserList", className, { UserList_mobile: mobile })}>
+      <div className={clsx("UserList", className)}>
         {first3avatarsJSX}
 
-        {uniqueCollaboratorsArray.length > 3 && (
+        {uniqueCollaboratorsArray.length > FIRST_N_AVATARS && (
           <div style={{ position: "relative" }}>
             <DropdownMenu open={open}>
               <DropdownMenu.Trigger
@@ -192,7 +224,7 @@ export const UserList = ({
                   setOpen(!open);
                 }}
               >
-                +{uniqueCollaboratorsArray.length - 3}
+                +{uniqueCollaboratorsArray.length - FIRST_N_AVATARS}
               </DropdownMenu.Trigger>
               <DropdownMenu.Content
                 style={{ width: "10rem" }}
@@ -203,10 +235,8 @@ export const UserList = ({
                 {uniqueCollaboratorsArray.map(([clientId, collaborator]) =>
                   renderCollaborator({
                     actionManager,
-                    // TODO follow-participant
-                    collaborator: collaborator as any,
+                    collaborator,
                     clientId,
-                    mobile,
                     withName: true,
                   }),
                 )}
