@@ -224,6 +224,7 @@ const bindTextToContainer = (
 
 const bindLinearElementToElement = (
   linearElement: ValidLinearElement,
+  elementStore: ElementStore,
 ): {
   linearElement: ExcalidrawLinearElement;
   startBoundElement?: ExcalidrawElement;
@@ -264,7 +265,7 @@ const bindLinearElementToElement = (
 
     let existingElement;
     if (start.id) {
-      existingElement = excalidrawElements
+      existingElement = elementStore
         .get()
         .find((ele) => ele?.id === start.id) as Exclude<
         ExcalidrawBindableElement,
@@ -331,7 +332,7 @@ const bindLinearElementToElement = (
 
     let existingElement;
     if (end.id) {
-      existingElement = excalidrawElements
+      existingElement = elementStore
         .get()
         .find((ele) => ele?.id === end.id) as Exclude<
         ExcalidrawBindableElement,
@@ -398,50 +399,39 @@ const bindLinearElementToElement = (
   };
 };
 
-const excalidrawElements = (() => {
-  const res: ExcalidrawElement[] = [];
-  const elementMap = new Map<string, number>();
+class ElementStore {
+  res: ExcalidrawElement[] = [];
+  elementMap = new Map<string, number>();
 
-  const add = (ele?: ExcalidrawElement) => {
+  add = (ele?: ExcalidrawElement) => {
     if (!ele) {
       return;
     }
-    const index = elementMap.get(ele.id);
+    const index = this.elementMap.get(ele.id);
     if (index !== undefined && index >= 0) {
-      res[index] = ele;
+      this.res[index] = ele;
     } else {
-      res.push(ele);
-      const index = res.length - 1;
-      elementMap.set(ele.id, index);
+      this.res.push(ele);
+      const index = this.res.length - 1;
+      this.elementMap.set(ele.id, index);
     }
   };
-  const clear = () => {
-    res.length = 0;
-    elementMap.clear();
+  get = () => {
+    return this.res;
   };
-  const get = () => {
-    return res;
-  };
-  const hasElementWithId = (id: string) => {
-    const index = elementMap.get(id);
+  hasElementWithId = (id: string) => {
+    const index = this.elementMap.get(id);
     return index !== undefined && index >= 0;
   };
-  return {
-    add,
-    clear,
-    get,
-    hasElementWithId,
-  };
-})();
+}
 
 export const convertToExcalidrawElements = (
   elements: ExcalidrawProgrammaticAPI["elements"],
 ): ExcalidrawElement[] => {
-  excalidrawElements.clear();
   if (!elements) {
     return [];
   }
-
+  const elementStore = new ElementStore();
   // Push all elements to array as there could be cases where element id
   // is referenced before element is created
   elements.forEach((element) => {
@@ -450,15 +440,15 @@ export const convertToExcalidrawElements = (
     // To make sure every element has a unique id since regenerateId appends
     // _copy to the original id and if it exists we need to generate again
     // hence a loop
-    while (excalidrawElements.hasElementWithId(elementId)) {
+    while (elementStore.hasElementWithId(elementId)) {
       elementId = regenerateId(elementId);
     }
     const elementWithId = { ...element, id: elementId };
-    excalidrawElements.add(elementWithId as ExcalidrawElement);
+    elementStore.add(elementWithId as ExcalidrawElement);
   });
 
   const pushedElements =
-    excalidrawElements.get() as readonly ExcalidrawProgrammaticElement[];
+    elementStore.get() as readonly ExcalidrawProgrammaticElement[];
   pushedElements.forEach((element) => {
     const elementWithId = { ...element };
 
@@ -477,8 +467,8 @@ export const convertToExcalidrawElements = (
             } & ValidLinearElement),
         elementWithId?.label,
       );
-      excalidrawElements.add(container);
-      excalidrawElements.add(text);
+      elementStore.add(container);
+      elementStore.add(text);
 
       if (container.type === "arrow") {
         const originalStart =
@@ -486,15 +476,18 @@ export const convertToExcalidrawElements = (
         const originalEnd =
           elementWithId.type === "arrow" ? elementWithId?.end : undefined;
         const { linearElement, startBoundElement, endBoundElement } =
-          bindLinearElementToElement({
-            ...container,
-            start: originalStart,
-            end: originalEnd,
-          });
+          bindLinearElementToElement(
+            {
+              ...container,
+              start: originalStart,
+              end: originalEnd,
+            },
+            elementStore,
+          );
         container = linearElement;
-        excalidrawElements.add(linearElement);
-        excalidrawElements.add(startBoundElement);
-        excalidrawElements.add(endBoundElement);
+        elementStore.add(linearElement);
+        elementStore.add(startBoundElement);
+        elementStore.add(endBoundElement);
       }
     } else {
       let excalidrawElement;
@@ -518,13 +511,13 @@ export const convertToExcalidrawElements = (
           ...elementWithId,
         };
 
-        excalidrawElements.add(excalidrawElement as ExcalidrawTextElement);
+        elementStore.add(excalidrawElement as ExcalidrawTextElement);
       } else if (elementWithId.type === "arrow") {
         const { linearElement, startBoundElement, endBoundElement } =
-          bindLinearElementToElement(elementWithId);
-        excalidrawElements.add(linearElement);
-        excalidrawElements.add(startBoundElement);
-        excalidrawElements.add(endBoundElement);
+          bindLinearElementToElement(elementWithId, elementStore);
+        elementStore.add(linearElement);
+        elementStore.add(startBoundElement);
+        elementStore.add(endBoundElement);
       } else if (elementWithId.type === "line") {
         const width = elementWithId.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
         const height =
@@ -538,23 +531,23 @@ export const convertToExcalidrawElements = (
           ],
           ...elementWithId,
         });
-        excalidrawElements.add(lineElement);
+        elementStore.add(lineElement);
       } else if (elementWithId.type === "image") {
         const imageElement = newImageElement({
           width: elementWithId?.width || DEFAULT_DIMENSION,
           height: elementWithId?.height || DEFAULT_DIMENSION,
           ...elementWithId,
         });
-        excalidrawElements.add(imageElement);
+        elementStore.add(imageElement);
       } else {
         excalidrawElement = {
           ...elementWithId,
           width: elementWithId?.width || DEFAULT_DIMENSION,
           height: elementWithId?.height || DEFAULT_DIMENSION,
         } as ExcalidrawGenericElement;
-        excalidrawElements.add(excalidrawElement);
+        elementStore.add(excalidrawElement);
       }
     }
   });
-  return excalidrawElements.get();
+  return elementStore.get();
 };
