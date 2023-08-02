@@ -34,6 +34,7 @@ export type Snap = {
   distance: number;
   point: GA.Point;
   snapLine: SnapLine;
+  isSnapped: boolean;
 };
 
 export type Snaps = Snap[];
@@ -66,7 +67,7 @@ const isSnappingEnabled = ({
 
 export const round = (x: number) => {
   // round numbers to avoid glitches for floating point rounding errors
-  const decimalPlacesTolerance = 2;
+  const decimalPlacesTolerance = 8;
   return (
     Math.round(x * 10 ** decimalPlacesTolerance) / 10 ** decimalPlacesTolerance
   );
@@ -330,6 +331,7 @@ export const getSnaps = ({
             distance,
             point,
             snapLine,
+            isSnapped: false,
           };
         })
         .filter(

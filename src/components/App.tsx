@@ -145,7 +145,6 @@ import {
   isBindingElementType,
   isBoundToContainer,
   isFrameElement,
-  isFreeDrawElement,
   isImageElement,
   isInitializedImageElement,
   isLinearElement,
@@ -7164,10 +7163,9 @@ class App extends React.Component<AppProps, AppState> {
     // TODO: update condition as linear, freedraw and multiple elements snapping on resizing is supported
     const shouldGetResizedSnaps =
       selectedElements.length === 1 &&
-      selectedElements[0].angle === 0 &&
-      !isFreeDrawElement(selectedElements[0]);
+      selectedElements[0].type !== "arrow" &&
+      selectedElements[0].angle === 0;
 
-    // console.time("getting snaps");
     const snaps = shouldGetResizedSnaps
       ? getSnaps({
           elements: this.scene.getNonDeletedElements(),
@@ -7182,9 +7180,6 @@ class App extends React.Component<AppProps, AppState> {
           event,
         })
       : null;
-
-    this.setState({ snaps });
-    // console.timeEnd("getting snaps");
 
     if (
       transformElements(
@@ -7203,6 +7198,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.resize.center.y,
         this.state,
         snaps,
+        (snaps) => this.setState({ snaps }),
       )
     ) {
       this.maybeSuggestBindingForAll(selectedElements);

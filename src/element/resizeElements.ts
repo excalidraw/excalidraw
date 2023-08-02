@@ -56,8 +56,16 @@ import {
   getBoundTextMaxHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
-import { Snap, Snaps, getSnapThreshold, round, snapToPoint } from "../snapping";
+import {
+  SNAP_PRECISION,
+  Snap,
+  Snaps,
+  getSnapThreshold,
+  round,
+  snapToPoint,
+} from "../snapping";
 import * as GAPoints from "../gapoints";
+import * as GALines from "../galines";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -84,6 +92,7 @@ export const transformElements = (
   centerY: number,
   appState: AppState,
   snaps: Snaps | null,
+  snapsCallback: (snaps: Snaps | null) => void,
 ) => {
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
@@ -122,6 +131,7 @@ export const transformElements = (
         pointerY,
         appState,
         snaps,
+        snapsCallback,
       );
     }
 
@@ -356,6 +366,7 @@ export const resizeSingleElement = (
   pointerY: number,
   appState: AppState,
   snaps: Snaps | null,
+  snapsCallback: (snaps: Snaps | null) => void,
 ) => {
   const stateAtResizeStart = originalElements.get(element.id)!;
   // Gets bounds corners
@@ -557,26 +568,6 @@ export const resizeSingleElement = (
   const rotatedNewCenter = rotatePoint(newCenter, startCenter, angle);
   newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
 
-  // Readjust points for linear elements
-  let rescaledElementPointsY;
-  let rescaledPoints;
-
-  if (isLinearElement(element) || isFreeDrawElement(element)) {
-    rescaledElementPointsY = rescalePoints(
-      1,
-      eleNewHeight,
-      (stateAtResizeStart as ExcalidrawLinearElement).points,
-      true,
-    );
-
-    rescaledPoints = rescalePoints(
-      0,
-      eleNewWidth,
-      rescaledElementPointsY,
-      true,
-    );
-  }
-
   // For linear elements (x,y) are the coordinates of the first drawn point not the top-left corner
   // So we need to readjust (x,y) to be where the first point should be
   const newOrigin = [...newTopLeft];
@@ -718,6 +709,52 @@ export const resizeSingleElement = (
       }
     }
 
+    const nextSnaps = snaps
+      .map((snap) => {
+        if (snap === verticalSnap || snap === horizontalSnap) {
+          return {
+            ...snap,
+            isSnapped: true,
+          };
+        }
+        if (verticalSnap) {
+          if (
+            GALines.areParallel(
+              snap.snapLine.line,
+              verticalSnap.snapLine.line,
+            ) &&
+            GALines.distance(snap.snapLine.line, verticalSnap.snapLine.line) <=
+              SNAP_PRECISION
+          ) {
+            return {
+              ...snap,
+              isSnapped: true,
+            };
+          }
+        }
+        if (horizontalSnap) {
+          if (
+            GALines.areParallel(
+              snap.snapLine.line,
+              horizontalSnap.snapLine.line,
+            ) &&
+            GALines.distance(
+              snap.snapLine.line,
+              horizontalSnap.snapLine.line,
+            ) <= SNAP_PRECISION
+          ) {
+            return {
+              ...snap,
+              isSnapped: true,
+            };
+          }
+        }
+        return snap;
+      })
+      .filter((snap) => snap?.isSnapped);
+
+    snapsCallback(nextSnaps);
+
     // aspect ratio compensation
     if (shouldMaintainAspectRatio) {
       if (
@@ -758,22 +795,25 @@ export const resizeSingleElement = (
           (stateAtResizeStart.y - newBoundsY1);
       }
     }
+  }
 
-    if (isLinearElement(element) || isFreeDrawElement(element)) {
-      rescaledElementPointsY = rescalePoints(
-        1,
-        eleNewHeight,
-        (stateAtResizeStart as ExcalidrawLinearElement).points,
-        true,
-      );
+  // Readjust points for linear elements
+  let rescaledElementPointsY;
+  let rescaledPoints;
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    rescaledElementPointsY = rescalePoints(
+      1,
+      eleNewHeight,
+      (stateAtResizeStart as ExcalidrawLinearElement).points,
+      true,
+    );
 
-      rescaledPoints = rescalePoints(
-        0,
-        eleNewWidth,
-        rescaledElementPointsY,
-        true,
-      );
-    }
+    rescaledPoints = rescalePoints(
+      0,
+      eleNewWidth,
+      rescaledElementPointsY,
+      true,
+    );
   }
 
   const resizedElement = {
