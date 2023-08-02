@@ -27,7 +27,10 @@
     "start": {
       "name": "Start Excalidraw",
       "command": "yarn start",
-      "runAtStart": true
+      "runAtStart": true,
+      "preview": {
+        "port": 3000
+      }
     },
     "test": {
       "name": "Run Tests",
@@ -37,7 +40,11 @@
     "install-deps": {
       "name": "Install Dependencies",
       "command": "yarn install",
-      "restartOn": { "files": ["yarn.lock"] }
+      "restartOn": {
+        "files": ["yarn.lock"],
+        "branch": false,
+        "resume": false
+      }
     }
   }
 }

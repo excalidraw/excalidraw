@@ -2,6 +2,7 @@ import { register } from "./register";
 import { deepCopyElement } from "../element/newElement";
 import { randomId } from "../random";
 import { t } from "../i18n";
+import { LIBRARY_DISABLED_TYPES } from "../constants";
 
 export const actionAddToLibrary = register({
   name: "addToLibrary",
@@ -12,14 +13,17 @@ export const actionAddToLibrary = register({
       includeBoundTextElement: true,
       includeElementsInFrames: true,
     });
-    if (selectedElements.some((element) => element.type === "image")) {
-      return {
-        commitToHistory: false,
-        appState: {
-          ...appState,
-          errorMessage: "Support for adding images to the library coming soon!",
-        },
-      };
+
+    for (const type of LIBRARY_DISABLED_TYPES) {
+      if (selectedElements.some((element) => element.type === type)) {
+        return {
+          commitToHistory: false,
+          appState: {
+            ...appState,
+            errorMessage: t(`errors.libraryElementTypeError.${type}`),
+          },
+        };
+      }
     }
 
     return app.library
