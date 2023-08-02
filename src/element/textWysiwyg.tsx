@@ -23,7 +23,6 @@ import { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import {
   getBoundTextElementId,
-  getContainerDims,
   getContainerElement,
   getTextElementAngle,
   getTextWidth,
@@ -177,20 +176,19 @@ export const textWysiwyg = ({
           updatedTextElement,
           editable,
         );
-        const containerDims = getContainerDims(container);
 
         let originalContainerData;
         if (propertiesUpdated) {
           originalContainerData = updateOriginalContainerCache(
             container.id,
-            containerDims.height,
+            container.height,
           );
         } else {
           originalContainerData = originalContainerCache[container.id];
           if (!originalContainerData) {
             originalContainerData = updateOriginalContainerCache(
               container.id,
-              containerDims.height,
+              container.height,
             );
           }
         }
@@ -214,7 +212,7 @@ export const textWysiwyg = ({
           // autoshrink container height until original container height
           // is reached when text is removed
           !isArrowElement(container) &&
-          containerDims.height > originalContainerData.height &&
+          container.height > originalContainerData.height &&
           textElementHeight < maxHeight
         ) {
           const targetContainerHeight = computeContainerDimensionForBoundText(
