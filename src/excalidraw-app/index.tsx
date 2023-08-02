@@ -731,6 +731,13 @@ const ExcalidrawWrapper = () => {
             />
           );
         }}
+        scrollConstraints={{
+          x: 0,
+          y: 0,
+          width: 2560,
+          height: 1300,
+          lockZoom: true,
+        }}
       >
         <AppMainMenu
           setCollabDialogShown={setCollabDialogShown}

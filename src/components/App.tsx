@@ -8358,7 +8358,7 @@ class App extends React.Component<AppProps, AppState> {
     width: AppState["width"],
     height: AppState["height"],
   ) => {
-    const DEFAULT_VIEWPORT_ZOOM_FACTOR = 0.2;
+    const DEFAULT_VIEWPORT_ZOOM_FACTOR = 0.7;
 
     const lockZoom = scrollConstraints.lockZoom ?? false;
     const viewportZoomFactor = scrollConstraints.viewportZoomFactor
