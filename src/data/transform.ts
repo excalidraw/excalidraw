@@ -550,6 +550,5 @@ export const convertToExcalidrawElements = (
       }
     }
   });
-  console.log(excalidrawElements.get());
   return excalidrawElements.get();
 };
