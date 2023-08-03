@@ -154,7 +154,9 @@ export const exportToSvg = async (
   /*if (process.env.IS_EXCALIDRAW_NPM_PACKAGE) { //zsviczian
     assetPath =
       window.EXCALIDRAW_ASSET_PATH ||
-      `https://unpkg.com/${process.env.PKG_NAME}@${process.env.PKG_VERSION}`;
+      `https://unpkg.com/${import.meta.env.VITE_PKG_NAME}@${
+        import.meta.env.PKG_VERSION
+      }`;
 
     if (assetPath?.startsWith("/")) {
       assetPath = assetPath.replace("/", `${window.location.origin}/`);

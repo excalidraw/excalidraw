@@ -59,6 +59,7 @@
     "cross-env": "7.0.3",
     "css-loader": "6.7.1",
     "dotenv": "16.0.1",
+    "import-meta-loader": "1.1.0",
     "mini-css-extract-plugin": "2.6.1",
     "postcss-loader": "7.0.1",
     "sass-loader": "13.0.2",
