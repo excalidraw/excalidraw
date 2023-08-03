@@ -348,6 +348,7 @@ export const resizeSingleElement = (
   pointerX: number,
   pointerY: number,
 ) => {
+  if(element.customData?.isAnchored) return; //zsviczian
   const stateAtResizeStart = originalElements.get(element.id)!;
   // Gets bounds corners
   const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
@@ -736,8 +737,8 @@ export const resizeMultipleElements = (
       continue;
     }
 
-    const width = orig.width * scale;
-    const height = orig.height * scale;
+    const width = orig.customData?.isAnchored ? orig.width : orig.width * scale; //zsviczian
+    const height = orig.customData?.isAnchored ? orig.height : orig.height * scale; //zsviczian
     const angle = normalizeAngle(orig.angle * flipFactorX * flipFactorY);
 
     const isLinearOrFreeDraw = isLinearElement(orig) || isFreeDrawElement(orig);
