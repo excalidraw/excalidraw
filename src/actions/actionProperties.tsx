@@ -46,13 +46,7 @@ import {
   TextAlignRightIcon,
   FillZigZagIcon,
 } from "../components/icons";
-import {
-  DEFAULT_FONT_FAMILY,
-  DEFAULT_FONT_SIZE,
-  FONT_FAMILY,
-  ROUNDNESS,
-  VERTICAL_ALIGN,
-} from "../constants";
+import { FONT_FAMILY, ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import {
   getNonDeletedElements,
   isTextElement,
@@ -82,7 +76,6 @@ import { getLanguage, t } from "../i18n";
 import { KEYS } from "../keys";
 import { randomInteger } from "../random";
 import {
-  canChangeRoundness,
   canHaveArrowheads,
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
@@ -122,6 +115,7 @@ const getFormValue = function <T>(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
+  isRelevantElement: (element: ExcalidrawElement) => boolean,
   defaultValue: T,
 ): T {
   const editingElement = appState.editingElement;
@@ -130,7 +124,7 @@ const getFormValue = function <T>(
     (editingElement && getAttribute(editingElement)) ??
     (isSomeElementSelected(nonDeletedElements, appState)
       ? getCommonAttributeOfSelectedElements(
-          nonDeletedElements,
+          nonDeletedElements.filter((el) => isRelevantElement(el)),
           appState,
           getAttribute,
         )
@@ -247,6 +241,7 @@ export const actionChangeStrokeColor = register({
           elements,
           appState,
           (element) => element.strokeColor,
+          (element) => true,
           appState.currentItemStrokeColor,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
@@ -289,6 +284,7 @@ export const actionChangeBackgroundColor = register({
           elements,
           appState,
           (element) => element.backgroundColor,
+          (element) => true,
           appState.currentItemBackgroundColor,
         )}
         onChange={(color) => updateData({ currentItemBackgroundColor: color })}
@@ -354,18 +350,10 @@ export const actionChangeFillStyle = register({
             elements,
             appState,
             (element) => element.fillStyle,
-            appState.currentItemFillStyle,
+            (element) => element.hasOwnProperty("fillStyle"),
+            null,
           )}
-          onClick={(value, event) => {
-            const nextValue =
-              event.altKey &&
-              value === "hachure" &&
-              selectedElements.every((el) => el.fillStyle === "hachure")
-                ? "zigzag"
-                : value;
-
-            updateData(nextValue);
-          }}
+          onClick={(value) => updateData(value)}
         />
       </fieldset>
     );
@@ -412,7 +400,8 @@ export const actionChangeStrokeWidth = register({
           elements,
           appState,
           (element) => element.strokeWidth,
-          appState.currentItemStrokeWidth,
+          (element) => element.hasOwnProperty("strokeWidth"),
+          null,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -461,7 +450,8 @@ export const actionChangeSloppiness = register({
           elements,
           appState,
           (element) => element.roughness,
-          appState.currentItemRoughness,
+          (element) => element.hasOwnProperty("roughness"),
+          null,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -509,7 +499,8 @@ export const actionChangeStrokeStyle = register({
           elements,
           appState,
           (element) => element.strokeStyle,
-          appState.currentItemStrokeStyle,
+          (element) => element.hasOwnProperty("strokeStyle"),
+          null,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -549,6 +540,7 @@ export const actionChangeOpacity = register({
             elements,
             appState,
             (element) => element.opacity,
+            (element) => true,
             appState.currentItemOpacity,
           ) ?? undefined
         }
@@ -607,7 +599,9 @@ export const actionChangeFontSize = register({
             }
             return null;
           },
-          appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+          (element) =>
+            isTextElement(element) || getBoundTextElement(element) !== null,
+          null,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -729,7 +723,9 @@ export const actionChangeFontFamily = register({
               }
               return null;
             },
-            appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
+            (element) =>
+              isTextElement(element) || getBoundTextElement(element) !== null,
+            null,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -806,7 +802,9 @@ export const actionChangeTextAlign = register({
               }
               return null;
             },
-            appState.currentItemTextAlign,
+            (element) =>
+              isTextElement(element) || getBoundTextElement(element) !== null,
+            null,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -870,11 +868,7 @@ export const actionChangeVerticalAlign = register({
             },
           ]}
           value={getFormValue(
-            elements.filter(
-              (el) =>
-                (isTextElement(el) && el.containerId) ||
-                getBoundTextElement(el) !== null,
-            ),
+            elements,
             appState,
             (element) => {
               if (isTextElement(element) && element.containerId) {
@@ -886,7 +880,9 @@ export const actionChangeVerticalAlign = register({
               }
               return null;
             },
-            VERTICAL_ALIGN.MIDDLE,
+            (element) =>
+              isTextElement(element) || getBoundTextElement(element) !== null,
+            null,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -951,9 +947,8 @@ export const actionChangeRoundness = register({
             appState,
             (element) =>
               hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
-            (canChangeRoundness(appState.activeTool.type) &&
-              appState.currentItemRoundness) ||
-              null,
+            (element) => element.hasOwnProperty("roundness"),
+            null,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -1047,6 +1042,7 @@ export const actionChangeArrowhead = register({
                 isLinearElement(element) && canHaveArrowheads(element.type)
                   ? element.startArrowhead
                   : appState.currentItemStartArrowhead,
+              (element) => true,
               appState.currentItemStartArrowhead,
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
@@ -1093,6 +1089,7 @@ export const actionChangeArrowhead = register({
                 isLinearElement(element) && canHaveArrowheads(element.type)
                   ? element.endArrowhead
                   : appState.currentItemEndArrowhead,
+              (element) => true,
               appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
