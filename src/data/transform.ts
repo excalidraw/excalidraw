@@ -266,7 +266,7 @@ const bindLinearElementToElement = (
     let existingElement;
     if (start.id) {
       existingElement = elementStore
-        .get()
+        .getElements()
         .find((ele) => ele?.id === start.id) as Exclude<
         ExcalidrawBindableElement,
         ExcalidrawImageElement | ExcalidrawFrameElement
@@ -333,7 +333,7 @@ const bindLinearElementToElement = (
     let existingElement;
     if (end.id) {
       existingElement = elementStore
-        .get()
+        .getElements()
         .find((ele) => ele?.id === end.id) as Exclude<
         ExcalidrawBindableElement,
         ExcalidrawImageElement | ExcalidrawFrameElement
@@ -416,7 +416,7 @@ class ElementStore {
       this.elementMap.set(ele.id, index);
     }
   };
-  get = () => {
+  getElements = () => {
     return this.res;
   };
   hasElementWithId = (id: string) => {
@@ -448,7 +448,7 @@ export const convertToExcalidrawElements = (
   });
 
   const pushedElements =
-    elementStore.get() as readonly ExcalidrawProgrammaticElement[];
+    elementStore.getElements() as readonly ExcalidrawProgrammaticElement[];
   pushedElements.forEach((element) => {
     const elementWithId = { ...element };
 
@@ -550,5 +550,5 @@ export const convertToExcalidrawElements = (
       elementStore.add(element);
     }
   });
-  return elementStore.get();
+  return elementStore.getElements();
 };
