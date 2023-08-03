@@ -353,7 +353,16 @@ export const actionChangeFillStyle = register({
             (element) => element.hasOwnProperty("fillStyle"),
             null,
           )}
-          onClick={(value) => updateData(value)}
+          onClick={(value, event) => {
+            const nextValue =
+              event.altKey &&
+              value === "hachure" &&
+              selectedElements.every((el) => el.fillStyle === "hachure")
+                ? "zigzag"
+                : value;
+
+            updateData(nextValue);
+          }}
         />
       </fieldset>
     );
