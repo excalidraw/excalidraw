@@ -489,64 +489,65 @@ export const convertToExcalidrawElements = (
         elementStore.add(startBoundElement);
         elementStore.add(endBoundElement);
       }
-    } else {
-      let excalidrawElement;
-      if (elementWithId.type === "text") {
-        const fontFamily = elementWithId?.fontFamily || DEFAULT_FONT_FAMILY;
-        const fontSize = elementWithId?.fontSize || DEFAULT_FONT_SIZE;
-        const lineHeight =
-          elementWithId?.lineHeight || getDefaultLineHeight(fontFamily);
-        const text = elementWithId.text ?? "";
-        const normalizedText = normalizeText(text);
-        const metrics = measureText(
-          normalizedText,
-          getFontString({ fontFamily, fontSize }),
-          lineHeight,
-        );
-        excalidrawElement = {
-          width: metrics.width,
-          height: metrics.height,
-          fontFamily,
-          fontSize,
-          ...elementWithId,
-        };
+    } else if (elementWithId.type === "text") {
+      const fontFamily = elementWithId?.fontFamily || DEFAULT_FONT_FAMILY;
+      const fontSize = elementWithId?.fontSize || DEFAULT_FONT_SIZE;
+      const lineHeight =
+        elementWithId?.lineHeight || getDefaultLineHeight(fontFamily);
+      const text = elementWithId.text ?? "";
+      const normalizedText = normalizeText(text);
+      const metrics = measureText(
+        normalizedText,
+        getFontString({ fontFamily, fontSize }),
+        lineHeight,
+      );
 
-        elementStore.add(excalidrawElement as ExcalidrawTextElement);
-      } else if (elementWithId.type === "arrow") {
-        const { linearElement, startBoundElement, endBoundElement } =
-          bindLinearElementToElement(elementWithId, elementStore);
-        elementStore.add(linearElement);
-        elementStore.add(startBoundElement);
-        elementStore.add(endBoundElement);
-      } else if (elementWithId.type === "line") {
-        const width = elementWithId.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
-        const height =
-          elementWithId.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
-        const lineElement = newLinearElement({
-          width,
-          height,
-          points: [
-            [0, 0],
-            [width, height],
-          ],
-          ...elementWithId,
-        });
-        elementStore.add(lineElement);
-      } else if (elementWithId.type === "image") {
-        const imageElement = newImageElement({
-          width: elementWithId?.width || DEFAULT_DIMENSION,
-          height: elementWithId?.height || DEFAULT_DIMENSION,
-          ...elementWithId,
-        });
-        elementStore.add(imageElement);
-      } else {
-        excalidrawElement = {
-          ...elementWithId,
-          width: elementWithId?.width || DEFAULT_DIMENSION,
-          height: elementWithId?.height || DEFAULT_DIMENSION,
-        } as ExcalidrawGenericElement;
-        elementStore.add(excalidrawElement);
-      }
+      const textElement = newTextElement({
+        width: metrics.width,
+        height: metrics.height,
+        fontFamily,
+        fontSize,
+        ...elementWithId,
+      });
+      elementStore.add(textElement);
+    } else if (elementWithId.type === "arrow") {
+      const { linearElement, startBoundElement, endBoundElement } =
+        bindLinearElementToElement(elementWithId, elementStore);
+      elementStore.add(linearElement);
+      elementStore.add(startBoundElement);
+      elementStore.add(endBoundElement);
+    } else if (elementWithId.type === "line") {
+      const width = elementWithId.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
+      const height =
+        elementWithId.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
+      const lineElement = newLinearElement({
+        width,
+        height,
+        points: [
+          [0, 0],
+          [width, height],
+        ],
+        ...elementWithId,
+      });
+      elementStore.add(lineElement);
+    } else if (elementWithId.type === "image") {
+      const imageElement = newImageElement({
+        width: elementWithId?.width || DEFAULT_DIMENSION,
+        height: elementWithId?.height || DEFAULT_DIMENSION,
+        ...elementWithId,
+      });
+      elementStore.add(imageElement);
+    } else if (
+      elementWithId.type === "rectangle" ||
+      elementWithId.type === "ellipse" ||
+      elementWithId.type === "diamond"
+    ) {
+      const element = newElement({
+        ...elementWithId,
+        width: elementWithId?.width || DEFAULT_DIMENSION,
+        height: elementWithId?.height || DEFAULT_DIMENSION,
+      });
+      elementStore.add(element);
     }
   });
   return elementStore.get();
