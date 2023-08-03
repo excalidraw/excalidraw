@@ -55,11 +55,15 @@ describe("Test Transform", () => {
       },
     ];
 
-    expect(
-      convertToExcalidrawElements(
-        elements as ExcalidrawProgrammaticAPI["elements"],
-      ),
-    ).toMatchSnapshot();
+    convertToExcalidrawElements(
+      elements as ExcalidrawProgrammaticAPI["elements"],
+    ).forEach((ele) => {
+      expect(ele).toMatchSnapshot({
+        seed: expect.any(Number),
+        versionNonce: expect.any(Number),
+        id: expect.any(String),
+      });
+    });
   });
 
   it("should transform text element", () => {
@@ -79,11 +83,15 @@ describe("Test Transform", () => {
         strokeColor: "#5f3dc4",
       },
     ];
-    expect(
-      convertToExcalidrawElements(
-        elements as ExcalidrawProgrammaticAPI["elements"],
-      ),
-    ).toMatchSnapshot();
+    convertToExcalidrawElements(
+      elements as ExcalidrawProgrammaticAPI["elements"],
+    ).forEach((ele) => {
+      expect(ele).toMatchSnapshot({
+        seed: expect.any(Number),
+        versionNonce: expect.any(Number),
+        id: expect.any(String),
+      });
+    });
   });
 
   it("should transform linear elements", () => {
@@ -627,10 +635,14 @@ describe("Test Transform", () => {
         height: 200,
       },
     ];
-    expect(
-      convertToExcalidrawElements(
-        elements as ExcalidrawProgrammaticAPI["elements"],
-      ),
-    ).toMatchSnapshot();
+    convertToExcalidrawElements(
+      elements as ExcalidrawProgrammaticAPI["elements"],
+    ).forEach((ele) => {
+      expect(ele).toMatchSnapshot({
+        seed: expect.any(Number),
+        versionNonce: expect.any(Number),
+        id: expect.any(String),
+      });
+    });
   });
 });
