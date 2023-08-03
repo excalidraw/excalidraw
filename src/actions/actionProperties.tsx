@@ -870,7 +870,11 @@ export const actionChangeVerticalAlign = register({
             },
           ]}
           value={getFormValue(
-            elements,
+            elements.filter(
+              (el) =>
+                (isTextElement(el) && el.containerId) ||
+                getBoundTextElement(el) !== null,
+            ),
             appState,
             (element) => {
               if (isTextElement(element) && element.containerId) {
