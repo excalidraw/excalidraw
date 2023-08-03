@@ -109,12 +109,12 @@
     "createContainerFromText": "Avvolgi il testo in un container",
     "link": {
       "edit": "Modifica link",
-      "editEmbed": "",
+      "editEmbed": "Modifica collegamento e incorpora",
       "create": "Crea link",
-      "createEmbed": "",
+      "createEmbed": "Crea collegamento e incorpora",
       "label": "Link",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Collega & incorpora",
+      "empty": "Nessun collegamento impostato"
     },
     "lineEditor": {
       "edit": "Modifica linea",
@@ -168,11 +168,11 @@
     "cancel": "Annulla",
     "clear": "Cancella",
     "remove": "Rimuovi",
-    "embed": "",
+    "embed": "Attiva/disattiva incorporamento",
     "publishLibrary": "Pubblica",
     "submit": "Invia",
     "confirm": "Conferma",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Clicca per interagire"
   },
   "alerts": {
     "clearReset": "Questa azione cancellerà l'intera tela. Sei sicuro?",
@@ -214,8 +214,8 @@
       "line4": "Se la disattivazione di questa impostazione non risolve la visualizzazione degli elementi di testo, apri un <issueLink>problema</issueLink> sul nostro GitHub o scrivici su <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "image": ""
+      "embeddable": "Gli elementi incorporabili non possono essere aggiunti alla libreria.",
+      "image": "Il supporto per l'aggiunta d'immagini alla libreria verrà aggiunto a breve!"
     }
   },
   "toolBar": {
@@ -234,7 +234,7 @@
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
     "eraser": "Gomma",
     "frame": "Strumento riquadro",
-    "embeddable": "",
+    "embeddable": "Incorporamento Web",
     "hand": "Mano (strumento di panoramica)",
     "extraTools": "Altri strumenti"
   },
@@ -248,7 +248,7 @@
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
-    "embeddable": "",
+    "embeddable": "Fare click e trascina per creare un incorporamento web",
     "text_selected": "Fai doppio click o premi INVIO per modificare il testo",
     "text_editing": "Premi ESC o CtrlOCmd+INVIO per completare le modifiche",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
@@ -424,8 +424,8 @@
     "canvas": "tela",
     "selection": "selezione",
     "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "Incorporare questo url non è permesso. Crea una issue su GitHub per richiedere che l'url sia autorizzato",
+    "unrecognizedLinkFormat": "Il link che hai incorporato non corrisponde al formato previsto. Prova a incollare la stringa 'embed' fornita dal sito di origine"
   },
   "colors": {
     "transparent": "Trasparente",
