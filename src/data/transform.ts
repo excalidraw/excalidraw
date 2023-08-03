@@ -334,10 +334,14 @@ const bindLinearElementToElement = (
     if (end.id) {
       existingElement = elementStore
         .getElements()
-        .find((ele) => ele?.id === end.id) as Exclude<
-        ExcalidrawBindableElement,
-        ExcalidrawImageElement | ExcalidrawFrameElement
-      >;
+        .find(
+          (
+            ele,
+          ): ele is Exclude<
+            ExcalidrawBindableElement,
+            ExcalidrawImageElement | ExcalidrawFrameElement
+          > => ele?.id === end.id,
+        );
       if (!existingElement) {
         console.error(`No element for end binding with id ${end.id} found`);
       }

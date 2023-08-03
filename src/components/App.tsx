@@ -346,7 +346,10 @@ import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
-import { convertToExcalidrawElements } from "../data/transform";
+import {
+  ExcalidrawProgrammaticElement,
+  convertToExcalidrawElements,
+} from "../data/transform";
 import { ValueOf } from "../utility-types";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 
@@ -2288,8 +2291,9 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.elements) {
         const elements = (
           data.programmaticAPI
-            ? //@ts-ignore
-              convertToExcalidrawElements(data.elements)
+            ? convertToExcalidrawElements(
+                data.elements as ExcalidrawProgrammaticElement[],
+              )
             : data.elements
         ) as readonly ExcalidrawElement[];
         // TODO remove formatting from elements if isPlainPaste
