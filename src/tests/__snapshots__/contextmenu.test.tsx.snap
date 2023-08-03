@@ -1,283 +1,284 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`contextMenu element right-clicking on a group should select whole group: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > right-clicking on a group should select whole group > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
-  "contextMenu": Object {
-    "items": Array [
-      Object {
+  "contextMenu": {
+    "items": [
+      {
         "contextItemLabel": "labels.cut",
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copy",
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.paste",
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "canvas",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "history",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.copyAsPng",
         "keyTest": [Function],
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.copyStyles",
         "keyTest": [Function],
         "name": "copyStyles",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.pasteStyles",
         "keyTest": [Function],
         "name": "pasteStyles",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.group",
         "keyTest": [Function],
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.sendBackward",
         "keyPriority": 40,
         "keyTest": [Function],
         "name": "sendBackward",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
         "name": "bringForward",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.sendToBack",
         "keyTest": [Function],
         "name": "sendToBack",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.bringToFront",
         "keyTest": [Function],
         "name": "bringToFront",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.flipHorizontal",
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.flipVertical",
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": [Function],
         "keyTest": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "action": "click",
           "category": "hyperlink",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.duplicateSelection",
         "keyTest": [Function],
         "name": "duplicateSelection",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": [Function],
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.delete",
         "keyTest": [Function],
         "name": "deleteSelectedElements",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "action": "delete",
           "category": "element",
         },
@@ -314,6 +315,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -330,55 +337,54 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id0": true,
     "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {
+  "selectedGroupIds": {
     "g1": true,
   },
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element right-clicking on a group should select whole group: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > right-clicking on a group should select whole group > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "red",
   "boundElements": null,
   "fillStyle": "solid",
   "frameId": null,
-  "groupIds": Array [
+  "groupIds": [
     "g1",
   ],
   "height": 100,
@@ -388,7 +394,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 337897,
@@ -405,14 +411,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element right-clicking on a group should select whole group: [end of test] element 1 1`] = `
-Object {
+exports[`contextMenu element > right-clicking on a group should select whole group > [end of test] element 1 1`] = `
+{
   "angle": 0,
   "backgroundColor": "red",
   "boundElements": null,
   "fillStyle": "solid",
   "frameId": null,
-  "groupIds": Array [
+  "groupIds": [
     "g1",
   ],
   "height": 100,
@@ -422,7 +428,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -439,33 +445,34 @@ Object {
 }
 `;
 
-exports[`contextMenu element right-clicking on a group should select whole group: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > right-clicking on a group should select whole group > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
   ],
 }
 `;
 
-exports[`contextMenu element right-clicking on a group should select whole group: [end of test] number of elements 1`] = `2`;
+exports[`contextMenu element > right-clicking on a group should select whole group > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element right-clicking on a group should select whole group: [end of test] number of renders 1`] = `7`;
+exports[`contextMenu element > right-clicking on a group should select whole group > [end of test] number of renders 1`] = `7`;
 
-exports[`contextMenu element selecting 'Add to library' in context menu adds element to library: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
@@ -501,6 +508,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -517,54 +530,53 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id0": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
-  "toast": Object {
+  "toast": {
     "message": "Added to library",
   },
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element selecting 'Add to library' in context menu adds element to library: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id0",
   "isDeleted": false,
@@ -572,7 +584,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -589,41 +601,41 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Add to library' in context menu adds element to library: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -631,7 +643,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -652,13 +664,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Add to library' in context menu adds element to library: [end of test] number of elements 1`] = `1`;
+exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element selecting 'Add to library' in context menu adds element to library: [end of test] number of renders 1`] = `14`;
+exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] number of renders 1`] = `14`;
 
-exports[`contextMenu element selecting 'Bring forward' in context menu brings element forward: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
@@ -694,6 +707,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -710,52 +729,51 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id0": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element selecting 'Bring forward' in context menu brings element forward: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id1",
   "isDeleted": false,
@@ -763,7 +781,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 453191,
@@ -780,14 +798,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Bring forward' in context menu brings element forward: [end of test] element 1 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] element 1 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id0",
   "isDeleted": false,
@@ -795,7 +813,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -812,41 +830,41 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Bring forward' in context menu brings element forward: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -854,7 +872,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -871,25 +889,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -897,7 +915,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -912,13 +930,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -926,7 +944,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -943,25 +961,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -969,7 +987,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -984,13 +1002,13 @@ Object {
           "x": 20,
           "y": 30,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -998,7 +1016,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -1019,13 +1037,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Bring forward' in context menu brings element forward: [end of test] number of elements 1`] = `2`;
+exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Bring forward' in context menu brings element forward: [end of test] number of renders 1`] = `18`;
+exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] number of renders 1`] = `18`;
 
-exports[`contextMenu element selecting 'Bring to front' in context menu brings element to front: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
@@ -1061,6 +1080,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -1077,52 +1102,51 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id0": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element selecting 'Bring to front' in context menu brings element to front: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id1",
   "isDeleted": false,
@@ -1130,7 +1154,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 453191,
@@ -1147,14 +1171,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Bring to front' in context menu brings element to front: [end of test] element 1 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] element 1 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id0",
   "isDeleted": false,
@@ -1162,7 +1186,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -1179,41 +1203,41 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Bring to front' in context menu brings element to front: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -1221,7 +1245,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -1238,25 +1262,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -1264,7 +1288,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -1279,13 +1303,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -1293,7 +1317,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -1310,25 +1334,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -1336,7 +1360,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -1351,13 +1375,13 @@ Object {
           "x": 20,
           "y": 30,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -1365,7 +1389,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -1386,13 +1410,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Bring to front' in context menu brings element to front: [end of test] number of elements 1`] = `2`;
+exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Bring to front' in context menu brings element to front: [end of test] number of renders 1`] = `18`;
+exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] number of renders 1`] = `18`;
 
-exports[`contextMenu element selecting 'Copy styles' in context menu copies styles: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
@@ -1428,6 +1453,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -1444,54 +1475,53 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id0": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
-  "toast": Object {
+  "toast": {
     "message": "Copied styles.",
   },
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element selecting 'Copy styles' in context menu copies styles: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id0",
   "isDeleted": false,
@@ -1499,58 +1529,58 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
-  "seed": 449462985,
+  "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 453191,
+  "versionNonce": 449462985,
   "width": 20,
   "x": -10,
   "y": 0,
 }
 `;
 
-exports[`contextMenu element selecting 'Copy styles' in context menu copies styles: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -1558,17 +1588,17 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 449462985,
           "width": 20,
           "x": -10,
           "y": 0,
@@ -1579,13 +1609,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Copy styles' in context menu copies styles: [end of test] number of elements 1`] = `1`;
+exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element selecting 'Copy styles' in context menu copies styles: [end of test] number of renders 1`] = `14`;
+exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] number of renders 1`] = `14`;
 
-exports[`contextMenu element selecting 'Delete' in context menu deletes element: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
@@ -1621,6 +1652,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -1637,50 +1674,49 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {},
+  "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element selecting 'Delete' in context menu deletes element: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id0",
   "isDeleted": true,
@@ -1688,7 +1724,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -1705,41 +1741,41 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Delete' in context menu deletes element: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -1747,7 +1783,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -1764,23 +1800,23 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": true,
@@ -1788,7 +1824,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -1809,13 +1845,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Delete' in context menu deletes element: [end of test] number of elements 1`] = `1`;
+exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element selecting 'Delete' in context menu deletes element: [end of test] number of renders 1`] = `14`;
+exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] number of renders 1`] = `14`;
 
-exports[`contextMenu element selecting 'Duplicate' in context menu duplicates element: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
@@ -1851,6 +1888,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -1867,52 +1910,51 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id0_copy": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element selecting 'Duplicate' in context menu duplicates element: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id0",
   "isDeleted": false,
@@ -1920,7 +1962,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -1937,14 +1979,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Duplicate' in context menu duplicates element: [end of test] element 1 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] element 1 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id0_copy",
   "isDeleted": false,
@@ -1952,7 +1994,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 453191,
@@ -1969,41 +2011,41 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Duplicate' in context menu duplicates element: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -2011,7 +2053,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -2028,25 +2070,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0_copy": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -2054,7 +2096,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -2069,13 +2111,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0_copy",
           "isDeleted": false,
@@ -2083,7 +2125,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -2104,13 +2146,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Duplicate' in context menu duplicates element: [end of test] number of elements 1`] = `2`;
+exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Duplicate' in context menu duplicates element: [end of test] number of renders 1`] = `14`;
+exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] number of renders 1`] = `14`;
 
-exports[`contextMenu element selecting 'Group selection' in context menu groups selected elements: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
@@ -2146,6 +2189,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -2162,58 +2211,56 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {
+  "previousSelectedElementIds": {
     "id1": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id0": true,
     "id1": true,
-    "id2": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {
+  "selectedGroupIds": {
     "id3": true,
   },
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element selecting 'Group selection' in context menu groups selected elements: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [
+  "groupIds": [
     "id3",
   ],
   "height": 20,
@@ -2223,7 +2270,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -2240,14 +2287,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Group selection' in context menu groups selected elements: [end of test] element 1 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] element 1 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [
+  "groupIds": [
     "id3",
   ],
   "height": 20,
@@ -2257,7 +2304,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 453191,
@@ -2274,41 +2321,41 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Group selection' in context menu groups selected elements: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -2316,7 +2363,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -2333,25 +2380,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -2359,7 +2406,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -2374,13 +2421,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -2388,7 +2435,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -2405,29 +2452,28 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
           "id1": true,
-          "id2": true,
         },
-        "selectedGroupIds": Object {
+        "selectedGroupIds": {
           "id3": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [
+          "groupIds": [
             "id3",
           ],
           "height": 20,
@@ -2437,7 +2483,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -2452,13 +2498,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [
+          "groupIds": [
             "id3",
           ],
           "height": 20,
@@ -2468,7 +2514,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -2489,13 +2535,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Group selection' in context menu groups selected elements: [end of test] number of elements 1`] = `2`;
+exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Group selection' in context menu groups selected elements: [end of test] number of renders 1`] = `20`;
+exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] number of renders 1`] = `20`;
 
-exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
@@ -2531,6 +2578,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -2547,54 +2600,53 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id0": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
-  "toast": Object {
+  "toast": {
     "message": "Copied styles.",
   },
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "#a5d8ff",
   "boundElements": null,
   "fillStyle": "cross-hatch",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id0",
   "isDeleted": false,
@@ -2602,7 +2654,7 @@ Object {
   "locked": false,
   "opacity": 60,
   "roughness": 2,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -2619,14 +2671,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] element 1 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] element 1 1`] = `
+{
   "angle": 0,
   "backgroundColor": "#a5d8ff",
   "boundElements": null,
   "fillStyle": "cross-hatch",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id1",
   "isDeleted": false,
@@ -2634,7 +2686,7 @@ Object {
   "locked": false,
   "opacity": 60,
   "roughness": 2,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 400692809,
@@ -2651,41 +2703,41 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -2693,7 +2745,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -2710,25 +2762,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -2736,7 +2788,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -2751,13 +2803,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -2765,7 +2817,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -2782,25 +2834,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -2808,7 +2860,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -2823,13 +2875,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -2837,7 +2889,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -2854,25 +2906,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -2880,7 +2932,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -2895,13 +2947,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "#a5d8ff",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -2909,7 +2961,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -2926,25 +2978,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -2952,7 +3004,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -2967,13 +3019,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "#a5d8ff",
           "boundElements": null,
           "fillStyle": "cross-hatch",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -2981,7 +3033,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -2998,25 +3050,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -3024,7 +3076,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -3039,13 +3091,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "#a5d8ff",
           "boundElements": null,
           "fillStyle": "cross-hatch",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -3053,7 +3105,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -3070,25 +3122,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -3096,7 +3148,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -3111,13 +3163,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "#a5d8ff",
           "boundElements": null,
           "fillStyle": "cross-hatch",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -3125,7 +3177,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -3142,25 +3194,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -3168,7 +3220,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -3183,13 +3235,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "#a5d8ff",
           "boundElements": null,
           "fillStyle": "cross-hatch",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -3197,7 +3249,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 2,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 400692809,
@@ -3214,25 +3266,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -3240,7 +3292,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -3255,13 +3307,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "#a5d8ff",
           "boundElements": null,
           "fillStyle": "cross-hatch",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -3269,7 +3321,7 @@ Object {
           "locked": false,
           "opacity": 60,
           "roughness": 2,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 400692809,
@@ -3286,25 +3338,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "#a5d8ff",
           "boundElements": null,
           "fillStyle": "cross-hatch",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -3312,7 +3364,7 @@ Object {
           "locked": false,
           "opacity": 60,
           "roughness": 2,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -3327,13 +3379,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "#a5d8ff",
           "boundElements": null,
           "fillStyle": "cross-hatch",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -3341,7 +3393,7 @@ Object {
           "locked": false,
           "opacity": 60,
           "roughness": 2,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 400692809,
@@ -3362,13 +3414,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] number of elements 1`] = `2`;
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `32`;
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of renders 1`] = `32`;
 
-exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
@@ -3404,6 +3457,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -3420,52 +3479,51 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id1",
   "isDeleted": false,
@@ -3473,7 +3531,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 453191,
@@ -3490,14 +3548,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] element 1 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] element 1 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id0",
   "isDeleted": false,
@@ -3505,7 +3563,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -3522,41 +3580,41 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -3564,7 +3622,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -3581,25 +3639,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -3607,7 +3665,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -3622,13 +3680,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -3636,7 +3694,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -3653,25 +3711,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -3679,7 +3737,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -3694,13 +3752,13 @@ Object {
           "x": 20,
           "y": 30,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -3708,7 +3766,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -3729,13 +3787,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] number of elements 1`] = `2`;
+exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] number of renders 1`] = `18`;
+exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] number of renders 1`] = `18`;
 
-exports[`contextMenu element selecting 'Send to back' in context menu sends element to back: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
@@ -3771,6 +3830,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -3787,52 +3852,51 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element selecting 'Send to back' in context menu sends element to back: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id1",
   "isDeleted": false,
@@ -3840,7 +3904,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 453191,
@@ -3857,14 +3921,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Send to back' in context menu sends element to back: [end of test] element 1 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] element 1 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id0",
   "isDeleted": false,
@@ -3872,7 +3936,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -3889,41 +3953,41 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Send to back' in context menu sends element to back: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -3931,7 +3995,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -3948,25 +4012,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -3974,7 +4038,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -3989,13 +4053,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -4003,7 +4067,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -4020,25 +4084,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -4046,7 +4110,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -4061,13 +4125,13 @@ Object {
           "x": 20,
           "y": 30,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -4075,7 +4139,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -4096,13 +4160,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Send to back' in context menu sends element to back: [end of test] number of elements 1`] = `2`;
+exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Send to back' in context menu sends element to back: [end of test] number of renders 1`] = `18`;
+exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] number of renders 1`] = `18`;
 
-exports[`contextMenu element selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
@@ -4138,6 +4203,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -4154,56 +4225,54 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {
+  "previousSelectedElementIds": {
     "id1": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id0": true,
     "id1": true,
-    "id2": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id0",
   "isDeleted": false,
@@ -4211,10 +4280,42 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
-  "seed": 449462985,
+  "seed": 1278240551,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 4,
+  "versionNonce": 1014066025,
+  "width": 20,
+  "x": -10,
+  "y": 0,
+}
+`;
+
+exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "fillStyle": "hachure",
+  "frameId": null,
+  "groupIds": [],
+  "height": 20,
+  "id": "id1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "seed": 453191,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 1,
@@ -4223,78 +4324,46 @@ Object {
   "version": 4,
   "versionNonce": 238820263,
   "width": 20,
-  "x": -10,
-  "y": 0,
-}
-`;
-
-exports[`contextMenu element selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] element 1 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": Array [],
-  "height": 20,
-  "id": "id1",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": Object {
-    "type": 3,
-  },
-  "seed": 401146281,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 4,
-  "versionNonce": 400692809,
-  "width": 20,
   "x": 20,
   "y": 30,
 }
 `;
 
-exports[`contextMenu element selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -4302,42 +4371,42 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 449462985,
           "width": 20,
           "x": -10,
           "y": 0,
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -4345,28 +4414,28 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 449462985,
           "width": 20,
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -4374,46 +4443,45 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 453191,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 401146281,
           "width": 20,
           "x": 20,
           "y": 30,
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
           "id1": true,
-          "id2": true,
         },
-        "selectedGroupIds": Object {
+        "selectedGroupIds": {
           "id3": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [
+          "groupIds": [
             "id3",
           ],
           "height": 20,
@@ -4423,10 +4491,41 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 1278240551,
+          "strokeColor": "#1e1e1e",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 3,
+          "versionNonce": 1150084233,
+          "width": 20,
+          "x": -10,
+          "y": 0,
+        },
+        {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "frameId": null,
+          "groupIds": [
+            "id3",
+          ],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": {
+            "type": 3,
+          },
+          "seed": 453191,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
@@ -4435,63 +4534,31 @@ Object {
           "version": 3,
           "versionNonce": 1116226695,
           "width": 20,
-          "x": -10,
-          "y": 0,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElements": null,
-          "fillStyle": "hachure",
-          "frameId": null,
-          "groupIds": Array [
-            "id3",
-          ],
-          "height": 20,
-          "id": "id1",
-          "isDeleted": false,
-          "link": null,
-          "locked": false,
-          "opacity": 100,
-          "roughness": 1,
-          "roundness": Object {
-            "type": 3,
-          },
-          "seed": 401146281,
-          "strokeColor": "#1e1e1e",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 3,
-          "versionNonce": 1014066025,
-          "width": 20,
           "x": 20,
           "y": 30,
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
           "id1": true,
-          "id2": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -4499,28 +4566,28 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 238820263,
+          "versionNonce": 1014066025,
           "width": 20,
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id1",
           "isDeleted": false,
@@ -4528,17 +4595,17 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 453191,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 4,
-          "versionNonce": 400692809,
+          "versionNonce": 238820263,
           "width": 20,
           "x": 20,
           "y": 30,
@@ -4549,288 +4616,289 @@ Object {
 }
 `;
 
-exports[`contextMenu element selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of elements 1`] = `2`;
+exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of renders 1`] = `21`;
+exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] number of renders 1`] = `21`;
 
-exports[`contextMenu element shows 'Group selection' in context menu for multiple selected elements: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
-  "contextMenu": Object {
-    "items": Array [
-      Object {
+  "contextMenu": {
+    "items": [
+      {
         "contextItemLabel": "labels.cut",
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copy",
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.paste",
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "canvas",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "history",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.copyAsPng",
         "keyTest": [Function],
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.copyStyles",
         "keyTest": [Function],
         "name": "copyStyles",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.pasteStyles",
         "keyTest": [Function],
         "name": "pasteStyles",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.group",
         "keyTest": [Function],
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.sendBackward",
         "keyPriority": 40,
         "keyTest": [Function],
         "name": "sendBackward",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
         "name": "bringForward",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.sendToBack",
         "keyTest": [Function],
         "name": "sendToBack",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.bringToFront",
         "keyTest": [Function],
         "name": "bringToFront",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.flipHorizontal",
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.flipVertical",
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": [Function],
         "keyTest": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "action": "click",
           "category": "hyperlink",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.duplicateSelection",
         "keyTest": [Function],
         "name": "duplicateSelection",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": [Function],
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.delete",
         "keyTest": [Function],
         "name": "deleteSelectedElements",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "action": "delete",
           "category": "element",
         },
@@ -4867,6 +4935,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -4883,58 +4957,54 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {
+  "previousSelectedElementIds": {
     "id0": true,
-    "id2": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id0": true,
     "id1": true,
-    "id2": true,
-    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element shows 'Group selection' in context menu for multiple selected elements: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 10,
   "id": "id0",
   "isDeleted": false,
@@ -4942,7 +5012,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -4959,14 +5029,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element shows 'Group selection' in context menu for multiple selected elements: [end of test] element 1 1`] = `
-Object {
+exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] element 1 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 10,
   "id": "id1",
   "isDeleted": false,
@@ -4974,7 +5044,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 453191,
@@ -4991,41 +5061,41 @@ Object {
 }
 `;
 
-exports[`contextMenu element shows 'Group selection' in context menu for multiple selected elements: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 10,
           "id": "id0",
           "isDeleted": false,
@@ -5033,7 +5103,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -5050,25 +5120,25 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 10,
           "id": "id0",
           "isDeleted": false,
@@ -5076,7 +5146,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -5091,13 +5161,13 @@ Object {
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 10,
           "id": "id1",
           "isDeleted": false,
@@ -5105,7 +5175,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 453191,
@@ -5126,288 +5196,289 @@ Object {
 }
 `;
 
-exports[`contextMenu element shows 'Group selection' in context menu for multiple selected elements: [end of test] number of elements 1`] = `2`;
+exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element shows 'Group selection' in context menu for multiple selected elements: [end of test] number of renders 1`] = `20`;
+exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] number of renders 1`] = `20`;
 
-exports[`contextMenu element shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
-  "contextMenu": Object {
-    "items": Array [
-      Object {
+  "contextMenu": {
+    "items": [
+      {
         "contextItemLabel": "labels.cut",
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copy",
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.paste",
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "canvas",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "history",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.copyAsPng",
         "keyTest": [Function],
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.copyStyles",
         "keyTest": [Function],
         "name": "copyStyles",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.pasteStyles",
         "keyTest": [Function],
         "name": "pasteStyles",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.group",
         "keyTest": [Function],
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.sendBackward",
         "keyPriority": 40,
         "keyTest": [Function],
         "name": "sendBackward",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
         "name": "bringForward",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.sendToBack",
         "keyTest": [Function],
         "name": "sendToBack",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.bringToFront",
         "keyTest": [Function],
         "name": "bringToFront",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.flipHorizontal",
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.flipVertical",
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": [Function],
         "keyTest": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "action": "click",
           "category": "hyperlink",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.duplicateSelection",
         "keyTest": [Function],
         "name": "duplicateSelection",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": [Function],
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.delete",
         "keyTest": [Function],
         "name": "deleteSelectedElements",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "action": "delete",
           "category": "element",
         },
@@ -5444,6 +5515,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -5460,60 +5537,56 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {
+  "previousSelectedElementIds": {
     "id0": true,
-    "id2": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id0": true,
     "id1": true,
-    "id2": true,
-    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {
+  "selectedGroupIds": {
     "id4": true,
   },
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [
+  "groupIds": [
     "id4",
   ],
   "height": 10,
@@ -5523,31 +5596,31 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
-  "seed": 449462985,
+  "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
   "updated": 1,
   "version": 3,
-  "versionNonce": 1014066025,
+  "versionNonce": 1116226695,
   "width": 10,
   "x": -10,
   "y": 0,
 }
 `;
 
-exports[`contextMenu element shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] element 1 1`] = `
-Object {
+exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] element 1 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [
+  "groupIds": [
     "id4",
   ],
   "height": 10,
@@ -5557,58 +5630,58 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
-  "seed": 401146281,
+  "seed": 453191,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
   "updated": 1,
   "version": 3,
-  "versionNonce": 238820263,
+  "versionNonce": 1014066025,
   "width": 10,
   "x": 10,
   "y": 0,
 }
 `;
 
-exports[`contextMenu element shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 10,
           "id": "id0",
           "isDeleted": false,
@@ -5616,42 +5689,42 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 449462985,
           "width": 10,
           "x": -10,
           "y": 0,
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id1": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 10,
           "id": "id0",
           "isDeleted": false,
@@ -5659,28 +5732,28 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 1278240551,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 449462985,
           "width": 10,
           "x": -10,
           "y": 0,
         },
-        Object {
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 10,
           "id": "id1",
           "isDeleted": false,
@@ -5688,47 +5761,45 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
-          "seed": 401146281,
+          "seed": 453191,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
           "updated": 1,
           "version": 2,
-          "versionNonce": 2019559783,
+          "versionNonce": 401146281,
           "width": 10,
           "x": 10,
           "y": 0,
         },
       ],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
           "id1": true,
-          "id2": true,
-          "id3": true,
         },
-        "selectedGroupIds": Object {
+        "selectedGroupIds": {
           "id4": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [
+          "groupIds": [
             "id4",
           ],
           "height": 10,
@@ -5738,10 +5809,41 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
-          "seed": 449462985,
+          "seed": 1278240551,
+          "strokeColor": "#1e1e1e",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "updated": 1,
+          "version": 3,
+          "versionNonce": 1116226695,
+          "width": 10,
+          "x": -10,
+          "y": 0,
+        },
+        {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "fillStyle": "hachure",
+          "frameId": null,
+          "groupIds": [
+            "id4",
+          ],
+          "height": 10,
+          "id": "id1",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": {
+            "type": 3,
+          },
+          "seed": 453191,
           "strokeColor": "#1e1e1e",
           "strokeStyle": "solid",
           "strokeWidth": 1,
@@ -5749,37 +5851,6 @@ Object {
           "updated": 1,
           "version": 3,
           "versionNonce": 1014066025,
-          "width": 10,
-          "x": -10,
-          "y": 0,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElements": null,
-          "fillStyle": "hachure",
-          "frameId": null,
-          "groupIds": Array [
-            "id4",
-          ],
-          "height": 10,
-          "id": "id1",
-          "isDeleted": false,
-          "link": null,
-          "locked": false,
-          "opacity": 100,
-          "roughness": 1,
-          "roundness": Object {
-            "type": 3,
-          },
-          "seed": 401146281,
-          "strokeColor": "#1e1e1e",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 3,
-          "versionNonce": 238820263,
           "width": 10,
           "x": 10,
           "y": 0,
@@ -5790,127 +5861,128 @@ Object {
 }
 `;
 
-exports[`contextMenu element shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] number of elements 1`] = `2`;
+exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] number of renders 1`] = `21`;
+exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] number of renders 1`] = `21`;
 
-exports[`contextMenu element shows context menu for canvas: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > shows context menu for canvas > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
-  "contextMenu": Object {
-    "items": Array [
-      Object {
+  "contextMenu": {
+    "items": [
+      {
         "contextItemLabel": "labels.paste",
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.copyAsPng",
         "keyTest": [Function],
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.selectAll",
         "keyTest": [Function],
         "name": "selectAll",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "canvas",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.elementLock.unlockAll",
         "name": "unlockAllElements",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "canvas",
         },
         "viewMode": false,
       },
       "separator",
-      Object {
+      {
         "checked": [Function],
         "contextItemLabel": "labels.showGrid",
         "keyTest": [Function],
         "name": "gridMode",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "canvas",
           "predicate": [Function],
         },
         "viewMode": true,
       },
-      Object {
+      {
         "checked": [Function],
         "contextItemLabel": "buttons.zenMode",
         "keyTest": [Function],
         "name": "zenMode",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "canvas",
           "predicate": [Function],
         },
         "viewMode": true,
       },
-      Object {
+      {
         "checked": [Function],
         "contextItemLabel": "labels.viewMode",
         "keyTest": [Function],
         "name": "viewMode",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "canvas",
           "predicate": [Function],
         },
         "viewMode": true,
       },
-      Object {
+      {
         "checked": [Function],
         "contextItemLabel": "stats.title",
         "keyTest": [Function],
         "name": "stats",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "menu",
         },
         "viewMode": true,
@@ -5947,6 +6019,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -5963,344 +6041,344 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {},
+  "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element shows context menu for canvas: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > shows context menu for canvas > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
   ],
 }
 `;
 
-exports[`contextMenu element shows context menu for canvas: [end of test] number of elements 1`] = `0`;
+exports[`contextMenu element > shows context menu for canvas > [end of test] number of elements 1`] = `0`;
 
-exports[`contextMenu element shows context menu for canvas: [end of test] number of renders 1`] = `6`;
+exports[`contextMenu element > shows context menu for canvas > [end of test] number of renders 1`] = `6`;
 
-exports[`contextMenu element shows context menu for element: [end of test] appState 1`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > shows context menu for element > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
-  "contextMenu": Object {
-    "items": Array [
-      Object {
+  "contextMenu": {
+    "items": [
+      {
         "contextItemLabel": "labels.cut",
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copy",
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.paste",
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "canvas",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "history",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.copyAsPng",
         "keyTest": [Function],
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.copyStyles",
         "keyTest": [Function],
         "name": "copyStyles",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.pasteStyles",
         "keyTest": [Function],
         "name": "pasteStyles",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.group",
         "keyTest": [Function],
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.sendBackward",
         "keyPriority": 40,
         "keyTest": [Function],
         "name": "sendBackward",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
         "name": "bringForward",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.sendToBack",
         "keyTest": [Function],
         "name": "sendToBack",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.bringToFront",
         "keyTest": [Function],
         "name": "bringToFront",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.flipHorizontal",
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.flipVertical",
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": [Function],
         "keyTest": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "action": "click",
           "category": "hyperlink",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.duplicateSelection",
         "keyTest": [Function],
         "name": "duplicateSelection",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": [Function],
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.delete",
         "keyTest": [Function],
         "name": "deleteSelectedElements",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "action": "delete",
           "category": "element",
         },
@@ -6337,6 +6415,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -6353,322 +6437,322 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id0": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element shows context menu for element: [end of test] appState 2`] = `
-Object {
-  "activeTool": Object {
+exports[`contextMenu element > shows context menu for element > [end of test] appState 2`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
     "customType": null,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
-  "contextMenu": Object {
-    "items": Array [
-      Object {
+  "contextMenu": {
+    "items": [
+      {
         "contextItemLabel": "labels.cut",
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copy",
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.paste",
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "canvas",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "history",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.copyAsPng",
         "keyTest": [Function],
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.copyStyles",
         "keyTest": [Function],
         "name": "copyStyles",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.pasteStyles",
         "keyTest": [Function],
         "name": "pasteStyles",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.group",
         "keyTest": [Function],
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.sendBackward",
         "keyPriority": 40,
         "keyTest": [Function],
         "name": "sendBackward",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
         "name": "bringForward",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.sendToBack",
         "keyTest": [Function],
         "name": "sendToBack",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.bringToFront",
         "keyTest": [Function],
         "name": "bringToFront",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": "labels.flipHorizontal",
         "keyTest": [Function],
         "name": "flipHorizontal",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": "labels.flipVertical",
         "keyTest": [Function],
         "name": "flipVertical",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "contextItemLabel": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": [Function],
         "keyTest": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "action": "click",
           "category": "hyperlink",
         },
       },
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.duplicateSelection",
         "keyTest": [Function],
         "name": "duplicateSelection",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
-      Object {
+      {
         "contextItemLabel": [Function],
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "category": "element",
         },
       },
       "separator",
-      Object {
+      {
         "PanelComponent": [Function],
         "contextItemLabel": "labels.delete",
         "keyTest": [Function],
         "name": "deleteSelectedElements",
         "perform": [Function],
-        "trackEvent": Object {
+        "trackEvent": {
           "action": "delete",
           "category": "element",
         },
@@ -6705,6 +6789,12 @@ Object {
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
   "frameToHighlight": null,
   "gridSize": null,
   "height": 100,
@@ -6721,52 +6811,51 @@ Object {
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "pasteDialog": Object {
+  "pasteDialog": {
     "data": null,
     "shown": false,
   },
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
+  "selectedElementIds": {
     "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": Object {},
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
-  "shouldRenderFrames": true,
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": true,
   "startBoundElement": null,
-  "suggestedBindings": Array [],
+  "suggestedBindings": [],
   "theme": "light",
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
   "zenModeEnabled": false,
-  "zoom": Object {
+  "zoom": {
     "value": 1,
   },
 }
 `;
 
-exports[`contextMenu element shows context menu for element: [end of test] element 0 1`] = `
-Object {
+exports[`contextMenu element > shows context menu for element > [end of test] element 0 1`] = `
+{
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 20,
   "id": "id0",
   "isDeleted": false,
@@ -6774,7 +6863,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -6791,14 +6880,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element shows context menu for element: [end of test] element 0 2`] = `
-Object {
+exports[`contextMenu element > shows context menu for element > [end of test] element 0 2`] = `
+{
   "angle": 0,
   "backgroundColor": "red",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 200,
   "id": "id0",
   "isDeleted": false,
@@ -6806,7 +6895,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 337897,
@@ -6823,14 +6912,14 @@ Object {
 }
 `;
 
-exports[`contextMenu element shows context menu for element: [end of test] element 1 1`] = `
-Object {
+exports[`contextMenu element > shows context menu for element > [end of test] element 1 1`] = `
+{
   "angle": 0,
   "backgroundColor": "red",
   "boundElements": null,
   "fillStyle": "hachure",
   "frameId": null,
-  "groupIds": Array [],
+  "groupIds": [],
   "height": 200,
   "id": "id1",
   "isDeleted": false,
@@ -6838,7 +6927,7 @@ Object {
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": Object {
+  "roundness": {
     "type": 3,
   },
   "seed": 1278240551,
@@ -6855,41 +6944,41 @@ Object {
 }
 `;
 
-exports[`contextMenu element shows context menu for element: [end of test] history 1`] = `
-Object {
+exports[`contextMenu element > shows context menu for element > [end of test] history 1`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
-    Object {
-      "appState": Object {
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
+        "selectedElementIds": {
           "id0": true,
         },
-        "selectedGroupIds": Object {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [
-        Object {
+      "elements": [
+        {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElements": null,
           "fillStyle": "hachure",
           "frameId": null,
-          "groupIds": Array [],
+          "groupIds": [],
           "height": 20,
           "id": "id0",
           "isDeleted": false,
@@ -6897,7 +6986,7 @@ Object {
           "locked": false,
           "opacity": 100,
           "roughness": 1,
-          "roundness": Object {
+          "roundness": {
             "type": 3,
           },
           "seed": 1278240551,
@@ -6918,30 +7007,30 @@ Object {
 }
 `;
 
-exports[`contextMenu element shows context menu for element: [end of test] history 2`] = `
-Object {
+exports[`contextMenu element > shows context menu for element > [end of test] history 2`] = `
+{
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
+  "redoStack": [],
+  "stateHistory": [
+    {
+      "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {},
-        "selectedGroupIds": Object {},
+        "selectedElementIds": {},
+        "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
       },
-      "elements": Array [],
+      "elements": [],
     },
   ],
 }
 `;
 
-exports[`contextMenu element shows context menu for element: [end of test] number of elements 1`] = `1`;
+exports[`contextMenu element > shows context menu for element > [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element shows context menu for element: [end of test] number of elements 2`] = `2`;
+exports[`contextMenu element > shows context menu for element > [end of test] number of elements 2`] = `2`;
 
-exports[`contextMenu element shows context menu for element: [end of test] number of renders 1`] = `12`;
+exports[`contextMenu element > shows context menu for element > [end of test] number of renders 1`] = `12`;
 
-exports[`contextMenu element shows context menu for element: [end of test] number of renders 2`] = `11`;
+exports[`contextMenu element > shows context menu for element > [end of test] number of renders 2`] = `11`;

@@ -27,7 +27,13 @@ import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
 import { RenderConfig } from "../scene/types";
-import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
+import {
+  distance,
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+  isTransparent,
+} from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, BinaryFiles, Zoom } from "../types";
@@ -49,8 +55,12 @@ import {
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import {
+  createPlaceholderEmbeddableLabel,
+  getEmbedLink,
+} from "../element/embeddable";
 import { getContainingFrame } from "../frame";
-import { normalizeLink } from "../data/url";
+import { normalizeLink, toValidURL } from "../data/url";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -262,6 +272,7 @@ const drawElementOnCanvas = (
     ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
   switch (element.type) {
     case "rectangle":
+    case "embeddable":
     case "diamond":
     case "ellipse": {
       context.lineJoin = "round";
@@ -427,13 +438,13 @@ export const generateRoughOptions = (
 
   switch (element.type) {
     case "rectangle":
+    case "embeddable":
     case "diamond":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
-      options.fill =
-        element.backgroundColor === "transparent"
-          ? undefined
-          : element.backgroundColor;
+      options.fill = isTransparent(element.backgroundColor)
+        ? undefined
+        : element.backgroundColor;
       if (element.type === "ellipse") {
         options.curveFitting = 1;
       }
@@ -458,6 +469,26 @@ export const generateRoughOptions = (
   }
 };
 
+const modifyEmbeddableForRoughOptions = (
+  element: NonDeletedExcalidrawElement,
+  isExporting: boolean,
+) => {
+  if (
+    element.type === "embeddable" &&
+    (isExporting || !element.validated) &&
+    isTransparent(element.backgroundColor) &&
+    isTransparent(element.strokeColor)
+  ) {
+    return {
+      ...element,
+      roughness: 0,
+      backgroundColor: "#d3d3d3",
+      fillStyle: "solid",
+    } as const;
+  }
+  return element;
+};
+
 /**
  * Generates the element's shape and puts it into the cache.
  * @param element
@@ -466,8 +497,9 @@ export const generateRoughOptions = (
 const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
+  isExporting: boolean = false,
 ) => {
-  let shape = shapeCache.get(element);
+  let shape = isExporting ? undefined : shapeCache.get(element);
 
   // `null` indicates no rc shape applicable for this element type
   // (= do not generate anything)
@@ -475,7 +507,11 @@ const generateElementShape = (
     elementWithCanvasCache.delete(element);
 
     switch (element.type) {
-      case "rectangle": {
+      case "rectangle":
+      case "embeddable": {
+        // this is for rendering the stroke/bg of the embeddable, especially
+        // when the src url is not set
+
         if (element.roundness) {
           const w = element.width;
           const h = element.height;
@@ -486,7 +522,10 @@ const generateElementShape = (
             } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
               h - r
             } L 0 ${r} Q 0 0, ${r} 0`,
-            generateRoughOptions(element, true),
+            generateRoughOptions(
+              modifyEmbeddableForRoughOptions(element, isExporting),
+              true,
+            ),
           );
         } else {
           shape = generator.rectangle(
@@ -494,7 +533,10 @@ const generateElementShape = (
             0,
             element.width,
             element.height,
-            generateRoughOptions(element),
+            generateRoughOptions(
+              modifyEmbeddableForRoughOptions(element, isExporting),
+              false,
+            ),
           );
         }
         setShapeForElement(element, shape);
@@ -873,7 +915,7 @@ const drawElementFromCanvas = (
     );
 
     if (
-      process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
+      import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
         "true" &&
       hasBoundTextElement(element)
     ) {
@@ -931,7 +973,11 @@ export const renderElement = (
       break;
     }
     case "frame": {
-      if (!renderConfig.isExporting && appState.shouldRenderFrames) {
+      if (
+        !renderConfig.isExporting &&
+        appState.frameRendering.enabled &&
+        appState.frameRendering.outline
+      ) {
         context.save();
         context.translate(
           element.x + renderConfig.scrollX,
@@ -992,8 +1038,9 @@ export const renderElement = (
     case "line":
     case "arrow":
     case "image":
-    case "text": {
-      generateElementShape(element, generator);
+    case "text":
+    case "embeddable": {
+      generateElementShape(element, generator, renderConfig.isExporting);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
         const cx = (x1 + x2) / 2 + renderConfig.scrollX;
@@ -1176,7 +1223,9 @@ export const renderElementToSvg = (
   offsetY: number,
   exportWithDarkMode?: boolean,
   exportingFrameId?: string | null,
+  renderEmbeddables?: boolean,
 ) => {
+  const offset = { x: offsetX, y: offsetY };
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   let cx = (x2 - x1) / 2 - (element.x - x1);
   let cy = (y2 - y1) / 2 - (element.y - y1);
@@ -1247,6 +1296,106 @@ export const renderElementToSvg = (
       );
 
       g ? root.appendChild(g) : root.appendChild(node);
+      break;
+    }
+    case "embeddable": {
+      // render placeholder rectangle
+      generateElementShape(element, generator, true);
+      const node = roughSVGDrawWithPrecision(
+        rsvg,
+        getShapeForElement(element)!,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
+      const opacity = element.opacity / 100;
+      if (opacity !== 1) {
+        node.setAttribute("stroke-opacity", `${opacity}`);
+        node.setAttribute("fill-opacity", `${opacity}`);
+      }
+      node.setAttribute("stroke-linecap", "round");
+      node.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      root.appendChild(node);
+
+      const label: ExcalidrawElement =
+        createPlaceholderEmbeddableLabel(element);
+      renderElementToSvg(
+        label,
+        rsvg,
+        root,
+        files,
+        label.x + offset.x - element.x,
+        label.y + offset.y - element.y,
+        exportWithDarkMode,
+        exportingFrameId,
+        renderEmbeddables,
+      );
+
+      // render embeddable element + iframe
+      const embeddableNode = roughSVGDrawWithPrecision(
+        rsvg,
+        getShapeForElement(element)!,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
+      embeddableNode.setAttribute("stroke-linecap", "round");
+      embeddableNode.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      while (embeddableNode.firstChild) {
+        embeddableNode.removeChild(embeddableNode.firstChild);
+      }
+      const radius = getCornerRadius(
+        Math.min(element.width, element.height),
+        element,
+      );
+
+      const embedLink = getEmbedLink(toValidURL(element.link || ""));
+
+      // if rendering embeddables explicitly disabled or
+      // embedding documents via srcdoc (which doesn't seem to work for SVGs)
+      // replace with a link instead
+      if (renderEmbeddables === false || embedLink?.type === "document") {
+        const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
+        anchorTag.setAttribute("href", normalizeLink(element.link || ""));
+        anchorTag.setAttribute("target", "_blank");
+        anchorTag.setAttribute("rel", "noopener noreferrer");
+        anchorTag.style.borderRadius = `${radius}px`;
+
+        embeddableNode.appendChild(anchorTag);
+      } else {
+        const foreignObject = svgRoot.ownerDocument!.createElementNS(
+          SVG_NS,
+          "foreignObject",
+        );
+        foreignObject.style.width = `${element.width}px`;
+        foreignObject.style.height = `${element.height}px`;
+        foreignObject.style.border = "none";
+        const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
+        div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        div.style.width = "100%";
+        div.style.height = "100%";
+        const iframe = div.ownerDocument!.createElement("iframe");
+        iframe.src = embedLink?.link ?? "";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        iframe.style.borderRadius = `${radius}px`;
+        iframe.style.top = "0";
+        iframe.style.left = "0";
+        iframe.allowFullscreen = true;
+        div.appendChild(iframe);
+        foreignObject.appendChild(div);
+
+        embeddableNode.appendChild(foreignObject);
+      }
+
+      root.appendChild(embeddableNode);
       break;
     }
     case "line":

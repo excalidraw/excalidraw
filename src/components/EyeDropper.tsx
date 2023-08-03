@@ -58,7 +58,7 @@ export const EyeDropper: React.FC<{
       return;
     }
 
-    let currentColor = COLOR_PALETTE.black;
+    let currentColor: string = COLOR_PALETTE.black;
     let isHoldingPointerDown = false;
 
     const ctx = app.canvas.getContext("2d")!;
@@ -77,8 +77,8 @@ export const EyeDropper: React.FC<{
       colorPreviewDiv.style.left = `${clientX + 20}px`;
 
       const pixel = ctx.getImageData(
-        clientX * window.devicePixelRatio - appState.offsetLeft,
-        clientY * window.devicePixelRatio - appState.offsetTop,
+        (clientX - appState.offsetLeft) * window.devicePixelRatio,
+        (clientY - appState.offsetTop) * window.devicePixelRatio,
         1,
         1,
       ).data;

@@ -1,7 +1,5 @@
 import { t } from "../i18n";
-import { NonDeletedExcalidrawElement } from "../element/types";
-import { getSelectedElements } from "../scene";
-import { Device, UIAppState } from "../types";
+import { AppClassProperties, Device, UIAppState } from "../types";
 import {
   isImageElement,
   isLinearElement,
@@ -15,17 +13,12 @@ import "./HintViewer.scss";
 
 interface HintViewerProps {
   appState: UIAppState;
-  elements: readonly NonDeletedExcalidrawElement[];
   isMobile: boolean;
   device: Device;
+  app: AppClassProperties;
 }
 
-const getHints = ({
-  appState,
-  elements,
-  isMobile,
-  device,
-}: HintViewerProps) => {
+const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
@@ -51,11 +44,15 @@ const getHints = ({
     return t("hints.text");
   }
 
+  if (activeTool.type === "embeddable") {
+    return t("hints.embeddable");
+  }
+
   if (appState.activeTool.type === "image" && appState.pendingImageElementId) {
     return t("hints.placeImage");
   }
 
-  const selectedElements = getSelectedElements(elements, appState);
+  const selectedElements = app.scene.getSelectedElements(appState);
 
   if (
     isResizing &&
@@ -115,15 +112,15 @@ const getHints = ({
 
 export const HintViewer = ({
   appState,
-  elements,
   isMobile,
   device,
+  app,
 }: HintViewerProps) => {
   let hint = getHints({
     appState,
-    elements,
     isMobile,
     device,
+    app,
   });
   if (!hint) {
     return null;
