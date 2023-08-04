@@ -17,7 +17,10 @@ export const selectGroup = (
   groupId: GroupId,
   appState: InteractiveCanvasAppState,
   elements: readonly NonDeleted<ExcalidrawElement>[],
-): InteractiveCanvasAppState => {
+): Pick<
+  InteractiveCanvasAppState,
+  "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
+> => {
   const elementsInGroup = elements.reduce((acc, element) => {
     if (element.groupIds.includes(groupId)) {
       acc[element.id] = true;
@@ -31,7 +34,7 @@ export const selectGroup = (
       appState.editingGroupId === groupId
     ) {
       return {
-        ...appState,
+        selectedElementIds: appState.selectedElementIds,
         selectedGroupIds: { ...appState.selectedGroupIds, [groupId]: false },
         editingGroupId: null,
       };
@@ -40,7 +43,7 @@ export const selectGroup = (
   }
 
   return {
-    ...appState,
+    editingGroupId: appState.editingGroupId,
     selectedGroupIds: { ...appState.selectedGroupIds, [groupId]: true },
     selectedElementIds: {
       ...appState.selectedElementIds,
@@ -226,11 +229,12 @@ export const selectGroupsFromGivenElements = (
     }
     if (groupIds.length > 0) {
       const groupId = groupIds[groupIds.length - 1];
-      nextAppState = selectGroup(groupId, nextAppState, elements);
+      nextAppState = {
+        ...nextAppState,
+        ...selectGroup(groupId, nextAppState, elements),
+      };
     }
   }
-
-  // nextAppState = selectGroups(elements, elements, appState);
 
   return nextAppState.selectedGroupIds;
 };
