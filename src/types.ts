@@ -373,6 +373,12 @@ export interface ExcalidrawProps {
     zoom: Zoom;
     scroll: { x: number; y: number };
   }) => void;
+  // TODO follow-participant
+  onUserFollowed?: (payload: {
+    userToFollow: UserToFollow;
+    // TODO follow-participant extract to own type
+    action: "subscribe" | "unsubscribe";
+  }) => void;
   children?: React.ReactNode;
 }
 

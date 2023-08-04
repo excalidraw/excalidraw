@@ -12,7 +12,7 @@ import {
   FILE_UPLOAD_TIMEOUT,
   WS_SCENE_EVENT_TYPES,
 } from "../app_constants";
-import { UserIdleState } from "../../types";
+import { UserIdleState, UserToFollow } from "../../types";
 import { trackEvent } from "../../analytics";
 import throttle from "lodash.throttle";
 import { newElementWith } from "../../element/mutateElement";
@@ -83,6 +83,8 @@ class Portal {
   async _broadcastSocketData(
     data: SocketUpdateData,
     volatile: boolean = false,
+    // TODO follow-participant
+    roomId?: string,
   ) {
     if (this.isOpen()) {
       const json = JSON.stringify(data);
@@ -91,7 +93,8 @@ class Portal {
 
       this.socket?.emit(
         volatile ? WS_EVENTS.SERVER_VOLATILE : WS_EVENTS.SERVER,
-        this.roomId,
+        // TODO follow-participant
+        roomId ?? this.roomId,
         encryptedBuffer,
         iv,
       );
@@ -221,9 +224,12 @@ class Portal {
     }
   };
 
-  broadcastScrollAndZoom = (payload: {
-    bounds: [number, number, number, number];
-  }) => {
+  broadcastScrollAndZoom = (
+    payload: {
+      bounds: [number, number, number, number];
+    },
+    roomId: string,
+  ) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["SCROLL_AND_ZOOM"] = {
         type: "SCROLL_AND_ZOOM",
@@ -237,7 +243,17 @@ class Portal {
       return this._broadcastSocketData(
         data as SocketUpdateData,
         true, // volatile
+        roomId,
       );
+    }
+  };
+
+  broadcastUserFollowed = (payload: {
+    userToFollow: UserToFollow;
+    action: "subscribe" | "unsubscribe";
+  }) => {
+    if (this.socket?.id) {
+      this.socket?.emit("on-user-follow", payload);
     }
   };
 }

@@ -1,6 +1,6 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import { AppState, ExcalidrawImperativeAPI } from "../../types";
+import { AppState, ExcalidrawImperativeAPI, UserToFollow } from "../../types";
 import { ErrorDialog } from "../../components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../constants";
 import { ImportedDataState } from "../../data/types";
@@ -92,6 +92,7 @@ export interface CollabAPI {
   isCollaborating: () => boolean;
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   onScrollAndZoomChange: CollabInstance["onScrollAndZoomChange"];
+  onUserFollowed: CollabInstance["onUserFollowed"];
   startCollaboration: CollabInstance["startCollaboration"];
   stopCollaboration: CollabInstance["stopCollaboration"];
   syncElements: CollabInstance["syncElements"];
@@ -166,6 +167,7 @@ class Collab extends PureComponent<Props, CollabState> {
       isCollaborating: this.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
       onScrollAndZoomChange: this.onScrollAndZoomChange,
+      onUserFollowed: this.onUserFollowed,
       startCollaboration: this.startCollaboration,
       syncElements: this.syncElements,
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
@@ -543,15 +545,16 @@ class Collab extends PureComponent<Props, CollabState> {
               decryptedData.payload.socketId;
 
             const _appState = this.excalidrawAPI.getAppState();
-            if (_appState.userToFollow?.clientId === socketId) {
-              const { appState } = zoomToFitBounds({
-                appState: _appState,
-                bounds,
-                fitToViewport: true,
-                viewportZoomFactor: 1,
-              });
-              this.excalidrawAPI.updateScene({ appState });
-            }
+            // TODO follow-participant
+            // if (_appState.userToFollow?.clientId === socketId) {
+            const { appState } = zoomToFitBounds({
+              appState: _appState,
+              bounds,
+              fitToViewport: true,
+              viewportZoomFactor: 1,
+            });
+            this.excalidrawAPI.updateScene({ appState });
+            // }
 
             break;
           }
@@ -580,6 +583,17 @@ class Collab extends PureComponent<Props, CollabState> {
         roomLinkData: existingRoomLinkData,
       });
       scenePromise.resolve(sceneData);
+    });
+
+    // TODO follow-participant
+    // set amIBeingFollowed flag
+    this.portal.socket.on("broadcast-follow", () => {
+      console.log("broadcast-follow");
+    });
+    // TODO follow-participant
+    // set amIBeingFollowed flag
+    this.portal.socket.on("broadcast-unfollow", () => {
+      console.log("broadcast-unfollow");
     });
 
     this.initializeIdleDetector();
@@ -789,6 +803,9 @@ class Collab extends PureComponent<Props, CollabState> {
     CURSOR_SYNC_TIMEOUT,
   );
 
+  // TODO follow-participant
+  // only calculate this + broadcast if some flag on appState is set
+  // (eg amIBeingFollowed)
   onScrollAndZoomChange = throttle(
     (payload: { zoom: AppState["zoom"]; scroll: { x: number; y: number } }) => {
       const appState = this.excalidrawAPI.getAppState();
@@ -816,9 +833,20 @@ class Collab extends PureComponent<Props, CollabState> {
       );
 
       this.portal.socket &&
-        this.portal.broadcastScrollAndZoom({ bounds: [x1, y1, x2, y2] });
+        this.portal.broadcastScrollAndZoom(
+          { bounds: [x1, y1, x2, y2] },
+          // TODO follow-participant
+          `follow_${this.portal.socket.id}`,
+        );
     },
   );
+
+  onUserFollowed = (payload: {
+    userToFollow: UserToFollow;
+    action: "subscribe" | "unsubscribe";
+  }) => {
+    this.portal.socket && this.portal.broadcastUserFollowed(payload);
+  };
 
   onIdleStateChange = (userState: UserIdleState) => {
     this.portal.broadcastIdleChange(userState);

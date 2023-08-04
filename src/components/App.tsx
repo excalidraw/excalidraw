@@ -1539,6 +1539,22 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
+    if (prevState.userToFollow !== this.state.userToFollow) {
+      if (prevState.userToFollow) {
+        this.props?.onUserFollowed?.({
+          userToFollow: prevState.userToFollow,
+          action: "unsubscribe",
+        });
+      }
+
+      if (this.state.userToFollow) {
+        this.props?.onUserFollowed?.({
+          userToFollow: this.state.userToFollow,
+          action: "subscribe",
+        });
+      }
+    }
+
     if (
       Object.keys(this.state.selectedElementIds).length &&
       isEraserActive(this.state)
