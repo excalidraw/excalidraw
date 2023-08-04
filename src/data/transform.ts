@@ -24,6 +24,7 @@ import {
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  ExcalidrawEmbeddableElement,
   ExcalidrawFrameElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
@@ -37,7 +38,7 @@ import {
   VerticalAlign,
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
-import { getFontString } from "../utils";
+import { assertNever, getFontString } from "../utils";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -56,7 +57,7 @@ export type ValidLinearElement = {
             | {
                 type: Exclude<
                   ExcalidrawBindableElement["type"],
-                  "image" | "selection" | "text" | "frame"
+                  "image" | "text" | "frame" | "embeddable"
                 >;
                 id?: ExcalidrawGenericElement["id"];
               }
@@ -64,7 +65,7 @@ export type ValidLinearElement = {
                 id: ExcalidrawGenericElement["id"];
                 type?: Exclude<
                   ExcalidrawBindableElement["type"],
-                  "image" | "selection" | "text" | "frame"
+                  "image" | "text" | "frame" | "embeddable"
                 >;
               }
           )
@@ -88,7 +89,7 @@ export type ValidLinearElement = {
             | {
                 type: Exclude<
                   ExcalidrawBindableElement["type"],
-                  "image" | "selection" | "text" | "frame"
+                  "image" | "text" | "frame" | "embeddable"
                 >;
                 id?: ExcalidrawGenericElement["id"];
               }
@@ -96,7 +97,7 @@ export type ValidLinearElement = {
                 id: ExcalidrawGenericElement["id"];
                 type?: Exclude<
                   ExcalidrawBindableElement["type"],
-                  "image" | "selection" | "text" | "frame"
+                  "image" | "text" | "frame" | "embeddable"
                 >;
               }
           )
@@ -131,8 +132,8 @@ export type ValidContainer =
 
 export type ExcalidrawProgrammaticElement =
   | Extract<
-      ExcalidrawElement,
-      | ExcalidrawSelectionElement
+      Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+      | ExcalidrawEmbeddableElement
       | ExcalidrawFreeDrawElement
       | ExcalidrawFrameElement
     >
@@ -160,15 +161,6 @@ export type ExcalidrawProgrammaticElement =
 export interface ExcalidrawProgrammaticAPI {
   elements?: readonly ExcalidrawProgrammaticElement[] | null;
 }
-export const ELEMENTS_SUPPORTING_PROGRAMMATIC_API = [
-  "rectangle",
-  "ellipse",
-  "diamond",
-  "text",
-  "arrow",
-  "line",
-  "image",
-];
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
   width: 300,
@@ -269,7 +261,9 @@ const bindLinearElementToElement = (
         .getElements()
         .find((ele) => ele?.id === start.id) as Exclude<
         ExcalidrawBindableElement,
-        ExcalidrawImageElement | ExcalidrawFrameElement
+        | ExcalidrawImageElement
+        | ExcalidrawFrameElement
+        | ExcalidrawEmbeddableElement
       >;
       if (!existingElement) {
         console.error(`No element for start binding with id ${start.id} found`);
@@ -339,7 +333,9 @@ const bindLinearElementToElement = (
             ele,
           ): ele is Exclude<
             ExcalidrawBindableElement,
-            ExcalidrawImageElement | ExcalidrawFrameElement
+            | ExcalidrawImageElement
+            | ExcalidrawFrameElement
+            | ExcalidrawEmbeddableElement
           > => ele?.id === end.id,
         );
       if (!existingElement) {
@@ -423,10 +419,6 @@ class ElementStore {
   getElements = () => {
     return this.res;
   };
-  hasElementWithId = (id: string) => {
-    const index = this.elementMap.get(id);
-    return index !== undefined && index >= 0;
-  };
 }
 
 export const convertToExcalidrawElements = (
@@ -435,124 +427,159 @@ export const convertToExcalidrawElements = (
   if (!elements) {
     return [];
   }
+
   const elementStore = new ElementStore();
-  // Push all elements to array as there could be cases where element id
-  // is referenced before element is created
-  elements.forEach((element) => {
-    let elementId = element.id || regenerateId(null);
+
+  // ensure unique ids
+  // ---------------------------------------------------------------------------
+  const ids = new Set<ExcalidrawElement["id"]>();
+  const elementsWithIds = elements.map((element) => {
+    let id = element.id || regenerateId(null);
 
     // To make sure every element has a unique id since regenerateId appends
     // _copy to the original id and if it exists we need to generate again
     // hence a loop
-    while (elementStore.hasElementWithId(elementId)) {
-      elementId = regenerateId(elementId);
+    while (ids.has(id)) {
+      id = regenerateId(id);
     }
-    const elementWithId = { ...element, id: elementId };
-    elementStore.add(elementWithId as ExcalidrawElement);
+
+    ids.add(id);
+
+    return { ...element, id };
   });
+  // ---------------------------------------------------------------------------
 
-  const pushedElements =
-    elementStore.getElements() as readonly ExcalidrawProgrammaticElement[];
-  pushedElements.forEach((element) => {
-    const elementWithId = { ...element };
-
-    if (
-      (elementWithId.type === "rectangle" ||
-        elementWithId.type === "ellipse" ||
-        elementWithId.type === "diamond" ||
-        elementWithId.type === "arrow") &&
-      elementWithId?.label?.text
-    ) {
-      let [container, text] = bindTextToContainer(
-        elementWithId as
-          | ValidContainer
-          | ({
-              type: "arrow";
-            } & ValidLinearElement),
-        elementWithId?.label,
-      );
-      elementStore.add(container);
-      elementStore.add(text);
-
-      if (container.type === "arrow") {
-        const originalStart =
-          elementWithId.type === "arrow" ? elementWithId?.start : undefined;
-        const originalEnd =
-          elementWithId.type === "arrow" ? elementWithId?.end : undefined;
-        const { linearElement, startBoundElement, endBoundElement } =
-          bindLinearElementToElement(
-            {
-              ...container,
-              start: originalStart,
-              end: originalEnd,
-            },
-            elementStore,
+  for (const element of elementsWithIds) {
+    switch (element.type) {
+      case "rectangle":
+      case "ellipse":
+      case "diamond":
+      case "arrow": {
+        if (element.label?.text) {
+          let [container, text] = bindTextToContainer(
+            element as
+              | ValidContainer
+              | ({
+                  type: "arrow";
+                } & ValidLinearElement),
+            element?.label,
           );
-        container = linearElement;
-        elementStore.add(linearElement);
-        elementStore.add(startBoundElement);
-        elementStore.add(endBoundElement);
-      }
-    } else if (elementWithId.type === "text") {
-      const fontFamily = elementWithId?.fontFamily || DEFAULT_FONT_FAMILY;
-      const fontSize = elementWithId?.fontSize || DEFAULT_FONT_SIZE;
-      const lineHeight =
-        elementWithId?.lineHeight || getDefaultLineHeight(fontFamily);
-      const text = elementWithId.text ?? "";
-      const normalizedText = normalizeText(text);
-      const metrics = measureText(
-        normalizedText,
-        getFontString({ fontFamily, fontSize }),
-        lineHeight,
-      );
+          elementStore.add(container);
+          elementStore.add(text);
 
-      const textElement = newTextElement({
-        width: metrics.width,
-        height: metrics.height,
-        fontFamily,
-        fontSize,
-        ...elementWithId,
-      });
-      elementStore.add(textElement);
-    } else if (elementWithId.type === "arrow") {
-      const { linearElement, startBoundElement, endBoundElement } =
-        bindLinearElementToElement(elementWithId, elementStore);
-      elementStore.add(linearElement);
-      elementStore.add(startBoundElement);
-      elementStore.add(endBoundElement);
-    } else if (elementWithId.type === "line") {
-      const width = elementWithId.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
-      const height =
-        elementWithId.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
-      const lineElement = newLinearElement({
-        width,
-        height,
-        points: [
-          [0, 0],
-          [width, height],
-        ],
-        ...elementWithId,
-      });
-      elementStore.add(lineElement);
-    } else if (elementWithId.type === "image") {
-      const imageElement = newImageElement({
-        width: elementWithId?.width || DEFAULT_DIMENSION,
-        height: elementWithId?.height || DEFAULT_DIMENSION,
-        ...elementWithId,
-      });
-      elementStore.add(imageElement);
-    } else if (
-      elementWithId.type === "rectangle" ||
-      elementWithId.type === "ellipse" ||
-      elementWithId.type === "diamond"
-    ) {
-      const element = newElement({
-        ...elementWithId,
-        width: elementWithId?.width || DEFAULT_DIMENSION,
-        height: elementWithId?.height || DEFAULT_DIMENSION,
-      });
-      elementStore.add(element);
+          if (container.type === "arrow") {
+            const originalStart =
+              element.type === "arrow" ? element?.start : undefined;
+            const originalEnd =
+              element.type === "arrow" ? element?.end : undefined;
+            const { linearElement, startBoundElement, endBoundElement } =
+              bindLinearElementToElement(
+                {
+                  ...container,
+                  start: originalStart,
+                  end: originalEnd,
+                },
+                elementStore,
+              );
+            container = linearElement;
+            elementStore.add(linearElement);
+            elementStore.add(startBoundElement);
+            elementStore.add(endBoundElement);
+          }
+        } else {
+          switch (element.type) {
+            case "arrow": {
+              const { linearElement, startBoundElement, endBoundElement } =
+                bindLinearElementToElement(element, elementStore);
+              elementStore.add(linearElement);
+              elementStore.add(startBoundElement);
+              elementStore.add(endBoundElement);
+              break;
+            }
+            case "rectangle":
+            case "ellipse":
+            case "diamond": {
+              elementStore.add(
+                newElement({
+                  ...element,
+                  width: element?.width || DEFAULT_DIMENSION,
+                  height: element?.height || DEFAULT_DIMENSION,
+                }),
+              );
+              break;
+            }
+            default: {
+              assertNever(
+                element.type,
+                `Unhandled element type "${element.type}"`,
+              );
+            }
+          }
+        }
+        break;
+      }
+      case "line": {
+        const width = element.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
+        const height = element.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
+        const lineElement = newLinearElement({
+          width,
+          height,
+          points: [
+            [0, 0],
+            [width, height],
+          ],
+          ...element,
+        });
+        elementStore.add(lineElement);
+        break;
+      }
+      case "text": {
+        const fontFamily = element?.fontFamily || DEFAULT_FONT_FAMILY;
+        const fontSize = element?.fontSize || DEFAULT_FONT_SIZE;
+        const lineHeight =
+          element?.lineHeight || getDefaultLineHeight(fontFamily);
+        const text = element.text ?? "";
+        const normalizedText = normalizeText(text);
+        const metrics = measureText(
+          normalizedText,
+          getFontString({ fontFamily, fontSize }),
+          lineHeight,
+        );
+
+        const textElement = newTextElement({
+          width: metrics.width,
+          height: metrics.height,
+          fontFamily,
+          fontSize,
+          ...element,
+        });
+        elementStore.add(textElement);
+        break;
+      }
+      case "image": {
+        const imageElement = newImageElement({
+          width: element?.width || DEFAULT_DIMENSION,
+          height: element?.height || DEFAULT_DIMENSION,
+          ...element,
+        });
+        elementStore.add(imageElement);
+        break;
+      }
+      case "freedraw":
+      case "frame":
+      case "embeddable": {
+        elementStore.add(element);
+        break;
+      }
+      default: {
+        elementStore.add(element);
+        assertNever(
+          element,
+          `Unhandled element type "${(element as any).type}"`,
+          true,
+        );
+      }
     }
-  });
+  }
   return elementStore.getElements();
 };
