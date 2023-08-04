@@ -7175,11 +7175,10 @@ class App extends React.Component<AppProps, AppState> {
       });
     });
 
-    // TODO: update condition as linear, freedraw and multiple elements snapping on resizing is supported
-    const shouldGetResizedSnaps =
+    const shouldGetResizedSnaps = !(
       selectedElements.length === 1 &&
-      selectedElements[0].type !== "arrow" &&
-      selectedElements[0].angle === 0;
+      (selectedElements[0].type === "arrow" || selectedElements[0].angle !== 0)
+    );
 
     const snaps = shouldGetResizedSnaps
       ? getSnaps({

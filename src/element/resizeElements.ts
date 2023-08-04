@@ -55,7 +55,14 @@ import {
   getBoundTextMaxHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
-import { SNAP_PRECISION, Snap, Snaps, getNearestSnaps } from "../snapping";
+import {
+  SNAP_PRECISION,
+  Snap,
+  Snaps,
+  getElementsCorners,
+  getNearestSnaps,
+  getSnapThreshold,
+} from "../snapping";
 import * as GAPoints from "../gapoints";
 import * as GALines from "../galines";
 
@@ -153,6 +160,9 @@ export const transformElements = (
         shouldResizeFromCenter,
         pointerX,
         pointerY,
+        appState,
+        snaps,
+        snapsCallback,
       );
       return true;
     }
@@ -834,6 +844,9 @@ export const resizeMultipleElements = (
   shouldResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
+  appState: AppState,
+  snaps: Snaps | null,
+  snapsCallback?: (snaps: Snaps | null) => void,
 ) => {
   // map selected elements to the original elements. While it never should
   // happen that pointerDownState.originalElements won't contain the selected
@@ -881,6 +894,10 @@ export const resizeMultipleElements = (
   const { minX, minY, maxX, maxY, midX, midY } = getCommonBoundingBox(
     targetElements.map(({ orig }) => orig).concat(boundTextElements),
   );
+
+  const originalHeight = maxY - minY;
+  const originalWidth = maxX - minX;
+
   const direction = transformHandleType;
 
   const mapDirectionsToAnchors: Record<typeof direction, Point> = {
@@ -896,7 +913,7 @@ export const resizeMultipleElements = (
     ? [midX, midY]
     : mapDirectionsToAnchors[direction];
 
-  const scale =
+  let scale =
     Math.max(
       Math.abs(pointerX - anchorX) / (maxX - minX) || 0,
       Math.abs(pointerY - anchorY) / (maxY - minY) || 0,
@@ -929,6 +946,131 @@ export const resizeMultipleElements = (
   ].map((condition) => (condition ? 1 : -1));
   const isFlippedByX = flipFactorX < 0;
   const isFlippedByY = flipFactorY < 0;
+
+  if (snaps) {
+    // TODO: corner is decided based on handle direction
+    const [topLeft, , , bottomRight] = getElementsCorners(
+      targetElements.map(({ latest }) => latest).concat(boundTextElements),
+    );
+    const minX = topLeft[0];
+    const maxX = bottomRight[0];
+    const minY = topLeft[1];
+    const maxY = bottomRight[1];
+
+    let cornerX = minX;
+    let cornerY = minY;
+
+    if (direction.includes("e")) {
+      cornerX = maxX;
+
+      if (isFlippedByX) {
+        cornerX = minX;
+      }
+    }
+
+    if (direction.includes("w")) {
+      cornerX = minX;
+      if (isFlippedByX) {
+        cornerX = minX;
+      }
+    }
+
+    if (direction.includes("s")) {
+      cornerY = maxY;
+
+      if (isFlippedByY) {
+        cornerY = minY;
+      }
+    }
+
+    if (direction.includes("n")) {
+      cornerY = minY;
+
+      if (isFlippedByY) {
+        cornerY = maxY;
+      }
+    }
+
+    const corner: Point = [cornerX, cornerY];
+
+    let { horizontalSnap, verticalSnap } = getNearestSnaps(
+      corner,
+      snaps,
+      appState,
+    );
+
+    const snapPoint = horizontalSnap
+      ? GAPoints.toTuple(horizontalSnap.snapLine.point)
+      : verticalSnap
+      ? GAPoints.toTuple(verticalSnap.snapLine.point)
+      : null;
+
+    if (snapPoint) {
+      const snapThreshold = getSnapThreshold(appState.zoom.value);
+      if (
+        Math.abs(corner[1] - pointerY) > snapThreshold &&
+        Math.abs(corner[0] - pointerX) > snapThreshold
+      ) {
+        horizontalSnap = null;
+        verticalSnap = null;
+      }
+
+      if (horizontalSnap) {
+        scale = Math.abs(snapPoint[1] - anchorY) / originalHeight;
+      }
+
+      if (verticalSnap) {
+        scale = Math.abs(snapPoint[0] - anchorX) / originalWidth;
+      }
+    }
+
+    const nextSnaps = snaps
+      .map((snap) => {
+        let nextSnap: Snap = snap;
+
+        if (snap === verticalSnap || snap === horizontalSnap) {
+          nextSnap = {
+            ...snap,
+            isSnapped: true,
+          };
+        } else if (verticalSnap) {
+          if (
+            GALines.areParallel(
+              snap.snapLine.line,
+              verticalSnap.snapLine.line,
+            ) &&
+            GALines.distance(snap.snapLine.line, verticalSnap.snapLine.line) <=
+              SNAP_PRECISION
+          ) {
+            nextSnap = {
+              ...snap,
+              isSnapped: true,
+            };
+          }
+        } else if (horizontalSnap) {
+          if (
+            GALines.areParallel(
+              snap.snapLine.line,
+              horizontalSnap.snapLine.line,
+            ) &&
+            GALines.distance(
+              snap.snapLine.line,
+              horizontalSnap.snapLine.line,
+            ) <= SNAP_PRECISION
+          ) {
+            nextSnap = {
+              ...snap,
+              isSnapped: true,
+            };
+          }
+        }
+
+        return nextSnap;
+      })
+      .filter((snap) => snap?.isSnapped);
+
+    snapsCallback?.(nextSnaps);
+  }
 
   const elementsAndUpdates: {
     element: NonDeletedExcalidrawElement;
