@@ -131,6 +131,41 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id40",
+      "type": "arrow",
+    },
+  ],
+  "fillStyle": "hachure",
+  "frameId": null,
+  "groupIds": [],
+  "height": 300,
+  "id": Any<String>,
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "width": 300,
+  "x": -53,
+  "y": 270,
+}
+`;
+
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 5`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
   "boundElements": null,
   "endArrowhead": "arrow",
   "endBinding": {
@@ -177,41 +212,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "width": 400,
   "x": 227,
   "y": 450,
-}
-`;
-
-exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 5`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id40",
-      "type": "arrow",
-    },
-  ],
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": [],
-  "height": 300,
-  "id": Any<String>,
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": Any<Number>,
-  "width": 300,
-  "x": -53,
-  "y": 270,
 }
 `;
 
@@ -1304,6 +1304,45 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
+  "baseline": 0,
+  "boundElements": null,
+  "containerId": "id24",
+  "fillStyle": "hachure",
+  "fontFamily": 1,
+  "fontSize": 20,
+  "frameId": null,
+  "groupIds": [],
+  "height": 25,
+  "id": Any<String>,
+  "isDeleted": false,
+  "lineHeight": 1.25,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "originalText": "LABELED ARROW",
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "text": "LABELED ARROW",
+  "textAlign": "center",
+  "type": "text",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "verticalAlign": "middle",
+  "width": 130,
+  "x": 185,
+  "y": 87.5,
+}
+`;
+
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 3`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
   "boundElements": [
     {
       "id": "id29",
@@ -1350,7 +1389,46 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 }
 `;
 
-exports[`Test Transform > should transform to labelled arrows when label provided for arrows 3`] = `
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 4`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "baseline": 0,
+  "boundElements": null,
+  "containerId": "id25",
+  "fillStyle": "hachure",
+  "fontFamily": 1,
+  "fontSize": 20,
+  "frameId": null,
+  "groupIds": [],
+  "height": 25,
+  "id": Any<String>,
+  "isDeleted": false,
+  "lineHeight": 1.25,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "originalText": "STYLED LABELED ARROW",
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#099268",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "text": "STYLED LABELED ARROW",
+  "textAlign": "center",
+  "type": "text",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "verticalAlign": "middle",
+  "width": 200,
+  "x": 150,
+  "y": 187.5,
+}
+`;
+
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 5`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -1400,7 +1478,47 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 }
 `;
 
-exports[`Test Transform > should transform to labelled arrows when label provided for arrows 4`] = `
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 6`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "baseline": 0,
+  "boundElements": null,
+  "containerId": "id26",
+  "fillStyle": "hachure",
+  "fontFamily": 1,
+  "fontSize": 20,
+  "frameId": null,
+  "groupIds": [],
+  "height": 50,
+  "id": Any<String>,
+  "isDeleted": false,
+  "lineHeight": 1.25,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "originalText": "ANOTHER STYLED LABELLED ARROW",
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1098ad",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "text": "ANOTHER STYLED 
+LABELLED ARROW",
+  "textAlign": "center",
+  "type": "text",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "verticalAlign": "middle",
+  "width": 150,
+  "x": 175,
+  "y": 275,
+}
+`;
+
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 7`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -1447,124 +1565,6 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "width": 300,
   "x": 100,
   "y": 400,
-}
-`;
-
-exports[`Test Transform > should transform to labelled arrows when label provided for arrows 5`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "baseline": 0,
-  "boundElements": null,
-  "containerId": "id24",
-  "fillStyle": "hachure",
-  "fontFamily": 1,
-  "fontSize": 20,
-  "frameId": null,
-  "groupIds": [],
-  "height": 25,
-  "id": Any<String>,
-  "isDeleted": false,
-  "lineHeight": 1.25,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "originalText": "LABELED ARROW",
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "text": "LABELED ARROW",
-  "textAlign": "center",
-  "type": "text",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": Any<Number>,
-  "verticalAlign": "middle",
-  "width": 130,
-  "x": 185,
-  "y": 87.5,
-}
-`;
-
-exports[`Test Transform > should transform to labelled arrows when label provided for arrows 6`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "baseline": 0,
-  "boundElements": null,
-  "containerId": "id25",
-  "fillStyle": "hachure",
-  "fontFamily": 1,
-  "fontSize": 20,
-  "frameId": null,
-  "groupIds": [],
-  "height": 25,
-  "id": Any<String>,
-  "isDeleted": false,
-  "lineHeight": 1.25,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "originalText": "STYLED LABELED ARROW",
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#099268",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "text": "STYLED LABELED ARROW",
-  "textAlign": "center",
-  "type": "text",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": Any<Number>,
-  "verticalAlign": "middle",
-  "width": 200,
-  "x": 150,
-  "y": 187.5,
-}
-`;
-
-exports[`Test Transform > should transform to labelled arrows when label provided for arrows 7`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "baseline": 0,
-  "boundElements": null,
-  "containerId": "id26",
-  "fillStyle": "hachure",
-  "fontFamily": 1,
-  "fontSize": 20,
-  "frameId": null,
-  "groupIds": [],
-  "height": 50,
-  "id": Any<String>,
-  "isDeleted": false,
-  "lineHeight": 1.25,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "originalText": "ANOTHER STYLED LABELLED ARROW",
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#1098ad",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "text": "ANOTHER STYLED 
-LABELLED ARROW",
-  "textAlign": "center",
-  "type": "text",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": Any<Number>,
-  "verticalAlign": "middle",
-  "width": 150,
-  "x": 175,
-  "y": 275,
 }
 `;
 
@@ -1647,181 +1647,6 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id19",
-      "type": "text",
-    },
-  ],
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": [],
-  "height": 85,
-  "id": Any<String>,
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": Any<Number>,
-  "width": 200,
-  "x": 500,
-  "y": 100,
-}
-`;
-
-exports[`Test Transform > should transform to text containers when label provided 3`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id20",
-      "type": "text",
-    },
-  ],
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": [],
-  "height": 170,
-  "id": Any<String>,
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "diamond",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": Any<Number>,
-  "width": 280,
-  "x": 100,
-  "y": 150,
-}
-`;
-
-exports[`Test Transform > should transform to text containers when label provided 4`] = `
-{
-  "angle": 0,
-  "backgroundColor": "#fff3bf",
-  "boundElements": [
-    {
-      "id": "id21",
-      "type": "text",
-    },
-  ],
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": [],
-  "height": 120,
-  "id": Any<String>,
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 2,
-  "type": "diamond",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": Any<Number>,
-  "width": 300,
-  "x": 100,
-  "y": 400,
-}
-`;
-
-exports[`Test Transform > should transform to text containers when label provided 5`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id22",
-      "type": "text",
-    },
-  ],
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": [],
-  "height": 85,
-  "id": Any<String>,
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#c2255c",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": Any<Number>,
-  "width": 200,
-  "x": 500,
-  "y": 300,
-}
-`;
-
-exports[`Test Transform > should transform to text containers when label provided 6`] = `
-{
-  "angle": 0,
-  "backgroundColor": "#ffec99",
-  "boundElements": [
-    {
-      "id": "id23",
-      "type": "text",
-    },
-  ],
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": [],
-  "height": 120,
-  "id": Any<String>,
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#f08c00",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": Any<Number>,
-  "width": 200,
-  "x": 500,
-  "y": 500,
-}
-`;
-
-exports[`Test Transform > should transform to text containers when label provided 7`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
   "containerId": "id12",
@@ -1857,7 +1682,42 @@ exports[`Test Transform > should transform to text containers when label provide
 }
 `;
 
-exports[`Test Transform > should transform to text containers when label provided 8`] = `
+exports[`Test Transform > should transform to text containers when label provided 3`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id19",
+      "type": "text",
+    },
+  ],
+  "fillStyle": "hachure",
+  "frameId": null,
+  "groupIds": [],
+  "height": 85,
+  "id": Any<String>,
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "ellipse",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "width": 200,
+  "x": 500,
+  "y": 100,
+}
+`;
+
+exports[`Test Transform > should transform to text containers when label provided 4`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -1897,7 +1757,42 @@ CONTAINER",
 }
 `;
 
-exports[`Test Transform > should transform to text containers when label provided 9`] = `
+exports[`Test Transform > should transform to text containers when label provided 5`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id20",
+      "type": "text",
+    },
+  ],
+  "fillStyle": "hachure",
+  "frameId": null,
+  "groupIds": [],
+  "height": 170,
+  "id": Any<String>,
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "diamond",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "width": 280,
+  "x": 100,
+  "y": 150,
+}
+`;
+
+exports[`Test Transform > should transform to text containers when label provided 6`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -1939,7 +1834,42 @@ CONTAINER",
 }
 `;
 
-exports[`Test Transform > should transform to text containers when label provided 10`] = `
+exports[`Test Transform > should transform to text containers when label provided 7`] = `
+{
+  "angle": 0,
+  "backgroundColor": "#fff3bf",
+  "boundElements": [
+    {
+      "id": "id21",
+      "type": "text",
+    },
+  ],
+  "fillStyle": "hachure",
+  "frameId": null,
+  "groupIds": [],
+  "height": 120,
+  "id": Any<String>,
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "diamond",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "width": 300,
+  "x": 100,
+  "y": 400,
+}
+`;
+
+exports[`Test Transform > should transform to text containers when label provided 8`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -1979,7 +1909,42 @@ TEXT CONTAINER",
 }
 `;
 
-exports[`Test Transform > should transform to text containers when label provided 11`] = `
+exports[`Test Transform > should transform to text containers when label provided 9`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id22",
+      "type": "text",
+    },
+  ],
+  "fillStyle": "hachure",
+  "frameId": null,
+  "groupIds": [],
+  "height": 85,
+  "id": Any<String>,
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#c2255c",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "width": 200,
+  "x": 500,
+  "y": 300,
+}
+`;
+
+exports[`Test Transform > should transform to text containers when label provided 10`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -2017,6 +1982,41 @@ CONTAINER",
   "width": 170,
   "x": 505,
   "y": 305,
+}
+`;
+
+exports[`Test Transform > should transform to text containers when label provided 11`] = `
+{
+  "angle": 0,
+  "backgroundColor": "#ffec99",
+  "boundElements": [
+    {
+      "id": "id23",
+      "type": "text",
+    },
+  ],
+  "fillStyle": "hachure",
+  "frameId": null,
+  "groupIds": [],
+  "height": 120,
+  "id": Any<String>,
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#f08c00",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "ellipse",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "width": 200,
+  "x": 500,
+  "y": 500,
 }
 `;
 
