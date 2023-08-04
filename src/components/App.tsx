@@ -5305,6 +5305,7 @@ class App extends React.Component<AppProps, AppState> {
 
           const snaps = getSnaps({
             elements: originalElements,
+            selectedElements: getSelectedElements(originalElements, this.state),
             appState: this.state,
             event,
             dragOffset,
@@ -7059,6 +7060,7 @@ class App extends React.Component<AppProps, AppState> {
         distance(pointerDownState.origin.y, pointerCoords.y),
         shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
+        this.state,
       );
     } else {
       const [gridX, gridY] = getGridPoint(
@@ -7075,6 +7077,17 @@ class App extends React.Component<AppProps, AppState> {
           ? image.width / image.height
           : null;
 
+      const snaps = getSnaps({
+        elements: this.scene.getNonDeletedElements(),
+        selectedElements: [draggingElement],
+        corners: getElementsCorners([draggingElement], {
+          boundingBoxCorners: true,
+          omitCenter: true,
+        }),
+        appState: this.state,
+      });
+      this.setState({ snaps });
+
       dragNewElement(
         draggingElement,
         this.state.activeTool.type,
@@ -7088,7 +7101,9 @@ class App extends React.Component<AppProps, AppState> {
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
+        this.state,
         aspectRatio,
+        snaps,
       );
 
       this.maybeSuggestBindingForAll([draggingElement]);
@@ -7169,6 +7184,10 @@ class App extends React.Component<AppProps, AppState> {
     const snaps = shouldGetResizedSnaps
       ? getSnaps({
           elements: this.scene.getNonDeletedElements(),
+          selectedElements: getSelectedElements(
+            this.scene.getNonDeletedElements(),
+            this.state,
+          ),
           corners: getElementsCorners(
             getSelectedElements(this.scene.getNonDeletedElements(), this.state),
             {

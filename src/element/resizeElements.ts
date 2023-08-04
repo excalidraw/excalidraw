@@ -6,7 +6,6 @@ import {
   adjustXYWithRotation,
   centerPoint,
   rotatePoint,
-  distance2d,
 } from "../math";
 import {
   ExcalidrawLinearElement,
@@ -56,14 +55,7 @@ import {
   getBoundTextMaxHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
-import {
-  SNAP_PRECISION,
-  Snap,
-  Snaps,
-  getSnapThreshold,
-  round,
-  snapToPoint,
-} from "../snapping";
+import { SNAP_PRECISION, Snap, Snaps, getNearestSnaps } from "../snapping";
 import * as GAPoints from "../gapoints";
 import * as GALines from "../galines";
 
@@ -623,42 +615,11 @@ export const resizeSingleElement = (
 
     const corner: Point = [cornerX, cornerY];
 
-    const snapThreshold = getSnapThreshold(appState.zoom.value);
-
-    let leastDistanceX = snapThreshold;
-    let leastDistanceY = snapThreshold;
-
-    const resizingAlongXAxis =
-      transformHandleDirection.includes("w") ||
-      transformHandleDirection.includes("e");
-    const resizingAlongYAxis =
-      transformHandleDirection.includes("n") ||
-      transformHandleDirection.includes("s");
-
-    let verticalSnap: Snap | null = null;
-    let horizontalSnap: Snap | null = null;
-
-    for (const snap of snaps) {
-      const distance = round(distance2d(...snapToPoint(snap), ...corner));
-
-      if (resizingAlongXAxis) {
-        if (snap.snapLine.direction === "vertical") {
-          if (distance <= leastDistanceX) {
-            leastDistanceX = distance;
-            verticalSnap = snap;
-          }
-        }
-      }
-
-      if (resizingAlongYAxis) {
-        if (snap.snapLine.direction === "horizontal") {
-          if (distance <= leastDistanceY) {
-            leastDistanceY = distance;
-            horizontalSnap = snap;
-          }
-        }
-      }
-    }
+    const { horizontalSnap, verticalSnap } = getNearestSnaps(
+      corner,
+      snaps,
+      appState,
+    );
 
     if (verticalSnap) {
       if (

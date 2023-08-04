@@ -3,13 +3,14 @@ import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { NonDeletedExcalidrawElement } from "./types";
-import { AppState, PointerDownState } from "../types";
+import { AppState, Point, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
-import { Snaps, snapProject } from "../snapping";
+import { Snaps, getNearestSnaps, snapProject } from "../snapping";
 import { getGridPoint } from "../math";
 import Scene from "../scene/Scene";
 import { isFrameElement } from "./typeChecks";
+import * as GAPoints from "../gapoints";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -143,9 +144,11 @@ export const dragNewElement = (
   height: number,
   shouldMaintainAspectRatio: boolean,
   shouldResizeFromCenter: boolean,
+  appState: AppState,
   /** whether to keep given aspect ratio when `isResizeWithSidesSameLength` is
       true */
   widthAspectRatio?: number | null,
+  snaps: Snaps | null = null,
 ) => {
   if (shouldMaintainAspectRatio && draggingElement.type !== "selection") {
     if (widthAspectRatio) {
@@ -182,6 +185,77 @@ export const dragNewElement = (
     height += height;
     newX = originX - width / 2;
     newY = originY - height / 2;
+  }
+
+  if (snaps) {
+    let cornerX: number = newX + width;
+    let cornerY: number = newY + height;
+    if (x < originX) {
+      cornerX = newX;
+    }
+    if (y < originY) {
+      cornerY = newY;
+    }
+
+    const corner: Point = [cornerX, cornerY];
+
+    const { horizontalSnap, verticalSnap } = getNearestSnaps(
+      corner,
+      snaps,
+      appState,
+    );
+
+    if (horizontalSnap) {
+      const snapPoint = GAPoints.toTuple(horizontalSnap.snapLine.point);
+      height = snapPoint[1] - newY;
+
+      if (y < originY) {
+        newY = snapPoint[1];
+        height = originY - newY;
+      }
+
+      if (shouldMaintainAspectRatio) {
+        if (widthAspectRatio) {
+          width = height * widthAspectRatio;
+        } else {
+          width = height;
+        }
+      }
+
+      if (y < originY) {
+        newY = snapPoint[1];
+      }
+
+      if (x < originX) {
+        newX = originX - width;
+      }
+    }
+
+    if (verticalSnap) {
+      const snapPoint = GAPoints.toTuple(verticalSnap.snapLine.point);
+      width = GAPoints.toTuple(verticalSnap.snapLine.point)[0] - newX;
+
+      if (x < originX) {
+        newX = snapPoint[0];
+        width = originX - newX;
+      }
+
+      if (shouldMaintainAspectRatio) {
+        if (widthAspectRatio) {
+          height = width / widthAspectRatio;
+        } else {
+          height = width;
+        }
+      }
+
+      if (x < originX) {
+        newX = snapPoint[0];
+      }
+
+      if (y < originY) {
+        newY = originY - height;
+      }
+    }
   }
 
   if (width !== 0 && height !== 0) {

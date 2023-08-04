@@ -9,8 +9,7 @@ import * as GALines from "./galines";
 import * as GAPoints from "./gapoints";
 import { getMaximumGroups } from "./groups";
 import { KEYS } from "./keys";
-import { rotatePoint } from "./math";
-import { getSelectedElements } from "./scene";
+import { distance2d, rotatePoint } from "./math";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
 import { AppState, Point, Zoom } from "./types";
 
@@ -256,6 +255,7 @@ const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
 
 export const getSnaps = ({
   elements,
+  selectedElements,
   corners,
   appState,
   event = null,
@@ -265,13 +265,12 @@ export const getSnaps = ({
   },
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
+  selectedElements: NonDeletedExcalidrawElement[];
   corners: Point[];
   appState: AppState;
   event?: PointerEvent | MouseEvent | KeyboardEvent | null;
   dragOffset?: { x: number; y: number };
 }) => {
-  const selectedElements = getSelectedElements(elements, appState);
-
   if (!isSnappingEnabled({ appState, event, selectedElements })) {
     return null;
   }
@@ -376,4 +375,38 @@ export const getSnaps = ({
   }
 
   return null;
+};
+
+// TODO: rename to something more appropriate
+export const getNearestSnaps = (
+  corner: Point,
+  snaps: Snaps,
+  appState: AppState,
+) => {
+  let verticalSnap: Snap | null = null;
+  let horizontalSnap: Snap | null = null;
+
+  const snapThreshold = getSnapThreshold(appState.zoom.value);
+
+  let leastDistanceX = snapThreshold;
+  let leastDistanceY = snapThreshold;
+
+  for (const snap of snaps) {
+    const distance = round(distance2d(...snapToPoint(snap), ...corner));
+
+    if (snap.snapLine.direction === "vertical") {
+      if (distance <= leastDistanceX) {
+        leastDistanceX = distance;
+        verticalSnap = snap;
+      }
+    } else if (distance <= leastDistanceY) {
+      leastDistanceY = distance;
+      horizontalSnap = snap;
+    }
+  }
+
+  return {
+    verticalSnap,
+    horizontalSnap,
+  };
 };

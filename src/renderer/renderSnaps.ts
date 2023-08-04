@@ -24,7 +24,8 @@ export const renderSnaps = (
     drawSnap(
       GAPoints.toTuple(snap.snapLine.point),
       appState.isResizing
-        ? snapToPoint(snap)
+        ? // || (appState.draggingElement && appState.activeTool.type !== "selection")
+          snapToPoint(snap)
         : snapProject({
             origin: GAPoints.toObject(snap.point),
             snaps,
