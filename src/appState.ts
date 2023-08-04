@@ -100,6 +100,7 @@ export const getDefaultAppState = (): Omit<
     selectedLinearElement: null,
     userToFollow: null,
     shouldDisconnectFollowModeOnCanvasInteraction: true,
+    amIBeingFollowed: false,
   };
 };
 
@@ -212,6 +213,7 @@ const APP_STATE_STORAGE_CONF = (<
     export: false,
     server: false,
   },
+  amIBeingFollowed: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

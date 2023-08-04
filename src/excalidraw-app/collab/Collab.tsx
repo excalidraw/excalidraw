@@ -1,6 +1,10 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import { AppState, ExcalidrawImperativeAPI, UserToFollow } from "../../types";
+import {
+  AppState,
+  ExcalidrawImperativeAPI,
+  OnUserFollowedPayload,
+} from "../../types";
 import { ErrorDialog } from "../../components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../constants";
 import { ImportedDataState } from "../../data/types";
@@ -541,12 +545,8 @@ class Collab extends PureComponent<Props, CollabState> {
           case "SCROLL_AND_ZOOM": {
             const { bounds } = decryptedData.payload;
 
-            const socketId: SocketUpdateDataSource["SCROLL_AND_ZOOM"]["payload"]["socketId"] =
-              decryptedData.payload.socketId;
-
             const _appState = this.excalidrawAPI.getAppState();
-            // TODO follow-participant
-            // if (_appState.userToFollow?.clientId === socketId) {
+
             const { appState } = zoomToFitBounds({
               appState: _appState,
               bounds,
@@ -554,7 +554,6 @@ class Collab extends PureComponent<Props, CollabState> {
               viewportZoomFactor: 1,
             });
             this.excalidrawAPI.updateScene({ appState });
-            // }
 
             break;
           }
@@ -585,15 +584,16 @@ class Collab extends PureComponent<Props, CollabState> {
       scenePromise.resolve(sceneData);
     });
 
-    // TODO follow-participant
-    // set amIBeingFollowed flag
     this.portal.socket.on("broadcast-follow", () => {
-      console.log("broadcast-follow");
+      this.excalidrawAPI.updateScene({
+        appState: { amIBeingFollowed: true },
+      });
     });
-    // TODO follow-participant
-    // set amIBeingFollowed flag
+
     this.portal.socket.on("broadcast-unfollow", () => {
-      console.log("broadcast-unfollow");
+      this.excalidrawAPI.updateScene({
+        appState: { amIBeingFollowed: false },
+      });
     });
 
     this.initializeIdleDetector();
@@ -803,48 +803,44 @@ class Collab extends PureComponent<Props, CollabState> {
     CURSOR_SYNC_TIMEOUT,
   );
 
-  // TODO follow-participant
-  // only calculate this + broadcast if some flag on appState is set
-  // (eg amIBeingFollowed)
   onScrollAndZoomChange = throttle(
     (payload: { zoom: AppState["zoom"]; scroll: { x: number; y: number } }) => {
       const appState = this.excalidrawAPI.getAppState();
 
-      const { x: x1, y: y1 } = viewportCoordsToSceneCoords(
-        { clientX: 0, clientY: 0 },
-        {
-          offsetLeft: appState.offsetLeft,
-          offsetTop: appState.offsetTop,
-          scrollX: payload.scroll.x,
-          scrollY: payload.scroll.y,
-          zoom: payload.zoom,
-        },
-      );
-
-      const { x: x2, y: y2 } = viewportCoordsToSceneCoords(
-        { clientX: appState.width, clientY: appState.height },
-        {
-          offsetLeft: appState.offsetLeft,
-          offsetTop: appState.offsetTop,
-          scrollX: payload.scroll.x,
-          scrollY: payload.scroll.y,
-          zoom: payload.zoom,
-        },
-      );
-
-      this.portal.socket &&
-        this.portal.broadcastScrollAndZoom(
-          { bounds: [x1, y1, x2, y2] },
-          // TODO follow-participant
-          `follow_${this.portal.socket.id}`,
+      if (appState.amIBeingFollowed) {
+        const { x: x1, y: y1 } = viewportCoordsToSceneCoords(
+          { clientX: 0, clientY: 0 },
+          {
+            offsetLeft: appState.offsetLeft,
+            offsetTop: appState.offsetTop,
+            scrollX: payload.scroll.x,
+            scrollY: payload.scroll.y,
+            zoom: payload.zoom,
+          },
         );
+
+        const { x: x2, y: y2 } = viewportCoordsToSceneCoords(
+          { clientX: appState.width, clientY: appState.height },
+          {
+            offsetLeft: appState.offsetLeft,
+            offsetTop: appState.offsetTop,
+            scrollX: payload.scroll.x,
+            scrollY: payload.scroll.y,
+            zoom: payload.zoom,
+          },
+        );
+
+        this.portal.socket &&
+          this.portal.broadcastScrollAndZoom(
+            { bounds: [x1, y1, x2, y2] },
+            // TODO follow-participant
+            `follow_${this.portal.socket.id}`,
+          );
+      }
     },
   );
 
-  onUserFollowed = (payload: {
-    userToFollow: UserToFollow;
-    action: "subscribe" | "unsubscribe";
-  }) => {
+  onUserFollowed = (payload: OnUserFollowedPayload) => {
     this.portal.socket && this.portal.broadcastUserFollowed(payload);
   };
 

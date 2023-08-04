@@ -229,6 +229,8 @@ export type AppState = {
   userToFollow: UserToFollow | null;
   /** whether follow mode should be disconnected when the non-remote user interacts with the canvas */
   shouldDisconnectFollowModeOnCanvasInteraction: boolean;
+  /** whether the user is being followed on the canvas */
+  amIBeingFollowed: boolean;
 };
 
 export type UIAppState = Omit<
@@ -313,6 +315,11 @@ export type ExcalidrawInitialDataState = Merge<
   }
 >;
 
+export type OnUserFollowedPayload = {
+  userToFollow: UserToFollow;
+  action: "follow" | "unfollow";
+};
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly ExcalidrawElement[],
@@ -373,12 +380,7 @@ export interface ExcalidrawProps {
     zoom: Zoom;
     scroll: { x: number; y: number };
   }) => void;
-  // TODO follow-participant
-  onUserFollowed?: (payload: {
-    userToFollow: UserToFollow;
-    // TODO follow-participant extract to own type
-    action: "subscribe" | "unsubscribe";
-  }) => void;
+  onUserFollowed?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
 }
 

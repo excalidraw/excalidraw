@@ -12,7 +12,7 @@ import {
   FILE_UPLOAD_TIMEOUT,
   WS_SCENE_EVENT_TYPES,
 } from "../app_constants";
-import { UserIdleState, UserToFollow } from "../../types";
+import { OnUserFollowedPayload, UserIdleState } from "../../types";
 import { trackEvent } from "../../analytics";
 import throttle from "lodash.throttle";
 import { newElementWith } from "../../element/mutateElement";
@@ -248,10 +248,7 @@ class Portal {
     }
   };
 
-  broadcastUserFollowed = (payload: {
-    userToFollow: UserToFollow;
-    action: "subscribe" | "unsubscribe";
-  }) => {
+  broadcastUserFollowed = (payload: OnUserFollowedPayload) => {
     if (this.socket?.id) {
       this.socket?.emit("on-user-follow", payload);
     }

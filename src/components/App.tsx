@@ -1543,14 +1543,14 @@ class App extends React.Component<AppProps, AppState> {
       if (prevState.userToFollow) {
         this.props?.onUserFollowed?.({
           userToFollow: prevState.userToFollow,
-          action: "unsubscribe",
+          action: "unfollow",
         });
       }
 
       if (this.state.userToFollow) {
         this.props?.onUserFollowed?.({
           userToFollow: this.state.userToFollow,
-          action: "subscribe",
+          action: "follow",
         });
       }
     }
