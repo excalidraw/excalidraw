@@ -1,5 +1,55 @@
 # JSON Schema
 
+## Attributes Description
+
+
+
+| Attribute              | Description                                            | Example Value                                                |
+|------------------------|--------------------------------------------------------|--------------------------------------------------------------|
+| `type`                   | The type of the Excalidraw document.                   | "excalidraw"                                                 |
+| `version`                | The version of the Excalidraw document.                | 2                                                            |
+| `source`                 | The source URL of the Excalidraw application.          | "https://excalidraw.com"                                     |
+| `elements`               | An array of objects representing elements on canvas.   | Array containing element objects (see example below)         |
+| `appstate`               | Additional application state/configurations.          | Object containing application state properties (see example) |
+| `files`                  | Data for "image" elements in the canvas.               | Object containing image data (see example)                  |
+
+Example of an element object within the "elements" array:
+```json
+{
+    "id": "pologsyG-tAraPgiN9xP9b",
+    "type": "rectangle",
+    "x": 928,
+    "y": 319,
+    "width": 134,
+    "height": 90,
+    // Additional attributes for the element
+    // ...
+}
+```
+
+Example of the "appstate" object:
+```json
+"appstate": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+}
+```
+
+Example of an image data object within the "files" object:
+```json
+"files": {
+    "3cebd7720911620a3938ce77243696149da03861": {
+        "mimeType": "image/png",
+        "id": "3cebd7720911620a3938c.77243626149da03861",
+        "dataURL": "data:image/ongibase64,iVBORw...[truncated]",
+        "created": 1690295874454,
+        "lastRetrieved": 1690295874454
+    }
+}
+```
+
+
+### Complete JSON Schema
 ```json
 {
     // Schema information
