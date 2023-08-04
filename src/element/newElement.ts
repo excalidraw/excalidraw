@@ -134,7 +134,7 @@ export const newElement = (
 export const newEmbeddableElement = (
   opts: {
     type: "embeddable";
-    validated: boolean | undefined;
+    validated: ExcalidrawEmbeddableElement["validated"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawEmbeddableElement> => {
   return {

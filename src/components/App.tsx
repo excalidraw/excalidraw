@@ -5405,7 +5405,7 @@ class App extends React.Component<AppProps, AppState> {
       width: embedLink.aspectRatio.w,
       height: embedLink.aspectRatio.h,
       link,
-      validated: undefined,
+      validated: null,
     });
 
     this.scene.replaceAllElements([
@@ -5593,7 +5593,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private createGenericElementOnPointerDown = (
-    elementType: ExcalidrawGenericElement["type"],
+    elementType: ExcalidrawGenericElement["type"] | "embeddable",
     pointerDownState: PointerDownState,
   ): void => {
     const [gridX, gridY] = getGridPoint(
@@ -5607,8 +5607,7 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
-    const element = newElement({
-      type: elementType,
+    const baseElementAttributes = {
       x: gridX,
       y: gridY,
       strokeColor: this.state.currentItemStrokeColor,
@@ -5621,8 +5620,21 @@ class App extends React.Component<AppProps, AppState> {
       roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
-      ...(elementType === "embeddable" ? { validated: false } : {}),
-    });
+    } as const;
+
+    let element;
+    if (elementType === "embeddable") {
+      element = newEmbeddableElement({
+        type: "embeddable",
+        validated: null,
+        ...baseElementAttributes,
+      });
+    } else {
+      element = newElement({
+        type: elementType,
+        ...baseElementAttributes,
+      });
+    }
 
     if (element.type === "selection") {
       this.setState({
