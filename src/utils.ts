@@ -914,3 +914,14 @@ export const isOnlyExportingSingleFrame = (
     )
   );
 };
+
+export const upsertMap = <T>(key: T, value: object, map: Map<T, object>) => {
+  if (!map.has(key)) {
+    map.set(key, value);
+  } else {
+    const old = map.get(key);
+    map.set(key, { ...old, ...value });
+  }
+
+  return map;
+};

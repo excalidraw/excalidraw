@@ -1,6 +1,6 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import { ExcalidrawImperativeAPI } from "../../types";
+import { ExcalidrawImperativeAPI, PauseCollaborationState } from "../../types";
 import { ErrorDialog } from "../../components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../constants";
 import { ImportedDataState } from "../../data/types";
@@ -16,6 +16,7 @@ import { Collaborator, Gesture } from "../../types";
 import {
   preventUnload,
   resolvablePromise,
+  upsertMap,
   withBatchedUpdates,
 } from "../../utils";
 import {
@@ -24,12 +25,15 @@ import {
   FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
   LOAD_IMAGES_TIMEOUT,
+  PAUSE_COLLABORATION_TIMEOUT,
   WS_SCENE_EVENT_TYPES,
   SYNC_FULL_SCENE_INTERVAL_MS,
+  RESUME_FALLBACK_TIMEOUT,
 } from "../app_constants";
 import {
   generateCollaborationLinkData,
   getCollaborationLink,
+  getCollaborationLinkData,
   getCollabServer,
   getSyncableElements,
   SocketUpdateDataSource,
@@ -43,8 +47,8 @@ import {
   saveToFirebase,
 } from "../data/firebase";
 import {
-  importUsernameFromLocalStorage,
-  saveUsernameToLocalStorage,
+  importUsernameAndIdFromLocalStorage,
+  saveUsernameAndIdToLocalStorage,
 } from "../data/localStorage";
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
@@ -71,16 +75,19 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
+import { nanoid } from "nanoid";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
 export const isCollaboratingAtom = atom(false);
 export const isOfflineAtom = atom(false);
+export const isCollaborationPausedAtom = atom(false);
 
 interface CollabState {
   errorMessage: string;
   username: string;
   activeRoomLink: string;
+  userId: string;
 }
 
 type CollabInstance = InstanceType<typeof Collab>;
@@ -94,6 +101,7 @@ export interface CollabAPI {
   syncElements: CollabInstance["syncElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
   setUsername: (username: string) => void;
+  isPaused: () => boolean;
 }
 
 interface PublicProps {
@@ -108,6 +116,7 @@ class Collab extends PureComponent<Props, CollabState> {
   excalidrawAPI: Props["excalidrawAPI"];
   activeIntervalId: number | null;
   idleTimeoutId: number | null;
+  pauseTimeoutId: number | null;
 
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
@@ -115,9 +124,13 @@ class Collab extends PureComponent<Props, CollabState> {
 
   constructor(props: Props) {
     super(props);
+
+    const { username, userId } = importUsernameAndIdFromLocalStorage() || {};
+
     this.state = {
       errorMessage: "",
-      username: importUsernameFromLocalStorage() || "",
+      username: username || "",
+      userId: userId || "",
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
@@ -149,6 +162,7 @@ class Collab extends PureComponent<Props, CollabState> {
     this.excalidrawAPI = props.excalidrawAPI;
     this.activeIntervalId = null;
     this.idleTimeoutId = null;
+    this.pauseTimeoutId = null;
   }
 
   componentDidMount() {
@@ -167,6 +181,7 @@ class Collab extends PureComponent<Props, CollabState> {
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
       stopCollaboration: this.stopCollaboration,
       setUsername: this.setUsername,
+      isPaused: this.isPaused,
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
@@ -192,10 +207,13 @@ class Collab extends PureComponent<Props, CollabState> {
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload);
     window.removeEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
-    window.removeEventListener(
-      EVENT.VISIBILITY_CHANGE,
-      this.onVisibilityChange,
-    );
+    // window.removeEventListener(
+    //   EVENT.VISIBILITY_CHANGE,
+    //   this.onVisibilityChange,
+    // );
+    window.removeEventListener(EVENT.BLUR, this.onVisibilityChange);
+    window.removeEventListener(EVENT.FOCUS, this.onVisibilityChange);
+
     if (this.activeIntervalId) {
       window.clearInterval(this.activeIntervalId);
       this.activeIntervalId = null;
@@ -203,6 +221,10 @@ class Collab extends PureComponent<Props, CollabState> {
     if (this.idleTimeoutId) {
       window.clearTimeout(this.idleTimeoutId);
       this.idleTimeoutId = null;
+    }
+    if (this.pauseTimeoutId) {
+      window.clearTimeout(this.pauseTimeoutId);
+      this.pauseTimeoutId = null;
     }
   }
 
@@ -307,6 +329,128 @@ class Collab extends PureComponent<Props, CollabState> {
     }
   };
 
+  fallbackResumeTimeout: null | ReturnType<typeof setTimeout> = null;
+
+  /**
+   * Handles the pause and resume states of a collaboration session.
+   * This function gets triggered when a change in the collaboration pause state is detected.
+   * Based on the state, the function carries out the following actions:
+   * 1. `PAUSED`: Saves the current scene to Firebase, disconnects the socket, and updates the scene to view mode.
+   * 2. `RESUMED`: Connects the socket, shows a toast message, sets a fallback to fetch data from Firebase, and resets the pause timeout if any.
+   * 3. `SYNCED`: Clears the fallback timeout if any, updates the collaboration pause state, and updates the scene to editing mode.
+   *
+   * @param state - The new state of the collaboration session. It is one of the values of `PauseCollaborationState` enum, which includes `PAUSED`, `RESUMED`, and `SYNCED`.
+   */
+  onPauseCollaborationChange = (state: PauseCollaborationState) => {
+    switch (state) {
+      case PauseCollaborationState.PAUSED: {
+        if (this.portal.socket) {
+          // Save current scene to firebase
+          this.saveCollabRoomToFirebase(
+            getSyncableElements(
+              this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+            ),
+          );
+
+          this.portal.socket.disconnect();
+          this.portal.socketInitialized = false;
+          this.setIsCollaborationPaused(true);
+
+          this.excalidrawAPI.updateScene({
+            appState: { viewModeEnabled: true },
+          });
+        }
+        break;
+      }
+      case PauseCollaborationState.RESUMED: {
+        if (this.portal.socket && this.isPaused()) {
+          this.portal.socket.connect();
+          this.portal.socket.emit(WS_SCENE_EVENT_TYPES.INIT);
+
+          console.log("setting toast");
+          this.excalidrawAPI.setToast({
+            message: t("toast.reconnectRoomServer"),
+            duration: Infinity,
+            spinner: true,
+            closable: false,
+          });
+
+          // Fallback to fetch data from firebase when reconnecting to scene without collaborators
+          const fallbackResumeHandler = async () => {
+            const roomLinkData = getCollaborationLinkData(
+              this.state.activeRoomLink,
+            );
+            if (!roomLinkData) {
+              return;
+            }
+            const elements = await loadFromFirebase(
+              roomLinkData.roomId,
+              roomLinkData.roomKey,
+              this.portal.socket,
+            );
+            if (elements) {
+              this.setLastBroadcastedOrReceivedSceneVersion(
+                getSceneVersion(elements),
+              );
+
+              this.excalidrawAPI.updateScene({
+                elements,
+              });
+            }
+            this.onPauseCollaborationChange(PauseCollaborationState.SYNCED);
+          };
+
+          // Set timeout to fallback to fetch data from firebase
+          this.fallbackResumeTimeout = setTimeout(
+            fallbackResumeHandler,
+            RESUME_FALLBACK_TIMEOUT,
+          );
+
+          // When no users are in the room, we fallback to fetch data from firebase immediately and clear fallback timeout
+          this.portal.socket.on("first-in-room", () => {
+            if (this.portal.socket) {
+              this.portal.socket.off("first-in-room");
+              // Recall init event to initialize collab with other users (fixes https://github.com/excalidraw/excalidraw/pull/6638#issuecomment-1600799080)
+              this.portal.socket.emit(WS_SCENE_EVENT_TYPES.INIT);
+            }
+
+            fallbackResumeHandler();
+          });
+        }
+
+        // Clear pause timeout if exists
+        if (this.pauseTimeoutId) {
+          clearTimeout(this.pauseTimeoutId);
+        }
+
+        break;
+      }
+      case PauseCollaborationState.SYNCED: {
+        if (this.fallbackResumeTimeout) {
+          clearTimeout(this.fallbackResumeTimeout);
+          this.fallbackResumeTimeout = null;
+        }
+
+        if (this.isPaused()) {
+          this.setIsCollaborationPaused(false);
+
+          this.excalidrawAPI.updateScene({
+            appState: { viewModeEnabled: false },
+          });
+          console.log("resetting toast");
+          this.excalidrawAPI.setToast(null);
+          this.excalidrawAPI.scrollToContent();
+        }
+      }
+    }
+  };
+
+  isPaused = () => appJotaiStore.get(isCollaborationPausedAtom)!;
+
+  setIsCollaborationPaused = (isPaused: boolean) => {
+    appJotaiStore.set(isCollaborationPausedAtom, isPaused);
+  };
+
   private destroySocketClient = (opts?: { isUnload: boolean }) => {
     this.lastBroadcastedOrReceivedSceneVersion = -1;
     this.portal.close();
@@ -383,6 +527,11 @@ class Collab extends PureComponent<Props, CollabState> {
         const username = getRandomUsername();
         this.onUsernameChange(username);
       });
+    }
+
+    if (!this.state.userId) {
+      const userId = nanoid();
+      this.onUserIdChange(userId);
     }
 
     if (this.portal.socket) {
@@ -499,6 +648,7 @@ class Collab extends PureComponent<Props, CollabState> {
                 elements: reconciledElements,
                 scrollToContent: true,
               });
+              this.onPauseCollaborationChange(PauseCollaborationState.SYNCED);
             }
             break;
           }
@@ -508,33 +658,45 @@ class Collab extends PureComponent<Props, CollabState> {
             );
             break;
           case "MOUSE_LOCATION": {
-            const { pointer, button, username, selectedElementIds } =
-              decryptedData.payload;
-            const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
-              decryptedData.payload.socketId ||
-              // @ts-ignore legacy, see #2094 (#2097)
-              decryptedData.payload.socketID;
-
-            const collaborators = new Map(this.collaborators);
-            const user = collaborators.get(socketId) || {}!;
-            user.pointer = pointer;
-            user.button = button;
-            user.selectedElementIds = selectedElementIds;
-            user.username = username;
-            collaborators.set(socketId, user);
+            const {
+              pointer,
+              button,
+              username,
+              selectedElementIds,
+              userId,
+              socketId,
+            } = decryptedData.payload;
+            const collaborators = upsertMap(
+              userId,
+              {
+                username,
+                pointer,
+                button,
+                selectedElementIds,
+                socketId,
+              },
+              this.collaborators,
+            );
             this.excalidrawAPI.updateScene({
-              collaborators,
+              collaborators: new Map(collaborators),
             });
             break;
           }
           case "IDLE_STATUS": {
-            const { userState, socketId, username } = decryptedData.payload;
-            const collaborators = new Map(this.collaborators);
-            const user = collaborators.get(socketId) || {}!;
-            user.userState = userState;
-            user.username = username;
+            const { userState, username, userId, socketId } =
+              decryptedData.payload;
+            const collaborators = upsertMap(
+              userId,
+              {
+                username,
+                userState,
+                userId,
+                socketId,
+              },
+              this.collaborators,
+            );
             this.excalidrawAPI.updateScene({
-              collaborators,
+              collaborators: new Map(collaborators),
             });
             break;
           }
@@ -543,6 +705,7 @@ class Collab extends PureComponent<Props, CollabState> {
     );
 
     this.portal.socket.on("first-in-room", async () => {
+      console.log("first in room");
       if (this.portal.socket) {
         this.portal.socket.off("first-in-room");
       }
@@ -684,7 +847,9 @@ class Collab extends PureComponent<Props, CollabState> {
   };
 
   private onVisibilityChange = () => {
-    if (document.hidden) {
+    // if (document.hidden) {
+    console.log("VIS CHANGE");
+    if (!document.hasFocus()) {
       if (this.idleTimeoutId) {
         window.clearTimeout(this.idleTimeoutId);
         this.idleTimeoutId = null;
@@ -693,6 +858,10 @@ class Collab extends PureComponent<Props, CollabState> {
         window.clearInterval(this.activeIntervalId);
         this.activeIntervalId = null;
       }
+      this.pauseTimeoutId = window.setTimeout(
+        () => this.onPauseCollaborationChange(PauseCollaborationState.PAUSED),
+        PAUSE_COLLABORATION_TIMEOUT,
+      );
       this.onIdleStateChange(UserIdleState.AWAY);
     } else {
       this.idleTimeoutId = window.setTimeout(this.reportIdle, IDLE_THRESHOLD);
@@ -701,6 +870,11 @@ class Collab extends PureComponent<Props, CollabState> {
         ACTIVE_THRESHOLD,
       );
       this.onIdleStateChange(UserIdleState.ACTIVE);
+      if (this.pauseTimeoutId) {
+        window.clearTimeout(this.pauseTimeoutId);
+        this.onPauseCollaborationChange(PauseCollaborationState.RESUMED);
+        this.pauseTimeoutId = null;
+      }
     }
   };
 
@@ -717,22 +891,19 @@ class Collab extends PureComponent<Props, CollabState> {
   };
 
   private initializeIdleDetector = () => {
-    document.addEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
-    document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
+    // document.addEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
+    // document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
+    window.addEventListener(EVENT.BLUR, this.onVisibilityChange);
+    window.addEventListener(EVENT.FOCUS, this.onVisibilityChange);
   };
 
   setCollaborators(sockets: string[]) {
-    const collaborators: InstanceType<typeof Collab>["collaborators"] =
-      new Map();
-    for (const socketId of sockets) {
-      if (this.collaborators.has(socketId)) {
-        collaborators.set(socketId, this.collaborators.get(socketId)!);
-      } else {
-        collaborators.set(socketId, {});
+    this.collaborators.forEach((value, key) => {
+      if (value.socketId && !sockets.includes(value.socketId)) {
+        this.collaborators.delete(key);
       }
-    }
-    this.collaborators = collaborators;
-    this.excalidrawAPI.updateScene({ collaborators });
+    });
+    this.excalidrawAPI.updateScene({ collaborators: this.collaborators });
   }
 
   public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
@@ -818,7 +989,12 @@ class Collab extends PureComponent<Props, CollabState> {
 
   onUsernameChange = (username: string) => {
     this.setUsername(username);
-    saveUsernameToLocalStorage(username);
+    saveUsernameAndIdToLocalStorage(username, this.state.userId);
+  };
+
+  onUserIdChange = (userId: string) => {
+    this.setState({ userId });
+    saveUsernameAndIdToLocalStorage(this.state.username, userId);
   };
 
   render() {

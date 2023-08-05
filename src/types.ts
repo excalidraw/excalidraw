@@ -56,6 +56,7 @@ export type Collaborator = {
   avatarUrl?: string;
   // user id. If supplied, we'll filter out duplicates when rendering user avatars.
   id?: string;
+  socketId?: string;
 };
 
 export type DataURL = string & { _brand: "DataURL" };
@@ -399,6 +400,12 @@ export enum UserIdleState {
   ACTIVE = "active",
   AWAY = "away",
   IDLE = "idle",
+}
+
+export enum PauseCollaborationState {
+  PAUSED = "paused",
+  RESUMED = "resumed",
+  SYNCED = "synced",
 }
 
 export type ExportOpts = {

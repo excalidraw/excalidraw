@@ -707,8 +707,8 @@ export const _renderScene = ({
           if (renderConfig.remoteSelectedElementIds[element.id]) {
             selectionColors.push(
               ...renderConfig.remoteSelectedElementIds[element.id].map(
-                (socketId) => {
-                  const background = getClientColor(socketId);
+                (userId) => {
+                  const background = getClientColor(userId);
                   return background;
                 },
               ),

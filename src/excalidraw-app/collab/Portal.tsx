@@ -34,26 +34,12 @@ class Portal {
 
   open(socket: SocketIOClient.Socket, id: string, key: string) {
     this.socket = socket;
+    // @ts-ignore
+    window.socket = socket;
     this.roomId = id;
     this.roomKey = key;
 
-    // Initialize socket listeners
-    this.socket.on("init-room", () => {
-      if (this.socket) {
-        this.socket.emit("join-room", this.roomId);
-        trackEvent("share", "room joined");
-      }
-    });
-    this.socket.on("new-user", async (_socketId: string) => {
-      this.broadcastScene(
-        WS_SCENE_EVENT_TYPES.INIT,
-        this.collab.getSceneElementsIncludingDeleted(),
-        /* syncAll */ true,
-      );
-    });
-    this.socket.on("room-user-change", (clients: string[]) => {
-      this.collab.setCollaborators(clients);
-    });
+    this.initializeSocketListeners();
 
     return socket;
   }
@@ -69,6 +55,31 @@ class Portal {
     this.roomKey = null;
     this.socketInitialized = false;
     this.broadcastedElementVersions = new Map();
+  }
+
+  initializeSocketListeners() {
+    if (!this.socket) {
+      return;
+    }
+
+    // Initialize socket listeners
+    this.socket.on("init-room", () => {
+      console.log("join room");
+      if (this.socket) {
+        this.socket.emit("join-room", this.roomId);
+        trackEvent("share", "room joined");
+      }
+    });
+    this.socket.on("new-user", async (_socketId: string) => {
+      this.broadcastScene(
+        WS_SCENE_EVENT_TYPES.INIT,
+        this.collab.getSceneElementsIncludingDeleted(),
+        /* syncAll */ true,
+      );
+    });
+    this.socket.on("room-user-change", (clients: string[]) => {
+      this.collab.setCollaborators(clients);
+    });
   }
 
   isOpen() {
@@ -181,13 +192,14 @@ class Portal {
   };
 
   broadcastIdleChange = (userState: UserIdleState) => {
-    if (this.socket?.id) {
+    if (this.socket) {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {
         type: "IDLE_STATUS",
         payload: {
-          socketId: this.socket.id,
           userState,
           username: this.collab.state.username,
+          userId: this.collab.state.userId,
+          socketId: this.socket.id,
         },
       };
       return this._broadcastSocketData(
@@ -201,16 +213,17 @@ class Portal {
     pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
   }) => {
-    if (this.socket?.id) {
+    if (this.socket) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
         type: "MOUSE_LOCATION",
         payload: {
-          socketId: this.socket.id,
           pointer: payload.pointer,
           button: payload.button || "up",
           selectedElementIds:
             this.collab.excalidrawAPI.getAppState().selectedElementIds,
           username: this.collab.state.username,
+          userId: this.collab.state.userId,
+          socketId: this.socket.id,
         },
       };
       return this._broadcastSocketData(

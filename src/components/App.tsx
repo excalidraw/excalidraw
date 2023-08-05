@@ -2747,6 +2747,7 @@ class App extends React.Component<AppProps, AppState> {
     toast: {
       message: string;
       closable?: boolean;
+      spinner?: boolean;
       duration?: number;
     } | null,
   ) => {
