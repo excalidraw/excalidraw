@@ -21,12 +21,15 @@ export const selectGroup = (
   InteractiveCanvasAppState,
   "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
 > => {
-  const elementsInGroup = elements.reduce((acc, element) => {
-    if (element.groupIds.includes(groupId)) {
-      acc[element.id] = true;
-    }
-    return acc;
-  }, {} as Record<string, boolean>);
+  const elementsInGroup = elements.reduce(
+    (acc: Record<string, true>, element) => {
+      if (element.groupIds.includes(groupId)) {
+        acc[element.id] = true;
+      }
+      return acc;
+    },
+    {},
+  );
 
   if (Object.keys(elementsInGroup).length < 2) {
     if (
@@ -48,7 +51,7 @@ export const selectGroup = (
     selectedElementIds: {
       ...appState.selectedElementIds,
       ...elementsInGroup,
-    } as AppState["selectedElementIds"],
+    },
   };
 };
 
@@ -92,21 +95,24 @@ export const selectGroups = (function () {
 
     // Gather all the elements within selected groups
     const groupElementsIndex: Record<GroupId, string[]> = {};
-    const selectedElementIdsInGroups = elements.reduce((acc, element) => {
-      const groupId = element.groupIds.find((id) => selectedGroupIds[id]);
+    const selectedElementIdsInGroups = elements.reduce(
+      (acc: Record<string, true>, element) => {
+        const groupId = element.groupIds.find((id) => selectedGroupIds[id]);
 
-      if (groupId) {
-        acc[element.id] = true;
+        if (groupId) {
+          acc[element.id] = true;
 
-        // Populate the index
-        if (!Array.isArray(groupElementsIndex[groupId])) {
-          groupElementsIndex[groupId] = [element.id];
-        } else {
-          groupElementsIndex[groupId].push(element.id);
+          // Populate the index
+          if (!Array.isArray(groupElementsIndex[groupId])) {
+            groupElementsIndex[groupId] = [element.id];
+          } else {
+            groupElementsIndex[groupId].push(element.id);
+          }
         }
-      }
-      return acc;
-    }, {} as Record<string, boolean>);
+        return acc;
+      },
+      {},
+    );
 
     for (const groupId of Object.keys(groupElementsIndex)) {
       // If there is one element in the group, and the group is selected or it's being edited, it's not a group
@@ -126,7 +132,7 @@ export const selectGroups = (function () {
       selectedElementIds: {
         ...appState.selectedElementIds,
         ...selectedElementIdsInGroups,
-      } as AppState["selectedElementIds"],
+      },
     };
 
     return lastAppState;

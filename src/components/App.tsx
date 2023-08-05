@@ -7591,21 +7591,24 @@ class App extends React.Component<AppProps, AppState> {
     this.setState(
       {
         ...(element && !this.state.selectedElementIds[element.id]
-          ? selectGroupsForSelectedElements(
-              {
-                ...this.state,
-                selectedElementIds: { [element.id]: true },
-                selectedLinearElement: isLinearElement(element)
-                  ? new LinearElementEditor(element, this.scene)
-                  : null,
-              },
-              this.scene.getNonDeletedElements(),
-              this.state,
-              this,
-            )
+          ? {
+              ...this.state,
+              ...selectGroupsForSelectedElements(
+                {
+                  ...this.state,
+                  selectedElementIds: { [element.id]: true },
+                  selectedLinearElement: isLinearElement(element)
+                    ? new LinearElementEditor(element, this.scene)
+                    : null,
+                },
+                this.scene.getNonDeletedElements(),
+                this.state,
+                this,
+              ),
+            }
           : this.state),
         showHyperlinkPopup: false,
-      } as AppState,
+      },
       () => {
         this.setState({
           contextMenu: { top, left, items: this.getContextMenuItems(type) },

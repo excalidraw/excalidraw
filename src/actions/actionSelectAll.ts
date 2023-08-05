@@ -6,7 +6,6 @@ import { ExcalidrawElement } from "../element/types";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
-import { AppState } from "../types";
 
 export const actionSelectAll = register({
   name: "selectAll",
@@ -29,22 +28,25 @@ export const actionSelectAll = register({
     }, {});
 
     return {
-      appState: selectGroupsForSelectedElements(
-        {
-          ...appState,
-          selectedLinearElement:
-            // single linear element selected
-            Object.keys(selectedElementIds).length === 1 &&
-            isLinearElement(elements[0])
-              ? new LinearElementEditor(elements[0], app.scene)
-              : null,
-          editingGroupId: null,
-          selectedElementIds,
-        },
-        getNonDeletedElements(elements),
-        appState,
-        app,
-      ) as AppState,
+      appState: {
+        ...appState,
+        ...selectGroupsForSelectedElements(
+          {
+            ...appState,
+            selectedLinearElement:
+              // single linear element selected
+              Object.keys(selectedElementIds).length === 1 &&
+              isLinearElement(elements[0])
+                ? new LinearElementEditor(elements[0], app.scene)
+                : null,
+            editingGroupId: null,
+            selectedElementIds,
+          },
+          getNonDeletedElements(elements),
+          appState,
+          app,
+        ),
+      },
       commitToHistory: true,
     };
   },
