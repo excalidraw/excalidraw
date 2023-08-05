@@ -348,7 +348,8 @@ import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
 import { ValueOf } from "../utility-types";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
-import { StaticCanvas, InteractiveCanvas, CanvasesWrapper } from "./canvases";
+import { StaticCanvas, InteractiveCanvas } from "./canvases";
+import { Renderer } from "../scene/Renderer";
 
 // remove this hack when we can sync render & resizeObserver (state update)
 // to rAF. See #5439
@@ -459,6 +460,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public scene: Scene;
+  public renderer: Renderer;
   private fonts: Fonts;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
@@ -503,8 +505,13 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
     };
+
     this.id = nanoid();
+
     this.library = new Library(this);
+    this.scene = new Scene();
+    this.renderer = new Renderer(this.scene);
+
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -547,7 +554,6 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
-    this.scene = new Scene();
     this.fonts = new Fonts({
       scene: this.scene,
       onSceneUpdated: this.onSceneUpdated,
@@ -1101,6 +1107,20 @@ class App extends React.Component<AppProps, AppState> {
     const selectedElement = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderCustomStats } = this.props;
 
+    const versionNonce = this.scene.getVersionNonce();
+    const { canvasElements, visibleElements } =
+      this.renderer.getRenderableElements({
+        zoom: this.state.zoom,
+        offsetLeft: this.state.offsetLeft,
+        offsetTop: this.state.offsetTop,
+        scrollX: this.state.scrollX,
+        scrollY: this.state.scrollY,
+        height: this.state.height,
+        width: this.state.width,
+        editingElement: this.state.editingElement,
+        pendingImageElementId: this.state.pendingImageElementId,
+      });
+
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -1190,65 +1210,54 @@ class App extends React.Component<AppProps, AppState> {
                             actionManager={this.actionManager}
                           />
                         )}
-                        <CanvasesWrapper
+                        <StaticCanvas
+                          canvas={this.canvas}
+                          rc={this.rc}
+                          elements={canvasElements}
+                          visibleElements={visibleElements}
+                          versionNonce={versionNonce}
+                          selectionNonce={
+                            this.state.selectionElement?.versionNonce
+                          }
+                          scale={window.devicePixelRatio}
                           appState={this.state}
-                          scene={this.scene}
-                        >
-                          {(versionNonce, elements, visibleElements) => (
-                            <>
-                              <StaticCanvas
-                                canvas={this.canvas}
-                                rc={this.rc}
-                                elements={elements}
-                                visibleElements={visibleElements}
-                                versionNonce={versionNonce}
-                                selectionNonce={
-                                  this.state.selectionElement?.versionNonce
-                                }
-                                scale={window.devicePixelRatio}
-                                appState={this.state}
-                                renderConfig={{
-                                  imageCache: this.imageCache,
-                                  isExporting: false,
-                                  renderGrid: true,
-                                }}
-                                handleCanvasRef={this.handleCanvasRef}
-                              />
-                              <InteractiveCanvas
-                                canvas={this.interactiveCanvas}
-                                elements={elements}
-                                visibleElements={visibleElements}
-                                versionNonce={versionNonce}
-                                selectionNonce={
-                                  this.state.selectionElement?.versionNonce
-                                }
-                                scale={window.devicePixelRatio}
-                                appState={this.state}
-                                renderInteractiveSceneCallback={
-                                  this.renderInteractiveSceneCallback
-                                }
-                                handleCanvasRef={
-                                  this.handleInteractiveCanvasRef
-                                }
-                                onContextMenu={
-                                  this.handleCanvasContextMenu as (
-                                    event: React.PointerEvent<HTMLCanvasElement>,
-                                  ) => void
-                                }
-                                onPointerMove={this.handleCanvasPointerMove}
-                                onPointerUp={this.handleCanvasPointerUp}
-                                onPointerCancel={this.removePointer}
-                                onTouchMove={this.handleTouchMove}
-                                onPointerDown={this.handleCanvasPointerDown}
-                                onDoubleClick={
-                                  this.state.viewModeEnabled
-                                    ? undefined
-                                    : this.handleCanvasDoubleClick
-                                }
-                              />
-                            </>
-                          )}
-                        </CanvasesWrapper>
+                          renderConfig={{
+                            imageCache: this.imageCache,
+                            isExporting: false,
+                            renderGrid: true,
+                          }}
+                          handleCanvasRef={this.handleCanvasRef}
+                        />
+                        <InteractiveCanvas
+                          canvas={this.interactiveCanvas}
+                          elements={canvasElements}
+                          visibleElements={visibleElements}
+                          versionNonce={versionNonce}
+                          selectionNonce={
+                            this.state.selectionElement?.versionNonce
+                          }
+                          scale={window.devicePixelRatio}
+                          appState={this.state}
+                          renderInteractiveSceneCallback={
+                            this.renderInteractiveSceneCallback
+                          }
+                          handleCanvasRef={this.handleInteractiveCanvasRef}
+                          onContextMenu={
+                            this.handleCanvasContextMenu as (
+                              event: React.PointerEvent<HTMLCanvasElement>,
+                            ) => void
+                          }
+                          onPointerMove={this.handleCanvasPointerMove}
+                          onPointerUp={this.handleCanvasPointerUp}
+                          onPointerCancel={this.removePointer}
+                          onTouchMove={this.handleTouchMove}
+                          onPointerDown={this.handleCanvasPointerDown}
+                          onDoubleClick={
+                            this.state.viewModeEnabled
+                              ? undefined
+                              : this.handleCanvasDoubleClick
+                          }
+                        />
                         {this.renderFrameNames()}
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
@@ -1696,6 +1705,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    this.renderer.destroy();
+    this.scene = new Scene();
+    this.renderer = new Renderer(this.scene);
     this.files = {};
     this.imageCache.clear();
     this.resizeObserver?.disconnect();
