@@ -4,8 +4,8 @@ const autoprefixer = require("autoprefixer");
 const { parseEnvVariables } = require("./env");
 const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-
 const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
+
 module.exports = {
   mode: "development",
   entry: {
@@ -18,7 +18,6 @@ module.exports = {
     filename: "[name].js",
     chunkFilename: "excalidraw-assets-dev/[name]-[contenthash].js",
     assetModuleFilename: "excalidraw-assets-dev/[name][ext]",
-
     publicPath: "",
   },
   resolve: {
@@ -48,7 +47,7 @@ module.exports = {
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,
         exclude:
-          /node_modules\/(?!(browser-fs-access|canvas-roundrect-polyfill))/,
+          /node_modules[\\/](?!(browser-fs-access|canvas-roundrect-polyfill))/,
 
         use: [
           {
