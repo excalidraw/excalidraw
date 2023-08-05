@@ -13,69 +13,8 @@ export class Renderer {
   }
 
   public getRenderableElements = (() => {
-    const getVisibleCanvasElements = memoize(
-      ({
-        elements,
-        zoom,
-        offsetLeft,
-        offsetTop,
-        scrollX,
-        scrollY,
-        height,
-        width,
-      }: {
-        elements: readonly NonDeletedExcalidrawElement[];
-        zoom: AppState["zoom"];
-        offsetLeft: AppState["offsetLeft"];
-        offsetTop: AppState["offsetTop"];
-        scrollX: AppState["scrollX"];
-        scrollY: AppState["scrollY"];
-        height: AppState["height"];
-        width: AppState["width"];
-      }): readonly NonDeletedExcalidrawElement[] => {
-        return elements.filter((element) =>
-          isVisibleElement(element, width, height, {
-            zoom,
-            offsetLeft,
-            offsetTop,
-            scrollX,
-            scrollY,
-          }),
-        );
-      },
-    );
-
-    const getCanvasElements = memoize(
-      ({
-        editingElement,
-        elements,
-        pendingImageElementId,
-      }: {
-        elements: readonly NonDeletedExcalidrawElement[];
-        editingElement: AppState["editingElement"];
-        pendingImageElementId: AppState["pendingImageElementId"];
-      }) => {
-        return elements.filter((element) => {
-          if (isImageElement(element)) {
-            if (
-              // => not placed on canvas yet (but in elements array)
-              pendingImageElementId === element.id
-            ) {
-              return false;
-            }
-          }
-          // we don't want to render text element that's being currently edited
-          // (it's rendered on remote only)
-          return (
-            !editingElement ||
-            editingElement.type !== "text" ||
-            element.id !== editingElement.id
-          );
-        });
-      },
-    );
-
-    const ret = ({
+    const getVisibleCanvasElements = ({
+      elements,
       zoom,
       offsetLeft,
       offsetTop,
@@ -83,9 +22,8 @@ export class Renderer {
       scrollY,
       height,
       width,
-      editingElement,
-      pendingImageElementId,
     }: {
+      elements: readonly NonDeletedExcalidrawElement[];
       zoom: AppState["zoom"];
       offsetLeft: AppState["offsetLeft"];
       offsetTop: AppState["offsetTop"];
@@ -93,19 +31,48 @@ export class Renderer {
       scrollY: AppState["scrollY"];
       height: AppState["height"];
       width: AppState["width"];
+    }): readonly NonDeletedExcalidrawElement[] => {
+      return elements.filter((element) =>
+        isVisibleElement(element, width, height, {
+          zoom,
+          offsetLeft,
+          offsetTop,
+          scrollX,
+          scrollY,
+        }),
+      );
+    };
+
+    const getCanvasElements = ({
+      editingElement,
+      elements,
+      pendingImageElementId,
+    }: {
+      elements: readonly NonDeletedExcalidrawElement[];
       editingElement: AppState["editingElement"];
       pendingImageElementId: AppState["pendingImageElementId"];
     }) => {
-      const elements = this.scene.getNonDeletedElements();
-
-      const canvasElements = getCanvasElements({
-        elements,
-        editingElement,
-        pendingImageElementId,
+      return elements.filter((element) => {
+        if (isImageElement(element)) {
+          if (
+            // => not placed on canvas yet (but in elements array)
+            pendingImageElementId === element.id
+          ) {
+            return false;
+          }
+        }
+        // we don't want to render text element that's being currently edited
+        // (it's rendered on remote only)
+        return (
+          !editingElement ||
+          editingElement.type !== "text" ||
+          element.id !== editingElement.id
+        );
       });
+    };
 
-      const visibleElements = getVisibleCanvasElements({
-        elements: canvasElements,
+    return memoize(
+      ({
         zoom,
         offsetLeft,
         offsetTop,
@@ -113,17 +80,45 @@ export class Renderer {
         scrollY,
         height,
         width,
-      });
+        editingElement,
+        pendingImageElementId,
+        // unused but serves we cache on it to invalidate elements if they
+        // get mutated
+        versionNonce: _versionNonce,
+      }: {
+        zoom: AppState["zoom"];
+        offsetLeft: AppState["offsetLeft"];
+        offsetTop: AppState["offsetTop"];
+        scrollX: AppState["scrollX"];
+        scrollY: AppState["scrollY"];
+        height: AppState["height"];
+        width: AppState["width"];
+        editingElement: AppState["editingElement"];
+        pendingImageElementId: AppState["pendingImageElementId"];
+        versionNonce: ReturnType<InstanceType<typeof Scene>["getVersionNonce"]>;
+      }) => {
+        const elements = this.scene.getNonDeletedElements();
 
-      return { canvasElements, visibleElements };
-    };
+        const canvasElements = getCanvasElements({
+          elements,
+          editingElement,
+          pendingImageElementId,
+        });
 
-    ret.clear = () => {
-      getVisibleCanvasElements.clear();
-      getCanvasElements.clear();
-    };
+        const visibleElements = getVisibleCanvasElements({
+          elements: canvasElements,
+          zoom,
+          offsetLeft,
+          offsetTop,
+          scrollX,
+          scrollY,
+          height,
+          width,
+        });
 
-    return ret;
+        return { canvasElements, visibleElements };
+      },
+    );
   })();
 
   public destroy() {

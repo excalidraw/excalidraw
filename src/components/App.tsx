@@ -1110,6 +1110,7 @@ class App extends React.Component<AppProps, AppState> {
     const versionNonce = this.scene.getVersionNonce();
     const { canvasElements, visibleElements } =
       this.renderer.getRenderableElements({
+        versionNonce,
         zoom: this.state.zoom,
         offsetLeft: this.state.offsetLeft,
         offsetTop: this.state.offsetTop,

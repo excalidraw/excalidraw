@@ -94,7 +94,12 @@ const areEqual = (
 ) => {
   if (
     prevProps.versionNonce !== nextProps.versionNonce ||
-    prevProps.scale !== nextProps.scale
+    prevProps.scale !== nextProps.scale ||
+    // we need to memoize on element arrays because they may have renewed
+    // even if versionNonce didn't change (e.g. we filter elements out based
+    // on appState)
+    prevProps.elements !== nextProps.elements ||
+    prevProps.visibleElements !== nextProps.visibleElements
   ) {
     return false;
   }
