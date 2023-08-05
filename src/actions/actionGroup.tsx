@@ -215,7 +215,7 @@ export const actionUngroup = register({
     });
 
     const updateAppState = selectGroupsForSelectedElements(
-      { ...appState, selectedGroupIds: {} },
+      appState,
       getNonDeletedElements(nextElements),
       appState,
       null,

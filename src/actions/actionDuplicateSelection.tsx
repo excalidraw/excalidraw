@@ -263,8 +263,7 @@ const duplicateElements = (
       ...appState,
       ...selectGroupsForSelectedElements(
         {
-          ...appState,
-          selectedGroupIds: {},
+          editingGroupId: appState.editingGroupId,
           selectedElementIds: nextElementsToSelect.reduce(
             (acc: Record<ExcalidrawElement["id"], true>, element) => {
               if (!isBoundToContainer(element)) {

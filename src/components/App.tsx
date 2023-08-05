@@ -177,7 +177,6 @@ import {
   getSelectedGroupIds,
   isElementInGroup,
   isSelectedViaGroup,
-  selectGroups,
   selectGroupsForSelectedElements,
 } from "../groups";
 import History from "../history";
@@ -1706,7 +1705,7 @@ class App extends React.Component<AppProps, AppState> {
     this.library.destroy();
     clearTimeout(touchTimeout);
     isSomeElementSelected.clearCache();
-    selectGroups.clearCache();
+    selectGroupsForSelectedElements.clearCache();
     touchTimeout = 0;
   }
 
@@ -2300,35 +2299,37 @@ class App extends React.Component<AppProps, AppState> {
       excludeElementsInFramesFromSelection(newElements);
 
     this.setState(
-      selectGroupsForSelectedElements(
-        {
-          ...this.state,
-          // keep sidebar (presumably the library) open if it's docked and
-          // can fit.
-          //
-          // Note, we should close the sidebar only if we're dropping items
-          // from library, not when pasting from clipboard. Alas.
-          openSidebar:
-            this.state.openSidebar &&
-            this.device.canDeviceFitSidebar &&
-            jotaiStore.get(isSidebarDockedAtom)
-              ? this.state.openSidebar
-              : null,
-          selectedElementIds: nextElementsToSelect.reduce(
-            (acc: Record<ExcalidrawElement["id"], true>, element) => {
-              if (!isBoundToContainer(element)) {
-                acc[element.id] = true;
-              }
-              return acc;
-            },
-            {},
-          ),
-          selectedGroupIds: {},
-        },
-        this.scene.getNonDeletedElements(),
-        this.state,
-        this,
-      ),
+      {
+        ...this.state,
+        // keep sidebar (presumably the library) open if it's docked and
+        // can fit.
+        //
+        // Note, we should close the sidebar only if we're dropping items
+        // from library, not when pasting from clipboard. Alas.
+        openSidebar:
+          this.state.openSidebar &&
+          this.device.canDeviceFitSidebar &&
+          jotaiStore.get(isSidebarDockedAtom)
+            ? this.state.openSidebar
+            : null,
+        ...selectGroupsForSelectedElements(
+          {
+            editingGroupId: null,
+            selectedElementIds: nextElementsToSelect.reduce(
+              (acc: Record<ExcalidrawElement["id"], true>, element) => {
+                if (!isBoundToContainer(element)) {
+                  acc[element.id] = true;
+                }
+                return acc;
+              },
+              {},
+            ),
+          },
+          this.scene.getNonDeletedElements(),
+          this.state,
+          this,
+        ),
+      },
       () => {
         if (opts.files) {
           this.addNewImagesToImageCache();
@@ -3589,19 +3590,18 @@ class App extends React.Component<AppProps, AppState> {
         getSelectedGroupIdForElement(hitElement, this.state.selectedGroupIds);
 
       if (selectedGroupId) {
-        this.setState((prevState) =>
-          selectGroupsForSelectedElements(
+        this.setState((prevState) => ({
+          ...prevState,
+          ...selectGroupsForSelectedElements(
             {
-              ...prevState,
               editingGroupId: selectedGroupId,
               selectedElementIds: { [hitElement!.id]: true },
-              selectedGroupIds: {},
             },
             this.scene.getNonDeletedElements(),
             prevState,
             this,
           ),
-        );
+        }));
         return;
       }
     }
@@ -5096,19 +5096,21 @@ class App extends React.Component<AppProps, AppState> {
                   }
                 }
 
-                return selectGroupsForSelectedElements(
-                  {
-                    ...prevState,
-                    selectedElementIds: nextSelectedElementIds,
-                    showHyperlinkPopup:
-                      hitElement.link || isEmbeddableElement(hitElement)
-                        ? "info"
-                        : false,
-                  },
-                  this.scene.getNonDeletedElements(),
-                  prevState,
-                  this,
-                );
+                return {
+                  ...selectGroupsForSelectedElements(
+                    {
+                      editingGroupId: prevState.editingGroupId,
+                      selectedElementIds: nextSelectedElementIds,
+                    },
+                    this.scene.getNonDeletedElements(),
+                    prevState,
+                    this,
+                  ),
+                  showHyperlinkPopup:
+                    hitElement.link || isEmbeddableElement(hitElement)
+                      ? "info"
+                      : false,
+                };
               });
               pointerDownState.hit.wasAddedToSelection = true;
             }
@@ -6028,34 +6030,36 @@ class App extends React.Component<AppProps, AppState> {
               }
             }
 
-            return selectGroupsForSelectedElements(
-              {
-                ...prevState,
-                ...(!shouldReuseSelection && {
-                  selectedGroupIds: {},
-                  editingGroupId: null,
-                }),
-                selectedElementIds: nextSelectedElementIds,
-                showHyperlinkPopup:
-                  elementsWithinSelection.length === 1 &&
-                  (elementsWithinSelection[0].link ||
-                    isEmbeddableElement(elementsWithinSelection[0]))
-                    ? "info"
-                    : false,
-                // select linear element only when we haven't box-selected anything else
-                selectedLinearElement:
-                  elementsWithinSelection.length === 1 &&
-                  isLinearElement(elementsWithinSelection[0])
-                    ? new LinearElementEditor(
-                        elementsWithinSelection[0],
-                        this.scene,
-                      )
-                    : null,
-              },
-              this.scene.getNonDeletedElements(),
-              prevState,
-              this,
-            );
+            prevState = !shouldReuseSelection
+              ? { ...prevState, selectedGroupIds: {}, editingGroupId: null }
+              : prevState;
+
+            return {
+              ...selectGroupsForSelectedElements(
+                {
+                  editingGroupId: prevState.editingGroupId,
+                  selectedElementIds: nextSelectedElementIds,
+                },
+                this.scene.getNonDeletedElements(),
+                prevState,
+                this,
+              ),
+              // select linear element only when we haven't box-selected anything else
+              selectedLinearElement:
+                elementsWithinSelection.length === 1 &&
+                isLinearElement(elementsWithinSelection[0])
+                  ? new LinearElementEditor(
+                      elementsWithinSelection[0],
+                      this.scene,
+                    )
+                  : null,
+              showHyperlinkPopup:
+                elementsWithinSelection.length === 1 &&
+                (elementsWithinSelection[0].link ||
+                  isEmbeddableElement(elementsWithinSelection[0]))
+                  ? "info"
+                  : false,
+            };
           });
         }
       }
@@ -6656,24 +6660,26 @@ class App extends React.Component<AppProps, AppState> {
                   { selectedElementIds: newSelectedElementIds },
                 );
 
-                return selectGroupsForSelectedElements(
-                  {
-                    ...prevState,
-                    selectedElementIds: newSelectedElementIds,
-                    // set selectedLinearElement only if thats the only element selected
-                    selectedLinearElement:
-                      newSelectedElements.length === 1 &&
-                      isLinearElement(newSelectedElements[0])
-                        ? new LinearElementEditor(
-                            newSelectedElements[0],
-                            this.scene,
-                          )
-                        : prevState.selectedLinearElement,
-                  },
-                  this.scene.getNonDeletedElements(),
-                  prevState,
-                  this,
-                );
+                return {
+                  ...selectGroupsForSelectedElements(
+                    {
+                      editingGroupId: prevState.editingGroupId,
+                      selectedElementIds: newSelectedElementIds,
+                    },
+                    this.scene.getNonDeletedElements(),
+                    prevState,
+                    this,
+                  ),
+                  // set selectedLinearElement only if thats the only element selected
+                  selectedLinearElement:
+                    newSelectedElements.length === 1 &&
+                    isLinearElement(newSelectedElements[0])
+                      ? new LinearElementEditor(
+                          newSelectedElements[0],
+                          this.scene,
+                        )
+                      : prevState.selectedLinearElement,
+                };
               });
             }
           } else if (
@@ -6701,19 +6707,21 @@ class App extends React.Component<AppProps, AppState> {
                   delete nextSelectedElementIds[element.id];
                 });
 
-              return selectGroupsForSelectedElements(
-                {
-                  ...prevState,
-                  selectedElementIds: nextSelectedElementIds,
-                  showHyperlinkPopup:
-                    hitElement.link || isEmbeddableElement(hitElement)
-                      ? "info"
-                      : false,
-                },
-                this.scene.getNonDeletedElements(),
-                prevState,
-                this,
-              );
+              return {
+                ...selectGroupsForSelectedElements(
+                  {
+                    editingGroupId: prevState.editingGroupId,
+                    selectedElementIds: nextSelectedElementIds,
+                  },
+                  this.scene.getNonDeletedElements(),
+                  prevState,
+                  this,
+                ),
+                showHyperlinkPopup:
+                  hitElement.link || isEmbeddableElement(hitElement)
+                    ? "info"
+                    : false,
+              };
             });
           } else {
             // add element to selection while keeping prev elements selected
@@ -6731,20 +6739,20 @@ class App extends React.Component<AppProps, AppState> {
           this.setState((prevState) => ({
             ...selectGroupsForSelectedElements(
               {
-                ...prevState,
+                editingGroupId: prevState.editingGroupId,
                 selectedElementIds: { [hitElement.id]: true },
-                selectedLinearElement:
-                  isLinearElement(hitElement) &&
-                  // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
-                  // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
-                  prevState.selectedLinearElement?.elementId !== hitElement.id
-                    ? new LinearElementEditor(hitElement, this.scene)
-                    : prevState.selectedLinearElement,
               },
               this.scene.getNonDeletedElements(),
               prevState,
               this,
             ),
+            selectedLinearElement:
+              isLinearElement(hitElement) &&
+              // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
+              // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
+              prevState.selectedLinearElement?.elementId !== hitElement.id
+                ? new LinearElementEditor(hitElement, this.scene)
+                : prevState.selectedLinearElement,
           }));
         }
       }
@@ -7595,16 +7603,16 @@ class App extends React.Component<AppProps, AppState> {
               ...this.state,
               ...selectGroupsForSelectedElements(
                 {
-                  ...this.state,
+                  editingGroupId: this.state.editingGroupId,
                   selectedElementIds: { [element.id]: true },
-                  selectedLinearElement: isLinearElement(element)
-                    ? new LinearElementEditor(element, this.scene)
-                    : null,
                 },
                 this.scene.getNonDeletedElements(),
                 this.state,
                 this,
               ),
+              selectedLinearElement: isLinearElement(element)
+                ? new LinearElementEditor(element, this.scene)
+                : null,
             }
           : this.state),
         showHyperlinkPopup: false,

@@ -32,13 +32,6 @@ export const actionSelectAll = register({
         ...appState,
         ...selectGroupsForSelectedElements(
           {
-            ...appState,
-            selectedLinearElement:
-              // single linear element selected
-              Object.keys(selectedElementIds).length === 1 &&
-              isLinearElement(elements[0])
-                ? new LinearElementEditor(elements[0], app.scene)
-                : null,
             editingGroupId: null,
             selectedElementIds,
           },
@@ -46,6 +39,12 @@ export const actionSelectAll = register({
           appState,
           app,
         ),
+        selectedLinearElement:
+          // single linear element selected
+          Object.keys(selectedElementIds).length === 1 &&
+          isLinearElement(elements[0])
+            ? new LinearElementEditor(elements[0], app.scene)
+            : null,
       },
       commitToHistory: true,
     };
