@@ -3,7 +3,9 @@ import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
-  DEFAULT_ELEMENT_STROKE_PICKS,
+  DEFAULT_ELEMENT_STROKE_COLOR_PICKS,
+  DEFAULT_ELEMENT_TEXT_COLOR_PALETTE,
+  DEFAULT_ELEMENT_TEXT_COLOR_PICKS,
 } from "../colors";
 import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
@@ -89,7 +91,7 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
-import { hasStrokeColor } from "../scene/comparisons";
+import { hasStrokeColor, hasText } from "../scene/comparisons";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 
@@ -235,13 +237,13 @@ export const actionChangeStrokeColor = register({
       commitToHistory: !!value.currentItemStrokeColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, appProps }) => (
+  PanelComponent: ({ elements, appState, updateData }) => (
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
-        topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
+        topPicks={DEFAULT_ELEMENT_STROKE_COLOR_PICKS}
         palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
-        type="elementStroke"
+        type="elementStrokeColor"
         label={t("labels.stroke")}
         color={getFormValue(
           elements,
@@ -250,6 +252,55 @@ export const actionChangeStrokeColor = register({
           appState.currentItemStrokeColor,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
+        elements={elements}
+        appState={appState}
+        updateData={updateData}
+      />
+    </>
+  ),
+});
+
+export const actionChangeTextColor = register({
+  name: "changeTextColor",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      ...(value.currentItemTextColor && {
+        elements: changeProperty(
+          elements,
+          appState,
+          (el) => {
+            return hasText(el.type)
+              ? newElementWith(el as ExcalidrawTextElement, {
+                  textColor: value.currentItemTextColor,
+                })
+              : el;
+          },
+          true,
+        ),
+      }),
+      appState: {
+        ...appState,
+        ...value,
+      },
+      commitToHistory: !!value.currentItemTextColor,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, appProps }) => (
+    <>
+      <h3 aria-hidden="true">{t("labels.textColor")}</h3>
+      <ColorPicker
+        topPicks={DEFAULT_ELEMENT_TEXT_COLOR_PICKS}
+        palette={DEFAULT_ELEMENT_TEXT_COLOR_PALETTE}
+        type="elementTextColor"
+        label={t("labels.textColor")}
+        color={getFormValue(
+          elements,
+          appState,
+          (element) => (element as ExcalidrawTextElement).textColor,
+          appState.currentItemTextColor,
+        )}
+        onChange={(color) => updateData({ currentItemTextColor: color })}
         elements={elements}
         appState={appState}
         updateData={updateData}

@@ -41,6 +41,7 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
+  DEFAULT_TEXT_COLOR,
   DEFAULT_VERTICAL_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -190,6 +191,7 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"];
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     strokeWidth?: ExcalidrawTextElement["strokeWidth"];
+    textColor?: ExcalidrawTextElement["textColor"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -207,6 +209,7 @@ export const newTextElement = (
     { textAlign, verticalAlign },
     metrics,
   );
+  const textColor = opts.textColor || DEFAULT_TEXT_COLOR;
 
   const textElement = newElementWith(
     {
@@ -224,6 +227,7 @@ export const newTextElement = (
       containerId: opts.containerId || null,
       originalText: text,
       lineHeight,
+      textColor,
     },
     {},
   );

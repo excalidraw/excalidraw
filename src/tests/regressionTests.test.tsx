@@ -164,7 +164,7 @@ describe("regression tests", () => {
     UI.clickOnTestId("color-yellow");
     UI.clickOnTestId("color-red");
 
-    togglePopover("Stroke");
+    togglePopover("Stroke color");
     UI.clickOnTestId("color-blue");
     expect(API.getSelectedElement().backgroundColor).toBe("#ffc9c9");
     expect(API.getSelectedElement().strokeColor).toBe("#1971c2");

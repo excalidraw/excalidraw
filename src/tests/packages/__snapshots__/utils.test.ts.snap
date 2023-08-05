@@ -25,6 +25,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "currentItemStrokeStyle": "solid",
   "currentItemStrokeWidth": 1,
   "currentItemTextAlign": "left",
+  "currentItemTextColor": "#1e1e1e",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
   "draggingElement": null,

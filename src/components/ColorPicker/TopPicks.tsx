@@ -3,7 +3,8 @@ import { ColorPickerType } from "./colorPickerUtils";
 import {
   DEFAULT_CANVAS_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
-  DEFAULT_ELEMENT_STROKE_PICKS,
+  DEFAULT_ELEMENT_STROKE_COLOR_PICKS,
+  DEFAULT_ELEMENT_TEXT_COLOR_PICKS,
 } from "../../colors";
 
 interface TopPicksProps {
@@ -20,8 +21,12 @@ export const TopPicks = ({
   topPicks,
 }: TopPicksProps) => {
   let colors;
-  if (type === "elementStroke") {
-    colors = DEFAULT_ELEMENT_STROKE_PICKS;
+  if (type === "elementStrokeColor") {
+    colors = DEFAULT_ELEMENT_STROKE_COLOR_PICKS;
+  }
+
+  if (type === "elementTextColor") {
+    colors = DEFAULT_ELEMENT_TEXT_COLOR_PICKS;
   }
 
   if (type === "elementBackground") {

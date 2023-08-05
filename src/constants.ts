@@ -1,6 +1,10 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
-import { ExcalidrawElement, FontFamilyValues } from "./element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  FontFamilyValues,
+} from "./element/types";
 import { COLOR_PALETTE } from "./colors";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
@@ -122,6 +126,8 @@ export const DEFAULT_FONT_SIZE = 20;
 export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
+export const DEFAULT_TEXT_COLOR =
+  COLOR_PALETTE.black as ExcalidrawTextElement["textColor"];
 export const DEFAULT_VERSION = "{version}";
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];

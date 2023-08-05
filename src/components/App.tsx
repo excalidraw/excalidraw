@@ -2440,6 +2440,7 @@ class App extends React.Component<AppProps, AppState> {
       x,
       y,
       strokeColor: this.state.currentItemStrokeColor,
+      textColor: this.state.currentItemTextColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.state.currentItemStrokeWidth,
@@ -3095,7 +3096,7 @@ class App extends React.Component<AppProps, AppState> {
           event.stopPropagation();
         }
         if (event.key === KEYS.S) {
-          this.setState({ openPopup: "elementStroke" });
+          this.setState({ openPopup: "elementStrokeColor" });
           event.stopPropagation();
         }
       }
@@ -3576,7 +3577,7 @@ class App extends React.Component<AppProps, AppState> {
           y: parentCenterPosition
             ? parentCenterPosition.elementCenterY
             : sceneY,
-          strokeColor: this.state.currentItemStrokeColor,
+          textColor: this.state.currentItemTextColor,
           backgroundColor: this.state.currentItemBackgroundColor,
           fillStyle: this.state.currentItemFillStyle,
           strokeWidth: this.state.currentItemStrokeWidth,

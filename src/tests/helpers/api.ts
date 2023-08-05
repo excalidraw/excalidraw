@@ -103,6 +103,7 @@ export class API {
     roughness?: ExcalidrawGenericElement["roughness"];
     opacity?: ExcalidrawGenericElement["opacity"];
     // text props
+    textColor?: T extends "text" ? ExcalidrawTextElement["textColor"] : never;
     text?: T extends "text" ? ExcalidrawTextElement["text"] : never;
     fontSize?: T extends "text" ? ExcalidrawTextElement["fontSize"] : never;
     fontFamily?: T extends "text" ? ExcalidrawTextElement["fontFamily"] : never;
@@ -199,8 +200,10 @@ export class API {
       case "text":
         const fontSize = rest.fontSize ?? appState.currentItemFontSize;
         const fontFamily = rest.fontFamily ?? appState.currentItemFontFamily;
+        const textColor = rest.textColor ?? appState.currentItemTextColor;
         element = newTextElement({
           ...base,
+          textColor,
           text: rest.text || "test",
           fontSize,
           fontFamily,

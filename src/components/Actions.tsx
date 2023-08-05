@@ -95,11 +95,19 @@ export const SelectedShapeActions = ({
           commonSelectedType !== "image" &&
           commonSelectedType !== "frame") ||
           targetElements.some((element) => hasStrokeColor(element.type))) &&
+          !targetElements.every((element) => hasText(element.type)) &&
           renderAction("changeStrokeColor")}
       </div>
+
       {showChangeBackgroundIcons && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
+
+      {(hasText(appState.activeTool.type) ||
+        targetElements.some((element) => hasText(element.type))) && (
+        <div>{renderAction("changeTextColor")}</div>
+      )}
+
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||

@@ -228,8 +228,10 @@ const ColorPickerTrigger = ({
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}
       title={
-        type === "elementStroke"
+        type === "elementStrokeColor"
           ? t("labels.showStroke")
+          : type === "elementTextColor"
+          ? t("labels.showText")
           : t("labels.showBackground")
       }
     >
