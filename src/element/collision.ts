@@ -655,18 +655,23 @@ export const determineFocusDistance = (
   const c = line[1];
   const mabs = Math.abs(m);
   const nabs = Math.abs(n);
+  let ret;
   switch (element.type) {
     case "rectangle":
     case "image":
     case "text":
     case "embeddable":
     case "frame":
-      return c / (hwidth * (nabs + q * mabs));
+      ret = c / (hwidth * (nabs + q * mabs));
+      break;
     case "diamond":
-      return mabs < nabs ? c / (nabs * hwidth) : c / (mabs * hheight);
+      ret = mabs < nabs ? c / (nabs * hwidth) : c / (mabs * hheight);
+      break;
     case "ellipse":
-      return c / (hwidth * Math.sqrt(n ** 2 + q ** 2 * m ** 2));
+      ret = c / (hwidth * Math.sqrt(n ** 2 + q ** 2 * m ** 2));
+      break;
   }
+  return ret || 0;
 };
 
 export const determineFocusPoint = (

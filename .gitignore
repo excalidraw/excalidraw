@@ -29,3 +29,5 @@ src/packages/excalidraw/yarn.lock
 coverage
 src/packages/excalidraw/yarn.lock
 yarn.lock
+dev-dist
+html
