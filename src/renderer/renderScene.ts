@@ -38,7 +38,6 @@ import {
   SCROLLBAR_COLOR,
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
-import { getSelectedElements } from "../scene/selection";
 
 import {
   renderElement,
@@ -398,7 +397,6 @@ const getNormalizedCanvasDimensions = (
 const bootstrapCanvas = ({
   canvas,
   scale,
-  zoom,
   normalizedWidth,
   normalizedHeight,
   theme,
@@ -407,7 +405,6 @@ const bootstrapCanvas = ({
 }: {
   canvas: HTMLCanvasElement;
   scale: number;
-  zoom: CommonCanvasAppState["zoom"];
   normalizedWidth: number;
   normalizedHeight: number;
   theme?: CommonCanvasAppState["theme"];
@@ -417,7 +414,6 @@ const bootstrapCanvas = ({
   const context = canvas.getContext("2d")!;
 
   context.setTransform(1, 0, 0, 1, 0, 0);
-  context.save();
   context.scale(scale, scale);
 
   if (isExporting && theme === "dark") {
@@ -442,10 +438,6 @@ const bootstrapCanvas = ({
     context.clearRect(0, 0, normalizedWidth, normalizedHeight);
   }
 
-  // Apply zoom
-  context.save();
-  context.scale(zoom.value, zoom.value);
-
   return context;
 };
 
@@ -453,6 +445,7 @@ const _renderInteractiveScene = ({
   canvas,
   elements,
   visibleElements,
+  selectedElements,
   scale,
   appState,
   renderConfig,
@@ -471,8 +464,11 @@ const _renderInteractiveScene = ({
     scale,
     normalizedWidth,
     normalizedHeight,
-    zoom: appState.zoom,
   });
+
+  // Apply zoom
+  context.save();
+  context.scale(appState.zoom.value, appState.zoom.value);
 
   let editingLinearElement: NonDeleted<ExcalidrawLinearElement> | undefined =
     undefined;
@@ -517,8 +513,7 @@ const _renderInteractiveScene = ({
     renderElementsBoxHighlight(context, appState, appState.elementsToHighlight);
   }
 
-  const locallySelectedElements = getSelectedElements(elements, appState);
-  const isFrameSelected = locallySelectedElements.some((element) =>
+  const isFrameSelected = selectedElements.some((element) =>
     isFrameElement(element),
   );
 
@@ -526,13 +521,13 @@ const _renderInteractiveScene = ({
   // ShapeCache returns empty hence making sure that we get the
   // correct element from visible elements
   if (
-    locallySelectedElements.length === 1 &&
-    appState.editingLinearElement?.elementId === locallySelectedElements[0].id
+    selectedElements.length === 1 &&
+    appState.editingLinearElement?.elementId === selectedElements[0].id
   ) {
     renderLinearPointHandles(
       context,
       appState,
-      locallySelectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
+      selectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
     );
   }
 
@@ -544,32 +539,27 @@ const _renderInteractiveScene = ({
   }
   // Paint selected elements
   if (!appState.multiElement && !appState.editingLinearElement) {
-    const showBoundingBox = shouldShowBoundingBox(
-      locallySelectedElements,
-      appState,
-    );
+    const showBoundingBox = shouldShowBoundingBox(selectedElements, appState);
 
     const isSingleLinearElementSelected =
-      locallySelectedElements.length === 1 &&
-      isLinearElement(locallySelectedElements[0]);
+      selectedElements.length === 1 && isLinearElement(selectedElements[0]);
     // render selected linear element points
     if (
       isSingleLinearElementSelected &&
-      appState.selectedLinearElement?.elementId ===
-        locallySelectedElements[0].id &&
-      !locallySelectedElements[0].locked
+      appState.selectedLinearElement?.elementId === selectedElements[0].id &&
+      !selectedElements[0].locked
     ) {
       renderLinearPointHandles(
         context,
         appState,
-        locallySelectedElements[0] as ExcalidrawLinearElement,
+        selectedElements[0] as ExcalidrawLinearElement,
       );
     }
     const selectionColor = renderConfig.selectionColor || oc.black;
 
     if (showBoundingBox) {
       // Optimisation for finding quickly relevant element ids
-      const locallySelectedIds = locallySelectedElements.reduce(
+      const locallySelectedIds = selectedElements.reduce(
         (acc: Record<string, boolean>, element) => {
           acc[element.id] = true;
           return acc;
@@ -671,10 +661,10 @@ const _renderInteractiveScene = ({
     context.save();
     context.translate(appState.scrollX, appState.scrollY);
 
-    if (locallySelectedElements.length === 1) {
+    if (selectedElements.length === 1) {
       context.fillStyle = oc.white;
       const transformHandles = getTransformHandles(
-        locallySelectedElements[0],
+        selectedElements[0],
         appState.zoom,
         "mouse", // when we render we don't know which pointer type so use mouse
       );
@@ -684,13 +674,13 @@ const _renderInteractiveScene = ({
           renderConfig,
           appState,
           transformHandles,
-          locallySelectedElements[0].angle,
+          selectedElements[0].angle,
         );
       }
-    } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
+    } else if (selectedElements.length > 1 && !appState.isRotating) {
       const dashedLinePadding = (DEFAULT_SPACING * 2) / appState.zoom.value;
       context.fillStyle = oc.white;
-      const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
+      const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
       const initialLineDash = context.getLineDash();
       context.setLineDash([2 / appState.zoom.value]);
       const lineWidth = context.lineWidth;
@@ -717,7 +707,7 @@ const _renderInteractiveScene = ({
           ? OMIT_SIDES_FOR_FRAME
           : OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
       );
-      if (locallySelectedElements.some((element) => !element.locked)) {
+      if (selectedElements.some((element) => !element.locked)) {
         renderTransformHandles(
           context,
           renderConfig,
@@ -899,9 +889,6 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
-  context.restore();
-  context.restore();
-
   return {
     scrollBars,
     atLeastOneVisibleElement: visibleElements.length > 0,
@@ -934,11 +921,13 @@ const _renderStaticScene = ({
     scale,
     normalizedWidth,
     normalizedHeight,
-    zoom: appState.zoom,
     theme: appState.theme,
     isExporting,
     viewBackgroundColor: appState.viewBackgroundColor,
   });
+
+  // Apply zoom
+  context.scale(appState.zoom.value, appState.zoom.value);
 
   // Grid
   if (renderGrid && appState.gridSize) {
@@ -1057,8 +1046,6 @@ const _renderStaticScene = ({
         console.error(error);
       }
     });
-
-  context.restore();
 };
 
 export const renderInteractiveScene = <

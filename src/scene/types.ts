@@ -53,6 +53,7 @@ export type InteractiveSceneRenderConfig = {
   canvas: HTMLCanvasElement | null;
   elements: readonly NonDeletedExcalidrawElement[];
   visibleElements: readonly NonDeletedExcalidrawElement[];
+  selectedElements: readonly NonDeletedExcalidrawElement[];
   scale: number;
   appState: InteractiveCanvasAppState;
   renderConfig: InteractiveCanvasRenderConfig;

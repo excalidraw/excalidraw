@@ -1100,7 +1100,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public render() {
-    const selectedElement = this.scene.getSelectedElements(this.state);
+    const selectedElements = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderCustomStats } = this.props;
 
     const versionNonce = this.scene.getVersionNonce();
@@ -1180,12 +1180,12 @@ class App extends React.Component<AppProps, AppState> {
                         <div className="excalidraw-textEditorContainer" />
                         <div className="excalidraw-contextMenuContainer" />
                         <div className="excalidraw-eye-dropper-container" />
-                        {selectedElement.length === 1 &&
+                        {selectedElements.length === 1 &&
                           !this.state.contextMenu &&
                           this.state.showHyperlinkPopup && (
                             <Hyperlink
-                              key={selectedElement[0].id}
-                              element={selectedElement[0]}
+                              key={selectedElements[0].id}
+                              element={selectedElements[0]}
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
                               setToast={this.setToast}
@@ -1229,6 +1229,7 @@ class App extends React.Component<AppProps, AppState> {
                           canvas={this.interactiveCanvas}
                           elements={canvasElements}
                           visibleElements={visibleElements}
+                          selectedElements={selectedElements}
                           versionNonce={versionNonce}
                           selectionNonce={
                             this.state.selectionElement?.versionNonce

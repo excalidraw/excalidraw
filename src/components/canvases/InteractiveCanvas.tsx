@@ -19,6 +19,7 @@ type InteractiveCanvasProps = {
   canvas: HTMLCanvasElement | null;
   elements: readonly NonDeletedExcalidrawElement[];
   visibleElements: readonly NonDeletedExcalidrawElement[];
+  selectedElements: readonly NonDeletedExcalidrawElement[];
   versionNonce: number | undefined;
   selectionNonce: number | undefined;
   scale: number;
@@ -92,6 +93,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         canvas: props.canvas,
         elements: props.elements,
         visibleElements: props.visibleElements,
+        selectedElements: props.selectedElements,
         scale: window.devicePixelRatio,
         appState: props.appState,
         renderConfig: {
@@ -179,7 +181,8 @@ const areEqual = (
     // even if versionNonce didn't change (e.g. we filter elements out based
     // on appState)
     prevProps.elements !== nextProps.elements ||
-    prevProps.visibleElements !== nextProps.visibleElements
+    prevProps.visibleElements !== nextProps.visibleElements ||
+    prevProps.selectedElements !== nextProps.selectedElements
   ) {
     return false;
   }

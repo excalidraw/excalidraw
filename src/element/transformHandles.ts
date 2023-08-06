@@ -276,7 +276,7 @@ export const getTransformHandles = (
 };
 
 export const shouldShowBoundingBox = (
-  elements: NonDeletedExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: InteractiveCanvasAppState,
 ) => {
   if (appState.editingLinearElement) {
