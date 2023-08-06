@@ -20,6 +20,7 @@ import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
 import { isEraserActive, isHandToolActive } from "./appState";
 import { ResolutionType } from "./utility-types";
+import React from "react";
 
 let mockDateTime: string | null = null;
 
@@ -958,3 +959,35 @@ export const memoize = <T extends Record<string, any>, R extends any>(
 
   return ret as typeof func & { clear: () => void };
 };
+
+export const isRenderThrottlingEnabled = (() => {
+  // we don't want to throttle in react < 18 because of #5439 and it was
+  // getting more complex to maintain the fix
+  let IS_REACT_18_AND_UP: boolean;
+  try {
+    const version = React.version.split(".");
+    IS_REACT_18_AND_UP = Number(version[0]) > 17;
+  } catch {
+    IS_REACT_18_AND_UP = false;
+  }
+
+  IS_REACT_18_AND_UP = false;
+
+  let hasWarned = false;
+
+  return () => {
+    if (window.EXCALIDRAW_THROTTLE_RENDER === true) {
+      if (!IS_REACT_18_AND_UP) {
+        if (!hasWarned) {
+          hasWarned = true;
+          console.warn(
+            "Excalidraw: render throttling is disabled on React versions < 18.",
+          );
+        }
+        return false;
+      }
+      return true;
+    }
+    return false;
+  };
+})();

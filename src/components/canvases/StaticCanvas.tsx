@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { renderStaticScene } from "../../renderer/renderScene";
-import { isShallowEqual } from "../../utils";
+import { isRenderThrottlingEnabled, isShallowEqual } from "../../utils";
 import type { AppState, StaticCanvasAppState } from "../../types";
 import type { StaticCanvasRenderConfig } from "../../scene/types";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
@@ -37,13 +37,8 @@ const StaticCanvas = (props: StaticCanvasProps) => {
         appState: props.appState,
         renderConfig: props.renderConfig,
       },
-      window.EXCALIDRAW_THROTTLE_NEXT_RENDER &&
-        window.EXCALIDRAW_THROTTLE_RENDER === true,
+      isRenderThrottlingEnabled(),
     );
-
-    if (!window.EXCALIDRAW_THROTTLE_NEXT_RENDER) {
-      window.EXCALIDRAW_THROTTLE_NEXT_RENDER = true;
-    }
   });
 
   return (

@@ -1,6 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import { renderInteractiveScene } from "../../renderer/renderScene";
-import { isShallowEqual, sceneCoordsToViewportCoords } from "../../utils";
+import {
+  isRenderThrottlingEnabled,
+  isShallowEqual,
+  sceneCoordsToViewportCoords,
+} from "../../utils";
 import { CURSOR_TYPE } from "../../constants";
 import { t } from "../../i18n";
 import type { DOMAttributes } from "react";
@@ -101,13 +105,8 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         },
         callback: props.renderInteractiveSceneCallback,
       },
-      window.EXCALIDRAW_THROTTLE_NEXT_RENDER &&
-        window.EXCALIDRAW_THROTTLE_RENDER === true,
+      isRenderThrottlingEnabled(),
     );
-
-    if (!window.EXCALIDRAW_THROTTLE_NEXT_RENDER) {
-      window.EXCALIDRAW_THROTTLE_NEXT_RENDER = true;
-    }
   });
 
   return (
