@@ -971,8 +971,6 @@ export const isRenderThrottlingEnabled = (() => {
     IS_REACT_18_AND_UP = false;
   }
 
-  IS_REACT_18_AND_UP = false;
-
   let hasWarned = false;
 
   return () => {
