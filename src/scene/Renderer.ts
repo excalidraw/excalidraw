@@ -1,4 +1,4 @@
-import { isVisibleElement } from "../element/sizeHelpers";
+import { isElementInViewport } from "../element/sizeHelpers";
 import { isImageElement } from "../element/typeChecks";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -33,7 +33,7 @@ export class Renderer {
       width: AppState["width"];
     }): readonly NonDeletedExcalidrawElement[] => {
       return elements.filter((element) =>
-        isVisibleElement(element, width, height, {
+        isElementInViewport(element, width, height, {
           zoom,
           offsetLeft,
           offsetTop,

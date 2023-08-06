@@ -189,7 +189,7 @@ import {
   isArrowKey,
   KEYS,
 } from "../keys";
-import { isVisibleElement } from "../element/sizeHelpers";
+import { isElementInViewport } from "../element/sizeHelpers";
 import {
   distance2d,
   getCornerRadius,
@@ -800,7 +800,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           );
           const embedLink = getEmbedLink(toValidURL(el.link || ""));
-          const isVisible = isVisibleElement(
+          const isVisible = isElementInViewport(
             el,
             normalizedWidth,
             normalizedHeight,
@@ -963,7 +963,7 @@ class App extends React.Component<AppProps, AppState> {
     return this.scene.getNonDeletedFrames().map((f, index) => {
       if (
         !this.canvas ||
-        !isVisibleElement(
+        !isElementInViewport(
           f,
           this.canvas.width / window.devicePixelRatio,
           this.canvas.height / window.devicePixelRatio,

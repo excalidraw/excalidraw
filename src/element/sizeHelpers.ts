@@ -15,7 +15,7 @@ export const isInvisiblySmallElement = (
   return element.width === 0 && element.height === 0;
 };
 
-export const isVisibleElement = (
+export const isElementInViewport = (
   element: ExcalidrawElement,
   width: number,
   height: number,
