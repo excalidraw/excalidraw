@@ -12,7 +12,6 @@ import {
   updateImageCache,
 } from "../element/image";
 import Scene from "./Scene";
-import { isVisibleElement } from "../element/sizeHelpers";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -55,31 +54,15 @@ export const exportToCanvas = async (
 
   const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
-  const viewTransformations = {
-    zoom: appState.zoom,
-    offsetLeft: appState.offsetLeft,
-    offsetTop: appState.offsetTop,
-    scrollX: appState.scrollX,
-    scrollY: appState.scrollY,
-  };
-
-  const visibleElements = elements.filter((element) =>
-    isVisibleElement(
-      element,
-      appState.width,
-      appState.height,
-      viewTransformations,
-    ),
-  );
-
   renderStaticScene({
     canvas,
     rc: rough.canvas(canvas),
     elements,
-    visibleElements,
+    visibleElements: elements,
     scale,
     appState: {
       ...appState,
+      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
       scrollX: -minX + (onlyExportingSingleFrame ? 0 : exportPadding),
       scrollY: -minY + (onlyExportingSingleFrame ? 0 : exportPadding),
       zoom: defaultAppState.zoom,
