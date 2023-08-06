@@ -467,17 +467,17 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "छवि स्वरूप में निर्यात करे",
+        "button": "छवि स्वरूप निर्यात करे",
+        "description": "दृष्य डेटा छवि स्वरूप में निर्यात करे, उस स्वरूप से आप उसे पुनः आयात कर सकते हो"
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "डिस्क में सम्हाले",
+        "button": "डिस्क में सम्हाले",
+        "description": "दृष्य डेटा बाहरी फ़ाइल में निर्यात करे, जहाँसे आप उसे पुनः आयात कर सकते हो"
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "एक्षकालीड्रॉ+",
         "button": "",
         "description": ""
       }
