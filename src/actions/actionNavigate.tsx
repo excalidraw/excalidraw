@@ -1,6 +1,5 @@
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
-import DropdownMenu from "../components/dropdownMenu/DropdownMenu";
 import { centerScrollOn } from "../scene/scroll";
 import { Collaborator } from "../types";
 import { register } from "./register";
@@ -58,20 +57,19 @@ export const actionGoToCollaborator = register({
     const background = getClientColor(clientId);
 
     return withName ? (
-      <DropdownMenu.Item
-        onSelect={() => updateData({ ...collaborator, clientId })}
-        icon={
-          <Avatar
-            color={background}
-            onClick={() => {}}
-            name={collaborator.username || ""}
-            src={collaborator.avatarUrl}
-            isBeingFollowed={appState.userToFollow?.clientId === clientId}
-          />
-        }
+      <div
+        className="dropdown-menu-item dropdown-menu-item-base"
+        onClick={() => updateData({ ...collaborator, clientId })}
       >
+        <Avatar
+          color={background}
+          onClick={() => {}}
+          name={collaborator.username || ""}
+          src={collaborator.avatarUrl}
+          isBeingFollowed={appState.userToFollow?.clientId === clientId}
+        />
         {collaborator.username}
-      </DropdownMenu.Item>
+      </div>
     ) : (
       <Avatar
         color={background}

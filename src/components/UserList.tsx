@@ -5,8 +5,10 @@ import clsx from "clsx";
 import { AppState, Collaborator } from "../types";
 import { Tooltip } from "./Tooltip";
 import { useExcalidrawActionManager } from "./App";
-import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { ActionManager } from "../actions/manager";
+
+import * as Popover from "@radix-ui/react-popover";
+import { Island } from "./Island";
 
 const sampleCollaborators = new Map([
   [
@@ -49,6 +51,20 @@ const sampleCollaborators = new Map([
     {
       username: "Jill Doe",
       color: "#FCCB5F",
+    },
+  ],
+  [
+    "client-id-7",
+    {
+      username: "Jack Doe",
+      color: "#BCE784",
+    },
+  ],
+  [
+    "client-id-8",
+    {
+      username: "Jolly Doe",
+      color: "#5DD39E",
     },
   ],
 ]) as any as Map<string, Collaborator>;
@@ -116,18 +132,16 @@ export const UserList = ({
 }) => {
   const actionManager = useExcalidrawActionManager();
 
-  const [open, setOpen] = React.useState(false);
+  // const uniqueCollaboratorsMap = new Map<string, Collaborator>();
+  // collaborators.forEach((collaborator, socketId) => {
+  //   uniqueCollaboratorsMap.set(
+  //     // filter on user id, else fall back on unique socketId
+  //     collaborator.id || socketId,
+  //     collaborator,
+  //   );
+  // });
 
-  const uniqueCollaboratorsMap = new Map<string, Collaborator>();
-  collaborators.forEach((collaborator, socketId) => {
-    uniqueCollaboratorsMap.set(
-      // filter on user id, else fall back on unique socketId
-      collaborator.id || socketId,
-      collaborator,
-    );
-  });
-
-  // const uniqueCollaboratorsMap = sampleCollaborators;
+  const uniqueCollaboratorsMap = sampleCollaborators;
   const uniqueCollaboratorsArray = Array.from(uniqueCollaboratorsMap).filter(
     ([_, collaborator]) => Object.keys(collaborator).length !== 0,
   );
@@ -167,33 +181,39 @@ export const UserList = ({
       {first3avatarsJSX}
 
       {uniqueCollaboratorsArray.length > FIRST_N_AVATARS && (
-        <div style={{ position: "relative" }}>
-          <DropdownMenu open={open}>
-            <DropdownMenu.Trigger
-              className="UserList__more"
-              onToggle={() => {
-                setOpen(!open);
-              }}
-            >
-              +{uniqueCollaboratorsArray.length - FIRST_N_AVATARS}
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content
-              style={{ width: "10rem" }}
-              onClickOutside={() => {
-                setOpen(false);
-              }}
-            >
-              {uniqueCollaboratorsArray.map(([clientId, collaborator]) =>
-                renderCollaborator({
-                  actionManager,
-                  collaborator,
-                  clientId,
-                  withName: true,
-                }),
-              )}
-            </DropdownMenu.Content>
-          </DropdownMenu>
-        </div>
+        <Popover.Root>
+          <Popover.Trigger className="UserList__more">
+            +{uniqueCollaboratorsArray.length - FIRST_N_AVATARS}
+          </Popover.Trigger>
+          <Popover.Content
+            style={{ zIndex: 2, maxWidth: "14rem", textAlign: "left" }}
+            align="end"
+            sideOffset={10}
+          >
+            <Island>
+              {/* TODO follow-participant */}
+              <div>TODO search</div>
+              <div className="dropdown-menu UserList__collaborators">
+                {uniqueCollaboratorsArray.map(([clientId, collaborator]) =>
+                  renderCollaborator({
+                    actionManager,
+                    collaborator,
+                    clientId,
+                    withName: true,
+                  }),
+                )}
+              </div>
+              {/* TODO follow-participant */}
+              <div className="UserList__hint">
+                <div className="UserList__hint-heading">TODO hint</div>
+                <div className="UserList__hint-text">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Quibusdam, ipsum!
+                </div>
+              </div>
+            </Island>
+          </Popover.Content>
+        </Popover.Root>
       )}
     </div>
   );
