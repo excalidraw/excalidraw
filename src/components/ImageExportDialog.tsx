@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
 
 import type { ActionManager } from "../actions/manager";
 import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
@@ -62,6 +63,12 @@ type ImageExportModalProps = {
   onExportImage: AppClassProperties["onExportImage"];
 };
 
+function isBackgroundImageKey(
+  key: string,
+): key is keyof typeof EXPORT_BACKGROUND_IMAGES {
+  return key in EXPORT_BACKGROUND_IMAGES;
+}
+
 const ImageExportModal = ({
   appState,
   elements,
@@ -78,9 +85,9 @@ const ImageExportModal = ({
   const [exportWithBackground, setExportWithBackground] = useState(
     appState.exportBackground,
   );
-  const [exportBackgroundImage, setExportBackgroundImage] = useState<string>(
-    DEFAULT_EXPORT_BACKGROUND_IMAGE,
-  );
+  const [exportBackgroundImage, setExportBackgroundImage] = useState<
+    keyof typeof EXPORT_BACKGROUND_IMAGES
+  >(DEFAULT_EXPORT_BACKGROUND_IMAGE);
 
   const [exportDarkMode, setExportDarkMode] = useState(
     appState.exportWithDarkMode,
@@ -105,6 +112,7 @@ const ImageExportModal = ({
     }
     const maxWidth = previewNode.offsetWidth;
     const maxHeight = previewNode.offsetHeight;
+
     if (!maxWidth) {
       return;
     }
@@ -127,13 +135,25 @@ const ImageExportModal = ({
         console.error(error);
         setRenderError(error);
       });
-  }, [appState, files, exportedElements]);
+  }, [
+    appState,
+    appState.exportBackground,
+    appState.exportBackgroundImage,
+    files,
+    exportedElements,
+  ]);
 
   return (
     <div className="ImageExportModal">
       <h3>{t("imageExportDialog.header")}</h3>
       <div className="ImageExportModal__preview">
-        <div className="ImageExportModal__preview__canvas" ref={previewRef}>
+        <div
+          className={clsx("ImageExportModal__preview__canvas", {
+            "ImageExportModal__preview__canvas--img-bcg":
+              appState.exportBackground && appState.exportBackgroundImage,
+          })}
+          ref={previewRef}
+        >
           {renderError && <ErrorCanvasPreview />}
         </div>
       </div>
@@ -183,12 +203,14 @@ const ImageExportModal = ({
             placeholder={t("imageExportDialog.label.backgroundImage")}
             value={exportBackgroundImage}
             onChange={(value) => {
-              setExportBackgroundImage(value);
-              actionManager.executeAction(
-                actionChangeExportBackgroundImage,
-                "ui",
-                value,
-              );
+              if (isBackgroundImageKey(value)) {
+                setExportBackgroundImage(value);
+                actionManager.executeAction(
+                  actionChangeExportBackgroundImage,
+                  "ui",
+                  EXPORT_BACKGROUND_IMAGES[value].path,
+                );
+              }
             }}
           />
           <Switch

@@ -87,6 +87,18 @@
           }
         }
 
+        &--img-bcg {
+          padding: 0;
+          background: none;
+          border: none;
+          border-radius: 0;
+
+          & > canvas {
+            max-width: calc(100%);
+            max-height: calc(100%);
+          }
+        }
+
         @include isMobile {
           margin-top: 24px;
           max-width: unset;

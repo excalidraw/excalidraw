@@ -4,7 +4,7 @@ import * as RadixSelect from "@radix-ui/react-select";
 import "./Select.scss";
 import { tablerChevronDownIcon, tablerChevronUpIcon } from "./icons";
 
-type SelectItems = Record<string, string>;
+type SelectItems = Record<string, { path: string | null; label: string }>;
 
 export type SelectProps = {
   items: SelectItems;
@@ -43,7 +43,7 @@ const Select = ({
       <RadixSelect.Viewport className="Select__viewport">
         {Object.entries(items).map(([itemValue, itemLabel]) => (
           <SelectItem value={itemValue} key={itemValue}>
-            {itemLabel}
+            {itemLabel.label}
           </SelectItem>
         ))}
       </RadixSelect.Viewport>
