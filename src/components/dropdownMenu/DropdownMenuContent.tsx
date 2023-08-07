@@ -16,6 +16,7 @@ const MenuContent = ({
   style,
   sideOffset = 4,
   align = "start",
+  collisionPadding,
 }: {
   children?: React.ReactNode;
   onClickOutside?: () => void;
@@ -27,6 +28,9 @@ const MenuContent = ({
   style?: React.CSSProperties;
   sideOffset?: number;
   align?: "start" | "center" | "end";
+  collisionPadding?:
+    | number
+    | Partial<Record<"top" | "right" | "bottom" | "left", number>>;
 }) => {
   const device = useDevice();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -49,6 +53,7 @@ const MenuContent = ({
         side="bottom"
         sideOffset={sideOffset}
         align={align}
+        collisionPadding={collisionPadding}
       >
         {/* the zIndex ensures this menu has higher stacking order,
     see https://github.com/excalidraw/excalidraw/pull/1445 */}

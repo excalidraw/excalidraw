@@ -46,7 +46,7 @@
 
     .dropdown-menu-container {
       background-color: #fff !important;
-      max-height: calc(100vh - 150px);
+      max-height: var(--radix-popper-available-height);
       overflow-y: auto;
       --gap: 2;
     }

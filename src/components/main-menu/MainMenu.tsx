@@ -68,6 +68,15 @@ const MainMenu = Object.assign(
               onSelect={composeEventHandlers(onSelect, () => {
                 setAppState({ openMenu: null });
               })}
+              collisionPadding={
+                // accounting for
+                // - editor footer on desktop
+                // - toolbar on mobile
+                // we probably don't want the menu to overlay these elements
+                !device.isMobile
+                  ? { bottom: 90, top: 10 }
+                  : { top: 90, bottom: 10 }
+              }
             >
               {children}
               {device.isMobile && appState.collaborators.size > 0 && (
