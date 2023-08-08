@@ -5,6 +5,7 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
+  EXPORT_BACKGROUND_IMAGES,
   EXPORT_SCALES,
   THEME,
 } from "./constants";
@@ -100,7 +101,8 @@ export const getDefaultAppState = (): Omit<
     pendingImageElementId: null,
     showHyperlinkPopup: false,
     selectedLinearElement: null,
-    exportBackgroundImage: DEFAULT_EXPORT_BACKGROUND_IMAGE,
+    exportBackgroundImage:
+      EXPORT_BACKGROUND_IMAGES[DEFAULT_EXPORT_BACKGROUND_IMAGE].path,
   };
 };
 
