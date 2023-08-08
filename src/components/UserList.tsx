@@ -142,27 +142,40 @@ export const UserList = ({
   // });
 
   const uniqueCollaboratorsMap = sampleCollaborators;
-  const uniqueCollaboratorsArray = Array.from(uniqueCollaboratorsMap).filter(
-    ([_, collaborator]) => Object.keys(collaborator).length !== 0,
+  const uniqueCollaboratorsArray = React.useMemo(
+    () =>
+      Array.from(uniqueCollaboratorsMap).filter(
+        ([_, collaborator]) => Object.keys(collaborator).length !== 0,
+      ),
+    [uniqueCollaboratorsMap],
+  );
+
+  const [searchTerm, setSearchTerm] = React.useState("");
+
+  const filteredCollaborators = React.useMemo(
+    () =>
+      uniqueCollaboratorsArray.filter(([, collaborator]) =>
+        collaborator.username?.toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
+    [uniqueCollaboratorsArray, searchTerm],
   );
 
   if (uniqueCollaboratorsArray.length === 0) {
     return null;
   }
 
-  const firstThreeCollaborators = uniqueCollaboratorsArray.slice(
+  const firstNCollaborators = uniqueCollaboratorsArray.slice(
     0,
     FIRST_N_AVATARS,
   );
 
-  const first3avatarsJSX = firstThreeCollaborators.map(
-    ([clientId, collaborator]) =>
-      renderCollaborator({
-        actionManager,
-        collaborator,
-        clientId,
-        shouldWrapWithTooltip: true,
-      }),
+  const firstNAvatarsJSX = firstNCollaborators.map(([clientId, collaborator]) =>
+    renderCollaborator({
+      actionManager,
+      collaborator,
+      clientId,
+      shouldWrapWithTooltip: true,
+    }),
   );
 
   return mobile ? (
@@ -178,10 +191,16 @@ export const UserList = ({
     </div>
   ) : (
     <div className={clsx("UserList", className)}>
-      {first3avatarsJSX}
+      {firstNAvatarsJSX}
 
       {uniqueCollaboratorsArray.length > FIRST_N_AVATARS && (
-        <Popover.Root>
+        <Popover.Root
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              setSearchTerm("");
+            }
+          }}
+        >
           <Popover.Trigger className="UserList__more">
             +{uniqueCollaboratorsArray.length - FIRST_N_AVATARS}
           </Popover.Trigger>
@@ -190,11 +209,22 @@ export const UserList = ({
             align="end"
             sideOffset={10}
           >
-            <Island>
-              {/* TODO follow-participant */}
-              <div>TODO search</div>
+            <Island style={{ overflow: "hidden" }}>
+              {/* TODO follow-participant add search icon */}
+              <div>
+                <input
+                  className="UserList__search"
+                  type="text"
+                  placeholder="Search"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                  }}
+                />
+              </div>
               <div className="dropdown-menu UserList__collaborators">
-                {uniqueCollaboratorsArray.map(([clientId, collaborator]) =>
+                {/* TODO follow-participant empty state */}
+                {filteredCollaborators.map(([clientId, collaborator]) =>
                   renderCollaborator({
                     actionManager,
                     collaborator,
