@@ -370,21 +370,16 @@ const bindLinearElementToElement = (
 
 class ElementStore {
   excalidrawElements = new Map<string, ExcalidrawElement>();
-  elementMap = new Map<string, number>();
-  programmaticElementsWithId = new Map<string, ExcalidrawProgrammaticElement>();
 
   add = (ele?: ExcalidrawElement) => {
     if (!ele) {
       return;
     }
-    if (this.excalidrawElements.has(ele.id)) {
-      this.excalidrawElements.set(ele.id, ele);
-    } else {
-      this.excalidrawElements.set(ele.id, ele);
-    }
+
+    this.excalidrawElements.set(ele.id, ele);
   };
   getElements = () => {
-    return this.excalidrawElements.values();
+    return Array.from(this.excalidrawElements.values());
   };
 
   getElement = (id: string) => {
@@ -490,7 +485,6 @@ export const convertToExcalidrawElements = (
       case "frame":
       case "embeddable": {
         excalidrawElement = element;
-        elementStore.add(element);
         break;
       }
 
@@ -562,5 +556,5 @@ export const convertToExcalidrawElements = (
       }
     }
   }
-  return Array.from(elementStore.getElements());
+  return elementStore.getElements();
 };
