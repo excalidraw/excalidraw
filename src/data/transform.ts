@@ -14,7 +14,6 @@ import {
   ElementConstructorOpts,
   newImageElement,
   newTextElement,
-  regenerateId,
 } from "../element/newElement";
 import {
   getDefaultLineHeight,
@@ -22,6 +21,7 @@ import {
   normalizeText,
 } from "../element/textElement";
 import {
+  ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawEmbeddableElement,
@@ -170,28 +170,9 @@ const DEFAULT_LINEAR_ELEMENT_PROPS = {
 const DEFAULT_DIMENSION = 100;
 
 const bindTextToContainer = (
-  containerProps: ValidContainer | ({ type: "arrow" } & ValidLinearElement),
+  container: ExcalidrawElement,
   textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
 ) => {
-  let container: ExcalidrawGenericElement | ExcalidrawLinearElement;
-  if (containerProps.type === "arrow") {
-    const width = containerProps.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
-    const height = containerProps.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
-    container = newLinearElement({
-      width,
-      height,
-      endArrowhead: "arrow",
-      points: [
-        [0, 0],
-        [width, height],
-      ],
-      ...containerProps,
-    });
-  } else {
-    container = newElement({
-      ...containerProps,
-    });
-  }
   const textElement: ExcalidrawTextElement = newTextElement({
     x: 0,
     y: 0,
@@ -210,43 +191,23 @@ const bindTextToContainer = (
   });
 
   redrawTextBoundingBox(textElement, container);
-
   return [container, textElement] as const;
 };
 
 const bindLinearElementToElement = (
-  linearElement: ValidLinearElement,
+  linearElement: ExcalidrawArrowElement,
+  start: ValidLinearElement["start"],
+  end: ValidLinearElement["end"],
   elementStore: ElementStore,
 ): {
   linearElement: ExcalidrawLinearElement;
   startBoundElement?: ExcalidrawElement;
   endBoundElement?: ExcalidrawElement;
 } => {
-  const {
-    start,
-    end,
-    type,
-    endArrowhead = linearElement.type === "arrow" ? "arrow" : null,
-    ...rest
-  } = linearElement;
-  const width = linearElement.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
-  const height = linearElement.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
-  const excliadrawLinearElement = newLinearElement({
-    type,
-    width,
-    height,
-    points: [
-      [0, 0],
-      [width, height],
-    ],
-    endArrowhead,
-    ...rest,
-  });
-
   let startBoundElement;
   let endBoundElement;
 
-  Object.assign(excliadrawLinearElement, {
+  Object.assign(linearElement, {
     startBinding: linearElement?.startBinding || null,
     endBinding: linearElement.endBinding || null,
   });
@@ -257,21 +218,14 @@ const bindLinearElementToElement = (
 
     let existingElement;
     if (start.id) {
-      existingElement = elementStore
-        .getElements()
-        .find((ele) => ele?.id === start.id) as Exclude<
-        ExcalidrawBindableElement,
-        | ExcalidrawImageElement
-        | ExcalidrawFrameElement
-        | ExcalidrawEmbeddableElement
-      >;
+      existingElement = elementStore.getElement(start.id);
       if (!existingElement) {
         console.error(`No element for start binding with id ${start.id} found`);
       }
     }
 
-    const startX = start.x || excliadrawLinearElement.x - width;
-    const startY = start.y || excliadrawLinearElement.y - height / 2;
+    const startX = start.x || linearElement.x - width;
+    const startY = start.y || linearElement.y - height / 2;
     const startType = existingElement ? existingElement.type : start.type;
 
     if (startType) {
@@ -284,7 +238,7 @@ const bindLinearElementToElement = (
         }
         if (!text) {
           console.error(
-            `No text found for start binding text element for ${excliadrawLinearElement.id}`,
+            `No text found for start binding text element for ${linearElement.id}`,
           );
         }
         startBoundElement = newTextElement({
@@ -297,24 +251,37 @@ const bindLinearElementToElement = (
         });
         // to position the text correctly when coordinates not provided
         Object.assign(startBoundElement, {
-          x: start.x || excliadrawLinearElement.x - startBoundElement.width,
-          y:
-            start.y || excliadrawLinearElement.y - startBoundElement.height / 2,
+          x: start.x || linearElement.x - startBoundElement.width,
+          y: start.y || linearElement.y - startBoundElement.height / 2,
         });
       } else {
-        startBoundElement = newElement({
-          x: startX,
-          y: startY,
-          width,
-          height,
-          ...existingElement,
-          ...start,
-          type: startType,
-        });
+        switch (startType) {
+          case "rectangle":
+          case "ellipse":
+          case "diamond": {
+            startBoundElement = newElement({
+              x: startX,
+              y: startY,
+              width,
+              height,
+              ...existingElement,
+              ...start,
+              type: startType,
+            });
+            break;
+          }
+          default: {
+            assertNever(
+              linearElement as never,
+              `Unhandled element start type "${start.type}"`,
+              true,
+            );
+          }
+        }
       }
 
       bindLinearElement(
-        excliadrawLinearElement,
+        linearElement,
         startBoundElement as ExcalidrawBindableElement,
         "start",
       );
@@ -326,25 +293,13 @@ const bindLinearElementToElement = (
 
     let existingElement;
     if (end.id) {
-      existingElement = elementStore
-        .getElements()
-        .find(
-          (
-            ele,
-          ): ele is Exclude<
-            ExcalidrawBindableElement,
-            | ExcalidrawImageElement
-            | ExcalidrawFrameElement
-            | ExcalidrawEmbeddableElement
-          > => ele?.id === end.id,
-        );
+      existingElement = elementStore.getElement(end.id);
       if (!existingElement) {
         console.error(`No element for end binding with id ${end.id} found`);
       }
     }
-    const endX =
-      end.x || excliadrawLinearElement.x + excliadrawLinearElement.width;
-    const endY = end.y || excliadrawLinearElement.y - height / 2;
+    const endX = end.x || linearElement.x + linearElement.width;
+    const endY = end.y || linearElement.y - height / 2;
     const endType = existingElement ? existingElement.type : end.type;
 
     if (endType) {
@@ -358,7 +313,7 @@ const bindLinearElementToElement = (
 
         if (!text) {
           console.error(
-            `No text found for end binding text element for ${excliadrawLinearElement.id}`,
+            `No text found for end binding text element for ${linearElement.id}`,
           );
         }
         endBoundElement = newTextElement({
@@ -371,157 +326,109 @@ const bindLinearElementToElement = (
         });
         // to position the text correctly when coordinates not provided
         Object.assign(endBoundElement, {
-          y: end.y || excliadrawLinearElement.y - endBoundElement.height / 2,
+          y: end.y || linearElement.y - endBoundElement.height / 2,
         });
       } else {
-        endBoundElement = newElement({
-          x: endX,
-          y: endY,
-          width,
-          height,
-          ...existingElement,
-          ...end,
-          type: endType,
-        }) as ExcalidrawBindableElement;
+        switch (endType) {
+          case "rectangle":
+          case "ellipse":
+          case "diamond": {
+            endBoundElement = newElement({
+              x: endX,
+              y: endY,
+              width,
+              height,
+              ...existingElement,
+              ...end,
+              type: endType,
+            });
+            break;
+          }
+          default: {
+            assertNever(
+              linearElement as never,
+              `Unhandled element end type "${endType}"`,
+              true,
+            );
+          }
+        }
       }
 
       bindLinearElement(
-        excliadrawLinearElement,
+        linearElement,
         endBoundElement as ExcalidrawBindableElement,
         "end",
       );
     }
   }
   return {
-    linearElement: excliadrawLinearElement,
+    linearElement,
     startBoundElement,
     endBoundElement,
   };
 };
 
 class ElementStore {
-  res: ExcalidrawElement[] = [];
+  excalidrawElements = new Map<string, ExcalidrawElement>();
   elementMap = new Map<string, number>();
+  programmaticElementsWithId = new Map<string, ExcalidrawProgrammaticElement>();
 
   add = (ele?: ExcalidrawElement) => {
     if (!ele) {
       return;
     }
-    const index = this.elementMap.get(ele.id);
-    if (index !== undefined && index >= 0) {
-      this.res[index] = ele;
+    if (this.excalidrawElements.has(ele.id)) {
+      this.excalidrawElements.set(ele.id, ele);
     } else {
-      this.res.push(ele);
-      const index = this.res.length - 1;
-      this.elementMap.set(ele.id, index);
+      this.excalidrawElements.set(ele.id, ele);
     }
   };
   getElements = () => {
-    return this.res;
+    return this.excalidrawElements.values();
+  };
+
+  getElement = (id: string) => {
+    return this.excalidrawElements.get(id);
   };
 }
 
 export const convertToExcalidrawElements = (
   elements: ExcalidrawProgrammaticAPI["elements"],
-): ExcalidrawElement[] => {
+) => {
   if (!elements) {
     return [];
   }
 
   const elementStore = new ElementStore();
+  const elementsWithIds = new Map<string, ExcalidrawProgrammaticElement>();
 
-  // ensure unique ids
-  // ---------------------------------------------------------------------------
-  const ids = new Set<ExcalidrawElement["id"]>();
-  const elementsWithIds = elements.map((element) => {
-    let id = element.id || regenerateId(null);
-
-    // To make sure every element has a unique id since regenerateId appends
-    // _copy to the original id and if it exists we need to generate again
-    // hence a loop
-    while (ids.has(id)) {
-      id = regenerateId(id);
-    }
-
-    ids.add(id);
-
-    return { ...element, id };
-  });
-  // ---------------------------------------------------------------------------
-
-  for (const element of elementsWithIds) {
+  // Create individual elements
+  for (const element of elements) {
+    let excalidrawElement: ExcalidrawElement;
     switch (element.type) {
       case "rectangle":
       case "ellipse":
-      case "diamond":
-      case "arrow": {
-        if (element.label?.text) {
-          let [container, text] = bindTextToContainer(
-            element as
-              | ValidContainer
-              | ({
-                  type: "arrow";
-                } & ValidLinearElement),
-            element?.label,
-          );
-          elementStore.add(container);
-          elementStore.add(text);
+      case "diamond": {
+        const width =
+          element?.label?.text && element.width === undefined
+            ? 0
+            : element?.width || DEFAULT_DIMENSION;
+        const height =
+          element?.label?.text && element.height === undefined
+            ? 0
+            : element?.height || DEFAULT_DIMENSION;
+        excalidrawElement = newElement({
+          ...element,
+          width,
+          height,
+        });
 
-          if (container.type === "arrow") {
-            const originalStart =
-              element.type === "arrow" ? element?.start : undefined;
-            const originalEnd =
-              element.type === "arrow" ? element?.end : undefined;
-            const { linearElement, startBoundElement, endBoundElement } =
-              bindLinearElementToElement(
-                {
-                  ...container,
-                  start: originalStart,
-                  end: originalEnd,
-                },
-                elementStore,
-              );
-            container = linearElement;
-            elementStore.add(linearElement);
-            elementStore.add(startBoundElement);
-            elementStore.add(endBoundElement);
-          }
-        } else {
-          switch (element.type) {
-            case "arrow": {
-              const { linearElement, startBoundElement, endBoundElement } =
-                bindLinearElementToElement(element, elementStore);
-              elementStore.add(linearElement);
-              elementStore.add(startBoundElement);
-              elementStore.add(endBoundElement);
-              break;
-            }
-            case "rectangle":
-            case "ellipse":
-            case "diamond": {
-              elementStore.add(
-                newElement({
-                  ...element,
-                  width: element?.width || DEFAULT_DIMENSION,
-                  height: element?.height || DEFAULT_DIMENSION,
-                }),
-              );
-              break;
-            }
-            default: {
-              assertNever(
-                element.type,
-                `Unhandled element type "${element.type}"`,
-              );
-            }
-          }
-        }
         break;
       }
       case "line": {
         const width = element.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
         const height = element.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
-        const lineElement = newLinearElement({
+        excalidrawElement = newLinearElement({
           width,
           height,
           points: [
@@ -530,7 +437,22 @@ export const convertToExcalidrawElements = (
           ],
           ...element,
         });
-        elementStore.add(lineElement);
+
+        break;
+      }
+      case "arrow": {
+        const width = element.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
+        const height = element.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
+        excalidrawElement = newLinearElement({
+          width,
+          height,
+          endArrowhead: "arrow",
+          points: [
+            [0, 0],
+            [width, height],
+          ],
+          ...element,
+        });
         break;
       }
       case "text": {
@@ -546,33 +468,34 @@ export const convertToExcalidrawElements = (
           lineHeight,
         );
 
-        const textElement = newTextElement({
+        excalidrawElement = newTextElement({
           width: metrics.width,
           height: metrics.height,
           fontFamily,
           fontSize,
           ...element,
         });
-        elementStore.add(textElement);
         break;
       }
       case "image": {
-        const imageElement = newImageElement({
+        excalidrawElement = newImageElement({
           width: element?.width || DEFAULT_DIMENSION,
           height: element?.height || DEFAULT_DIMENSION,
           ...element,
         });
-        elementStore.add(imageElement);
+
         break;
       }
       case "freedraw":
       case "frame":
       case "embeddable": {
+        excalidrawElement = element;
         elementStore.add(element);
         break;
       }
+
       default: {
-        elementStore.add(element);
+        excalidrawElement = element;
         assertNever(
           element,
           `Unhandled element type "${(element as any).type}"`,
@@ -580,6 +503,64 @@ export const convertToExcalidrawElements = (
         );
       }
     }
+    elementStore.add(excalidrawElement);
+    elementsWithIds.set(excalidrawElement.id, element);
   }
-  return elementStore.getElements();
+
+  // Add labels and arrow bindings
+  for (const [id, element] of elementsWithIds) {
+    const excalidrawElement = elementStore.getElement(id)!;
+
+    switch (element.type) {
+      case "rectangle":
+      case "ellipse":
+      case "diamond":
+      case "arrow": {
+        if (element.label?.text) {
+          let [container, text] = bindTextToContainer(
+            excalidrawElement,
+            element?.label,
+          );
+          elementStore.add(container);
+          elementStore.add(text);
+
+          if (container.type === "arrow") {
+            const originalStart =
+              element.type === "arrow" ? element?.start : undefined;
+            const originalEnd =
+              element.type === "arrow" ? element?.end : undefined;
+            const { linearElement, startBoundElement, endBoundElement } =
+              bindLinearElementToElement(
+                container as ExcalidrawArrowElement,
+                originalStart,
+                originalEnd,
+                elementStore,
+              );
+            container = linearElement;
+            elementStore.add(linearElement);
+            elementStore.add(startBoundElement);
+            elementStore.add(endBoundElement);
+          }
+        } else {
+          switch (element.type) {
+            case "arrow": {
+              const { linearElement, startBoundElement, endBoundElement } =
+                bindLinearElementToElement(
+                  excalidrawElement as ExcalidrawArrowElement,
+                  element.start,
+                  element.end,
+                  elementStore,
+                );
+              elementStore.add(linearElement);
+              elementStore.add(startBoundElement);
+              elementStore.add(endBoundElement);
+              break;
+            }
+          }
+        }
+        break;
+      }
+    }
+  }
+  return Array.from(elementStore.getElements());
 };

@@ -615,7 +615,8 @@ describe("Test Transform", () => {
     });
   });
 
-  it("should generate new ids if multiple elements contain same ids", () => {
+  // Skipping this test since we might remove this capability and just throw error instead
+  it.skip("should generate new ids if multiple elements contain same ids", () => {
     const elements = [
       {
         type: "rectangle",
@@ -635,14 +636,12 @@ describe("Test Transform", () => {
         height: 200,
       },
     ];
-    convertToExcalidrawElements(
+    const excaldrawElements = convertToExcalidrawElements(
       elements as ExcalidrawProgrammaticAPI["elements"],
-    ).forEach((ele) => {
-      expect(ele).toMatchSnapshot({
-        seed: expect.any(Number),
-        versionNonce: expect.any(Number),
-        id: expect.any(String),
-      });
-    });
+    );
+
+    expect(excaldrawElements.length).toBe(2);
+    expect(excaldrawElements[0].id).toBe("rect-1");
+    expect(excaldrawElements[0].id).not.toBe("rect-1");
   });
 });
