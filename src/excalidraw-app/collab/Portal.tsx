@@ -83,7 +83,6 @@ class Portal {
   async _broadcastSocketData(
     data: SocketUpdateData,
     volatile: boolean = false,
-    // TODO follow-participant
     roomId?: string,
   ) {
     if (this.isOpen()) {
@@ -93,7 +92,6 @@ class Portal {
 
       this.socket?.emit(
         volatile ? WS_EVENTS.SERVER_VOLATILE : WS_EVENTS.SERVER,
-        // TODO follow-participant
         roomId ?? this.roomId,
         encryptedBuffer,
         iv,

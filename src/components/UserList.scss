@@ -16,18 +16,17 @@
       display: none;
     }
 
-    // can fit max 5 avatars in a column
-    max-height: 140px;
+    box-sizing: border-box;
 
-    // can fit max 10 avatars in a row when there's enough space
-    max-width: 290px;
+    // can fit max 4 avatars (3 avatars + show more) in a column
+    max-height: 120px;
+
+    // can fit max 4 avatars (3 avatars + show more) when there's enough space
+    max-width: 120px;
 
     // Tweak in 30px increments to fit more/fewer avatars in a row/column ^^
 
-    // TODO follow-participant
-    // rethink the above given that we'll have 3 avatars + "more" button max
-    // most likely
-    // overflow: hidden;
+    overflow: hidden;
   }
 
   .UserList > * {

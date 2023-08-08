@@ -833,7 +833,6 @@ class Collab extends PureComponent<Props, CollabState> {
         this.portal.socket &&
           this.portal.broadcastScrollAndZoom(
             { bounds: [x1, y1, x2, y2] },
-            // TODO follow-participant
             `follow_${this.portal.socket.id}`,
           );
       }
