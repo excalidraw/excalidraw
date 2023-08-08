@@ -197,22 +197,24 @@ const ImageExportModal = ({
           label={t("imageExportDialog.label.withBackground")}
           name="exportBackgroundSwitch"
         >
-          <Select
-            items={EXPORT_BACKGROUND_IMAGES}
-            ariaLabel={t("imageExportDialog.label.backgroundImage")}
-            placeholder={t("imageExportDialog.label.backgroundImage")}
-            value={exportBackgroundImage}
-            onChange={(value) => {
-              if (isBackgroundImageKey(value)) {
-                setExportBackgroundImage(value);
-                actionManager.executeAction(
-                  actionChangeExportBackgroundImage,
-                  "ui",
-                  EXPORT_BACKGROUND_IMAGES[value].path,
-                );
-              }
-            }}
-          />
+          {exportWithBackground && (
+            <Select
+              items={EXPORT_BACKGROUND_IMAGES}
+              ariaLabel={t("imageExportDialog.label.backgroundImage")}
+              placeholder={t("imageExportDialog.label.backgroundImage")}
+              value={exportBackgroundImage}
+              onChange={(value) => {
+                if (isBackgroundImageKey(value)) {
+                  setExportBackgroundImage(value);
+                  actionManager.executeAction(
+                    actionChangeExportBackgroundImage,
+                    "ui",
+                    EXPORT_BACKGROUND_IMAGES[value].path,
+                  );
+                }
+              }}
+            />
+          )}
           <Switch
             name="exportBackgroundSwitch"
             checked={exportWithBackground}
