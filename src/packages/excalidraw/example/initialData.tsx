@@ -1,7 +1,7 @@
-import { ExcalidrawProgrammaticAPI } from "../../../data/transform";
+import { ExcalidrawElementSkeleton } from "../../../data/transform";
 import { FileId } from "../../../element/types";
 
-const elements: ExcalidrawProgrammaticAPI["elements"] = [
+const elements: ExcalidrawElementSkeleton[] = [
   {
     type: "rectangle",
     x: 10,

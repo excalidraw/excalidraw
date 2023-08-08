@@ -1,5 +1,5 @@
 import {
-  ExcalidrawProgrammaticAPI,
+  ExcalidrawElementSkeleton,
   convertToExcalidrawElements,
 } from "./transform";
 
@@ -56,7 +56,7 @@ describe("Test Transform", () => {
     ];
 
     convertToExcalidrawElements(
-      elements as ExcalidrawProgrammaticAPI["elements"],
+      elements as ExcalidrawElementSkeleton[],
     ).forEach((ele) => {
       expect(ele).toMatchSnapshot({
         seed: expect.any(Number),
@@ -84,7 +84,7 @@ describe("Test Transform", () => {
       },
     ];
     convertToExcalidrawElements(
-      elements as ExcalidrawProgrammaticAPI["elements"],
+      elements as ExcalidrawElementSkeleton[],
     ).forEach((ele) => {
       expect(ele).toMatchSnapshot({
         seed: expect.any(Number),
@@ -125,7 +125,7 @@ describe("Test Transform", () => {
       },
     ];
     const excaldrawElements = convertToExcalidrawElements(
-      elements as ExcalidrawProgrammaticAPI["elements"],
+      elements as ExcalidrawElementSkeleton[],
     );
 
     expect(excaldrawElements.length).toBe(4);
@@ -207,7 +207,7 @@ describe("Test Transform", () => {
       },
     ];
     const excaldrawElements = convertToExcalidrawElements(
-      elements as ExcalidrawProgrammaticAPI["elements"],
+      elements as ExcalidrawElementSkeleton[],
     );
 
     expect(excaldrawElements.length).toBe(12);
@@ -264,7 +264,7 @@ describe("Test Transform", () => {
       },
     ];
     const excaldrawElements = convertToExcalidrawElements(
-      elements as ExcalidrawProgrammaticAPI["elements"],
+      elements as ExcalidrawElementSkeleton[],
     );
 
     expect(excaldrawElements.length).toBe(8);
@@ -297,7 +297,7 @@ describe("Test Transform", () => {
         },
       ];
       const excaldrawElements = convertToExcalidrawElements(
-        elements as ExcalidrawProgrammaticAPI["elements"],
+        elements as ExcalidrawElementSkeleton[],
       );
 
       expect(excaldrawElements.length).toBe(4);
@@ -380,7 +380,7 @@ describe("Test Transform", () => {
       ];
 
       const excaldrawElements = convertToExcalidrawElements(
-        elements as ExcalidrawProgrammaticAPI["elements"],
+        elements as ExcalidrawElementSkeleton[],
       );
 
       expect(excaldrawElements.length).toBe(4);
@@ -496,7 +496,7 @@ describe("Test Transform", () => {
       ];
 
       const excaldrawElements = convertToExcalidrawElements(
-        elements as ExcalidrawProgrammaticAPI["elements"],
+        elements as ExcalidrawElementSkeleton[],
       );
 
       expect(excaldrawElements.length).toBe(5);
@@ -544,7 +544,7 @@ describe("Test Transform", () => {
       ];
 
       const excaldrawElements = convertToExcalidrawElements(
-        elements as ExcalidrawProgrammaticAPI["elements"],
+        elements as ExcalidrawElementSkeleton[],
       );
 
       expect(excaldrawElements.length).toBe(4);
@@ -594,7 +594,7 @@ describe("Test Transform", () => {
       ];
 
       const excaldrawElements = convertToExcalidrawElements(
-        elements as ExcalidrawProgrammaticAPI["elements"],
+        elements as ExcalidrawElementSkeleton[],
       );
 
       expect(excaldrawElements.length).toBe(4);
@@ -637,7 +637,7 @@ describe("Test Transform", () => {
       },
     ];
     const excaldrawElements = convertToExcalidrawElements(
-      elements as ExcalidrawProgrammaticAPI["elements"],
+      elements as ExcalidrawElementSkeleton[],
     );
 
     expect(excaldrawElements.length).toBe(2);

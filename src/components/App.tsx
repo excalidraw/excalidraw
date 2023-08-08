@@ -347,7 +347,7 @@ import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
 import {
-  ExcalidrawProgrammaticElement,
+  ExcalidrawElementSkeleton,
   convertToExcalidrawElements,
 } from "../data/transform";
 import { ValueOf } from "../utility-types";
@@ -2292,7 +2292,7 @@ class App extends React.Component<AppProps, AppState> {
         const elements = (
           data.programmaticAPI
             ? convertToExcalidrawElements(
-                data.elements as ExcalidrawProgrammaticElement[],
+                data.elements as ExcalidrawElementSkeleton[],
               )
             : data.elements
         ) as readonly ExcalidrawElement[];

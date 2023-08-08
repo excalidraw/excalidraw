@@ -130,7 +130,7 @@ export type ValidContainer =
       } & MarkOptional<ElementConstructorOpts, "x" | "y">;
     } & ElementConstructorOpts;
 
-export type ExcalidrawProgrammaticElement =
+export type ExcalidrawElementSkeleton =
   | Extract<
       Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
       | ExcalidrawEmbeddableElement
@@ -157,10 +157,6 @@ export type ExcalidrawProgrammaticElement =
       y: number;
       fileId: FileId;
     } & Partial<ExcalidrawImageElement>);
-
-export interface ExcalidrawProgrammaticAPI {
-  elements?: readonly ExcalidrawProgrammaticElement[] | null;
-}
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
   width: 300,
@@ -388,14 +384,14 @@ class ElementStore {
 }
 
 export const convertToExcalidrawElements = (
-  elements: ExcalidrawProgrammaticAPI["elements"],
+  elements: ExcalidrawElementSkeleton[] | null,
 ) => {
   if (!elements) {
     return [];
   }
 
   const elementStore = new ElementStore();
-  const elementsWithIds = new Map<string, ExcalidrawProgrammaticElement>();
+  const elementsWithIds = new Map<string, ExcalidrawElementSkeleton>();
 
   // Create individual elements
   for (const element of elements) {
