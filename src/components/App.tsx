@@ -1522,17 +1522,15 @@ class App extends React.Component<AppProps, AppState> {
       this.refreshDeviceState(this.excalidrawContainerRef.current);
     }
 
-    if (prevState.zoom.value !== this.state.zoom.value) {
-      this.props?.onScrollAndZoomChange?.({
-        zoom: this.state.zoom,
-        scroll: { x: this.state.scrollX, y: this.state.scrollY },
-      });
+    const hasScrollChanged =
+      prevState.scrollX !== this.state.scrollX ||
+      prevState.scrollY !== this.state.scrollY;
+
+    if (hasScrollChanged) {
+      this.props?.onScrollChange?.(this.state.scrollX, this.state.scrollY);
     }
 
-    if (
-      prevState.scrollX !== this.state.scrollX ||
-      prevState.scrollY !== this.state.scrollY
-    ) {
+    if (prevState.zoom.value !== this.state.zoom.value || hasScrollChanged) {
       this.props?.onScrollAndZoomChange?.({
         zoom: this.state.zoom,
         scroll: { x: this.state.scrollX, y: this.state.scrollY },
@@ -2414,26 +2412,13 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.cancelInProgresAnimation?.();
 
-    // TODO follow-participant
-    // seems to work fine but ideally figure out a way to satisfy TS
-    // @ts-ignore
-    this.setState((prevState, props) => {
-      if (typeof state === "function") {
-        return {
-          ...state(prevState, props),
-          userToFollow: prevState.shouldDisconnectFollowModeOnCanvasInteraction
-            ? null
-            : prevState.userToFollow,
-        };
-      }
-
-      return {
-        ...state,
-        userToFollow: prevState.shouldDisconnectFollowModeOnCanvasInteraction
-          ? null
-          : prevState.userToFollow,
-      };
-    });
+    // potentially unfollow participant
+    this.setState((prevState, props) => ({
+      ...(typeof state === "function" ? state(prevState, props) : state),
+      userToFollow: prevState.shouldDisconnectFollowModeOnCanvasInteraction
+        ? null
+        : prevState.userToFollow,
+    }));
   };
 
   setToast = (
