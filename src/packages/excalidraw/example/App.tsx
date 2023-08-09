@@ -75,6 +75,7 @@ const {
   WelcomeScreen,
   MainMenu,
   LiveCollaborationTrigger,
+  convertToExcalidrawElements,
 } = window.ExcalidrawLib;
 
 const COMMENT_ICON_DIMENSION = 32;
@@ -140,7 +141,10 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         ];
 
         //@ts-ignore
-        initialStatePromiseRef.current.promise.resolve(initialData);
+        initialStatePromiseRef.current.promise.resolve({
+          ...initialData,
+          elements: convertToExcalidrawElements(initialData.elements),
+        });
         excalidrawAPI.addFiles(imagesArray);
       };
     };
@@ -184,38 +188,40 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
   const updateScene = () => {
     const sceneData = {
       elements: restoreElements(
-        [
+        convertToExcalidrawElements([
           {
             type: "rectangle",
-            version: 141,
-            versionNonce: 361174001,
-            isDeleted: false,
-            id: "oDVXy8D6rom3H1-LLH2-f",
+            id: "rect-1",
             fillStyle: "hachure",
             strokeWidth: 1,
             strokeStyle: "solid",
             roughness: 1,
-            opacity: 100,
             angle: 0,
             x: 100.50390625,
             y: 93.67578125,
             strokeColor: "#c92a2a",
-            backgroundColor: "transparent",
             width: 186.47265625,
             height: 141.9765625,
             seed: 1968410350,
-            groupIds: [],
-            frameId: null,
-            boundElements: null,
-            locked: false,
-            link: null,
-            updated: 1,
             roundness: {
               type: ROUNDNESS.ADAPTIVE_RADIUS,
               value: 32,
             },
           },
-        ],
+          {
+            type: "arrow",
+            x: 300,
+            y: 150,
+            start: { id: "rect-1" },
+            end: { type: "ellipse" },
+          },
+          {
+            type: "text",
+            x: 300,
+            y: 100,
+            text: "HELLO WORLD!",
+          },
+        ]),
         null,
       ),
       appState: {

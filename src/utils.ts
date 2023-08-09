@@ -914,3 +914,16 @@ export const isOnlyExportingSingleFrame = (
     )
   );
 };
+
+export const assertNever = (
+  value: never,
+  message: string,
+  softAssert?: boolean,
+): never => {
+  if (softAssert) {
+    console.error(message);
+    return value;
+  }
+
+  throw new Error(message);
+};

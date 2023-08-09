@@ -164,6 +164,7 @@ export const EXPORT_DATA_TYPES = {
   excalidraw: "excalidraw",
   excalidrawClipboard: "excalidraw/clipboard",
   excalidrawLibrary: "excalidrawlib",
+  excalidrawClipboardWithAPI: "excalidraw-api/clipboard",
 } as const;
 
 export const EXPORT_SOURCE =
