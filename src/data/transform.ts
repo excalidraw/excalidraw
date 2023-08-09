@@ -500,9 +500,10 @@ export const convertToExcalidrawElements = (
         `Duplicate id found for ${excalidrawElement.id}`,
         true,
       );
+    } else {
+      elementStore.add(excalidrawElement);
+      elementsWithIds.set(excalidrawElement.id, element);
     }
-    elementStore.add(excalidrawElement);
-    elementsWithIds.set(excalidrawElement.id, element);
   }
 
   // Add labels and arrow bindings

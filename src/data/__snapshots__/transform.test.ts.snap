@@ -752,7 +752,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
 }
 `;
 
-exports[`Test Transform > should generate new ids if multiple elements contain same ids 1`] = `
+exports[`Test Transform > should not allow duplicate ids 1`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -761,7 +761,7 @@ exports[`Test Transform > should generate new ids if multiple elements contain s
   "frameId": null,
   "groupIds": [],
   "height": 200,
-  "id": Any<String>,
+  "id": "rect-1",
   "isDeleted": false,
   "link": null,
   "locked": false,
@@ -779,36 +779,6 @@ exports[`Test Transform > should generate new ids if multiple elements contain s
   "width": 100,
   "x": 300,
   "y": 100,
-}
-`;
-
-exports[`Test Transform > should generate new ids if multiple elements contain same ids 2`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "hachure",
-  "frameId": null,
-  "groupIds": [],
-  "height": 200,
-  "id": Any<String>,
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 1,
-  "versionNonce": Any<Number>,
-  "width": 100,
-  "x": 100,
-  "y": 200,
 }
 `;
 

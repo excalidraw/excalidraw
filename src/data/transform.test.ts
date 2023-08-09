@@ -695,7 +695,10 @@ describe("Test Transform", () => {
     );
 
     expect(excaldrawElements.length).toBe(1);
-    expect(excaldrawElements[0].id).toBe("rect-1");
+    expect(excaldrawElements[0]).toMatchSnapshot({
+      seed: expect.any(Number),
+      versionNonce: expect.any(Number),
+    });
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "Duplicate id found for rect-1",
     );
