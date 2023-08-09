@@ -346,6 +346,10 @@ import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
+import {
+  ExcalidrawElementSkeleton,
+  convertToExcalidrawElements,
+} from "../data/transform";
 import { ValueOf } from "../utility-types";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 
@@ -2231,7 +2235,6 @@ class App extends React.Component<AppProps, AppState> {
       let file = event?.clipboardData?.files[0];
 
       const data = await parseClipboard(event, isPlainPaste);
-
       if (!file && data.text && !isPlainPaste) {
         const string = data.text.trim();
         if (string.startsWith("<svg") && string.endsWith("</svg>")) {
@@ -2286,9 +2289,16 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       } else if (data.elements) {
+        const elements = (
+          data.programmaticAPI
+            ? convertToExcalidrawElements(
+                data.elements as ExcalidrawElementSkeleton[],
+              )
+            : data.elements
+        ) as readonly ExcalidrawElement[];
         // TODO remove formatting from elements if isPlainPaste
         this.addElementsFromPasteOrLibrary({
-          elements: data.elements,
+          elements,
           files: data.files || null,
           position: "cursor",
           retainSeed: isPlainPaste,

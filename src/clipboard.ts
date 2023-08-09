@@ -24,6 +24,7 @@ export interface ClipboardData {
   files?: BinaryFiles;
   text?: string;
   errorMessage?: string;
+  programmaticAPI?: boolean;
 }
 
 let CLIPBOARD = "";
@@ -48,6 +49,7 @@ const clipboardContainsElements = (
     [
       EXPORT_DATA_TYPES.excalidraw,
       EXPORT_DATA_TYPES.excalidrawClipboard,
+      EXPORT_DATA_TYPES.excalidrawClipboardWithAPI,
     ].includes(contents?.type) &&
     Array.isArray(contents.elements)
   ) {
@@ -191,6 +193,8 @@ export const parseClipboard = async (
 
   try {
     const systemClipboardData = JSON.parse(systemClipboard);
+    const programmaticAPI =
+      systemClipboardData.type === EXPORT_DATA_TYPES.excalidrawClipboardWithAPI;
     if (clipboardContainsElements(systemClipboardData)) {
       return {
         elements: systemClipboardData.elements,
@@ -198,6 +202,7 @@ export const parseClipboard = async (
         text: isPlainPaste
           ? JSON.stringify(systemClipboardData.elements, null, 2)
           : undefined,
+        programmaticAPI,
       };
     }
   } catch (e) {}

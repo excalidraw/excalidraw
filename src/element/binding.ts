@@ -190,7 +190,7 @@ export const maybeBindLinearElement = (
   }
 };
 
-const bindLinearElement = (
+export const bindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
