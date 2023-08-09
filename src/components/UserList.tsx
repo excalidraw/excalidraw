@@ -9,7 +9,12 @@ import { ActionManager } from "../actions/manager";
 
 import * as Popover from "@radix-ui/react-popover";
 import { Island } from "./Island";
+import { searchIcon } from "./icons";
+import { t } from "../i18n";
 
+// TODO follow-participant
+// can be used for debugging styling, filter, etc
+// don't forget to remove it before shipping
 const sampleCollaborators = new Map([
   [
     "client-id-1",
@@ -70,6 +75,7 @@ const sampleCollaborators = new Map([
 ]) as any as Map<string, Collaborator>;
 
 const FIRST_N_AVATARS = 3;
+const SHOW_COLLABORATORS_FILTER_AT = 6;
 
 const ConditionalTooltipWrapper = ({
   shouldWrap,
@@ -132,16 +138,19 @@ export const UserList = ({
 }) => {
   const actionManager = useExcalidrawActionManager();
 
-  // const uniqueCollaboratorsMap = new Map<string, Collaborator>();
-  // collaborators.forEach((collaborator, socketId) => {
-  //   uniqueCollaboratorsMap.set(
-  //     // filter on user id, else fall back on unique socketId
-  //     collaborator.id || socketId,
-  //     collaborator,
-  //   );
-  // });
+  const uniqueCollaboratorsMap = React.useMemo(() => {
+    const map = new Map<string, Collaborator>();
+    collaborators.forEach((collaborator, socketId) => {
+      map.set(
+        // filter on user id, else fall back on unique socketId
+        collaborator.id || socketId,
+        collaborator,
+      );
+    });
+    return map;
+  }, [collaborators]);
 
-  const uniqueCollaboratorsMap = sampleCollaborators;
+  // const uniqueCollaboratorsMap = sampleCollaborators;
   const uniqueCollaboratorsArray = React.useMemo(
     () =>
       Array.from(uniqueCollaboratorsMap).filter(
@@ -210,20 +219,27 @@ export const UserList = ({
             sideOffset={10}
           >
             <Island style={{ overflow: "hidden" }}>
-              {/* TODO follow-participant add search icon */}
-              <div>
-                <input
-                  className="UserList__search"
-                  type="text"
-                  placeholder="Search"
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                  }}
-                />
-              </div>
+              {SHOW_COLLABORATORS_FILTER_AT <=
+                uniqueCollaboratorsArray.length && (
+                <div className="UserList__search-wrapper">
+                  {searchIcon}
+                  <input
+                    className="UserList__search"
+                    type="text"
+                    placeholder={t("userList.search.placeholder")}
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                    }}
+                  />
+                </div>
+              )}
               <div className="dropdown-menu UserList__collaborators">
-                {/* TODO follow-participant empty state */}
+                {filteredCollaborators.length === 0 && (
+                  <div className="UserList__collaborators__empty">
+                    {t("userList.search.empty")}
+                  </div>
+                )}
                 {filteredCollaborators.map(([clientId, collaborator]) =>
                   renderCollaborator({
                     actionManager,
@@ -233,12 +249,12 @@ export const UserList = ({
                   }),
                 )}
               </div>
-              {/* TODO follow-participant */}
               <div className="UserList__hint">
-                <div className="UserList__hint-heading">TODO hint</div>
+                <div className="UserList__hint-heading">
+                  {t("userList.hint.heading")}
+                </div>
                 <div className="UserList__hint-text">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Quibusdam, ipsum!
+                  {t("userList.hint.text")}
                 </div>
               </div>
             </Island>

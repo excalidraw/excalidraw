@@ -480,5 +480,15 @@
         "description": "Loading external drawing will <bold>replace your existing content</bold>.<br></br>You can back up your drawing first by using one of the options below."
       }
     }
+  },
+  "userList": {
+    "search": {
+      "placeholder": "Quick search",
+      "empty": "No users found"
+    },
+    "hint": {
+      "heading": "Follow mode",
+      "text": "You can click on a user to toggle follow mode. In follow mode, their canvas movements will be mirrored on your canvas."
+    }
   }
 }
