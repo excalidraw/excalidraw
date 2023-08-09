@@ -28,13 +28,34 @@ type InteractiveCanvasProps = {
     data: RenderInteractiveSceneCallback,
   ) => void;
   handleCanvasRef: (canvas: HTMLCanvasElement) => void;
-  onContextMenu: DOMAttributes<HTMLCanvasElement>["onContextMenu"];
-  onPointerMove: DOMAttributes<HTMLCanvasElement>["onPointerMove"];
-  onPointerUp: DOMAttributes<HTMLCanvasElement>["onPointerUp"];
-  onPointerCancel: DOMAttributes<HTMLCanvasElement>["onPointerCancel"];
-  onTouchMove: DOMAttributes<HTMLCanvasElement>["onTouchMove"];
-  onPointerDown: DOMAttributes<HTMLCanvasElement>["onPointerDown"];
-  onDoubleClick: DOMAttributes<HTMLCanvasElement>["onDoubleClick"];
+  onContextMenu: Exclude<
+    DOMAttributes<HTMLCanvasElement>["onContextMenu"],
+    undefined
+  >;
+  onPointerMove: Exclude<
+    DOMAttributes<HTMLCanvasElement>["onPointerMove"],
+    undefined
+  >;
+  onPointerUp: Exclude<
+    DOMAttributes<HTMLCanvasElement>["onPointerUp"],
+    undefined
+  >;
+  onPointerCancel: Exclude<
+    DOMAttributes<HTMLCanvasElement>["onPointerCancel"],
+    undefined
+  >;
+  onTouchMove: Exclude<
+    DOMAttributes<HTMLCanvasElement>["onTouchMove"],
+    undefined
+  >;
+  onPointerDown: Exclude<
+    DOMAttributes<HTMLCanvasElement>["onPointerDown"],
+    undefined
+  >;
+  onDoubleClick: Exclude<
+    DOMAttributes<HTMLCanvasElement>["onDoubleClick"],
+    undefined
+  >;
 };
 
 const InteractiveCanvas = (props: InteractiveCanvasProps) => {
@@ -130,7 +151,9 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       onPointerCancel={props.onPointerCancel}
       onTouchMove={props.onTouchMove}
       onPointerDown={props.onPointerDown}
-      onDoubleClick={props.onDoubleClick}
+      onDoubleClick={
+        props.appState.viewModeEnabled ? undefined : props.onDoubleClick
+      }
     >
       {t("labels.drawingCanvas")}
     </canvas>
