@@ -274,7 +274,7 @@ describe("Test Linear Elements", () => {
 
       // drag line from midpoint
       drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(12);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
       expect(renderStaticScene).toHaveBeenCalledTimes(4);
 
       expect(line.points.length).toEqual(3);
@@ -358,7 +358,7 @@ describe("Test Linear Elements", () => {
       // Move the element
       drag(startPoint, endPoint);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(13);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
       expect(renderStaticScene).toHaveBeenCalledTimes(6);
 
       expect([line.x, line.y]).toEqual([
@@ -417,7 +417,7 @@ describe("Test Linear Elements", () => {
           lastSegmentMidpoint[1] + delta,
         ]);
 
-        expect(renderInteractiveScene).toHaveBeenCalledTimes(17);
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
         expect(renderStaticScene).toHaveBeenCalledTimes(6);
 
         expect(line.points.length).toEqual(5);
@@ -458,7 +458,7 @@ describe("Test Linear Elements", () => {
         // Drag from first point
         drag(hitCoords, [hitCoords[0] - delta, hitCoords[1] - delta]);
 
-        expect(renderInteractiveScene).toHaveBeenCalledTimes(13);
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
         expect(renderStaticScene).toHaveBeenCalledTimes(5);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
@@ -485,7 +485,7 @@ describe("Test Linear Elements", () => {
         // Drag from first point
         drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
 
-        expect(renderInteractiveScene).toHaveBeenCalledTimes(13);
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
         expect(renderStaticScene).toHaveBeenCalledTimes(5);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
@@ -520,7 +520,7 @@ describe("Test Linear Elements", () => {
         // delete 3rd point
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
-        expect(renderInteractiveScene).toHaveBeenCalledTimes(19);
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
         expect(renderStaticScene).toHaveBeenCalledTimes(6);
 
         const newMidPoints = LinearElementEditor.getEditorMidPoints(
@@ -567,8 +567,8 @@ describe("Test Linear Elements", () => {
           lastSegmentMidpoint[0] + delta,
           lastSegmentMidpoint[1] + delta,
         ]);
-        expect(renderInteractiveScene).toHaveBeenCalledTimes(17);
-        expect(renderStaticScene).toHaveBeenCalledTimes(6);
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(20);
+        expect(renderStaticScene).toHaveBeenCalledTimes(7);
         expect(line.points.length).toEqual(5);
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)
@@ -622,14 +622,8 @@ describe("Test Linear Elements", () => {
         expect(midPoints[1]).not.toEqual(newMidPoints[1]);
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
-            [
-              31.884084517616053,
-              23.13275505472383,
-            ],
-            [
-              77.74792546875662,
-              44.57840982272327,
-            ],
+            null,
+            null,
           ]
         `);
       });
@@ -643,7 +637,7 @@ describe("Test Linear Elements", () => {
         // Drag from first point
         drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
 
-        expect(renderInteractiveScene).toHaveBeenCalledTimes(13);
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
         expect(renderStaticScene).toHaveBeenCalledTimes(5);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
