@@ -1,7 +1,9 @@
+import { vi } from "vitest";
 import {
   ExcalidrawElementSkeleton,
   convertToExcalidrawElements,
 } from "./transform";
+import { ExcalidrawArrowElement } from "../element/types";
 
 describe("Test Transform", () => {
   it("should transform regular shapes", () => {
@@ -559,6 +561,9 @@ describe("Test Transform", () => {
     });
 
     it("should bind arrows to existing elements if ids are correct", () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementationOnce(() => void 0);
       const elements = [
         {
           x: 100,
@@ -612,11 +617,60 @@ describe("Test Transform", () => {
         startBinding: null,
         endBinding: null,
       });
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+      expect(consoleErrorSpy).toHaveBeenNthCalledWith(
+        1,
+        "No element for start binding with id text-13 found",
+      );
+      expect(consoleErrorSpy).toHaveBeenNthCalledWith(
+        2,
+        "No element for end binding with id rect-11 found",
+      );
+    });
+
+    it("should bind when ids referenced before the element data", () => {
+      const elements = [
+        {
+          type: "arrow",
+          x: 255,
+          y: 239,
+          end: {
+            id: "rect-1",
+          },
+        },
+        {
+          type: "rectangle",
+          x: 560,
+          y: 139,
+          id: "rect-1",
+          width: 100,
+          height: 200,
+          backgroundColor: "#bac8ff",
+        },
+      ];
+      const excaldrawElements = convertToExcalidrawElements(
+        elements as ExcalidrawElementSkeleton[],
+      );
+      expect(excaldrawElements.length).toBe(2);
+      const [arrow, rect] = excaldrawElements;
+      expect((arrow as ExcalidrawArrowElement).endBinding).toStrictEqual({
+        elementId: "rect-1",
+        focus: 0,
+        gap: 5,
+      });
+      expect(rect.boundElements).toStrictEqual([
+        {
+          id: "id47",
+          type: "arrow",
+        },
+      ]);
     });
   });
 
-  // Skipping this test since we might remove this capability and just throw error instead
-  it.skip("should generate new ids if multiple elements contain same ids", () => {
+  it("should not allow duplicate ids", () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementationOnce(() => void 0);
     const elements = [
       {
         type: "rectangle",
@@ -640,8 +694,10 @@ describe("Test Transform", () => {
       elements as ExcalidrawElementSkeleton[],
     );
 
-    expect(excaldrawElements.length).toBe(2);
+    expect(excaldrawElements.length).toBe(1);
     expect(excaldrawElements[0].id).toBe("rect-1");
-    expect(excaldrawElements[0].id).not.toBe("rect-1");
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Duplicate id found for rect-1",
+    );
   });
 });

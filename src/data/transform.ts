@@ -493,6 +493,14 @@ export const convertToExcalidrawElements = (
         );
       }
     }
+    const existingElement = elementStore.getElement(excalidrawElement.id);
+    if (existingElement) {
+      assertNever(
+        excalidrawElement as never,
+        `Duplicate id found for ${excalidrawElement.id}`,
+        true,
+      );
+    }
     elementStore.add(excalidrawElement);
     elementsWithIds.set(excalidrawElement.id, element);
   }
