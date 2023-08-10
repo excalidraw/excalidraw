@@ -1048,6 +1048,15 @@ const _renderStaticScene = ({
     });
 };
 
+/** throttled to animation framerate */
+const renderInteractiveSceneThrottled = throttleRAF(
+  (config: InteractiveSceneRenderConfig) => {
+    const ret = _renderInteractiveScene(config);
+    config.callback?.(ret);
+  },
+  { trailing: true },
+);
+
 export const renderInteractiveScene = <
   U extends typeof _renderInteractiveScene,
   T extends boolean = false,
@@ -1056,16 +1065,7 @@ export const renderInteractiveScene = <
   throttle?: T,
 ): T extends true ? void : ReturnType<U> => {
   if (throttle) {
-    /** throttled to animation framerate */
-    const renderFuncThrottled = throttleRAF(
-      (config) => {
-        const ret = _renderInteractiveScene(config);
-        config.callback?.(ret);
-      },
-      { trailing: true },
-    );
-
-    renderFuncThrottled(renderConfig);
+    renderInteractiveSceneThrottled(renderConfig);
     return undefined as T extends true ? void : ReturnType<U>;
   }
   const ret = _renderInteractiveScene(renderConfig);
@@ -1073,20 +1073,20 @@ export const renderInteractiveScene = <
   return ret as T extends true ? void : ReturnType<U>;
 };
 
+/** throttled to animation framerate */
+const renderStaticSceneThrottled = throttleRAF(
+  (config: StaticSceneRenderConfig) => {
+    _renderStaticScene(config);
+  },
+  { trailing: true },
+);
+
 export const renderStaticScene = (
   renderConfig: StaticSceneRenderConfig,
   throttle?: boolean,
 ) => {
   if (throttle) {
-    /** throttled to animation framerate */
-    const renderFuncThrottled = throttleRAF(
-      (config) => {
-        _renderStaticScene(config);
-      },
-      { trailing: true },
-    );
-
-    renderFuncThrottled(renderConfig);
+    renderStaticSceneThrottled(renderConfig);
     return;
   }
 
