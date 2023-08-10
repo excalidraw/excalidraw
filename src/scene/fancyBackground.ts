@@ -137,6 +137,7 @@ const addContentBackground = (
 const updateRenderConfig = (
   renderConfig: RenderConfig,
   canvasDimensions: Dimensions,
+  contentDimesions: Dimensions,
 ): { scale: number; renderConfig: RenderConfig } => {
   const totalPadding =
     FANCY_BG_PADDING + FANCY_BG_BORDER_RADIUS + DEFAULT_EXPORT_PADDING;
@@ -147,7 +148,7 @@ const updateRenderConfig = (
       scrollX: renderConfig.scrollX + totalPadding,
       scrollY: renderConfig.scrollY + totalPadding,
     },
-    scale: getScaleToFit(canvasDimensions, {
+    scale: getScaleToFit(contentDimesions, {
       w: canvasDimensions.w - totalPadding * 2,
       h: canvasDimensions.h - totalPadding * 2,
     }),
@@ -159,12 +160,14 @@ export const applyFancyBackground = async ({
   fancyBackgroundImageUrl,
   backgroundColor,
   renderConfig,
+  contentDimensions,
 }: {
   canvas: HTMLCanvasElement;
   fancyBackgroundImageUrl: DataURL;
   backgroundColor: string;
   scale: number;
   renderConfig: RenderConfig;
+  contentDimensions: Dimensions;
 }) => {
   const context = canvas.getContext("2d")!;
 
@@ -183,5 +186,5 @@ export const applyFancyBackground = async ({
 
   addContentBackground(context, canvasDimensions, backgroundColor);
 
-  return updateRenderConfig(renderConfig, canvasDimensions);
+  return updateRenderConfig(renderConfig, canvasDimensions, contentDimensions);
 };
