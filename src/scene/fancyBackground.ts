@@ -1,7 +1,12 @@
-import { FANCY_BG_BORDER_RADIUS, FANCY_BG_PADDING } from "../constants";
+import {
+  DEFAULT_EXPORT_PADDING,
+  FANCY_BG_BORDER_RADIUS,
+  FANCY_BG_PADDING,
+} from "../constants";
 import { loadHTMLImageElement } from "../element/image";
 import { roundRect } from "../renderer/roundRect";
 import { DataURL } from "../types";
+import { RenderConfig } from "./types";
 
 type Dimensions = { w: number; h: number };
 
@@ -25,23 +30,35 @@ const getScaleToFit = (contentSize: Dimensions, containerSize: Dimensions) => {
 
 const addImageBackground = (
   context: CanvasRenderingContext2D,
-  canvasWidth: number,
-  canvasHeight: number,
+  canvasDimensions: Dimensions,
   fancyBackgroundImage: HTMLImageElement,
 ) => {
   context.save();
   context.beginPath();
   if (context.roundRect) {
-    context.roundRect(0, 0, canvasWidth, canvasHeight, FANCY_BG_BORDER_RADIUS);
+    context.roundRect(
+      0,
+      0,
+      canvasDimensions.w,
+      canvasDimensions.h,
+      FANCY_BG_BORDER_RADIUS,
+    );
   } else {
-    roundRect(context, 0, 0, canvasWidth, canvasHeight, FANCY_BG_BORDER_RADIUS);
+    roundRect(
+      context,
+      0,
+      0,
+      canvasDimensions.w,
+      canvasDimensions.h,
+      FANCY_BG_BORDER_RADIUS,
+    );
   }
   const scale = getScaleToFill(
     { w: fancyBackgroundImage.width, h: fancyBackgroundImage.height },
-    { w: canvasWidth, h: canvasHeight },
+    { w: canvasDimensions.w, h: canvasDimensions.h },
   );
-  const x = (canvasWidth - fancyBackgroundImage.width * scale) / 2;
-  const y = (canvasHeight - fancyBackgroundImage.height * scale) / 2;
+  const x = (canvasDimensions.w - fancyBackgroundImage.width * scale) / 2;
+  const y = (canvasDimensions.h - fancyBackgroundImage.height * scale) / 2;
   context.clip();
   context.drawImage(
     fancyBackgroundImage,
@@ -56,8 +73,7 @@ const addImageBackground = (
 
 const addContentBackground = (
   context: CanvasRenderingContext2D,
-  canvasWidth: number,
-  canvasHeight: number,
+  normalizedDimensions: Dimensions,
   contentBackgroundColor: string,
 ) => {
   const shadows = [
@@ -94,8 +110,8 @@ const addContentBackground = (
       context.roundRect(
         FANCY_BG_PADDING,
         FANCY_BG_PADDING,
-        canvasWidth - FANCY_BG_PADDING * 2,
-        canvasHeight - FANCY_BG_PADDING * 2,
+        normalizedDimensions.w - FANCY_BG_PADDING * 2,
+        normalizedDimensions.h - FANCY_BG_PADDING * 2,
         FANCY_BG_BORDER_RADIUS,
       );
     } else {
@@ -103,8 +119,8 @@ const addContentBackground = (
         context,
         FANCY_BG_PADDING,
         FANCY_BG_PADDING,
-        canvasWidth - FANCY_BG_PADDING * 2,
-        canvasHeight - FANCY_BG_PADDING * 2,
+        normalizedDimensions.w - FANCY_BG_PADDING * 2,
+        normalizedDimensions.h - FANCY_BG_PADDING * 2,
         FANCY_BG_BORDER_RADIUS,
       );
     }
@@ -118,23 +134,54 @@ const addContentBackground = (
   });
 };
 
-export const applyFancyBackground = async (
-  canvas: HTMLCanvasElement,
-  fancyBackgroundImageUrl: DataURL,
-  backgroundColor: string,
-) => {
+const updateRenderConfig = (
+  renderConfig: RenderConfig,
+  canvasDimensions: Dimensions,
+): { scale: number; renderConfig: RenderConfig } => {
+  const totalPadding =
+    FANCY_BG_PADDING + FANCY_BG_BORDER_RADIUS + DEFAULT_EXPORT_PADDING;
+
+  return {
+    renderConfig: {
+      ...renderConfig,
+      scrollX: renderConfig.scrollX + totalPadding,
+      scrollY: renderConfig.scrollY + totalPadding,
+    },
+    scale: getScaleToFit(canvasDimensions, {
+      w: canvasDimensions.w - totalPadding * 2,
+      h: canvasDimensions.h - totalPadding * 2,
+    }),
+  };
+};
+
+export const applyFancyBackground = async ({
+  canvas,
+  fancyBackgroundImageUrl,
+  backgroundColor,
+  renderConfig,
+}: {
+  canvas: HTMLCanvasElement;
+  fancyBackgroundImageUrl: DataURL;
+  backgroundColor: string;
+  scale: number;
+  renderConfig: RenderConfig;
+}) => {
   const context = canvas.getContext("2d")!;
 
   const fancyBackgroundImage = await loadHTMLImageElement(
     fancyBackgroundImageUrl,
   );
 
-  addImageBackground(
-    context,
-    canvas.width,
-    canvas.height,
-    fancyBackgroundImage,
-  );
+  const canvasDimensions: Dimensions = { w: canvas.width, h: canvas.height };
 
-  addContentBackground(context, canvas.width, canvas.height, backgroundColor);
+  // const normalizedDimensions: Dimensions = {
+  //   w: canvas.width / scale,
+  //   h: canvas.height / scale,
+  // };
+
+  addImageBackground(context, canvasDimensions, fancyBackgroundImage);
+
+  addContentBackground(context, canvasDimensions, backgroundColor);
+
+  return updateRenderConfig(renderConfig, canvasDimensions);
 };
