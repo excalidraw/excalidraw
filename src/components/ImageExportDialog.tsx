@@ -138,7 +138,7 @@ const ImageExportModal = ({
   }, [
     appState,
     appState.exportBackground,
-    appState.exportBackgroundImage,
+    appState.fancyBackgroundImageUrl,
     files,
     exportedElements,
   ]);
@@ -150,7 +150,7 @@ const ImageExportModal = ({
         <div
           className={clsx("ImageExportModal__preview__canvas", {
             "ImageExportModal__preview__canvas--img-bcg":
-              appState.exportBackground && appState.exportBackgroundImage,
+              appState.exportBackground && appState.fancyBackgroundImageUrl,
           })}
           ref={previewRef}
         >
@@ -159,8 +159,8 @@ const ImageExportModal = ({
       </div>
       <div className="ImageExportModal__settings">
         <h3>{t("imageExportDialog.header")}</h3>
-        <div className="ImageExportModal__settings__filename">
-          {!nativeFileSystemSupported && (
+        {!nativeFileSystemSupported && (
+          <div className="ImageExportModal__settings__filename">
             <input
               type="text"
               className="TextInput"
@@ -177,8 +177,8 @@ const ImageExportModal = ({
                 );
               }}
             />
-          )}
-        </div>
+          </div>
+        )}
         {someElementIsSelected && (
           <ExportSetting
             label={t("imageExportDialog.label.onlySelected")}

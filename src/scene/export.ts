@@ -12,6 +12,7 @@ import {
   updateImageCache,
 } from "../element/image";
 import Scene from "./Scene";
+import { applyFancyBackground } from "./fancyBackground";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -53,6 +54,14 @@ export const exportToCanvas = async (
   });
 
   const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
+
+  if (appState.fancyBackgroundImageUrl) {
+    await applyFancyBackground(
+      canvas,
+      appState.fancyBackgroundImageUrl,
+      viewBackgroundColor,
+    );
+  }
 
   renderStaticScene({
     canvas,

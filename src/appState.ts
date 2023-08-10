@@ -72,7 +72,7 @@ export const getDefaultAppState = (): Omit<
     openMenu: null,
     openPopup: null,
     openSidebar: null,
-    openDialog: null,
+    openDialog: "imageExport",
     pasteDialog: { shown: false, data: null },
     previousSelectedElementIds: {},
     resizingElement: null,
@@ -101,7 +101,7 @@ export const getDefaultAppState = (): Omit<
     pendingImageElementId: null,
     showHyperlinkPopup: false,
     selectedLinearElement: null,
-    exportBackgroundImage:
+    fancyBackgroundImageUrl:
       EXPORT_BACKGROUND_IMAGES[DEFAULT_EXPORT_BACKGROUND_IMAGE].path,
   };
 };

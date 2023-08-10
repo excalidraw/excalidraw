@@ -1,5 +1,5 @@
 import cssVariables from "./css/variables.module.scss";
-import { AppProps } from "./types";
+import { AppProps, DataURL } from "./types";
 import { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
 
@@ -321,11 +321,14 @@ export const LIBRARY_DISABLED_TYPES = new Set(["embeddable", "image"] as const);
 
 export const EXPORT_BACKGROUND_IMAGES = {
   solid: { path: null, label: "solid color" },
-  bubbles: { path: "/backgrounds/bubbles.svg", label: "bubbles" },
-  bubbles2: { path: "/backgrounds/bubbles2.svg", label: "bubbles 2" },
-  bricks: { path: "/backgrounds/bricks.svg", label: "bricks" },
-  lines: { path: "/backgrounds/lines.svg", label: "lines" },
-  lines2: { path: "/backgrounds/lines2.svg", label: "lines 2" },
+  bubbles: { path: "/backgrounds/bubbles.svg" as DataURL, label: "bubbles" },
+  bubbles2: {
+    path: "/backgrounds/bubbles2.svg" as DataURL,
+    label: "bubbles 2",
+  },
+  bricks: { path: "/backgrounds/bricks.svg" as DataURL, label: "bricks" },
+  lines: { path: "/backgrounds/lines.svg" as DataURL, label: "lines" },
+  lines2: { path: "/backgrounds/lines2.svg" as DataURL, label: "lines 2" },
 } as const;
 
 export const DEFAULT_EXPORT_BACKGROUND_IMAGE: keyof typeof EXPORT_BACKGROUND_IMAGES =

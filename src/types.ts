@@ -287,7 +287,7 @@ export type AppState = {
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
-  exportBackgroundImage: string | null;
+  fancyBackgroundImageUrl: DataURL | null;
 };
 
 export type UIAppState = Omit<
