@@ -72,7 +72,7 @@ export const getDefaultAppState = (): Omit<
     openMenu: null,
     openPopup: null,
     openSidebar: null,
-    openDialog: "imageExport",
+    openDialog: null,
     pasteDialog: { shown: false, data: null },
     previousSelectedElementIds: {},
     resizingElement: null,
