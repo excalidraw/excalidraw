@@ -7,8 +7,8 @@ import type { StaticCanvasRenderConfig } from "../../scene/types";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
 
 type StaticCanvasProps = {
-  canvas: HTMLCanvasElement | null;
-  rc: RoughCanvas | null;
+  canvas: HTMLCanvasElement;
+  rc: RoughCanvas;
   elements: readonly NonDeletedExcalidrawElement[];
   visibleElements: readonly NonDeletedExcalidrawElement[];
   versionNonce: number | undefined;
@@ -16,21 +16,36 @@ type StaticCanvasProps = {
   scale: number;
   appState: StaticCanvasAppState;
   renderConfig: StaticCanvasRenderConfig;
-  handleCanvasRef: (canvas: HTMLCanvasElement | null) => void;
 };
 
 const StaticCanvas = (props: StaticCanvasProps) => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const isComponentMounted = useRef(false);
 
   useEffect(() => {
-    if (!isComponentMounted.current) {
-      isComponentMounted.current = true;
+    const wrapper = wrapperRef.current;
+    if (!wrapper) {
       return;
     }
+
+    const canvas = props.canvas;
+
+    if (!isComponentMounted.current) {
+      isComponentMounted.current = true;
+
+      wrapper.replaceChildren(canvas);
+      canvas.classList.add("excalidraw__canvas", "static");
+    }
+
+    canvas.style.width = `${props.appState.width}px`;
+    canvas.style.height = `${props.appState.height}px`;
+    canvas.width = props.appState.width * props.scale;
+    canvas.height = props.appState.height * props.scale;
+
     renderStaticScene(
       {
-        canvas: props.canvas,
-        rc: props.rc!,
+        canvas,
+        rc: props.rc,
         scale: props.scale,
         elements: props.elements,
         visibleElements: props.visibleElements,
@@ -41,19 +56,7 @@ const StaticCanvas = (props: StaticCanvasProps) => {
     );
   });
 
-  return (
-    <canvas
-      className="excalidraw__canvas static"
-      style={{
-        width: props.appState.width,
-        height: props.appState.height,
-        pointerEvents: "none",
-      }}
-      width={props.appState.width * props.scale}
-      height={props.appState.height * props.scale}
-      ref={props.handleCanvasRef}
-    />
-  );
+  return <div className="excalidraw__canvas-wrapper" ref={wrapperRef} />;
 };
 
 const getRelevantAppStateProps = (

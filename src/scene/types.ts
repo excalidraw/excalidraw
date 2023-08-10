@@ -40,7 +40,7 @@ export type RenderInteractiveSceneCallback = {
 };
 
 export type StaticSceneRenderConfig = {
-  canvas: HTMLCanvasElement | null;
+  canvas: HTMLCanvasElement;
   rc: RoughCanvas;
   elements: readonly NonDeletedExcalidrawElement[];
   visibleElements: readonly NonDeletedExcalidrawElement[];

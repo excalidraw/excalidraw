@@ -453,13 +453,13 @@ export type ExportOpts = {
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: UIAppState,
     files: BinaryFiles,
-    canvas: HTMLCanvasElement | null,
+    canvas: HTMLCanvasElement,
   ) => void;
   renderCustomUI?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: UIAppState,
     files: BinaryFiles,
-    canvas: HTMLCanvasElement | null,
+    canvas: HTMLCanvasElement,
   ) => JSX.Element;
 };
 
@@ -504,7 +504,7 @@ export type AppProps = Merge<
  * in the app, eg Manager. Factored out into a separate type to keep DRY. */
 export type AppClassProperties = {
   props: AppProps;
-  canvas: HTMLCanvasElement | null;
+  canvas: HTMLCanvasElement;
   interactiveCanvas: HTMLCanvasElement | null;
   focusContainer(): void;
   library: Library;

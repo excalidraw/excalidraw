@@ -78,6 +78,11 @@
     // feedback loop (see https://github.com/excalidraw/excalidraw/pull/3379)
   }
 
+  &__canvas-wrapper,
+  &__canvas.static {
+    pointer-events: none;
+  }
+
   &__canvas {
     position: absolute;
   }

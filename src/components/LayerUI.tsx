@@ -57,7 +57,7 @@ interface LayerUIProps {
   actionManager: ActionManager;
   appState: UIAppState;
   files: BinaryFiles;
-  canvas: HTMLCanvasElement | null;
+  canvas: HTMLCanvasElement;
   interactiveCanvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];

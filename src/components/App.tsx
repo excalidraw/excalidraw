@@ -443,9 +443,9 @@ const gesture: Gesture = {
 };
 
 class App extends React.Component<AppProps, AppState> {
-  canvas: AppClassProperties["canvas"] = null;
-  interactiveCanvas: AppClassProperties["canvas"] = null;
-  rc: RoughCanvas | null = null;
+  canvas: AppClassProperties["canvas"];
+  interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
+  rc: RoughCanvas;
   unmounted: boolean = false;
   actionManager: ActionManager;
   device: Device = deviceContextInitialValue;
@@ -509,6 +509,9 @@ class App extends React.Component<AppProps, AppState> {
 
     this.library = new Library(this);
     this.scene = new Scene();
+
+    this.canvas = document.createElement("canvas");
+    this.rc = rough.canvas(this.canvas);
     this.renderer = new Renderer(this.scene);
 
     if (excalidrawRef) {
@@ -961,7 +964,6 @@ class App extends React.Component<AppProps, AppState> {
 
     return this.scene.getNonDeletedFrames().map((f, index) => {
       if (
-        !this.canvas ||
         !isElementInViewport(
           f,
           this.canvas.width / window.devicePixelRatio,
@@ -1222,7 +1224,6 @@ class App extends React.Component<AppProps, AppState> {
                             isExporting: false,
                             renderGrid: true,
                           }}
-                          handleCanvasRef={this.handleStaticCanvasRef}
                         />
                         <InteractiveCanvas
                           canvas={this.interactiveCanvas}
@@ -7431,14 +7432,6 @@ class App extends React.Component<AppProps, AppState> {
         EVENT.TOUCH_END,
         this.onTouchEnd,
       );
-    }
-  };
-
-  private handleStaticCanvasRef = (canvas: HTMLCanvasElement | null) => {
-    // canvas is null when unmounting
-    if (canvas !== null) {
-      this.canvas = canvas;
-      this.rc = rough.canvas(this.canvas);
     }
   };
 
