@@ -1246,9 +1246,6 @@ class App extends React.Component<AppProps, AppState> {
                           onTouchMove={this.handleTouchMove}
                           onPointerDown={this.handleCanvasPointerDown}
                           onDoubleClick={this.handleCanvasDoubleClick}
-                          onWheel={this.handleWheel}
-                          onTouchStart={this.onTouchStart}
-                          onTouchEnd={this.onTouchEnd}
                         />
                         {this.renderFrameNames()}
                       </ExcalidrawActionManagerContext.Provider>
@@ -2059,7 +2056,7 @@ class App extends React.Component<AppProps, AppState> {
     didTapTwice = false;
   }
 
-  private onTouchStart = (event: React.TouchEvent) => {
+  private onTouchStart = (event: TouchEvent) => {
     // fix for Apple Pencil Scribble
     // On Android, preventing the event would disable contextMenu on tap-hold
     if (!isAndroid) {
@@ -2099,7 +2096,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private onTouchEnd = (event: React.TouchEvent) => {
+  private onTouchEnd = (event: TouchEvent) => {
     this.resetContextMenuTimer();
     if (event.touches.length > 0) {
       this.setState({
@@ -7409,6 +7406,31 @@ class App extends React.Component<AppProps, AppState> {
     // canvas is null when unmounting
     if (canvas !== null) {
       this.interactiveCanvas = canvas;
+
+      // -----------------------------------------------------------------------
+      // NOTE wheel, touchstart, touchend events must be registered outside
+      // of react because react binds them them passively (so we can't prevent
+      // default on them)
+      this.interactiveCanvas.addEventListener(EVENT.WHEEL, this.handleWheel);
+      this.interactiveCanvas.addEventListener(
+        EVENT.TOUCH_START,
+        this.onTouchStart,
+      );
+      this.interactiveCanvas.addEventListener(EVENT.TOUCH_END, this.onTouchEnd);
+      // -----------------------------------------------------------------------
+    } else {
+      this.interactiveCanvas?.removeEventListener(
+        EVENT.WHEEL,
+        this.handleWheel,
+      );
+      this.interactiveCanvas?.removeEventListener(
+        EVENT.TOUCH_START,
+        this.onTouchStart,
+      );
+      this.interactiveCanvas?.removeEventListener(
+        EVENT.TOUCH_END,
+        this.onTouchEnd,
+      );
     }
   };
 
