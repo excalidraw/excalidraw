@@ -3867,11 +3867,11 @@ class App extends React.Component<AppProps, AppState> {
         // Since we are reading from previous state which is not possible with
         // automatic batching in React 18 hence using flush sync to synchronously
         // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
-        flushSync(() => {
-          this.setState({
-            editingLinearElement,
-          });
+        // flushSync(() => {
+        this.setState({
+          editingLinearElement,
         });
+        // });
       }
       if (editingLinearElement?.lastUncommittedPoint != null) {
         this.maybeSuggestBindingAtCursor(scenePointer);
