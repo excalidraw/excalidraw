@@ -1,4 +1,4 @@
-import { EXPORT_BG_BORDER_RADIUS, EXPORT_BG_PADDING } from "../constants";
+import { FANCY_BG_BORDER_RADIUS, FANCY_BG_PADDING } from "../constants";
 import { loadHTMLImageElement } from "../element/image";
 import { roundRect } from "../renderer/roundRect";
 import { DataURL } from "../types";
@@ -32,16 +32,9 @@ const addImageBackground = (
   context.save();
   context.beginPath();
   if (context.roundRect) {
-    context.roundRect(0, 0, canvasWidth, canvasHeight, EXPORT_BG_BORDER_RADIUS);
+    context.roundRect(0, 0, canvasWidth, canvasHeight, FANCY_BG_BORDER_RADIUS);
   } else {
-    roundRect(
-      context,
-      0,
-      0,
-      canvasWidth,
-      canvasHeight,
-      EXPORT_BG_BORDER_RADIUS,
-    );
+    roundRect(context, 0, 0, canvasWidth, canvasHeight, FANCY_BG_BORDER_RADIUS);
   }
   const scale = getScaleToFill(
     { w: fancyBackgroundImage.width, h: fancyBackgroundImage.height },
@@ -99,20 +92,20 @@ const addContentBackground = (
 
     if (context.roundRect) {
       context.roundRect(
-        EXPORT_BG_PADDING,
-        EXPORT_BG_PADDING,
-        canvasWidth - EXPORT_BG_PADDING * 2,
-        canvasHeight - EXPORT_BG_PADDING * 2,
-        EXPORT_BG_BORDER_RADIUS,
+        FANCY_BG_PADDING,
+        FANCY_BG_PADDING,
+        canvasWidth - FANCY_BG_PADDING * 2,
+        canvasHeight - FANCY_BG_PADDING * 2,
+        FANCY_BG_BORDER_RADIUS,
       );
     } else {
       roundRect(
         context,
-        EXPORT_BG_PADDING,
-        EXPORT_BG_PADDING,
-        canvasWidth - EXPORT_BG_PADDING * 2,
-        canvasHeight - EXPORT_BG_PADDING * 2,
-        EXPORT_BG_BORDER_RADIUS,
+        FANCY_BG_PADDING,
+        FANCY_BG_PADDING,
+        canvasWidth - FANCY_BG_PADDING * 2,
+        canvasHeight - FANCY_BG_PADDING * 2,
+        FANCY_BG_BORDER_RADIUS,
       );
     }
 

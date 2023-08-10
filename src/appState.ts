@@ -1,11 +1,11 @@
 import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_ELEMENT_PROPS,
-  DEFAULT_EXPORT_BACKGROUND_IMAGE,
+  DEFAULT_FANCY_BACKGROUND_IMAGE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
-  EXPORT_BACKGROUND_IMAGES,
+  FANCY_BACKGROUND_IMAGES,
   EXPORT_SCALES,
   THEME,
 } from "./constants";
@@ -102,7 +102,7 @@ export const getDefaultAppState = (): Omit<
     showHyperlinkPopup: false,
     selectedLinearElement: null,
     fancyBackgroundImageUrl:
-      EXPORT_BACKGROUND_IMAGES[DEFAULT_EXPORT_BACKGROUND_IMAGE].path,
+      FANCY_BACKGROUND_IMAGES[DEFAULT_FANCY_BACKGROUND_IMAGE].path,
   };
 };
 
@@ -210,7 +210,7 @@ const APP_STATE_STORAGE_CONF = (<
   pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
-  exportBackgroundImage: { browser: false, export: false, server: false },
+  fancyBackgroundImageUrl: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

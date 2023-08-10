@@ -226,8 +226,8 @@ export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 
 export const EXPORT_SCALES = [1, 2, 3];
 export const DEFAULT_EXPORT_PADDING = 10; // px
-export const EXPORT_BG_PADDING = 24; // px
-export const EXPORT_BG_BORDER_RADIUS = 12; // px
+export const FANCY_BG_PADDING = 24; // px
+export const FANCY_BG_BORDER_RADIUS = 12; // px
 
 export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 
@@ -319,7 +319,7 @@ export const DEFAULT_SIDEBAR = {
 
 export const LIBRARY_DISABLED_TYPES = new Set(["embeddable", "image"] as const);
 
-export const EXPORT_BACKGROUND_IMAGES = {
+export const FANCY_BACKGROUND_IMAGES = {
   solid: { path: null, label: "solid color" },
   bubbles: { path: "/backgrounds/bubbles.svg" as DataURL, label: "bubbles" },
   bubbles2: {
@@ -331,5 +331,5 @@ export const EXPORT_BACKGROUND_IMAGES = {
   lines2: { path: "/backgrounds/lines2.svg" as DataURL, label: "lines 2" },
 } as const;
 
-export const DEFAULT_EXPORT_BACKGROUND_IMAGE: keyof typeof EXPORT_BACKGROUND_IMAGES =
+export const DEFAULT_FANCY_BACKGROUND_IMAGE: keyof typeof FANCY_BACKGROUND_IMAGES =
   "solid" as const;

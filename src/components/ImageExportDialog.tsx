@@ -10,7 +10,7 @@ import {
   actionChangeExportEmbedScene,
   actionChangeExportScale,
   actionChangeProjectName,
-  actionChangeExportBackgroundImage,
+  actionChangeFancyBackgroundImageUrl,
 } from "../actions/actionExport";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import {
@@ -18,8 +18,8 @@ import {
   EXPORT_IMAGE_TYPES,
   isFirefox,
   EXPORT_SCALES,
-  EXPORT_BACKGROUND_IMAGES,
-  DEFAULT_EXPORT_BACKGROUND_IMAGE,
+  FANCY_BACKGROUND_IMAGES,
+  DEFAULT_FANCY_BACKGROUND_IMAGE,
 } from "../constants";
 
 import { canvasToBlob } from "../data/blob";
@@ -65,8 +65,8 @@ type ImageExportModalProps = {
 
 function isBackgroundImageKey(
   key: string,
-): key is keyof typeof EXPORT_BACKGROUND_IMAGES {
-  return key in EXPORT_BACKGROUND_IMAGES;
+): key is keyof typeof FANCY_BACKGROUND_IMAGES {
+  return key in FANCY_BACKGROUND_IMAGES;
 }
 
 const ImageExportModal = ({
@@ -86,8 +86,8 @@ const ImageExportModal = ({
     appState.exportBackground,
   );
   const [exportBackgroundImage, setExportBackgroundImage] = useState<
-    keyof typeof EXPORT_BACKGROUND_IMAGES
-  >(DEFAULT_EXPORT_BACKGROUND_IMAGE);
+    keyof typeof FANCY_BACKGROUND_IMAGES
+  >(DEFAULT_FANCY_BACKGROUND_IMAGE);
 
   const [exportDarkMode, setExportDarkMode] = useState(
     appState.exportWithDarkMode,
@@ -199,7 +199,7 @@ const ImageExportModal = ({
         >
           {exportWithBackground && (
             <Select
-              items={EXPORT_BACKGROUND_IMAGES}
+              items={FANCY_BACKGROUND_IMAGES}
               ariaLabel={t("imageExportDialog.label.backgroundImage")}
               placeholder={t("imageExportDialog.label.backgroundImage")}
               value={exportBackgroundImage}
@@ -207,9 +207,9 @@ const ImageExportModal = ({
                 if (isBackgroundImageKey(value)) {
                   setExportBackgroundImage(value);
                   actionManager.executeAction(
-                    actionChangeExportBackgroundImage,
+                    actionChangeFancyBackgroundImageUrl,
                     "ui",
-                    EXPORT_BACKGROUND_IMAGES[value].path,
+                    FANCY_BACKGROUND_IMAGES[value].path,
                   );
                 }
               }}

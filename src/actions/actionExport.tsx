@@ -12,9 +12,9 @@ import { register } from "./register";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
 import {
-  DEFAULT_EXPORT_BACKGROUND_IMAGE,
+  DEFAULT_FANCY_BACKGROUND_IMAGE,
   DEFAULT_EXPORT_PADDING,
-  EXPORT_BACKGROUND_IMAGES,
+  FANCY_BACKGROUND_IMAGES,
   EXPORT_SCALES,
   THEME,
 } from "../constants";
@@ -114,21 +114,21 @@ export const actionChangeExportBackground = register({
   ),
 });
 
-export const actionChangeExportBackgroundImage = register({
-  name: "changeExportBackgroundImage",
+export const actionChangeFancyBackgroundImageUrl = register({
+  name: "changeFancyBackgroundImageUrl",
   trackEvent: { category: "export", action: "toggleBackgroundImage" },
   perform: (_elements, appState, value) => {
     return {
-      appState: { ...appState, exportBackgroundImage: value },
+      appState: { ...appState, fancyBackgroundImageUrl: value },
       commitToHistory: false,
     };
   },
   PanelComponent: ({ updateData }) => (
     <Select
-      items={EXPORT_BACKGROUND_IMAGES}
+      items={FANCY_BACKGROUND_IMAGES}
       ariaLabel={t("imageExportDialog.label.backgroundImage")}
       placeholder={t("imageExportDialog.label.backgroundImage")}
-      value={DEFAULT_EXPORT_BACKGROUND_IMAGE}
+      value={DEFAULT_FANCY_BACKGROUND_IMAGE}
       onChange={(value) => {
         updateData(value);
       }}
