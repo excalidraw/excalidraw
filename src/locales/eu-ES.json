@@ -424,8 +424,8 @@
     "canvas": "oihala",
     "selection": "hautapena",
     "pasteAsSingleElement": "Erabili {{shortcut}} elementu bakar gisa itsasteko,\nedo itsatsi lehendik dagoen testu-editore batean",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "Url hau txertatzea ez da une honetan onartzen. Sortu issue bat GitHub-en Urla zerrenda zurian sartzea eskatzeko",
+    "unrecognizedLinkFormat": "Kapsulatu duzun esteka ez dator bat espero den formatuarekin. Mesedez, saiatu iturburu-guneak emandako 'kapsulatu' katea itsasten"
   },
   "colors": {
     "transparent": "Gardena",
