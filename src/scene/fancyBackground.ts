@@ -1,26 +1,12 @@
-import {
-  DEFAULT_EXPORT_PADDING,
-  FANCY_BG_BORDER_RADIUS,
-  FANCY_BG_PADDING,
-} from "../constants";
+import { FANCY_BG_BORDER_RADIUS, FANCY_BG_PADDING } from "../constants";
 import { loadHTMLImageElement } from "../element/image";
 import { roundRect } from "../renderer/roundRect";
 import { DataURL } from "../types";
-import { RenderConfig } from "./types";
 
 type Dimensions = { w: number; h: number };
 
 const getScaleToFill = (contentSize: Dimensions, containerSize: Dimensions) => {
   const scale = Math.max(
-    containerSize.w / contentSize.w,
-    containerSize.h / contentSize.h,
-  );
-
-  return scale;
-};
-
-const getScaleToFit = (contentSize: Dimensions, containerSize: Dimensions) => {
-  const scale = Math.min(
     containerSize.w / contentSize.w,
     containerSize.h / contentSize.h,
   );
@@ -134,47 +120,14 @@ const addContentBackground = (
   });
 };
 
-const updateRenderConfig = (
-  renderConfig: RenderConfig,
-  canvasDimensions: Dimensions,
-  contentDimensions: Dimensions,
-): { scale: number; renderConfig: RenderConfig } => {
-  const totalPadding =
-    FANCY_BG_PADDING + FANCY_BG_BORDER_RADIUS + DEFAULT_EXPORT_PADDING;
-
-  const scale = getScaleToFit(contentDimensions, {
-    w: canvasDimensions.w - totalPadding * 2,
-    h: canvasDimensions.h - totalPadding * 2,
-  });
-
-  const centeredScrollX =
-    (canvasDimensions.w - contentDimensions.w * scale) / 2;
-  const centeredScrollY =
-    (canvasDimensions.h - contentDimensions.h * scale) / 2;
-
-  return {
-    renderConfig: {
-      ...renderConfig,
-      scrollX: centeredScrollX + renderConfig.scrollX,
-      scrollY: centeredScrollY + renderConfig.scrollY,
-    },
-    scale,
-  };
-};
-
 export const applyFancyBackground = async ({
   canvas,
   fancyBackgroundImageUrl,
   backgroundColor,
-  renderConfig,
-  contentDimensions,
 }: {
   canvas: HTMLCanvasElement;
   fancyBackgroundImageUrl: DataURL;
   backgroundColor: string;
-  scale: number;
-  renderConfig: RenderConfig;
-  contentDimensions: Dimensions;
 }) => {
   const context = canvas.getContext("2d")!;
 
@@ -184,14 +137,7 @@ export const applyFancyBackground = async ({
 
   const canvasDimensions: Dimensions = { w: canvas.width, h: canvas.height };
 
-  // const normalizedDimensions: Dimensions = {
-  //   w: canvas.width / scale,
-  //   h: canvas.height / scale,
-  // };
-
   addImageBackground(context, canvasDimensions, fancyBackgroundImage);
 
   addContentBackground(context, canvasDimensions, backgroundColor);
-
-  return updateRenderConfig(renderConfig, canvasDimensions, contentDimensions);
 };
