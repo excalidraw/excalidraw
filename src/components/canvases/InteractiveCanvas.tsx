@@ -27,9 +27,9 @@ type InteractiveCanvasProps = {
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
-  handleCanvasRef: (canvas: HTMLCanvasElement) => void;
+  handleCanvasRef: (canvas: HTMLCanvasElement | null) => void;
   onContextMenu: Exclude<
-    DOMAttributes<HTMLCanvasElement>["onContextMenu"],
+    DOMAttributes<HTMLCanvasElement | HTMLDivElement>["onContextMenu"],
     undefined
   >;
   onPointerMove: Exclude<
@@ -54,6 +54,15 @@ type InteractiveCanvasProps = {
   >;
   onDoubleClick: Exclude<
     DOMAttributes<HTMLCanvasElement>["onDoubleClick"],
+    undefined
+  >;
+  onWheel: Exclude<DOMAttributes<HTMLCanvasElement>["onWheel"], undefined>;
+  onTouchStart: Exclude<
+    DOMAttributes<HTMLCanvasElement>["onTouchStart"],
+    undefined
+  >;
+  onTouchEnd: Exclude<
+    DOMAttributes<HTMLCanvasElement>["onTouchEnd"],
     undefined
   >;
 };
@@ -154,6 +163,9 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       onDoubleClick={
         props.appState.viewModeEnabled ? undefined : props.onDoubleClick
       }
+      onWheel={props.onWheel}
+      onTouchStart={props.onTouchStart}
+      onTouchEnd={props.onTouchEnd}
     >
       {t("labels.drawingCanvas")}
     </canvas>

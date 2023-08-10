@@ -16,7 +16,7 @@ type StaticCanvasProps = {
   scale: number;
   appState: StaticCanvasAppState;
   renderConfig: StaticCanvasRenderConfig;
-  handleCanvasRef: (canvas: HTMLCanvasElement) => void;
+  handleCanvasRef: (canvas: HTMLCanvasElement | null) => void;
 };
 
 const StaticCanvas = (props: StaticCanvasProps) => {

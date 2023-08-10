@@ -1085,11 +1085,7 @@ class App extends React.Component<AppProps, AppState> {
           }}
           onPointerDown={(event) => this.handleCanvasPointerDown(event)}
           onWheel={(event) => this.handleWheel(event)}
-          onContextMenu={
-            this.handleCanvasContextMenu as (
-              event: React.PointerEvent<HTMLDivElement>,
-            ) => void
-          }
+          onContextMenu={this.handleCanvasContextMenu}
           onDoubleClick={() => {
             this.setState({
               editingFrame: f.id,
@@ -1226,7 +1222,7 @@ class App extends React.Component<AppProps, AppState> {
                             isExporting: false,
                             renderGrid: true,
                           }}
-                          handleCanvasRef={this.handleCanvasRef}
+                          handleCanvasRef={this.handleStaticCanvasRef}
                         />
                         <InteractiveCanvas
                           canvas={this.interactiveCanvas}
@@ -1243,17 +1239,16 @@ class App extends React.Component<AppProps, AppState> {
                             this.renderInteractiveSceneCallback
                           }
                           handleCanvasRef={this.handleInteractiveCanvasRef}
-                          onContextMenu={
-                            this.handleCanvasContextMenu as (
-                              event: React.PointerEvent<HTMLCanvasElement>,
-                            ) => void
-                          }
+                          onContextMenu={this.handleCanvasContextMenu}
                           onPointerMove={this.handleCanvasPointerMove}
                           onPointerUp={this.handleCanvasPointerUp}
                           onPointerCancel={this.removePointer}
                           onTouchMove={this.handleTouchMove}
                           onPointerDown={this.handleCanvasPointerDown}
                           onDoubleClick={this.handleCanvasDoubleClick}
+                          onWheel={this.handleWheel}
+                          onTouchStart={this.onTouchStart}
+                          onTouchEnd={this.onTouchEnd}
                         />
                         {this.renderFrameNames()}
                       </ExcalidrawActionManagerContext.Provider>
@@ -2064,7 +2059,7 @@ class App extends React.Component<AppProps, AppState> {
     didTapTwice = false;
   }
 
-  private onTapStart = (event: TouchEvent) => {
+  private onTouchStart = (event: React.TouchEvent) => {
     // fix for Apple Pencil Scribble
     // On Android, preventing the event would disable contextMenu on tap-hold
     if (!isAndroid) {
@@ -2083,7 +2078,7 @@ class App extends React.Component<AppProps, AppState> {
     // insert text only if we tapped twice with a single finger
     // event.touches.length === 1 will also prevent inserting text when user's zooming
     if (didTapTwice && event.touches.length === 1) {
-      const [touch] = event.touches;
+      const touch = event.touches[0];
       // @ts-ignore
       this.handleCanvasDoubleClick({
         clientX: touch.clientX,
@@ -2104,7 +2099,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private onTapEnd = (event: TouchEvent) => {
+  private onTouchEnd = (event: React.TouchEvent) => {
     this.resetContextMenuTimer();
     if (event.touches.length > 0) {
       this.setState({
@@ -7410,36 +7405,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private handleInteractiveCanvasRef = (canvas: HTMLCanvasElement) => {
+  private handleInteractiveCanvasRef = (canvas: HTMLCanvasElement | null) => {
     // canvas is null when unmounting
     if (canvas !== null) {
       this.interactiveCanvas = canvas;
-
-      this.interactiveCanvas.addEventListener(EVENT.WHEEL, this.handleWheel, {
-        passive: false,
-      });
-      this.interactiveCanvas.addEventListener(
-        EVENT.TOUCH_START,
-        this.onTapStart,
-      );
-      this.interactiveCanvas.addEventListener(EVENT.TOUCH_END, this.onTapEnd);
-    } else {
-      this.interactiveCanvas?.removeEventListener(
-        EVENT.WHEEL,
-        this.handleWheel,
-      );
-      this.interactiveCanvas?.removeEventListener(
-        EVENT.TOUCH_START,
-        this.onTapStart,
-      );
-      this.interactiveCanvas?.removeEventListener(
-        EVENT.TOUCH_END,
-        this.onTapEnd,
-      );
     }
   };
 
-  private handleCanvasRef = (canvas: HTMLCanvasElement) => {
+  private handleStaticCanvasRef = (canvas: HTMLCanvasElement | null) => {
     // canvas is null when unmounting
     if (canvas !== null) {
       this.canvas = canvas;
@@ -7589,13 +7562,15 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleCanvasContextMenu = (
-    event: React.PointerEvent<HTMLElement>,
+    event: React.MouseEvent<HTMLElement | HTMLCanvasElement>,
   ) => {
     event.preventDefault();
 
     if (
-      (event.nativeEvent.pointerType === "touch" ||
-        (event.nativeEvent.pointerType === "pen" &&
+      (("pointerType" in event.nativeEvent &&
+        event.nativeEvent.pointerType === "touch") ||
+        ("pointerType" in event.nativeEvent &&
+          event.nativeEvent.pointerType === "pen" &&
           // always allow if user uses a pen secondary button
           event.button !== POINTER_BUTTON.SECONDARY)) &&
       this.state.activeTool.type !== "selection"
@@ -7933,7 +7908,9 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleWheel = withBatchedUpdates(
-    (event: WheelEvent | React.WheelEvent<HTMLDivElement>) => {
+    (
+      event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
+    ) => {
       event.preventDefault();
       if (isPanning) {
         return;
