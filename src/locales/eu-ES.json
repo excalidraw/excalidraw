@@ -109,12 +109,12 @@
     "createContainerFromText": "Bilatu testua edukiontzi batean",
     "link": {
       "edit": "Editatu esteka",
-      "editEmbed": "",
+      "editEmbed": "Editatu esteka eta kapsulatu",
       "create": "Sortu esteka",
-      "createEmbed": "",
+      "createEmbed": "Sortu esteka eta kapsulatu",
       "label": "Esteka",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Esteka eta kapsula",
+      "empty": "Ez da estekarik ezarri"
     },
     "lineEditor": {
       "edit": "Editatu lerroa",
@@ -168,11 +168,11 @@
     "cancel": "Utzi",
     "clear": "Garbitu",
     "remove": "Kendu",
-    "embed": "",
+    "embed": "Aldatu kapsulatzea",
     "publishLibrary": "Argitaratu",
     "submit": "Bidali",
     "confirm": "Bai",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Egin klik elkar eragiteko"
   },
   "alerts": {
     "clearReset": "Honek oihal osoa garbituko du. Ziur zaude?",
@@ -214,8 +214,8 @@
       "line4": "Ezarpen hau desgaituz gero, testu-elementuen bistaratzea konpontzen ez bada, ireki <issueLink>arazo</issueLink> gure GitHub-en edo idatzi iezaguzu <discordLink>Discord</discordLink> helbidera"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "image": ""
+      "embeddable": "Kapsulatutako elementuak ezin dira liburutegira gehitu.",
+      "image": "Laster egongo da irudiak liburutegian gehitzeko laguntza!"
     }
   },
   "toolBar": {
@@ -234,7 +234,7 @@
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma",
     "frame": "Marko tresna",
-    "embeddable": "",
+    "embeddable": "Web kapsulatzea",
     "hand": "Eskua (panoratze tresna)",
     "extraTools": "Tresna gehiago"
   },
@@ -248,7 +248,7 @@
     "linearElement": "Egin klik hainbat puntu hasteko, arrastatu lerro bakarrerako",
     "freeDraw": "Egin klik eta arrastatu, askatu amaitutakoan",
     "text": "Aholkua: testua gehitu dezakezu edozein lekutan klik bikoitza eginez hautapen tresnarekin",
-    "embeddable": "",
+    "embeddable": "Egin klik eta arrastatu webgunea kapsulatzeko",
     "text_selected": "Egin klik bikoitza edo sakatu SARTU testua editatzeko",
     "text_editing": "Sakatu Esc edo Ctrl+SARTU editatzen amaitzeko",
     "linearElementMulti": "Egin klik azken puntuan edo sakatu Esc edo Sartu amaitzeko",
