@@ -67,6 +67,7 @@ import {
 } from "../element/embeddable";
 import { getContainingFrame } from "../frame";
 import { normalizeLink, toValidURL } from "../data/url";
+import { ShapeCache } from "../scene/ShapeCache";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -270,6 +271,7 @@ const drawImagePlaceholder = (
     size,
   );
 };
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -286,7 +288,7 @@ const drawElementOnCanvas = (
     case "ellipse": {
       context.lineJoin = "round";
       context.lineCap = "round";
-      rc.draw(getShapeForElement(element)!);
+      rc.draw(ShapeCache.get(element)!);
       break;
     }
     case "arrow":
@@ -294,7 +296,7 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      getShapeForElement(element)!.forEach((shape) => {
+      ShapeCache.get(element)!.forEach((shape) => {
         rc.draw(shape);
       });
       break;
@@ -305,7 +307,7 @@ const drawElementOnCanvas = (
       context.fillStyle = element.strokeColor;
 
       const path = getFreeDrawPath2D(element) as Path2D;
-      const fillShape = getShapeForElement(element);
+      const fillShape = ShapeCache.get(element);
 
       if (fillShape) {
         rc.draw(fillShape);
@@ -386,33 +388,6 @@ const elementWithCanvasCache = new WeakMap<
   ExcalidrawElement,
   ExcalidrawElementWithCanvas
 >();
-
-const shapeCache = new WeakMap<ExcalidrawElement, ElementShape>();
-
-type ElementShape = Drawable | Drawable[] | null;
-
-type ElementShapes = {
-  freedraw: Drawable | null;
-  arrow: Drawable[];
-  line: Drawable[];
-  text: null;
-  image: null;
-};
-
-export const getShapeForElement = <T extends ExcalidrawElement>(element: T) =>
-  shapeCache.get(element) as T["type"] extends keyof ElementShapes
-    ? ElementShapes[T["type"]] | undefined
-    : Drawable | null | undefined;
-
-export const setShapeForElement = <T extends ExcalidrawElement>(
-  element: T,
-  shape: T["type"] extends keyof ElementShapes
-    ? ElementShapes[T["type"]]
-    : Drawable,
-) => shapeCache.set(element, shape);
-
-export const invalidateShapeForElement = (element: ExcalidrawElement) =>
-  shapeCache.delete(element);
 
 export const generateRoughOptions = (
   element: ExcalidrawElement,
@@ -503,16 +478,22 @@ const modifyEmbeddableForRoughOptions = (
  * @param element
  * @param generator
  */
-const generateElementShape = (
+export const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
   isExporting: boolean = false,
-) => {
-  let shape = isExporting ? undefined : shapeCache.get(element);
+): Drawable | Drawable[] | null => {
+  const cachedShape = isExporting ? undefined : ShapeCache.get(element);
+
+  if (cachedShape) {
+    return cachedShape;
+  }
 
   // `null` indicates no rc shape applicable for this element type
   // (= do not generate anything)
-  if (shape === undefined) {
+  if (cachedShape === undefined) {
+    let shape: Drawable | Drawable[] | null = null;
+
     elementWithCanvasCache.delete(element);
 
     switch (element.type) {
@@ -548,7 +529,7 @@ const generateElementShape = (
             ),
           );
         }
-        setShapeForElement(element, shape);
+        ShapeCache.set(element, shape);
 
         break;
       }
@@ -598,7 +579,7 @@ const generateElementShape = (
             generateRoughOptions(element),
           );
         }
-        setShapeForElement(element, shape);
+        ShapeCache.set(element, shape);
 
         break;
       }
@@ -610,7 +591,7 @@ const generateElementShape = (
           element.height,
           generateRoughOptions(element),
         );
-        setShapeForElement(element, shape);
+        ShapeCache.set(element, shape);
 
         break;
       case "line":
@@ -735,7 +716,7 @@ const generateElementShape = (
           }
         }
 
-        setShapeForElement(element, shape);
+        ShapeCache.set(element, shape);
 
         break;
       }
@@ -751,17 +732,19 @@ const generateElementShape = (
         } else {
           shape = null;
         }
-        setShapeForElement(element, shape);
+        ShapeCache.set(element, shape);
         break;
       }
       case "text":
       case "image": {
         // just to ensure we don't regenerate element.canvas on rerenders
-        setShapeForElement(element, null);
+        ShapeCache.set(element, null);
         break;
       }
     }
+    return shape;
   }
+  return null;
 };
 
 const generateElementWithCanvas = (
@@ -1300,7 +1283,7 @@ export const renderElementToSvg = (
       generateElementShape(element, generator);
       const node = roughSVGDrawWithPrecision(
         rsvg,
-        getShapeForElement(element)!,
+        ShapeCache.get(element)!,
         MAX_DECIMALS_FOR_SVG_EXPORT,
       );
       if (opacity !== 1) {
@@ -1330,7 +1313,7 @@ export const renderElementToSvg = (
       generateElementShape(element, generator, true);
       const node = roughSVGDrawWithPrecision(
         rsvg,
-        getShapeForElement(element)!,
+        ShapeCache.get(element)!,
         MAX_DECIMALS_FOR_SVG_EXPORT,
       );
       const opacity = element.opacity / 100;
@@ -1364,7 +1347,7 @@ export const renderElementToSvg = (
       // render embeddable element + iframe
       const embeddableNode = roughSVGDrawWithPrecision(
         rsvg,
-        getShapeForElement(element)!,
+        ShapeCache.get(element)!,
         MAX_DECIMALS_FOR_SVG_EXPORT,
       );
       embeddableNode.setAttribute("stroke-linecap", "round");
@@ -1477,7 +1460,7 @@ export const renderElementToSvg = (
       }
       group.setAttribute("stroke-linecap", "round");
 
-      getShapeForElement(element)!.forEach((shape) => {
+      ShapeCache.get(element)!.forEach((shape) => {
         const node = roughSVGDrawWithPrecision(
           rsvg,
           shape,
@@ -1520,7 +1503,7 @@ export const renderElementToSvg = (
     case "freedraw": {
       generateElementShape(element, generator);
       generateFreeDrawShape(element);
-      const shape = getShapeForElement(element);
+      const shape = ShapeCache.get(element);
       const node = shape
         ? roughSVGDrawWithPrecision(rsvg, shape, MAX_DECIMALS_FOR_SVG_EXPORT)
         : svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");

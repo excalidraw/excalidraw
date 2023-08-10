@@ -44,9 +44,9 @@ import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
 import { shouldRotateWithDiscreteAngle } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
-import { getShapeForElement } from "../renderer/renderElement";
 import { DRAGGING_THRESHOLD } from "../constants";
 import { Mutable } from "../utility-types";
+import { ShapeCache } from "../scene/ShapeCache";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -1423,7 +1423,7 @@ export class LinearElementEditor {
     let y1;
     let x2;
     let y2;
-    if (element.points.length < 2 || !getShapeForElement(element)) {
+    if (element.points.length < 2 || !ShapeCache.get(element)) {
       // XXX this is just a poor estimate and not very useful
       const { minX, minY, maxX, maxY } = element.points.reduce(
         (limits, [x, y]) => {
@@ -1442,7 +1442,7 @@ export class LinearElementEditor {
       x2 = maxX + element.x;
       y2 = maxY + element.y;
     } else {
-      const shape = getShapeForElement(element)!;
+      const shape = ShapeCache.generateElementShape(element);
 
       // first element is always the curve
       const ops = getCurvePathOps(shape[0]);

@@ -196,7 +196,6 @@ import {
   getGridPoint,
   isPathALoop,
 } from "../math";
-import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
   getElementsAtPosition,
@@ -353,6 +352,7 @@ import { ValueOf } from "../utility-types";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
+import { ShapeCache } from "../scene/ShapeCache";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -764,7 +764,7 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           mutateElement(element, { validated }, false);
-          invalidateShapeForElement(element);
+          ShapeCache.delete(element);
         }
       }
       return false;
@@ -1704,6 +1704,7 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     this.scene.destroy();
     this.library.destroy();
+    ShapeCache.destroy();
     clearTimeout(touchTimeout);
     isSomeElementSelected.clearCache();
     selectGroupsForSelectedElements.clearCache();
@@ -1713,7 +1714,7 @@ class App extends React.Component<AppProps, AppState> {
   private onResize = withBatchedUpdates(() => {
     this.scene
       .getElementsIncludingDeleted()
-      .forEach((element) => invalidateShapeForElement(element));
+      .forEach((element) => ShapeCache.delete(element));
     this.setState({});
   });
 
@@ -2701,7 +2702,7 @@ class App extends React.Component<AppProps, AppState> {
           filesMap.has(element.fileId)
         ) {
           this.imageCache.delete(element.fileId);
-          invalidateShapeForElement(element);
+          ShapeCache.delete(element);
         }
       });
       this.scene.informMutation();
@@ -7262,7 +7263,7 @@ class App extends React.Component<AppProps, AppState> {
     if (updatedFiles.size || erroredFiles.size) {
       for (const element of elements) {
         if (updatedFiles.has(element.fileId)) {
-          invalidateShapeForElement(element);
+          ShapeCache.delete(element);
         }
       }
     }

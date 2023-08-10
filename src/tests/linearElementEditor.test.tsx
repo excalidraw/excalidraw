@@ -567,8 +567,8 @@ describe("Test Linear Elements", () => {
           lastSegmentMidpoint[0] + delta,
           lastSegmentMidpoint[1] + delta,
         ]);
-        expect(renderInteractiveScene).toHaveBeenCalledTimes(20);
-        expect(renderStaticScene).toHaveBeenCalledTimes(8);
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
+        expect(renderStaticScene).toHaveBeenCalledTimes(7);
         expect(line.points.length).toEqual(5);
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)
@@ -622,8 +622,14 @@ describe("Test Linear Elements", () => {
         expect(midPoints[1]).not.toEqual(newMidPoints[1]);
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
-            null,
-            null,
+            [
+              31.884084517616053,
+              23.13275505472383,
+            ],
+            [
+              77.74792546875662,
+              44.57840982272327,
+            ],
           ]
         `);
       });
