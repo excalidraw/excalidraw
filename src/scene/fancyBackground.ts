@@ -137,21 +137,28 @@ const addContentBackground = (
 const updateRenderConfig = (
   renderConfig: RenderConfig,
   canvasDimensions: Dimensions,
-  contentDimesions: Dimensions,
+  contentDimensions: Dimensions,
 ): { scale: number; renderConfig: RenderConfig } => {
   const totalPadding =
     FANCY_BG_PADDING + FANCY_BG_BORDER_RADIUS + DEFAULT_EXPORT_PADDING;
 
+  const scale = getScaleToFit(contentDimensions, {
+    w: canvasDimensions.w - totalPadding * 2,
+    h: canvasDimensions.h - totalPadding * 2,
+  });
+
+  const centeredScrollX =
+    (canvasDimensions.w - contentDimensions.w * scale) / 2;
+  const centeredScrollY =
+    (canvasDimensions.h - contentDimensions.h * scale) / 2;
+
   return {
     renderConfig: {
       ...renderConfig,
-      scrollX: renderConfig.scrollX + totalPadding,
-      scrollY: renderConfig.scrollY + totalPadding,
+      scrollX: centeredScrollX + renderConfig.scrollX,
+      scrollY: centeredScrollY + renderConfig.scrollY,
     },
-    scale: getScaleToFit(contentDimesions, {
-      w: canvasDimensions.w - totalPadding * 2,
-      h: canvasDimensions.h - totalPadding * 2,
-    }),
+    scale,
   };
 };
 
