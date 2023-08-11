@@ -39,7 +39,7 @@ export type Snap = {
 export type Snaps = Snap[];
 
 const shouldSnap = (snap: Snap, zoom: Zoom) =>
-  snap.distance < SNAP_DISTANCE / zoom.value;
+  snap.distance < SNAP_DISTANCE / zoom.value / 2;
 
 const isSnappingEnabled = ({
   event,
@@ -382,6 +382,7 @@ export const getNearestSnaps = (
   corner: Point,
   snaps: Snaps,
   appState: AppState,
+  onlyKeepOne = false,
 ) => {
   let verticalSnap: Snap | null = null;
   let horizontalSnap: Snap | null = null;
@@ -402,6 +403,16 @@ export const getNearestSnaps = (
     } else if (distance <= leastDistanceY) {
       leastDistanceY = distance;
       horizontalSnap = snap;
+    }
+  }
+
+  if (onlyKeepOne) {
+    if (leastDistanceX < leastDistanceY) {
+      horizontalSnap = null;
+    }
+
+    if (leastDistanceY < leastDistanceX) {
+      verticalSnap = null;
     }
   }
 

@@ -948,7 +948,6 @@ export const resizeMultipleElements = (
   const isFlippedByY = flipFactorY < 0;
 
   if (snaps) {
-    // TODO: corner is decided based on handle direction
     const [topLeft, , , bottomRight] = getElementsCorners(
       targetElements.map(({ latest }) => latest).concat(boundTextElements),
     );
@@ -997,6 +996,7 @@ export const resizeMultipleElements = (
       corner,
       snaps,
       appState,
+      true,
     );
 
     const snapPoint = horizontalSnap
@@ -1017,9 +1017,7 @@ export const resizeMultipleElements = (
 
       if (horizontalSnap) {
         scale = Math.abs(snapPoint[1] - anchorY) / originalHeight;
-      }
-
-      if (verticalSnap) {
+      } else if (verticalSnap) {
         scale = Math.abs(snapPoint[0] - anchorX) / originalWidth;
       }
     }
