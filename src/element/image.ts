@@ -123,3 +123,24 @@ export const normalizeSVG = async (SVGString: string) => {
     return svg.outerHTML;
   }
 };
+
+export const loadSVGElement = (filePath: string) => {
+  return new Promise<SVGSVGElement>((resolve, reject) => {
+    fetch(filePath)
+      .then((response) => response.text())
+      .then((svgString) => {
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(svgString, "image/svg+xml");
+        const svgElement = svgDoc.documentElement;
+
+        if (svgElement instanceof SVGSVGElement) {
+          resolve(svgElement);
+        } else {
+          reject(new Error("Parsed element is not an SVGSVGElement"));
+        }
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+};

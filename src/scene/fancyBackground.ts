@@ -1,5 +1,5 @@
-import { FANCY_BG_BORDER_RADIUS, FANCY_BG_PADDING } from "../constants";
-import { loadHTMLImageElement } from "../element/image";
+import { FANCY_BG_BORDER_RADIUS, FANCY_BG_PADDING, SVG_NS } from "../constants";
+import { loadHTMLImageElement, loadSVGElement } from "../element/image";
 import { roundRect } from "../renderer/roundRect";
 import { AppState, DataURL } from "../types";
 
@@ -121,7 +121,7 @@ const addContentBackground = (
   });
 };
 
-export const applyFancyBackground = async ({
+export const applyFancyBackgroundOnCanvas = async ({
   canvas,
   fancyBackgroundImageUrl,
   backgroundColor,
@@ -143,4 +143,46 @@ export const applyFancyBackground = async ({
   addImageBackground(context, canvasDimensions, fancyBackgroundImage);
 
   addContentBackground(context, canvasDimensions, backgroundColor, exportScale);
+};
+
+export const applyFancyBackgroundOnSvg = async ({
+  svgRoot,
+  fancyBackgroundImageUrl,
+  backgroundColor,
+  dimensions,
+  exportScale,
+}: {
+  svgRoot: SVGSVGElement;
+  fancyBackgroundImageUrl: DataURL;
+  backgroundColor: string;
+  dimensions: Dimensions;
+  exportScale: AppState["exportScale"];
+}) => {
+  const fancyBackgroundImage = await loadSVGElement(
+    `${fancyBackgroundImageUrl}`,
+  );
+
+  fancyBackgroundImage.setAttribute("x", "0");
+  fancyBackgroundImage.setAttribute("y", "0");
+  fancyBackgroundImage.setAttribute("width", `${dimensions.w}`);
+  fancyBackgroundImage.setAttribute("height", `${dimensions.h}`);
+  fancyBackgroundImage.setAttribute("preserveAspectRatio", "none");
+
+  svgRoot.appendChild(fancyBackgroundImage);
+
+  const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
+  rect.setAttribute("x", (FANCY_BG_PADDING * exportScale).toString());
+  rect.setAttribute("y", (FANCY_BG_PADDING * exportScale).toString());
+  rect.setAttribute(
+    "width",
+    `${dimensions.w - FANCY_BG_PADDING * 2 * exportScale}`,
+  );
+  rect.setAttribute(
+    "height",
+    `${dimensions.h - FANCY_BG_PADDING * 2 * exportScale}`,
+  );
+  rect.setAttribute("rx", (FANCY_BG_PADDING * exportScale).toString());
+  rect.setAttribute("ry", (FANCY_BG_PADDING * exportScale).toString());
+  rect.setAttribute("fill", backgroundColor);
+  svgRoot.appendChild(rect);
 };

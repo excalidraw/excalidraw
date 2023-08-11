@@ -3,7 +3,7 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
 import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
 import { distance, isOnlyExportingSingleFrame } from "../utils";
-import { AppState, BinaryFiles } from "../types";
+import { AppState, BinaryFiles, DataURL } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
   FANCY_BG_BORDER_RADIUS,
@@ -19,7 +19,10 @@ import {
   updateImageCache,
 } from "../element/image";
 import Scene from "./Scene";
-import { applyFancyBackground } from "./fancyBackground";
+import {
+  applyFancyBackgroundOnCanvas,
+  applyFancyBackgroundOnSvg,
+} from "./fancyBackground";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -93,7 +96,7 @@ export const exportToCanvas = async (
   };
 
   if (exportWithFancyBackground) {
-    await applyFancyBackground({
+    await applyFancyBackgroundOnCanvas({
       canvas,
       fancyBackgroundImageUrl: appState.fancyBackgroundImageUrl!,
       backgroundColor: viewBackgroundColor,
@@ -136,6 +139,7 @@ export const exportToSvg = async (
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
     renderFrame?: boolean;
+    fancyBackgroundImageUrl: DataURL | null;
   },
   files: BinaryFiles | null,
   opts?: {
@@ -148,7 +152,18 @@ export const exportToSvg = async (
     viewBackgroundColor,
     exportScale = 1,
     exportEmbedScene,
+    exportBackground,
   } = appState;
+
+  const exportWithFancyBackground =
+    exportBackground &&
+    !!appState.fancyBackgroundImageUrl &&
+    elements.length > 0;
+
+  const padding = !exportWithFancyBackground
+    ? exportPadding
+    : (exportPadding + FANCY_BG_PADDING + FANCY_BG_BORDER_RADIUS) * exportScale;
+
   let metadata = "";
   if (exportEmbedScene) {
     try {
@@ -163,7 +178,7 @@ export const exportToSvg = async (
       console.error(error);
     }
   }
-  const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
+  const [minX, minY, width, height] = getCanvasSize(elements, padding);
 
   // initialize SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
@@ -198,8 +213,8 @@ export const exportToSvg = async (
 
   const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
-  const offsetX = -minX + (onlyExportingSingleFrame ? 0 : exportPadding);
-  const offsetY = -minY + (onlyExportingSingleFrame ? 0 : exportPadding);
+  const offsetX = -minX + (onlyExportingSingleFrame ? 0 : padding);
+  const offsetY = -minY + (onlyExportingSingleFrame ? 0 : padding);
 
   const exportingFrame =
     isExportingWholeCanvas || !onlyExportingSingleFrame
@@ -243,13 +258,24 @@ export const exportToSvg = async (
 
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
-    const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
-    rect.setAttribute("x", "0");
-    rect.setAttribute("y", "0");
-    rect.setAttribute("width", `${width}`);
-    rect.setAttribute("height", `${height}`);
-    rect.setAttribute("fill", viewBackgroundColor);
-    svgRoot.appendChild(rect);
+    if (appState.fancyBackgroundImageUrl) {
+      await applyFancyBackgroundOnSvg({
+        svgRoot,
+        fancyBackgroundImageUrl:
+          `${appState.fancyBackgroundImageUrl}` as DataURL,
+        backgroundColor: viewBackgroundColor,
+        dimensions: { w: width, h: height },
+        exportScale,
+      });
+    } else {
+      const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
+      rect.setAttribute("x", "0");
+      rect.setAttribute("y", "0");
+      rect.setAttribute("width", `${width}`);
+      rect.setAttribute("height", `${height}`);
+      rect.setAttribute("fill", viewBackgroundColor);
+      svgRoot.appendChild(rect);
+    }
   }
 
   const rsvg = rough.svg(svgRoot);
