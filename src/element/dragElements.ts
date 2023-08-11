@@ -16,7 +16,6 @@ export const dragSelectedElements = (
   pointerDownState: PointerDownState,
   selectedElements: NonDeletedExcalidrawElement[],
   offset: { x: number; y: number },
-  lockDirection: boolean = false,
   appState: AppState,
   scene: Scene,
   snaps: Snaps | null = null,
@@ -41,14 +40,7 @@ export const dragSelectedElements = (
   }
 
   elementsToUpdate.forEach((element) => {
-    updateElementCoords(
-      lockDirection,
-      pointerDownState,
-      element,
-      offset,
-      appState,
-      snaps,
-    );
+    updateElementCoords(pointerDownState, element, offset, appState, snaps);
     // update coords of bound text only if we're dragging the container directly
     // (we don't drag the group that it's part of)
     if (
@@ -67,7 +59,6 @@ export const dragSelectedElements = (
         (!textElement.frameId || !frames.includes(textElement.frameId))
       ) {
         updateElementCoords(
-          lockDirection,
           pointerDownState,
           textElement,
           offset,
@@ -83,19 +74,12 @@ export const dragSelectedElements = (
 };
 
 const updateElementCoords = (
-  lockDirection: boolean,
   pointerDownState: PointerDownState,
   element: NonDeletedExcalidrawElement,
   offset: { x: number; y: number },
   appState: AppState,
   snaps: Snaps | null = null,
 ) => {
-  const distanceX = Math.abs(offset.x);
-  const distanceY = Math.abs(offset.y);
-
-  const lockX = lockDirection && distanceX < distanceY;
-  const lockY = lockDirection && distanceX > distanceY;
-
   const originalElement =
     pointerDownState.originalElements.get(element.id) ?? element;
 
@@ -107,8 +91,8 @@ const updateElementCoords = (
   const [nextX, nextY] =
     !snaps || snaps.length === 0
       ? getGridPoint(
-          lockX ? origin.x : origin.x + offset.x,
-          lockY ? origin.y : origin.y + offset.y,
+          origin.x + offset.x,
+          origin.y + offset.y,
           appState.gridSize,
         )
       : snapProject({
@@ -119,8 +103,8 @@ const updateElementCoords = (
         });
 
   mutateElement(element, {
-    x: lockX ? origin.x : nextX,
-    y: lockY ? origin.y : nextY,
+    x: nextX,
+    y: nextY,
   });
 };
 

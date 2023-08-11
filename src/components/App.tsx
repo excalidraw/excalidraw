@@ -5303,6 +5303,25 @@ class App extends React.Component<AppProps, AppState> {
             ...pointerDownState.originalElements.values(),
           ];
 
+          // We only drag in one direction if shift is pressed
+          const lockDirection = event.shiftKey;
+
+          if (lockDirection) {
+            const distanceX = Math.abs(dragOffset.x);
+            const distanceY = Math.abs(dragOffset.y);
+
+            const lockX = lockDirection && distanceX < distanceY;
+            const lockY = lockDirection && distanceX > distanceY;
+
+            if (lockX) {
+              dragOffset.x = 0;
+            }
+
+            if (lockY) {
+              dragOffset.y = 0;
+            }
+          }
+
           const snaps = getSnaps({
             elements: originalElements,
             selectedElements: getSelectedElements(originalElements, this.state),
@@ -5318,9 +5337,6 @@ class App extends React.Component<AppProps, AppState> {
           });
           this.setState({ snaps });
 
-          // We only drag in one direction if shift is pressed
-          const lockDirection = event.shiftKey;
-
           // when we're editing the name of a frame, we want the user to be
           // able to select and interact with the text input
           !this.state.editingFrame &&
@@ -5328,7 +5344,6 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState,
               selectedElements,
               dragOffset,
-              lockDirection,
               this.state,
               this.scene,
               snaps,

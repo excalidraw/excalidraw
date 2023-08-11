@@ -41,7 +41,7 @@ export type Snaps = Snap[];
 const shouldSnap = (snap: Snap, zoom: Zoom) =>
   snap.distance < SNAP_DISTANCE / zoom.value / 2;
 
-const isSnappingEnabled = ({
+export const isSnappingEnabled = ({
   event,
   appState,
   selectedElements,
