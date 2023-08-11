@@ -1,7 +1,7 @@
 import { FANCY_BG_BORDER_RADIUS, FANCY_BG_PADDING } from "../constants";
 import { loadHTMLImageElement } from "../element/image";
 import { roundRect } from "../renderer/roundRect";
-import { DataURL } from "../types";
+import { AppState, DataURL } from "../types";
 
 type Dimensions = { w: number; h: number };
 
@@ -61,6 +61,7 @@ const addContentBackground = (
   context: CanvasRenderingContext2D,
   normalizedDimensions: Dimensions,
   contentBackgroundColor: string,
+  exportScale: AppState["exportScale"],
 ) => {
   const shadows = [
     {
@@ -94,20 +95,20 @@ const addContentBackground = (
 
     if (context.roundRect) {
       context.roundRect(
-        FANCY_BG_PADDING,
-        FANCY_BG_PADDING,
-        normalizedDimensions.w - FANCY_BG_PADDING * 2,
-        normalizedDimensions.h - FANCY_BG_PADDING * 2,
-        FANCY_BG_BORDER_RADIUS,
+        FANCY_BG_PADDING * exportScale,
+        FANCY_BG_PADDING * exportScale,
+        normalizedDimensions.w - FANCY_BG_PADDING * 2 * exportScale,
+        normalizedDimensions.h - FANCY_BG_PADDING * 2 * exportScale,
+        FANCY_BG_BORDER_RADIUS * exportScale,
       );
     } else {
       roundRect(
         context,
-        FANCY_BG_PADDING,
-        FANCY_BG_PADDING,
-        normalizedDimensions.w - FANCY_BG_PADDING * 2,
-        normalizedDimensions.h - FANCY_BG_PADDING * 2,
-        FANCY_BG_BORDER_RADIUS,
+        FANCY_BG_PADDING * exportScale,
+        FANCY_BG_PADDING * exportScale,
+        normalizedDimensions.w - FANCY_BG_PADDING * 2 * exportScale,
+        normalizedDimensions.h - FANCY_BG_PADDING * 2 * exportScale,
+        FANCY_BG_BORDER_RADIUS * exportScale,
       );
     }
 
@@ -124,10 +125,12 @@ export const applyFancyBackground = async ({
   canvas,
   fancyBackgroundImageUrl,
   backgroundColor,
+  exportScale,
 }: {
   canvas: HTMLCanvasElement;
   fancyBackgroundImageUrl: DataURL;
   backgroundColor: string;
+  exportScale: AppState["exportScale"];
 }) => {
   const context = canvas.getContext("2d")!;
 
@@ -139,5 +142,5 @@ export const applyFancyBackground = async ({
 
   addImageBackground(context, canvasDimensions, fancyBackgroundImage);
 
-  addContentBackground(context, canvasDimensions, backgroundColor);
+  addContentBackground(context, canvasDimensions, backgroundColor, exportScale);
 };
