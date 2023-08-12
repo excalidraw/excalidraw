@@ -981,6 +981,7 @@ const _renderStaticScene = ({
 
           const frame = getTargetFrame(element, appState);
 
+          // TODO do we need to check isElementInFrame here?
           if (frame && isElementInFrame(element, elements, appState)) {
             frameClip(frame, context, renderConfig, appState);
           }
