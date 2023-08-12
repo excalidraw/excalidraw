@@ -149,11 +149,14 @@ export const actionGroup = register({
     ];
 
     return {
-      appState: selectGroup(
-        newGroupId,
-        { ...appState, selectedGroupIds: {} },
-        getNonDeletedElements(nextElements),
-      ),
+      appState: {
+        ...appState,
+        ...selectGroup(
+          newGroupId,
+          { ...appState, selectedGroupIds: {} },
+          getNonDeletedElements(nextElements),
+        ),
+      },
       elements: nextElements,
       commitToHistory: true,
     };
@@ -212,7 +215,7 @@ export const actionUngroup = register({
     });
 
     const updateAppState = selectGroupsForSelectedElements(
-      { ...appState, selectedGroupIds: {} },
+      appState,
       getNonDeletedElements(nextElements),
       appState,
       null,
@@ -243,7 +246,7 @@ export const actionUngroup = register({
     );
 
     return {
-      appState: updateAppState,
+      appState: { ...appState, ...updateAppState },
       elements: nextElements,
       commitToHistory: true,
     };
