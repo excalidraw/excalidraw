@@ -1,6 +1,7 @@
 import { isElementInViewport } from "../element/sizeHelpers";
 import { isImageElement } from "../element/typeChecks";
 import { NonDeletedExcalidrawElement } from "../element/types";
+import { cancelRender } from "../renderer/renderScene";
 import { AppState } from "../types";
 import { memoize } from "../utils";
 import Scene from "./Scene";
@@ -121,7 +122,10 @@ export class Renderer {
     );
   })();
 
+  // NOTE Doesn't destroy everything (scene, rc, etc.) because it may not be
+  // safe to break TS contract here (for upstream cases)
   public destroy() {
+    cancelRender();
     this.getRenderableElements.clear();
   }
 }

@@ -1057,6 +1057,10 @@ const renderInteractiveSceneThrottled = throttleRAF(
   { trailing: true },
 );
 
+/**
+ * Interactive scene is the ui-canvas where we render boundinb boxes, selections
+ * and other ui stuff.
+ */
 export const renderInteractiveScene = <
   U extends typeof _renderInteractiveScene,
   T extends boolean = false,
@@ -1081,6 +1085,9 @@ const renderStaticSceneThrottled = throttleRAF(
   { trailing: true },
 );
 
+/**
+ * Static scene is the non-ui canvas where we render elements.
+ */
 export const renderStaticScene = (
   renderConfig: StaticSceneRenderConfig,
   throttle?: boolean,
@@ -1091,6 +1098,11 @@ export const renderStaticScene = (
   }
 
   _renderStaticScene(renderConfig);
+};
+
+export const cancelRender = () => {
+  renderInteractiveSceneThrottled.cancel();
+  renderStaticSceneThrottled.cancel();
 };
 
 const renderTransformHandles = (
