@@ -25,10 +25,7 @@ import {
 } from "react";
 import clsx from "clsx";
 import { KEYS } from "../keys";
-import {
-  DEFAULT_LINK_SIZE,
-  invalidateShapeForElement,
-} from "../renderer/renderElement";
+import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
 import { rotate } from "../math";
 import { EVENT, HYPERLINK_TOOLTIP_DELAY, MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
@@ -42,6 +39,7 @@ import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
 import { useAppProps, useExcalidrawAppState } from "../components/App";
 import { isEmbeddableElement } from "./typeChecks";
+import { ShapeCache } from "../scene/ShapeCache";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -115,7 +113,7 @@ export const Hyperlink = ({
           validated: false,
           link,
         });
-        invalidateShapeForElement(element);
+        ShapeCache.delete(element);
       } else {
         const { width, height } = element;
         const embedLink = getEmbedLink(link);
@@ -147,7 +145,7 @@ export const Hyperlink = ({
           validated: true,
           link,
         });
-        invalidateShapeForElement(element);
+        ShapeCache.delete(element);
         if (embeddableLinkCache.has(element.id)) {
           embeddableLinkCache.delete(element.id);
         }
@@ -393,7 +391,7 @@ export const getContextMenuLabel = (
 export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
-  appState: UIAppState,
+  appState: Pick<UIAppState, "zoom">,
 ): [x: number, y: number, width: number, height: number] => {
   const size = DEFAULT_LINK_SIZE;
   const linkWidth = size / appState.zoom.value;

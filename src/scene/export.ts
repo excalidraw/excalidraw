@@ -1,7 +1,7 @@
 import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
-import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
+import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
 import { distance, isOnlyExportingSingleFrame } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import { DEFAULT_EXPORT_PADDING, SVG_NS, THEME_FILTER } from "../constants";
@@ -54,26 +54,23 @@ export const exportToCanvas = async (
 
   const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
-  renderScene({
-    elements,
-    appState,
-    scale,
-    rc: rough.canvas(canvas),
+  renderStaticScene({
     canvas,
-    renderConfig: {
+    rc: rough.canvas(canvas),
+    elements,
+    visibleElements: elements,
+    scale,
+    appState: {
+      ...appState,
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
       scrollX: -minX + (onlyExportingSingleFrame ? 0 : exportPadding),
       scrollY: -minY + (onlyExportingSingleFrame ? 0 : exportPadding),
       zoom: defaultAppState.zoom,
-      remotePointerViewportCoords: {},
-      remoteSelectedElementIds: {},
       shouldCacheIgnoreZoom: false,
-      remotePointerUsernames: {},
-      remotePointerUserStates: {},
       theme: appState.exportWithDarkMode ? "dark" : "light",
+    },
+    renderConfig: {
       imageCache,
-      renderScrollbars: false,
-      renderSelection: false,
       renderGrid: false,
       isExporting: true,
     },
