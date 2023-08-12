@@ -14,10 +14,11 @@ import { vi } from "vitest";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderScene = vi.spyOn(Renderer, "renderScene");
+const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+
 beforeEach(() => {
   localStorage.clear();
-  renderScene.mockClear();
+  renderStaticScene.mockClear();
   reseed(7);
 });
 

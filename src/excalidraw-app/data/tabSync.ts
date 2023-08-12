@@ -16,14 +16,24 @@ export const isBrowserStorageStateNewer = (type: BrowserStateTypes) => {
 
 export const updateBrowserStateVersion = (type: BrowserStateTypes) => {
   const timestamp = Date.now();
-  localStorage.setItem(type, JSON.stringify(timestamp));
-  LOCAL_STATE_VERSIONS[type] = timestamp;
+  try {
+    localStorage.setItem(type, JSON.stringify(timestamp));
+    LOCAL_STATE_VERSIONS[type] = timestamp;
+  } catch (error) {
+    console.error("error while updating browser state verison", error);
+  }
 };
 
 export const resetBrowserStateVersions = () => {
-  for (const key of Object.keys(LOCAL_STATE_VERSIONS) as BrowserStateTypes[]) {
-    const timestamp = -1;
-    localStorage.setItem(key, JSON.stringify(timestamp));
-    LOCAL_STATE_VERSIONS[key] = timestamp;
+  try {
+    for (const key of Object.keys(
+      LOCAL_STATE_VERSIONS,
+    ) as BrowserStateTypes[]) {
+      const timestamp = -1;
+      localStorage.setItem(key, JSON.stringify(timestamp));
+      LOCAL_STATE_VERSIONS[key] = timestamp;
+    }
+  } catch (error) {
+    console.error("error while resetting browser state verison", error);
   }
 };

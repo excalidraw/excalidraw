@@ -36,7 +36,7 @@ type MobileMenuProps = {
   onLockToggle: () => void;
   onHandToolToggle: () => void;
   onPenModeToggle: () => void;
-  canvas: HTMLCanvasElement | null;
+  interactiveCanvas: HTMLCanvasElement | null;
 
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
@@ -58,7 +58,7 @@ export const MobileMenu = ({
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
-  canvas,
+  interactiveCanvas,
   onImageAction,
   renderTopRightUI,
   renderCustomStats,
@@ -85,7 +85,7 @@ export const MobileMenu = ({
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
                       appState={appState}
-                      canvas={canvas}
+                      interactiveCanvas={interactiveCanvas}
                       activeTool={appState.activeTool}
                       setAppState={setAppState}
                       onImageAction={({ pointerType }) => {
@@ -202,7 +202,7 @@ export const MobileMenu = ({
                   className="scroll-back-to-content"
                   onClick={() => {
                     setAppState((appState) => ({
-                      ...calculateScrollCenter(elements, appState, canvas),
+                      ...calculateScrollCenter(elements, appState),
                     }));
                   }}
                 >

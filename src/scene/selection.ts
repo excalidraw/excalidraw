@@ -3,7 +3,7 @@ import {
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
-import { AppState } from "../types";
+import { AppState, InteractiveCanvasAppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
   elementOverlapsWithFrame,
@@ -146,7 +146,7 @@ export const getCommonAttributeOfSelectedElements = <T>(
 
 export const getSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds">,
+  appState: Pick<InteractiveCanvasAppState, "selectedElementIds">,
   opts?: {
     includeBoundTextElement?: boolean;
     includeElementsInFrames?: boolean;

@@ -26,7 +26,7 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 
-import { RenderConfig } from "../scene/types";
+import { StaticCanvasRenderConfig } from "../scene/types";
 import {
   distance,
   getFontString,
@@ -36,7 +36,13 @@ import {
 } from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
-import { AppState, BinaryFiles, Zoom } from "../types";
+import {
+  AppState,
+  StaticCanvasAppState,
+  BinaryFiles,
+  Zoom,
+  InteractiveCanvasAppState,
+} from "../types";
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
@@ -61,6 +67,7 @@ import {
 } from "../element/embeddable";
 import { getContainingFrame } from "../frame";
 import { normalizeLink, toValidURL } from "../data/url";
+import { ShapeCache } from "../scene/ShapeCache";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -72,17 +79,18 @@ const defaultAppState = getDefaultAppState();
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
-  renderConfig: RenderConfig,
+  renderConfig: StaticCanvasRenderConfig,
 ) =>
   isInitializedImageElement(element) &&
   !renderConfig.imageCache.has(element.fileId);
 
 const shouldResetImageFilter = (
   element: ExcalidrawElement,
-  renderConfig: RenderConfig,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
 ) => {
   return (
-    renderConfig.theme === "dark" &&
+    appState.theme === "dark" &&
     isInitializedImageElement(element) &&
     !isPendingImageElement(element, renderConfig) &&
     renderConfig.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
@@ -99,9 +107,9 @@ const getCanvasPadding = (element: ExcalidrawElement) =>
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
-  theme: RenderConfig["theme"];
+  theme: AppState["theme"];
   scale: number;
-  zoomValue: RenderConfig["zoom"]["value"];
+  zoomValue: AppState["zoom"]["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
   boundTextElementVersion: number | null;
@@ -165,7 +173,8 @@ const cappedElementCanvasSize = (
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
-  renderConfig: RenderConfig,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -205,17 +214,17 @@ const generateElementCanvas = (
   const rc = rough.canvas(canvas);
 
   // in dark theme, revert the image color filter
-  if (shouldResetImageFilter(element, renderConfig)) {
+  if (shouldResetImageFilter(element, renderConfig, appState)) {
     context.filter = IMAGE_INVERT_FILTER;
   }
 
-  drawElementOnCanvas(element, rc, context, renderConfig);
+  drawElementOnCanvas(element, rc, context, renderConfig, appState);
   context.restore();
 
   return {
     element,
     canvas,
-    theme: renderConfig.theme,
+    theme: appState.theme,
     scale,
     zoomValue: zoom.value,
     canvasOffsetX,
@@ -262,11 +271,13 @@ const drawImagePlaceholder = (
     size,
   );
 };
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
 ) => {
   context.globalAlpha =
     ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
@@ -277,7 +288,7 @@ const drawElementOnCanvas = (
     case "ellipse": {
       context.lineJoin = "round";
       context.lineCap = "round";
-      rc.draw(getShapeForElement(element)!);
+      rc.draw(ShapeCache.get(element)!);
       break;
     }
     case "arrow":
@@ -285,7 +296,7 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      getShapeForElement(element)!.forEach((shape) => {
+      ShapeCache.get(element)!.forEach((shape) => {
         rc.draw(shape);
       });
       break;
@@ -296,7 +307,7 @@ const drawElementOnCanvas = (
       context.fillStyle = element.strokeColor;
 
       const path = getFreeDrawPath2D(element) as Path2D;
-      const fillShape = getShapeForElement(element);
+      const fillShape = ShapeCache.get(element);
 
       if (fillShape) {
         rc.draw(fillShape);
@@ -321,7 +332,7 @@ const drawElementOnCanvas = (
           element.height,
         );
       } else {
-        drawImagePlaceholder(element, context, renderConfig.zoom.value);
+        drawImagePlaceholder(element, context, appState.zoom.value);
       }
       break;
     }
@@ -377,33 +388,6 @@ const elementWithCanvasCache = new WeakMap<
   ExcalidrawElement,
   ExcalidrawElementWithCanvas
 >();
-
-const shapeCache = new WeakMap<ExcalidrawElement, ElementShape>();
-
-type ElementShape = Drawable | Drawable[] | null;
-
-type ElementShapes = {
-  freedraw: Drawable | null;
-  arrow: Drawable[];
-  line: Drawable[];
-  text: null;
-  image: null;
-};
-
-export const getShapeForElement = <T extends ExcalidrawElement>(element: T) =>
-  shapeCache.get(element) as T["type"] extends keyof ElementShapes
-    ? ElementShapes[T["type"]] | undefined
-    : Drawable | null | undefined;
-
-export const setShapeForElement = <T extends ExcalidrawElement>(
-  element: T,
-  shape: T["type"] extends keyof ElementShapes
-    ? ElementShapes[T["type"]]
-    : Drawable,
-) => shapeCache.set(element, shape);
-
-export const invalidateShapeForElement = (element: ExcalidrawElement) =>
-  shapeCache.delete(element);
 
 export const generateRoughOptions = (
   element: ExcalidrawElement,
@@ -494,16 +478,22 @@ const modifyEmbeddableForRoughOptions = (
  * @param element
  * @param generator
  */
-const generateElementShape = (
+export const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
   isExporting: boolean = false,
-) => {
-  let shape = isExporting ? undefined : shapeCache.get(element);
+): Drawable | Drawable[] | null => {
+  const cachedShape = isExporting ? undefined : ShapeCache.get(element);
+
+  if (cachedShape) {
+    return cachedShape;
+  }
 
   // `null` indicates no rc shape applicable for this element type
   // (= do not generate anything)
-  if (shape === undefined) {
+  if (cachedShape === undefined) {
+    let shape: Drawable | Drawable[] | null = null;
+
     elementWithCanvasCache.delete(element);
 
     switch (element.type) {
@@ -539,7 +529,7 @@ const generateElementShape = (
             ),
           );
         }
-        setShapeForElement(element, shape);
+        ShapeCache.set(element, shape);
 
         break;
       }
@@ -589,7 +579,7 @@ const generateElementShape = (
             generateRoughOptions(element),
           );
         }
-        setShapeForElement(element, shape);
+        ShapeCache.set(element, shape);
 
         break;
       }
@@ -601,7 +591,7 @@ const generateElementShape = (
           element.height,
           generateRoughOptions(element),
         );
-        setShapeForElement(element, shape);
+        ShapeCache.set(element, shape);
 
         break;
       case "line":
@@ -726,7 +716,7 @@ const generateElementShape = (
           }
         }
 
-        setShapeForElement(element, shape);
+        ShapeCache.set(element, shape);
 
         break;
       }
@@ -742,36 +732,39 @@ const generateElementShape = (
         } else {
           shape = null;
         }
-        setShapeForElement(element, shape);
+        ShapeCache.set(element, shape);
         break;
       }
       case "text":
       case "image": {
         // just to ensure we don't regenerate element.canvas on rerenders
-        setShapeForElement(element, null);
+        ShapeCache.set(element, null);
         break;
       }
     }
+    return shape;
   }
+  return null;
 };
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
-  renderConfig: RenderConfig,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
 ) => {
-  const zoom: Zoom = renderConfig ? renderConfig.zoom : defaultAppState.zoom;
+  const zoom: Zoom = renderConfig ? appState.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
-    !renderConfig?.shouldCacheIgnoreZoom;
+    !appState?.shouldCacheIgnoreZoom;
   const boundTextElementVersion = getBoundTextElement(element)?.version || null;
   const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
 
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
-    prevElementWithCanvas.theme !== renderConfig.theme ||
+    prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
   ) {
@@ -779,6 +772,7 @@ const generateElementWithCanvas = (
       element,
       zoom,
       renderConfig,
+      appState,
     );
 
     elementWithCanvasCache.set(element, elementWithCanvas);
@@ -790,9 +784,9 @@ const generateElementWithCanvas = (
 
 const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
-  rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
 ) => {
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
@@ -807,8 +801,8 @@ const drawElementFromCanvas = (
     y2 = Math.ceil(y2);
   }
 
-  const cx = ((x1 + x2) / 2 + renderConfig.scrollX) * window.devicePixelRatio;
-  const cy = ((y1 + y2) / 2 + renderConfig.scrollY) * window.devicePixelRatio;
+  const cx = ((x1 + x2) / 2 + appState.scrollX) * window.devicePixelRatio;
+  const cy = ((y1 + y2) / 2 + appState.scrollY) * window.devicePixelRatio;
 
   context.save();
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
@@ -906,9 +900,9 @@ const drawElementFromCanvas = (
 
     context.drawImage(
       elementWithCanvas.canvas!,
-      (x1 + renderConfig.scrollX) * window.devicePixelRatio -
+      (x1 + appState.scrollX) * window.devicePixelRatio -
         (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
-      (y1 + renderConfig.scrollY) * window.devicePixelRatio -
+      (y1 + appState.scrollY) * window.devicePixelRatio -
         (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
       elementWithCanvas.canvas!.width / elementWithCanvas.scale,
       elementWithCanvas.canvas!.height / elementWithCanvas.scale,
@@ -926,8 +920,8 @@ const drawElementFromCanvas = (
       context.strokeStyle = "#c92a2a";
       context.lineWidth = 3;
       context.strokeRect(
-        (coords.x + renderConfig.scrollX) * window.devicePixelRatio,
-        (coords.y + renderConfig.scrollY) * window.devicePixelRatio,
+        (coords.x + appState.scrollX) * window.devicePixelRatio,
+        (coords.y + appState.scrollY) * window.devicePixelRatio,
         getBoundTextMaxWidth(element) * window.devicePixelRatio,
         getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
       );
@@ -938,40 +932,38 @@ const drawElementFromCanvas = (
   // Clear the nested element we appended to the DOM
 };
 
+export const renderSelectionElement = (
+  element: NonDeletedExcalidrawElement,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+) => {
+  context.save();
+  context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
+  context.fillStyle = "rgba(0, 0, 200, 0.04)";
+
+  // render from 0.5px offset  to get 1px wide line
+  // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
+  // TODO can be be improved by offseting to the negative when user selects
+  // from right to left
+  const offset = 0.5 / appState.zoom.value;
+
+  context.fillRect(offset, offset, element.width, element.height);
+  context.lineWidth = 1 / appState.zoom.value;
+  context.strokeStyle = " rgb(105, 101, 219)";
+  context.strokeRect(offset, offset, element.width, element.height);
+
+  context.restore();
+};
+
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
-  appState: AppState,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
 ) => {
   const generator = rc.generator;
   switch (element.type) {
-    case "selection": {
-      // do not render selection when exporting
-      if (!renderConfig.isExporting) {
-        context.save();
-        context.translate(
-          element.x + renderConfig.scrollX,
-          element.y + renderConfig.scrollY,
-        );
-        context.fillStyle = "rgba(0, 0, 200, 0.04)";
-
-        // render from 0.5px offset  to get 1px wide line
-        // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
-        // TODO can be be improved by offseting to the negative when user selects
-        // from right to left
-        const offset = 0.5 / renderConfig.zoom.value;
-
-        context.fillRect(offset, offset, element.width, element.height);
-        context.lineWidth = 1 / renderConfig.zoom.value;
-        context.strokeStyle = " rgb(105, 101, 219)";
-        context.strokeRect(offset, offset, element.width, element.height);
-
-        context.restore();
-      }
-      break;
-    }
     case "frame": {
       if (
         !renderConfig.isExporting &&
@@ -980,12 +972,12 @@ export const renderElement = (
       ) {
         context.save();
         context.translate(
-          element.x + renderConfig.scrollX,
-          element.y + renderConfig.scrollY,
+          element.x + appState.scrollX,
+          element.y + appState.scrollY,
         );
         context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
-        context.lineWidth = 2 / renderConfig.zoom.value;
+        context.lineWidth = 2 / appState.zoom.value;
         context.strokeStyle = FRAME_STYLE.strokeColor;
 
         if (FRAME_STYLE.radius && context.roundRect) {
@@ -995,7 +987,7 @@ export const renderElement = (
             0,
             element.width,
             element.height,
-            FRAME_STYLE.radius / renderConfig.zoom.value,
+            FRAME_STYLE.radius / appState.zoom.value,
           );
           context.stroke();
           context.closePath();
@@ -1012,22 +1004,28 @@ export const renderElement = (
 
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-        const cx = (x1 + x2) / 2 + renderConfig.scrollX;
-        const cy = (y1 + y2) / 2 + renderConfig.scrollY;
+        const cx = (x1 + x2) / 2 + appState.scrollX;
+        const cy = (y1 + y2) / 2 + appState.scrollY;
         const shiftX = (x2 - x1) / 2 - (element.x - x1);
         const shiftY = (y2 - y1) / 2 - (element.y - y1);
         context.save();
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig);
+        drawElementOnCanvas(element, rc, context, renderConfig, appState);
         context.restore();
       } else {
         const elementWithCanvas = generateElementWithCanvas(
           element,
           renderConfig,
+          appState,
         );
-        drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
+        drawElementFromCanvas(
+          elementWithCanvas,
+          context,
+          renderConfig,
+          appState,
+        );
       }
 
       break;
@@ -1043,8 +1041,8 @@ export const renderElement = (
       generateElementShape(element, generator, renderConfig.isExporting);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-        const cx = (x1 + x2) / 2 + renderConfig.scrollX;
-        const cy = (y1 + y2) / 2 + renderConfig.scrollY;
+        const cx = (x1 + x2) / 2 + appState.scrollX;
+        const cy = (y1 + y2) / 2 + appState.scrollY;
         let shiftX = (x2 - x1) / 2 - (element.x - x1);
         let shiftY = (y2 - y1) / 2 - (element.y - y1);
         if (isTextElement(element)) {
@@ -1062,7 +1060,7 @@ export const renderElement = (
         context.save();
         context.translate(cx, cy);
 
-        if (shouldResetImageFilter(element, renderConfig)) {
+        if (shouldResetImageFilter(element, renderConfig, appState)) {
           context.filter = "none";
         }
         const boundTextElement = getBoundTextElement(element);
@@ -1096,7 +1094,13 @@ export const renderElement = (
 
           tempCanvasContext.translate(-shiftX, -shiftY);
 
-          drawElementOnCanvas(element, tempRc, tempCanvasContext, renderConfig);
+          drawElementOnCanvas(
+            element,
+            tempRc,
+            tempCanvasContext,
+            renderConfig,
+            appState,
+          );
 
           tempCanvasContext.translate(shiftX, shiftY);
 
@@ -1133,7 +1137,7 @@ export const renderElement = (
           }
 
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig);
+          drawElementOnCanvas(element, rc, context, renderConfig, appState);
         }
 
         context.restore();
@@ -1143,6 +1147,7 @@ export const renderElement = (
         const elementWithCanvas = generateElementWithCanvas(
           element,
           renderConfig,
+          appState,
         );
 
         const currentImageSmoothingStatus = context.imageSmoothingEnabled;
@@ -1150,7 +1155,7 @@ export const renderElement = (
         if (
           // do not disable smoothing during zoom as blurry shapes look better
           // on low resolution (while still zooming in) than sharp ones
-          !renderConfig?.shouldCacheIgnoreZoom &&
+          !appState?.shouldCacheIgnoreZoom &&
           // angle is 0 -> always disable smoothing
           (!element.angle ||
             // or check if angle is a right angle in which case we can still
@@ -1167,7 +1172,12 @@ export const renderElement = (
           context.imageSmoothingEnabled = false;
         }
 
-        drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
+        drawElementFromCanvas(
+          elementWithCanvas,
+          context,
+          renderConfig,
+          appState,
+        );
 
         // reset
         context.imageSmoothingEnabled = currentImageSmoothingStatus;
@@ -1273,7 +1283,7 @@ export const renderElementToSvg = (
       generateElementShape(element, generator);
       const node = roughSVGDrawWithPrecision(
         rsvg,
-        getShapeForElement(element)!,
+        ShapeCache.get(element)!,
         MAX_DECIMALS_FOR_SVG_EXPORT,
       );
       if (opacity !== 1) {
@@ -1303,7 +1313,7 @@ export const renderElementToSvg = (
       generateElementShape(element, generator, true);
       const node = roughSVGDrawWithPrecision(
         rsvg,
-        getShapeForElement(element)!,
+        ShapeCache.get(element)!,
         MAX_DECIMALS_FOR_SVG_EXPORT,
       );
       const opacity = element.opacity / 100;
@@ -1337,7 +1347,7 @@ export const renderElementToSvg = (
       // render embeddable element + iframe
       const embeddableNode = roughSVGDrawWithPrecision(
         rsvg,
-        getShapeForElement(element)!,
+        ShapeCache.get(element)!,
         MAX_DECIMALS_FOR_SVG_EXPORT,
       );
       embeddableNode.setAttribute("stroke-linecap", "round");
@@ -1450,7 +1460,7 @@ export const renderElementToSvg = (
       }
       group.setAttribute("stroke-linecap", "round");
 
-      getShapeForElement(element)!.forEach((shape) => {
+      ShapeCache.get(element)!.forEach((shape) => {
         const node = roughSVGDrawWithPrecision(
           rsvg,
           shape,
@@ -1493,7 +1503,7 @@ export const renderElementToSvg = (
     case "freedraw": {
       generateElementShape(element, generator);
       generateFreeDrawShape(element);
-      const shape = getShapeForElement(element);
+      const shape = ShapeCache.get(element);
       const node = shape
         ? roughSVGDrawWithPrecision(rsvg, shape, MAX_DECIMALS_FOR_SVG_EXPORT)
         : svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");

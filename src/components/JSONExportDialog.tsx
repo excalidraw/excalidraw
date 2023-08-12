@@ -34,7 +34,7 @@ const JSONExportModal = ({
   actionManager: ActionManager;
   onCloseRequest: () => void;
   exportOpts: ExportOpts;
-  canvas: HTMLCanvasElement | null;
+  canvas: HTMLCanvasElement;
 }) => {
   const { onExportToBackend } = exportOpts;
   return (
@@ -100,7 +100,7 @@ export const JSONExportDialog = ({
   files: BinaryFiles;
   actionManager: ActionManager;
   exportOpts: ExportOpts;
-  canvas: HTMLCanvasElement | null;
+  canvas: HTMLCanvasElement;
   setAppState: React.Component<any, UIAppState>["setState"];
 }) => {
   const handleClose = React.useCallback(() => {

@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element";
-import { Zoom } from "../types";
+import { InteractiveCanvasAppState } from "../types";
 import { ScrollBars } from "./types";
 import { getGlobalCSSVariable } from "../utils";
 import { getLanguage } from "../i18n";
@@ -13,15 +13,7 @@ export const getScrollBars = (
   elements: readonly ExcalidrawElement[],
   viewportWidth: number,
   viewportHeight: number,
-  {
-    scrollX,
-    scrollY,
-    zoom,
-  }: {
-    scrollX: number;
-    scrollY: number;
-    zoom: Zoom;
-  },
+  appState: InteractiveCanvasAppState,
 ): ScrollBars => {
   if (elements.length === 0) {
     return {
@@ -34,8 +26,8 @@ export const getScrollBars = (
     getCommonBounds(elements);
 
   // Apply zoom
-  const viewportWidthWithZoom = viewportWidth / zoom.value;
-  const viewportHeightWithZoom = viewportHeight / zoom.value;
+  const viewportWidthWithZoom = viewportWidth / appState.zoom.value;
+  const viewportHeightWithZoom = viewportHeight / appState.zoom.value;
 
   const viewportWidthDiff = viewportWidth - viewportWidthWithZoom;
   const viewportHeightDiff = viewportHeight - viewportHeightWithZoom;
@@ -50,8 +42,10 @@ export const getScrollBars = (
   const isRTL = getLanguage().rtl;
 
   // The viewport is the rectangle currently visible for the user
-  const viewportMinX = -scrollX + viewportWidthDiff / 2 + safeArea.left;
-  const viewportMinY = -scrollY + viewportHeightDiff / 2 + safeArea.top;
+  const viewportMinX =
+    -appState.scrollX + viewportWidthDiff / 2 + safeArea.left;
+  const viewportMinY =
+    -appState.scrollY + viewportHeightDiff / 2 + safeArea.top;
   const viewportMaxX = viewportMinX + viewportWidthWithZoom - safeArea.right;
   const viewportMaxY = viewportMinY + viewportHeightWithZoom - safeArea.bottom;
 

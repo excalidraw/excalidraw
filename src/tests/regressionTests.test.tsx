@@ -21,7 +21,7 @@ import { vi } from "vitest";
 
 const { h } = window;
 
-const renderScene = vi.spyOn(Renderer, "renderScene");
+const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
 
 const mouse = new Pointer("mouse");
 const finger1 = new Pointer("touch", 1);
@@ -33,7 +33,7 @@ const finger2 = new Pointer("touch", 2);
  * to debug where a test failure came from.
  */
 const checkpoint = (name: string) => {
-  expect(renderScene.mock.calls.length).toMatchSnapshot(
+  expect(renderStaticScene.mock.calls.length).toMatchSnapshot(
     `[${name}] number of renders`,
   );
   expect(h.state).toMatchSnapshot(`[${name}] appState`);
@@ -48,7 +48,7 @@ beforeEach(async () => {
   ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
   localStorage.clear();
-  renderScene.mockClear();
+  renderStaticScene.mockClear();
   reseed(7);
   setDateTimeForTests("201933152653");
 
@@ -1054,6 +1054,28 @@ describe("regression tests", () => {
     mouse.clickOn(rect3);
     expect(h.state.selectedGroupIds).toEqual(selectedGroupIds_prev);
     expect(API.getSelectedElements()).toEqual(selectedElements_prev);
+  });
+
+  it("deleting last but one element in editing group should unselect the group", () => {
+    const rect1 = UI.createElement("rectangle", { x: 10 });
+    const rect2 = UI.createElement("rectangle", { x: 50 });
+
+    UI.group([rect1, rect2]);
+
+    mouse.doubleClickOn(rect1);
+    Keyboard.keyDown(KEYS.DELETE);
+
+    // Clicking on the deleted element, hence in the empty space
+    mouse.clickOn(rect1);
+
+    expect(h.state.selectedGroupIds).toEqual({});
+    expect(API.getSelectedElements()).toEqual([]);
+
+    // Clicking back in and expecting no group selection
+    mouse.clickOn(rect2);
+
+    expect(h.state.selectedGroupIds).toEqual({ [rect2.groupIds[0]]: false });
+    expect(API.getSelectedElements()).toEqual([rect2.get()]);
   });
 
   it("Cmd/Ctrl-click exclusively select element under pointer", () => {

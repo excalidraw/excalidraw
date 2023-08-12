@@ -90,7 +90,7 @@
     "vite-plugin-ejs": "1.6.4",
     "vite-plugin-pwa": "0.16.4",
     "vite-plugin-svgr": "2.4.0",
-    "vitest": "0.32.2",
+    "vitest": "0.34.1",
     "vitest-canvas-mock": "0.3.2"
   },
   "engines": {

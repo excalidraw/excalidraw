@@ -39,7 +39,6 @@ import {
 import { FrameNameBoundsCache, Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
-import { getShapeForElement } from "../renderer/renderElement";
 import {
   hasBoundTextElement,
   isEmbeddableElement,
@@ -50,6 +49,7 @@ import { isTransparent } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
 import { getBoundTextElement } from "./textElement";
 import { Mutable } from "../utility-types";
+import { ShapeCache } from "../scene/ShapeCache";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -489,7 +489,7 @@ const hitTestFreeDrawElement = (
     B = element.points[i + 1];
   }
 
-  const shape = getShapeForElement(element);
+  const shape = ShapeCache.get(element);
 
   // for filled freedraw shapes, support
   // selecting from inside
@@ -502,7 +502,7 @@ const hitTestFreeDrawElement = (
 
 const hitTestLinear = (args: HitTestArgs): boolean => {
   const { element, threshold } = args;
-  if (!getShapeForElement(element)) {
+  if (!ShapeCache.get(element)) {
     return false;
   }
 
@@ -520,7 +520,7 @@ const hitTestLinear = (args: HitTestArgs): boolean => {
   }
   const [relX, relY] = GAPoint.toTuple(point);
 
-  const shape = getShapeForElement(element as ExcalidrawLinearElement);
+  const shape = ShapeCache.get(element as ExcalidrawLinearElement);
 
   if (!shape) {
     return false;

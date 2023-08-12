@@ -1,6 +1,6 @@
 import { fireEvent, GlobalTestState, toggleMenu, render } from "../test-utils";
 import { Excalidraw, Footer, MainMenu } from "../../packages/excalidraw/index";
-import { queryByText, queryByTestId, screen } from "@testing-library/react";
+import { queryByText, queryByTestId } from "@testing-library/react";
 import { GRID_SIZE, THEME } from "../../constants";
 import { t } from "../../i18n";
 import { useMemo } from "react";
@@ -23,7 +23,7 @@ describe("<Excalidraw/>", () => {
       ).toBe(0);
       expect(h.state.zenModeEnabled).toBe(false);
 
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,
@@ -42,8 +42,8 @@ describe("<Excalidraw/>", () => {
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(0);
       expect(h.state.zenModeEnabled).toBe(true);
-      screen.debug();
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,
@@ -95,7 +95,7 @@ describe("<Excalidraw/>", () => {
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(0);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,
@@ -114,7 +114,7 @@ describe("<Excalidraw/>", () => {
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(0);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,

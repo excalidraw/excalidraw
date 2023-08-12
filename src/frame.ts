@@ -16,7 +16,7 @@ import {
 } from "./element/textElement";
 import { arrayToMap, findIndex } from "./utils";
 import { mutateElement } from "./element/mutateElement";
-import { AppClassProperties, AppState } from "./types";
+import { AppClassProperties, AppState, StaticCanvasAppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
 import { moveOneRight } from "./zindex";
@@ -469,9 +469,16 @@ export const addElementsToFrame = (
   }
 
   let nextElements = allElements.slice();
+  // Optimisation since findIndex on "newElements" is slow
+  const nextElementsIndex = nextElements.reduce(
+    (acc: Record<string, number | undefined>, element, index) => {
+      acc[element.id] = index;
+      return acc;
+    },
+    {},
+  );
 
   const frameBoundary = findIndex(nextElements, (e) => e.frameId === frame.id);
-
   for (const element of omitGroupsContainingFrames(
     allElements,
     _elementsToAdd,
@@ -485,8 +492,8 @@ export const addElementsToFrame = (
         false,
       );
 
-      const frameIndex = findIndex(nextElements, (e) => e.id === frame.id);
-      const elementIndex = findIndex(nextElements, (e) => e.id === element.id);
+      const frameIndex = nextElementsIndex[frame.id] ?? -1;
+      const elementIndex = nextElementsIndex[element.id] ?? -1;
 
       if (elementIndex < frameBoundary) {
         nextElements = [
@@ -648,7 +655,7 @@ export const omitGroupsContainingFrames = (
  */
 export const getTargetFrame = (
   element: ExcalidrawElement,
-  appState: AppState,
+  appState: StaticCanvasAppState,
 ) => {
   const _element = isTextElement(element)
     ? getContainerElement(element) || element
@@ -660,11 +667,12 @@ export const getTargetFrame = (
     : getContainingFrame(_element);
 };
 
+// TODO: this a huge bottleneck for large scenes, optimise
 // given an element, return if the element is in some frame
 export const isElementInFrame = (
   element: ExcalidrawElement,
   allElements: ExcalidrawElementsIncludingDeleted,
-  appState: AppState,
+  appState: StaticCanvasAppState,
 ) => {
   const frame = getTargetFrame(element, appState);
   const _element = isTextElement(element)

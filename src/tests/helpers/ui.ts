@@ -107,7 +107,7 @@ export class Pointer {
   restorePosition(x = 0, y = 0) {
     this.clientX = x;
     this.clientY = y;
-    fireEvent.pointerMove(GlobalTestState.canvas, this.getEvent());
+    fireEvent.pointerMove(GlobalTestState.interactiveCanvas, this.getEvent());
   }
 
   private getEvent() {
@@ -129,18 +129,18 @@ export class Pointer {
     if (dx !== 0 || dy !== 0) {
       this.clientX += dx;
       this.clientY += dy;
-      fireEvent.pointerMove(GlobalTestState.canvas, this.getEvent());
+      fireEvent.pointerMove(GlobalTestState.interactiveCanvas, this.getEvent());
     }
   }
 
   down(dx = 0, dy = 0) {
     this.move(dx, dy);
-    fireEvent.pointerDown(GlobalTestState.canvas, this.getEvent());
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, this.getEvent());
   }
 
   up(dx = 0, dy = 0) {
     this.move(dx, dy);
-    fireEvent.pointerUp(GlobalTestState.canvas, this.getEvent());
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, this.getEvent());
   }
 
   click(dx = 0, dy = 0) {
@@ -150,7 +150,7 @@ export class Pointer {
 
   doubleClick(dx = 0, dy = 0) {
     this.move(dx, dy);
-    fireEvent.doubleClick(GlobalTestState.canvas, this.getEvent());
+    fireEvent.doubleClick(GlobalTestState.interactiveCanvas, this.getEvent());
   }
 
   // absolute coords
@@ -159,19 +159,19 @@ export class Pointer {
   moveTo(x: number = this.clientX, y: number = this.clientY) {
     this.clientX = x;
     this.clientY = y;
-    fireEvent.pointerMove(GlobalTestState.canvas, this.getEvent());
+    fireEvent.pointerMove(GlobalTestState.interactiveCanvas, this.getEvent());
   }
 
   downAt(x = this.clientX, y = this.clientY) {
     this.clientX = x;
     this.clientY = y;
-    fireEvent.pointerDown(GlobalTestState.canvas, this.getEvent());
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, this.getEvent());
   }
 
   upAt(x = this.clientX, y = this.clientY) {
     this.clientX = x;
     this.clientY = y;
-    fireEvent.pointerUp(GlobalTestState.canvas, this.getEvent());
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, this.getEvent());
   }
 
   clickAt(x: number, y: number) {
@@ -180,7 +180,7 @@ export class Pointer {
   }
 
   rightClickAt(x: number, y: number) {
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: x,
       clientY: y,
@@ -189,7 +189,7 @@ export class Pointer {
 
   doubleClickAt(x: number, y: number) {
     this.moveTo(x, y);
-    fireEvent.doubleClick(GlobalTestState.canvas, this.getEvent());
+    fireEvent.doubleClick(GlobalTestState.interactiveCanvas, this.getEvent());
   }
 
   // ---------------------------------------------------------------------------
@@ -323,6 +323,13 @@ export class UI {
   static group(elements: ExcalidrawElement[]) {
     mouse.select(elements);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.G);
+    });
+  }
+
+  static ungroup(elements: ExcalidrawElement[]) {
+    mouse.select(elements);
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
       Keyboard.keyPress(KEYS.G);
     });
   }
