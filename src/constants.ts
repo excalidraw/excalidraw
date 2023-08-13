@@ -356,4 +356,4 @@ export const FANCY_BACKGROUND_IMAGES = {
 } as const;
 
 export const DEFAULT_FANCY_BACKGROUND_IMAGE: keyof typeof FANCY_BACKGROUND_IMAGES =
-  "bubbles" as const;
+  "solid" as const;

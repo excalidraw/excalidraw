@@ -92,7 +92,7 @@ const ImageExportModal = ({
   );
   const [exportBackgroundImage, setExportBackgroundImage] = useState<
     keyof typeof FANCY_BACKGROUND_IMAGES
-  >(DEFAULT_FANCY_BACKGROUND_IMAGE);
+  >(appState.fancyBackgroundImageKey);
 
   const [exportDarkMode, setExportDarkMode] = useState(
     appState.exportWithDarkMode,
