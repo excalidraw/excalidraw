@@ -25,7 +25,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
 
 import "../components/ToolIcon.scss";
-import Select from "../components/Select";
+import Select, { convertToSelectItems } from "../components/Select";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -119,21 +119,27 @@ export const actionChangeFancyBackgroundImageUrl = register({
   trackEvent: { category: "export", action: "toggleBackgroundImage" },
   perform: (_elements, appState, value) => {
     return {
-      appState: { ...appState, fancyBackgroundImageUrl: value },
+      appState: { ...appState, fancyBackgroundImageKey: value },
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData }) => (
-    <Select
-      items={FANCY_BACKGROUND_IMAGES}
-      ariaLabel={t("imageExportDialog.label.backgroundImage")}
-      placeholder={t("imageExportDialog.label.backgroundImage")}
-      value={DEFAULT_FANCY_BACKGROUND_IMAGE}
-      onChange={(value) => {
-        updateData(value);
-      }}
-    />
-  ),
+  PanelComponent: ({ updateData }) => {
+    const items = convertToSelectItems(
+      FANCY_BACKGROUND_IMAGES,
+      (item) => item.label,
+    );
+    return (
+      <Select
+        items={items}
+        ariaLabel={t("imageExportDialog.label.backgroundImage")}
+        placeholder={t("imageExportDialog.label.backgroundImage")}
+        value={DEFAULT_FANCY_BACKGROUND_IMAGE}
+        onChange={(value) => {
+          updateData(value);
+        }}
+      />
+    );
+  },
 });
 
 export const actionChangeExportEmbedScene = register({

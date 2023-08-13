@@ -5,7 +5,6 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
-  FANCY_BACKGROUND_IMAGES,
   EXPORT_SCALES,
   THEME,
 } from "./constants";
@@ -101,8 +100,7 @@ export const getDefaultAppState = (): Omit<
     pendingImageElementId: null,
     showHyperlinkPopup: false,
     selectedLinearElement: null,
-    fancyBackgroundImageUrl:
-      FANCY_BACKGROUND_IMAGES[DEFAULT_FANCY_BACKGROUND_IMAGE].path,
+    fancyBackgroundImageKey: DEFAULT_FANCY_BACKGROUND_IMAGE,
   };
 };
 
@@ -210,7 +208,7 @@ const APP_STATE_STORAGE_CONF = (<
   pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
-  fancyBackgroundImageUrl: { browser: false, export: false, server: false },
+  fancyBackgroundImageKey: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

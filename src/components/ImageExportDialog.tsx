@@ -38,7 +38,7 @@ import { Tooltip } from "./Tooltip";
 import "./ImageExportDialog.scss";
 import { useAppProps } from "./App";
 import { FilledButton } from "./FilledButton";
-import Select from "./Select";
+import Select, { convertToSelectItems } from "./Select";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -68,6 +68,11 @@ function isBackgroundImageKey(
 ): key is keyof typeof FANCY_BACKGROUND_IMAGES {
   return key in FANCY_BACKGROUND_IMAGES;
 }
+
+const backgroundSelectItems = convertToSelectItems(
+  FANCY_BACKGROUND_IMAGES,
+  (item) => item.label,
+);
 
 const ImageExportModal = ({
   appState,
@@ -138,7 +143,7 @@ const ImageExportModal = ({
   }, [
     appState,
     appState.exportBackground,
-    appState.fancyBackgroundImageUrl,
+    appState.fancyBackgroundImageKey,
     files,
     exportedElements,
   ]);
@@ -150,7 +155,9 @@ const ImageExportModal = ({
         <div
           className={clsx("ImageExportModal__preview__canvas", {
             "ImageExportModal__preview__canvas--img-bcg":
-              appState.exportBackground && appState.fancyBackgroundImageUrl,
+              appState.exportBackground &&
+              appState.fancyBackgroundImageKey &&
+              appState.fancyBackgroundImageKey !== "solid",
           })}
           ref={previewRef}
         >
@@ -199,7 +206,7 @@ const ImageExportModal = ({
         >
           {exportWithBackground && (
             <Select
-              items={FANCY_BACKGROUND_IMAGES}
+              items={backgroundSelectItems}
               ariaLabel={t("imageExportDialog.label.backgroundImage")}
               placeholder={t("imageExportDialog.label.backgroundImage")}
               value={exportBackgroundImage}
@@ -209,7 +216,7 @@ const ImageExportModal = ({
                   actionManager.executeAction(
                     actionChangeFancyBackgroundImageUrl,
                     "ui",
-                    FANCY_BACKGROUND_IMAGES[value].path,
+                    value,
                   );
                 }
               }}

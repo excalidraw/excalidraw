@@ -3,9 +3,10 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
 import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
 import { distance, isOnlyExportingSingleFrame } from "../utils";
-import { AppState, BinaryFiles, DataURL } from "../types";
+import { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
+  FANCY_BACKGROUND_IMAGES,
   FANCY_BG_BORDER_RADIUS,
   FANCY_BG_PADDING,
   SVG_NS,
@@ -51,7 +52,8 @@ export const exportToCanvas = async (
 ) => {
   const exportWithFancyBackground =
     exportBackground &&
-    !!appState.fancyBackgroundImageUrl &&
+    appState.fancyBackgroundImageKey &&
+    appState.fancyBackgroundImageKey !== "solid" &&
     elements.length > 0;
   const padding = !exportWithFancyBackground
     ? exportPadding
@@ -75,7 +77,7 @@ export const exportToCanvas = async (
 
   const renderConfig = {
     viewBackgroundColor:
-      exportBackground && !appState.fancyBackgroundImageUrl
+      exportBackground && !exportWithFancyBackground
         ? viewBackgroundColor
         : null,
     scrollX: -minX + (onlyExportingSingleFrame ? 0 : padding),
@@ -92,15 +94,19 @@ export const exportToCanvas = async (
     renderSelection: false,
     renderGrid: false,
     isExporting: true,
-    exportBackgroundImage: appState.fancyBackgroundImageUrl,
+    exportBackgroundImage: appState.fancyBackgroundImageKey,
   };
 
-  if (exportWithFancyBackground) {
+  if (
+    exportWithFancyBackground &&
+    appState.fancyBackgroundImageKey !== "solid"
+  ) {
     await applyFancyBackgroundOnCanvas({
       canvas,
-      fancyBackgroundImageUrl: appState.fancyBackgroundImageUrl!,
+      fancyBackgroundImageKey: appState.fancyBackgroundImageKey,
       backgroundColor: viewBackgroundColor,
       exportScale: appState.exportScale,
+      theme: renderConfig.theme,
     });
   }
 
@@ -139,7 +145,7 @@ export const exportToSvg = async (
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
     renderFrame?: boolean;
-    fancyBackgroundImageUrl: DataURL | null;
+    fancyBackgroundImageKey?: keyof typeof FANCY_BACKGROUND_IMAGES;
   },
   files: BinaryFiles | null,
   opts?: {
@@ -157,8 +163,9 @@ export const exportToSvg = async (
 
   const exportWithFancyBackground =
     exportBackground &&
-    !!appState.fancyBackgroundImageUrl &&
-    elements.length > 0;
+    elements.length > 0 &&
+    appState.fancyBackgroundImageKey &&
+    appState.fancyBackgroundImageKey !== "solid";
 
   const padding = !exportWithFancyBackground
     ? exportPadding
@@ -191,7 +198,8 @@ export const exportToSvg = async (
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
-  let assetPath = "https://excalidraw.com/";
+  // let assetPath = "https://excalidraw.com/";
+  let assetPath = "http://localhost:3000/";
   // Asset path needs to be determined only when using package
   if (import.meta.env.VITE_IS_EXCALIDRAW_NPM_PACKAGE) {
     assetPath =
@@ -258,14 +266,17 @@ export const exportToSvg = async (
 
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
-    if (appState.fancyBackgroundImageUrl) {
+    if (
+      appState.fancyBackgroundImageKey &&
+      appState.fancyBackgroundImageKey !== "solid"
+    ) {
       await applyFancyBackgroundOnSvg({
         svgRoot,
-        fancyBackgroundImageUrl:
-          `${appState.fancyBackgroundImageUrl}` as DataURL,
+        fancyBackgroundImageKey: `${appState.fancyBackgroundImageKey}`,
         backgroundColor: viewBackgroundColor,
         dimensions: { w: width, h: height },
         exportScale,
+        theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
       });
     } else {
       const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");

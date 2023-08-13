@@ -1,7 +1,15 @@
-import { FANCY_BG_BORDER_RADIUS, FANCY_BG_PADDING, SVG_NS } from "../constants";
+import {
+  FANCY_BACKGROUND_IMAGES,
+  FANCY_BG_BORDER_RADIUS,
+  FANCY_BG_PADDING,
+  IMAGE_INVERT_FILTER,
+  SVG_NS,
+  THEME,
+  THEME_FILTER,
+} from "../constants";
 import { loadHTMLImageElement, loadSVGElement } from "../element/image";
 import { roundRect } from "../renderer/roundRect";
-import { AppState, DataURL } from "../types";
+import { AppState } from "../types";
 
 type Dimensions = { w: number; h: number };
 
@@ -62,6 +70,7 @@ const addContentBackground = (
   normalizedDimensions: Dimensions,
   contentBackgroundColor: string,
   exportScale: AppState["exportScale"],
+  theme: AppState["theme"],
 ) => {
   const shadows = [
     {
@@ -113,6 +122,9 @@ const addContentBackground = (
     }
 
     if (index === shadows.length - 1) {
+      if (theme === THEME.DARK) {
+        context.filter = THEME_FILTER;
+      }
       context.fillStyle = contentBackgroundColor;
       context.fill();
     }
@@ -123,16 +135,24 @@ const addContentBackground = (
 
 export const applyFancyBackgroundOnCanvas = async ({
   canvas,
-  fancyBackgroundImageUrl,
+  fancyBackgroundImageKey,
   backgroundColor,
   exportScale,
+  theme,
 }: {
   canvas: HTMLCanvasElement;
-  fancyBackgroundImageUrl: DataURL;
+  fancyBackgroundImageKey: Exclude<
+    keyof typeof FANCY_BACKGROUND_IMAGES,
+    "solid"
+  >;
   backgroundColor: string;
   exportScale: AppState["exportScale"];
+  theme: AppState["theme"];
 }) => {
   const context = canvas.getContext("2d")!;
+
+  const fancyBackgroundImageUrl =
+    FANCY_BACKGROUND_IMAGES[fancyBackgroundImageKey][theme];
 
   const fancyBackgroundImage = await loadHTMLImageElement(
     fancyBackgroundImageUrl,
@@ -142,31 +162,45 @@ export const applyFancyBackgroundOnCanvas = async ({
 
   addImageBackground(context, canvasDimensions, fancyBackgroundImage);
 
-  addContentBackground(context, canvasDimensions, backgroundColor, exportScale);
+  addContentBackground(
+    context,
+    canvasDimensions,
+    backgroundColor,
+    exportScale,
+    theme,
+  );
 };
 
 export const applyFancyBackgroundOnSvg = async ({
   svgRoot,
-  fancyBackgroundImageUrl,
+  fancyBackgroundImageKey,
   backgroundColor,
   dimensions,
   exportScale,
+  theme,
 }: {
   svgRoot: SVGSVGElement;
-  fancyBackgroundImageUrl: DataURL;
+  fancyBackgroundImageKey: Exclude<
+    keyof typeof FANCY_BACKGROUND_IMAGES,
+    "solid"
+  >;
   backgroundColor: string;
   dimensions: Dimensions;
   exportScale: AppState["exportScale"];
+  theme: AppState["theme"];
 }) => {
-  const fancyBackgroundImage = await loadSVGElement(
-    `${fancyBackgroundImageUrl}`,
-  );
+  const fancyBackgroundImageUrl =
+    FANCY_BACKGROUND_IMAGES[fancyBackgroundImageKey][theme];
+  const fancyBackgroundImage = await loadSVGElement(fancyBackgroundImageUrl);
 
   fancyBackgroundImage.setAttribute("x", "0");
   fancyBackgroundImage.setAttribute("y", "0");
   fancyBackgroundImage.setAttribute("width", `${dimensions.w}`);
   fancyBackgroundImage.setAttribute("height", `${dimensions.h}`);
   fancyBackgroundImage.setAttribute("preserveAspectRatio", "none");
+  if (theme === THEME.DARK) {
+    fancyBackgroundImage.setAttribute("filter", IMAGE_INVERT_FILTER);
+  }
 
   svgRoot.appendChild(fancyBackgroundImage);
 

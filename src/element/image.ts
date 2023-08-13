@@ -124,9 +124,9 @@ export const normalizeSVG = async (SVGString: string) => {
   }
 };
 
-export const loadSVGElement = (filePath: string) => {
+export const loadSVGElement = (dataURL: DataURL) => {
   return new Promise<SVGSVGElement>((resolve, reject) => {
-    fetch(filePath)
+    fetch(dataURL)
       .then((response) => response.text())
       .then((svgString) => {
         const parser = new DOMParser();
