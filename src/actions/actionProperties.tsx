@@ -46,7 +46,13 @@ import {
   TextAlignRightIcon,
   FillZigZagIcon,
 } from "../components/icons";
-import { FONT_FAMILY, ROUNDNESS, VERTICAL_ALIGN } from "../constants";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  FONT_FAMILY,
+  ROUNDNESS,
+  VERTICAL_ALIGN,
+} from "../constants";
 import {
   getNonDeletedElements,
   isTextElement,
@@ -351,7 +357,9 @@ export const actionChangeFillStyle = register({
             appState,
             (element) => element.fillStyle,
             (element) => element.hasOwnProperty("fillStyle"),
-            null,
+            getSelectedElements(elements, appState).length >= 2
+              ? null
+              : appState.currentItemFillStyle,
           )}
           onClick={(value, event) => {
             const nextValue =
@@ -410,7 +418,9 @@ export const actionChangeStrokeWidth = register({
           appState,
           (element) => element.strokeWidth,
           (element) => element.hasOwnProperty("strokeWidth"),
-          null,
+          getSelectedElements(elements, appState).length >= 2
+            ? null
+            : appState.currentItemStrokeWidth,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -460,7 +470,9 @@ export const actionChangeSloppiness = register({
           appState,
           (element) => element.roughness,
           (element) => element.hasOwnProperty("roughness"),
-          null,
+          getSelectedElements(elements, appState).length >= 2
+            ? null
+            : appState.currentItemRoughness,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -509,7 +521,9 @@ export const actionChangeStrokeStyle = register({
           appState,
           (element) => element.strokeStyle,
           (element) => element.hasOwnProperty("strokeStyle"),
-          null,
+          getSelectedElements(elements, appState).length >= 2
+            ? null
+            : appState.currentItemStrokeStyle,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -610,7 +624,9 @@ export const actionChangeFontSize = register({
           },
           (element) =>
             isTextElement(element) || getBoundTextElement(element) !== null,
-          null,
+          getSelectedElements(elements, appState).length >= 2
+            ? null
+            : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -734,7 +750,9 @@ export const actionChangeFontFamily = register({
             },
             (element) =>
               isTextElement(element) || getBoundTextElement(element) !== null,
-            null,
+            getSelectedElements(elements, appState).length >= 2
+              ? null
+              : appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -813,7 +831,9 @@ export const actionChangeTextAlign = register({
             },
             (element) =>
               isTextElement(element) || getBoundTextElement(element) !== null,
-            null,
+            getSelectedElements(elements, appState).length >= 2
+              ? null
+              : appState.currentItemTextAlign,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -891,7 +911,9 @@ export const actionChangeVerticalAlign = register({
             },
             (element) =>
               isTextElement(element) || getBoundTextElement(element) !== null,
-            null,
+            getSelectedElements(elements, appState).length >= 2
+              ? null
+              : VERTICAL_ALIGN.MIDDLE,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -957,7 +979,9 @@ export const actionChangeRoundness = register({
             (element) =>
               hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
             (element) => element.hasOwnProperty("roundness"),
-            null,
+            getSelectedElements(elements, appState).length >= 2
+              ? null
+              : appState.currentItemRoundness,
           )}
           onChange={(value) => updateData(value)}
         />
