@@ -9,9 +9,9 @@ const parseEnvVariables = (filepath) => {
     },
     {},
   );
-  envVars.PKG_NAME = JSON.stringify(pkg.name);
-  envVars.PKG_VERSION = JSON.stringify(pkg.version);
-  envVars.IS_EXCALIDRAW_NPM_PACKAGE = JSON.stringify(true);
+  envVars.VITE_PKG_NAME = JSON.stringify(pkg.name);
+  envVars.VITE_PKG_VERSION = JSON.stringify(pkg.version);
+  envVars.VITE_IS_EXCALIDRAW_NPM_PACKAGE = JSON.stringify(true);
   return envVars;
 };
 

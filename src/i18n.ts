@@ -1,6 +1,5 @@
 import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
-import { ENV } from "./constants";
 import { jotaiScope, jotaiStore } from "./jotai";
 import { atom, useAtomValue } from "jotai";
 import { NestedKeyOf } from "./utility-types";
@@ -74,7 +73,7 @@ export const languages: Language[] = [
 ];
 
 const TEST_LANG_CODE = "__test__";
-if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
+if (import.meta.env.DEV) {
   languages.unshift(
     { code: TEST_LANG_CODE, label: "test language" },
     {
@@ -145,7 +144,7 @@ export const t = (
   if (translation === undefined) {
     const errorMessage = `Can't find translation for ${path}`;
     // in production, don't blow up the app on a missing translation key
-    if (process.env.NODE_ENV === "production") {
+    if (import.meta.env.PROD) {
       console.warn(errorMessage);
       return "";
     }

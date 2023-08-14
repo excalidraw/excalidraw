@@ -6,7 +6,6 @@ import {
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
-  ENV,
   VERTICAL_ALIGN,
 } from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
@@ -384,7 +383,7 @@ const chartTypeBar = (
       y,
       groupId,
       backgroundColor,
-      process.env.NODE_ENV === ENV.DEVELOPMENT,
+      import.meta.env.DEV,
     ),
   ];
 };
@@ -473,7 +472,7 @@ const chartTypeLine = (
       y,
       groupId,
       backgroundColor,
-      process.env.NODE_ENV === ENV.DEVELOPMENT,
+      import.meta.env.DEV,
     ),
     line,
     ...lines,
