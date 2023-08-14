@@ -57,7 +57,8 @@ interface LayerUIProps {
   actionManager: ActionManager;
   appState: UIAppState;
   files: BinaryFiles;
-  canvas: HTMLCanvasElement | null;
+  canvas: HTMLCanvasElement;
+  interactiveCanvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
@@ -117,6 +118,7 @@ const LayerUI = ({
   setAppState,
   elements,
   canvas,
+  interactiveCanvas,
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
@@ -282,7 +284,7 @@ const LayerUI = ({
 
                           <ShapesSwitcher
                             appState={appState}
-                            canvas={canvas}
+                            interactiveCanvas={interactiveCanvas}
                             activeTool={appState.activeTool}
                             setAppState={setAppState}
                             onImageAction={({ pointerType }) => {
@@ -428,7 +430,7 @@ const LayerUI = ({
           onLockToggle={onLockToggle}
           onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
-          canvas={canvas}
+          interactiveCanvas={interactiveCanvas}
           onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}
@@ -480,7 +482,7 @@ const LayerUI = ({
                 className="scroll-back-to-content"
                 onClick={() => {
                   setAppState((appState) => ({
-                    ...calculateScrollCenter(elements, appState, canvas),
+                    ...calculateScrollCenter(elements, appState),
                   }));
                 }}
               >
@@ -523,8 +525,18 @@ const areEqual = (prevProps: LayerUIProps, nextProps: LayerUIProps) => {
     return false;
   }
 
-  const { canvas: _prevCanvas, appState: prevAppState, ...prev } = prevProps;
-  const { canvas: _nextCanvas, appState: nextAppState, ...next } = nextProps;
+  const {
+    canvas: _pC,
+    interactiveCanvas: _pIC,
+    appState: prevAppState,
+    ...prev
+  } = prevProps;
+  const {
+    canvas: _nC,
+    interactiveCanvas: _nIC,
+    appState: nextAppState,
+    ...next
+  } = nextProps;
 
   return (
     isShallowEqual(

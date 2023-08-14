@@ -20,6 +20,7 @@ import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
 import { isEraserActive, isHandToolActive } from "./appState";
 import { ResolutionType } from "./utility-types";
+import React from "react";
 
 let mockDateTime: string | null = null;
 
@@ -399,22 +400,25 @@ export const updateActiveTool = (
   };
 };
 
-export const resetCursor = (canvas: HTMLCanvasElement | null) => {
-  if (canvas) {
-    canvas.style.cursor = "";
+export const resetCursor = (interactiveCanvas: HTMLCanvasElement | null) => {
+  if (interactiveCanvas) {
+    interactiveCanvas.style.cursor = "";
   }
 };
 
-export const setCursor = (canvas: HTMLCanvasElement | null, cursor: string) => {
-  if (canvas) {
-    canvas.style.cursor = cursor;
+export const setCursor = (
+  interactiveCanvas: HTMLCanvasElement | null,
+  cursor: string,
+) => {
+  if (interactiveCanvas) {
+    interactiveCanvas.style.cursor = cursor;
   }
 };
 
 let eraserCanvasCache: any;
 let previewDataURL: string;
 export const setEraserCursor = (
-  canvas: HTMLCanvasElement | null,
+  interactiveCanvas: HTMLCanvasElement | null,
   theme: AppState["theme"],
 ) => {
   const cursorImageSizePx = 20;
@@ -446,7 +450,7 @@ export const setEraserCursor = (
   }
 
   setCursor(
-    canvas,
+    interactiveCanvas,
     `url(${previewDataURL}) ${cursorImageSizePx / 2} ${
       cursorImageSizePx / 2
     }, auto`,
@@ -454,23 +458,23 @@ export const setEraserCursor = (
 };
 
 export const setCursorForShape = (
-  canvas: HTMLCanvasElement | null,
+  interactiveCanvas: HTMLCanvasElement | null,
   appState: Pick<AppState, "activeTool" | "theme">,
 ) => {
-  if (!canvas) {
+  if (!interactiveCanvas) {
     return;
   }
   if (appState.activeTool.type === "selection") {
-    resetCursor(canvas);
+    resetCursor(interactiveCanvas);
   } else if (isHandToolActive(appState)) {
-    canvas.style.cursor = CURSOR_TYPE.GRAB;
+    interactiveCanvas.style.cursor = CURSOR_TYPE.GRAB;
   } else if (isEraserActive(appState)) {
-    setEraserCursor(canvas, appState.theme);
+    setEraserCursor(interactiveCanvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
     // Ignore custom type as well and let host decide
   } else if (!["image", "custom"].includes(appState.activeTool.type)) {
-    canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
+    interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
 
@@ -914,3 +918,87 @@ export const isOnlyExportingSingleFrame = (
     )
   );
 };
+
+export const assertNever = (
+  value: never,
+  message: string,
+  softAssert?: boolean,
+): never => {
+  if (softAssert) {
+    console.error(message);
+    return value;
+  }
+
+  throw new Error(message);
+};
+
+/**
+ * Memoizes on values of `opts` object (strict equality).
+ */
+export const memoize = <T extends Record<string, any>, R extends any>(
+  func: (opts: T) => R,
+) => {
+  let lastArgs: Map<string, any> | undefined;
+  let lastResult: R | undefined;
+
+  const ret = function (opts: T) {
+    const currentArgs = Object.entries(opts);
+
+    if (lastArgs) {
+      let argsAreEqual = true;
+      for (const [key, value] of currentArgs) {
+        if (lastArgs.get(key) !== value) {
+          argsAreEqual = false;
+          break;
+        }
+      }
+      if (argsAreEqual) {
+        return lastResult;
+      }
+    }
+
+    const result = func(opts);
+
+    lastArgs = new Map(currentArgs);
+    lastResult = result;
+
+    return result;
+  };
+
+  ret.clear = () => {
+    lastArgs = undefined;
+    lastResult = undefined;
+  };
+
+  return ret as typeof func & { clear: () => void };
+};
+
+export const isRenderThrottlingEnabled = (() => {
+  // we don't want to throttle in react < 18 because of #5439 and it was
+  // getting more complex to maintain the fix
+  let IS_REACT_18_AND_UP: boolean;
+  try {
+    const version = React.version.split(".");
+    IS_REACT_18_AND_UP = Number(version[0]) > 17;
+  } catch {
+    IS_REACT_18_AND_UP = false;
+  }
+
+  let hasWarned = false;
+
+  return () => {
+    if (window.EXCALIDRAW_THROTTLE_RENDER === true) {
+      if (!IS_REACT_18_AND_UP) {
+        if (!hasWarned) {
+          hasWarned = true;
+          console.warn(
+            "Excalidraw: render throttling is disabled on React versions < 18.",
+          );
+        }
+        return false;
+      }
+      return true;
+    }
+    return false;
+  };
+})();

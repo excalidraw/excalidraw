@@ -89,16 +89,23 @@ export const redrawTextBoundingBox = (
       container,
       textElement as ExcalidrawTextElementWithContainer,
     );
+    const maxContainerWidth = getBoundTextMaxWidth(container);
 
-    let nextHeight = container.height;
     if (metrics.height > maxContainerHeight) {
-      nextHeight = computeContainerDimensionForBoundText(
+      const nextHeight = computeContainerDimensionForBoundText(
         metrics.height,
         container.type,
         container.customData?.legacyTextWrap, //zsviczian
       );
       mutateElement(container, { height: nextHeight });
       updateOriginalContainerCache(container.id, nextHeight);
+    }
+    if (metrics.width > maxContainerWidth) {
+      const nextWidth = computeContainerDimensionForBoundText(
+        metrics.width,
+        container.type,
+      );
+      mutateElement(container, { width: nextWidth });
     }
     const updatedTextElement = {
       ...textElement,
@@ -863,8 +870,9 @@ const VALID_CONTAINER_TYPES = new Set([
   "arrow",
 ]);
 
-export const isValidTextContainer = (element: ExcalidrawElement) =>
-  VALID_CONTAINER_TYPES.has(element.type);
+export const isValidTextContainer = (element: {
+  type: ExcalidrawElement["type"];
+}) => VALID_CONTAINER_TYPES.has(element.type);
 
 export const computeContainerDimensionForBoundText = (
   dimension: number,
