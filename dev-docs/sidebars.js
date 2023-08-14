@@ -86,6 +86,15 @@ const sidebars = {
               link: { type: "doc", id: "@excalidraw/excalidraw/api/constants" },
               items: [],
             },
+            {
+              type: "category",
+              label: "Excalidraw Element Skeleton",
+              link: {
+                type: "doc",
+                id: "@excalidraw/excalidraw/api/excalidraw-element-skeleton",
+              },
+              items: [],
+            },
           ],
         },
         "@excalidraw/excalidraw/faq",
