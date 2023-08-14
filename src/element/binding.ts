@@ -192,7 +192,7 @@ export const maybeBindLinearElement = (
   }
 };
 
-const bindLinearElement = (
+export const bindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
@@ -476,6 +476,7 @@ const maybeCalculateNewGapWhenScaling = (
   return { elementId, gap: newGap, focus };
 };
 
+// TODO: this is a bottleneck, optimise
 export const getEligibleElementsForBinding = (
   elements: NonDeleted<ExcalidrawElement>[],
 ): SuggestedBinding[] => {
