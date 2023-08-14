@@ -20,14 +20,6 @@ export const dragSelectedElements = (
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
   selectedElements.forEach((element) => {
-    updateElementCoords(
-      lockDirection,
-      distanceX,
-      distanceY,
-      pointerDownState,
-      element,
-      offset,
-    );
     // update coords of bound text only if we're dragging the container directly
     // (we don't drag the group that it's part of)
     if (
@@ -50,6 +42,15 @@ export const dragSelectedElements = (
         );
       }
     }
+    
+    updateElementCoords(
+      lockDirection,
+      distanceX,
+      distanceY,
+      pointerDownState,
+      element,
+      offset,
+    );
     updateBoundElements(element, {
       simultaneouslyUpdated: selectedElements,
     });
