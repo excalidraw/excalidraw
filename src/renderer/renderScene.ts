@@ -172,7 +172,7 @@ const strokeGrid = (
   zoom: Zoom,
   width: number,
   height: number,
-  color: string,
+  color: string, //zsviczian
 ) => {
   const BOLD_LINE_FREQUENCY = 5;
 
@@ -943,6 +943,7 @@ const _renderStaticScene = ({
       appState.zoom,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
+      appState.gridColor,
     );
   }
 

@@ -84,6 +84,8 @@ const getRelevantAppStateProps = (
   selectedElementsAreBeingDragged: appState.selectedElementsAreBeingDragged,
   gridSize: appState.gridSize,
   frameRendering: appState.frameRendering,
+  linkOpacity: appState.linkOpacity, //zsviczian
+  gridColor: appState.gridColor, //zsviczian
 });
 
 const areEqual = (

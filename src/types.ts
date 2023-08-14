@@ -132,6 +132,7 @@ export type StaticCanvasAppState = CommonCanvasAppState & {
   gridSize: AppState["gridSize"];
   frameRendering: AppState["frameRendering"];
   linkOpacity: AppState["linkOpacity"]; //zsviczian
+  gridColor: AppState["gridColor"]; //zsviczian
 };
 
 export type InteractiveCanvasAppState = CommonCanvasAppState & {

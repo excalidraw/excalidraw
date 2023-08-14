@@ -175,6 +175,7 @@ const bindTextToContainer = (
     textAlign: TEXT_ALIGN.CENTER,
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     ...textProps,
+    rawText: textProps.text, //zsviczian
     containerId: container.id,
     strokeColor: textProps.strokeColor || container.strokeColor,
   });
@@ -244,6 +245,7 @@ const bindLinearElementToElement = (
           ...existingElement,
           ...start,
           text,
+          rawText: text, //zsviczian
         });
         // to position the text correctly when coordinates not provided
         Object.assign(startBoundElement, {
@@ -319,6 +321,7 @@ const bindLinearElementToElement = (
           ...existingElement,
           ...end,
           text,
+          rawText: text, //zsviczian
         });
         // to position the text correctly when coordinates not provided
         Object.assign(endBoundElement, {
@@ -465,6 +468,7 @@ export const convertToExcalidrawElements = (
           fontFamily,
           fontSize,
           ...element,
+          rawText: element.text, //zsviczian
         });
         break;
       }
