@@ -1,4 +1,5 @@
-import { RoughCanvas } from "roughjs/bin/canvas";
+import type { RoughCanvas } from "roughjs/bin/canvas";
+import { Drawable } from "roughjs/bin/core";
 import {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
@@ -89,4 +90,19 @@ export type ScrollBars = {
     width: number;
     height: number;
   } | null;
+};
+
+export type ElementShape = Drawable | Drawable[] | null;
+
+export type ElementShapes = {
+  rectangle: Drawable;
+  ellipse: Drawable;
+  diamond: Drawable;
+  embeddable: Drawable;
+  freedraw: Drawable | null;
+  arrow: Drawable[];
+  line: Drawable[];
+  text: null;
+  image: null;
+  frame: null;
 };

@@ -10,7 +10,7 @@ import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
-import { generateRoughOptions } from "../renderer/renderElement";
+import { generateRoughOptions } from "../scene/Shape";
 import {
   isArrowElement,
   isFreeDrawElement,
