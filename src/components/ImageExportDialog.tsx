@@ -19,7 +19,6 @@ import {
   isFirefox,
   EXPORT_SCALES,
   FANCY_BACKGROUND_IMAGES,
-  DEFAULT_FANCY_BACKGROUND_IMAGE,
 } from "../constants";
 
 import { canvasToBlob } from "../data/blob";
