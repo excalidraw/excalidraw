@@ -149,7 +149,13 @@ const ImageExportModal = ({
     } else {
       setExportBaseScale(defaultExportScale);
     }
-  }, [actionManager, exportedElements, previewRef]);
+  }, [
+    actionManager,
+    exportedElements,
+    previewRef,
+    exportWithBackground,
+    exportBackgroundImage,
+  ]);
 
   useEffect(() => {
     const previewNode = previewRef.current;
