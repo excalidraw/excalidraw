@@ -3,7 +3,7 @@ import {
   exportToSvg as _exportToSvg,
 } from "../scene/export";
 import { getDefaultAppState } from "../appState";
-import { AppState, BinaryFiles } from "../types";
+import { AppState, BinaryFiles, Dimensions } from "../types";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { restore } from "../data/restore";
 import { MIME_TYPES } from "../constants";
@@ -237,3 +237,27 @@ export {
 } from "../data/blob";
 export { getFreeDrawSvgPath } from "../renderer/renderElement";
 export { mergeLibraryItems } from "../data/library";
+
+export const getScaleToFill = (
+  contentSize: Dimensions,
+  containerSize: Dimensions,
+) => {
+  const scale = Math.max(
+    containerSize.width / contentSize.width,
+    containerSize.height / contentSize.height,
+  );
+
+  return scale;
+};
+
+export const getScaleToFit = (
+  contentSize: Dimensions,
+  containerSize: Dimensions,
+) => {
+  const scale = Math.min(
+    containerSize.width / contentSize.width,
+    containerSize.height / contentSize.height,
+  );
+
+  return scale;
+};

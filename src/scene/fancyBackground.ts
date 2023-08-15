@@ -8,19 +8,9 @@ import {
   THEME_FILTER,
 } from "../constants";
 import { loadHTMLImageElement, loadSVGElement } from "../element/image";
+import { getScaleToFill } from "../packages/utils";
 import { roundRect } from "../renderer/roundRect";
-import { AppState } from "../types";
-
-type Dimensions = { w: number; h: number };
-
-const getScaleToFill = (contentSize: Dimensions, containerSize: Dimensions) => {
-  const scale = Math.max(
-    containerSize.w / contentSize.w,
-    containerSize.h / contentSize.h,
-  );
-
-  return scale;
-};
+import { AppState, Dimensions } from "../types";
 
 const addImageBackground = (
   context: CanvasRenderingContext2D,
@@ -33,8 +23,8 @@ const addImageBackground = (
     context.roundRect(
       0,
       0,
-      canvasDimensions.w,
-      canvasDimensions.h,
+      canvasDimensions.width,
+      canvasDimensions.height,
       FANCY_BG_BORDER_RADIUS,
     );
   } else {
@@ -42,17 +32,17 @@ const addImageBackground = (
       context,
       0,
       0,
-      canvasDimensions.w,
-      canvasDimensions.h,
+      canvasDimensions.width,
+      canvasDimensions.height,
       FANCY_BG_BORDER_RADIUS,
     );
   }
   const scale = getScaleToFill(
-    { w: fancyBackgroundImage.width, h: fancyBackgroundImage.height },
-    { w: canvasDimensions.w, h: canvasDimensions.h },
+    { width: fancyBackgroundImage.width, height: fancyBackgroundImage.height },
+    { width: canvasDimensions.width, height: canvasDimensions.height },
   );
-  const x = (canvasDimensions.w - fancyBackgroundImage.width * scale) / 2;
-  const y = (canvasDimensions.h - fancyBackgroundImage.height * scale) / 2;
+  const x = (canvasDimensions.width - fancyBackgroundImage.width * scale) / 2;
+  const y = (canvasDimensions.height - fancyBackgroundImage.height * scale) / 2;
   context.clip();
   context.drawImage(
     fancyBackgroundImage,
@@ -106,8 +96,8 @@ const addContentBackground = (
       context.roundRect(
         FANCY_BG_PADDING * exportScale,
         FANCY_BG_PADDING * exportScale,
-        normalizedDimensions.w - FANCY_BG_PADDING * 2 * exportScale,
-        normalizedDimensions.h - FANCY_BG_PADDING * 2 * exportScale,
+        normalizedDimensions.width - FANCY_BG_PADDING * 2 * exportScale,
+        normalizedDimensions.height - FANCY_BG_PADDING * 2 * exportScale,
         FANCY_BG_BORDER_RADIUS * exportScale,
       );
     } else {
@@ -115,8 +105,8 @@ const addContentBackground = (
         context,
         FANCY_BG_PADDING * exportScale,
         FANCY_BG_PADDING * exportScale,
-        normalizedDimensions.w - FANCY_BG_PADDING * 2 * exportScale,
-        normalizedDimensions.h - FANCY_BG_PADDING * 2 * exportScale,
+        normalizedDimensions.width - FANCY_BG_PADDING * 2 * exportScale,
+        normalizedDimensions.height - FANCY_BG_PADDING * 2 * exportScale,
         FANCY_BG_BORDER_RADIUS * exportScale,
       );
     }
@@ -158,7 +148,10 @@ export const applyFancyBackgroundOnCanvas = async ({
     fancyBackgroundImageUrl,
   );
 
-  const canvasDimensions: Dimensions = { w: canvas.width, h: canvas.height };
+  const canvasDimensions: Dimensions = {
+    width: canvas.width,
+    height: canvas.height,
+  };
 
   addImageBackground(context, canvasDimensions, fancyBackgroundImage);
 
@@ -195,8 +188,8 @@ export const applyFancyBackgroundOnSvg = async ({
 
   fancyBackgroundImage.setAttribute("x", "0");
   fancyBackgroundImage.setAttribute("y", "0");
-  fancyBackgroundImage.setAttribute("width", `${dimensions.w}`);
-  fancyBackgroundImage.setAttribute("height", `${dimensions.h}`);
+  fancyBackgroundImage.setAttribute("width", `${dimensions.width}`);
+  fancyBackgroundImage.setAttribute("height", `${dimensions.height}`);
   fancyBackgroundImage.setAttribute("preserveAspectRatio", "none");
   if (theme === THEME.DARK) {
     fancyBackgroundImage.setAttribute("filter", IMAGE_INVERT_FILTER);
@@ -209,11 +202,11 @@ export const applyFancyBackgroundOnSvg = async ({
   rect.setAttribute("y", (FANCY_BG_PADDING * exportScale).toString());
   rect.setAttribute(
     "width",
-    `${dimensions.w - FANCY_BG_PADDING * 2 * exportScale}`,
+    `${dimensions.width - FANCY_BG_PADDING * 2 * exportScale}`,
   );
   rect.setAttribute(
     "height",
-    `${dimensions.h - FANCY_BG_PADDING * 2 * exportScale}`,
+    `${dimensions.height - FANCY_BG_PADDING * 2 * exportScale}`,
   );
   rect.setAttribute("rx", (FANCY_BG_PADDING * exportScale).toString());
   rect.setAttribute("ry", (FANCY_BG_PADDING * exportScale).toString());

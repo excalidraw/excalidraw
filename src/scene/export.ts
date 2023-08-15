@@ -274,7 +274,7 @@ export const exportToSvg = async (
         svgRoot,
         fancyBackgroundImageKey: `${appState.fancyBackgroundImageKey}`,
         backgroundColor: viewBackgroundColor,
-        dimensions: { w: width, h: height },
+        dimensions: { width, height },
         exportScale,
         theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
       });
