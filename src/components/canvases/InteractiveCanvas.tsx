@@ -58,107 +58,114 @@ type InteractiveCanvasProps = {
   >;
 };
 
-const InteractiveCanvas = (props: InteractiveCanvasProps) => {
-  const isComponentMounted = useRef(false);
+const InteractiveCanvas = React.forwardRef(
+  (props: InteractiveCanvasProps, forwardedRef: React.Ref<HTMLDivElement>) => {
+    const isComponentMounted = useRef(false);
 
-  useEffect(() => {
-    if (!isComponentMounted.current) {
-      isComponentMounted.current = true;
-      return;
-    }
-
-    const cursorButton: {
-      [id: string]: string | undefined;
-    } = {};
-    const pointerViewportCoords: InteractiveCanvasRenderConfig["remotePointerViewportCoords"] =
-      {};
-    const remoteSelectedElementIds: InteractiveCanvasRenderConfig["remoteSelectedElementIds"] =
-      {};
-    const pointerUsernames: { [id: string]: string } = {};
-    const pointerUserStates: { [id: string]: string } = {};
-
-    props.appState.collaborators.forEach((user, socketId) => {
-      if (user.selectedElementIds) {
-        for (const id of Object.keys(user.selectedElementIds)) {
-          if (!(id in remoteSelectedElementIds)) {
-            remoteSelectedElementIds[id] = [];
-          }
-          remoteSelectedElementIds[id].push(socketId);
-        }
-      }
-      if (!user.pointer) {
+    useEffect(() => {
+      if (!isComponentMounted.current) {
+        isComponentMounted.current = true;
         return;
       }
-      if (user.username) {
-        pointerUsernames[socketId] = user.username;
-      }
-      if (user.userState) {
-        pointerUserStates[socketId] = user.userState;
-      }
-      pointerViewportCoords[socketId] = sceneCoordsToViewportCoords(
+
+      const cursorButton: {
+        [id: string]: string | undefined;
+      } = {};
+      const pointerViewportCoords: InteractiveCanvasRenderConfig["remotePointerViewportCoords"] =
+        {};
+      const remoteSelectedElementIds: InteractiveCanvasRenderConfig["remoteSelectedElementIds"] =
+        {};
+      const pointerUsernames: { [id: string]: string } = {};
+      const pointerUserStates: { [id: string]: string } = {};
+
+      props.appState.collaborators.forEach((user, socketId) => {
+        if (user.selectedElementIds) {
+          for (const id of Object.keys(user.selectedElementIds)) {
+            if (!(id in remoteSelectedElementIds)) {
+              remoteSelectedElementIds[id] = [];
+            }
+            remoteSelectedElementIds[id].push(socketId);
+          }
+        }
+        if (!user.pointer) {
+          return;
+        }
+        if (user.username) {
+          pointerUsernames[socketId] = user.username;
+        }
+        if (user.userState) {
+          pointerUserStates[socketId] = user.userState;
+        }
+        pointerViewportCoords[socketId] = sceneCoordsToViewportCoords(
+          {
+            sceneX: user.pointer.x,
+            sceneY: user.pointer.y,
+          },
+          props.appState,
+        );
+        cursorButton[socketId] = user.button;
+      });
+
+      const selectionColor =
+        forwardedRef && "current" in forwardedRef && forwardedRef.current
+          ? getComputedStyle(
+              forwardedRef.current,
+            ).getPropertyValue("--color-selection")
+          : "#6965db";
+
+      renderInteractiveScene(
         {
-          sceneX: user.pointer.x,
-          sceneY: user.pointer.y,
+          canvas: props.canvas,
+          elements: props.elements,
+          visibleElements: props.visibleElements,
+          selectedElements: props.selectedElements,
+          scale: window.devicePixelRatio,
+          appState: props.appState,
+          renderConfig: {
+            remotePointerViewportCoords: pointerViewportCoords,
+            remotePointerButton: cursorButton,
+            remoteSelectedElementIds,
+            remotePointerUsernames: pointerUsernames,
+            remotePointerUserStates: pointerUserStates,
+            selectionColor,
+            renderScrollbars: false,
+          },
+          callback: props.renderInteractiveSceneCallback,
         },
-        props.appState,
+        isRenderThrottlingEnabled(),
       );
-      cursorButton[socketId] = user.button;
     });
 
-    const selectionColor = getComputedStyle(
-      document.querySelector(".excalidraw")!,
-    ).getPropertyValue("--color-selection");
-
-    renderInteractiveScene(
-      {
-        canvas: props.canvas,
-        elements: props.elements,
-        visibleElements: props.visibleElements,
-        selectedElements: props.selectedElements,
-        scale: window.devicePixelRatio,
-        appState: props.appState,
-        renderConfig: {
-          remotePointerViewportCoords: pointerViewportCoords,
-          remotePointerButton: cursorButton,
-          remoteSelectedElementIds,
-          remotePointerUsernames: pointerUsernames,
-          remotePointerUserStates: pointerUserStates,
-          selectionColor,
-          renderScrollbars: false,
-        },
-        callback: props.renderInteractiveSceneCallback,
-      },
-      isRenderThrottlingEnabled(),
+    return (
+      <div ref={forwardedRef}>
+        <canvas
+          className="excalidraw__canvas interactive"
+          style={{
+            width: props.appState.width,
+            height: props.appState.height,
+            cursor: props.appState.viewModeEnabled
+              ? CURSOR_TYPE.GRAB
+              : CURSOR_TYPE.AUTO,
+          }}
+          width={props.appState.width * props.scale}
+          height={props.appState.height * props.scale}
+          ref={props.handleCanvasRef}
+          onContextMenu={props.onContextMenu}
+          onPointerMove={props.onPointerMove}
+          onPointerUp={props.onPointerUp}
+          onPointerCancel={props.onPointerCancel}
+          onTouchMove={props.onTouchMove}
+          onPointerDown={props.onPointerDown}
+          onDoubleClick={
+            props.appState.viewModeEnabled ? undefined : props.onDoubleClick
+          }
+        >
+          {t("labels.drawingCanvas")}
+        </canvas>
+      </div>
     );
-  });
-
-  return (
-    <canvas
-      className="excalidraw__canvas interactive"
-      style={{
-        width: props.appState.width,
-        height: props.appState.height,
-        cursor: props.appState.viewModeEnabled
-          ? CURSOR_TYPE.GRAB
-          : CURSOR_TYPE.AUTO,
-      }}
-      width={props.appState.width * props.scale}
-      height={props.appState.height * props.scale}
-      ref={props.handleCanvasRef}
-      onContextMenu={props.onContextMenu}
-      onPointerMove={props.onPointerMove}
-      onPointerUp={props.onPointerUp}
-      onPointerCancel={props.onPointerCancel}
-      onTouchMove={props.onTouchMove}
-      onPointerDown={props.onPointerDown}
-      onDoubleClick={
-        props.appState.viewModeEnabled ? undefined : props.onDoubleClick
-      }
-    >
-      {t("labels.drawingCanvas")}
-    </canvas>
-  );
-};
+  },
+);
 
 const getRelevantAppStateProps = (
   appState: AppState,
