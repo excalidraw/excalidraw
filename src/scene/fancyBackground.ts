@@ -21,6 +21,7 @@ const addImageBackground = (
   context: CanvasRenderingContext2D,
   canvasDimensions: Dimensions,
   fancyBackgroundImage: HTMLImageElement,
+  exportScale: AppState["exportScale"],
 ) => {
   context.save();
   context.beginPath();
@@ -30,7 +31,7 @@ const addImageBackground = (
       0,
       canvasDimensions.width,
       canvasDimensions.height,
-      FANCY_BG_BORDER_RADIUS,
+      FANCY_BG_BORDER_RADIUS * exportScale,
     );
   } else {
     roundRect(
@@ -39,7 +40,7 @@ const addImageBackground = (
       0,
       canvasDimensions.width,
       canvasDimensions.height,
-      FANCY_BG_BORDER_RADIUS,
+      FANCY_BG_BORDER_RADIUS * exportScale,
     );
   }
   const scale = getScaleToFill(
@@ -93,9 +94,9 @@ const addContentBackground = (
     context.save();
     context.beginPath();
     context.shadowColor = `rgba(0, 0, 0, ${shadow.alpha})`;
-    context.shadowBlur = shadow.blur;
-    context.shadowOffsetX = shadow.offsetX;
-    context.shadowOffsetY = shadow.offsetY;
+    context.shadowBlur = shadow.blur * exportScale;
+    context.shadowOffsetX = shadow.offsetX * exportScale;
+    context.shadowOffsetY = shadow.offsetY * exportScale;
 
     if (context.roundRect) {
       context.roundRect(
@@ -158,7 +159,12 @@ export const applyFancyBackgroundOnCanvas = async ({
     height: canvas.height,
   };
 
-  addImageBackground(context, canvasDimensions, fancyBackgroundImage);
+  addImageBackground(
+    context,
+    canvasDimensions,
+    fancyBackgroundImage,
+    exportScale,
+  );
 
   addContentBackground(
     context,
