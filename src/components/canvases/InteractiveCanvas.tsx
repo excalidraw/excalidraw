@@ -108,9 +108,9 @@ const InteractiveCanvas = React.forwardRef(
 
       const selectionColor =
         forwardedRef && "current" in forwardedRef && forwardedRef.current
-          ? getComputedStyle(
-              forwardedRef.current,
-            ).getPropertyValue("--color-selection")
+          ? getComputedStyle(forwardedRef.current).getPropertyValue(
+              "--color-selection",
+            )
           : "#6965db";
 
       renderInteractiveScene(
