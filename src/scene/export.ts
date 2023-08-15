@@ -7,8 +7,6 @@ import { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
   FANCY_BACKGROUND_IMAGES,
-  FANCY_BG_BORDER_RADIUS,
-  FANCY_BG_PADDING,
   SVG_NS,
   THEME,
   THEME_FILTER,
@@ -23,6 +21,7 @@ import Scene from "./Scene";
 import {
   applyFancyBackgroundOnCanvas,
   applyFancyBackgroundOnSvg,
+  getFancyBackgroundPadding,
 } from "./fancyBackground";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
@@ -57,7 +56,7 @@ export const exportToCanvas = async (
     elements.length > 0;
   const padding = !exportWithFancyBackground
     ? exportPadding
-    : exportPadding + FANCY_BG_PADDING + FANCY_BG_BORDER_RADIUS;
+    : getFancyBackgroundPadding(exportPadding);
 
   const [minX, minY, width, height] = getCanvasSize(elements, padding);
 
@@ -169,7 +168,7 @@ export const exportToSvg = async (
 
   const padding = !exportWithFancyBackground
     ? exportPadding
-    : (exportPadding + FANCY_BG_PADDING + FANCY_BG_BORDER_RADIUS) * exportScale;
+    : getFancyBackgroundPadding(exportPadding) * exportScale;
 
   let metadata = "";
   if (exportEmbedScene) {

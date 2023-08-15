@@ -4,6 +4,7 @@ import {
   CURSOR_TYPE,
   DEFAULT_VERSION,
   EVENT,
+  EXPORT_SCALES,
   FONT_FAMILY,
   isDarwin,
   MIME_TYPES,
@@ -1002,3 +1003,7 @@ export const isRenderThrottlingEnabled = (() => {
     return false;
   };
 })();
+
+export const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
+  ? devicePixelRatio
+  : 1;

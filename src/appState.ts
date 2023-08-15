@@ -5,16 +5,11 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
-  EXPORT_SCALES,
   THEME,
 } from "./constants";
 import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
-import { getDateTime } from "./utils";
-
-const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
-  ? devicePixelRatio
-  : 1;
+import { getDateTime, defaultExportScale } from "./utils";
 
 export const getDefaultAppState = (): Omit<
   AppState,

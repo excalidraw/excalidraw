@@ -26,7 +26,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { exportToCanvas } from "../packages/utils";
+import { exportToCanvas, getScaleToFit } from "../packages/utils";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
@@ -38,6 +38,9 @@ import "./ImageExportDialog.scss";
 import { useAppProps } from "./App";
 import { FilledButton } from "./FilledButton";
 import Select, { convertToSelectItems } from "./Select";
+import { getCommonBounds } from "../element";
+import { defaultExportScale, distance } from "../utils";
+import { getFancyBackgroundPadding } from "../scene/fancyBackground";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -98,6 +101,7 @@ const ImageExportModal = ({
   );
   const [embedScene, setEmbedScene] = useState(appState.exportEmbedScene);
   const [exportScale, setExportScale] = useState(appState.exportScale);
+  const [exportBaseScale, setExportBaseScale] = useState(appState.exportScale);
 
   const previewRef = useRef<HTMLDivElement>(null);
   const [renderError, setRenderError] = useState<Error | null>(null);
@@ -110,12 +114,52 @@ const ImageExportModal = ({
     : elements;
 
   useEffect(() => {
+    if (
+      exportedElements.length > 0 &&
+      exportWithBackground &&
+      exportBackgroundImage !== "solid"
+    ) {
+      const previewNode = previewRef.current;
+      if (!previewNode) {
+        return;
+      }
+      const [minX, minY, maxX, maxY] = getCommonBounds(exportedElements);
+      const maxWidth = previewNode.offsetWidth;
+      const maxHeight = previewNode.offsetHeight;
+
+      const scale =
+        Math.floor(
+          (getScaleToFit(
+            {
+              width: distance(minX, maxX) + getFancyBackgroundPadding() * 2,
+              height: distance(minY, maxY) + getFancyBackgroundPadding() * 2,
+            },
+            { width: maxWidth, height: maxHeight },
+          ) +
+            Number.EPSILON) *
+            100,
+        ) / 100;
+
+      if (scale > 1) {
+        actionManager.executeAction(actionChangeExportScale, "ui", scale);
+        setExportBaseScale(scale);
+      } else {
+        setExportBaseScale(defaultExportScale);
+      }
+    } else {
+      setExportBaseScale(defaultExportScale);
+    }
+  }, [actionManager, exportedElements, previewRef]);
+
+  useEffect(() => {
     const previewNode = previewRef.current;
     if (!previewNode) {
       return;
     }
     const maxWidth = previewNode.offsetWidth;
     const maxHeight = previewNode.offsetHeight;
+
+    const maxWidthOrHeight = Math.min(maxWidth, maxHeight);
 
     if (!maxWidth) {
       return;
@@ -125,7 +169,7 @@ const ImageExportModal = ({
       appState,
       files,
       exportPadding: DEFAULT_EXPORT_PADDING,
-      maxWidthOrHeight: Math.max(maxWidth, maxHeight),
+      maxWidthOrHeight,
     })
       .then((canvas) => {
         setRenderError(null);
@@ -283,8 +327,8 @@ const ImageExportModal = ({
               actionManager.executeAction(actionChangeExportScale, "ui", scale);
             }}
             choices={EXPORT_SCALES.map((scale) => ({
-              value: scale,
-              label: `${scale}\u00d7`,
+              value: scale * exportBaseScale,
+              label: `${scale * exportBaseScale}\u00d7`,
             }))}
           />
         </ExportSetting>

@@ -1,4 +1,5 @@
 import {
+  DEFAULT_EXPORT_PADDING,
   FANCY_BACKGROUND_IMAGES,
   FANCY_BG_BORDER_RADIUS,
   FANCY_BG_PADDING,
@@ -11,6 +12,10 @@ import { loadHTMLImageElement, loadSVGElement } from "../element/image";
 import { getScaleToFill } from "../packages/utils";
 import { roundRect } from "../renderer/roundRect";
 import { AppState, Dimensions } from "../types";
+
+export const getFancyBackgroundPadding = (
+  exportPadding = DEFAULT_EXPORT_PADDING,
+) => FANCY_BG_PADDING + FANCY_BG_BORDER_RADIUS + exportPadding;
 
 const addImageBackground = (
   context: CanvasRenderingContext2D,
