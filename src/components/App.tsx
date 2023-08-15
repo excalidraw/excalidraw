@@ -1226,7 +1226,7 @@ class App extends React.Component<AppProps, AppState> {
                           }}
                         />
                         <InteractiveCanvas
-                          ref={this.excalidrawContainerRef}
+                          containerRef={this.excalidrawContainerRef}
                           canvas={this.interactiveCanvas}
                           elements={canvasElements}
                           visibleElements={visibleElements}
