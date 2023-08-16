@@ -7,7 +7,7 @@ import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
 import Scene from "../scene/Scene";
-import { isFrameElement } from "./typeChecks";
+import { isArrowElement, isFrameElement } from "./typeChecks";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -54,11 +54,13 @@ export const dragSelectedElements = (
     // update coords of bound text only if we're dragging the container directly
     // (we don't drag the group that it's part of)
     if (
+      // Don't update coords of arrow label since we calculate its position during render
+      !isArrowElement(element) &&
       // container isn't part of any group
       // (perf optim so we don't check `isSelectedViaGroup()` in every case)
-      !element.groupIds.length ||
-      // container is part of a group, but we're dragging the container directly
-      (appState.editingGroupId && !isSelectedViaGroup(appState, element))
+      (!element.groupIds.length ||
+        // container is part of a group, but we're dragging the container directly
+        (appState.editingGroupId && !isSelectedViaGroup(appState, element)))
     ) {
       const textElement = getBoundTextElement(element);
       if (
@@ -104,6 +106,7 @@ const updateElementCoords = (
     x = element.x + offset.x;
     y = element.y + offset.y;
   }
+  console.log(element, "updating");
 
   mutateElement(element, {
     x,
