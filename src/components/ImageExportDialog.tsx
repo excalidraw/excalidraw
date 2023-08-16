@@ -113,6 +113,7 @@ const ImageExportModal = ({
       })
     : elements;
 
+  //FIXME: this is broken by fix for padding in export preview
   useEffect(() => {
     if (
       exportedElements.length > 0 &&
