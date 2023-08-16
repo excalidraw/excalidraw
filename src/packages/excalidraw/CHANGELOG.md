@@ -11,6 +11,10 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## 0.15.3 (2023-08-16)
+
+- Properly sanitize element `link` urls. [#6728](https://github.com/excalidraw/excalidraw/pull/6728).
+
 ## 0.15.2 (2023-04-20)
 
 ### Docs
