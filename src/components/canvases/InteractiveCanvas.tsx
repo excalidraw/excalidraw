@@ -107,13 +107,11 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
     });
 
     const selectionColor =
-      props.containerRef &&
-      "current" in props.containerRef &&
-      props.containerRef.current
-        ? getComputedStyle(props.containerRef.current).getPropertyValue(
-            "--color-selection",
-          )
-        : "#6965db";
+      (props.containerRef?.current &&
+        getComputedStyle(props.containerRef.current).getPropertyValue(
+          "--color-selection",
+        )) ||
+      "#6965db";
 
     renderInteractiveScene(
       {
