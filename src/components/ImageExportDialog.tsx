@@ -334,7 +334,7 @@ const ImageExportModal = ({
             }}
             choices={EXPORT_SCALES.map((scale) => ({
               value: scale * exportBaseScale,
-              label: `${scale * exportBaseScale}\u00d7`,
+              label: `${scale}\u00d7`,
             }))}
           />
         </ExportSetting>
