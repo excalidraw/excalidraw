@@ -16,6 +16,7 @@ import type {
 import type { NonDeletedExcalidrawElement } from "../../element/types";
 
 type InteractiveCanvasProps = {
+  containerRef: React.RefObject<HTMLDivElement>;
   canvas: HTMLCanvasElement | null;
   elements: readonly NonDeletedExcalidrawElement[];
   visibleElements: readonly NonDeletedExcalidrawElement[];
@@ -105,9 +106,12 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       cursorButton[socketId] = user.button;
     });
 
-    const selectionColor = getComputedStyle(
-      document.querySelector(".excalidraw")!,
-    ).getPropertyValue("--color-selection");
+    const selectionColor =
+      (props.containerRef?.current &&
+        getComputedStyle(props.containerRef.current).getPropertyValue(
+          "--color-selection",
+        )) ||
+      "#6965db";
 
     renderInteractiveScene(
       {
