@@ -106,7 +106,6 @@ const updateElementCoords = (
     x = element.x + offset.x;
     y = element.y + offset.y;
   }
-  console.log(element, "updating");
 
   mutateElement(element, {
     x,
