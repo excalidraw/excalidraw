@@ -7,7 +7,11 @@ import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
 import Scene from "../scene/Scene";
-import { isArrowElement, isFrameElement } from "./typeChecks";
+import {
+  isArrowElement,
+  isBoundToContainer,
+  isFrameElement,
+} from "./typeChecks";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -36,6 +40,7 @@ export const dragSelectedElements = (
   if (frames.length > 0) {
     const elementsInFrames = scene
       .getNonDeletedElements()
+      .filter((e) => !isBoundToContainer(e))
       .filter((e) => e.frameId !== null)
       .filter((e) => frames.includes(e.frameId!));
 
@@ -63,13 +68,7 @@ export const dragSelectedElements = (
         (appState.editingGroupId && !isSelectedViaGroup(appState, element)))
     ) {
       const textElement = getBoundTextElement(element);
-      if (
-        textElement &&
-        // when container is added to a frame, so will its bound text
-        // so the text is already in `elementsToUpdate` and we should avoid
-        // updating its coords again
-        (!textElement.frameId || !frames.includes(textElement.frameId))
-      ) {
+      if (textElement) {
         updateElementCoords(
           lockDirection,
           distanceX,
