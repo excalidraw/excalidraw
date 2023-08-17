@@ -109,12 +109,12 @@
     "createContainerFromText": "Envolver el texto en un contenedor",
     "link": {
       "edit": "Editar enlace",
-      "editEmbed": "",
+      "editEmbed": "Editar enlace e incrustar",
       "create": "Crear enlace",
-      "createEmbed": "",
+      "createEmbed": "Crear enlace e incrustar",
       "label": "Enlace",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Enlazar e incrustar",
+      "empty": "No se ha establecido un enlace"
     },
     "lineEditor": {
       "edit": "Editar línea",
@@ -128,9 +128,9 @@
     },
     "statusPublished": "Publicado",
     "sidebarLock": "Mantener barra lateral abierta",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Seleccionar todos los elementos en el marco",
+    "removeAllElementsFromFrame": "Eliminar todos los elementos del marco",
+    "eyeDropper": "Seleccionar un color del lienzo"
   },
   "library": {
     "noItems": "No hay elementos añadidos todavía...",
@@ -172,7 +172,7 @@
     "publishLibrary": "Publicar",
     "submit": "Enviar",
     "confirm": "Confirmar",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Pulsa para interactuar"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -234,9 +234,9 @@
     "link": "Añadir/Actualizar enlace para una forma seleccionada",
     "eraser": "Borrar",
     "frame": "",
-    "embeddable": "",
+    "embeddable": "Incrustar Web",
     "hand": "Mano (herramienta de panoramización)",
-    "extraTools": ""
+    "extraTools": "Más herramientas"
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
@@ -248,7 +248,7 @@
     "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
-    "embeddable": "",
+    "embeddable": "Haga clic y arrastre para crear un sitio web incrustado",
     "text_selected": "Doble clic o pulse ENTER para editar el texto",
     "text_editing": "Pulse Escape o Ctrl/Cmd + ENTER para terminar de editar",
     "linearElementMulti": "Haz clic en el último punto o presiona Escape o Enter para finalizar",
@@ -372,22 +372,22 @@
     "removeItemsFromLib": "Eliminar elementos seleccionados de la biblioteca"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exportar imagen",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Fondo",
+      "onlySelected": "Sólo seleccionados",
+      "darkMode": "Modo oscuro",
+      "embedScene": "Incrustar escena",
+      "scale": "Escalar",
+      "padding": "Espaciado"
     },
     "tooltip": {
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportar a PNG",
+      "exportToSvg": "Exportar a SVG",
+      "copyPngToClipboard": "Copiar PNG al portapapeles"
     },
     "button": {
       "exportToPng": "PNG",
@@ -431,18 +431,18 @@
     "transparent": "Transparente",
     "black": "Negro",
     "white": "Blanco",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "red": "Rojo",
+    "pink": "Rosa",
+    "grape": "Uva",
+    "violet": "Violeta",
+    "gray": "Gris",
+    "blue": "Azul",
+    "cyan": "Cian",
+    "teal": "Turquesa",
+    "green": "Verde",
+    "yellow": "Amarillo",
+    "orange": "Naranja",
+    "bronze": "Bronce"
   },
   "welcomeScreen": {
     "app": {
@@ -458,16 +458,16 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
+    "mostUsedCustomColors": "Colores personalizados más utilizados",
+    "colors": "Colores",
     "shades": "",
-    "hexCode": "",
+    "hexCode": "Código Hexadecimal",
     "noShades": ""
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
+        "title": "Exportar como imagen",
         "button": "",
         "description": ""
       },
