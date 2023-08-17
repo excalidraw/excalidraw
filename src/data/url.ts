@@ -9,7 +9,16 @@ export const normalizeLink = (link: string) => {
 };
 
 export const isLocalLink = (link: string | null) => {
-  return !!(link?.includes(location.origin) || link?.startsWith("/"));
+  if (!link) {
+    return false;
+  }
+  try {
+    const current = new URL(location.href);
+    const target = new URL(link, location.origin);
+    return current.origin === target.origin;
+  } catch {
+    return false; // parse error, assume external link
+  }
 };
 
 /**
