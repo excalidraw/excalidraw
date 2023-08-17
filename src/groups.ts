@@ -12,6 +12,7 @@ import {
 import { getSelectedElements } from "./scene";
 import { getBoundTextElement } from "./element/textElement";
 import { makeNextSelectedElementIds } from "./scene/selection";
+import { Mutable } from "./utility-types";
 
 export const selectGroup = (
   groupId: GroupId,
@@ -155,9 +156,11 @@ export const selectGroupsForSelectedElements = (function () {
      * you don't care about optimizing selectElements retrieval
      */
     app: AppClassProperties | null,
-  ): Pick<
-    InteractiveCanvasAppState,
-    "selectedGroupIds" | "editingGroupId" | "selectedElementIds"
+  ): Mutable<
+    Pick<
+      InteractiveCanvasAppState,
+      "selectedGroupIds" | "editingGroupId" | "selectedElementIds"
+    >
   > => {
     const selectedElements = app
       ? app.scene.getSelectedElements({

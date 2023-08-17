@@ -61,13 +61,7 @@ const StaticCanvas = (props: StaticCanvasProps) => {
 
 const getRelevantAppStateProps = (
   appState: AppState,
-): Omit<
-  StaticCanvasAppState,
-  | "editingElement"
-  | "selectedElementIds"
-  | "editingGroupId"
-  | "frameToHighlight"
-> => ({
+): StaticCanvasAppState => ({
   zoom: appState.zoom,
   scrollX: appState.scrollX,
   scrollY: appState.scrollY,
@@ -84,6 +78,9 @@ const getRelevantAppStateProps = (
   selectedElementsAreBeingDragged: appState.selectedElementsAreBeingDragged,
   gridSize: appState.gridSize,
   frameRendering: appState.frameRendering,
+  selectedElementIds: appState.selectedElementIds,
+  frameToHighlight: appState.frameToHighlight,
+  editingGroupId: appState.editingGroupId,
 });
 
 const areEqual = (
