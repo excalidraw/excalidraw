@@ -1,0 +1,50 @@
+@import "../css/variables.module";
+
+.mermaid-to-excalidraw-wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+
+  label {
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  &-text {
+    display: flex;
+    flex-direction: column;
+
+    textarea {
+      width: 20rem;
+      height: 22rem;
+      resize: none;
+    }
+  }
+
+  &-preview-canvas {
+    width: 20rem;
+    height: 23.5rem;
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
+      left center;
+
+    border: 1px solid var(--ImageExportModal-preview-border);
+    border-radius: 12px;
+  }
+
+  &-preview-insert.excalidraw-button {
+    height: 2.5rem;
+    margin-top: 1em;
+    margin-bottom: 0.3em;
+    width: 5rem;
+    background-color: var(--color-primary);
+    &:hover {
+      background-color: var(--color-primary-darke);
+    }
+    &:active {
+      background-color: var(--color-primary-darkest);
+    }
+
+    color: $oc-white;
+  }
+}
