@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 
 import type { ActionManager } from "../actions/manager";
@@ -113,7 +113,16 @@ const ImageExportModal = ({
       })
     : elements;
 
-  //FIXME: this is broken by fix for padding in export preview
+  const updateAllScales = useCallback(
+    (scale: number) => {
+      actionManager.executeAction(actionChangeExportScale, "ui", scale);
+      setExportScale(scale);
+      setExportBaseScale(scale);
+    },
+    [actionManager, setExportScale, setExportBaseScale],
+  );
+
+  // Upscale exported image when is smaller than preview
   useEffect(() => {
     if (
       exportedElements.length > 0 &&
@@ -142,20 +151,21 @@ const ImageExportModal = ({
         ) / 100;
 
       if (scale > 1) {
-        actionManager.executeAction(actionChangeExportScale, "ui", scale);
-        setExportBaseScale(scale);
+        if (scale !== exportBaseScale) {
+          updateAllScales(scale);
+        }
       } else {
-        setExportBaseScale(defaultExportScale);
+        updateAllScales(defaultExportScale);
       }
-    } else {
-      setExportBaseScale(defaultExportScale);
+    } else if (exportBaseScale !== defaultExportScale) {
+      updateAllScales(defaultExportScale);
     }
   }, [
-    actionManager,
-    exportedElements,
-    previewRef,
-    exportWithBackground,
     exportBackgroundImage,
+    exportWithBackground,
+    exportedElements,
+    exportBaseScale,
+    updateAllScales,
   ]);
 
   useEffect(() => {
