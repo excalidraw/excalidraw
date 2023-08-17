@@ -208,7 +208,7 @@
     "collabSaveFailed": "No se pudo guardar en la base de datos del backend. Si los problemas persisten, debería guardar su archivo localmente para asegurarse de que no pierde su trabajo.",
     "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Debería guardar el archivo localmente para asegurarse de que no pierde su trabajo.",
     "brave_measure_text_error": {
-      "line1": "",
+      "line1": "Parece que estás usando el navegador Brave con el ajuste <bold>Forzar el bloqueo de huellas digitales</bold> habilitado.",
       "line2": "",
       "line3": "",
       "line4": ""
@@ -468,12 +468,12 @@
     "action": {
       "exportToImage": {
         "title": "Exportar como imagen",
-        "button": "",
+        "button": "Exportar como imagen",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "Guardar en el disco",
+        "button": "Guardar en el disco",
         "description": ""
       },
       "excalidrawPlus": {
@@ -484,13 +484,13 @@
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "Cargar desde un archivo",
+        "button": "Cargar desde un archivo",
         "description": ""
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
+        "title": "Cargar desde un enlace",
+        "button": "Reemplazar mi contenido",
         "description": "Cargar un dibujo externo <bold>reemplazará tu contenido existente</bold>.<br></br>Puedes primero hacer una copia de seguridad de tu dibujo usando una de las opciones de abajo."
       }
     }
