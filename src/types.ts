@@ -92,7 +92,8 @@ export type LastActiveTool =
         | "eraser"
         | "hand"
         | "frame"
-        | "embeddable";
+        | "embeddable"
+        | "mermaid";
       customType: null;
     }
   | {
@@ -197,7 +198,8 @@ export type AppState = {
           | "eraser"
           | "hand"
           | "frame"
-          | "embeddable";
+          | "embeddable"
+          | "mermaid";
         customType: null;
       }
     | {

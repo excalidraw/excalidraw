@@ -397,6 +397,22 @@ export const ShapesSwitcher = ({
             >
               {t("toolBar.embeddable")}
             </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onSelect={() => {
+                const nextActiveTool = updateActiveTool(appState, {
+                  type: "mermaid",
+                });
+                setAppState({
+                  activeTool: nextActiveTool,
+                  multiElement: null,
+                  selectedElementIds: {},
+                });
+              }}
+              icon={EmbedIcon}
+              data-testid="toolbar-embeddable"
+            >
+              {t("toolBar.mermaidToExcalidraw")}
+            </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu>
       )}

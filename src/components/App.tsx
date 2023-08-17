@@ -353,6 +353,7 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
+import MermaidToExcalidraw from "./MermaidToExcalidraw";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1177,7 +1178,9 @@ class App extends React.Component<AppProps, AppState> {
                           app={this}
                         >
                           {this.props.children}
+                          <MermaidToExcalidraw appState={this.state} />
                         </LayerUI>
+
                         <div className="excalidraw-textEditorContainer" />
                         <div className="excalidraw-contextMenuContainer" />
                         <div className="excalidraw-eye-dropper-container" />
