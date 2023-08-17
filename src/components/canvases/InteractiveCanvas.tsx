@@ -166,7 +166,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
 
 const getRelevantAppStateProps = (
   appState: AppState,
-): Omit<InteractiveCanvasAppState, "editingElement"> => ({
+): InteractiveCanvasAppState => ({
   zoom: appState.zoom,
   scrollX: appState.scrollX,
   scrollY: appState.scrollY,
