@@ -74,28 +74,6 @@ export const exportToCanvas = async (
 
   const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
-  const renderConfig = {
-    viewBackgroundColor:
-      exportBackground && !exportWithFancyBackground
-        ? viewBackgroundColor
-        : null,
-    scrollX: -minX + (onlyExportingSingleFrame ? 0 : padding),
-    scrollY: -minY + (onlyExportingSingleFrame ? 0 : padding),
-    zoom: defaultAppState.zoom,
-    remotePointerViewportCoords: {},
-    remoteSelectedElementIds: {},
-    shouldCacheIgnoreZoom: false,
-    remotePointerUsernames: {},
-    remotePointerUserStates: {},
-    theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
-    imageCache,
-    renderScrollbars: false,
-    renderSelection: false,
-    renderGrid: false,
-    isExporting: true,
-    exportBackgroundImage: appState.fancyBackgroundImageKey,
-  };
-
   if (
     exportWithFancyBackground &&
     appState.fancyBackgroundImageKey !== "solid"
@@ -105,7 +83,7 @@ export const exportToCanvas = async (
       fancyBackgroundImageKey: appState.fancyBackgroundImageKey,
       backgroundColor: viewBackgroundColor,
       exportScale: scale,
-      theme: renderConfig.theme,
+      theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
     });
   }
 
@@ -117,17 +95,21 @@ export const exportToCanvas = async (
     scale,
     appState: {
       ...appState,
-      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: -minX + (onlyExportingSingleFrame ? 0 : exportPadding),
-      scrollY: -minY + (onlyExportingSingleFrame ? 0 : exportPadding),
+      viewBackgroundColor:
+        exportBackground && !exportWithFancyBackground
+          ? viewBackgroundColor
+          : null,
+      scrollX: -minX + (onlyExportingSingleFrame ? 0 : padding),
+      scrollY: -minY + (onlyExportingSingleFrame ? 0 : padding),
       zoom: defaultAppState.zoom,
       shouldCacheIgnoreZoom: false,
-      theme: appState.exportWithDarkMode ? "dark" : "light",
+      theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
     },
     renderConfig: {
       imageCache,
       renderGrid: false,
       isExporting: true,
+      exportWithFancyBackground,
     },
   });
 
