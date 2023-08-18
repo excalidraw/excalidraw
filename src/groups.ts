@@ -12,6 +12,7 @@ import {
 import { getSelectedElements } from "./scene";
 import { getBoundTextElement } from "./element/textElement";
 import { makeNextSelectedElementIds } from "./scene/selection";
+import { Mutable } from "./utility-types";
 
 export const selectGroup = (
   groupId: GroupId,
@@ -70,6 +71,7 @@ export const selectGroupsForSelectedElements = (function () {
     selectedElements: readonly NonDeleted<ExcalidrawElement>[],
     elements: readonly NonDeleted<ExcalidrawElement>[],
     appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
+    prevAppState: InteractiveCanvasAppState,
   ): SelectGroupsReturnType => {
     if (
       lastReturnValue !== undefined &&
@@ -133,10 +135,13 @@ export const selectGroupsForSelectedElements = (function () {
     lastReturnValue = {
       editingGroupId: appState.editingGroupId,
       selectedGroupIds,
-      selectedElementIds: {
-        ...appState.selectedElementIds,
-        ...selectedElementIdsInGroups,
-      },
+      selectedElementIds: makeNextSelectedElementIds(
+        {
+          ...appState.selectedElementIds,
+          ...selectedElementIdsInGroups,
+        },
+        prevAppState,
+      ),
     };
 
     return lastReturnValue;
@@ -155,9 +160,11 @@ export const selectGroupsForSelectedElements = (function () {
      * you don't care about optimizing selectElements retrieval
      */
     app: AppClassProperties | null,
-  ): Pick<
-    InteractiveCanvasAppState,
-    "selectedGroupIds" | "editingGroupId" | "selectedElementIds"
+  ): Mutable<
+    Pick<
+      InteractiveCanvasAppState,
+      "selectedGroupIds" | "editingGroupId" | "selectedElementIds"
+    >
   > => {
     const selectedElements = app
       ? app.scene.getSelectedElements({
@@ -178,7 +185,7 @@ export const selectGroupsForSelectedElements = (function () {
       };
     }
 
-    return _selectGroups(selectedElements, elements, appState);
+    return _selectGroups(selectedElements, elements, appState, prevAppState);
   };
 
   selectGroupsForSelectedElements.clearCache = () => {
