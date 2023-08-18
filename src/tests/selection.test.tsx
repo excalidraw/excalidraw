@@ -308,7 +308,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(8);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -338,7 +338,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(8);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -368,7 +368,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(8);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -411,7 +411,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(8);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -453,7 +453,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(8);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -475,5 +475,48 @@ describe("tool locking & selection", () => {
         expect(h.state.selectedElementIds[element.id]).not.toBe(true);
       }
     }
+  });
+});
+
+describe("selectedElementIds stability", () => {
+  beforeEach(async () => {
+    await render(<ExcalidrawApp />);
+  });
+
+  it("box-selection should be stable when not changing selection", () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 10,
+      height: 10,
+    });
+
+    h.elements = [rectangle];
+
+    const selectedElementIds_1 = h.state.selectedElementIds;
+
+    mouse.downAt(-100, -100);
+    mouse.moveTo(-50, -50);
+    mouse.up();
+
+    expect(h.state.selectedElementIds).toBe(selectedElementIds_1);
+
+    mouse.downAt(-50, -50);
+    mouse.moveTo(50, 50);
+
+    const selectedElementIds_2 = h.state.selectedElementIds;
+
+    expect(selectedElementIds_2).toEqual({ [rectangle.id]: true });
+
+    mouse.moveTo(60, 60);
+
+    // box-selecting further without changing selection should keep
+    // selectedElementIds stable (the same object)
+    expect(h.state.selectedElementIds).toBe(selectedElementIds_2);
+
+    mouse.up();
+
+    expect(h.state.selectedElementIds).toBe(selectedElementIds_2);
   });
 });

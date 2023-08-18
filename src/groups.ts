@@ -71,6 +71,7 @@ export const selectGroupsForSelectedElements = (function () {
     selectedElements: readonly NonDeleted<ExcalidrawElement>[],
     elements: readonly NonDeleted<ExcalidrawElement>[],
     appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
+    prevAppState: InteractiveCanvasAppState,
   ): SelectGroupsReturnType => {
     if (
       lastReturnValue !== undefined &&
@@ -134,10 +135,13 @@ export const selectGroupsForSelectedElements = (function () {
     lastReturnValue = {
       editingGroupId: appState.editingGroupId,
       selectedGroupIds,
-      selectedElementIds: {
-        ...appState.selectedElementIds,
-        ...selectedElementIdsInGroups,
-      },
+      selectedElementIds: makeNextSelectedElementIds(
+        {
+          ...appState.selectedElementIds,
+          ...selectedElementIdsInGroups,
+        },
+        prevAppState,
+      ),
     };
 
     return lastReturnValue;
@@ -181,7 +185,7 @@ export const selectGroupsForSelectedElements = (function () {
       };
     }
 
-    return _selectGroups(selectedElements, elements, appState);
+    return _selectGroups(selectedElements, elements, appState, prevAppState);
   };
 
   selectGroupsForSelectedElements.clearCache = () => {
