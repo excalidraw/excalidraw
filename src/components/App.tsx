@@ -1271,6 +1271,7 @@ class App extends React.Component<AppProps, AppState> {
                           }}
                         />
                         <InteractiveCanvas
+                          containerRef={this.excalidrawContainerRef}
                           canvas={this.interactiveCanvas}
                           elements={canvasElements}
                           visibleElements={visibleElements}
@@ -6135,7 +6136,7 @@ class App extends React.Component<AppProps, AppState> {
                 .map((element) => element.id),
             );
 
-            const elements = this.scene.getNonDeletedElements();
+            const elements = this.scene.getElementsIncludingDeleted();
 
             for (const element of elements) {
               if (

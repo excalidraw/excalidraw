@@ -6,8 +6,8 @@ import {
   StaticCanvasAppState,
   BinaryFiles,
   Point,
-  CommonCanvasAppState,
   Zoom,
+  AppState,
 } from "../types";
 import {
   ExcalidrawElement,
@@ -409,7 +409,7 @@ const bootstrapCanvas = ({
   scale: number;
   normalizedWidth: number;
   normalizedHeight: number;
-  theme?: CommonCanvasAppState["theme"];
+  theme?: AppState["theme"];
   isExporting?: StaticCanvasRenderConfig["isExporting"];
   viewBackgroundColor?: StaticCanvasAppState["viewBackgroundColor"];
 }): CanvasRenderingContext2D => {
