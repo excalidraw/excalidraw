@@ -8,9 +8,9 @@ import { mutateElement } from "../element/mutateElement";
 import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import { KEYS } from "../keys";
-import { invalidateShapeForElement } from "../renderer/renderElement";
 import { getSelectedElements } from "../scene";
 import Scene from "../scene/Scene";
+import { ShapeCache } from "../scene/ShapeCache";
 import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
 
 import "./EyeDropper.scss";
@@ -58,7 +58,7 @@ export const EyeDropper: React.FC<{
       return;
     }
 
-    let currentColor = COLOR_PALETTE.black;
+    let currentColor: string = COLOR_PALETTE.black;
     let isHoldingPointerDown = false;
 
     const ctx = app.canvas.getContext("2d")!;
@@ -77,8 +77,8 @@ export const EyeDropper: React.FC<{
       colorPreviewDiv.style.left = `${clientX + 20}px`;
 
       const pixel = ctx.getImageData(
-        clientX * window.devicePixelRatio - appState.offsetLeft,
-        clientY * window.devicePixelRatio - appState.offsetTop,
+        (clientX - appState.offsetLeft) * window.devicePixelRatio,
+        (clientY - appState.offsetTop) * window.devicePixelRatio,
         1,
         1,
       ).data;
@@ -98,7 +98,7 @@ export const EyeDropper: React.FC<{
             },
             false,
           );
-          invalidateShapeForElement(element);
+          ShapeCache.delete(element);
         }
         Scene.getScene(
           metaStuffRef.current.selectedElements[0],

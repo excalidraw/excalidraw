@@ -1,8 +1,6 @@
 import {
   ExcalidrawElement,
-  ExcalidrawLinearElement,
   ExcalidrawTextElement,
-  Arrowhead,
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
@@ -16,21 +14,22 @@ import {
   isArrowElement,
   hasBoundTextElement,
 } from "../element/typeChecks";
-import {
-  getDiamondPoints,
-  getElementAbsoluteCoords,
-  getArrowheadPoints,
-} from "../element/bounds";
-import { RoughCanvas } from "roughjs/bin/canvas";
-import { Drawable, Options } from "roughjs/bin/core";
-import { RoughSVG } from "roughjs/bin/svg";
-import { RoughGenerator } from "roughjs/bin/generator";
+import { getElementAbsoluteCoords } from "../element/bounds";
+import type { RoughCanvas } from "roughjs/bin/canvas";
+import type { Drawable } from "roughjs/bin/core";
+import type { RoughSVG } from "roughjs/bin/svg";
 
-import { RenderConfig } from "../scene/types";
+import { StaticCanvasRenderConfig } from "../scene/types";
 import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
-import { AppState, BinaryFiles, Zoom } from "../types";
+import {
+  AppState,
+  StaticCanvasAppState,
+  BinaryFiles,
+  Zoom,
+  InteractiveCanvasAppState,
+} from "../types";
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
@@ -49,7 +48,13 @@ import {
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import {
+  createPlaceholderEmbeddableLabel,
+  getEmbedLink,
+} from "../element/embeddable";
 import { getContainingFrame } from "../frame";
+import { normalizeLink, toValidURL } from "../data/url";
+import { ShapeCache } from "../scene/ShapeCache";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -61,26 +66,23 @@ const defaultAppState = getDefaultAppState();
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
-  renderConfig: RenderConfig,
+  renderConfig: StaticCanvasRenderConfig,
 ) =>
   isInitializedImageElement(element) &&
   !renderConfig.imageCache.has(element.fileId);
 
 const shouldResetImageFilter = (
   element: ExcalidrawElement,
-  renderConfig: RenderConfig,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
 ) => {
   return (
-    renderConfig.theme === "dark" &&
+    appState.theme === "dark" &&
     isInitializedImageElement(element) &&
     !isPendingImageElement(element, renderConfig) &&
     renderConfig.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
   );
 };
-
-const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
-
-const getDashArrayDotted = (strokeWidth: number) => [1.5, 6 + strokeWidth];
 
 const getCanvasPadding = (element: ExcalidrawElement) =>
   element.type === "freedraw" ? element.strokeWidth * 12 : 20;
@@ -88,9 +90,9 @@ const getCanvasPadding = (element: ExcalidrawElement) =>
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
-  theme: RenderConfig["theme"];
+  theme: AppState["theme"];
   scale: number;
-  zoomValue: RenderConfig["zoom"]["value"];
+  zoomValue: AppState["zoom"]["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
   boundTextElementVersion: number | null;
@@ -154,7 +156,8 @@ const cappedElementCanvasSize = (
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
-  renderConfig: RenderConfig,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -194,17 +197,17 @@ const generateElementCanvas = (
   const rc = rough.canvas(canvas);
 
   // in dark theme, revert the image color filter
-  if (shouldResetImageFilter(element, renderConfig)) {
+  if (shouldResetImageFilter(element, renderConfig, appState)) {
     context.filter = IMAGE_INVERT_FILTER;
   }
 
-  drawElementOnCanvas(element, rc, context, renderConfig);
+  drawElementOnCanvas(element, rc, context, renderConfig, appState);
   context.restore();
 
   return {
     element,
     canvas,
-    theme: renderConfig.theme,
+    theme: appState.theme,
     scale,
     zoomValue: zoom.value,
     canvasOffsetX,
@@ -251,21 +254,24 @@ const drawImagePlaceholder = (
     size,
   );
 };
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
 ) => {
   context.globalAlpha =
     ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
   switch (element.type) {
     case "rectangle":
+    case "embeddable":
     case "diamond":
     case "ellipse": {
       context.lineJoin = "round";
       context.lineCap = "round";
-      rc.draw(getShapeForElement(element)!);
+      rc.draw(ShapeCache.get(element)!);
       break;
     }
     case "arrow":
@@ -273,7 +279,7 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      getShapeForElement(element)!.forEach((shape) => {
+      ShapeCache.get(element)!.forEach((shape) => {
         rc.draw(shape);
       });
       break;
@@ -284,7 +290,7 @@ const drawElementOnCanvas = (
       context.fillStyle = element.strokeColor;
 
       const path = getFreeDrawPath2D(element) as Path2D;
-      const fillShape = getShapeForElement(element);
+      const fillShape = ShapeCache.get(element);
 
       if (fillShape) {
         rc.draw(fillShape);
@@ -309,7 +315,7 @@ const drawElementOnCanvas = (
           element.height,
         );
       } else {
-        drawImagePlaceholder(element, context, renderConfig.zoom.value);
+        drawImagePlaceholder(element, context, appState.zoom.value);
       }
       break;
     }
@@ -361,374 +367,29 @@ const drawElementOnCanvas = (
   context.globalAlpha = 1;
 };
 
-const elementWithCanvasCache = new WeakMap<
+export const elementWithCanvasCache = new WeakMap<
   ExcalidrawElement,
   ExcalidrawElementWithCanvas
 >();
 
-const shapeCache = new WeakMap<ExcalidrawElement, ElementShape>();
-
-type ElementShape = Drawable | Drawable[] | null;
-
-type ElementShapes = {
-  freedraw: Drawable | null;
-  arrow: Drawable[];
-  line: Drawable[];
-  text: null;
-  image: null;
-};
-
-export const getShapeForElement = <T extends ExcalidrawElement>(element: T) =>
-  shapeCache.get(element) as T["type"] extends keyof ElementShapes
-    ? ElementShapes[T["type"]] | undefined
-    : Drawable | null | undefined;
-
-export const setShapeForElement = <T extends ExcalidrawElement>(
-  element: T,
-  shape: T["type"] extends keyof ElementShapes
-    ? ElementShapes[T["type"]]
-    : Drawable,
-) => shapeCache.set(element, shape);
-
-export const invalidateShapeForElement = (element: ExcalidrawElement) =>
-  shapeCache.delete(element);
-
-export const generateRoughOptions = (
-  element: ExcalidrawElement,
-  continuousPath = false,
-): Options => {
-  const options: Options = {
-    seed: element.seed,
-    strokeLineDash:
-      element.strokeStyle === "dashed"
-        ? getDashArrayDashed(element.strokeWidth)
-        : element.strokeStyle === "dotted"
-        ? getDashArrayDotted(element.strokeWidth)
-        : undefined,
-    // for non-solid strokes, disable multiStroke because it tends to make
-    // dashes/dots overlay each other
-    disableMultiStroke: element.strokeStyle !== "solid",
-    // for non-solid strokes, increase the width a bit to make it visually
-    // similar to solid strokes, because we're also disabling multiStroke
-    strokeWidth:
-      element.strokeStyle !== "solid"
-        ? element.strokeWidth + 0.5
-        : element.strokeWidth,
-    // when increasing strokeWidth, we must explicitly set fillWeight and
-    // hachureGap because if not specified, roughjs uses strokeWidth to
-    // calculate them (and we don't want the fills to be modified)
-    fillWeight: element.strokeWidth / 2,
-    hachureGap: element.strokeWidth * 4,
-    roughness: element.roughness,
-    stroke: element.strokeColor,
-    preserveVertices: continuousPath,
-  };
-
-  switch (element.type) {
-    case "rectangle":
-    case "diamond":
-    case "ellipse": {
-      options.fillStyle = element.fillStyle;
-      options.fill =
-        element.backgroundColor === "transparent"
-          ? undefined
-          : element.backgroundColor;
-      if (element.type === "ellipse") {
-        options.curveFitting = 1;
-      }
-      return options;
-    }
-    case "line":
-    case "freedraw": {
-      if (isPathALoop(element.points)) {
-        options.fillStyle = element.fillStyle;
-        options.fill =
-          element.backgroundColor === "transparent"
-            ? undefined
-            : element.backgroundColor;
-      }
-      return options;
-    }
-    case "arrow":
-      return options;
-    default: {
-      throw new Error(`Unimplemented type ${element.type}`);
-    }
-  }
-};
-
-/**
- * Generates the element's shape and puts it into the cache.
- * @param element
- * @param generator
- */
-const generateElementShape = (
-  element: NonDeletedExcalidrawElement,
-  generator: RoughGenerator,
-) => {
-  let shape = shapeCache.get(element);
-
-  // `null` indicates no rc shape applicable for this element type
-  // (= do not generate anything)
-  if (shape === undefined) {
-    elementWithCanvasCache.delete(element);
-
-    switch (element.type) {
-      case "rectangle": {
-        if (element.roundness) {
-          const w = element.width;
-          const h = element.height;
-          const r = getCornerRadius(Math.min(w, h), element);
-          shape = generator.path(
-            `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
-              h - r
-            } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
-              h - r
-            } L 0 ${r} Q 0 0, ${r} 0`,
-            generateRoughOptions(element, true),
-          );
-        } else {
-          shape = generator.rectangle(
-            0,
-            0,
-            element.width,
-            element.height,
-            generateRoughOptions(element),
-          );
-        }
-        setShapeForElement(element, shape);
-
-        break;
-      }
-      case "diamond": {
-        const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
-          getDiamondPoints(element);
-        if (element.roundness) {
-          const verticalRadius = getCornerRadius(
-            Math.abs(topX - leftX),
-            element,
-          );
-
-          const horizontalRadius = getCornerRadius(
-            Math.abs(rightY - topY),
-            element,
-          );
-
-          shape = generator.path(
-            `M ${topX + verticalRadius} ${topY + horizontalRadius} L ${
-              rightX - verticalRadius
-            } ${rightY - horizontalRadius}
-            C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
-              rightX - verticalRadius
-            } ${rightY + horizontalRadius}
-            L ${bottomX + verticalRadius} ${bottomY - horizontalRadius}
-            C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
-              bottomX - verticalRadius
-            } ${bottomY - horizontalRadius}
-            L ${leftX + verticalRadius} ${leftY + horizontalRadius}
-            C ${leftX} ${leftY}, ${leftX} ${leftY}, ${leftX + verticalRadius} ${
-              leftY - horizontalRadius
-            }
-            L ${topX - verticalRadius} ${topY + horizontalRadius}
-            C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
-              topY + horizontalRadius
-            }`,
-            generateRoughOptions(element, true),
-          );
-        } else {
-          shape = generator.polygon(
-            [
-              [topX, topY],
-              [rightX, rightY],
-              [bottomX, bottomY],
-              [leftX, leftY],
-            ],
-            generateRoughOptions(element),
-          );
-        }
-        setShapeForElement(element, shape);
-
-        break;
-      }
-      case "ellipse":
-        shape = generator.ellipse(
-          element.width / 2,
-          element.height / 2,
-          element.width,
-          element.height,
-          generateRoughOptions(element),
-        );
-        setShapeForElement(element, shape);
-
-        break;
-      case "line":
-      case "arrow": {
-        const options = generateRoughOptions(element);
-
-        // points array can be empty in the beginning, so it is important to add
-        // initial position to it
-        const points = element.points.length ? element.points : [[0, 0]];
-
-        // curve is always the first element
-        // this simplifies finding the curve for an element
-        if (!element.roundness) {
-          if (options.fill) {
-            shape = [generator.polygon(points as [number, number][], options)];
-          } else {
-            shape = [
-              generator.linearPath(points as [number, number][], options),
-            ];
-          }
-        } else {
-          shape = [generator.curve(points as [number, number][], options)];
-        }
-
-        // add lines only in arrow
-        if (element.type === "arrow") {
-          const { startArrowhead = null, endArrowhead = "arrow" } = element;
-
-          const getArrowheadShapes = (
-            element: ExcalidrawLinearElement,
-            shape: Drawable[],
-            position: "start" | "end",
-            arrowhead: Arrowhead,
-          ) => {
-            const arrowheadPoints = getArrowheadPoints(
-              element,
-              shape,
-              position,
-              arrowhead,
-            );
-
-            if (arrowheadPoints === null) {
-              return [];
-            }
-
-            // Other arrowheads here...
-            if (arrowhead === "dot") {
-              const [x, y, r] = arrowheadPoints;
-
-              return [
-                generator.circle(x, y, r, {
-                  ...options,
-                  fill: element.strokeColor,
-                  fillStyle: "solid",
-                  stroke: "none",
-                }),
-              ];
-            }
-
-            if (arrowhead === "triangle") {
-              const [x, y, x2, y2, x3, y3] = arrowheadPoints;
-
-              // always use solid stroke for triangle arrowhead
-              delete options.strokeLineDash;
-
-              return [
-                generator.polygon(
-                  [
-                    [x, y],
-                    [x2, y2],
-                    [x3, y3],
-                    [x, y],
-                  ],
-                  {
-                    ...options,
-                    fill: element.strokeColor,
-                    fillStyle: "solid",
-                  },
-                ),
-              ];
-            }
-
-            // Arrow arrowheads
-            const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
-
-            if (element.strokeStyle === "dotted") {
-              // for dotted arrows caps, reduce gap to make it more legible
-              const dash = getDashArrayDotted(element.strokeWidth - 1);
-              options.strokeLineDash = [dash[0], dash[1] - 1];
-            } else {
-              // for solid/dashed, keep solid arrow cap
-              delete options.strokeLineDash;
-            }
-            return [
-              generator.line(x3, y3, x2, y2, options),
-              generator.line(x4, y4, x2, y2, options),
-            ];
-          };
-
-          if (startArrowhead !== null) {
-            const shapes = getArrowheadShapes(
-              element,
-              shape,
-              "start",
-              startArrowhead,
-            );
-            shape.push(...shapes);
-          }
-
-          if (endArrowhead !== null) {
-            if (endArrowhead === undefined) {
-              // Hey, we have an old arrow here!
-            }
-
-            const shapes = getArrowheadShapes(
-              element,
-              shape,
-              "end",
-              endArrowhead,
-            );
-            shape.push(...shapes);
-          }
-        }
-
-        setShapeForElement(element, shape);
-
-        break;
-      }
-      case "freedraw": {
-        generateFreeDrawShape(element);
-
-        if (isPathALoop(element.points)) {
-          // generate rough polygon to fill freedraw shape
-          shape = generator.polygon(element.points as [number, number][], {
-            ...generateRoughOptions(element),
-            stroke: "none",
-          });
-        } else {
-          shape = null;
-        }
-        setShapeForElement(element, shape);
-        break;
-      }
-      case "text":
-      case "image": {
-        // just to ensure we don't regenerate element.canvas on rerenders
-        setShapeForElement(element, null);
-        break;
-      }
-    }
-  }
-};
-
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
-  renderConfig: RenderConfig,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
 ) => {
-  const zoom: Zoom = renderConfig ? renderConfig.zoom : defaultAppState.zoom;
+  const zoom: Zoom = renderConfig ? appState.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
-    !renderConfig?.shouldCacheIgnoreZoom;
+    !appState?.shouldCacheIgnoreZoom;
   const boundTextElementVersion = getBoundTextElement(element)?.version || null;
   const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
 
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
-    prevElementWithCanvas.theme !== renderConfig.theme ||
+    prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
   ) {
@@ -736,6 +397,7 @@ const generateElementWithCanvas = (
       element,
       zoom,
       renderConfig,
+      appState,
     );
 
     elementWithCanvasCache.set(element, elementWithCanvas);
@@ -747,9 +409,9 @@ const generateElementWithCanvas = (
 
 const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
-  rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
 ) => {
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
@@ -764,8 +426,8 @@ const drawElementFromCanvas = (
     y2 = Math.ceil(y2);
   }
 
-  const cx = ((x1 + x2) / 2 + renderConfig.scrollX) * window.devicePixelRatio;
-  const cy = ((y1 + y2) / 2 + renderConfig.scrollY) * window.devicePixelRatio;
+  const cx = ((x1 + x2) / 2 + appState.scrollX) * window.devicePixelRatio;
+  const cy = ((y1 + y2) / 2 + appState.scrollY) * window.devicePixelRatio;
 
   context.save();
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
@@ -863,16 +525,16 @@ const drawElementFromCanvas = (
 
     context.drawImage(
       elementWithCanvas.canvas!,
-      (x1 + renderConfig.scrollX) * window.devicePixelRatio -
+      (x1 + appState.scrollX) * window.devicePixelRatio -
         (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
-      (y1 + renderConfig.scrollY) * window.devicePixelRatio -
+      (y1 + appState.scrollY) * window.devicePixelRatio -
         (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
       elementWithCanvas.canvas!.width / elementWithCanvas.scale,
       elementWithCanvas.canvas!.height / elementWithCanvas.scale,
     );
 
     if (
-      process.env.REACT_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
+      import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
         "true" &&
       hasBoundTextElement(element)
     ) {
@@ -883,8 +545,8 @@ const drawElementFromCanvas = (
       context.strokeStyle = "#c92a2a";
       context.lineWidth = 3;
       context.strokeRect(
-        (coords.x + renderConfig.scrollX) * window.devicePixelRatio,
-        (coords.y + renderConfig.scrollY) * window.devicePixelRatio,
+        (coords.x + appState.scrollX) * window.devicePixelRatio,
+        (coords.y + appState.scrollY) * window.devicePixelRatio,
         getBoundTextMaxWidth(element) * window.devicePixelRatio,
         getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
       );
@@ -895,50 +557,51 @@ const drawElementFromCanvas = (
   // Clear the nested element we appended to the DOM
 };
 
+export const renderSelectionElement = (
+  element: NonDeletedExcalidrawElement,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+) => {
+  context.save();
+  context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
+  context.fillStyle = "rgba(0, 0, 200, 0.04)";
+
+  // render from 0.5px offset  to get 1px wide line
+  // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
+  // TODO can be be improved by offseting to the negative when user selects
+  // from right to left
+  const offset = 0.5 / appState.zoom.value;
+
+  context.fillRect(offset, offset, element.width, element.height);
+  context.lineWidth = 1 / appState.zoom.value;
+  context.strokeStyle = " rgb(105, 101, 219)";
+  context.strokeRect(offset, offset, element.width, element.height);
+
+  context.restore();
+};
+
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  renderConfig: RenderConfig,
-  appState: AppState,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
 ) => {
-  const generator = rc.generator;
   switch (element.type) {
-    case "selection": {
-      // do not render selection when exporting
-      if (!renderConfig.isExporting) {
-        context.save();
-        context.translate(
-          element.x + renderConfig.scrollX,
-          element.y + renderConfig.scrollY,
-        );
-        context.fillStyle = "rgba(0, 0, 200, 0.04)";
-
-        // render from 0.5px offset  to get 1px wide line
-        // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
-        // TODO can be be improved by offseting to the negative when user selects
-        // from right to left
-        const offset = 0.5 / renderConfig.zoom.value;
-
-        context.fillRect(offset, offset, element.width, element.height);
-        context.lineWidth = 1 / renderConfig.zoom.value;
-        context.strokeStyle = " rgb(105, 101, 219)";
-        context.strokeRect(offset, offset, element.width, element.height);
-
-        context.restore();
-      }
-      break;
-    }
     case "frame": {
-      if (!renderConfig.isExporting && appState.shouldRenderFrames) {
+      if (
+        !renderConfig.isExporting &&
+        appState.frameRendering.enabled &&
+        appState.frameRendering.outline
+      ) {
         context.save();
         context.translate(
-          element.x + renderConfig.scrollX,
-          element.y + renderConfig.scrollY,
+          element.x + appState.scrollX,
+          element.y + appState.scrollY,
         );
         context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
-        context.lineWidth = 2 / renderConfig.zoom.value;
+        context.lineWidth = 2 / appState.zoom.value;
         context.strokeStyle = FRAME_STYLE.strokeColor;
 
         if (FRAME_STYLE.radius && context.roundRect) {
@@ -948,7 +611,7 @@ export const renderElement = (
             0,
             element.width,
             element.height,
-            FRAME_STYLE.radius / renderConfig.zoom.value,
+            FRAME_STYLE.radius / appState.zoom.value,
           );
           context.stroke();
           context.closePath();
@@ -961,26 +624,35 @@ export const renderElement = (
       break;
     }
     case "freedraw": {
-      generateElementShape(element, generator);
+      // TODO investigate if we can do this in situ. Right now we need to call
+      // beforehand because math helpers (such as getElementAbsoluteCoords)
+      // rely on existing shapes
+      ShapeCache.generateElementShape(element);
 
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-        const cx = (x1 + x2) / 2 + renderConfig.scrollX;
-        const cy = (y1 + y2) / 2 + renderConfig.scrollY;
+        const cx = (x1 + x2) / 2 + appState.scrollX;
+        const cy = (y1 + y2) / 2 + appState.scrollY;
         const shiftX = (x2 - x1) / 2 - (element.x - x1);
         const shiftY = (y2 - y1) / 2 - (element.y - y1);
         context.save();
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig);
+        drawElementOnCanvas(element, rc, context, renderConfig, appState);
         context.restore();
       } else {
         const elementWithCanvas = generateElementWithCanvas(
           element,
           renderConfig,
+          appState,
         );
-        drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
+        drawElementFromCanvas(
+          elementWithCanvas,
+          context,
+          renderConfig,
+          appState,
+        );
       }
 
       break;
@@ -991,12 +663,16 @@ export const renderElement = (
     case "line":
     case "arrow":
     case "image":
-    case "text": {
-      generateElementShape(element, generator);
+    case "text":
+    case "embeddable": {
+      // TODO investigate if we can do this in situ. Right now we need to call
+      // beforehand because math helpers (such as getElementAbsoluteCoords)
+      // rely on existing shapes
+      ShapeCache.generateElementShape(element, renderConfig.isExporting);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-        const cx = (x1 + x2) / 2 + renderConfig.scrollX;
-        const cy = (y1 + y2) / 2 + renderConfig.scrollY;
+        const cx = (x1 + x2) / 2 + appState.scrollX;
+        const cy = (y1 + y2) / 2 + appState.scrollY;
         let shiftX = (x2 - x1) / 2 - (element.x - x1);
         let shiftY = (y2 - y1) / 2 - (element.y - y1);
         if (isTextElement(element)) {
@@ -1014,7 +690,7 @@ export const renderElement = (
         context.save();
         context.translate(cx, cy);
 
-        if (shouldResetImageFilter(element, renderConfig)) {
+        if (shouldResetImageFilter(element, renderConfig, appState)) {
           context.filter = "none";
         }
         const boundTextElement = getBoundTextElement(element);
@@ -1048,7 +724,13 @@ export const renderElement = (
 
           tempCanvasContext.translate(-shiftX, -shiftY);
 
-          drawElementOnCanvas(element, tempRc, tempCanvasContext, renderConfig);
+          drawElementOnCanvas(
+            element,
+            tempRc,
+            tempCanvasContext,
+            renderConfig,
+            appState,
+          );
 
           tempCanvasContext.translate(shiftX, shiftY);
 
@@ -1085,7 +767,7 @@ export const renderElement = (
           }
 
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig);
+          drawElementOnCanvas(element, rc, context, renderConfig, appState);
         }
 
         context.restore();
@@ -1095,6 +777,7 @@ export const renderElement = (
         const elementWithCanvas = generateElementWithCanvas(
           element,
           renderConfig,
+          appState,
         );
 
         const currentImageSmoothingStatus = context.imageSmoothingEnabled;
@@ -1102,7 +785,7 @@ export const renderElement = (
         if (
           // do not disable smoothing during zoom as blurry shapes look better
           // on low resolution (while still zooming in) than sharp ones
-          !renderConfig?.shouldCacheIgnoreZoom &&
+          !appState?.shouldCacheIgnoreZoom &&
           // angle is 0 -> always disable smoothing
           (!element.angle ||
             // or check if angle is a right angle in which case we can still
@@ -1119,7 +802,12 @@ export const renderElement = (
           context.imageSmoothingEnabled = false;
         }
 
-        drawElementFromCanvas(elementWithCanvas, rc, context, renderConfig);
+        drawElementFromCanvas(
+          elementWithCanvas,
+          context,
+          renderConfig,
+          appState,
+        );
 
         // reset
         context.imageSmoothingEnabled = currentImageSmoothingStatus;
@@ -1175,7 +863,9 @@ export const renderElementToSvg = (
   offsetY: number,
   exportWithDarkMode?: boolean,
   exportingFrameId?: string | null,
+  renderEmbeddables?: boolean,
 ) => {
+  const offset = { x: offsetX, y: offsetY };
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   let cx = (x2 - x1) / 2 - (element.x - x1);
   let cy = (y2 - y1) / 2 - (element.y - y1);
@@ -1195,7 +885,6 @@ export const renderElementToSvg = (
     }
   }
   const degree = (180 * element.angle) / Math.PI;
-  const generator = rsvg.generator;
 
   // element to append node to, most of the time svgRoot
   let root = svgRoot;
@@ -1203,7 +892,7 @@ export const renderElementToSvg = (
   // if the element has a link, create an anchor tag and make that the new root
   if (element.link) {
     const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
-    anchorTag.setAttribute("href", element.link);
+    anchorTag.setAttribute("href", normalizeLink(element.link));
     root.appendChild(anchorTag);
     root = anchorTag;
   }
@@ -1220,10 +909,10 @@ export const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      generateElementShape(element, generator);
+      const shape = ShapeCache.generateElementShape(element);
       const node = roughSVGDrawWithPrecision(
         rsvg,
-        getShapeForElement(element)!,
+        shape,
         MAX_DECIMALS_FOR_SVG_EXPORT,
       );
       if (opacity !== 1) {
@@ -1246,6 +935,106 @@ export const renderElementToSvg = (
       );
 
       g ? root.appendChild(g) : root.appendChild(node);
+      break;
+    }
+    case "embeddable": {
+      // render placeholder rectangle
+      const shape = ShapeCache.generateElementShape(element, true);
+      const node = roughSVGDrawWithPrecision(
+        rsvg,
+        shape,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
+      const opacity = element.opacity / 100;
+      if (opacity !== 1) {
+        node.setAttribute("stroke-opacity", `${opacity}`);
+        node.setAttribute("fill-opacity", `${opacity}`);
+      }
+      node.setAttribute("stroke-linecap", "round");
+      node.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      root.appendChild(node);
+
+      const label: ExcalidrawElement =
+        createPlaceholderEmbeddableLabel(element);
+      renderElementToSvg(
+        label,
+        rsvg,
+        root,
+        files,
+        label.x + offset.x - element.x,
+        label.y + offset.y - element.y,
+        exportWithDarkMode,
+        exportingFrameId,
+        renderEmbeddables,
+      );
+
+      // render embeddable element + iframe
+      const embeddableNode = roughSVGDrawWithPrecision(
+        rsvg,
+        shape,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
+      embeddableNode.setAttribute("stroke-linecap", "round");
+      embeddableNode.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      while (embeddableNode.firstChild) {
+        embeddableNode.removeChild(embeddableNode.firstChild);
+      }
+      const radius = getCornerRadius(
+        Math.min(element.width, element.height),
+        element,
+      );
+
+      const embedLink = getEmbedLink(toValidURL(element.link || ""));
+
+      // if rendering embeddables explicitly disabled or
+      // embedding documents via srcdoc (which doesn't seem to work for SVGs)
+      // replace with a link instead
+      if (renderEmbeddables === false || embedLink?.type === "document") {
+        const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
+        anchorTag.setAttribute("href", normalizeLink(element.link || ""));
+        anchorTag.setAttribute("target", "_blank");
+        anchorTag.setAttribute("rel", "noopener noreferrer");
+        anchorTag.style.borderRadius = `${radius}px`;
+
+        embeddableNode.appendChild(anchorTag);
+      } else {
+        const foreignObject = svgRoot.ownerDocument!.createElementNS(
+          SVG_NS,
+          "foreignObject",
+        );
+        foreignObject.style.width = `${element.width}px`;
+        foreignObject.style.height = `${element.height}px`;
+        foreignObject.style.border = "none";
+        const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
+        div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        div.style.width = "100%";
+        div.style.height = "100%";
+        const iframe = div.ownerDocument!.createElement("iframe");
+        iframe.src = embedLink?.link ?? "";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        iframe.style.borderRadius = `${radius}px`;
+        iframe.style.top = "0";
+        iframe.style.left = "0";
+        iframe.allowFullscreen = true;
+        div.appendChild(iframe);
+        foreignObject.appendChild(div);
+
+        embeddableNode.appendChild(foreignObject);
+      }
+
+      root.appendChild(embeddableNode);
       break;
     }
     case "line":
@@ -1293,14 +1082,14 @@ export const renderElementToSvg = (
         maskRectInvisible.setAttribute("opacity", "1");
         maskPath.appendChild(maskRectInvisible);
       }
-      generateElementShape(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       if (boundText) {
         group.setAttribute("mask", `url(#mask-${element.id})`);
       }
       group.setAttribute("stroke-linecap", "round");
 
-      getShapeForElement(element)!.forEach((shape) => {
+      const shapes = ShapeCache.generateElementShape(element);
+      shapes.forEach((shape) => {
         const node = roughSVGDrawWithPrecision(
           rsvg,
           shape,
@@ -1341,11 +1130,13 @@ export const renderElementToSvg = (
       break;
     }
     case "freedraw": {
-      generateElementShape(element, generator);
-      generateFreeDrawShape(element);
-      const shape = getShapeForElement(element);
-      const node = shape
-        ? roughSVGDrawWithPrecision(rsvg, shape, MAX_DECIMALS_FOR_SVG_EXPORT)
+      const backgroundFillShape = ShapeCache.generateElementShape(element);
+      const node = backgroundFillShape
+        ? roughSVGDrawWithPrecision(
+            rsvg,
+            backgroundFillShape,
+            MAX_DECIMALS_FOR_SVG_EXPORT,
+          )
         : svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       if (opacity !== 1) {
         node.setAttribute("stroke-opacity", `${opacity}`);

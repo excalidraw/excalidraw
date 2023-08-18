@@ -15,7 +15,11 @@ import fs from "fs";
 import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
-import { newFreeDrawElement, newImageElement } from "../../element/newElement";
+import {
+  newEmbeddableElement,
+  newFreeDrawElement,
+  newImageElement,
+} from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { isLinearElementType } from "../../element/typeChecks";
@@ -185,6 +189,13 @@ export class API {
           ...base,
         });
         break;
+      case "embeddable":
+        element = newEmbeddableElement({
+          type: "embeddable",
+          ...base,
+          validated: null,
+        });
+        break;
       case "text":
         const fontSize = rest.fontSize ?? appState.currentItemFontSize;
         const fontFamily = rest.fontFamily ?? appState.currentItemFontFamily;
@@ -268,7 +279,7 @@ export class API {
   };
 
   static drop = async (blob: Blob) => {
-    const fileDropEvent = createEvent.drop(GlobalTestState.canvas);
+    const fileDropEvent = createEvent.drop(GlobalTestState.interactiveCanvas);
     const text = await new Promise<string>((resolve, reject) => {
       try {
         const reader = new FileReader();
@@ -295,6 +306,6 @@ export class API {
         },
       },
     });
-    fireEvent(GlobalTestState.canvas, fileDropEvent);
+    fireEvent(GlobalTestState.interactiveCanvas, fileDropEvent);
   };
 }

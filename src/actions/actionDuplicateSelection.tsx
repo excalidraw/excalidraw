@@ -259,21 +259,25 @@ const duplicateElements = (
 
   return {
     elements: finalElements,
-    appState: selectGroupsForSelectedElements(
-      {
-        ...appState,
-        selectedGroupIds: {},
-        selectedElementIds: nextElementsToSelect.reduce(
-          (acc: Record<ExcalidrawElement["id"], true>, element) => {
-            if (!isBoundToContainer(element)) {
-              acc[element.id] = true;
-            }
-            return acc;
-          },
-          {},
-        ),
-      },
-      getNonDeletedElements(finalElements),
-    ),
+    appState: {
+      ...appState,
+      ...selectGroupsForSelectedElements(
+        {
+          editingGroupId: appState.editingGroupId,
+          selectedElementIds: nextElementsToSelect.reduce(
+            (acc: Record<ExcalidrawElement["id"], true>, element) => {
+              if (!isBoundToContainer(element)) {
+                acc[element.id] = true;
+              }
+              return acc;
+            },
+            {},
+          ),
+        },
+        getNonDeletedElements(finalElements),
+        appState,
+        null,
+      ),
+    },
   };
 };

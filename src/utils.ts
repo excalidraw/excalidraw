@@ -20,6 +20,7 @@ import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
 import { isEraserActive, isHandToolActive } from "./appState";
 import { ResolutionType } from "./utility-types";
+import React from "react";
 
 let mockDateTime: string | null = null;
 
@@ -160,7 +161,7 @@ export const throttleRAF = <T extends any[]>(
   };
 
   const ret = (...args: T) => {
-    if (process.env.NODE_ENV === "test") {
+    if (import.meta.env.MODE === "test") {
       fn(...args);
       return;
     }
@@ -197,38 +198,75 @@ export const throttleRAF = <T extends any[]>(
  * @param {number} k - The value to be tweened.
  * @returns {number} The tweened value.
  */
-function easeOut(k: number): number {
+export const easeOut = (k: number) => {
   return 1 - Math.pow(1 - k, 4);
-}
+};
+
+const easeOutInterpolate = (from: number, to: number, progress: number) => {
+  return (to - from) * easeOut(progress) + from;
+};
 
 /**
- * Compute new values based on the same ease function and trigger the
- * callback through a requestAnimationFrame call
+ * Animates values from `fromValues` to `toValues` using the requestAnimationFrame API.
+ * Executes the `onStep` callback on each step with the interpolated values.
+ * Returns a function that can be called to cancel the animation.
  *
- * use `opts` to define a duration and/or an easeFn
+ * @example
+ * // Example usage:
+ * const fromValues = { x: 0, y: 0 };
+ * const toValues = { x: 100, y: 200 };
+ * const onStep = ({x, y}) => {
+ *   setState(x, y)
+ * };
+ * const onCancel = () => {
+ *   console.log("Animation canceled");
+ * };
  *
- * for example:
- * ```ts
- * easeToValuesRAF([10, 20, 10], [0, 0, 0], (a, b, c) => setState(a,b, c))
- * ```
+ * const cancelAnimation = easeToValuesRAF({
+ *   fromValues,
+ *   toValues,
+ *   onStep,
+ *   onCancel,
+ * });
  *
- * @param fromValues The initial values, must be numeric
- * @param toValues The destination values, must also be numeric
- * @param callback The callback receiving the values
- * @param opts default to 250ms duration and the easeOut function
+ * // To cancel the animation:
+ * cancelAnimation();
  */
-export const easeToValuesRAF = (
-  fromValues: number[],
-  toValues: number[],
-  callback: (...values: number[]) => void,
-  opts?: { duration?: number; easeFn?: (value: number) => number },
-) => {
+export const easeToValuesRAF = <
+  T extends Record<keyof T, number>,
+  K extends keyof T,
+>({
+  fromValues,
+  toValues,
+  onStep,
+  duration = 250,
+  interpolateValue,
+  onStart,
+  onEnd,
+  onCancel,
+}: {
+  fromValues: T;
+  toValues: T;
+  /**
+   * Interpolate a single value.
+   * Return undefined to be handled by the default interpolator.
+   */
+  interpolateValue?: (
+    fromValue: number,
+    toValue: number,
+    /** no easing applied  */
+    progress: number,
+    key: K,
+  ) => number | undefined;
+  onStep: (values: T) => void;
+  duration?: number;
+  onStart?: () => void;
+  onEnd?: () => void;
+  onCancel?: () => void;
+}) => {
   let canceled = false;
   let frameId = 0;
   let startTime: number;
-
-  const duration = opts?.duration || 250; // default animation to 0.25 seconds
-  const easeFn = opts?.easeFn || easeOut; // default the easeFn to easeOut
 
   function step(timestamp: number) {
     if (canceled) {
@@ -236,29 +274,58 @@ export const easeToValuesRAF = (
     }
     if (startTime === undefined) {
       startTime = timestamp;
+      onStart?.();
     }
 
-    const elapsed = timestamp - startTime;
+    const elapsed = Math.min(timestamp - startTime, duration);
+    const factor = easeOut(elapsed / duration);
+
+    const newValues = {} as T;
+
+    Object.keys(fromValues).forEach((key) => {
+      const _key = key as keyof T;
+      const result = ((toValues[_key] - fromValues[_key]) * factor +
+        fromValues[_key]) as T[keyof T];
+      newValues[_key] = result;
+    });
+
+    onStep(newValues);
 
     if (elapsed < duration) {
-      // console.log(elapsed, duration, elapsed / duration);
-      const factor = easeFn(elapsed / duration);
-      const newValues = fromValues.map(
-        (fromValue, index) =>
-          (toValues[index] - fromValue) * factor + fromValue,
-      );
+      const progress = elapsed / duration;
 
-      callback(...newValues);
+      const newValues = {} as T;
+
+      Object.keys(fromValues).forEach((key) => {
+        const _key = key as K;
+        const startValue = fromValues[_key];
+        const endValue = toValues[_key];
+
+        let result;
+
+        result = interpolateValue
+          ? interpolateValue(startValue, endValue, progress, _key)
+          : easeOutInterpolate(startValue, endValue, progress);
+
+        if (result == null) {
+          result = easeOutInterpolate(startValue, endValue, progress);
+        }
+
+        newValues[_key] = result as T[K];
+      });
+      onStep(newValues);
+
       frameId = window.requestAnimationFrame(step);
     } else {
-      // ensure final values are reached at the end of the transition
-      callback(...toValues);
+      onStep(toValues);
+      onEnd?.();
     }
   }
 
   frameId = window.requestAnimationFrame(step);
 
   return () => {
+    onCancel?.();
     canceled = true;
     window.cancelAnimationFrame(frameId);
   };
@@ -303,7 +370,14 @@ export const distance = (x: number, y: number) => Math.abs(x - y);
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: (
-    | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame" }
+    | {
+        type:
+          | typeof SHAPES[number]["value"]
+          | "eraser"
+          | "hand"
+          | "frame"
+          | "embeddable";
+      }
     | { type: "custom"; customType: string }
   ) & { lastActiveToolBeforeEraser?: LastActiveTool },
 ): AppState["activeTool"] => {
@@ -326,22 +400,25 @@ export const updateActiveTool = (
   };
 };
 
-export const resetCursor = (canvas: HTMLCanvasElement | null) => {
-  if (canvas) {
-    canvas.style.cursor = "";
+export const resetCursor = (interactiveCanvas: HTMLCanvasElement | null) => {
+  if (interactiveCanvas) {
+    interactiveCanvas.style.cursor = "";
   }
 };
 
-export const setCursor = (canvas: HTMLCanvasElement | null, cursor: string) => {
-  if (canvas) {
-    canvas.style.cursor = cursor;
+export const setCursor = (
+  interactiveCanvas: HTMLCanvasElement | null,
+  cursor: string,
+) => {
+  if (interactiveCanvas) {
+    interactiveCanvas.style.cursor = cursor;
   }
 };
 
 let eraserCanvasCache: any;
 let previewDataURL: string;
 export const setEraserCursor = (
-  canvas: HTMLCanvasElement | null,
+  interactiveCanvas: HTMLCanvasElement | null,
   theme: AppState["theme"],
 ) => {
   const cursorImageSizePx = 20;
@@ -373,7 +450,7 @@ export const setEraserCursor = (
   }
 
   setCursor(
-    canvas,
+    interactiveCanvas,
     `url(${previewDataURL}) ${cursorImageSizePx / 2} ${
       cursorImageSizePx / 2
     }, auto`,
@@ -381,23 +458,23 @@ export const setEraserCursor = (
 };
 
 export const setCursorForShape = (
-  canvas: HTMLCanvasElement | null,
+  interactiveCanvas: HTMLCanvasElement | null,
   appState: Pick<AppState, "activeTool" | "theme">,
 ) => {
-  if (!canvas) {
+  if (!interactiveCanvas) {
     return;
   }
   if (appState.activeTool.type === "selection") {
-    resetCursor(canvas);
+    resetCursor(interactiveCanvas);
   } else if (isHandToolActive(appState)) {
-    canvas.style.cursor = CURSOR_TYPE.GRAB;
+    interactiveCanvas.style.cursor = CURSOR_TYPE.GRAB;
   } else if (isEraserActive(appState)) {
-    setEraserCursor(canvas, appState.theme);
+    setEraserCursor(interactiveCanvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
     // Ignore custom type as well and let host decide
   } else if (!["image", "custom"].includes(appState.activeTool.type)) {
-    canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
+    interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
 
@@ -699,7 +776,7 @@ export const arrayToMapWithIndex = <T extends { id: string }>(
     return acc;
   }, new Map<string, [element: T, index: number]>());
 
-export const isTestEnv = () => process.env.NODE_ENV === "test";
+export const isTestEnv = () => import.meta.env.MODE === "test";
 
 export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
   return new CustomEvent(name, {
@@ -841,3 +918,87 @@ export const isOnlyExportingSingleFrame = (
     )
   );
 };
+
+export const assertNever = (
+  value: never,
+  message: string,
+  softAssert?: boolean,
+): never => {
+  if (softAssert) {
+    console.error(message);
+    return value;
+  }
+
+  throw new Error(message);
+};
+
+/**
+ * Memoizes on values of `opts` object (strict equality).
+ */
+export const memoize = <T extends Record<string, any>, R extends any>(
+  func: (opts: T) => R,
+) => {
+  let lastArgs: Map<string, any> | undefined;
+  let lastResult: R | undefined;
+
+  const ret = function (opts: T) {
+    const currentArgs = Object.entries(opts);
+
+    if (lastArgs) {
+      let argsAreEqual = true;
+      for (const [key, value] of currentArgs) {
+        if (lastArgs.get(key) !== value) {
+          argsAreEqual = false;
+          break;
+        }
+      }
+      if (argsAreEqual) {
+        return lastResult;
+      }
+    }
+
+    const result = func(opts);
+
+    lastArgs = new Map(currentArgs);
+    lastResult = result;
+
+    return result;
+  };
+
+  ret.clear = () => {
+    lastArgs = undefined;
+    lastResult = undefined;
+  };
+
+  return ret as typeof func & { clear: () => void };
+};
+
+export const isRenderThrottlingEnabled = (() => {
+  // we don't want to throttle in react < 18 because of #5439 and it was
+  // getting more complex to maintain the fix
+  let IS_REACT_18_AND_UP: boolean;
+  try {
+    const version = React.version.split(".");
+    IS_REACT_18_AND_UP = Number(version[0]) > 17;
+  } catch {
+    IS_REACT_18_AND_UP = false;
+  }
+
+  let hasWarned = false;
+
+  return () => {
+    if (window.EXCALIDRAW_THROTTLE_RENDER === true) {
+      if (!IS_REACT_18_AND_UP) {
+        if (!hasWarned) {
+          hasWarned = true;
+          console.warn(
+            "Excalidraw: render throttling is disabled on React versions < 18.",
+          );
+        }
+        return false;
+      }
+      return true;
+    }
+    return false;
+  };
+})();

@@ -89,10 +89,12 @@ const populateElements = (
     ...selectGroupsForSelectedElements(
       { ...h.state, ...appState, selectedElementIds },
       h.elements,
+      h.state,
+      null,
     ),
     ...appState,
     selectedElementIds,
-  });
+  } as AppState);
 
   return selectedElementIds;
 };

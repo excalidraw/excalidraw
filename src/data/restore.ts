@@ -3,6 +3,7 @@ import {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
+  PointBinding,
   StrokeRoundness,
 } from "../element/types";
 import {
@@ -28,6 +29,7 @@ import {
   FONT_FAMILY,
   ROUNDNESS,
   DEFAULT_SIDEBAR,
+  DEFAULT_ELEMENT_PROPS,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -40,7 +42,7 @@ import {
   getDefaultLineHeight,
   measureBaseline,
 } from "../element/textElement";
-import { COLOR_PALETTE } from "../colors";
+import { normalizeLink } from "./url";
 
 type RestoredAppState = Omit<
   AppState,
@@ -63,6 +65,7 @@ export const AllowedExcalidrawActiveTools: Record<
   eraser: false,
   custom: true,
   frame: true,
+  embeddable: true,
   hand: true,
 };
 
@@ -79,6 +82,13 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
     ] as FontFamilyValues;
   }
   return DEFAULT_FONT_FAMILY;
+};
+
+const repairBinding = (binding: PointBinding | null) => {
+  if (!binding) {
+    return null;
+  }
+  return { ...binding, focus: binding.focus || 0 };
 };
 
 const restoreElementWithProperties = <
@@ -112,16 +122,18 @@ const restoreElementWithProperties = <
     versionNonce: element.versionNonce ?? 0,
     isDeleted: element.isDeleted ?? false,
     id: element.id || randomId(),
-    fillStyle: element.fillStyle || "hachure",
-    strokeWidth: element.strokeWidth || 1,
-    strokeStyle: element.strokeStyle ?? "solid",
-    roughness: element.roughness ?? 1,
-    opacity: element.opacity == null ? 100 : element.opacity,
+    fillStyle: element.fillStyle || DEFAULT_ELEMENT_PROPS.fillStyle,
+    strokeWidth: element.strokeWidth || DEFAULT_ELEMENT_PROPS.strokeWidth,
+    strokeStyle: element.strokeStyle ?? DEFAULT_ELEMENT_PROPS.strokeStyle,
+    roughness: element.roughness ?? DEFAULT_ELEMENT_PROPS.roughness,
+    opacity:
+      element.opacity == null ? DEFAULT_ELEMENT_PROPS.opacity : element.opacity,
     angle: element.angle || 0,
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
-    strokeColor: element.strokeColor || COLOR_PALETTE.black,
-    backgroundColor: element.backgroundColor || COLOR_PALETTE.transparent,
+    strokeColor: element.strokeColor || DEFAULT_ELEMENT_PROPS.strokeColor,
+    backgroundColor:
+      element.backgroundColor || DEFAULT_ELEMENT_PROPS.backgroundColor,
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
@@ -142,7 +154,7 @@ const restoreElementWithProperties = <
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
-    link: element.link ?? null,
+    link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
   };
 
@@ -236,7 +248,6 @@ const restoreElement = (
         startArrowhead = null,
         endArrowhead = element.type === "arrow" ? "arrow" : null,
       } = element;
-
       let x = element.x;
       let y = element.y;
       let points = // migrate old arrow model to new one
@@ -256,8 +267,8 @@ const restoreElement = (
           (element.type as ExcalidrawElement["type"] | "draw") === "draw"
             ? "line"
             : element.type,
-        startBinding: element.startBinding,
-        endBinding: element.endBinding,
+        startBinding: repairBinding(element.startBinding),
+        endBinding: repairBinding(element.endBinding),
         lastCommittedPoint: null,
         startArrowhead,
         endArrowhead,
@@ -274,6 +285,10 @@ const restoreElement = (
       return restoreElementWithProperties(element, {});
     case "diamond":
       return restoreElementWithProperties(element, {});
+    case "embeddable":
+      return restoreElementWithProperties(element, {
+        validated: null,
+      });
     case "frame":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,
@@ -396,7 +411,6 @@ export const restoreElements = (
 ): ExcalidrawElement[] => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
   const restoredElements = (elements || []).reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
@@ -415,6 +429,7 @@ export const restoreElements = (
           migratedElement = { ...migratedElement, id: randomId() };
         }
         existingIds.add(migratedElement.id);
+
         elements.push(migratedElement);
       }
     }

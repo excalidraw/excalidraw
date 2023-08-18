@@ -47,3 +47,10 @@ export type ForwardRef<T, P = any> = Parameters<
 export type ExtractSetType<T extends Set<any>> = T extends Set<infer U>
   ? U
   : never;
+
+export type SameType<T, U> = T extends U ? (U extends T ? true : false) : false;
+export type Assert<T extends true> = T;
+
+export type NestedKeyOf<T, K = keyof T> = K extends keyof T & (string | number)
+  ? `${K}` | (T[K] extends object ? `${K}.${NestedKeyOf<T[K]>}` : never)
+  : never;

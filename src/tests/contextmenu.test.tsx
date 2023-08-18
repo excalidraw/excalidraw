@@ -21,9 +21,10 @@ import { copiedStyles } from "../actions/actionStyles";
 import { API } from "./helpers/api";
 import { setDateTimeForTests } from "../utils";
 import { LibraryItem } from "../types";
+import { vi } from "vitest";
 
 const checkpoint = (name: string) => {
-  expect(renderScene.mock.calls.length).toMatchSnapshot(
+  expect(renderStaticScene.mock.calls.length).toMatchSnapshot(
     `[${name}] number of renders`,
   );
   expect(h.state).toMatchSnapshot(`[${name}] appState`);
@@ -39,10 +40,10 @@ const mouse = new Pointer("mouse");
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
 beforeEach(() => {
   localStorage.clear();
-  renderScene.mockClear();
+  renderStaticScene.mockClear();
   reseed(7);
 });
 
@@ -51,7 +52,7 @@ const { h } = window;
 describe("contextMenu element", () => {
   beforeEach(async () => {
     localStorage.clear();
-    renderScene.mockClear();
+    renderStaticScene.mockClear();
     reseed(7);
     setDateTimeForTests("201933152653");
 
@@ -74,7 +75,7 @@ describe("contextMenu element", () => {
   });
 
   it("shows context menu for canvas", () => {
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 1,
       clientY: 1,
@@ -104,7 +105,7 @@ describe("contextMenu element", () => {
     mouse.down(10, 10);
     mouse.up(20, 20);
 
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 1,
       clientY: 1,
@@ -158,7 +159,7 @@ describe("contextMenu element", () => {
     API.setSelectedElements([rect1]);
 
     // lower z-index
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 100,
       clientY: 100,
@@ -168,7 +169,7 @@ describe("contextMenu element", () => {
 
     // higher z-index
     API.setSelectedElements([rect2]);
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 100,
       clientY: 100,
@@ -192,7 +193,7 @@ describe("contextMenu element", () => {
       mouse.click(20, 0);
     });
 
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 1,
       clientY: 1,
@@ -245,7 +246,7 @@ describe("contextMenu element", () => {
       Keyboard.keyPress(KEYS.G);
     });
 
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 1,
       clientY: 1,
@@ -284,7 +285,7 @@ describe("contextMenu element", () => {
     mouse.down(10, 10);
     mouse.up(20, 20);
 
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 1,
       clientY: 1,
@@ -332,7 +333,7 @@ describe("contextMenu element", () => {
     mouse.reset();
 
     // Copy styles of second rectangle
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 40,
       clientY: 40,
@@ -345,7 +346,7 @@ describe("contextMenu element", () => {
 
     mouse.reset();
     // Paste styles to first rectangle
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 10,
       clientY: 10,
@@ -369,7 +370,7 @@ describe("contextMenu element", () => {
     mouse.down(10, 10);
     mouse.up(20, 20);
 
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 1,
       clientY: 1,
@@ -385,7 +386,7 @@ describe("contextMenu element", () => {
     mouse.down(10, 10);
     mouse.up(20, 20);
 
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 1,
       clientY: 1,
@@ -406,7 +407,7 @@ describe("contextMenu element", () => {
     mouse.down(10, 10);
     mouse.up(20, 20);
 
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 1,
       clientY: 1,
@@ -429,7 +430,7 @@ describe("contextMenu element", () => {
     mouse.up(20, 20);
 
     mouse.reset();
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 40,
       clientY: 40,
@@ -451,7 +452,7 @@ describe("contextMenu element", () => {
     mouse.up(20, 20);
 
     mouse.reset();
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 10,
       clientY: 10,
@@ -473,7 +474,7 @@ describe("contextMenu element", () => {
     mouse.up(20, 20);
 
     mouse.reset();
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 40,
       clientY: 40,
@@ -494,7 +495,7 @@ describe("contextMenu element", () => {
     mouse.up(20, 20);
 
     mouse.reset();
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 10,
       clientY: 10,
@@ -519,7 +520,7 @@ describe("contextMenu element", () => {
       mouse.click(10, 10);
     });
 
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 1,
       clientY: 1,
@@ -549,7 +550,7 @@ describe("contextMenu element", () => {
       Keyboard.keyPress(KEYS.G);
     });
 
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 1,
       clientY: 1,

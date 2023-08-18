@@ -759,7 +759,7 @@ describe("textWysiwyg", () => {
       expect(h.elements[1].type).toBe("text");
 
       API.setSelectedElements([h.elements[0], h.elements[1]]);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -903,7 +903,7 @@ describe("textWysiwyg", () => {
       mouse.clickAt(10, 20);
       mouse.down();
       mouse.up();
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -955,7 +955,7 @@ describe("textWysiwyg", () => {
       // should center align horizontally and vertically by default
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-        Array [
+        [
           85,
           4.5,
         ]
@@ -979,7 +979,7 @@ describe("textWysiwyg", () => {
       // should left align horizontally and bottom vertically after resize
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-        Array [
+        [
           15,
           65,
         ]
@@ -1001,7 +1001,7 @@ describe("textWysiwyg", () => {
       // should right align horizontally and top vertically after resize
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-        Array [
+        [
           375,
           -539,
         ]
@@ -1154,7 +1154,7 @@ describe("textWysiwyg", () => {
 
       h.elements = [container, text];
       API.setSelectedElements([container, text]);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -1168,7 +1168,7 @@ describe("textWysiwyg", () => {
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text).toBe(
         "Online \nwhitebo\nard \ncollabo\nration \nmade \neasy",
       );
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -1279,7 +1279,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Left"));
         fireEvent.click(screen.getByTitle("Align top"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             15,
             25,
           ]
@@ -1290,7 +1290,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Center"));
         fireEvent.click(screen.getByTitle("Align top"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             30,
             25,
           ]
@@ -1302,7 +1302,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align top"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             45,
             25,
           ]
@@ -1313,7 +1313,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Center vertically"));
         fireEvent.click(screen.getByTitle("Left"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             15,
             45,
           ]
@@ -1325,7 +1325,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Center vertically"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             30,
             45,
           ]
@@ -1337,7 +1337,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Center vertically"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             45,
             45,
           ]
@@ -1349,7 +1349,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align bottom"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             15,
             65,
           ]
@@ -1360,7 +1360,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Center"));
         fireEvent.click(screen.getByTitle("Align bottom"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             30,
             65,
           ]
@@ -1371,7 +1371,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Right"));
         fireEvent.click(screen.getByTitle("Align bottom"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             45,
             65,
           ]
@@ -1406,7 +1406,7 @@ describe("textWysiwyg", () => {
 
       API.setSelectedElements([textElement]);
 
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,

@@ -17,7 +17,7 @@ import { updateFrameMembershipOfSelectedElements } from "../frame";
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     return {
       elements: flipSelectedElements(elements, appState, "horizontal"),
       appState,
@@ -31,11 +31,12 @@ export const actionFlipHorizontal = register({
 export const actionFlipVertical = register({
   name: "flipVertical",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     return {
       elements: updateFrameMembershipOfSelectedElements(
         flipSelectedElements(elements, appState, "vertical"),
         appState,
+        app,
       ),
       appState,
       commitToHistory: true,

@@ -144,11 +144,7 @@ export const loadSceneOrLibraryFromBlob = async (
               fileHandle: fileHandle || blob.handle || null,
               ...cleanAppStateForExport(data.appState || {}),
               ...(localAppState
-                ? calculateScrollCenter(
-                    data.elements || [],
-                    localAppState,
-                    null,
-                  )
+                ? calculateScrollCenter(data.elements || [], localAppState)
                 : {}),
             },
             files: data.files,

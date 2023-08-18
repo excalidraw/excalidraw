@@ -84,6 +84,19 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
   type: "ellipse";
 };
 
+export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "embeddable";
+    /**
+     * indicates whether the embeddable src (url) has been validated for rendering.
+     * null value indicates that the validation is pending. We reset the
+     * value on each restore (or url change) so that we can guarantee
+     * the validation came from a trusted source (the editor). Also because we
+     * may not have access to host-app supplied url validator during restore.
+     */
+    validated: boolean | null;
+  }>;
+
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
   Readonly<{
     type: "image";
@@ -124,7 +137,8 @@ export type ExcalidrawElement =
   | ExcalidrawLinearElement
   | ExcalidrawFreeDrawElement
   | ExcalidrawImageElement
-  | ExcalidrawFrameElement;
+  | ExcalidrawFrameElement
+  | ExcalidrawEmbeddableElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: boolean;
@@ -156,6 +170,7 @@ export type ExcalidrawBindableElement =
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
   | ExcalidrawImageElement
+  | ExcalidrawEmbeddableElement
   | ExcalidrawFrameElement;
 
 export type ExcalidrawTextContainer =
