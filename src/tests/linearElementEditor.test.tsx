@@ -275,7 +275,7 @@ describe("Test Linear Elements", () => {
       // drag line from midpoint
       drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
       expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
-      expect(renderStaticScene).toHaveBeenCalledTimes(8);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
 
       expect(line.points.length).toEqual(3);
       expect(line.points).toMatchInlineSnapshot(`
@@ -418,7 +418,7 @@ describe("Test Linear Elements", () => {
         ]);
 
         expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
-        expect(renderStaticScene).toHaveBeenCalledTimes(11);
+        expect(renderStaticScene).toHaveBeenCalledTimes(9);
 
         expect(line.points.length).toEqual(5);
 
@@ -521,7 +521,7 @@ describe("Test Linear Elements", () => {
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
         expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
-        expect(renderStaticScene).toHaveBeenCalledTimes(12);
+        expect(renderStaticScene).toHaveBeenCalledTimes(9);
 
         const newMidPoints = LinearElementEditor.getEditorMidPoints(
           line,
@@ -568,7 +568,7 @@ describe("Test Linear Elements", () => {
           lastSegmentMidpoint[1] + delta,
         ]);
         expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
-        expect(renderStaticScene).toHaveBeenCalledTimes(11);
+        expect(renderStaticScene).toHaveBeenCalledTimes(9);
         expect(line.points.length).toEqual(5);
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)

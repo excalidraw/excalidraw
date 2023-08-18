@@ -1734,7 +1734,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
 
 exports[`regression tests > Cmd/Ctrl-click exclusively select element under pointer > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > Cmd/Ctrl-click exclusively select element under pointer > [end of test] number of renders 1`] = `32`;
+exports[`regression tests > Cmd/Ctrl-click exclusively select element under pointer > [end of test] number of renders 1`] = `30`;
 
 exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] appState 1`] = `
 {
@@ -4609,7 +4609,7 @@ exports[`regression tests > click-drag to select a group > [end of test] history
 
 exports[`regression tests > click-drag to select a group > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > click-drag to select a group > [end of test] number of renders 1`] = `19`;
+exports[`regression tests > click-drag to select a group > [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests > deleting last but one element in editing group should unselect the group > [end of test] appState 1`] = `
 {
@@ -15305,7 +15305,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
 
 exports[`regression tests > single-clicking on a subgroup of a selected group should not alter selection > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > single-clicking on a subgroup of a selected group should not alter selection > [end of test] number of renders 1`] = `31`;
+exports[`regression tests > single-clicking on a subgroup of a selected group should not alter selection > [end of test] number of renders 1`] = `30`;
 
 exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] appState 1`] = `
 {
