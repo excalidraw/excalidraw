@@ -469,14 +469,6 @@ export const addElementsToFrame = (
   }
 
   let nextElements = allElements.slice();
-  // Optimisation since findIndex on "newElements" is slow
-  const nextElementsIndex = nextElements.reduce(
-    (acc: Record<string, number | undefined>, element, index) => {
-      acc[element.id] = index;
-      return acc;
-    },
-    {},
-  );
 
   const frameBoundary = findIndex(nextElements, (e) => e.frameId === frame.id);
   for (const element of omitGroupsContainingFrames(
@@ -492,8 +484,8 @@ export const addElementsToFrame = (
         false,
       );
 
-      const frameIndex = nextElementsIndex[frame.id] ?? -1;
-      const elementIndex = nextElementsIndex[element.id] ?? -1;
+      const frameIndex = findIndex(nextElements, (e) => e.id === frame.id);
+      const elementIndex = findIndex(nextElements, (e) => e.id === element.id);
 
       if (elementIndex < frameBoundary) {
         nextElements = [
