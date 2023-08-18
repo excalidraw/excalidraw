@@ -6037,7 +6037,9 @@ class App extends React.Component<AppProps, AppState> {
 
           this.setState((prevState) => {
             const nextSelectedElementIds = {
-              ...(shouldReuseSelection && pointerDownState.selectedElementIds),
+              ...(shouldReuseSelection &&
+                event.shiftKey &&
+                pointerDownState.selectedElementIds),
               ...elementsWithinSelection.reduce(
                 (acc: Record<ExcalidrawElement["id"], true>, element) => {
                   acc[element.id] = true;
