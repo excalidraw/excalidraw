@@ -219,8 +219,8 @@ export const applyFancyBackgroundOnSvg = async ({
     "height",
     `${dimensions.height - FANCY_BG_PADDING * 2 * exportScale}`,
   );
-  rect.setAttribute("rx", (FANCY_BG_PADDING * exportScale).toString());
-  rect.setAttribute("ry", (FANCY_BG_PADDING * exportScale).toString());
+  rect.setAttribute("rx", (FANCY_BG_BORDER_RADIUS * exportScale).toString());
+  rect.setAttribute("ry", (FANCY_BG_BORDER_RADIUS * exportScale).toString());
   rect.setAttribute("fill", backgroundColor);
   svgRoot.appendChild(rect);
 };
