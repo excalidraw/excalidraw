@@ -14,12 +14,11 @@ import {
   getBoundTextElement,
   getContainerElement,
 } from "./element/textElement";
-import { arrayToMap, findIndex } from "./utils";
+import { arrayToMap } from "./utils";
 import { mutateElement } from "./element/mutateElement";
 import { AppClassProperties, AppState, StaticCanvasAppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
-import { moveOneRight } from "./zindex";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import Scene, { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
 import { getElementLineSegments } from "./element/bounds";
@@ -468,9 +467,6 @@ export const addElementsToFrame = (
     }
   }
 
-  let nextElements = allElements.slice();
-
-  const frameBoundary = findIndex(nextElements, (e) => e.frameId === frame.id);
   for (const element of omitGroupsContainingFrames(
     allElements,
     _elementsToAdd,
@@ -483,35 +479,17 @@ export const addElementsToFrame = (
         },
         false,
       );
-
-      const frameIndex = findIndex(nextElements, (e) => e.id === frame.id);
-      const elementIndex = findIndex(nextElements, (e) => e.id === element.id);
-
-      if (elementIndex < frameBoundary) {
-        nextElements = [
-          ...nextElements.slice(0, elementIndex),
-          ...nextElements.slice(elementIndex + 1, frameBoundary),
-          element,
-          ...nextElements.slice(frameBoundary),
-        ];
-      } else if (elementIndex > frameIndex) {
-        nextElements = [
-          ...nextElements.slice(0, frameIndex),
-          element,
-          ...nextElements.slice(frameIndex, elementIndex),
-          ...nextElements.slice(elementIndex + 1),
-        ];
-      }
     }
   }
 
-  return nextElements;
+  // FIXME! probably no need to copy since there is only mutation and order does not change?
+  return allElements.slice();
 };
 
 export const removeElementsFromFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
   elementsToRemove: NonDeletedExcalidrawElement[],
-  appState: AppState,
+  appState: AppState, // FIXME! no need for appState
 ) => {
   const _elementsToRemove: ExcalidrawElement[] = [];
 
@@ -535,13 +513,8 @@ export const removeElementsFromFrame = (
     );
   }
 
-  const nextElements = moveOneRight(
-    allElements,
-    appState,
-    Array.from(_elementsToRemove),
-  );
-
-  return nextElements;
+  // FIXME! probably no need to copy since there is only mutation and order does not change?
+  return allElements.slice();
 };
 
 export const removeAllElementsFromFrame = (
