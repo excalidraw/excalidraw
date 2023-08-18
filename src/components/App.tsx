@@ -4756,6 +4756,7 @@ class App extends React.Component<AppProps, AppState> {
     const origin = viewportCoordsToSceneCoords(event, this.state);
     const selectedElements = this.scene.getSelectedElements(this.state);
     const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
+    const selectedElementIds = this.state.selectedElementIds;
 
     return {
       origin,
@@ -4808,6 +4809,7 @@ class App extends React.Component<AppProps, AppState> {
         hasOccurred: false,
       },
       elementIdsToErase: {},
+      selectedElementIds,
     };
   }
 
@@ -6035,7 +6037,7 @@ class App extends React.Component<AppProps, AppState> {
 
           this.setState((prevState) => {
             const nextSelectedElementIds = {
-              ...(shouldReuseSelection && prevState.selectedElementIds),
+              ...(shouldReuseSelection && pointerDownState.selectedElementIds),
               ...elementsWithinSelection.reduce(
                 (acc: Record<ExcalidrawElement["id"], true>, element) => {
                   acc[element.id] = true;

@@ -592,6 +592,7 @@ export type PointerDownState = Readonly<{
       erase: boolean;
     };
   };
+  selectedElementIds: AppState["selectedElementIds"];
 }>;
 
 export type ExcalidrawImperativeAPI = {
