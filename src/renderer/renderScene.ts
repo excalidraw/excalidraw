@@ -76,7 +76,11 @@ import {
   isEmbeddableOrFrameLabel,
   createPlaceholderEmbeddableLabel,
 } from "../element/embeddable";
-import { getTargetFrame, isElementInFrame } from "../frame";
+import {
+  elementOverlapsWithFrame,
+  getTargetFrame,
+  isElementInFrame,
+} from "../frame";
 import "canvas-roundrect-polyfill";
 
 export const DEFAULT_SPACING = 2;
@@ -940,113 +944,109 @@ const _renderStaticScene = ({
     );
   }
 
-  // FIXME! seems this is not referenced anywhere? regression?
-  // const groupsToBeAddedToFrame = new Set<string>();
+  const groupsToBeAddedToFrame = new Set<string>();
 
-  // visibleElements.forEach((element) => {
-  //   if (
-  //     element.groupIds.length > 0 &&
-  //     appState.frameToHighlight &&
-  //     appState.selectedElementIds[element.id] &&
-  //     (elementOverlapsWithFrame(element, appState.frameToHighlight) ||
-  //       element.groupIds.find((groupId) => groupsToBeAddedToFrame.has(groupId)))
-  //   ) {
-  //     element.groupIds.forEach((groupId) =>
-  //       groupsToBeAddedToFrame.add(groupId),
-  //     );
-  //   }
-  // });
+  visibleElements.forEach((element) => {
+    if (
+      element.groupIds.length > 0 &&
+      appState.frameToHighlight &&
+      appState.selectedElementIds[element.id] &&
+      (elementOverlapsWithFrame(element, appState.frameToHighlight) ||
+        element.groupIds.find((groupId) => groupsToBeAddedToFrame.has(groupId)))
+    ) {
+      element.groupIds.forEach((groupId) =>
+        groupsToBeAddedToFrame.add(groupId),
+      );
+    }
+  });
 
-  const renderVisibleElement = (
-    element: NonDeletedExcalidrawElement,
-    renderFunc?: () => void,
-  ) => {
-    try {
-      const render = () =>
-        renderFunc
-          ? renderFunc()
-          : renderElement(element, rc, context, renderConfig, appState);
+  // Paint visible elements
+  visibleElements
+    .filter((el) => !isEmbeddableOrFrameLabel(el))
+    .forEach((element) => {
+      try {
+        // - when exporting the whole canvas, we DO NOT apply clipping
+        // - when we are exporting a particular frame, apply clipping
+        //   if the containing frame is not selected, apply clipping
+        const frameId = element.frameId || appState.frameToHighlight?.id;
 
-      // - when exporting the whole canvas, we DO NOT apply clipping
-      // - when we are exporting a particular frame, apply clipping
-      //   if the containing frame is not selected, apply clipping
-      const frameId = element.frameId || appState.frameToHighlight?.id;
+        if (
+          frameId &&
+          ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
+            (!renderConfig.isExporting &&
+              appState.frameRendering.enabled &&
+              appState.frameRendering.clip))
+        ) {
+          context.save();
 
-      if (
-        frameId &&
-        ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
-          (!renderConfig.isExporting &&
-            appState.frameRendering.enabled &&
-            appState.frameRendering.clip))
-      ) {
-        context.save();
+          const frame = getTargetFrame(element, appState);
 
-        const frame = getTargetFrame(element, appState);
-
-        // FIXME! do we need to check isElementInFrame here? double-check!
-        if (frame && isElementInFrame(element, elements, appState)) {
-          frameClip(frame, context, renderConfig, appState);
+          // TODO do we need to check isElementInFrame here?
+          if (frame && isElementInFrame(element, elements, appState)) {
+            frameClip(frame, context, renderConfig, appState);
+          }
+          renderElement(element, rc, context, renderConfig, appState);
+          context.restore();
+        } else {
+          renderElement(element, rc, context, renderConfig, appState);
         }
-
-        render();
-
-        context.restore();
-      } else {
-        render();
-      }
-
-      if (!isExporting) {
-        renderLinkIcon(element, context, appState);
-      }
-    } catch (error: unknown) {
-      console.error(error);
-    }
-  };
-
-  const groupedVisibleElements = {
-    embeddables: new Array<NonDeletedExcalidrawElement>(),
-    frames: new Array<NonDeletedExcalidrawElement>(),
-    others: new Array<NonDeletedExcalidrawElement>(),
-  } as const;
-
-  // Group different element types
-  visibleElements.forEach((el) => {
-    // FIXME! why is frame label considered embeddable?
-    if (isEmbeddableOrFrameLabel(el)) {
-      groupedVisibleElements.embeddables.push(el);
-    } else if (isFrameElement(el)) {
-      groupedVisibleElements.frames.push(el);
-    } else {
-      groupedVisibleElements.others.push(el);
-    }
-  });
-
-  // First paint visible elements
-  groupedVisibleElements.others.forEach((element) => {
-    renderVisibleElement(element);
-  });
-
-  // Then paint frames
-  groupedVisibleElements.frames.forEach((element) => {
-    renderVisibleElement(element);
-  });
-
-  // Then paint embeddables
-  groupedVisibleElements.embeddables.forEach((element) => {
-    renderVisibleElement(element, () => {
-      renderElement(element, rc, context, renderConfig, appState);
-
-      if (
-        isEmbeddableElement(element) &&
-        (isExporting || !element.validated) &&
-        element.width &&
-        element.height
-      ) {
-        const label = createPlaceholderEmbeddableLabel(element);
-        renderElement(label, rc, context, renderConfig, appState);
+        if (!isExporting) {
+          renderLinkIcon(element, context, appState);
+        }
+      } catch (error: any) {
+        console.error(error);
       }
     });
-  });
+
+  // render embeddables on top
+  visibleElements
+    .filter((el) => isEmbeddableOrFrameLabel(el))
+    .forEach((element) => {
+      try {
+        const render = () => {
+          renderElement(element, rc, context, renderConfig, appState);
+
+          if (
+            isEmbeddableElement(element) &&
+            (isExporting || !element.validated) &&
+            element.width &&
+            element.height
+          ) {
+            const label = createPlaceholderEmbeddableLabel(element);
+            renderElement(label, rc, context, renderConfig, appState);
+          }
+          if (!isExporting) {
+            renderLinkIcon(element, context, appState);
+          }
+        };
+        // - when exporting the whole canvas, we DO NOT apply clipping
+        // - when we are exporting a particular frame, apply clipping
+        //   if the containing frame is not selected, apply clipping
+        const frameId = element.frameId || appState.frameToHighlight?.id;
+
+        if (
+          frameId &&
+          ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
+            (!renderConfig.isExporting &&
+              appState.frameRendering.enabled &&
+              appState.frameRendering.clip))
+        ) {
+          context.save();
+
+          const frame = getTargetFrame(element, appState);
+
+          if (frame && isElementInFrame(element, elements, appState)) {
+            frameClip(frame, context, renderConfig, appState);
+          }
+          render();
+          context.restore();
+        } else {
+          render();
+        }
+      } catch (error: any) {
+        console.error(error);
+      }
+    });
 };
 
 /** throttled to animation framerate */

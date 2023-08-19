@@ -1,4 +1,3 @@
-// TODO rewrite tests since now it does not depends on the order
 import {
   convertToExcalidrawElements,
   Excalidraw,
