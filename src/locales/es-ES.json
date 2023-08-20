@@ -209,8 +209,8 @@
     "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Debería guardar el archivo localmente para asegurarse de que no pierde su trabajo.",
     "brave_measure_text_error": {
       "line1": "Parece que estás usando el navegador Brave con el ajuste <bold>Forzar el bloqueo de huellas digitales</bold> habilitado.",
-      "line2": "",
-      "line3": "",
+      "line2": "Esto podría resultar en errores en los <bold>Elementos de Texto</bold> en tus dibujos.",
+      "line3": "Recomendamos fuertemente deshabilitar esta configuración. Puedes seguir <link>estos pasos</link> sobre cómo hacerlo.",
       "line4": ""
     },
     "libraryElementTypeError": {
