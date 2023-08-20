@@ -475,17 +475,15 @@ export const addElementsToFrame = (
     },
     {},
   );
+
   const frameIndex = allElementsIndex[frame.id];
-  const leftFrameBoundary = findIndex(
+  const leftFrameBoundaryIndex = findIndex(
     allElements,
     (e) => e.frameId === frame.id,
   );
-  const leftFrameBoundaryIndex =
-    leftFrameBoundary >= 0 ? leftFrameBoundary : frameIndex;
 
-  const existingFrameElements = allElements.slice(
-    leftFrameBoundaryIndex,
-    frameIndex,
+  const existingFrameElements = allElements.filter(
+    (element) => element.frameId === frame.id,
   );
   const newFrameElements = omitGroupsContainingFrames(
     allElements,
@@ -519,8 +517,9 @@ export const addElementsToFrame = (
 
   const frameElement = allElements[frameIndex];
   const nextLeftNonFrameElements = allElements
-    .slice(0, leftFrameBoundaryIndex)
+    .slice(0, leftFrameBoundaryIndex >= 0 ? leftFrameBoundaryIndex : frameIndex)
     .filter((element) => !newLeftFrameElementsIndex[element.id]);
+
   const nextRightNonFrameElements = allElements
     .slice(frameIndex + 1)
     .filter((element) => !newRightFrameElementsIndex[element.id]);

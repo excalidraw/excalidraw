@@ -10,6 +10,22 @@ import { render } from "./tests/test-utils";
 const { h } = window;
 const mouse = new Pointer("mouse");
 
+/**
+ * FIXME!:
+ * try to solve the failing tests below
+ * unify the test with tests below
+ *
+ * test more comple cases
+ * - bounded text / arrows
+ * - different elements (i.e. arrows)
+ * - multiple frames
+ * - groups containing frames and etc.
+ *
+ * selecting frame (mouseClick) should not call "addElementsToFrame"
+ * removing element from frame should not again call "addElementsToFrame"
+ * - related, "existingElements" are empty in tests due to this, but not in browser
+ */
+
 describe("adding elements to frames", () => {
   type ElementType = string;
   const assertOrder = (
@@ -134,56 +150,56 @@ describe("adding elements to frames", () => {
     });
   });
 
-  /**
-   * TODO:
-   * dragging element into the frame
-   *
-   * selecting frame (mouseClick) should not call "addElementsToFrame"
-   * removing element from frame should not again call "addElementsToFrame"
-   * - related, "existingElements" are empty in tests due to this, but no in browser
-   */
-  describe("resizing frame over rectangles one by one", async () => {
-    let frame: ExcalidrawElement;
-    let rect1: ExcalidrawElement;
-    let rect2: ExcalidrawElement;
-    let rect3: ExcalidrawElement;
-    let rect4: ExcalidrawElement;
+  function dragElementIntoFrame(
+    frame: ExcalidrawElement,
+    element: ExcalidrawElement,
+  ) {
+    mouse.clickAt(element.x, element.y);
+    mouse.downAt(element.x + element.width / 2, element.y + element.height / 2);
+    mouse.moveTo(frame.x + frame.width / 2, frame.y + frame.height / 2);
+    mouse.up();
+  }
 
-    beforeEach(async () => {
-      await render(<Excalidraw />);
+  let frame: ExcalidrawElement;
+  let rect1: ExcalidrawElement;
+  let rect2: ExcalidrawElement;
+  let rect3: ExcalidrawElement;
+  let rect4: ExcalidrawElement;
 
-      frame = API.createElement({ id: "id0", type: "frame", x: 0, y: 0 });
-      rect1 = API.createElement({
-        id: "id1",
-        type: "rectangle",
-        x: -1000,
-        y: -1000,
-      });
-      rect2 = API.createElement({
-        id: "id2",
-        type: "rectangle",
-        x: 100,
-        y: 100,
-      });
-      rect3 = API.createElement({
-        id: "id3",
-        type: "rectangle",
-        x: 200,
-        y: 200,
-      });
-      rect4 = API.createElement({
-        id: "id4",
-        type: "rectangle",
-        x: 1000,
-        y: 1000,
-      });
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+
+    frame = API.createElement({ id: "id0", type: "frame", x: 0 });
+    rect1 = API.createElement({
+      id: "id1",
+      type: "rectangle",
+      x: -1000,
     });
+    rect2 = API.createElement({
+      id: "id2",
+      type: "rectangle",
+      x: 150,
+    });
+    rect3 = API.createElement({
+      id: "id3",
+      type: "rectangle",
+      x: 300,
+    });
+    rect4 = API.createElement({
+      id: "id4",
+      type: "rectangle",
+      x: 1000,
+    });
+  });
 
+  const commonTestCases = async (
+    func: typeof resizeFrameOverElement | typeof dragElementIntoFrame,
+  ) => {
     describe("when frame is in a layer below", async () => {
       it("should add an element", async () => {
         h.elements = [frame, rect2];
 
-        resizeFrameOverElement(frame, rect2);
+        func(frame, rect2);
 
         expect(h.elements[0].frameId).toBe(frame.id);
         expect(h.elements).toEqual([rect2, frame]);
@@ -192,8 +208,8 @@ describe("adding elements to frames", () => {
       it("should add elements", async () => {
         h.elements = [frame, rect2, rect3];
 
-        resizeFrameOverElement(frame, rect2);
-        resizeFrameOverElement(frame, rect3);
+        func(frame, rect2);
+        func(frame, rect3);
 
         expect(rect2.frameId).toBe(frame.id);
         expect(rect3.frameId).toBe(frame.id);
@@ -203,8 +219,8 @@ describe("adding elements to frames", () => {
       it("should add elements when there are other other elements in between", async () => {
         h.elements = [frame, rect1, rect2, rect4, rect3];
 
-        resizeFrameOverElement(frame, rect2);
-        resizeFrameOverElement(frame, rect3);
+        func(frame, rect2);
+        func(frame, rect3);
 
         expect(rect2.frameId).toBe(frame.id);
         expect(rect3.frameId).toBe(frame.id);
@@ -214,19 +230,8 @@ describe("adding elements to frames", () => {
       it("should add elements when there are other elements in between and the order is reversed", async () => {
         h.elements = [frame, rect3, rect4, rect2, rect1];
 
-        resizeFrameOverElement(frame, rect2);
-        resizeFrameOverElement(frame, rect3);
-
-        expect(rect2.frameId).toBe(frame.id);
-        expect(rect3.frameId).toBe(frame.id);
-        expect(h.elements).toEqual([rect2, rect3, frame, rect4, rect1]);
-      });
-
-      it("should add elements when resizing down", async () => {
-        h.elements = [frame, rect1, rect2, rect3, rect4];
-
-        resizeFrameOverElement(frame, rect4);
-        resizeFrameOverElement(frame, rect3);
+        func(frame, rect2);
+        func(frame, rect3);
 
         expect(rect2.frameId).toBe(frame.id);
         expect(rect3.frameId).toBe(frame.id);
@@ -238,7 +243,7 @@ describe("adding elements to frames", () => {
       it("should add an element", async () => {
         h.elements = [rect2, frame];
 
-        resizeFrameOverElement(frame, rect2);
+        func(frame, rect2);
 
         expect(h.elements[0].frameId).toBe(frame.id);
         expect(h.elements).toEqual([rect2, frame]);
@@ -247,8 +252,8 @@ describe("adding elements to frames", () => {
       it("should add elements", async () => {
         h.elements = [rect2, rect3, frame];
 
-        resizeFrameOverElement(frame, rect2);
-        resizeFrameOverElement(frame, rect3);
+        func(frame, rect2);
+        func(frame, rect3);
 
         expect(rect2.frameId).toBe(frame.id);
         expect(rect3.frameId).toBe(frame.id);
@@ -258,8 +263,8 @@ describe("adding elements to frames", () => {
       it("should add elements when there are other other elements in between", async () => {
         h.elements = [rect1, rect2, rect4, rect3, frame];
 
-        resizeFrameOverElement(frame, rect2);
-        resizeFrameOverElement(frame, rect3);
+        func(frame, rect2);
+        func(frame, rect3);
 
         expect(rect2.frameId).toBe(frame.id);
         expect(rect3.frameId).toBe(frame.id);
@@ -269,23 +274,12 @@ describe("adding elements to frames", () => {
       it("should add elements when there are other elements in between and the order is reversed", async () => {
         h.elements = [rect3, rect4, rect2, rect1, frame];
 
-        resizeFrameOverElement(frame, rect2);
-        resizeFrameOverElement(frame, rect3);
+        func(frame, rect2);
+        func(frame, rect3);
 
         expect(rect2.frameId).toBe(frame.id);
         expect(rect3.frameId).toBe(frame.id);
         expect(h.elements).toEqual([rect4, rect1, rect3, rect2, frame]);
-      });
-
-      it("should add elements when resizing down", async () => {
-        h.elements = [rect1, rect2, rect3, rect4, frame];
-
-        resizeFrameOverElement(frame, rect4);
-        resizeFrameOverElement(frame, rect3);
-
-        expect(rect2.frameId).toBe(frame.id);
-        expect(rect3.frameId).toBe(frame.id);
-        expect(h.elements).toEqual([rect1, rect2, rect3, frame, rect4]);
       });
     });
 
@@ -293,8 +287,8 @@ describe("adding elements to frames", () => {
       it("should add elements", async () => {
         h.elements = [rect2, frame, rect3];
 
-        resizeFrameOverElement(frame, rect2);
-        resizeFrameOverElement(frame, rect3);
+        func(frame, rect2);
+        func(frame, rect3);
 
         expect(rect2.frameId).toBe(frame.id);
         expect(rect3.frameId).toBe(frame.id);
@@ -304,8 +298,8 @@ describe("adding elements to frames", () => {
       it("should add elements when there are other other elements in between", async () => {
         h.elements = [rect2, rect1, frame, rect4, rect3];
 
-        resizeFrameOverElement(frame, rect2);
-        resizeFrameOverElement(frame, rect3);
+        func(frame, rect2);
+        func(frame, rect3);
 
         expect(rect2.frameId).toBe(frame.id);
         expect(rect3.frameId).toBe(frame.id);
@@ -315,24 +309,54 @@ describe("adding elements to frames", () => {
       it("should add elements when there are other elements in between and the order is reversed", async () => {
         h.elements = [rect3, rect4, frame, rect2, rect1];
 
-        resizeFrameOverElement(frame, rect2);
-        resizeFrameOverElement(frame, rect3);
+        func(frame, rect2);
+        func(frame, rect3);
 
         expect(rect2.frameId).toBe(frame.id);
         expect(rect3.frameId).toBe(frame.id);
         expect(h.elements).toEqual([rect4, rect3, rect2, frame, rect1]);
       });
-
-      it("should add elements when resizing down", async () => {
-        h.elements = [rect1, rect2, frame, rect3, rect4];
-
-        resizeFrameOverElement(frame, rect4);
-        resizeFrameOverElement(frame, rect3);
-
-        expect(rect2.frameId).toBe(frame.id);
-        expect(rect3.frameId).toBe(frame.id);
-        expect(h.elements).toEqual([rect1, rect2, rect3, frame, rect4]);
-      });
     });
+  };
+
+  describe("resizing frame over elements", async () => {
+    await commonTestCases(resizeFrameOverElement);
+
+    it("should add elements when frame is in a layer below", async () => {
+      h.elements = [frame, rect1, rect2, rect3, rect4];
+
+      resizeFrameOverElement(frame, rect4);
+      resizeFrameOverElement(frame, rect3);
+
+      expect(rect2.frameId).toBe(frame.id);
+      expect(rect3.frameId).toBe(frame.id);
+      expect(h.elements).toEqual([rect2, rect3, frame, rect4, rect1]);
+    });
+
+    it("should add elements when frame is in a layer above", async () => {
+      h.elements = [rect1, rect2, rect3, rect4, frame];
+
+      resizeFrameOverElement(frame, rect4);
+      resizeFrameOverElement(frame, rect3);
+
+      expect(rect2.frameId).toBe(frame.id);
+      expect(rect3.frameId).toBe(frame.id);
+      expect(h.elements).toEqual([rect1, rect2, rect3, frame, rect4]);
+    });
+
+    it("should add elements when is in an inner layer", async () => {
+      h.elements = [rect1, rect2, frame, rect3, rect4];
+
+      resizeFrameOverElement(frame, rect4);
+      resizeFrameOverElement(frame, rect3);
+
+      expect(rect2.frameId).toBe(frame.id);
+      expect(rect3.frameId).toBe(frame.id);
+      expect(h.elements).toEqual([rect1, rect2, rect3, frame, rect4]);
+    });
+  });
+
+  describe("dragging elements into the frame", async () => {
+    await commonTestCases(dragElementIntoFrame);
   });
 });
