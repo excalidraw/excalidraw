@@ -4499,7 +4499,8 @@ class App extends React.Component<AppProps, AppState> {
       this.createFrameElementOnPointerDown(pointerDownState);
     } else if (
       this.state.activeTool.type !== "eraser" &&
-      this.state.activeTool.type !== "hand"
+      this.state.activeTool.type !== "hand" &&
+      this.state.activeTool.type !== "mermaid"
     ) {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
