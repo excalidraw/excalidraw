@@ -1,7 +1,13 @@
-import { GroupId, ExcalidrawElement, NonDeleted } from "./element/types";
-import { AppState } from "./types";
+import {
+  GroupId,
+  ExcalidrawElement,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
+} from "./element/types";
+import { AppClassProperties, AppState } from "./types";
 import { getSelectedElements } from "./scene";
 import { getBoundTextElement } from "./element/textElement";
+import { makeNextSelectedElementIds } from "./scene/selection";
 
 export const selectGroup = (
   groupId: GroupId,
@@ -66,14 +72,33 @@ export const getSelectedGroupIds = (appState: AppState): GroupId[] =>
  */
 export const selectGroupsForSelectedElements = (
   appState: AppState,
-  elements: readonly NonDeleted<ExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
+  prevAppState: AppState,
+  /**
+   * supply null in cases where you don't have access to App instance and
+   * you don't care about optimizing selectElements retrieval
+   */
+  app: AppClassProperties | null,
 ): AppState => {
   let nextAppState: AppState = { ...appState, selectedGroupIds: {} };
 
-  const selectedElements = getSelectedElements(elements, appState);
+  const selectedElements = app
+    ? app.scene.getSelectedElements({
+        selectedElementIds: appState.selectedElementIds,
+        // supplying elements explicitly in case we're passed non-state elements
+        elements,
+      })
+    : getSelectedElements(elements, appState);
 
   if (!selectedElements.length) {
-    return { ...nextAppState, editingGroupId: null };
+    return {
+      ...nextAppState,
+      editingGroupId: null,
+      selectedElementIds: makeNextSelectedElementIds(
+        nextAppState.selectedElementIds,
+        prevAppState,
+      ),
+    };
   }
 
   for (const selectedElement of selectedElements) {
@@ -90,6 +115,11 @@ export const selectGroupsForSelectedElements = (
       nextAppState = selectGroup(groupId, nextAppState, elements);
     }
   }
+
+  nextAppState.selectedElementIds = makeNextSelectedElementIds(
+    nextAppState.selectedElementIds,
+    prevAppState,
+  );
 
   return nextAppState;
 };

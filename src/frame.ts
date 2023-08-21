@@ -16,7 +16,7 @@ import {
 } from "./element/textElement";
 import { arrayToMap, findIndex } from "./utils";
 import { mutateElement } from "./element/mutateElement";
-import { AppState } from "./types";
+import { AppClassProperties, AppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
 import { moveOneRight } from "./zindex";
@@ -304,7 +304,7 @@ export const groupsAreCompletelyOutOfFrame = (
 /**
  * Returns a map of frameId to frame elements. Includes empty frames.
  */
-export const groupByFrames = (elements: ExcalidrawElementsIncludingDeleted) => {
+export const groupByFrames = (elements: readonly ExcalidrawElement[]) => {
   const frameElementsMap = new Map<
     ExcalidrawElement["id"],
     ExcalidrawElement[]
@@ -571,8 +571,13 @@ export const replaceAllElementsInFrame = (
 export const updateFrameMembershipOfSelectedElements = (
   allElements: ExcalidrawElementsIncludingDeleted,
   appState: AppState,
+  app: AppClassProperties,
 ) => {
-  const selectedElements = getSelectedElements(allElements, appState);
+  const selectedElements = app.scene.getSelectedElements({
+    selectedElementIds: appState.selectedElementIds,
+    // supplying elements explicitly in case we're passed non-state elements
+    elements: allElements,
+  });
   const elementsToFilter = new Set<ExcalidrawElement>(selectedElements);
 
   if (appState.editingGroupId) {
@@ -591,6 +596,7 @@ export const updateFrameMembershipOfSelectedElements = (
 
   elementsToFilter.forEach((element) => {
     if (
+      element.frameId &&
       !isFrameElement(element) &&
       !isElementInFrame(element, allElements, appState)
     ) {
@@ -598,7 +604,9 @@ export const updateFrameMembershipOfSelectedElements = (
     }
   });
 
-  return removeElementsFromFrame(allElements, [...elementsToRemove], appState);
+  return elementsToRemove.size > 0
+    ? removeElementsFromFrame(allElements, [...elementsToRemove], appState)
+    : allElements;
 };
 
 /**

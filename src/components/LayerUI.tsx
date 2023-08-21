@@ -41,6 +41,7 @@ import { jotaiScope } from "../jotai";
 import { Provider, useAtom, useAtomValue } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
+import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
@@ -71,6 +72,7 @@ interface LayerUIProps {
   onExportImage: AppClassProperties["onExportImage"];
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
+  app: AppClassProperties;
 }
 
 const DefaultMainMenu: React.FC<{
@@ -99,6 +101,15 @@ const DefaultMainMenu: React.FC<{
   );
 };
 
+const DefaultOverwriteConfirmDialog = () => {
+  return (
+    <OverwriteConfirmDialog __fallback>
+      <OverwriteConfirmDialog.Actions.SaveToDisk />
+      <OverwriteConfirmDialog.Actions.ExportToImage />
+    </OverwriteConfirmDialog>
+  );
+};
+
 const LayerUI = ({
   actionManager,
   appState,
@@ -117,6 +128,7 @@ const LayerUI = ({
   onExportImage,
   renderWelcomeScreen,
   children,
+  app,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
@@ -230,9 +242,9 @@ const LayerUI = ({
                       >
                         <HintViewer
                           appState={appState}
-                          elements={elements}
                           isMobile={device.isMobile}
                           device={device}
+                          app={app}
                         />
                         {heading}
                         <Stack.Row gap={1}>
@@ -343,6 +355,7 @@ const LayerUI = ({
       >
         {t("toolBar.library")}
       </DefaultSidebar.Trigger>
+      <DefaultOverwriteConfirmDialog />
       {/* ------------------------------------------------------------------ */}
 
       {appState.isLoading && <LoadingMessage delay={250} />}
@@ -374,6 +387,7 @@ const LayerUI = ({
         />
       )}
       <ActiveConfirmDialog />
+      <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
       {renderJSONExportDialog()}
       {appState.pasteDialog.shown && (
@@ -387,8 +401,9 @@ const LayerUI = ({
           }
         />
       )}
-      {device.isMobile && !eyeDropperState && (
+      {device.isMobile && (
         <MobileMenu
+          app={app}
           appState={appState}
           elements={elements}
           actionManager={actionManager}

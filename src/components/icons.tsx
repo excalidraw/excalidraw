@@ -396,6 +396,14 @@ export const TrashIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const EmbedIcon = createIcon(
+  <g strokeWidth="1.25">
+    <polyline points="12 16 18 10 12 4" />
+    <polyline points="8 4 2 10 8 16" />
+  </g>,
+  modifiedTablerIconProps,
+);
+
 export const DuplicateIcon = createIcon(
   <g strokeWidth="1.25">
     <path d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z" />
@@ -1604,6 +1612,16 @@ export const tablerCheckIcon = createIcon(
   <>
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <path d="M5 12l5 5l10 -10"></path>
+  </>,
+  tablerIconProps,
+);
+
+export const alertTriangleIcon = createIcon(
+  <>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M10.24 3.957l-8.422 14.06a1.989 1.989 0 0 0 1.7 2.983h16.845a1.989 1.989 0 0 0 1.7 -2.983l-8.423 -14.06a1.989 1.989 0 0 0 -3.4 0z" />
+    <path d="M12 9v4" />
+    <path d="M12 17h.01" />
   </>,
   tablerIconProps,
 );

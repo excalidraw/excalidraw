@@ -13,6 +13,7 @@ import {
   FontFamilyValues,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
+  ExcalidrawEmbeddableElement,
 } from "../element/types";
 import { arrayToMap, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -156,6 +157,18 @@ export const newElement = (
   return _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 };
 
+export const newEmbeddableElement = (
+  opts: {
+    type: "embeddable";
+    validated: boolean | undefined;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawEmbeddableElement> => {
+  return {
+    ..._newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts),
+    validated: opts.validated,
+  };
+};
+
 export const newFrameElement = (
   opts: ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFrameElement> => {
@@ -203,7 +216,6 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"];
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     strokeWidth?: ExcalidrawTextElement["strokeWidth"];
-    isFrameName?: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -240,7 +252,6 @@ export const newTextElement = (
       containerId: opts.containerId || null,
       originalText: text,
       lineHeight,
-      isFrameName: opts.isFrameName || false,
     },
     {},
   );
@@ -462,7 +473,7 @@ const _deepCopyElement = (val: any, depth: number = 0) => {
   // we're not cloning non-array & non-plain-object objects because we
   // don't support them on excalidraw elements yet. If we do, we need to make
   // sure we start cloning them, so let's warn about it.
-  if (process.env.NODE_ENV === "development") {
+  if (import.meta.env.DEV) {
     if (
       objectType !== "[object Object]" &&
       objectType !== "[object Array]" &&

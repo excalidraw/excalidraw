@@ -62,7 +62,7 @@ describe("exportToSvg", () => {
     );
 
     expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(
-      `"themeFilter"`,
+      '"_themeFilter_f32792"',
     );
   });
 

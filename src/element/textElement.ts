@@ -11,6 +11,8 @@ import {
 } from "./types";
 import { mutateElement } from "./mutateElement";
 import {
+  ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO,
+  ARROW_LABEL_WIDTH_FRACTION,
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -90,7 +92,7 @@ export const redrawTextBoundingBox = (
   boundTextUpdates.text = textElement.text;
 
   if (container) {
-    maxWidth = getBoundTextMaxWidth(container);
+    maxWidth = getBoundTextMaxWidth(container, textElement);
     boundTextUpdates.text = wrapTextElement(textElement, maxWidth);
   }
   const metrics = measureTextElement(textElement, {
@@ -110,13 +112,12 @@ export const redrawTextBoundingBox = (
     }
   }
   if (container) {
-    const containerDims = getContainerDims(container);
     const maxContainerHeight = getBoundTextMaxHeight(
       container,
       textElement as ExcalidrawTextElementWithContainer,
     );
 
-    let nextHeight = containerDims.height;
+    let nextHeight = container.height;
     if (metrics.height > maxContainerHeight) {
       nextHeight = computeContainerDimensionForBoundText(
         metrics.height,
@@ -182,6 +183,7 @@ export const bindTextToShapeAfterDuplication = (
 export const handleBindTextResize = (
   container: NonDeletedExcalidrawElement,
   transformHandleType: MaybeTransformHandleType,
+  shouldMaintainAspectRatio = false,
 ) => {
   const boundTextElementId = getBoundTextElementId(container);
   if (!boundTextElementId) {
@@ -202,15 +204,17 @@ export const handleBindTextResize = (
     let text = textElement.text;
     let nextHeight = textElement.height;
     let nextWidth = textElement.width;
-    const containerDims = getContainerDims(container);
     const maxWidth = getBoundTextMaxWidth(container);
     const maxHeight = getBoundTextMaxHeight(
       container,
       textElement as ExcalidrawTextElementWithContainer,
     );
-    let containerHeight = containerDims.height;
+    let containerHeight = container.height;
     let nextBaseLine = textElement.baseline;
-    if (transformHandleType !== "n" && transformHandleType !== "s") {
+    if (
+      shouldMaintainAspectRatio ||
+      (transformHandleType !== "n" && transformHandleType !== "s")
+    ) {
       if (text) {
         text = wrapTextElement(textElement, maxWidth);
       }
@@ -226,7 +230,7 @@ export const handleBindTextResize = (
         container.type,
       );
 
-      const diff = containerHeight - containerDims.height;
+      const diff = containerHeight - container.height;
       // fix the y coord when resizing from ne/nw/n
       const updatedY =
         !isArrowElement(container) &&
@@ -706,16 +710,6 @@ export const getContainerElement = (
   return null;
 };
 
-export const getContainerDims = (element: ExcalidrawElement) => {
-  const MIN_WIDTH = 300;
-  if (isArrowElement(element)) {
-    const width = Math.max(element.width, MIN_WIDTH);
-    const height = element.height;
-    return { width, height };
-  }
-  return { width: element.width, height: element.height };
-};
-
 export const getContainerCenter = (
   container: ExcalidrawElement,
   appState: AppState,
@@ -881,7 +875,6 @@ const VALID_CONTAINER_TYPES = new Set([
   "rectangle",
   "ellipse",
   "diamond",
-  "image",
   "arrow",
 ]);
 
@@ -907,12 +900,19 @@ export const computeContainerDimensionForBoundText = (
   return dimension + padding;
 };
 
-export const getBoundTextMaxWidth = (container: ExcalidrawElement) => {
-  const width = getContainerDims(container).width;
+export const getBoundTextMaxWidth = (
+  container: ExcalidrawElement,
+  boundTextElement: ExcalidrawTextElement | null = getBoundTextElement(
+    container,
+  ),
+) => {
+  const { width } = container;
   if (isArrowElement(container)) {
-    return width - BOUND_TEXT_PADDING * 8 * 2;
+    const minWidth =
+      (boundTextElement?.fontSize ?? DEFAULT_FONT_SIZE) *
+      ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO;
+    return Math.max(ARROW_LABEL_WIDTH_FRACTION * width, minWidth);
   }
-
   if (container.type === "ellipse") {
     // The width of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
@@ -931,7 +931,7 @@ export const getBoundTextMaxHeight = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
-  const height = getContainerDims(container).height;
+  const { height } = container;
   if (isArrowElement(container)) {
     const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
     if (containerHeight <= 0) {

@@ -3,6 +3,7 @@ import {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
+  PointBinding,
   StrokeRoundness,
 } from "../element/types";
 import {
@@ -42,6 +43,7 @@ import {
   measureTextElement,
 } from "../element/textElement";
 import { COLOR_PALETTE } from "../colors";
+import { normalizeLink } from "./url";
 
 type RestoredAppState = Omit<
   AppState,
@@ -64,6 +66,7 @@ export const AllowedExcalidrawActiveTools: Record<
   eraser: false,
   custom: true,
   frame: true,
+  embeddable: true,
   hand: true,
 };
 
@@ -80,6 +83,13 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
     ] as FontFamilyValues;
   }
   return DEFAULT_FONT_FAMILY;
+};
+
+const repairBinding = (binding: PointBinding | null) => {
+  if (!binding) {
+    return null;
+  }
+  return { ...binding, focus: binding.focus || 0 };
 };
 
 const restoreElementWithProperties = <
@@ -144,7 +154,7 @@ const restoreElementWithProperties = <
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
-    link: element.link ?? null,
+    link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
   };
 
@@ -257,8 +267,8 @@ const restoreElement = (
           (element.type as ExcalidrawElement["type"] | "draw") === "draw"
             ? "line"
             : element.type,
-        startBinding: element.startBinding,
-        endBinding: element.endBinding,
+        startBinding: repairBinding(element.startBinding),
+        endBinding: repairBinding(element.endBinding),
         lastCommittedPoint: null,
         startArrowhead,
         endArrowhead,
@@ -275,6 +285,10 @@ const restoreElement = (
       return restoreElementWithProperties(element, {});
     case "diamond":
       return restoreElementWithProperties(element, {});
+    case "embeddable":
+      return restoreElementWithProperties(element, {
+        validated: undefined,
+      });
     case "frame":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,
@@ -371,6 +385,24 @@ const repairBoundElement = (
   }
 };
 
+/**
+ * Remove an element's frameId if its containing frame is non-existent
+ *
+ * NOTE mutates elements.
+ */
+const repairFrameMembership = (
+  element: Mutable<ExcalidrawElement>,
+  elementsMap: Map<string, Mutable<ExcalidrawElement>>,
+) => {
+  if (element.frameId) {
+    const containingFrame = elementsMap.get(element.frameId);
+
+    if (!containingFrame) {
+      element.frameId = null;
+    }
+  }
+};
+
 export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
@@ -411,6 +443,10 @@ export const restoreElements = (
   // repair binding. Mutates elements.
   const restoredElementsMap = arrayToMap(restoredElements);
   for (const element of restoredElements) {
+    if (element.frameId) {
+      repairFrameMembership(element, restoredElementsMap);
+    }
+
     if (isTextElement(element) && element.containerId) {
       repairBoundElement(element, restoredElementsMap);
     } else if (element.boundElements) {

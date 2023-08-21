@@ -96,6 +96,7 @@ export const exportToSvg = async (
   files: BinaryFiles | null,
   opts?: {
     serializeAsJSON?: () => string;
+    renderEmbeddables?: boolean;
   },
 ): Promise<SVGSVGElement> => {
   const {
@@ -132,12 +133,13 @@ export const exportToSvg = async (
   }
 
   let assetPath = "https://excalidraw.com/";
-
   // Asset path needs to be determined only when using package
-  if (process.env.IS_EXCALIDRAW_NPM_PACKAGE) {
+  if (import.meta.env.VITE_IS_EXCALIDRAW_NPM_PACKAGE) {
     assetPath =
       window.EXCALIDRAW_ASSET_PATH ||
-      `https://unpkg.com/${process.env.PKG_NAME}@${process.env.PKG_VERSION}`;
+      `https://unpkg.com/${import.meta.env.VITE_PKG_NAME}@${
+        import.meta.env.PKG_VERSION
+      }`;
 
     if (assetPath?.startsWith("/")) {
       assetPath = assetPath.replace("/", `${window.location.origin}/`);
@@ -212,6 +214,7 @@ export const exportToSvg = async (
     offsetY,
     exportWithDarkMode: appState.exportWithDarkMode,
     exportingFrameId: exportingFrame?.id || null,
+    renderEmbeddables: opts?.renderEmbeddables,
   });
 
   return svgRoot;

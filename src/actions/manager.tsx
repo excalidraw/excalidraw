@@ -122,6 +122,7 @@ export class ActionManager {
             event,
             this.getAppState(),
             this.getElementsIncludingDeleted(),
+            this.app,
           ),
       );
 
@@ -201,6 +202,7 @@ export class ActionManager {
           appState={this.getAppState()}
           updateData={updateData}
           appProps={this.app.props}
+          app={this.app}
           data={data}
         />
       );

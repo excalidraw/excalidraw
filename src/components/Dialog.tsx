@@ -17,14 +17,32 @@ import { useSetAtom } from "jotai";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { jotaiScope } from "../jotai";
 
+export type DialogSize = number | "small" | "regular" | "wide" | undefined;
+
 export interface DialogProps {
   children: React.ReactNode;
   className?: string;
-  size?: "small" | "regular" | "wide";
+  size?: DialogSize;
   onCloseRequest(): void;
   title: React.ReactNode | false;
   autofocus?: boolean;
   closeOnClickOutside?: boolean;
+}
+
+function getDialogSize(size: DialogSize): number {
+  if (size && typeof size === "number") {
+    return size;
+  }
+
+  switch (size) {
+    case "small":
+      return 550;
+    case "wide":
+      return 1024;
+    case "regular":
+    default:
+      return 800;
+  }
 }
 
 export const Dialog = (props: DialogProps) => {
@@ -85,9 +103,7 @@ export const Dialog = (props: DialogProps) => {
     <Modal
       className={clsx("Dialog", props.className)}
       labelledBy="dialog-title"
-      maxWidth={
-        props.size === "wide" ? 1024 : props.size === "small" ? 550 : 800
-      }
+      maxWidth={getDialogSize(props.size)}
       onCloseRequest={onClose}
       closeOnClickOutside={props.closeOnClickOutside}
     >

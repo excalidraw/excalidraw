@@ -124,6 +124,8 @@
     },
     "statusPublished": "Publicerad",
     "sidebarLock": "Håll sidofältet öppet",
+    "selectAllElementsInFrame": "Markera alla element i rutan",
+    "removeAllElementsFromFrame": "Ta bort alla element från rutan",
     "eyeDropper": "Välj färg från canvas"
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "Pennläge - förhindra touch",
     "link": "Lägg till / Uppdatera länk för en vald form",
     "eraser": "Radergummi",
-    "hand": "Hand (panoreringsverktyg)"
+    "frame": "Rutverktyg",
+    "hand": "Hand (panoreringsverktyg)",
+    "extraTools": "Fler verktyg"
   },
   "headings": {
     "canvasActions": "Canvas-åtgärder",

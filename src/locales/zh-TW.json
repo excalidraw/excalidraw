@@ -124,6 +124,8 @@
     },
     "statusPublished": "已發布",
     "sidebarLock": "側欄維持開啟",
+    "selectAllElementsInFrame": "選取框架內的所有元素",
+    "removeAllElementsFromFrame": "從框架內移除所有元素",
     "eyeDropper": "從畫布中選取顏色"
   },
   "library": {
@@ -221,7 +223,9 @@
     "penMode": "筆模式 - 避免觸摸",
     "link": "為所選的形狀增加\b/更新連結",
     "eraser": "橡皮擦",
-    "hand": "手形（平移工具）"
+    "frame": "框架工具",
+    "hand": "手形（平移工具）",
+    "extraTools": "更多工具"
   },
   "headings": {
     "canvasActions": "canvas 動作",
