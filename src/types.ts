@@ -525,6 +525,8 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   lastViewportPosition: App["lastViewportPosition"];
+  scrollToContent: App["scrollToContent"];
+  addFiles: App["addFiles"];
 };
 
 export type PointerDownState = Readonly<{

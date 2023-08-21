@@ -1178,7 +1178,10 @@ class App extends React.Component<AppProps, AppState> {
                           app={this}
                         >
                           {this.props.children}
-                          <MermaidToExcalidraw appState={this.state} />
+                          <MermaidToExcalidraw
+                            appState={this.state}
+                            elements={this.scene.getNonDeletedElements()}
+                          />
                         </LayerUI>
 
                         <div className="excalidraw-textEditorContainer" />
