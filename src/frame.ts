@@ -477,6 +477,7 @@ export const addElementsToFrame = (
   );
 
   const frameIndex = allElementsIndex[frame.id];
+  // need to be calculated before the mutation below occurs
   const leftFrameBoundaryIndex = findIndex(
     allElements,
     (e) => e.frameId === frame.id,
@@ -485,50 +486,54 @@ export const addElementsToFrame = (
   const existingFrameElements = allElements.filter(
     (element) => element.frameId === frame.id,
   );
-  const newFrameElements = omitGroupsContainingFrames(
-    allElements,
-    _elementsToAdd,
-  ).filter(
-    (element) => element.frameId !== frame.id && !isFrameElement(element),
-  );
 
   const newLeftFrameElements: ExcalidrawElement[] = [];
   const newRightFrameElements: ExcalidrawElement[] = [];
-  const newLeftFrameElementsIndex: Record<string, boolean> = {};
-  const newRightFrameElementsIndex: Record<string, boolean> = {};
 
-  for (const element of newFrameElements) {
-    if (allElementsIndex[element.id] > frameIndex) {
-      newRightFrameElements.push(element);
-      newRightFrameElementsIndex[element.id] = true;
-    } else {
-      newLeftFrameElements.push(element);
-      newLeftFrameElementsIndex[element.id] = true;
+  for (const element of omitGroupsContainingFrames(
+    allElements,
+    _elementsToAdd,
+  )) {
+    if (element.frameId !== frame.id && !isFrameElement(element)) {
+      if (allElementsIndex[element.id] > frameIndex) {
+        newRightFrameElements.push(element);
+      } else {
+        newLeftFrameElements.push(element);
+      }
+
+      mutateElement(
+        element,
+        {
+          frameId: frame.id,
+        },
+        false,
+      );
     }
-
-    mutateElement(
-      element,
-      {
-        frameId: frame.id,
-      },
-      false,
-    );
   }
 
   const frameElement = allElements[frameIndex];
+  const frameElements = newLeftFrameElements
+    .concat(existingFrameElements)
+    .concat(newRightFrameElements);
+
+  const frameElementsIndex = frameElements.reduce(
+    (acc: Record<string, boolean>, element) => {
+      acc[element.id] = true;
+      return acc;
+    },
+    {},
+  );
+
   const nextLeftNonFrameElements = allElements
     .slice(0, leftFrameBoundaryIndex >= 0 ? leftFrameBoundaryIndex : frameIndex)
-    .filter((element) => !newLeftFrameElementsIndex[element.id]);
+    .filter((element) => !frameElementsIndex[element.id]);
 
   const nextRightNonFrameElements = allElements
     .slice(frameIndex + 1)
-    .filter((element) => !newRightFrameElementsIndex[element.id]);
+    .filter((element) => !frameElementsIndex[element.id]);
 
-  const nextElements = new Array<ExcalidrawElement>()
-    .concat(nextLeftNonFrameElements)
-    .concat(newLeftFrameElements)
-    .concat(existingFrameElements)
-    .concat(newRightFrameElements)
+  const nextElements = nextLeftNonFrameElements
+    .concat(frameElements)
     .concat([frameElement])
     .concat(nextRightNonFrameElements);
 
