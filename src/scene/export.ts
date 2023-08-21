@@ -179,8 +179,7 @@ export const exportToSvg = async (
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
-  // let assetPath = "https://excalidraw.com/";
-  let assetPath = "http://localhost:3000/";
+  let assetPath = "https://excalidraw.com/";
   // Asset path needs to be determined only when using package
   if (import.meta.env.VITE_IS_EXCALIDRAW_NPM_PACKAGE) {
     assetPath =

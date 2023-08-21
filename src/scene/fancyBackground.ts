@@ -193,6 +193,7 @@ export const applyFancyBackgroundOnSvg = async ({
   exportScale: AppState["exportScale"];
   theme: AppState["theme"];
 }) => {
+  // Image background
   const fancyBackgroundImageUrl =
     FANCY_BACKGROUND_IMAGES[fancyBackgroundImageKey][theme];
   const fancyBackgroundImage = await loadSVGElement(fancyBackgroundImageUrl);
@@ -208,6 +209,7 @@ export const applyFancyBackgroundOnSvg = async ({
 
   svgRoot.appendChild(fancyBackgroundImage);
 
+  // Solid color background
   const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
   rect.setAttribute("x", (FANCY_BG_PADDING * exportScale).toString());
   rect.setAttribute("y", (FANCY_BG_PADDING * exportScale).toString());
