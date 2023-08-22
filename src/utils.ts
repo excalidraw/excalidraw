@@ -16,7 +16,7 @@ import {
   FontString,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
+import { AppState, DataURL, Dimensions, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
 import { isEraserActive, isHandToolActive } from "./appState";
@@ -1007,3 +1007,48 @@ export const isRenderThrottlingEnabled = (() => {
 export const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio
   : 1;
+
+/**
+ * Expands dimensions to fit into a specified aspect ratio without cropping.
+ * The resulting dimensions are rounded up to the nearest integer.
+ *
+ * @param dimensions - The original dimensions.
+ * @param aspectRatio - The aspect ratio to fit the dimensions into.
+ *
+ * @return The expanded dimensions.
+ *
+ * @example
+ * ```typescript
+ * const originalDimensions = { width: 800, height: 600 };
+ * const targetAspectRatio = { width: 16, height: 9 };
+ * const expandedDimensions = expandToAspectRatio(originalDimensions, targetAspectRatio);
+ * // Output will be { width: 1067, height: 600 }
+ * ```
+ */
+export const expandToAspectRatio = (
+  dimensions: Dimensions,
+  aspectRatio: Dimensions,
+): Dimensions => {
+  const originalWidth = dimensions.width;
+  const originalHeight = dimensions.height;
+
+  const originalAspectRatio = originalWidth / originalHeight;
+  const targetAspectRatio = aspectRatio.width / aspectRatio.height;
+
+  let newWidth = Math.round(originalWidth);
+  let newHeight = Math.round(originalHeight);
+
+  // Expand by width
+  if (originalAspectRatio > targetAspectRatio) {
+    newWidth = Math.round(originalHeight * targetAspectRatio);
+  }
+  // Expand by height
+  else {
+    newHeight = Math.round(originalWidth / targetAspectRatio);
+  }
+
+  return {
+    width: newWidth,
+    height: newHeight,
+  };
+};

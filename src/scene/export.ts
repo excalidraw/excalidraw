@@ -2,8 +2,12 @@ import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
 import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
-import { distance, isOnlyExportingSingleFrame } from "../utils";
-import { AppState, BinaryFiles } from "../types";
+import {
+  distance,
+  expandToAspectRatio,
+  isOnlyExportingSingleFrame,
+} from "../utils";
+import { AppState, BinaryFiles, Dimensions } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
   FANCY_BACKGROUND_IMAGES,
@@ -58,7 +62,11 @@ export const exportToCanvas = async (
     ? exportPadding
     : getFancyBackgroundPadding(exportPadding);
 
-  const [minX, minY, width, height] = getCanvasSize(elements, padding);
+  const [minX, minY, width, height] = !exportWithFancyBackground
+    ? getCanvasSize(elements, padding)
+    : getCanvasSize(elements, padding, {
+        aspectRatio: { width: 16, height: 9 },
+      });
 
   const { canvas, scale = 1 } = createCanvas(width, height);
 
@@ -285,6 +293,7 @@ export const exportToSvg = async (
 const getCanvasSize = (
   elements: readonly NonDeletedExcalidrawElement[],
   exportPadding: number,
+  opts?: { aspectRatio: Dimensions },
 ): [number, number, number, number] => {
   // we should decide if we are exporting the whole canvas
   // if so, we are not clipping elements in the frame
@@ -311,11 +320,20 @@ const getCanvasSize = (
     );
   }
 
+  const padding = onlyExportingSingleFrame ? 0 : exportPadding * 2;
+
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  const width =
-    distance(minX, maxX) + (onlyExportingSingleFrame ? 0 : exportPadding * 2);
-  const height =
-    distance(minY, maxY) + (onlyExportingSingleFrame ? 0 : exportPadding * 2);
+  const width = distance(minX, maxX) + padding;
+  const height = distance(minY, maxY) + padding;
+
+  if (opts?.aspectRatio) {
+    const expandedDimensions = expandToAspectRatio(
+      { width, height },
+      opts.aspectRatio,
+    );
+
+    return [minX, minY, expandedDimensions.width, expandedDimensions.height];
+  }
 
   return [minX, minY, width, height];
 };

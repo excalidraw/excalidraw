@@ -186,7 +186,11 @@ const ImageExportModal = ({
       appState,
       files,
       exportPadding: DEFAULT_EXPORT_PADDING,
-      maxWidthOrHeight,
+      maxWidthOrHeight: !(
+        exportBackgroundImage !== "solid" && exportWithBackground
+      )
+        ? maxWidthOrHeight
+        : undefined,
     })
       .then((canvas) => {
         setRenderError(null);
