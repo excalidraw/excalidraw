@@ -1527,12 +1527,17 @@
   resolved "https://registry.yarnpkg.com/@excalidraw/eslint-config/-/eslint-config-1.0.3.tgz#2122ef7413ae77874ae9848ce0f1c6b3f0d8bbbd"
   integrity sha512-GemHNF5Z6ga0BWBSX7GJaNBUchLu6RwTcAB84eX1MeckRNhNasAsPCdelDlFalz27iS4RuYEQh0bPE8SRxJgbQ==
 
-"@excalidraw/mermaid-to-excalidraw@0.1.0-test":
-  version "0.1.0-test"
-  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-0.1.0-test.tgz#c35246ddc3d05cec51fb00e7c30a7bb01e0d0a55"
-  integrity sha512-5JtrJS3KdFVOUXKodU3yCc+eIvblIQc5pixGXUwa3w/ILYrXkZ/LYq6N7KUQFRc4WKbVABq1V69ivSSK6ic3RA==
+"@excalidraw/markdown-to-text@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@excalidraw/markdown-to-text/-/markdown-to-text-0.1.2.tgz#1703705e7da608cf478f17bfe96fb295f55a23eb"
+  integrity sha512-1nDXBNAojfi3oSFwJswKREkFm5wrSjqay81QlyRv2pkITG/XYB5v+oChENVBQLcxQwX4IUATWvXM5BcaNhPiIg==
+
+"@excalidraw/mermaid-to-excalidraw@0.1.0-test-named-export":
+  version "0.1.0-test-named-export"
+  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-0.1.0-test-named-export.tgz#0d8415c36166954f5fbb658d3c3458c27ac2ed4f"
+  integrity sha512-GmLBqWlT3UEce+9MsdHoNIEBwDhNrE0oXnS6fxoXbqO1bmoOfxpbzVe7M9DBlHt/TYWUFEANzvXzFZqjQCt1UA==
   dependencies:
-    markdown-to-text "0.1.1"
+    "@excalidraw/markdown-to-text" "^0.1.2"
     mermaid "10.2.3"
     nanoid "4.0.2"
 
@@ -2504,7 +2509,7 @@
   dependencies:
     "@types/chai" "*"
 
-"@types/chai@*", "@types/chai@^4.2.14", "@types/chai@^4.3.5":
+"@types/chai@*", "@types/chai@^4.3.5":
   version "4.3.5"
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.5.tgz#ae69bcbb1bebb68c4ac0b11e9d8ed04526b3562b"
   integrity sha512-mEo1sAde+UCE6b2hxn332f1g1E8WfYRu6p5SvTKr2ZKC1f7gFJXk4h5PyGP9Dt6gCaG8y8XhwnXWC6Iy2cmBng==
@@ -2599,11 +2604,6 @@
   integrity sha512-DT+iNIRNX884cx0/Q1ja7NyUPpZuv0KPyL5rGNxm1WC1OtHstl7n4Jb7nk+xacNShQMbczJjt8uFzznpp6kYBg==
   dependencies:
     "@types/unist" "^2"
-
-"@types/mocha@^8.2.0":
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-8.2.3.tgz#bbeb55fbc73f28ea6de601fbfa4613f58d785323"
-  integrity sha512-ekGvFhFgrc2zYQoX4JeZPmVzZxw6Dtllga7iGHzfbYIYkAMUx/sAFP2GdFpLff+vdHXu5fl7WX9AT+TtqYcsyw==
 
 "@types/ms@*":
   version "0.7.31"
@@ -5961,14 +5961,6 @@ make-dir@^4.0.0:
   integrity sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==
   dependencies:
     semver "^7.5.3"
-
-markdown-to-text@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/markdown-to-text/-/markdown-to-text-0.1.1.tgz#3ee569c75d6340077daa703439f3a318f94e4bde"
-  integrity sha512-co/J5l8mJ2RK9wD/nQRGwO7JxoeyfvVNtOZll016EdAX2qYkwCWMdtYvJO42b41Ho7GFEJMuly9llf0Nj+ReQw==
-  dependencies:
-    "@types/chai" "^4.2.14"
-    "@types/mocha" "^8.2.0"
 
 mdast-util-from-markdown@^1.3.0:
   version "1.3.1"

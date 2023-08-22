@@ -62,28 +62,33 @@ const MermaidToExcalidraw = ({
     });
   }, [canvasData, canvasRef]);
 
+  useEffect(() => {
+    const convertMermaidToExcal = async () => {
+      let mermaidGraphData;
+      try {
+        mermaidGraphData = await parseMermaid(text, {
+          fontSize: DEFAULT_FONT_SIZE,
+        });
+      } catch (e) {
+        // Parse error, displaying error message to users
+      }
+
+      if (mermaidGraphData) {
+        const { elements, files } = graphToExcalidraw(mermaidGraphData);
+
+        setCanvasData({
+          elements: convertToExcalidrawElements(elements),
+          files,
+        });
+      }
+    };
+    convertMermaidToExcal();
+  }, [text]);
+
   const setAppState = useExcalidrawSetAppState();
   if (appState?.activeTool?.type !== "mermaid") {
     return null;
   }
-
-  const onChange = async (event: any) => {
-    setText(event.target.value);
-    let mermaidGraphData;
-    try {
-      mermaidGraphData = await parseMermaid(event.target.value, {
-        fontSize: DEFAULT_FONT_SIZE,
-      });
-    } catch (e) {
-      // Parse error, displaying error message to users
-    }
-
-    if (mermaidGraphData) {
-      const { elements, files } = graphToExcalidraw(mermaidGraphData);
-
-      setCanvasData({ elements: convertToExcalidrawElements(elements), files });
-    }
-  };
 
   const onClose = () => {
     const activeTool = updateActiveTool(appState, { type: "selection" });
@@ -102,7 +107,10 @@ const MermaidToExcalidraw = ({
       <div className="mermaid-to-excalidraw-wrapper">
         <div className="mermaid-to-excalidraw-wrapper-text">
           <label>Describe</label>
-          <textarea onChange={onChange} value={text} />
+          <textarea
+            onChange={(event) => setText(event.target.value)}
+            value={text}
+          />
         </div>
         <div className="mermaid-to-excalidraw-wrapper-preview">
           <label>Preview</label>
