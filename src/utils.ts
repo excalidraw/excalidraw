@@ -1038,11 +1038,11 @@ export const expandToAspectRatio = (
   let newWidth = Math.round(originalWidth);
   let newHeight = Math.round(originalHeight);
 
-  // Expand by width
-  if (originalAspectRatio > targetAspectRatio) {
+  // Original is landscape, expand width
+  if (originalAspectRatio < targetAspectRatio) {
     newWidth = Math.round(originalHeight * targetAspectRatio);
   }
-  // Expand by height
+  // Original is portrait or square, expand height
   else {
     newHeight = Math.round(originalWidth / targetAspectRatio);
   }

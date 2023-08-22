@@ -82,6 +82,9 @@ export const exportToCanvas = async (
 
   const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
+  let scrollXAdjustment = 0;
+  let scrollYAdjustment = 0;
+
   if (
     exportWithFancyBackground &&
     appState.fancyBackgroundImageKey !== "solid"
@@ -93,6 +96,15 @@ export const exportToCanvas = async (
       exportScale: scale,
       theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
     });
+
+    const commonBounds = getCommonBounds(elements);
+    const contentSize: Dimensions = {
+      width: distance(commonBounds[0], commonBounds[2]),
+      height: distance(commonBounds[1], commonBounds[3]),
+    };
+
+    scrollXAdjustment = (width - contentSize.width - padding * 2) / 2;
+    scrollYAdjustment = (height - contentSize.height - padding * 2) / 2;
   }
 
   renderStaticScene({
@@ -107,8 +119,10 @@ export const exportToCanvas = async (
         exportBackground && !exportWithFancyBackground
           ? viewBackgroundColor
           : null,
-      scrollX: -minX + (onlyExportingSingleFrame ? 0 : padding),
-      scrollY: -minY + (onlyExportingSingleFrame ? 0 : padding),
+      scrollX:
+        -minX + (onlyExportingSingleFrame ? 0 : padding + scrollXAdjustment),
+      scrollY:
+        -minY + (onlyExportingSingleFrame ? 0 : padding + scrollYAdjustment),
       zoom: defaultAppState.zoom,
       shouldCacheIgnoreZoom: false,
       theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
