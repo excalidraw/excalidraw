@@ -89,19 +89,20 @@ export const exportToCanvas = async (
     exportWithFancyBackground &&
     appState.fancyBackgroundImageKey !== "solid"
   ) {
+    const commonBounds = getCommonBounds(elements);
+    const contentSize: Dimensions = {
+      width: distance(commonBounds[0], commonBounds[2]),
+      height: distance(commonBounds[1], commonBounds[3]),
+    };
+
     await applyFancyBackgroundOnCanvas({
       canvas,
       fancyBackgroundImageKey: appState.fancyBackgroundImageKey,
       backgroundColor: viewBackgroundColor,
       exportScale: scale,
       theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+      contentSize,
     });
-
-    const commonBounds = getCommonBounds(elements);
-    const contentSize: Dimensions = {
-      width: distance(commonBounds[0], commonBounds[2]),
-      height: distance(commonBounds[1], commonBounds[3]),
-    };
 
     scrollXAdjustment = (width - contentSize.width - padding * 2) / 2;
     scrollYAdjustment = (height - contentSize.height - padding * 2) / 2;

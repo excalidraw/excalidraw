@@ -67,6 +67,7 @@ const addContentBackground = (
   contentBackgroundColor: string,
   exportScale: AppState["exportScale"],
   theme: AppState["theme"],
+  contentSize: Dimensions,
 ) => {
   const shadows = [
     {
@@ -98,12 +99,21 @@ const addContentBackground = (
     context.shadowOffsetX = shadow.offsetX * exportScale;
     context.shadowOffsetY = shadow.offsetY * exportScale;
 
+    const x =
+      (normalizedDimensions.width - contentSize.width) / 2 - FANCY_BG_PADDING;
+    const y =
+      (normalizedDimensions.height - contentSize.height) / 2 - FANCY_BG_PADDING;
+
     if (context.roundRect) {
       context.roundRect(
-        FANCY_BG_PADDING * exportScale,
-        FANCY_BG_PADDING * exportScale,
-        normalizedDimensions.width - FANCY_BG_PADDING * 2 * exportScale,
-        normalizedDimensions.height - FANCY_BG_PADDING * 2 * exportScale,
+        x,
+        y,
+        (contentSize.width +
+          (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
+          exportScale,
+        (contentSize.height * exportScale +
+          (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
+          exportScale,
         FANCY_BG_BORDER_RADIUS * exportScale,
       );
     } else {
@@ -135,6 +145,7 @@ export const applyFancyBackgroundOnCanvas = async ({
   backgroundColor,
   exportScale,
   theme,
+  contentSize,
 }: {
   canvas: HTMLCanvasElement;
   fancyBackgroundImageKey: Exclude<
@@ -144,6 +155,7 @@ export const applyFancyBackgroundOnCanvas = async ({
   backgroundColor: string;
   exportScale: AppState["exportScale"];
   theme: AppState["theme"];
+  contentSize: Dimensions;
 }) => {
   const context = canvas.getContext("2d")!;
 
@@ -172,6 +184,7 @@ export const applyFancyBackgroundOnCanvas = async ({
     backgroundColor,
     exportScale,
     theme,
+    contentSize,
   );
 };
 
