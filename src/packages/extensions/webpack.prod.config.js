@@ -9,7 +9,7 @@ const { parseEnvVariables } = require("./env");
 module.exports = {
   mode: "production",
   entry: {
-    "excalidraw-extensions.production.min": "./index.ts",
+    "excalidraw-extensions.production.min": "./entry.js",
   },
   output: {
     path: path.resolve(__dirname, "dist"),

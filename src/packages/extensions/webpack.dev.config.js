@@ -8,7 +8,7 @@ module.exports = {
   mode: "development",
   devtool: false,
   entry: {
-    "excalidraw-extensions.development": "./index.ts",
+    "excalidraw-extensions.development": "./entry.js",
   },
   output: {
     path: path.resolve(__dirname, outputDir),
