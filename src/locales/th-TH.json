@@ -376,7 +376,7 @@
     "label": {
       "withBackground": "",
       "onlySelected": "",
-      "darkMode": "",
+      "darkMode": "โหมดกลางคืน",
       "embedScene": "",
       "scale": "",
       "padding": ""
@@ -385,14 +385,14 @@
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "ส่งออกไปเป็น SVG",
+      "exportToSvg": "ส่งออกไปเป็น SVG",
+      "copyPngToClipboard": "คัดลอก PNG ไปยังคลิปบอร์ด"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "คัดลอกไปยังคลิปบอร์ด"
     }
   },
   "encrypted": {
@@ -438,11 +438,11 @@
     "gray": "",
     "blue": "",
     "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "teal": "ฟ้าน้ำทะเล",
+    "green": "เขียว",
+    "yellow": "เหลือง",
+    "orange": "ส้ม",
+    "bronze": "ทองแดง"
   },
   "welcomeScreen": {
     "app": {
