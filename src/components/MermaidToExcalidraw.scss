@@ -23,6 +23,11 @@
   }
 
   &-preview-canvas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+
     width: 20rem;
     height: 23.5rem;
     background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
