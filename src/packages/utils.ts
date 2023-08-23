@@ -70,6 +70,20 @@ export const exportToCanvas = ({
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
 
+      if (
+        appState?.exportBackground &&
+        appState?.fancyBackgroundImageKey !== "solid"
+      ) {
+        const scale = appState?.exportScale ?? 1;
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+
+        return {
+          canvas,
+          scale,
+        };
+      }
+
       if (maxWidthOrHeight) {
         if (typeof getDimensions === "function") {
           console.warn(
