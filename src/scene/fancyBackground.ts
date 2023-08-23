@@ -100,9 +100,11 @@ const addContentBackground = (
     context.shadowOffsetY = shadow.offsetY * exportScale;
 
     const x =
-      (normalizedDimensions.width - contentSize.width) / 2 - FANCY_BG_PADDING;
+      (normalizedDimensions.width - contentSize.width * exportScale) / 2 -
+      FANCY_BG_PADDING * exportScale;
     const y =
-      (normalizedDimensions.height - contentSize.height) / 2 - FANCY_BG_PADDING;
+      (normalizedDimensions.height - contentSize.height * exportScale) / 2 -
+      FANCY_BG_PADDING * exportScale;
 
     // fixme: position is no scaled to the center
     if (context.roundRect) {
@@ -112,7 +114,7 @@ const addContentBackground = (
         (contentSize.width +
           (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
           exportScale,
-        (contentSize.height * exportScale +
+        (contentSize.height +
           (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
           exportScale,
         FANCY_BG_BORDER_RADIUS * exportScale,
