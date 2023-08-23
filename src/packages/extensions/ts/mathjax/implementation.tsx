@@ -190,7 +190,9 @@ const loadMathJax = async () => {
     // Configure AsciiMath to use the "display" option.  See
     // https://github.com/mathjax/MathJax/issues/2520#issuecomment-1128831182.
     const MathJax = (
-      await require("mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax")
+      await import(
+        /* @vite-ignore */ "mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax"
+      )
     ).MathJax;
     mathJax.amFixes = MathJax.InputJax.AsciiMath.AM.Augment;
 
@@ -256,7 +258,9 @@ const loadMathJax = async () => {
         return new Promise<string>((resolve, reject) => {
           try {
             const mathmap = JSON.stringify(
-              require(`mathjax-full/es5/sre/mathmaps/${locale}.json`),
+              import(
+                /* @vite-ignore */ `mathjax-full/es5/sre/mathmaps/${locale}.json`
+              ),
             );
             resolve(mathmap);
           } catch (e) {
