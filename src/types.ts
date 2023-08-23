@@ -527,6 +527,7 @@ export type AppClassProperties = {
   lastViewportPosition: App["lastViewportPosition"];
   scrollToContent: App["scrollToContent"];
   addFiles: App["addFiles"];
+  setSelection: App["setSelection"];
 };
 
 export type PointerDownState = Readonly<{

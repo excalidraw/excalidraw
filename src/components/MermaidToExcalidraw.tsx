@@ -99,6 +99,9 @@ const MermaidToExcalidraw = ({
     app.scene.replaceAllElements([...elements, ...canvasData.elements]);
     app.addFiles(Object.values(canvasData.files || []));
     app.scrollToContent(canvasData.elements);
+
+    app.setSelection(canvasData.elements);
+
     onClose();
   };
 

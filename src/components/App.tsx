@@ -7393,6 +7393,30 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ suggestedBindings });
   }
 
+  public setSelection(elements: readonly NonDeletedExcalidrawElement[]) {
+    const selectedElementIds: { [id: string]: true } = {};
+    const selectedGroupIds: { [id: string]: true } = {};
+
+    elements.forEach((ele) => {
+      if (ele.groupIds.length) {
+        selectedElementIds[ele.id] = true;
+        ele.groupIds.forEach((id) => {
+          selectedGroupIds[id] = true;
+        });
+      }
+      // exclude bound text elements as we don't mark them as selected when
+      // container is selected unless in group
+      else if (!isBoundToContainer(ele)) {
+        selectedElementIds[ele.id] = true;
+      }
+    });
+
+    this.setState({
+      previousSelectedElementIds: this.state.selectedElementIds,
+      selectedElementIds,
+      selectedGroupIds,
+    });
+  }
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: makeNextSelectedElementIds({}, prevState),
