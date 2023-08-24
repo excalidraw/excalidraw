@@ -10,10 +10,7 @@ import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
-import {
-  getShapeForElement,
-  generateRoughOptions,
-} from "../renderer/renderElement";
+import { generateRoughOptions } from "../scene/Shape";
 import {
   isArrowElement,
   isFreeDrawElement,
@@ -24,6 +21,7 @@ import { rescalePoints } from "../points";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { Mutable } from "../utility-types";
+import { ShapeCache } from "../scene/ShapeCache";
 
 export type RectangleBox = {
   x: number;
@@ -621,7 +619,7 @@ const getLinearElementRotatedBounds = (
   }
 
   // first element is always the curve
-  const cachedShape = getShapeForElement(element)?.[0];
+  const cachedShape = ShapeCache.get(element)?.[0];
   const shape = cachedShape ?? generateLinearElementShape(element);
   const ops = getCurvePathOps(shape);
   const transformXY = (x: number, y: number) =>

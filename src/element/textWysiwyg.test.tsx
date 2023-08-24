@@ -759,7 +759,7 @@ describe("textWysiwyg", () => {
       expect(h.elements[1].type).toBe("text");
 
       API.setSelectedElements([h.elements[0], h.elements[1]]);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -903,7 +903,7 @@ describe("textWysiwyg", () => {
       mouse.clickAt(10, 20);
       mouse.down();
       mouse.up();
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -1154,7 +1154,7 @@ describe("textWysiwyg", () => {
 
       h.elements = [container, text];
       API.setSelectedElements([container, text]);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -1168,7 +1168,7 @@ describe("textWysiwyg", () => {
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text).toBe(
         "Online \nwhitebo\nard \ncollabo\nration \nmade \neasy",
       );
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -1406,7 +1406,7 @@ describe("textWysiwyg", () => {
 
       API.setSelectedElements([textElement]);
 
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
