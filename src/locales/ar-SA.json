@@ -50,7 +50,7 @@
     "veryLarge": "كبير جدا",
     "solid": "كامل",
     "hachure": "خطوط",
-    "zigzag": "",
+    "zigzag": "متعرج",
     "crossHatch": "خطوط متقطعة",
     "thin": "نحيف",
     "bold": "داكن",
@@ -106,15 +106,15 @@
     "increaseFontSize": "تكبير حجم الخط",
     "unbindText": "فك ربط النص",
     "bindText": "ربط النص بالحاوية",
-    "createContainerFromText": "",
+    "createContainerFromText": "نص مغلف في حاوية",
     "link": {
       "edit": "تعديل الرابط",
-      "editEmbed": "",
+      "editEmbed": "تحرير الرابط وإدراجه",
       "create": "إنشاء رابط",
-      "createEmbed": "",
+      "createEmbed": "إنشاء رابط و إدراجه",
       "label": "رابط",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "رابط و إدراج",
+      "empty": "لم يتم تعيين رابط"
     },
     "lineEditor": {
       "edit": "تحرير السطر",
@@ -128,9 +128,9 @@
     },
     "statusPublished": "نُشر",
     "sidebarLock": "إبقاء الشريط الجانبي مفتوح",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "تحديد جميع العناصر في الإطار",
+    "removeAllElementsFromFrame": "إزالة جميع العناصر من الإطار",
+    "eyeDropper": "اختيار اللون من القماش"
   },
   "library": {
     "noItems": "لا توجد عناصر أضيفت بعد...",
@@ -168,11 +168,11 @@
     "cancel": "إلغاء",
     "clear": "مسح",
     "remove": "إزالة",
-    "embed": "",
+    "embed": "تبديل الإدراج",
     "publishLibrary": "انشر",
     "submit": "أرسل",
     "confirm": "تأكيد",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "اضغط للتفاعل"
   },
   "alerts": {
     "clearReset": "هذا سيُزيل كامل اللوحة. هل أنت متأكد؟",
@@ -195,7 +195,7 @@
     "resetLibrary": "هذا سوف يمسح مكتبتك. هل أنت متأكد؟",
     "removeItemsFromsLibrary": "حذف {{count}} عنصر (عناصر) من المكتبة؟",
     "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "لا يوجد اتصال بالانترنت.\nلن يتم حفظ التغييرات التي قمت بها!"
   },
   "errors": {
     "unsupportedFileType": "نوع الملف غير مدعوم.",
@@ -208,7 +208,7 @@
     "collabSaveFailed": "تعذر الحفظ في قاعدة البيانات. إذا استمرت المشاكل، يفضل أن تحفظ ملفك محليا كي لا تفقد عملك.",
     "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك.",
     "brave_measure_text_error": {
-      "line1": "",
+      "line1": "يبدو أنك تستخدم متصفح Brave مع إعداد <bold>حظر صارم لتتبع البصمة</bold>.",
       "line2": "",
       "line3": "",
       "line4": ""
