@@ -81,8 +81,9 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 };
 
 const restoreElementWithProperties = <
-  T extends Required<Omit<ExcalidrawElement, "customData">> & {
+  T extends Required<Omit<ExcalidrawElement, "customData" | "__source__">> & {
     customData?: ExcalidrawElement["customData"];
+    __source__?: ExcalidrawElement["__source__"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
     /** @deprecated */
@@ -125,6 +126,7 @@ const restoreElementWithProperties = <
     height: element.height || 0,
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
+    __source__: element.__source__,
     roundness: element.roundness
       ? element.roundness
       : element.strokeSharpness === "round"

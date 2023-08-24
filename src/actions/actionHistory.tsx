@@ -10,6 +10,7 @@ import { newElementWith } from "../element/mutateElement";
 import { fixBindingsAfterDeletion } from "../element/binding";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
+import { SOURCE } from "../element/newElement";
 
 const writeData = (
   prevElements: readonly ExcalidrawElement[],
@@ -36,16 +37,25 @@ const writeData = (
       (prevElement) => !nextElementMap.has(prevElement.id),
     );
     const elements = nextElements
-      .map((nextElement) =>
-        newElementWith(
+      .map((nextElement) => {
+        const prevEle = prevElementMap.get(nextElement.id);
+        if (nextElement.__source__ !== SOURCE && prevEle?.isDeleted) {
+          return newElementWith(nextElement, prevEle || nextElement);
+        }
+        return newElementWith(
           prevElementMap.get(nextElement.id) || nextElement,
           nextElement,
-        ),
-      )
+        );
+      })
       .concat(
-        deletedElements.map((prevElement) =>
-          newElementWith(prevElement, { isDeleted: true }),
-        ),
+        deletedElements.map((prevElement) => {
+          if (prevElement.__source__ !== SOURCE) {
+            return prevElement;
+          }
+          return newElementWith(prevElement, {
+            isDeleted: true,
+          });
+        }),
       );
     fixBindingsAfterDeletion(elements, deletedElements);
 

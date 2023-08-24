@@ -657,7 +657,7 @@ class Collab extends PureComponent<Props, CollabState> {
     // when we receive any messages from another peer. This UX can be pretty rough -- if you
     // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
     // right now we think this is the right tradeoff.
-    this.excalidrawAPI.history.clear();
+    // this.excalidrawAPI.history.clear();
 
     this.loadImageFiles();
   };

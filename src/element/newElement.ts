@@ -46,6 +46,7 @@ import {
 } from "../constants";
 import { isArrowElement } from "./typeChecks";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
+export const SOURCE = Math.random().toString();
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -109,6 +110,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     roughness,
     opacity,
     groupIds,
+    __source__: SOURCE,
     roundness,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
