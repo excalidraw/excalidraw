@@ -189,7 +189,11 @@ export const exportToSvg = async (
       console.error(error);
     }
   }
-  const [minX, minY, width, height] = getCanvasSize(elements, padding);
+  const [minX, minY, width, height] = !exportWithFancyBackground
+    ? getCanvasSize(elements, padding)
+    : getCanvasSize(elements, padding, {
+        aspectRatio: { width: 16, height: 9 },
+      });
 
   // initialize SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
@@ -267,12 +271,20 @@ export const exportToSvg = async (
   </defs>
   `;
 
+  let offsetXAdjustment = 0;
+  let offsetYAdjustment = 0;
+
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
     if (
       appState.fancyBackgroundImageKey &&
       appState.fancyBackgroundImageKey !== "solid"
     ) {
+      const commonBounds = getCommonBounds(elements);
+      const contentSize: Dimensions = {
+        width: distance(commonBounds[0], commonBounds[2]),
+        height: distance(commonBounds[1], commonBounds[3]),
+      };
       await applyFancyBackgroundOnSvg({
         svgRoot,
         fancyBackgroundImageKey: `${appState.fancyBackgroundImageKey}`,
@@ -280,7 +292,11 @@ export const exportToSvg = async (
         dimensions: { width, height },
         exportScale,
         theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+        contentSize,
       });
+
+      offsetXAdjustment = (width - contentSize.width - padding * 2) / 2;
+      offsetYAdjustment = (height - contentSize.height - padding * 2) / 2;
     } else {
       const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
       rect.setAttribute("x", "0");
@@ -294,8 +310,8 @@ export const exportToSvg = async (
 
   const rsvg = rough.svg(svgRoot);
   renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
-    offsetX,
-    offsetY,
+    offsetX: offsetX + offsetXAdjustment,
+    offsetY: offsetY + offsetYAdjustment,
     exportWithDarkMode: appState.exportWithDarkMode,
     exportingFrameId: exportingFrame?.id || null,
     renderEmbeddables: opts?.renderEmbeddables,

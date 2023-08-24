@@ -11,7 +11,7 @@ import {
 import { loadHTMLImageElement, loadSVGElement } from "../element/image";
 import { getScaleToFill } from "../packages/utils";
 import { roundRect } from "../renderer/roundRect";
-import { AppState, Dimensions } from "../types";
+import { AppState, DataURL, Dimensions } from "../types";
 
 export const getFancyBackgroundPadding = (
   exportPadding = DEFAULT_EXPORT_PADDING,
@@ -61,6 +61,32 @@ const addImageBackground = (
   context.restore();
 };
 
+const getContentBackgound = (
+  contentSize: Dimensions,
+  normalizedDimensions: Dimensions,
+  exportScale: number,
+): { x: number; y: number; width: number; height: number } => {
+  const x =
+    (normalizedDimensions.width - contentSize.width * exportScale) / 2 -
+    FANCY_BG_PADDING * exportScale;
+
+  const y =
+    (normalizedDimensions.height - contentSize.height * exportScale) / 2 -
+    FANCY_BG_PADDING * exportScale;
+
+  const width =
+    (contentSize.width +
+      (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
+    exportScale;
+
+  const height =
+    (contentSize.height +
+      (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
+    exportScale;
+
+  return { x, y, width, height };
+};
+
 const addContentBackground = (
   context: CanvasRenderingContext2D,
   normalizedDimensions: Dimensions,
@@ -72,20 +98,20 @@ const addContentBackground = (
   const shadows = [
     {
       offsetX: 0,
-      offsetY: 0.7698959708213806,
-      blur: 1.4945039749145508,
+      offsetY: 0,
+      blur: 2,
       alpha: 0.02,
     },
     {
       offsetX: 0,
-      offsetY: 1.1299999952316284,
-      blur: 4.1321120262146,
+      offsetY: 1,
+      blur: 4,
       alpha: 0.04,
     },
     {
       offsetX: 0,
-      offsetY: 4.130000114440918,
-      blur: 9.94853401184082,
+      offsetY: 4,
+      blur: 10,
       alpha: 0.05,
     },
     { offsetX: 0, offsetY: 13, blur: 33, alpha: 0.07 },
@@ -99,24 +125,18 @@ const addContentBackground = (
     context.shadowOffsetX = shadow.offsetX * exportScale;
     context.shadowOffsetY = shadow.offsetY * exportScale;
 
-    const x =
-      (normalizedDimensions.width - contentSize.width * exportScale) / 2 -
-      FANCY_BG_PADDING * exportScale;
-    const y =
-      (normalizedDimensions.height - contentSize.height * exportScale) / 2 -
-      FANCY_BG_PADDING * exportScale;
+    const { x, y, width, height } = getContentBackgound(
+      contentSize,
+      normalizedDimensions,
+      exportScale,
+    );
 
-    // fixme: position is no scaled to the center
     if (context.roundRect) {
       context.roundRect(
         x,
         y,
-        (contentSize.width +
-          (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
-          exportScale,
-        (contentSize.height +
-          (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
-          exportScale,
+        width,
+        height,
         FANCY_BG_BORDER_RADIUS * exportScale,
       );
     } else {
@@ -124,12 +144,8 @@ const addContentBackground = (
         context,
         x,
         y,
-        (contentSize.width +
-          (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
-          exportScale,
-        (contentSize.height * exportScale +
-          (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
-          exportScale,
+        width,
+        height,
         FANCY_BG_BORDER_RADIUS * exportScale,
       );
     }
@@ -195,27 +211,17 @@ export const applyFancyBackgroundOnCanvas = async ({
   );
 };
 
-export const applyFancyBackgroundOnSvg = async ({
+const addImageBackgroundToSvg = async ({
   svgRoot,
-  fancyBackgroundImageKey,
-  backgroundColor,
+  fancyBackgroundImageUrl,
   dimensions,
-  exportScale,
   theme,
 }: {
   svgRoot: SVGSVGElement;
-  fancyBackgroundImageKey: Exclude<
-    keyof typeof FANCY_BACKGROUND_IMAGES,
-    "solid"
-  >;
-  backgroundColor: string;
+  fancyBackgroundImageUrl: DataURL;
   dimensions: Dimensions;
-  exportScale: AppState["exportScale"];
   theme: AppState["theme"];
 }) => {
-  // Image background
-  const fancyBackgroundImageUrl =
-    FANCY_BACKGROUND_IMAGES[fancyBackgroundImageKey][theme];
   const fancyBackgroundImage = await loadSVGElement(fancyBackgroundImageUrl);
 
   fancyBackgroundImage.setAttribute("x", "0");
@@ -228,21 +234,126 @@ export const applyFancyBackgroundOnSvg = async ({
   }
 
   svgRoot.appendChild(fancyBackgroundImage);
+};
+const addContentBackgroundToSvg = ({
+  svgRoot,
+  exportScale,
+  contentSize,
+  backgroundColor,
+  dimensions,
+}: {
+  svgRoot: SVGSVGElement;
+  exportScale: number;
+  contentSize: Dimensions;
+  backgroundColor: string;
+  dimensions: Dimensions;
+}) => {
+  // Create the shadow filter
+  const filter = svgRoot.ownerDocument!.createElementNS(SVG_NS, "filter");
+  filter.setAttribute("id", "shadow");
+
+  const feGaussianBlur = svgRoot.ownerDocument!.createElementNS(
+    SVG_NS,
+    "feGaussianBlur",
+  );
+  feGaussianBlur.setAttribute("in", "SourceAlpha");
+  feGaussianBlur.setAttribute("stdDeviation", "3");
+
+  const feOffset = svgRoot.ownerDocument!.createElementNS(SVG_NS, "feOffset");
+  feOffset.setAttribute("dx", "4");
+  feOffset.setAttribute("dy", "4");
+  feOffset.setAttribute("result", "offsetblur");
+
+  const feFlood = svgRoot.ownerDocument!.createElementNS(SVG_NS, "feFlood");
+  feFlood.setAttribute("flood-color", "black");
+  feFlood.setAttribute("flood-opacity", "0.04");
+  feFlood.setAttribute("result", "color");
+
+  const feComposite = svgRoot.ownerDocument!.createElementNS(
+    SVG_NS,
+    "feComposite",
+  );
+  feComposite.setAttribute("in", "color");
+  feComposite.setAttribute("in2", "offsetblur");
+  feComposite.setAttribute("operator", "in");
+  feComposite.setAttribute("result", "shadow");
+
+  const feMerge = svgRoot.ownerDocument!.createElementNS(SVG_NS, "feMerge");
+  const feMergeNodeIn = svgRoot.ownerDocument!.createElementNS(
+    SVG_NS,
+    "feMergeNode",
+  );
+  feMergeNodeIn.setAttribute("in", "shadow");
+  const feMergeNodeGraphic = svgRoot.ownerDocument!.createElementNS(
+    SVG_NS,
+    "feMergeNode",
+  );
+  feMergeNodeGraphic.setAttribute("in", "SourceGraphic");
+  feMerge.appendChild(feMergeNodeIn);
+  feMerge.appendChild(feMergeNodeGraphic);
+
+  filter.appendChild(feGaussianBlur);
+  filter.appendChild(feOffset);
+  filter.appendChild(feFlood);
+  filter.appendChild(feComposite);
+  filter.appendChild(feMerge);
+
+  svgRoot.appendChild(filter);
 
   // Solid color background
+  const { x, y, width, height } = getContentBackgound(
+    contentSize,
+    dimensions,
+    exportScale,
+  );
   const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
-  rect.setAttribute("x", (FANCY_BG_PADDING * exportScale).toString());
-  rect.setAttribute("y", (FANCY_BG_PADDING * exportScale).toString());
-  rect.setAttribute(
-    "width",
-    `${dimensions.width - FANCY_BG_PADDING * 2 * exportScale}`,
-  );
-  rect.setAttribute(
-    "height",
-    `${dimensions.height - FANCY_BG_PADDING * 2 * exportScale}`,
-  );
+  rect.setAttribute("x", x.toString());
+  rect.setAttribute("y", y.toString());
+  rect.setAttribute("width", width.toString());
+  rect.setAttribute("height", height.toString());
   rect.setAttribute("rx", (FANCY_BG_BORDER_RADIUS * exportScale).toString());
   rect.setAttribute("ry", (FANCY_BG_BORDER_RADIUS * exportScale).toString());
   rect.setAttribute("fill", backgroundColor);
+  rect.setAttribute("filter", "url(#shadow)");
   svgRoot.appendChild(rect);
+};
+
+export const applyFancyBackgroundOnSvg = async ({
+  svgRoot,
+  fancyBackgroundImageKey,
+  backgroundColor,
+  dimensions,
+  exportScale,
+  theme,
+  contentSize,
+}: {
+  svgRoot: SVGSVGElement;
+  fancyBackgroundImageKey: Exclude<
+    keyof typeof FANCY_BACKGROUND_IMAGES,
+    "solid"
+  >;
+  backgroundColor: string;
+  dimensions: Dimensions;
+  exportScale: AppState["exportScale"];
+  theme: AppState["theme"];
+  contentSize: Dimensions;
+}) => {
+  // Image background
+  const fancyBackgroundImageUrl =
+    FANCY_BACKGROUND_IMAGES[fancyBackgroundImageKey][theme];
+
+  await addImageBackgroundToSvg({
+    svgRoot,
+    fancyBackgroundImageUrl,
+    dimensions,
+    theme,
+  });
+
+  addContentBackgroundToSvg({
+    svgRoot,
+    exportScale,
+    contentSize,
+    backgroundColor,
+    dimensions,
+  });
 };
