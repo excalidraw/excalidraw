@@ -4,10 +4,6 @@ import { updateActiveTool } from "../utils";
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
-import {
-  parseMermaid,
-  graphToExcalidraw,
-} from "@excalidraw/mermaid-to-excalidraw";
 
 import "./MermaidToExcalidraw.scss";
 import { DEFAULT_EXPORT_PADDING, DEFAULT_FONT_SIZE } from "../constants";
@@ -50,35 +46,53 @@ const MermaidToExcalidraw = ({
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
 }) => {
+  const mermaidToExcalidrawLib = useRef<any>(null);
   const [text, setText] = useState("");
-
+  const [loading, setLoading] = useState(true);
   const canvasRef = useRef<HTMLDivElement>(null);
   const data = useRef<{
     elements: readonly NonDeletedExcalidrawElement[];
     files: BinaryFiles | null;
   }>({ elements: [], files: null });
+
   const app = useApp();
 
   useEffect(() => {
-    const data = importMermaidDataFromStorage();
-    if (data) {
-      setText(data);
-    }
+    const loadMermaidToExcalidrawLib = async () => {
+      mermaidToExcalidrawLib.current = await import(
+        /* webpackChunkName:"mermaid-to-excalidraw" */ "@excalidraw/mermaid-to-excalidraw"
+      );
+      setLoading(false);
+    };
+    loadMermaidToExcalidrawLib();
   }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      const data = importMermaidDataFromStorage();
+      if (data) {
+        setText(data);
+      }
+    }
+  }, [loading]);
 
   useEffect(() => {
     const convertMermaidToExcal = async () => {
       let mermaidGraphData;
       try {
-        mermaidGraphData = await parseMermaid(text, {
-          fontSize: DEFAULT_FONT_SIZE,
-        });
+        mermaidGraphData = await mermaidToExcalidrawLib.current.parseMermaid(
+          text,
+          {
+            fontSize: DEFAULT_FONT_SIZE,
+          },
+        );
       } catch (e) {
         // Parse error, displaying error message to users
       }
 
       if (mermaidGraphData) {
-        const { elements, files } = graphToExcalidraw(mermaidGraphData);
+        const { elements, files } =
+          mermaidToExcalidrawLib.current.graphToExcalidraw(mermaidGraphData);
 
         data.current = {
           elements: convertToExcalidrawElements(elements),
