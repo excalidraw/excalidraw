@@ -51,12 +51,12 @@ const MermaidToExcalidraw = ({
   elements: readonly NonDeletedExcalidrawElement[];
 }) => {
   const [text, setText] = useState("");
-  const [canvasData, setCanvasData] = useState<{
-    //@ts-ignore
+
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const data = useRef<{
     elements: readonly NonDeletedExcalidrawElement[];
     files: BinaryFiles | null;
   }>({ elements: [], files: null });
-  const canvasRef = useRef<HTMLDivElement>(null);
   const app = useApp();
 
   useEffect(() => {
@@ -65,34 +65,6 @@ const MermaidToExcalidraw = ({
       setText(data);
     }
   }, []);
-
-  useEffect(() => {
-    const canvasNode = canvasRef.current;
-    if (!canvasNode) {
-      return;
-    }
-    const maxWidth = canvasNode.offsetWidth;
-    const maxHeight = canvasNode.offsetHeight;
-    let dimension = Math.max(maxWidth, maxHeight);
-    if (dimension > canvasNode.offsetWidth) {
-      dimension = canvasNode.offsetWidth - 10;
-    }
-    if (dimension > canvasNode.offsetHeight) {
-      dimension = canvasNode.offsetHeight;
-    }
-    exportToCanvas({
-      elements: canvasData.elements,
-      files: canvasData.files,
-      exportPadding: DEFAULT_EXPORT_PADDING,
-      maxWidthOrHeight: dimension,
-    }).then((canvas) => {
-      // if converting to blob fails, there's some problem that will
-      // likely prevent preview and export (e.g. canvas too big)
-      return canvasToBlob(canvas).then(() => {
-        canvasNode.replaceChildren(canvas);
-      });
-    });
-  }, [canvasData, canvasRef]);
 
   useEffect(() => {
     const convertMermaidToExcal = async () => {
@@ -108,9 +80,35 @@ const MermaidToExcalidraw = ({
       if (mermaidGraphData) {
         const { elements, files } = graphToExcalidraw(mermaidGraphData);
 
-        setCanvasData({
+        data.current = {
           elements: convertToExcalidrawElements(elements),
           files,
+        };
+
+        const canvasNode = canvasRef.current;
+        if (!canvasNode) {
+          return;
+        }
+        const maxWidth = canvasNode.offsetWidth;
+        const maxHeight = canvasNode.offsetHeight;
+        let dimension = Math.max(maxWidth, maxHeight);
+        if (dimension > canvasNode.offsetWidth) {
+          dimension = canvasNode.offsetWidth - 10;
+        }
+        if (dimension > canvasNode.offsetHeight) {
+          dimension = canvasNode.offsetHeight;
+        }
+        exportToCanvas({
+          elements: data.current.elements,
+          files: data.current.files,
+          exportPadding: DEFAULT_EXPORT_PADDING,
+          maxWidthOrHeight: dimension,
+        }).then((canvas) => {
+          // if converting to blob fails, there's some problem that will
+          // likely prevent preview and export (e.g. canvas too big)
+          return canvasToBlob(canvas).then(() => {
+            canvasNode.replaceChildren(canvas);
+          });
         });
       }
     };
@@ -126,11 +124,12 @@ const MermaidToExcalidraw = ({
   };
 
   const onSelect = () => {
-    app.scene.replaceAllElements([...elements, ...canvasData.elements]);
-    app.addFiles(Object.values(canvasData.files || []));
-    app.scrollToContent(canvasData.elements);
+    const { elements: newElements, files } = data.current;
+    app.scene.replaceAllElements([...elements, ...newElements]);
+    app.addFiles(Object.values(files || []));
+    app.scrollToContent(newElements);
 
-    app.setSelection(canvasData.elements);
+    app.setSelection(newElements);
 
     onClose();
   };
