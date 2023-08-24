@@ -18,6 +18,31 @@ import {
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { canvasToBlob } from "../data/blob";
 
+const LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW = "mermaid-to-excalidraw";
+
+const saveMermaidDataToStorage = (data: string) => {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW, data);
+  } catch (error: any) {
+    // Unable to access window.localStorage
+    console.error(error);
+  }
+};
+
+const importMermaidDataFromStorage = () => {
+  try {
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW);
+    if (data) {
+      return data;
+    }
+  } catch (error: any) {
+    // Unable to access localStorage
+    console.error(error);
+  }
+
+  return null;
+};
+
 const MermaidToExcalidraw = ({
   appState,
   elements,
@@ -33,6 +58,13 @@ const MermaidToExcalidraw = ({
   }>({ elements: [], files: null });
   const canvasRef = useRef<HTMLDivElement>(null);
   const app = useApp();
+
+  useEffect(() => {
+    const data = importMermaidDataFromStorage();
+    if (data) {
+      setText(data);
+    }
+  }, []);
 
   useEffect(() => {
     const canvasNode = canvasRef.current;
@@ -86,13 +118,11 @@ const MermaidToExcalidraw = ({
   }, [text]);
 
   const setAppState = useExcalidrawSetAppState();
-  if (appState?.activeTool?.type !== "mermaid") {
-    return null;
-  }
 
   const onClose = () => {
     const activeTool = updateActiveTool(appState, { type: "selection" });
     setAppState({ activeTool });
+    saveMermaidDataToStorage(text);
   };
 
   const onSelect = () => {
