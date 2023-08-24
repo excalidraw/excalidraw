@@ -29,7 +29,7 @@ index 41f6a1f..25096c6 100644
      return this.Compile(am,display);
    }
  };
-+})})})});
++})})})})
 diff --git a/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js b/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js
 index 903ede2..504ae4f 100644
 --- a/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js
