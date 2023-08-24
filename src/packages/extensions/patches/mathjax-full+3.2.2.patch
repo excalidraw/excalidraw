@@ -1,5 +1,5 @@
 diff --git a/node_modules/mathjax-full/js/input/asciimath/mathjax2/input/AsciiMath.js b/node_modules/mathjax-full/js/input/asciimath/mathjax2/input/AsciiMath.js
-index 41f6a1f..a2c3c07 100644
+index 41f6a1f..25096c6 100644
 --- a/node_modules/mathjax-full/js/input/asciimath/mathjax2/input/AsciiMath.js
 +++ b/node_modules/mathjax-full/js/input/asciimath/mathjax2/input/AsciiMath.js
 @@ -1,4 +1,4 @@
@@ -8,6 +8,28 @@ index 41f6a1f..a2c3c07 100644
  
  //
  //  Load component-based configuration, if any
+@@ -13,11 +13,12 @@ MathJax.Ajax.Preloading(
+   "[MathJax]/jax/element/mml/jax.js"
+ );
+ 
+-require("../legacy/jax/element/mml/jax.js");
+-require("../legacy/jax/input/AsciiMath/config.js");
+-require("../legacy/jax/input/AsciiMath/jax.js");
++exports.LegacyAsciiMath = void 0;
++import("../legacy/jax/element/mml/jax.js").then(() => {
++import("../legacy/jax/input/AsciiMath/config.js").then(() => {
++import("../legacy/jax/input/AsciiMath/jax.js").then(() => {
+ 
+-require("../legacy/jax/element/MmlNode.js");
++import("../legacy/jax/element/MmlNode.js").then(() => {
+ 
+ var MmlFactory = require("../../../../core/MmlTree/MmlFactory.js").MmlFactory;
+ var factory = new MmlFactory();
+@@ -37,3 +38,4 @@ exports.LegacyAsciiMath = {
+     return this.Compile(am,display);
+   }
+ };
++})})})})
 diff --git a/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js b/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js
 index 903ede2..504ae4f 100644
 --- a/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js
