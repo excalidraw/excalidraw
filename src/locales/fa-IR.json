@@ -429,19 +429,19 @@
   },
   "colors": {
     "transparent": "شفاف",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
+    "black": "سیاه",
+    "white": "سفید",
+    "red": "قرمز",
+    "pink": "صورتی",
     "grape": "",
     "violet": "",
     "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
+    "blue": "آبی",
+    "cyan": "فیروزه‌ای",
+    "teal": "سبزآبی",
+    "green": "سبز",
+    "yellow": "زرد",
+    "orange": "نارنجی",
     "bronze": ""
   },
   "welcomeScreen": {
@@ -459,7 +459,7 @@
   },
   "colorPicker": {
     "mostUsedCustomColors": "",
-    "colors": "",
+    "colors": "رنگ‌ها",
     "shades": "",
     "hexCode": "",
     "noShades": ""
