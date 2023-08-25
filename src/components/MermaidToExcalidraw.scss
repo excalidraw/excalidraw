@@ -1,55 +1,59 @@
 @import "../css/variables.module";
-
-.mermaid-to-excalidraw-wrapper {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-
-  label {
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 600;
-  }
-
-  &-text {
+.excalidraw {
+  .mermaid-to-excalidraw-wrapper {
     display: flex;
-    flex-direction: column;
+    width: 100%;
+    justify-content: space-between;
 
-    textarea {
+    label {
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    &-text {
+      display: flex;
+      flex-direction: column;
+
+      textarea {
+        width: 20rem;
+        height: 22rem;
+        resize: none;
+        border: 1px solid var(--ImageExportModal-preview-border);
+        border-radius: 8px;
+        padding: 1rem;
+      }
+    }
+
+    &-preview-canvas {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.85rem;
+
       width: 20rem;
       height: 22rem;
-      resize: none;
-    }
-  }
+      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
+        left center;
 
-  &-preview-canvas {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-
-    width: 20rem;
-    height: 23.5rem;
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
-      left center;
-
-    border: 1px solid var(--ImageExportModal-preview-border);
-    border-radius: 12px;
-  }
-
-  &-preview-insert.excalidraw-button {
-    height: 2.5rem;
-    margin-top: 1em;
-    margin-bottom: 0.3em;
-    width: 5rem;
-    background-color: var(--color-primary);
-    &:hover {
-      background-color: var(--color-primary-darke);
-    }
-    &:active {
-      background-color: var(--color-primary-darkest);
+      border: 1px solid var(--ImageExportModal-preview-border);
+      border-radius: 8px;
     }
 
-    color: $oc-white;
+    &-preview-insert.excalidraw-button {
+      height: 2.5rem;
+      margin-top: 1em;
+      margin-bottom: 0.3em;
+      width: 5rem;
+      background-color: var(--color-primary);
+      &:hover {
+        background-color: var(--color-primary-darker);
+      }
+      &:active {
+        background-color: var(--color-primary-darkest);
+      }
+
+      color: $oc-white;
+    }
   }
 }

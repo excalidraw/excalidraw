@@ -151,14 +151,25 @@ const MermaidToExcalidraw = ({
   return (
     <Dialog onCloseRequest={onClose} title="Mermaid to Excalidraw">
       <div className="mermaid-to-excalidraw-wrapper">
-        <div className="mermaid-to-excalidraw-wrapper-text">
+        <div
+          className="mermaid-to-excalidraw-wrapper-text"
+          style={{ display: "flex", flexDirection: "column" }}
+        >
           <label>Describe</label>
           <textarea
+            style={{
+              padding: "0.85rem",
+              borderRadius: "8px",
+              border: "1px solid var(--ImageExportModal-preview-border)",
+            }}
             onChange={(event) => setText(event.target.value)}
             value={text}
           />
         </div>
-        <div className="mermaid-to-excalidraw-wrapper-preview">
+        <div
+          className="mermaid-to-excalidraw-wrapper-preview"
+          style={{ display: "flex", flexDirection: "column" }}
+        >
           <label>Preview</label>
           <div
             className="mermaid-to-excalidraw-wrapper-preview-canvas"
