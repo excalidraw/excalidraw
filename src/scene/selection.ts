@@ -94,10 +94,12 @@ export const getVisibleAndNonSelectedElements = (
   selectedElements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
 ) => {
-  const selectedElementsSet = new Set(selectedElements);
+  const selectedElementsSet = new Set(
+    selectedElements.map((element) => element.id),
+  );
   return elements.filter(
     (element) =>
-      !selectedElementsSet.has(element) &&
+      !selectedElementsSet.has(element.id) &&
       isVisibleElement(element, appState.width, appState.height, {
         zoom: appState.zoom,
         offsetLeft: appState.offsetLeft,

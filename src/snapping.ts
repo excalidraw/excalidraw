@@ -1,4 +1,9 @@
-import { getCommonBounds, getElementAbsoluteCoords } from "./element/bounds";
+import {
+  getCommonBounds,
+  getDraggedElementsBounds,
+  getElementAbsoluteCoords,
+  getElementBounds,
+} from "./element/bounds";
 import { isBoundToContainer, isFrameElement } from "./element/typeChecks";
 import {
   ExcalidrawElement,
@@ -9,7 +14,12 @@ import * as GALines from "./galines";
 import * as GAPoints from "./gapoints";
 import { getMaximumGroups } from "./groups";
 import { KEYS } from "./keys";
-import { distance2d, rotatePoint } from "./math";
+import {
+  distance2d,
+  rangeIntersection,
+  rangesOverlap,
+  rotatePoint,
+} from "./math";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
 import { AppState, Point, Zoom } from "./types";
 
@@ -35,6 +45,40 @@ export type Snap = {
   snapLine: SnapLine;
   isSnapped: boolean;
 };
+
+export type Gap = {
+  //  start edge ↓     length
+  // ┌───────────┐◄───────────────►
+  // │           │-----------------┌───────────┐
+  // │  start    │       ↑         │           │
+  // │  element  │  intersection   │  end      │
+  // │           │       ↓         │  element  │
+  // └───────────┘-----------------│           │
+  //                               └───────────┘
+  //                               ↑ end edge
+
+  startElement: ExcalidrawElement;
+  endElement: ExcalidrawElement;
+  startEdge: [Point, Point];
+  endEdge: [Point, Point];
+  length: number;
+  intersection: [number, number];
+};
+
+export type GapSnap = {
+  type: "gap";
+  direction:
+    | "center_horizontal"
+    | "center_vertical"
+    | "side_left"
+    | "side_right"
+    | "side_top"
+    | "side_bottom";
+  gap: Gap;
+  offset: number;
+};
+
+export type GapSnaps = GapSnap[];
 
 export type Snaps = Snap[];
 
@@ -253,6 +297,24 @@ const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
     .flat();
 };
 
+const getReferenceElements = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  selectedElements: NonDeletedExcalidrawElement[],
+  appState: AppState,
+) => {
+  const selectedFrames = selectedElements
+    .filter((element) => isFrameElement(element))
+    .map((frame) => frame.id);
+
+  return getVisibleAndNonSelectedElements(
+    elements,
+    selectedElements,
+    appState,
+  ).filter(
+    (element) => !(element.frameId && selectedFrames.includes(element.frameId)),
+  );
+};
+
 export const getSnaps = ({
   elements,
   selectedElements,
@@ -279,16 +341,10 @@ export const getSnaps = ({
     return null;
   }
 
-  const selectedFrames = selectedElements
-    .filter((element) => isFrameElement(element))
-    .map((frame) => frame.id);
-
-  let referenceElements: ExcalidrawElement[] = getVisibleAndNonSelectedElements(
+  let referenceElements: ExcalidrawElement[] = getReferenceElements(
     elements,
     selectedElements,
     appState,
-  ).filter(
-    (element) => !(element.frameId && selectedFrames.includes(element.frameId)),
   );
 
   if (appState.frameToHighlight) {
@@ -420,4 +476,273 @@ export const getNearestSnaps = (
     verticalSnap,
     horizontalSnap,
   };
+};
+
+export const getVisibleGaps = (
+  elements: ExcalidrawElement[],
+  selectedElements: ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const referenceElements: ExcalidrawElement[] = getReferenceElements(
+    elements,
+    selectedElements,
+    appState,
+  );
+
+  // TODO: we could cache horizontally and vertically sorted elements
+  const horizontallySorted = referenceElements.sort(
+    (a, b) => getElementBounds(a)[0] - getElementBounds(b)[0],
+  );
+
+  const horizontalGaps: Gap[] = [];
+
+  for (let i = 0; i < horizontallySorted.length; i++) {
+    const startElement = horizontallySorted[i];
+
+    for (let j = i + 1; j < horizontallySorted.length; j++) {
+      const endElement = horizontallySorted[j];
+
+      const [, startMinY, startMaxX, startMaxY] =
+        getElementBounds(startElement);
+      const [endMinX, endMinY, , endMaxY] = getElementBounds(endElement);
+
+      if (
+        startMaxX < endMinX &&
+        rangesOverlap([startMinY, startMaxY], [endMinY, endMaxY])
+      ) {
+        horizontalGaps.push({
+          startElement,
+          endElement,
+          startEdge: [
+            [startMaxX, startMinY],
+            [startMaxX, startMaxY],
+          ],
+          endEdge: [
+            [endMinX, endMinY],
+            [endMinX, endMaxY],
+          ],
+          length: endMinX - startMaxX,
+          intersection: rangeIntersection(
+            [startMinY, startMaxY],
+            [endMinY, endMaxY],
+          )!,
+        });
+      }
+    }
+  }
+
+  const verticallySorted = referenceElements.sort(
+    (a, b) => getElementBounds(a)[1] - getElementBounds(b)[1],
+  );
+
+  const verticalGaps: Gap[] = [];
+
+  for (let i = 0; i < verticallySorted.length; i++) {
+    const startElement = verticallySorted[i];
+
+    for (let j = i + 1; j < verticallySorted.length; j++) {
+      const endElement = verticallySorted[j];
+
+      const [startMinX, , startMaxX, startMaxY] =
+        getElementBounds(startElement);
+      const [endMinX, endMinY, endMaxX] = getElementBounds(endElement);
+
+      if (
+        startMaxY < endMinY &&
+        rangesOverlap([startMinX, startMaxX], [endMinX, endMaxX])
+      ) {
+        verticalGaps.push({
+          startElement,
+          endElement,
+          startEdge: [
+            [startMinX, startMaxY],
+            [startMaxX, startMaxY],
+          ],
+          endEdge: [
+            [endMinX, endMinY],
+            [endMaxX, endMinY],
+          ],
+          length: endMinY - startMaxY,
+          intersection: rangeIntersection(
+            [startMinX, startMaxX],
+            [endMinX, endMaxX],
+          )!,
+        });
+      }
+    }
+  }
+
+  return {
+    horizontalGaps,
+    verticalGaps,
+  };
+};
+
+export const getGapSnaps = (
+  elements: ExcalidrawElement[],
+  selectedElements: ExcalidrawElement[],
+  dragOffset: { x: number; y: number },
+  appState: AppState,
+): GapSnaps => {
+  const { horizontalGaps, verticalGaps } = getVisibleGaps(
+    elements,
+    selectedElements,
+    appState,
+  );
+
+  const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
+    selectedElements,
+    dragOffset,
+  );
+  const centerX = (minX + maxX) / 2;
+  const centerY = (minY + maxY) / 2;
+
+  let minOffsetX = SNAP_DISTANCE;
+  const neartestSnapsX: GapSnaps = [];
+
+  for (const gap of horizontalGaps) {
+    if (!rangesOverlap([minY, maxY], gap.intersection)) {
+      continue;
+    }
+
+    // center gap
+    const gapMidX = gap.startEdge[0][0] + gap.length / 2;
+    const centerOffset = gapMidX - centerX;
+    const gapIsLargerThanSelection = gap.length > maxX - minX;
+
+    if (
+      gapIsLargerThanSelection &&
+      round(Math.abs(centerOffset)) <= minOffsetX
+    ) {
+      if (round(Math.abs(centerOffset)) < minOffsetX) {
+        neartestSnapsX.length = 0;
+      }
+      minOffsetX = Math.abs(centerOffset);
+
+      const snap: GapSnap = {
+        type: "gap",
+        direction: "center_horizontal",
+        gap,
+        offset: centerOffset,
+      };
+
+      neartestSnapsX.push(snap);
+      continue;
+    }
+
+    // side gap, from the right
+    const [, , endMaxX] = getElementBounds(gap.endElement);
+    const distanceToEndElementX = minX - endMaxX;
+    const sideOffsetRight = distanceToEndElementX - gap.length;
+
+    if (round(Math.abs(sideOffsetRight)) <= minOffsetX) {
+      if (round(Math.abs(sideOffsetRight)) < minOffsetX) {
+        neartestSnapsX.length = 0;
+      }
+
+      const snap: GapSnap = {
+        type: "gap",
+        direction: "side_right",
+        gap,
+        offset: sideOffsetRight,
+      };
+      neartestSnapsX.push(snap);
+      continue;
+    }
+
+    // side gap, from the left
+    const [startMinX, , ,] = getElementBounds(gap.startElement);
+    const distanceToStartElementX = startMinX - maxX;
+    const sideOffsetLeft = distanceToStartElementX - gap.length;
+
+    if (round(Math.abs(sideOffsetLeft)) <= minOffsetX) {
+      if (round(Math.abs(sideOffsetLeft)) < minOffsetX) {
+        neartestSnapsX.length = 0;
+      }
+
+      const snap: GapSnap = {
+        type: "gap",
+        direction: "side_left",
+        gap,
+        offset: sideOffsetLeft,
+      };
+      neartestSnapsX.push(snap);
+      continue;
+    }
+  }
+
+  const neartestSnapsY: GapSnaps = [];
+  let minOffsetY = SNAP_DISTANCE;
+  for (const gap of verticalGaps) {
+    if (!rangesOverlap([minX, maxX], gap.intersection)) {
+      continue;
+    }
+
+    // center gap
+    const gapMidY = gap.startEdge[0][1] + gap.length / 2;
+    const centerOffset = gapMidY - centerY;
+    const gapIsLargerThanSelection = gap.length > maxY - minY;
+
+    if (
+      gapIsLargerThanSelection &&
+      round(Math.abs(centerOffset)) <= minOffsetY
+    ) {
+      if (round(Math.abs(centerOffset)) < minOffsetX) {
+        neartestSnapsY.length = 0;
+      }
+      minOffsetY = Math.abs(centerOffset);
+
+      const snap: GapSnap = {
+        type: "gap",
+        direction: "center_vertical",
+        gap,
+        offset: centerOffset,
+      };
+
+      neartestSnapsY.push(snap);
+      continue;
+    }
+
+    // side gap, from the top
+    const [, startMinY, ,] = getElementBounds(gap.startElement);
+    const distanceToStartElementY = startMinY - maxY;
+    const sideOffsetTop = distanceToStartElementY - gap.length;
+
+    if (round(Math.abs(sideOffsetTop)) <= minOffsetX) {
+      if (round(Math.abs(sideOffsetTop)) < minOffsetX) {
+        neartestSnapsY.length = 0;
+      }
+
+      const snap: GapSnap = {
+        type: "gap",
+        direction: "side_top",
+        gap,
+        offset: sideOffsetTop,
+      };
+      neartestSnapsY.push(snap);
+      continue;
+    }
+
+    // side gap, from the bottom
+    const [, , , endMaxY] = getElementBounds(gap.endElement);
+    const distanceToEndElementY = minY - endMaxY;
+    const sideOffsetBottom = distanceToEndElementY - gap.length;
+
+    if (round(Math.abs(sideOffsetBottom)) <= minOffsetX) {
+      if (round(Math.abs(sideOffsetBottom)) < minOffsetX) {
+        neartestSnapsY.length = 0;
+      }
+
+      const snap: GapSnap = {
+        type: "gap",
+        direction: "side_bottom",
+        gap,
+        offset: sideOffsetBottom,
+      };
+      neartestSnapsY.push(snap);
+      continue;
+    }
+  }
+
+  return [...neartestSnapsX, ...neartestSnapsY];
 };

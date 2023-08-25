@@ -99,6 +99,7 @@ export const getDefaultAppState = (): Omit<
     showHyperlinkPopup: false,
     selectedLinearElement: null,
     snaps: null,
+    gapSnaps: [],
     objectsSnapModeEnabled: false,
   };
 };
@@ -207,6 +208,7 @@ const APP_STATE_STORAGE_CONF = (<
   showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
   snaps: { browser: true, export: false, server: false },
+  gapSnaps: { browser: false, export: false, server: false },
   objectsSnapModeEnabled: { browser: true, export: false, server: false },
 });
 

@@ -328,7 +328,7 @@ import {
 } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
-import { getElementsCorners, getSnaps } from "../snapping";
+import { getGapSnaps, getElementsCorners, getSnaps } from "../snapping";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
@@ -5337,6 +5337,14 @@ class App extends React.Component<AppProps, AppState> {
           });
           this.setState({ snaps });
 
+          const gapSnaps = getGapSnaps(
+            originalElements,
+            getSelectedElements(originalElements, this.state),
+            dragOffset,
+            this.state,
+          );
+          this.setState({ gapSnaps });
+
           // when we're editing the name of a frame, we want the user to be
           // able to select and interact with the text input
           !this.state.editingFrame &&
@@ -5347,6 +5355,7 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
               this.scene,
               snaps,
+              gapSnaps,
             );
 
           this.maybeSuggestBindingForAll(selectedElements);
@@ -5645,6 +5654,7 @@ class App extends React.Component<AppProps, AppState> {
             ? this.state.editingElement
             : null,
         snaps: null,
+        gapSnaps: [],
       });
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
