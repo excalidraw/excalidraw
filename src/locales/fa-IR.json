@@ -130,7 +130,7 @@
     "sidebarLock": "باز نگه داشتن سایدبار",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "انتخاب رنگ از کرباس"
   },
   "library": {
     "noItems": "آیتمی به اینجا اضافه نشده...",
@@ -433,16 +433,16 @@
     "white": "سفید",
     "red": "قرمز",
     "pink": "صورتی",
-    "grape": "",
-    "violet": "",
-    "gray": "",
+    "grape": "یاقوتی",
+    "violet": "بنفش",
+    "gray": "خاکستری",
     "blue": "آبی",
     "cyan": "فیروزه‌ای",
     "teal": "سبزآبی",
     "green": "سبز",
     "yellow": "زرد",
     "orange": "نارنجی",
-    "bronze": ""
+    "bronze": "برنزی"
   },
   "welcomeScreen": {
     "app": {
@@ -460,8 +460,8 @@
   "colorPicker": {
     "mostUsedCustomColors": "",
     "colors": "رنگ‌ها",
-    "shades": "",
-    "hexCode": "",
+    "shades": "جلوه‌ها",
+    "hexCode": "کدِ هگز",
     "noShades": ""
   },
   "overwriteConfirm": {
